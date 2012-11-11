@@ -173,13 +173,59 @@ class completion_criteria_completion extends data_object {
 
 
 /**
+ * This function review's each other users criteria and marks
+ * complete if necessary.
+ *
+ * @param   integer $courseid
+ * @param   integer $userid
+ * @return  boolean
+ */
+function completion_handle_criteria_recalc($courseid, $userid) {
+    global $DB;
+    static $courses = array();
+
+    // Cached course completion enabled and aggregation method
+    if (!isset($courses[$courseid])) {
+        $c = new stdClass();
+        $c->id = $courseid;
+        $info = new completion_info($c);
+        $courses[$courseid] = new stdClass();
+        $courses[$courseid]->enabled = $info->is_enabled();
+        if ($courses[$courseid]->enabled) {
+            $courses[$courseid]->criteria = $info->get_criteria();
+        }
+    }
+
+    // No need to do this if completion is disabled
+    if (!$courses[$courseid]->enabled) {
+        return false;
+    }
+
+    // Review each of the criteria
+    foreach ($courses[$courseid]->criteria as $criterion) {
+        $params = array(
+            'course'        => $courseid,
+            'userid'        => $userid,
+            'criteriaid'    => $criterion->id
+        );
+
+        $completion = new completion_criteria_completion($params);
+        $criterion->review($completion);
+    }
+
+    return true;
+}
+
+
+/**
  * Triggered by the completion_criteria_calc event, this function
- * marks a user as complete in this completion criteria if applicable
+ * checks if the course is a dependency of any others and marks the
+ * user as complete in the applicable completion criteria.
  *
  * @param   object      $eventdata
  * @return  boolean
  */
-function completion_handle_criteria_calc($eventdata) {
+function completion_handle_criteria_course_calc($eventdata) {
     // Check if a criteria exists.
     $criteriadata = (array)$eventdata;
     unset($criteriadata['userid']);

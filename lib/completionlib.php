@@ -869,8 +869,8 @@ class completion_info {
     }
 
     /**
-     * Determines how much course completion data exists for a course. This is used when
-     * deciding whether completion information should be 'locked' in the completion
+     * Determines how much course completion criteria data exists for a course. This is used
+     * to help decide whether completion information should be 'locked' in the completion
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion data for a single user
@@ -901,12 +901,49 @@ class completion_info {
     }
 
     /**
+     * Determines how many course completion records exist for a course. This is used
+     * to help decide whether completion information should be 'locked' in the completion
+     * settings form and activity completion settings.
+     *
+     * @param int $user_id Optionally only get course completion records for a single user
+     * @return int The number of users who have completion records stored for this
+     *     course, 0 if none
+     */
+    public function count_course_completions_data($user_id = null) {
+        global $DB;
+
+        $sql = '
+    SELECT
+        COUNT(1)
+    FROM
+        {course_completions}
+    WHERE
+        course = ?
+        ';
+
+        $params = array($this->course_id);
+
+        // Limit data to a single user if an ID is supplied
+        if ($user_id) {
+            $sql .= ' AND userid = ?';
+            $params[] = $user_id;
+        }
+
+        return $DB->get_field_sql($sql, $params);
+    }
+
+
+    /**
      * Check if this course's completion criteria should be locked
+     *
+     * If there is existing criteria completion data *or* any
+     * course completion records then it should be locked as they
+     * will be deleted when an unlocked form is saved.
      *
      * @return boolean
      */
     public function is_course_locked() {
-        return (bool) $this->count_course_user_data();
+        return ($this->count_course_user_data() || $this->count_course_completions_data());
     }
 
     /**
