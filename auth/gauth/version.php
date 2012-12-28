@@ -15,8 +15,4 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2007092700;            // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires = 2010000000;            // Requires this Moodle version
-$plugin->component = 'gradeexport_fusion'; // Full name of the plugin (used for diagnostics)
+$plugin->version = 2009080102;

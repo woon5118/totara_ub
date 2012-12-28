@@ -34,9 +34,10 @@ class fusion_grade_export_form extends moodleform {
         }
 
         $mform->addElement('header', 'options', get_string('options', 'grades'));
-        $mform->addElement('text', 'tablename' , get_string('tablename', 'local_oauth'), array('size' => 40, 'maxlength' => 256));
+        $mform->addElement('text', 'tablename' , get_string('tablename', 'gradeexport_fusion'), array('size' => 40, 'maxlength' => 256));
         $strgrades = get_string('grades');
         $tablename = preg_replace('/\s/', '_', clean_filename("{$COURSE->shortname} $strgrades"));
+        $mform->setType('tablename', PARAM_TEXT);
         $mform->setDefault('tablename', $tablename);
 
 //        $mform->addElement('advcheckbox', 'export_feedback', get_string('exportfeedback', 'grades'));
@@ -158,7 +159,7 @@ class fusion_grade_export_form extends moodleform {
 
         $tablename = preg_replace('/\s/', '_', clean_filename(trim($data['tablename'])));
         if (empty($tablename)) {
-            $errors['tablename'] = get_string('error_noname', 'local_oauth');
+            $errors['tablename'] = get_string('error_noname', 'gradeexport_fusion');
         }
 
         return $errors;

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,8 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Plugin capabilities.
+ *
+ * @package    repository_googledrive
+ * @copyright  2009 Dan Poltawski <talktodan@gmail.com>
+ * @copyright  2012 Piers Harding
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2007092700;            // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires = 2010000000;            // Requires this Moodle version
-$plugin->component = 'gradeexport_fusion'; // Full name of the plugin (used for diagnostics)
+$capabilities = array(
+
+    'repository/googledrive:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        )
+    )
+);

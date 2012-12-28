@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,8 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_repository_googledocs_upgrade($oldversion) {
+    global $CFG, $DB;
 
-$plugin->version  = 2007092700;            // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires = 2010000000;            // Requires this Moodle version
-$plugin->component = 'gradeexport_fusion'; // Full name of the plugin (used for diagnostics)
+    $dbman = $DB->get_manager();
+
+    return true;
+}
+

@@ -29,20 +29,11 @@ class grade_export_fusion extends grade_export {
         $this->grade_export($course, $groupid, $itemlist, $export_feedback, $updatedgradesonly, $displaytype, $decimalpoints);
         $this->separator = $separator;
         $this->tablename = preg_replace('/\s/', '_', clean_filename(trim($tablename)));
-    }
-
-    public function __construct($formdata) {
-        parent::__construct($formdata);
-        if (isset($formdata->separator)) {
-            $this->separator = $formdata->separator;
-        }
-        if (isset($formdata->tablename)) {
-            $this->tablename = preg_replace('/\s/', '_', clean_filename(trim($tablename)));
-        }
+        $this->course = $course;
     }
 
     public function set_table($tablename) {
-            $this->tablename = preg_replace('/\s/', '_', clean_filename(trim($tablename)));
+        $this->tablename = preg_replace('/\s/', '_', clean_filename(trim($tablename)));
     }
 
     public function get_export_params() {
@@ -52,10 +43,9 @@ class grade_export_fusion extends grade_export {
         return $params;
     }
 
-    // dummy function
+    // Dummy function.
     public function print_grades() {
     }
-
 
     public function table_exists($tables, $name) {
         foreach ($tables as $table) {
@@ -74,52 +64,47 @@ class grade_export_fusion extends grade_export {
     }
 
     public function export_grades($oauth) {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         $export_tracking = $this->track_exports();
 
-        $tables = $oauth->show_tables();
+        $this->tablename .= ' ' . date("Y-m-d H:i:s", strtotime('+0 days'));
         if (!$oauth->table_exists($this->tablename)) {
             $columns = array(
-                         "firstname" => 'STRING',
-                         "lastname" => 'STRING',
-                         "idnumber" => 'STRING',
-                         "institution" => 'STRING',
-                         "department" => 'STRING',
-                         "email" => 'STRING',
-                         );
+                 "firstname" => 'STRING',
+                 "lastname" => 'STRING',
+                 "idnumber" => 'STRING',
+                 "institution" => 'STRING',
+                 "department" => 'STRING',
+                 "email" => 'STRING',
+                 );
 
             foreach ($this->columns as $grade_item) {
                 $column = self::clean_column_name($this->format_column_name($grade_item));
                 $columns[$column] = 'NUMBER';
             }
             $result = $oauth->create_table($this->tablename, $columns);
-            $tables = $oauth->show_tables();
         }
 
-
-/// Print all the lines of data.
+        /// Print all the lines of data.
         $geub = new grade_export_update_buffer();
         $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
         $gui->init();
         $rows = array();
         $separator = ' | ';
         while ($userdata = $gui->next_user()) {
-
             $user = $userdata->user;
-
             $row = array($user->firstname, $user->lastname, $user->idnumber, $user->institution, $user->department, $user->email,);
-
             $grades = array();
             foreach ($userdata->grades as $itemid => $grade) {
-                $grades[(int)$itemid]=  $this->format_grade($grade);
+                $grades[(int)$itemid] = $this->format_grade($grade);
             }
 
             ksort($grades);
             foreach ($grades as $itemid => $grade) {
-                $row[]=  $grade;
+                $row[] = $grade;
             }
-            $rows[]= $row;
+            $rows[] = $row;
         }
         $gui->close();
         $geub->close();
@@ -127,26 +112,22 @@ class grade_export_fusion extends grade_export {
         $result = $oauth->insert_rows($this->tablename, $rows);
 
         $table = $oauth->table_by_name($this->tablename, true);
-        $table_id = $table['table id'];
-        // output a basic page and do the popup and redirect
-        $table_url = 'https://www.google.com/fusiontables/DataSource?dsrcid='.$table_id;
+        $table_id = $table->tableId;
+        // Output a basic page and do the popup and redirect.
+        $table_url = 'https://www.google.com/fusiontables/DataSource?docid='.$table_id;
         $course_url = $CFG->wwwroot.'/course/view.php?id='.$this->course->id;
         print_grade_page_head($this->course->id, 'export', 'fusion', get_string('exportto', 'grades') . ' ' . get_string('modulename', 'gradeexport_fusion'));
-        print_heading(get_string('popup', 'gradeexport_fusion'));
-        ?>
-            <script type="text/javascript">
+        echo $OUTPUT->heading(get_string('popup', 'gradeexport_fusion'));
+        $noscript = get_string('noscript', 'gradeexport_fusion');
+        echo "<script type='text/javascript'>
             //<![CDATA[
-                url = "<?php echo $table_url ?>";
-                courseurl = "<?php echo $course_url ?>";
-                window.open(url, "_blank", 'left=20,top=20,width=1024,height=768,toolbar=1,resizable=1,menubar=1,scrollbars=1,status=1,location=1');
-                window.location = courseurl;
+                window.open('".$table_url."', '_blank', 'left=20,top=20,width=1024,height=768,toolbar=1,resizable=1,menubar=1,scrollbars=1,status=1,location=1');
+                window.location = '".$course_url."';
             //]]>
             </script>
-            <noscript>
-                <?php echo get_string('noscript', 'gradeexport_fusion'); ?>
-            </noscript>
-        <?php
-        print_footer('none');
+            <noscript>".$noscript."</noscript>";
+
+        echo $OUTPUT->footer();
         exit;
     }
 
@@ -162,35 +143,27 @@ class grade_export_fusion extends grade_export {
         $return_to = new moodle_url('/grade/export/'.$this->plugin.'/export.php', $params);
         $params['return_to'] = urlencode($return_to->out());
 
-        //echo $OUTPUT->heading(get_string('export', 'grades'));
-        print_heading(get_string('export', 'grades'));
+        echo $OUTPUT->heading(get_string('export', 'grades'));
 
-        //echo $OUTPUT->container_start('gradeexportlink');
-        echo '<div class="gradeexportlink">';
+        echo $OUTPUT->container_start('gradeexportlink');
 
-        if (!$this->userkey) {      // this button should trigger a download prompt
-            //echo $OUTPUT->single_button(new moodle_url('/grade/export/'.$this->plugin.'/export.php', $params), get_string('export', 'grades'));
-            print_single_button($CFG->wwwroot.'/grade/export/'.$this->plugin.'/export.php',
-                                $params, get_string('export', 'grades'));
-
+        if (!$this->userkey) {
+            // This button should trigger a download prompt.
+            echo $OUTPUT->single_button(new moodle_url('/grade/export/'.$this->plugin.'/export.php', $params), get_string('export', 'grades'));
         } else {
             $paramstr = '';
             $sep = '?';
-            foreach($params as $name=>$value) {
+            foreach ($params as $name=>$value) {
                 $paramstr .= $sep.$name.'='.$value;
                 $sep = '&';
             }
 
             $link = $CFG->wwwroot.'/grade/export/'.$this->plugin.'/dump.php'.$paraM.str.'&key='.$this->userkey;
 
-            //echo get_string('download', 'admin').': ' . html_writer::link($link, $link);
-            echo get_string('download', 'admin').': <a href="'.$link.'">'.$link.'</a>';
+            echo get_string('download', 'admin') . ': ' . html_writer::link($link, $link);
         }
-        //echo $OUTPUT->container_end();
-        echo '</div>';
+        echo $OUTPUT->container_end();
 
-        //echo $OUTPUT->heading(get_string('tablename', 'local_oauth').': '.$this->tablename);
-        print_heading(get_string('tablename', 'local_oauth').': '.$this->tablename);
+        echo $OUTPUT->heading(get_string('tablename', 'gradeexport_fusion').': '.$this->tablename);
     }
-
 }

@@ -22,9 +22,9 @@ require_once 'fusion_grade_export_form.php';
 
 $id = required_param('id', PARAM_INT); // course id
 
-//$PAGE->set_url('/grade/export/fusion/index.php', array('id'=>$id));
+$PAGE->set_url('/grade/export/fusion/index.php', array('id'=>$id));
 
-if (!$course = get_record('course', 'id', $id)) {
+if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error('nocourseid');
 }
 
@@ -45,10 +45,8 @@ $mform = new fusion_grade_export_form(null, array('includeseparator'=>true, 'pub
 $groupmode    = groups_get_course_groupmode($course);   // Groups are being used
 $currentgroup = groups_get_course_group($course, true);
 if ($groupmode == SEPARATEGROUPS and !$currentgroup and !has_capability('moodle/site:accessallgroups', $context)) {
-    //echo $OUTPUT->heading(get_string("notingroup"));
-    print_heading(get_string("notingroup"));
-    //echo $OUTPUT->footer();
-    print_footer($course);
+    echo $OUTPUT->heading(get_string("notingroup"));
+    echo $OUTPUT->footer();
     die;
 }
 
@@ -62,8 +60,7 @@ if ($data = $mform->get_data()) {
     $export->set_table($data->tablename);
     $export->print_continue();
     $export->display_preview();
-    //echo $OUTPUT->footer();
-    print_footer($course);
+    echo $OUTPUT->footer();
     exit;
 }
 
@@ -72,6 +69,5 @@ echo '<div class="clearer"></div>';
 
 $mform->display();
 
-//echo $OUTPUT->footer();
-print_footer();
+echo $OUTPUT->footer();
 
