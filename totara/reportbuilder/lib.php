@@ -2513,7 +2513,7 @@ class reportbuilder {
                     $allgrouped = false;
                     $group = array_merge($group, $column->get_fields($this->src, $mode, true));
                 } else {
-                    // We still need to add extrafields to the GROUP BY if there is a displayfunc
+                    // We still need to add extrafields to the GROUP BY if there is a displayfunc.
                     if ($column->extrafields !== null && $column->displayfunc !== null) {
                         foreach ($column->extrafields as $alias => $field) {
                             $gp = ($mode == rb_column::CACHE || $mode == rb_column::ALIASONLY) ? $alias : $field;

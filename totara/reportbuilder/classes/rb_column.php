@@ -360,7 +360,8 @@ class rb_column {
                 }
             }
         }
-        // Add extrafields to the array after the main fields
+
+        // Add extrafields to the array after the main fields.
         if ($returnextrafields && $extrafields !== null) {
             foreach ($extrafields as $alias => $extrafield) {
                 switch ($aliasmode) {
