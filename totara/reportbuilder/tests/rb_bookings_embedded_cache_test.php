@@ -174,7 +174,6 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $session->sessiondates = facetoface_get_session_dates($session->id);
 
         // Signup for session
-        $this->preventResetByRollback(); // Due to messaging.
         $sink = $this->redirectMessages();
         $usernote = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
         facetoface_user_signup($session, $facetoface1, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,

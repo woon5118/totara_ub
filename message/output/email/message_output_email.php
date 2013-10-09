@@ -39,14 +39,8 @@ class message_output_email extends message_output {
     function send_message($eventdata) {
         global $CFG;
 
-        if (!empty($CFG->noemailever)) {
-            // hidden setting for development sites, set in config.php if needed
-            //turn off display of errors if we have arrived here from an AJAX script
-            if (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') {
-                debugging('$CFG->noemailever active, no email message sent.', DEBUG_MINIMAL);
-            }
-            return true;
-        }
+        // Ignore $CFG->noemailever here because we want to test this code,
+        // the message sending fails later in email_to_user().
 
         // skip any messaging suspended and deleted users
         if ($eventdata->userto->auth === 'nologin' or $eventdata->userto->suspended or $eventdata->userto->deleted) {
