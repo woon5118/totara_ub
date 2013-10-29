@@ -60,6 +60,7 @@ if (!$id) {
 $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 
 $report = reportbuilder_get_embedded_report('cohort_associations_visible', array('cohortid' => $id), false, $sid);
+$report->include_js();
 
 // Handle a request for export.
 if($format != '') {
@@ -68,7 +69,7 @@ if($format != '') {
 }
 
 // Setup lightbox.
-local_js(array(TOTARA_JS_DIALOG,TOTARA_JS_TREEVIEW));
+local_js(array(TOTARA_JS_DIALOG, TOTARA_JS_TREEVIEW));
 
 $PAGE->requires->strings_for_js(array('none'), 'moodle');
 $PAGE->requires->strings_for_js(array('assignvisiblelearning', 'assignenrolledlearning', 'deletelearningconfirm', 'savinglearning'), 'totara_cohort');
