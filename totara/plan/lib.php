@@ -387,7 +387,8 @@ function dp_get_rol_tabs_visible($userid) {
     $visible[] = 'evidence';
 
     $certification_progs = prog_get_certification_programs($userid, '', '', '', true, true);
-    if ($certification_progs > 0) {
+    $unassignedcertifications = $DB->record_exists('certif_completion_history', array('userid' => $userid, 'unassigned' => 1));
+    if (($certification_progs > 0) || ($unassignedcertifications)) {
         $visible[] = 'certifications';
     }
 

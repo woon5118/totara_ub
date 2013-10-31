@@ -482,6 +482,7 @@ $string['noprogramsfound'] = 'No programs were found with the words \'{$a}\'';
 $string['noprogramsyet'] = 'No programs in this category';
 $string['norequiredlearning'] = 'No required learning';
 $string['nostartdate'] = 'No start date';
+$string['notassigned'] = 'Not assigned';
 $string['notavailable'] = 'Not available';
 $string['notifymanager'] = 'Send notice to manager';
 $string['notifymanager_help'] = 'Check this box if you also want to send a notice to the message recipient\'s manager.';

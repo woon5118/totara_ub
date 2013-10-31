@@ -478,6 +478,7 @@ class columns_test extends reportcache_advanced_testcase {
     protected $certif_completion_history_data = array(
         'id' => 1, 'certifid' => 1, 'userid' => 2, 'certifpath' => 1, 'status' => 1, 'renewalstatus' => 0,
         'timewindowopens' => 1332153673, 'timeexpires' => 1332113673, 'timecompleted' => null, 'timemodified' => 1332153671,
+        'unassigned' => 0,
     );
 
     protected $course_completion_history_data = array(

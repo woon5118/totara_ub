@@ -130,7 +130,13 @@ function program_unassigned_handler($eventdata) {
     $prog = $DB->get_record('prog', array('id' => $eventdata->programid));
 
     if ($prog->certifid) {
-        $DB->delete_records('certif_completion', array('certifid' => $prog->certifid, 'userid' => $eventdata->userid));
+        $params = array('certifid' => $prog->certifid, 'userid' => $eventdata->userid);
+        if ($completionrecord = $DB->get_record('certif_completion', $params)) {
+            if (!in_array($completionrecord->status, array(CERTIFSTATUS_UNSET, CERTIFSTATUS_ASSIGNED))) {
+                copy_certif_completion_to_hist($prog->certifid, $eventdata->userid, true);
+            }
+            $DB->delete_records('certif_completion', $params);
+        }
     }
 }
 
@@ -501,9 +507,10 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
  *
  * @param integer $certificationid
  * @param integer $userid
+ * @param bool $unassigned
  * @return boolean
  */
-function copy_certif_completion_to_hist($certificationid, $userid) {
+function copy_certif_completion_to_hist($certificationid, $userid, $unassigned = false) {
     global $DB;
 
     $certificationcompletion = $DB->get_record('certif_completion', array('certifid' => $certificationid, 'userid' => $userid));
@@ -512,9 +519,8 @@ function copy_certif_completion_to_hist($certificationid, $userid) {
         print_error('error:incorrectid', 'totara_certification');
     }
 
-    // Its possible to get an insert error after unassigning an individual from a certification, then reassigning them
-    // so check & Update if present.
     $certificationcompletion->timemodified = time();
+    $certificationcompletion->unassigned = $unassigned;
     $completionhistory = $DB->get_record('certif_completion_history',
             array('certifid' => $certificationid, 'userid' => $userid, 'timeexpires' => $certificationcompletion->timeexpires));
     if ($completionhistory) {

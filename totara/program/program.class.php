@@ -1154,9 +1154,9 @@ class program {
 
                 $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
             } else if ($certifcompletion) {
-                // If on certification path OR if on recertification but not recertified before: display certification coursesset
-                // else display recert path.
-                $histcount = $DB->count_records('certif_completion_history', array('certifid' => $this->certifid, 'userid' =>  $userid));
+                // If on certification path OR if on recertification but not recertified before: display certification coursesset,
+                // Else display recert path.
+                $histcount = $DB->count_records('certif_completion_history', array('certifid' => $this->certifid, 'userid' => $userid, 'unassigned' => 0));
 
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT ||
                                 ($certifcompletion->certifpath == CERTIFPATH_RECERT && !$histcount)) {
@@ -1348,7 +1348,7 @@ class program {
         $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
 
         if (!$prog_completion) {
-            $out = get_string('notenrolled', 'totara_program');
+            $out = get_string('notassigned', 'totara_program');
             return $out;
         } else if ($prog_completion->status == STATUS_PROGRAM_COMPLETE) {
             $overall_progress = 100;

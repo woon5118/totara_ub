@@ -89,11 +89,39 @@ class rb_source_dp_certification extends rb_base_source {
         $joinlist[] = new rb_join(
                 'certif_completion',
                 'INNER',
-                '{certif_completion}',
-                '(certif_completion.certifid = base.certifid
-                        AND certif_completion.userid = prog_completion.userid)',
+                '(SELECT ' . $DB->sql_concat("'active'", 'cc.id') . ' AS uniqueid,
+                        cc.id,
+                        cc.certifid,
+                        cc.userid,
+                        cc.certifpath,
+                        cc.status,
+                        cc.renewalstatus,
+                        cc.timewindowopens,
+                        cc.timeexpires,
+                        cc.timecompleted,
+                        cc.timemodified,
+                        0 as unassigned
+                    FROM {certif_completion} cc
+                    UNION
+                    SELECT ' . $DB->sql_concat("'history'", 'cch.id') . ' AS uniqueid,
+                        cch.id,
+                        cch.certifid,
+                        cch.userid,
+                        cch.certifpath,
+                        cch.status,
+                        cch.renewalstatus,
+                        cch.timewindowopens,
+                        cch.timeexpires,
+                        cch.timecompleted,
+                        cch.timemodified,
+                        cch.unassigned
+                    FROM {certif_completion_history} cch
+                    LEFT JOIN {certif_completion} cc ON cc.certifid = cch.certifid AND cc.userid = cch.userid
+                    WHERE cch.unassigned = 1
+                    AND cc.id IS NULL)',
+                '(certif_completion.certifid = base.certifid)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                array('base', 'prog_completion')
+                array('base')
         );
 
         $joinlist[] = new rb_join(
@@ -104,6 +132,7 @@ class rb_source_dp_certification extends rb_base_source {
                     certifid,
                     COUNT(id) AS historycount
                     FROM {certif_completion_history}
+                    WHERE unassigned = 0
                     GROUP BY userid, certifid)',
                 '(certif_completion_history.certifid = base.certifid
                     AND certif_completion_history.userid = certif_completion.userid)',
@@ -112,12 +141,14 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $joinlist[] =  new rb_join(
-                'prog_completion', // table alias
-                'INNER', // type of join
+                'prog_completion', // Table alias.
+                'LEFT', // Type of join.
                 '{prog_completion}',
-                'base.id = prog_completion.programid AND prog_completion.coursesetid = 0', // zero = the program
+                '(prog_completion.programid = base.id
+                    AND prog_completion.coursesetid = 0
+                    AND prog_completion.userid = certif_completion.userid)',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
-                array('base')
+                array('base', 'certif_completion')
         );
 
         $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
@@ -229,7 +260,10 @@ class rb_source_dp_certification extends rb_base_source {
                 'certif_completion.status',
                 array(
                     'joins' => 'certif_completion',
-                    'displayfunc' => 'certif_status'
+                    'displayfunc' => 'certif_status',
+                    'extrafields' => array(
+                        'unassigned' => 'certif_completion.unassigned'
+                    )
                 )
         );
 
@@ -240,7 +274,10 @@ class rb_source_dp_certification extends rb_base_source {
                 'certif_completion.renewalstatus',
                 array(
                     'joins' => 'certif_completion',
-                    'displayfunc' => 'certif_renewalstatus'
+                    'displayfunc' => 'certif_renewalstatus',
+                    'extrafields' => array(
+                        'unassigned' => 'certif_completion.unassigned'
+                    )
                 )
         );
 
@@ -467,7 +504,7 @@ class rb_source_dp_certification extends rb_base_source {
         // OR status = ' . CERTIFSTATUS_EXPIRED . '
         $paramoptions[] = new rb_param_option(
                 'rolstatus',
-                '(CASE WHEN prog_completion.status = ' . STATUS_PROGRAM_COMPLETE . ' THEN \'completed\' ELSE \'active\' END)',
+                '(CASE WHEN prog_completion.status = ' . STATUS_PROGRAM_COMPLETE . ' OR certif_completion.unassigned = 1 THEN \'completed\' ELSE \'active\' END)',
                 'prog_completion',
                 'string'
         );
@@ -519,9 +556,11 @@ class rb_source_dp_certification extends rb_base_source {
 
     function rb_display_timedue_date($time, $row) {
         $dateformat = get_string('strfdateshortmonth', 'langconfig');
-        if ($row->certifpath == CERTIFPATH_CERT) {
+        if (($row->certifpath == CERTIFPATH_CERT) && ($row->completionstatus != null)) {
             $program = new program($row->programid);
             return $program->display_timedue_date($row->completionstatus, $time, $dateformat);
+        } else if (empty($row->timeexpires)) {
+            return '';
         } else {
             return userdate($row->timeexpires, $dateformat);
         }
@@ -601,7 +640,11 @@ class rb_source_dp_certification extends rb_base_source {
     function rb_display_certif_status($status, $row) {
         global $CERTIFSTATUS;
         if ($status && isset($CERTIFSTATUS[$status])) {
-            return get_string($CERTIFSTATUS[$status], 'totara_certification');
+            $unassigned = '';
+            if ($row->unassigned) {
+                $unassigned = get_string('unassigned', 'rb_source_dp_certification');
+            }
+            return get_string($CERTIFSTATUS[$status], 'totara_certification') .' '. $unassigned;
         }
     }
 

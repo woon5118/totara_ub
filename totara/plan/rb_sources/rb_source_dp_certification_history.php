@@ -60,7 +60,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 userid,
                 timecompleted,
                 timeexpires
-                FROM {certif_completion_history})';
+                FROM {certif_completion_history}
+                WHERE unassigned = 0)';
         $this->base = $sql;
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
