@@ -38,7 +38,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('my-teammembers');
 $PAGE->set_url(new moodle_url('/my/teammembers.php'));
 
-global $SESSION, $USER;
+global $USER;
 
 $edit = optional_param('edit', -1, PARAM_BOOL);
 $sid = optional_param('sid', '0', PARAM_INT);
@@ -114,11 +114,10 @@ echo $report->display_saved_search_options();
 
 echo html_writer::empty_tag('br');
 
-if ($countfiltered>0) {
-    $report->display_table();
-    // Export button.
-    $renderer->export_select($report->_id, $sid);
-}
+$report->display_table();
+
+// Export button.
+$renderer->export_select($report->_id, $sid);
 
 echo $OUTPUT->container_end();
 echo $OUTPUT->footer();

@@ -147,7 +147,7 @@ class reportbuilder {
     public $columnoptions, $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
     public $_id, $recordsperpage, $defaultsortcolumn, $defaultsortorder;
     private $_joinlist, $_base, $_params, $_sid;
-    private $_paramoptions, $_embeddedparams, $_fullcount, $_filteredcount;
+    private $_paramoptions, $_embeddedparams, $_fullcount, $_filteredcount, $_isinitiallyhidden;
     public $src, $grouped, $reportfor, $badcolumns, $embedded;
     private $_post_config_restrictions;
 
@@ -2589,7 +2589,12 @@ class reportbuilder {
     function get_full_count() {
         global $DB;
 
-        // use cached value if present
+        // Don't do the calculation if the results are initially hidden.
+        if ($this->is_initially_hidden()) {
+            return 0;
+        }
+
+        // Use cached value if present.
         if (empty($this->_fullcount)) {
             list($sql, $params) = $this->build_query(true);
             $this->_fullcount = $DB->count_records_sql($sql, $params);
@@ -2605,7 +2610,12 @@ class reportbuilder {
     function get_filtered_count() {
         global $DB;
 
-        // use cached value if present
+        // Don't do the calculation if the results are initially hidden.
+        if ($this->is_initially_hidden()) {
+            return 0;
+        }
+
+        // Use cached value if present.
         if (empty($this->_filteredcount)) {
             list($sql, $params) = $this->build_query(true, true);
             $this->_filteredcount = $DB->count_records_sql($sql, $params);
@@ -2660,13 +2670,16 @@ class reportbuilder {
      * @return No return value but prints the current data table
      */
     function display_table() {
-        global $SESSION, $DB, $OUTPUT;
+        global $DB, $OUTPUT;
+
+        if ($this->is_initially_hidden()) {
+            echo get_string('initialdisplay_pending', 'totara_reportbuilder');
+            return;
+        }
 
         define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
         define('SHOW_ALL_PAGE_SIZE', 9999);
-        $spage     = optional_param('spage', 0, PARAM_INT);                    // which page to show
         $perpage   = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
-        $ssort     = optional_param('ssort', '', PARAM_TEXT);
 
         $columns = $this->columns;
         $shortname = $this->shortname;
@@ -2794,6 +2807,24 @@ class reportbuilder {
             echo html_writer::link($this->src->redirecturl, $message);
         }
     }
+
+    /**
+     * Determine if the report should be hidden due to the initialdisplay setting.
+     */
+    public function is_initially_hidden() {
+        if (isset($this->_isinitiallyhidden)) {
+            return $this->_isinitiallyhidden;
+        }
+
+        $searched = optional_param_array('submitgroup', array(), PARAM_ALPHANUM);
+        $override_initial = isset($searched['addfilter']);
+        $this->_isinitiallyhidden = ($this->initialdisplay == RB_INITIAL_DISPLAY_HIDE &&
+                !$override_initial &&
+                !$this->is_report_filtered());
+
+        return $this->_isinitiallyhidden;
+    }
+
 
     /**
      * Get column identifiers of columns that should be hidden on page load
@@ -3761,6 +3792,11 @@ class reportbuilder {
      */
     function print_feedback_results() {
         global $DB, $OUTPUT;
+
+        if ($this->is_initially_hidden()) {
+            return get_string('initialdisplay_pending', 'totara_reportbuilder');
+        }
+
         // get paging parameters
         define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
         define('SHOW_ALL_PAGE_SIZE', 9999);

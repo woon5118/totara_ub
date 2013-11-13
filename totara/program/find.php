@@ -26,7 +26,7 @@ require_once('../../config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 $sid = optional_param('sid', '0', PARAM_INT);
-$format = optional_param('format','', PARAM_TEXT); // export format
+$format = optional_param('format','', PARAM_TEXT); // Export format.
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_totara_menu_selected('program');
@@ -80,11 +80,11 @@ $report->display_search();
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();
 
-if ($countfiltered>0) {
-    print $renderer->showhide_button($report->_id, $report->shortname);
-    $report->display_table();
-    // export button
-    $renderer->export_select($report->_id, $sid);
-}
+print $renderer->showhide_button($report->_id, $report->shortname);
+
+$report->display_table();
+
+// Export button.
+$renderer->export_select($report->_id, $sid);
 
 echo $OUTPUT->footer();
