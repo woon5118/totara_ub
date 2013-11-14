@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  */
 class scheduled_reports_new_form extends moodleform {
     function definition() {
-        global $REPORT_BUILDER_EXPORT_OPTIONS;
 
         $mform =& $this->_form;
         $id = $this->_customdata['id'];
@@ -53,16 +52,8 @@ class scheduled_reports_new_form extends moodleform {
         $mform->addElement('hidden', 'reportid', $report->_id);
         $mform->setType('reportid', PARAM_INT);
 
-        $exportoptions = get_config('reportbuilder', 'exportoptions');
-
-        //Export type options
-        $exportformatselect = array();
-        foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
-            // bitwise operator to see if option bit is set
-            if (($exportoptions & $code) == $code && ($option != 'fusion')) {
-                $exportformatselect[$code] = get_string('export' . $option, 'totara_reportbuilder');
-            }
-        }
+        // Export type options.
+        $exportformatselect = reportbuilder_get_export_options();
 
         $exporttofilesystemenabled = false;
         if (get_config('reportbuilder', 'exporttofilesystem') == 1) {

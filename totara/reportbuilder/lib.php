@@ -31,7 +31,8 @@
 require_once($CFG->dirroot . '/calendar/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/filters/lib.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
@@ -2647,17 +2648,17 @@ class reportbuilder {
             }
         }
         switch($format) {
-            case 'ods':
+            case REPORT_BUILDER_EXPORT_ODS:
                 $this->download_ods($headings, $sql . $order, $params, $count, $restrictions, null, $cache);
-            case 'xls':
+            case REPORT_BUILDER_EXPORT_EXCEL:
                 $this->download_xls($headings, $sql . $order, $params, $count, $restrictions, null, $cache);
-            case 'csv':
+            case REPORT_BUILDER_EXPORT_CSV:
                 $this->download_csv($headings, $sql . $order, $params, $count);
-            case 'fusion':
+            case REPORT_BUILDER_EXPORT_FUSION:
                 $this->download_fusion();
-            case 'pdf_portrait':
+            case REPORT_BUILDER_EXPORT_PDF_PORTRAIT:
                 $this->download_pdf($headings, $sql . $order, $params, $count, $restrictions, true, null, $cache);
-            case 'pdf_landscape':
+            case REPORT_BUILDER_EXPORT_PDF_LANDSCAPE:
                 $this->download_pdf($headings, $sql . $order, $params, $count, $restrictions, false, null, $cache);
         }
         die;
@@ -4684,7 +4685,25 @@ function reportbuilder_get_export_filename($report, $userid, $scheduleid) {
     $reportfilename = clean_param($reportfilename, PARAM_FILE);
     $username = $DB->get_field('user', 'username', array('id' => $userid));
 
-    $dir = get_config('reportbuilder', 'exporttofilesystempath') . DIRECTORY_SEPARATOR . $username;
+    // Validate directory.
+    $path = get_config('reportbuilder', 'exporttofilesystempath');
+    if (!empty($path)) {
+        // Check path format.
+        if (DIRECTORY_SEPARATOR == '\\') {
+            $pattern = '/[^a-zA-Z0-9\/_\\\\\\:-]/i';
+        } else {
+            $pattern = '/[^a-zA-Z0-9\/_-]/i';
+        }
+        if (preg_match($pattern, $path)) {
+            mtrace(get_string('error:notapathexportfilesystempath', 'totara_reportbuilder'));
+        } else if (!is_dir($path)) {
+            mtrace(get_string('error:notdirexportfilesystempath', 'totara_reportbuilder'));
+        } else if (!is_writable($path)) {
+            mtrace(get_string('error:notwriteableexportfilesystempath', 'totara_reportbuilder'));
+        }
+    }
+
+    $dir = $path . DIRECTORY_SEPARATOR . $username;
     if (!is_directory_a_preset($dir) && !file_exists($dir)) {
         mkdir($dir);
     }
@@ -5075,6 +5094,25 @@ function reportbuilder_rename_data($table, $source, $oldtype, $oldvalue, $newtyp
     return true;
 }
 
+/**
+ * Returns available export options for reportbuilder.
+ *
+ * @return array (option => string name)
+ */
+function reportbuilder_get_export_options() {
+    global $REPORT_BUILDER_EXPORT_OPTIONS;
+    $exportoptions = get_config('reportbuilder', 'exportoptions');
+    $options = !empty($exportoptions) ? explode(',', $exportoptions) : array();
+
+    $alloptions = array_flip($REPORT_BUILDER_EXPORT_OPTIONS);
+
+    $select = array();
+    foreach ($options as $key => $value) {
+        $select[$value] = get_string('export' . $alloptions[$value], 'totara_reportbuilder');
+    }
+
+    return $select;
+}
 
 /**
 * Serves reportbuilder file type files. Required for M2 File API
@@ -5097,4 +5135,89 @@ function totara_reportbuilder_pluginfile($course, $cm, $context, $filearea, $arg
     }
     // finally send the file
     send_stored_file($file, 86400, 0, true, $options); // download MUST be forced - security!
+}
+
+/**
+ * Day/month picker admin setting for report builder settings.
+ *
+ */
+class admin_setting_configdaymonthpicker extends admin_setting {
+    /**
+     * Constructor
+     * @param string $name unique ascii name, either 'mysetting' for settings that in config,
+     *                     or 'myplugin/mysetting' for ones in config_plugins.
+     * @param string $visiblename localised name
+     * @param string $description localised long description
+     * @param mixed $defaultsetting string or array depending on implementation
+     */
+    public function __construct($name, $visiblename, $description, $defaultsetting) {
+        parent::__construct($name, $visiblename, $description, $defaultsetting);
+    }
+
+    /**
+     * Gets the current settings as an array
+     *
+     * @return mixed Null if none, else array of settings
+     */
+    public function get_setting() {
+        $result = $this->config_read($this->name);
+        if (is_null($result)) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Store the data as ddmm string.
+     *
+     * @param string $data
+     * @return bool true if success, false if not
+     */
+    public function write_setting($data) {
+        if (!is_array($data)) {
+            return '';
+        }
+        $result = $this->config_write($this->name, date("dm", mktime(0, 0, 0, $data['m'], $data['d'], 0)));
+
+        return ($result ? '' : get_string('errorsetting', 'admin'));
+    }
+
+    /**
+     * Returns day/month select+select fields.
+     *
+     * @param string $data
+     * @param string $query
+     * @return string html select+select fields and wrapping div(s)
+     */
+    public function output_html($data, $query='') {
+        // Default settings.
+        $default = $this->get_defaultsetting();
+
+        if (!is_null($default)) {
+            $defaultday = substr($default, 0, 2);
+            $defaultmonth = substr($default, 2, 2);
+            $defaultinfo = date('j F', mktime(0, 0, 0, $defaultmonth, $defaultday, 0));
+        } else {
+            $defaultinfo = null;
+        }
+
+        // Saved settings.
+        $day = substr($data, 0, 2);
+        $month = substr($data, 2, 2);
+
+        $days = array_combine(range(1,31), range(1,31));
+        $months = array();
+        for ($i = 1; $i <= 12; $i++) {
+            $mname = date("F", mktime(0, 0, 0, $i, 10));
+            $months[$i] = $mname;
+        }
+
+        $return = html_writer::start_tag('div', array('class' => 'form-daymonth defaultsnext'));
+        $return .= html_writer::select($days, $this->get_full_name() . '[d]' , (int)$day);
+        $return .= html_writer::select($months, $this->get_full_name() . '[m]', (int)$month);
+        $return .= html_writer::end_tag('div');
+
+        return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $defaultinfo, $query);
+    }
 }

@@ -118,7 +118,7 @@ $string['coursetypeicon'] = 'Type';
 $string['coursevisible'] = 'Course Visible';
 $string['createasavedsearch'] = 'Create a saved search';
 $string['createreport'] = 'Create report';
-$string['csvformat'] = 'text format';
+$string['csvformat'] = 'CSV format';
 $string['currentfinancial'] = 'The current financial year';
 $string['currentorgenable'] = 'Show records from staff in the user\'s organisation';
 $string['currentposenable'] = 'Show records from staff in the user\'s position';
@@ -210,15 +210,18 @@ $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:updatescheduledreport'] = 'Error updating Scheduled Report';
 $string['excludetags'] = 'Exclude records tagged with';
 $string['export'] = 'Export';
-$string['exportcsv'] = 'Export in text format';
+$string['exportcsv'] = 'Export in CSV format';
 $string['exportfilesystemoptions'] = 'Export options';
-$string['exportfilesystempath'] = 'Export file system path:';
+$string['exportfilesystempath'] = 'File export path';
+$string['exportfilesystempath_help'] = 'Absolute file system path to a writeable directory where reports can be exported and stored.
+
+**Warning!** Make sure to configure a correct system path if you are going to export reports to file system.';
 $string['exportfusion'] = 'Export to Google Fusion';
 $string['exportods'] = 'Export in ODS format';
-$string['exportoptions'] = 'Report Export options';
-$string['exportpdf_landscape'] = 'Export in PDF format (Landscape)';
+$string['exportoptions'] = 'Format export options';
+$string['exportpdf_landscape'] = 'Export in PDF (Landscape) format';
 $string['exportpdf_mramlimitexceeded'] = 'Notice: Ram memory limit exceeded! Probably the report being exported is too big, as it took almost {$a} MB of ram memory to create it, please consider reducing the size of the report, applying filters or splitting the report in several files.';
-$string['exportpdf_portrait'] = 'Export in PDF format';
+$string['exportpdf_portrait'] = 'Export in PDF (Portrait) format';
 $string['exportproblem'] = 'There was a problem downloading the file';
 $string['exporttoemail'] = 'Email scheduled report';
 $string['exporttoemailandsave'] = 'Email and save scheduled report to file';
@@ -235,7 +238,7 @@ $string['filters'] = 'Filters';
 $string['filters_updated'] = 'Filters updated';
 $string['financialyear'] = 'Financial year start';
 $string['format'] = 'Format';
-$string['globalsettings'] = 'Global settings';
+$string['globalsettings'] = 'General settings';
 $string['globalsettingsupdated'] = 'Global settings updated';
 $string['gradeandgradetocomplete'] = '{$a->grade}% ({$a->pass}% to complete)';
 $string['groupconfirmdelete'] = 'Are you sure you want to delete this group?';
@@ -488,18 +491,17 @@ This filter allows you to filter information based on a hierarchy. The filter ha
 
 Once a framework item has been selected you can use the \'Include children?\' checkbox to choose whether to match only that item, or match that item and any sub-items belonging to that item.';
 $string['reportbuilderexportoptions'] = 'Report Export Settings';
-$string['reportbuilderexportoptions_help'] = '
-**Report export settings** allows a user with the appropriate permissions to specify the export options that are available for users at the bottom of a report page. This setting affects all **Report builder** reports.
+$string['reportbuilderexportoptions_help'] = 'Report export settings allows a user with the appropriate permissions to specify the export options that are available for users at the bottom of a report page. This setting affects all Report builder reports.
 
 When multiple options are selected the user can choose their preferred options from the export dropdown menu.
 
-When no options are selected the export function is disabled..';
+When no options are selected the export function is disabled.';
 $string['reportbuilderexporttofilesystem'] = 'Enable exporting to file system';
-$string['reportbuilderexporttofilesystem_help'] = '**Exporting to file system** allows reports to be saved to a directory on the web server\'s file system, instead of only emailing the report to the user scheduling the report.
+$string['reportbuilderexporttofilesystem_help'] = 'Exporting to file system allows reports to be saved to a directory on the web server\'s file system, instead of only emailing the report to the user scheduling the report.
 
 This can be useful when the report needs to be accessed by an external system automation, and the report directory might have SFTP access enabled.
 
-Reports saved to the filesystem are saved as **\'Export file system root path\'**/username/report.ext where *username* is an internal username of a user who owns the scheduled report, *report* is the name of the scheduled report with non alpha-numeric characters removed, and *ext* is the appropriate export file name extension.';
+Reports saved to the filesystem are saved as [Export file system path]/username/report.ext where *username* is an internal username of a user who owns the scheduled report, *report* is the name of the scheduled report with non alpha-numeric characters removed, and *ext* is the appropriate export file name extension.';
 $string['reportbuilderfilters'] = 'Search Options (Filters)';
 $string['reportbuilderfilters_help'] = '
 **Search Options** allows you to customise the filters that appear on your report. The available filters are determined by the **Source** of the report. Each report source has a set of default filters.
@@ -514,9 +516,7 @@ Filters can be added, sorted and removed.
 
 **Changing multiple filter types:** You can modify multiple filter types at the same time by selecting a different filter from the dropdown menu and clicking **Save changes**.';
 $string['reportbuilderfinancialyear'] = 'Report Financial Year Settings';
-$string['reportbuilderfinancialyear_help'] = '**Financial year** is used in the reports content controls.
-
-This setting allows to set the start date of the financial year.';
+$string['reportbuilderfinancialyear_help'] = 'This setting allows to set the start date of the financial year which is used in the reports content controls.';
 $string['reportbuilderfullname'] = 'Report Name';
 $string['reportbuilderfullname_help'] = 'This is the name that will appear at the top of your report page and in the \'Report Manager\' block.';
 $string['reportbuilderglobalsettings'] = 'Report Builder Global Settings';

@@ -38,31 +38,20 @@ class report_builder_export_form extends moodleform {
      * Definition of the export report form
      */
     function definition() {
-        global $REPORT_BUILDER_EXPORT_OPTIONS;
         $mform =& $this->_form;
 
         $id = $this->_customdata['id'];
         $sid = $this->_customdata['sid'];
-        $exportoptions = get_config('reportbuilder', 'exportoptions');
-        $select = array();
+        $select = reportbuilder_get_export_options();
         $sitecontext = context_system::instance();
-        foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
-            // specific checks for fusion tables export
-            // disabled for now, awaiting new repository/gdrive integration
-            if ($option == 'fusion') {
-                continue;
-            }
-            // bitwise operator to see if option bit is set
-            if (($exportoptions & $code) == $code) {
-                $select[$option] = get_string('export'.$option, 'totara_reportbuilder');
-            }
-        }
+
         if (count($select) == 0) {
             // no export options - don't show form
             return false;
         } else if (count($select) == 1) {
             // no options - show a button
             $mform->addElement('hidden', 'format', key($select));
+            $mform->setType('format', PARAM_INT);
             $mform->addElement('submit', 'export', current($select));
         } else {
             // show pulldown menu

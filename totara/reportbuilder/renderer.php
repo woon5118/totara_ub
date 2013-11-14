@@ -323,44 +323,6 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $export->display();
     }
 
-    /** Prints separate buttons to export current report in the allowed
-     * formats
-     *
-     * for this to work page must contain:
-     * if ($format != '') { $report->export_data($format);die;}
-     * before header is printed
-     *
-     * @param integer $id ID of the report to exported
-     * @param integer $sid Saved search ID if a saved search is active (optional)
-     *
-     * @return string Returns the code for the export buttons
-     */
-    public function export_buttons($id, $sid = 0) {
-        global $REPORT_BUILDER_EXPORT_OPTIONS;
-        $exportoptions = get_config('reportbuilder', 'exportoptions');
-
-        $out = html_writer::start_tag('table') . html_writer::start_tag('tr');
-        $sitecontext = context_system::instance();
-        foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
-            // specific checks for fusion tables export
-            // disabled for now, awaiting new repository/gdrive integration
-            if ($option == 'fusion') {
-                continue;
-            }
-            $exporturl = new moodle_url(qualified_me(),
-                array('format' => $option, 'id' => $id, 'sid' => $sid));
-            // bitwise operator to see if option bit is set
-            if (($exportoptions & $code) == $code) {
-                $out .= html_writer::start_tag('td');
-                $out .= $this->output->single_button(new moodle_url(qualified_me(), array('format' => $option)), get_string('export'.$option, 'totara_reportbuilder'), 'post');
-                $out .= html_writer::end_tag('td');
-            }
-        }
-        $out .= html_writer::end_tag('tr') . html_writer::end_tag('table');
-
-        return $out;
-    }
-
     /**
      * Returns a link that takes the user to a page which displays the report
      *

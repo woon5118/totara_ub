@@ -1102,7 +1102,6 @@ class reportbuilderlib_test extends advanced_testcase {
 
     // skipping tests for the following as they just print HTML
     // export_select()
-    // export_buttons()
     // view_button()
     // save_button()
     // saved_menu()

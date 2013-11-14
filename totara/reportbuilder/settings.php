@@ -1,4 +1,4 @@
-<?php // $Id$
+<?php
 /*
  * This file is part of Totara LMS
  *
@@ -25,32 +25,41 @@
 /**
  * Add reportbuilder administration menu settings
  */
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+global $REPORT_BUILDER_EXPORT_OPTIONS;
 
-$ADMIN->add('reports',
-    new admin_category('totara_reportbuilder',
-    get_string('reportbuilder','totara_reportbuilder')),
-    'comments'
-);
-// add links to report builder reports
-$ADMIN->add('totara_reportbuilder',
-    new admin_externalpage('rbmanagereports',
-        get_string('managereports','totara_reportbuilder'),
-        "$CFG->wwwroot/totara/reportbuilder/index.php",
-        array('totara/reportbuilder:managereports')
-    )
-);
-$ADMIN->add('totara_reportbuilder',
-    new admin_externalpage('rbglobalsettings',
-        get_string('globalsettings','totara_reportbuilder'),
-        "$CFG->wwwroot/totara/reportbuilder/globalsettings.php",
-        array('totara/reportbuilder:managereports')
-    )
-);
-$ADMIN->add('totara_reportbuilder',
-    new admin_externalpage('rbactivitygroups',
-        get_string('activitygroups','totara_reportbuilder'),
-        "$CFG->wwwroot/totara/reportbuilder/groups.php",
-        array('totara/reportbuilder:managereports'),
-        true
-    )
-);
+$ADMIN->add('reports', new admin_category('totara_reportbuilder', get_string('reportbuilder','totara_reportbuilder')), 'comments');
+
+// Main report builder settings.
+$rb = new admin_settingpage('rbsettings',
+                            new lang_string('globalsettings','totara_reportbuilder'),
+                            array('totara/reportbuilder:managereports'));
+
+foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
+    // Fusion tables export disabled for now, awaiting new repository/gdrive integration.
+    if ($option == 'fusion') {
+        continue;
+    }
+
+    $formatbyname[$code] = new lang_string('export' . $option, 'totara_reportbuilder');
+    $defaultformats[$code] = 1;
+}
+
+$rb->add(new admin_setting_configmulticheckbox('reportbuilder/exportoptions', new lang_string('exportoptions', 'totara_reportbuilder'),
+         new lang_string('reportbuilderexportoptions_help', 'totara_reportbuilder'), $defaultformats, $formatbyname));
+
+$rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),
+         new lang_string('reportbuilderexporttofilesystem_help', 'totara_reportbuilder'), false));
+
+$rb->add(new admin_setting_configdirectory('reportbuilder/exporttofilesystempath', new lang_string('exportfilesystempath', 'totara_reportbuilder'),
+         new lang_string('exportfilesystempath_help', 'totara_reportbuilder'), ''));
+
+$rb->add(new admin_setting_configdaymonthpicker('reportbuilder/financialyear', new lang_string('financialyear', 'totara_reportbuilder'),
+         new lang_string('reportbuilderfinancialyear_help', 'totara_reportbuilder'), '0107'));
+
+// Add all above settings to the report builder settings node.
+$ADMIN->add('totara_reportbuilder', $rb);
+
+// Add links to report builder reports.
+$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanagereports', new lang_string('managereports','totara_reportbuilder'),
+            new moodle_url('/totara/reportbuilder/index.php'), array('totara/reportbuilder:managereports')));

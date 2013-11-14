@@ -23,6 +23,7 @@
  */
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 /**
  * Local database upgrade script
@@ -31,7 +32,7 @@ require_once($CFG->dirroot.'/totara/core/db/utils.php');
  * @return  boolean $result
  */
 function xmldb_totara_reportbuilder_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $CFG, $DB, $REPORT_BUILDER_EXPORT_OPTIONS;
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
     if ($oldversion < 2012071300) {
@@ -292,5 +293,24 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         $dbman->change_field_precision($table, $field);
         totara_upgrade_mod_savepoint(true, 2014012400, 'totara_reportbuilder');
     }
+
+    if ($oldversion < 2014021100) {
+        $tempconfig = get_config('reportbuilder', 'exportoptions');
+
+        if (!is_null($tempconfig)) {
+            $selected = array();
+            foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
+                // Bitwise operator to see if option bit is set.
+                if (($tempconfig & $code) == $code) {
+                    $selected[] = $code;
+                }
+            }
+            $selected = implode(',', $selected);
+            set_config('exportoptions', $selected, 'reportbuilder');
+        }
+        // Report builder savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014021100, 'totara_reportbuilder');
+    }
+
     return true;
 }
