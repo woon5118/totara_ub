@@ -3286,7 +3286,8 @@ class appraisal_question extends question_storage {
      * @param array $otherassignments
      * @return bool user's role can answer on this question
      */
-    public function populate_roles_element(appraisal_role_assignment $roleassignment, $otherassignments) {
+    public function populate_roles_element(appraisal_role_assignment $roleassignment,
+            $otherassignments, $nouserpic = false) {
         global $OUTPUT, $DB;
         $questroles = $this->roles;
         unset($questroles[$roleassignment->appraisalrole]);
@@ -3301,7 +3302,11 @@ class appraisal_question extends question_storage {
                 // Add information about other roles to element.
                 $questioninfo = new question_manager($subject->id, $otherassignments[$eachrole]->id);
                 $questioninfo->viewonly = true;
-                $questioninfo->userimage = $OUTPUT->user_picture($subject);
+                if (!$nouserpic) {
+                    $questioninfo->userimage = $OUTPUT->user_picture($subject);
+                } else {
+                   $questioninfo->userimage = '';
+                }
                 $questioninfo->label = get_string('role_answer_' . $rolecodestrings[$eachrole], 'totara_appraisal');
                 $this->get_element()->add_question_role_info($eachrole, $questioninfo);
             }

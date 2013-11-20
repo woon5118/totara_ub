@@ -130,6 +130,7 @@ class appraisal_answer_form extends moodleform {
         $otherassignments = $this->_customdata['otherassignments'];
         $readonly = isset($this->_customdata['readonly']) ? $this->_customdata['readonly'] : false;
         $spaces = isset($this->_customdata['spaces']) ? $this->_customdata['spaces'] : false;
+        $nouserpic = isset($this->_customdata['nouserpic']) ? $this->_customdata['nouserpic'] : false;
 
         $stage = new appraisal_stage($page->appraisalstageid);
         $stageiscomplete = $stage->is_completed($roleassignment);
@@ -177,7 +178,7 @@ class appraisal_answer_form extends moodleform {
             }
 
             if (($rights & appraisal::ACCESS_CANVIEWOTHER) == appraisal::ACCESS_CANVIEWOTHER) {
-                if (!$question->populate_roles_element($roleassignment, $otherassignments)) {
+                if (!$question->populate_roles_element($roleassignment, $otherassignments, $nouserpic)) {
                     $isviewonlyquestion = false;
                 }
             }
