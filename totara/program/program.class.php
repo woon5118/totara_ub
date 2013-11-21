@@ -292,6 +292,15 @@ class program {
                     foreach ($user_assignments as $ua) {
                         // Check user exists for current assignment
                         if ($user->id == $ua->userid && $ua->assignmentid == $assign->id) {
+                            $sendmessage = false;
+
+                            $exception = $DB->get_record('prog_exception', array('userid' => $ua->userid, 'assignmentid' => $ua->assignmentid));
+
+                            if (!empty($exception) && $exception->timeraised == $ua->timeassigned) {
+                                // This exception was raised the first time they were assigned, they haven't received an assignment message yet.
+                                $sendmessage = true;
+                            }
+
                             $user_exists = true;
                             $user_assign_data = $ua;
                             break;
@@ -303,11 +312,9 @@ class program {
 
                         // Create user assignment object
                         $current_assignment = new user_assignment($user->id, $user_assign_data->assignmentid, $this->id);
-                        if (!in_array($user_assign_data->exceptionstatus,
-                               array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED, PROGRAM_EXCEPTION_RESOLVED)) &&
-                            (isset($current_assignment->completion)
-                                            && $timedue != $current_assignment->completion->timedue)) {
-                            // there is no exception, and the timedue has changed
+
+                        if (!empty($current_assignment->completion) && $timedue != $current_assignment->completion->timedue) {
+                            // The timedue has changed, we'll need to update it and check for exceptions.
 
                             if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
                                 // this means that the user hasn't logged in yet
@@ -324,6 +331,16 @@ class program {
                                 $user_assign_todb->exceptionstatus = $exceptions ? PROGRAM_EXCEPTION_RAISED : PROGRAM_EXCEPTION_NONE;
 
                                 $DB->update_record('prog_user_assignment', $user_assign_todb);
+                            }
+
+                            if (empty($exceptions) && $sendmessage) {
+                                // Add the user to the message queue so they'll receive an assignment message.
+                                $eventdata = new stdClass();
+                                $eventdata->programid = $this->id;
+                                $eventdata->userid = $user->id;
+
+                                $queue = array("new:{$user->id}", $eventdata);
+                                $message_queue = array_merge($message_queue, $queue);
                             }
                         }
                     } else {

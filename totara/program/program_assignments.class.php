@@ -479,30 +479,6 @@ abstract class prog_assignment_category {
                         $original_object->completiontime != $object->completiontime ||
                         $original_object->completionevent != $object->completionevent) {
 
-                        if ($object->completionevent != $original_object->completionevent) {
-                            //Rule Changed
-                            //Delete old exceptions, completion records dates and user assignments
-                            prog_exceptions_manager::delete_exceptions_by_assignment($object->id);
-
-                            // Create comma separated list to use in deletions
-                            $user_assignments_sql = "SELECT userid FROM {prog_user_assignment} WHERE assignmentid = ?";
-                            $user_assignments = $DB->get_records_sql($user_assignments_sql, array($object->id));
-                            if (count($user_assignments) > 0) {
-                                list($assignment_userid_sql, $assignment_userid_params) = $DB->get_in_or_equal(array_keys($user_assignments));
-                                $transaction = $DB->start_delegated_transaction();
-                                $delete_user_assign_sql = "DELETE FROM {prog_user_assignment} WHERE assignmentid = ?";
-                                $DB->execute($delete_user_assign_sql, array($object->id));
-                                $delete_completions_sql = "DELETE FROM {prog_completion} WHERE coursesetid = 0 AND userid {$assignment_userid_sql} AND programid = ?";
-                                $DB->execute($delete_completions_sql, array_merge($assignment_userid_params, array($object->programid)));
-                                $transaction->allow_commit();
-                            }
-
-                        } else if ($object->completiontime != $original_object->completiontime) {
-                            // Completion date changed
-                            // Delete old exceptions
-                            prog_exceptions_manager::delete_exceptions_by_assignment($object->id);
-                        }
-
                         if (!$DB->update_record('prog_assignment', $object)) {
                             print_error('error:updatingprogramassignment', 'totara_program');
                         }
