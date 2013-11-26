@@ -136,6 +136,35 @@ function totara_hierarchy_install_default_comp_scale() {
 }
 
 /**
+ * Handler function called when a user_deleted event is triggered
+ * Placed here so we can use this function for all hierarchy types.
+ *
+ * @param object $user  The user object for the deleted user.
+ */
+function hierarchy_eventhandler_user_deleted($user) {
+    global $DB, $POSITION_TYPES;
+
+    // Remove any existing temporary manager records related to the deleted user.
+    $DB->delete_records('temporary_manager', array('tempmanagerid' => $user->id));
+    $DB->delete_records('temporary_manager', array('userid' => $user->id));
+
+    // Check if the deleted user is any other users primary manager and update them appropriately.
+    foreach ($POSITION_TYPES as $typeid => $typename) {
+        $teammembers = totara_get_staff($user->id, $typeid);
+        if (!empty($teammembers)) {
+            foreach ($teammembers as $member) {
+                $pa = new position_assignment(array('userid' => $member, 'type' => $typeid));
+                $pa->managerid = null;
+                $pa->save(true);
+            }
+        }
+    }
+
+    // Remove the deleted user's position assignments.
+    $DB->delete_records('pos_assignment', array('userid' => $user->id));
+}
+
+/**
  * An abstract object that holds methods and attributes common to all hierarchy objects.
  * @abstract
  */
@@ -2775,5 +2804,4 @@ class hierarchy {
             'hierarchyhasscales', 'canviewscales', 'canmanage', 'canview');
         return $out;
     }
-
 }
