@@ -5543,10 +5543,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml='', $a
     global $CFG, $FULLME;
 
     // TODO: use ical library instead
-    if (substr($messagehtml, 0, 5) == 'ical:') {
+    if (strpos($attachname, ".ics") !== false) {
         $is_this_an_ical_request = TRUE;
-        $icaltype = substr($messagehtml, 5);
-        $messagehtml = '';
     } else {
         $is_this_an_ical_request = FALSE;
         if ($messagehtml && right_to_left()) {
@@ -5746,7 +5744,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml='', $a
     }
 
     if ($is_this_an_ical_request) {
-        $mail->ContentType = "text/calendar; name={$icaltype}.ics; method=REQUEST; charset=UTF-8";
+        $mail->ContentType = "text/calendar; name={$attachname}; method=REQUEST; charset=UTF-8";
         $mail->Encoding = '8bit';
         $mail->LE = "\r\n";
         $mail->AddCustomHeader("Content-class: urn:content-classes:calendarmessage\r\n");
