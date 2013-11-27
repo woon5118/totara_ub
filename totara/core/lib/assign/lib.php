@@ -860,6 +860,9 @@ class totara_assign_ui_picker_hierarchy extends totara_dialog_content_hierarchy_
         // Only return generated tree html.
         $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
+        $frameworkid = optional_param('frameworkid', 0, PARAM_INT);
+        $switchframework = optional_param('switchframework', false, PARAM_BOOL);
+
         // Setup page.
         $hierarchy = $this->shortprefix;
         $alreadyselected = array();
@@ -873,6 +876,10 @@ class totara_assign_ui_picker_hierarchy extends totara_dialog_content_hierarchy_
 
         // Load dialog content generator.
         $dialog = $this;
+
+        if ($switchframework) {
+            $dialog->set_framework($frameworkid);
+        }
 
         // Toggle treeview only display.
         $dialog->show_treeview_only = $treeonly;
