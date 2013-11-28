@@ -1257,7 +1257,7 @@ function import_completions($tempfilename, $importname, $importtime, $quiet = fa
         return false;
     }
     if (!$quiet) {
-        echo $OUTPUT->notification(get_string('dataimportdone', 'totara_completionimport', $importname), 'notifysuccess');
+        echo $OUTPUT->notification(get_string('dataimportdone_' . $importname, 'totara_completionimport'), 'notifysuccess');
     }
 
     // End the transaction.
