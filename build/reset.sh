@@ -22,9 +22,10 @@
 # @package totara
 # @subpackage build
 #
-# This accepts two arguments
+# This accepts three arguments
 # 1/ The database server e.g. oak
 # 2/ The database type e.g. postgres7
+# 3/ The default language to use e.g. en
 
 echo "Update Jenkins directory permissions"
 # when Jenkins updates via apt it resets to 750 which, makes the webroot
@@ -67,9 +68,18 @@ else
     DBTYPE="$2"
 fi
 
+# If the language is set, use that language. Otherwise default to english.
+if [ -n "$3"]
+then
+    LANG="$3"
+else
+    LANG='en'
+fi
+
+
 sudo -u www-data php admin/cli/install.php \
     --chmod=755 \
-    --lang=en_utf8 \
+    --lang=$LANG \
     --wwwroot="http://jobs.test.totaralms.com/$JOB_NAME" \
     --dataroot="/var/lib/jenkins/jobs/$JOB_NAME/moodledata" \
     --dbtype="$DBTYPE" \
