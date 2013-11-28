@@ -443,7 +443,6 @@ function import_data_checks($importname, $importtime) {
                                 AND {$shortnameoridnumber})";
             $DB->execute($sql, $params);
         }
-
     }
 
     // Set import error so we ignore any records that have an error message from above.
@@ -453,7 +452,6 @@ function import_data_checks($importname, $importtime) {
             {$sqlwhere}
             AND " . $DB->sql_isnotempty($tablename, 'importerrormsg', true, true); // Note text = true.
     $DB->execute($sql, $params);
-
 }
 
 /**
@@ -779,6 +777,7 @@ function import_certification($importname, $importtime) {
     $errors = array();
     $updateids = array();
     $cc = array();
+    $deleted = array();
     $pc = array();
     $pchistory = array();
     $cchistory = array();
@@ -787,6 +786,7 @@ function import_certification($importname, $importtime) {
 
     $pluginname = 'totara_completionimport_' . $importname;
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+    $overrideactivecertification = get_default_config($pluginname, 'overrideactive', false);
 
     list($sqlwhere, $stdparams) = get_importsqlwhere($importtime);
     $params = array();
@@ -832,7 +832,8 @@ function import_certification($importname, $importtime) {
                     pa.id AS assignmentid,
                     cc.id AS ccid,
                     pc.id AS pcid,
-                    pua.id AS puaid
+                    pua.id AS puaid,
+                    cc.timecompleted AS currenttimecompleted
             FROM {{$tablename}} i
             JOIN {prog} p ON {$shortnameoridnumber}
             JOIN {certif} c ON c.id = p.certifid
@@ -856,6 +857,11 @@ function import_certification($importname, $importtime) {
         foreach ($programs as $program) {
             if (empty($programid) || ($programid != $program->progid) || (($insertcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
                 // Insert a batch for a given programid (as need to insert user roles with program context).
+                if (!empty($deleted)) {
+                    $DB->delete_records_list('certif_completion', 'id', $deleted);
+                    unset($deleted);
+                    $deleted = array();
+                }
                 if (!empty($cc)) {
                     $DB->insert_records_via_batch('certif_completion', $cc);
                     unset($cc);
@@ -910,6 +916,8 @@ function import_certification($importname, $importtime) {
             $ccdata->status = CERTIFSTATUS_COMPLETED;
             $ccdata->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
 
+            $now = time();
+
             // Do recert times.
             $timecompleted = totara_date_parse_from_format($csvdateformat, $program->completiondate);
             if (!$timecompleted) {
@@ -920,16 +928,58 @@ function import_certification($importname, $importtime) {
             $ccdata->timewindowopens = get_timewindowopens($ccdata->timeexpires, $program->windowperiod);
 
             $ccdata->timecompleted = $timecompleted;
-            $ccdata->timemodified = time();
+            $ccdata->timemodified = $now;
 
-            // Overwrite completion if already exists, else add.
-            if (empty($program->ccid)) {
+            // Active record not complete, delete the current completion record and
+            // put the imported one in it's place.
+            if (empty($program->currenttimecompleted)) {
+                $deleted[] = $program->ccid;
                 $cc[] = $ccdata;
-            } else {
-                // Already exists so out into history but don't create duplicates
-                if (!$DB->record_exists('certif_completion_history', array('certifid' => $ccdata->certifid, 'userid' => $ccdata->userid, 'timeexpires' => $ccdata->timeexpires))) {
+            } else if ($ccdata->timecompleted > $program->currenttimecompleted) {
+                // The imported record is newer than the current record.
+                if ($ccdata->timeexpires > $now && $ccdata->timewindowopens > $now) { // Not due.
+                    $deleted[] = $program->ccid;
+                    $cc[] = $ccdata;
+                } else if ($ccdata->timeexpires > $now && $ccdata->timewindowopens <= $now) { // Due.
+                    // Check config variable here to see if we want to override.
+                    if ($overrideactivecertification) {
+                        $deleted[] = $program->ccid;
+                        $cc[] = $ccdata;
+                    }
+                } else {
+                    // Certification has already expired, don't change the active record.
+                    // Flag as error and add an entry to the import log.
+                    $sql = "UPDATE {{$tablename}}
+                        SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
+                        importerror = :importerror
+                        WHERE id = :importid";
+                    $params = array('errorstring' => 'certificationexpired;', 'importerror' => 1, 'importid' => $program->importid);
+
+                    $DB->execute($sql, $params);
+                    continue;
+                }
+            } else if ($ccdata->timecompleted < $program->currenttimecompleted) {
+                // The imported record is older than the current record.
+                // Put the imported record directly into the history table and leave
+                // the active record unchanged
+                $chparams = array('certifid'    => $ccdata->certifid,
+                    'userid'      => $ccdata->userid,
+                    'timeexpires' => $ccdata->timeexpires);
+
+                if (!$DB->record_exists('certif_completion_history', $chparams)) {
                     $cchistory[] = $ccdata;
                 }
+            } else {
+                // The imported record and the active record have exactly the same date
+                // Flag as error and add an entry to the import log.
+                $sql = "UPDATE {{$tablename}}
+                    SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
+                        importerror = :importerror
+                        WHERE id = :importid";
+                $params = array('errorstring' => 'completiondatesame;', 'importerror' => 1, 'importid' => $program->importid);
+
+                $DB->execute($sql, $params);
+                continue;
             }
 
             // Program completion.
@@ -970,11 +1020,15 @@ function import_certification($importname, $importtime) {
 
             // Totara_compl_import_cert ids.
             $updateids[] = $program->importid;
-
         }
     }
     $programs->close();
 
+    if (!empty($deleted)) {
+        $DB->delete_records_list('certif_completion', 'id', $deleted);
+        unset($deleted);
+        $deleted = array();
+    }
     if (!empty($cc)) {
         $DB->insert_records_via_batch('certif_completion', $cc);
         unset($cc);
@@ -1124,6 +1178,9 @@ function get_config_data($filesource, $importname) {
     $data->csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $data->csvseparator = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
     $data->csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
+    if ($importname == 'certification') {
+        $data->overrideactive = get_default_config($pluginname, 'overrideactive', 0);
+    }
     return $data;
 }
 
@@ -1143,6 +1200,9 @@ function set_config_data($data, $importname) {
     set_config('csvdelimiter', $data->csvdelimiter, $pluginname);
     set_config('csvseparator', $data->csvseparator, $pluginname);
     set_config('csvencoding', $data->csvencoding, $pluginname);
+    if ($importname == 'certification') {
+        set_config('overrideactive', $data->overrideactive, $pluginname);
+    }
 }
 
 /**

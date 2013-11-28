@@ -86,6 +86,11 @@ class upload_form extends moodleform {
         $mform->setType('csvdelimiter', PARAM_TEXT);
         $mform->setDefault('csvencoding', 'UTF-8');
 
+        if ($data->importname == 'certification') {
+            $mform->addElement('advcheckbox', 'overrideactive', get_string('overrideactivecertifications', 'totara_completionimport'));
+
+        }
+
         $this->add_action_buttons(false, get_string('upload'));
 
         $this->set_data($data);
