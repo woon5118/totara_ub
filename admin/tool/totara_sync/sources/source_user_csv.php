@@ -341,20 +341,21 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                     if (!empty($this->config->{'import_'.$cf})) {
                         // Get shortname and check if we need to do field type processing
                         $value = trim($csvrow[$cf]);
-                        if (!empty($value)) {
-                            $shortname = str_replace("customfield_", "", $cf);
-                            $datatype = $DB->get_field('user_info_field', 'datatype', array('shortname' => $shortname));
-                            switch ($datatype) {
-                                case 'datetime':
-                                    // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                                    $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
-                                    if ($parsed_date) {
-                                        $value = $parsed_date;
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
+                        $shortname = str_replace("customfield_", "", $cf);
+                        $datatype = $DB->get_field('user_info_field', 'datatype', array('shortname' => $shortname));
+                        switch ($datatype) {
+                            case 'datetime':
+                                // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
+                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
+                                if ($parsed_date) {
+                                    $value = $parsed_date;
+                                } else {
+                                    // Don't try to put a value if the field has been left empty.
+                                    continue 2;
+                                }
+                                break;
+                            default:
+                                break;
                         }
                         $cfield_data[$cf] = $value;
                         unset($dbrow[$cf]);
