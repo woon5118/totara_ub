@@ -74,17 +74,21 @@ class rb_role_access extends rb_base_access {
         $anycontextcheck = false;
         $allowedreports = array();
 
-        $sql =  "SELECT rbs.reportid, rbs.value AS activeroles, rbs2.value AS context
-                   FROM {report_builder_settings} rbs
+        $sql =  "SELECT rb.id AS reportid, rbs.value AS activeroles, rbs2.value AS context
+                   FROM {report_builder} rb
+        LEFT OUTER JOIN {report_builder_settings} rbs
+                     ON rb.id = rbs.reportid
+                    AND rbs.type = ?
+                    AND rbs.name = ?
         LEFT OUTER JOIN {report_builder_settings} rbs2
                      ON (rbs.reportid = rbs2.reportid
                     AND rbs2.type = ?
                     AND rbs2.name = ?)
-                  WHERE rbs.type = ?
-                    AND rbs.name = ?";
-        $reports = $DB->get_records_sql($sql, array($type, 'context', $type, 'activeroles'));
+                  WHERE rb.embedded = ?";
 
-        if ($reports) {
+        $reports = $DB->get_records_sql($sql, array($type, 'activeroles', $type, 'context', 0));
+
+        if (count($reports) > 0) {
             // site admins no longer have records in role_assignments to check: assume access to everything
             if (is_siteadmin($userid)) {
                 foreach ($reports as $rpt) {
