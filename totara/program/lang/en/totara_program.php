@@ -579,6 +579,7 @@ $string['programduedate'] = 'Program due date';
 $string['programduemessage'] = 'Program due message';
 $string['programduemessage_help'] = 'This message will be sent at the specified time before a program is due.';
 $string['programends'] = 'Program ends';
+$string['programenrollmentdate'] = 'Program enrollment date';
 $string['programexceptions'] = 'Program exceptions';
 $string['programfullname'] = 'Program Fullname';
 $string['programfullname_help'] = 'The full name of the program is displayed at the top of the screen and in the program listings.';

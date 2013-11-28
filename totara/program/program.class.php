@@ -671,24 +671,24 @@ class program {
             }
         }
 
-        // Else it's a relative event, need to do a lookup
+        // Else it's a relative event, need to do a lookup.
         global $COMPLETION_EVENTS_CLASSNAMES;
 
         if (!isset($COMPLETION_EVENTS_CLASSNAMES[$assignment_record->completionevent])) {
             throw new ProgramException(get_string('eventnotfound', 'totara_program', $assignment_record->completionevent));
         }
 
-        // See if we can retrieve the object form the cache
+        // See if we can retrieve the object form the cache.
         if (isset($this->completion_object_cache[$assignment_record->completionevent])) {
             $event_object = $this->completion_object_cache[$assignment_record->completionevent];
         }
         else {
-            // Else make it it and add to the cache for future use
+            // Else make it it and add to the cache for future use.
             $event_object = new $COMPLETION_EVENTS_CLASSNAMES[$assignment_record->completionevent]();
             $this->completion_object_cache[$assignment_record->completionevent] = $event_object;
         }
 
-        $basetime = $event_object->get_timestamp($userid, $assignment_record->completioninstance);
+        $basetime = $event_object->get_timestamp($userid, $assignment_record);
 
         if ($basetime == false) {
             return false;
