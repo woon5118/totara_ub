@@ -69,7 +69,7 @@ else
 fi
 
 # If the language is set, use that language. Otherwise default to english.
-if [ -n "$3"]
+if [ -n "$3" ]
 then
     LANG="$3"
 else
