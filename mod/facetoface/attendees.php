@@ -91,7 +91,20 @@ $available_actions = array();
 $context = context_course::instance($course->id);
 $contextmodule = context_module::instance($cm->id);
 if (!$onlycontent) { // Need to check this for security issues
-    require_login();
+
+    $coursecheck = null;
+    $modulecheck = null;
+    $guestaccess = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'guest'));
+    if (!empty($guestaccess) && $guestaccess->status === '0') {
+        // Guest access is enabled, we need to check login against the course.
+        $coursecheck = $course;
+        if (!$cm->visible && !has_capability('moodle/course:viewhiddenactivities', $context)) {
+            // The module is hidden, we need to check the users ability to view it.
+            $modulecheck = $cm;
+        }
+    }
+
+    require_login($coursecheck, true, $modulecheck);
 }
 
 $PAGE->set_context($contextmodule);
