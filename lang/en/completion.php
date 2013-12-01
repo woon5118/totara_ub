@@ -238,7 +238,9 @@ $string['archivecompletions'] = 'Completions archive';
 $string['cannotarchivecompletions'] = 'No permission to archive this course completions';
 $string['archivingcompletions'] = 'Archiving completions for course {$a}';
 $string['archivedcompletions'] = 'Archived completions for course : {$a}';
-$string['archivecompletionscheck'] = 'Are you sure you want to archive all completion records for users completed on this course?';
+$string['archivecompletionscheck'] = 'Are you sure you want to archive all completion records for users completed on this course?
+    <br />
+    This will store a limited historical record of the completions and then delete them completely.';
 $string['archivecheck'] = 'Archive {$a} ?';
 $string['nouserstoarchive'] = 'There are no users that have completed this course';
 $string['archiveusersaffected'] = '{$a} users will be affected';
