@@ -24,17 +24,16 @@
  */
 
 /**
- * Local db upgrades for Totara Core
+ * DB upgrades for Totara Hierarchies
  */
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
-
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
 /**
- * Local database upgrade script
+ * Database upgrade script
  *
  * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
- * @return  boolean $result
  */
 function xmldb_totara_hierarchy_upgrade($oldversion) {
     global $CFG, $DB, $OUTPUT;
@@ -842,8 +841,63 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
                 $dbman->add_key($table, $key);
             }
         }
-        // Cohort savepoint reached.
+        // Savepoint reached.
         upgrade_plugin_savepoint(true, 2013103000, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2013120200) {
+        // Update all position assignments to ensure managerpath is set correctly.
+        global $POSITION_TYPES;
+
+        // May have already been applied in a previous branch.
+        $fixapplied = get_config('totara_hierarchy', 'managerpathfixapplied');
+        if (empty($fixapplied)) {
+
+            // We need to store array of pos_assignments, could be big.
+            raise_memory_limit(MEMORY_HUGE);
+
+            $transaction = $DB->start_delegated_transaction();
+
+            foreach ($POSITION_TYPES as $positiontype => $typestring) {
+                $typename = get_string('type' . $typestring, 'totara_hierarchy');
+
+                // Fill position assignments with manager path data.
+                $assignments = $DB->get_records('pos_assignment', array('type' => $positiontype), 'userid',
+                    'id,userid,managerid,managerpath');
+
+                $totalcount = count($assignments);
+                $i = 0;
+
+                // Build a keyed array for faster access.
+                // Unique key ensures only one userid for each primary position assignment.
+                $manager_relations = array();
+                if ($assignments) {
+                    foreach ($assignments as $assignment) {
+                        $manager_relations[$assignment->userid] = $assignment->managerid;
+                    }
+
+                    $pbar = new progress_bar('fixposassign' . $positiontype, 500, true);
+                    $pbar->update($i, $totalcount, "Fixing {$typename} manager paths - $i/$totalcount.");
+                    foreach ($assignments as $assignment) {
+                        $path = '/' . implode(totara_get_lineage($manager_relations, $assignment->userid), '/');
+                        // Only update if current path is wrong.
+                        if ($assignment->managerpath != $path) {
+                            $todb = new stdClass();
+                            $todb->id = $assignment->id;
+                            $todb->managerpath = $path;
+                            $DB->update_record('pos_assignment', $todb);
+                        }
+
+                        $i++;
+                        $pbar->update($i, $totalcount, "Fixing {$typename} manager paths - $i/$totalcount.");
+                    }
+                }
+            }
+            $transaction->allow_commit();
+            set_config('managerpathfixapplied', 1, 'totara_hierarchy');
+        }
+
+        upgrade_plugin_savepoint(true, 2013120200, 'totara', 'hierarchy');
     }
 
     return true;

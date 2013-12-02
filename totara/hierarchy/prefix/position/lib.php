@@ -602,7 +602,8 @@ class position_assignment extends data_object {
 
         if ($managerchanged) {
             // now recalculate managerpath
-            $manager_relations = $DB->get_records_menu('pos_assignment', array('type' => POSITION_TYPE_PRIMARY), 'userid', 'userid,managerid');
+            $manager_relations = $DB->get_records_menu('pos_assignment', array('type' => $this->type),
+                'userid', 'userid,managerid');
             //Manager relation for this assignment's user is wrong so we have to fix it
             $manager_relations[$this->userid] = $this->managerid;
             $this->managerpath = '/' . implode(totara_get_lineage($manager_relations, $this->userid), '/');
@@ -620,7 +621,7 @@ class position_assignment extends data_object {
                 SET managerpath = {$managerpath}
                 WHERE type = ? AND $like";
             $params = array(
-                POSITION_TYPE_PRIMARY,
+                $this->type,
                 "%/{$this->userid}/%"
             );
 
