@@ -1741,6 +1741,49 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2013103000, 'facetoface');
     }
 
+    if ($oldversion < 2013120100) {
+
+        $strmgr = get_string_manager();
+        $langs = array_keys($strmgr->get_list_of_translations());
+        foreach ($langs as $lang) {
+
+            if ($lang == 'en' || $strmgr->get_string('facetoface', 'facetoface', null, $lang) !== $strmgr->get_string('facetoface', 'facetoface', null, 'en')) {
+
+                $f2flabel = $strmgr->get_string('facetoface', 'facetoface', null, $lang);
+                $courselabel = $strmgr->get_string('course', 'moodle', null, $lang);
+
+                $body_key = "/{$courselabel}:\s*\[facetofacename\]/";
+                $body_replacement = "{$courselabel}:   [coursename]<br />\n{$f2flabel}:   [facetofacename]";
+
+                $title_key = "/{$courselabel}/";
+                $title_replacement = "{$f2flabel}";
+
+                $managerprefix_key = "/{$courselabel}:\s*\[facetofacename\]/";
+                $managerprefix_replacement = "{$courselabel}:   [coursename]<br />\n{$f2flabel}:   [facetofacename]";
+
+                $records = $DB->get_records('facetoface_notification_tpl', null, '', 'id, title, body, managerprefix');
+                foreach($records as $row) {
+
+                    $row->body = preg_replace($body_key, $body_replacement, $row->body);
+                    $row->title = preg_replace($title_key, $title_replacement, $row->title);
+                    $row->managerprefix = preg_replace($managerprefix_key, $managerprefix_replacement, $row->managerprefix);
+                    $result = $DB->update_record('facetoface_notification_tpl', $row);
+                }
+
+                $records = $DB->get_records('facetoface_notification', null, '', 'id, title, body, managerprefix');
+                foreach($records as $row) {
+
+                    $row->body = preg_replace($body_key, $body_replacement, $row->body);
+                    $row->title = preg_replace($title_key, $title_replacement, $row->title);
+                    $row->managerprefix = preg_replace($managerprefix_key, $managerprefix_replacement, $row->managerprefix);
+                    $result = $DB->update_record('facetoface_notification', $row);
+                }
+            }
+        }
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2013120100, 'facetoface');
+    }
+
     return $result;
 }
 

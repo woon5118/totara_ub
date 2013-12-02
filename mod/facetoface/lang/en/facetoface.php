@@ -385,6 +385,7 @@ $string['roomcreatesuccess'] = 'Successfully created room';
 $string['roomtype'] = 'Room type';
 $string['roomtype_help'] = 'The room type is used to determine if the system should try and prevent room booking conflicts. This will prevent a room from being booked for 2 sessions that are running at the same time.';
 $string['roomupdatesuccess'] = 'Successfully updated room';
+$string['placeholder:coursename'] = '[coursename]';
 $string['placeholder:facetofacename'] = '[facetofacename]';
 $string['placeholder:firstname'] = '[firstname]';
 $string['placeholder:lastname'] = '[lastname]';
@@ -495,7 +496,8 @@ $string['setting:defaultcancellationmessagedefault'] = 'This is to advise that y
 ***BOOKING CANCELLED***
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:   [duration]
 Date(s):
@@ -507,7 +509,7 @@ Room:   [session:room]
 ';
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
 $string['setting:defaultcancellationsubject_caption'] = 'Cancellation subject';
-$string['setting:defaultcancellationsubjectdefault'] = 'Course booking cancellation';
+$string['setting:defaultcancellationsubjectdefault'] = 'Face-to-face booking cancellation';
 $string['setting:defaultdeclineinstrmngr'] = 'Default decline message sent to managers.';
 $string['setting:defaultdeclineinstrmngr_caption'] = 'Decline message (managers)';
 $string['setting:defaultdeclineinstrmngrdefault'] = '*** Advice only ****
@@ -523,7 +525,8 @@ $string['setting:defaultdeclinemessagedefault'] = 'This is to advise that your b
 ***BOOKING DECLINED***
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:   [duration]
 Date(s):
@@ -535,7 +538,7 @@ Room:   [session:room]
 ';
 $string['setting:defaultdeclinesubject'] = 'Default subject line for decline emails.';
 $string['setting:defaultdeclinesubject_caption'] = 'Decline subject';
-$string['setting:defaultdeclinesubjectdefault'] = 'Course booking decline';
+$string['setting:defaultdeclinesubjectdefault'] = 'Face-to-face booking decline';
 $string['setting:defaultconfirmationinstrmngr'] = 'Default confirmation message sent to managers.';
 $string['setting:defaultconfirmationinstrmngr_caption'] = 'Confirmation message (managers)';
 $string['setting:defaultconfirmationinstrmngrdefault'] = '*** Advice only ****
@@ -551,7 +554,8 @@ $string['setting:defaultconfirmationmessage_caption'] = 'Confirmation message';
 $string['setting:defaultconfirmationmessagedefault'] = 'This is to confirm that you are now booked on the following course:
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 Cost:   [cost]
 
 Duration:    [duration]
@@ -571,11 +575,12 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultconfirmationsubject'] = 'Default subject line for confirmation emails.';
 $string['setting:defaultconfirmationsubject_caption'] = 'Confirmation subject';
-$string['setting:defaultconfirmationsubjectdefault'] = 'Course booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultconfirmationsubjectdefault'] = 'Face-to-face booking confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultdatetimechangemessagedefault'] = 'Your session date/time has changed:
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:   [duration]
 Date(s):
@@ -587,7 +592,7 @@ Room:   [session:room]
 ';
 $string['setting:defaultdatetimechangesubject'] = 'Default subject line for date/time change emails.';
 $string['setting:defaultdatetimechangesubject_caption'] = 'Date/time change subject';
-$string['setting:defaultdatetimechangesubjectdefault'] = 'Course booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultdatetimechangesubjectdefault'] = 'Face-to-face booking date/time changed: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultreminderinstrmngr'] = 'Default reminder message sent to managers.';
 $string['setting:defaultreminderinstrmngr_caption'] = 'Reminder message (managers)';
 $string['setting:defaultreminderinstrmngrdefault'] = '*** Reminder only ****
@@ -603,7 +608,8 @@ $string['setting:defaultremindermessage_caption'] = 'Reminder message';
 $string['setting:defaultremindermessagedefault'] = 'This is a reminder that you are booked on the following course:
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -623,10 +629,11 @@ To re-schedule your booking you need to cancel this booking and then re-book a n
 ';
 $string['setting:defaultremindersubject'] = 'Default subject line for reminder emails.';
 $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
-$string['setting:defaultremindersubjectdefault'] = 'Course booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultremindersubjectdefault'] = 'Face-to-face booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -645,7 +652,8 @@ $string['setting:defaultrequestinstrmngrcopybelow'] = '*** [firstname] [lastname
 $string['setting:defaultrequestmessagedefault'] = 'Your request to book into the following course has been sent to your manager:
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 Cost:   [cost]
 
 Duration:   [duration]
@@ -656,13 +664,14 @@ Location:   [session:location]
 Venue:   [session:venue]
 Room:   [session:room]
 ';
-$string['setting:defaultrequestsubjectdefault'] = 'Course booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultrequestsubjectdefault'] = 'Face-to-face booking request: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to a session.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
 $string['setting:defaulttrainerconfirmationmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following course:
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:    [duration]
 Date(s):
@@ -678,7 +687,7 @@ Room:   [session:room]
 ';
 $string['setting:defaulttrainerconfirmationsubject'] = 'Default subject line for trainer confirmation emails.';
 $string['setting:defaulttrainerconfirmationsubject_caption'] = 'Trainer confirmation subject';
-$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Course trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaulttrainerconfirmationsubjectdefault'] = 'Face-to-face trainer confirmation: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 
 $string['setting:defaulttrainersessioncancellationmessage'] = 'Default session cancellation message sent to the trainer.';
 $string['setting:defaulttrainersessioncancellationmessage_caption'] = 'Trainer session cancellation message';
@@ -687,7 +696,8 @@ $string['setting:defaulttrainersessioncancellationmessagedefault'] = 'This is to
 ***SESSION CANCELLED***
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:   [duration]
 Date(s):
@@ -700,7 +710,7 @@ Room:   [session:room]
 
 $string['setting:defaulttrainersessioncancellationsubject'] = 'Default subject line for trainer session cancellation emails.';
 $string['setting:defaulttrainersessioncancellationsubject_caption'] = 'Trainer session cancellation subject';
-$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Course session trainer cancellation';
+$string['setting:defaulttrainersessioncancellationsubjectdefault'] = 'Face-to-face session trainer cancellation';
 
 $string['setting:defaulttrainersessionunassignedmessage'] = 'Default session unassigned message sent to the trainer.';
 $string['setting:defaulttrainersessionunassignedmessage_caption'] = 'Trainer session unassigned message';
@@ -709,7 +719,8 @@ $string['setting:defaulttrainersessionunassignedmessagedefault'] = 'This is to a
 ***SESSION UNASSIGNED***
 
 Participant:   [firstname] [lastname]
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 
 Duration:   [duration]
 Date(s):
@@ -722,13 +733,14 @@ Room:   [session:room]
 
 $string['setting:defaulttrainersessionunassignedsubject'] = 'Default subject line for trainer session unassigned emails.';
 $string['setting:defaulttrainersessionunassignedsubject_caption'] = 'Trainer session unassigned subject';
-$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Course session trainer unassigned';
+$string['setting:defaulttrainersessionunassignedsubjectdefault'] = 'Face-to-face session trainer unassigned';
 $string['setting:defaultvalue'] = 'Default value';
 $string['setting:defaultwaitlistedmessage'] = 'Default wait-listed message sent to users.';
 $string['setting:defaultwaitlistedmessage_caption'] = 'Wait-listed message';
 $string['setting:defaultwaitlistedmessagedefault'] = 'This is to advise that you have been added to the waitlist for:
 
-Course:   [facetofacename]
+Course:   [coursename]
+Face-to-face:   [facetofacename]
 Location:  [session:location]
 Participant:   [firstname] [lastname]
 

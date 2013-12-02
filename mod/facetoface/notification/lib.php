@@ -466,7 +466,13 @@ class facetoface_notification extends data_object {
 
         // Load facetoface object
         if (empty($this->_facetoface)) {
-            $this->_facetoface = $DB->get_record('facetoface', array('id' => $this->facetofaceid));
+            $this->_facetoface = $DB->get_record_sql("SELECT f2f.*, c.fullname AS coursename
+                FROM {facetoface} f2f
+                INNER JOIN {course} c ON c.id = f2f.course
+                WHERE f2f.id = ?", array($this->facetofaceid));
+        } else if (!isset($this->_facetoface->coursename)) {
+            $course = $DB->get_record('course', array('id' => $this->_facetoface->course), 'fullname');
+            $this->_facetoface->coursename = $course->fullname;
         }
 
         // Load session object
@@ -482,11 +488,14 @@ class facetoface_notification extends data_object {
         $subject = $this->title;
         $body = $this->body;
         $managerprefix = $this->managerprefix;
+        $options = array('context' => context_course::instance($this->_facetoface->course));
+        $coursename = format_string($this->_facetoface->coursename, true, $options);
 
         $subst = array('subject', 'body', 'managerprefix');
         foreach ($subst as $text) {
             $$text = facetoface_message_substitutions(
                 $$text,
+                $coursename,
                 $this->_facetoface->name,
                 $user,
                 $session,
@@ -991,7 +1000,7 @@ function facetoface_send_request_notice($facetoface, $session, $userid) {
  * @param   int     $sessionid      Session ID
  * @return  string
  */
-function facetoface_message_substitutions($msg, $facetofacename, $user, $data, $sessionid) {
+function facetoface_message_substitutions($msg, $coursename, $facetofacename, $user, $data, $sessionid) {
     global $CFG, $DB;
 
     if (empty($msg)) {
@@ -1034,6 +1043,7 @@ function facetoface_message_substitutions($msg, $facetofacename, $user, $data, $
         $finishtime  = get_string('unknowntime', 'facetoface');
     }
 
+    $msg = str_replace(get_string('placeholder:coursename', 'facetoface'), $coursename, $msg);
     $msg = str_replace(get_string('placeholder:facetofacename', 'facetoface'), $facetofacename, $msg);
     $msg = str_replace(get_string('placeholder:firstname', 'facetoface'), $user->firstname, $msg);
     $msg = str_replace(get_string('placeholder:lastname', 'facetoface'), $user->lastname, $msg);
