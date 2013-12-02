@@ -27,6 +27,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once($CFG->dirroot . '/totara/certification/lib.php');
+require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
 define('COMPLETIONTYPE_ALL', 1);
 define('COMPLETIONTYPE_ANY', 2);
@@ -743,9 +744,7 @@ class multi_course_set extends course_set {
     }
 
     public function display($userid=null, $previous_sets=array(), $next_sets=array(), $accessible=true, $viewinganothersprogram=false) {
-        global $USER, $OUTPUT, $DB, $CFG;
-
-        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+        global $USER, $OUTPUT, $DB;
 
         if ($userid) {
             $usercontext = context_user::instance($userid);
@@ -1541,9 +1540,7 @@ class competency_course_set extends course_set {
     }
 
     public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false) {
-        global $OUTPUT, $DB, $CFG;
-
-        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+        global $OUTPUT, $DB;
 
         $out = '';
         $out .= html_writer::start_tag('fieldset', array('class' => 'surround display-program'));
