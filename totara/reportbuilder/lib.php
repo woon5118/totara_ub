@@ -414,7 +414,6 @@ class reportbuilder {
      */
     function debug($level=1) {
         global $OUTPUT;
-        $context = context_system::instance();
         if (!is_siteadmin()) {
             return false;
         }

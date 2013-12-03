@@ -608,6 +608,9 @@ abstract class rb_base_source {
                     case 'goal_type':
                         $prefix = 'goal';
                         break;
+                    case 'course':
+                        $prefix = 'course';
+                        break;
                     default:
                         //unknown prefix
                         return '';
@@ -658,6 +661,9 @@ abstract class rb_base_source {
                     break;
                 case 'goal_type':
                     $prefix = 'goal';
+                    break;
+                case 'course':
+                    $prefix = 'course';
                     break;
                 default:
                     //unknown prefix

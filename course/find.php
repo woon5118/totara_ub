@@ -28,6 +28,7 @@ require_once(dirname(dirname(__FILE__)).'/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 $format = optional_param('format','', PARAM_TEXT); // export format
+$debug = optional_param('debug', 0, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('noblocks');
@@ -68,6 +69,10 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading($fullname);
 echo $OUTPUT->header();
+
+if ($debug) {
+    $report->debug($debug);
+}
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
