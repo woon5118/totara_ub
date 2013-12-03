@@ -915,5 +915,17 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2013102900, 'totara_core');
     }
 
+    if ($oldversion < 2013120300) {
+        // Add timecompleted for module completion.
+        $table = new xmldb_table('oldpassword');
+        $field = new xmldb_field('hash', XMLDB_TYPE_CHAR, '255');
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2013120300, 'totara_core');
+    }
+
     return true;
 }
