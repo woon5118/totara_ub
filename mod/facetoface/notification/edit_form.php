@@ -82,7 +82,7 @@ class mod_facetoface_notification_form extends moodleform {
             $mform->addElement('html', '<br /><br />');
 
             $group = array();
-            $group[] = $mform->createElement('checkbox', 'booked', get_string('status_booked', 'facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'booked', get_string('status_booked', 'facetoface'));
             $group[] = $mform->createElement('radio', 'booked_type', '',
                     get_string('recipients_allbooked', 'facetoface'), MDL_F2F_RECIPIENTS_ALLBOOKED);
             $group[] = $mform->createElement('radio', 'booked_type', '',
@@ -90,8 +90,8 @@ class mod_facetoface_notification_form extends moodleform {
             $group[] = $mform->createElement('radio', 'booked_type', '',
                     get_string('recipients_noshowsonly', 'facetoface'), MDL_F2F_RECIPIENTS_NOSHOWS);
 
-            $group[] = $mform->createElement('checkbox', 'waitlisted', get_string('status_waitlisted', 'facetoface'));
-            $group[] = $mform->createElement('checkbox', 'cancelled', get_string('status_user_cancelled', 'facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'waitlisted', get_string('status_waitlisted', 'facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'cancelled', get_string('status_user_cancelled', 'facetoface'));
 
             $mform->addGroup($group, 'recipients', get_string('recipients', 'facetoface'), '', false);
 
