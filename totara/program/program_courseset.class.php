@@ -698,11 +698,12 @@ class multi_course_set extends course_set {
      * @return int|bool
      */
     public function check_courseset_complete($userid) {
+        global $DB;
 
         $courses = $this->courses;
         $completiontype = $this->completiontype;
 
-        // check that the course set contains at least one course
+        // Check that the course set contains at least one course.
         if (!count($courses)) {
             return false;
         }
@@ -714,28 +715,46 @@ class multi_course_set extends course_set {
             // create a new completion object for this course
             $completion_info = new completion_info($course);
 
+            $params = array('userid' => $userid, 'course' => $course->id);
+            $completion_completion = new completion_completion($params);
+
             // check if the course is complete
-            if ($completion_info->is_course_complete($userid)) {
+            if ($completion_completion->is_complete()) {
                 if ($completiontype == COMPLETIONTYPE_ANY) {
                     $completionsettings = array(
                         'status'        => STATUS_COURSESET_COMPLETE,
-                        'timecompleted' => time()
+                        'timecompleted' => $completion_completion->timecompleted
                     );
                     return $this->update_courseset_complete($userid, $completionsettings);
                 }
             } else {
-                // if all courses must be completed for this ourse set to be complete
+                // If all courses must be completed for this course set to be complete.
                 if ($completiontype == COMPLETIONTYPE_ALL) {
                     return false;
                 }
             }
         }
 
-        // if processing reaches here and all courses in this set must be comleted then the course set is complete
+        // If processing reaches here and all courses in this set must be completed then
+        // the course set is complete.
         if ($completiontype == COMPLETIONTYPE_ALL) {
+            // Get the last course completed so we can use that timestamp for the courseset.
+            $courseids = array();
+            foreach ($courses as $course) {
+                $courseids[] = $course->id;
+            }
+
+            list($incourse, $params) = $DB->get_in_or_equal($courseids);
+            $sql = "SELECT MAX(timecompleted) AS timecompleted
+                FROM {course_completions}
+                WHERE course $incourse
+                AND userid = ?";
+            $params[] = $userid;
+            $completion = $DB->get_record_sql($sql, $params);
+
             $completionsettings = array(
                 'status'        => STATUS_COURSESET_COMPLETE,
-                'timecompleted' => time()
+                'timecompleted' => $completion->timecompleted
             );
             return $this->update_courseset_complete($userid, $completionsettings);
         }

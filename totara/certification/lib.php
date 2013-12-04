@@ -455,7 +455,7 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
     $todb->userid = $userid;
     $todb->renewalstatus = $renewalstatus;
     $todb->certifpath = $certificationpath;
-    if ($certificationpath == CERTIFPATH_RECERT) {
+    if ($certificationpath == CERTIFPATH_RECERT) { // Recertifying.
         $todb->status = CERTIFSTATUS_COMPLETED;
         $lastcompleted = certif_get_content_completion_time($certificationid, $userid);
         // If no courses completed, maintain default behaviour.
@@ -478,7 +478,7 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
         $todb->timeexpires = get_timeexpires($base, $certification->activeperiod);
         $todb->timewindowopens = get_timewindowopens($todb->timeexpires, $certification->windowperiod);
         $todb->timecompleted = $lastcompleted;
-    } else { // CERT.
+    } else { // Certifying.
         $todb->status =  CERTIFSTATUS_ASSIGNED;
         // Window/expires not relevant for CERTIFPATH_CERT as should be doing in program 'due' time.
         $todb->timewindowopens = 0;

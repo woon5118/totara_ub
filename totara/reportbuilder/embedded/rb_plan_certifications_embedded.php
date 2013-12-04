@@ -75,7 +75,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
                 'heading' => get_string('timeexpires', 'rb_source_dp_certification'),
             ),
             array(
-                'type' => 'prog_completion',
+                'type' => 'certif_completion',
                 'value' => 'timecompleted',
                 'heading' => get_string('timecompleted', 'rb_source_dp_certification'),
             ),
@@ -128,7 +128,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
                 'advanced' => 1,
             ),
             array(
-                'type' => 'prog_completion',
+                'type' => 'certif_completion',
                 'value' => 'timecompleted',
                 'advanced' => 1,
             ),

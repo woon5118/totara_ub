@@ -268,5 +268,16 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2013103000, 'totara_reportbuilder');
     }
 
+    if ($oldversion < 2013121000) {
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+        // Rename any existing records for the timecompleted column/filter in dp_certifications.
+        reportbuilder_rename_data('columns', 'dp_certification', 'prog_completion', 'timecompleted', 'certif_completion', 'timecompleted');
+        reportbuilder_rename_data('filters', 'dp_certification', 'prog_completion', 'timecompleted', 'certif_completion', 'timecompleted');
+
+        // Report builder savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2013121000, 'totara_reportbuilder');
+    }
+
     return true;
 }

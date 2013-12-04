@@ -273,12 +273,12 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $columnoptions[] = new rb_column_option(
-                'prog_completion',
+                'certif_completion',
                 'timecompleted',
                 get_string('timecompleted', 'rb_source_dp_certification'),
-                'prog_completion.timecompleted',
+                'certif_completion.timecompleted',
                 array(
-                    'joins' => 'prog_completion',
+                    'joins' => 'certif_completion',
                     'displayfunc' => 'nice_date'
                 )
         );
@@ -422,7 +422,7 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-                'prog_completion',
+                'certif_completion',
                 'timecompleted',
                 get_string('timecompleted', 'rb_source_dp_certification'),
                 'date'

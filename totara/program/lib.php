@@ -1458,6 +1458,8 @@ function prog_process_extensions($extensions) {
  * @param program $program if not set - all programs will be updated
  */
 function prog_update_completion($userid, program $program = null) {
+    global $DB;
+
     if (!$program) {
         $proglist = prog_get_all_programs($userid);
         $programs = array();
@@ -1527,9 +1529,16 @@ function prog_update_completion($userid, program $program = null) {
 
         // Courseset_group_completed will be true if all the course groups in the program have been completed.
         if ($courseset_group_completed) {
+            //Get the completion date of the last courseset to use in program completion
+            $sql = "SELECT MAX(timecompleted) as timecompleted
+                    FROM {prog_completion}
+                    WHERE coursesetid != 0 AND programid = ?";
+            $params = array($program->id);
+            $coursesetcompletion = $DB->get_record_sql($sql, $params);
+
             $completionsettings = array(
                 'status'        => STATUS_PROGRAM_COMPLETE,
-                'timecompleted' => time()
+                'timecompleted' => $coursesetcompletion->timecompleted
                 );
             $program->update_program_complete($userid, $completionsettings);
         }
