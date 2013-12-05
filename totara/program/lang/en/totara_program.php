@@ -78,6 +78,7 @@ $string['allcurrentlyassignedissues'] = 'All "already assigned" issues';
 $string['allduplicatecourseissues'] = 'All "duplicate course in certifications" issues';
 $string['allextensionrequestissues'] = 'All "extension request" issues';
 $string['alllearners'] = 'All learners';
+$string['allowedtimeforprogramaslearner'] = 'You are allowed {$a->num} {$a->periodstr} to complete this program.';
 $string['allowedtimeforprogramasmanager'] = '{$a->fullname} will require at least {$a->num} {$a->periodstr} to complete this program.';
 $string['allowedtimeforprograminfinity'] = 'There is no time limit to complete this program.';
 $string['allowedtimeforprogramviewing'] = 'A learner is allowed {$a->num} {$a->periodstr} to complete this program.';
