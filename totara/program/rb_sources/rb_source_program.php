@@ -145,21 +145,28 @@ class rb_source_program extends rb_base_source {
         return $requiredcolumns;
     }
 
+    public function post_config(reportbuilder $report) {
+        // Visibility.
+        $this->requiredcolumns[] = new rb_column(
+            'base',
+            'visible',
+            '',
+            "base.visible"
+        );
+        $this->requiredcolumns[] = new rb_column(
+            'base',
+            'audiencevisible',
+            '',
+            "base.audiencevisible"
+        );
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
+        $reportfor = $report->reportfor; // ID of the user the report is for.
+        $fieldbaseid = $report->get_field('base', 'id', 'base.id');
+        $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
+        $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
+        $report->set_post_config_restrictions(totara_visibility_where($reportfor,
+                $fieldbaseid, $fieldvisible, $fieldaudvis, COHORT_ASSN_ITEMTYPE_PROGRAM));
+    }
 
-
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
-
-
-
-} // end of rb_source_courses class
+} // End of rb_source_courses class.
 

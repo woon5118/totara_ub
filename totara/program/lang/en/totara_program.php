@@ -616,6 +616,7 @@ $string['programvisibility'] = 'Program Visibility';
 $string['programvisibility_help'] = 'If the program is visible, it will appear in program listings and search results and students will be able to view the program contents.
 
 If the program is not visble, it will not appear in program listings or search results but the program will still be displayed in the learning plans of any students who have been assigned to the program and students can still access the program if they know the program\'s URL.';
+$string['programvisible'] = 'Program Visible';
 $string['progress'] = 'Progress';
 $string['reason'] = 'Extension reason';
 $string['reasonforextension'] = 'Reason for extension';

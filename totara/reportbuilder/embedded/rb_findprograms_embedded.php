@@ -59,19 +59,7 @@ class rb_findprograms_embedded extends rb_base_embedded {
             ),
         );
 
-        // no restrictions
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
-
-        // don't include the front page (site-level course)
-        $this->embeddedparams = array(
-            'category' => '!0',
-        );
-
-        $context = context_system::instance();
-        if (!has_capability('totara/program:viewhiddenprograms', $context)) {
-            // don't show hidden courses to non-admins
-            $this->embeddedparams['visible'] = 1;
-        }
 
         parent::__construct();
     }

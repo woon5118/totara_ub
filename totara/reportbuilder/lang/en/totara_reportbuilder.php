@@ -50,6 +50,7 @@ $string['anyofthefollowing'] = 'Any of the following';
 $string['ascending'] = 'Ascending (A to Z, 1 to 9)';
 $string['assignedactivities'] = 'Assigned activities';
 $string['at'] = 'at';
+$string['audiencevisibility'] = 'Audience Visibility';
 $string['backtoallgroups'] = 'Back to all groups';
 $string['badcolumns'] = 'Invalid columns';
 $string['badcolumnsdesc'] = 'The following columns have been included in this report, but do not exist in the report\'s source. This can occur if the source changes on disk after reports have been generated. To fix, either restore the previous source file, or delete the columns from this report.';

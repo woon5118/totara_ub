@@ -831,7 +831,6 @@ abstract class rb_base_source {
 
     // convert a course category name into a link to that category's page
     function rb_display_link_course_category($category, $row, $isexport = false) {
-
         if ($isexport) {
             return format_string($category);
         }
@@ -844,6 +843,13 @@ abstract class rb_base_source {
         $attr = (isset($row->cat_visible) && $row->cat_visible == 0) ? array('class' => 'dimmed') : array();
         $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
         return html_writer::link($url, $category, $attr);
+    }
+
+
+    public function rb_display_audience_visibility($visibility, $row, $isexport = false) {
+        global $COHORT_VISIBILITY;
+
+        return $COHORT_VISIBILITY[$visibility];
     }
 
 
@@ -1694,6 +1700,16 @@ abstract class rb_base_source {
         );
         $columnoptions[] = new rb_column_option(
             'course',
+            'audvis',
+            get_string('audiencevisibility', 'totara_reportbuilder'),
+            "$join.audiencevisible",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'audience_visibility'
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course',
             'icon',
             get_string('courseicon', 'totara_reportbuilder'),
             "$join.icon",
@@ -1980,6 +1996,26 @@ abstract class rb_base_source {
                     'program_id' => "$join.id",
                     'program_icon' => "$join.icon"
                 )
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'prog',
+            'visible',
+            get_string('programvisible', 'totara_program'),
+            "$join.visible",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'yes_no'
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'prog',
+            'audvis',
+            get_string('audiencevisibility', 'totara_reportbuilder'),
+            "$join.audiencevisible",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'audience_visibility'
             )
         );
         return true;
