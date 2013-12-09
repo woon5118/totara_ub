@@ -106,14 +106,6 @@ class profile_field_base {
         }
 
         $data = new stdClass();
-        // If a datetime is disabled then remove any existing data
-        if(get_class($this) == 'profile_field_datetime') {
-            $enabled = $this->inputname . '_enabled';
-            if (!isset($usernew->$enabled) && !empty($this->data)) {
-                $DB->delete_records('user_info_data', array('userid' => $usernew->id, 'fieldid' => $this->field->id));
-                return;
-            }
-        }
 
         $usernew->{$this->inputname} = $this->edit_save_data_preprocess($usernew->{$this->inputname}, $data);
 
