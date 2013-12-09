@@ -51,6 +51,11 @@ step_time "1"
 echo "STEP 2: Run php syntax check";
 for FILE in $affectedFiles
 do
+    # Deleted files will be in affectedFiles but shouldn't be checked.
+    if [ ! -f $FILE ]
+        then
+            continue
+    fi
     ./build/lint.sh ${FILE} | grep -v "No syntax errors detected"
 done
 step_time "2"
@@ -59,6 +64,11 @@ step_time "2"
 echo "STEP 3: Run version check"
 for FILE in $affectedFiles
 do
+    # Deleted files will be in affectedFiles but shouldn't be checked.
+    if [ ! -f $FILE ]
+        then
+            continue
+    fi
     case $FILE in
         *version.php)  versionFile="true";;
     esac
