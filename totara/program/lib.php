@@ -1024,7 +1024,7 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
             }
         }
 
-        if ($program->visible || has_capability('totara/program:viewhiddenprograms', program_get_context($program->id))) {
+        if ($program->is_viewable($USER->id) || $program->user_is_assigned($USER->id)) {
             // Don't exit this loop till the end we need to count all the visible programs to update $totalcount.
             if ($c >= $limitfrom && $c < $limitto) {
                 $programs[] = $program;

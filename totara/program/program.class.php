@@ -1501,7 +1501,12 @@ class program {
             }
 
             // If this user is able to view hidden programs, then let it be visible.
-            if (has_capability('totara/program:viewhiddenprograms', program_get_context($this->id), $user->id)) {
+            if (empty($this->certifid)) {
+                $capability = 'totara/program:viewhiddenprograms';
+            } else {
+                $capability = 'totara/certification:viewhiddencertifications';
+            }
+            if (has_capability($capability, program_get_context($this->id), $user->id)) {
                 return true;
             }
         } else {

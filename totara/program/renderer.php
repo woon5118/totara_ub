@@ -618,8 +618,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $programs = array();
             $displayoptions = $chelper->get_programs_display_options();
             if (!$chelper->get_programs_display_option('nodisplay') && $coursecat->id != 0) {
-                $programs = prog_get_programs($coursecat->id, 'p.sortorder ASC',
-                        'p.id, p.category, p.sortorder, p.shortname, p.fullname, p.visible, p.icon', $type, $displayoptions);
+                $programs = prog_get_programs($coursecat->id, 'p.sortorder ASC', 'p.*', $type, $displayoptions);
             }
             if ($viewmoreurl = $chelper->get_programs_display_option('viewmoreurl')) {
                 // The option for 'View more' link was specified, display more link.
@@ -1044,8 +1043,13 @@ class totara_program_renderer extends plugin_renderer_base {
         } else {
             $programicon = $this->output->pix_url('/programicons/default', 'totara_core');
         }
+        if (empty($CFG->audiencevisibility)) {
+            $isdimmed = !$program->visible;
+        } else {
+            $isdimmed = $program->audiencevisible != COHORT_VISIBLE_ALL;
+        }
         $programnamelink = html_writer::link(new moodle_url('/totara/program/view.php', array('id' => $program->id)),
-                        $programname, array('class' => $program->visible ? '' : 'dimmed' ,
+                        $programname, array('class' => $isdimmed ? 'dimmed' : '' ,
                         'style' => "background-image:url({$programicon->out()})"));
         $content .= html_writer::tag($nametag, $programnamelink, array('class' => 'name'));
 

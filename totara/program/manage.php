@@ -535,7 +535,12 @@ if (!$programs) {
 
         $programurl = new moodle_url('/totara/program/view.php', array('id' => $aprogram->id, 'viewtype' => $viewtype));
         $attributes = array();
-        $attributes['class'] = $aprogram->visible ? '' : 'dimmed';
+        if (empty($CFG->audiencevisibility)) {
+            $isdimmed = !$aprogram->visible;
+        } else {
+            $isdimmed = $aprogram->audiencevisible != COHORT_VISIBLE_ALL;
+        }
+        $attributes['class'] = $isdimmed ? 'dimmed' : '';
         $programname = format_string($aprogram->fullname);
         $programname = html_writer::link($programurl, $programname, $attributes);
 
