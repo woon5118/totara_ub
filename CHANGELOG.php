@@ -3,6 +3,45 @@
 
 Totara LMS Changelog
 
+Release 2.5.3 (10th December 2013):
+==================================================
+
+Improvements:
+    T-11422    Made the audience visibility column editable for Audiences visible learning tabs
+    T-11658    Completions upload reports now show all records instead of just errors
+    T-11693    Improved required learning courseset operators to allow for longer string translations
+    T-11675    Added additional warnings on the archive completions confirmation page
+
+Database Upgrades:
+    T-11682    Changed program/certification completion times to be based off course completion
+    T-11670    Added coursename variable to facetoface notifications and fixed the labelling of facetofacename variables
+    T-11680    Fixed bug where assigning a manager to a secondary position could affect primary positions
+
+Bug Fixes:
+    T-11607    Fixed dates when importing certifications using the historic import
+    T-11671    Fixed the handling of blank values for date/time custom fields in Totara Sync
+    T-11614    Fixed the framework selector for appraisal and feedback360 assignment dialogs
+    T-11622    Fixed goal permissions being applied inconsistently
+    T-11690    Fixed a string not being translated correctly on the required learning page
+    T-11673    Fixed access to reports when site roles have been renamed
+    T-11569    Fixed the required course grade for languages using different characters for the decimal point
+    T-11687    Fixed textarea and file custom course fields not displaying in report builder
+    T-11629    Fixed programs sending duplicate enrolment messages when changing due date between set and relative
+    T-11552    Fixed icals not opening automatically in Outlook 2010
+    T-11534    Fixed facetoface calendar entries not taking course visibility into account
+    T-11657    Fixed role name missing in security overview report
+    T-11650    Fixed access to facetoface approvals page with guest access enabled
+    T-11608    Fixed "Restrict initial display" option not being applied in embedded reports
+    T-11603    Fixed rendering issue in appraisal snapshots
+    T-11685    Fixed facetoface notifications form elements not saving when unchecked
+    T-11661    Prevent password reuse if rotation limit setting enabled
+    T-11681    Fixed ability to view courses within required learning for learners
+    T-11672    Fixed hardcoded string in the completion imports success message
+
+API Changes:
+    T-11662    Added a database event to delete related position assignments when a user is deleted
+
+
 Release 2.5.2 (26th November 2013):
 ==================================================
 
