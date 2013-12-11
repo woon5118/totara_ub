@@ -319,7 +319,13 @@ class program {
                             if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
                                 // this means that the user hasn't logged in yet
                                 // create a future assignment so we can assign them when they do login
-                                $this->create_future_assignment($this->id, $user->id, $assign->id);
+                                $fassigncount++;
+                                $fassignusers[$user->id] = $user->id;
+                                if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
+                                    $this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id);
+                                    $fassigncount = 0;
+                                    $fassignusers = array();
+                                }
                                 continue;
                             }
 
