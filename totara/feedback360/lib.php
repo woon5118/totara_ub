@@ -480,7 +480,8 @@ class feedback360 {
                 $message = get_string('cancellationemail', 'totara_feedback360', $stringvars);
             }
             // Send a cancellation email.
-            self::email_external_address($email, $userfrom, $subject, $message, $message);
+            $userto = totara_generate_email_user($email);
+            email_to_user($userto, $userfrom, $subject, strip_tags($message), $message);
         } else {
             $DB->delete_records('feedback360_resp_assignment', array('id' => $resp_assignment->id));
 
@@ -734,167 +735,6 @@ class feedback360 {
 
         $params = array('feedback360id' => $feedback360id, 'userid' => $userid);
         return $DB->record_exists('feedback360_user_assignment', $params);
-    }
-
-    /**
-     * Sends an email to a supplied external email address
-     *
-     * NOTE: Doesn't support attachments.
-     *
-     * @param string $emailaddress      The email address we will send the message to.
-     * @param object $userfrom          The system user sending out the email (needs firstname,lastname,email)
-     * @param string $subject           The subject of the email being sent out
-     * @param string $message           The message of the email being sent out
-     * @param string $messagealt        The non-html version of the message
-     * @param bool   $usetrueaddress    Determines whether $userfrom email address should be sent out.
-     */
-    public static function email_external_address($emailaddress, $userfrom, $subject, $message, $messagealt,
-            $usetrueaddress = true, $wordwrapwidth = 79) {
-        global $CFG;
-
-        // Check $emailaddress is !empty and valid format.
-        if (empty($emailaddress) || !validate_email($emailaddress)) {
-            // We can not send emails to invalid addresses - it might create security issue or confuse the mailer.
-            $invalidemail = "{$emailaddress} is invalid! Not sending.";
-            error_log($invalidemail);
-            if (CLI_SCRIPT) {
-                mtrace('Error: feedback360::email_external_address(): '.$invalidemail);
-            }
-            return false;
-        }
-
-        // Check $userfrom is !empty and is a object.
-        if (empty($userfrom) || !is_object($userfrom)) {
-            error_log('$userfrom was empty, please make sure you specify who the message is from');
-        }
-
-        // Check the message?
-
-        // Check if noemailever is set.
-        if (!empty($CFG->noemailever)) {
-            // Hidden setting for development sites, set in config.php if needed.
-            $noemail = 'Not sending email due to noemailever config setting';
-            error_log($noemail);
-            if (CLI_SCRIPT) {
-                mtrace('Error: feedback360::email_external_address(): '.$noemail);
-            }
-            return true;
-        }
-
-        // Check if divertallemailsto is set.
-        if (!empty($CFG->divertallemailsto)) {
-            $subject = "[DIVERTED {$emailaddress}] $subject";
-            $user = clone($user);
-            $user->email = $CFG->divertallemailsto;
-        }
-
-        $mail = get_mailer();
-        $supportuser = generate_email_supportuser();
-        $temprecipients = array();
-        $tempreplyto = array();
-
-        // Handle bounces?
-        if (!empty($CFG->handlebounces)) {
-            $modargs = 'B' . base64_encode(pack('V', $user->id)) . substr(md5($user->email), 0, 16);
-            $mail->Sender = generate_email_processing_address(0, $modargs);
-        } else {
-            $mail->Sender = $supportuser->email;
-        }
-
-        // Set the user from.
-        if ($usetrueaddress and !empty($userfrom->maildisplay)) {
-            $mail->From     = $userfrom->email;
-            $mail->FromName = fullname($userfrom);
-        } else {
-            $mail->From     = $CFG->noreplyaddress;
-            $mail->FromName = fullname($userfrom);
-        }
-
-        $mail->Subject = substr($subject, 0, 900);
-
-        $temprecipients[] = array($emailaddress);
-
-        // Set the word wrap.
-        $mail->WordWrap = $wordwrapwidth;
-
-        // Add custom headers.
-        if (!empty($userfrom->customheaders)) {
-            if (is_array($userfrom->customheaders)) {
-                foreach ($userfrom->customheaders as $customheader) {
-                    $mail->AddCustomHeader($customheader);
-                }
-            } else {
-                $mail->AddCustomHeader($userfrom->customheaders);
-            }
-        }
-
-        // Unlikely this will be used but we'll leave it in just in case.
-        if (!empty($userfrom->priority)) {
-            $mail->Priority = $userfrom->priority;
-        }
-
-        // Try to send the message as HTML, should default to messagealt if unable to.
-        $mail->IsHTML(true);
-        $mail->Encoding = 'quoted-printable'; // Encoding to use.
-        $mail->Body    =  $message;
-        $mail->AltBody =  "\n$messagealt\n";
-
-        // Attachments go here in the email_to_user function from moodlelib.php.
-
-        // Check if the email should be sent in an other charset then the default UTF-8.
-        if ((!empty($CFG->sitemailcharset) || !empty($CFG->allowusermailcharset))) {
-
-            // Use the defined site mail charset or eventually the one preferred by the recipient.
-            $charset = $CFG->sitemailcharset;
-            if (!empty($CFG->allowusermailcharset)) {
-                if ($useremailcharset = get_user_preferences('mailcharset', '0', $user->id)) {
-                    $charset = $useremailcharset;
-                }
-            }
-
-            // Convert all the necessary strings if the charset is supported.
-            $charsets = get_list_of_charsets();
-            unset($charsets['UTF-8']);
-            if (in_array($charset, $charsets)) {
-                $mail->CharSet  = $charset;
-                $mail->FromName = textlib::convert($mail->FromName, 'utf-8', strtolower($charset));
-                $mail->Subject  = textlib::convert($mail->Subject, 'utf-8', strtolower($charset));
-                $mail->Body     = textlib::convert($mail->Body, 'utf-8', strtolower($charset));
-                $mail->AltBody  = textlib::convert($mail->AltBody, 'utf-8', strtolower($charset));
-
-                foreach ($temprecipients as $key => $values) {
-                    $temprecipients[$key][1] = textlib::convert($values[1], 'utf-8', strtolower($charset));
-                }
-                foreach ($tempreplyto as $key => $values) {
-                    $tempreplyto[$key][1] = textlib::convert($values[1], 'utf-8', strtolower($charset));
-                }
-            }
-        }
-
-        foreach ($temprecipients as $values) {
-            $mail->AddAddress($values[0]);
-        }
-        foreach ($tempreplyto as $values) {
-            $mail->AddReplyTo($values[0]);
-        }
-
-        // Try to send the email.
-        if ($mail->Send()) {
-            set_send_count($userfrom);
-            if (!empty($mail->SMTPDebug)) {
-                echo '</pre>';
-            }
-            return true;
-        } else {
-            add_to_log(SITEID, 'library', 'mailer', qualified_me(), 'ERROR: '. $mail->ErrorInfo);
-            if (CLI_SCRIPT) {
-                mtrace('Error: feedback360::email_external_address(): '.$mail->ErrorInfo);
-            }
-            if (!empty($mail->SMTPDebug)) {
-                echo '</pre>';
-            }
-            return false;
-        }
     }
 
     /**
@@ -1641,17 +1481,18 @@ class feedback360_responder {
             $emailvars->url = $url->out();
 
             if ($asmanager) {
-                $emailstr = get_string('manageremailrequeststr', 'totara_feedback360', $emailvars);
-                $emailstralt = get_string('manageremailrequeststralt', 'totara_feedback360', $emailvars);
+                $emailplain = get_string('manageremailrequeststr', 'totara_feedback360', $emailvars);
+                $emailhtml = get_string('manageremailrequesthtml', 'totara_feedback360', $emailvars);
                 $emailsubject = get_string('manageremailrequestsubject', 'totara_feedback360', $emailvars);
             } else {
-                $emailstr = get_string('emailrequeststr', 'totara_feedback360', $emailvars);
-                $emailstralt = get_string('emailrequeststralt', 'totara_feedback360', $emailvars);
+                $emailplain = get_string('emailrequeststr', 'totara_feedback360', $emailvars);
+                $emailhtml = get_string('emailrequesthtml', 'totara_feedback360', $emailvars);
                 $emailsubject = get_string('emailrequestsubject', 'totara_feedback360', $emailvars);
             }
 
             // Send the email requesting feedback from external email.
-            feedback360::email_external_address($email, $userfrom, $emailsubject, $emailstr, $emailstralt);
+            $userto = totara_generate_email_user($email);
+            email_to_user($userto, $userfrom, $emailsubject, $emailplain, $emailhtml);
         }
 
         foreach ($cancellations as $email) {

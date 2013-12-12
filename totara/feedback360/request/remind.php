@@ -115,17 +115,18 @@ if (!empty($confirmation)) {
                 $remvars->url = $url->out();
 
                 if ($asmanager) {
-                    $emailstr = get_string('managerreminderemailbody', 'totara_feedback360', $remvars);
-                    $emailstralt = get_string('managerreminderemailbodyalt', 'totara_feedback360', $remvars);
+                    $emailplain = get_string('managerreminderemailbody', 'totara_feedback360', $remvars);
+                    $emailhtml = get_string('managerreminderemailbodyhtml', 'totara_feedback360', $remvars);
                     $emailsubject = get_string('managerreminderemailsubject', 'totara_feedback360', $remvars);
                 } else {
-                    $emailstr = get_string('reminderemailbody', 'totara_feedback360', $remvars);
-                    $emailstralt = get_string('reminderemailbodyalt', 'totara_feedback360', $remvars);
+                    $emailplain = get_string('reminderemailbody', 'totara_feedback360', $remvars);
+                    $emailhtml = get_string('reminderemailbodyhtml', 'totara_feedback360', $remvars);
                     $emailsubject = get_string('reminderemailsubject', 'totara_feedback360', $remvars);
                 }
 
                 // Send the feedback reminder email.
-                feedback360::email_external_address($email_assignment->email, $sendfrom, $emailsubject, $emailstr, $emailstralt);
+                $userto = totara_generate_email_user($email_assignment->email);
+                email_to_user($userto, $sendfrom, $emailsubject, $emailplain, $emailhtml);
             } else {
                 // Internal user, send them an alert.
                 $userto = $DB->get_record('user', array('id' => $resp_assignment->userid));
@@ -149,10 +150,14 @@ if (!empty($confirmation)) {
                             $remvars, $userto->lang);
                     $eventdata->fullmessage = $stringmanager->get_string('managerreminderemailbody', 'totara_feedback360',
                             $remvars, $userto->lang);
+                    $eventdata->fullmessagehtml = $stringmanager->get_string('managerreminderemailbodyhtml', 'totara_feedback360',
+                            $remvars, $userto->lang);
                 } else {
                     $eventdata->subject = $stringmanager->get_string('reminderemailsubject', 'totara_feedback360',
                             $remvars, $userto->lang);
                     $eventdata->fullmessage = $stringmanager->get_string('reminderemailbody', 'totara_feedback360',
+                            $remvars, $userto->lang);
+                    $eventdata->fullmessagehtml = $stringmanager->get_string('reminderemailbodyhtml', 'totara_feedback360',
                             $remvars, $userto->lang);
                 }
 

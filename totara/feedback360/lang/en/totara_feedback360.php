@@ -89,19 +89,12 @@ $string['emailmissing'] = 'Email missing';
 $string['emailrequestsexisting'] = 'Existing External Feedback Request(s)';
 $string['emailrequestsnew'] = 'Add External Feedback Request(s)';
 $string['emailrequestsnew_help'] = 'To request feedback from external users, enter one email address per line';
-$string['emailrequeststr'] = '<p>{$a->fullname} has requested you fill in their feedback form. Please click the link below and fill in the displayed form:<p>
+$string['emailrequesthtml'] = '<p>{$a->fullname} has requested you fill in their feedback form. Please click the link below and fill in the displayed form:<p>
 <p>{$a->link}</p>';
-$string['emailrequeststralt'] = '{$a->fullname} has requested you fill in their feedback form. Please click go to the link below and fill in the displayed form:
-
-{$a->url}';
 $string['enablefeedback360'] = 'Show 360 Feedback';
-$string['manageremailrequeststr'] = '<p>{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click the link below and fill in the displayed form:<p>
-<p>{$a->link}</p>';
-$string['manageremailrequeststralt'] = '{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click go to the link below and fill in the displayed form:
-
+$string['emailrequeststr'] = '{$a->fullname} has requested you fill in their feedback form. Please visit the URL below and fill in the displayed form:
 {$a->url}';
 $string['emailrequestsubject'] = 'Feedback request from {$a->fullname}';
-$string['manageremailrequestsubject'] = '{$a->fullname} requests Feedback about their staff member {$a->staffname}';
 $string['emailrequesturlmask'] = 'here';
 $string['error:accessdenied'] = 'Access Denied, you do not have permission to view this page';
 $string['error:activationconfirmation'] = 'Feedback is not ready to be activated';
@@ -166,6 +159,21 @@ $string['loadfeedback360failure'] = 'Failed to load the 360 Feedback';
 
 $string['managefeedback360'] = 'Manage Feedback';
 $string['managefeedback360s'] = 'Manage 360&deg; Feedbacks';
+$string['manageremailrequesthtml'] = '<p>{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click the link below to start filling out the form:<\p>
+<p>{$a->link}</p>';
+$string['manageremailrequeststr'] = '{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please visit the url below to start filling out the form:
+
+{$a->url}';
+$string['manageremailrequestsubject'] = '{$a->fullname} requests Feedback about their staff member {$a->staffname}';
+$string['managerreminderemailbody'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form before {$a->timedue}, go to {$a->url} to get started.
+
+Thank you,
+{$a->userfrom}';
+$string['managerreminderemailbodyhtml'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form before {$a->timedue}, click {$a->link} to get started.
+
+Thank you,
+{$a->userfrom}';
+$string['managerreminderemailsubject'] = 'Reminder: {$a->staffname}\'s feedback request';
 $string['manageuserrequests'] = 'Manage user requests';
 $string['messages'] = 'Messages';
 $string['myfeedback'] = 'My Feedback';
@@ -212,17 +220,8 @@ $string['reminderconfirm'] = 'This will send a reminder message to everyone you 
 $string['reminderssent'] = 'Reminders sent for {$a}';
 $string['remindresponders'] = 'Send Feedback Reminders';
 $string['reminderemailsubject'] = 'Reminder: {$a->requestername}\'s feedback request';
-$string['reminderemailbody'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please click {$a->link} and complete the form.';
-$string['reminderemailbodyalt'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please go to {$a->url} and complete the form.';
-$string['managerreminderemailsubject'] = 'Reminder: {$a->staffname}\'s feedback request';
-$string['managerreminderemailbody'] = 'I wanted to remind you about the feedback request about my staff member {$a->staffname}, can you please fill in the form before {$a->timedue}. Click {$a->link} to get started.
-
-Thank you,
-{$a->userfrom}';
-$string['managerreminderemailbodyalt'] = 'I wanted to remind you about the feedback request about my staff member {$a->staffname}, can you pleace fill in the form before {$a->timedue}. Go to {$a->url} to get started.
-
-Thank you,
-{$a->userfrom}';
+$string['reminderemailbody'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please go to {$a->url} and complete the form.';
+$string['reminderemailbodyhtml'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please click {$a->link} and complete the form.';
 $string['removerequest'] = 'Delete Feedback Request';
 $string['removerequestconfirm'] = 'Are you sure you want to remove the feedback request to {$a}?';
 $string['responsecount'] = '{$a->responded} Responses (out of {$a->total})';

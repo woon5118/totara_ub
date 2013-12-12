@@ -353,7 +353,8 @@ if ($mform->is_cancelled()) {
             }
 
             foreach ($emailkeep as $email) {
-                feedback360::email_external_address($email, $sendas, $emailsubject, $email_str, $email_str);
+                $userto = totara_generate_email_user($email);
+                email_to_user($userto, $sendas, $emailsubject, $email_str, $email_str);
             }
         }
 

@@ -2017,6 +2017,7 @@ function totara_generate_email_user($emailaddress) {
     $emailuser->firstname = $emailaddress;
     $emailuser->lastname = '';
     $emailuser->maildisplay = true;
+    $emailuser->mailformat = 1;
 
     return $emailuser;
 }
