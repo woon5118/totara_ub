@@ -783,7 +783,11 @@ function import_certification($importname, $importtime) {
     $cchistory = array();
     $pua = array();
     $users = array();
-
+    // Arrays to hold info on previously-processed records for program/user pairs in this batch.
+    // In certifications an upload may contain multiple records for a program for one user going back historically.
+    $priorcc = array();
+    $priorpc = array();
+    $priorua = array();
     $pluginname = 'totara_completionimport_' . $importname;
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
     $overrideactivecertification = get_default_config($pluginname, 'overrideactive', false);
@@ -799,7 +803,7 @@ function import_certification($importname, $importtime) {
     // Note: Postgres objects to manifest constants being used as parameters where they are the left hand.
     // of an SQL clause (eg 5 AS assignmenttype) so manifest constants are placed in the query directly (better anyway!).
     $shortnameoridnumber = get_shortnameoridnumber('p', 'i', 'certificationshortname', 'certificationidnumber');
-    $sql = "SELECT p.id AS programid,
+    $sql = "SELECT DISTINCT p.id AS programid,
             ".ASSIGNTYPE_INDIVIDUAL." AS assignmenttype,
             u.id AS assignmenttypeid,
             0 AS includechildren,
@@ -814,13 +818,14 @@ function import_certification($importname, $importtime) {
                 WHERE pa.programid = p.id AND pa.userid = u.id)";
 
     $assignments = $DB->get_recordset_sql($sql, $params);
+
     $DB->insert_records_via_batch('prog_assignment', $assignments);
     $assignments->close();
 
     // Now get the records to import.
     $params = $stdparams;
     $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttype2' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
-    $sql = "SELECT i.id as importid,
+    $sql = "SELECT DISTINCT i.id as importid,
                     i.completiondate,
                     p.id AS progid,
                     c.id AS certifid,
@@ -835,9 +840,9 @@ function import_certification($importname, $importtime) {
                     pua.id AS puaid,
                     cc.timecompleted AS currenttimecompleted
             FROM {{$tablename}} i
-            JOIN {prog} p ON {$shortnameoridnumber}
-            JOIN {certif} c ON c.id = p.certifid
-            JOIN {user} u ON u.username = i.username
+            LEFT JOIN {prog} p ON {$shortnameoridnumber}
+            LEFT JOIN {certif} c ON c.id = p.certifid
+            LEFT JOIN {user} u ON u.username = i.username
             LEFT JOIN {prog_assignment} pa ON pa.programid = p.id
                                         AND ((pa.assignmenttype = :assignmenttype
                                             AND pa.assignmenttypeid = u.id)
@@ -850,7 +855,6 @@ function import_certification($importname, $importtime) {
 
     $insertcount = 1;
     $programid = 0;
-
     $programs = $DB->get_recordset_sql($sql, $params);
 
     if ($programs->valid()) {
@@ -937,28 +941,30 @@ function import_certification($importname, $importtime) {
 
             $ccdata->timecompleted = $timecompleted;
             $ccdata->timemodified = $now;
-
+            $priorkey = "{$ccdata->certifid}_{$ccdata->userid}";
+            $priorhistorykey = "{$ccdata->certifid}_{$ccdata->userid}_{$ccdata->timeexpires}";
+            $addtopending = false;
             // Active record not complete, delete the current completion record and
-            // put the imported one in it's place.
+            // put the imported one in its place.
             if (empty($program->currenttimecompleted)) {
                 if (!is_null($program->ccid)) {
                     $deleted[] = $program->ccid;
                 }
-                $cc[] = $ccdata;
+                $addtopending = true;
             } else if ($ccdata->timecompleted > $program->currenttimecompleted) {
                 // The imported record is newer than the current record.
                 if ($ccdata->timeexpires > $now && $ccdata->timewindowopens > $now) { // Not due.
                     if (!is_null($program->ccid)) {
                         $deleted[] = $program->ccid;
                     }
-                    $cc[] = $ccdata;
+                    $addtopending = true;
                 } else if ($ccdata->timeexpires > $now && $ccdata->timewindowopens <= $now) { // Due.
                     // Check config variable here to see if we want to override.
                     if ($overrideactivecertification) {
                         if (!is_null($program->ccid)) {
                             $deleted[] = $program->ccid;
                         }
-                        $cc[] = $ccdata;
+                        $addtopending = true;
                     } else {
                         // Don't override and generate an import error.
                         $params = array('errorstring' => 'certificationdueforrecert;', 'importerror' => 1, 'importid' => $program->importid);
@@ -976,14 +982,14 @@ function import_certification($importname, $importtime) {
                 }
             } else if ($ccdata->timecompleted < $program->currenttimecompleted) {
                 // The imported record is older than the current record.
-                // Put the imported record directly into the history table and leave
-                // the active record unchanged
+                // Put the imported record directly into the history table and
+                // leave the active record unchanged.
                 $chparams = array('certifid'    => $ccdata->certifid,
                     'userid'      => $ccdata->userid,
                     'timeexpires' => $ccdata->timeexpires);
 
-                if (!$DB->record_exists('certif_completion_history', $chparams)) {
-                    $cchistory[] = $ccdata;
+                if (!array_key_exists($priorhistorykey, $cchistory) && !$DB->record_exists('certif_completion_history', $chparams)) {
+                    $cchistory[$priorhistorykey] = $ccdata;
                 }
             } else {
                 // The imported record and the active record have exactly the same date
@@ -992,6 +998,26 @@ function import_certification($importname, $importtime) {
 
                 $DB->execute($errorsql, $params);
                 continue;
+            }
+
+            if ($addtopending) {
+                // Scan the pending completions in this batch for an existing program/user match
+                // then compare completion dates to make sure older completions go into the cchistory array.
+                if (isset($priorcc[$priorkey])) {
+                    if ($ccdata->timecompleted > $priorcc[$priorkey]->timecompleted) {
+                        // Newer record, swap out and put the existing in history instead.
+                        $cchistory[$priorhistorykey] = $priorcc[$priorkey];
+                        $priorcc[$priorkey] = $ccdata;
+                        $cc[$priorkey] = $ccdata;
+                    } else if ($ccdata->timecompleted < $priorcc[$priorkey]->timecompleted) {
+                        // Older record, put directly in history.
+                        $cchistory[$priorhistorykey] = $ccdata;
+                    }
+                } else {
+                    // No prior matching record exists in this batch, add to pending completions.
+                    $cc[$priorkey] = $ccdata;
+                    $priorcc[$priorkey] = $ccdata;
+                }
             }
 
             // Program completion.
@@ -1005,14 +1031,28 @@ function import_certification($importname, $importtime) {
             $pcdata->timecompleted = $timecompleted;
 
             if (empty($program->pcid)) {
-                // New record completion record.
-                $pc[] = $pcdata;
+                // New program completion record.
+                if (isset($priorpc[$priorkey])) {
+                    if ($pcdata->timecompleted > $priorpc[$priorkey]->timecompleted) {
+                        // Newer record, swap out and put the existing in history instead.
+                        $pchistory[] = $priorpc[$priorkey];
+                        $priorpc[$priorkey] = $pcdata;
+                        $pc[$priorkey] = $pcdata;
+                    } else if ($pcdata->timecompleted < $priorcc[$priorkey]->timecompleted) {
+                        // Older record, put directly in history.
+                        $pchistory[] = $pcdata;
+                    }
+                } else {
+                    // No prior matching record exists in this batch, add to pending completions.
+                    $pc[$priorkey] = $pcdata;
+                    $priorpc[$priorkey] = $pcdata;
+                }
             } else {
                 // There is an existing record so put into history.
                 $pchistory[] = $pcdata;
             }
 
-            // Program user assignment.
+            // Program user assignment if not already assigned in this batch.
             $puadata = new stdClass();
             $puadata->programid = $program->progid;
             $puadata->userid = $program->userid;
@@ -1021,14 +1061,23 @@ function import_certification($importname, $importtime) {
             $puadata->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
 
             if (empty($program->puaid)) {
-                $pua[] = $puadata;
+                if (!isset($priorua[$priorkey])) {
+                    $pua[] = $puadata;
+                    $priorua[$priorkey] = $puadata;
+                }
             } else {
-                $puadata->id = $program->puaid;
-                $DB->update_record('prog_user_assignment', $puadata);
+                // Do not waste time updating record again if we have already processed this user.
+                if (!isset($priorua[$priorkey])) {
+                    $puadata->id = $program->puaid;
+                    $DB->update_record('prog_user_assignment', $puadata);
+                    $priorua[$priorkey] = $puadata;
+                }
             }
 
             // User array for role addition.
-            $users[] = $program->userid;
+            if (!in_array($program->userid, $users)) {
+                $users[] = $program->userid;
+            }
 
             // Totara_compl_import_cert ids.
             $updateids[] = $program->importid;
