@@ -715,6 +715,7 @@ $string['userid'] = 'User ID';
 $string['useridnumber'] = 'User ID Number';
 $string['userincohort'] = 'User is a member of audience';
 $string['userinstitution'] = 'User\'s Institution';
+$string['userlang'] = 'User\'s Preferred Language';
 $string['userlastlogin'] = 'User Last Login';
 $string['userlastname'] = 'User Last Name';
 $string['username'] = 'Username';

@@ -1439,6 +1439,16 @@ abstract class rb_base_source {
                 'displayfunc' => 'nice_datetime',
             )
         );
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'lang',
+            get_string('userlang', 'totara_reportbuilder'),
+            "$join.lang",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'language_code',
+            )
+        );
         // auto-generate columns for user fields
         $fields = array(
             'firstname' => get_string('userfirstname', 'totara_reportbuilder'),
