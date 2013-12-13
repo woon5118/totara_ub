@@ -162,7 +162,7 @@ class csv_iterator extends SplFileObject
     private function clean_fields($fields) {
         if (!empty($fields) && is_array($fields)) {
             foreach ($fields as $key => $value) {
-                $value = clean_text(trim($value));
+                $value = html_entity_decode(clean_text(trim($value)), ENT_QUOTES, 'UTF-8');
                 $fields[$key] = textlib::convert($value, $this->encoding, 'utf-8');
             }
         }
