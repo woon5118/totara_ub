@@ -249,6 +249,9 @@ function xmldb_totara_core_install() {
     // Adding indexes to table 'badge'
     $table->add_index('type', XMLDB_INDEX_NOTUNIQUE, array('type'));
 
+    // Set the comment for the table 'badge'.
+    $table->setComment('Defines badge');
+
     // Conditionally launch create table for 'badge'
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
@@ -271,6 +274,9 @@ function xmldb_totara_core_install() {
     $table->add_index('criteriatype', XMLDB_INDEX_NOTUNIQUE, array('criteriatype'));
     $table->add_index('badgecriteriatype', XMLDB_INDEX_UNIQUE, array('badgeid', 'criteriatype'));
 
+    // Set the comment for the table 'badge_criteria'.
+    $table->setComment('Defines criteria for issuing badges');
+
     // Conditionally launch create table for 'badge_criteria'
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
@@ -288,6 +294,9 @@ function xmldb_totara_core_install() {
     // Adding keys to table 'badge_criteria_param'
     $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
     $table->add_key('fk_critid', XMLDB_KEY_FOREIGN, array('critid'), 'badge_criteria', array('id'));
+
+    // Set the comment for the table 'badge_criteria_param'.
+    $table->setComment('Defines parameters for badges criteria');
 
     // Conditionally launch create table for 'badge_criteria_param'
     if (!$dbman->table_exists($table)) {
@@ -315,6 +324,9 @@ function xmldb_totara_core_install() {
     // Adding indexes to table 'badge_issued'
     $table->add_index('badgeuser', XMLDB_INDEX_UNIQUE, array('badgeid', 'userid'));
 
+    // Set the comment for the table 'badge_issued'.
+    $table->setComment('Defines issued badges');
+
     // Conditionally launch create table for 'badge_issued'
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
@@ -335,6 +347,9 @@ function xmldb_totara_core_install() {
     $table->add_key('fk_critid', XMLDB_KEY_FOREIGN, array('critid'), 'badge_criteria', array('id'));
     $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
     $table->add_key('fk_issuedid', XMLDB_KEY_FOREIGN, array('issuedid'), 'badge_issued', array('id'));
+
+    // Set the comment for the table 'badge_criteria_met'.
+    $table->setComment('Defines criteria that were met for an issued badge');
 
     // Conditionally launch create table for 'badge_criteria_met'
     if (!$dbman->table_exists($table)) {
@@ -359,6 +374,9 @@ function xmldb_totara_core_install() {
     $table->add_key('fk_issuerid', XMLDB_KEY_FOREIGN, array('issuerid'), 'user', array('id'));
     $table->add_key('fk_issuerrole', XMLDB_KEY_FOREIGN, array('issuerrole'), 'role', array('id'));
 
+    // Set the comment for the table 'badge_manual_award'.
+    $table->setComment('Track manual award criteria for badges');
+
     // Conditionally launch create table for 'badge_manual_award'
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
@@ -381,6 +399,9 @@ function xmldb_totara_core_install() {
     $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
     $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
 
+    // Set the comment for the table 'badge_backpack'.
+    $table->setComment('Defines settings for connecting external backpack');
+
     // Conditionally launch create table for 'badge_backpack'
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
@@ -398,6 +419,9 @@ function xmldb_totara_core_install() {
     // Adding keys to table 'badge_external'.
     $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
     $table->add_key('fk_backpackid', XMLDB_KEY_FOREIGN, array('backpackid'), 'badge_backpack', array('id'));
+
+    // Set the comment for the table 'badge_external'.
+    $table->setComment('Setting for external badges display');
 
     // Conditionally launch create table for 'badge_external'.
     if (!$dbman->table_exists($table)) {
