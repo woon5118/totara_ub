@@ -386,7 +386,7 @@ if ($form = data_submitted()) {
                 }
             }
 
-            // Send messages
+            // Send messages.
             $fromaddress = get_config(NULL, 'facetoface_fromaddress');
             if (!$fromaddress) {
                 $fromaddress = '';
@@ -396,18 +396,18 @@ if ($form = data_submitted()) {
             $emailerrors = 0;
             foreach ($recipients as $recipient) {
                 $body = $data->body['text'];
-                $bodyplain = html_to_text($body['text']);
+                $bodyplain = html_to_text($body);
 
                 if (email_to_user($recipient, $fromaddress, $data->subject, $bodyplain, $body) === true) {
                     $emailcount += 1;
 
-                    // Check if we are sending to managers and if user has a manager assigned
+                    // Check if we are sending to managers and if user has a manager assigned.
                     if (empty($data->cc_managers) || !$manager = totara_get_manager($recipient->id)) {
                         continue;
                     }
 
-                    // Append to message
-                    $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body;
+                    // Append to message.
+                    $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
                     $bodyplain = html_to_text($body);
 
                     if (email_to_user($manager, $fromaddress, $data->subject, $bodyplain, $body) === true) {
