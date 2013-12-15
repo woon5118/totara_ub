@@ -345,7 +345,7 @@ class program {
                                 $eventdata->programid = $this->id;
                                 $eventdata->userid = $user->id;
 
-                                $queue = array("new:{$user->id}", $eventdata);
+                                $queue = array("new:{$user->id}" => $eventdata);
                                 $message_queue = array_merge($message_queue, $queue);
                             }
                         }
