@@ -308,8 +308,8 @@ $string['generalsettings'] = 'General settings';
 $string['invalidemailaddress'] = 'Invalid email address \'{$a}\'';
 $string['notifications'] = 'Notifications';
 $string['notifymailto'] = 'Email notifications to';
-$string['notifymailto_help'] = 'A comma-separated list of email addresses so which nofifications should be sent.';
-$string['notifytypes'] = 'Send nofications for';
+$string['notifymailto_help'] = 'A comma-separated list of email addresses so which notifications should be sent.';
+$string['notifytypes'] = 'Send notifications for';
 $string['schedule'] = 'Schedule';
 
 ?>
