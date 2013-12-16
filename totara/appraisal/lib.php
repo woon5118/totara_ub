@@ -309,7 +309,9 @@ class appraisal {
      * @return $err Array Array of error strings to combine with any existing errors
      */
     public function validate_roles() {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+
         if (!defined('APPRAISAL_VALIDATION_MAX_BAD_ROLES')) {
             define('APPRAISAL_VALIDATION_MAX_BAD_ROLES', 500);
         }
@@ -336,12 +338,15 @@ class appraisal {
 
         $from = " FROM {user} u
             LEFT JOIN {pos_assignment} pa
-                ON u.id = pa.userid
+                ON (u.id = pa.userid AND pa.type = ?)
             LEFT JOIN {pos_assignment} pa2
-                ON pa.managerid = pa2.userid";
+                ON (pa.managerid = pa2.userid AND pa2.type = ?)";
+        $params = array(POSITION_TYPE_PRIMARY, POSITION_TYPE_PRIMARY);
 
         // Get SQL to limit to only users involved in this appraisal.
-        list($joinsql, $params) = $assign->get_users_from_groups_sql('u', 'id');
+        list($joinsql, $joinparams) = $assign->get_users_from_groups_sql('u', 'id');
+
+        $params = array_merge($params, $joinparams);
 
         // Only get rows that are missing data if we require that role.
         $allroles = $this->get_roles();
