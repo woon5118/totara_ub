@@ -34,6 +34,7 @@ $string['cannotsaveupload'] = 'Cannot save file to {$a}';
 $string['certification_results'] = 'Certification results';
 $string['certificationblankrefs'] = 'Blank certification shortname and certification ID number';
 $string['certificationexpired'] = 'Import certification expired, skipping importing';
+$string['certificationdueforrecert'] = 'Import certification due for renewal, skipping import';
 $string['choosefile'] = 'Choose file to upload';
 $string['completiondatesame'] = 'Record completion date exists';
 $string['completionimport'] = 'Upload Completion Records';

@@ -916,6 +916,11 @@ function import_certification($importname, $importtime) {
             $ccdata->status = CERTIFSTATUS_COMPLETED;
             $ccdata->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
 
+            $errorsql = "UPDATE {{$tablename}}
+                SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
+                    importerror = :importerror
+                    WHERE id = :importid";
+
             $now = time();
 
             // Do recert times.
@@ -945,17 +950,19 @@ function import_certification($importname, $importtime) {
                     if ($overrideactivecertification) {
                         $deleted[] = $program->ccid;
                         $cc[] = $ccdata;
+                    } else {
+                        // Don't override and generate an import error.
+                        $params = array('errorstring' => 'certificationdueforrecert;', 'importerror' => 1, 'importid' => $program->importid);
+
+                        $DB->execute($errorsql, $params);
+                        continue;
                     }
                 } else {
                     // Certification has already expired, don't change the active record.
                     // Flag as error and add an entry to the import log.
-                    $sql = "UPDATE {{$tablename}}
-                        SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
-                        importerror = :importerror
-                        WHERE id = :importid";
                     $params = array('errorstring' => 'certificationexpired;', 'importerror' => 1, 'importid' => $program->importid);
 
-                    $DB->execute($sql, $params);
+                    $DB->execute($errorsql, $params);
                     continue;
                 }
             } else if ($ccdata->timecompleted < $program->currenttimecompleted) {
@@ -972,13 +979,9 @@ function import_certification($importname, $importtime) {
             } else {
                 // The imported record and the active record have exactly the same date
                 // Flag as error and add an entry to the import log.
-                $sql = "UPDATE {{$tablename}}
-                    SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
-                        importerror = :importerror
-                        WHERE id = :importid";
                 $params = array('errorstring' => 'completiondatesame;', 'importerror' => 1, 'importid' => $program->importid);
 
-                $DB->execute($sql, $params);
+                $DB->execute($errorsql, $params);
                 continue;
             }
 
