@@ -928,7 +928,10 @@ function import_certification($importname, $importtime) {
             if (!$timecompleted) {
                 $timecompleted = now();
             }
-            $base = get_certiftimebase($program->recertifydatetype, $program->timeexpires, $timecompleted);
+            // In imports we always use CERTIFRECERT_COMPLETION, instead of the user's value from $program->recertifydatetype.
+            // That is because when importing we only have the completion date so "use certification expiry date" doesn't make
+            // sense. See T-11684.
+            $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $program->timeexpires, $timecompleted);
             $ccdata->timeexpires = get_timeexpires($base, $program->activeperiod);
             $ccdata->timewindowopens = get_timewindowopens($ccdata->timeexpires, $program->windowperiod);
 
