@@ -977,18 +977,69 @@ abstract class rb_base_source {
         }
     }
 
-    // convert a language code into text
+    /**
+     * Column displayfunc to convert a language code to a human-readable string
+     * @param $code Language code
+     * @param $row data row - unused in this function
+     * @return string
+     */
     function rb_display_language_code($code, $row) {
-        global $CFG;
+            global $CFG;
+        static $languages = array();
+        $strmgr = get_string_manager();
+        // Populate the static variable if empty
+        if (count($languages) == 0) {
+            // Return all languages available in system (adapted from stringmanager->get_list_of_translations()).
+            $langdirs = get_list_of_plugins('', '', $CFG->langotherroot);
+            $langdirs = array_merge($langdirs, array("{$CFG->dirroot}/lang/en"=>'en'));
+            $curlang = current_language();
+            // Loop through all langs and get info.
+            foreach ($langdirs as $lang) {
+                if (isset($languages[$lang])){
+                    continue;
+                }
+                if (strstr($lang, '_local') !== false) {
+                    continue;
+                }
+                if (strstr($lang, '_utf8') !== false) {
+                    continue;
+                }
+                $string = $strmgr->load_component_strings('langconfig', $lang);
+                if (!empty($string['thislanguage'])) {
+                    $languages[$lang] = $string['thislanguage'];
+                    // If not the current language, provide the English translation also.
+                    if(strpos($lang, $curlang) === false) {
+                        $languages[$lang] .= ' ('. $string['thislanguageint'] .')';
+                    }
+                }
+                unset($string);
+            }
+        }
+
         if (empty($code)) {
             return get_string('notspecified', 'totara_reportbuilder');
         }
-        $countries = get_string_manager()->get_list_of_languages();
-        if (!array_key_exists($code, $countries)) {
-            return get_string('unknown', 'totara_reportbuilder');
+        if (strpos($code, '_') !== false) {
+            list($langcode, $langvariant) = explode('_', $code);
+        } else {
+            $langcode = $code;
         }
 
-        return $countries[$code];
+        // Now see if we have a match in "localname (English)" format.
+        if (isset($languages[$code])) {
+            return $languages[$code];
+        } else {
+            // Not an installed language - may have been uninstalled, as last resort try the get_list_of_languages silly function.
+            $langcodes = $strmgr->get_list_of_languages();
+            if (isset($langcodes[$langcode])) {
+                $a = new stdClass();
+                $a->code = $langcode;
+                $a->name = $langcodes[$langcode];
+                return get_string('uninstalledlanguage', 'totara_reportbuilder', $a);
+            } else {
+                return get_string('unknownlanguage', 'totara_reportbuilder', $code);
+            }
+        }
     }
 
     function rb_display_user_email($email, $row, $isexport = false) {
