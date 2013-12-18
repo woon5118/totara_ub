@@ -1809,7 +1809,9 @@ $string['virusfoundsubject'] = '{$a}: Virus found!';
 $string['virusfounduser'] = 'The file you have uploaded, {$a->filename}, has been scanned by a virus checker and found to be infected! Your file upload was NOT successful.';
 $string['virusplaceholder'] = 'This file that has been uploaded was found to contain a virus and has been moved or deleted and the user notified.';
 $string['visible'] = 'Visible';
-$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from teachers and administrators, users are not allowed to enter the course.';
+$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the \'viewhiddencourse\' capability (course creators, editing trainers, trainers and managers by default), users are not allowed to enter the course, even if enrolled.
+
+This setting allows a course administrator to setup up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';
 $string['visibletostudents'] = 'Visible to {$a}';
 $string['warning'] = 'Warning';
 $string['warningdeleteresource'] = 'Warning: {$a} is referred in a resource. Would you like to update the resource?';
