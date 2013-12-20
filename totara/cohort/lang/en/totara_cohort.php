@@ -255,7 +255,7 @@ $string['excludeuserswho_help'] = 'This setting lets you choose types of users t
 If a user has a plan based on this template that was manually created by them or their manager then they will not get a new plan created.
 
 **having an existing, automatically created plan based on this template** <br />
-If a user has an automatically created based on this template then they will not get a new plan created.
+If a user has an automatically created plan based on this template then they will not get a new plan created.
 
 **have a completed plan based on this template** <br />
 If this option is selected then users who have a completed plans based on this template will not have a new template created.';
