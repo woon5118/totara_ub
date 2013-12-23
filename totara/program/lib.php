@@ -425,8 +425,12 @@ function prog_add_required_learning_base_navlinks($userid) {
 /**
  * Returns list of programs, for whole site, or category
  *
+ * Note: Cannot use p.* in $fields because MSSQL does not handle DISTINCT text fields.
+ * See T-11732
  */
-function prog_get_programs($categoryid="all", $sort="p.sortorder ASC", $fields="p.*", $type = 'program', $options = array()) {
+function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
+                           $fields="p.id, p.category, p.sortorder, p.shortname, p.fullname, p.visible, p.icon, p.audiencevisible",
+                           $type = 'program', $options = array()) {
     global $USER, $DB, $CFG;
     require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
