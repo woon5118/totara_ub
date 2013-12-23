@@ -3,6 +3,40 @@
 
 Totara LMS Changelog
 
+Release 2.5.4 (24th December 2013):
+==================================================
+
+New features:
+    T-9788    Added "Program enrollment date" event to the program completion criteria options
+
+Improvements:
+    T-11669    Made the "Date Created" field editable for learning plans
+    T-11703    Expanded help relating to course and program visibility
+    T-11708    Added new optional column "preferred language" to reportbuilder user report source
+
+Bug Fixes:
+    MDL-34481  Ensure that completion is recalculated on next cron run following changes to completion settings
+    T-11725    Backport MDL-43019 to fix IE11 crashes in SCORM
+    T-11231    Fixed an issue with certification completion records missing if user is unassigned
+    T-11695    Program report source now conforms to audience visibility
+    T-11705    Fixed potential call to nonexistent function while updating program assignments
+    T-11719    Fixed broken appraisal activation when secondary or aspirational positions are used
+    T-11659    Fixed "Goal Assignments" title duplication when assigning a position, organisation or audience
+               competency to a goal
+    T-11707    Fixed "Assigned Goals" section duplication when adding goals and competencies to an organisation
+    T-11607    Fixed dates when importing certifications using the historic import
+    T-11710    Fixed the "CC managers" setting for facetoface notifications
+    T-11245    Removed hover style in list of courses/programs
+    T-11688    Removed link to blogs when they are disabled
+    T-11684    Certification completion date is now used for expiry and recertification window calculations
+    T-11702    Minor fixes related to visibility of programs and certifications
+    T-11713    Fixed completion import when certification shortname contains an ampersand
+    T-11674    Fixed user profile date fields being set to 1970 when disabled
+    T-11629    Fixed emails not being sent when manually resolving Program exceptions
+    T-5879     Fixed typos in English strings in 360 Feedback, Audiences, and Hierarchy
+    T-11731    Fixed broken certification unit tests in MySQL with sql_auto_is_null setting enabled
+
+
 Release 2.5.3 (10th December 2013):
 ==================================================
 
