@@ -941,17 +941,23 @@ function import_certification($importname, $importtime) {
             // Active record not complete, delete the current completion record and
             // put the imported one in it's place.
             if (empty($program->currenttimecompleted)) {
-                $deleted[] = $program->ccid;
+                if (!is_null($program->ccid)) {
+                    $deleted[] = $program->ccid;
+                }
                 $cc[] = $ccdata;
             } else if ($ccdata->timecompleted > $program->currenttimecompleted) {
                 // The imported record is newer than the current record.
                 if ($ccdata->timeexpires > $now && $ccdata->timewindowopens > $now) { // Not due.
-                    $deleted[] = $program->ccid;
+                    if (!is_null($program->ccid)) {
+                        $deleted[] = $program->ccid;
+                    }
                     $cc[] = $ccdata;
                 } else if ($ccdata->timeexpires > $now && $ccdata->timewindowopens <= $now) { // Due.
                     // Check config variable here to see if we want to override.
                     if ($overrideactivecertification) {
-                        $deleted[] = $program->ccid;
+                        if (!is_null($program->ccid)) {
+                            $deleted[] = $program->ccid;
+                        }
                         $cc[] = $ccdata;
                     } else {
                         // Don't override and generate an import error.
