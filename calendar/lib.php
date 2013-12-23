@@ -1650,6 +1650,24 @@ function calendar_preferences_button(stdClass $course) {
  * @return string $eventtime link/string for event time
  */
 function calendar_format_event_time($event, $now, $linkparams = null, $usecommonwords = true, $showtime=0) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+    // Display timezone information for F2F sessions.
+    if ($event->modulename == 'facetoface' && $event->eventtype == 'facetofacesession') {
+        $sql = "SELECT fsd.id, fsd.sessiontimezone
+                  FROM {facetoface_sessions_dates} fsd
+            INNER JOIN {facetoface_sessions} fs
+                    ON fsd.sessionid = fs.id
+                   AND fs.facetoface = ?
+                 WHERE fsd.timestart = ?";
+        if ($sessiondata = $DB->get_record_sql($sql, array($event->instance, $event->timestart))) {
+            $sessionobj = facetoface_format_session_times($event->timestart,
+                                                          $event->timestart + $event->timeduration,
+                                                          $sessiondata->sessiontimezone);
+            return get_string('sessiondatetimecourseformat', 'facetoface', $sessionobj);
+        }
+    }
+
     $startdate = usergetdate($event->timestart);
     $enddate = usergetdate($event->timestart + $event->timeduration);
     $usermidnightstart = usergetmidnight($event->timestart);
