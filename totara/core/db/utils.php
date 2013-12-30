@@ -519,10 +519,10 @@ function totara_cohort_remap_rules($rulestofix) {
  * @return bool True if the rule can be fixed automatically, false otherwise.
  */
 function totara_cohort_is_rule_fixable($brokenrule) {
-    global $CFG;
 
     // They upgraded from a version before 2.4.8, we know the rules are wrong so we can fix them.
-    if (isset($CFG->existingtotaraversion) && version_compare('2.4.8', $CFG->existingtotaraversion, '>')) {
+    $previousversion = get_config('totara_core', 'previous_version');
+    if (!empty($previousversion) && version_compare('2.4.8', $previousversion, '>')) {
         return true;
     }
 
