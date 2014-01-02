@@ -325,6 +325,10 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 $dbrow['deleted'] = empty($dbrow['deleted']) ? 0 : 1;
             }
 
+            if (isset($dbrow['suspended'])) {
+                $dbrow['suspended'] = empty($dbrow['suspended']) ? 0 : 1;
+            }
+
             if (isset($dbrow['timezone'])) {
                 // Clean deprecated timezones if possible
                 $timezone = $dbrow['timezone'];

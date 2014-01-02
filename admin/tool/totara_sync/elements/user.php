@@ -480,6 +480,8 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
+
+        $user->suspended = empty($suser->suspended) ? 0 : $suser->suspended;
     }
 
     /**
