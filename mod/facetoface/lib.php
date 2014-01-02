@@ -1340,8 +1340,6 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                 $userids[] = $signup->id;
             }
         }
-        $grading_info = grade_get_grades(reset($signups)->courseid, 'mod', 'facetoface',
-                                         $facetofaceid, $userids);
 
         foreach ($signups as $signup) {
             $userid = $signup->id;
@@ -1354,11 +1352,6 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                         $signup->$fieldname = $value;
                     }
                 }
-            }
-
-            // Set grade
-            if (!empty($grading_info->items) and !empty($grading_info->items[0]->grades[$userid])) {
-                $signup->grade = $grading_info->items[0]->grades[$userid]->str_grade;
             }
 
             $sessionsignups[$signup->sessionid][$signup->id] = $signup;
