@@ -711,9 +711,10 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
  * @return string $out              the form to display
  */
 function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage='courses', $rolstatus='none', $showrol=true, $selectedprogid=0, $showrequired=true) {
-    global $OUTPUT, $DB;
+    global $OUTPUT, $DB, $CFG;
     $list = array();
     $attr = array();
+    $enableplans = !empty($CFG->enablelearningplans);
 
     $out = $OUTPUT->container_start(null, 'dp-plans-menu');
 
@@ -733,7 +734,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display active plans
-    if ($plans = dp_get_plans($userid, array(DP_PLAN_STATUS_APPROVED))) {
+    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_APPROVED))) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('activeplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
@@ -754,7 +755,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display unapproved plans
-    if ($plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED))) {
+    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED))) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
@@ -776,7 +777,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display completed plans
-    if ($plans = dp_get_plans($userid, DP_PLAN_STATUS_COMPLETE)) {
+    if ($enableplans && $plans = dp_get_plans($userid, DP_PLAN_STATUS_COMPLETE)) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('completedplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');

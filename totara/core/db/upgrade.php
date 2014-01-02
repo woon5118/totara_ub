@@ -951,5 +951,12 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2013120300, 'totara_core');
     }
 
+    if ($oldversion < 2014010700) {
+        set_config('enablegoals', '1');
+        set_config('enableappraisals', '1');
+        set_config('enablefeedback360', '1');
+        set_config('enablelearningplans', '1');
+        totara_upgrade_mod_savepoint(true, 2014010700, 'totara_core');
+    }
     return true;
 }

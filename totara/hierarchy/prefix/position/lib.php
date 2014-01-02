@@ -141,7 +141,7 @@ class position extends hierarchy {
         echo html_writer::empty_tag('br');
 
         // Display all goals assigned to this item.
-        if (!is_ajax_request($_SERVER)) {
+        if (!empty($CFG->enablegoals) && !is_ajax_request($_SERVER)) {
             $addgoalparam = array('assignto' => $item->id, 'assigntype' => GOAL_ASSIGNMENT_POSITION, 'sesskey' => sesskey());
             $addgoalurl = new moodle_url('/totara/hierarchy/prefix/goal/assign/find.php', $addgoalparam);
             echo html_writer::start_tag('div', array('class' => 'list-assigned-goals'));

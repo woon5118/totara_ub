@@ -1466,7 +1466,7 @@ function totara_build_menu() {
     }
 
     require_once($CFG->dirroot . '/totara/plan/lib.php');
-    $canviewlearningplans = dp_can_view_users_plans($USER->id);
+    $canviewlearningplans = !empty($CFG->enablelearningplans) && dp_can_view_users_plans($USER->id);
     $requiredlearninglink = prog_get_tab_link($USER->id);
 
     require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
@@ -1496,10 +1496,10 @@ function totara_build_menu() {
     require_once($CFG->dirroot . '/totara/appraisal/lib.php');
     require_once($CFG->dirroot . '/totara/feedback360/lib.php');
     require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
-    $viewownappraisals = appraisal::can_view_own_appraisals($USER->id);
-    $viewappraisals = $viewownappraisals || appraisal::can_view_staff_appraisals($USER->id);
-    $viewfeedback360s = feedback360::can_view_feedback360s($USER->id);
-    $viewgoals = goal::can_view_goals($USER->id);
+    $viewownappraisals = !empty($CFG->enableappraisals) && appraisal::can_view_own_appraisals($USER->id);
+    $viewappraisals = !empty($CFG->enableappraisals) && ($viewownappraisals || appraisal::can_view_staff_appraisals($USER->id));
+    $viewfeedback360s = !empty($CFG->enablefeedback360) && feedback360::can_view_feedback360s($USER->id);
+    $viewgoals = !empty($CFG->enablegoals) && goal::can_view_goals($USER->id);
     if ($viewappraisals || $viewfeedback360s || $viewgoals) {
         if ($viewownappraisals) {
             $tree[] = (object)array(

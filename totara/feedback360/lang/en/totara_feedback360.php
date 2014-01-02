@@ -59,6 +59,7 @@ $string['cancelusersemail'] = 'Cancel existing requests to these external users:
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
 $string['closenow'] = '(Close Now)';
+$string['configenablefeedback360'] = 'If not checked, navigation links to 360 Feedbacks will not be shown';
 $string['confirmactivatefeedback360'] = 'Are you sure you want to activate Feedback - {$a}?';
 $string['confirmclosefeedback360'] = 'Are you sure you want to close Feedback - {$a}?';
 $string['confirmdeletefeedback360'] = 'Are you sure you want to delete Feedback - {$a}?';
@@ -93,6 +94,7 @@ $string['emailrequeststr'] = '<p>{$a->fullname} has requested you fill in their 
 $string['emailrequeststralt'] = '{$a->fullname} has requested you fill in their feedback form. Please click go to the link below and fill in the displayed form:
 
 {$a->url}';
+$string['enablefeedback360'] = 'Show 360 Feedback';
 $string['manageremailrequeststr'] = '<p>{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click the link below and fill in the displayed form:<p>
 <p>{$a->link}</p>';
 $string['manageremailrequeststralt'] = '{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click go to the link below and fill in the displayed form:
