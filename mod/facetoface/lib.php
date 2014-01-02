@@ -2223,7 +2223,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                                         'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
                                         'mod/facetoface:takeattendance'), $contextcourse);
 
-    $table = '';
+    $table = html_writer::start_tag('table', array('class' => 'table90 inlinetable'));
     $timenow = time();
 
     $strviewallsessions = get_string('viewallsessions', 'facetoface');
@@ -2248,25 +2248,21 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 }
 
                 $sessiondates = '';
-                $sessiontimes = '';
 
                 if ($session->datetimeknown) {
                     foreach ($session->sessiondates as $date) {
                         if (!empty($sessiondates)) {
                             $sessiondates .= html_writer::empty_tag('br');
-                            $sessiontimes .= html_writer::empty_tag('br');
                         }
                         $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
                         if ($sessionobj->startdate == $sessionobj->enddate) {
-                            $sessiondates .= $sessionobj->startdate;
+                            $sessiondates .= get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
                         } else {
-                            $sessiondates .= $sessionobj->startdate . ' - ' . $sessionobj->enddate;
+                            $sessiondates .= get_string('sessionstartfinishandtime', 'facetoface', $sessionobj);
                         }
-                        $sessiontimes .= get_string('sessiondatetimecourseformat', 'facetoface', $sessionobj);
                     }
                 } else {
                     $sessiondates = get_string('wait-listed', 'facetoface');
-                    $sessiontimes = get_string('wait-listed', 'facetoface');
                 }
 
                 $span = html_writer::tag('span', get_string('options', 'facetoface').':', array('class' => 'f2fsessionnotice'));
@@ -2304,12 +2300,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     $options       = html_writer::tag('tr', html_writer::tag('td', $span));
                 }
 
-                $table = html_writer::start_tag('table', array('class' => 'table90 inlinetable'))
-                    .html_writer::start_tag('tr')
+                $table .= html_writer::start_tag('tr')
                     .html_writer::tag('td', $status, array('class' => 'f2fsessionnotice', 'colspan' => '2'))
                     .html_writer::end_tag('tr')
                     .html_writer::start_tag('tr', array('class' => 'f2fsessioninfo'))
-                    .html_writer::tag('td', $roomtext . $sessiondates . html_writer::empty_tag('br') . $sessiontimes, array('class' => 'f2fwidth'))
+                    .html_writer::tag('td', $roomtext . $sessiondates . html_writer::empty_tag('br'), array('class' => 'f2fwidth'))
                     .html_writer::tag('td', html_writer::start_tag('table'))
                         .$options
                         .$moreinfolink
@@ -2317,30 +2312,30 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         .$cancellink
                         .html_writer::end_tag('table')
                     .html_writer::end_tag('td')
-                    .html_writer::end_tag('tr')
-                    .html_writer::start_tag('tr')
-                    .html_writer::tag('td', $htmlviewallsessions, array('colspan' => '2'))
-                    .html_writer::end_tag('tr')
-                    .html_writer::end_tag('table');
+                    .html_writer::end_tag('tr');
             }
         }
+        // Add closing "view all sessions" row to table.
+        $table .= html_writer::start_tag('tr')
+            .html_writer::tag('td', $htmlviewallsessions, array('colspan' => '2'))
+            .html_writer::end_tag('tr')
+            .html_writer::end_tag('table');
     } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
         if ($facetoface->display > 0) {
-            $table = html_writer::start_tag('table', array('class' => 'table90 inlinetable'));
             $j=1;
+
+            $sessionsinprogress = array();
+            $futuresessions = array();
+
             foreach ($sessions as $session) {
                 if (!facetoface_session_has_capacity($session, $contextmodule, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                     continue;
                 }
 
-                $options = '';
-                $moreinfolink = html_writer::tag('tr', html_writer::tag('td', '&nbsp;'));
-                if ($session->datetimeknown && (facetoface_has_session_started($session, $timenow)) && facetoface_is_session_in_progress($session, $timenow)) {
-                    $status = get_string('sessioninprogress', 'facetoface');
-                } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
+                if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && !facetoface_is_session_in_progress($session, $timenow)) {
+                    // Finished session, don't display.
                     continue;
                 } else {
-                    $status = get_string('signupforsession', 'facetoface');
                     $signup = get_string('signup', 'facetoface');
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
                     $moreinfolink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($signup_url, $signup, array('class' => 'f2fsessionlinks f2fsessioninfolink', 'title' => $signup))));
@@ -2359,11 +2354,10 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     } else {
                         $sessionobj = facetoface_format_session_times($session->sessiondates[0]->timestart, $session->sessiondates[0]->timefinish, $session->sessiondates[0]->sessiontimezone);
                         if ($sessionobj->startdate == $sessionobj->enddate) {
-                            $sessiondate = $sessionobj->startdate;
+                            $sessiondate = get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
                         } else {
-                            $sessiondate .= $sessionobj->startdate . ' - ' . $sessionobj->enddate;
+                            $sessiondate .= get_string('sessionstartfinishdateandtime', 'facetoface', $sessionobj);
                         }
-                        $sessiontime = get_string('sessiondatetimecourseformat', 'facetoface', $sessionobj);
                         if (count($session->sessiondates) > 1) {
                             $multidate = html_writer::start_tag('br') . get_string('multidate', 'facetoface');
                         }
@@ -2380,23 +2374,58 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     $locationstring .= isset($roomdata->address)  ? format_string($roomdata->address) .', '.html_writer::empty_tag('br') : '';
                 }
 
-                $table .= html_writer::start_tag('tr')
-                    .html_writer::tag('td', $j.'. '.$status, array('class' => 'f2fsessionnotice', 'colspan' => '2'))
-                    .html_writer::end_tag('tr')
-                    .html_writer::start_tag('tr')
-                    .html_writer::tag('td', html_writer::tag('span', $locationstring.$sessiondate.html_writer::empty_tag('br').$sessiontime.$multidate, array('class' => 'f2fsessiontime')), array('class' => 'f2fwidth'))
-                    .html_writer::tag('td', html_writer::start_tag('table'))
-                    .$options
-                    .$moreinfolink
-                    .html_writer::end_tag('table')
-                    .html_writer::end_tag('td')
-                    .html_writer::end_tag('tr');
+                $sessionobject = new stdClass();
+                $sessionobject->location = $locationstring;
+                $sessionobject->date = $sessiondate;
+                $sessionobject->multidate = $multidate;
+
+                if ($session->datetimeknown && (facetoface_has_session_started($session, $timenow)) && facetoface_is_session_in_progress($session, $timenow)) {
+                    $sessionsinprogress[] = $sessionobject;
+                } else {
+                    $sessionobject->options = $options;
+                    $sessionobject->moreinfolink = $moreinfolink;
+                    $futuresessions[] = $sessionobject;
+                }
 
                 $j++;
                 if ($j > $facetoface->display) {
                     break;
                 }
             }
+
+            if (!empty($sessionsinprogress)) {
+                $table .= html_writer::start_tag('tr')
+                    . html_writer::tag('td', get_string('sessioninprogress', 'facetoface'), array('class' => 'f2fsessionnotice', 'colspan' => '2'))
+                    . html_writer::end_tag('tr');
+
+                foreach ($sessionsinprogress as $session) {
+                    $table .= html_writer::start_tag('tr')
+                        .html_writer::tag('td', html_writer::tag('span', $session->location.$session->date.$session->multidate, array('class' => 'f2fsessiontime')), array('class' => 'f2fwidth'))
+                        .html_writer::tag('td', html_writer::start_tag('table'))
+                        .html_writer::tag('tr', html_writer::tag('td', '&nbsp;'))
+                        .html_writer::end_tag('table')
+                        .html_writer::end_tag('td')
+                        .html_writer::end_tag('tr');
+                }
+            }
+
+            if (!empty($futuresessions)) {
+                $table .= html_writer::start_tag('tr')
+                    . html_writer::tag('td', get_string('signupforsession', 'facetoface'), array('class' => 'f2fsessionnotice', 'colspan' => '2'))
+                    . html_writer::end_tag('tr');
+
+                foreach ($futuresessions as $session) {
+                    $table .= html_writer::start_tag('tr')
+                        .html_writer::tag('td', html_writer::tag('span', $session->location.$session->date.$session->multidate, array('class' => 'f2fsessiontime')), array('class' => 'f2fwidth'))
+                        .html_writer::tag('td', html_writer::start_tag('table'))
+                        .$session->options
+                        .$session->moreinfolink
+                        .html_writer::end_tag('table')
+                        .html_writer::end_tag('td')
+                        .html_writer::end_tag('tr');
+                }
+            }
+
             $table .= html_writer::start_tag('tr')
                 .html_writer::tag('td', ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions, array('colspan' => '2'))
                 .html_writer::end_tag('tr')
