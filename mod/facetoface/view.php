@@ -206,6 +206,8 @@ function print_session_list($courseid, $facetoface, $location) {
         }
     }
 
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
     // Upcoming sessions
     echo $OUTPUT->heading(get_string('upcomingsessions', 'facetoface'));
     if (empty($upcomingarray) && empty($upcomingtbdarray)) {
@@ -213,7 +215,7 @@ function print_session_list($courseid, $facetoface, $location) {
     }
     else {
         $upcomingarray = array_merge($upcomingarray, $upcomingtbdarray);
-        echo $f2f_renderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions);
+        echo $f2f_renderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions, $displaytimezones);
     }
 
     if ($editsessions) {
@@ -223,7 +225,7 @@ function print_session_list($courseid, $facetoface, $location) {
     // Previous sessions
     if (!empty($previousarray)) {
         echo $OUTPUT->heading(get_string('previoussessions', 'facetoface'));
-        echo $f2f_renderer->print_session_list_table($customfields, $previousarray, $viewattendees, $editsessions);
+        echo $f2f_renderer->print_session_list_table($customfields, $previousarray, $viewattendees, $editsessions, $displaytimezones);
     }
 }
 

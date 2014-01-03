@@ -1008,6 +1008,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         return '';
     }
 
+    // Get timezone setting.
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
     if ($data->datetimeknown) {
         // Scheduled session
         $alldates = '';
@@ -1024,7 +1027,8 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
             }
             $starttime = userdate($date->timestart, get_string('strftimetime'), $date->sessiontimezone);
             $finishtime = userdate($date->timefinish, get_string('strftimetime'), $date->sessiontimezone);
-            $timestr = $starttime . ' - ' . $finishtime . ' ' . $date->sessiontimezone;
+            $timestr = $starttime . ' - ' . $finishtime . ' ';
+            $timestr .= $displaytimezones ? $date->sessiontimezone : '';
             $alldates .= $timestr;
         }
 
