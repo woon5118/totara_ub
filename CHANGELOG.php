@@ -3,6 +3,21 @@
 
 Totara LMS Changelog
 
+Release 2.5.5 (7th January 2014):
+==================================================
+
+Improvements:
+    T-10914    Added totara settings to hide certain functionalities
+
+Bug Fixes:
+    T-11661    Fixed version number in totara core
+    T-11527    Fixed config variable not being set when upgrading from an earlier version of Totara 2.4.8 - Affecting rules based on text in dynamic audiences
+    T-11726    Allow suspended field in user source to be left blank in Totara Sync
+    T-11729    Timezone information is now displayed for Facetoface sessions in the calendar
+    T-11709    Fixed certification completion upload when multiple records for one user exist in CSV file
+    T-11696    Fixed discrepancy between Facetoface Attendance and Export Attendance Reports
+
+
 Release 2.5.4 (24th December 2013):
 ==================================================
 
