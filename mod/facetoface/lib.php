@@ -365,6 +365,9 @@ function facetoface_add_instance($facetoface) {
     global $DB;
     $facetoface->timemodified = time();
 
+    if (empty($facetoface->reservecancel)) {
+        $facetoface->reservecanceldays = 0;
+    }
     facetoface_fix_settings($facetoface);
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
@@ -463,6 +466,18 @@ function facetoface_add_instance($facetoface) {
     $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
     $trainer_unassigned->save();
 
+    $cancelreservation = new facetoface_notification($defaults, false);
+    $cancelreservation->title = get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface');
+    $cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
+    $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
+    $cancelreservation->save();
+
+    $cancelallreservations = new facetoface_notification($defaults, false);
+    $cancelallreservations->title = get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface');
+    $cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
+    $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
+    $cancelallreservations->save();
+
     return $facetoface->id;
 }
 
@@ -479,6 +494,9 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
     }
     if (empty($facetoface->completionstatusrequired)) {
         $facetoface->completionstatusrequired = null;
+    }
+    if (empty($facetoface->reservecancel)) {
+        $facetoface->reservecanceldays = 0;
     }
 
    facetoface_fix_settings($facetoface);
@@ -701,7 +719,7 @@ function facetoface_update_attendees($session) {
     $course = $DB->get_record('course', array('id' => $facetoface->course));
 
     // Update user status'
-    $users = facetoface_get_attendees($session->id);
+    $users = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED), true);
 
     if ($users) {
         // No/deleted session dates
@@ -711,7 +729,10 @@ function facetoface_update_attendees($session) {
             foreach ($users as $user) {
                 if ($user->statuscode == MDL_F2F_STATUS_BOOKED) {
 
-                    if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id)) {
+                    if (!$user->id) {
+                        // Cope with reserved spaces.
+                        facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_WAITLISTED, $USER->id);
+                    } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id)) {
                         // rollback_sql();
                         return false;
                     }
@@ -740,7 +761,10 @@ function facetoface_update_attendees($session) {
 
                     if ($user->statuscode == MDL_F2F_STATUS_WAITLISTED) {
 
-                        if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id)) {
+                        if (!$user->id) {
+                            // Cope with reserved spaces.
+                            facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_BOOKED, $USER->id);
+                        } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id)) {
                             // rollback_sql();
                             return false;
                         }
@@ -824,6 +848,9 @@ function facetoface_delete_session($session) {
         }
     }
 
+    // Notify managers who had reservations.
+    facetoface_notify_reserved_session_deleted($facetoface, $session);
+
     $transaction = $DB->start_delegated_transaction();
 
     // Remove entries from the teacher calendars
@@ -858,6 +885,48 @@ function facetoface_delete_session($session) {
     $transaction->allow_commit();
 
     return true;
+}
+
+/**
+ * Notify managers that a session they had reserved spaces on has been deleted.
+ *
+ * @param object $facetoface
+ * @param object $session
+ */
+function facetoface_notify_reserved_session_deleted($facetoface, $session) {
+    global $CFG;
+
+    $attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED), true);
+    $reservedids = array();
+    foreach ($attendees as $attendee) {
+        if ($attendee->bookedby) {
+            if (!$attendee->id) {
+                // Managers can already get booking cancellation notices - just adding reserve cancellation notices.
+                $reservedids[] = $attendee->bookedby;
+            }
+        }
+    }
+    if (!$reservedids) {
+        return;
+    }
+    $reservedids = array_unique($reservedids);
+
+    $ccmanager = !empty($facetoface->ccmanager);
+    $facetoface->ccmanager = false; // Never Cc the manager's manager (that would just be too much).
+
+    // Notify all managers that have reserved spaces for their team.
+    $params = array(
+        'facetofaceid'  => $facetoface->id,
+        'type'          => MDL_F2F_NOTIFICATION_AUTO,
+        'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED
+    );
+
+    $includeical = empty($CFG->facetoface_disableicalcancel);
+    foreach ($reservedids as $reservedid) {
+        facetoface_send_notice($facetoface, $session, $reservedid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
+    }
+
+    $facetoface->ccmanager = $ccmanager;
 }
 
 /**
@@ -899,7 +968,62 @@ function facetoface_cron($testing = false) {
         }
     }
 
+    facetoface_remove_reservations_after_deadline($testing);
+
     return true;
+}
+
+/**
+ * Find any reservations that are too close to the start of the session and delete them.
+ */
+function facetoface_remove_reservations_after_deadline($testing) {
+    global $DB;
+    $sql = "SELECT DISTINCT su.id, s.id AS sessionid, f.id AS facetofaceid, su.bookedby
+                  FROM {facetoface} f
+                  JOIN {facetoface_sessions} s ON s.facetoface = f.id
+                  JOIN {facetoface_sessions_dates} sd ON sd.sessionid = s.id
+                  JOIN {facetoface_signups} su ON su.sessionid = s.id AND su.userid = 0
+                  JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
+                 WHERE f.reservecanceldays > 0 AND sd.timestart < (:timenow + (f.reservecanceldays * :daysecs))";
+    $params = array('timenow' => time(), 'daysecs' => DAYSECS);
+    $signups = $DB->get_records_sql($sql, $params);
+
+    if ($signups) {
+        $tonotify = array();
+        if (!$testing) {
+            mtrace('Removing unconfirmed face to face reservations for sessions that will be starting soon');
+        }
+        foreach ($signups as $signup) {
+            if (!$testing) {
+                mtrace("- signupid: {$signup->id}, sessionid: {$signup->sessionid}, facetofaceid: {$signup->facetofaceid}");
+            }
+            if (!isset($tonotify[$signup->facetofaceid])) {
+                $tonotify[$signup->facetofaceid] = array();
+            }
+            if (!isset($tonotify[$signup->facetofaceid][$signup->sessionid])) {
+                $tonotify[$signup->facetofaceid][$signup->sessionid] = array();
+            }
+            $tonotify[$signup->facetofaceid][$signup->sessionid][$signup->bookedby] = $signup->bookedby;
+        }
+        $signupids = array_keys($signups);
+        $DB->delete_records_list('facetoface_signups_status', 'signupid', $signupids);
+        $DB->delete_records_list('facetoface_signups', 'id', $signupids);
+
+        $notifyparams = array(
+            'type' => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED,
+        );
+        foreach ($tonotify as $facetofaceid => $sessions) {
+            $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
+            $notifyparams['facetofaceid'] = $facetoface->id;
+            foreach ($sessions as $sessionid => $managers) {
+                $session = facetoface_get_session($sessionid);
+                foreach ($managers as $managerid) {
+                    facetoface_send_notice($facetoface, $session, $managerid, $notifyparams);
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -1040,15 +1164,28 @@ function facetoface_get_grade($userid, $courseid, $facetofaceid) {
  * @access public
  * @param integer Session ID
  * @param array $status Array of statuses to include
+ * @param bool $includereserved optional - if true, then include 'reserved' spaces (note this will change the array index
+ *                                to signupid instead of the user id, to prevent duplicates)
  * @return array
  */
-function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED)) {
+function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED), $includereserved = false) {
     global $DB;
 
     list($statussql, $statusparams) = $DB->get_in_or_equal($status);
 
+    // Find the reservation details (and LEFT JOIN with the {user}, as that will be 0 for reservations).
+    $reservedfields = '';
+    $userjoin = 'JOIN';
+    if ($includereserved) {
+        $reservedfields = 'su.id AS signupid, bb.firstname AS bookedbyfirstname,
+                        bb.lastname AS bookedbylastname, bb.id AS bookedby, ';
+        $userjoin = 'LEFT JOIN {user} bb ON bb.id = su.bookedby
+                     LEFT JOIN';
+    }
+
     $sql = "
         SELECT
+            {$reservedfields}
             u.id,
             su.id AS submissionid,
             u.firstname,
@@ -1078,7 +1215,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
         JOIN
             {facetoface_signups_status} ss
          ON su.id = ss.signupid
-        JOIN
+       {$userjoin}
             {user} u
          ON u.id = su.userid
         WHERE
@@ -3614,14 +3751,23 @@ function facetoface_get_declines($sessionid) {
  * @param   integer $sessionid
  * @param   mixed   $status     Integer or array of integers
  * @param   string  $select     SELECT clause
+ * @param   bool    $includereserved   optional - include 'reserved' users (note this will change the array index
+ *                              to be the signupid, to avoid duplicate id problems).
  * @return  array|false
  */
-function facetoface_get_users_by_status($sessionid, $status, $select = '') {
+function facetoface_get_users_by_status($sessionid, $status, $select = '', $includereserved = false) {
     global $DB;
 
     // If no select SQL supplied, use default
     if (!$select) {
         $select = "u.id, su.id AS signupid, u.firstname, u.lastname, ss.timecreated, u.email";
+        if ($includereserved) {
+            $select = "su.id, ".$select;
+        }
+    }
+    $userjoin = 'JOIN';
+    if ($includereserved) {
+        $userjoin = 'LEFT JOIN';
     }
 
     // Make string from array of statuses
@@ -3633,7 +3779,7 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '') {
         SELECT {$select}
           FROM {facetoface_signups} su
           JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
-          JOIN {user} u ON u.id = su.userid
+          $userjoin {user} u ON u.id = su.userid
          WHERE su.sessionid = ? AND ss.superceded != 1
            AND ss.statuscode = ?
          ORDER BY " . $DB->sql_fullname('u.firstname', 'u.lastname') . ", ss.timecreated
@@ -4871,4 +5017,571 @@ function display_bulk_actions_picker() {
     $out .= $OUTPUT->container_end();
 
     return $out;
+}
+
+/**
+ * Count how many spaces the current user has reserved in the given face to face instance.
+ * @param object $facetoface
+ * @param int $managerid
+ * @return array 'all' => total count; sessionid => session count
+ */
+function facetoface_count_reservations($facetoface, $managerid) {
+    global $DB;
+    static $reservations = array();
+
+    if (!isset($reservations[$facetoface->id])) {
+        $sql = 'SELECT s.id, COUNT(*) AS reservecount
+                  FROM {facetoface_sessions} s
+                  JOIN {facetoface_signups} su ON su.sessionid = s.id
+                 WHERE s.facetoface = :facetofaceid AND su.bookedby = :userid AND su.userid = 0
+                 GROUP BY s.id';
+        $params = array('facetofaceid' => $facetoface->id, 'userid' => $managerid);
+        $reservations[$facetoface->id] = $DB->get_records_sql_menu($sql, $params);
+        $reservations[$facetoface->id]['all'] = array_sum($reservations[$facetoface->id]);
+    }
+
+    return $reservations[$facetoface->id];
+}
+
+/**
+ * Count how many allocations the current user has made in the given face to face instance.
+ * @param object $facetoface
+ * @param int $managerid
+ * @return array 'all' => total count; sessionid => session count
+ */
+function facetoface_count_allocations($facetoface, $managerid) {
+    global $DB;
+    static $allocations = array();
+
+    if (!isset($allocations[$facetoface->id])) {
+        $sql = 'SELECT s.id, COUNT(*) AS allocatecount
+                  FROM {facetoface_sessions} s
+                  JOIN {facetoface_signups} su ON su.sessionid = s.id
+                  JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
+                                                       AND sus.statuscode > :cancelled
+                 WHERE s.facetoface = :facetofaceid AND su.bookedby = :userid AND su.userid <> 0
+                 GROUP BY s.id';
+        $params = array('facetofaceid' => $facetoface->id, 'userid' => $managerid, 'cancelled' => MDL_F2F_STATUS_USER_CANCELLED);
+        $allocations[$facetoface->id] = $DB->get_records_sql_menu($sql, $params);
+        $allocations[$facetoface->id]['all'] = array_sum($allocations[$facetoface->id]);
+    }
+
+    return $allocations[$facetoface->id];
+}
+
+/**
+ * Returns details of whether or not the user can reserve or allocate spaces for their team.
+ * Note - an exception is throw if the managerid is set to another user and the current user is missing the
+ * 'reserveother' capability
+ *
+ * @param object $facetoface
+ * @param object[] $sessions
+ * @param context $context
+ * @param int $managerid optional defaults to current user
+ * @throws moodle_exception
+ * @return array with values 'allocate' - array how many spare allocations there are, per sesion + 'all'
+ *                                        (false if not able to allocate)
+ *                           'allocated' - array how many spaces have been allocated by this manager, per session + 'all'
+ *                           'maxallocate' - the maximum number of spaces this manager could allocate, per session + 'all'
+ *                           'reserve' - array how many spare reservations there are, per session + 'all'
+ *                                       (false if not able to reserve)
+ *                           'reserved' - array how many spaces have been reserved by this manager, per session + 'all'
+ *                           'maxreserve' - array the maximum number of spaces this manager could still allocate, per session + 'all'
+ *                           'reservedeadline' - any sessions that start after this date are able to reserve places
+ *                           'reservecancel' - any sessions that before this date will have all reservations deleted
+ */
+function facetoface_can_reserve_or_allocate($facetoface, $sessions, $context, $managerid = null) {
+    global $USER;
+
+    $reserveother = has_capability('mod/facetoface:reserveother', $context);
+    if (!$managerid || $managerid == $USER->id) {
+        $managerid = $USER->id;
+    } else {
+        if (!$reserveother) {
+            throw new moodle_exception('cannotreserveother', 'mod_facetoface');
+        }
+    }
+
+    $ret = array(
+        'allocate' => false, 'allocated' => array('all' => 0), 'maxallocate' => array('all' => 0),
+        'reserve' => false, 'reserved' => array('all' => 0), 'maxreserve' => array('all' => 0),
+        'reservedeadline' => 0, 'reservecancel' => 0, 'reserveother' => false
+    );
+    if (!$facetoface->managerreserve) {
+        return $ret; // Manager reservations disabled for this activity.
+    }
+
+    $ret['reserveother'] = $reserveother;
+    $ret['reservedeadline'] = time() + ($facetoface->reservedays * DAYSECS);
+    $ret['reservecancel'] = time() + ($facetoface->reservecanceldays * DAYSECS);
+
+    if (!has_capability('mod/facetoface:reservespace', $context, $managerid)) {
+        return $ret; // Manager is not allowed to reserve/allocate any spaces.
+    }
+
+    if (!totara_get_staff($managerid)) {
+        return $ret; // No staff to allocate spaces to.
+    }
+
+    // Allowed to make allocations / reservations - gather some details about the spaces remaining.
+    $allocations = facetoface_count_allocations($facetoface, $managerid);
+    $reservations = facetoface_count_reservations($facetoface, $managerid);
+    foreach ($sessions as $session) {
+        if (!isset($allocations[$session->id])) {
+            $allocations[$session->id] = 0;
+        }
+        if (!isset($reservations[$session->id])) {
+            $reservations[$session->id] = 0;
+        }
+    }
+    $ret['allocate'] = array();
+    $ret['allocated'] = $allocations;
+    $ret['maxallocate'] = array();
+    $ret['reserve'] = array();
+    $ret['reserved'] = $reservations;
+    $ret['maxreserve'] = array();
+
+    foreach ($allocations as $sid => $allocation) {
+        $reservation = isset($reservations[$sid]) ? $reservations[$sid] : 0;
+        // Max allocation = overall max - allocations for other sessions - reservations for other sessions.
+        $ret['maxallocate'][$sid] = $facetoface->maxmanagerreserves - ($allocations['all'] - $allocation);
+        $ret['maxallocate'][$sid] -= ($reservations['all'] - $reservation);
+        $ret['allocate'][$sid] = $ret['maxallocate'][$sid] - $allocation; // Number left to allocate.
+
+        // Max reservations = overall max - allocations (all) - reservations for other sessions
+        $ret['maxreserve'][$sid] = $facetoface->maxmanagerreserves - $allocations['all'];
+        $ret['maxreserve'][$sid] -= ($reservations['all'] - $reservation);
+        $ret['reserve'][$sid] = $ret['maxreserve'][$sid] - $reservation; // Number left to reserve.
+
+        // Make sure no values are < 0 (e.g. if the allocation limit has changed).
+        $ret['maxallocate'][$sid] = max(0, $ret['maxallocate'][$sid]);
+        $ret['allocate'][$sid] = max(0, $ret['allocate'][$sid]);
+        $ret['maxreserve'][$sid] = max(0, $ret['maxreserve'][$sid]);
+        $ret['reserve'][$sid] = max(0, $ret['reserve'][$sid]);
+    }
+
+    return $ret;
+}
+
+/**
+ * Given the number of spaces the manager has reserved / allocated (from 'can_reserve_or_allocate')
+ * and the overall remaining capacity of the particular session, work out how many spaces they can
+ * actually reserve/allocate for this session.
+ *
+ * @param int $sessionid
+ * @param array $reserveinfo
+ * @param int $capacityleft
+ * @return array - see facetoface_can_reserve_or_allocate for details
+ */
+function facetoface_limit_reserveinfo_to_capacity_left($sessionid, $reserveinfo, $capacityleft) {
+    if (!empty($reserveinfo['reserve'])) {
+        if ($reserveinfo['reserve'][$sessionid] > $capacityleft) {
+            $reserveinfo['reserve'][$sessionid] = $capacityleft;
+            $reserveinfo['maxreserve'][$sessionid] = $reserveinfo['reserve'][$sessionid] + $reserveinfo['reserved'][$sessionid];
+        }
+    }
+    if (!empty($reserveinfo['allocate'])) {
+        if ($reserveinfo['allocate'][$sessionid] > $capacityleft) {
+            $reserveinfo['allocate'][$sessionid] = $capacityleft;
+            $reserveinfo['maxallocate'][$sessionid] = $reserveinfo['allocate'][$sessionid] + $reserveinfo['allocated'][$sessionid];
+        }
+    }
+
+    return $reserveinfo;
+}
+
+/**
+ * Given the session details, determines if reservations are still allowed, or if the deadline has now passed.
+ *
+ * @param array $reserveinfo
+ * @param object $session
+ * @return array - see facetoface_can_reserve_or_allocate for details, but adds two new values:
+ *                  'reservepastdeadline' - true if the deadline for adding new reservations has passed
+ *                  'reservepastcancel' - true if all existing reservations should be cancelled
+ */
+function facetoface_limit_reserveinfo_by_session_date($reserveinfo, $session) {
+    $reserveinfo['reservepastdeadline'] = false;
+    $reserveinfo['reservepastcancel'] = false;
+    if ($session->datetimeknown) {
+        $firstdate = reset($session->sessiondates);
+        if (!isset($reserveinfo['reservedeadline']) || $firstdate->timestart <= $reserveinfo['reservedeadline']) {
+            $reserveinfo['reservepastdeadline'] = true;
+        }
+        if (!isset($reserveinfo['reservecancel']) || $firstdate->timestart <= $reserveinfo['reservecancel']) {
+            $reserveinfo['reservepastcancel'] = true;
+        }
+    }
+
+    return $reserveinfo;
+}
+
+/**
+ * Add the number of reservations requested (it is assumed that all capacity checks have
+ * already been done by this point, so no extra checking is performed).
+ *
+ * @param object $session the session the reservations are for
+ * @param int $bookedby the user making the reservations
+ * @param int $number how many reservations to make
+ * @param int $waitlisted how many reservations to add to the waitlist (not included in $number)
+ */
+function facetoface_add_reservations($session, $bookedby, $number, $waitlisted) {
+    global $DB;
+
+    $usersignup = (object)array(
+        'sessionid' => $session->id,
+        'userid' => 0,
+        'notificationtype' => MDL_F2F_NOTIFICATION_AUTO,
+        'archived' => 0,
+        'bookedby' => $bookedby,
+    );
+
+    for ($i=0; $i<($number+$waitlisted); $i++) {
+        $usersignup->id = $DB->insert_record('facetoface_signups', $usersignup);
+        if ($session->datetimeknown && ($i < $number)) {
+            $status = MDL_F2F_STATUS_BOOKED;
+        } else {
+            $status = MDL_F2F_STATUS_WAITLISTED;
+        }
+        facetoface_update_signup_status($usersignup->id, $status, $bookedby);
+    }
+
+    facetoface_update_attendees($session);
+}
+
+/**
+ * Remove the (up to) the given number of reservations originally made by the given user.
+ *
+ * @param object $facetoface
+ * @param object $session the session to remove the reservations from
+ * @param int $bookedby the user who made the original reservations
+ * @param int $number the number of reservations to remove
+ * @param bool $sendnotification
+ */
+function facetoface_remove_reservations($facetoface, $session, $bookedby, $number, $sendnotification = false) {
+    global $DB;
+
+    $sql = 'SELECT su.id
+              FROM {facetoface_signups} su
+              JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
+             WHERE su.sessionid = :sessionid AND su.userid = 0 AND su.bookedby = :bookedby
+             ORDER BY sus.statuscode ASC, id DESC';
+    // Start by deleting low-status reservations (cancelled, waitlisted), then order by most recently booked.
+    $params = array('sessionid' => $session->id, 'bookedby' => $bookedby);
+
+    $reservations = $DB->get_records_sql($sql, $params, 0, $number);
+    $removecount = count($reservations);
+    foreach ($reservations as $reservation) {
+        $DB->delete_records('facetoface_signups_status', array('signupid' => $reservation->id));
+        $DB->delete_records('facetoface_signups', array('id' => $reservation->id));
+    }
+
+    if ($removecount && $sendnotification) {
+        $params = array(
+            'facetofaceid' => $facetoface->id,
+            'type' => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_RESERVATION_CANCELLED,
+        );
+        facetoface_send_notice($facetoface, $session, $bookedby, $params);
+    }
+
+    facetoface_update_attendees($session);
+}
+
+/**
+ * Replace the manager reservations for this session with allocations for the given userids.
+ * The list of userids still to be allocated will be returned.
+ * Note: There are no checks made to see if the given users have already booked on a session, etc. -
+ * it is assumed that any such checks have been completed before calling this function.
+ *
+ * @param object $session
+ * @param object $facetoface
+ * @param object $course
+ * @param int $bookedby
+ * @param int[] $userids
+ * @throws moodle_exception
+ * @return int[]
+ */
+function facetoface_replace_reservations($session, $facetoface, $course, $bookedby, $userids) {
+    global $DB, $CFG;
+
+    $facetoface->approvalreqd = false; // Make sure they are directly signed-up.
+
+    $sql = 'SELECT su.id, sus.statuscode, su.discountcode, su.notificationtype
+              FROM {facetoface_signups} su
+              JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
+             WHERE su.sessionid = :sessionid AND su.userid = 0 AND su.bookedby = :bookedby
+             ORDER BY sus.statuscode DESC, id DESC';
+    // Prioritise allocating high-status reservations (booked) over lower-status reservations (waitinglist)
+    $params = array('sessionid' => $session->id, 'bookedby' => $bookedby);
+    $reservations = $DB->get_records_sql($sql, $params, 0, count($userids));
+
+    foreach ($reservations as $reservation) {
+        $userid = array_shift($userids);
+        // Make sure that the user is enroled in the course
+        $context = context_course::instance($course->id);
+        if (!is_enrolled($context, $userid)) {
+            $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
+            if (!enrol_try_internal_enrol($course->id, $userid, $defaultlearnerrole->id, time())) {
+                throw new moodle_exception('unabletoenrol', 'mod_facetoface');
+            }
+        }
+
+        if ($oldbooking = $DB->get_record('facetoface_signups', array('sessionid' => $session->id, 'userid' => $userid))) {
+            // This could happen if a user booked themselves, then cancelled and are now being allocated by their manager.
+
+            // Delete the reservation completely.
+            $DB->delete_records('facetoface_signups_status', array('signupid' => $reservation->id));
+            $DB->delete_records('facetoface_signups', array('id' => $reservation->id));
+
+            // Update the bookedby field.
+            $DB->set_field('facetoface_signups', 'bookedby', $bookedby, array('id' => $oldbooking->id));
+
+        } else {
+            // Switch the booking over to the given user.
+            $upd = (object)array(
+                'id' => $reservation->id,
+                'userid' => $userid,
+                'sessionid' => $session->id,
+            );
+            $DB->update_record('facetoface_signups', $upd);
+        }
+
+        // Make sure the status is set and the correct notification messages are sent.
+        facetoface_user_signup($session, $facetoface, $course, $reservation->discountcode, $reservation->notificationtype,
+                               $reservation->statuscode, $userid);
+    }
+
+    return $userids;
+}
+
+/**
+ * Allocate spaces to all the users specified.
+ * Note: there are no checks done against the user's allocation limit.
+ *
+ * @param object $session
+ * @param object $facetoface
+ * @param object $course
+ * @param int $bookedby
+ * @param int[] $userids
+ * @param int $capacityleft how much (non-waitlist) space there is left on the session
+ * @throws moodle_exception
+ */
+function facetoface_allocate_spaces($session, $facetoface, $course, $bookedby, $userids, $capacityleft) {
+    global $DB, $CFG;
+
+    $facetoface->approvalreqd = false; // Make sure they are directly signed-up.
+
+    foreach ($userids as $userid) {
+        // Make sure that the user is enroled in the course
+        $context = context_course::instance($course->id);
+        if (!is_enrolled($context, $userid)) {
+            $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
+            if (!enrol_try_internal_enrol($course->id, $userid, $defaultlearnerrole->id, time())) {
+                throw new moodle_exception('unabletoenrol', 'mod_facetoface');
+            }
+        }
+
+        $status = MDL_F2F_STATUS_BOOKED;
+        if ($capacityleft <= 0) {
+            $status = MDL_F2F_STATUS_WAITLISTED;
+        }
+
+        // Make sure the status is set and the correct notification messages are sent.
+        if (facetoface_user_signup($session, $facetoface, $course, null, MDL_F2F_NOTIFICATION_AUTO, $status, $userid)) {
+            $DB->set_field('facetoface_signups', 'bookedby', $bookedby, array('sessionid' => $session->id, 'userid' => $userid));
+        }
+        $capacityleft--;
+    }
+}
+
+/**
+ * Remove the given allocations and, optionally, convert them back into reservations.
+ *
+ * @param object $session
+ * @param object $facetoface
+ * @param object $course
+ * @param int[] $userids
+ * @param bool $converttoreservations if true, convert allocations to reservations, if false, just cancel
+ * @param int $managerid optional defaults to current user
+ */
+function facetoface_remove_allocations($session, $facetoface, $course, $userids, $converttoreservations, $managerid = null) {
+    global $DB, $USER;
+
+    if (!$managerid) {
+        $managerid = $USER->id;
+    }
+
+    foreach ($userids as $userid) {
+        if ($converttoreservations) {
+            $DB->set_field('facetoface_signups', 'userid', 0, array('sessionid' => $session->id, 'userid' => $userid,
+                                                                    'bookedby' => $managerid));
+        } else {
+            facetoface_user_cancel($session, $userid);
+        }
+    }
+}
+
+/**
+ * Get a list of staff who can be allocated / deallocated + reasons why other users cannot be allocated.
+ *
+ * @param object $facetoface
+ * @param object $session
+ * @param int $managerid optional
+ * @return object containing potential - list of users who could be allocated
+ *                           current - list of users who are already allocated
+ *                           othersession - users allocated to another sesssion
+ *                           cannotunallocate - users who cannot be unallocated (also listed in 'current')
+ */
+function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = null) {
+    global $DB, $USER;
+
+    if (!$managerid) {
+        $managerid = $USER->id;
+    }
+    $ret = (object)array('potential' => array(), 'current' => array(), 'othersession' => array(), 'cannotunallocate' => array());
+    if (!$staff = totara_get_staff($managerid)) {
+        return $ret;
+    }
+
+    list($usql, $params) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED);
+    // Get list of sign-ups that already exist for these users.
+    $sql = "SELECT u.*, su.sessionid, su.bookedby, b.firstname AS bookedbyfirstname, b.lastname AS bookedbylastname,
+                   su.statuscode
+              FROM {user} u
+              LEFT JOIN (
+                  SELECT xsu.sessionid, xsu.bookedby, xsu.userid, sus.statuscode
+                    FROM {facetoface_signups} xsu
+                    JOIN {facetoface_signups_status} sus ON sus.signupid = xsu.id AND sus.superceded = 0
+                    JOIN {facetoface_sessions} s ON s.id = xsu.sessionid
+                   WHERE s.facetoface = :facetofaceid AND sus.statuscode > :statuscancelled
+              ) su ON su.userid = u.id
+              LEFT JOIN {user} b ON b.id = su.bookedby
+             WHERE u.id $usql";
+    $params['facetofaceid'] = $facetoface->id;
+    $params['statuscancelled'] = MDL_F2F_STATUS_USER_CANCELLED;
+    $users = $DB->get_records_sql($sql, $params);
+
+    foreach ($users as $user) {
+        if (!$user->sessionid) {
+            // User has no bookings for this activity => potentially can be allocated.
+            $ret->potential[$user->id] = $user;
+        } else {
+            if ($user->bookedby != $managerid) {
+                if ($user->bookedby == 0) {
+                    $user->cannotremove = 'selfbooked';
+                } else {
+                    $user->cannotremove = 'otherbookedby'; // Booked by someone else - cannot be unbooked.
+                }
+                $ret->cannotunallocate[$user->id] = $user;
+            }
+
+            if ($user->sessionid != $session->id) {
+                // Allocated to a different session - cannot be booked/unbooked.
+                $ret->othersession[$user->id] = $user;
+            } else {
+                if (empty($user->cannotremove) && $user->statuscode && $user->statuscode > MDL_F2F_STATUS_BOOKED) {
+                    $user->cannotremove = 'attendancetaken'; // Attendance taken - cannot be unbooked.
+                    $ret->cannotunallocate[$user->id] = $user;
+                }
+                $ret->current[$user->id] = $user;
+            }
+        }
+    }
+
+    return $ret;
+}
+
+/**
+ * Get a full list of all managers on the system.
+ *
+ * @return array
+ */
+function facetoface_get_manager_list() {
+    global $CFG, $DB;
+
+    $ret = array();
+
+    $sql = "SELECT u.id, u.firstname, u.lastname
+              FROM {pos_assignment} pa
+              JOIN {user} u ON u.id = pa.managerid
+             WHERE pa.type = ?
+             GROUP BY u.id, u.firstname, u.lastname
+             ORDER BY u.lastname, u.firstname";
+    $params = array(POSITION_TYPE_PRIMARY);
+    $managers = $DB->get_records_sql($sql, $params);
+    foreach ($managers as $manager) {
+        $ret[$manager->id] = fullname($manager);
+    }
+
+    if (!empty($CFG->enabletempmanagers)) {
+        $sql = "SELECT u.id, u.firstname, u.lastname
+                  FROM {temporary_manager} tm
+                  JOIN {user} u ON u.id = tm.tempmanagerid
+                 WHERE tm.expirytime > ?
+                 GROUP BY u.id, u.firstname, u.lastname
+                 ORDER BY u.lastname, u.firstname";
+        $params = array(time());
+        $tempmanagers = $DB->get_records_sql($sql, $params);
+        foreach ($tempmanagers as $tempmanager) {
+            $ret[$tempmanager->id] = fullname($tempmanager);
+        }
+    }
+
+    return $ret;
+}
+
+/**
+ * Returns the details of all the other reservations made in the current face to face
+ * by the given manager
+ *
+ * @param object $facetoface
+ * @param object $session
+ * @param int $managerid
+ * @return object[]
+ */
+function facetoface_get_other_reservations($facetoface, $session, $managerid) {
+    global $DB;
+
+    // Get a list of all the bookings the manager has made (not including the current session).
+    $sql = "SELECT su.id, s.id AS sessionid, s.datetimeknown, u.id AS userid, u.firstname, u.lastname
+              FROM {facetoface_signups} su
+              JOIN {facetoface_sessions} s ON s.id = su.sessionid
+              JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0
+                                                   AND sus.statuscode > :cancelled
+              LEFT JOIN {user} u ON u.id = su.userid
+             WHERE su.bookedby = :managerid AND su.sessionid <> :sessionid AND s.facetoface = :facetofaceid
+             ORDER BY s.id";
+    $params = array('managerid' => $managerid, 'sessionid' => $session->id, 'facetofaceid' => $facetoface->id,
+                    'cancelled' => MDL_F2F_STATUS_USER_CANCELLED);
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+/**
+ * Format the dates for the given session, when listing the other bookings made by a given manager
+ * in a particular face to face instance.
+ *
+ * @param $session
+ * @return string
+ */
+function facetoface_format_session_dates($session) {
+    if ($session->datetimeknown) {
+        $formatteddates = array();
+        foreach ($session->sessiondates as $date) {
+            $formatteddate = '';
+            $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+            if ($sessionobj->startdate == $sessionobj->enddate) {
+                $formatteddate .= $sessionobj->startdate . ', ';
+            } else {
+                $formatteddate .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . ', ';
+            }
+            $formatteddate .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
+            $formatteddates[] = $formatteddate;
+        }
+        $formatteddates = '<li>'.implode('</li><li>', $formatteddates).'</li>';
+        $ret = html_writer::tag('ul', $formatteddates);
+    } else {
+        $ret = html_writer::tag('em', get_string('wait-listed', 'facetoface'));
+    }
+    return $ret;
 }

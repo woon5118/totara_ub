@@ -126,6 +126,9 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         $data->sessionid = $this->get_new_parentid('facetoface_session');
         $data->userid = $this->get_mappingid('user', $data->userid);
+        if (!empty($data->bookedby)) {
+            $data->bookedby = $this->get_mappingid('user', $data->bookedby);
+        }
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups', $data);

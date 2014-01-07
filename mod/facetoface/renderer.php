@@ -29,7 +29,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Builds session list table given an array of sessions
      */
-    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions, $displaytimezones) {
+    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array()) {
         $output = '';
 
         $tableheader = array();
@@ -190,6 +190,37 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $options .= html_writer::link('attendees.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface')));
                 $options .= html_writer::empty_tag('br');
             }
+
+            // Output links to reserve/allocate spaces.
+            $sessreserveinfo = $reserveinfo;
+            if (!$session->allowoverbook) {
+                $sessreserveinfo = facetoface_limit_reserveinfo_to_capacity_left($session->id, $sessreserveinfo,
+                                                                                max(0, $session->capacity - $signupcount));
+            }
+            $sessreserveinfo = facetoface_limit_reserveinfo_by_session_date($sessreserveinfo, $session);
+            if (!empty($sessreserveinfo['allocate']) && $sessreserveinfo['maxallocate'][$session->id] > 0) {
+                // Able to allocate and not used all allocations for other sessions.
+                $allocateurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'allocate', 's' => $session->id,
+                                                                                  'backtoallsessions' => $session->facetoface));
+                $options .= html_writer::link($allocateurl, get_string('allocate', 'mod_facetoface'));
+                $options .= ' ('.$sessreserveinfo['allocated'][$session->id].'/'.$sessreserveinfo['maxallocate'][$session->id].')';
+                $options .= html_writer::empty_tag('br');
+            }
+            if (!empty($sessreserveinfo['reserve']) && $sessreserveinfo['maxreserve'][$session->id] > 0) {
+                if (empty($sessreserveinfo['reservepastdeadline'])) {
+                    $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
+                                                                                     'backtoallsessions' => $session->facetoface));
+                    $options .= html_writer::link($reserveurl, get_string('reserve', 'mod_facetoface'));
+                    $options .= ' ('.$sessreserveinfo['reserved'][$session->id].'/'.$sessreserveinfo['maxreserve'][$session->id].')';
+                    $options .= html_writer::empty_tag('br');
+                }
+            } else if (!empty($sessreserveinfo['reserveother']) && empty($sessreserveinfo['reservepastdeadline'])) {
+                $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
+                                                                                 'backtoallsessions' => $session->facetoface));
+                $options .= html_writer::link($reserveurl, get_string('reserveother', 'mod_facetoface'));
+                $options .= html_writer::empty_tag('br');
+            }
+
             if ($isbookedsession) {
                 $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
                 $options .= html_writer::empty_tag('br');
@@ -303,6 +334,170 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
     public function setcontext($context) {
         $this->context = $context;
+    }
+
+    /**
+     * Generate the multiselect inputs + add/remove buttons to control allocating / deallocating users
+     * for this session
+     *
+     * @param object $team containing the lists of users who can be allocated / deallocated
+     * @param object $session
+     * @param array $reserveinfo details of the number of allocations allowed / left
+     * @return string HTML fragment to be output
+     */
+    function session_user_selector($team, $session, $reserveinfo) {
+        $table = new html_table();
+        $table->attributes['class'] = 'generaltable generalbox groupmanagementtable boxaligncenter';
+
+        $cells = array();
+        // Current allocations.
+        $cell = new html_table_cell();
+        $cell->id = 'existingcell';
+        $info = (object)array(
+            'allocated' => $reserveinfo['allocated'][$session->id],
+            'max' => $reserveinfo['maxallocate'][$session->id],
+        );
+        $heading = get_string('currentallocations', 'mod_facetoface', $info);
+        $cell->text = html_writer::tag('label', $heading, array('for' => 'deallocation'));
+        $selected = optional_param_array('deallocation', array(), PARAM_INT);
+
+        $opts = '';
+        $opts .= html_writer::start_tag('optgroup', array('label' => get_string('thissession', 'mod_facetoface')));
+        if (empty($team->current)) {
+            $opts .= html_writer::tag('option', get_string('none'), array('value' => null, 'disabled' => 'disabled'));
+        } else {
+            foreach ($team->current as $user) {
+                $name = fullname($user);
+                $attr = array('value' => $user->id);
+                if (in_array($user->id, $selected)) {
+                    $attr['selected'] = 'selected';
+                }
+                if (!empty($user->cannotremove)) {
+                    $attr['disabled'] = 'disabled';
+                    $name .= ' ('.get_string($user->cannotremove, 'mod_facetoface').')';
+                }
+                $opts .= html_writer::tag('option', $name, $attr)."\n";
+            }
+        }
+        $opts .= html_writer::end_tag('optgroup');
+        if (!empty($team->othersession)) {
+            $opts .= html_writer::start_tag('optgroup', array('label' => get_string('othersession', 'mod_facetoface')));
+            foreach ($team->othersession as $user) {
+                $name = fullname($user);
+                $attr = array('value' => $user->id, 'disabled' => 'disabled');
+                if (!empty($user->cannotremove)) {
+                    $name .= ' ('.get_string($user->cannotremove, 'mod_facetoface').')';
+                }
+                $opts .= html_writer::tag('option', $name, $attr)."\n";
+            }
+        }
+        $select = html_writer::tag('select', $opts, array('name' => 'deallocation[]', 'multiple' => 'multiple',
+                                                          'id' => 'deallocation', 'size' => 20));
+        $cell->text .= html_writer::div($select, 'userselector');
+        $cells[] = $cell;
+
+        // Buttons.
+        $cell = new html_table_cell();
+        $cell->id = 'buttonscell';
+        $addlabel = $this->output->larrow().' '.get_string('add');
+        $buttons = html_writer::empty_tag('input', array('name' => 'add', 'id' => 'add', 'type' => 'submit',
+                                                         'value' => $addlabel, 'title' => get_string('add')));
+        $buttons .= html_writer::empty_tag('br');
+        $removelabel = get_string('remove').' '.$this->output->rarrow();
+        $buttons .= html_writer::empty_tag('input', array('name' => 'remove', 'id' => 'remove', 'type' => 'submit',
+                                                          'value' => $removelabel, 'title' => get_string('remove')));
+        $cell->text = html_writer::tag('p', $buttons, array('class' => 'arrow_button'));
+        $cells[] = $cell;
+
+        // Potential allocations.
+        $cell = new html_table_cell();
+        $cell->id = 'potentialcell';
+        $cell->text = html_writer::tag('label', get_string('potentialallocations', 'mod_facetoface',
+                                                           $reserveinfo['allocate'][$session->id]),
+                                       array('for' => 'allocation'));
+
+        $selected = optional_param_array('allocation', array(), PARAM_INT);
+        $optspotential = array();
+        foreach ($team->potential as $potential) {
+            $optspotential[$potential->id] = fullname($potential);
+        }
+        $attr = array('multiple' => 'multiple', 'id' => 'allocation', 'size' => 20);
+        if ($reserveinfo['allocate'][$session->id] == 0) {
+            $attr['disabled'] = 'disabled';
+        }
+        $select = html_writer::select($optspotential, 'allocation[]', $selected, null, $attr);
+
+        $cell->text .= html_writer::div($select, 'userselector');
+        $cells[] = $cell;
+
+        $row = new html_table_row($cells);
+
+        $table->data[] = $row;
+
+        return html_writer::table($table);
+    }
+
+    /**
+     * Output the given list of reservations/allocations that this manager has made
+     * in other sessions in this facetoface.
+     *
+     * @param object[] $bookings
+     * @param object $manager
+     * @return string HTML fragment to output the list
+     */
+    function other_reservations($bookings, $manager) {
+        global $USER;
+
+        if (!$bookings) {
+            return '';
+        }
+
+        // Gather the session data together.
+        $sessions = array();
+        foreach ($bookings as $booking) {
+            if (!isset($sessions[$booking->sessionid])) {
+                $session = facetoface_get_session($booking->sessionid);
+                $sessions[$booking->sessionid] = (object)array(
+                    'reservations' => 0,
+                    'bookings' => array(),
+                    'dates' => facetoface_format_session_dates($session),
+                );
+            }
+            if ($booking->userid) {
+                $sessions[$booking->sessionid]->bookings[$booking->userid] = fullname($booking);
+            } else {
+                $sessions[$booking->sessionid]->reservations++;
+            }
+        }
+
+        // Output the details as a table.
+        if ($manager->id == $USER->id) {
+            $bookingstr = get_string('yourbookings', 'facetoface');
+        } else {
+            $bookingstr = get_string('managerbookings', 'facetoface', fullname($manager));
+        }
+        $table = new html_table();
+        $table->head = array(
+            get_string('sessiondatetime', 'facetoface'),
+            $bookingstr,
+        );
+        $table->attributes = array('class' => 'generaltable managerbookings');
+
+        foreach ($sessions as $session) {
+            $details = array();
+            if ($session->reservations) {
+                $details[] = get_string('reservations', 'mod_facetoface', $session->reservations);
+            }
+            $details += $session->bookings;
+            $details = '<li>'.implode('</li><li>', $details).'</li>';
+            $details = html_writer::tag('ul', $details);
+            $row = new html_table_row(array($session->dates, $details));
+            $table->data[] = $row;
+        }
+
+        $heading = $this->output->heading(get_string('existingbookings', 'mod_facetoface'), 3);
+
+        return $heading . html_writer::table($table);
     }
 }
 ?>

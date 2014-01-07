@@ -72,6 +72,24 @@ $settings->add(new admin_setting_configtext('facetoface_manageraddressformat', n
 
 $settings->add(new admin_setting_configtext('facetoface_manageraddressformatreadable', new lang_string('setting:manageraddressformatreadable_caption', 'facetoface'),new lang_string('setting:manageraddressformatreadable', 'facetoface'), new lang_string('setting:manageraddressformatreadabledefault', 'facetoface'), PARAM_NOTAGS));
 
+$settings->add(new admin_setting_heading('facetoface/managerreserveheader',
+                                         new lang_string('setting:managerreserveheader', 'mod_facetoface'), ''));
+
+$settings->add(new admin_setting_configcheckbox('facetoface/managerreserve',
+                                                new lang_string('setting:managerreserve', 'mod_facetoface'),
+                                                new lang_string('setting:managerreserve_desc', 'mod_facetoface'), 0));
+
+$settings->add(new admin_setting_configtext('facetoface/maxmanagerreserves',
+                                            new lang_string('setting:maxmanagerreserves', 'mod_facetoface'),
+                                            new lang_string('setting:maxmanagerreserves_desc', 'mod_facetoface'), 1, PARAM_INT));
+
+$settings->add(new admin_setting_configtext('facetoface/reservecanceldays',
+                                            new lang_string('setting:reservecanceldays', 'mod_facetoface'),
+                                            new lang_string('setting:reservecanceldays_desc', 'mod_facetoface'), 1, PARAM_INT));
+
+$settings->add(new admin_setting_configtext('facetoface/reservedays',
+                                            new lang_string('setting:reservedays', 'mod_facetoface'),
+                                            new lang_string('setting:reservedays_desc', 'mod_facetoface'), 2, PARAM_INT));
 
 $settings->add(new admin_setting_heading('facetoface_cost_header', new lang_string('costheading', 'facetoface'), ''));
 

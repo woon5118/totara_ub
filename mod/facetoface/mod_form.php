@@ -77,6 +77,39 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $multiplesessions = get_config(null, 'facetoface_multiplesessions') ? 1 : 0;
         $mform->setDefault('multiplesessions', $multiplesessions);
 
+        $conf = get_config('facetoface');
+
+        $mform->addElement('header', 'managerreserveheader', get_string('managerreserveheader', 'mod_facetoface'));
+
+        $mform->addElement('selectyesno', 'managerreserve', get_string('managerreserve', 'mod_facetoface'));
+        $mform->setDefault('managerreserve', $conf->managerreserve);
+        $mform->addHelpButton('managerreserve', 'managerreserve', 'mod_facetoface');
+
+        $mform->addElement('text', 'maxmanagerreserves', get_string('maxmanagerreserves', 'mod_facetoface'));
+        $mform->setType('maxmanagerreserves', PARAM_INT);
+        $mform->setDefault('maxmanagerreserves', $conf->maxmanagerreserves);
+        $mform->addHelpButton('maxmanagerreserves', 'maxmanagerreserves', 'mod_facetoface');
+        $mform->disabledIf('maxmanagerreserves', 'managerreserve', 'eq', 0);
+
+        $mform->addElement('selectyesno', 'reservecancel', get_string('reservecancel', 'mod_facetoface'));
+        $mform->setDefault('reservecancel', 1);
+        $mform->disabledIf('reservecancel', 'managerreserve', 'eq', 0);
+
+        $mform->addElement('text', 'reservecanceldays', get_string('reservecanceldays', 'mod_facetoface'));
+        $mform->setType('reservecanceldays', PARAM_INT);
+        $mform->setDefault('reservecanceldays', $conf->reservecanceldays);
+        $mform->addHelpButton('reservecanceldays', 'reservecanceldays', 'mod_facetoface');
+        $mform->disabledIf('reservecanceldays', 'managerreserve', 'eq', 0);
+        $mform->disabledIf('reservecanceldays', 'reservecancel', 'eq', 0);
+
+        $mform->addElement('text', 'reservedays', get_string('reservedays', 'mod_facetoface'));
+        $mform->setType('reservedays', PARAM_INT);
+        $mform->setDefault('reservedays', $conf->reservedays);
+        $mform->addHelpButton('reservedays', 'reservedays', 'mod_facetoface');
+        $mform->disabledIf('reservedays', 'managerreserve', 'eq', 0);
+        $mform->addRule(array('reservedays', 'reservecanceldays'), get_string('reservegtcancel', 'mod_facetoface'),
+                        'compare', 'gt', 'server');
+
         $mform->addElement('header', 'calendaroptions', get_string('calendaroptions', 'facetoface'));
 
         $calendarOptions = array(
@@ -137,6 +170,17 @@ class mod_facetoface_mod_form extends moodleform_mod {
             // Unpack values.
             $cvalues = json_decode($default_values['completionstatusrequired'], true);
             $default_values['completionstatusrequired'] = $cvalues;
+        }
+
+        $conf = get_config('facetoface');
+
+        if (isset($default_values['reservecanceldays'])) {
+            if ($default_values['reservecanceldays'] == 0) {
+                $default_values['reservecanceldays'] = $conf->reservecanceldays;
+                $default_values['reservecancel'] = 0;
+            } else {
+                $default_values['reservecancel'] = 1;
+            }
         }
     }
 

@@ -1872,6 +1872,66 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014021300, 'facetoface');
     }
 
+    // Add extra 'manager reservations' settings.
+    if ($oldversion < 2014022000) {
+
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('managerreserve', XMLDB_TYPE_INTEGER, '4', null, null, null, '0', 'completionstatusrequired');
+        $field->setComment('Can managers make reservations/bookings on behalf of their team');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('maxmanagerreserves', XMLDB_TYPE_INTEGER, '7', null, null, null, '1', 'managerreserve');
+        $field->setComment('How many reservations can each manager make');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('reservecanceldays', XMLDB_TYPE_INTEGER, '7', null, null, null, '1', 'maxmanagerreserves');
+        $field->setComment('Number days before the session when all unconfirmed reservations are deleted');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('reservedays', XMLDB_TYPE_INTEGER, '7', null, null, null, '2', 'reservecanceldays');
+        $field->setComment('Number days before the session when reservations are closed');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Record the ID of managers when they reserve/book spaces on a session.
+        // Define field bookedby to be added to facetoface_signups.
+        $table = new xmldb_table('facetoface_signups');
+        $field = new xmldb_field('bookedby', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'archived');
+        $field->setComment('The manager who reserved / booked this space');
+
+        // Conditionally launch add field bookedby.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Insert the templates for the new notification types.
+        // Cancel reservation.
+        $tpl_cancelreservation = new stdClass();
+        $tpl_cancelreservation->status = 1;
+        $tpl_cancelreservation->ccmanager = 0;
+        $tpl_cancelreservation->title = get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface');
+        $tpl_cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
+        $DB->insert_record('facetoface_notification_tpl', $tpl_cancelreservation);
+
+        // Cancel all reservations.
+        $tpl_cancelallreservations = new stdClass();
+        $tpl_cancelallreservations->status = 1;
+        $tpl_cancelallreservations->ccmanager = 0;
+        $tpl_cancelallreservations->title = get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface');
+        $tpl_cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
+        $DB->insert_record('facetoface_notification_tpl', $tpl_cancelallreservations);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014022000, 'facetoface');
+    }
+
     return $result;
 }
 

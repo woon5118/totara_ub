@@ -642,14 +642,55 @@ if ($show_table) {
                 $table->add_toolbar_content(display_bulk_actions_picker(), 'left' , 'top', 1);
             }
         }
+        $cancancelreservations = has_capability('mod/facetoface:reserveother', $context);
 
         foreach ($rows as $attendee) {
             $data = array();
-            $attendee_url = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
-            if ($download) {
-                $data[] = format_string(fullname($attendee));
+            // Add the name of the manager who made the booking after the user's name.
+            $managername = null;
+            if (!empty($attendee->bookedby)) {
+                $managerurl = new moodle_url('/user/view.php', array('id' => $attendee->bookedby));
+                $manager = (object)array('firstname' => $attendee->bookedbyfirstname, 'lastname' => $attendee->bookedbylastname);
+                $managername = fullname($manager);
+                if (!$download) {
+                    $managername = html_writer::link($managerurl, $managername);
+                }
+            }
+            if ($attendee->id) {
+                $attendeename = fullname($attendee);
+                if (!$download) {
+                    $attendeeurl = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
+                    $attendeename = html_writer::link($attendeeurl, $attendeename);
+                }
+                if ($managername) {
+                    $strinfo = (object)array('attendeename' => $attendeename, 'managername' => $managername);
+                    $attendeename = get_string('namewithmanager', 'mod_facetoface', $strinfo);
+                }
+                $data[] = $attendeename;
             } else {
-                $data[] = html_writer::link($attendee_url, format_string(fullname($attendee)));
+                // Reserved space - display 'Reserved' + the name of the person who booked it.
+                $cancelicon = '';
+                if (!$download && $attendee->bookedby) {
+                    if ($cancancelreservations) {
+                        $params = array(
+                            's' => $session->id,
+                            'managerid' => $attendee->bookedby,
+                            'action' => 'reserve',
+                            'backtosession' => $action,
+                            'cancelreservation' => 1,
+                            'sesskey' => sesskey(),
+                        );
+                        $cancelurl = new moodle_url('/mod/facetoface/reserve.php', $params);
+                        $cancelicon = $OUTPUT->pix_icon('t/delete', get_string('cancelreservation', 'mod_facetoface'));
+                        $cancelicon = ' '.html_writer::link($cancelurl, $cancelicon);
+                    }
+                }
+                if ($managername) {
+                    $reserved = get_string('reservedby', 'mod_facetoface', $managername);
+                } else {
+                    $reserved = get_string('reserved', 'mod_facetoface');
+                }
+                $data[] = $reserved.$cancelicon;
             }
             $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
 

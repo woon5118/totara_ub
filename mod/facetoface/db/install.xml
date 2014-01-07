@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/facetoface/db" VERSION="20130828" COMMENT="XMLDB file for Moodle mod/facetoface"
+<XMLDB PATH="mod/facetoface/db" VERSION="20131114" COMMENT="XMLDB file for Moodle mod/facetoface"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -22,6 +22,10 @@
         <FIELD NAME="usercalentry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="multiplesessions" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="completionstatusrequired" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="managerreserve" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Can managers make reservations/bookings on behalf of their team"/>
+        <FIELD NAME="maxmanagerreserves" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="How many reservations can each manager make"/>
+        <FIELD NAME="reservecanceldays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Number days before the session when all unconfirmed reservations are deleted"/>
+        <FIELD NAME="reservedays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="2" SEQUENCE="false" COMMENT="Number days before the session when reservations are closed"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -85,6 +89,7 @@
         <FIELD NAME="discountcode" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="notificationtype" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="archived" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Has this sign up been archived by the archive completion feature."/>
+        <FIELD NAME="bookedby" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The manager who reserved / booked this space"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>

@@ -24,6 +24,7 @@
 $string['sourcetitle'] = 'Face-to-face sessions';
 // columns
 $string['address'] = 'Address';
+$string['bookedby'] = 'Booked by';
 $string['building'] = 'Building';
 $string['roomcapacity'] = 'Room capacity';
 $string['discountcode'] = 'Discount code';
@@ -55,6 +56,7 @@ $string['cancellationreason'] = 'Cancellation reason';
 $string['currentorg'] = 'The user\'s current organisation';
 $string['currentpos'] = 'The user\'s current position';
 $string['user'] = 'The user';
+$string['reserved'] = 'Reserved';
 $string['thedate'] = 'The session date';
 // filters
 $string['pilot'] = 'Pilot';

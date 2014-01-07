@@ -71,7 +71,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $facetoface = new backup_nested_element('facetoface', array('id'), array(
             'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'approvalreqd', 'usercalentry',
-            'multiplesessions', 'completionstatusrequired'));
+            'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
+            'reservedays'));
         $notifications = new backup_nested_element('notifications');
 
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -89,7 +90,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $signups = new backup_nested_element('signups');
 
         $signup = new backup_nested_element('signup', array('id'), array(
-            'sessionid', 'userid', 'mailedreminder', 'discountcode', 'notificationtype', 'archived'));
+            'sessionid', 'userid', 'mailedreminder', 'discountcode', 'notificationtype', 'archived', 'bookedby'));
 
         $signups_status = new backup_nested_element('signups_status');
 
@@ -164,6 +165,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         // Define id annotations
         $signup->annotate_ids('user', 'userid');
+
+        $signup->annotate_ids('user', 'bookedby');
 
         $session_role->annotate_ids('role', 'roleid');
 

@@ -190,6 +190,31 @@ $capabilities = array(
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
+
+    // Manager can reserve / allocate spaces for their team.
+    'mod/facetoface:reservespace' => array(
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
+        ),
+
+        'clonepermissionsfrom' => 'mod/facetoface:addattendees'
+    ),
+
+    // Can reserve spaces on behalf of a manager.
+    'mod/facetoface:reserveother' => array(
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        ),
+    ),
 );
 
 ?>

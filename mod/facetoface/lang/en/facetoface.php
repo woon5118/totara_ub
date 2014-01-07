@@ -41,6 +41,10 @@ $string['addroom'] = 'Add a room';
 $string['addstudent'] = 'Add student';
 $string['afterendofsession'] = 'after end of session';
 $string['alllocations'] = 'All locations';
+$string['allocate'] = 'Allocate spaces for team';
+$string['allocatenoteam'] = 'There are no team members you can allocate to this session';
+$string['allocationfull_noreserve'] = 'Without replacing your current reservations, you can only allocate {$a} space(s) for this session';
+$string['allocationfull_reserve'] = 'You can only allocate {$a} space(s) for this session';
 $string['allowconflicts'] = 'Allow conflicts';
 $string['allowconflicts_help'] = 'This will allow scheduling conflicts to exist';
 $string['allowoverbook'] = 'Allow overbooking';
@@ -101,6 +105,7 @@ $string['capacityoverbooked'] = ' (Overbooked)';
 $string['capacityoverbookedlong'] = 'This session is overbooked ({$a->current} / {$a->maximum})';
 $string['changemanageremailaddress'] = 'Change manager email address';
 $string['changemanageremailinstruction'] = 'Please enter the email address for your current manager below.';
+$string['cancelreservation'] = 'Cancel reservation';
 $string['cannotsignupguest'] = 'Cannot sign up guest';
 $string['cannotsignupsessioninprogress'] = 'You cannot sign up, this session is in progress';
 $string['cannotsignupsessionover'] = 'You cannot sign up, this session is over.';
@@ -138,6 +143,7 @@ $string['cancellationconfirm'] = 'Are you sure you want to cancel your booking t
 $string['costheading'] = 'Session Cost';
 $string['csvtextfile'] = 'Text file';
 $string['csvtextinput'] = 'CSV text input';
+$string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
 $string['currentstatus'] = 'Current status';
 $string['customfieldsheading'] = 'Custom Session Fields';
 $string['date'] = 'Date';
@@ -253,6 +259,7 @@ $string['error:userassignedsessionconflictmultidayselfsignup'] = 'You are alread
 $string['error:userbookedsessionconflictmultidayselfsignup'] = 'You are already booked to attend {$a->session} at {$a->datetimestart} to {$a->datetimefinish}.';
 $string['error:userimportuseridnotanint'] = 'Cannot add user with user id {$a} because it is not an integer';
 $string['excelformat'] = 'Excel';
+$string['existingbookings'] = 'Bookings in other sessions';
 $string['existingrecipients'] = 'Existing recipients';
 $string['export'] = 'Export';
 $string['exportattendanceods'] = 'Export attendance form (ods)';
@@ -272,6 +279,8 @@ $string['facetoface:addinstance'] = 'Add a new facetoface';
 $string['facetoface:editsessions'] = 'Add, edit, copy and delete face-to-face sessions';
 $string['facetoface:overbook'] = 'Sign-up to full sessions.';
 $string['facetoface:removeattendees'] = 'Remove attendees from a face-to-face session';
+$string['facetoface:reserveother'] = 'Reserve on behalf of other managers';
+$string['facetoface:reservespace'] = 'Reserve or allocate spaces for team members';
 $string['facetoface:signup'] = 'Sign-up for a session';
 $string['facetoface:takeattendance'] = 'Take attendance';
 $string['facetoface:view'] = 'View face-to-face activities and sessions';
@@ -299,12 +308,14 @@ $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['internal'] = 'Prevent room conflicts';
+$string['lastreservation'] = 'Last reservations are {$a->reservedays} days before the session starts. Unallocated reservations will be deleted {$a->reservecanceldays} days before the session starts.';
 $string['late'] = '\{$a} late';
 $string['location'] = 'Location';
 $string['lookfor'] = 'Search';
 $string['managenotificationtemplates'] = 'Manage notification templates';
 $string['managerooms'] = 'Manage rooms';
 $string['manageradded'] = 'Your manager\'s email address has been accepted.';
+$string['managerbookings'] = 'Bookings / reservations made by {$a}';
 $string['managerchanged'] = 'Your manager\'s email address has been changed.';
 $string['manageremail'] = 'Manager\'s email';
 $string['manageremailaddress'] = 'Manager\'s email address';
@@ -314,10 +325,15 @@ $string['manageremailinstruction'] = 'In order to sign-up for a training session
 $string['manageremailinstructionconfirm'] = 'Please confirm that this is your manager\'s email address:';
 $string['managername'] = 'Manager\'s name';
 $string['managerprefix'] = 'Manager copy prefix';
+$string['managerreserve'] = 'Allow manager reservations';
+$string['managerreserve_help'] = 'Managers are able to make reservations or bookings on behalf of their team members';
+$string['managerreserveheader'] = 'Manager reservations';
 $string['managerupdated'] = 'Your manager\'s email address has been updated.';
 $string['mark_selected_as'] = 'Mark all selected as: ';
 $string['maximumpoints'] = 'Maximum number of points';
 $string['maximumsize'] = 'Maximum number of attendees';
+$string['maxmanagerreserves'] = 'Maximum reservations';
+$string['maxmanagerreserves_help'] = 'The maximum number of reservations / bookings that a manager can make for their team';
 $string['message'] = 'Change in booking in the course {$a->coursename}!
 
 There has been a free place in the session on {$a->duedate} ({$a->name}) in the course {$a->coursename}.
@@ -336,6 +352,7 @@ $string['moreinfo'] = 'More info';
 $string['multidate'] = '(multi-date)';
 $string['multiplesessions'] = 'Allow multiple sessions signup per user';
 $string['multiplesessionsheading'] = 'Multiple sessions signup settings';
+$string['namewithmanager'] = '{$a->attendeename} ({$a->managername})';
 $string['newmanageremailaddress'] = 'Manager\'s email address';
 $string['noactionableunapprovedrequests'] = 'No actionable unapproved requests';
 $string['nocustomfields'] = '<p>No custom fields are defined.</p>';
@@ -351,6 +368,7 @@ $string['norecipients'] = 'No recipients';
 $string['normalcost'] = 'Normal cost';
 $string['normalcosthinttext'] = '';
 $string['noremindersneedtobesent'] = 'No reminders need to be sent.';
+$string['noreservations'] = 'None';
 $string['nosignedupusers'] = 'No users have signed-up for this session.';
 $string['nosignedupusersnumrequests'] = 'No users are fully booked for this session. {$a} users are awaiting approval.';
 $string['nosignedupusersonerequest'] = 'No users are fully booked for this session. 1 user is awaiting approval.';
@@ -397,9 +415,28 @@ $string['oneminute'] = '1 minute';
 $string['options'] = 'Options';
 $string['or'] = 'or';
 $string['order'] = 'Order';
+$string['otherbookedby'] = 'Booked by another manager';
 $string['otherroom'] = 'Other room';
+$string['othersession'] = 'Other session(s) in this activity';
 $string['pdroomcapacityexceeded'] = '<strong>Warning:</strong> Note that pre-defined room capacity is being exceeded by session capacity';
 $string['place'] = 'Room';
+$string['reserve'] = 'Reserve spaces for team';
+$string['reserveallallocated'] = 'You have already allocated the maximum number of spaces you are able for this activity, you cannot reserve any more';
+$string['reserveallallocatedother'] = 'This manager has already allocated the maximum number of spaces they are able to for this activity, you cannot reserve any more for them';
+$string['reservecancel'] = 'Automatically cancel reservations';
+$string['reservecanceldays'] = 'Reservation cancellation days';
+$string['reservecanceldays_help'] = 'The number of days in advance of the session that reservations will be automatically cancelled, if not confirmed';
+$string['reservecapacitywarning'] = '* Any new reservations over the current session capacity ({$a} left) will be added to the waiting list';
+$string['reserved'] = 'Reserved';
+$string['reservedby'] = 'Reserved ({$a})';
+$string['reservedays'] = 'Reservation deadline';
+$string['reservedays_help'] = 'The number of days before the session starts after which no more reservations are allowed (must be greater than the cancellation days)';
+$string['reservegtcancel'] = 'The reservation deadline must be greater than the cancellation days';
+$string['reserveintro'] = 'You can use this form to change the number of reservations you have for this session - to cancel existing reservations, just reduce the number below.';
+$string['reserveintroother'] = 'You can use this form to change the number of reservations {$a} has for this session - to cancel existing reservations, just reduce the number below.';
+$string['reservenocapacity'] = 'There are no spaces left on this course, so you will not be able to make any reservations unless one of the participants cancels';
+$string['reserveother'] = 'Reserve for another manager';
+$string['reservepastdeadline'] = 'You cannot make any further reservations within {$a} days of the session starting';
 $string['result'] = 'Result';
 $string['return'] = 'Return';
 $string['roomdeleted'] = 'Room deleted';
@@ -435,6 +472,7 @@ $string['pluginadministration'] = 'Facetoface administration';
 $string['pluginname'] = 'Face-to-face';
 $string['points'] = 'Points';
 $string['pointsplural'] = 'Points';
+$string['potentialallocations'] = 'Potential allocations ({$a} left)';
 $string['potentialrecipients'] = 'Potential recipients';
 $string['predefinedroom'] = '{$a->name}, {$a->building}, {$a->address}, {$a->description} (Capacity: {$a->capacity})';
 $string['previoussessions'] = 'Previous sessions';
@@ -452,7 +490,10 @@ $string['reminder'] = 'Reminder';
 $string['remindermessage'] = 'Reminder message';
 $string['removedsuccessfully'] = 'Removed successfully';
 $string['removeroominuse'] = 'This room is currently being used';
+$string['replaceallocations'] = 'Create reservations when removing allocations';
+$string['replacereservations'] = 'Replace reservations when adding allocations';
 $string['requestmessage'] = 'Request message';
+$string['reservations'] = '{$a} reservation(s)';
 $string['room'] = 'Room';
 $string['roomalreadybooked'] = ' (room unavailable on selected dates)';
 $string['saveallfeedback'] = 'Save all responses';
@@ -473,10 +514,12 @@ $string['select'] = ' Select ';
 $string['selectall'] = 'Select all';
 $string['selectnone'] = 'Select none';
 $string['selectallop'] = 'All';
+$string['selectmanager'] = 'Select manager';
 $string['selectnoneop'] = 'None';
 $string['selectnotsetop'] = 'Not Set';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
 $string['selectsetop'] = 'Set';
+$string['selfbooked'] = 'Self booked';
 $string['sendlater'] = 'Send later';
 $string['sendmessage'] = 'Send message';
 $string['sendnow'] = 'Send now';
@@ -551,6 +594,35 @@ Room:   [session:room]
 $string['setting:defaultcancellationsubject'] = 'Default subject line for cancellation emails.';
 $string['setting:defaultcancellationsubject_caption'] = 'Cancellation subject';
 $string['setting:defaultcancellationsubjectdefault'] = 'Face-to-face booking cancellation';
+$string['setting:defaultcancelallreservationssubjectdefault'] = 'All reservations cancelled';
+$string['setting:defaultcancelallreservationsmessagedefault'] = 'This is to advise you that all unallocated reservations for the following course have been automatically cancelled, as the course will be starting soon:
+
+***ALL RESERVATIONS CANCELLED***
+
+Course:   [facetofacename]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]
+';
+$string['setting:defaultcancelreservationsubjectdefault'] = 'Reservation cancellation';
+$string['setting:defaultcancelreservationmessagedefault'] = 'This is to advise you that your reservation for the following course has been cancelled:
+
+***RESERVATION CANCELLED***
+
+Course:   [facetofacename]
+
+Duration:   [duration]
+Date(s):
+[alldates]
+
+Location:   [session:location]
+Venue:   [session:venue]
+Room:   [session:room]';
 $string['setting:defaultdeclineinstrmngr'] = 'Default decline message sent to managers.';
 $string['setting:defaultdeclineinstrmngr_caption'] = 'Decline message (managers)';
 $string['setting:defaultdeclineinstrmngrdefault'] = '*** Advice only ****
@@ -807,6 +879,11 @@ $string['setting:manageraddressformatdefault'] = '';
 $string['setting:manageraddressformatreadable'] = 'Short description of the restrictions on a manager\'s email address.  This setting has no effect if the previous one is not set.';
 $string['setting:manageraddressformatreadable_caption'] = 'Format example:';
 $string['setting:manageraddressformatreadabledefault'] = 'firstname.lastname@company.com';
+$string['setting:managerreserve'] = 'Allow reserve/assign (default)';
+$string['setting:managerreserve_desc'] = 'Managers are able to make reservations or bookings on behalf of their team members';
+$string['setting:managerreserveheader'] = 'Manager reservations';
+$string['setting:maxmanagerreserves'] = 'Max reservations (default)';
+$string['setting:maxmanagerreserves_desc'] = 'The total number of reservations / bookings that a manager can make for their team';
 $string['setting:multiplesessions'] = 'Default value for allowing multiple sessions signup per user';
 $string['setting:multiplesessions_caption'] = 'Multiple sessions default';
 $string['setting:oneemailperday'] = 'Send multiple confirmation emails for multi-date sessions. Note: If there is more than one session date on a single day then each session date will generate an email. One session date spanning over multiple days will generate only one email.';
@@ -819,6 +896,10 @@ $string['setting:sitenotices'] = 'Notices only appear on the Face-to-face Calend
 $string['setting:sitenoticeshere'] = 'here';
 $string['setting:isfilter'] = 'Display as a filter'; // I guess this needs to be removed for 2.6.
 $string['setting:possiblevalues'] = 'List of possible values';
+$string['setting:reservecanceldays'] = 'Reservation cancellation days (default)';
+$string['setting:reservecanceldays_desc'] = 'The number of days in advance of the session that reservations will be automatically cancelled, if not confirmed.';
+$string['setting:reservedays'] = 'Reservation deadline (default)';
+$string['setting:reservedays_desc'] = 'The number of days before the session starts after which no more reservations are allowed (must be greater than the cancellation days)';
 $string['setting:showinsummary'] = 'Show in exports and lists';
 $string['setting:sessionroles'] = 'Users assigned to the selected roles in a course can be tracked with each face-to-face session';
 $string['setting:sessionroles_caption'] = 'Session roles:';
@@ -859,6 +940,7 @@ $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} a
 $string['summary'] = 'Summary';
 $string['takeattendance'] = 'Take attendance';
 $string['template'] = 'Template';
+$string['thissession'] = 'This session';
 $string['time'] = 'Time';
 $string['timeandtimezone'] = 'Time and Time Zone';
 $string['timedue'] = 'Registration deadline';
@@ -909,6 +991,7 @@ $string['xmessagessenttoattendeesandmanagers'] = '{$a} message(s) successfully s
 $string['xminutes'] = '{$a} minute(s)';
 $string['xusers'] = '{$a} user(s)';
 $string['youarebooked'] = 'You are booked for the following session';
+$string['yourbookings'] = 'Your bookings / reservations';
 $string['youremailaddress'] = 'Your email address';
 $string['error:shortnametaken'] = 'Custom field with this short name already exists.';
 

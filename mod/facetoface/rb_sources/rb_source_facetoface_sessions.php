@@ -115,6 +115,13 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'sessions'
             ),
+            new rb_join(
+                'bookedby',
+                'LEFT',
+                '{user}',
+                'bookedby.id = base.bookedby',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE
+            ),
         );
 
 
@@ -141,6 +148,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
     }
 
     protected function define_columnoptions() {
+        global $DB;
         $columnoptions = array(
             new rb_column_option(
                 'session',              // type
@@ -315,6 +323,14 @@ class rb_source_facetoface_sessions extends rb_base_source {
                       'outputformat' => 'text')
             ),
             new rb_column_option(
+                'session',
+                'bookedby',
+                get_string('bookedby', 'rb_source_facetoface_sessions'),
+                $DB->sql_fullname('bookedby.firstname', 'bookedby.lastname'),
+                array('joins' => 'bookedby', 'displayfunc' => 'link_f2f_bookedby',
+                     'extrafields' => array('bookedby_id' => 'bookedby.id'))
+            ),
+            new rb_column_option(
                 'room',
                 'name',
                 get_string('roomname', 'rb_source_facetoface_sessions'),
@@ -372,6 +388,14 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
+        // Redirect the display of 'user' columns (to insert 'unassigned' when needed).
+        foreach ($columnoptions as $key => $columnoption) {
+            if (!($columnoption->type == 'user' && $columnoption->value == 'fullname')) {
+                continue;
+            }
+            $columnoptions[$key]->extrafields = array('user_id' => 'auser.id');
+            $columnoptions[$key]->displayfunc = 'user';
+        }
 
         return $columnoptions;
     }
@@ -449,6 +473,24 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'discountcost',
                 get_string('discountcost', 'rb_source_facetoface_sessions'),
                 'text'
+            ),
+            new rb_filter_option(
+                'session',
+                'bookedby',
+                get_string('bookedby', 'rb_source_facetoface_sessions'),
+                'text'
+            ),
+            new rb_filter_option(
+                'session',
+                'reserved',
+                get_string('reserved', 'rb_source_facetoface_sessions'),
+                'select',
+                array(
+                     'selectchoices' => array(
+                         '0' => get_string('reserved', 'rb_source_facetoface_sessions'),
+                     )
+                ),
+                'base.userid'
             ),
             new rb_filter_option(
                 'room',
@@ -928,6 +970,37 @@ class rb_source_facetoface_sessions extends rb_base_source {
         } else {
             return '';
         }
+    }
+
+    // Output the booking managers name (linked to their profile).
+    function rb_display_link_f2f_bookedby($name, $row) {
+        global $OUTPUT;
+        $bookedbyid = $row->bookedby_id;
+        return $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $bookedbyid)), $name);
+    }
+
+    // Override user display function to show 'Reserved' for reserved spaces.
+    function rb_display_link_user($user, $row, $isexport = false) {
+        if ($row->user_id) {
+            return parent::rb_display_link_user($user, $row, $isexport);
+        }
+        return get_string('reserved', 'rb_source_facetoface_sessions');
+    }
+
+    // Override user display function to show 'Reserved' for reserved spaces.
+    function rb_display_link_user_icon($user, $row, $isexport = false) {
+        if ($row->user_id) {
+            return parent::rb_display_link_user_icon($user, $row, $isexport);
+        }
+        return get_string('reserved', 'rb_source_facetoface_sessions');
+    }
+
+    // Override user display function to show 'Reserved' for reserved spaces.
+    function rb_display_user($user, $row, $isexport = false) {
+        if ($row->user_id) {
+            return $user;
+        }
+        return get_string('reserved', 'rb_source_facetoface_sessions');
     }
 
 

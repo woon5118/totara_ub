@@ -61,6 +61,8 @@ define('MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE',     64);
 define('MDL_F2F_CONDITION_TRAINER_CONFIRMATION',        128);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION', 256);
 define('MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT', 512);
+define('MDL_F2F_CONDITION_RESERVATION_CANCELLED',        16384);
+define('MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED',    32768);
 
 /**
  * Notification sent state
@@ -878,7 +880,7 @@ function facetoface_send_cancellation_notice($facetoface, $session, $userid) {
         'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
     );
 
-    $includeical = !isset($CFG->facetoface_disableicalcancel) || empty($CFG->facetoface_disableicalcancel);
+    $includeical = empty($CFG->facetoface_disableicalcancel);
     return facetoface_send_notice($facetoface, $session, $userid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
 }
 
@@ -900,7 +902,7 @@ function facetoface_send_decline_notice($facetoface, $session, $userid) {
             'conditiontype' => MDL_F2F_CONDITION_DECLINE_CONFIRMATION
             );
 
-    $includeical = !isset($CFG->facetoface_disableicalcancel) || empty($CFG->facetoface_disableicalcancel);
+    $includeical = empty($CFG->facetoface_disableicalcancel);
     return facetoface_send_notice($facetoface, $session, $userid, $params, $includeical ? MDL_F2F_BOTH : MDL_F2F_TEXT, MDL_F2F_CANCEL);
 }
 

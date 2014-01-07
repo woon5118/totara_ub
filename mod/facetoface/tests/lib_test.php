@@ -604,7 +604,12 @@ class facetofacelib_test extends advanced_testcase {
             'requestsubject' => 'reqsub1',
             'requestmessage' => 'reqmsg1',
             'requestinstrmngr' => '',
-            'usercalentry' => false
+            'usercalentry' => false,
+            'multiplesessions' => 0,
+            'managerreserve' => 0,
+            'maxmanagerreserves' => 1,
+            'reservecanceldays' => 1,
+            'reservedays' => 2
         ),
         'f2f1' => array(
             'id' => 2,
@@ -634,7 +639,12 @@ class facetofacelib_test extends advanced_testcase {
             'requestsubject' => 'reqsub2',
             'requestmessage' => 'reqmsg2',
             'requestinstrmngr' => 'reqinstmngr2',
-            'usercalentry' => true
+            'usercalentry' => true,
+            'multiplesessions' => 0,
+            'managerreserve' => 0,
+            'maxmanagerreserves' => 1,
+            'reservecanceldays' => 1,
+            'reservedays' => 2
         ),
     );
 
