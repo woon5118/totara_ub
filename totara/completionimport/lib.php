@@ -586,10 +586,12 @@ function import_course($importname, $importtime) {
     $updateids = array();
     $users = array();
     $completions = array();
+    $deletedcompletions = array();
     $completion_history = array();
 
     $pluginname = 'totara_completionimport_' . $importname;
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+    $overridecurrentcompletion = get_default_config($pluginname, 'overrideactive' . $importname, false);
 
     list($sqlwhere, $params) = get_importsqlwhere($importtime);
     $params['enrolname'] = 'manual';
@@ -606,7 +608,8 @@ function import_course($importname, $importtime) {
                     ue.status as userenrolstatus,
                     cc.id as coursecompletionid,
                     cc.timestarted,
-                    cc.timeenrolled
+                    cc.timeenrolled,
+                    cc.timecompleted as currenttimecompleted
             FROM {{$tablename}} i
             JOIN {user} u ON u.username = i.username
             JOIN {course} c ON {$shortnameoridnumber}
@@ -626,26 +629,28 @@ function import_course($importname, $importtime) {
 
         foreach ($courses as $course) {
             if (empty($enrolid) || ($enrolid != $course->enrolid) || (($enrolcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
+                // Delete any existing course completions we are overriding.
+                if (!empty($deletedcompletions)) {
+                    $DB->delete_records_list('course_completions', 'id', $deletedcompletions);
+                    $deletedcompletions = array();
+                }
                 // New enrol record or reached the next batch insert.
                 if (!empty($users)) {
                     // Batch enrol users.
                     $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
                     $enrolcount = 0;
-                    unset($users);
                     $users = array();
                 }
 
                 if (!empty($completions)) {
                     // Batch import completions.
                     $DB->insert_records_via_batch('course_completions', $completions);
-                    unset($completions);
                     $completions = array();
                 }
 
                 if (!empty($completion_history)) {
                     // Batch import completions.
                     $DB->insert_records_via_batch('course_completion_history', $completion_history);
-                    unset($completion_history);
                     $completion_history = array();
                 }
 
@@ -692,27 +697,38 @@ function import_course($importname, $importtime) {
                 }
             }
 
+            // Create completion record.
+            $completion = new stdClass();
+            $completion->rpl = get_string('rpl', 'totara_completionimport', $course->grade);
+            $completion->rplgrade = $course->grade;
+            $completion->status = COMPLETION_STATUS_COMPLETEVIARPL;
+            $completion->timeenrolled = $timeenrolled;
+            $completion->timestarted = $timestarted;
+            $completion->timecompleted = $timecompleted;
+            $completion->reaggregate = 0;
+            $completion->userid = $course->userid;
+            $completion->course = $course->courseid;
+
             if (empty($course->coursecompletionid)) {
-                // New record.
-                $completion = new stdClass();
-                $completion->rpl = get_string('rpl', 'totara_completionimport', $course->grade);
-                $completion->rplgrade = $course->grade;
-                $completion->status = COMPLETION_STATUS_COMPLETEVIARPL;
-                $completion->timeenrolled = $timeenrolled;
-                $completion->timestarted = $timestarted;
-                $completion->timecompleted = $timecompleted;
-                $completion->reaggregate = 0;
-                $completion->userid = $course->userid;
-                $completion->course = $course->courseid;
+                // No completion exists, add record.
                 $completions[] = $completion;
             } else {
-                // Existing record - put it into history.
-                $history = new StdClass();
-                $history->courseid = $course->courseid;
-                $history->userid = $course->userid;
-                $history->timecompleted = $timecompleted;
-                $history->grade = $course->grade;
-                $completion_history[] = $history;
+                if ($course->completiondate > $course->currenttimecompleted) {
+                    if ($overridecurrentcompletion) {
+                        // Completion exists but we are overriding, add to deleted array.
+                        $deletedcompletions[] = $course->coursecompletionid;
+
+                        $completions[] = $completion;
+                    }
+                } else {
+                    // Existing record - put it into history.
+                    $history = new StdClass();
+                    $history->courseid = $course->courseid;
+                    $history->userid = $course->userid;
+                    $history->timecompleted = $timecompleted;
+                    $history->grade = $course->grade;
+                    $completion_history[] = $history;
+                }
             }
 
             $updateids[] = $course->importid;
@@ -720,27 +736,29 @@ function import_course($importname, $importtime) {
         }
     }
     $courses->close();
+    // Delete any existing course completions we are overriding.
+    if (!empty($deletedcompletions)) {
+        $DB->delete_records_list('course_completions', 'id', $deletedcompletions);
+        $deletedcompletions = array();
+    }
 
     // Add any remaining records.
     if (!empty($users)) {
         // Batch enrol users.
         $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
         $enrolcount = 0;
-        unset($users);
         $users = array();
     }
 
     if (!empty($completions)) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completions', $completions);
-        unset($completions);
         $completions = array();
     }
 
     if (!empty($completion_history)) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completion_history', $completion_history);
-        unset($completion_history);
         $completion_history = array();
     }
 
@@ -752,7 +770,6 @@ function import_course($importname, $importtime) {
                 SET timeupdated = :timeupdated
                 WHERE id {$insql}";
         $DB->execute($sql, $params);
-        unset($updateids);
         $updateids = array();
     }
 
@@ -790,7 +807,7 @@ function import_certification($importname, $importtime) {
     $priorua = array();
     $pluginname = 'totara_completionimport_' . $importname;
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
-    $overrideactivecertification = get_default_config($pluginname, 'overrideactive', false);
+    $overrideactivecertification = get_default_config($pluginname, 'overrideactive' . $importname, false);
 
     list($sqlwhere, $stdparams) = get_importsqlwhere($importtime);
     $params = array();
@@ -1239,9 +1256,8 @@ function get_config_data($filesource, $importname) {
     $data->csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $data->csvseparator = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
     $data->csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
-    if ($importname == 'certification') {
-        $data->overrideactive = get_default_config($pluginname, 'overrideactive', 0);
-    }
+    $overridesetting = 'overrideactive' . $importname;
+    $data->$overridesetting = get_default_config($pluginname, 'overrideactive' . $importname, 0);
     return $data;
 }
 
@@ -1261,9 +1277,8 @@ function set_config_data($data, $importname) {
     set_config('csvdelimiter', $data->csvdelimiter, $pluginname);
     set_config('csvseparator', $data->csvseparator, $pluginname);
     set_config('csvencoding', $data->csvencoding, $pluginname);
-    if ($importname == 'certification') {
-        set_config('overrideactive', $data->overrideactive, $pluginname);
-    }
+    $overridesetting = 'overrideactive' . $importname;
+    set_config('overrideactive' . $importname, $data->$overridesetting, $pluginname);
 }
 
 /**
