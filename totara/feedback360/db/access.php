@@ -134,7 +134,7 @@ $capabilities = array(
         )
     ),
     'totara/feedback360:manageownfeedback360' => array(
-        'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS | RISK_SPAM,
+        'riskbitmask'   => RISK_SPAM,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
