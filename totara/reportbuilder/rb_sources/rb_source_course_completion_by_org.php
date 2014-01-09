@@ -43,6 +43,7 @@ class rb_source_course_completion_by_org extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_course_completion_by_org');
 
         parent::__construct();
+        $this->populate_hierarchy_name_map(array('org'));
     }
 
     //
@@ -125,7 +126,20 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'organisationpath',
                 get_string('completionorgpath', 'rb_source_course_completion_by_org'),
                 'completion_organisation.path',
-                array('joins' => 'completion_organisation')
+                array(
+                    'joins' => 'completion_organisation',
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'organisationpathtext',
+                get_string('completionorgpathtext', 'rb_source_course_completion_by_org'),
+                'completion_organisation.path',
+                array(
+                    'joins' => 'completion_organisation',
+                    'displayfunc' => 'nice_hierarchy_path',
+                    'extrafields' => array('hierarchytype' => '\'org\'')
+                )
             ),
             new rb_column_option(
                 'course_completion',

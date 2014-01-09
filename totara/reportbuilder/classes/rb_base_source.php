@@ -72,7 +72,8 @@ abstract class rb_base_source {
             'groupid' => null,
             'selectable' => true,
             'scheduleable' => true,
-            'cacheable' => true
+            'cacheable' => true,
+            'hierarchymap' => array()
         );
         foreach ($defaults as $property => $default) {
             if (!property_exists($this, $property)) {
@@ -978,6 +979,40 @@ abstract class rb_base_source {
     }
 
     /**
+     * Column displayfunc to show a hierarchy path as a human-readable string
+     * @param $path the path string of delimited ids e.g. 1/3/7
+     * @param $row data row
+     */
+    function rb_display_nice_hierarchy_path($path, $row) {
+        global $DB;
+        if (empty($path)) {
+            return '';
+        }
+        $displaypath = '';
+        $parentid = 0;
+        // Make sure we know what we are looking for, and that the private var is populated (in source constructor).
+        if (isset($row->hierarchytype) && isset($this->hierarchymap[$row->hierarchytype])) {
+            $paths = explode('/', substr($path, 1));
+            $map = $this->hierarchymap[$row->hierarchytype];
+            foreach ($paths as $path) {
+                if ($parentid !== 0) {
+                    // Include ' > ' before name except on top element.
+                    $displaypath .= ' &gt; ';
+                }
+                if (isset($map[$path])) {
+                    $displaypath .= $map[$path];
+                } else {
+                    // Should not happen if paths are correct!
+                    $displaypath .= get_string('unknown', 'totara_reportbuilder');
+                }
+                $parentid = $path;
+            }
+        }
+
+        return $displaypath;
+    }
+
+    /**
      * Column displayfunc to convert a language code to a human-readable string
      * @param $code Language code
      * @param $row data row - unused in this function
@@ -1355,6 +1390,21 @@ abstract class rb_base_source {
     //
     //
 
+    /**
+     * Populate the hierarchymap private variable to look up Hierarchy names from ids
+     * e.g. when converting a hierarchy path from ids to human-readable form
+     *
+     * @param array $hierarchies array of all the hierarchy types we want to populate (pos, org, comp, goal etc)
+     *
+     * @return boolean True
+     */
+    function populate_hierarchy_name_map($hierarchies) {
+        global $DB;
+        foreach ($hierarchies as $hierarchy) {
+            $this->hierarchymap["{$hierarchy}"] = $DB->get_records_menu($hierarchy, null, 'id', 'id, fullname');
+        }
+        return true;
+    }
 
     /**
      * Adds the user table to the $joinlist array
