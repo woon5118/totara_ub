@@ -19,116 +19,89 @@
  *
  * @author Piers Harding <piers@catalyst.net.nz>
  * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author Yuliya Bozhko <yuliya.bozhko@totaralms.com>
+ *
  * @package totara
  * @subpackage reportbuilder
  */
-global $DB;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once($CFG->libdir . '/googleapi.php');
+require_once($CFG->dirroot . '/grade/export/fusion/fusionlib.php');
 require_once('lib.php');
+
+$id = required_param('id', PARAM_INT); // Report id.
+$sid = optional_param('sid', 0, PARAM_INT); // Report search id.
 
 require_login();
 
-$id         = required_param('id', PARAM_INT); // report id
-$sid        = optional_param('sid', NULL, PARAM_INT); // report search id
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/totara/reportbuilder/fusionexporter.php', array('id' => $id));
 
-if ($id != null) {
-    // look for existing report by id
-    $report = $DB->get_record('report_builder', array('id' => $id));
-} else {
-    // id is required
-    print_error('invalidreportid', 'local_reportbuilder');
-}
-$rep =  new reportbuilder($id, null, false, $sid) ;
-
-if (!$rep->is_capable($id)) {
+$report = new reportbuilder($id, null, false, $sid);
+if (!$report->is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 
-// temporarily disable awaiting repository/gdrive integration
-print_error('error:fusion_oauthnotsupported', 'totara_reportbuilder');
+$returnurl = new moodle_url('/totara/reportbuilder/fusionexporter.php', array('id' => $id, 'sid' => $sid));
+$returnurl->param('sesskey', sesskey());
 
-// check OAuth
-$oauth = new local_oauth_fusion();
-// parameters to preserve
-$preserve = array(
-                   'id' => $id,
-                   'sid' => $sid,
-            );
-try {
-    if (!$oauth->authenticate($preserve)) {
-        print_error(get_string('oauthfailed', 'totara_oauth'));
-    }
-    $oauth->show_tables();
-}
-catch (local_oauth_exception $e) {
-    // clean it down
-    $oauth->wipe_auth();
-    // try again
-    $oauth = new local_oauth_fusion();
-    if (!$oauth->authenticate($preserve)) {
-        print_error(get_string('oauthfailed', 'totara_oauth'));
-    }
-}
+// Check the config.
+$clientid = get_config('gradeexport_fusion', 'clientid');
+$secret = get_config('gradeexport_fusion', 'secret');
 
-$columns = $rep->columns;
-$shortname = $rep->shortname;
-$count = $rep->get_filtered_count();
-list($query, $params) = $rep->build_query(false, true);
+$fusionrealm = 'https://www.googleapis.com/auth/fusiontables';
+$googleoauth = new google_oauth($clientid, $secret, $returnurl, $fusionrealm);
+if (!$googleoauth->is_logged_in()) {
+    $url = $googleoauth->get_login_url();
+    redirect($url, get_string('login', 'gradeexport_fusion'), 2);
+}
+$oauth = new fusion_grade_export_oauth_fusion($googleoauth);
+$oauth->show_tables();
+
+$errors = array();
+$columns = $report->columns;
+$shortname = $report->shortname;
+$count = $report->get_filtered_count();
+list($query, $params) = $report->build_query(false, true);
 $query .= flexible_table::get_sort_for_table($shortname);
 
-// array of filters that have been applied
-// for including in report where possible
-$restrictions = $rep->get_restriction_descriptions();
+// Array of filters that have been applied for including in report where possible.
+$restrictions = $report->get_restriction_descriptions();
 
 $fields = array();
 foreach ($columns as $column) {
-    // check that column should be included
+    // Check that column should be included.
     if ($column->display_column(true)) {
         $type = 'STRING';
         if ($column->displayfunc == 'nice_date') {
             $type = 'DATETIME';
-        }
-        else if ($column->displayfunc == 'number') {
+        } else if ($column->displayfunc == 'number') {
             $type = 'NUMBER';
         }
         $fields[clean_column_name(strip_tags($column->heading))] = $type;
     }
 }
+
 $tablename = preg_replace('/\s/u', '_', clean_filename(trim($shortname))).' '.date("Y-m-d H:i:s", strtotime('+0 days'));
-try {
-    $tables = $oauth->show_tables();
-}
-catch (local_oauth_exception $e) {
-    // clean it down
-    $oauth->wipe_auth();
-
-    // try again
-    $oauth = new local_oauth_fusion();
-    if (!$oauth->authenticate($preserve)) {
-        print_error(get_string('oauthfailed', 'totara_oauth'));
-    }
-
-}
 if (!$oauth->table_exists($tablename)) {
-    $result = $oauth->create_table($tablename, $fields);
+    $errors = $oauth->create_table($tablename, $fields);
 }
+
 $tables = $oauth->show_tables();
 
-// switch off the timeout as this could easily be long running
+// Switch off the timeout as this could easily be long running.
 @set_time_limit(0);
 
-// process the output
+// Process the output.
 $numfields = count($fields);
-// break the data into blocks as single array gets too big
-global $data_len;
 
 if ($records = $DB->get_recordset_sql($query, $params)) {
     $rows = array();
     foreach ($records as $record) {
-        $record_data = $rep->process_data_row($record, true, true);
+        $record_data = $report->process_data_row($record, true, true);
         $row = array();
-        for($j=0; $j<$numfields; $j++) {
+        for($j=0; $j < $numfields; $j++) {
             if (isset($record_data[$j])) {
                 $row[] = htmlspecialchars_decode($record_data[$j]);
             } else {
@@ -137,17 +110,39 @@ if ($records = $DB->get_recordset_sql($query, $params)) {
         }
         $rows[]= $row;
     }
-    $result = $oauth->insert_rows($tablename, $rows);
+    // Add last rows.
+    $errors = array_merge($errors, $oauth->insert_rows($tablename, $rows));
     $records->close();
 }
 
-// all done - go and have a look at the table
-$table = $oauth->table_by_name($tablename, true);
-$table_id = $table['table id'];
-redirect('https://www.google.com/fusiontables/DataSource?dsrcid=' . $table_id);
-exit;
+if (empty($errors)) {
+    // All done, redirect to show the table.
+
+    $table = $oauth->table_by_name($tablename, true);
+    $table_id = $table->tableId;
+    redirect('https://www.google.com/fusiontables/DataSource?docid=' . $table_id);
+    exit;
+} else {
+    $errormessages = array();
+
+    foreach ($errors as $error) {
+        $errormessages[] = $error->message;
+    }
+
+    $brtag = html_writer::empty_tag('br');
+    $errordetails = implode($brtag, $errormessages);
+    $url = $report->report_url();
+
+    totara_set_notification(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)), $url);
+}
 
 
+/**
+ * Clean column of invalid characters for fusion tables
+ *
+ * @param string $name String to be cleaned
+ * @return string
+ */
 function clean_column_name($name) {
     $name = preg_replace('/[^a-zA-Z0-9\_ ]/u', ' ', $name);
     $name = preg_replace('/\s+/u', ' ', $name);

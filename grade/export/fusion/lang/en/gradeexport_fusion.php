@@ -37,3 +37,4 @@ $string['clientid'] = 'Client ID';
 $string['clientiddesc'] = 'The Client ID specified in your configured Google API web service';
 $string['secret'] = 'Secret';
 $string['secretdesc'] = 'The Secret specified in your configured Google API web service';
+$string['error:fusionexport'] = 'There was an error while exporting data to Google Fusion Tables: {$a}';

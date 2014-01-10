@@ -36,11 +36,6 @@ $rb = new admin_settingpage('rbsettings',
                             array('totara/reportbuilder:managereports'));
 
 foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
-    // Fusion tables export disabled for now, awaiting new repository/gdrive integration.
-    if ($option == 'fusion') {
-        continue;
-    }
-
     $formatbyname[$code] = new lang_string('export' . $option, 'totara_reportbuilder');
     $defaultformats[$code] = 1;
 }

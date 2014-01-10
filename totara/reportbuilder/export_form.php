@@ -46,15 +46,15 @@ class report_builder_export_form extends moodleform {
         $sitecontext = context_system::instance();
 
         if (count($select) == 0) {
-            // no export options - don't show form
+            // No export options - don't show form.
             return false;
         } else if (count($select) == 1) {
-            // no options - show a button
+            // No options - show a button.
             $mform->addElement('hidden', 'format', key($select));
             $mform->setType('format', PARAM_INT);
             $mform->addElement('submit', 'export', current($select));
         } else {
-            // show pulldown menu
+            // Show pulldown menu.
             $group=array();
             $group[] =& $mform->createElement('select', 'format', null, $select);
             $group[] =& $mform->createElement('submit', 'export', get_string('export', 'totara_reportbuilder'));
