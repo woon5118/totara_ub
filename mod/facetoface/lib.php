@@ -2218,6 +2218,10 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $contextcourse = context_course::instance($coursemodule->course);
     // Can view attendees.
     $viewattendees = has_capability('mod/facetoface:viewattendees', $contextcourse);
+    // Can see "view all sessions" link even if activity is hidden/currently unavailable.
+    $iseditor = has_any_capability(array('mod/facetoface:viewattendees', 'mod/facetoface:editsessions',
+                                        'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
+                                        'mod/facetoface:takeattendance'), $contextcourse);
 
     $table = '';
     $timenow = time();
@@ -2394,7 +2398,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 }
             }
             $table .= html_writer::start_tag('tr')
-                .html_writer::tag('td', $coursemodule->visible ? $htmlviewallsessions : $strviewallsessions, array('colspan' => '2'))
+                .html_writer::tag('td', ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions, array('colspan' => '2'))
                 .html_writer::end_tag('tr')
                 .html_writer::end_tag('table');
         } else {
