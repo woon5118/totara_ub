@@ -255,7 +255,6 @@ class rb_source_facetoface_summary extends rb_base_source {
         // Include some standard columns.
         $this->add_facetoface_session_custom_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions);
-        $this->add_cohort_user_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
