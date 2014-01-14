@@ -1289,7 +1289,8 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             u.*,
             f.course AS courseid,
             ss.grade,
-            sign.timecreated
+            sign.timecreated,
+            u2.email AS managersemail
         FROM
             {facetoface} f
         JOIN
@@ -1323,14 +1324,21 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
          ON su.id = sign.signupid
         JOIN
             {user} u
-         ON u.id = su.userid
+            ON u.id = su.userid
+        JOIN
+            {pos_assignment} pa
+            ON pa.userid = u.id
+        JOIN
+            {user} u2
+            ON u2.id = pa.managerid
         WHERE
             f.id = ?
         AND ss.superceded != 1
         AND ss.statuscode >= ?
+        AND pa.type = ?
         ORDER BY
             s.id, u.firstname, u.lastname
-    ", array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $facetofaceid, MDL_F2F_STATUS_APPROVED));
+    ", array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $facetofaceid, MDL_F2F_STATUS_APPROVED, POSITION_TYPE_PRIMARY));
 
     if ($signups) {
         // Get all grades at once
