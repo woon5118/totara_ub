@@ -494,6 +494,22 @@ abstract class rb_base_source {
         return $item === null ? null : sprintf('%.1f%%', $item);
     }
 
+    /**
+     * Display correct course grade via grade or RPL as a percentage string
+     *
+     * @param string $item A number to convert
+     * @param object $row Object containing all other fields for this row
+     *
+     * @return string The percentage with 1 decimal place
+     */
+    function rb_display_course_grade_percent($item, $row) {
+        global $CFG;
+        require_once($CFG->dirroot.'/completion/completion_completion.php');
+        if ($row->course_completion_status == COMPLETION_STATUS_COMPLETEVIARPL && !empty($row->rplgrade)) {
+            $item = $row->rplgrade;
+        }
+        return $item === null ? null : sprintf('%.1f%%', $item);
+    }
     // link user's name to profile page
     // requires the user_id extra field
     // in column definition

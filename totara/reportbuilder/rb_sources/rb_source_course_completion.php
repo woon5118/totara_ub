@@ -218,7 +218,8 @@ class rb_source_course_completion extends rb_base_source {
                 'grade_grades.finalgrade',
                 array(
                     'joins' => 'grade_grades',
-                    'displayfunc' => 'percent',
+                    'extrafields' => array('rplgrade' => 'base.rplgrade'),
+                    'displayfunc' => 'course_grade_percent',
                 )
             ),
             new rb_column_option(
