@@ -6644,7 +6644,8 @@ function admin_search_settings_html($query) {
  * @return array
  */
 function admin_output_new_settings_by_page($node) {
-    global $OUTPUT;
+    global $OUTPUT, $CFG;
+    $totaracoreinstall = isset($CFG->totaracoreinstallation) ? $CFG->totaracoreinstallation : 0;
     $return = array();
 
     if ($node instanceof admin_category) {
@@ -6656,6 +6657,11 @@ function admin_output_new_settings_by_page($node) {
     } else if ($node instanceof admin_settingpage) {
             $newsettings = array();
             foreach ($node->settings as $setting) {
+                // Always show enablecompletion after a Totara install.
+                if($totaracoreinstall && $setting->name == 'enablecompletion') {
+                    $newsettings[] = $setting;
+                }
+
                 if (is_null($setting->get_setting())) {
                     $newsettings[] = $setting;
                 }

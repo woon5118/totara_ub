@@ -131,6 +131,12 @@ function xmldb_totara_core_install() {
     set_config('frontpage', '');
     set_config('frontpageloggedin', '');
 
+    // Turn completion on in Totara by default.
+    require_once($CFG->dirroot . '/lib/completionlib.php');
+    if(!completion_info::is_enabled_for_site()){
+        set_config('totaracoreinstallation', 1);
+        set_config('enablecompletion', 1);
+    }
     // Add completionstartonenrol column to course table.
     $table = new xmldb_table('course');
 
