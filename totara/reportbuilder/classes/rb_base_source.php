@@ -607,7 +607,7 @@ abstract class rb_base_source {
         } else {
             //hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
             //extract prefix from field name
-            $pattern = '/(?P<prefix>(.*?))_custom_field_(\d?)$/';
+            $pattern = '/(?P<prefix>(.*?))_custom_field_(\d+)$/';
             $matches = array();
             preg_match($pattern, $field, $matches);
             if (!empty($matches)) {
