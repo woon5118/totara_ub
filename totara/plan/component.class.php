@@ -357,7 +357,7 @@ abstract class dp_base_component {
         $table->no_sorting('actions');
         $table->no_sorting('comments');
         $table->setup();
-        $table->pagesize(20, $count);
+        $table->pagesize(DP_COMPONENTS_PER_PAGE, $count);
 
         // Load items for table
         $page_start = $table->get_page_start();

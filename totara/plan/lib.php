@@ -61,6 +61,9 @@ define('DP_PRIORITY_REQUIRED', 2);
 // Maximum number of priority options
 define('DP_MAX_PRIORITY_OPTIONS', 5);
 
+// Number of components displayed per page.
+define('DP_COMPONENTS_PER_PAGE', 20);
+
 // Maximum number of required learning to display (programs and certifications)
 define('DP_MAX_PROGS_TO_DISPLAY', 5);
 
