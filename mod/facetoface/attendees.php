@@ -246,9 +246,9 @@ if ($action == 'attendees') {
     }
 
     if ($has_attendees) {
-        $actions['exportxls'] = get_string('exportxls', 'totara_reportbuilder');
-        $actions['exportods'] = get_string('exportods', 'totara_reportbuilder');
-        $actions['exportcsv'] = get_string('exportcsv', 'totara_reportbuilder');
+        $actions['exportxls'] = get_string('exportattendancexls', 'facetoface');
+        $actions['exportods'] = get_string('exportattendanceods', 'facetoface');
+        $actions['exportcsv'] = get_string('exportattendancetxt', 'facetoface');
     };
 
     $params['statusgte'] = MDL_F2F_STATUS_BOOKED;

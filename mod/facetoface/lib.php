@@ -1349,12 +1349,25 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             }
         }
 
+        $usercustomfields = explode(',', $CFG->facetoface_export_customprofilefields);
+
+        // Figure out which custom fields will need date/time formatting later on.
+        $formatdate = array('firstaccess', 'lastaccess', 'lastlogin', 'currentlogin');
+        list($cf_sql, $cf_param) = $DB->get_in_or_equal($usercustomfields);
+        $sql = "SELECT " . $DB->sql_concat("'customfield_'", 'shortname') . " AS shortname
+                FROM {user_info_field}
+                WHERE shortname {$cf_sql}
+                AND datatype = 'datetime'";
+        $usercustomformats = $DB->get_records_sql($sql, $cf_param);
+
+        $formatdate = array_merge($formatdate, array_keys($usercustomformats));
+
         foreach ($signups as $signup) {
             $userid = $signup->id;
 
             if (!empty($CFG->facetoface_export_customprofilefields)) {
                 $customuserfields = facetoface_get_user_customfields($userid,
-                    array_map('trim', explode(',', $CFG->facetoface_export_customprofilefields)));
+                    array_map('trim', $usercustomfields));
                 foreach ($customuserfields as $fieldname => $value) {
                     if (!isset($signup->$fieldname)) {
                         $signup->$fieldname = $value;
@@ -1495,17 +1508,13 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                         $value = $attendee->$shortname;
                     }
 
-                    if ('firstaccess' == $shortname or 'lastaccess' == $shortname or
-                        'lastlogin' == $shortname or 'currentlogin' == $shortname) {
-
-                            if (method_exists($worksheet, 'write_date')) {
-                                $worksheet->write_date($i, $j++, (int)$value, $dateformat);
-                            }
-                            else {
-                                $worksheet->write_string($i, $j++, userdate($value, get_string('strftimedate', 'langconfig')));
-                            }
+                    if (in_array($shortname, $formatdate)) {
+                        if (method_exists($worksheet, 'write_date')) {
+                            $worksheet->write_date($i, $j++, (int)$value, $dateformat);
+                        } else {
+                            $worksheet->write_string($i, $j++, userdate($value, get_string('strftimedate', 'langconfig')));
                         }
-                    else {
+                    } else {
                         $worksheet->write_string($i,$j++,$value);
                     }
                 }
@@ -4482,9 +4491,9 @@ function facetoface_download_xls($fields, $datarows, $file=null) {
     $worksheet[0] = $workbook->add_worksheet('');
     $row = 0;
     $col = 0;
-    $dateformat =& $workbook->add_format();
+    $dateformat = $workbook->add_format();
     $dateformat->set_num_format('dd mmm yyyy');
-    $datetimeformat =& $workbook->add_format();
+    $datetimeformat = $workbook->add_format();
     $datetimeformat->set_num_format('dd mmm yyyy h:mm');
 
     foreach ($fields as $field) {
