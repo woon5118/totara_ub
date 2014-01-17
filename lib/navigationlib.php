@@ -4025,6 +4025,10 @@ class settings_navigation extends navigation_node {
             $usersetting->add(get_string("changepassword"), $passwordchangeurl, self::TYPE_SETTING);
         }
 
+        // Add positions links
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+        pos_add_nav_positions_links($course->id, $user->id, $usersetting);
+
         // View the roles settings
         if (has_any_capability(array('moodle/role:assign', 'moodle/role:safeoverride','moodle/role:override', 'moodle/role:manage'), $usercontext)) {
             $roles = $usersetting->add(get_string('roles'), null, self::TYPE_SETTING);
