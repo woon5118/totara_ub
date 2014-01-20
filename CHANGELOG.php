@@ -3,6 +3,38 @@
 
 Totara LMS Changelog
 
+Release 2.5.6 (21st January 2014):
+==================================================
+
+Security Fixes:
+    MoodleHQ   http://docs.moodle.org/dev/Moodle_2.5.4_release_notes
+
+Improvements:
+    T-10159    Course completion is now turned on by default on an upgrade from Moodle
+    T-11736    Made Facetoface session date/time display on course page more logical
+    T-11742    Added setting to override current course completions in course imports
+    T-11735    Made the view sessions link inactive when the activity is unavailable to learners
+    T-11743    Added human-readable text version of hierarchy paths in reportbuilder reports
+
+Bug Fixes:
+    T-11641    Fixed hardcoded string in required learning when program uses "or" coursesets
+    T-11754    Fixed the display of grades in the Course Completion Report for courses completed via RPL
+    T-11748    Fixed open recertification windows always being marked as overdue
+    T-11760    Prevent deleted users' assignments from being synced
+    T-11758    Fixed facetoface attendees exports and formatting of datetime custom fields
+    T-11221    Fixed recurring courses copying grades into a new course
+    T-11759    Fixed component pagination in Learning Plans
+    T-11699    Fixed capability error when teachers click on Other Users in course enrolment
+    T-11757    Fixed custom field textareas in reports when field id is greater than 9
+    T-11747    Fixed course backup/restore to include the "completionstartonenrol" setting
+    T-10346    Fixed managers email being left blank when exporting Facetoface attendance
+    T-11656    Fixed permission warnings on some feedback360 capabilities
+    T-11021    Fixed RTL issues on Badges pages
+
+API Changes:
+    T-11762    Moved positions navigation code out of Moodle Core
+
+
 Release 2.5.5 (7th January 2014):
 ==================================================
 
