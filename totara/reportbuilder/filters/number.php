@@ -62,7 +62,7 @@ class rb_filter_number extends rb_filter_type {
      */
     function setupForm(&$mform) {
         global $SESSION;
-        $label = $this->label;
+        $label = format_string($this->label);
         $advanced = $this->advanced;
 
         $objs = array();

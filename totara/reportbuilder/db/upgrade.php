@@ -279,5 +279,18 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2013121000, 'totara_reportbuilder');
     }
 
+    if ($oldversion < 2014012400) {
+        // Changing length of field from 255 to 1024 to match length of hierarchy custom field names.
+        $table = new xmldb_table('report_builder_columns');
+        $field = new xmldb_field('heading', XMLDB_TYPE_CHAR, '1024', null, null, null, null, 'value');
+        // Launch change of type for field heading
+        $dbman->change_field_precision($table, $field);
+        // Changing length of field from 255 to 1024 to match length of hierarchy custom field names.
+        $table = new xmldb_table('report_builder_filters');
+        $field = new xmldb_field('filtername', XMLDB_TYPE_CHAR, '1024', null, null, null, null, 'advanced');
+        // Launch change of type for field filtername
+        $dbman->change_field_precision($table, $field);
+        totara_upgrade_mod_savepoint(true, 2014012400, 'totara_reportbuilder');
+    }
     return true;
 }

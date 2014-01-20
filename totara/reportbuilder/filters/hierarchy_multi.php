@@ -66,7 +66,7 @@ class rb_filter_hierarchy_multi extends rb_filter_type {
      */
     function setupForm(&$mform) {
         global $SESSION;
-        $label = $this->label;
+        $label = format_string($this->label);
         $advanced = $this->advanced;
         $type = $this->options['hierarchytype'];
 

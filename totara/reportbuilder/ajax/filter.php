@@ -77,6 +77,9 @@ switch ($action) {
         if ($filter = $DB->get_record('report_builder_filters', array('id' => $fid))) {
             $DB->delete_records('report_builder_filters', array('id' => $fid));
             reportbuilder_set_status($reportid);
+            // Check filtername for multilang spans. Need to set context to use format_string.
+            $PAGE->set_context(context_user::instance($USER->id));
+            $filter->filtername = format_string($filter->filtername);
             echo json_encode((array)$filter);
         } else {
             echo false;

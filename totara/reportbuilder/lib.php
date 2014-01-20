@@ -964,7 +964,7 @@ class reportbuilder {
                  * directly. */
                 if ($column->customheading) {
                     // Use value from database.
-                    $heading = $column->heading;
+                    $heading = format_string($column->heading);
                 } else {
                     // Use default value.
                     $defaultheadings = $this->get_default_headings_array();
@@ -3488,7 +3488,7 @@ class reportbuilder {
             }
 
             $key = $filter->type . '-' . $filter->value;
-            $ret[$section][$key] = $filter->label;
+            $ret[$section][$key] = format_string($filter->label);
         }
         return $ret;
     }
@@ -3533,7 +3533,7 @@ class reportbuilder {
             }
 
             $key = $column->type . '-' . $column->value;
-            $ret[$section][$key] = $column->name;
+            $ret[$section][$key] = format_string($column->name);
         }
         return $ret;
     }
