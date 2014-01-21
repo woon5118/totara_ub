@@ -574,19 +574,27 @@ class rb_source_dp_certification extends rb_base_source {
         if (!empty($time)) {
             $out = userdate($time, get_string('strfdateshortmonth', 'langconfig'));
 
-            $days = '';
-            if ($row->status != CERTIFSTATUS_EXPIRED) {
+            $extra = '';
+            if ($time < time()) {
+                // Window is currently open or expired.
+                if ($row->status != CERTIFSTATUS_EXPIRED) {
+                    $extra = $OUTPUT->notification(get_string('windowopen', 'totara_certification'), 'notifysuccess');
+                } else {
+                    $extra = $OUTPUT->notification(get_string('status_expired', 'totara_certification'), 'notifyproblem');
+                }
+            } else {
+                // Window is sometime in the future.
                 $days_remaining = floor(($time - time()) / 86400);
+
                 if ($days_remaining == 1) {
-                    $days = get_string('onedayremaining', 'totara_program');
+                    $extra = $OUTPUT->notification(get_string('windowopenin1day', 'totara_certification'), 'notifynotice');
                 } else if ($days_remaining < 10 && $days_remaining > 0) {
-                    $days = get_string('daysremaining', 'totara_program', $days_remaining);
-                } else if ($time < time()) {
-                    $days = get_string('overdue', 'totara_plan');
+                    $extra = $OUTPUT->notification(get_string('windowopeninxdays', 'totara_certification', $days_remaining), 'notifynotice');
                 }
-                if ($days != '') {
-                    $out .= html_writer::empty_tag('br') . $OUTPUT->error_text($days);
-                }
+            }
+
+            if (!empty($extra)) {
+                $out .= html_writer::empty_tag('br') . $extra;
             }
         }
         return $out;

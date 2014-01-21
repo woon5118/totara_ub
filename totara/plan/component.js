@@ -62,14 +62,15 @@ M.totara_plan_component = M.totara_plan_component || {
             var data = {
                 submitbutton: "1",
                 ajax: "1",
-                sesskey: M.totara_plan_component.config.sesskey
+                sesskey: M.totara_plan_component.config.sesskey,
+                page: M.totara_plan_component.config.page
             };
 
             // Get current value
             data[$(this).attr('name')] = $(this).val();
 
             $.post(
-                M.cfg.wwwroot + '/totara/plan/component.php?id='+M.totara_plan_component.config.plan_id+'&c='+M.totara_plan_component.config.component_name,
+                M.cfg.wwwroot + '/totara/plan/component.php?id='+M.totara_plan_component.config.plan_id+'&c='+M.totara_plan_component.config.component_name+'&page='+M.totara_plan_component.config.page,
                 data,
                 M.totara_plan_component.totara_totara_plan_update
             );

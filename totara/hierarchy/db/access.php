@@ -600,7 +600,6 @@ $capabilities = array(
                 )
             ),
         'totara/hierarchy:manageownpersonalgoal' => array(
-            'riskbitmask'   => RISK_DATALOSS | RISK_SPAM,
             'captype' => 'write',
             'contextlevel' => CONTEXT_USER,
             'archetypes' => array(
@@ -608,7 +607,6 @@ $capabilities = array(
                 )
             ),
         'totara/hierarchy:manageowncompanygoal' => array(
-            'riskbitmask'   => RISK_DATALOSS | RISK_SPAM,
             'captype' => 'write',
             'contextlevel' => CONTEXT_USER,
             'archetypes' => array(

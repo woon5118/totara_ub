@@ -140,6 +140,7 @@ class totara_sync_element_user extends totara_sync_element {
             // Remove the deleted records from the sync table.
             // This ensures that our create/update queries runs smoothly.
             $DB->execute("DELETE FROM {{$synctable}} WHERE deleted = 1");
+            $DB->execute("DELETE FROM {{$synctable_clone}} WHERE deleted = 1");
         }
 
         $issane = $this->check_sanity($synctable, $synctable_clone);

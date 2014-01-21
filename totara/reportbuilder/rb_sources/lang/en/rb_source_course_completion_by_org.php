@@ -25,7 +25,8 @@
 $string['sourcetitle'] = 'Course Completion by Organisation';
 // columns
 $string['completionorgid'] = 'Completion Organisation ID';
-$string['completionorgpath'] = 'Completion Organisation Path';
+$string['completionorgpath'] = 'Completion Organisation Path (IDs)';
+$string['completionorgpathtext'] = 'Completion Organisation Path (Text)';
 $string['completionorgname'] = 'Completion Organisation Name';
 $string['participants'] = 'All Participants';
 $string['numofrecords'] = 'Number of Records';
