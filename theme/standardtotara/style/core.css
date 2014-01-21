@@ -1070,3 +1070,9 @@ select.totara-expanded-width {
     left: 0;
     top: 0;
 }
+.pull-right {
+    float: right;
+}
+.dir-rtl .pull-right {
+    float: left;
+}

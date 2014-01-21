@@ -515,6 +515,7 @@ if (!$onlycontent && !$download) {
 /**
  * Print attendees (if user able to view)
  */
+$pix = new pix_icon('t/edit', get_string('edit', 'facetoface'));
 if ($show_table) {
     // Get list of attendees
 
@@ -634,6 +635,8 @@ if ($show_table) {
 
             $headers[] = get_string('attendance', 'facetoface');
             $columns[] = 'attendance';
+            $headers[] = get_string('attendeenote', 'facetoface');
+            $columns[] = 'usernote';
         }
         if (!$download) {
             $table->define_columns($columns);
@@ -724,6 +727,11 @@ if ($show_table) {
                     }
                 }
                 $data[] = str_replace(' ', '&nbsp;', get_string('status_'.facetoface_get_status($attendee->statuscode), 'facetoface'));
+
+                $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id));
+                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+                $note = html_writer::span($attendee->usernote, 'note'.$attendee->id, array('id' => 'usernote'.$attendee->id));
+                $data[] = $icon . $note;
             }
             if (!$download) {
                 $table->add_data($data);
@@ -805,7 +813,7 @@ if ($action == 'approvalrequired') {
 
     $table = new html_table();
     $table->summary = get_string('requeststablesummary', 'facetoface');
-    $table->head = array(get_string('name'), get_string('timerequested', 'facetoface'),
+    $table->head = array(get_string('name'), get_string('timerequested', 'facetoface'), get_string('attendeenote', 'facetoface'),
         get_string('decidelater', 'facetoface'), get_string('decline', 'facetoface'), get_string('approve', 'facetoface'));
     $table->align = array('left', 'center', 'center', 'center', 'center');
 
@@ -814,6 +822,12 @@ if ($action == 'approvalrequired') {
         $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
         $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
         $data[] = userdate($attendee->timerequested, get_string('strftimedatetime'));
+
+        $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id));
+        $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+        $note = html_writer::span($attendee->usernote, 'note'.$attendee->id, array('id' => 'usernote'.$attendee->id));
+        $data[] = $icon . $note;
+
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
         $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));

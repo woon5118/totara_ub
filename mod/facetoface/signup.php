@@ -112,6 +112,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $params = array();
     $params['discountcode']     = $fromform->discountcode;
     $params['notificationtype'] = $fromform->notificationtype;
+    $params['usernote']         = $fromform->usernote;
 
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {

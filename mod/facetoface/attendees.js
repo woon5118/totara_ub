@@ -410,6 +410,61 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             });
         }
 
+        /**
+        *  Attaches mouse events to the loaded content.
+        */
+        function attachEvents() {
+            // Add new page button.
+            $('a.attendee-add-note').on('click', function(){
+                $.get($(this).attr('href'), function(href){
+                    modalForm(href);
+                });
+                return false;
+            });
+        }
+        attachEvents();
+
+        /**
+        * Modal popup for generic single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
+        * @param content The desired contents of the panel
+        */
+        function modalForm(href) {
+            this.Y.use('panel', function(Y) {
+                var panel = new Y.Panel({
+                    headerContent: null,
+                    bodyContent  : href,
+                    width        : 500,
+                    zIndex       : 5,
+                    centered     : true,
+                    modal        : true,
+                    render       : true,
+                });
+                var $content = $('#' + panel.get('id'));
+                $content.find('input[type="text"]').eq(0).focus();
+                $content.find('#id_submitbutton').on('click', function() {
+                    var $theFrm = $content.find('form.mform');
+                    var apprObj = $theFrm.serialize();
+                    apprObj += ('&submitbutton=' + $(this).attr('value'));
+                    $.post($theFrm.attr('action'), apprObj).done(function(data){
+                        var obj = $.parseJSON(data);
+                        if (obj.result == 'success') {
+                            var span = "#usernote"+obj.id;
+                            $(span).html(obj.usernote);
+                            panel.destroy(true);
+                        } else {
+                            $("#attendee_note_err").text(obj.error);
+                        }
+                    });
+                    return false;
+                });
+                $content.find('#id_cancel').on('click', function() {
+                    panel.destroy(true);
+                    return false;
+                });
+                panel.show();
+            });
+        }
+
         // Handle actions drop down.
         $(document).on('change', 'select#menuf2f-actions', function() {
             var select = $(this);
@@ -448,5 +503,17 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 $('form.f2f-takeattendance-form').submit();
             }
         });
+
+        function removeselect_onfocus() {
+            $('form#assignform input[name=add]').attr('disabled', 'disabled');
+            $('form#assignform input[name=remove]').removeAttr('disabled');
+            $('#addselect').val(-1);
+        }
+
+        function addselect_onfocus() {
+            $('form#assignform input[name=remove]').attr('disabled', 'disabled');
+            $('form#assignform input[name=add]').removeAttr('disabled');
+            $('#removeselect').val(-1);
+        }
     }
 }

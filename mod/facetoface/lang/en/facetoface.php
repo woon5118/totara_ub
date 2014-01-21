@@ -502,6 +502,7 @@ $string['room'] = 'Room';
 $string['roomalreadybooked'] = ' (room unavailable on selected dates)';
 $string['saveallfeedback'] = 'Save all responses';
 $string['saveattendance'] = 'Save attendance';
+$string['savenote'] = 'Save note';
 $string['schedule_unit_1'] = '{$a} hours';
 $string['schedule_unit_1_singular'] = '1 hour';
 $string['schedule_unit_2'] = '{$a} days';
@@ -974,6 +975,10 @@ $string['usercalentry'] = 'Show entry on user\'s calendar';
 $string['userdeletedcancel'] = 'User has been deleted';
 $string['usersuspendedcancel'] = 'User has been suspended';
 $string['usernotsignedup'] = 'Status: not signed up';
+$string['usernote'] = 'Sign-up note';
+$string['attendeenote'] = 'Attendee\'s note';
+$string['usernoteupdated'] = 'Attendee\'s note updated';
+$string['usernoteheading'] = '{$a} - update note';
 $string['usersignedup'] = 'Status: signed up';
 $string['usersignedupmultiple'] = 'User signed up on {$a} sessions';
 $string['usersignedupon'] = 'User signed up on {$a}';
@@ -1156,6 +1161,10 @@ $string['venue_help'] = '**Venue** is the building the session will be held in.
 The **Venue** displays on the \'Sign-up\' page, the \'View all sessions\' page and in all email notifications.';
 
 $string['waitlistedmessage_help'] = 'This message is sent out whenever users sign-up for a wait-listed session.';
+$string['usernote_help'] = 'Any specific requirements that the session organiser might need to know about:
+
+* Dietary requirements
+* Disabilities';
 
 //Totara Messaging strings
 $string['requestattendsession'] = 'Request to attend session {$a}';

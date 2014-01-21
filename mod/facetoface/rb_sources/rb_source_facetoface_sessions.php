@@ -216,6 +216,15 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array('dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
+             new rb_column_option(
+                'session',
+                'usernote',
+                get_string('usernote', 'rb_source_facetoface_sessions'),
+                'status.note',
+                array(
+                    'joins' => 'status',
+                )
+            ),
             new rb_column_option(
                 'session',
                 'normalcost',
@@ -454,6 +463,12 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'session',
                 'discountcode',
                 get_string('discountcode', 'rb_source_facetoface_sessions'),
+                'text'
+            ),
+            new rb_filter_option(
+                'session',
+                'usernote',
+                get_string('usernote', 'rb_source_facetoface_sessions'),
                 'text'
             ),
             new rb_filter_option(

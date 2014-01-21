@@ -170,10 +170,11 @@ class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
         facetoface_update_calendar_entries($session, $facetoface);
 
         // Signup for session
+        $usernote = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
         facetoface_user_signup($session, $facetoface, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
-            $initiator->id, false);
+            $initiator->id, false, $usernote);
         facetoface_user_signup($session, $facetoface, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
-            $attender->id, false);
+            $attender->id, false, $usernote);
     }
 
     /**

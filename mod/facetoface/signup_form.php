@@ -56,6 +56,11 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('discountcode', PARAM_TEXT);
 
+        $mform->addElement('text', 'usernote', get_string('usernote', 'facetoface'), 'size="35"');
+        $mform->addHelpButton('usernote', 'usernote', 'facetoface');
+        $mform->addRule('usernote', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->setType('usernote', PARAM_TEXT);
+
         if (empty($CFG->facetoface_notificationdisable)) {
             $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
                              MDL_F2F_TEXT => get_string('notificationemail', 'facetoface'),
