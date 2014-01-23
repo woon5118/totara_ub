@@ -213,6 +213,9 @@ function xmldb_totara_core_install() {
     set_config('updateautocheck', false);
     set_config('updatenotifybuilds', false);
 
+    // Disable editing execpaths by default for security.
+    set_config('preventexecpath', '1');
+
     // Adding some totara upgrade code from lib/db/upgrade.php to
     // avoid conflicts every time we upgrade moodle.
     // This can be removed once we reach the verion of Moodle that

@@ -245,6 +245,7 @@ $string['position_typeicon'] = 'Position type icon';
 $string['positionatcompletion'] = 'Position at completion';
 $string['positionsarrow'] = 'Positions > ';
 $string['poweredby'] = 'Powered by TotaraLMS';
+$string['execpathnotallowed'] = 'This setting is currently disabled. To enable, add<br />$CFG->preventexecpath = 0;<br /> to config.php';
 $string['proficiency'] = 'Proficiency';
 $string['progdoesntbelongcat'] = 'The program doesn\'t belong to this category';
 $string['programicon'] = 'Program icon';
