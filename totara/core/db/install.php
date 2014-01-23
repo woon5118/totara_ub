@@ -95,6 +95,7 @@ function xmldb_totara_core_install() {
 
     set_role_contextlevels($staffmanagerrole,   get_default_contextlevels('staffmanager'));
     assign_capability('moodle/user:viewdetails', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
+    assign_capability('moodle/user:viewuseractivitiesreport', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/cohort:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/comment:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/comment:delete', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
