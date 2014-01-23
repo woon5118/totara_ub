@@ -319,6 +319,9 @@ class totara_dialog_content {
         // before giving up and suggesting search instead
         $maxitems = TOTARA_DIALOG_MAXITEMS;
 
+        // Check if user has capability to view emails.
+        $canviewemail = in_array('email', get_extra_user_fields(context_system::instance()));
+
         $html = '';
 
         $html .= !$this->show_treeview_only ? '<div class="treeview-wrapper dialog-nobind">' : '';
@@ -378,7 +381,7 @@ class totara_dialog_content {
 
                     // Grab item display name
                     if (isset($element->fullname)) {
-                        if (isset($element->email)) {
+                        if (isset($element->email) && $canviewemail) {
                             $displayname = get_string('assignindividual', 'totara_program', $element);
                         } else {
                             $displayname = $element->fullname;
