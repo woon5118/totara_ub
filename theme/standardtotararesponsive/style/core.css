@@ -147,6 +147,7 @@ table.invisible td {
     padding: 0;
 }
 table.invisible {
+    visibility: visible;
     padding: 0;
     margin: 0;
 }
