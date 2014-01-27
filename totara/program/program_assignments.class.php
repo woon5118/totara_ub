@@ -815,7 +815,7 @@ class organisations_category extends prog_assignment_category {
     }
 
     function get_js($programid) {
-        $title = get_string('addorganisationstoprogram', 'totara_program');
+        $title = addslashes_js(get_string('addorganisationstoprogram', 'totara_program'));
         $url = 'find_hierarchy.php?type=organisation&table=org&programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'organisations', '{$url}', '{$title}');";
     }
@@ -962,7 +962,7 @@ class positions_category extends prog_assignment_category {
     }
 
     function get_js($programid) {
-        $title = get_string('addpositiontoprogram', 'totara_program');
+        $title = addslashes_js(get_string('addpositiontoprogram', 'totara_program'));
         $url = 'find_hierarchy.php?type=position&table=pos&programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'positions', '{$url}', '{$title}');";
     }
@@ -1066,7 +1066,7 @@ class cohorts_category extends prog_assignment_category {
     }
 
     function get_js($programid) {
-        $title = get_string('addcohortstoprogram', 'totara_program');
+        $title = addslashes_js(get_string('addcohortstoprogram', 'totara_program'));
         $url = 'find_cohort.php?programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'cohorts', '{$url}', '{$title}');";
     }
@@ -1225,7 +1225,7 @@ class managers_category extends prog_assignment_category {
     }
 
     function get_js($programid) {
-        $title = get_string('addmanagerstoprogram', 'totara_program');
+        $title = addslashes_js(get_string('addmanagerstoprogram', 'totara_program'));
         $url = 'find_manager_hierarchy.php?programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'managers', '{$url}', '{$title}');";
     }
@@ -1302,7 +1302,7 @@ class individuals_category extends prog_assignment_category {
     }
 
     function get_js($programid) {
-        $title = get_string('addindividualstoprogram', 'totara_program');
+        $title = addslashes_js(get_string('addindividualstoprogram', 'totara_program'));
         $url = 'find_individual.php?programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'individuals', '{$url}', '{$title}');";
     }
