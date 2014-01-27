@@ -219,31 +219,50 @@ function completion_handle_criteria_recalc($courseid, $userid) {
 
 /**
  * Triggered by the completion_criteria_calc event, this function
- * checks if the course is a dependency of any others and marks the
- * user as complete in the applicable completion criteria.
+ * checks if the criteria exists, if it is applicable to the user
+ * and then reviews the user's state in it.
  *
  * @param   object      $eventdata
  * @return  boolean
  */
 function completion_handle_criteria_course_calc($eventdata) {
-    // Check if a criteria exists.
-    $criteriadata = (array)$eventdata;
-    unset($criteriadata['userid']);
-    $criteria = completion_criteria::factory($criteriadata, true);
-    if (!$criteria->id) {
+    global $DB;
+
+    // Check if applicable course criteria exists.
+    $criteria = completion_criteria::factory((array)$eventdata);
+    $params = array_intersect_key((array)$eventdata, array_flip($criteria->required_fields));
+
+    $criteria = $DB->get_records('course_completion_criteria', $params);
+    if (!$criteria) {
         return true;
     }
 
-    // Load completion record.
-    $data = array(
-        'criteriaid'    => $criteria->id,
-        'userid'        => $eventdata->userid,
-        'course'        => $criteria->course
-    );
-    $completion = new completion_criteria_completion($data);
+    // Loop through, and see if the criteria apply to this user.
+    foreach ($criteria as $criterion) {
 
-    // Review and mark complete if necessary.
-    $criteria->review($completion);
+        $course = new stdClass();
+        $course->id = $criterion->course;
+        $cinfo = new completion_info($course);
+
+
+        if (!$cinfo->is_tracked_user($eventdata->userid)) {
+            continue;
+        }
+
+        // Load criterion.
+        $criterion = completion_criteria::factory((array) $criterion);
+
+        // Load completion record.
+        $data = array(
+            'criteriaid'    => $criterion->id,
+            'userid'        => $eventdata->userid,
+            'course'        => $criterion->course
+        );
+        $completion = new completion_criteria_completion($data);
+
+        // Review and mark complete if necessary.
+        $criterion->review($completion);
+    }
 
     return true;
 }
