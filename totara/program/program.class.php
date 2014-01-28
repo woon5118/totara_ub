@@ -727,7 +727,9 @@ class program {
      * @return bool True if the program is assigned to a learning plan, false if not
      */
     public function assigned_to_users_non_required_learning($userid) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
+
         $sql = "SELECT p.id
                 FROM {dp_plan} AS p
                 JOIN {dp_plan_program_assign} AS ppa ON p.id = ppa.planid

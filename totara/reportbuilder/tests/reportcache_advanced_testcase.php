@@ -286,7 +286,9 @@ class reportcache_testing_data_generator extends testing_data_generator {
      * @return stdClass Program record
      */
     public function create_plan($userid, $record = array()) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
+
         if (is_object($record)) {
             $record = (array)$record;
         }

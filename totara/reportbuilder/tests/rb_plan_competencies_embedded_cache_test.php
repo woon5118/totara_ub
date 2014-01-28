@@ -125,20 +125,22 @@ class rb_plan_competencies_embedded_cache_test extends reportcache_advanced_test
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $planidalias = reportbuilder_get_extrafield_alias('plan', 'planlink', 'plan_id');
+        $competencyidalias = reportbuilder_get_extrafield_alias('competency', 'proficiencyandapproval', 'competencyid');
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                             array('userid' => $this->user1->id), $usecache);
         $this->assertCount(1, $result);
         $r = array_shift($result);
-        $this->assertEquals($this->plan1->id, $r->plan_id);
-        $this->assertEquals($this->competency1->id, $r->competencyid);
+        $this->assertEquals($this->plan1->id, $r->$planidalias);
+        $this->assertEquals($this->competency1->id, $r->$competencyidalias);
 
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                             array('userid' => $this->user2->id), $usecache);
         $this->assertCount(2, $result);
         $was = array('');
         foreach($result as $r) {
-            $this->assertContains($r->competencyid, array($this->competency2->id, $this->competency3->id));
-            $this->assertEquals($this->plan2->id, $r->plan_id);
+            $this->assertContains($r->$competencyidalias, array($this->competency2->id, $this->competency3->id));
+            $this->assertEquals($this->plan2->id, $r->$planidalias);
             $this->assertNotContains($r->competency_fullname, $was);
             $was[] = $r->competency_fullname;
         }

@@ -360,9 +360,10 @@ class rb_column {
                 }
             }
         }
-        // Add extrafields to the array after the main fields
+        // Add extrafields to the array after the main fields.
         if ($returnextrafields && $extrafields !== null) {
-            foreach ($extrafields as $alias => $extrafield) {
+            foreach ($extrafields as $extrafieldname => $extrafield) {
+                $alias = reportbuilder_get_extrafield_alias($type, $value, $extrafieldname);
                 switch ($aliasmode) {
                     case self::ALIASONLY:
                     case self::CACHE:

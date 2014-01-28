@@ -180,15 +180,16 @@ class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $courseidalias = reportbuilder_get_extrafield_alias('course', 'courselink', 'course_id');
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user1->id), $usecache);
         $this->assertCount(2, $result);
         foreach ($result as $r) {
-            $this->assertEquals($this->course1->id, $r->course_id);
+            $this->assertEquals($this->course1->id, $r->$courseidalias);
         }
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user2->id), $usecache);
         $this->assertCount(1, $result);
         foreach ($result as $r) {
-            $this->assertEquals($this->course1->id, $r->course_id);
+            $this->assertEquals($this->course1->id, $r->$courseidalias);
         }
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user4->id), $usecache);
         $this->assertCount(0, $result);

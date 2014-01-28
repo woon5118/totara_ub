@@ -2515,7 +2515,8 @@ class reportbuilder {
                 } else {
                     // We still need to add extrafields to the GROUP BY if there is a displayfunc
                     if ($column->extrafields !== null && $column->displayfunc !== null) {
-                        foreach ($column->extrafields as $alias => $field) {
+                        foreach ($column->extrafields as $name => $field) {
+                            $alias = reportbuilder_get_extrafield_alias($column->type, $column->value, $name);
                             $gp = ($mode == rb_column::CACHE || $mode == rb_column::ALIASONLY) ? $alias : $field;
                             if (!in_array($gp, $group)) {
                                 $group[] = $gp;
@@ -2886,7 +2887,7 @@ class reportbuilder {
      * functions exist for any columns the data is passed to the display
      * function and the result included instead.
      *
-     * @param array $record A record returnd by a recordset
+     * @param object $record A record returned by a recordset
      * @param boolean $striptags If true, returns the data with any html tags removed
      * @param boolean $isexport If true, data is being exported
      * @param boolean $excel true if processing data for an export_xls
@@ -2895,7 +2896,6 @@ class reportbuilder {
      */
     function process_data_row($record, $striptags=false, $isexport=false, $excel=false) {
         $columns = $this->columns;
-        $columnoptions = $this->columnoptions;
 
         $tabledata = array();
         foreach ($columns as $column) {
@@ -2908,12 +2908,14 @@ class reportbuilder {
                 if (isset($column->displayfunc)) {
                     $func = 'rb_display_'.$column->displayfunc;
                     if (method_exists($this->src, $func)) {
+                        // Get extrafields for column and rename them before passing them to display function.
+                        $extrafields = $this->get_extrafields_row($record, $column);
                         if ($column->displayfunc == 'customfield_textarea' || $column->displayfunc == 'customfield_file' || $column->displayfunc == 'tinymce_textarea') {
-                            $tabledata[] = $this->src->$func($field, $record->$field, $record, $isexport);
+                            $tabledata[] = $this->src->$func($field, $record->$field, $extrafields, $isexport);
                         } else if (($column->displayfunc == 'nice_date' || $column->displayfunc == 'nice_datetime') && $excel) {
                             $tabledata[] = $record->$field;
                         } else {
-                            $tabledata[] = $this->src->$func(format_text($record->$field, FORMAT_HTML), $record, $isexport);
+                            $tabledata[] = $this->src->$func(format_text($record->$field, FORMAT_HTML), $extrafields, $isexport);
                         }
                     } else {
                         $tabledata[] = format_text($record->$field, FORMAT_HTML);
@@ -3891,12 +3893,16 @@ class reportbuilder {
                 if (isset($primary_field->displayfunc)) {
                     $func = 'rb_display_' . $primary_field->displayfunc;
                     if (method_exists($this->src, $func)) {
-                        $primaryvalue = $this->src->$func(format_text($item->$primaryname, FORMAT_HTML), $item, false);
+                        // Get extrafields for column and rename them before passing them to display function.
+                        $extrafields = $this->get_extrafields_row($item, $primary_field);
+                        $primaryvalue = $this->src->$func(format_text($item->$primaryname, FORMAT_HTML), $extrafields, false);
                     } else {
-                        $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) : get_string('unknown', 'totara_reportbuilder');
+                        $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) :
+                                get_string('unknown', 'totara_reportbuilder');
                     }
                 } else {
-                    $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) : get_string('unknown', 'totara_reportbuilder');
+                    $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) :
+                            get_string('unknown', 'totara_reportbuilder');
                 }
 
                 $out .= $OUTPUT->heading($primaryheading . ': ' . $primaryvalue, 2);
@@ -4094,6 +4100,32 @@ class reportbuilder {
             return array('', array());
         }
         return $this->_post_config_restrictions;
+    }
+
+    /**
+     * Get extrafields for a column from a database record.
+     * This removes the stuff that was added to make the name unique when processed in a query.
+     *
+     * @param object $row record returned from sql query
+     * @param rb_column $column which has a display function with extra fields (else returns empty array)
+     * @return object $extrafieldsrow only the extrafields specified by the column, with unique identifier removed.
+     */
+    private function get_extrafields_row($row, $column) {
+        $extrafieldsrow = new stdClass();
+
+        if (!isset($column->extrafields) || empty($column->extrafields)) {
+            return $extrafieldsrow;
+        }
+
+        $extrafields = $column->extrafields;
+        foreach ($extrafields as $extrafield => $value) {
+            $extrafieldalias = reportbuilder_get_extrafield_alias($column->type, $column->value, $extrafield);
+            if (isset($row->$extrafieldalias)) {
+                $extrafieldsrow->$extrafield = $row->$extrafieldalias;
+            }
+        }
+
+        return $extrafieldsrow;
     }
 
 } // End of reportbuilder class
@@ -5097,4 +5129,22 @@ function totara_reportbuilder_pluginfile($course, $cm, $context, $filearea, $arg
     }
     // finally send the file
     send_stored_file($file, 86400, 0, true, $options); // download MUST be forced - security!
+}
+
+/**
+ * Get extrafield alias.
+ * Hash type and value so it works when caching reports in MySQL
+ * (current restriction in MySQL: fieldname cannot be longer than 64 chars)
+ *
+ * @param string $type column type of this option in the report
+ * @param string $value column value of this option in the report
+ * @param string $name the field name
+ * @return string $extrafieldalias
+ */
+function reportbuilder_get_extrafield_alias($type, $value, $name) {
+    $typevalue = "{$type}_{$value}";
+    $hashtypevalue = substr(md5($typevalue), 0, 10);
+    $extrafieldalias = "ef_{$hashtypevalue}_{$name}";
+
+    return $extrafieldalias;
 }

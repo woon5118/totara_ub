@@ -114,11 +114,12 @@ class rb_plan_courses_embedded_cache_test extends reportcache_advanced_testcase 
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $courseidalias = reportbuilder_get_extrafield_alias('course', 'courselink', 'course_id');
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user1->id,), $usecache);
         $this->assertCount(2, $result);
         $was = array();
         foreach($result as $r) {
-            $this->assertContains($r->course_id, array($this->course1->id, $this->course3->id));
+            $this->assertContains($r->$courseidalias, array($this->course1->id, $this->course3->id));
             $this->assertNotContains($r->course_courselink, $was);
             $was[] = $r->course_courselink;
         }
@@ -127,7 +128,7 @@ class rb_plan_courses_embedded_cache_test extends reportcache_advanced_testcase 
         $this->assertCount(3, $result);
         $was = array();
         foreach($result as $r) {
-            $this->assertContains($r->course_id, array($this->course2->id, $this->course3->id, $this->course4->id));
+            $this->assertContains($r->$courseidalias, array($this->course2->id, $this->course3->id, $this->course4->id));
             $this->assertNotContains($r->course_courselink, $was);
             $was[] = $r->course_courselink;
         }

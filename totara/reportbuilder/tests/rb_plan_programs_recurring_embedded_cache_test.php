@@ -139,6 +139,7 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $programidalias = reportbuilder_get_extrafield_alias('program_completion_history', 'status', 'programid');
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                 array('userid' => $this->user1->id), $usecache);
         $this->assertCount(1, $result);
@@ -151,8 +152,8 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
         $was = array('');
         foreach($result as $res) {
             $this->assertContains($res->program_completion_history_courselink, array($this->course1->id, $this->course2->id));
-            $this->assertNotContains($res->programid, $was);
-            $was[] = $res->programid;
+            $this->assertNotContains($res->$programidalias, $was);
+            $was[] = $res->$programidalias;
         }
 
         $result = $this->get_report_result($this->report_builder_data['shortname'],
