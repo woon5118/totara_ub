@@ -259,7 +259,7 @@ if ($frm = data_submitted()) {
 // Main page
 $attendeescount = count($attendees);
 
-$where = "username <> 'guest' AND deleted = 0 AND confirmed = 1";
+$where = "username <> 'guest' AND deleted = 0 AND suspended = 0 AND confirmed = 1";
 $params = array();
 
 // Apply search terms
