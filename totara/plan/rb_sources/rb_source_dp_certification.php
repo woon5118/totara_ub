@@ -574,15 +574,26 @@ class rb_source_dp_certification extends rb_base_source {
 
 
     function rb_display_timedue_date($time, $row) {
-        $dateformat = get_string('strfdateshortmonth', 'langconfig');
-        if (($row->certifpath == CERTIFPATH_CERT) && ($row->completionstatus != null)) {
-            $program = new program($row->programid);
-            return $program->display_timedue_date($row->completionstatus, $time, $dateformat);
-        } else if (empty($row->timeexpires)) {
-            return '';
+        global $OUTPUT;
+
+        $program = new program($row->programid);
+
+        if (empty($row->timeexpires)) {
+            if (empty($row->prog_completion_timedue) || $row->prog_completion_timedue == COMPLETION_TIME_NOT_SET) {
+                // There is no time due set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($row->prog_completion_timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+                // User is still in the first stage of certification, not overdue yet.
+                return $program->display_duedate($row->prog_completion_timedue, $row->certifpath, $row->status);
+            } else {
+                // Looks like the certification has expired, overdue!
+                return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+            }
         } else {
-            return userdate($row->timeexpires, $dateformat);
+            return $program->display_duedate($row->timeexpires, $row->certifpath, $row->status);
         }
+
+        return '';
     }
 
 

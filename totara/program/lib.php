@@ -159,7 +159,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
 
     // Construct sql query
     $count = 'SELECT COUNT(*) ';
-    $select = 'SELECT p.id, p.fullname, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.timeexpires ';
+    $select = 'SELECT p.id, p.fullname, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.status, cfc.timeexpires ';
     $from = "FROM {prog} p
             INNER JOIN {prog_completion} pc ON p.id = pc.programid
                     AND pc.coursesetid = 0
@@ -329,11 +329,7 @@ function prog_display_certification_programs($userid) {
         }
         $row = array();
         $row[] = $program->display_summary_widget($userid);
-        if ($cp->certifpath == CERTIFPATH_CERT) {
-            $row[] = ($cp->duedate ? $program->display_duedate($cp->duedate) : get_string('noduedate', 'totara_program'));
-        } else {
-            $row[] = $program->display_date_as_text($cp->timeexpires);
-        }
+        $row[] = $program->display_duedate($cp->duedate, $cp->certifpath, $cp->status);
         $row[] = $program->display_progress($userid);
         $table->add_data($row);
         $rowcount++;
