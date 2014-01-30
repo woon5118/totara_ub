@@ -146,13 +146,22 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $sessionrow[] = $stats;
 
             // Status.
+            $allowcancellation = false;
             $status  = get_string('bookingopen', 'facetoface');
             if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                 $status = get_string('sessioninprogress', 'facetoface');
                 $sessionstarted = true;
+                // If user status is wait-listed.
+                if ($bookedsession && $bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                    $allowcancellation = true;
+                }
             } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                 $status = get_string('sessionover', 'facetoface');
                 $sessionstarted = true;
+                // If user status is wait-listed.
+                if ($bookedsession && $bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                    $allowcancellation = true;
+                }
             } else if ($bookedsession && $session->id == $bookedsession->sessionid) {
                 $signupstatus = facetoface_get_status($bookedsession->statuscode);
                 $status = get_string('status_'.$signupstatus, 'facetoface');
@@ -173,11 +182,12 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $options .= html_writer::empty_tag('br');
             }
             if ($viewattendees) {
-                $options .= html_writer::link('attendees.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface'))) . html_writer::empty_tag('br');
+                $options .= html_writer::link('attendees.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('attendees', 'facetoface'), array('title' => get_string('seeattendees', 'facetoface')));
+                $options .= html_writer::empty_tag('br');
             }
             if ($isbookedsession) {
-                $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface'))) . html_writer::empty_tag('br');
-
+                $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
+                $options .= html_writer::empty_tag('br');
                 $options .= html_writer::link('cancelsignup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
             } else if (!$sessionstarted and !$bookedsession) {
                 if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
@@ -187,7 +197,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 }
             }
             if (empty($options)) {
-                $options = get_string('none', 'facetoface');
+                if ($sessionstarted && $allowcancellation) {
+                    $options = html_writer::link('cancelsignup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                } else {
+                    $options = get_string('none', 'facetoface');
+                }
             }
             $sessionrow[] = $options;
 

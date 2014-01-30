@@ -2253,10 +2253,17 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
+                $allowcancellation = false;
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
+                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                        $allowcancellation = true;
+                    }
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
+                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                        $allowcancellation = true;
+                    }
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
@@ -2285,15 +2292,20 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 // Don't include the link to cancel a session if it has already occurred.
                 $moreinfolink = '';
                 $cancellink = '';
+                $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                 if (!facetoface_has_session_started($session, $timenow)) {
                     $strmoreinfo  = get_string('moreinfo', 'facetoface');
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
                     $moreinfolink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($signup_url, $strmoreinfo, array('class' => 'f2fsessionlinks f2fsessioninfolink', 'title' => $strmoreinfo))));
 
-                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
-                    $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                     $cancellink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking))));
                     $options    = html_writer::tag('tr', html_writer::tag('td', $span));
+                } else {
+                    // Session is started.
+                    if ($allowcancellation) {
+                        $cancellink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking))));
+                    }
                 }
 
                 // Get room data.
