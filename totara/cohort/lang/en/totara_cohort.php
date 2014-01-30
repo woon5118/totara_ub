@@ -249,6 +249,7 @@ $string['error:rulemissingparams'] = 'This rule is not defined.';
 $string['error:startafterfinish'] = 'Start date must not be later than finish date';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:visiblelearningdisabled'] = 'Visible learning is not enabled.';
+$string['error:typecompletion'] = 'Rule definition type is incorrect';
 $string['excludeuserswho'] = 'Exclude users who';
 $string['excludeuserswho_help'] = 'This setting lets you choose types of users to exclude from having plans generated for them
 

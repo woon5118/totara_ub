@@ -36,10 +36,22 @@ define('COHORT_RULE_COMPLETION_OP_ALL', 40);
 
 define('COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN', 50);
 define('COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN', 60);
+define('COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION', 70);
+define('COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION', 80);
+define('COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION', 90);
+define('COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION', 100);
+
+define ('COHORT_PICKER_PROGRAM_COMPLETION', 0);
+define ('COHORT_PICKER_COURSE_COMPLETION', 1);
+
 global $COHORT_RULE_COMPLETION_OP;
 $COHORT_RULE_COMPLETION_OP = array(
-    COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN => '<=',
-    COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN => '>=',
+    COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN => 'before',
+    COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN => 'after',
+    COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION => 'beforepastduration',
+    COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION => 'inpastduration',
+    COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION => 'inpastduration',
+    COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION => 'beforepastduration',
 );
 
 /**
@@ -137,28 +149,48 @@ abstract class cohort_rule_sqlhandler_completion_date extends cohort_rule_sqlhan
     );
 
     public function get_sql_snippet() {
-        global $COHORT_RULE_COMPLETION_OP;
 
         if (count($this->listofids) == 0){
             // todo: error message?
             return '1=0';
         }
 
+        $time = time();
+        switch ($this->operator) {
+            case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
+                $comparison = "<= {$this->date}";
+                break;
+            case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
+                $comparison = ">= {$this->date}";
+                break;
+            case COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION:
+                $comparison = '<= ' . ($time - ($this->date * 24 * 60 * 60));
+                break;
+            case COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION:
+                $comparison = 'BETWEEN ' . ($time - ($this->date * 24 * 60 * 60)) . ' AND ' . $time;
+                break;
+            case COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION:
+                $comparison = 'BETWEEN ' . $time . ' AND ' . ($time + ($this->date * 24 * 60 * 60));
+                break;
+            case COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION:
+                $comparison = '>= ' . ($time + ($this->date * 24 * 60 * 60));
+                break;
+        }
+
         $date = (int) $this->date;
         $goalnum = count($this->listofids);
-        $operator = $COHORT_RULE_COMPLETION_OP[$this->operator];
 
-        return $this->construct_sql_snippet($goalnum, $operator, $date, $this->listofids);
+        return $this->construct_sql_snippet($goalnum, $comparison, $this->listofids);
     }
 
-    protected abstract function construct_sql_snippet($goalnum, $operator, $date, $lov);
+    protected abstract function construct_sql_snippet($goalnum, $comparison, $lov);
 }
 
 /**
  * Rule for checking whether users has completed all the courses in a list before a fixed date
  */
 class cohort_rule_sqlhandler_completion_date_course extends cohort_rule_sqlhandler_completion_date {
-    protected function construct_sql_snippet($goalnum, $operator, $date, $lov) {
+    protected function construct_sql_snippet($goalnum, $comparison, $lov) {
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdc'.$this->ruleid);
@@ -167,7 +199,7 @@ class cohort_rule_sqlhandler_completion_date_course extends cohort_rule_sqlhandl
                 ."where cc.userid = u.id "
                 ."and cc.course {$sqlin} "
                 ."and cc.timecompleted > 0 "
-                ."and cc.timecompleted {$operator} {$date}"
+                ."and cc.timecompleted {$comparison}"
             .")";
         $sqlhandler->params = $params;
         return $sqlhandler;
@@ -178,7 +210,7 @@ class cohort_rule_sqlhandler_completion_date_course extends cohort_rule_sqlhandl
  * Rule for checking whether user has completed all the programs in a list before a fixed date
  */
 class cohort_rule_sqlhandler_completion_date_program extends cohort_rule_sqlhandler_completion_date {
-    protected function construct_sql_snippet($goalnum, $operator, $date, $lov) {
+    protected function construct_sql_snippet($goalnum, $comparison, $lov) {
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdp'.$this->ruleid);
@@ -187,7 +219,7 @@ class cohort_rule_sqlhandler_completion_date_program extends cohort_rule_sqlhand
                 ."where pc.userid = u.id "
                 ."and pc.programid {$sqlin} "
                 ."and pc.timecompleted > 0 "
-                ."and pc.timecompleted {$operator} {$date}"
+                ."and pc.timecompleted {$comparison}"
             .")";
         $sqlhandler->params = $params;
         return $sqlhandler;
@@ -200,7 +232,7 @@ class cohort_rule_sqlhandler_completion_date_program extends cohort_rule_sqlhand
  * the courses in a list
  */
 class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlhandler_completion_date {
-    protected function construct_sql_snippet($goalnum, $operator, $duration, $lov){
+    protected function construct_sql_snippet($goalnum, $comparison, $lov){
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin1, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdc1'.$this->ruleid);
@@ -212,13 +244,13 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
                     ."where cc.userid=u.id "
                     ."and cc.course {$sqlin1} "
                     ."and timecompleted > 0 "
-                .") AND {$duration} {$operator} ("
+                .") AND ("
                     ."select max(cc.timecompleted) - min(cc.timestarted) "
                     ."from {course_completions} cc "
                     ."where cc.userid = u.id "
                     ."and cc.course {$sqlin2} "
                     ."and timecompleted > 0 "
-               .")"
+               .") {$comparison}"
            .")";
         $sqlhandler->params = $params;
         return $sqlhandler;
@@ -230,7 +262,7 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
  * the programs in a list
  */
 class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sqlhandler_completion_date {
-    protected function construct_sql_snippet($goalnum, $operator, $duration, $lov){
+    protected function construct_sql_snippet($goalnum, $comparison, $lov){
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin1, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'cdp1'.$this->ruleid);
@@ -242,13 +274,13 @@ class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sql
                     ."where pc.userid=u.id "
                     ."and pc.programid {$sqlin1} "
                     ."and pc.timecompleted > 0 "
-                .") AND {$duration} {$operator} ("
+                .") AND ("
                     ."select max(pc.timecompleted) - min(pc.timestarted) "
                     ."from {prog_completion} pc "
                     ."where pc.userid = u.id "
                     ."and pc.programid {$sqlin2} "
                     ."and pc.timecompleted > 0 "
-                .")"
+                .") {$comparison}"
             .")";
         $sqlhandler->params = $params;
         return $sqlhandler;

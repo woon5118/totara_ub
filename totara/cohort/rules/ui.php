@@ -740,7 +740,7 @@ JS;
         $datepickerjs .= <<<JS
 ',
                 showOn: 'both',
-                buttonImage: M.util.image_url('t/calendar', 'theme'),
+                buttonImage: M.util.image_url('t/calendar'),
                 buttonImageOnly: true,
                 beforeShow: function() { $('#ui-datepicker-div').css('z-index', 1600); },
                 constrainInput: true
@@ -1053,20 +1053,30 @@ class totara_dialog_content_cohort_rules_courses extends totara_dialog_content_c
     }
 }
 
-abstract class cohort_rule_ui_picker_course extends cohort_rule_ui {
+abstract class cohort_rule_ui_picker_course_program extends cohort_rule_ui {
     public $handlertype = 'treeview';
+    protected $pickertype;
 
     /**
      * @param string $description Brief description of this rule
      */
-    public function __construct($description) {
+    public function __construct($description, $pickertype) {
         $this->description = $description;
+        $this->pickertype = $pickertype;
     }
 
 
     public function printDialogContent($hidden=array(), $ruleinstanceid=false) {
         global $CFG, $DB;
-        require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_courses.class.php');
+
+        if ($this->pickertype == COHORT_PICKER_COURSE_COMPLETION) {
+            require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_courses.class.php');
+        } else if ($this->pickertype == COHORT_PICKER_PROGRAM_COMPLETION) {
+            require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_programs.class.php');
+        } else {
+            echo get_string('error:typecompletion', 'totara_cohort');
+            return;
+        }
 
         ///
         /// Setup / loading data
@@ -1082,28 +1092,45 @@ abstract class cohort_rule_ui_picker_course extends cohort_rule_ui {
         /// Setup dialog
         ///
 
-        // Load dialog content generator
-        $dialog = new totara_dialog_content_cohort_rules_courses($categoryid);
+        // Load dialog content generator.
+        if ($this->pickertype == COHORT_PICKER_COURSE_COMPLETION) {
+            $dialog = new totara_dialog_content_cohort_rules_courses($categoryid);
+        } else {
+            $dialog = new totara_dialog_content_cohort_rules_programs($categoryid);
+        }
 
-        // Set type to multiple
+        // Set type to multiple.
         $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
-        $dialog->selected_title = ''; //itemstoadd';
+        $dialog->selected_title = '';
 
         $dialog->urlparams = $hidden;
 
-        // Add data
-        $dialog->load_courses();
+        // Add data.
+        if ($this->pickertype == COHORT_PICKER_COURSE_COMPLETION) {
+            $dialog->load_courses();
+        } else {
+            $dialog->load_programs();
+        }
 
-        // Set selected items
-        // Setup page
+        // Set selected items.
         if ($ruleinstanceid) {
-            $sql = "SELECT course.id, course.fullname
-                FROM {course} course
-                INNER JOIN {cohort_rule_params} crp
-                    ON course.id=" . $DB->sql_cast_char2int('crp.value') . "
-                WHERE crp.ruleid = ? and crp.name='listofids'
-                ORDER BY course.fullname
-                ";
+            if ($this->pickertype == COHORT_PICKER_COURSE_COMPLETION) {
+                $sql = "SELECT course.id, course.fullname
+                        FROM {course} course
+                        INNER JOIN {cohort_rule_params} crp
+                            ON course.id=" . $DB->sql_cast_char2int('crp.value') . "
+                        WHERE crp.ruleid = ? and crp.name='listofids'
+                        ORDER BY course.fullname
+                        ";
+            } else {
+                $sql = "SELECT program.id, program.fullname
+                        FROM {prog} program
+                        INNER JOIN {cohort_rule_params} crp
+                            ON program.id=" . $DB->sql_cast_char2int('crp.value') . "
+                        WHERE crp.ruleid = ? and crp.name='listofids'
+                        ORDER BY program.fullname
+                        ";
+            }
             $alreadyselected = $DB->get_records_sql($sql, array($ruleinstanceid));
             if (!$alreadyselected) {
                 $alreadyselected = array();
@@ -1113,14 +1140,15 @@ abstract class cohort_rule_ui_picker_course extends cohort_rule_ui {
         }
         $dialog->selected_items = $alreadyselected;
 
-        // Set unremovable items
-        $dialog->unremovable_items = array(); //$unremovable;
+        // Set unremovable items.
+        $dialog->unremovable_items = array();
 
-        // semi-hack to allow for callback to this ui class to generate some elements of the treeview
+        // Semi-hack to allow for callback to this ui class to generate some elements of the treeview.
         $dialog->cohort_rule_ui = $this;
 
-        // Display
+        // Display.
         $markup = $dialog->generate_markup();
+
         echo $markup;
     }
 
@@ -1130,7 +1158,7 @@ abstract class cohort_rule_ui_picker_course extends cohort_rule_ui {
     abstract public function getExtraSelectedItemsPaneWidgets();
 }
 
-class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picker_course {
+class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picker_course_program {
     public $params = array(
         'operator' => 0,
         'listofids' => 1
@@ -1194,7 +1222,7 @@ class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picke
         $courselist = $DB->get_records_sql($sql, $sqlparams);
 
         foreach ($courselist as $i => $c) {
-            $value = '"' . $c->fullname . '"';
+            $value = '"' . format_string($c->fullname) . '"';
             if (!$static) {
                 $value .= $this->param_delete_action_icon($c->paramid);
             }
@@ -1207,7 +1235,7 @@ class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picke
     }
 }
 
-class cohort_rule_ui_picker_course_duration extends cohort_rule_ui_picker_course {
+class cohort_rule_ui_picker_course_duration extends cohort_rule_ui_picker_course_program {
     public $params = array(
         'operator' => 0,
         'date' => 0,
@@ -1321,7 +1349,7 @@ JS;
     }
 }
 
-class cohort_rule_ui_picker_course_date extends cohort_rule_ui_picker_course {
+class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_course_program {
     public $params = array(
         'operator' => 0,
         'date' => 0,
@@ -1332,79 +1360,79 @@ class cohort_rule_ui_picker_course_date extends cohort_rule_ui_picker_course {
         global $CFG;
 
         $html = '';
-        $html .= '<div class="mform cohort-treeview-dialog-extrafields">';
+        $html .= html_writer::start_div('mform cohort-treeview-dialog-extrafields');
+        $html .= html_writer::start_tag('form', array('id' => 'form_course_program_date'));
 
-        $operatormenu = array();
-        $operatormenu[COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN] = get_string('datemenufixeddatebefore', 'totara_cohort');
-        $operatormenu[COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN] = get_string('datemenufixeddateafter', 'totara_cohort');
+        $opmenufix = array(); // Operator menu for fixed date options.
+        $opmenurel = array(); // Operator menu for relative date options.
+
+        $opmenufix[COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN] = get_string('datemenufixeddatebefore', 'totara_cohort');
+        $opmenufix[COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN] = get_string('datemenufixeddateafter', 'totara_cohort');
+
+        $opmenurel[COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION] = get_string('datemenudurationbeforepast', 'totara_cohort');
+        $opmenurel[COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION] = get_string('datemenudurationwithinpast', 'totara_cohort');
+        $opmenurel[COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION] = get_string('datemenudurationwithinfuture', 'totara_cohort');
+        $opmenurel[COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION] = get_string('datemenudurationafterfuture', 'totara_cohort');
+
+        // Set default values.
         $selected = isset($this->operator) ? $this->operator : '';
-        $html .= get_string('completionusercompletedbeforeafter', 'totara_cohort');
-        $html .= html_writer::select($operatormenu, 'operator', $selected, array(),
-            array('id' => 'id_operator', 'class' => 'cohorttreeviewsubmitfield'));
-        $html .= '<fieldset><input class="cohorttreeviewsubmitfield" size="10" name="date" id="completiondate" value="';
-        if (isset($this->date)) {
-            $html .= htmlspecialchars(userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false));
+        $htmldate = get_string('datepickerlongyearplaceholder', 'totara_core');
+        $class = 'cohorttreeviewsubmitfield';
+        $duration = '';
+        $radio2prop = $radio1prop = array('type' => 'radio', 'name' => 'fixeddynamic', 'checked' => 'checked', 'class' => $class);
+        if (isset($this->operator) && array_key_exists($this->operator, $opmenufix)) {
+            array_splice($radio2prop, 2);
+            $htmldate = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+        } else if (isset($this->operator) && array_key_exists($this->operator, $opmenurel)) {
+            array_splice($radio1prop, 2);
+            $duration = htmlspecialchars($this->date);
         } else {
-            $html .= get_string('datepickerlongyearplaceholder', 'totara_core');
+            array_splice($radio2prop, 2);
         }
-        $html .= '" /></fieldset>';
-        $html .= '</div>';
-        $validdatestr = get_string('error:baddate', 'totara_cohort');
-        $html .= <<<JS
-<script type="text/javascript">
-$(function() {
-    $('#completiondate').datepicker(
-        {
-            dateFormat: '
-JS;
-        $html .= get_string('datepickerlongyeardisplayformat', 'totara_core');
-        $html .= <<<JS
-',
-            showOn: 'both',
-            buttonImage: M.util.image_url('t/calendar', 'theme'),
-            buttonImageOnly: true,
-            beforeShow: function() { $('#ui-datepicker-div').css('z-index', 1600); },
-            constrainInput: true
-        }
-    );
-});
 
-$(function() {
-    var valfunc = function(element){
-        element = $(element);
-        var parent = element.parent();
-        if (!element.val().match(/^[0-9]{1,2}[\/\-][0-9]{1,2}[\/\-](19|20)?[0-9]{2}$/)){
-            parent.addClass('error');
-            if ($('#id_error_completiondate').length == 0) {
-                parent.prepend('<span id="id_error_completiondate" class="error">{$validdatestr}</span>');
-            }
-            return false;
-        } else {
-            $('#id_error_completiondate').remove();
-            parent.removeClass('error');
-            return true;
-        }
-    };
-    $('#completiondate').get(0).cohort_validation_func = valfunc;
-    $('#completiondate').change(
-        function(){
-            valfunc(this);
-        }
-    );
-});
-</script>
-JS;
+        // Fixed date.
+        $html .= get_string('completionusercompletedbeforeafter', 'totara_cohort');
+        $html .= html_writer::start_tag('fieldset');
+        $html .= html_writer::empty_tag('input', array_merge(array('id' => 'fixedordynamic1', 'value' => '1'), $radio1prop));
+        $html .= html_writer::select($opmenufix, 'beforeaftermenu', $selected, array(), array('class' => $class));
+        $html .= html_writer::empty_tag('input', array('type' => 'text', 'size' => '10', 'id' => 'completiondate',
+            'name' => 'date', 'value' => htmlspecialchars($htmldate), 'class' => $class));
+        $html .= html_writer::end_tag('fieldset');
+
+        // Relative date.
+        $html .= get_string('or', 'totara_cohort');
+        $html .= html_writer::start_tag('fieldset');
+        $html .= html_writer::empty_tag('input', array_merge(array('id' => 'fixedordynamic2', 'value' => '2'), $radio2prop));
+        $html .= html_writer::select($opmenurel, 'durationmenu', $selected, array(), array('class' => $class));
+        $html .= html_writer::empty_tag('input', array('type' => 'text', 'size' => '3', 'id' => 'completiondurationdate',
+            'name' => 'durationdate', 'value' => $duration, 'class' => $class));
+        $html .= get_string('completiondurationdays', 'totara_cohort');
+        $html .= html_writer::end_tag('fieldset');
+
+        $html .= html_writer::end_tag('form');
+        $html .= html_writer::end_div();
+
         return $html;
     }
 
     public function handleDialogUpdate($sqlhandler){
-        $date = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), required_param('date', PARAM_TEXT));
-        $operator = required_param('operator', PARAM_INT);
-        $listofids = required_param('selected', PARAM_SEQUENCE);
-        $listofids = explode(',',$listofids);
+        $fixedordynamic = required_param('fixeddynamic', PARAM_INT);
+        switch($fixedordynamic) {
+            case 1:
+                $operator = required_param('beforeaftermenu', PARAM_INT);
+                $date = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
+                    required_param('date', PARAM_TEXT));
+                break;
+            case 2:
+                $operator = required_param('durationmenu', PARAM_INT);
+                $date = required_param('durationdate', PARAM_INT); // Convert number to seconds.
+                break;
+            default:
+                return false;
+        }
         $this->date = $sqlhandler->date = $date;
         $this->operator = $sqlhandler->operator = $operator;
-        $this->listofids = $sqlhandler->listofids = $listofids;
+        $this->listofids = $sqlhandler->listofids = explode(',', required_param('selected', PARAM_SEQUENCE));
         $sqlhandler->write();
     }
 
@@ -1415,36 +1443,47 @@ JS;
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $DB, $CFG;
+        global $DB, $CFG, $COHORT_RULE_COMPLETION_OP;
         if (!isset($this->operator) || !isset($this->listofids)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
+        $ret = ucfirst($this->description);
         switch ($this->operator) {
             case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
-                $descstr = 'ccdatedescbefore';
-                break;
             case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
-                $descstr = 'ccdatedescafter';
+                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+                break;
+            case COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION:
+            case COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION:
+            case COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION:
+            case COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION:
+                $a = $this->date;
                 break;
         }
-        $ret = get_string(
-            $descstr,
-            'totara_cohort',
-            userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false)
-        );
+        $ret .= ' ' . get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a) . ' ';
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
-        $sql = "SELECT c.id, c.fullname, crp.id AS paramid
-            FROM {course} c
-            INNER JOIN {cohort_rule_params} crp ON c.id = " . $DB->sql_cast_char2int('crp.value') . "
-            WHERE c.id {$sqlin}
-            AND crp.name = 'listofids' AND crp.ruleid = ?
-            ORDER BY sortorder, fullname";
-        $courselist = $DB->get_records_sql($sql, $sqlparams);
+        if ($this->pickertype == COHORT_PICKER_COURSE_COMPLETION) {
+            $sql = "SELECT c.id, c.fullname, crp.id AS paramid
+                FROM {course} c
+                INNER JOIN {cohort_rule_params} crp ON c.id = " . $DB->sql_cast_char2int('crp.value') . "
+                WHERE c.id {$sqlin}
+                AND crp.name = 'listofids' AND crp.ruleid = ?
+                ORDER BY sortorder, fullname";
+        } else {
+            $sql = "SELECT p.id, p.fullname, crp.id AS paramid
+                FROM {prog} p
+                INNER JOIN {cohort_rule_params} crp ON p.id = " . $DB->sql_cast_char2int('crp.value') . "
+                WHERE p.id {$sqlin}
+                AND crp.name = 'listofids' AND crp.ruleid = ?
+                ORDER BY sortorder, fullname";
+        }
 
-        foreach ($courselist as $i => $c) {
-            $value = '"' . $c->fullname . '"';
+        $courseprogramlist = $DB->get_records_sql($sql, $sqlparams);
+
+        foreach ($courseprogramlist as $i => $c) {
+            $value = '"' . format_string($c->fullname) . '"';
             if (!$static) {
                 $value .= $this->param_delete_action_icon($c->paramid);
             }
@@ -1474,88 +1513,7 @@ class totara_dialog_content_cohort_rules_programs extends totara_dialog_content_
     }
 }
 
-abstract class cohort_rule_ui_picker_program extends cohort_rule_ui {
-    public $handlertype = 'treeview';
-
-    /**
-     * @param string $description Brief description of this rule
-     */
-    public function __construct($description) {
-        $this->description = $description;
-    }
-
-
-    public function printDialogContent($hidden=array(), $ruleinstanceid=false) {
-        global $CFG, $DB;
-        require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_programs.class.php');
-
-        ///
-        /// Setup / loading data
-        ///
-
-        // Category id
-        $categoryid = optional_param('parentid', 'cat0', PARAM_ALPHANUM);
-
-        // Strip cat from begining of categoryid
-        $categoryid = (int) substr($categoryid, 3);
-
-
-        ///
-        /// Setup dialog
-        ///
-
-        // Load dialog content generator
-        $dialog = new totara_dialog_content_cohort_rules_programs($categoryid);
-
-        // Set type to multiple
-        $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
-        $dialog->selected_title = ''; //itemstoadd';
-
-        $dialog->urlparams = $hidden;
-
-        // Add data
-        $dialog->load_programs();
-
-        // Set selected items
-        // todo: get the already-selected programs
-        // Setup page
-        if ($ruleinstanceid) {
-            $sql = "SELECT program.id, program.fullname
-                FROM {prog} program
-                INNER JOIN {cohort_rule_params} crp
-                    ON program.id=" . $DB->sql_cast_char2int('crp.value') . "
-                WHERE crp.ruleid = ? and crp.name='listofids'
-                ORDER BY program.fullname
-                ";
-            $alreadyselected = $DB->get_records_sql($sql, array($ruleinstanceid));
-            if (!$alreadyselected) {
-                $alreadyselected = array();
-            }
-        } else {
-            $alreadyselected = array();
-        }
-        $dialog->selected_items = $alreadyselected;
-
-        // Set unremovable items
-        $dialog->unremovable_items = array(); //$unremovable;
-
-        // semi-hack to allow for callback to this ui class to generate some elements of the treeview
-        $dialog->cohort_rule_ui = $this;
-
-        // Display
-        $markup = $dialog->generate_markup();
-        // Hack to get around the hack that prevents deleting items via dialogs
-        $markup = str_replace('<td class="selected" ', '<td class="selected selected-shown" ', $markup);
-        echo $markup;
-    }
-
-    /**
-     * Provide extra elements to insert into the top of the "selected items" pane of the treeview
-     */
-    abstract public function getExtraSelectedItemsPaneWidgets();
-}
-
-class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_picker_program {
+class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_picker_course_program {
     public $params = array(
         'operator' => 0,
         'listofids' => 1
@@ -1618,7 +1576,7 @@ class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_pick
         $proglist = $DB->get_records_sql($sql, $sqlparams);
 
         foreach ($proglist as $i => $p) {
-            $value = '"' . $p->fullname . '"';
+            $value = '"' . format_string($p->fullname) . '"';
             if (!$static) {
                 $value .= $this->param_delete_action_icon($p->paramid);
             }
@@ -1632,7 +1590,7 @@ class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_pick
     }
 }
 
-class cohort_rule_ui_picker_program_duration extends cohort_rule_ui_picker_program {
+class cohort_rule_ui_picker_program_duration extends cohort_rule_ui_picker_course_program {
     public $params = array(
         'operator' => 0,
         'date' => 0,
@@ -1731,144 +1689,7 @@ JS;
         $proglist = $DB->get_records_sql($sql, $sqlparams);
 
         foreach ($proglist as $i => $p) {
-            $value = '"' . $p->fullname . '"';
-            if (!$static) {
-                $value .= $this->param_delete_action_icon($p->paramid);
-            }
-            $proglist[$i] = html_writer::tag('span', $value, array('class' => 'ruleparamcontainer'));
-        };
-
-        $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $proglist);
-
-        return $ret;
-    }
-}
-
-class cohort_rule_ui_picker_program_date extends cohort_rule_ui_picker_program {
-    public $params = array(
-        'operator' => 0,
-        'date' => 0,
-        'listofids' => 1
-    );
-
-    public function getExtraSelectedItemsPaneWidgets(){
-        global $CFG;
-
-        $html = '';
-        $html .= '<div class="mform cohort-treeview-dialog-extrafields">';
-
-        $operatormenu = array();
-        $operatormenu[COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN] = get_string('datemenufixeddatebefore', 'totara_cohort');
-        $operatormenu[COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN] = get_string('datemenufixeddateafter', 'totara_cohort');
-        $selected = isset($this->operator) ? $this->operator : '';
-        $html .= get_string('completionusercompletedbeforeafter', 'totara_cohort');
-        $html .= html_writer::select($operatormenu, 'operator', $selected, array(),
-            array('id' => 'id_operator', 'class' => 'cohorttreeviewsubmitfield'));
-        $html .= '<fieldset><input class="cohorttreeviewsubmitfield" size="10" name="date" id="completiondate" value="';
-        if (isset($this->date)) {
-            $html .= htmlspecialchars(userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false));
-        } else {
-            $html .= get_string('datepickerlongyearplaceholder', 'totara_core');
-        }
-        $html .= '" /></fieldset>';
-        $html .= '</div>';
-        $baddate = get_string('error:baddate', 'totara_cohort');
-        $html .= <<<JS
-<script type="text/javascript">
-$(function() {
-    $('#completiondate').datepicker(
-        {
-            dateFormat: '
-JS;
-        $html .= get_string('datepickerlongyeardisplayformat', 'totara_core');
-        $html .= <<<JS
-',
-            showOn: 'both',
-            buttonImage: M.util.image_url('t/calendar', 'theme'),
-            buttonImageOnly: true,
-            beforeShow: function() { $('#ui-datepicker-div').css('z-index', 1600); },
-            constrainInput: true
-        }
-    );
-});
-
-$(function() {
-    var valfunc = function(element){
-        element = $(element);
-        var parent = element.parent();
-        if (!element.val().match(/^[0-9]{1,2}[\/\-][0-9]{1,2}[\/\-](19|20)?[0-9]{2}$/)){
-            parent.addClass('error');
-            if ($('#id_error_completiondate').length == 0) {
-                parent.prepend('<span id="id_error_completiondate" class="error">{$baddate}</span>');
-            }
-            return false;
-        } else {
-            $('#id_error_completiondate').remove();
-            parent.removeClass('error');
-            return true;
-        }
-    };
-    $('#completiondate').get(0).cohort_validation_func = valfunc;
-    $('#completiondate').change(
-        function(){
-            valfunc(this);
-        }
-    );
-});
-</script>
-JS;
-        return $html;
-    }
-
-    public function handleDialogUpdate($sqlhandler){
-        $date = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), required_param('date', PARAM_TEXT));
-        $operator = required_param('operator', PARAM_INT);
-        $listofids = required_param('selected', PARAM_SEQUENCE);
-        $listofids = explode(',',$listofids);
-        $this->date = $sqlhandler->date = $date;
-        $this->operator = $sqlhandler->operator = $operator;
-        $this->listofids = $sqlhandler->listofids = $listofids;
-        $sqlhandler->write();
-    }
-
-    /**
-     * Get the description of this rule for the list of rules
-     * @param int $ruleid
-     * @param boolean $static only display static description, without action controls
-     * @return string
-     */
-    public function getRuleDescription($ruleid, $static=true) {
-        global $DB, $CFG;
-        if (!isset($this->operator) || !isset($this->listofids)) {
-            return get_string('error:rulemissingparams', 'totara_cohort');
-        }
-        switch ($this->operator) {
-            case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
-                $getstr = 'pcdatedescbefore';
-                break;
-            case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
-                $getstr = 'pcdatedescafter';
-                break;
-        }
-        $ret = get_string(
-            $getstr,
-            'totara_cohort',
-            userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false)
-        );
-
-        list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
-        $sqlparams[] = $ruleid;
-        $sql = "SELECT p.id, p.fullname, crp.id AS paramid
-            FROM {prog} p
-            INNER JOIN {cohort_rule_params} crp ON p.id = " . $DB->sql_cast_char2int('crp.value') . "
-            WHERE p.id {$sqlin}
-            AND crp.name = 'listofids' AND crp.ruleid = ?
-            ORDER BY sortorder, fullname";
-        $proglist = $DB->get_records_sql($sql, $sqlparams);
-
-        foreach ($proglist as $i => $p) {
-            $value = '"' . $p->fullname . '"';
+            $value = '"' . format_string($p->fullname) . '"';
             if (!$static) {
                 $value .= $this->param_delete_action_icon($p->paramid);
             }

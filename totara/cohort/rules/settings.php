@@ -463,7 +463,8 @@ function cohort_rules_list(){
             'learning',
             'coursecompletionlist',
             new cohort_rule_ui_picker_course_allanynotallnone(
-                get_string('ruledesc-learning-coursecompletionlist', 'totara_cohort')
+                get_string('ruledesc-learning-coursecompletionlist', 'totara_cohort'),
+                COHORT_PICKER_COURSE_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_list_course()
         );
@@ -471,8 +472,9 @@ function cohort_rules_list(){
         $rules[] = new cohort_rule_option(
             'learning',
             'coursecompletiondate',
-            new cohort_rule_ui_picker_course_date(
-                get_string('ruledesc-learning-coursecompletiondate', 'totara_cohort')
+            new cohort_rule_ui_picker_course_program_date(
+                get_string('ruledesc-learning-coursecompletiondate', 'totara_cohort'),
+                COHORT_PICKER_COURSE_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_date_course()
         );
@@ -481,7 +483,8 @@ function cohort_rules_list(){
             'learning',
             'coursecompletionduration',
             new cohort_rule_ui_picker_course_duration(
-                get_string('ruledesc-learning-coursecompletionduration', 'totara_cohort')
+                get_string('ruledesc-learning-coursecompletionduration', 'totara_cohort'),
+                COHORT_PICKER_COURSE_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_duration_course()
         );
@@ -490,7 +493,8 @@ function cohort_rules_list(){
             'learning',
             'programcompletionlist',
             new cohort_rule_ui_picker_program_allanynotallnone(
-                get_string('ruledesc-learning-programcompletionlist', 'totara_cohort')
+                get_string('ruledesc-learning-programcompletionlist', 'totara_cohort'),
+                COHORT_PICKER_PROGRAM_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_list_program()
         );
@@ -498,8 +502,9 @@ function cohort_rules_list(){
         $rules[] = new cohort_rule_option(
             'learning',
             'programcompletiondate',
-            new cohort_rule_ui_picker_program_date(
-                get_string('ruledesc-learning-programcompletiondate', 'totara_cohort')
+            new cohort_rule_ui_picker_course_program_date(
+                get_string('ruledesc-learning-programcompletiondate', 'totara_cohort'),
+                COHORT_PICKER_PROGRAM_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_date_program()
         );
@@ -508,7 +513,8 @@ function cohort_rules_list(){
             'learning',
             'programcompletionduration',
             new cohort_rule_ui_picker_program_duration(
-                get_string('ruledesc-learning-programcompletionduration', 'totara_cohort')
+                get_string('ruledesc-learning-programcompletionduration', 'totara_cohort'),
+                COHORT_PICKER_PROGRAM_COMPLETION
             ),
             new cohort_rule_sqlhandler_completion_duration_program()
         );

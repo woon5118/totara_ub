@@ -51,7 +51,10 @@ local_js(array(
 
 // Include cohort rule js module
 $args = array('args' => '{"cohortid":' . $id . '}');
-$PAGE->requires->strings_for_js(array('addrule', 'orcohort', 'andcohort', 'or', 'and', 'rulesupdatesuccess'), 'totara_cohort');
+$PAGE->requires->strings_for_js(
+    array('error:baddate', 'error:badduration', 'addrule', 'orcohort', 'andcohort', 'or', 'and', 'rulesupdatesuccess'),
+    'totara_cohort');
+$PAGE->requires->strings_for_js(array('datepickerlongyearregexjs', 'datepickerlongyeardisplayformat'), 'totara_core');
 $jsmodule = array(
         'name' => 'totara_cohortrules',
         'fullpath' => '/totara/cohort/rules/ruledialog.js',
