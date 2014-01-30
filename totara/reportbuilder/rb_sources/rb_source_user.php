@@ -428,7 +428,7 @@ class rb_source_user extends rb_base_source {
         $goal_link = html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
 
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        $show_plan_link = !empty($CFG->enablelearningplans) && dp_can_view_users_plans($userid);
+        $show_plan_link = totara_feature_visible('learningplans') && dp_can_view_users_plans($userid);
         $links = html_writer::start_tag('ul');
         $links .= $show_plan_link ? html_writer::tag('li', $plan_link) : '';
         $links .= html_writer::tag('li', $profile_link);
@@ -436,15 +436,15 @@ class rb_source_user extends rb_base_source {
         $links .= html_writer::tag('li', $rol_link);
         // Hide link for temporary managers.
         $tempman = totara_get_manager($userid, null, false, true);
-        if ((!$tempman || $tempman->id != $USER->id) && $CFG->enableappraisals) {
+        if ((!$tempman || $tempman->id != $USER->id) && totara_feature_visible('appraisals')) {
             $links .= html_writer::tag('li', $appraisal_link);
         }
 
-        if (!empty($CFG->enablefeedback360)) {
+        if (totara_feature_visible('feedback360')) {
             $links .= html_writer::tag('li', $feedback_link);
         }
 
-        if (!empty($CFG->enablegoals)) {
+        if (totara_feature_visible('goals')) {
             $links .= html_writer::tag('li', $goal_link);
         }
         $links .= html_writer::tag('li', $required_link);

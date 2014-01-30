@@ -25,7 +25,11 @@
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 require_once('edit_form.php');
+
+// Check if Goals are enabled.
+goal::check_feature_enabled();
 
 //
 // Setup / loading data.

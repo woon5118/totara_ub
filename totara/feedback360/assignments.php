@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib/assign/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Check if 360 Feedbacks are enabled.
+feedback360::check_feature_enabled();
+
 // Get the feedback360 id.
 $itemid = required_param('id', PARAM_INT);
 $module = 'feedback360';

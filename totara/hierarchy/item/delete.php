@@ -41,6 +41,8 @@ $id     = required_param('id', PARAM_INT);
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
 $page  = optional_param('page', 0, PARAM_INT);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 $item = $hierarchy->get_item($id);

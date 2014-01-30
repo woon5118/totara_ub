@@ -39,6 +39,14 @@ $viewtype = optional_param('viewtype', 'program', PARAM_TEXT);
 $perpage = optional_param('perpage', $CFG->coursesperpage, PARAM_INT);
 // Search words.
 $search = optional_param('search', '', PARAM_RAW);
+
+// Check if programs or certifications are enabled.
+if ($viewtype == 'program') {
+    check_program_enabled();
+} else {
+    check_certification_enabled();
+}
+
 if (!$id && !empty($search)) {
     $searchcriteria = array('search' => $search);
 } else {

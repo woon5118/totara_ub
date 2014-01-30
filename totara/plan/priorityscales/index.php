@@ -29,6 +29,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once('../lib.php');
 require_once('lib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $delete = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $moveup = optional_param('moveup', null, PARAM_INT);

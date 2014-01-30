@@ -725,7 +725,7 @@ class totara_core_renderer extends plugin_renderer_base {
         }
 
         // Learning plans.
-        if (!empty($CFG->enablelearningplans) && dp_can_view_users_plans($userid)) {
+        if (totara_feature_visible('learningplans') && dp_can_view_users_plans($userid)) {
             $strplans = get_string('learningplans', 'totara_plan');
             $urlplans = new moodle_url('/totara/plan/index.php', array('userid' => $userid));
             echo html_writer::tag('dt', $strplans);

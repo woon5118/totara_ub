@@ -36,6 +36,8 @@ $id      = optional_param('id', 0, PARAM_INT);    // type id; 0 if creating a ne
 $page       = optional_param('page', 0, PARAM_INT);
 $returnurl = $CFG->wwwroot . '/totara/hierarchy/type/index.php?prefix='. $prefix;
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // If the hierarchy prefix has type editing files use them else use the generic files

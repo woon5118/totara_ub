@@ -47,6 +47,8 @@ $movedown       = optional_param('movedown', 0, PARAM_INT);
 $search         = optional_param('search', '', PARAM_TEXT);
 $format         = optional_param('format', '', PARAM_TEXT);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $sitecontext    = context_system::instance();
 $shortprefix    = hierarchy::get_short_prefix($prefix);
 $searchactive = (strlen(trim($search)) > 0);

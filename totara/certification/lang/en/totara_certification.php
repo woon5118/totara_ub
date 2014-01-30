@@ -52,6 +52,7 @@ $string['certificationdeletesuccess'] = 'Certification "{$a}" deleted sucessfull
 $string['certificationdetailssaved'] = 'Certification details saved';
 $string['certificationhistory'] = 'Previous Certification';
 $string['certifications'] = 'Certifications';
+$string['certificationsdisabled'] = 'Certifications are not enabled on this site';
 $string['certificationsinthiscategory'] = 'Certifications in this category';
 $string['certifdeletefail'] = 'Could not delete certification "{$a}"';
 $string['certifname'] = 'Certification name';

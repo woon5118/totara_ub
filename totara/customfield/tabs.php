@@ -46,8 +46,10 @@ $inactive = array();
 
 $row[] = new tabobject('course', new moodle_url('/totara/customfield/index.php', array('prefix' => 'course')),
         get_string('courses'));
-$row[] = new tabobject('program', new moodle_url('/totara/customfield/index.php', array('prefix' => 'program')),
+if (totara_feature_visible('programs') || totara_feature_visible('certifications')) {
+    $row[] = new tabobject('program', new moodle_url('/totara/customfield/index.php', array('prefix' => 'program')),
         get_string('programscerts', 'totara_program'));
+}
 
 $tabs[] = $row;
 $activated[] = $currenttab;

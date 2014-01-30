@@ -42,6 +42,8 @@ $show        = optional_param('show', 0, PARAM_INT);
 $moveup      = optional_param('moveup', 0, PARAM_INT);
 $movedown    = optional_param('movedown', 0, PARAM_INT);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // Cache user capabilities.

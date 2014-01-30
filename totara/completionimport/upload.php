@@ -145,10 +145,12 @@ echo format_text(get_string('uploadcourseintro', 'totara_completionimport', $col
 $courseform->display();
 
 // Display upload certification heading + fields to import.
-echo $OUTPUT->heading(get_string('uploadcertification', 'totara_completionimport'), 3);
-$columnnames = implode(',', get_columnnames('certification'));
-echo format_text(get_string('uploadcertificationintro', 'totara_completionimport', $columnnames));
-$certform->display();
+if (totara_feature_visible('certifications')) {
+    echo $OUTPUT->heading(get_string('uploadcertification', 'totara_completionimport'), 3);
+    $columnnames = implode(',', get_columnnames('certification'));
+    echo format_text(get_string('uploadcertificationintro', 'totara_completionimport', $columnnames));
+    $certform->display();
+}
 
 if ($filesource == TCI_SOURCE_EXTERNAL) {
     $importurl = new moodle_url('/totara/completionimport/upload.php', array('filesource' => TCI_SOURCE_UPLOAD));

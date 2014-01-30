@@ -49,6 +49,13 @@ $PAGE->set_context($programcontext);
 
 customfield_load_data($program, 'program', 'prog');
 
+// Check if programs or certifications are enabled.
+if ($iscertif) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 // Redirect to delete page if deleting.
 if ($action == 'delete') {
     redirect(new moodle_url('/totara/program/delete.php', array('id' => $id, 'category' => $category)));

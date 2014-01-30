@@ -48,7 +48,9 @@ $ADMIN->add('totara_completionimport',
                 'totara_completionimport_certification',
                 get_string('report_certification', 'totara_completionimport'),
                 new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'certification')),
-                array('totara/completionimport:import')));
+                array('totara/completionimport:import'),
+                totara_feature_disabled('certifications')
+        ));
 
 $ADMIN->add('totara_completionimport',
         new admin_externalpage(

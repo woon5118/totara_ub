@@ -96,7 +96,9 @@ function totara_hierarchy_cron() {
     require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/cron.php');
 
     competency_cron();
-    goal_cron();
+    if (!totara_feature_disabled('goals')) {
+        goal_cron();
+    }
 }
 
 /**
@@ -2803,5 +2805,27 @@ class hierarchy {
             'canviewitems', 'cancreatescales', 'canupdatescales', 'candeletescales', 'canmanagescales',
             'hierarchyhasscales', 'canviewscales', 'canmanage', 'canview');
         return $out;
+    }
+
+    /**
+     * Check if the hierarchy is enabled
+     *
+     * @access  public
+     * @param   $prefix   string  Hierarchy prefix
+     */
+    public static function check_enable_hierarchy($prefix) {
+        global $CFG;
+
+        // $prefix could be user input so sanitize.
+        $prefix = clean_param($prefix, PARAM_ALPHA);
+
+        // Check file exists.
+        $libpath = $CFG->dirroot.'/totara/hierarchy/prefix/'.$prefix.'/lib.php';
+        if (file_exists($libpath)) {
+            require_once $libpath;
+            if (method_exists($prefix, 'check_feature_enabled')) {
+                call_user_func(array($prefix, 'check_feature_enabled'));
+            }
+        }
     }
 }

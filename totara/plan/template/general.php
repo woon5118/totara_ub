@@ -32,6 +32,9 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once('template_forms.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $id = required_param('id', PARAM_INT);
 $notice = optional_param('notice', 0, PARAM_INT); // notice flag
 

@@ -28,8 +28,11 @@ require_once($CFG->dirroot.'/totara/appraisal/lib.php');
  * Run cron for appraisal
  */
 function appraisal_cron($time = 0) {
-    if (!$time) {
-        $time = time();
+    // Execute the cron if Appraisals are not disabled.
+    if (!totara_feature_disabled('appraisals')) {
+        if (!$time) {
+            $time = time();
+        }
+        appraisal_event_handler::send_scheduled($time);
     }
-    appraisal_event_handler::send_scheduled($time);
 }

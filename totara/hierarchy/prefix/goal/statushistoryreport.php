@@ -25,6 +25,10 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+
+// Check if Goals are enabled.
+goal::check_feature_enabled();
 
 $itemandscope = optional_param('itemandscope', null, PARAM_TEXT);
 $userid = optional_param('userid', null, PARAM_INT);

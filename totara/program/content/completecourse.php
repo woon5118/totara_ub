@@ -36,6 +36,17 @@ $programid = required_param('progid', PARAM_INT);
 
 require_login();
 
+if (!$program = new program($id)) {
+    print_error('error:programid', 'totara_program');
+}
+
+// Check if programs or certifications are enabled.
+if ($program->certifid) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }

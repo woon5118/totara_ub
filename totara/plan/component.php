@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/totara/plan/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 require_once($CFG->libdir.'/completionlib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 //
 // Load parameters
 //

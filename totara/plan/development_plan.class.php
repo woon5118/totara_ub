@@ -398,7 +398,7 @@ class development_plan {
      * @return string $out
      */
     function display_summary_widget() {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $CFG;
 
         $link = html_writer::link(new moodle_url('/totara/plan/view.php', array('id' => $this->id)), $this->name);
         $out = $OUTPUT->container($link, 'dp-summary-widget-title');
@@ -407,6 +407,11 @@ class development_plan {
         $pendingitems = $this->num_pendingitems();
         $content = '';
         $count = 1;
+
+        if (!totara_feature_visible('programs')) {
+            $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
+        }
+
         foreach ($components as $c) {
             $component = $this->get_component($c->component);
             $compname = get_string($component->component.'plural', 'totara_plan');
@@ -1642,6 +1647,10 @@ class development_plan {
 
         // get active components in correct order
         $components = $this->get_components();
+
+        if (!totara_feature_visible('programs')) {
+            $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
+        }
 
         if ($components) {
             foreach ($components as $component) {

@@ -384,7 +384,7 @@ function dp_get_rol_tabs_visible($userid) {
 
     $sql = 'SELECT COUNT(id) FROM {prog_user_assignment} WHERE userid = :uid AND exceptionstatus != :eid';
     $assigned_progs = $DB->count_records_sql($sql, array('uid' => $userid, 'eid' => PROGRAM_EXCEPTION_RAISED));
-    if ($assigned_progs > 0 || $show_program_tab) {
+    if (($assigned_progs > 0 || $show_program_tab) && totara_feature_visible('programs')) {
         $visible[] = 'programs';
     }
 
@@ -392,7 +392,7 @@ function dp_get_rol_tabs_visible($userid) {
 
     $certification_progs = prog_get_certification_programs($userid, '', '', '', true, true);
     $unassignedcertifications = $DB->record_exists('certif_completion_history', array('userid' => $userid, 'unassigned' => 1));
-    if (($certification_progs > 0) || ($unassignedcertifications)) {
+    if (($certification_progs > 0 || $unassignedcertifications) && totara_feature_visible('certifications')) {
         $visible[] = 'certifications';
     }
 
@@ -723,7 +723,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     global $OUTPUT, $DB, $CFG;
     $list = array();
     $attr = array();
-    $enableplans = !empty($CFG->enablelearningplans);
+    $enableplans = totara_feature_visible('learningplans');
 
     $out = $OUTPUT->container_start(null, 'dp-plans-menu');
 
@@ -812,6 +812,8 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
         $programs = prog_get_required_programs($userid, ' ORDER BY fullname ASC ', '', '', false, true);
         $certifications = prog_get_certification_programs($userid, ' ORDER BY fullname ASC ', '', '', false, true, true);
         if ($programs || $certifications) {
+            $canviewprograms = totara_feature_visible('programs');
+            $canviewcertifications = totara_feature_visible('certifications');
             $extraparams = array();
             $headingclass = 'main';
             if ($role == 'manager') {
@@ -821,12 +823,12 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
             }
             $out .= $OUTPUT->heading(get_string('requiredlearning', 'totara_program'), 3, $headingclass);
 
-            if ($programs) {
+            if ($programs && $canviewprograms) {
                 $list = dp_display_plans_menu_required($programs, $extraparams);
                 $out .= $OUTPUT->heading(get_string('programs', 'totara_program'), 5);
                 $out .= html_writer::alist($list, $attr);
             }
-            if ($certifications) {
+            if ($certifications && $canviewcertifications) {
                 $list = dp_display_plans_menu_required($certifications, $extraparams, count($list));
                 $out .= $OUTPUT->heading(get_string('certifications', 'totara_program'), 5);
                 $out .= html_writer::alist($list, $attr);
@@ -1572,8 +1574,12 @@ function plan_remove_dp_course_assignments($courseid) {
  */
 function totara_plan_cron() {
     global $CFG;
-    require_once($CFG->dirroot . '/totara/plan/cron.php');
-    plan_cron();
+
+    // Run cron if Learning plans are enabled.
+    if (!totara_feature_disabled('learningplans')) {
+        require_once($CFG->dirroot . '/totara/plan/cron.php');
+        plan_cron();
+    }
 }
 
 
@@ -1589,4 +1595,14 @@ function display_rol_tab_for_component($component) {
     $enabled = $component->get_setting('enabled');
 
     return $enabled && $items;
+}
+
+/**
+ * Prints an error if Learning Plan is not enabled
+ *
+ */
+function check_learningplan_enabled() {
+    if (totara_feature_disabled('learningplans')) {
+        print_error('learningplansdisabled', 'totara_plan');
+    }
 }

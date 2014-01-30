@@ -38,6 +38,8 @@ $prefix        = required_param('prefix', PARAM_ALPHA);
 $edit        = optional_param('edit', -1, PARAM_BOOL);
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // @todo add capabilities

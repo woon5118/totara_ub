@@ -35,7 +35,16 @@ require_login();
 $id = required_param('id', PARAM_INT); // program id
 $viewtype = optional_param('viewtype', 'program', PARAM_TEXT); // Type of a page, program or certification.
 
-$program = new program($id);
+if (!$program = new program($id)) {
+    print_error('error:programid', 'totara_program');
+}
+
+// Check if programs or certifications are enabled.
+if ($program->certifid) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
 
 $PAGE->set_context(context_program::instance($program->id));
 $PAGE->set_url('/totara/program/view.php', array('id' => $id, 'viewtype' => $viewtype));

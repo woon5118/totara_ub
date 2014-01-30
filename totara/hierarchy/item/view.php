@@ -37,6 +37,8 @@ $frameworkid = optional_param('framework', 0, PARAM_INT);
 $sitecontext = context_system::instance();
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 /*

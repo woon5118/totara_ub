@@ -46,15 +46,22 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
         )
     );
 
-    $ADMIN->add('courses', new admin_externalpage('programmgmt', new lang_string('manageprograms', 'admin'), $CFG->wwwroot . '/totara/program/manage.php',
-                    array('totara/program:createprogram', 'totara/program:configuredetails')));
+    $ADMIN->add('courses', new admin_externalpage('programmgmt', new lang_string('manageprograms', 'admin'),
+        $CFG->wwwroot . '/totara/program/manage.php',
+        array('totara/program:createprogram', 'totara/program:configuredetails'),
+        totara_feature_disabled('programs')
+    ));
 
     $ADMIN->add('courses', new admin_externalpage('managecertifications', new lang_string('managecertifications', 'totara_core'),
-            $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification',
-            array('totara/certification:createcertification', 'totara/certification:configurecertification')));
+        $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification',
+        array('totara/certification:createcertification', 'totara/certification:configurecertification'),
+        totara_feature_disabled('certifications')
+    ));
 
-    $ADMIN->add('courses', new admin_externalpage('coursecustomfields', new lang_string('customfields', 'totara_customfield'), $CFG->wwwroot . '/totara/customfield/index.php?prefix=course',
-                    array('totara/core:createcoursecustomfield', 'totara/core:updatecoursecustomfield', 'totara/core:deletecoursecustomfield')));
+    $ADMIN->add('courses', new admin_externalpage('coursecustomfields', new lang_string('customfields', 'totara_customfield'),
+        $CFG->wwwroot . '/totara/customfield/index.php?prefix=course',
+        array('totara/core:createcoursecustomfield', 'totara/core:updatecoursecustomfield', 'totara/core:deletecoursecustomfield')
+    ));
 
     $ADMIN->add('courses', new admin_externalpage('customicons', new lang_string('customicons', 'totara_core'), $CFG->wwwroot . '/totara/core/manage_customicons.php',
         array('moodle/site:config')));

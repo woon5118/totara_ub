@@ -40,6 +40,13 @@ require_login();
 $categoryid = optional_param('category', 0, PARAM_INT); // course category - can be changed in edit form
 $iscertif = optional_param('iscertif', 0, PARAM_INT); // program=0|certification=1 - passed from certification/add.php
 
+// Check if programs or certifications are enabled.
+if ($iscertif) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 $systemcontext = context_system::instance();
 $actualurl = new moodle_url('/totara/program/add.php', array('category' => $categoryid, 'iscertif' => $iscertif));
 

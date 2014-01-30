@@ -26,6 +26,9 @@ require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/item/edit_form.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
+
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $goalpersonalid = optional_param('goalpersonalid', 0, PARAM_INT);
 

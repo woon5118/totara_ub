@@ -37,6 +37,13 @@ if (!empty($CFG->enhancedcatalog)) {
     }
 }
 
+// Check if programs or certifications are enabled.
+if ($viewtype == 'program') {
+    check_program_enabled();
+} else {
+    check_certification_enabled();
+}
+
 $site = get_site();
 
 if ($categoryid) {

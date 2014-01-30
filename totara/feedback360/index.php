@@ -25,6 +25,9 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 
+// Check if 360 Feedbacks are enabled.
+feedback360::check_feature_enabled();
+
 // Set up page.
 require_login();
 

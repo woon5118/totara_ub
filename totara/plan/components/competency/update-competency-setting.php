@@ -29,6 +29,8 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 require_once($CFG->dirroot.'/totara/plan/development_plan.class.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
 
 // 1. Get information
 $competencyid = required_param('competencyid', PARAM_INT);

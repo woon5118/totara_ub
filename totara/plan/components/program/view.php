@@ -29,6 +29,9 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/plan/components/evidence/evidence.class.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 $id = required_param('id', PARAM_INT); // plan id

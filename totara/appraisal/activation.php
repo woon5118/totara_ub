@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib/assign/lib.php');
 require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 $id = required_param('id', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_INT);

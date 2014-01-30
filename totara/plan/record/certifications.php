@@ -29,8 +29,12 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 require_login();
+
+// Check if certifications are enabled.
+check_certification_enabled();
 
 $sid = optional_param('sid', '0', PARAM_INT);
 $certifid = optional_param('certifid', null, PARAM_INT);

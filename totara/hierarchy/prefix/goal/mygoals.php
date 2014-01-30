@@ -26,6 +26,9 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
+
 $userid     = optional_param('userid', $USER->id, PARAM_INT);  // Show goals of this user.
 $edit       = optional_param('edit', -1, PARAM_BOOL);    // Turn editing on and off.
 $display    = optional_param('display', false, PARAM_BOOL); // Determines whether or not to show the goal details in the table.

@@ -72,20 +72,22 @@
 
     // Goals.
 
-    $ADMIN->add('hierarchies', new admin_category('goals', get_string('goals', 'totara_hierarchy'), empty($CFG->enablegoals)));
+    $ADMIN->add('hierarchies', new admin_category('goals', get_string('goals', 'totara_hierarchy'),
+        totara_feature_disabled('goals')
+    ));
 
     $ADMIN->add('goals', new admin_externalpage('goalmanage', get_string('goalmanage', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=goal",
             array('totara/hierarchy:creategoalframeworks', 'totara/hierarchy:updategoalframeworks', 'totara/hierarchy:deletegoalframeworks',
                   'totara/hierarchy:creategoal', 'totara/hierarchy:updategoal', 'totara/hierarchy:deletegoal',
                   'totara/hierarchy:creategoalscale', 'totara/hierarchy:updategoalscale', 'totara/hierarchy:deletegoalscale'),
-            empty($CFG->enablegoals)));
+            totara_feature_disabled('goals')));
 
     $ADMIN->add('goals', new admin_externalpage('goaltypemanage', get_string('managegoaltypes', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal",
             array('totara/hierarchy:creategoaltype', 'totara/hierarchy:updategoaltype', 'totara/hierarchy:deletegoaltype'),
-            empty($CFG->enablegoals)));
+            totara_feature_disabled('goals')));
 
     $ADMIN->add('goals', new admin_externalpage('goalreport', get_string('goalreports', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/prefix/goal/reports.php",
-            array('totara/hierarchy:viewgoalreport'), empty($CFG->enablegoals)));
+            array('totara/hierarchy:viewgoalreport'), totara_feature_disabled('goals')));

@@ -25,6 +25,9 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 $planuser = optional_param('userid', $USER->id, PARAM_INT); // show plans for this user

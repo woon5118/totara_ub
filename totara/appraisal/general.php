@@ -27,6 +27,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 $id = optional_param('id', 0, PARAM_INT);
 
 admin_externalpage_setup('manageappraisals');

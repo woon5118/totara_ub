@@ -1414,4 +1414,15 @@ class goal extends hierarchy {
 
         return $permissions;
     }
+
+    /**
+     * Check if goal feature is disabled
+     *
+     * @return Nothing but print an error if goals are not enabled
+     */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('goals')) {
+            print_error('goalsdisabled', 'totara_hierarchy');
+        }
+    }
 }

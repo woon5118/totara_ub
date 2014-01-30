@@ -41,6 +41,13 @@ $program = new program($id);
 $iscertif = $program->certifid ? true : false;
 $programcontext = $program->get_context();
 
+// Check if programs or certifications are enabled.
+if ($iscertif) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 if (!has_capability('totara/program:configureassignments', $programcontext)) {
     print_error('error:nopermissions', 'totara_program');
 }

@@ -342,7 +342,12 @@ $string['competencyupdatedframework'] = 'The competency framework "{$a}" has bee
 $string['competencyupdatetype'] = 'The competency type "{$a}" has been updated';
 $string['competent'] = 'Competent';
 $string['competentwithsupervision'] = 'Competent with supervision';
-$string['configenablegoals'] = 'If not checked, navigation links to Goals will not be shown';
+$string['configenablegoals'] = 'This option will let you: Enable(show)/Hide/Disable Goal features from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to goals will be accessible.
+* If Hide is chosen, all links and tabs related to goals will be hidden.
+* If Disable is chosen, goals will disappear from any menu on the site and will not be accessible.
+';
 $string['confirmmoveitems'] = 'Are you sure you want to move {$a->num} {$a->items} into "{$a->parentname}"?<br /><br />Any children of the {$a->items} being moved will also be relocated at the same time.';
 $string['confirmpersonaldelete'] = 'Are you sure you want to delete {$a->username}\'s personal goal {$a->goalname}';
 $string['confirmproceed'] = 'Are you sure you want to proceed?';
@@ -410,7 +415,7 @@ $string['editposition'] = 'Edit position';
 $string['editscalevalue'] = 'Edit scale value';
 $string['edittype'] = 'Edit type';
 $string['edittypelevel'] = 'Edit type';
-$string['enablegoals'] = 'Show Goals';
+$string['enablegoals'] = 'Enable Goals';
 $string['enternamesoneperline'] = 'Enter {$a} names (one per line)';
 $string['entervaliddate'] = 'Enter a valid date';
 $string['error:addcompetency'] = 'There was a problem adding the competency "{$a}"';
@@ -691,6 +696,7 @@ A scale value is used to define a learner’s progress for a goal. You can add a
 $string['goalscalevaluenumeric'] = 'Goal Scale Numeric Value';
 $string['goalscalevaluenumericalvalue'] = 'Scale value numerical value';
 $string['goalscalevaluenumericalvalue_help'] = 'Scale value numerical value is the numerical value associated with the scale value. The scale value must be within the range -99999.99999 to 99999.99999 with no more than 5 decimal places.';
+$string['goalsdisabled'] = 'Goals are not enabled on this site';
 $string['goalshortname'] = 'Goal short name';
 $string['goalshortname_help'] = 'Goal short name is the quick reference name of the goal and can be used for display purposes.';
 $string['goalstatushistoryreportfor'] = 'Goal status history report: ';

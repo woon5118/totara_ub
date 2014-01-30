@@ -24,6 +24,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 $debug = optional_param('debug', 0, PARAM_INT);
 
@@ -34,6 +35,8 @@ $PAGE->set_url('/totara/coursecatalog/certifications.php');
 if ($CFG->forcelogin) {
     require_login();
 }
+
+check_certification_enabled();
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 $strheading = get_string('searchcertifications', 'totara_certification');

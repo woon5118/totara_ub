@@ -35,10 +35,12 @@ require_once($CFG->dirroot.'/totara/certification/lib.php');
  * @return  void
  */
 function certification_cron() {
-    $result = true;
+    $result = false;
 
-    // Run the tasks that should be run hourly.
-    $result = $result && certification_hourly_cron();
+    if (!totara_feature_disabled('certifications')) {
+        // Run the tasks that should be run hourly.
+        $result = certification_hourly_cron();
+    }
 
     return $result;
 }

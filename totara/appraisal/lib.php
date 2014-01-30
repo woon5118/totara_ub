@@ -1398,6 +1398,16 @@ class appraisal {
         return null;
     }
 
+    /**
+     * Prints an error if Appraisal is not enabled
+     *
+     */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('appraisals')) {
+            print_error('appraisalsdisabled', 'totara_appraisal');
+        }
+    }
+
 }
 
 

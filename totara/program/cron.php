@@ -38,6 +38,12 @@ require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 function program_cron() {
     $result = true;
 
+    // Don't run programs cron if programs and certifications are disabled.
+    if (totara_feature_disabled('programs') &&
+        totara_feature_disabled('certifications')) {
+        return false;
+    }
+
     // Run the tasks that should be run once a day
     $result = $result && program_daily_cron();
 

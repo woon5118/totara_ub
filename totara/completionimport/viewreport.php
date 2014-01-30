@@ -30,6 +30,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/completionimport/lib.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 $importname = optional_param('importname', 'course', PARAM_ALPHA);
 $timecreated = optional_param('timecreated', null, PARAM_INT);
@@ -39,6 +40,9 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $pageparams = array('importname' => $importname, 'importuserid' => $importuserid, 'timecreated' => $timecreated);
 
 require_login();
+
+// Check if certifications are enabled.
+check_certification_enabled();
 
 $context = context_system::instance();
 $PAGE->set_context($context);

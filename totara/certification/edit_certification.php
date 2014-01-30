@@ -34,6 +34,9 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once('edit_certification_form.php');
 
+// Check if certifications are enabled.
+check_certification_enabled();
+
 $id = required_param('id', PARAM_INT); // Certification id.
 
 require_login();

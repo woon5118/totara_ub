@@ -797,6 +797,15 @@ class feedback360 {
         return array();
     }
 
+    /**
+     * Prints an error if Feedback 360 is not enabled
+     *
+     */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('feedback360')) {
+            print_error('feedback360disabled', 'totara_feedback360');
+        }
+    }
 }
 
 /**

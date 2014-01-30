@@ -27,6 +27,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $debug = optional_param('debug', 0, PARAM_INT);

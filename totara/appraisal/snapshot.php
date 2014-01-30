@@ -27,6 +27,9 @@ require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 require_login();
 
 // Set system context.

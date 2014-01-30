@@ -41,6 +41,8 @@ $itemid      = optional_param('itemid', 0, PARAM_INT);
 $page        = optional_param('page', 0, PARAM_INT);
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // the form can be used to modify individual items and all items in a type

@@ -25,6 +25,9 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
+
 // Permissions.
 require_sesskey();
 

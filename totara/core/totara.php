@@ -28,6 +28,9 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 define('PUBLIC_KEY_PATH', $CFG->dirroot . '/totara_public.pem');
+define('TOTARA_SHOWFEATURE', 1);
+define('TOTARA_HIDEFEATURE', 2);
+define('TOTARA_DISABLEFEATURE', 3);
 
 /**
  * This function loads the program settings that are available for the user
@@ -1641,7 +1644,7 @@ function totara_build_menu() {
     }
 
     require_once($CFG->dirroot . '/totara/plan/lib.php');
-    $canviewlearningplans = !empty($CFG->enablelearningplans) && dp_can_view_users_plans($USER->id);
+    $canviewlearningplans = totara_feature_visible('learningplans') && dp_can_view_users_plans($USER->id);
     $requiredlearninglink = prog_get_tab_link($USER->id);
 
     require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
@@ -1649,6 +1652,9 @@ function totara_build_menu() {
         $reportbuilder_permittedreports = reportbuilder::get_permitted_reports();
     }
     $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
+
+    $viewprograms = totara_feature_visible('programs');
+    $viewcertifications = totara_feature_visible('certifications');
 
     $tree = array();
 
@@ -1671,10 +1677,11 @@ function totara_build_menu() {
     require_once($CFG->dirroot . '/totara/appraisal/lib.php');
     require_once($CFG->dirroot . '/totara/feedback360/lib.php');
     require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
-    $viewownappraisals = !empty($CFG->enableappraisals) && appraisal::can_view_own_appraisals($USER->id);
-    $viewappraisals = !empty($CFG->enableappraisals) && ($viewownappraisals || appraisal::can_view_staff_appraisals($USER->id));
-    $viewfeedback360s = !empty($CFG->enablefeedback360) && feedback360::can_view_feedback360s($USER->id);
-    $viewgoals = !empty($CFG->enablegoals) && goal::can_view_goals($USER->id);
+    $isappraisalenabled = totara_feature_visible('appraisals');
+    $viewownappraisals = $isappraisalenabled && appraisal::can_view_own_appraisals($USER->id);
+    $viewappraisals = $isappraisalenabled && ($viewownappraisals || appraisal::can_view_staff_appraisals($USER->id));
+    $viewfeedback360s = totara_feature_visible('feedback360') && feedback360::can_view_feedback360s($USER->id);
+    $viewgoals = totara_feature_visible('goals') && goal::can_view_goals($USER->id);
     if ($viewappraisals || $viewfeedback360s || $viewgoals) {
         if ($viewownappraisals) {
             $tree[] = (object)array(
@@ -1763,7 +1770,8 @@ function totara_build_menu() {
         'url' => '/totara/plan/record/index.php'
     );
 
-    if ($requiredlearninglink) {
+    if ($requiredlearninglink &&
+        (totara_feature_visible('programs') || totara_feature_visible('certifications'))) {
         $tree[] = (object)array(
             'name' => 'requiredlearning',
             'linktext' => get_string('requiredlearning', 'totara_program'),
@@ -1816,15 +1824,17 @@ function totara_build_menu() {
         'url' => $findcoursesurl
     );
 
-    $tree[] = (object)array(
-        'name' => 'program',
-        'linktext' => get_string('programs', 'totara_program'),
-        'parent' => 'findlearning',
-        'url' => $findprogsurl
-    );
+    if ($viewprograms) {
+        $tree[] = (object)array(
+            'name' => 'program',
+            'linktext' => get_string('programs', 'totara_program'),
+            'parent' => 'findlearning',
+            'url' => $findprogsurl
+        );
+    }
 
     $plugins = get_plugin_list('totara');
-    if (isset($plugins['certification'])) {
+    if (isset($plugins['certification']) && $viewcertifications) {
         $tree[] = (object)array(
             'name' => 'certification',
             'linktext' => get_string('certifications', 'totara_certification'),
@@ -2259,4 +2269,72 @@ function totara_idnumber_exists($table, $idnumber, $itemid = 0) {
     }
 
     return $duplicate;
+}
+
+/**
+ * List of strings which can be used with 'totara_feature_*() functions'.
+ *
+ * Update this list if you add/remove settings in admin/settings/subsystems.php.
+ *
+ * @return array Array of strings of supported features (should have a matching "enable{$feature}" config setting).
+ */
+function totara_advanced_features_list() {
+    return array(
+        'goals',
+        'appraisals',
+        'feedback360',
+        'learningplans',
+        'programs',
+        'certifications',
+    );
+}
+
+/**
+ * Check the state of a particular Totara feature against the specified state.
+ *
+ * Used by the totara_feature_*() functions to see if some Totara functionality is visible/hidden/disabled.
+ *
+ * @param string $feature Name of the feature to check, must match options from {@link totara_advanced_features_list()}.
+ * @param integer $stateconstant State to check, must match one of TOTARA_*FEATURE constants defined in this file.
+ * @return bool True if the feature's config setting is in the specified state.
+ */
+function totara_feature_check_state($feature, $stateconstant) {
+    global $CFG;
+
+    if (!in_array($feature, totara_advanced_features_list())) {
+        throw new coding_exception("'{$feature}' not supported by Totara feature checking code.");
+    }
+
+    $cfgsetting = "enable{$feature}";
+    return (isset($CFG->$cfgsetting) && $CFG->$cfgsetting == $stateconstant);
+}
+
+/**
+ * Check to see if a feature is set to be visible in Advanced Features
+ *
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is set to be visible.
+ */
+function totara_feature_visible($feature) {
+    return totara_feature_check_state($feature, TOTARA_SHOWFEATURE);
+}
+
+/**
+ * Check to see if a feature is set to be disabled in Advanced Features
+ *
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is disabled.
+ */
+function totara_feature_disabled($feature) {
+    return totara_feature_check_state($feature, TOTARA_DISABLEFEATURE);
+}
+
+/**
+ * Check to see if a feature is set to be hidden in Advanced Features
+ *
+ * @param string $feature The name of the feature from the list in {@link totara_feature_check_support()}.
+ * @return bool True if the feature is hidden.
+ */
+function totara_feature_hidden($feature) {
+    return totara_feature_check_state($feature, TOTARA_HIDEFEATURE);
 }

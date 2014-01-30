@@ -28,14 +28,15 @@ require_once($CFG->libdir . '/formslib.php');
 
 class reset_form extends moodleform {
     public function definition() {
-        global $DB;
         $mform =& $this->_form;
 
         $mform->addElement('checkbox', 'course', get_string('resetcourse', 'totara_completionimport'));
         $mform->setType('course', PARAM_BOOL);
 
-        $mform->addElement('checkbox', 'certification', get_string('resetcertification', 'totara_completionimport'));
-        $mform->setType('certification', PARAM_BOOL);
+        if (!totara_feature_disabled('certifications')) {
+            $mform->addElement('checkbox', 'certification', get_string('resetcertification', 'totara_completionimport'));
+            $mform->setType('certification', PARAM_BOOL);
+        }
 
         $this->add_action_buttons(false, get_string('resetabove', 'totara_completionimport'));
 

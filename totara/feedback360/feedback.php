@@ -29,6 +29,9 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/feedback360_forms.php');
 
+// Check if 360 Feedbacks are enabled.
+feedback360::check_feature_enabled();
+
 $preview = optional_param('preview', 0, PARAM_INT);
 $viewanswer = optional_param('myfeedback', 0, PARAM_INT);
 $returnurl = new moodle_url('/totara/feedback360/index.php');

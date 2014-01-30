@@ -31,6 +31,9 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $id = optional_param('id', null, PARAM_INT);
 
 admin_externalpage_setup('managetemplates');

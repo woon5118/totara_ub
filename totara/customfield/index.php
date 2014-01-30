@@ -42,6 +42,10 @@ $sitecontext = context_system::instance();
 if (in_array($prefix, array('course', 'program'))) {
     if ($prefix == 'program') {
         $tableprefix = $shortprefix = 'prog';
+        if (totara_feature_disabled('programs') &&
+            totara_feature_disabled('certifications')) {
+            print_error('programsandcertificationsdisabled', 'totara_program');
+        }
     } else {
         $tableprefix = $shortprefix = $prefix;
     }

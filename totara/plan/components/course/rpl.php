@@ -27,6 +27,9 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/plan/components/course/rpl_form.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $id = required_param('id', PARAM_INT);
 $courseid = required_param('courseid', PARAM_INT);
 

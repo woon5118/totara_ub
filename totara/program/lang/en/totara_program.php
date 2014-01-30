@@ -154,6 +154,18 @@ $string['completionstatus'] = 'Status';
 $string['completiontimeunknown'] = 'Completion time unknown';
 $string['completiontype'] = 'Completion type';
 $string['completiontype_help'] = 'The operator options (\'Learner must complete\') within the set are \'one course\', meaning OR or \'all courses\', meaning AND. The idea is to keep the flow humanly readable. Depending on the option chosen, the text in front of the courses changes automatically.';
+$string['configenablecertifications'] = 'This option will let you: Enable(show)/Hide/Disable Certifications features from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to certifications will be accessible.
+* If Hide is chosen, all links and tabs related to certifications will be hidden.
+* If Disable is chosen, certifications will disappear from any menu on the site and will not be accessible.
+';
+$string['configenableprograms'] = 'This option will let you: Enable(show)/Hide/Disable Programs features from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to programs will be accessible.
+* If Hide is chosen, all links and tabs related to programs will be hidden.
+* If Disable is chosen, programs will disappear from any menu on the site and will not be accessible.
+';
 $string['confirmassignmentchanges'] = 'Confirm assignment changes';
 $string['confirmcontentchanges'] = 'Confirm content changes';
 $string['confirmmessagechanges'] = 'Confirm message changes';
@@ -222,6 +234,8 @@ $string['editprogramdetails'] = 'Edit program details';
 $string['editprogrammessages'] = 'Edit program messages';
 $string['editprogramroleassignments'] = 'Edit program role assignments';
 $string['editprograms'] = 'Add/edit programs';
+$string['enablecertifications'] = 'Enable Certifications';
+$string['enableprograms'] = 'Enable Programs';
 $string['endnote'] = 'Endnote';
 $string['endnote_help'] = 'Note to be displayed at the end of the program';
 $string['enrolment'] = 'Enrolment';
@@ -654,8 +668,10 @@ $string['programoverviewfiles'] = 'Summary files';
 $string['programoverviewfiles_help'] = 'Program summary files, such as images, are displayed in the list of programs together with the summary.';
 $string['programrecurring'] = 'Program recurring';
 $string['programs'] = 'Programs';
+$string['programsandcertificationsdisabled'] = 'Programs and Certifications are disabled on this site';
 $string['programscomplete'] = 'Programs complete';
 $string['programscerts'] = 'Programs / Certifications';
+$string['programsdisabled'] = 'Programs are not enabled on this site';
 $string['programshortname'] = 'Program short name';
 $string['programshortname_help'] = 'The program shortname will be used in several places where the full name isn\'t appropriate (such us in the subject line of an alert message).';
 $string['programsinthiscategory'] = 'Programs in this category ({$a})';

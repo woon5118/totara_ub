@@ -40,6 +40,8 @@ $prefix = required_param('prefix', PARAM_ALPHA);
 // Delete confirmation hash
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // Setup page and check permissions

@@ -32,6 +32,9 @@ $goalid         = required_param('goalid', PARAM_INT);
 $assigntype     = required_param('assigntype', PARAM_INT);
 $modid          = required_param('modid', PARAM_INT);
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
+
 // Delete confirmation hash.
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
 

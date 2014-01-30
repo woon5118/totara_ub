@@ -27,6 +27,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/renderer.php');
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
+
 admin_externalpage_setup('goalreport');
 $systemcontext = context_system::instance();
 

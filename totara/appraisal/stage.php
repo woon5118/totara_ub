@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 admin_externalpage_setup('manageappraisals');
 $systemcontext = context_system::instance();
 require_capability('totara/appraisal:managepageelements', $systemcontext);

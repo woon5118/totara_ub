@@ -27,6 +27,9 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
 $PAGE->set_context(context_system::instance());
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 ///

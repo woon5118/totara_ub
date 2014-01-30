@@ -32,6 +32,9 @@ require_once('add_evidence_form.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/evidence.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 ///
 /// Setup / loading data
 ///

@@ -48,7 +48,7 @@ if ($hassiteconfig || has_any_capability($appraisalcaps, $systemcontext) || has_
             new lang_string('manageappraisals', 'totara_appraisal'),
             new moodle_url('/totara/appraisal/manage.php'),
             $appraisalcaps,
-            empty($CFG->enableappraisals)
+            totara_feature_disabled('appraisals')
         )
     );
 
@@ -57,7 +57,7 @@ if ($hassiteconfig || has_any_capability($appraisalcaps, $systemcontext) || has_
             new lang_string('managefeedback360', 'totara_feedback360'),
             new moodle_url('/totara/feedback360/manage.php'),
             $feedbackcaps,
-            empty($CFG->enablefeedback360)
+            totara_feature_disabled('feedback360')
         )
     );
 
@@ -66,7 +66,7 @@ if ($hassiteconfig || has_any_capability($appraisalcaps, $systemcontext) || has_
             new lang_string('reportappraisals', 'totara_appraisal'),
             new moodle_url('/totara/appraisal/reports.php'),
             $appraisalcaps,
-            empty($CFG->enableappraisals)
+            totara_feature_disabled('appraisals')
         )
     );
 }

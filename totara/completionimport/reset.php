@@ -55,7 +55,7 @@ if ($pageparams['confirm']) {
         if ($pageparams['course']) {
             reset_import('course');
         }
-        if ($pageparams['certification']) {
+        if ($pageparams['certification'] && totara_feature_visible('certifications')) {
             reset_import('certification');
         }
     }

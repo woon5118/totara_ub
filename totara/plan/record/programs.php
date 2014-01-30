@@ -31,8 +31,12 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 require_login();
+
+// Check if programs are enabled.
+check_program_enabled();
 
 global $USER;
 

@@ -34,6 +34,16 @@ $programid = optional_param('id', 0, PARAM_INT);
 $filter = optional_param('filter', 'all', PARAM_TEXT);
 
 $PAGE->set_context(context_system::instance());
+// Check if programs or certifications are enabled.
+if ($filter == 'program') {
+    check_program_enabled();
+} else if ($filter == 'certification') {
+    check_certification_enabled();
+} else if (totara_feature_disabled('programs') &&
+    totara_feature_disabled('certifications')) {
+    print_error('programsandcertificationsdisabled', 'totara_program');
+}
+
 $PAGE->set_url('/totara/program/required.php');
 $PAGE->set_pagelayout('noblocks');
 
@@ -169,7 +179,7 @@ if ($programid) {
     echo html_writer::start_tag('div', array('style' => 'clear: both;')) . html_writer::end_tag('div');
     echo $OUTPUT->container_end();
 
-    if ($filter == 'all' || $filter == 'program') {
+    if (($filter == 'all' || $filter == 'program') && totara_feature_visible('programs')) {
         echo $OUTPUT->container_start('', 'required-learning-list');
         echo $OUTPUT->heading(get_string('programs', 'totara_program'), 4);
 
@@ -184,7 +194,7 @@ if ($programid) {
         echo $OUTPUT->container_end();
     }
 
-    if ($filter == 'all' || $filter == 'certification') {
+    if (($filter == 'all' || $filter == 'certification') && totara_feature_visible('certifications')) {
         echo $OUTPUT->container_start('', 'certification-learning-list');
         echo $OUTPUT->heading(get_string('certifications', 'totara_program'), 4);
 

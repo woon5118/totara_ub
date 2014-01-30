@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Check if Appraisals are enabled.
+appraisal::check_feature_enabled();
+
 // Get the appraisal id.
 $appraisalid = required_param('appraisalid', PARAM_INT);
 $module = 'appraisal';

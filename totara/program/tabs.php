@@ -93,7 +93,8 @@ if (has_capability('totara/program:configuremessages', $context)) {
 }
 
 // Certification Tab
-if ($iscertif && has_capability('totara/certification:configurecertification', $context)) {
+if ($iscertif && has_capability('totara/certification:configurecertification', $context)
+    && totara_feature_visible('certifications')) {
     $toprow[] = new tabobject('certification', $CFG->wwwroot.'/totara/certification/edit_certification.php?id='.$id,
                     get_string('certification', 'totara_certification'));
     if (substr($currenttab, 0, 13) == 'certification') {

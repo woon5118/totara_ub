@@ -43,6 +43,8 @@ $id   = optional_param('id', 0, PARAM_INT);
 $frameworkid = optional_param('frameworkid', 0, PARAM_INT);
 $page       = optional_param('page', 0, PARAM_INT);
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // We require either an id for editing, or a framework for creating

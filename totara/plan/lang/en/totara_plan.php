@@ -309,7 +309,12 @@ $string['componentupdatelongmanager'] = '{$a->component} in learning plan "{$a->
 $string['componentupdatelongmanagerhtml'] = '{$a->component} in learning plan "{$a->planhtml}" updated:<br /> {$a->updateshtml}';
 $string['componentupdateshortlearner'] = '{$a} updated';
 $string['componentupdateshortmanager'] = '{$a->user} updated {$a->component}';
-$string['configenablelearningplans'] = 'If not checked, navigation links to Learning Plans will not be shown';
+$string['configenablelearningplans'] = 'This option will let you: Enable(show)/Hide/Disable Learning Plan features from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to learning plans will be accessible.
+* If Hide is chosen, all links and tabs related to learning plans will be hidden.
+* If Disable is chosen, learning plans will disappear from any menu on the site and will not be accessible.
+';
 $string['confirm'] = 'Confirm';
 $string['confirmcreateplans'] = 'Confirm creation of plans';
 $string['confirmcreateplansmessage'] = 'This will create new learning plans for {$a} user(s).
@@ -413,7 +418,7 @@ $string['editobjective'] = 'Edit objective {$a}';
 $string['editobjectivevalue'] = 'Edit objective value';
 $string['editpriority'] = 'Edit priority {$a}';
 $string['editpriorityvalue'] = 'Edit priority value';
-$string['enablelearningplans'] = 'Show Learning Plans';
+$string['enablelearningplans'] = 'Enable Learning Plans';
 $string['enddate'] = 'End date';
 $string['error:cannotaddscalevalue'] = 'You cannot add a scale value to a scale that is in use';
 $string['error:cannotupdatecompetencies'] = 'Cannot update competencies';
@@ -566,6 +571,7 @@ $string['learner'] = 'Learner';
 $string['learning'] = 'Learning';
 $string['learningplan'] = 'Learning Plan';
 $string['learningplans'] = 'Learning Plans';
+$string['learningplansdisabled'] = 'Learning Plans are not enabled on this site.';
 $string['linkedcompetencies'] = 'Linked competencies';
 $string['linkedcourses'] = 'Linked courses';
 $string['linkedobjectives'] = 'Linked objectives';

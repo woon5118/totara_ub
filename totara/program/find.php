@@ -24,6 +24,7 @@
 
 require_once('../../config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format','', PARAM_TEXT); // Export format.
@@ -36,6 +37,9 @@ $PAGE->set_url('/totara/program/find.php');
 if ($CFG->forcelogin) {
     require_login();
 }
+
+// Check if programs are enabled.
+check_program_enabled();
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 $strheading = get_string('searchprograms', 'totara_program');

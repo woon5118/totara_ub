@@ -40,6 +40,14 @@ require_login();
 $systemcontext = context_system::instance();
 $program = new program($id);
 $iscertif = $program->certifid ? true : false;
+
+// Check if programs or certifications are enabled.
+if ($iscertif) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 $programcontext = $program->get_context();
 
 if (!has_capability('totara/program:configuremessages', $programcontext)) {

@@ -997,5 +997,24 @@ function xmldb_totara_core_upgrade($oldversion) {
         if (!get_config('reportbuilder', 'exporttofilesystempath')) {set_config('exporttofilesystempath', '', 'reportbuilder');}
         totara_upgrade_mod_savepoint(true, 2014031901, 'totara_core');
     }
+
+    if ($oldversion < 2014032000) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/core/totara.php');
+
+        // Set features as they were before (enable/disable).
+        $featureslist = totara_advanced_features_list();
+        foreach ($featureslist as $feature) {
+            $cfgsetting = "enable{$feature}";
+            if (!isset($CFG->$cfgsetting)) {
+                set_config($cfgsetting, TOTARA_SHOWFEATURE);
+            } else if ($CFG->$cfgsetting == 0) {
+                set_config($cfgsetting, TOTARA_HIDEFEATURE);
+            }
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014032000, 'totara_core');
+    }
+
     return true;
 }

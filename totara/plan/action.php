@@ -32,6 +32,9 @@ require_once('../../config.php');
 require_once('lib.php');
 require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 ///

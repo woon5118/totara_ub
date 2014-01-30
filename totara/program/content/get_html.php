@@ -35,6 +35,13 @@ $program = new program($id);
 if (!has_capability('totara/program:configurecontent', $program->get_context())) {
     exit;
 }
+// Check if programs or certifications are enabled.
+if ($program->certifid) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 $programcontent = $program->get_content();
 
 if ($htmltype == 'multicourseset') { // if a new mulitcourse set is being added

@@ -31,6 +31,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 require_once('template_forms.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $id = optional_param('id', null, PARAM_INT);
 $confirm = optional_param('confirm', null, PARAM_ALPHA); // notice flag
 

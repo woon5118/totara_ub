@@ -27,6 +27,9 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 require_once($CFG->dirroot.'/totara/plan/components/evidence/evidence.class.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 $planid = required_param('planid', PARAM_INT);

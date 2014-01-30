@@ -27,6 +27,9 @@ require_once($CFG->dirroot . '/totara/feedback360/feedback360_forms.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 require_once($CFG->dirroot . '/totara/message/messagelib.php');
 
+// Check if 360 Feedbacks are enabled.
+feedback360::check_feature_enabled();
+
 $userid = required_param('userid', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
 

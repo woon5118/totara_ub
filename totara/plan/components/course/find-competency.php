@@ -28,6 +28,9 @@ require_once($CFG->dirroot.'/totara/plan/components/competency/dialog_content_li
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
 $PAGE->set_context(context_system::instance());
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 require_login();
 
 ///

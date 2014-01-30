@@ -33,6 +33,8 @@ $shortprefix = hierarchy::get_short_prefix($prefix);
 $id      = optional_param('id', 0, PARAM_INT);    // 0 if creating a new framework
 $context = context_system::instance();
 
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // If the hierarchy prefix has framework editing files use them else use the generic files

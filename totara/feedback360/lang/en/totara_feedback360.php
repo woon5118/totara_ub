@@ -59,7 +59,11 @@ $string['cancelusersemail'] = 'Cancel existing requests to these external users:
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
 $string['closenow'] = '(Close Now)';
-$string['configenablefeedback360'] = 'If not checked, navigation links to 360 Feedbacks will not be shown';
+$string['configenablefeedback360'] = 'This option will let you: Enable(show)/Hide/Disable 360 Feedback features from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to 360 feedbacks will be accessible.
+* If Hide is chosen, all links and tabs related to 360 feedbacks will be hidden.
+* If Disable is chosen, 360 feedbacks will disappear from any menu on the site and will not be accessible.';
 $string['confirmactivatefeedback360'] = 'Are you sure you want to activate Feedback - {$a}?';
 $string['confirmclosefeedback360'] = 'Are you sure you want to close Feedback - {$a}?';
 $string['confirmdeletefeedback360'] = 'Are you sure you want to delete Feedback - {$a}?';
@@ -91,7 +95,7 @@ $string['emailrequestsnew'] = 'Add External Feedback Request(s)';
 $string['emailrequestsnew_help'] = 'To request feedback from external users, enter one email address per line';
 $string['emailrequesthtml'] = '<p>{$a->fullname} has requested you fill in their feedback form. Please click the link below and fill in the displayed form:<p>
 <p>{$a->link}</p>';
-$string['enablefeedback360'] = 'Show 360 Feedback';
+$string['enablefeedback360'] = 'Enable 360 Feedbacks';
 $string['emailrequeststr'] = '{$a->fullname} has requested you fill in their feedback form. Please visit the URL below and fill in the displayed form:
 {$a->url}';
 $string['emailrequestsubject'] = 'Feedback request from {$a->fullname}';
@@ -143,6 +147,7 @@ $string['feedback360activenochangesallowed'] = 'This 360 Feedback is active, no 
 $string['feedback360cloned'] = 'Successfully cloned Feedback';
 $string['feedback360closed'] = 'Successfully closed Feedback';
 $string['feedback360created'] = 'Successfully created Feedback';
+$string['feedback360disabled'] = '360 Feedbacks are not enabled on this site';
 $string['feedback360fixerrors'] = 'You must fix the following errors prior to feedback activation';
 $string['feedback360notfound'] = 'Feedback form not found';
 $string['feedback360requestdeleted'] = 'Feedback request successfully deleted';

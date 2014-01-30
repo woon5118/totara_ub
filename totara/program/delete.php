@@ -37,6 +37,13 @@ if (!has_capability('totara/program:deleteprogram', $program->get_context())) {
     print_error('error:nopermissions', 'local_program');
 }
 
+// Check if programs or certifications are enabled.
+if ($program->certifid) {
+    check_certification_enabled();
+} else {
+    check_program_enabled();
+}
+
 admin_externalpage_setup('programmgmt', '', array('id' => $id, 'delete' => $delete), $CFG->wwwroot.'/totara/program/delete.php');
 
 $returnurl = "{$CFG->wwwroot}/totara/program/edit.php?id={$program->id}";

@@ -1995,3 +1995,23 @@ function prog_get_all_users_programs($userid, $fields = NULL, $sort = 'visible D
     $programs = $DB->get_records_sql($sql, $params);
     return $programs;
 }
+
+/**
+ * Prints an error if Program is not enabled
+ *
+ */
+function check_program_enabled() {
+    if (totara_feature_disabled('programs')) {
+        print_error('programsdisabled', 'totara_program');
+    }
+}
+
+/**
+ * Prints an error if Certification is not enabled
+ *
+ */
+function check_certification_enabled() {
+    if (totara_feature_disabled('certifications')) {
+        print_error('certificationsdisabled', 'totara_certification');
+    }
+}

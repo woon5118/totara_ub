@@ -31,6 +31,9 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/plan/edit_form.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 global $USER;
 
 require_login();
