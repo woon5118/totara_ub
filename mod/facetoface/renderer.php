@@ -231,10 +231,9 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string html
      */
     public function calendar_filter_controls() {
-        global $DB, $SESSION;
+        global $SESSION;
 
-        // Get fields.
-        $fields = $DB->get_records('facetoface_session_field', array('isfilter' => 1));
+        $fields = facetoface_get_customfield_filters();
 
         $output = '';
         foreach ($fields as $f) {
@@ -255,10 +254,6 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      */
     public function custom_field_chooser($field, $currentval) {
         global $DB;
-
-        if (empty($field->isfilter)) {
-            return false; // not a filter
-        }
 
         $values = array();
         switch ($field->type) {

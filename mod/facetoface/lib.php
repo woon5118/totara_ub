@@ -4649,14 +4649,42 @@ function facetoface_filter_calendar_events(&$events) {
  * @return void
  */
 function facetoface_calendar_set_filter() {
-    global $DB, $SESSION;
+    global $SESSION;
 
-    $fields = $DB->get_records('facetoface_session_field', array('isfilter' => 1));
+    $fields = facetoface_get_customfield_filters();
 
     $SESSION->calendarfacetofacefilter = array();
     foreach ($fields as $f) {
         $SESSION->calendarfacetofacefilter[$f->shortname] = optional_param("field_{$f->shortname}", '', PARAM_TEXT);
     }
+}
+
+/**
+ * Get custom field filters that are currently selected in facetoface settings
+ *
+ * @return array Array of objects if any filter is found, empty array otherwise
+ */
+function facetoface_get_customfield_filters() {
+    global $DB;
+
+    $fields = array();
+    $calendarcustomfields = get_config(null, 'facetoface_calendarfilters');
+    if ($calendarcustomfields) {
+        $customfieldids = array();
+        $calendarcustomfields = explode(',', $calendarcustomfields);
+        foreach ($calendarcustomfields as $filterkey) {
+            if (is_numeric($filterkey)) {
+                $customfieldids[] = $filterkey;
+            }
+        }
+        if (!empty($customfieldids)) {
+            list($sessionfieldids, $params) = $DB->get_in_or_equal($customfieldids);
+            $sql = "SELECT * FROM {facetoface_session_field} WHERE id $sessionfieldids";
+            $fields = $DB->get_records_sql($sql, $params);
+        }
+    }
+
+    return $fields;
 }
 
 /**

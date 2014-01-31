@@ -107,9 +107,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if (empty($fromform->required)) {
         $fromform->required = 0;
     }
-    if (empty($fromform->isfilter)) {
-        $fromform->isfilter = 0;
-    }
     if (empty($fromform->showinsummary)) {
         $fromform->showinsummary = 0;
     }
@@ -133,7 +130,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->defaultvalue = trim($fromform->defaultvalue);
     $todb->possiblevalues = implode(CUSTOMFIELD_DELIMITER, $pos_vals);
     $todb->required = $fromform->required;
-    $todb->isfilter = $fromform->isfilter;
     $todb->showinsummary = $fromform->showinsummary;
 
     if ($field != null) {
@@ -161,7 +157,6 @@ elseif ($field != null) { // Edit mode
     $possible_values = implode(PHP_EOL, $value_array);
     $toform->possiblevalues = $possible_values;
     $toform->required = ($field->required == 1);
-    $toform->isfilter = ($field->isfilter == 1);
     $toform->showinsummary = ($field->showinsummary == 1);
 
     $mform->set_data($toform);

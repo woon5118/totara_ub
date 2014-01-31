@@ -91,11 +91,11 @@ class facetofacelib_test extends advanced_testcase {
 
     protected $facetoface_sessions_field_data = array(
         array('id',     'name',     'shortname',    'type',     'possiblevalues',
-            'required',     'defaultvalue',   'isfilter',     'showinsummary'),
-        array(1,    'name1',    'shortname1',   0,  'possible1',    0,  'defaultvalue1',    1,  1),
-        array(2,    'name2',    'shortname2',   2,  'possible2',    0,  'defaultvalue2',    1,  1),
-        array(3,    'name3',    'shortname3',   3,  'possible3',    1,  'defaultvalue3',    1,  1),
-        array(4,    'name4',    'shortname4',   4,  'possible4',    1,  'defaultvalue4',    1,  1),
+            'required',     'defaultvalue',   'showinsummary'),
+        array(1,    'name1',    'shortname1',   0,  'possible1',    0,  'defaultvalue1',    1),
+        array(2,    'name2',    'shortname2',   2,  'possible2',    0,  'defaultvalue2',    1),
+        array(3,    'name3',    'shortname3',   3,  'possible3',    1,  'defaultvalue3',    1),
+        array(4,    'name4',    'shortname4',   4,  'possible4',    1,  'defaultvalue4',    1),
     );
 
     protected $facetoface_sessions_data_data = array(

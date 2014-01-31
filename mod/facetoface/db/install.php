@@ -66,5 +66,8 @@ function xmldb_facetoface_install() {
     $tpl_decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
     $tpl_decline->managerprefix = text_to_html(get_string('setting:defaultdeclineinstrmngrdefault', 'facetoface'));
     $DB->insert_record('facetoface_notification_tpl', $tpl_decline);
+
+    // Setting room, building, and address as default filters.
+    set_config('facetoface_calendarfilters', 'room,building,address');
 }
 ?>
