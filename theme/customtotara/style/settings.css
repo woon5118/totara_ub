@@ -44,7 +44,32 @@ input[type="button"]:hover,
 button:hover,
 a.link-as-button:hover {
     color:[[setting:buttoncolor-readable-text]];
-    background-color:[[setting:buttoncolor]];
+    background-color:[[setting:buttoncolor-lighter-perc]];
+    background-image:-ms-linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
+    background-image:-webkit-gradient(linear, 0 0, 0 100%, from([[setting:buttoncolor-dark]]), to([[setting:buttoncolor]]));
+    background-image:-webkit-linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
+    background-image:-o-linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
+    background-image:linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
+    background-image:-moz-linear-gradient(top, [[setting:buttoncolor]], [[setting:buttoncolor-light]]);
+}
+button.disabled,
+input.form-submit.disabled,
+input[type="button"].disabled,
+input[type="submit"].disabled,
+input[type="reset"].disabled,
+button[disabled],
+input.form-submit[disabled],
+input[type="button"][disabled],
+input[type="submit"][disabled],
+input[type="reset"][disabled] {
+    color:#888888;
+    background-color:[[setting:buttoncolor-lighter-perc]];
+    background-image:-ms-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
+    background-image:-webkit-gradient(linear, 0 0, 0 100%, from([[setting:buttoncolor-light-perc]]), to([[setting:buttoncolor-light-perc]]));
+    background-image:-webkit-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
+    background-image:-o-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
+    background-image:linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
+    background-image:-moz-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
 }
 #page-header, #page-footer, .block > .header {
     background-color: [[setting:headerbgc]];
