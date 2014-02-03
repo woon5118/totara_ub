@@ -33,7 +33,7 @@ class rb_plan_programs_completion_history_embedded extends rb_base_embedded {
         $userid = array_key_exists('userid', $data) ? $data['userid'] : null;
         $courseid = array_key_exists('courseid', $data) ? $data['courseid'] : null;
 
-        $url = new moodle_url('/totara/plan/record/courses.php', array('history' => 1));
+        $url = new moodle_url('/totara/plan/record/programs.php', array('history' => 1));
 
         $this->url = $url->out_as_local_url();
         $this->source = 'dp_program_recurring'; // Existing report source
