@@ -590,6 +590,17 @@ input[type="checkbox"] {
         position: static;
         display: block;
     }
+
+    /* this definition is required to fix the menu expand and collapse on the iPhone
+     * have upstreamed this (MDL-43989)
+     */
+    .nav-collapse.collapse.active {
+        display: block;
+    }
+    .nav-collapse.collapse {
+        height: auto;
+        display: none;
+    }
 }
 /**
  * Help
