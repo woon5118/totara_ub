@@ -25,7 +25,7 @@
 /**
  * Overriding core rendering functions for kiwifruit
  */
-class theme_kiwifruit_core_renderer extends core_renderer {
+class theme_kiwifruit_core_renderer extends theme_standardtotara_core_renderer {
 
     /**
      * Return the standard string that says whether you are logged in (and switched
