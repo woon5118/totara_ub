@@ -139,6 +139,30 @@ td,
     background-color:#FFFFFF;
     border-color:#EEEEEE;
 }
+table.generaltable tbody>tr.r0>td,
+table.flexible tbody>tr.r0>td,
+table.generaltable tbody>tr.r0>th,
+table.flexible tbody>tr.r0>th {
+    background-color: #ffffff;
+}
+.generaltable .r1 td,
+.flexible .r1 td,
+.generaltable .r1 th,
+.flexible .r1 th {
+    background-color: #f9f9f9;
+}
+
+table.generaltable tbody>tr.r0:hover > td,
+table.flexible tbody>tr.r0:hover > td,
+table.generaltable tbody>tr.r0:hover > th,
+table.flexible tbody>tr.r0:hover > th,
+table.generaltable tbody>tr.r1:hover > td,
+table.flexible tbody>tr.r1:hover > td,
+table.generaltable tbody>tr.r1:hover > th,
+table.flexible tbody>tr.r1:hover > th {
+    background-color: #f5f5f5;
+}
+
 table.invisible th.header {
     background: none;
     padding: 0;
