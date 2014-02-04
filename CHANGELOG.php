@@ -3,6 +3,36 @@
 
 Totara LMS Changelog
 
+Release 2.5.7 (4th February 2014):
+==================================================
+
+Security Fixes:
+    T-11785    Cleaned modulename parameter before generating coursemodule instances
+    T-11783    Added missing validation when exporting calendar
+    T-11782    Added missing validation when managing user tags
+    T-11766    Prevent admins editing system paths without a specific config setting in new installs only
+
+Improvements:
+    T-11746    Changed the totara sync behaviour around user passwords, see here http://community.totaralms.com/mod/forum/discuss.php?d=3708
+
+Bug Fixes:
+    T-11787    Fixed typo in facetoface session to show finish date properly
+    T-11639    Fixed the display of tab trees containing a second row
+    T-11775    Prevent new "Before Session" facetoface notifications from being sent retroactively
+    T-11772    Fixed fatal error on completion with multiple dependant courses
+    T-6072     Fixed whitespace formatting for CLI installs
+    T-11729    Timezone information is now displayed for Facetoface sessions in the calendar
+    T-11764    Fixed display of custom field names when multi-language filter is enabled in reportbuilder
+    T-8008     Fixed staff manager capabilities on new installs
+    T-11366    Fixed delete buttons after adding users to feedback360
+    T-11781    Excluded suspended users from facetoface booking selector
+    T-11776    Fixed Responsive Theme issue when adding rules to an audience
+    T-11778    Fixed language string escaping on Program Assignments tab
+
+API Changes:
+    T-11779    Moved tables header code to totaratablelib.php
+
+
 Release 2.5.6 (21st January 2014):
 ==================================================
 

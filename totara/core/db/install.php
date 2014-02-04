@@ -95,6 +95,7 @@ function xmldb_totara_core_install() {
 
     set_role_contextlevels($staffmanagerrole,   get_default_contextlevels('staffmanager'));
     assign_capability('moodle/user:viewdetails', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
+    assign_capability('moodle/user:viewuseractivitiesreport', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/cohort:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/comment:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
     assign_capability('moodle/comment:delete', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
@@ -212,6 +213,9 @@ function xmldb_totara_core_install() {
     set_config('updateautodeploy', false);
     set_config('updateautocheck', false);
     set_config('updatenotifybuilds', false);
+
+    // Disable editing execpaths by default for security.
+    set_config('preventexecpath', '1');
 
     // Adding some totara upgrade code from lib/db/upgrade.php to
     // avoid conflicts every time we upgrade moodle.

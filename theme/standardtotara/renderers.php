@@ -142,4 +142,31 @@ class theme_standardtotara_core_renderer extends core_renderer {
 
         return $loggedinas;
     }
+
+    /**
+     * Renders tabtree
+     *
+     * @param tabtree $tabtree
+     * @return string
+     */
+    protected function render_tabtree(tabtree $tabtree) {
+        if (empty($tabtree->subtree)) {
+            return '';
+        }
+
+        // Check to see if this tree has a second level on the activated root.
+        $classes = 'tabtree';
+        foreach ($tabtree->subtree as $node) {
+            if ($node->activated && count($node->subtree)) {
+                $classes .= ' tabtree2';
+            }
+        }
+
+        $str = '';
+        $str .= html_writer::start_tag('div', array('class' => $classes));
+        $str .= $this->render_tabobject($tabtree);
+        $str .= html_writer::end_tag('div').
+                html_writer::tag('div', ' ', array('class' => 'clearer'));
+        return $str;
+    }
 }

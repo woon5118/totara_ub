@@ -1664,7 +1664,7 @@ function calendar_format_event_time($event, $now, $linkparams = null, $usecommon
             $sessionobj = facetoface_format_session_times($event->timestart,
                                                           $event->timestart + $event->timeduration,
                                                           $sessiondata->sessiontimezone);
-            return get_string('sessiondatetimecourseformat', 'facetoface', $sessionobj);
+            return get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
         }
     }
 

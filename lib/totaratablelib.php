@@ -214,6 +214,28 @@ class totara_table extends flexible_table {
     }
 
     /**
+     * Prints the headers and search bar if required
+     */
+    function print_headers() {
+        $headerset = false;
+        foreach ($this->headers as $header) {
+            if ($header !== null) {
+                $headerset = true;
+            }
+        }
+
+        if ($headerset) {
+            return parent::print_headers();
+        }
+
+        if (array_key_exists('top', $this->toolbar)) {
+            echo html_writer::start_tag('thead');
+            $this->print_extended_headers();
+            echo html_writer::end_tag('thead');
+        }
+    }
+
+    /**
      * Setup the table
      *
      * Re-use parent class, but also add 'totaratable' class

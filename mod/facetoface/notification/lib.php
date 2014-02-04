@@ -355,16 +355,17 @@ class facetoface_notification extends data_object {
         $sent = 0;
         foreach ($recordset as $session) {
             $count++;
-
             // Check if they aren't ready to have their notification sent
             switch ($this->conditiontype) {
                 case MDL_F2F_CONDITION_BEFORE_SESSION:
-                    if (($session->timestart - $this->scheduletime) > $time) {
+                    if ($session->timestart < $time ||
+                       ($session->timestart - $this->scheduletime) > $time) {
                         continue 2;
                     }
                     break;
                 case MDL_F2F_CONDITION_AFTER_SESSION:
-                    if (($session->timefinish + $this->scheduletime) > $time) {
+                    if ($session->timefinish > $time ||
+                       ($session->timefinish + $this->scheduletime) > $time) {
                         continue 2;
                     }
                     break;

@@ -2267,7 +2267,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         if ($sessionobj->startdate == $sessionobj->enddate) {
                             $sessiondates .= get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
                         } else {
-                            $sessiondates .= get_string('sessionstartfinishandtime', 'facetoface', $sessionobj);
+                            $sessiondates .= get_string('sessionstartfinishdateandtime', 'facetoface', $sessionobj);
                         }
                     }
                 } else {

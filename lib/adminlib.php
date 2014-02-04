@@ -2116,6 +2116,7 @@ class admin_setting_configfile extends admin_setting_configtext {
      * @return string XHTML field
      */
     public function output_html($data, $query='') {
+        global $CFG;
         $default = $this->get_defaultsetting();
 
         if ($data) {
@@ -2127,9 +2128,13 @@ class admin_setting_configfile extends admin_setting_configtext {
         } else {
             $executable = '';
         }
-
+        $disabled = '';
+        if (!empty($CFG->preventexecpath)) {
+            $this->visiblename .= '<div class="form-overridden">'.get_string('execpathnotallowed', 'admin').'</div>';
+            $disabled = ' disabled ';
+        }
         return format_admin_setting($this, $this->visiblename,
-        '<div class="form-file defaultsnext"><input type="text" size="'.$this->size.'" id="'.$this->get_id().'" name="'.$this->get_full_name().'" value="'.s($data).'" />'.$executable.'</div>',
+        '<div class="form-file defaultsnext"><input ' . $disabled . ' type="text" size="'.$this->size.'" id="'.$this->get_id().'" name="'.$this->get_full_name().'" value="'.s($data).'" />'.$executable.'</div>',
         $this->description, true, '', $default, $query);
     }
     /**
@@ -2172,12 +2177,14 @@ class admin_setting_configexecutable extends admin_setting_configfile {
         } else {
             $executable = '';
         }
+        $disabled = '';
         if (!empty($CFG->preventexecpath)) {
-            $this->visiblename .= '<div class="form-overridden">'.get_string('execpathnotallowed', 'admin').'</div>';
+            $this->visiblename .= '<div class="form-overridden">'.get_string('execpathnotallowed', 'totara_core').'</div>';
+            $disabled = ' disabled ';
         }
 
         return format_admin_setting($this, $this->visiblename,
-        '<div class="form-file defaultsnext"><input type="text" size="'.$this->size.'" id="'.$this->get_id().'" name="'.$this->get_full_name().'" value="'.s($data).'" />'.$executable.'</div>',
+        '<div class="form-file defaultsnext"><input ' . $disabled . ' type="text" size="'.$this->size.'" id="'.$this->get_id().'" name="'.$this->get_full_name().'" value="'.s($data).'" />'.$executable.'</div>',
         $this->description, true, '', $default, $query);
     }
 }

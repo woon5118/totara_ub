@@ -59,6 +59,10 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('selectyesno', 'allowduplicatedemails', get_string('allowduplicatedemails', 'tool_totara_sync'));
         $mform->addElement('static', 'allowduplicatedemailsdesc', '', get_string('allowduplicatedemailsdesc', 'tool_totara_sync'));
 
+        // User password settings.
+        $mform->addElement('selectyesno', 'ignoreexistingpass', get_string('ignoreexistingpass', 'tool_totara_sync'));
+        $mform->addElement('static', 'ignoreexistingpassdesc', '', get_string('ignoreexistingpassdesc', 'tool_totara_sync'));
+
         $mform->addElement('header', 'crudheading', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
         $mform->setDefault('allow_create', 1);
@@ -72,6 +76,7 @@ class totara_sync_element_user extends totara_sync_element {
     function config_save($data) {
         $this->set_config('sourceallrecords', $data->sourceallrecords);
         $this->set_config('allowduplicatedemails', $data->allowduplicatedemails);
+        $this->set_config('ignoreexistingpass', $data->ignoreexistingpass);
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', !empty($data->allow_delete));
@@ -235,7 +240,7 @@ class totara_sync_element_user extends totara_sync_element {
                 }
 
                 // Update user password.
-                if (isset($suser->password) && trim($suser->password) !== '') {
+                if (empty($this->config->ignoreexistingpass) && isset($suser->password) && trim($suser->password) !== '') {
                     $userauth = get_auth_plugin($user->auth);
                     if ($userauth->can_change_password()) {
                         if (!$userauth->user_update_password($user, $suser->password)) {
@@ -523,6 +528,9 @@ class totara_sync_element_user extends totara_sync_element {
         if (!isset($this->config->allowduplicatedemails)) {
             $this->config->allowduplicatedemails = 0;
         }
+        if (!isset($this->config->ignoreexistingpass)) {
+            $this->config->ignoreexistingpass = 0;
+        }
         if (isset($syncfields->email) && !$this->config->allowduplicatedemails) {
             // Get duplicated emails.
             $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'email', 'duplicateuserswithemailx');
@@ -532,12 +540,6 @@ class totara_sync_element_user extends totara_sync_element {
             $invalidids = array_merge($invalidids, $badids);
             // Check emails against the DB to avoid saving repeated values.
             $badids = $this->check_values_in_db($synctable, 'email', 'duplicateusersemailxdb');
-            $invalidids = array_merge($invalidids, $badids);
-        }
-
-        if (isset($syncfields->password)) {
-            // Get empty passwords.
-            $badids = $this->check_empty_values($synctable, 'password', 'emptyvaluepasswordx');
             $invalidids = array_merge($invalidids, $badids);
         }
 

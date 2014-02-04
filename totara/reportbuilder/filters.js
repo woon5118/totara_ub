@@ -290,7 +290,7 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
                             $('.new_filter_selector').append(optgroup);
                         }
                         if (optgroup.find('option[value='+o.type+'-'+o.value+']').length == 0) {
-                            optgroup.append('<option value="'+o.type+'-'+o.value+'">'+rb_filter_headings[o.type+'-'+o.value]+'</option>');
+                            optgroup.append('<option value="'+o.type+'-'+o.value+'">'+o.filtername+'</option>');
                         }
 
                         module.rb_init_filter_rows();

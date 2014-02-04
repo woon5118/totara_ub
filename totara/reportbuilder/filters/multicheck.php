@@ -73,7 +73,7 @@ class rb_filter_multicheck extends rb_filter_type {
      */
     function setupForm(&$mform) {
         global $OUTPUT, $SESSION;
-        $label = $this->label;
+        $label = format_string($this->label);
         $advanced = $this->advanced;
         $options = $this->options['selectchoices'];
         $attr = $this->options['attributes'];
