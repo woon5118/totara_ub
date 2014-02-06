@@ -862,6 +862,7 @@ $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not 
 $string['useriddoesnotexist'] = 'User with ID "{$a}" does not exist';
 $string['usercalentry'] = 'Show entry on user\'s calendar';
 $string['userdeletedcancel'] = 'User has been deleted';
+$string['usersuspendedcancel'] = 'User has been suspended';
 $string['usernotsignedup'] = 'Status: not signed up';
 $string['usersignedup'] = 'Status: signed up';
 $string['usersignedupmultiple'] = 'User signed up on {$a} sessions';

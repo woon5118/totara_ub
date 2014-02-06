@@ -1834,6 +1834,24 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2013120100, 'facetoface');
     }
 
+    if ($oldversion < 2014021000) {
+        $del_users = $DB->get_records('user', array('deleted' => 1));
+        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
+
+        foreach ($del_users as $user) {
+            // Cancel already deleted users facetoface signups.
+            facetoface_eventhandler_user_deleted($user);
+        }
+
+        foreach ($sus_users as $user) {
+            // Cancel already suspended users facetoface signups.
+            facetoface_eventhandler_user_suspended($user);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014021000, 'facetoface');
+    }
+
     return $result;
 }
 

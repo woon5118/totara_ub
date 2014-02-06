@@ -3636,8 +3636,30 @@ function facetoface_eventhandler_user_deleted($user) {
     if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
         foreach ($signups as $signup) {
             $session = facetoface_get_session($signup->sessionid);
-            // using $null, null fails because of passing by reference
+            // Using $null, null fails because of passing by reference.
             facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
+        }
+    }
+    return true;
+}
+
+/**
+ * Event that is triggered when a user is suspended.
+ *
+ * Cancels a user from any future sessions when they are suspended
+ * this is to make sure suspended users aren't using space in sessions
+ * when there is limited capacity.
+ *
+ * @param object $user
+ */
+function facetoface_eventhandler_user_suspended($user) {
+    global $DB;
+
+    if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+        foreach ($signups as $signup) {
+            $session = facetoface_get_session($signup->sessionid);
+            // Using $null, null fails because of passing by reference.
+            facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
         }
     }
     return true;
