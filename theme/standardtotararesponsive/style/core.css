@@ -277,6 +277,9 @@ h2.headingblock {
     background-color: #DFF0D8;
     border-color: #C2D6B2;
 }
+#notice {
+    min-width: 0;
+}
 .notice,
 .notifynotice {
     background: #FFFBE7 url([[pix:theme|notifynotice]]) no-repeat 8px 11px;
