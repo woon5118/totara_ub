@@ -385,6 +385,16 @@ function program_cron_copy_recurring_courses() {
         $bc = new backup_controller(backup::TYPE_1COURSE, $course->id, backup::FORMAT_MOODLE,
             backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id);
         $bc->update_plan_setting('userscompletion', 0);
+
+        // Set userinfo to false to avoid restoring grades into the new course.
+        $plan = $bc->get_plan();
+        $settings = $plan->get_settings();
+        $sections = $DB->get_fieldset_select('course_sections', 'id', 'course = :cid', array('cid' => $course->id));
+
+        foreach ($sections as $section) {
+            $settings["section_{$section}_userinfo"]->set_value(false);
+        }
+
         $bc->execute_plan();
 
         if ($backupfile = $bc->get_results()) {
