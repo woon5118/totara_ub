@@ -534,6 +534,10 @@ input[type="checkbox"] {
 .mform .fdescription.required {
     color:#6b6b6b;
 }
+.mform .fdescription.required {
+    text-align: right;
+    margin-left: 0;
+}
 .mform .fitem {
     padding-bottom:5px;
     margin-bottom:5px;
