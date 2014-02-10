@@ -100,6 +100,31 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
     }
 
     /**
+     * Attempt to automatically enrol current user in course without any interaction,
+     * calling code has to make sure the plugin and instance are active.
+     *
+     * This should return either a timestamp in the future or false.
+     *
+     * @param stdClass $instance course enrol instance
+     * @return bool|int false means not enrolled, integer means timeend
+     */
+    public function try_autoenrol(stdClass $instance) {
+        global $OUTPUT, $USER, $DB;
+
+        $course = $DB->get_record('course', array('id' => $instance->courseid));
+        if ($this->is_user_approved($instance->courseid)) {
+            // Get default roleid.
+            $instance->roleid = parent::get_config('roleid');
+            parent::enrol_user($instance, $USER->id, $instance->roleid);
+
+            totara_set_notification($OUTPUT->container(get_string('nowenrolled', 'enrol_totara_learningplan', $course->fullname), 'plan_box'), null, array('class' => 'notifysuccess'));
+            // No time limit on Plan enrolment.
+            return 0;
+        }
+        return false;
+    }
+
+    /**
      * Check if the user has approval to enrol in the course
      *
      * @param int courseid the id of the course to check
