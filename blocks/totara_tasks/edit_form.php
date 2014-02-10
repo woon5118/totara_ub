@@ -30,13 +30,16 @@ class block_totara_tasks_edit_form extends block_edit_form {
     protected function specific_definition($mform) {
         global $CFG;
 
-        if (!empty($CFG->block_totara_tasks)) {
-            $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
-            $options = array(0 => get_string('no'), 1 => get_string('yes'));
-
-            $mform->addElement('select', 'config_showempty', get_string('showempty', 'block_totara_tasks'), $options);
-            $mform->setDefault('config_showempty', 0);
+        $options = array(0 => get_string('no'), 1 => get_string('yes'));
+        $attributes = array();
+        if (empty($CFG->block_totara_tasks_showempty)) {
+            $attributes['disabled'] = 'disabled';
         }
+
+        $mform->addElement('select', 'config_showempty', get_string('showempty', 'block_totara_tasks'), $options, $attributes);
+        $mform->addHelpButton('config_showempty', 'showempty', 'block_totara_tasks');
+        $mform->setDefault('config_showempty', 0);
     }
 }

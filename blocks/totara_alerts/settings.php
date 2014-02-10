@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     $options = array(0 => get_string('no'), 1 => get_string('yes'));
-    $settings->add(new admin_setting_configselect('block_totara_alerts', new lang_string('showemptyconfig', 'block_totara_alerts'),
+    $settings->add(new admin_setting_configselect('block_totara_alerts_showempty', new lang_string('showemptyconfig', 'block_totara_alerts'),
                     new lang_string('showempty', 'block_totara_alerts'), 0, $options));
 }
 

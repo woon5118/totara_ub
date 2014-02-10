@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Piers Harding <piers@catalyst.net.nz>
+ * @author Alastair Munro <alastair.munro@totaralms.com>
  * @package totara
  * @subpackage blocks_totara_tasks
  */
@@ -30,15 +31,15 @@ class block_totara_tasks extends block_base {
         $this->title = get_string('pluginname', 'block_totara_tasks');
     }
 
-    // only one instance of this block is required
+    // Only one instance of this block is required.
     function instance_allow_multiple() {
       return false;
-    } //instance_allow_multiple
+    }
 
-    // label and button values can be set in admin
+    // Label and button values can be set in admin.
     function has_config() {
       return true;
-    } //has_config
+    }
 
     function preferred_width() {
         return 210;
@@ -47,7 +48,7 @@ class block_totara_tasks extends block_base {
     function get_content() {
         global $CFG, $FULLME, $DB, $OUTPUT, $PAGE;
 
-        //cache block contents
+        // Cache block contents
         if ($this->content !== NULL) {
         return $this->content;
         }
@@ -62,7 +63,7 @@ class block_totara_tasks extends block_base {
         local_js($code);
         $PAGE->requires->js_init_call('M.totara_message.init');
 
-        // just get the tasks for this user
+        // Just get the tasks for this user.
         $total = tm_messages_count('totara_task', false);
         $this->msgs = tm_messages_get('totara_task', 'timecreated DESC ', false, true);
         $count = is_array($this->msgs) ? count($this->msgs) : 0;
@@ -73,7 +74,7 @@ class block_totara_tasks extends block_base {
             return $this->content;
         }
 
-        // now build the table of results
+        // Now build the table of results.
         $table = new html_table();
         $table->attributes['class'] = 'fullwidth invisiblepadded';
         if (!empty($this->msgs)) {
@@ -85,20 +86,20 @@ class block_totara_tasks extends block_base {
                 $msgrejectdata = totara_message_eventdata($msg->id, 'onreject', $msgmeta);
                 $msginfodata = totara_message_eventdata($msg->id, 'oninfo', $msgmeta);
 
-                // user name + link
+                // User name + link.
                 $userfrom_link = $CFG->wwwroot.'/user/view.php?id='.$msg->useridfrom;
                 $from = $DB->get_record('user', array('id' => $msg->useridfrom));
                 $fromname = fullname($from);
 
-                // message creation time
+                // Message creation time.
                 $when = userdate($msg->timecreated, get_string('strftimedate', 'langconfig'));
 
-                // statement - multipart: user + statment + object
+                // Statement - multipart: user + statment + object.
                 $rowbkgd = ($cnt % 2) ? 'shade' : 'noshade';
                 $cssclass = totara_message_cssclass($msg->msgtype);
                 $msglink = !empty($msg->contexturl) ? $msg->contexturl : '';
 
-                // Status icon
+                // Status icon.
                 $cells = array();
                 $icon = $OUTPUT->pix_icon('msgicons/' . $msg->icon, format_string($msg->subject), 'totara_core', array('class'=>"msgicon {$cssclass}", 'title' => format_string($msg->subject)));
                 if (!empty($msglink)) {
@@ -112,7 +113,7 @@ class block_totara_tasks extends block_base {
                 $cell->attributes['class'] = 'status';
                 $cells[] = $cell;
 
-                // Details
+                // Details.
                 $text = format_string($msg->subject ? $msg->subject : $msg->fullmessage);
                 if (!empty($msglink)) {
                     $url = new moodle_url($msglink);
@@ -125,9 +126,9 @@ class block_totara_tasks extends block_base {
                 $cell->attributes['class'] = 'statement';
                 $cells[] = $cell;
 
-                // Info icon/dialog
+                // Info icon/dialog.
                 $detailbuttons = array();
-                // Add 'accept' button
+                // Add 'accept' button.
                 if (!empty($msgacceptdata) && count((array)$msgacceptdata)) {
                     $btn = new stdClass();
                     $btn->text = !empty($msgacceptdata->acceptbutton) ?
@@ -137,7 +138,7 @@ class block_totara_tasks extends block_base {
                         $msgacceptdata->data['redirect'] : $FULLME;
                     $detailbuttons[] = $btn;
                 }
-                // Add 'reject' button
+                // Add 'reject' button.
                 if (!empty($msgrejectdata) && count((array)$msgrejectdata)) {
                     $btn = new stdClass();
                     $btn->text = !empty($msgrejectdata->rejectbutton) ?
@@ -147,7 +148,7 @@ class block_totara_tasks extends block_base {
                         $msgrejectdata->data['redirect'] : $FULLME;
                     $detailbuttons[] = $btn;
                 }
-                // Add 'info' button
+                // Add 'info' button.
                 if (!empty($msginfodata) && count((array)$msginfodata)) {
                     $btn = new stdClass();
                     $btn->text = !empty($msginfodata->infobutton) ?
@@ -176,7 +177,7 @@ class block_totara_tasks extends block_base {
         if ($count) {
             $this->content->text .= html_writer::tag('p', get_string('showingxofx', 'block_totara_tasks', array('count' => $count, 'total' => $total)));
         } else {
-            if (!empty($CFG->block_totara_tasks)) {
+            if (!empty($CFG->block_totara_tasks_showempty)) {
                 if (!empty($this->config->showempty)) {
                     $this->content->text .= html_writer::tag('p', get_string('notasks', 'block_totara_tasks'));
                 } else {
