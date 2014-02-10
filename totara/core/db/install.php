@@ -137,6 +137,8 @@ function xmldb_totara_core_install() {
     if(!completion_info::is_enabled_for_site()){
         set_config('totaracoreinstallation', 1);
         set_config('enablecompletion', 1);
+        set_config('enablecompletion', 1, 'moodlecourse');
+        set_config('completionstartonenrol', 1, 'moodlecourse');
     }
     // Add completionstartonenrol column to course table.
     $table = new xmldb_table('course');
