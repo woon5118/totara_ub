@@ -538,7 +538,10 @@ input[type="checkbox"] {
 .mform .fitem .feditor table.mceLayout {
     width:100% !important;
 }
-
+.mform .ftextarea textarea {
+    width: 95%;
+    max-width: 600px;
+}
 #fgroup_id_buttonar {
   margin: 5px 0;
   padding: 0 0 5px;
