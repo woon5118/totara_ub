@@ -930,6 +930,16 @@ input[type="checkbox"] {
 .totara-dialog .ui-dialog-titlebar h2 {
     margin-bottom: 5px;
 }
+.ui-dialog-title label {
+    display: inline-block;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+.ui-dialog-title  em {
+    font-weight: inherit;
+}
+
 .ui-dialog .dialog-content .header {
     background: none;
 }
