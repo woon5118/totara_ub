@@ -173,6 +173,10 @@ $PAGE->requires->data_for_js('scormplayerdata', Array('launch' => false,
                                                        'popupoptions' => $scorm->options), true);
 $PAGE->requires->js('/mod/scorm/request.js', true);
 $PAGE->requires->js('/lib/cookies.js', true);
+if ($displaymode == 'popup') {
+    // Ensure child scorm popup will refresh the parent course page when the popup closes to activate completion.
+    $PAGE->requires->js('/mod/scorm/refreshparent.js', true);
+}
 echo $OUTPUT->header();
 
 $PAGE->requires->string_for_js('navigation', 'scorm');
