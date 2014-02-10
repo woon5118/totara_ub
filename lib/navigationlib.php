@@ -3255,6 +3255,9 @@ class settings_navigation extends navigation_node {
             case CONTEXT_COURSECAT:
                 $this->load_category_settings();
                 break;
+            case CONTEXT_PROGRAM:
+                totara_load_program_settings($this, $this->page->context, true);
+                break;
             case CONTEXT_COURSE:
                 if ($this->page->course->id != $SITE->id) {
                     $this->load_course_settings(($context->id == $this->context->id));
