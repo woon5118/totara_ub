@@ -1012,26 +1012,8 @@ input[type="checkbox"] {
     border-right: none;
     border-top: none;
 }
-#dialog-tabs ul li.ui-state-default {
-    background: #F5F5F5;
-    border-color: #CCCCCC;
-}
-#dialog-tabs ul li.ui-state-default a {
-    color: #888;
-}
-#dialog-tabs ul li.ui-state-default a:hover {
-    color: #333333;
-    background: #EEEEEE;
-}
-#dialog-tabs ul li.ui-tabs-selected {
-    background: #FFFFFF;
-}
-#dialog-tabs ul li.ui-tabs-selected a {
-    color: #333333;
-}
-#dialog-tabs ul li.ui-tabs-selected a:hover {
-    color: #333333;
-    background: #FFFFFF;
+#dialog-tabs li {
+    margin-bottom: 0;
 }
 /* selected items in multi-select dialogs (improve spacing) */
 .ui-dialog .dialog-content td.selected span.clickable {
