@@ -2772,10 +2772,16 @@ class reportbuilder {
         // get the ORDER BY SQL fragment from table
         $order = $this->get_report_sort($table);
         try {
-            if ($records = $DB->get_recordset_sql($sql.$order, $params, $table->get_page_start(), $table->get_page_size())) {
+            if ($records = $DB->get_recordset_sql($sql.$order, $params, $table->get_page_start(), $perpage)) {
+                $count = $this->get_filtered_count();
+                $location = 0;
                 foreach ($records as $record) {
                     $record_data = $this->process_data_row($record);
-                    $table->add_data($record_data);
+                    if (++$location == $count % $perpage || $location == $perpage) {
+                        $table->add_data($record_data, 'last');
+                    } else {
+                        $table->add_data($record_data);
+                    }
                 }
             } else if ($data === false) {
                 print_error('error:problemobtainingreportdata', 'totara_reportbuilder');

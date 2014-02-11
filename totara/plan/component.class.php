@@ -432,8 +432,14 @@ abstract class dp_base_component {
         }
 
         // Send them off to the table for display
+        $numberrows = count($rows);
+        $rownumber = 0;
         foreach ($rows as $row) {
-            $table->add_data($row);
+            if (++$rownumber >= $numberrows) {
+                $table->add_data($row, 'last');
+            } else {
+                $table->add_data($row);
+            }
         }
 
         $table->finish_html();

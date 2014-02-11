@@ -671,6 +671,7 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     if (empty($plans)) {
         return '';
     }
+    $rownumber = 0;
     foreach ($plans as $p) {
         $plan = new development_plan($p->id);
         if ($plan->get_setting('view') == DP_PERMISSION_ALLOW) {
@@ -687,7 +688,11 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
             }
             $row[] = $plan->display_actions();
 
-            $table->add_data($row);
+            if (++$rownumber >= $count) {
+                $table->add_data($row, 'last');
+            } else {
+                $table->add_data($row);
+            }
         }
     }
     unset($plans);

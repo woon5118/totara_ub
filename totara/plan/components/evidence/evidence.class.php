@@ -188,6 +188,8 @@ class dp_evidence_relation {
         if (!$items = $DB->get_recordset_sql($sql, $params)) {
             return false;
         }
+        $numberrows = $DB->count_records_sql('SELECT COUNT(*) FROM (' . $sql . ') t', $params);
+        $rownumber = 0;
 
         $tableheaders = array(get_string('evidencename', 'totara_plan'));
 
@@ -216,7 +218,11 @@ class dp_evidence_relation {
                 $row[] = html_writer::checkbox('delete_linked_evidence['.$item->id.']', '1', false);
             }
 
-            $table->add_data($row);
+            if (++$rownumber >= $numberrows) {
+                $table->add_data($row, 'last');
+            } else {
+                $table->add_data($row);
+            }
         }
 
         $items->close();

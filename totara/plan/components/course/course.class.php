@@ -547,6 +547,8 @@ class dp_course_component extends dp_base_component {
 
         $sql = $select.$from.$where.$sort;
         if ($records = $DB->get_recordset_sql($sql, $params)) {
+            $numberrows = $DB->count_records_sql('SELECT COUNT(*) FROM (' . $sql . ') t', $params);
+            $rownumber = 0;
             // get the scale values used for competencies in this plan
             $priorityvalues = $DB->get_records('dp_priority_scale_value', array('priorityscaleid' => $priorityscaleid), 'sortorder', 'id,name,sortorder');
 
@@ -575,7 +577,11 @@ class dp_course_component extends dp_base_component {
                     }
                 }
 
-                $table->add_data($row);
+                if (++$rownumber >= $numberrows) {
+                    $table->add_data($row, 'last');
+                } else {
+                    $table->add_data($row);
+                }
             }
 
             $records->close();

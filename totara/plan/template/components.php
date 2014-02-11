@@ -173,7 +173,6 @@ if ($components) {
         $compname = $configsetting ? $configsetting : get_string($component->component.'plural', 'totara_plan');
         $tablerow[] = html_writer::tag('span', $compname, array('class' => $cssclass));
 
-
         if ($component->enabled) {
             $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/plan/template/components.php', array('id' => $id, 'hide' => $component->id)), new pix_icon('t/hide', $str_disable));
         } else {

@@ -70,6 +70,8 @@ $table->set_attribute('id', 'elements');
 $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide');
 $table->setup();
 
+$count = count($elements);
+$rownumber = 0;
 foreach ($elements as $ename => $eobj) {
     if (!has_capability('tool/totara_sync:manage' . $ename, $systemcontext)) {
         continue;
@@ -92,7 +94,11 @@ foreach ($elements as $ename => $eobj) {
     }
     $row[] = $eobj->is_enabled() ? html_writer::link(new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', array('element' => $ename)), $strsettings) : '';
 
-    $table->add_data($row);
+    if (++$rownumber >= $count) {
+        $table->add_data($row, 'last');
+    } else {
+        $table->add_data($row);
+    }
 }
 
 $table->finish_html();

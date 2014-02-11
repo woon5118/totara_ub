@@ -304,7 +304,7 @@ if ($templates) {
     $updaterow[] = html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('update')));
     $updaterow[] = '';
     $updaterow[] = '';
-    $table->add_data($updaterow);
+    $table->add_data($updaterow, 'last');
 
     $table->finish_html();
     echo html_writer::end_tag('form');

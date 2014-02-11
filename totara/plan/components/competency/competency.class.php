@@ -633,8 +633,9 @@ class dp_competency_component extends dp_base_component {
 
         // get the scale values used for competencies in this plan
         $priorityvalues = $DB->get_records('dp_priority_scale_value', array('priorityscaleid' => $priorityscaleid), 'sortorder', 'id,name,sortorder');
-
-        if ($records = $DB->get_recordset_sql($select.$from.$where.$sort, $params)) {
+        $numberrows = $DB->count_records_sql('SELECT COUNT(*) FROM (' . $select . $from . $where . ') t', $params);
+        $rownumber = 0;
+        if ($records = $DB->get_recordset_sql($select . $from . $where . $sort, $params)) {
 
             foreach ($records as $ca) {
                 $proficient = $this->is_item_complete($ca);
@@ -662,7 +663,11 @@ class dp_competency_component extends dp_base_component {
                     }
                 }
 
-                $table->add_data($row);
+                if (++$rownumber >= $numberrows) {
+                    $table->add_data($row, 'last');
+                } else {
+                    $table->add_data($row);
+                }
             }
             $records->close();
 

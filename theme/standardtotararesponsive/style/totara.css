@@ -91,13 +91,8 @@ body.dir-rtl .totaratable .toolbar-right-table {
     border-bottom: none;
     border-top: none;
 }
-.totaratable .toolbar-top.first td.toolbar,
 .totaratable .toolbar-bottom.first td.toolbar {
     border-top: 1px solid #ddd;
-}
-.totaratable .toolbar-top.last td.toolbar,
-.totaratable .toolbar-bottom.last td.toolbar {
-    border-bottom: 1px solid #ddd;
 }
 
 /* Reduce the margin for paging bars inside the toolbar */

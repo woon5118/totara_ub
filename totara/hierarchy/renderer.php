@@ -619,20 +619,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $bglighter = 'mygoals_lighter';
         $bgdarker = 'mygoals_darker';
 
-        // Set up the header rows for both tables.
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('goaltable:name', 'totara_hierarchy'));
-        $header_cells['name']->header = true;
-        $header_cells['status'] = new html_table_cell(get_string('goaltable:status', 'totara_hierarchy'));
-        $header_cells['status']->header = true;
-        $header_cells['assign'] = new html_table_cell(get_string('goaltable:assigned', 'totara_hierarchy'));
-        $header_cells['assign']->header = true;
-        $header_row = new html_table_row($header_cells);
-        $header_row->attributes = array('class' => "mygoals_header {$bgdarker}");
-
         $assignments = goal::get_user_assignments($userid, $can_edit, $display);
         $company_table = new html_table();
-        $company_table->data[] = $header_row;
+
+        $company_table->head = array(
+            get_string('goaltable:name', 'totara_hierarchy'),
+            get_string('goaltable:status', 'totara_hierarchy'),
+            get_string('goaltable:assigned', 'totara_hierarchy')
+        );
 
         $goaltypes = $DB->get_records('goal_type');
         $customfields = $DB->get_records('goal_type_info_field');
@@ -716,7 +710,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $row->attributes = array('class' => "company_row {$row_bg}");
 
             $company_table->data[] = $row;
-            $company_table->attributes = array('class' => 'company_table fullwidth');
+            $company_table->attributes = array('class' => 'company_table fullwidth generaltable');
         }
 
         $out .= html_writer::start_tag('div', array('id' => 'company_goals_table', 'class' => 'individual'));
@@ -741,25 +735,16 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $bglighter = 'mygoals_lighter';
         $bgdarker = 'mygoals_darker';
 
-        // Set up the header rows for both tables.
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('goaltable:name', 'totara_hierarchy'));
-        $header_cells['name']->header = true;
-        $header_cells['due'] = new html_table_cell(get_string('goaltable:due', 'totara_hierarchy'));
-        $header_cells['due']->header = true;
-        $header_cells['status'] = new html_table_cell(get_string('goaltable:status', 'totara_hierarchy'));
-        $header_cells['status']->header = true;
-        $header_cells['assign'] = new html_table_cell(get_string('goaltable:assigned', 'totara_hierarchy'));
-        $header_cells['assign']->header = true;
-        $header_cells['edit'] = new html_table_cell(get_string('edit'));
-        $header_cells['edit']->header = true;
-        $header_row = new html_table_row($header_cells);
-        $header_row->attributes = array('class' => "mygoals_header {$bgdarker}");
-
         // Set up the personal goal data.
         $goalpersonals = goal::get_goal_items(array('userid' => $userid), goal::SCOPE_PERSONAL);
         $personal_table = new html_table();
-        $personal_table->data[] = $header_row;
+        $personal_table->head = array(
+            get_string('goaltable:name', 'totara_hierarchy'),
+            get_string('goaltable:due', 'totara_hierarchy'),
+            get_string('goaltable:status', 'totara_hierarchy'),
+            get_string('goaltable:assigned', 'totara_hierarchy'),
+            get_string('edit')
+        );
 
         // Add any personal goals the user has assigned to the table.
         foreach ($goalpersonals as $goalpersonal) {
@@ -854,7 +839,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             $row->attributes = array('class' => "company_row {$row_bg}");
 
             $personal_table->data[] = $row;
-            $personal_table->attributes = array('class' => 'personal_table fullwidth');
+            $personal_table->attributes = array('class' => 'personal_table fullwidth generaltable');
         }
 
         $out .= html_writer::start_tag('div', array('id' => 'personal_goals_table'));
