@@ -297,16 +297,16 @@ class rb_source_program_completion extends rb_base_source {
     protected function define_contentoptions() {
         $contentoptions = array(
             new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'rb_source_course_completion'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
                 'current_pos',
-                get_string('currentpos', 'rb_source_course_completion'),
+                get_string('currentpos', 'totara_reportbuilder'),
                 'position.path',
                 'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
             ),
             new rb_content_option(
                 'completed_org',

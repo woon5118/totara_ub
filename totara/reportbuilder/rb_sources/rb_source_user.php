@@ -299,16 +299,16 @@ class rb_source_user extends rb_base_source {
                 'base.id'
             ),
             new rb_content_option(
-                'current_org',
-                get_string('currentorg', 'rb_source_course_completion'),
-                'organisation.path',
-                'organisation'
-            ),
-            new rb_content_option(
                 'current_pos',
-                get_string('currentpos', 'rb_source_course_completion'),
+                get_string('currentpos', 'totara_reportbuilder'),
                 'position.path',
                 'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
             ),
             new rb_content_option(
                 'date',

@@ -1120,7 +1120,7 @@ class reportbuilderlib_test extends advanced_testcase {
         // should return an array of content options
         $this->assertTrue((bool)is_array($contentoptions));
         // should have the appropriate format
-        $this->assertEquals('current_org', current($contentoptions));
+        $this->assertEquals('current_pos', current($contentoptions));
 
         $this->resetAfterTest(true);
     }
