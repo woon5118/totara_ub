@@ -25,8 +25,9 @@ require_once "$CFG->dirroot/lib/formslib.php";
 
 class mod_facetoface_signup_form extends moodleform {
 
-    function definition()
-    {
+    function definition() {
+        global $CFG;
+
         $mform =& $this->_form;
         $manageremail = $this->_customdata['manageremail'];
         $showdiscountcode = $this->_customdata['showdiscountcode'];
@@ -55,14 +56,19 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('discountcode', PARAM_TEXT);
 
-        $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
-                         MDL_F2F_TEXT => get_string('notificationemail', 'facetoface'),
-                         MDL_F2F_NONE => get_string('notificationnone', 'facetoface'),
-                         );
-        $mform->addElement('select', 'notificationtype', get_string('notificationtype', 'facetoface'), $options);
-        $mform->addHelpButton('notificationtype', 'notificationtype', 'facetoface');
-        $mform->addRule('notificationtype', null, 'required', null, 'client');
-        $mform->setDefault('notificationtype', MDL_F2F_BOTH);
+        if (empty($CFG->facetoface_notificationdisable)) {
+            $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
+                             MDL_F2F_TEXT => get_string('notificationemail', 'facetoface'),
+                             MDL_F2F_NONE => get_string('notificationnone', 'facetoface'),
+                             );
+            $mform->addElement('select', 'notificationtype', get_string('notificationtype', 'facetoface'), $options);
+            $mform->addHelpButton('notificationtype', 'notificationtype', 'facetoface');
+            $mform->addRule('notificationtype', null, 'required', null, 'client');
+            $mform->setDefault('notificationtype', MDL_F2F_BOTH);
+        } else {
+            $mform->addElement('hidden', 'notificationtype', MDL_F2F_NONE);
+        }
+        $mform->setType('notificationtype', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('signup', 'facetoface'));
     }

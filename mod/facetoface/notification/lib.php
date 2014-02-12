@@ -460,8 +460,8 @@ class facetoface_notification extends data_object {
     public function send_to_user($user, $sessionid, $sessiondate = null) {
         global $CFG, $USER, $DB;
 
-        // Check notification is enabled
-        if (!$this->status) {
+        // Check notification or system notification is enabled.
+        if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
             return;
         }
 

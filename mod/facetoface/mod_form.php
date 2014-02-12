@@ -45,12 +45,19 @@ class mod_facetoface_mod_form extends moodleform_mod {
 
         $this->add_intro_editor(true);
 
-        $mform->addElement('text', 'thirdparty', get_string('thirdpartyemailaddress', 'facetoface'), array('size' => '64'));
-        $mform->setType('thirdparty', PARAM_NOTAGS);
-        $mform->addHelpButton('thirdparty', 'thirdpartyemailaddress', 'facetoface');
+        if (empty($CFG->facetoface_notificationdisable)) {
+            $mform->addElement('text', 'thirdparty', get_string('thirdpartyemailaddress', 'facetoface'), array('size' => '64'));
+            $mform->setType('thirdparty', PARAM_NOTAGS);
+            $mform->addHelpButton('thirdparty', 'thirdpartyemailaddress', 'facetoface');
 
-        $mform->addElement('checkbox', 'thirdpartywaitlist', get_string('thirdpartywaitlist', 'facetoface'));
-        $mform->addHelpButton('thirdpartywaitlist', 'thirdpartywaitlist', 'facetoface');
+            $mform->addElement('checkbox', 'thirdpartywaitlist', get_string('thirdpartywaitlist', 'facetoface'));
+            $mform->addHelpButton('thirdpartywaitlist', 'thirdpartywaitlist', 'facetoface');
+        } else {
+            $mform->addElement('hidden', 'thirdparty', $this->_customdata['thirdparty']);
+            $mform->addElement('hidden', 'thirdpartywaitlist', $this->_customdata['thirdpartywaitlist']);
+        }
+        $mform->setType('thirdparty', PARAM_NOTAGS);
+        $mform->setType('thirdpartywaitlist', PARAM_INT);
 
         $display = array();
         for ($i=0; $i<=18; $i += 2) {
