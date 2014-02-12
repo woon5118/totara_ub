@@ -877,7 +877,7 @@ class completion_info {
      * @return int The number of users who have completion data stored for this
      *     course, 0 if none
      */
-    public function count_course_user_data($user_id = null) {
+    public function count_course_user_data($user_id = null, $countrpl = true) {
         global $DB;
 
         $sql = '
@@ -889,6 +889,9 @@ class completion_info {
         course = ?
         ';
 
+        if ($countrpl == false) {
+            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
+        }
         $params = array($this->course_id);
 
         // Limit data to a single user if an ID is supplied
@@ -942,8 +945,8 @@ class completion_info {
      *
      * @return boolean
      */
-    public function is_course_locked() {
-        return ($this->count_course_user_data() || $this->count_course_completions_data());
+    public function is_course_locked($countrpl = true) {
+        return (bool) $this->count_course_user_data(null, $countrpl);
     }
 
     /**
@@ -956,22 +959,37 @@ class completion_info {
 
         require_once("{$CFG->dirroot}/blocks/totara_stats/locallib.php");
 
-        $params = array('course' => $this->course_id);
-        if (!empty($userid)) {
-            $params['userid'] = $userid;
+        $transaction = $DB->start_delegated_transaction();
+        // Find all RPL completions for this course.
+        $sql = "SELECT userid FROM {course_completions}
+                 WHERE course = ? AND status = ?";
+        if ($rpl = $DB->get_fieldset_sql($sql, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
+            list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
+            $insql = ' AND userid ' . $insql;
+        } else {
+            $insql = '';
+            $inparams = array();
         }
+        $params = array_merge(array($this->course_id), $inparams);
+        $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
+        // Do not remove RPL activity completion records.
+        $DB->delete_records_select('course_completion_crit_compl', "(rpl = '' OR rpl IS NULL)", array());
 
-        $DB->delete_records('course_completions', $params);
-        $DB->delete_records('course_completion_crit_compl', $params);
+        // Remove stats data.
+        $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);
+        $DB->delete_records_select(
+            'block_totara_stats',
+            "eventtype = ? AND data2 = ? {$insql}",
+            $statparams
+        );
 
-        // Remove stats data
-        unset($params['course']);
-        $params['eventtype'] = STATS_EVENT_COURSE_STARTED;
-        $params['data2'] = $this->course_id;
-        $DB->delete_records('block_totara_stats', $params);
-
-        $params['eventtype'] = STATS_EVENT_COURSE_COMPLETE;
-        $DB->delete_records('block_totara_stats', $params);
+        $statparams = array_merge(array(STATS_EVENT_COURSE_COMPLETE), $params);
+        $DB->delete_records_select(
+            'block_totara_stats',
+            "eventtype = ? AND data2 = ? {$insql}",
+            $statparams
+        );
+        $transaction->allow_commit();
     }
 
     /**

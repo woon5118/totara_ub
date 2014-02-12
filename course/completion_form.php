@@ -56,8 +56,8 @@ class course_completion_form extends moodleform {
 /// form definition
 //--------------------------------------------------------------------------------
 
-        // Check if there is existing criteria completions
-        if ($completion->is_course_locked() && !$unlocked) {
+        // Check if there are existing non-RPL criteria completions.
+        if ($completion->is_course_locked(false) && !$unlocked) {
             $mform->addElement('header', '', get_string('completionsettingslocked', 'completion'));
 
             if (completion_can_unlock_data($course->id)) {
@@ -296,8 +296,8 @@ class course_completion_form extends moodleform {
         $mform->setType('id', PARAM_INT);
         $mform->setType('unlocked', PARAM_INT);
 
-        // If the criteria are locked, freeze values and submit button
-        if ($completion->is_course_locked() && !$unlocked) {
+        // If the criteria are locked, freeze values and submit button.
+        if ($completion->is_course_locked(false) && !$unlocked) {
             $except = array('settingsunlockgroup');
             $mform->hardFreezeAllVisibleExcept($except);
             $mform->addElement('cancel');
