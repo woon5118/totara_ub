@@ -1336,7 +1336,8 @@ class quiz_attempt {
     public function process_submitted_actions($timestamp, $becomingoverdue = false) {
         global $DB;
 
-        $transaction = $DB->start_delegated_transaction();
+        // We cannot use transactions here because of the MDL-30029 issue in messagelib.php.
+        //$transaction = $DB->start_delegated_transaction();
 
         $this->quba->process_all_actions($timestamp);
         question_engine::save_questions_usage_by_activity($this->quba);
@@ -1355,7 +1356,7 @@ class quiz_attempt {
             quiz_save_best_grade($this->get_quiz(), $this->get_userid());
         }
 
-        $transaction->allow_commit();
+        //$transaction->allow_commit();
     }
 
     /**
