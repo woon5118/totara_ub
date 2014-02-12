@@ -27,6 +27,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->dirroot.'/mod/facetoface/attendees_message_form.php');
+require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 global $DB;
@@ -36,8 +37,6 @@ global $DB;
  */
 // Face-to-face session ID
 $s = required_param('s', PARAM_INT);
-// Take attendance
-$takeattendance    = optional_param('takeattendance', false, PARAM_BOOL);
 // Cancel request
 $cancelform        = optional_param('cancelform', false, PARAM_BOOL);
 // Action being performed
@@ -342,17 +341,6 @@ if ($form = data_submitted()) {
         die();
     }
 
-    // Take attendance
-    if ($action == 'takeattendance' && $takeattendance) {
-        if (facetoface_take_attendance($form)) {
-            add_to_log($course->id, 'facetoface', 'take attendance', "view.php?id=$cm->id", $facetoface->id, $cm->id);
-        } else {
-            add_to_log($course->id, 'facetoface', 'take attendance (FAILED)', "view.php?id=$cm->id", $facetoface->id, $cm->id);
-        }
-        redirect($return);
-        die();
-    }
-
     // Send messages
     if ($action == 'messageusers') {
         $formurl = clone($baseurl);
@@ -455,7 +443,10 @@ if (!$onlycontent) {
 
     $PAGE->requires->string_for_js('save', 'admin');
     $PAGE->requires->string_for_js('cancel', 'moodle');
-    $PAGE->requires->strings_for_js(array('uploadfile', 'addremoveattendees', 'approvalreqd','bulkaddattendeesfrominput', 'submitcsvtext', 'bulkaddattendeesresults', 'bulkaddattendeesfromfile', 'bulkaddattendeesresults', 'wait-list', 'cancellations', 'approvalreqd', 'takeattendance'), 'facetoface');
+    $PAGE->requires->strings_for_js(array('uploadfile', 'addremoveattendees', 'approvalreqd','bulkaddattendeesfrominput',
+        'submitcsvtext', 'bulkaddattendeesresults', 'bulkaddattendeesfromfile', 'bulkaddattendeesresults', 'wait-list',
+        'cancellations', 'approvalreqd', 'takeattendance', 'updateattendeessuccessful', 'updateattendeesunsuccessful'),
+        'facetoface');
 
     $json_action = json_encode($action);
     $args = array('args' => '{"sessionid":'.$session->id.','.
@@ -484,6 +475,17 @@ if (!$onlycontent) {
             'fullpath' => '/mod/facetoface/attendees.js',
             'requires' => array('json', 'totara_core'));
 
+        $args = array('args' => '{"sessionid":'.$session->id.','.
+            '"action":'.$json_action.','.
+            '"sesskey":"'.sesskey().'",'.
+            '"selectall":'.MDL_F2F_SELECT_ALL.','.
+            '"selectnone":'.MDL_F2F_SELECT_NONE.','.
+            '"selectset":"'.MDL_F2F_SELECT_SET.'",'.
+            '"selectnotset":"'.MDL_F2F_SELECT_NOT_SET.'",'.
+            '"courseid":"'.$course->id.'",'.
+            '"facetofaceid":"'.$facetoface->id.'",'.
+            '"notsetop":"'.MDL_F2F_STATUS_NOT_SET.'"}');
+
         $PAGE->requires->js_init_call('M.totara_f2f_attendees.init', $args, false, $jsmodule);
     }
 
@@ -504,11 +506,6 @@ if (!$onlycontent) {
 /**
  * Print page content
  */
-// If taking attendance, make sure the session has already started
-if ($takeattendance && $session->datetimeknown && !facetoface_has_session_started($session, time())) {
-    $link = "{$CFG->wwwroot}/mod/facetoface/attendees.php?s={$session->id}";
-    print_error('error:canttakeattendanceforunstartedsession', 'facetoface', $link);
-}
 
 if (!$onlycontent && !$download) {
     echo $OUTPUT->box_start();
@@ -599,17 +596,11 @@ if ($show_table) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 's', 'value' => $s));
 
             // Prepare status options array
-            $status_options = array();
-            foreach ($MDL_F2F_STATUS as $key => $value) {
-                if ($key <= MDL_F2F_STATUS_BOOKED) {
-                    continue;
-                }
-
-                $status_options[$key] = get_string('status_'.$value, 'facetoface');
-            }
+            $statusoptions = get_attendance_status();
         }
 
-        $table = new flexible_table('facetoface-attendees');
+        echo html_writer::tag('div', '', array('class' => 'hide', 'id' => 'noticeupdate'));
+        $table = new totara_table('facetoface-attendees');
         $baseurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'sesskey' => sesskey(), 'onlycontent' => true));
         if ($action) {
             $baseurl->param('action', $action);
@@ -629,12 +620,12 @@ if ($show_table) {
         $columns[] = 'timesignedup';
 
         if ($action == 'takeattendance') {
+            $chooseoption = get_string('select','facetoface');
+            $selectlist = html_writer::select($F2F_SELECT_OPTIONS, 'bulk_select', '', false);
+            array_unshift($headers, $chooseoption . $selectlist);
+            array_unshift($columns, 'selectedusers');
             $headers[] = get_string('currentstatus', 'facetoface');
             $columns[] = 'currentstatus';
-            if (!$download) {
-                $headers[] = get_string('attendedsession', 'facetoface');
-                $columns[] = 'attendedsession';
-            }
         } else if ($action == 'cancellations') {
             $headers[] = get_string('timecancelled', 'facetoface');
             $columns[] = 'timecancelled';
@@ -657,10 +648,15 @@ if ($show_table) {
             $table->define_columns($columns);
             $table->define_headers($headers);
             $table->setup();
+            if ($action == 'takeattendance') {
+                $table->add_toolbar_content(display_bulk_actions_picker(), 'left' , 'top', 1);
+            }
         }
 
         foreach ($rows as $attendee) {
             $data = array();
+            $optionid = 'submissionid_' . $attendee->submissionid;
+            $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
             $attendee_url = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
             if ($download) {
                 $data[] = format_string(fullname($attendee));
@@ -671,13 +667,18 @@ if ($show_table) {
 
             if ($action == 'takeattendance') {
                 // Show current status
-                $data[] = get_string('status_'.facetoface_get_status($attendee->statuscode), 'facetoface');
+                if ($attendee->statuscode == MDL_F2F_STATUS_BOOKED) {
+                    $attendee->statuscode = (string) MDL_F2F_STATUS_NOT_SET;
+                }
 
                 if (!$download) {
-                    $optionid = 'submissionid_'.$attendee->submissionid;
                     $status = $attendee->statuscode;
-                    $select = html_writer::select($status_options, $optionid, $status);
+                    $checkbox = html_writer::checkbox($checkoptionid, $status, false, '', array('class' => 'selectedcheckboxes'));
+                    array_unshift($data, $checkbox);
+                    $select = html_writer::select($statusoptions, $optionid, $status, false);
                     $data[] = $select;
+                } else {
+                    $data[] = get_string('status_' . facetoface_get_status($attendee->statuscode), 'facetoface');
                 }
             } else if ($action == 'cancellations') {
                 $data[] = userdate($attendee->timecancelled, get_string('strftimedatetime'));
@@ -698,7 +699,7 @@ if ($show_table) {
             }
         }
         if (!$download) {
-            $table->finish_output();
+            $table->finish_html();
         } else {
             switch ($download) {
                 case 'ods':
@@ -712,13 +713,6 @@ if ($show_table) {
                     break;
             }
         }
-    }
-
-    if ($action == 'takeattendance') {
-        echo html_writer::start_tag('p');
-        echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('saveattendance', 'facetoface')));
-        echo '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'cancelform', 'value' => get_string('cancel')));
-        echo html_writer::end_tag('p') . html_writer::end_tag('form');
     }
 
     echo $OUTPUT->container_start('actions last');

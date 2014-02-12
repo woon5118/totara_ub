@@ -58,6 +58,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             throw new Error('M.totara_f2f_attendees.init()-> jQuery dependency required for this module to function.');
         }
 
+        var notsetoption = M.totara_f2f_attendees.config.notsetop.toString();
+
         totaraDialog_handler_addremoveattendees = function() {};
         totaraDialog_handler_addremoveattendees.prototype = new totaraDialog_handler();
 
@@ -130,7 +132,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var cancellationtab = $('span:contains("' + M.util.get_string('cancellations','facetoface') + '")');
             var takeattendancetab = $('span:contains("' + M.util.get_string('takeattendance','facetoface') + '")');
             var approvalrequiredtab = $('span:contains("' + M.util.get_string('approvalreqd','facetoface') + '")');
-
 
             // Activate or deactivate waitlist tab
             if (waitlisttab.length > 0) {
@@ -210,7 +211,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 );
         })();
 
-
         (function() {
             var handler = new totaraDialog_handler();
             var name = 'bulkaddfile';
@@ -261,7 +261,6 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 );
         })();
 
-
         (function() {
             var handler = new totaraDialog_handler_form();
             var name = 'bulkaddresults';
@@ -281,8 +280,137 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 );
         })();
 
+        function mark_set_unset(val, operator) {
+            // Reset all checkboxes.
+            $('.selectedcheckboxes').prop('checked', false);
+            $(":checkbox").filter(function() {
+                if (operator == 'EQ') {
+                    return this.value == val;
+                } else {
+                    return this.value != val;
+                }
+            }).prop("checked", "true");
+        }
 
-        // Handle actions drop down
+        // Set error (boolean).
+        function set_error(error) {
+            if (error) {
+                $('select#menubulk_select').addClass('error');
+                $('#selectoptionbefore').removeClass('hide');
+            } else {
+                $('select#menubulk_select').removeClass('error');
+                $('#selectoptionbefore').addClass('hide');
+            }
+        }
+
+        // Print notice of operation (boolean: true =>success false=>failure).
+        function print_notice(success) {
+            var notice = M.util.get_string('updateattendeessuccessful','facetoface');
+            var classname = 'notifysuccess';
+            if (!success) {
+                notice = M.util.get_string('updateattendeesunsuccessful','facetoface');
+                classname = 'notifyproblem';
+            }
+            $('div#noticeupdate').removeClass('hide').addClass(classname).text(notice);
+        }
+
+        function options_validated(selectbulk) {
+            var proceed = false;
+
+            if (!selectbulk) {
+                set_error(false);
+            } else if ($(':checkbox:checked').length == 0) {
+                set_error(true);
+            } else {
+                proceed = true;
+            }
+
+            return proceed;
+        }
+
+        // Handle select list.
+        $('select#menubulk_select').change(function() {
+            var selected = $(this).val();
+            set_error(false); // Delete error if any.
+
+            switch(selected) {
+                case M.totara_f2f_attendees.config.selectall.toString():
+                    $('.selectedcheckboxes').prop('checked', true);
+                    break;
+                case M.totara_f2f_attendees.config.selectnone.toString():
+                    $('.selectedcheckboxes').prop('checked', false);
+                    break;
+                case M.totara_f2f_attendees.config.selectset.toString():
+                    mark_set_unset(notsetoption, 'NE');
+                    break;
+                case M.totara_f2f_attendees.config.selectnotset.toString():
+                    mark_set_unset(notsetoption, 'EQ');
+                    break;
+                default:
+                    $('.selectedcheckboxes').prop('checked', false);
+                    break;
+            }
+
+            // Reset drop-down bulk list.
+            $('select#menubulkattendanceop').prop('selectedIndex', 0);
+        });
+
+        // Handle drop-down menu attendees current status.
+        $('select[id^="menusubmissionid"]').change(function() {
+            var datatosubmit = {s: $('input[name="s"]').val()};
+            var idchecked = (this.name).substring(13); // Select list name (starts with submissionid_).
+            // Mark value of the checkbox peer with the selected option.
+            $('input[name="check_submissionid_'+idchecked+'"]').val($(this).val());
+
+            if ($(this).val() != notsetoption) {
+                datatosubmit[this.name] = $(this).val();
+                save_attendance_status(datatosubmit);
+            }
+        });
+
+        // Handle drop-down bulk attendance actions.
+        $('select#menubulkattendanceop').change(function() {
+            var selected = $(this).val();
+            var idchecked = 0;
+            var datatosubmit = {s: $('input[name="s"]').val()}; // Create object to send via ajax.
+
+            if (selected != notsetoption && options_validated(selected)) {
+                $(':checkbox:checked').each(function(index) {
+                    idchecked = (this.name).substring(19); // Checkbox id.
+                    $(this).val(selected); // Mark value of this checkbox with the selected option.
+                    $('select#menusubmissionid_'+idchecked+' option[value='+selected+']').prop('selected', true);
+                    datatosubmit['submissionid_'+idchecked] = selected; // Add data to submit via ajax.
+                });
+
+                save_attendance_status(datatosubmit);
+            }
+        });
+
+        // Save attendance via AJAX.
+        function save_attendance_status(data) {
+            $.ajax({
+                type: "POST",
+                url: M.cfg.wwwroot + '/mod/facetoface/updateattendance.php',
+                data: ({
+                    courseid:  M.totara_f2f_attendees.config.courseid,
+                    facetofaceid:  M.totara_f2f_attendees.config.facetofaceid,
+                    datasubmission: data
+                }),
+                success: function(o) {
+                    // If success, update operators description in the client side.
+                    if (o.length > 0) {
+                        print_notice(true);
+                    } else {
+                        print_notice(false);
+                    }
+                },
+                error: function() {
+                    print_notice(false)
+                }
+            });
+        }
+
+        // Handle actions drop down.
         $(document).on('change', 'select#menuf2f-actions', function() {
             var select = $(this);
 

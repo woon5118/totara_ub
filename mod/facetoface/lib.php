@@ -82,10 +82,17 @@ define('MDL_F2F_STATUS_BOOKED',             70);
 define('MDL_F2F_STATUS_NO_SHOW',            80);
 define('MDL_F2F_STATUS_PARTIALLY_ATTENDED', 90);
 define('MDL_F2F_STATUS_FULLY_ATTENDED',     100);
+define('MDL_F2F_STATUS_NOT_SET',            110);
+
+// Define bulk attendance options
+define('MDL_F2F_SELECT_ALL', 10);
+define('MDL_F2F_SELECT_NONE', 20);
+define('MDL_F2F_SELECT_SET', 30);
+define('MDL_F2F_SELECT_NOT_SET', 40);
 
 // This array must match the status codes above, and the values
 // must equal the end of the constant name but in lower case
-global $MDL_F2F_STATUS;
+global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
 $MDL_F2F_STATUS = array(
     MDL_F2F_STATUS_USER_CANCELLED       => 'user_cancelled',
 //  SESSION_CANCELLED is not yet implemented
@@ -98,6 +105,14 @@ $MDL_F2F_STATUS = array(
     MDL_F2F_STATUS_NO_SHOW              => 'no_show',
     MDL_F2F_STATUS_PARTIALLY_ATTENDED   => 'partially_attended',
     MDL_F2F_STATUS_FULLY_ATTENDED       => 'fully_attended',
+    MDL_F2F_STATUS_NOT_SET              => 'not_set'
+);
+
+$F2F_SELECT_OPTIONS = array(
+    MDL_F2F_SELECT_NONE    => get_string('selectnoneop', 'facetoface'),
+    MDL_F2F_SELECT_ALL     => get_string('selectallop', 'facetoface'),
+    MDL_F2F_SELECT_SET     => get_string('selectsetop', 'facetoface'),
+    MDL_F2F_SELECT_NOT_SET => get_string('selectnotsetop', 'facetoface')
 );
 
 
@@ -4801,4 +4816,43 @@ function facetoface_archive_completion($userid, $courseid) {
         $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
         $completion->invalidatecache($courseid, $userid, true);
     }
+}
+
+/**
+ * Get attendance status
+ */
+function get_attendance_status() {
+    global $MDL_F2F_STATUS;
+
+    // Look for status fully_attended, partially_attended and no_show.
+    $statusoptions = array();
+    foreach ($MDL_F2F_STATUS as $key => $value) {
+        if ($key <= MDL_F2F_STATUS_BOOKED) {
+            continue;
+        }
+        $statusoptions[$key] = get_string('status_' . $value, 'facetoface');
+    }
+
+    return array_reverse($statusoptions, true);
+}
+/**
+ * Displays a bulk actions selector
+ */
+function display_bulk_actions_picker() {
+    global $OUTPUT;
+
+    $status_options = get_attendance_status();
+    unset($status_options[MDL_F2F_STATUS_NOT_SET]);
+    $out = $OUTPUT->container_start('facetoface-bulk-actions-picker');
+    $select = html_writer::select($status_options, 'bulkattendanceop', '',
+        array('' => get_string('bulkactions', 'facetoface')), array('class' => 'bulkactions'));
+    $label = get_string('mark_selected_as', 'facetoface');
+    $error = get_string('selectoptionbefore', 'facetoface');
+    $hidenlabel = html_writer::tag('span', $error, array('id' => 'selectoptionbefore', 'class' => 'hide error'));
+    $out .= $label;
+    $out .= $select;
+    $out .= $hidenlabel;
+    $out .= $OUTPUT->container_end();
+
+    return $out;
 }
