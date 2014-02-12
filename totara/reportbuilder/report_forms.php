@@ -1016,24 +1016,34 @@ class report_builder_save_form extends moodleform {
         $mform =& $this->_form;
         $report = $this->_customdata['report'];
         $id = $this->_customdata['id'];
+        $sid = isset($this->_customdata['sid']) ? $this->_customdata['sid'] : '';
         $filterparams = $report->get_restriction_descriptions('filter');
         $shortname = $report->shortname;
         $filtername = 'filtering_'.$shortname;
-        $searchsettings = serialize($SESSION->reportbuilder[$id]);
+        $searchsettings = (isset($SESSION->reportbuilder[$id])) ? serialize($SESSION->reportbuilder[$id]) : null;
         $params = implode(html_writer::empty_tag('br'), $filterparams);
 
-        $mform->addElement('header', 'savesearch', get_string('createasavedsearch', 'totara_reportbuilder'));
+        if (isset($this->_customdata['sid'])) {
+            $mform->addElement('header', 'savesearch', get_string('editingsavedsearch', 'totara_reportbuilder'));
+        } else {
+            $mform->addElement('header', 'savesearch', get_string('createasavedsearch', 'totara_reportbuilder'));
+        }
         $mform->addElement('static', 'description', '', get_string('savedsearchdesc', 'totara_reportbuilder'));
         $mform->addElement('static', 'params', get_string('currentsearchparams', 'totara_reportbuilder'), $params);
         $mform->addElement('text', 'name', get_string('searchname', 'totara_reportbuilder'));
         $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', get_string('missingsearchname', 'totara_reportbuilder'), 'required', null, 'server');
         $mform->addElement('advcheckbox', 'ispublic', get_string('publicallyavailable', 'totara_reportbuilder'), '', null, array(0, 1));
         $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'sid', $sid);
+        $mform->setType('sid', PARAM_INT);
         $mform->addElement('hidden', 'search', $searchsettings);
         $mform->setType('search', PARAM_TEXT);
-        $mform->addElement('hidden', 'userid', $USER->id);
-        $mform->setType('userid', PARAM_INT);
+        $mform->addElement('hidden', 'creatoruserid', $USER->id);
+        $mform->setType('creatoruserid', PARAM_INT);
+        $mform->addElement('hidden', 'action', 'edit');
+        $mform->setType('action', PARAM_ALPHANUMEXT);
 
         $this->add_action_buttons();
     }

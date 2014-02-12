@@ -8,19 +8,12 @@ div.multicheck-items fieldset.felement span {
 
 /* show/hide button alignment */
 .dir-ltr .rb-showhide.boxalignright {
+    clear: both;
     text-align: right;
 }
 .dir-rtl .rb-showhide.boxalignright {
+    clear: both;
     text-align: left;
-}
-
-.dir-ltr .rb-search {
-    margin-left: auto;
-    margin-right: 0;
-}
-.dir-rtl .rb-search {
-    margin-left: 0;
-    margin-right: auto;
 }
 
 .rb-search-menu {
@@ -200,4 +193,10 @@ form[id^="toolbarsearch"].mform .fsubmit {
 .rb-display-expand-link {
     margin-left: 20px;
     white-space: nowrap;
+}
+#rb-search-controls {
+    float: right;
+}
+#rb-search-controls > div {
+    display: inline-block;
 }

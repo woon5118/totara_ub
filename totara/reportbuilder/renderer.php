@@ -443,9 +443,10 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * @return string HTML to display the button
      */
     public function save_button($report) {
+        global $SESSION;
 
         $buttonsarray = optional_param_array('submitgroup', null, PARAM_TEXT);
-        $search = isset($buttonsarray['addfilter']) ? $buttonsarray['addfilter'] : null;
+        $search = (isset($SESSION->reportbuilder[$report->_id]) && !empty($SESSION->reportbuilder[$report->_id])) ? true : false;
         // If a report has required url params then scheduled reports require a saved search.
         // This is because the user needs to be able to save the search with no filters defined.
         $hasrequiredurlparams = isset($report->src->redirecturl);
@@ -519,6 +520,28 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
         // Close the container.
         $html .= html_writer::end_div();
+    }
+
+    /**
+     * Returns HTML for a button that lets users see saved search
+     *
+     * JQuery, dialog code and searchlist.js should be included in page
+     * when this is used (see code in report.php)
+     *
+     * @param int $report
+     * @return string HTML to display the button
+     */
+    public function manage_search_button($report) {
+        $html = html_writer::start_tag('div', array('class' => 'boxalignright'));
+        $html .= html_writer::start_tag('form');
+        $html .= html_writer::empty_tag('input', array('type' => 'button',
+            'class' => 'boxalignright',
+            'name' => 'rb_manage_search',
+            'id' => 'show-searchlist-dialog',
+            'value' => get_string('managesavedsearches', 'totara_reportbuilder')
+        ));
+        $html .= html_writer::end_tag('form');
+        $html .= html_writer::end_tag('div');
 
         return $html;
     }
@@ -578,30 +601,32 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      */
     public function saved_searches_table($searches, $report) {
         $tableheader = array(get_string('name', 'totara_reportbuilder'),
+                             get_string('publicsearch', 'totara_reportbuilder'),
                              get_string('options', 'totara_reportbuilder'));
         $data = array();
+        $stredit = get_string('edit');
+        $strdelete = get_string('delete', 'totara_reportbuilder');
 
         foreach ($searches as $search) {
+            $editurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
+                array('id' => $search->reportid, 'action' => 'edit', 'sid' => $search->id));
+            $deleteurl = new moodle_url('/totara/reportbuilder/savedsearches.php',
+                array('id' => $search->reportid, 'action' => 'delete', 'sid' => $search->id));
+
+            $actions = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle')) . ' ';
+            $actions .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+
             $row = array();
-            $strdelete = get_string('delete', 'totara_reportbuilder');
-            if ($report->embedded) {
-                $reporturl = new moodle_url($report->embeddedurl,
-                        array('id' => $search->reportid, 'sid' => $search->id));
-            } else {
-                $reporturl = new moodle_url('/totara/reportbuilder/report.php',
-                        array('id' => $search->reportid, 'sid' => $search->id));
-            }
-
-            $row[] = html_writer::link($reporturl, $search->name );
-
-            $deleteurl = new moodle_url('/totara/reportbuilder/savedsearches.php', array('id' => $search->reportid, 'd' => 1, 'sid' => $search->id));
-            $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
-            $row[] = $delete;
+            $row[] = $search->name;
+            $row[] = ($search->ispublic) ? get_string('yes') : get_string('no');
+            $row[] = $actions;
             $data[] = $row;
         }
+
         $table = new html_table();
         $table->summary = '';
         $table->head = $tableheader;
+        $table->attributes['class'] = 'fullwidth generaltable';
         $table->data = $data;
 
         return html_writer::table($table);

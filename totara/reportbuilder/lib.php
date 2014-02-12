@@ -380,6 +380,18 @@ class reportbuilder {
                 'moodle' => array('ok')
             );
             $js[] = $jsdetails;
+
+            // Add saved search.js.
+            $jsdetails = new stdClass();
+            $jsdetails->initcall = 'M.totara_reportbuilder_savedsearches.init';
+            $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_savedsearches',
+                'fullpath' => '/totara/reportbuilder/saved_searches.js');
+            $jsdetails->strings = array(
+                'totara_reportbuilder' => array('managesavedsearches'),
+                'form' => array('close')
+            );
+            $js[] = $jsdetails;
+
             $dialog = true;
         }
 
@@ -3396,9 +3408,7 @@ class reportbuilder {
             $select = new single_select($common, 'sid', $savedoptions, $sid);
             $select->label = get_string('viewsavedsearch', 'totara_reportbuilder');
             $select->formid = 'viewsavedsearch';
-
             return $OUTPUT->render($select);
-
         } else {
             return '';
         }
@@ -3423,24 +3433,21 @@ class reportbuilder {
             return '';
         }
 
-        $table = new html_table();
-        $row = new html_table_row();
-        $table->attributes['class'] = 'invisiblepadded rb-search';
+        $controls = html_writer::start_tag('div', array('id' => 'rb-search-controls'));
 
         if (strlen($savedbutton) != 0) {
-            $row->cells[] = new html_table_cell($savedbutton);
+            $controls .= $savedbutton;
         }
         if (strlen($savedmenu) != 0) {
-             $cell = new html_table_cell($savedmenu);
-             $cell->attributes['class'] .= 'rb-search-menu';
-             $row->cells[] = $cell;
+            $managesearchbutton = $output->manage_search_button($this);
+            $controls .= html_writer::tag('div', $savedmenu, array('id' => 'rb-search-menu'));
+            $controls .=  html_writer::tag('div', $managesearchbutton, array('id' => 'manage-saved-search-button'));;
         }
 
-        $table->data = array($row);
-        return html_writer::table($table);
+        $controls .= html_writer::end_tag('div');
+        return $controls;
 
     }
-
 
     /**
      * Returns HTML for a button that when clicked, takes the user to a page which
