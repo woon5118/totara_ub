@@ -408,6 +408,25 @@ fieldset.surround legend,
     width: auto;
     margin: 0;
 }
+
+/**
+ * Course layout fixes
+ */
+.coursebox .info {
+    position: relative;
+}
+.coursebox .info h3.name {
+    margin-right: 25px;
+}
+.coursebox .info .enrolmenticons {
+    position: absolute;
+    right: 0;
+}
+.coursebox .content .summary {
+    float: none;
+    width: auto;
+}
+
 /**
  * Moodle Forms
  */
