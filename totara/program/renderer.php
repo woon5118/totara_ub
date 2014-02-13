@@ -73,7 +73,7 @@ class totara_program_renderer extends plugin_renderer_base {
             $event = new $class();
             $dropdown_options[$event->get_id()] = $event->get_name();
         }
-        $out = html_writer::select($dropdown_options, $name, null, null, array('id' => $name, 'class' => $name, 'onchange' => 'handle_completion_selection(this.options[this.selectedIndex].value)'));
+        $out = html_writer::select($dropdown_options, $name, null, null, array('id' => $name, 'class' => $name, 'onchange' => 'handle_completion_selection()'));
         $out .= html_writer::script(prog_assignments::get_completion_events_script($name));
         return $out;
     }
@@ -431,7 +431,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $out .= ' ' . get_string('of', 'totara_program') . ' ';
         $out .= $this->completion_events_dropdown();
         $out .= html_writer::empty_tag('input', array('id' => 'instance', 'type' => 'hidden', 'name' => "instance", 'value' => ''));
-        $out .= html_writer::link('#', '', array('id' => 'instancetitle'));
+        $out .= html_writer::link('#', '', array('id' => 'instancetitle', 'onclick' => 'handle_completion_selection()'));
         $out .= html_writer::start_tag('button', array('class' => 'relativeeventtime')) . get_string('settimerelativetoevent', 'totara_program') . html_writer::end_tag('button');
         $out .= html_writer::end_tag('div');
 

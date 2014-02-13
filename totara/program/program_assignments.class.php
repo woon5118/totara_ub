@@ -283,13 +283,15 @@ class prog_assignments {
         $out = '';
 
         $out .= "
-            function handle_completion_selection(eventId) {
+            function handle_completion_selection() {
+                var eventselected = $('#eventtype option:selected').val();
+                eventid = eventselected;
         ";
 
         // Get the script that should be run if we select a specific event
         foreach ($COMPLETION_EVENTS_CLASSNAMES as $class) {
             $event = new $class();
-            $out .= "if (eventId == ". $event->get_id() .") { " . $event->get_script() . " }";
+            $out .= "if (eventid == ". $event->get_id() .") { " . $event->get_script() . " }";
         }
 
         $out .= "
@@ -1394,12 +1396,11 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
         global $CFG;
 
         return "
-            totaraDialogs['completionevent'].set_to_none();
             totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
-                handle_completion_selection(". $this->get_id() .");
+                handle_completion_selection();
                 return false;
             });
         ";
@@ -1444,12 +1445,11 @@ class prog_assigment_completion_program_completion extends prog_assignment_compl
         global $CFG;
 
         return "
-            totaraDialogs['completionevent'].set_to_none();
             totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_program.php?';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
-                handle_completion_selection(". $this->get_id() .");
+                handle_completion_selection();
                 return false;
             });
 
@@ -1497,12 +1497,11 @@ class prog_assigment_completion_course_completion extends prog_assignment_comple
         global $CFG;
 
         return "
-            totaraDialogs['completionevent'].set_to_none();
             totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_course.php?';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
-                handle_completion_selection(". $this->get_id() .");
+                handle_completion_selection();
                 return false;
             });
 
@@ -1549,12 +1548,11 @@ class prog_assigment_completion_profile_field_date extends prog_assignment_compl
         global $CFG;
 
         return "
-            totaraDialogs['completionevent'].set_to_none();
             totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_profile_field.php?';
             totaraDialogs['completionevent'].open();
 
             $('#instancetitle').unbind('click').click(function() {
-                handle_completion_selection(". $this->get_id() .");
+                handle_completion_selection();
                 return false;
             });
         ";
