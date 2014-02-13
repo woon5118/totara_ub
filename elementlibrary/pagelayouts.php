@@ -96,11 +96,11 @@ $url = new moodle_url('/elementlibrary/pagelayouts.php', array('layout' => $layo
 $PAGE->set_url($url);
 $PAGE->set_title($strheading);
 $PAGE->set_heading($strheading);
+admin_externalpage_setup('elementlibrary');
+
 if ($layout) {
     $PAGE->set_pagelayout($layout);
 }
-
-admin_externalpage_setup('elementlibrary');
 
 echo $OUTPUT->header();
 
