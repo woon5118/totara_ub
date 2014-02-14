@@ -513,6 +513,9 @@ input[type="checkbox"] {
     padding:10px 0 10px;
     border:none;
 }
+.mform fieldset.collapsible legend a.fheader {
+    margin-left: 0;
+}
 .mform fieldset legend {
     width:100%;
     color:#333333;
@@ -683,7 +686,7 @@ input[type="checkbox"] {
 }
 .tabtree .tabrow0 li.here a {
     position: relative;
-    z-index: 102;
+    z-index: 1;
 }
 .dir-rtl .tabtree .tabrow0 li a {
     margin-left: 3px;
