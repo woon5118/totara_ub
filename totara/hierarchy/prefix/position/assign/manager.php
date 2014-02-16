@@ -28,14 +28,14 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.
 $userid = required_param('userid', PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-require_login();
+
+if (!(get_config('totara_hierarchy', 'allowsignupmanager') && $userid == 0)) {
+    require_login();
+}
 
 ///
 /// Setup / loading data
 ///
-
-// Setup page
-require_login();
 
 //get guest user for exclusion purposes
 $guest = guest_user();

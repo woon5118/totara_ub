@@ -441,6 +441,43 @@ function profile_save_data($usernew) {
     }
 }
 
+function position_save_data($userprofile) {
+    global $CFG;
+    require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+
+    $allowsignupposition = get_config('totara_hierarchy', 'allowsignupposition');
+    $allowsignuporganisation = get_config('totara_hierarchy', 'allowsignuporganisation');
+    $allowsignupmanager = get_config('totara_hierarchy', 'allowsignupmanager');
+
+    if (!$allowsignupposition && !$allowsignuporganisation && !$allowsignupmanager) {
+        return;
+    }
+
+    $data = new stdClass();
+    $data->type = POSITION_TYPE_PRIMARY;
+    $data->userid = $userprofile->id;
+    if ($allowsignupmanager) {
+        $data->managerid = isset($userprofile->managerid) ? $userprofile->managerid : null;
+    }
+
+    if ($allowsignuporganisation) {
+        $data->organisationid = isset($userprofile->organisationid) ? $userprofile->organisationid : null;
+    }
+
+    if ($allowsignupposition) {
+        $data->positionid = isset($userprofile->positionid) ? $userprofile->positionid : null;
+    }
+
+    $position_assignment = new position_assignment(
+        array(
+            'userid'    => $data->userid,
+            'type'      => $data->type
+        )
+    );
+    position_assignment::set_properties($position_assignment, $data);
+    assign_user_position($position_assignment);
+}
+
 /**
  * Display current primary hierarchy information for the given user
  * @param  integer  userid
@@ -523,6 +560,93 @@ function profile_signup_fields($mform) {
             $formfield = new $newfield($field->fieldid);
             $formfield->edit_field($mform);
         }
+    }
+}
+
+function profile_signup_position($mform, $nojs) {
+    global $DB;
+
+    // Position details.
+    if ($nojs) {
+        $allpositions = $DB->get_records_menu('pos', null, 'frameworkid,sortthread', 'id,fullname');
+        $mform->addElement('select', 'positionid', get_string('chooseposition', 'totara_hierarchy'), $allpositions);
+        $mform->addHelpButton('positionid', 'chooseposition', 'totara_hierarchy');
+    } else {
+        $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),
+            html_writer::tag('span', '', array('class' => '', 'id' => 'positiontitle')).
+            html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_hierarchy'), 'id' => 'show-position-dialog'))
+        );
+        $mform->addElement('hidden', 'positionid');
+        $mform->setType('positionid', PARAM_INT);
+        $mform->setDefault('positionid', 0);
+        $mform->addHelpButton('positionselector', 'chooseposition', 'totara_hierarchy');
+    }
+}
+
+function profile_signup_organisation($mform, $nojs) {
+    global $DB;
+
+    // Organisation details.
+    if ($nojs) {
+        $allorgs = $DB->get_records_menu('org', null, 'frameworkid,sortthread', 'id,fullname');
+        if (is_array($allorgs) && !empty($allorgs)) {
+            $mform->addElement('select', 'organisationid', get_string('chooseorganisation', 'totara_hierarchy'),
+                array(0 => get_string('chooseorganisation', 'totara_hierarchy')) + $allorgs);
+        } else {
+            $mform->addElement('static', 'organisationid', get_string('chooseorganisation', 'totara_hierarchy'), get_string('noorganisation', 'totara_hierarchy') );
+        }
+        $mform->addHelpButton('organisationid', 'chooseorganisation', 'totara_hierarchy');
+    } else {
+        $mform->addElement('static', 'organisationselector', get_string('organisation', 'totara_hierarchy'),
+            html_writer::tag('span', '', array('class' => '', 'id' => 'organisationtitle')) .
+            html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_hierarchy'), 'id' => 'show-organisation-dialog'))
+        );
+
+        $mform->addElement('hidden', 'organisationid');
+        $mform->setType('organisationid', PARAM_INT);
+        $mform->setDefault('organisationid', 0);
+        $mform->addHelpButton('organisationselector', 'chooseorganisation', 'totara_hierarchy');
+    }
+}
+
+function profile_signup_manager($mform, $nojs) {
+    global $DB;
+
+    // Manager details.
+    if ($nojs) {
+        $allmanagers = $DB->get_records_sql_menu("
+                    SELECT
+                        u.id,
+                        " . $DB->sql_fullname('u.firstname', 'u.lastname') . " AS fullname
+                    FROM
+                        {user} u
+                    ORDER BY
+                        u.firstname,
+                        u.lastname");
+        if (is_array($allmanagers) && !empty($allmanagers)) {
+            // Manager.
+            $mform->addElement('select', 'managerid', get_string('choosemanager', 'totara_hierarchy'),
+                array(0 => get_string('choosemanager', 'totara_hierarchy')) + $allmanagers);
+            $mform->setType('managerid', PARAM_INT);
+        } else {
+            $mform->addElement('static', 'managerid', get_string('choosemanager', 'totara_hierarchy'),
+                get_string('error:dialognotreeitems', 'totara_core'));
+
+        }
+        $mform->addHelpButton('managerid', 'choosemanager', 'totara_hierarchy');
+    } else {
+        // Show manager
+        $mform->addElement(
+            'static',
+            'managerselector',
+            get_string('manager', 'totara_hierarchy'),
+            html_writer::tag('span', '', array('class' => '', 'id' => 'managertitle')) .
+            html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+        );
+
+        $mform->addElement('hidden', 'managerid');
+        $mform->setType('managerid', PARAM_INT);
+        $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
     }
 }
 

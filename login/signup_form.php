@@ -97,6 +97,34 @@ class login_signup_form extends moodleform {
 
         profile_signup_fields($mform);
 
+        $requirenojs = false;
+        $nojs = optional_param('nojs', 0, PARAM_BOOL);
+
+        // Manage positions in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignupposition')) {
+            profile_signup_position($mform, $nojs);
+            $requirenojs = true;
+        }
+
+        // Manage organisations in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignuporganisation')) {
+            profile_signup_organisation($mform, $nojs);
+            $requirenojs = true;
+        }
+
+        // Manage managers in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignupmanager')) {
+            profile_signup_manager($mform, $nojs);
+            $requirenojs = true;
+        }
+
+        if ($requirenojs) {
+            if (!$nojs) {
+                $mform->addElement('html', html_writer::tag('noscript', html_writer::tag('p', get_string('formrequiresjs', 'totara_hierarchy') .
+                    html_writer::link(new moodle_url(qualified_me(), array('nojs' => '1')), get_string('clickfornonjsform', 'totara_hierarchy')))));
+            }
+        }
+
         if (!empty($CFG->sitepolicy)) {
             $mform->addElement('header', 'policyagreement', get_string('policyagreement'), '');
             $mform->setExpanded('policyagreement');

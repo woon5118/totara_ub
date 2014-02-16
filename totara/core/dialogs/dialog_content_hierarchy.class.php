@@ -125,10 +125,12 @@ class totara_dialog_content_hierarchy extends totara_dialog_content {
      * @param   $prefix         string  Hierarchy prefix
      * @param   $frameworkid    int     Framework id (optional)
      * @param   $showhidden     boolean When listing frameworks, include hidden frameworks (optional)
+     * @param bool $skipaccesschecks
      */
-    public function __construct($prefix, $frameworkid = 0, $showhidden = false) {
+    public function __construct($prefix, $frameworkid = 0, $showhidden = false, $skipaccesschecks = false) {
 
         // Make some capability checks
+        $this->skip_access_checks = $skipaccesschecks;
         if (!$this->skip_access_checks) {
             require_login();
             require_capability("totara/hierarchy:view{$prefix}", context_system::instance());

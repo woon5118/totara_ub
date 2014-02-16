@@ -71,6 +71,19 @@ $string['allcompetencyscales'] = 'All competency scales';
 $string['allframeworks'] = 'All frameworks';
 $string['allgoalscales'] = 'All goal scales';
 $string['alltypes'] = 'All types';
+$string['allowsignuporganisation'] = 'Organisation';
+$string['allowsignuporganisationsecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about organisations will be public.';
+$string['allowsignuporganisation_help'] = 'When this option is selected and Self-registration is enabled,
+the organisation field will be available for users in the sign-up';
+$string['allowsignupposition'] = 'Position';
+$string['allowsignuppositionfields'] = 'Allow primary position fields';
+$string['allowsignuppositionsecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about positions will be public.';
+$string['allowsignupposition_help'] = 'When this option is selected and Self-registration is enabled,
+the position field will be available for users in the sign-up';
+$string['allowsignupmanager'] = 'Manager';
+$string['allowsignupmanagersecurityrisk'] =  'Security risk: Please be aware that while this option is enabled, information about users will be public.';
+$string['allowsignupmanager_help'] = 'When this option is selected and Self-registration is enabled,
+the manager field will be available for users in the sign-up';
 $string['andchildren'] = ' (and children)';
 $string['appraiser'] = 'Appraiser';
 $string['assign'] = 'Assign';
@@ -897,6 +910,7 @@ $string['nogoal'] = 'No goals defined';
 $string['nogoalsassignedtoposition'] = 'No goals assigned to position';
 $string['nogoalscales'] = 'You must define at least one goal scale with values before you can define a goal framework.';
 $string['nogoalsinframework'] = 'No goals in this framework';
+$string['nomanager'] = 'No managers defined';
 $string['nonsensicalproficientvalues'] = 'Warning: You have proficient values below non-proficient values in this scale. Remember that your scale should be ordered from most proficient at the top, to least proficient at the bottom.';
 $string['noorganisation'] = 'No organisations defined';
 $string['noorganisationsinframework'] = 'No organisations in this framework';

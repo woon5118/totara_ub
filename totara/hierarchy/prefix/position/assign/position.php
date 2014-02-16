@@ -26,8 +26,11 @@ require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
 
 $PAGE->set_context(context_system::instance());
-require_login();
 
+$skipaccess = (get_config('totara_hierarchy', 'allowsignupposition') && $USER->id == 0);
+if (!$skipaccess) {
+    require_login();
+}
 ///
 /// Load parameters
 ///
@@ -47,7 +50,7 @@ $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 ///
 
 // Load dialog content generator
-$dialog = new totara_dialog_content_hierarchy('position', $frameworkid);
+$dialog = new totara_dialog_content_hierarchy('position', $frameworkid, false, $skipacces);
 
 // Toggle treeview only display
 $dialog->show_treeview_only = $treeonly;

@@ -96,6 +96,12 @@ class auth_plugin_email extends auth_plugin_base {
         // Save any custom profile field information.
         profile_save_data($user);
 
+        // Save primary position fields if selected and settings allow it.
+        position_save_data($user);
+
+        $user = $DB->get_record('user', array('id' => $user->id));
+        events_trigger('user_created', $user);
+
         if (! send_confirmation_email($user)) {
             print_error('auth_emailnoemail','auth_email');
         }
@@ -222,13 +228,17 @@ class auth_plugin_email extends auth_plugin_base {
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // set to defaults if undefined
+        // Set to defaults if undefined.
         if (!isset($config->recaptcha)) {
             $config->recaptcha = false;
         }
 
-        // save settings
+        // Save settings.
         set_config('recaptcha', $config->recaptcha, 'auth/email');
+        set_config('allowsignupposition', $config->allowsignupposition, 'totara_hierarchy');
+        set_config('allowsignuporganisation', $config->allowsignuporganisation, 'totara_hierarchy');
+        set_config('allowsignupmanager', $config->allowsignupmanager, 'totara_hierarchy');
+
         return true;
     }
 
