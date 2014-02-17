@@ -3,6 +3,42 @@
 
 Totara LMS Changelog
 
+Release 2.5.8 (18th February 2014):
+==================================================
+
+Security Fixes:
+    T-11765    Set lockout threshold by default to help protect against brute force password attempt
+
+Improvements:
+    T-11596    Added capability to filter by some default fields in Facetoface calendar
+    T-11780    Marked expired certifications due date as overdue
+    T-11828    Avoided ajax call when changing rules in Audience that use radiobuttons
+    T-11722    Made org and pos content restrictions consistent across report sources
+    T-11786    Improved appearance of tables with headers/toolbars in responsive theme
+    T-11506    Added Time signed up to attendees tab for Facetoface
+
+Bug Fixes:
+    T-10885    Fixed Learning Plan enrolment plugin to ensure it enrols learners in course
+    T-11777    Allow wait-listed users to cancel Facetoface bookings if session is over or in progress
+    T-11237    Fixed drop down list forgetting previously saved values in program/certification assignments
+    T-11392    Fixed second level tabs overlapping the following text in Kiwifruit theme
+    T-11815    Fixed fatal error when grading a quiz triggers completion notification messages
+    T-10488    Fixed "reports to manager" Audience rule
+    T-11677    Ensure parent page refresh to start completion checks when SCORM opens as popup
+    T-11755    Fixed course completion upload when multiple records for one user exist in CSV file
+    T-11825    Fixed appearance of popup windows in Kiwifruit theme
+    T-11826    Fixed issue where tabs could appear above modal dialogs
+    T-11798    Remove suspended users from any prior Facetoface bookings
+    T-11791    Fixed issue where menu button didn't display the menu correctly on the iPhone in Totara responsive theme
+    T-11308    Made extra-field aliases unique to avoid name collisions in Report Builder
+    T-11793    Re-added program administration, course reminders, and course competencies navigation
+    T-11784    Fixed issue where the Custom Totara theme wasn't inheriting the base renderer
+    T-11802    Fixed Customtotara Theme issue where certain background colours could make headings hard to read
+    T-11789    Added missing user fields to RoL Certification and Program report sources
+    T-11795    Fixed issue with notice dialog buttons in Totara responsive theme
+    T-11790    Fixed incorrect embedded url in RoL Programs Completion History report
+
+
 Release 2.5.7 (4th February 2014):
 ==================================================
 
