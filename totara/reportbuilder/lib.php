@@ -4122,6 +4122,8 @@ class reportbuilder {
             $extrafieldalias = reportbuilder_get_extrafield_alias($column->type, $column->value, $extrafield);
             if (isset($row->$extrafieldalias)) {
                 $extrafieldsrow->$extrafield = $row->$extrafieldalias;
+            } else {
+                $extrafieldsrow->$extrafield = null;
             }
         }
 
