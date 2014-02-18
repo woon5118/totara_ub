@@ -83,7 +83,7 @@ class upload_form extends moodleform {
 
         $encodings = textlib::get_encodings();
         $mform->addElement('select', 'csvencoding', get_string('csvencoding', 'totara_completionimport'), $encodings);
-        $mform->setType('csvdelimiter', PARAM_TEXT);
+        $mform->setType('csvencoding', PARAM_TEXT);
         $mform->setDefault('csvencoding', 'UTF-8');
 
         $overrideactivestr = get_string('overrideactive' . $data->importname, 'totara_completionimport');
