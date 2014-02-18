@@ -144,6 +144,7 @@ $string['appraiseridnumber'] = 'Appraiser';
 $string['auth'] = 'Auth';
 $string['password'] = 'Password';
 $string['suspended'] = 'Suspended';
+$string['emailstop'] = 'Turn email off';
 $string['customfields'] = 'Custom fields';
 $string['csvimportfilestructinfo'] = 'The current config requires a CSV file with the following structure:<br><pre>{$a}<br>...<br>...<br>...</pre>';
 

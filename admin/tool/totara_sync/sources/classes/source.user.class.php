@@ -55,6 +55,7 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'firstname',
             'lastname',
             'email',
+            'emailstop',
             'city',
             'country',
             'timezone',
@@ -269,6 +270,9 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         if (!empty($this->config->import_suspended)) {
             $table->add_field('suspended', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        }
+        if (!empty($this->config->import_emailstop)) {
+            $table->add_field('emailstop', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         }
         $table->add_field('customfields', XMLDB_TYPE_TEXT, 'big');
 
