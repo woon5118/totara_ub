@@ -574,7 +574,7 @@ $string['setting:defaultconfirmationinstrmngrdefault'] = '*** Advice only ****
 
 This is to advise that [firstname] [lastname] has been booked for the following course and listed you as their Team Leader / Manager.
 
-If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.  If have concerns about your staff member taking this course please discuss this with them directly.
+If you are not their Team Leader / Manager and believe you have received this email by mistake please reply to this email.  If you have concerns about your staff member taking this course please discuss this with them directly.
 
 ';
 $string['setting:defaultconfirmationinstrmngrcopybelow'] = '*** [firstname] [lastname]\'s booking confirmation is copied below ****';
