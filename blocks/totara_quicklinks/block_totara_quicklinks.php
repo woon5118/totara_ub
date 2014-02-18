@@ -70,22 +70,27 @@ class block_totara_quicklinks extends block_base {
 
         // Get links to display
         $links = $DB->get_records('block_quicklinks', array('block_instance_id' => $this->instance->id), 'displaypos', 'id, url, title');
-
-        $table = new html_table();
-        $table->data = array();
-        $counter = 0;
-        foreach ($links as $l) {
-            $rowclass = ($counter % 2) ? 'noshade' : 'shade';
-            $counter++;
-            $cell = new html_table_cell(html_writer::tag('div', html_writer::link(format_string($l->url), format_string($l->title)), array('class' => 'quicklink-title')));
-            $cell->attributes['class'] = 'linkname';
-            $row = new html_table_row(array($cell));
-            $row->attributes['class'] = $rowclass;
-            $table->data[] = $row;
+        if (count($links) == 0) {
+            $this->content->text = get_string('noquicklinks', 'block_totara_quicklinks');
+            return $this->content;
         }
 
-        $this->content->text = html_writer::table($table);
+        $linksoutput = html_writer::start_tag('ul');
+        $odd = true;
+        foreach ($links as $link) {
+            $classes = "";
+            if ($odd) {
+                $classes = 'odd';
+            }
 
+            $linksoutput .= html_writer::start_tag('li', array('class' => $classes));
+            $linksoutput .= html_writer::link(format_string($link->url), format_string($link->title));
+            $linksoutput .= html_writer::end_tag('li');
+            $odd = !$odd;
+        }
+
+        $linksoutput .= html_writer::end_tag('ul');
+        $this->content->text = $linksoutput;
         return $this->content;
     }
 
