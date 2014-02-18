@@ -110,6 +110,11 @@ div.plan_box {
     padding: 10px 0;
 }
 
+#dp-plan-content .notifynotice input[type="submit"] {
+    margin: 0;
+    margin-left: 5px;
+}
+
 .dir-rtl #dp-plan-content #dp-plans-description .instructional_text {
     float: right;
 }

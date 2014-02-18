@@ -1031,29 +1031,16 @@ class development_plan {
         $out .= html_writer::start_tag('form', array('action' => new moodle_url('/totara/plan/action.php'), 'method' => 'post', 'class' => 'approvalform'));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $this->id));
         $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-
-        $table = new html_table();
-        $table->attributes['class'] = 'invisiblepadded';
-        $row = new html_table_row();
-        $cell = new html_table_cell(get_string('plannotapproved', 'totara_plan'));
-        $cell->attributes['class'] = 'c0';
-        $row->cells[] = $cell;
+        $out .= get_string('plannotapproved', 'totara_plan');
 
         if ($canapproveplan) {
-            $content = html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approve', 'value' => get_string('approve', 'totara_plan')));
-            $content .= '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'decline', 'value' => get_string('decline', 'totara_plan')));
-            $cell = new html_table_cell($content);
-            $cell->attributes['class'] = 'c1';
-            $row->cells[] = $cell;
-        } else if ($canrequestapproval) {
-            $content = html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
-            $cell = new html_table_cell($content);
-            $cell->attributes['class'] = 'c1';
-            $row->cells[] = $cell;
-        }
-        $table->data = array($row);
+            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approve', 'value' => get_string('approve', 'totara_plan')));
+            $out .= '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'decline', 'value' => get_string('decline', 'totara_plan')));
 
-        $out .= html_writer::table($table);
+        } else if ($canrequestapproval) {
+            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
+        }
+
         $out .= html_writer::end_tag('form');
         return $out;
     }
