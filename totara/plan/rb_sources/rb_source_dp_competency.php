@@ -210,6 +210,9 @@ from
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'base','userid');
+        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -477,6 +480,9 @@ from
         );
 
         $this->add_user_fields_to_columns($columnoptions);
+        $this->add_position_fields_to_columns($columnoptions);
+        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_cohort_user_fields_to_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -528,6 +534,9 @@ from
         );
 
         $this->add_user_fields_to_filters($filteroptions);
+        $this->add_position_fields_to_filters($filteroptions);
+        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_cohort_user_fields_to_filters($filteroptions);
 
         return $filteroptions;
     }

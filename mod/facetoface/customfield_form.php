@@ -60,8 +60,6 @@ class mod_facetoface_customfield_form extends moodleform {
 
         $mform->addElement('checkbox', 'required', get_string('required'));
         $mform->setDefault('required', false);
-        $mform->addElement('checkbox', 'isfilter', get_string('setting:isfilter', 'facetoface'));
-        $mform->setDefault('isfilter', false);
         $mform->addElement('checkbox', 'showinsummary', get_string('setting:showinsummary', 'facetoface'));
         $mform->setDefault('showinsummary', true);
 

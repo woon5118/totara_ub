@@ -72,6 +72,11 @@ class rb_source_dp_program_recurring extends rb_base_source {
             ),
         );
 
+        $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
+
         return $joinlist;
     }
 
@@ -165,6 +170,11 @@ class rb_source_dp_program_recurring extends rb_base_source {
             )
         );
 
+        $this->add_user_fields_to_columns($columnoptions);
+        $this->add_position_fields_to_columns($columnoptions);
+        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_cohort_user_fields_to_columns($columnoptions);
+
         return $columnoptions;
     }
 
@@ -247,6 +257,12 @@ class rb_source_dp_program_recurring extends rb_base_source {
                 get_string('completiondate', 'totara_program'),
                 'date'
             );
+
+        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_position_fields_to_filters($filteroptions);
+        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_cohort_user_fields_to_filters($filteroptions);
+
         return $filteroptions;
     }
 
@@ -283,6 +299,10 @@ class rb_source_dp_program_recurring extends rb_base_source {
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
             array(
+                'type' => 'user',
+                'value' => 'namelink',
+            ),
+            array(
                 'type' => 'program_completion_history',
                 'value' => 'courselink',
             ),
@@ -291,7 +311,18 @@ class rb_source_dp_program_recurring extends rb_base_source {
     }
 
     protected function define_defaultfilters() {
-        $defaultfilters = array();
+        $defaultfilters = array(
+            array(
+                'type' => 'user',
+                'value' => 'fullname',
+                'advanced' => 0,
+            ),
+            array(
+                'type' => 'program',
+                'value' => 'fullname',
+                'advanced' => 0,
+            ),
+        );
         return $defaultfilters;
     }
 

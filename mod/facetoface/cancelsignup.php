@@ -25,8 +25,6 @@ require_once '../../config.php';
 require_once 'lib.php';
 require_once 'cancelsignup_form.php';
 
-global $DB;
-
 $s  = required_param('s', PARAM_INT); // facetoface session ID
 $confirm           = optional_param('confirm', false, PARAM_BOOL);
 $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT);
@@ -64,9 +62,15 @@ if ($fromform = $mform->get_data()) { // Form submitted
         print_error('error:unknownbuttonclicked', 'facetoface', $returnurl);
     }
 
+    $forcecancel = false;
+    $timenow = time();
+    $bookedsession = facetoface_get_user_submissions($facetoface->id, $USER->id, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_WAITLISTED, $session->id);
+    if (!empty($bookedsession) && facetoface_has_session_started($session, $timenow)) {
+        $forcecancel = true;
+    }
 
     $errorstr = '';
-    if (facetoface_user_cancel($session, false, false, $errorstr, $fromform->cancelreason)) {
+    if (facetoface_user_cancel($session, false, $forcecancel, $errorstr, $fromform->cancelreason)) {
         add_to_log($course->id, 'facetoface', 'cancel booking', "cancelsignup.php?s=$session->id", $facetoface->id, $cm->id);
 
         $message = get_string('bookingcancelled', 'facetoface');

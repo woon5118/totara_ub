@@ -34,6 +34,11 @@ $handlers = array (
         'handlerfunction'   => 'facetoface_eventhandler_user_deleted',
         'schedule'          => 'instant'
     ),
+    'user_suspended' => array(
+        'handlerfile'       => '/mod/facetoface/lib.php',
+        'handlerfunction'   => 'facetoface_eventhandler_user_suspended',
+        'schedule'          => 'instant'
+    ),
     'user_unenrolled' => array(
         'handlerfile'       => '/mod/facetoface/lib.php',
         'handlerfunction'   => 'facetoface_eventhandler_user_unenrolled',

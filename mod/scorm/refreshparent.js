@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara LMS
  *
@@ -17,30 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage theme
+ * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
+ * @package mod/scorm
  */
 
-$THEME->name = 'customtotara';
-$THEME->parents = array('standardtotara', 'standard', 'base');
-$THEME->sheets = array(
-    'core',     /** Must come first**/
-    'navigation',
-    'admin',
-    'blocks',
-    'calendar',
-    'course',
-    'user',
-    'dock',
-    'grade',
-    'message',
-    'modules',
-    'question',
-    'pagelayout',
-    'settings'
-);
-
-$THEME->enable_dock = true;
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->csspostprocess = 'theme_customtotara_process_css';
+window.onunload = refreshParent;
+function refreshParent() {
+    window.opener.location.reload();
+}

@@ -120,13 +120,14 @@ class rb_cohort_orphaned_users_embedded_cache_test extends reportcache_advanced_
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $useridalias = reportbuilder_get_extrafield_alias('user', 'namelinkicon', 'user_id');
         $result = $this->get_report_result($this->report_builder_data['shortname'],  array(), $usecache);
         $this->assertCount(4, $result);
         $was = array();
         foreach($result as $r) {
-            $this->assertContains($r->user_id, array(2, $this->users[0]->id, $this->users[5]->id, $this->users[7]->id));
-            $this->assertNotContains($r->user_id, $was);
-            $was[] = $r->user_id;
+            $this->assertContains($r->$useridalias, array(2, $this->users[0]->id, $this->users[5]->id, $this->users[7]->id));
+            $this->assertNotContains($r->$useridalias, $was);
+            $was[] = $r->$useridalias;
         }
 
     }

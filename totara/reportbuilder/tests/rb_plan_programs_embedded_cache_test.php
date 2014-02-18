@@ -150,11 +150,12 @@ class rb_plan_programs_embedded_cache_test extends reportcache_advanced_testcase
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $programidalias = reportbuilder_get_extrafield_alias('program', 'proglinkicon', 'program_id');
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user1->id,), $usecache);
         $this->assertCount(2, $result);
         $was = array();
         foreach($result as $r) {
-            $this->assertContains($r->program_id, array($this->program1->id, $this->program3->id));
+            $this->assertContains($r->$programidalias, array($this->program1->id, $this->program3->id));
             $this->assertNotContains($r->program_proglinkicon, $was);
             $was[] = $r->program_proglinkicon;
         }
@@ -163,7 +164,7 @@ class rb_plan_programs_embedded_cache_test extends reportcache_advanced_testcase
         $this->assertCount(3, $result);
         $was = array();
         foreach($result as $r) {
-            $this->assertContains($r->program_id, array($this->program2->id, $this->program3->id, $this->program4->id));
+            $this->assertContains($r->$programidalias, array($this->program2->id, $this->program3->id, $this->program4->id));
             $this->assertNotContains($r->program_proglinkicon, $was);
             $was[] = $r->program_proglinkicon;
         }

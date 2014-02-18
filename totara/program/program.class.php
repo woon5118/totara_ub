@@ -727,7 +727,9 @@ class program {
      * @return bool True if the program is assigned to a learning plan, false if not
      */
     public function assigned_to_users_non_required_learning($userid) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/plan/lib.php');
+
         $sql = "SELECT p.id
                 FROM {dp_plan} AS p
                 JOIN {dp_plan_program_assign} AS ppa ON p.id = ppa.planid
@@ -1033,11 +1035,14 @@ class program {
         }
 
         $userassigned = $this->user_is_assigned($userid);
+        $timedue = null;
 
         // display the reason why this user has been assigned to the program (if it is mandatory for the user)
         if ($userassigned) {
             $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
             $user_assignments = $DB->get_records_select('prog_user_assignment', "programid = ? AND userid = ?", array($this->id, $userid));
+            $timedue = $prog_completion->timedue;
+
             if (count($user_assignments) > 0) {
                 if ($viewinganothersprogram) {
                     $message .= html_writer::tag('p', get_string('assignmentcriteriamanager', 'totara_program'));
@@ -1070,11 +1075,19 @@ class program {
                 $out .= html_writer::start_tag('p', array('class' => 'certifpath'));
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
                     if ($certifcompletion->renewalstatus == CERTIFRENEWALSTATUS_EXPIRED) {
+                        $sql = 'SELECT MAX(timeexpires)
+                                FROM {certif_completion_history}
+                                WHERE userid = :uid
+                                AND certifid = :cid';
+                        $params = array('uid' => $userid, 'cid' => $this->certifid);
+                        $timedue = $DB->get_field_sql($sql, $params);
+
                         $out .= get_string('certexpired', 'totara_certification');
                     } else {
                         $out .= get_string('certinprogress', 'totara_certification');
                     }
                 } else {
+                    $timedue = $certifcompletion->timeexpires;
                     if ($now > $certifcompletion->timewindowopens) {
                         $out .= get_string('recertwindowopen', 'totara_certification');
                         $out .= get_string('recertwindowexpiredate', 'totara_certification',
@@ -1112,9 +1125,11 @@ class program {
                 $startdatestr = ($prog_completion->timestarted != 0
                                 ? $this->display_date_as_text($prog_completion->timestarted)
                                 : get_string('nostartdate', 'totara_program'));
-                $duedatestr = (empty($prog_completion->timedue) || $prog_completion->timedue == COMPLETION_TIME_NOT_SET)
-                                ? get_string('duedatenotset', 'totara_program')
-                                : $this->display_date_as_text($prog_completion->timedue);
+                if ($iscertif) {
+                    $duedatestr = $this->display_duedate($timedue, $certifcompletion->certifpath, $certifcompletion->status);
+                } else {
+                    $duedatestr = $this->display_duedate($timedue);
+                }
                 $duedatestr .= html_writer::empty_tag('br');
                 $duedatestr .= $request;
 
@@ -1275,18 +1290,35 @@ class program {
     /**
      * Display the due date for a program
      *
-     * @param int $itemid
      * @param int $duedate
+     * @param int $certifpath   Optional param telling us the path of the certification
+     * @param int $certstatus   Optional param telling us the status of the certification
      * @return string
      */
-    function display_duedate($duedate) {
-        $out = '';
+    function display_duedate($duedate, $certifpath = null, $certstatus = null) {
+        global $OUTPUT;
 
-        if ($duedate == COMPLETION_TIME_NOT_SET) {
-            return get_string('noduedate', 'totara_program');
+        if (empty($duedate) || $duedate == COMPLETION_TIME_NOT_SET) {
+            if ($certifpath == null && $certstatus == null) {
+                // This is a program, display no due date set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($certifpath == CERTIFPATH_CERT) {
+                if ($certstatus == CERTIFSTATUS_EXPIRED) {
+                    // This certification has expired.
+                    return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+                } else {
+                    // This is the first run through of the certification and no due date was set.
+                    return get_string('duedatenotset', 'totara_program');
+                }
+            } else {
+                // Something has gone wrong here, a certification on recert should always have a duedate.
+                print_error('error:recertduedatenotset', 'totara_program');
+            }
+
         }
-        $out .= $this->display_date_as_text($duedate);
 
+        $out = '';
+        $out .= $this->display_date_as_text($duedate);
         // highlight dates that are overdue or due soon
         $out .= $this->display_duedate_highlight_info($duedate);
 
@@ -1316,6 +1348,8 @@ class program {
      * @return string
      */
     function display_duedate_highlight_info($duedate) {
+        global $OUTPUT;
+
         $out = '';
         $now = time();
         if (isset($duedate)) {
@@ -1323,7 +1357,7 @@ class program {
             if (($duedate < $now) && ($now - $duedate < 60*60*24)) {
                 $out .= get_string('duetoday', 'totara_plan');
             } else if ($duedate < $now) {
-                $out .= get_string('overdue', 'totara_plan');
+                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_plan'));
             } else if ($duedate - $now < 60*60*24*7) {
                 $days = ceil(($duedate - $now)/(60*60*24));
                 $out .= get_string('dueinxdays', 'totara_plan', $days);

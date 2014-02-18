@@ -832,12 +832,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification_tpl to be created
         $table = new xmldb_table('facetoface_notification_tpl');
 
+        // Set up the comment for the notification templates table.
+        $table->setComment('Face-to-face notification templates');
+
         // Adding fields to table facetoface_notification_tpl
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null, null, null);
-        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
 
         // Adding keys to table facetoface_notification_tpl
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -859,26 +862,29 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification to be created
         $table = new xmldb_table('facetoface_notification');
 
+        // Set up the comment for the facetoface notification table.
+        $table->setComment('Facetoface notifications');
+
         // Adding fields to table facetoface_notification
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('conditiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('scheduleunit', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, null);
-        $table->add_field('scheduleamount', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, null);
-        $table->add_field('scheduletime', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('ccmanager', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null, null, null);
-        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('booked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('waitlisted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('cancelled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('facetofaceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('issent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('conditiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('scheduleunit', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('scheduleamount', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('scheduletime', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('ccmanager', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('booked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('waitlisted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('cancelled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofaceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('issent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
         // Adding keys to table facetoface_notification
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -904,10 +910,13 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification_sent to be created
         $table = new xmldb_table('facetoface_notification_sent');
 
+        // Set up the comment for the facetoface notifications sent table.
+        $table->setComment('Face-to-face notification reciepts');
+
         // Adding fields to table facetoface_notification_sent
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
 
         // Adding keys to table facetoface_notification_sent
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1115,17 +1124,20 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_room to be created
         $table = new xmldb_table('facetoface_room');
 
+        // Set up comment for the facetoface room table.
+        $table->setComment('Table for storing pre-defined facetoface room data');
+
         // Adding fields to table facetoface_room
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, null, null, null, null, null);
-        $table->add_field('building', XMLDB_TYPE_CHAR, '100', null, null, null, null, null, null);
-        $table->add_field('address', XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null);
-        $table->add_field('capacity', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
-        $table->add_field('type', XMLDB_TYPE_CHAR, '10', null, null, null, null, null, null);
-        $table->add_field('description', XMLDB_TYPE_TEXT, 'small', null, null, null, null, null, null);
-        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('building', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('address', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('capacity', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('type', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
 
         // Adding keys to table facetoface_room
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1200,6 +1212,9 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // create new table instead
         $table = new xmldb_table('facetoface_notification_hist');
 
+        // Set up the comment for the facetoface notification history table.
+        $table->setComment('Notifications history (stores ical event information)');
+
         // Adding fields to table facetoface_notification_hist
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
         $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
@@ -1256,12 +1271,15 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification_tpl to be created
         $table = new xmldb_table('facetoface_notification_tpl');
 
+        // Set up the comment for the notification templates table.
+        $table->setComment('Face-to-face notification templates');
+
         // Adding fields to table facetoface_notification_tpl
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null, null, null);
-        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
 
         // Adding keys to table facetoface_notification_tpl
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1283,26 +1301,29 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification to be created
         $table = new xmldb_table('facetoface_notification');
 
+        // Set up the comment for the facetoface notification table.
+        $table->setComment('Facetoface notifications');
+
         // Adding fields to table facetoface_notification
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('conditiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('scheduleunit', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, null);
-        $table->add_field('scheduleamount', XMLDB_TYPE_INTEGER, '1', null, null, null, null, null, null);
-        $table->add_field('scheduletime', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('ccmanager', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null, null, null);
-        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('booked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('waitlisted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('cancelled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('facetofaceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('issent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
-        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, null);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('conditiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('scheduleunit', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('scheduleamount', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('scheduletime', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('ccmanager', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('managerprefix', XMLDB_TYPE_TEXT, 'big', null, null, null, null);
+        $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('body', XMLDB_TYPE_TEXT, 'big', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('booked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('waitlisted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, '0');
+        $table->add_field('cancelled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofaceid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('issent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
         // Adding keys to table facetoface_notification
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1328,10 +1349,13 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_notification_sent to be created
         $table = new xmldb_table('facetoface_notification_sent');
 
+        // Set up the comment for the facetoface notifications sent table.
+        $table->setComment('Face-to-face notification reciepts');
+
         // Adding fields to table facetoface_notification_sent
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
 
         // Adding keys to table facetoface_notification_sent
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1564,17 +1588,20 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Define table facetoface_room to be created
         $table = new xmldb_table('facetoface_room');
 
+        // Set up comment for the facetoface room table.
+        $table->setComment('Table for storing pre-defined facetoface room data');
+
         // Adding fields to table facetoface_room
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, null, null, null, null, null);
-        $table->add_field('building', XMLDB_TYPE_CHAR, '100', null, null, null, null, null, null);
-        $table->add_field('address', XMLDB_TYPE_CHAR, '255', null, null, null, null, null, null);
-        $table->add_field('capacity', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
-        $table->add_field('type', XMLDB_TYPE_CHAR, '10', null, null, null, null, null, null);
-        $table->add_field('description', XMLDB_TYPE_TEXT, 'small', null, null, null, null, null, null);
-        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, null, '0');
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('building', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('address', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('capacity', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('type', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
 
         // Adding keys to table facetoface_room
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -1648,6 +1675,9 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // create new table instead
         $table = new xmldb_table('facetoface_notification_hist');
+
+        // Set up the comment for the facetoface notification history table.
+        $table->setComment('Notifications history (stores ical event information)');
 
         // Adding fields to table facetoface_notification_hist
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
@@ -1802,6 +1832,45 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2013120100, 'facetoface');
+    }
+
+    if ($oldversion < 2014021000) {
+        $del_users = $DB->get_records('user', array('deleted' => 1));
+        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
+
+        foreach ($del_users as $user) {
+            // Cancel already deleted users facetoface signups.
+            facetoface_eventhandler_user_deleted($user);
+        }
+
+        foreach ($sus_users as $user) {
+            // Cancel already suspended users facetoface signups.
+            facetoface_eventhandler_user_suspended($user);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014021000, 'facetoface');
+    }
+
+    if ($oldversion < 2014021300) {
+        // Get custom fields marked as filters.
+        $selectedfilters = $DB->get_fieldset_select('facetoface_session_field', 'id', 'isfilter = 1');
+        // Activate room, building, and address as default filters.
+        $selectedfilters = array_merge($selectedfilters, array('room', 'building', 'address'));
+        $calendarfilters = count($selectedfilters) ? implode(',', $selectedfilters) : '';
+
+        // Store the selected filters in the DB.
+        set_config('facetoface_calendarfilters', $calendarfilters);
+
+        // Remove isfilter field (now unnecessary).
+        $table = new xmldb_table('facetoface_session_field');
+        $field = new xmldb_field('isfilter');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014021300, 'facetoface');
     }
 
     return $result;

@@ -208,6 +208,7 @@ class totara_sync_element_user extends totara_sync_element {
         if (!empty($this->config->allow_update) && $rsupdateaccounts->valid()) {
             foreach ($rsupdateaccounts as $suser) {
                 $user = $DB->get_record('user', array('id' => $suser->uid));
+
                 if (!empty($this->config->allow_create) && !empty($user->deleted)) {
                     // Revive previously-deleted user.
                     if (undelete_user($user)) {
@@ -226,6 +227,9 @@ class totara_sync_element_user extends totara_sync_element {
                         $this->addlog(get_string('cannotreviveuserx', 'tool_totara_sync', $suser->idnumber), 'warn', 'updateusers');
                     }
                 }
+
+                // Check if the user is going to be suspended before updating the $user object.
+                $suspenduser = $user->suspended == 0 && $suser->suspended == 1;
 
                 $transaction = $DB->start_delegated_transaction();
 
@@ -271,6 +275,10 @@ class totara_sync_element_user extends totara_sync_element {
                 $this->addlog(get_string('updateduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
 
                 $transaction->allow_commit();
+
+                if ($suspenduser) {
+                    events_trigger('user_suspended', $user);
+                }
 
                 events_trigger('user_updated', $user);
             }

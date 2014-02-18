@@ -709,25 +709,40 @@ function import_course($importname, $importtime) {
             $completion->userid = $course->userid;
             $completion->course = $course->courseid;
 
-            if (empty($course->coursecompletionid)) {
+            $priorkey = "{$completion->userid}_{$completion->course}";
+            $historyrecord = null;
+            if (empty($course->coursecompletionid) && (!array_key_exists($priorkey, $completions))) {
                 // No completion exists, add record.
-                $completions[] = $completion;
-            } else {
-                if ($course->completiondate > $course->currenttimecompleted) {
-                    if ($overridecurrentcompletion) {
-                        // Completion exists but we are overriding, add to deleted array.
-                        $deletedcompletions[] = $course->coursecompletionid;
-
-                        $completions[] = $completion;
-                    }
+                $completions[$priorkey] = $completion;
+            } else if (array_key_exists($priorkey, $completions)) {
+                if ($completion->timecompleted > $completions[$priorkey]->timecompleted) {
+                    $historyrecord = $completions[$priorkey];
+                    $completions[$priorkey] = $completion;
                 } else {
-                    // Existing record - put it into history.
-                    $history = new StdClass();
-                    $history->courseid = $course->courseid;
-                    $history->userid = $course->userid;
-                    $history->timecompleted = $timecompleted;
-                    $history->grade = $course->grade;
-                    $completion_history[] = $history;
+                    // Older record. Put it into history.
+                    $historyrecord = $completion;
+                }
+            } else if ($completion->timecompleted >= $course->currenttimecompleted) {
+                if ($overridecurrentcompletion) {
+                    // Completion exists but we are overriding, add to deleted array.
+                    $deletedcompletions[] = $course->coursecompletionid;
+                    $completions[$priorkey] = $completion;
+                }
+            } else {
+                // Existing record - put it into history.
+                $historyrecord = $completion;
+            }
+
+            if (!is_null($historyrecord)) {
+                $priorhistorykey = "{$historyrecord->course}_{$historyrecord->userid}_{$historyrecord->timecompleted}";
+                $history = new StdClass();
+                $history->courseid = $historyrecord->course;
+                $history->userid = $historyrecord->userid;
+                $history->timecompleted = $historyrecord->timecompleted;
+                $history->grade = $historyrecord->rplgrade;
+                if (!array_key_exists($priorhistorykey, $completion_history) &&
+                    !$DB->record_exists('course_completion_history', (array) $history)) {
+                    $completion_history[$priorhistorykey] = $history;
                 }
             }
 

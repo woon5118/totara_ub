@@ -118,12 +118,13 @@ class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testca
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
+        $objectiveidalias = reportbuilder_get_extrafield_alias('objective', 'fullnamelink', 'objective_id');
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                             array('userid' => $this->user1->id), $usecache);
         $this->assertCount(2, $result);
         $was = array('');
         foreach($result as $r) {
-            $this->assertContains($r->objective_id, array($this->objectives[0]->id, $this->objectives[1]->id));
+            $this->assertContains($r->$objectiveidalias, array($this->objectives[0]->id, $this->objectives[1]->id));
             $this->assertNotContains($r->objective_fullnamelink, $was);
             $was[] = $r->objective_fullnamelink;
         }
@@ -133,7 +134,7 @@ class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testca
         $this->assertCount(4, $result);
         $was = array('');
         foreach($result as $r) {
-            $this->assertContains($r->objective_id, array($this->objectives[2]->id,
+            $this->assertContains($r->$objectiveidalias, array($this->objectives[2]->id,
                 $this->objectives[3]->id, $this->objectives[4]->id, $this->objectives[5]->id));
             $this->assertNotContains($r->objective_fullnamelink, $was);
             $was[] = $r->objective_fullnamelink;

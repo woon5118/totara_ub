@@ -49,7 +49,7 @@ class rb_source_dp_certification extends rb_base_source {
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
-        $this->defaultfilters = array();
+        $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_certification');
         $this->sourcewhere = '(base.certifid > 0)';
@@ -153,7 +153,10 @@ class rb_source_dp_certification extends rb_base_source {
 
         $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
         $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
-//         $this->add_user_table_to_joinlist($joinlist, 'certif_completion', 'userid');
+        $this->add_user_table_to_joinlist($joinlist, 'certif_completion', 'userid');
+        $this->add_position_tables_to_joinlist($joinlist, 'certif_completion', 'userid');
+        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
+        $this->add_cohort_user_tables_to_joinlist($joinlist, 'certif_completion', 'userid');
 
         return $joinlist;
     }
@@ -361,8 +364,11 @@ class rb_source_dp_certification extends rb_base_source {
             )
         );
 
-        // include some standard columns
-//         $this->add_user_fields_to_columns($columnoptions);
+        // Include some standard columns.
+        $this->add_user_fields_to_columns($columnoptions);
+        $this->add_position_fields_to_columns($columnoptions);
+        $this->add_manager_fields_to_columns($columnoptions);
+        $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base');
 
         return $columnoptions;
@@ -472,6 +478,10 @@ class rb_source_dp_certification extends rb_base_source {
                 'number'
         );
 
+        $this->add_user_fields_to_filters($filteroptions);
+        $this->add_position_fields_to_filters($filteroptions);
+        $this->add_manager_fields_to_filters($filteroptions);
+        $this->add_cohort_user_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions);
 
         return $filteroptions;
@@ -520,6 +530,10 @@ class rb_source_dp_certification extends rb_base_source {
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
             array(
+                'type' => 'user',
+                'value' => 'namelink',
+            ),
+            array(
                 'type' => 'base',
                 'value' => 'fullnamelink',
             ),
@@ -534,11 +548,16 @@ class rb_source_dp_certification extends rb_base_source {
     protected function define_defaultfilters() {
         $defaultfilters = array(
             array(
+                'type' => 'user',
+                'value' => 'fullname',
+                'advanced' => 0,
+            ),
+            array(
                 'type' => 'base',
                 'value' => 'fullname',
                 'advanced' => 0,
             ),
-        array(
+            array(
                 'type' => 'course_category',
                 'value' => 'id',
                 'advanced' => 0,
@@ -555,15 +574,26 @@ class rb_source_dp_certification extends rb_base_source {
 
 
     function rb_display_timedue_date($time, $row) {
-        $dateformat = get_string('strfdateshortmonth', 'langconfig');
-        if (($row->certifpath == CERTIFPATH_CERT) && ($row->completionstatus != null)) {
-            $program = new program($row->programid);
-            return $program->display_timedue_date($row->completionstatus, $time, $dateformat);
-        } else if (empty($row->timeexpires)) {
-            return '';
+        global $OUTPUT;
+
+        $program = new program($row->programid);
+
+        if (empty($row->timeexpires)) {
+            if (empty($row->prog_completion_timedue) || $row->prog_completion_timedue == COMPLETION_TIME_NOT_SET) {
+                // There is no time due set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($row->prog_completion_timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+                // User is still in the first stage of certification, not overdue yet.
+                return $program->display_duedate($row->prog_completion_timedue, $row->certifpath, $row->status);
+            } else {
+                // Looks like the certification has expired, overdue!
+                return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+            }
         } else {
-            return userdate($row->timeexpires, $dateformat);
+            return $program->display_duedate($row->timeexpires, $row->certifpath, $row->status);
         }
+
+        return '';
     }
 
 

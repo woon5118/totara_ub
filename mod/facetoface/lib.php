@@ -1045,6 +1045,11 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             f.course,
             ss.grade,
             ss.statuscode,
+            (
+                SELECT MIN(timecreated)
+                FROM {facetoface_signups_status} ss2
+                WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
+            ) as timesignedup,
             ss.timecreated
         FROM
             {facetoface} f
@@ -1066,7 +1071,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
         AND ss.superceded != 1
         ORDER BY ss.timecreated ASC";
 
-    $params = array_merge(array($sessionid), $statusparams);
+    $params = array_merge(array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $sessionid), $statusparams);
 
     $records = $DB->get_records_sql($sql, $params);
 
@@ -2248,10 +2253,17 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
+                $allowcancellation = false;
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
+                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                        $allowcancellation = true;
+                    }
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
+                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+                        $allowcancellation = true;
+                    }
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
@@ -2280,15 +2292,20 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 // Don't include the link to cancel a session if it has already occurred.
                 $moreinfolink = '';
                 $cancellink = '';
+                $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                 if (!facetoface_has_session_started($session, $timenow)) {
                     $strmoreinfo  = get_string('moreinfo', 'facetoface');
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
                     $moreinfolink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($signup_url, $strmoreinfo, array('class' => 'f2fsessionlinks f2fsessioninfolink', 'title' => $strmoreinfo))));
 
-                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
-                    $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                     $cancellink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking))));
                     $options    = html_writer::tag('tr', html_writer::tag('td', $span));
+                } else {
+                    // Session is started.
+                    if ($allowcancellation) {
+                        $cancellink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking))));
+                    }
                 }
 
                 // Get room data.
@@ -3636,8 +3653,30 @@ function facetoface_eventhandler_user_deleted($user) {
     if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
         foreach ($signups as $signup) {
             $session = facetoface_get_session($signup->sessionid);
-            // using $null, null fails because of passing by reference
+            // Using $null, null fails because of passing by reference.
             facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
+        }
+    }
+    return true;
+}
+
+/**
+ * Event that is triggered when a user is suspended.
+ *
+ * Cancels a user from any future sessions when they are suspended
+ * this is to make sure suspended users aren't using space in sessions
+ * when there is limited capacity.
+ *
+ * @param object $user
+ */
+function facetoface_eventhandler_user_suspended($user) {
+    global $DB;
+
+    if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+        foreach ($signups as $signup) {
+            $session = facetoface_get_session($signup->sessionid);
+            // Using $null, null fails because of passing by reference.
+            facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
         }
     }
     return true;
@@ -4610,14 +4649,42 @@ function facetoface_filter_calendar_events(&$events) {
  * @return void
  */
 function facetoface_calendar_set_filter() {
-    global $DB, $SESSION;
+    global $SESSION;
 
-    $fields = $DB->get_records('facetoface_session_field', array('isfilter' => 1));
+    $fields = facetoface_get_customfield_filters();
 
     $SESSION->calendarfacetofacefilter = array();
     foreach ($fields as $f) {
         $SESSION->calendarfacetofacefilter[$f->shortname] = optional_param("field_{$f->shortname}", '', PARAM_TEXT);
     }
+}
+
+/**
+ * Get custom field filters that are currently selected in facetoface settings
+ *
+ * @return array Array of objects if any filter is found, empty array otherwise
+ */
+function facetoface_get_customfield_filters() {
+    global $DB;
+
+    $fields = array();
+    $calendarcustomfields = get_config(null, 'facetoface_calendarfilters');
+    if ($calendarcustomfields) {
+        $customfieldids = array();
+        $calendarcustomfields = explode(',', $calendarcustomfields);
+        foreach ($calendarcustomfields as $filterkey) {
+            if (is_numeric($filterkey)) {
+                $customfieldids[] = $filterkey;
+            }
+        }
+        if (!empty($customfieldids)) {
+            list($sessionfieldids, $params) = $DB->get_in_or_equal($customfieldids);
+            $sql = "SELECT * FROM {facetoface_session_field} WHERE id $sessionfieldids";
+            $fields = $DB->get_records_sql($sql, $params);
+        }
+    }
+
+    return $fields;
 }
 
 /**
