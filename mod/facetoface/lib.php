@@ -3772,7 +3772,7 @@ function facetoface_get_available_rooms($timeslots=array(), $fields='*', $exclud
     foreach ($timeslots as $t) {
         $timestart = $t[0];
         $timefinish = $t[1];
-        $timeslotsql[] = " (? >= d.timestart AND d.timefinish >= ?)";
+        $timeslotsql[] = " (? > d.timestart AND d.timefinish > ?)";
         $timeslotparams = array_merge($timeslotparams, array($timefinish, $timestart));
     }
 
