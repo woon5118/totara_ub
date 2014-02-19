@@ -118,24 +118,23 @@ class cohort_rule_sqlhandler_date_usercustomfield extends cohort_rule_sqlhandler
     protected function construct_sql_snippet($field, $comparison) {
         global $DB;
         $sqlhandler = new stdClass();
-        $sqlhandler->sql = "exists("
-                ."select 1 from {user_info_data} usinda "
-                ."where usinda.userid=u.id "
-                ."and usinda.fieldid={$field} "
-                ."and " . $DB->sql_cast_char2int('usinda.data', true) . " {$comparison}"
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 from {user_info_data} usinda "
+                . "WHERE usinda.userid=u.id "
+                . "AND usinda.fieldid=:ducf{$this->ruleid} "
+                . "AND " . $DB->sql_cast_char2int('usinda.data', true) . " {$comparison}"
             .")";
-        $sqlhandler->params = array();
+        $sqlhandler->params = array("ducf{$this->ruleid}" => $field);
         return $sqlhandler;
     }
 }
 
 /**
- * SQL snippet for finding out when a user started their primary position
+ * SQL snippet for finding out when a user was assigned their primary position.
  */
 class cohort_rule_sqlhandler_date_posstarted extends cohort_rule_sqlhandler_date {
     public function __construct(){
-        // No arguments necessary, this is a single-purpose SQL handler to
-        // query only one field
+        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
     }
 
     protected function construct_sql_snippet($field, $comparison) {
@@ -145,60 +144,110 @@ class cohort_rule_sqlhandler_date_posstarted extends cohort_rule_sqlhandler_date
         // "prog_pos_assignment" field and either fold the timeassigned
         // field into the pos_assignment table, or rely on the pos_assignment_history
         // table. At that time, we'll need to change this class
-        $sqlhandler->sql = "exists("
-                ."select 1 "
-                ."from {prog_pos_assignment} ppa "
-                ."inner join {pos} p "
-                ."on ppa.positionid=p.id "
-                ."where ppa.userid=u.id "
-                ."and ppa.type=" . POSITION_TYPE_PRIMARY . " "
-                ."and ppa.timeassigned {$comparison}"
-            .")";
-        $sqlhandler->params = array();
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 "
+                . "FROM {prog_pos_assignment} ppa "
+                . "INNER join {pos} p "
+                . "ON ppa.positionid=p.id "
+                . "WHERE ppa.userid=u.id "
+                . "AND ppa.type=:dps{$this->ruleid} "
+                . "AND ppa.timeassigned {$comparison}"
+            . ")";
+        $sqlhandler->params = array("dps{$this->ruleid}" => POSITION_TYPE_PRIMARY);
         return $sqlhandler;
     }
 }
 
 /**
- * SQL snippet for a position custom field holding a timestamp
+ * SQL snippet for finding out when a user started at their primary position.
+ */
+class cohort_rule_sqlhandler_date_postimevalidfrom extends cohort_rule_sqlhandler_date {
+    public function __construct(){
+        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
+    }
+
+    protected function construct_sql_snippet($field, $comparison) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 "
+                . "FROM {pos_assignment} pa "
+                . "INNER JOIN {pos} p "
+                . "ON pa.positionid=p.id "
+                . "WHERE pa.userid=u.id "
+                . "AND pa.type=:dtvf{$this->ruleid} "
+                . "AND pa.timevalidfrom {$comparison}"
+            . ")";
+        $sqlhandler->params = array("dtvf{$this->ruleid}" => POSITION_TYPE_PRIMARY);
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for finding out when a user's primary position expires.
+ */
+class cohort_rule_sqlhandler_date_postimevalidto extends cohort_rule_sqlhandler_date {
+    public function __construct(){
+        // No arguments necessary, this is a single-purpose SQL handler to query only one field.
+    }
+
+    protected function construct_sql_snippet($field, $comparison) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 "
+                . "FROM {pos_assignment} pa "
+                . "INNER JOIN {pos} p "
+                . "ON pa.positionid=p.id "
+                . "WHERE pa.userid=u.id "
+                . "AND pa.type=:dtvt{$this->ruleid} "
+                . "AND pa.timevalidto {$comparison}"
+            . ")";
+        $sqlhandler->params = array("dtvt{$this->ruleid}" => POSITION_TYPE_PRIMARY);
+        return $sqlhandler;
+    }
+}
+
+/**
+ * SQL snippet for a position custom field holding a timestamp.
  */
 class cohort_rule_sqlhandler_date_poscustomfield extends cohort_rule_sqlhandler_date {
     protected function construct_sql_snippet($field, $comparison) {
         global $DB;
         $sqlhandler = new stdClass();
-        $sqlhandler->sql = "exists("
-                ."select 1 "
-                ."from {pos_assignment} pa "
-                ."inner join {pos_type_info_data} ptid "
-                ."on pa.positionid=ptid.positionid and ptid.data != '' and ptid.data is not null "
-                ."where pa.userid=u.id "
-                ."and pa.type=".POSITION_TYPE_PRIMARY." "
-                ."and ptid.fieldid={$field} "
-                ."and ".$DB->sql_cast_char2int('ptid.data', true)." {$comparison}"
-            .")";
-        $sqlhandler->params = array();
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 "
+                . "FROM {pos_assignment} pa "
+                . "INNER JOIN {pos_type_info_data} ptid "
+                . "ON pa.positionid=ptid.positionid AND ptid.data != '' AND ptid.data IS NOT NULL "
+                . "WHERE pa.userid=u.id "
+                . "AND pa.type=:dpcf1{$this->ruleid} "
+                . "AND ptid.fieldid=:dpcf2{$this->ruleid} "
+                . "AND ".$DB->sql_cast_char2int('ptid.data', true)." {$comparison}"
+            . ")";
+        $sqlhandler->params = array("dpcf1{$this->ruleid}" => POSITION_TYPE_PRIMARY, "dpcf2{$this->ruleid}" => $field);
         return $sqlhandler;
     }
 }
 
 /**
- * SQL snippet for a organisation custom field holding a timestamp
+ * SQL snippet for a organisation custom field holding a timestamp.
  */
 class cohort_rule_sqlhandler_date_orgcustomfield extends cohort_rule_sqlhandler_date {
     protected function construct_sql_snippet($field, $comparison) {
         global $DB;
         $sqlhandler = new stdClass();
-        $sqlhandler->sql = "exists("
-                ."select 1 "
-                ."from {pos_assignment} pa "
-                ."inner join {org_type_info_data} otid "
-                ."on pa.organisationid=otid.organisationid and otid.data != '' and otid.data is not null "
-                ."where pa.userid=u.id "
-                ."and pa.type=".POSITION_TYPE_PRIMARY." "
-                ."and otid.fieldid={$field} "
-                ."and ".$DB->sql_cast_char2int('otid.data', true)." {$comparison}"
-            .")";
-        $sqlhandler->params = array();
+        $sqlhandler->sql = "EXISTS("
+                . "SELECT 1 "
+                . "FROM {pos_assignment} pa "
+                . "INNER JOIN {org_type_info_data} otid "
+                . "ON pa.organisationid=otid.organisationid AND otid.data != '' AND otid.data IS NOT NULL "
+                . "WHERE pa.userid=u.id "
+                . "AND pa.type=:docf1{$this->ruleid} "
+                . "AND otid.fieldid=:docf2{$this->ruleid} "
+                . "AND ".$DB->sql_cast_char2int('otid.data', true)." {$comparison}"
+            . ")";
+        $sqlhandler->params = array("docf1{$this->ruleid}" => POSITION_TYPE_PRIMARY, "docf2{$this->ruleid}" => $field);
         return $sqlhandler;
     }
 }
