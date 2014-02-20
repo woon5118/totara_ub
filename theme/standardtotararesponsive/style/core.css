@@ -312,6 +312,16 @@ p.errormessage {
     text-decoration:underline;
 }
 
+.notifysuccess input[type="submit"],
+.notifyproblem input[type="submit"],
+.notifymessage input[type="submit"],
+.notice input[type="submit"],
+.notifynotice input[type="submit"],
+.errorbox input[type="submit"] {
+    margin: 0;
+    margin-left: 5px;
+}
+
 /* Don't include the box border/background inside this class
  * Useful for showing warnings inside table cells, etc where
  * there isn't enough room for a full boxed notification

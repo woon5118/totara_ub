@@ -231,21 +231,20 @@ print '</div>';
 echo $OUTPUT->footer();
 
 function display_approval_action_box($cohortid, $style='display:block') {
-    global $CFG;
+    $attrs = array('class' => 'notifynotice clearfix', 'id' => 'cohort_rules_action_box', 'style' => $style);
+    echo html_writer::start_tag('div', $attrs);
+    $attrs = array('action' => new moodle_url("/totara/cohort/rules.php"), 'method' => 'POST', 'class' => 'approvalform');
+    echo html_writer::start_tag('form', $attrs);
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $cohortid));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+    echo html_writer::start_tag('span');
 
-    echo '<div class="notifynotice clearfix" id="cohort_rules_action_box" style="'.$style.'">';
-    $canapproverules = true;  // TODO: add cap check here?
-
-    echo "<form action=\"{$CFG->wwwroot}/totara/cohort/rules.php\" method=\"POST\" class=\"approvalform\">";
-    echo "<input type=\"hidden\" name=\"id\" value=\"{$cohortid}\"/>";
-    echo "<input type=\"hidden\" name=\"sesskey\" value=\"".sesskey()."\"/>";
-    echo '<table class="fullwidth invisible"><tr>';
-    echo '<td class="c0">'.get_string('cohortruleschanged', 'totara_cohort').'</td>';
-
-    if ($canapproverules) {
-        echo '<td class="c1"><input type="submit" name="approverulechanges" value="' . get_string('approvechanges', 'totara_cohort') . '" /> &nbsp; ';
-        echo '<input type="submit" name="cancelrulechanges" value="' . get_string('cancelchanges', 'totara_cohort') . '" /></td>';
-    }
-
-    echo '</tr></table></form></div>';
+    echo get_string('cohortruleschanged', 'totara_cohort');
+    $attrs = array('type' => 'submit', 'name' => 'approverulechanges', 'value' => get_string('approvechanges', 'totara_cohort'));
+    echo html_writer::empty_tag('input', $attrs);
+    $attrs = array('type' => 'submit', 'name' => 'cancelrulechanges', 'value' => get_string('cancelchanges', 'totara_cohort'));
+    echo html_writer::empty_tag('input', $attrs);
+    echo html_writer::end_tag('span');
+    echo html_writer::end_tag('form');
+    echo html_writer::end_tag('div'); // cohort_rules_action_box
 }
