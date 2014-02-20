@@ -359,6 +359,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     $canmanagerules = has_capability('totara/cohort:managerules', $systemcontext);
     $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext);
     $canassign = has_capability('moodle/cohort:assign', $systemcontext);
+    $canassignroles = has_capability('moodle/role:assign', $systemcontext);
     $canview = has_capability('moodle/cohort:view', $systemcontext);
 
     if ($canview) {
@@ -408,6 +409,11 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     if (!empty($CFG->enablegoals) && $canmanage) {
         $toprow[] = new tabobject('goals', new moodle_url('/totara/cohort/goals.php', array('id' => $cohortid)),
             get_string('goals', 'totara_hierarchy'));
+    }
+
+    if ($canassignroles) {
+        $toprow[] = new tabobject('roles', new moodle_url('/totara/cohort/assignroles.php', array('id' => $cohortid)),
+            get_string('assignroles', 'totara_cohort'));
     }
 
     $tabs = array($toprow);
