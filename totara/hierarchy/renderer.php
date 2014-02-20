@@ -43,8 +43,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
     public function print_competency_view_evidence($item, $evidence=null, $can_edit=false) {
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        $out = $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
-        $out .= html_writer::start_tag('div', array('id' => 'evidence-list-container'));
+        $out = html_writer::start_tag('div', array('id' => 'evidence-list-container'));
+        $out .= $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
 
         $table = new html_table();
         $table->attributes = array('class' => 'generalbox boxaligncenter list-evidence');
