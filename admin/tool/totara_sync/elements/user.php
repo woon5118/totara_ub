@@ -229,7 +229,7 @@ class totara_sync_element_user extends totara_sync_element {
                 }
 
                 // Check if the user is going to be suspended before updating the $user object.
-                $suspenduser = $user->suspended == 0 && $suser->suspended == 1;
+                $suspenduser = $user->suspended == 0 && (isset($suser->suspended) && $suser->suspended == 1);
 
                 $transaction = $DB->start_delegated_transaction();
 
