@@ -201,6 +201,9 @@ table#hierarchy-bulk-action td.option-column div.fitem div.fitemtitle,
 table#hierarchy-bulk-action td.action-column div.fitem div.fitemtitle {
     display: none;
 }
+.totaratable .spacer {
+    margin: 0 6px;
+}
 .buttons .singlebutton,
 .buttons .singlebutton form,
 .buttons .singlebutton div {
