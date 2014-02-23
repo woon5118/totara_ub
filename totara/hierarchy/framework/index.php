@@ -156,13 +156,13 @@ if ($frameworks) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'moveup' => $framework->id)),
                         new pix_icon('t/up', $str_moveup), null, array('title' => $str_moveup));
             } else {
-                $OUTPUT->spacer(array('height' => 11, 'width' => 11));
+                $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }
             if ($rowcount != count($frameworks)) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'movedown' => $framework->id)),
                         new pix_icon('t/down', $str_movedown), null, array('title' => $str_movedown));
             } else {
-                $OUTPUT->spacer(array('height' => 11, 'width' => 11));
+                $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }
             $rowcount++;
         }
