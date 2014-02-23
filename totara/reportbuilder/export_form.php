@@ -63,6 +63,7 @@ class report_builder_export_form extends moodleform {
         } else if (count($select) == 1) {
             // no options - show a button
             $mform->addElement('hidden', 'format', key($select));
+            $mform->setType('format', PARAM_ALPHANUMEXT);
             $mform->addElement('submit', 'export', current($select));
         } else {
             // show pulldown menu
