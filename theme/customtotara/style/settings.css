@@ -71,7 +71,7 @@ input[type="reset"][disabled] {
     background-image:linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
     background-image:-moz-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
 }
-#page-header, #page-footer, .block > .header {
+#page-footer, .block, .navbar-inner, .block > .header {
     background-color: [[setting:headerbgc]];
 }
 th.header,
@@ -93,6 +93,9 @@ div.header h6 {
 }
 #page-footer .footer-powered {
     color: [[setting:text-on-headerbgc]];
+}
+.block_action .moveto {
+    display: none;
 }
 
 /** Custom CSS defined via theme settings **/
