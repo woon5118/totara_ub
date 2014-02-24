@@ -134,7 +134,7 @@ foreach ($add as $addition) {
         $row->cells[] = new html_table_cell($OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/competency/template/view.php', array('id' => $related->id)), $related->fullname));
 
         $row->cells[] = new html_table_cell($OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/organisation/assigncompetency/remove.php', array('id' => $relationship->id, 'organisation' => $organisation->id)),
-             new pix_icon('t/delete.gif', $str_remove), null, array('class' => 'iconsmall', 'title' => $str_remove)));
+             new pix_icon('t/delete.gif', $str_remove, null, array('class' => 'iconsmall', 'title' => $str_remove))));
 
         echo $row;
     }

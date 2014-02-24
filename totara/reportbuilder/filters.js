@@ -452,11 +452,11 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
         // Replace btns with updated ones.
         var fid = filterrow.attr('fid');
         var deletebtn = module.rb_get_btn_delete(module.config.rb_reportid, fid);
-        var upbtn = '<img src="'+M.util.image_url('spacer')+'" class="iconsmall" alt="" />';
+        var upbtn = '<img src="'+M.util.image_url('spacer')+'" class="spacer" alt="" width="11px" height="11px"/>';
         if (filterrow.prev('tr').find('select.filter_selector').length > 0) {
             upbtn = module.rb_get_btn_up(module.config.rb_reportid, fid);
         }
-        var downbtn = '<img src="'+M.util.image_url('spacer')+'" class="iconsmall" alt="" />';
+        var downbtn = '<img src="'+M.util.image_url('spacer')+'" class="spacer" alt="" width="11px" height="11px"/>';
         if (filterrow.next('tr').next('tr').find('select.filter_selector').length > 0) {
             downbtn = module.rb_get_btn_down(module.config.rb_reportid, fid);
         }
@@ -466,15 +466,15 @@ M.totara_reportbuilderfilters = M.totara_reportbuilderfilters || {
 
 
     rb_get_btn_delete: function(reportid, fid) {
-        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&d=1" class="deletefilterbtn"><img src="' + M.util.image_url('t/delete') + '" alt="' + M.util.get_string('delete', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&d=1" class="deletefilterbtn action-icon"><img src="' + M.util.image_url('t/delete') + '" alt="' + M.util.get_string('delete', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
     },
 
     rb_get_btn_up: function(reportid, fid) {
-        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&m=up" class="movefilterupbtn"><img src="' + M.util.image_url('t/up') + '" alt="' + M.util.get_string('moveup', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&m=up" class="movefilterupbtn action-icon"><img src="' + M.util.image_url('t/up') + '" alt="' + M.util.get_string('moveup', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
     },
 
     rb_get_btn_down: function(reportid, fid) {
-        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&m=down" class="movefilterdownbtn"><img src="' + M.util.image_url('t/down') + '" alt="' + M.util.get_string('movedown', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
+        return $('<a href=' + M.cfg.wwwroot + '/totara/reportbuilder/filters.php?id=' + reportid + '&fid=' + fid + '&m=down" class="movefilterdownbtn action-icon"><img src="' + M.util.image_url('t/down') + '" alt="' + M.util.get_string('movedown', 'totara_reportbuilder') + '" class="iconsmall" /></a>');
     },
 
     rb_get_btn_add: function(reportid) {

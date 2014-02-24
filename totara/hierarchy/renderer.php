@@ -94,8 +94,12 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     $cell->attributes['style'] = 'text-align: center;';
                     $cells[] = $cell;
                     $str_remove = get_string('remove');
-                    $link = $this->output->action_link(new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php', array('id' => $eitem->id)),
-                    $this->output->pix_icon('t/delete', $str_remove), null, array('class' => 'iconsmall', 'title' => $str_remove));
+                    $link = $this->output->action_link(
+                        new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php', array('id' => $eitem->id)),
+                        $this->output->pix_icon('t/delete', $str_remove, null, array('class' => 'iconsmall')),
+                        null,
+                        array('title' => $str_remove)
+                    );
                     $cell = new html_table_cell($link);
                     $cell->attributes['style'] = 'text-align: center;';
                     $cells[] = $cell;
@@ -192,8 +196,12 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
                 if ($can_edit) {
                     $str_remove = get_string('remove');
-                    $content = $this->output->action_link(new moodle_url("/totara/hierarchy/prefix/competency/related/remove.php", array('id' => $item->id, 'related' => $ritem->id)),
-                         new pix_icon('t/delete', $str_remove), null, array('class' => 'iconsmall', 'title' => $str_remove));
+                    $content = $this->output->action_link(
+                        new moodle_url("/totara/hierarchy/prefix/competency/related/remove.php", array('id' => $item->id, 'related' => $ritem->id)),
+                        new pix_icon('t/delete', $str_remove, null, array('class' => 'iconsmall')),
+                        null,
+                        array('title' => $str_remove)
+                    );
                     $cell = new html_table_cell($content);
                     $cell->attributes['style'] = 'text-align: center;';
                     $cells[] = $cell;
@@ -281,8 +289,12 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $params = array('goalid' => $item->id, 'assigntype' => $assigntype,
                         'modid' => $assignment->sourceid, 'view' => true);
                 $url = new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php', $params);
-                $delete = $this->output->action_icon($url, new pix_icon('t/delete', $remove), null,
-                       array('id' => 'goalassigdel', 'class' => 'iconsmall', 'title' => $remove));
+                $delete = $this->output->action_icon(
+                    $url,
+                    new pix_icon('t/delete', $remove, null, array('class' => 'iconsmall')),
+                    null,
+                    array('id' => 'goalassigdel', 'title' => $remove)
+                );
             } else {
                 $delete = null;
             }
@@ -388,8 +400,13 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                                 "&t=' + $(this).val()".
                             ");")
                     );
-                    $content[] = $this->output->action_icon(new moodle_url('/totara/hierarchy/prefix/' . $prefix . '/assigncompetency/remove.php', array('id' => $ritem->aid, $prefix => $itemid, 'framework' => $framework)),
-                    new pix_icon('t/delete', $str_remove), null, array('class' => 'iconsmall', 'title' => $str_remove));
+                    $content[] = $this->output->action_icon(
+                        new moodle_url('/totara/hierarchy/prefix/' . $prefix . '/assigncompetency/remove.php',
+                                array('id' => $ritem->aid, $prefix => $itemid, 'framework' => $framework)),
+                        new pix_icon('t/delete', $str_remove, null, array('class' => 'iconsmall')),
+                        null,
+                        array('title' => $str_remove)
+                    );
                 }
                 $table->add_data($content);
             }
@@ -480,8 +497,12 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     // Add a delete action button.
                     $params = array('goalid' => $goal->goalid, 'assigntype' => $assignment_type, 'modid' => $itemid);
                     $url = new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php', $params);
-                    $delete = $this->output->action_icon($url, new pix_icon('t/delete', $remove), null,
-                           array('id' => 'goalassigdel', 'class' => 'iconsmall', 'title' => $remove));
+                    $delete = $this->output->action_icon(
+                        $url,
+                        new pix_icon('t/delete', $remove, null, array('class' => 'iconsmall')),
+                        null,
+                        array('id' => 'goalassigdel', 'title' => $remove)
+                    );
                 } else {
                     $delete = null;
                 }
@@ -705,9 +726,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             } else {
                 // Set up greyed out buttons.
                 $edit_button = $this->output->pix_icon('t/edit_gray',
-                        get_string('error:editgoals', 'totara_hierarchy'), 'moodle', array('class' => 'iconsmall'));
+                        get_string('error:editgoals', 'totara_hierarchy'), 'moodle', array('class' => 'iconsmall action-icon'));
                 $delete_button = $this->output->pix_icon('t/delete_gray',
-                        get_string('error:deletegoalassignment', 'totara_hierarchy'), 'moodle', array('class' => 'iconsmall'));
+                        get_string('error:deletegoalassignment', 'totara_hierarchy'), 'moodle', array('class' => 'iconsmall action-icon'));
             }
 
             $duedate = !empty($goalpersonal->targetdate) ? userdate($goalpersonal->targetdate,

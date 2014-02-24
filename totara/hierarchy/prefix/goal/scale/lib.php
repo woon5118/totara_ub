@@ -202,12 +202,12 @@ function goal_scale_display_table($scales) {
                     if ($scale_used) {
                         $buttons[] = $OUTPUT->pix_icon('t/delete_grey',
                                 get_string('error:nodeletegoalscaleinuse', 'totara_hierarchy'), 'totara_core',
-                                array('class' => 'iconsmall',
+                                array('class' => 'iconsmall disabled',
                                       'title' => get_string('error:nodeletegoalscaleinuse', 'totara_hierarchy')));
                     } else if ($scale_assigned) {
                         $buttons[] = $OUTPUT->pix_icon('t/delete_grey',
                                 get_string('error:nodeletegoalscaleassigned', 'totara_hierarchy'), 'totara_core',
-                                array('class' => 'iconsmall',
+                                array('class' => 'iconsmall disabled',
                                       'title' => get_string('error:nodeletegoalscaleassigned', 'totara_hierarchy')));
                     } else {
                         $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/goal/scale/delete.php',

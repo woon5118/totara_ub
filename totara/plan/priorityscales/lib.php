@@ -153,9 +153,11 @@ function dp_priority_display_table($priorities, $editingon=0) {
 
                 if ($can_delete) {
                     if ($scale_used) {
-                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletepriorityscaleinuse', 'totara_plan'), 'totara_core');
+                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletepriorityscaleinuse', 'totara_plan'), 'totara_core',
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeletepriorityscaleinuse', 'totara_plan')));
                     } else if ($scale_assigned) {
-                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletepriorityscaleassigned', 'totara_plan'), 'totara_core');
+                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletepriorityscaleassigned', 'totara_plan'), 'totara_core',
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeletepriorityscaleassigned', 'totara_plan')));
                     } else {
                         $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/plan/priorityscales/index.php', array('delete' => $priority->id)), new pix_icon('t/delete', $strdelete));
                     }

@@ -221,13 +221,22 @@ table.generalbox :last-child .last td:last-child {
     border-bottom-right-radius: 5px;
 }
 
+.action-icon img.iconsmall,
+.action-icon img.smallicon,
+.action-icon.iconsmall {
+    height: 11px;
+    width: 11px;
+    padding: 2px;
+    margin: 3px;
+}
 
-img.iconsmall {
+img.iconsmall.disabled {
     padding: 2px;
+    margin: 0 3px;
+    height: 11px;
+    width: 11px;
 }
-img.smallicon {
-    padding: 2px;
-}
+
 .course_icon,
 .program_icon {
     padding-right: 5px;
@@ -241,9 +250,24 @@ table#hierarchy-bulk-action td.option-column div.fitem div.fitemtitle,
 table#hierarchy-bulk-action td.action-column div.fitem div.fitemtitle {
     display: none;
 }
-.totaratable .spacer {
-    margin: 0 6px;
+
+.reportbuilderform .spacer,
+.flexible .spacer,
+.generaltable .spacer,
+.flexible .iconsmall.action-icon,
+.generaltable .iconsmall.action-icon {
+    margin: 0 5px;
 }
+.flexible .iconsmall.action-icon,
+.generaltable .iconsmall.action-icon {
+    height: auto;
+    width: auto;
+    margin: auto 3px;
+}
+.action-icon img.smallicon {
+    margin: 0 3px;
+}
+
 .buttons .singlebutton,
 .buttons .singlebutton form,
 .buttons .singlebutton div {

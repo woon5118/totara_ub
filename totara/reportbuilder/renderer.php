@@ -404,7 +404,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $html = html_writer::start_tag('div', array('class' => 'action-icon rb-inline'));
             $html .= html_writer::empty_tag('img', array(
                 'src' => $this->pix_url('/t/cache', 'moodle'),
-                'class' => 'show-cachenow-dialog smallicon rb-hidden rb-genicon',
+                'class' => 'show-cachenow-dialog iconsmall rb-hidden rb-genicon',
                 'data-id' => $reportid,
                 'name' => 'show-cachenow-dialog-' . $reportid,
                 'id' => 'show-cachenow-dialog-' . $reportid,

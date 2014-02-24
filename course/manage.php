@@ -692,7 +692,7 @@ function print_category_edit(html_table $table, coursecat $category, $depth = -1
         $str->hide = new lang_string('hide');
         $str->show = new lang_string('show');
         $str->cohorts = new lang_string('cohorts', 'cohort');
-        $str->spacer = $OUTPUT->spacer().' ';
+        $str->spacer = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
     }
 
     if ($category->id) {

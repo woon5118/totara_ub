@@ -99,11 +99,11 @@ function competency_template_display_table($templates, $frameworkid) {
             $buttons = array();
             if ($editingon && $can_edit) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('prefix/competency/template/edit.php', array('id' => $template->id)),
-                    new pix_icon('t/edit.gif', $stredit), null, array('class' => 'iconsmall', 'title' => $str_edit));
+                    new pix_icon('t/edit', $stredit, null, array('class' => 'iconsmall', 'title' => $str_edit)));
             }
             if ($editingon && $can_delete) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('prefix/competency/template/delete.php', array('id' => $template->id)),
-                    new pix_icon('t/delete.gif', $strdelete), null, array('class' => 'iconsmall', 'title' => $str_delete));
+                    new pix_icon('t/delete', $strdelete, null, array('class' => 'iconsmall', 'title' => $str_delete)));
             }
 
             if ($buttons) {

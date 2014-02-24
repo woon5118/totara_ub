@@ -369,9 +369,9 @@ class rb_source_dp_evidence extends rb_base_source {
                                 array('id' => $evidenceid, 'userid' => $row->userid)),
                         new pix_icon('t/edit', get_string('edit')));
 
-            $out .= $OUTPUT->spacer();
+            $out .= $OUTPUT->spacer(array('width' => 11, 'height' => 11, 'class' => 'iconsmall action-icon'));
 
-            $out.= $OUTPUT->action_icon(
+            $out .= $OUTPUT->action_icon(
                         new moodle_url('/totara/plan/record/evidence/edit.php',
                                 array('id' => $evidenceid, 'userid' => $row->userid, 'd' => '1')),
                         new pix_icon('t/delete', get_string('delete')));

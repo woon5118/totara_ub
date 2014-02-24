@@ -100,12 +100,19 @@ if ($types) {
         // Add edit link
         $buttons = array();
         if ($can_edit) {
-            $buttons[] = $OUTPUT->action_icon(new moodle_url('edit.php', array('prefix' => $prefix, 'id' => $type->id)),
-                new pix_icon('t/edit', $str_edit), null, array('title' => $str_edit, 'class' => 'iconsmall'));
+            $buttons[] = $OUTPUT->action_icon(
+                new moodle_url('/totara/hierarchy/type/edit.php', array('prefix' => $prefix, 'id' => $type->id)),
+                new pix_icon('t/edit', $str_edit, null, array('class' => 'iconsmall')),
+                null,
+                array('title' => $str_edit)
+            );
         }
         if ($can_delete) {
-            $buttons[] = $OUTPUT->action_icon(new moodle_url('delete.php', array('prefix' => $prefix, 'id' => $type->id)),
-                new pix_icon('t/delete', $str_delete), null, array('title' => $str_delete, 'class' => 'iconsmall'));
+            $buttons[] = $OUTPUT->action_icon(
+                new moodle_url('/totara/hierarchy/type/delete.php', array('prefix' => $prefix, 'id' => $type->id)),
+                new pix_icon('t/delete', $str_delete, null),
+                null,
+                array('title' => $str_delete));
         }
         if ($buttons) {
             $row[] = implode($buttons, '');

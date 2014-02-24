@@ -380,9 +380,15 @@ class cohort {
             if ($can_edit) {
                 $params = array('goalid' => $assignment->goalid, 'assigntype' => GOAL_ASSIGNMENT_AUDIENCE, 'modid' => $cohort->id);
                 $url = new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php', $params);
-                $delete =$OUTPUT->action_icon($url, new pix_icon('t/delete', $remove), null,
-                    array('id' => 'goalassigdel', 'class' => 'iconsmall', 'title' => $remove));
+
+                $delete = $OUTPUT->action_icon(
+                    $url,
+                    new pix_icon('t/delete', $remove, null, array('class' => 'iconsmall')),
+                    null,
+                    array('id' => 'goalassigdel', 'title' => $remove));
                 $row[] = new html_table_cell($delete);
+            } else {
+                $delete = null;
             }
 
             $table->data[] = new html_table_row($row);
