@@ -73,7 +73,7 @@ $leftcols = 1 + count($extrafields);
 ///
 /// Display RPL stuff
 ///
-function show_rpl($type, $user, $rpl, $describe, $fulldescribe) {
+function show_rpl($type, $user, $rpl, $describe, $fulldescribe, $cmid = null) {
     global $OUTPUT, $edituser, $course, $sort, $start;
 
     // If editing a user
@@ -81,6 +81,7 @@ function show_rpl($type, $user, $rpl, $describe, $fulldescribe) {
         // Show edit form
         print '<form action="save_rpl.php?type='.$type.'&course='.$course->id.'&sort='.$sort.'&start='.$start.'&redirect=1" method="post">';
         print '<input type="hidden" name="user" value="'.$user->id.'" />';
+        print '<input type="hidden" name="cmid" value="'.$cmid.'" />';
         print '<input type="text" name="rpl" value="'.format_string($rpl).'" maxlength="255" />';
         print '<input type="submit" name="saverpl" value="'.get_string('save', 'completion').'" /></form> ';
         print '<a href="index.php?course='.$course->id.'&sort='.$sort.'&start='.$start.'">'.get_string('cancel').'</a>';
@@ -728,14 +729,14 @@ foreach ($progress as $user) {
                 $row[] = $describe;
                 $row[] = $date;
             } else {
-                print '<td class="completion-progresscell rpl-'.$criterion->id.'">';
+                print '<td class="completion-progresscell rpl-'.$criterion->id.' cmid-'.$criterion->moduleinstance.'">';
 
                 print '<img src="'.$OUTPUT->pix_url('i/'.$completionicon).
                       '" alt="'.$describe.'" class="icon" title="'.$fulldescribe.'" />';
 
                 // Decide if we need to display an RPL
                 if (in_array($criterion->id, $criteria_with_rpl)) {
-                    show_rpl($criterion->id, $user, $criteria_completion->rpl, $describe, $fulldescribe);
+                    show_rpl($criterion->id, $user, $criteria_completion->rpl, $describe, $fulldescribe, $criterion->moduleinstance);
                 }
 
                 print '</td>';

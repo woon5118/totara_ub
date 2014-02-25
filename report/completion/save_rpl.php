@@ -32,6 +32,7 @@ $type       = required_param('type', PARAM_RAW);
 $course_id  = required_param('course', PARAM_INT);
 $user_id    = required_param('user', PARAM_INT);
 $rpl        = optional_param('rpl', '', PARAM_RAW);
+$cmid       = optional_param('cmid', '', PARAM_INT);
 
 // Non-js stuff
 $redirect   = optional_param('redirect', false, PARAM_BOOL);
@@ -91,21 +92,26 @@ if (!$rpl_enabled) {
     print_error('error:rplsaredisabled', 'completion');
 }
 
-
-///
-/// Complete user
-///
+// Contains the values that will be stored in the DB (course_modules_completion table).
+$data = new StdClass;
+$data->id = 0;
+$data->userid = $user->id;
+$data->viewed = 0;
+$data->coursemoduleid = $cmid;
 
 // Complete
 if (strlen($rpl)) {
     $completion->rpl = addslashes($rpl);
     $completion->mark_complete();
-
+    $data->completionstate = COMPLETION_COMPLETE;
 // If no RPL, uncomplete user, and let aggregation do its thing
 } else {
     $completion->delete();
+    $data->completionstate = COMPLETION_INCOMPLETE;
 }
-
+$data->timemodified = time();
+$cm = get_coursemodule_from_id(null, $cmid, null, false, MUST_EXIST);
+$info->internal_set_data($cm, $data);
 
 // Redirect, if requested (not an ajax request)
 if ($redirect) {
