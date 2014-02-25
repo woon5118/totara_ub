@@ -139,9 +139,9 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes'   => array(
-            'manager'       => CAP_ALLOW,
-            'user'          => CAP_ALLOW,
-        )
+            'manager'       => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => ' totara/hierarchy:assignselfposition'
     ),
     // Assign temporary manager to users.
     'totara/core:delegateusersmanager' => array(
