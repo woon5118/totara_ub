@@ -133,13 +133,13 @@ function tm_message_send($eventdata) {
     }
 
     if (is_int($eventdata->userto)) {
-        debugging('tm_message_send() userto is a user ID when it should be a user object');
-        $eventdata->userto = $DB->get_record('user', array('id' => $eventdata->useridto), '*', MUST_EXIST);
+        debugging('tm_message_send() userto is a user ID when it should be a user object', DEBUG_DEVELOPER);
+        $eventdata->userto = $DB->get_record('user', array('id' => $eventdata->userto), '*', MUST_EXIST);
     }
 
     if (is_int($eventdata->userfrom)) {
-        debugging('tm_message_send() userfrom is a user ID when it should be a user object');
-        $eventdata->userfrom = $DB->get_record('user', array('id' => $message->userfrom), '*', MUST_EXIST);
+        debugging('tm_message_send() userfrom is a user ID when it should be a user object', DEBUG_DEVELOPER);
+        $eventdata->userfrom = $DB->get_record('user', array('id' => $eventdata->userfrom), '*', MUST_EXIST);
     }
 
     // must have msgtype, urgency and msgstatus
