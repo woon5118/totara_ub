@@ -237,7 +237,8 @@ class rb_source_dp_certification extends rb_base_source {
                     'joins' => array('prog_completion', 'certif_completion'),
                     'displayfunc' => 'timedue_date',
                     'extrafields' => array(
-                        'completionstatus' => 'prog_completion.status',
+                        'prog_completion_timedue' => 'prog_completion.timedue',
+                        'status' => 'certif_completion.status',
                         'programid' => 'base.id',
                         'certifpath' => 'certif_completion.certifpath',
                         'timeexpires' => 'certif_completion.timeexpires',
