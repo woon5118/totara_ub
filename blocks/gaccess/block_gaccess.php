@@ -77,7 +77,7 @@ class block_gaccess extends block_list {
 
         // Test for domain settings
         if( empty($domain)) {
-            $this->content->items = array(get_string('mustusegoogleauthenticaion','block_gaccess'));
+            $this->content->items = array(get_string('mustusegoogleauthentication', 'block_gaccess'));
             $this->content->icons = array();
             return $this->content;
         }
