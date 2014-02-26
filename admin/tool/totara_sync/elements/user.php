@@ -62,6 +62,8 @@ class totara_sync_element_user extends totara_sync_element {
         // User password settings.
         $mform->addElement('selectyesno', 'ignoreexistingpass', get_string('ignoreexistingpass', 'tool_totara_sync'));
         $mform->addElement('static', 'ignoreexistingpassdesc', '', get_string('ignoreexistingpassdesc', 'tool_totara_sync'));
+        $mform->addElement('selectyesno', 'forcepwchange', get_string('forcepwchange', 'tool_totara_sync'));
+        $mform->addElement('static', 'forcepwchangedesc', '', get_string('forcepwchange', 'tool_totara_sync'));
 
         $mform->addElement('header', 'crudheading', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
@@ -77,6 +79,7 @@ class totara_sync_element_user extends totara_sync_element {
         $this->set_config('sourceallrecords', $data->sourceallrecords);
         $this->set_config('allowduplicatedemails', $data->allowduplicatedemails);
         $this->set_config('ignoreexistingpass', $data->ignoreexistingpass);
+        $this->set_config('forcepwchange', $data->forcepwchange);
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', !empty($data->allow_delete));
@@ -332,6 +335,8 @@ class totara_sync_element_user extends totara_sync_element {
                 // Set user password.
                 if (!$userauth->user_update_password($user, $suser->password)) {
                     $this->addlog(get_string('cannotsetuserpassword', 'tool_totara_sync', $user->idnumber), 'warn', 'createusers');
+                } else if (!empty($this->config->forcepwchange)) {
+                    set_user_preference('auth_forcepasswordchange', 1, $user->id);
                 }
             }
         }

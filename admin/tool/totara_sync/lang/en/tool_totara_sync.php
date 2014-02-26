@@ -78,6 +78,8 @@ $string['allowduplicatedemails'] = 'Allow duplicate emails';
 $string['allowduplicatedemailsdesc'] = 'If "Yes" duplicated emails are allowed from the source. If "No" only unique emails are allowed.';
 $string['ignoreexistingpass'] = 'Only sync new users\' passwords';
 $string['ignoreexistingpassdesc'] = 'If "Yes" passwords are only updated for new users, if "No" all users\' passwords are updated';
+$string['forcepwchange'] = 'Force password change for new users';
+$string['forcepwchangedesc'] = 'If "yes" new users have their password set but are forced to change it on first login';
 $string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
 $string['allowedactions'] = 'Allowed sync actions';
 $string['create'] = 'Create';
