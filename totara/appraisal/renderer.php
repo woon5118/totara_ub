@@ -1312,9 +1312,9 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $stagestatus = 'appraisal-stage-locked';
         }
 
-        $info .= file_rewrite_pluginfile_urls($stage->description, 'pluginfile.php', $TEXTAREA_OPTIONS['context']->id,
+        $description = file_rewrite_pluginfile_urls($stage->description, 'pluginfile.php', $TEXTAREA_OPTIONS['context']->id,
                 'totara_appraisal', 'appraisal_stage', $stage->id);
-
+        $info .= format_text($description, FORMAT_MOODLE);
         // Involved users statuses.
         if ($preview) {
             $rolescompletion = $stage->get_roles_involved(appraisal::ACCESS_CANANSWER);
