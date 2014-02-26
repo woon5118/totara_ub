@@ -71,6 +71,7 @@ $args = array('args' => '{"id":"'.$program->id.'",'.
                          '"COMPLETION_EVENT_NONE":"'.COMPLETION_EVENT_NONE.'",'.
                          '"COMPLETION_TIME_NOT_SET":"'.COMPLETION_TIME_NOT_SET.'",'.
                          '"COMPLETION_EVENT_FIRST_LOGIN":"'.COMPLETION_EVENT_FIRST_LOGIN.'",'.
+                         '"COMPLETION_EVENT_ENROLLMENT_DATE":"'.COMPLETION_EVENT_ENROLLMENT_DATE.'",'.
                          '"display_selected_completion_event":'.$display_selected.'}');
 
 $jsmodule = array(
