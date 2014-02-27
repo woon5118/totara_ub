@@ -32,8 +32,8 @@ require_login();
 ///
 /// Load parameters
 ///
-$id = required_param('id', PARAM_INT); // plan id
-$submitted = optional_param('submitbutton', null, PARAM_TEXT); // form submitted
+$id = required_param('id', PARAM_INT); // Plan id.
+$submitted = optional_param('submitbutton', null, PARAM_TEXT); // Form submitted.
 
 
 ///
@@ -51,7 +51,7 @@ if (!dp_can_view_users_plans($plan->userid)) {
 }
 
 
-// Redirect if plan complete
+// Redirect if plan complete.
 if ($plan->status == DP_PLAN_STATUS_COMPLETE) {
     totara_set_notification(
         get_string('plancomplete', 'totara_plan'),
@@ -60,13 +60,13 @@ if ($plan->status == DP_PLAN_STATUS_COMPLETE) {
 }
 
 
-// Get all components
+// Get all components.
 $components = $plan->get_components();
 
-// Get items the current user can approve
+// Get items the current user can approve.
 $requested_items = $plan->has_pending_items(null, true, true);
 
-// If no items
+// If no items.
 if (!$requested_items) {
     totara_set_notification(
         get_string('noitemsrequiringapproval', 'totara_plan'),
@@ -75,7 +75,7 @@ if (!$requested_items) {
 }
 
 $require_approval = array();
-// Get list of only items that require approval
+// Get list of only items that require approval.
 foreach ($components as $componentname => $component) {
     if (!empty($requested_items[$componentname])) {
         $require_approval[$componentname] = $component;
@@ -83,7 +83,7 @@ foreach ($components as $componentname => $component) {
 }
 
 
-// Flag this page as the review page
+// Flag this page as the review page.
 $plan->reviewing_pending = true;
 
 
@@ -92,11 +92,11 @@ $plan->reviewing_pending = true;
 ///
 if ($submitted && confirm_sesskey()) {
 
-    // Loop through components
+    // Loop through components.
     $errors = 0;
     foreach ($components as $componentname => $component) {
 
-        // Update settings
+        // Update settings.
         $result = $component->process_settings_update();
 
         if ($result === false) {
@@ -134,10 +134,10 @@ $output = $PAGE->get_renderer('totara_plan');
 
 echo $output->header();
 
-// Plan menu
+// Plan menu.
 echo dp_display_plans_menu($plan->userid, $plan->id, $plan->role);
 
-// Plan page content
+// Plan page content.
 echo $output->container_start('', 'dp-plan-content');
 
 echo $plan->display_plan_message_box();

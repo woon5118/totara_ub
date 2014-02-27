@@ -26,11 +26,10 @@ class totara_message_workflow_plan extends totara_message_workflow_plugin_base {
      * @param object $msg
      */
     function onaccept($eventdata, $msg) {
-        global $USER, $CFG;
-
-        // Load course
+        // Load course.
         $userid = $eventdata['userid'];
         $planid = $eventdata['planid'];
+        $reasonfordecision = (isset($eventdata['reasonfordecision'])) ? $eventdata['reasonfordecision'] : '';
         $plan = new development_plan($planid);
         if (!$plan) {
             print_error('planidnotfound', 'local_plan', $planid);
@@ -40,12 +39,12 @@ class totara_message_workflow_plan extends totara_message_workflow_plugin_base {
             return false;
         }
 
-        // Change status
-        if (!$plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE)) {
+        // Change status.
+        if (!$plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, $reasonfordecision)) {
             return false;
         }
 
-        return $plan->send_approved_alert();
+        return $plan->send_approved_alert($reasonfordecision);
     }
 
 
@@ -56,21 +55,25 @@ class totara_message_workflow_plan extends totara_message_workflow_plugin_base {
      * @param object $msg
      */
     function onreject($eventdata, $msg) {
-        global $USER, $CFG;
-
-        // can manipulate the language by setting $SESSION->lang temporarily
-        // Load course
+        // Can manipulate the language by setting $SESSION->lang temporarily.
+        // Load course.
         $userid = $eventdata['userid'];
         $planid = $eventdata['planid'];
+        $reasonfordecision = (isset($eventdata['reasonfordecision'])) ? $eventdata['reasonfordecision'] : '';
         $plan = new development_plan($planid);
         if (!$plan) {
             print_error('planidnotfound', 'local_plan', $planid);
+        }
+
+        // Change status.
+        if (!$plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_MANUAL_DECLINE, $reasonfordecision)) {
+            return false;
         }
 
         if (!in_array($plan->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
             return false;
         }
 
-        return $plan->send_declined_alert();
+        return $plan->send_declined_alert($reasonfordecision);
     }
 }

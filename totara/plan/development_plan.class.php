@@ -1034,9 +1034,12 @@ class development_plan {
         $out .= get_string('plannotapproved', 'totara_plan');
 
         if ($canapproveplan) {
+            $out .= html_writer::start_div();
+            $out .= get_string('reasonfordecision', 'totara_message');
+            $out .= html_writer::empty_tag('input', array('type' => 'text', 'name' => 'reasonfordecision'));
             $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approve', 'value' => get_string('approve', 'totara_plan')));
             $out .= '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'decline', 'value' => get_string('decline', 'totara_plan')));
-
+            $out .= html_writer::end_div();
         } else if ($canrequestapproval) {
             $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
         }
@@ -1249,11 +1252,12 @@ class development_plan {
      * Change plan's status
      *
      * @access  public
-     * @param   integer $status
-     * @param       $autocomplete
+     * @param  int $status
+     * @param  int $reason
+     * @param  string $reasontext Reason for declining or approving a plan
      * @return  bool
      */
-    public function set_status($status, $reason=DP_PLAN_REASON_MANUAL_APPROVE) {
+    public function set_status($status, $reason=DP_PLAN_REASON_MANUAL_APPROVE, $reasontext = '') {
         global $USER, $DB;
 
         $todb = new stdClass;
@@ -1304,6 +1308,7 @@ class development_plan {
         $todb->planid = $this->id;
         $todb->status = $status;
         $todb->reason = $reason;
+        $todb->reasonfordecision = $reasontext;
         $todb->timemodified = time();
         $todb->usermodified = $USER->id;
         $DB->insert_record('dp_plan_history', $todb);
@@ -1493,20 +1498,27 @@ class development_plan {
      * @global $CFG
      * @return void
      */
-    function send_approved_alert() {
+    function send_approved_alert($reasonfordecision) {
         global $USER, $CFG, $DB;
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
         $userto = $DB->get_record('user', array('id' => $this->userid));
         $userfrom = $DB->get_record('user', array('id' => $USER->id));
         $stringmanager = get_string_manager();
+
         $event = new stdClass;
         $event->userfrom = $userfrom;
         $event->userto = $userto;
         $event->icon = 'learningplan-approve';
         $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
         $event->subject = $stringmanager->get_string('planapproved', 'totara_plan', $this->name, $userto->lang);
-        $event->fullmessage = $stringmanager->get_string('planapproved', 'totara_plan', $this->name, $userto->lang);
+        $event->fullmessage = $stringmanager->get_string('approvedplanrequest', 'totara_plan', $this->name, $userto->lang);
+
+        if (!empty($reasonfordecision)) {
+            $event->fullmessage .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
+            $event->fullmessage .= $stringmanager->get_string('reasonapprovedplanrequest', 'totara_plan', $reasonfordecision, $userto->lang);
+        }
+
         tm_alert_send($event);
     }
 
@@ -1516,22 +1528,31 @@ class development_plan {
      *
      * @global $USER
      * @global $CFG
+     * @param string $reasonfordecision Reason for declining the plan
      * @return void
      */
-    function send_declined_alert() {
+    function send_declined_alert($reasonfordecision = '') {
         global $USER, $CFG, $DB;
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
         $userto = $DB->get_record('user', array('id' => $this->userid));
         $userfrom = $DB->get_record('user', array('id' => $USER->id));
         $stringmanager = get_string_manager();
+
         $event = new stdClass;
         $event->userfrom = $userfrom;
         $event->userto = $userto;
         $event->icon = 'learningplan-decline';
         $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
         $event->subject = format_string($stringmanager->get_string('plandeclined', 'totara_plan', $this->name, $userto->lang));
-        $event->fullmessage = format_string($stringmanager->get_string('plandeclined', 'totara_plan', $this->name, $userto->lang));
+        $event->fullmessage = $event->subject;
+        $event->fullmessage = $stringmanager->get_string('declinedplanrequest', 'totara_plan', $this->name, $userto->lang);
+
+        if (!empty($reasonfordecision)) {
+            $event->fullmessage .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
+            $event->fullmessage .= $stringmanager->get_string('reasondeclinedplanrequest', 'totara_plan', $reasonfordecision, $userto->lang);
+        }
+
         tm_alert_send($event);
     }
 

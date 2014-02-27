@@ -1337,9 +1337,10 @@ function prog_assignments_firstlogin($user) {
  * an array of exceptions and the action to take
  *
  * @param array $extensions list of extension ids and actions in the form array(id => action)
+ * @param array $reasonfordecision Reason for granting or denying the extension
  * @return array Contains count of extensions processed and number of failures
  */
-function prog_process_extensions($extensions) {
+function prog_process_extensions($extensions, $reasonfordecision = array()) {
     global $CFG, $DB, $USER;
 
     if (!empty($extensions)) {
@@ -1368,13 +1369,21 @@ function prog_process_extensions($extensions) {
                 //ensure the message is actually coming from $user's manager, default to support
                 $userfrom = totara_is_manager($extension->userid, $USER->id) ? $USER : generate_email_supportuser();
 
+                $program = $DB->get_record('prog', array('id' => $extension->programid), 'fullname');
+
                 $messagedata = new stdClass();
                 $messagedata->userto           = $userto;
                 $messagedata->userfrom         = $userfrom;
                 $messagedata->subject          = $stringmanager->get_string('extensiondenied', 'totara_program', null, $userto->lang);
                 $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                 $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
-                $messagedata->fullmessage      = $stringmanager->get_string('extensiondeniedmessage', 'totara_program', null, $userto->lang);
+                $messagedata->fullmessage      = $stringmanager->get_string('extensiondeniedmessage', 'totara_program', $program->fullname, $userto->lang);
+
+                if (!empty($reasonfordecision[$id])) {
+                    // Add reason to the message.
+                    $messagedata->fullmessage  .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
+                    $messagedata->fullmessage  .= $stringmanager->get_string('reasondeniedmessage', 'totara_program', $reasonfordecision[$id], $userto->lang);
+                }
 
                 $eventdata = new stdClass();
                 $eventdata->message = $messagedata;
@@ -1384,6 +1393,7 @@ function prog_process_extensions($extensions) {
                     $extension_todb = new stdClass();
                     $extension_todb->id = $extension->id;
                     $extension_todb->status = PROG_EXTENSION_DENY;
+                    $extension_todb->reasonfordecision = $reasonfordecision[$id];
 
                     if (!$DB->update_record('prog_extension', $extension_todb)) {
                         $update_fail_count++;
@@ -1420,7 +1430,7 @@ function prog_process_extensions($extensions) {
                         print_error('error:failedtofinduser', 'totara_program', $extension->userid);
                     }
 
-                    //ensure the message is actually coming from $user's manager, default to support
+                    // Ensure the message is actually coming from $user's manager, default to support.
                     $userfrom = totara_is_manager($extension->userid, $USER->id) ? $USER : generate_email_supportuser();
                     $stringmanager = get_string_manager();
                     $messagedata = new stdClass();
@@ -1431,11 +1441,18 @@ function prog_process_extensions($extensions) {
                     $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                     $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program', userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), $CFG->timezone), null, $userto->lang);
 
+                    if (!empty($reasonfordecision[$id])) {
+                        // Add reason to the message.
+                        $messagedata->fullmessage  .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
+                        $messagedata->fullmessage  .= $stringmanager->get_string('reasonapprovedmessage', 'totara_program', $reasonfordecision[$id], $userto->lang);
+                    }
+
                     if ($result = tm_alert_send($messagedata)) {
 
                         $extension_todb = new stdClass();
                         $extension_todb->id = $extension->id;
                         $extension_todb->status = PROG_EXTENSION_GRANT;
+                        $extension_todb->reasonfordecision = $reasonfordecision[$id];
 
                         if (!$DB->update_record('prog_extension', $extension_todb)) {
                             $update_fail_count++;

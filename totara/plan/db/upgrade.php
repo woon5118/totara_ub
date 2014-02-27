@@ -329,5 +329,41 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013111500, 'totara', 'plan');
     }
 
+    if ($oldversion < 2014030600) {
+        // Add reason for denying or approving a program extension.
+        $table = new xmldb_table('dp_plan_history');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'reason');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('dp_plan_competency_assign');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'approved');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('dp_plan_course_assign');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'approved');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('dp_plan_program_assign');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'approved');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('dp_plan_objective');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT, 'medium', null, null, null, null, 'approved');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2014030600, 'totara', 'plan');
+    }
+
     return true;
 }

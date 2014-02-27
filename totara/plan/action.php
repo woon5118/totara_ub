@@ -48,6 +48,7 @@ $approvalrequest = optional_param('approvalrequest', 0, PARAM_BOOL);
 $delete = optional_param('delete', 0, PARAM_BOOL);
 $complete = optional_param('complete', 0, PARAM_BOOL);
 $reactivate = optional_param('reactivate', 0, PARAM_BOOL);
+$reasonfordecision = optional_param('reasonfordecision', '', PARAM_TEXT);
 
 // Is this an ajax call?
 $ajax = optional_param('ajax', 0, PARAM_BOOL);
@@ -97,8 +98,8 @@ if (!dp_can_view_users_plans($plan->userid)) {
 ///
 if (!empty($approve)) {
     if (in_array($plan->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
-       $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE);
-       $plan->send_approved_alert();
+       $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, $reasonfordecision);
+       $plan->send_approved_alert($reasonfordecision);
        totara_set_notification(get_string('planapproved', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
     } else {
         if (empty($ajax)) {
@@ -113,7 +114,8 @@ if (!empty($approve)) {
 ///
 if (!empty($decline)) {
     if (in_array($plan->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
-        $plan->send_declined_alert();
+        $plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_MANUAL_DECLINE, $reasonfordecision);
+        $plan->send_declined_alert($reasonfordecision);
         add_to_log(SITEID, 'plan', 'declined', "view.php?id={$plan->id}", $plan->name);
         totara_set_notification(get_string('plandeclined', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
     } else {

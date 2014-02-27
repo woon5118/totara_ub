@@ -333,5 +333,17 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014030500, 'totara_program');
     }
 
+    if ($oldversion < 2014030600) {
+        // Add reason for denying or approving a program extension.
+        $table = new xmldb_table('prog_extension');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014030600, 'totara_program');
+    }
+
     return true;
 }

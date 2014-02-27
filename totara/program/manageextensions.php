@@ -30,6 +30,7 @@ require_login();
 
 $userid = optional_param('userid', 0, PARAM_INT);
 $extensions = optional_param_array('extension', array(), PARAM_INT);
+$reasons = optional_param_array('reasondecision', array(), PARAM_ALPHANUMEXT);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url("/totara/program/manageextensions.php", array('userid' => $userid)));
@@ -37,13 +38,14 @@ $PAGE->set_url(new moodle_url("/totara/program/manageextensions.php", array('use
 if ((!empty($userid) && !totara_is_manager($userid, $USER->id)) && !is_siteadmin()) {
     print_error('nopermissions', 'error', '', get_string('manageextensions', 'totara_program'));
 }
-if (data_submitted() && confirm_sesskey()) {
-    $result = prog_process_extensions($extensions);
+$extensionsselceted = array_filter($extensions);
+if (data_submitted() && confirm_sesskey() && (!empty($extensionsselceted))) {
+    $result = prog_process_extensions($extensionsselceted, $reasons);
     if ($result) {
         $total = $result['total'];
         $failcount = $result['failcount'];
         $update_fail_count = $result['updatefailcount'];
-        $update_extension_count = $total; 
+        $update_extension_count = $total;
         if ($total == 0) {
             redirect('manageextensions.php');
         } elseif ($update_fail_count == $update_extension_count && $update_fail_count > 0) {
@@ -55,7 +57,6 @@ if (data_submitted() && confirm_sesskey()) {
         }
     }
 }
-
 
 $heading = get_string('manageextensions', 'totara_program');
 $pagetitle = get_string('extensions', 'totara_program');
@@ -105,6 +106,8 @@ if (!empty($staff_ids)) {
         $headers[] = get_string('extensiondate', 'totara_program');
         $columns[] = 'reason';
         $headers[] = get_string('reason', 'totara_program');
+        $columns[] = 'reasonfordecision';
+        $headers[] = get_string('reasonfordecision', 'totara_message');
         $columns[] = 'grant';
         $headers[] = get_string('grantdeny', 'totara_program');
 
@@ -147,8 +150,9 @@ if (!empty($staff_ids)) {
             $attributes['class'] = 'approval';
             $attributes['id'] = null;
 
-            $pulldown_menu = html_writer::select($options, $pulldown_name, $extension->status, array(0 => 'choose'), $attributes);
+            $tablerow[] = html_writer::empty_tag('input', array('name' =>"reasondecision[{$extension->id}]", 'type' =>'text'));
 
+            $pulldown_menu = html_writer::select($options, $pulldown_name, $extension->status, array(0 => 'choose'), $attributes);
             $tablerow[] = $pulldown_menu;
             $table->add_data($tablerow);
         }

@@ -295,7 +295,7 @@ $string['extensionaccepttext'] = 'Extension Granted';
 $string['extensionbeforenow'] = 'Cannot request extension that is earlier than current date';
 $string['extensiondate'] = 'Extension date';
 $string['extensiondenied'] = 'Extension denied';
-$string['extensiondeniedmessage'] = 'Your request for an extension has been refused.';
+$string['extensiondeniedmessage'] = 'Your extension request for the program {$a} has been refused.';
 $string['extensionearlierthanduedate'] = 'Cannot request extension that is before current program due date';
 $string['extensiongranted'] = 'Extension granted';
 $string['extensiongrantedmessage'] = 'You have been granted an extension until {$a}.';
@@ -625,6 +625,8 @@ If the program is not visble, it will not appear in program listings or search r
 $string['programvisible'] = 'Program Visible';
 $string['progress'] = 'Progress';
 $string['reason'] = 'Extension reason';
+$string['reasonapprovedmessage'] = 'The reason given for approving the extension was: {$a}';
+$string['reasondeniedmessage'] = 'The reason given for denying the extension was: {$a}';
 $string['reasonforextension'] = 'Reason for extension';
 $string['recurrence'] = 'Recurrence';
 $string['recurrence_help'] = 'Recurrence defines the time period when the recurring course must be repeated. Recurrence can be specified by any number of days, weeks or months.';

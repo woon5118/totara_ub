@@ -38,6 +38,7 @@ if (isguestuser()) {
 
 /// Script parameters
 $msgid = required_param('id', PARAM_INT);
+$reasonfordecision = optional_param('reasonfordecision', '', PARAM_TEXT);
 $returnto = optional_param('returnto', NULL, PARAM_LOCALURL);
 
 // check message ownership
@@ -47,7 +48,7 @@ if (!$message || $message->useridto != $USER->id || !confirm_sesskey()) {
 }
 
 // onaccept the message and then return
-tm_message_task_accept($msgid);
+tm_message_task_accept($msgid, $reasonfordecision);
 
 if ($returnto) {
     redirect($returnto);

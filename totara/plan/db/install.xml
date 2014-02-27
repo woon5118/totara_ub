@@ -91,6 +91,7 @@
         <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the priority of this course within the current plan."/>
         <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of the date this course is due to be completed."/>
         <FIELD NAME="approved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates if the course has been accepted as part of a plan, or is awaiting approval."/>
+        <FIELD NAME="reasonfordecision" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The reason for approving/declining the request"/>
         <FIELD NAME="completionstatus" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Stores the course completion status at the moment the plan is marked as complete. Set to null before the plan is complete."/>
         <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="Stores the course grade at the moment the plan is marked as complete. Set to null for active plans."/>
         <FIELD NAME="manual" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this assignment made manually"/>
@@ -114,6 +115,7 @@
         <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the priority of this competency within the current plan."/>
         <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of the date this competency is due to be completed."/>
         <FIELD NAME="approved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates if the competency has been accepted as part of a plan, or is awaiting approval."/>
+        <FIELD NAME="reasonfordecision" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The reason for approving/declining the request"/>
         <FIELD NAME="scalevalueid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The final id of the proficiency scalevalue. This field is used as a snapshot field, for saving the proficiency, after the plan has been completed"/>
         <FIELD NAME="manual" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this assignment made manually"/>
       </FIELDS>
@@ -222,6 +224,7 @@
         <FIELD NAME="planid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The related plan's id"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="The plan's status"/>
         <FIELD NAME="reason" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="The reason for the status change"/>
+        <FIELD NAME="reasonfordecision" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The reason for approving/declining the request"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Modification time"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the user who made the modification"/>
       </FIELDS>
@@ -293,6 +296,7 @@
         <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="scalevalueid" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="approved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="reasonfordecision" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The reason for approving/declining the request"/>
         <FIELD NAME="manual" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this assignment made manually"/>
       </FIELDS>
       <KEYS>
@@ -323,6 +327,7 @@
         <FIELD NAME="priority" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the priority of this program within the current plan."/>
         <FIELD NAME="duedate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of the date this program is due to be completed."/>
         <FIELD NAME="approved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates if the program has been accepted as part of a plan, or is awaiting approval."/>
+        <FIELD NAME="reasonfordecision" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The reason for approving/declining the request"/>
         <FIELD NAME="manual" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was this assignment made manually"/>
       </FIELDS>
       <KEYS>

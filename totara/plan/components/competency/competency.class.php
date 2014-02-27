@@ -868,6 +868,7 @@ class dp_competency_component extends dp_base_component {
         $duedates = optional_param_array('duedate_competency', array(), PARAM_TEXT);
         $priorities = optional_param_array('priorities_competency', array(), PARAM_INT);
         $approved_comps = optional_param_array('approve_competency', array(), PARAM_INT);
+        $reasonfordecision = optional_param_array('reasonfordecision_competency', array(), PARAM_TEXT);
         $evidences = optional_param_array('compprof_competency', array(), PARAM_INT);
 
         // The parameter 'linkedcourses' is coming through as a 2D array, which is unsupported by optional_param_array.
@@ -974,14 +975,17 @@ class dp_competency_component extends dp_base_component {
                 if (!$approved) {
                     continue;
                 }
+                $reason = isset($reasonfordecision[$id]) ? $reasonfordecision[$id] : '' ;
                 if (array_key_exists($id, $stored_records)) {
                     // add to the existing update object
                     $stored_records[$id]->approved = $approved;
+                    $todb->reasonfordecision = $reason;
                 } else {
                     // create a new update object
                     $todb = new stdClass();
                     $todb->id = $id;
                     $todb->approved = $approved;
+                    $todb->reasonfordecision = $reason;
                     $stored_records[$id] = $todb;
                 }
             }
@@ -1055,6 +1059,7 @@ class dp_competency_component extends dp_base_component {
                         $approval->itemname = format_string($competency->fullname);
                         $approval->before = $oldrecords[$itemid]->approved;
                         $approval->after = $record->approved;
+                        $approval->reasonfordecision = $record->reasonfordecision;
                         $approvals[] = $approval;
 
                         // Check if we are auto marking competencies with default evidence values

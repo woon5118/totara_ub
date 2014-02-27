@@ -40,21 +40,22 @@ class totara_message_workflow_prog_extension extends totara_message_workflow_plu
      * @param object $msg
      */
     function onaccept($eventdata, $msg) {
-        global $CFG, $SITE;
+        global $SITE;
 
-        // Load course
+        // Load course.
         $userid = $eventdata['userid'];
         $extensionid = $eventdata['extensionid'];
         $programid = $eventdata['programid'];
+        $reasonfordecision = (isset($eventdata['reasonfordecision'])) ? $eventdata['reasonfordecision'] : '';
 
         $extensions = array($extensionid => 1);  // 1 = grant, 2 = deny
+        $reason = array($extensionid => $reasonfordecision);
 
         // Approve extensions
-        if (prog_process_extensions($extensions)) {
+        if (prog_process_extensions($extensions, $reason)) {
             add_to_log($SITE->id, 'program', 'grant extension', "view.php?id=$programid", $programid);
         }
 
-        // issue notification that registration has been accepted
         return true;
     }
 
@@ -66,43 +67,23 @@ class totara_message_workflow_prog_extension extends totara_message_workflow_plu
      * @param object $msg
      */
     function onreject($eventdata, $msg) {
-        global $CFG, $SITE;
+        global $SITE;
 
-        // can manipulate the language by setting $SESSION->lang temporarily
-        // Load course
+        // Can manipulate the language by setting $SESSION->lang temporarily.
+        // Load course.
         $userid = $eventdata['userid'];
         $extensionid = $eventdata['extensionid'];
         $programid = $eventdata['programid'];
+        $reasonfordecision = (isset($eventdata['reasonfordecision'])) ? $eventdata['reasonfordecision'] : '';
 
         $extensions = array($extensionid => 2);  // 1 = grant, 2 = deny
+        $reason = array($extensionid => $reasonfordecision);
 
-        // Decline extensions
-        if (prog_process_extensions($extensions)) {
+        // Decline extensions.
+        if (prog_process_extensions($extensions, $reason)) {
             add_to_log($SITE->id, 'program', 'deny extensions', "view.php?id=$programid", $programid);
         }
 
-        // issue notification that registration has been declined
         return true;
-    }
-
-    /**
-     * Send the accept or reject notification to the user
-     *
-     * @param int $userid
-     * @param object $facetoface
-     * @param object $session
-     * @param string $langkey
-     */
-    private function acceptreject_notification($userid, $program, $session, $langkey) {
-        global $CFG, $DB;
-
-        $newevent = new stdClass();
-        $newevent->userfrom         = NULL;
-        $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-        $newevent->userto           = $user;
-        $newevent->fullmessage      = get_string('extensionrequestsent', 'totara_program');
-        $newevent->subject          = $newevent->fullmessage;
-        $newevent->urgency          = TOTARA_MSG_URGENCY_NORMAL;
-        return tm_alert_send($newevent);
     }
 }
