@@ -741,7 +741,12 @@ from
                                 ON csa.scaleid = cs.id
                             WHERE c.id= ?";
                     $scaledetails = $DB->get_record_sql($sql, array($competencyid));
-                    $compscale = $DB->get_records_menu('comp_scale_values', array('scaleid' => $scaledetails->scaleid), 'sortorder');
+                    $formatscale = $DB->get_records_menu('comp_scale_values', array('scaleid' => $scaledetails->scaleid), 'sortorder');
+
+                    $compscale = array();
+                    foreach ($formatscale as $key => $scale) {
+                        $compscale[$key] = format_string($scale);
+                    }
                     $this->compscales[$compframeworkid] = $compscale;
                 }
 

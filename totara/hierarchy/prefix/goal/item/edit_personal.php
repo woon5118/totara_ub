@@ -32,9 +32,11 @@ $goalpersonalid = optional_param('goalpersonalid', 0, PARAM_INT);
 require_login();
 
 $strmygoals = get_string('mygoals', 'totara_hierarchy');
+$mygoalsurl = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', array('userid' => $userid));
 $pageurl = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', array('userid' => $userid));
 
 $context = context_user::instance($userid);
+$PAGE->set_context($context);
 
 $goal = new goal();
 if (!$permissions = $goal->get_permissions(null, $userid)) {
@@ -44,17 +46,10 @@ if (!$permissions = $goal->get_permissions(null, $userid)) {
 
 extract($permissions);
 
-// Set up the page.
-$PAGE->set_url($pageurl);
-$PAGE->set_context($context);
-$PAGE->set_pagelayout('admin');
-$PAGE->set_totara_menu_selected('mygoals');
-$PAGE->set_title($strmygoals);
-$PAGE->set_heading($strmygoals);
-
 if (!empty($goalpersonalid)) {
     $goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
     $goalpersonal->goalpersonalid = $goalpersonal->id;
+    $goalname = format_string($goalpersonal->name);
 
     // Check the specific permissions for this goal.
     if (!$can_edit[$goalpersonal->assigntype]) {
@@ -63,12 +58,22 @@ if (!empty($goalpersonalid)) {
 } else {
     $goalpersonal = new stdClass();
     $goalpersonal->userid = $userid;
+    $goalname = get_string('addgoalpersonal', 'totara_hierarchy');
 
     // Check they have generic permissions to create a personal goal for this user.
     if (!$can_edit[GOAL_ASSIGNMENT_SELF] && !$can_edit[GOAL_ASSIGNMENT_MANAGER] && !$can_edit[GOAL_ASSIGNMENT_ADMIN]) {
         print_error('error:createpersonalgoal', 'totara_hierarchy');
     }
 }
+
+// Set up the page.
+$PAGE->navbar->add($strmygoals, $mygoalsurl);
+$PAGE->navbar->add($goalname);
+$PAGE->set_url($pageurl);
+$PAGE->set_pagelayout('admin');
+$PAGE->set_totara_menu_selected('mygoals');
+$PAGE->set_title($strmygoals);
+$PAGE->set_heading($strmygoals);
 
 $mform = new goal_edit_personal_form();
 

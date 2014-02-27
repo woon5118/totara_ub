@@ -78,7 +78,7 @@ if (!$scale = $DB->get_record('goal_scale', array('id' => $value->scaleid))) {
 $scale_used = goal_scale_is_used($scale->id);
 
 // Save scale name for display in the form.
-$value->scalename = $scale->name;
+$value->scalename = format_string($scale->name);
 
 // Check scale isn't being used when adding new scale values.
 if ($value->id == 0 && $scale_used) {

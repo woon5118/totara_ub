@@ -302,7 +302,7 @@ class rb_source_goal_status_history extends rb_base_source {
         $goalscalevalues = $DB->get_records_sql($sql);
 
         foreach ($goalscalevalues as $goalscalevalue) {
-            $scalevalues[$goalscalevalue->id] = $goalscalevalue->scalename . ': ' . $goalscalevalue->name;
+            $scalevalues[$goalscalevalue->id] = format_string($goalscalevalue->scalename) . ': ' . format_string($goalscalevalue->name);
         }
 
         return $scalevalues;

@@ -612,7 +612,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 // Set up the array of options.
                 $options = array();
                 foreach ($scalevalues as $scalevalue) {
-                    $options[$scalevalue->id] = $scalevalue->name;
+                    $options[$scalevalue->id] = format_string($scalevalue->name);
                 }
 
                 $attributes = array(
@@ -744,7 +744,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     $values = $DB->get_records('goal_scale_values', array('scaleid' => $goalpersonal->scaleid));
                     $options = array();
                     foreach ($values as $value) {
-                        $options[$value->id] = $value->name;
+                        $options[$value->id] = format_string($value->name);
                     }
 
                     $attributes = array(

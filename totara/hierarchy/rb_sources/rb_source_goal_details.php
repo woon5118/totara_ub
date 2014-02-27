@@ -249,7 +249,7 @@ class rb_source_goal_details extends rb_base_source {
         $goalscalevalues = $DB->get_records_sql($sql);
 
         foreach ($goalscalevalues as $goalscalevalue) {
-            $scalevalues[$goalscalevalue->id] = $goalscalevalue->scalename . ': ' . $goalscalevalue->name;
+            $scalevalues[$goalscalevalue->id] = format_string($goalscalevalue->scalename) . ': ' . format_string($goalscalevalue->name);
         }
 
         return $scalevalues;
@@ -279,7 +279,7 @@ class rb_source_goal_details extends rb_base_source {
         $goallist = $DB->get_records_sql($sql);
 
         foreach ($goallist as $goal) {
-            $goals[$goal->id] = $goal->fullname . ': ' . $goal->scalename;
+            $goals[$goal->id] = format_string($goal->fullname) . ': ' . format_string($goal->scalename);
         }
 
         return $goals;

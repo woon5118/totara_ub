@@ -577,7 +577,7 @@ class rb_source_competency_evidence extends rb_base_source {
     // in column definition
     function rb_display_link_competency($comp, $row) {
         $compid = $row->competency_id;
-        $url = new moodle_url('/hierarchy/item/view.php', array('prefix' => 'competency', 'id' => $compid));
+        $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'competency', 'id' => $compid));
         return html_writer::link($url, $comp);
     }
 
@@ -590,9 +590,15 @@ class rb_source_competency_evidence extends rb_base_source {
     function rb_filter_proficiency_list() {
         global $DB;
 
-        // include all possible scale values (from every scale)
-        return $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
+        $values = $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
 
+        $scales = array();
+        foreach ($values as $value) {
+            $scales[] = format_string($value);
+        }
+
+        // include all possible scale values (from every scale)
+        return $scales;
     }
 
 } // end of rb_source_competency_evidence class

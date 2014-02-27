@@ -821,7 +821,7 @@ class dp_competency_component extends dp_base_component {
             $cells[] = new html_table_cell(get_string('duedate', 'totara_plan') . ': ' . $this->display_duedate_as_text($item->duedate) . html_writer::empty_tag('br') . $this->display_duedate_highlight_info($item->duedate));
         }
         if ($status = $this->get_status($item->competencyid)) {
-            $cells[] = new html_table_cell(get_string('status', 'totara_plan'). ': ' . $status);
+            $cells[] = new html_table_cell(get_string('status', 'totara_plan'). ': ' . format_string($status));
         }
         $rows = new html_table_row($cells);
         $t->data = array($rows);
@@ -1456,8 +1456,13 @@ class dp_competency_component extends dp_base_component {
 
         $compscale = $DB->get_records_menu('comp_scale_values', array('scaleid' => $scaledetails->scaleid), 'sortorder');
 
+        $formatscale = array();
+        foreach ($compscale as $key => $scale) {
+            $formatscale[$key] = format_string($scale);
+        }
+
         $attributes = array(); //in this case no attributes are set
-        $output = html_writer::select($compscale,
+        $output = html_writer::select($formatscale,
                                     "compprof_{$this->component}[{$item->id}]",
                                     $item->profscalevalueid,
                                     array(($item->profscalevalueid ? '' : 0) => ($item->profscalevalueid ? '' : get_string('notset', 'totara_hierarchy'))),
