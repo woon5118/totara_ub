@@ -1789,30 +1789,33 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
     }
 
     // Send notification.
-    if ($notifyuser && (int)$notificationtype != MDL_F2F_NONE) {
-        switch ($new_status) {
-            case MDL_F2F_STATUS_BOOKED:
-                $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, false);
-                break;
+    $notifytype = ((int)$notificationtype == MDL_F2F_NONE ? false : true);
+    $session->notifyuser = $notifyuser && $notifytype;
 
-            case MDL_F2F_STATUS_WAITLISTED:
-                $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, true);
-                break;
+    switch ($new_status) {
+        case MDL_F2F_STATUS_BOOKED:
+            $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, false);
+            break;
 
-            case MDL_F2F_STATUS_REQUESTED:
-                $error = facetoface_send_request_notice($facetoface, $session, $userid);
-                break;
+        case MDL_F2F_STATUS_WAITLISTED:
+            $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, true);
+            break;
+
+        case MDL_F2F_STATUS_REQUESTED:
+            $error = facetoface_send_request_notice($facetoface, $session, $userid);
+            break;
+    }
+
+    if (!empty($error)) {
+        if ($error == 'userdoesnotexist') {
+            print_error($error, 'facetoface');
+        } else {
+            // Don't fail if email isn't sent, just display a warning
+            echo $OUTPUT->notification(get_string($error, 'facetoface'), 'notifyproblem');
         }
+    }
 
-        if (!empty($error)) {
-            if ($error == 'userdoesnotexist') {
-                print_error($error, 'facetoface');
-            } else {
-                // Don't fail if email isn't sent, just display a warning
-                echo $OUTPUT->notification(get_string($error, 'facetoface'), 'notifyproblem');
-            }
-        }
-
+    if ($session->notifyuser) {
         if (!$DB->update_record('facetoface_signups', $usersignup)) {
             print_error('error:couldnotupdatef2frecord', 'facetoface');
         }
@@ -1865,8 +1868,6 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
     $signupstatus->superceded = 0;
     $signupstatus->mailed = 0;
 
-    $transaction = $DB->start_delegated_transaction();
-
     if ($statusid = $DB->insert_record('facetoface_signups_status', $signupstatus)) {
         // mark any previous signup_statuses as superceded
         $where = "signupid = ? AND ( superceded = 0 OR superceded IS NULL ) AND id != ?";
@@ -1882,7 +1883,6 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
         $status = $DB->get_record_sql($sql, array($signupid));
         facetoface_set_completion($status, $status->userid, COMPLETION_UNKNOWN);
 
-        $transaction->allow_commit();
         return $statusid;
     } else {
         return false;
