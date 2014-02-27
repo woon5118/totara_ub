@@ -47,48 +47,20 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $out .= $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
 
         $table = new html_table();
-        $table->attributes = array('class' => 'generalbox boxaligncenter list-evidence');
-        $table->attributes['width'] = '95%';
-        $table->attributes['cellpadding'] = '5';
-        $table->attributes['cellspacing'] = '1';
-        //set up table header
-        $cells = array();
-        $cell = new html_table_cell(get_string('name'));
-        $cell->header = true;
-        $cell->attributes['class'] = 'header c0';
-        $cell->attributes['style'] = 'vertical-align:top; white-space:nowrap;';
-        $cell->attributes['scope'] = 'col';
-        $cells[] = $cell;
+        $table->attributes = array('id' => 'list-evidence', 'class' => 'generaltable boxaligncenter');
+        // Set up table header.
+        $table->head = array();
+        $table->head[] = get_string('name');
         if (!empty($CFG->competencyuseresourcelevelevidence)) {
-            $cell = new html_table_cell(get_string('type', 'totara_hierarchy'));
-            $cell->header = true;
-            $cell->attributes['class'] = 'header c1';
-            $cell->attributes['style'] = 'vertical-align:top; white-space:nowrap;';
-            $cell->attributes['scope'] = 'col';
-            $cells[] = $cell;
-            $cell = new html_table_cell(get_string('activity'));
-            $cell->header = true;
-            $cell->attributes['class'] = 'header c2';
-            $cell->attributes['style'] = 'vertical-align:top; white-space:nowrap;';
-            $cell->attributes['scope'] = 'col';
-            $cells[] = $cell;
+            $table->head[] = get_string('type', 'totara_hierarchy');
+            $table->head[] = get_string('activity');
         }
         if ($can_edit) {
-            $cell = new html_table_cell(get_string('linktype', 'totara_plan'));
-            $cell->header = true;
-            $cell->attributes['class'] = 'header c4';
-            $cell->attributes['style'] = 'vertical-align:top; text-align:center; white-space:nowrap;';
-            $cell->attributes['scope'] = 'col';
-            $cells[] = $cell;
-            $cell = new html_table_cell(get_string('options', 'totara_hierarchy'));
-            $cell->header = true;
-            $cell->attributes['class'] = 'header c4';
-            $cell->attributes['style'] = 'vertical-align:top; text-align:center; white-space:nowrap;';
-            $cell->attributes['scope'] = 'col';
-            $cells[] = $cell;
+            $table->head[] = get_string('linktype', 'totara_plan');
+            $table->head[] = get_string('options', 'totara_hierarchy');
         }
-        $table->data[] = new html_table_row($cells);
-        //now the rows if any
+
+        // Now the rows if any.
         if ($evidence) {
             $oddeven = 1;
             foreach ($evidence as $eitem) {
@@ -190,35 +162,18 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $out = $this->output->heading(get_string('relatedcompetencies', 'totara_hierarchy'));
 
         $table = new html_table();
-        $table->attributes = array('id' => 'list-related', 'class' => 'generalbox boxaligncenter');
-        $table->attributes['width'] = '95%';
-        $table->attributes['cellpadding'] = '5';
-        $table->attributes['cellspacing'] = '1';
-        //set up table header
-        $cells = array();
-        $cell = new html_table_cell(get_string('competencyframework', 'totara_hierarchy'));
-        $cell->header = true;
-        $cell->attributes['class'] = 'header c0';
-        $cell->attributes['style'] = 'vertical-align:top; white-space:nowrap;';
-        $cell->attributes['scope'] = 'col';
-        $cells[] = $cell;
-        $cell = new html_table_cell(get_string('name'));
-        $cell->header = true;
-        $cell->attributes['class'] = 'header c1';
-        $cell->attributes['style'] = 'vertical-align:top; white-space:nowrap;';
-        $cell->attributes['scope'] = 'col';
-        $cells[] = $cell;
-        if ($can_edit) {
-            $cell = new html_table_cell(get_string('options', 'totara_plan'));
-            $cell->header = true;
-            $cell->attributes['class'] = 'header c4';
-            $cell->attributes['style'] = 'vertical-align:top; text-align:center; white-space:nowrap;';
-            $cell->attributes['scope'] = 'col';
-            $cells[] = $cell;
-        }
-        $table->data[] = new html_table_row($cells);
-        //now the rows if any
+        $table->attributes = array('id' => 'list-related', 'class' => 'generaltable boxaligncenter');
+        // Set up table header.
+        $table->head = array(
+            get_string('competencyframework', 'totara_hierarchy'),
+            get_string('name'),
+        );
 
+        if ($can_edit) {
+            $table->head[] = get_string('options', 'totara_plan');
+        }
+
+        // Now the rows if any.
         if ($related) {
             $sitecontext = context_system::instance();
             $can_manage_fw = has_capability('totara/hierarchy:updatecompetencyframeworks', $sitecontext);
@@ -304,22 +259,16 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
         // Initialise table and add header row.
         $table = new html_table();
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('goaltable:name', 'totara_hierarchy'));
-        $header_cells['name']->header = true;
-        $header_cells['type'] = new html_table_cell(get_string('goaltable:type', 'totara_hierarchy'));
-        $header_cells['type']->header = true;
-        $header_cells['users'] = new html_table_cell(get_string('goaltable:numusers', 'totara_hierarchy'));
-        $header_cells['users']->header = true;
+        $table->head = array(
+            get_string('goaltable:name', 'totara_hierarchy'),
+            get_string('goaltable:type', 'totara_hierarchy'),
+            get_string('goaltable:numusers', 'totara_hierarchy')
+        );
 
         $remove = get_string('remove');
         if ($can_edit) {
-            $header_cells['delete'] = new html_table_cell(get_string('delete'));
-            $header_cells['delete']->header = true;
+            $table->head[] = get_string('delete');
         }
-
-        $titlerow = new html_table_row($header_cells);
-        $table->data[] = $titlerow;
 
         $andchildstr = get_string('andchildren', 'totara_hierarchy');
         foreach ($assignments as $assignment) {
@@ -514,20 +463,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         } else {
             // Initialise table and add header row.
             $table = new html_table();
-            $cellname = new html_table_cell(get_string('goaltable:name', 'totara_hierarchy'));
-            $cellname->header = true;
-            $celltype = new html_table_cell(get_string('goaltable:assignmentlevel', 'totara_hierarchy'));
-            $celltype->header = true;
+            $table->head = array(
+                get_string('goaltable:name', 'totara_hierarchy'),
+                get_string('goaltable:assignmentlevel', 'totara_hierarchy')
+            );
 
             if ($can_edit) {
-                $celldelete = new html_table_cell(get_string('delete'));
-                $celldelete->header = true;
-            } else {
-                 $celldelete = null;
+                $table->head[] = get_string('delete');
             }
-
-            $titlerow = new html_table_row(array($cellname, $celltype, $celldelete));
-            $table->data[] = $titlerow;
 
             // Add each assignment to the table.
             foreach ($assigned_goals as $goal) {
