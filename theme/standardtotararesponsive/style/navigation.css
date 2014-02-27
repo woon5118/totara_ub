@@ -255,3 +255,9 @@ ul.first-of-type li a:hover {
     color: #003466;
 
 }
+
+@media screen and (max-width:1200px) and (min-width:769px) {
+    div#totaramenu ul li a {
+        padding: 8px 20px 7px;
+    }
+}
