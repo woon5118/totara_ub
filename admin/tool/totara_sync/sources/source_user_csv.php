@@ -96,6 +96,13 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
         }
 
+        $encodings = textlib::get_encodings();
+        $mform->addElement('select', 'csvuserencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
+        $mform->setType('csvuserencoding', PARAM_TEXT);
+        $default = $this->get_config('csvuserencoding');
+        $default = (!empty($default) ? $default : 'UTF-8');
+        $mform->setDefault('csvuserencoding', $default);
+
         $delimiteroptions = array(
             ',' => get_string('comma', 'tool_totara_sync'),
             ';' => get_string('semicolon', 'tool_totara_sync'),
@@ -116,6 +123,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
     function config_save($data) {
         $this->set_config('delimiter', $data->{'delimiter'});
+        $this->set_config('csvuserencoding', $data->{'csvuserencoding'});
 
         parent::config_save($data);
     }
@@ -258,6 +266,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
+        $encoding = textlib::strtoupper($this->get_config('csvuserencoding'));
         $badtimezones = false;
         $goodtimezones = totara_get_clean_timezone_list();
 
@@ -281,9 +290,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
             $csvrow = array_combine($fields, $csvrow);  // nice associative array ;)
 
-            // Clean the data a bit
-            $csvrow = array_map('trim', $csvrow);
-            $csvrow = array_map(create_function('$s', 'return clean_param($s, PARAM_TEXT);'), $csvrow);
+            // Encode and clean the data.
+            $csvrow = totara_sync_clean_fields($csvrow, $encoding);
 
             // Set up a db row
             $dbrow = array();

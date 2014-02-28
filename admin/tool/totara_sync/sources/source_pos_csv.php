@@ -78,6 +78,13 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
         }
 
+        $encodings = textlib::get_encodings();
+        $mform->addElement('select', 'csvposencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
+        $mform->setType('csvposencoding', PARAM_TEXT);
+        $default = $this->get_config('csvposencoding');
+        $default = (!empty($default) ? $default : 'UTF-8');
+        $mform->setDefault('csvposencoding', $default);
+
         $delimiteroptions = array(
             ',' => get_string('comma', 'tool_totara_sync'),
             ';' => get_string('semicolon', 'tool_totara_sync'),
@@ -98,6 +105,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
     function config_save($data) {
         $this->set_config('delimiter', $data->{'delimiter'});
+        $this->set_config('csvposencoding', $data->{'csvposencoding'});
 
         parent::config_save($data);
     }
@@ -236,6 +244,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
+        $encoding = textlib::strtoupper($this->get_config('csvposencoding'));
 
         while ($row = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;
@@ -256,9 +265,8 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             }
             $row = array_combine($fields, $row);  // nice associative array
 
-            // Clean the data a bit
-            $row = array_map('trim', $row);
-            $row = array_map(create_function('$s', 'return clean_param($s, PARAM_TEXT);'), $row);
+            // Encode and clean the data.
+            $row = totara_sync_clean_fields($row, $encoding);
 
             $row['parentidnumber'] = !empty($row['parentidnumber']) ? $row['parentidnumber'] : '';
             $row['parentidnumber'] = $row['parentidnumber'] == $row['idnumber'] ? '' : $row['parentidnumber'];
