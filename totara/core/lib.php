@@ -320,3 +320,88 @@ function totara_update_temporary_managers() {
         mtrace('DONE Removing expired temporary managers');
     }
 }
+
+/**
+ * To download the file we upload in totara_core filearea
+ *
+ * @param $course
+ * @param $cm
+ * @param $context
+ * @param $filearea
+ * @param $args
+ * @param $forcedownload
+ * @param array $options
+ * @return void Download the file
+ */
+function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options=array()) {
+    $component = 'totara_core';
+    $itemid = $args[0];
+    $filename = $args[1];
+    $fs = get_file_storage();
+
+    $file = $fs->get_file($context->id, $component, $filearea, $itemid, '/', $filename);
+
+    if (empty($file)) {
+        send_file_not_found();
+    }
+
+    send_stored_file($file, 60*60*24, 0, false, $options); // Enable long cache and disable forcedownload.
+}
+
+/**
+ * Resize all images found in a filearea.
+ *
+ * @param int $contextid Context id where image(s) are
+ * @param string $component Component where image(s) are
+ * @param string $filearea Filearea where image(s) are
+ * @param int $itemid Itemid where image(s) are
+ * @param int $width Width that the image(s) should have
+ * @param int $height Height that the image(s) should have
+ * @param bool $replace If true, replace the file for the resized one
+ * @return array $resizedimages Array of resized images
+ */
+function totara_resize_images_filearea($contextid, $component, $filearea, $itemid, $width, $height, $replace=false) {
+    global $CFG, $USER;
+    require_once($CFG->dirroot .'/lib/gdlib.php');
+
+    $resizedimages = array();
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($contextid, $component, $filearea, $itemid, 'id');
+
+    foreach ($files as $file) {
+        if (!$file->is_valid_image()) {
+            continue;
+        }
+        $tmproot = make_temp_directory('thumbnails');
+        $tmpfilepath = $tmproot . '/' . $file->get_contenthash();
+        $file->copy_content_to($tmpfilepath);
+        $imageinfo = getimagesize($tmpfilepath);
+        if (empty($imageinfo) || ($imageinfo[0] <= $width && $imageinfo[1] <= $height)) {
+            continue;
+        }
+        // Generate thumbnail.
+        $data = generate_image_thumbnail($tmpfilepath, $width, $height);
+        $resizedimages[] = $data;
+        unlink($tmpfilepath);
+
+        if ($replace) {
+            $record = array(
+                'contextid' => $file->get_contextid(),
+                'component' => $file->get_component(),
+                'filearea'  => $file->get_filearea(),
+                'itemid'    => $file->get_itemid(),
+                'filepath'  => '/',
+                'filename'  => $file->get_filename(),
+                'status'    => $file->get_status(),
+                'source'    => $file->get_source(),
+                'author'    => $file->get_author(),
+                'license'   => $file->get_license(),
+                'mimetype'  => $file->get_mimetype(),
+                'userid'    => $USER->id,
+            );
+            $file->delete();
+            $fs->create_file_from_string($record, $data);
+        }
+    }
+    return $resizedimages ;
+}

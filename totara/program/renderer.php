@@ -1053,11 +1053,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $content .= html_writer::start_tag('div', array('class' => 'info'));
 
         $programname = format_string($program->fullname);
-        if (!empty($program->icon)) {
-            $programicon = $this->output->pix_url('/programicons/' . $program->icon, 'totara_core');
-        } else {
-            $programicon = $this->output->pix_url('/programicons/default', 'totara_core');
-        }
+        $programicon = totara_get_icon($program->id, TOTARA_ICON_TYPE_PROGRAM);
         if (empty($CFG->audiencevisibility)) {
             $isdimmed = !$program->visible;
         } else {
@@ -1065,7 +1061,7 @@ class totara_program_renderer extends plugin_renderer_base {
         }
         $programnamelink = html_writer::link(new moodle_url('/totara/program/view.php', array('id' => $program->id)),
                         $programname, array('class' => $isdimmed ? 'dimmed' : '' ,
-                        'style' => "background-image:url({$programicon->out()})"));
+                        'style' => "background-image:url({$programicon})"));
         $content .= html_writer::tag($nametag, $programnamelink, array('class' => 'name'));
 
         // If we display program in collapsed form but the program has summary, display the link to the info page.

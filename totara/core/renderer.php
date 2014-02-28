@@ -652,10 +652,26 @@ class totara_core_renderer extends plugin_renderer_base {
     public function print_icons_list($type = 'course') {
         global $CFG;
 
-        $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
+        $fs = get_file_storage();
+        $files = $fs->get_area_files(context_system::instance()->id, 'totara_core', $type, 0, 'itemid', false);
+
         $out = html_writer::start_tag('ol', array('id' => 'icon-selectable'));
+        // Custom icons.
+        foreach ($files as $file) {
+            $itemid = $file->get_itemid();
+            $filename = $file->get_filename();
+            $url = moodle_url::make_pluginfile_url($file->get_contextid(), 'totara_core',
+                $file->get_filearea(), $itemid, $file->get_filepath(), $filename, true);
+            $out .= html_writer::start_tag('li', array('id' => $file->get_pathnamehash(), 'iconname' => $filename));
+            $out .= html_writer::empty_tag('img', array('src' => $url, 'class' => 'course_icon'));
+            $out .= html_writer::end_tag('li');
+        }
+        // Totara icons.
+        $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
         foreach (scandir($path) as $icon) {
-            if ($icon == '.' || $icon == '..') { continue;}
+            if ($icon == '.' || $icon == '..') {
+                continue;
+            }
             $iconid = str_replace('.png', '', $icon);
             $replace = array('.png' => '', '_' => ' ', '-' => ' ');
             $iconname = ucwords(strtr($icon, $replace));

@@ -821,7 +821,8 @@ class multi_course_set extends course_set {
                     $course->icon = 'default';
                 }
 
-                $coursedetails = $OUTPUT->pix_icon('/courseicons/' . $course->icon, '', 'totara_core', array('class' => 'course_icon'));
+                $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
+                    'class' => 'course_icon'));
 
                 $showcourseset = false;
                 if ($userid) {
@@ -1600,7 +1601,8 @@ class competency_course_set extends course_set {
                 }
 
                 $cells = array();
-                $coursedetails = $OUTPUT->pix_icon('/courseicons/' . $course->icon, '', 'totara_core', array('class' => 'course_icon'));
+                $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
+                    'class' => 'course_icon'));
                 $coursedetails .= $accessible ? html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
                                  format_string($course->fullname)) : format_string($course->fullname);
                 $cells[] = new html_table_cell($coursedetails);
@@ -2150,7 +2152,8 @@ class recurring_course_set extends course_set {
             if (empty($course->icon)) {
                 $course->icon = 'default';
             }
-            $coursedetails = $OUTPUT->pix_icon('/courseicons/' . $course->icon, '', 'totara_core', array('class' => 'course_icon'));
+            $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
+                'class' => 'course_icon'));
             $coursedetails .= $accessible ? html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
                             format_string($course->fullname)) : format_string($course->fullname);
             $cells[] = new html_table_cell($coursedetails);

@@ -1559,21 +1559,9 @@ totaraDialog_handler_selectable.prototype._updatePage = function(response) {
     var suffix = (typeof this._dialog.suffix === 'undefined') ? '' : this._dialog.suffix;
 
     // Replace any items on the main page with their content (if IDs match).
-    var src = $('#icon_preview' + suffix).attr('src');
-
-    // Parse URL to check if it uses slash arguments or not.
-    var parser = document.createElement('a');
-    parser.href = src;
-    if (parser.search == '') {
-        src = src.substring(0, src.lastIndexOf("/") + 1) + response;
-    } else {
-        src = src.replace(/image=(.*?)icons%2F(.*?)(&.*?){0,1}$/, 'image=$1'+'icons%2F'+response+'$3');
-    }
-
-    $('#icon_preview' + suffix).attr('src', src);
-    $('#icon_preview' + suffix).attr('title', response.replace(/-|_/g, " ").toTitleCase());
-    $("input[name=icon]").val(response);
-    $("#icon" + suffix).val(response);
+    $('#icon_preview').attr('src', response.src);
+    $('#icon_preview').attr('title', (response.id).replace(/-|_/g, " ").toTitleCase());
+    $("input[name=icon]").val(response.id);
 
     this._dialog.hide();
 };

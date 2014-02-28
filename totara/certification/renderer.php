@@ -58,7 +58,8 @@ class totara_certification_renderer extends plugin_renderer_base {
         $out .= html_writer::start_tag('div', array('class' => 'coursebox programbox clearfix'));
         $out .= html_writer::start_tag('div', array('class' => 'info'));
         $out .= html_writer::start_tag('div', array('class' => 'name'));
-        $out .= $this->output->pix_icon('/programicons/' . $data->icon, '', 'totara_core');
+        $out .= html_writer::empty_tag('img', array('src' => totara_get_icon($data->pid, TOTARA_ICON_TYPE_PROGRAM),
+            'class' => 'course_icon'));
         $url = new moodle_url('/totara/program/view.php', array('id' => $data->progid));
         $attributes = array('title' => get_string('viewprogram', 'totara_program'), 'class' => $linkcss);
         $linktext = highlight($data->highlightterms, format_string($data->fullname));

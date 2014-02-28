@@ -1434,10 +1434,10 @@ class program {
             $userid = $USER->id;
         }
         $programid = $program_id;
-        $programicon = !empty($program_icon) ? $program_icon : 'default';
 
         $program = new program($programid);
-        $icon = $OUTPUT->pix_icon('programicons/' . $programicon, $programname, 'totara_core', array('class' => 'course_icon'));
+        $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
+            'class' => 'course_icon'));
 
         if ($program->is_accessible()) {
             $html = $OUTPUT->action_link(

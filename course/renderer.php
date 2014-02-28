@@ -1234,7 +1234,7 @@ class core_course_renderer extends plugin_renderer_base {
         $coursenamelink = html_writer::link(
             new moodle_url('/course/view.php', array('id' => $course->id)),
             $coursename,
-            array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_course_icon($course->id) . ')')
+            array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE) . ')')
         );
         $content .= html_writer::tag($nametag, $coursenamelink, array('class' => 'coursename'));
 

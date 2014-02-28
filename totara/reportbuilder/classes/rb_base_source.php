@@ -1056,7 +1056,8 @@ abstract class rb_base_source {
             $cssclass = (isset($row->course_audiencevisible) && $row->course_audiencevisible == COHORT_VISIBLE_NONE) ?
                     'dimmed' : '';
         }
-        $icon = $OUTPUT->pix_icon('/courseicons/'.$courseicon, $course, 'totara_core', array('class' => 'course_icon'));
+        $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($courseid, TOTARA_ICON_TYPE_COURSE),
+            'class' => 'course_icon'));
         $link = $OUTPUT->action_link(
             new moodle_url('/course/view.php', array('id' => $courseid)),
             $icon . $course, null, array('class' => $cssclass)
@@ -1066,15 +1067,14 @@ abstract class rb_base_source {
 
     // display an icon based on the course icon field
     function rb_display_course_icon($icon, $row, $isexport = false) {
-        global $OUTPUT;
-        $icon = !empty($icon) ? $icon : 'default';
-
         if ($isexport) {
             return format_string($row->course_name);
         }
 
         $coursename = format_string($row->course_name);
-        return $OUTPUT->pix_icon('/courseicons/' . $icon, $coursename, 'totara_core', array('class' => 'course_icon'));
+        $courseicon = html_writer::empty_tag('img', array('src' => totara_get_icon($row->course_id, TOTARA_ICON_TYPE_COURSE),
+            'class' => 'course_icon', 'alt' => $coursename));
+        return $courseicon;
     }
 
     // display an icon for the course type
@@ -1409,7 +1409,8 @@ abstract class rb_base_source {
         global $OUTPUT;
         $programid = $row->program_id;
         $programicon = !empty($row->program_icon) ? $row->program_icon : 'default';
-        $icon = $OUTPUT->pix_icon('/programicons/' . $programicon, $program, 'totara_core', array('class' => 'course_icon'));
+        $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
+            'class' => 'course_icon'));
         $link = $OUTPUT->action_link(
             new moodle_url('/totara/program/view.php', array('id' => $programid)),
             $icon . $program, null, array('class' => 'course_icon')

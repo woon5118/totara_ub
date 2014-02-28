@@ -34,6 +34,10 @@ define('TOTARA_SEARCH_OP_GREATER_THAN_OR_EQUAL', 3);
 define('TOTARA_SEARCH_OP_LESS_THAN', 4);
 define('TOTARA_SEARCH_OP_LESS_THAN_OR_EQUAL', 5);
 
+// Type of icon.
+define ('TOTARA_ICON_TYPE_COURSE', 'course');
+define ('TOTARA_ICON_TYPE_PROGRAM', 'program');
+
 /**
  * Pop N items off the beginning of $items and return them as an array
  *

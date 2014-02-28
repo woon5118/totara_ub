@@ -761,13 +761,35 @@ function totara_create_icon_picker(&$mform, $action, $type, $currenticon = '', $
  * @return string HTML
  */
 function totara_icon_picker_preview($type, $currenticon, $ind = '', $alt = '') {
-    global $OUTPUT;
+    global $OUTPUT, $DB, $PAGE;
+
+    $component = 'totara_core';
+    $src = '';
+
+    // See if icon is a custom icon.
+    if ($customicon = $DB->get_record('files', array('pathnamehash' => $currenticon))) {
+        $fs = get_file_storage();
+        $context = context_system::instance();
+        if ($file = $fs->get_file($context->id, $component, $type, $customicon->itemid, '/', $customicon->filename)) {
+            $currenticon = $customicon->filename;
+            $src = moodle_url::make_pluginfile_url($file->get_contextid(), $component,
+                $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $customicon->filename, true);
+        }
+    }
+
+    if (empty($src)) {
+        $iconpath = $type . 'icons/';
+        $imagelocation = $PAGE->theme->resolve_image_location($iconpath. $currenticon, $component);
+        if (empty($currenticon) || empty($imagelocation)) {
+            $currenticon = 'default';
+        }
+        $src = $OUTPUT->pix_url('/' . $iconpath . $currenticon, $component);
+    }
+
     $replace = array('.png' => '', '_' => ' ', '-' => ' ');
     $alt = ($alt != '') ? $alt : ucwords(strtr($currenticon, $replace));
-    $iconhtml = $OUTPUT->pix_icon('/' . $type . 'icons/' . $currenticon,
-                            $alt,
-                            'totara_core',
-                            array('class' => "course_icon", 'id' => "icon_preview" . $ind));
+    $iconhtml = html_writer::empty_tag('img', array('src' => $src, 'id' => 'icon_preview' . $ind, 'class' => "course_icon", 'alt' => $alt));
+
     return $iconhtml;
 }
 /**
@@ -2136,20 +2158,42 @@ function encrypt_data($plaintext, $key = '') {
 }
 
 /**
- * Get course icon for displaying in course page.
+ * Get course/program icon for displaying in course/program page.
  *
- * @return string Course icon URL.
+ * @param $instanceid
+ * @return string icon URL.
  */
-function totara_get_course_icon($courseid) {
-    global $DB, $OUTPUT;
+function totara_get_icon($instanceid, $icontype) {
+    global $DB, $OUTPUT, $PAGE;
 
-    $icon = $DB->get_field('course', 'icon', array('id' => $courseid));
-    if (!empty($icon)) {
-        $courseicon = $OUTPUT->pix_url('/courseicons/' . $icon, 'totara_core');
+    $component = 'totara_core';
+    $urlicon = '';
+
+    if ($icontype == TOTARA_ICON_TYPE_COURSE) {
+        $icon = $DB->get_field('course', 'icon', array('id' => $instanceid));
     } else {
-        $courseicon = $OUTPUT->pix_url('/courseicons/default', 'totara_core');
+        $icon = $DB->get_field('prog', 'icon', array('id' => $instanceid));
     }
-    return $courseicon->out();
+
+    if ($customicon = $DB->get_record('files', array('pathnamehash' => $icon))) {
+        $fs = get_file_storage();
+        $context = context_system::instance();
+        if ($file = $fs->get_file($context->id, $component, $icontype, $customicon->itemid, '/', $customicon->filename)) {
+            $urlicon = moodle_url::make_pluginfile_url($file->get_contextid(), $component,
+                $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $customicon->filename, true);
+        }
+    }
+
+    if (empty($urlicon)) {
+        $iconpath = $icontype . 'icons/';
+        $imagelocation = $PAGE->theme->resolve_image_location($iconpath . $icon, $component);
+        if (empty($icon) || empty($imagelocation)) {
+            $icon = 'default';
+        }
+        $urlicon = $OUTPUT->pix_url('/' . $iconpath . $icon, $component);
+    }
+
+    return $urlicon->out();
 }
 
 /**

@@ -86,8 +86,10 @@ M.totara_iconpicker = M.totara_iconpicker || {
                 this.old_open();
             };
             dialog.close = function() {
-                var response = $(".ui-selected").attr('id');
-                handler._updatePage(response);
+                var id = $(".ui-selected").attr('id');
+                var source = $(".ui-selected > img").attr('src');
+                $data = {'id':id, 'src':source}
+                handler._updatePage($data);
             };
             totaraDialogs['icon-dialog' + suffix] = dialog;
 
