@@ -24,21 +24,30 @@
 
 global $SITE, $CFG;
 
-$capabilities = array(
+$appraisalcaps = array(
     'totara/appraisal:manageappraisals',
     'totara/appraisal:cloneappraisal',
     'totara/appraisal:assignappraisaltogroup',
     'totara/appraisal:managenotifications',
     'totara/appraisal:manageactivation',
-    'totara/appraisal:managepageelements');
+    'totara/appraisal:managepageelements'
+);
 
-if ($hassiteconfig || has_any_capability($capabilities, $systemcontext)) {
+$feedbackcaps = array(
+    'totara/feedback360:managefeedback360',
+    'totara/feedback360:clonefeedback360',
+    'totara/feedback360:assignfeedback360togroup',
+    'totara/feedback360:manageactivation',
+    'totara/feedback360:managepageelements'
+);
+
+if ($hassiteconfig || has_any_capability($appraisalcaps, $systemcontext) || has_any_capability($feedbackcaps, $systemcontext)) {
 
     $ADMIN->add('appraisals',
         new admin_externalpage('manageappraisals',
             new lang_string('manageappraisals', 'totara_appraisal'),
             new moodle_url('/totara/appraisal/manage.php'),
-            $capabilities,
+            $appraisalcaps,
             empty($CFG->enableappraisals)
         )
     );
@@ -47,7 +56,7 @@ if ($hassiteconfig || has_any_capability($capabilities, $systemcontext)) {
         new admin_externalpage('managefeedback360',
             new lang_string('managefeedback360', 'totara_feedback360'),
             new moodle_url('/totara/feedback360/manage.php'),
-            $capabilities,
+            $feedbackcaps,
             empty($CFG->enablefeedback360)
         )
     );
@@ -56,7 +65,7 @@ if ($hassiteconfig || has_any_capability($capabilities, $systemcontext)) {
         new admin_externalpage('reportappraisals',
             new lang_string('reportappraisals', 'totara_appraisal'),
             new moodle_url('/totara/appraisal/reports.php'),
-            $capabilities,
+            $appraisalcaps,
             empty($CFG->enableappraisals)
         )
     );
