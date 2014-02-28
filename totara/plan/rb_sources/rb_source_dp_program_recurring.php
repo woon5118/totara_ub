@@ -72,6 +72,13 @@ class rb_source_dp_program_recurring extends rb_base_source {
             ),
         );
 
+        $joinlist[] =  new rb_join(
+                'completion_organisation',
+                'LEFT',
+                '{org}',
+                'completion_organisation.id = base.organisationid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
@@ -273,7 +280,26 @@ class rb_source_dp_program_recurring extends rb_base_source {
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array();
+        $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            ),
+            new rb_content_option(
+                'completed_org',
+                get_string('orgwhencompleted', 'rb_source_course_completion_by_org'),
+                'completion_organisation.path',
+                'completion_organisation'
+            )
+        );
         return $contentoptions;
     }
 

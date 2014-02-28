@@ -105,6 +105,26 @@ class rb_source_dp_certification_history extends rb_base_source {
                 array('base')
         );
 
+        $joinlist[] = new rb_join(
+                'prog_completion', // Table alias.
+                'LEFT', // Type of join.
+                '{prog_completion}',
+                '(prog_completion.programid = prog.id
+                    AND prog_completion.coursesetid = 0
+                    AND prog_completion.userid = base.userid)',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                array('base')
+        );
+
+        $joinlist[] =  new rb_join(
+                'completion_organisation',
+                'LEFT',
+                '{org}',
+                'completion_organisation.id = prog_completion.organisationid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                array('prog', 'prog_completion')
+        );
+
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
@@ -300,7 +320,26 @@ class rb_source_dp_certification_history extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array();
+        $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            ),
+            new rb_content_option(
+                'completed_org',
+                get_string('orgwhencompleted', 'rb_source_course_completion_by_org'),
+                'completion_organisation.path',
+                'completion_organisation'
+            )
+        );
 
         // Include the rb_user_content content options for this report
         $contentoptions[] = new rb_content_option('user', get_string('users'), 'base.userid', 'base');

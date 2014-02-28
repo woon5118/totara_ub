@@ -245,6 +245,18 @@ class rb_source_totaramessages extends rb_base_source {
 
     protected function define_contentoptions() {
         $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            )
         );
         return $contentoptions;
     }

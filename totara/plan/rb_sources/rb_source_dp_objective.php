@@ -399,7 +399,20 @@ class rb_source_dp_objective extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array();
+        $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            )
+        );
 
         // Include the rb_user_content content options for this report
         $contentoptions[] = new rb_content_option('user', get_string('users'), 'dp.userid', 'dp');

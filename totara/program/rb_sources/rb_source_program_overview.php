@@ -505,6 +505,12 @@ class rb_source_program_overview extends rb_base_source {
                 'organisation'
             ),
             new rb_content_option(
+                'completed_org',
+                get_string('orgwhencompleted', 'rb_source_course_completion_by_org'),
+                'cplorganisation.path',
+                'cplorganisation'
+            ),
+            new rb_content_option(
                 'user',
                 get_string('user', 'rb_source_course_completion'),
                 'base.userid'

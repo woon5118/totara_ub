@@ -151,6 +151,14 @@ class rb_source_dp_certification extends rb_base_source {
                 array('base', 'certif_completion')
         );
 
+        $joinlist[] =  new rb_join(
+                'completion_organisation',
+                'LEFT',
+                '{org}',
+                'completion_organisation.id = prog_completion.organisationid',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                array('prog_completion')
+        );
         $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
         $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
         $this->add_user_table_to_joinlist($joinlist, 'certif_completion', 'userid');
@@ -500,8 +508,28 @@ class rb_source_dp_certification extends rb_base_source {
      * @return array
      */
     protected function define_contentoptions() {
-        $contentoptions = array();
-
+        $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            ),
+            new rb_content_option(
+                'completed_org',
+                get_string('orgwhencompleted', 'rb_source_course_completion_by_org'),
+                'completion_organisation.path',
+                'completion_organisation'
+            )
+        );
+        // Include the rb_user_content content options for this report
+        $contentoptions[] = new rb_content_option('user', get_string('users'), 'certif_completion.userid', 'certif_completion');
         return $contentoptions;
     }
 
