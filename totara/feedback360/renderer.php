@@ -573,21 +573,15 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out = '';
 
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('name', 'totara_feedback360'));
-        $header_cells['name']->header = true;
-        $header_cells['responses'] = new html_table_cell(get_string('responses', 'totara_feedback360'));
-        $header_cells['responses']->header = true;
-        $header_cells['duedate'] = new html_table_cell(get_string('duedate', 'totara_feedback360'));
-        $header_cells['duedate']->header = true;
-        if ($canmanage) {
-            $header_cells['options'] = new html_table_cell(get_string('options', 'totara_feedback360'));
-            $header_cells['options']->header = true;
-        }
-
-        $header_row = new html_table_row($header_cells);
         $user_table = new html_table();
-        $user_table->data[] = $header_row;
+        $user_table->head = array(
+            get_string('name', 'totara_feedback360'),
+            get_string('responses', 'totara_feedback360'),
+            get_string('duedate', 'totara_feedback360')
+        );
+        if ($canmanage) {
+            $user_table->head[] = get_string('options', 'totara_feedback360');
+        }
 
         $nodata = true;
         foreach ($user_assignments as $user_assignment) {
@@ -666,7 +660,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         if ($nodata) {
             $cell = new html_table_cell(get_string('nofeedback360requested', 'totara_feedback360'));
-            $cell->colspan = count($header_cells);
+            $cell->colspan = count($user_table->head);
             $user_table->data[] = new html_table_row(array($cell));
         }
 
@@ -685,21 +679,16 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out = '';
 
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('name', 'totara_feedback360'));
-        $header_cells['name']->header = true;
-        $header_cells['duedate'] = new html_table_cell(get_string('duedate', 'totara_feedback360'));
-        $header_cells['duedate']->header = true;
-        $header_cells['options'] = new html_table_cell(get_string('options', 'totara_feedback360'));
-        $header_cells['options']->header = true;
-
-        $header_row = new html_table_row($header_cells);
         $colleague_table = new html_table();
-        $colleague_table->data[] = $header_row;
+        $colleague_table->head = array(
+            get_string('name', 'totara_feedback360'),
+            get_string('duedate', 'totara_feedback360'),
+            get_string('options', 'totara_feedback360')
+        );
 
         if (empty($resp_assignments)) {
             $cell = new html_table_cell(get_string('nofeedback360togive', 'totara_feedback360'));
-            $cell->colspan = count($header_cells);
+            $cell->colspan = count($colleague_table->head);
             $colleague_table->data[] = new html_table_row(array($cell));
         } else {
             foreach ($resp_assignments as $resp_assignment) {
@@ -768,18 +757,12 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      */
     public function view_request_infotable($user_assignment, $resp_assignments) {
         $out = '';
-
-        $header_cells = array();
-        $header_cells['name'] = new html_table_cell(get_string('nameemail', 'totara_feedback360'));
-        $header_cells['name']->header = true;
-        $header_cells['completed'] = new html_table_cell(get_string('completed', 'totara_feedback360'));
-        $header_cells['completed']->header = true;
-        $header_cells['response'] = new html_table_cell(get_string('response', 'totara_feedback360'));
-        $header_cells['response']->header = true;
-
-        $header_row = new html_table_row($header_cells);
         $request_infotable = new html_table();
-        $request_infotable->data[] = $header_row;
+        $request_infotable->head = array(
+            get_string('nameemail', 'totara_feedback360'),
+            get_string('completed', 'totara_feedback360'),
+            get_string('response', 'totara_feedback360'),
+        );
 
         foreach ($resp_assignments as $resp_assignment) {
             if (!empty($resp_assignment->timecompleted)) {
