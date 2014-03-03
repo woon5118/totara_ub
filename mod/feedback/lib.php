@@ -3252,10 +3252,11 @@ function feedback_archive_completion($userid, $courseid) {
             WHERE fc.userid = :userid";
 
     if ($completeds = $DB->get_records_sql($sql, array('userid' => $userid, 'courseid' => $courseid))) {
+        $now = time();
         foreach ($completeds as $completed) {
             $data = clone $completed;
-            $data->timearchived = time();
-            $data->idarchived = $completed->id; // Not sure if this is needed but might be useful if there is a data issue later on
+            $data->timearchived = $now;
+            $data->idarchived = $completed->id; // Not sure if this is needed but might be useful if there is a data issue later on.
 
             $newid = $DB->insert_record('feedback_completed_history', $data, true);
 
