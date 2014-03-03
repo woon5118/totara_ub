@@ -82,6 +82,9 @@ if ($id) {
     }
 
     $forform = $notification;
+    // Booked is an integer to specify which type of booked is selected
+    // if it has any non-zero value (true) then we also have to make sure
+    // the checkbox is selected as well as the radiobox.
     $forform->booked_type = $forform->booked;
     $forform->booked = (bool) $forform->booked;
 
@@ -149,6 +152,8 @@ if ($form->is_cancelled()) {
     facetoface_notification::set_properties($notification, $data);
 
     if (!empty($data->booked)) {
+        // If one of the booked radio boxes are selected then the value
+        // will be taken from booked_type instead of booked (checkbox).
         $notification->booked = $data->booked_type;
     } else {
         $notification->booked = 0;

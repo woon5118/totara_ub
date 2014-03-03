@@ -402,7 +402,7 @@ class facetoface_notification extends data_object {
 
         // Hack to force ignore cancelled users
         $this->cancelled = false;
-        $this->booked = true;
+
         // Get recipients
         $recipients = $this->_get_recipients($sessionid);
 
