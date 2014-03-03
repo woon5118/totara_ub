@@ -149,7 +149,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                 if (unitformat.test(timeunit) == false) {
                     alert(M.util.get_string('pleaseentervalidunit', 'totara_program'));
                 }
-                else if (completioninstance == 0 && completionevent != M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_FIRST_LOGIN) {
+                else if (completioninstance == 0 && completionevent != M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_FIRST_LOGIN &&
+                    completionevent != M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_ENROLLMENT_DATE) {
                     alert(M.util.get_string('pleasepickaninstance', 'totara_program'));
                 }
                 else {
@@ -238,8 +239,11 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             }
 
             $(document).on('change', '#eventtype', function() {
-                $('#instance').val(0);
-                $('#instancetitle').text(M.util.get_string('none', 'moodle'));
+                if ($('#eventtype').val() != M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_FIRST_LOGIN &&
+                    $('#eventtype').val() != M.totara_cohortprogramcompletion.config.COMPLETION_EVENT_ENROLLMENT_DATE) {
+                    $('#instance').val(0);
+                    $('#instancetitle').text(M.util.get_string('none', 'moodle'));
+                }
             });
         }
 

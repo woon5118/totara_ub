@@ -286,7 +286,7 @@ function cohort_rules_list(){
             ),
             new cohort_rule_sqlhandler_in_posfield('idnumber', true)
         );
-        // User's position's start date
+        // User's position's date assigned.
         $rules[] = new cohort_rule_option(
             'pos',
             'startdate',
@@ -294,6 +294,24 @@ function cohort_rules_list(){
                 get_string('ruledesc-pos-startdate', 'totara_cohort')
             ),
             new cohort_rule_sqlhandler_date_posstarted()
+        );
+        // User's position's start date.
+        $rules[] = new cohort_rule_option(
+            'pos',
+            'timevalidfrom',
+            new cohort_rule_ui_date(
+                get_string('ruledesc-pos-timevalidfrom', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_date_postimevalidfrom()
+        );
+        // User's position's end date.
+        $rules[] = new cohort_rule_option(
+            'pos',
+            'timevalidto',
+            new cohort_rule_ui_date(
+                get_string('ruledesc-pos-timevalidto', 'totara_cohort')
+            ),
+            new cohort_rule_sqlhandler_date_postimevalidto()
         );
         // Custom fields for user's primary position
         $poscustomfields = $DB->get_records_sql(

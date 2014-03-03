@@ -267,6 +267,26 @@ function totara_sync_make_dirs($dirpath) {
 }
 
 /**
+ * Cleans the values and returns as an array
+ *
+ * @param array $fields
+ * @param string $encoding the encoding type that string is being converted from to utf-8
+ * @return array $fields
+ */
+function totara_sync_clean_fields($fields, $encoding) {
+    if ($encoding !== 'UTF-8') {
+        foreach ($fields as $key => $value) {
+            $value = textlib::convert(trim($value), $encoding, 'UTF-8');
+            $fields[$key] = clean_param($value, PARAM_TEXT);
+        }
+    } else {
+        $fields = array_map('trim', $fields);
+        $fields = clean_param_array($fields, PARAM_TEXT);
+    }
+    return $fields;
+}
+
+/**
  * Perform bulk inserts into specified table
  *
  * @param string $table table name

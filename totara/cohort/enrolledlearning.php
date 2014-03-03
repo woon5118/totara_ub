@@ -102,7 +102,8 @@ $args = array('args'=>'{"cohortid":'.$cohort->id.','.
         '"selected_program":'.$selected_program.','.
         '"COMPLETION_EVENT_NONE":'.COMPLETION_EVENT_NONE.','.
         '"COMPLETION_TIME_NOT_SET":'.COMPLETION_TIME_NOT_SET.','.
-        '"COMPLETION_EVENT_FIRST_LOGIN":'.COMPLETION_EVENT_FIRST_LOGIN.'}');
+        '"COMPLETION_EVENT_FIRST_LOGIN":'.COMPLETION_EVENT_FIRST_LOGIN.','.
+        '"COMPLETION_EVENT_ENROLLMENT_DATE":'.COMPLETION_EVENT_ENROLLMENT_DATE.'}');
 $PAGE->requires->js_init_call('M.totara_cohortprogramcompletion.init', $args, false, $jsmodule);
 
 $strheading = get_string('enrolledlearning', 'totara_cohort');

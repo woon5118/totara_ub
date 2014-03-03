@@ -97,6 +97,7 @@ class question_fixedtext extends question_base{
         } else {
             $form->addElement('editor', 'fixedtext_editor', get_string('questiontypefixedtext', 'totara_question'), null,
                     $TEXTAREA_OPTIONS);
+            $form->setType('fixedtext_editor', PARAM_CLEANHTML);
             $form->addRule('fixedtext_editor', get_string('required'), 'required', null, 'client');
         }
     }
@@ -124,7 +125,7 @@ class question_fixedtext extends question_base{
         global $TEXTAREA_OPTIONS;
         $fixedtext_editor = file_rewrite_pluginfile_urls($this->param1, 'pluginfile.php',
                 $TEXTAREA_OPTIONS['context']->id, 'totara_'.$this->prefix, 'quest_'.$this->getid(), 0, $TEXTAREA_OPTIONS);
-
+        $fixedtext_editor = format_text($fixedtext_editor, FORMAT_MOODLE);
         $form->addElement('static', $this->get_prefix_form(), $this->name, $fixedtext_editor);
         $this->render_without_label($form, $this->get_prefix_form());
     }

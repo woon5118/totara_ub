@@ -1126,9 +1126,9 @@ class rb_tag_content extends rb_base_content {
         $mform->addElement('html', html_writer::empty_tag('br'));
 
         // include the following tags
-        $checkgroup = array();
         $tags = $DB->get_records('tag', array('tagtype' => 'official'), 'name');
         if (!empty($tags)) {
+            $checkgroup = array();
             $opts = array(1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
                           0 => get_string('allofthefollowing', 'totara_reportbuilder'));
             $mform->addElement('select', 'tag_include_logic', get_string('includetags', 'totara_reportbuilder'), $opts);
@@ -1143,9 +1143,8 @@ class rb_tag_content extends rb_base_content {
                     $mform->setDefault('tag_include_option_' . $tag->id, 1);
                 }
             }
+            $mform->addGroup($checkgroup, 'tag_include_group', '', html_writer::empty_tag('br'), false);
         }
-        $mform->addGroup($checkgroup, 'tag_include_group',
-            '', html_writer::empty_tag('br'), false);
         $mform->disabledIf('tag_include_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('tag_include_group', 'tag_enable',
             'notchecked');
@@ -1153,8 +1152,8 @@ class rb_tag_content extends rb_base_content {
         $mform->addElement('html', str_repeat(html_writer::empty_tag('br'), 2));
 
         // exclude the following tags
-        $checkgroup = array();
-        if ($tags) {
+        if (!empty($tags)) {
+            $checkgroup = array();
             $opts = array(1 => get_string('anyofthefollowing', 'totara_reportbuilder'),
                           0 => get_string('allofthefollowing', 'totara_reportbuilder'));
             $mform->addElement('select', 'tag_exclude_logic', get_string('excludetags', 'totara_reportbuilder'), $opts);
@@ -1169,9 +1168,8 @@ class rb_tag_content extends rb_base_content {
                     $mform->setDefault('tag_exclude_option_' . $tag->id, 1);
                 }
             }
+            $mform->addGroup($checkgroup, 'tag_exclude_group', '', html_writer::empty_tag('br'), false);
         }
-        $mform->addGroup($checkgroup, 'tag_exclude_group',
-            '', html_writer::empty_tag('br'), false);
         $mform->disabledIf('tag_exclude_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('tag_exclude_group', 'tag_enable',
             'notchecked');
