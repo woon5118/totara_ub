@@ -117,7 +117,14 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if ($result['result'] === true) {
         add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
 
-        $message = get_string('bookingcompleted', 'facetoface');
+        if (!empty($facetoface->approvalreqd)) {
+            $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
+            $cssclass = 'notifymessage';
+        } else {
+            $message = get_string('bookingcompleted', 'facetoface');
+            $cssclass = 'notifysuccess';
+        }
+
         if ($session->datetimeknown
             && isset($facetoface->confirmationinstrmngr)
             && !empty($facetoface->confirmationstrmngr)) {
@@ -130,7 +137,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
             }
         }
 
-        totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
+        totara_set_notification($message, $returnurl, array('class' => $cssclass));
     } else {
         if (isset($result['conflict']) && $result['conflict']) {
             totara_set_notification($result['result'], $returnurl);

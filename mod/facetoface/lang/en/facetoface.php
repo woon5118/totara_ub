@@ -67,6 +67,7 @@ $string['body'] = 'Body';
 $string['booked'] = 'Booked';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
 $string['bookingcompleted'] = 'Your booking has been completed.';
+$string['bookingcompleted_approvalrequired'] = 'Your booking has been completed but requires approval from your manager.';
 $string['bookingfull'] = 'Booking full';
 $string['bookingopen'] = 'Booking open';
 $string['bookingstatus'] = 'You are booked for the following session';
