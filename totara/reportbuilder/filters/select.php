@@ -35,12 +35,13 @@ class rb_filter_select extends rb_filter_type {
      * @param string $value The filter value (from the db or embedded source)
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
+     * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
      *
      * @return rb_filter_select object
      */
-    function __construct($type, $value, $advanced, $report) {
-        parent::__construct($type, $value, $advanced, $report);
+    public function __construct($type, $value, $advanced, $region, $report) {
+        parent::__construct($type, $value, $advanced, $region, $report);
 
         // set defaults for optional rb_filter_select options
         if (!isset($this->options['simplemode'])) {

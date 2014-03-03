@@ -36,6 +36,7 @@ $string['activitygroups'] = 'Activity groups';
 $string['add'] = 'Add';
 $string['addanothercolumn'] = 'Add another column...';
 $string['addanotherfilter'] = 'Add another filter...';
+$string['addanothersearchcolumn'] = 'Add another search column...';
 $string['addcohorts'] = 'Add audiences';
 $string['addedscheduledreport'] = 'Added new scheduled report';
 $string['addscheduledreport'] = 'Add scheduled report';
@@ -91,16 +92,22 @@ $string['configenablereportcaching'] = 'This will allow administrators to config
 $string['confirmcoldelete'] = 'Are you sure you want to delete this column?';
 $string['confirmcolumndelete'] = 'Are you sure you want to delete this column?';
 $string['confirmfilterdelete'] = 'Are you sure you want to delete this filter?';
+$string['confirmsearchcolumndelete'] = 'Are you sure you want to delete this search column?';
 $string['content'] = 'Content';
 $string['contentclassnotexist'] = 'Content class {$a} does not exist';
 $string['contentcontrols'] = 'Content Controls';
 $string['context'] = 'Context';
 $string['couldnotsortjoinlist'] = 'Could not sort join list. Source either contains circular dependencies or references a non-existent join';
 $string['course_completion'] = 'Course Completion';
+$string['courseenddate'] = 'End date';
+$string['courseenrolavailable'] = 'Open enrolment';
+$string['courseenroltype'] = 'Enrolment type';
+$string['courseexpandlink'] = 'Course Name (expanding details)';
 $string['coursecategory'] = 'Course Category';
 $string['coursecategoryid'] = 'Course Category ID';
 $string['coursecategorylinked'] = 'Course Category (linked to category)';
 $string['coursecategorylinkedicon'] = 'Course Category (linked to category with icon)';
+$string['coursecompletedon'] = 'Course completed on {$a}';
 $string['courseenrolledincohort'] = 'Course is enrolled in by audience';
 $string['courseicon'] = 'Course Icon';
 $string['courseid'] = 'Course ID';
@@ -111,10 +118,15 @@ $string['coursenameandsummary'] = 'Course Name and Summary';
 $string['coursenamelinked'] = 'Course Name (linked to course page)';
 $string['coursenamelinkedicon'] = 'Course Name (linked to course page with icon)';
 $string['coursenotset'] = 'Course Not Set';
+$string['courseprogress'] = 'Progress';
 $string['courseshortname'] = 'Course Shortname';
 $string['coursestartdate'] = 'Course Start Date';
+$string['coursestatuscomplete'] = 'You have completed this course';
+$string['coursestatusenrolled'] = 'You are currently enrolled in this course';
+$string['coursestatusnotenrolled'] = 'You are not currently enrolled in this course';
 $string['coursesummary'] = 'Course Summary';
 $string['coursetypeicon'] = 'Type';
+$string['coursetype'] = 'Course Type';
 $string['coursevisible'] = 'Course Visible';
 $string['createasavedsearch'] = 'Create a saved search';
 $string['createreport'] = 'Create report';
@@ -129,7 +141,7 @@ $string['customiseheading'] = 'Customise heading';
 $string['customisename'] = 'Customise Field Name';
 $string['daily'] = 'Daily';
 $string['data'] = 'Data';
-$string['dateisbetween'] = 'Is between today and ';
+$string['dateisbetween'] = 'is between today and ';
 $string['datelabelisdaysafter'] = 'After today\'s date and before {$a->daysafter}';
 $string['datelabelisdaysbefore'] = 'Before today\'s date and after {$a->daysbefore}.';
 $string['datelabelisdaysbetween'] = '{$a->label} is after {$a->daysbefore} and before {$a->daysafter}';
@@ -233,8 +245,9 @@ $string['exporttosave'] = 'Save scheduled report to file system only';
 $string['exportxls'] = 'Export in Excel format';
 $string['extrasqlshouldusenamedparams'] = 'get_sql_filter() extra sql should use named parameters';
 $string['filter'] = 'Filter';
-$string['filter_deleted'] = 'Filter deleted';
-$string['filter_moved'] = 'Filter moved';
+$string['filterby'] = 'Filter by';
+$string['filterdeleted'] = 'Filter deleted';
+$string['filtermoved'] = 'Filter moved';
 $string['filternameformatincorrect'] = 'get_filter_joins(): filter name format incorrect. Query snippets may have included a dash character.';
 $string['filters'] = 'Filters';
 $string['filters_updated'] = 'Filters updated';
@@ -252,7 +265,6 @@ $string['grouptag'] = 'Group tag';
 $string['heading'] = 'Heading';
 $string['help:columnsdesc'] = 'The choices below determine which columns appear in the report and how those columns are labelled.';
 $string['help:restrictionoptions'] = 'The checkboxes below determine who has access to this report, and which records they are able to view. If no options are checked no results are visible. Click the help icon for more information';
-$string['help:searchdesc'] = 'The choices below determine which options appear in the search box at the top of the report.';
 $string['hidden'] = 'Hide in My Reports';
 $string['hide'] = 'Hide';
 $string['hierarchyfiltermusthavetype'] = 'Hierarchy filter of type "{$a->type}" and value "{$a->value}" must have "hierarchytype" set in source "{$a->source}"';
@@ -274,8 +286,9 @@ $string['initialdisplay_help'] = 'This setting controls how the report is initia
 **Enabled**: the report will not generate results until a filter is applied or an empty search is run.';
 $string['initialdisplay_pending'] = 'Please apply a filter to view the results of this report, or hit search without adding any filters to view all entries';
 $string['is'] = 'is';
-$string['isaftertoday'] = 'days after today (date of report generation)';
-$string['isbeforetoday'] = 'days before today (date of report generation)';
+$string['isaftertoday'] = 'days after today';
+$string['isbeforetoday'] = 'days before today';
+$string['isrelativetotoday'] = ' (date of report generation)';
 $string['isbelow'] = 'is below';
 $string['isnotfound'] = ' is NOT FOUND';
 $string['isnt'] = 'isn\'t';
@@ -314,6 +327,8 @@ $string['nogroups'] = 'There are currently no activity groups';
 $string['noheadingcolumnsdefined'] = 'No heading columns defined';
 $string['noneselected'] = 'None selected';
 $string['nopermission'] = 'You do not have permission to view this page';
+$string['norecordsinreport'] = 'There are no records in this report';
+$string['norecordswithfilter'] = 'There are no records that match your selected criteria';
 $string['noreloadreport'] = 'Report settings could not be reset';
 $string['norepeatcols'] = 'You cannot include the same column more than once';
 $string['norepeatfilters'] = 'You cannot include the same filter more than once';
@@ -321,8 +336,9 @@ $string['noreports'] = 'No reports have been created. You can create a report us
 $string['noreportscount'] = 'No reports using this group';
 $string['norestriction'] = 'All users can view this report';
 $string['norestrictionsfound'] = 'No restrictions found. Ask your developer to add restrictions to /totara/reportbuilder/sources/{$a}/restrictionoptions.php';
-$string['noresultsfound'] = 'No results found';
 $string['noscheduledreports'] = 'There are no scheduled reports';
+$string['nosearchcolumnsaskdeveloper'] = 'No search columns found. Ask your developer to define text and long text fields as searchable in the \'{$a}\' source.';
+$string['nosearchcolumnsyet'] = 'No search columns have been added yet - add them by selecting a column in the pulldown below.';
 $string['noshortnameorid'] = 'Invalid report id or shortname';
 $string['notags'] = 'No official tags exist. You must create one or more official tags to base your groups on.';
 $string['notcached'] = 'Not cached yet';
@@ -503,7 +519,7 @@ $string['reportbuilderexporttofilesystem_help'] = 'Exporting to file system allo
 
 This can be useful when the report needs to be accessed by an external system automation, and the report directory might have SFTP access enabled.
 
-Reports saved to the filesystem are saved as [Export file system path]/username/report.ext where *username* is an internal username of a user who owns the scheduled report, *report* is the name of the scheduled report with non alpha-numeric characters removed, and *ext* is the appropriate export file name extension.';
+Reports saved to the filesystem are saved as **\'Export file system root path\'**/username/report.ext where *username* is an internal username of a user who owns the scheduled report, *report* is the name of the scheduled report with non alpha-numeric characters removed, and *ext* is the appropriate export file name extension.';
 $string['reportbuilderfilters'] = 'Search Options (Filters)';
 $string['reportbuilderfilters_help'] = '
 **Search Options** allows you to customise the filters that appear on your report. The available filters are determined by the **Source** of the report. Each report source has a set of default filters.
@@ -646,6 +662,7 @@ $string['schedulenotset'] = 'Schedule not set';
 $string['scheduleweekly'] = 'Weekly';
 $string['search'] = 'Search';
 $string['searchby'] = 'Search by';
+$string['searchcolumndeleted']=  'Search column deleted';
 $string['searchfield'] = 'Search Field';
 $string['searchname'] = 'Search Name';
 $string['searchoptions'] = 'Report Search Options';
@@ -671,8 +688,52 @@ $string['showrecordsinorg'] = 'Just staff in the user\'s organisation';
 $string['showrecordsinorgandbelow'] = 'Staff at or below the user\'s organisation';
 $string['showrecordsinpos'] = 'Just staff in the user\'s position';
 $string['showrecordsinposandbelow'] = 'Staff at or below the user\'s position';
+$string['sidebarfilter'] = 'Sidebar filter options';
+$string['sidebarfilterdesc'] = 'The choices below determine which filters appear to the side of the report and how they are labelled.';
+$string['sidebarfilter_help'] = '
+**Sidebar filter options** allows you to customise the filters that appear to the side of your report. Sidebar filters have
+instant filtering enabled - each change made to a filter will automatically refresh the report data (if certain system
+requirements are met). The available filters are determined by the **Source** of the report. Only some types of filters can
+be placed in the sidebar, so not all standard filters can be placed there. Each report source has a set of default filters.
+
+A filter can appear in either the standard filter area or the sidebar filter area, but not both. Filters can be added, sorted
+and removed.
+
+**Adding filters:** To add a new filter to the report choose the required filter from the \'Add another filter...\' dropdown
+menu and click **Save changes**. When **Advanced** is checked the filter will not appear in the \'Search by\' box by default,
+you can click **Show advanced** when viewing a report to see these filters.
+
+**Moving filters:** The filters will appear in the \'Search by\' box in the order they are listed. Use the up and down arrows
+to change the order.
+
+**Deleting filters:** Click the **Delete** button (the cross icon) to the right of the report filter to remove that filter
+from the report.
+
+**Changing multiple filter types:** You can modify multiple filter types at the same time by selecting a different filter
+from the dropdown menu and clicking **Save changes**.';
 $string['sorting'] = 'Sorting';
 $string['source'] = 'Source';
+$string['standardfilter'] = 'Standard filter options.';
+$string['standardfilterdesc'] = 'The choices below determine which filter will appear above the report and how they are labelled.';
+$string['standardfilter_help'] = '
+**Standard filter options** allows you to customise the filters that appear above your report. The available filters are
+determined by the **Source** of the report. Each report source has a set of default filters.
+
+A filter can appear in either the standard filter area or the sidebar filter area, but not both. Filters can be added, sorted
+and removed.
+
+**Adding filters:** To add a new filter to the report choose the required filter from the \'Add another filter...\' dropdown
+menu and click **Save changes**. When **Advanced** is checked the filter will not appear in the \'Search by\' box by default,
+you can click **Show advanced** when viewing a report to see these filters.
+
+**Moving filters:** The filters will appear in the \'Search by\' box in the order they are listed. Use the up and down arrows
+to change the order.
+
+**Deleting filters:** Click the **Delete** button (the cross icon) to the right of the report filter to remove that filter
+from the report.
+
+**Changing multiple filter types:** You can modify multiple filter types at the same time by selecting a different filter
+from the dropdown menu and clicking **Save changes**.';
 $string['suspendedonly'] = 'Suspended users only';
 $string['suspendeduser'] = 'Suspended user';
 $string['systemcontext'] = 'Users must have role in the system context';
@@ -682,6 +743,29 @@ $string['tagids'] = 'Tag IDs';
 $string['tags'] = 'Tags';
 $string['thefuture'] = 'The future';
 $string['thepast'] = 'The past';
+$string['toolbarsearch'] = 'Toolbar search box';
+$string['toolbarsearch_help'] = '
+**Toolbar search box** allows you to customise the fields that will be searched when using the search box in the report header.
+The available filters are determined by the **Source** of the report. Each report source has a set of default fields. If no
+fields are specified then the search box is not displayed.
+
+You can specify that a field is searched, even if it is not included as a column in the report, although this may cause
+confusion for users if they cannot see why a particular record is included in their search results.
+
+**Adding search fields:** To add a new search field to the report choose the required field from the \'Add another search
+field...\' dropdown menu and click **Save changes**.
+
+**Delete search fields:** Click the **Delete** button (the cross icon) to the right of the report field to remove that
+search field.
+
+**Changing multiple search fields:** You can modify multiple search fields at the same time by selecting a different field
+from the dropdown menu and clicking **Save changes**.';
+$string['toolbarsearchdesc'] = 'The choices below determine which fields will be searched when a user enters text in the toolbar search box.';
+$string['toolbarsearchdisabled'] = 'Disable toolbar search box';
+$string['toolbarsearchdisabled_help'] = 'Checking this box will prevent the search box from appearing in the header of the
+report. This has the same result as removing all search fields.';
+$string['toolbarsearchtextiscontainedinsingle'] = '"{$a->searchtext}" is contained in the column "{$a->field}"';
+$string['toolbarsearchtextiscontainedinmultiple'] = '"{$a}" is contained in one or more of the following columns: ';
 $string['trainerownrecords'] = 'Show records where the user is the trainer';
 $string['trainerstaffrecords'] = 'Records where one of the user\'s direct reports is the trainer';
 $string['type'] = 'Type';

@@ -233,7 +233,9 @@ from
                 'dp_competency.planname',
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_competency'),
-                    'joins' => 'dp_competency'
+                    'joins' => 'dp_competency',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -286,7 +288,9 @@ from
                 'template.shortname',
                 array(
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_competency'),
-                    'joins' => 'template'
+                    'joins' => 'template',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -317,7 +321,9 @@ from
                 'competency.fullname',
                 array(
                     'defaultheading' => get_string('competencyname', 'rb_source_dp_competency'),
-                    'joins' => 'competency'
+                    'joins' => 'competency',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -338,7 +344,9 @@ from
                 get_string('competencypriority', 'rb_source_dp_competency'),
                 'priority.name',
                 array(
-                    'joins' => 'priority'
+                    'joins' => 'priority',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -372,7 +380,9 @@ from
                 get_string('competencytype', 'rb_source_dp_competency'),
                 'comp_type.fullname',
                 array(
-                    'joins' => 'comp_type'
+                    'joins' => 'comp_type',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             );
 
@@ -401,7 +411,9 @@ from
                     evidence_scale_value.name
                 END',
                 array(
-                    'joins' => array('dp_competency', 'scale_value', 'evidence_scale_value')
+                    'joins' => array('dp_competency', 'scale_value', 'evidence_scale_value'),
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 

@@ -38,12 +38,13 @@ class rb_filter_date extends rb_filter_type {
      * @param string $value The filter value (from the db or embedded source)
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
+     * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
      *
      * @return rb_filter_date object
      */
-    function __construct($type, $value, $advanced, $report) {
-        parent::__construct($type, $value, $advanced, $report);
+    public function __construct($type, $value, $advanced, $region, $report) {
+        parent::__construct($type, $value, $advanced, $region, $report);
 
         if (!isset($this->options['includetime'])) {
             $this->options['includetime'] = false;
@@ -69,6 +70,7 @@ class rb_filter_date extends rb_filter_type {
         } else {
             $objs[] =& $mform->createElement('date_selector', $this->name.'_sdt', null);
         }
+        $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
         $objs[] =& $mform->createElement('checkbox', $this->name.'_eck', null, get_string('isbefore', 'filters'));
         if ($includetime) {
             $objs[] =& $mform->createElement('date_time_selector', $this->name.'_edt', null, array('step' => 1, 'optional' => false));
@@ -76,17 +78,21 @@ class rb_filter_date extends rb_filter_type {
             $objs[] =& $mform->createElement('date_selector', $this->name.'_edt', null);
         }
         $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
-        $objs[] =& $mform->createElement('checkbox', $this->name.'daysbeforechkbox', null, null);
-        $objs[] =& $mform->createElement('static', null, null, get_string('dateisbetween', 'totara_reportbuilder'));
+        $objs[] =& $mform->createElement('checkbox', $this->name.'daysbeforechkbox', null,
+                get_string('dateisbetween', 'totara_reportbuilder'));
         $objs[] =& $mform->createElement('text', $this->name.'daysbefore', null, 'size="2"');
         $mform->setType($this->name.'daysbefore', PARAM_INT);
         $objs[] =& $mform->createElement('static', null, null, get_string('isbeforetoday', 'totara_reportbuilder'));
+        $objs[] =& $mform->createElement('static', null, null,
+                html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
         $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
-        $objs[] =& $mform->createElement('checkbox', $this->name.'daysafterchkbox', null, null);
-        $objs[] =& $mform->createElement('static', null, null, get_string('dateisbetween', 'totara_reportbuilder'));
+        $objs[] =& $mform->createElement('checkbox', $this->name.'daysafterchkbox', null,
+                get_string('dateisbetween', 'totara_reportbuilder'));
         $objs[] =& $mform->createElement('text', $this->name.'daysafter', null, 'size="2"');
         $mform->setType($this->name.'daysafter', PARAM_INT);
         $objs[] =& $mform->createElement('static', null, null, get_string('isaftertoday', 'totara_reportbuilder'));
+        $objs[] =& $mform->createElement('static', null, null,
+                html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
         $mform->addHelpButton($grp->_name, 'filterdate', 'filters');
 
@@ -227,7 +233,7 @@ class rb_filter_date extends rb_filter_type {
         $before = $data['before'];
         $daysafter = $data['daysafter'];
         $daysbefore = $data['daysbefore'];
-        $datetoday = time();
+        $datetoday = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
         $query  = $this->get_field();
 
         if (empty($after) and empty($before) and empty($daysafter) and empty($daysbefore)) {
@@ -246,7 +252,7 @@ class rb_filter_date extends rb_filter_type {
         }
         if ($before) {
             $uniqueparam = rb_unique_param('fdbefore');
-            $res .= " AND {$query} <= :{$uniqueparam}";
+            $res .= " AND {$query} < :{$uniqueparam}";
             $params[$uniqueparam] = $before;
         }
         if ($daysafter and $daysbefore) {

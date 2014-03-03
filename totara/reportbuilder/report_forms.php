@@ -126,38 +126,65 @@ class report_builder_edit_form extends moodleform {
  */
 class report_builder_edit_filters_form extends moodleform {
     function definition() {
-        global $CFG, $OUTPUT;
+        global $OUTPUT;
+
+        // Common.
         $mform =& $this->_form;
         $report = $this->_customdata['report'];
         $id = $this->_customdata['id'];
+        $allstandardfilters = $this->_customdata['allstandardfilters'];
+        $unusedstandardfilters = $this->_customdata['unusedstandardfilters'];
+        $allsidebarfilters = $this->_customdata['allsidebarfilters'];
+        $unusedsidebarfilters = $this->_customdata['unusedsidebarfilters'];
+        $allsearchcolumns = $this->_customdata['allsearchcolumns'];
+        $unusedsearchcolumns = $this->_customdata['unusedsearchcolumns'];
         $filters = array();
-
-        $mform->addElement('header', 'searchoptions', get_string('searchoptions', 'totara_reportbuilder'));
-
-        $mform->addHelpButton('searchoptions', 'reportbuilderfilters', 'totara_reportbuilder');
 
         $strmovedown = get_string('movedown', 'totara_reportbuilder');
         $strmoveup = get_string('moveup', 'totara_reportbuilder');
         $strdelete = get_string('delete', 'totara_reportbuilder');
         $spacer = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
 
+        $renderer =& $mform->defaultRenderer();
+
+        $selectelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fselectgroups'), 'fitem');
+        $checkelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fcheckbox'), 'fitem');
+        $textelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'ftext'), 'fitem');
+
+        // Standard and sidebar filters.
+        $mform->addElement('header', 'standardfilter', get_string('standardfilter', 'totara_reportbuilder'));
+        $mform->addHelpButton('standardfilter', 'standardfilter', 'totara_reportbuilder');
+        $mform->setExpanded('standardfilter');
+
         if (isset($report->filteroptions) && is_array($report->filteroptions) && count($report->filteroptions) > 0) {
-            $mform->addElement('html', $OUTPUT->container(get_string('help:searchdesc', 'totara_reportbuilder')) .
-                html_writer::empty_tag('br'));
+            $filters = $report->filters;
+
+            $standardfiltercount = 0;
+            $sidebarfiltercount = 0;
+            foreach ($filters as $filter) {
+                if ($filter->region == rb_filter_type::RB_FILTER_REGION_STANDARD) {
+                    $standardfiltercount++;
+                } else if ($filter->region == rb_filter_type::RB_FILTER_REGION_SIDEBAR) {
+                    $sidebarfiltercount++;
+                }
+            }
+
+            // Standard filter options.
+            $mform->addElement('html', $OUTPUT->container(get_string('standardfilterdesc', 'totara_reportbuilder')) .
+                    html_writer::empty_tag('br'));
 
             $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
-                html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
-                html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
-                html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
-                html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
-
-            $filtersselect = $report->get_filters_select();
+                    html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
+                    html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
 
             if (isset($report->filters) && is_array($report->filters) && count($report->filters) > 0) {
-                $filters = $report->filters;
-                $filtercount = count($filters);
                 $i = 1;
                 foreach ($filters as $index => $filter) {
+                    if ($filter->region != rb_filter_type::RB_FILTER_REGION_STANDARD) {
+                        continue;
+                    }
                     $row = array();
                     $filterid = $filter->filterid;
                     $type = $filter->type;
@@ -166,13 +193,13 @@ class report_builder_edit_filters_form extends moodleform {
                     $advanced = $filter->advanced;
 
                     $mform->addElement('html', html_writer::start_tag('tr', array('fid' => $filterid)) .
-                        html_writer::start_tag('td'));
-                    $mform->addElement('selectgroups', "filter{$filterid}", '', $filtersselect,
-                        array('class' => 'filter_selector'));
+                            html_writer::start_tag('td'));
+                    $mform->addElement('selectgroups', "filter{$filterid}", '', $allstandardfilters,
+                            array('class' => 'filter_selector'));
                     $mform->setDefault("filter{$filterid}", $field);
                     $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
                     $mform->addElement('advcheckbox', "customname{$filterid}", '', '',
-                        array('class' => 'filter_custom_name_checkbox', 'group' => 0), array(0, 1));
+                            array('class' => 'filter_custom_name_checkbox', 'group' => 0), array(0, 1));
                     $mform->setDefault("customname{$filterid}", $filter->customname);
                     $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
                     $mform->addElement('text', "filtername{$filterid}", '', 'class="filter_name_text"');
@@ -200,7 +227,7 @@ class report_builder_edit_filters_form extends moodleform {
                     } else {
                         $mform->addElement('html', $spacer);
                     }
-                    if ($i != $filtercount) {
+                    if ($i != $standardfiltercount) {
                         $movedownurl = new moodle_url('/totara/reportbuilder/filters.php',
                             array('m' => 'down', 'id' => $id, 'fid' => $filterid));
                         $mform->addElement('html', html_writer::link(
@@ -219,67 +246,207 @@ class report_builder_edit_filters_form extends moodleform {
             }
 
             $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td'));
-            $newfilterselect = array_merge(
-                array(
-                    get_string('new') => array(0 => get_string('addanotherfilter', 'totara_reportbuilder'))
-                ),
-                $filtersselect);
-            // Remove already-added filters from the new filter selector
-            $cleanedfilterselect = $newfilterselect;
-            foreach ($newfilterselect as $okey => $optgroup) {
-                foreach ($optgroup as $typeval => $filtername) {
-                    $typevalarr = explode('-', $typeval);
-                    foreach ($report->filters as $curfilter) {
-                        if ($curfilter->type == $typevalarr[0] && $curfilter->value == $typevalarr[1]) {
-                            unset($cleanedfilterselect[$okey][$typeval]);
-                        }
-                    }
-                }
-            }
-            $newfilterselect = $cleanedfilterselect;
-            unset($cleanednewfilterselect);
-
-            $mform->addElement('selectgroups', 'newfilter', '', $newfilterselect,
-                array('class' => 'new_filter_selector filter_selector'));
+            $mform->addElement('selectgroups', 'newstandardfilter', '', $unusedstandardfilters,
+                    array('class' => 'new_standard_filter_selector filter_selector'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
-            $mform->addElement('advcheckbox', "newcustomname", '', '',
-                array('id' => 'id_newcustomname', 'class' => 'filter_custom_name_checkbox', 'group' => 0), array(0, 1));
+            $mform->addElement('advcheckbox', 'newstandardcustomname', '', '',
+                    array('id' => 'id_newstandardcustomname', 'class' => 'filter_custom_name_checkbox', 'group' => 0),
+                    array(0, 1));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
-            $mform->setDefault("newcustomname", 0);
-            $mform->addElement('text', 'newfiltername', '', 'class="filter_name_text"');
-            $mform->setType('newfiltername', PARAM_TEXT);
+            $mform->setDefault('newstandardcustomname', 0);
+            $mform->addElement('text', 'newstandardfiltername', '', 'class="filter_name_text"');
+            $mform->setType('newstandardfiltername', PARAM_TEXT);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
-            $mform->addElement('advcheckbox', 'newadvanced', '', '', array('class' => 'filter_advanced_checkbox'));
-            $mform->disabledIf('newadvanced', 'newfilter', 'eq', 0);
+            $mform->addElement('advcheckbox', 'newstandardadvanced', '', '', array('class' => 'filter_advanced_checkbox'));
+            $mform->disabledIf('newstandardadvanced', 'newstandardfilter', 'eq', 0);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
             $mform->addElement('html', html_writer::end_tag('table') . $OUTPUT->container_end());
+
+            // Sidebar filter options.
+            $mform->addElement('header', 'sidebarfilter', get_string('sidebarfilter', 'totara_reportbuilder'));
+            $mform->addHelpButton('sidebarfilter', 'sidebarfilter', 'totara_reportbuilder');
+            $mform->setExpanded('sidebarfilter');
+
+            $mform->addElement('html', $OUTPUT->container(get_string('sidebarfilterdesc', 'totara_reportbuilder')) .
+                    html_writer::empty_tag('br'));
+            $mform->addElement('selectgroups', "all_sidebar_filters", '', $allsidebarfilters);
+
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+                    html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('customisename', 'totara_reportbuilder'), array('colspan' => 2)) .
+                    html_writer::tag('th', get_string('advanced', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
+
+            if (isset($report->filters) && is_array($report->filters) && count($report->filters) > 0) {
+                $i = 1;
+                foreach ($filters as $index => $filter) {
+                    if ($filter->region != rb_filter_type::RB_FILTER_REGION_SIDEBAR) {
+                        continue;
+                    }
+                    $row = array();
+                    $filterid = $filter->filterid;
+                    $type = $filter->type;
+                    $value = $filter->value;
+                    $field = "{$type}-{$value}";
+                    $advanced = $filter->advanced;
+
+                    $mform->addElement('html', html_writer::start_tag('tr', array('fid' => $filterid)) .
+                            html_writer::start_tag('td'));
+                    $mform->addElement('selectgroups', "filter{$filterid}", '', $allsidebarfilters,
+                            array('class' => 'filter_selector'));
+                    $mform->setDefault("filter{$filterid}", $field);
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $mform->addElement('advcheckbox', "customname{$filterid}", '', '',
+                            array('class' => 'filter_custom_name_checkbox', 'group' => 0), array(0, 1));
+                    $mform->setDefault("customname{$filterid}", $filter->customname);
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $mform->addElement('text', "filtername{$filterid}", '', 'class="filter_name_text"');
+                    $mform->setType("filtername{$filterid}", PARAM_TEXT);
+                    $mform->setDefault("filtername{$filterid}", (empty($filter->filtername) ?
+                            $filter->label : $filter->filtername));
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $mform->addElement('advcheckbox', "advanced{$filterid}", '', '',
+                            array('class' => 'filter_advanced_checkbox'));
+                    $mform->setDefault("advanced{$filterid}", $filter->advanced);
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $deleteurl = new moodle_url('/totara/reportbuilder/filters.php',
+                            array('d' => '1', 'id' => $id, 'fid' => $filterid));
+                    $mform->addElement('html', html_writer::link($deleteurl, $OUTPUT->pix_icon('/t/delete', $strdelete),
+                            array('title' => $strdelete, 'class' => 'deletefilterbtn')));
+                    if ($i != 1) {
+                        $moveupurl = new moodle_url('/totara/reportbuilder/filters.php',
+                                array('m' => 'up', 'id' => $id, 'fid' => $filterid));
+                        $mform->addElement('html', html_writer::link($moveupurl, $OUTPUT->pix_icon('/t/up', $strmoveup),
+                                array('title' => $strmoveup, 'class' => 'movefilterupbtn')));
+                    } else {
+                        $mform->addElement('html', $spacer);
+                    }
+                    if ($i != $sidebarfiltercount) {
+                        $movedownurl = new moodle_url('/totara/reportbuilder/filters.php',
+                                array('m' => 'down', 'id' => $id, 'fid' => $filterid));
+                        $mform->addElement('html', html_writer::link($movedownurl, $OUTPUT->pix_icon('/t/down', $strmovedown),
+                                array('title' => $strmovedown, 'class' => 'movefilterdownbtn')));
+                    } else {
+                        $mform->addElement('html', $spacer);
+                    }
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+                    $i++;
+                }
+            } else {
+                $mform->addElement('html', html_writer::tag('p', get_string('nofiltersyet', 'totara_reportbuilder')));
+            }
+
+            $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td'));
+            $mform->addElement('selectgroups', 'newsidebarfilter', '', $unusedsidebarfilters,
+                array('class' => 'new_sidebar_filter_selector filter_selector'));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('advcheckbox', 'newsidebarcustomname', '', '',
+                array('id' => 'id_newsidebarcustomname', 'class' => 'filter_custom_name_checkbox', 'group' => 0), array(0, 1));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->setDefault('newsidebarcustomname', 0);
+            $mform->addElement('text', 'newsidebarfiltername', '', 'class="filter_name_text"');
+            $mform->setType('newsidebarfiltername', PARAM_TEXT);
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('advcheckbox', 'newsidebaradvanced', '', '', array('class' => 'filter_advanced_checkbox'));
+            $mform->disabledIf('newsidebaradvanced', 'newsidebarfilter', 'eq', 0);
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+            $mform->addElement('html', html_writer::end_tag('table') . $OUTPUT->container_end());
+
+            // Standard and sidebar filters.
+
+            // Remove the labels from the form elements.
+            $renderer->setElementTemplate($selectelementtemplate, 'newstandardfilter');
+            $renderer->setElementTemplate($selectelementtemplate, 'newsidebarfilter');
+            $renderer->setElementTemplate($checkelementtemplate, 'newstandardadvanced');
+            $renderer->setElementTemplate($checkelementtemplate, 'newsidebaradvanced');
+            $renderer->setElementTemplate($textelementtemplate, 'newstandardfiltername');
+            $renderer->setElementTemplate($textelementtemplate, 'newsidebarfiltername');
+            $renderer->setElementTemplate($checkelementtemplate, 'newstandardcustomname');
+            $renderer->setElementTemplate($checkelementtemplate, 'newsidebarcustomname');
+
+            foreach ($filters as $index => $filter) {
+                $filterid = $filter->filterid;
+                $renderer->setElementTemplate($selectelementtemplate, 'filter' . $filterid);
+                $renderer->setElementTemplate($checkelementtemplate, 'advanced' . $filterid);
+                $renderer->setElementTemplate($textelementtemplate, 'filtername' . $filterid);
+                $renderer->setElementTemplate($checkelementtemplate, 'customname' . $filterid);
+            }
+
         } else {
+            // No filters available.
             $mform->addElement('html', get_string('nofilteraskdeveloper', 'totara_reportbuilder', $report->source));
         }
 
+        // Toolbar search options.
+        $mform->addElement('header', 'toolbarsearch', get_string('toolbarsearch', 'totara_reportbuilder'));
+        $mform->addHelpButton('toolbarsearch', 'toolbarsearch', 'totara_reportbuilder');
+        $mform->setExpanded('toolbarsearch');
+
+        $mform->addElement('advcheckbox', 'toolbarsearchdisabled', get_string('toolbarsearchdisabled', 'totara_reportbuilder'));
+        $mform->setDefault('toolbarsearchdisabled', !$report->toolbarsearch);
+        $mform->addHelpButton('toolbarsearchdisabled', 'toolbarsearchdisabled', 'totara_reportbuilder');
+
+        if (count($allsearchcolumns) > 0) {
+            $searchcolumns = $report->searchcolumns;
+
+            $mform->addElement('html', $OUTPUT->container(get_string('toolbarsearchdesc', 'totara_reportbuilder')) .
+                    html_writer::empty_tag('br'));
+
+            $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
+                    html_writer::start_tag('tr') . html_writer::tag('th', get_string('searchfield', 'totara_reportbuilder')) .
+                    html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
+
+            if (isset($report->searchcolumns) && is_array($report->searchcolumns) && count($report->searchcolumns) > 0) {
+                foreach ($searchcolumns as $index => $searchcolumn) {
+                    $row = array();
+                    $searchcolumnid = $searchcolumn->id;
+                    $type = $searchcolumn->type;
+                    $value = $searchcolumn->value;
+                    $field = "{$type}-{$value}";
+
+                    $mform->addElement('html', html_writer::start_tag('tr', array('searchcolumnid' => $searchcolumnid)) .
+                            html_writer::start_tag('td'));
+                    $mform->addElement('selectgroups', "searchcolumn{$searchcolumnid}", '', $allsearchcolumns,
+                            array('class' => 'search_column_selector'));
+                    $mform->setDefault("searchcolumn{$searchcolumnid}", $field);
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+                    $deleteurl = new moodle_url('/totara/reportbuilder/filters.php',
+                            array('d' => '1', 'id' => $id, 'searchcolumnid' => $searchcolumnid));
+                    $mform->addElement('html', html_writer::link($deleteurl, $OUTPUT->pix_icon('/t/delete', $strdelete),
+                            array('title' => $strdelete, 'class' => 'deletesearchcolumnbtn')));
+                    $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+                }
+            } else {
+                $mform->addElement('html', html_writer::tag('p', get_string('nosearchcolumnsyet', 'totara_reportbuilder')));
+            }
+
+            $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td'));
+            $mform->addElement('selectgroups', 'newsearchcolumn', '', $unusedsearchcolumns,
+                    array('class' => 'new_search_column_selector search_column_selector'));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+            $mform->addElement('html', html_writer::end_tag('table') . $OUTPUT->container_end());
+
+            $renderer->setElementTemplate($selectelementtemplate, 'newsearchcolumn');
+
+            foreach ($searchcolumns as $index => $searchcolumn) {
+                $searchcolumnid = $searchcolumn->id;
+                $renderer->setElementTemplate($selectelementtemplate, 'searchcolumn' . $searchcolumnid);
+            }
+
+        } else {
+            // No search columns available.
+            $mform->addElement('html', get_string('nosearchcolumnsaskdeveloper', 'totara_reportbuilder', $report->source));
+        }
+
+        // Common.
         $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'source', $report->source);
         $mform->setType('source', PARAM_TEXT);
         $this->add_action_buttons();
-
-        // remove the labels from the form elements
-        $renderer =& $mform->defaultRenderer();
-        $selectelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fselectgroups'), 'fitem');
-        $checkelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fcheckbox'), 'fitem');
-        $textelementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'ftext'), 'fitem');
-        $renderer->setElementTemplate($selectelementtemplate, 'newfilter');
-        $renderer->setElementTemplate($checkelementtemplate, 'newadvanced');
-        $renderer->setElementTemplate($textelementtemplate, 'newfiltername');
-        $renderer->setElementTemplate($checkelementtemplate, 'newcustomname');
-        foreach ($filters as $index => $filter) {
-            $filterid = $filter->filterid;
-            $renderer->setElementTemplate($selectelementtemplate, 'filter' . $filterid);
-            $renderer->setElementTemplate($checkelementtemplate, 'advanced' . $filterid);
-            $renderer->setElementTemplate($textelementtemplate, 'filtername' . $filterid);
-            $renderer->setElementTemplate($checkelementtemplate, 'customname' . $filterid);
-        }
     }
 
     /**
@@ -872,35 +1039,35 @@ class report_builder_save_form extends moodleform {
     }
 }
 
-class report_builder_search_form extends moodleform {
+class report_builder_standard_search_form extends moodleform {
     function definition() {
-        global $SESSION;
-        $mform       =& $this->_form;
-        $fields      = $this->_customdata['fields'];
+        $mform =& $this->_form;
+        $fields = $this->_customdata['fields'];
+
+        $mform->disable_form_change_checker();
 
         if ($fields && is_array($fields) && count($fields) > 0) {
-            $mform->addElement('header', 'newfilter', get_string('searchby', 'totara_reportbuilder'));
+            $mform->addElement('header', 'newfilterstandard', get_string('searchby', 'totara_reportbuilder'));
 
             foreach ($fields as $ft) {
                 $ft->setupForm($mform);
             }
 
             $submitgroup = array();
-            // Add button
             $submitgroup[] =& $mform->createElement('html', '&nbsp;', html_writer::empty_tag('br'));
-            $submitgroup[] =& $mform->createElement('submit', 'addfilter', get_string('search', 'totara_reportbuilder'));
-            // clear form button
-            $submitgroup[] =& $mform->createElement('submit', 'clearfilter', get_string('clearform', 'totara_reportbuilder'));
-            $mform->addGroup($submitgroup, 'submitgroup', '&nbsp;', ' &nbsp; ');
+            $submitgroup[] =& $mform->createElement('submit', 'addfilter',
+                    get_string('search', 'totara_reportbuilder'));
+            $submitgroup[] =& $mform->createElement('submit', 'clearstandardfilters',
+                    get_string('clearform', 'totara_reportbuilder'));
+            $mform->addGroup($submitgroup, 'submitgroupstandard', '&nbsp;', ' &nbsp; ');
         }
     }
 
     function definition_after_data() {
-        $mform       =& $this->_form;
-        $fields      = $this->_customdata['fields'];
+        $mform =& $this->_form;
+        $fields = $this->_customdata['fields'];
 
         if ($fields && is_array($fields) && count($fields) > 0) {
-
             foreach ($fields as $ft) {
                 if (method_exists($ft, 'definition_after_data')) {
                     $ft->definition_after_data($mform);
@@ -910,3 +1077,135 @@ class report_builder_search_form extends moodleform {
     }
 }
 
+class report_builder_sidebar_search_form extends moodleform {
+    public function definition() {
+        $mform =& $this->_form;
+        $report = $this->_customdata['report'];
+        $id = $report->_id;
+        $fields = $this->_customdata['fields'];
+
+        $mform->updateAttributes(array('id' => 'sidebarfilter'.$id));
+        $mform->disable_form_change_checker();
+
+        if ($fields && is_array($fields) && count($fields) > 0) {
+            $mform->addElement('header', 'newfiltersidebar', get_string('filterby', 'totara_reportbuilder'));
+
+            foreach ($fields as $ft) {
+                $ft->setupForm($mform);
+            }
+
+            $submitgroup = array();
+            $submitgroup[] =& $mform->createElement('html', '&nbsp;', html_writer::empty_tag('br'));
+            $submitgroup[] =& $mform->createElement('submit', 'addfilter',
+                    get_string('search', 'totara_reportbuilder'));
+            $submitgroup[] =& $mform->createElement('submit', 'clearsidebarfilters',
+                    get_string('clearform', 'totara_reportbuilder'));
+            $mform->addGroup($submitgroup, 'submitgroupsidebar', '&nbsp;', ' &nbsp; ');
+
+            $mform->addElement('hidden', 'id', $id);
+            $mform->setType('id', PARAM_INT);
+        }
+    }
+
+    public function definition_after_data() {
+        $mform =& $this->_form;
+        $report = $this->_customdata['report'];
+        $fields = $this->_customdata['fields'];
+
+        $report->add_filter_counts($mform);
+
+        if ($fields && is_array($fields) && count($fields) > 0) {
+            foreach ($fields as $ft) {
+                if (method_exists($ft, 'definition_after_data')) {
+                    $ft->definition_after_data($mform);
+                }
+            }
+        }
+    }
+}
+
+class report_builder_toolbar_search_form extends moodleform {
+    public function definition() {
+        $mform =& $this->_form;
+
+        $mform->addElement('text', 'toolbarsearchtext',
+                get_string('searchby', 'totara_reportbuilder'));
+        $mform->setType('toolbarsearchtext', PARAM_TEXT);
+        $mform->addElement('submit', 'toolbarsearchbutton',
+                get_string('search', 'totara_reportbuilder'));
+        $mform->addElement('submit', 'cleartoolbarsearchtext',
+                get_string('clearform', 'totara_reportbuilder'));
+    }
+
+    public function definition_after_data() {
+        $mform =& $this->_form;
+
+        $toolbarsearchtext = $this->_customdata['toolbarsearchtext'];
+
+        $mform->setDefault('toolbarsearchtext', $toolbarsearchtext);
+    }
+}
+
+class report_builder_course_expand_form extends moodleform {
+    public function definition() {
+        $mform =& $this->_form;
+
+        $summary = $this->_customdata['summary'];
+        $status = $this->_customdata['status'];
+        $enroltype = isset($this->_customdata['enroltype']) ? $this->_customdata['enroltype'] : '';
+        $progress = isset($this->_customdata['progress']) ? $this->_customdata['progress'] : '';
+        $enddate = isset($this->_customdata['enddate']) ? $this->_customdata['enddate'] : '';
+        $grade = isset($this->_customdata['grade']) ? $this->_customdata['grade'] : '';
+        $action = $this->_customdata['action'];
+        $url = $this->_customdata['url'];
+
+        if ($summary != '') {
+            $mform->addElement('static', 'summary', get_string('coursesummary'), $summary);
+        }
+        if ($status != '') {
+            $mform->addElement('static', 'status', get_string('status'), $status);
+        }
+        if ($enroltype != '') {
+            $mform->addElement('static', 'enroltype', get_string('courseenroltype', 'totara_reportbuilder'), $enroltype);
+        }
+        if ($progress != '') {
+            $mform->addElement('static', 'progress', get_string('courseprogress', 'totara_reportbuilder'), $progress);
+        }
+        if ($enddate != '') {
+            $mform->addElement('static', 'enddate', get_string('courseenddate', 'totara_reportbuilder'), $enddate);
+        }
+        if ($grade != '') {
+            $mform->addElement('static', 'grade', get_string('grade'), $grade);
+        }
+        if ($url != '') {
+            $mform->addElement('static', 'enrol', '', html_writer::link($url, $action,
+                    array('class' => 'link-as-button')));
+        } else {
+            $mform->addElement('static', 'enrol', '', $action);
+        }
+    }
+}
+
+class report_builder_program_expand_form extends moodleform {
+    public function definition() {
+        $mform =& $this->_form;
+
+        $prog = $this->_customdata;
+
+        if ($prog['summary']) {
+            $mform->addElement('static', 'summary', get_string('summary', 'totara_program'), $prog['summary']);
+        }
+
+        if ($prog['assigned']) {
+            if ($prog['certifid']) {
+                $mform->addElement('static', 'status', get_string('status'), get_string('youareassigned', 'totara_certification'));
+            } else {
+                $mform->addElement('static', 'status', get_string('status'), get_string('youareassigned', 'totara_program'));
+            }
+        }
+
+        $url = new moodle_url('/totara/program/view.php', array('id' => $prog['id']));
+        $mform->addElement('static', 'view', '', html_writer::link($url, get_string('viewprogram', 'totara_program'),
+                array('class' => 'link-as-button')));
+    }
+}

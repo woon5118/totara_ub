@@ -32,7 +32,6 @@ $format = optional_param('format', '', PARAM_TEXT); // export format
 $delete = optional_param('del', 'none', PARAM_ALPHANUM);
 
 $context = context_system::instance();
-require_capability('tool/totara_sync:manage', $context);
 $PAGE->set_context($context);
 $PAGE->set_url('/' . $CFG->admin . '/tool/totara_sync/admin/synclog.php');
 
@@ -112,6 +111,7 @@ if ($debug) {
 print $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

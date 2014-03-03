@@ -200,7 +200,13 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configcheckbox('courselistshortnames',
             new lang_string('courselistshortnames', 'admin'),
             new lang_string('courselistshortnames_desc', 'admin'), 0));
-    $temp->add(new admin_setting_configtext('coursesperpage', new lang_string('coursesperpage', 'admin'), new lang_string('configcoursesperpage', 'admin'), 20, PARAM_INT));
+    if (!empty($CFG->enhancedcatalog)) {
+        $temp->add(new admin_setting_nothing('coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpageenhcatenabled', 'admin')));
+    } else {
+        $temp->add(new admin_setting_configtext('coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpage', 'admin'), 20, PARAM_INT));
+    }
     $temp->add(new admin_setting_configtext('courseswithsummarieslimit', new lang_string('courseswithsummarieslimit', 'admin'), new lang_string('configcourseswithsummarieslimit', 'admin'), 10, PARAM_INT));
     $temp->add(new admin_setting_configtext('courseoverviewfileslimit', new lang_string('courseoverviewfileslimit'),
             new lang_string('configcourseoverviewfileslimit', 'admin'), 1, PARAM_INT));

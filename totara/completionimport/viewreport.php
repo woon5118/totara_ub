@@ -41,7 +41,6 @@ $pageparams = array('importname' => $importname, 'importuserid' => $importuserid
 require_login();
 
 $context = context_system::instance();
-require_capability('totara/completionimport:import', $context);
 $PAGE->set_context($context);
 
 $shortname = 'completionimport_' . $importname;
@@ -80,6 +79,7 @@ echo $OUTPUT->heading($heading);
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 echo $renderer->showhide_button($report->_id, $report->shortname);
 

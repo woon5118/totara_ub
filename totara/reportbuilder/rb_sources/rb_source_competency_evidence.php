@@ -106,11 +106,13 @@ class rb_source_competency_evidence extends rb_base_source {
 
         $columnoptions = array(
             new rb_column_option(
-                'competency_evidence',  // type
-                'proficiency',          // value
-                get_string('proficiency', 'rb_source_competency_evidence'), // name
-                'scale_values.name',    // field
-                array('joins' => 'scale_values') // options
+                'competency_evidence',  // Type.
+                'proficiency',          // Value.
+                get_string('proficiency', 'rb_source_competency_evidence'), // Name.
+                'scale_values.name',    // Field.
+                array('joins' => 'scale_values',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text') // Options.
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -150,7 +152,9 @@ class rb_source_competency_evidence extends rb_base_source {
                 'organisation',
                 get_string('completionorgname', 'rb_source_competency_evidence'),
                 'completion_organisation.fullname',
-                array('joins' => 'completion_organisation')
+                array('joins' => 'completion_organisation',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -177,41 +181,53 @@ class rb_source_competency_evidence extends rb_base_source {
                 'position',
                 get_string('completionposname', 'rb_source_competency_evidence'),
                 'completion_position.fullname',
-                array('joins' => 'completion_position')
+                array('joins' => 'completion_position',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'assessor',
                 get_string('assessorname', 'rb_source_competency_evidence'),
                 $DB->sql_fullname("assessor.firstname", "assessor.lastname"),
-                array('joins' => 'assessor')
+                array('joins' => 'assessor',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'assessorname',
                 get_string('assessororg', 'rb_source_competency_evidence'),
-                'base.assessorname'
+                'base.assessorname',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'fullname',
                 get_string('competencyname', 'rb_source_competency_evidence'),
                 'competency.fullname',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'shortname',
                 get_string('competencyshortname', 'rb_source_competency_evidence'),
                 'competency.shortname',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'idnumber',
                 get_string('competencyid', 'rb_source_competency_evidence'),
                 'competency.idnumber',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',

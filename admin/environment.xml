@@ -456,6 +456,9 @@
         </FEEDBACK>
       </PHP_SETTING>
     </PHP_SETTINGS>
+    <CUSTOM_CHECKS>
+        <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check"/>
+    </CUSTOM_CHECKS>
   </MOODLE>
   <MOODLE version="2.7" requires="2.2">
     <UNICODE level="required">

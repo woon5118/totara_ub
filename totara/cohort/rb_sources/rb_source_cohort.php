@@ -103,10 +103,12 @@ class rb_source_cohort extends rb_base_source {
         $columnoptions = array();
 
         $columnoptions[] = new rb_column_option(
-                                'cohort',  // Which table? Type.
-                                'name', // Alias for the field.
-                                get_string('name', 'totara_cohort'), // Name for the column.
-                                'base.name' // Table alias and field name.
+            'cohort',  // Which table? Type.
+            'name', // Alias for the field.
+            get_string('name', 'totara_cohort'), // Name for the column.
+            'base.name', // Table alias and field name.
+            array('dbdatatype' => 'char',
+                  'outputformat' => 'text') // Options.
         );
         $columnoptions[] = new rb_column_option(
             'cohort',
@@ -124,7 +126,9 @@ class rb_source_cohort extends rb_base_source {
             'cohort',
             'idnumber',
             get_string('idnumber', 'totara_cohort'),
-            'base.idnumber'
+            'base.idnumber',
+            array('dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'cohort',
@@ -269,10 +273,14 @@ class rb_source_cohort extends rb_base_source {
 
     protected function define_paramoptions() {
         $paramoptions = array(
-                            new rb_param_option(
+                        new rb_param_option(
                                 'cohortid', // Parameter name.
                                 'base.id'  // Field.
                         ),
+                        new rb_param_option(
+                                'contextid', // Parameter name.
+                                '' // No field because we don't want to filter by this param.
+                        )
         );
         return $paramoptions;
     }

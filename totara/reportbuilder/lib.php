@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/filters/lib.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_source.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
@@ -46,6 +47,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_filter_option.php
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_param.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_param_option.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_content_option.php');
+require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
@@ -144,12 +146,14 @@ class reportbuilder {
     const FILTER = 1;
     const FILTERALL = 2;
 
-    public $fullname, $shortname, $source, $hidden, $filters, $filteroptions, $columns, $requiredcolumns;
+    public $fullname, $shortname, $source, $hidden, $searchcolumns, $filters, $filteroptions, $columns, $requiredcolumns;
     public $columnoptions, $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
     public $_id, $recordsperpage, $defaultsortcolumn, $defaultsortorder;
     private $_joinlist, $_base, $_params, $_sid;
+
     private $_paramoptions, $_embeddedparams, $_fullcount, $_filteredcount, $_isinitiallyhidden;
-    public $src, $grouped, $reportfor, $badcolumns, $embedded;
+    public $src, $grouped, $reportfor, $badcolumns, $embedded, $toolbarsearch;
+
     private $_post_config_restrictions;
 
     /**
@@ -167,6 +171,12 @@ class reportbuilder {
      * @var stdClass $cacheschedule Record of cache scheduling and readyness
      */
     public $cacheschedule = null;
+
+    /**
+     *
+     * @var bool $ready State variable. True when reportbuilder finished construction.
+     */
+    protected $ready = false;
 
     /**
      * Constructor for reportbuilder object
@@ -240,6 +250,7 @@ class reportbuilder {
         $this->fullname = $report->fullname;
         $this->hidden = $report->hidden;
         $this->initialdisplay = $report->initialdisplay;
+        $this->toolbarsearch = $report->toolbarsearch;
         $this->cache = $report->cache;
         $this->cacheignore = $nocache;
         $this->description = $report->description;
@@ -285,6 +296,20 @@ class reportbuilder {
             $this->_embeddedparams = $embed->embeddedparams;
         }
         $this->_params = $this->get_current_params();
+
+        // Run the embedded report's capability checks.
+        if ($embed) {
+            if (method_exists($embed, 'is_capable')) {
+                if (!$embed->is_capable($this->reportfor, $this)) {
+                    print_error('nopermission', 'totara_reportbuilder');
+                }
+            } else {
+                debugging('This report doesn\'t implement is_capable().
+                    Sidebar filters will only use form submission rather than instant filtering.');
+            }
+        }
+
+        // Allow the source to configure additional tables and columns based on the parameters.
         $this->src->post_config($this);
 
         // Pull in the rest of the data for this report from the source.
@@ -293,19 +318,30 @@ class reportbuilder {
         $this->filteroptions = $this->src->filteroptions;
         $this->contentoptions = $this->src->contentoptions;
         $this->requiredcolumns = $this->src->requiredcolumns;
+        $this->searchcolumns = isset($this->searchcolumns) ? $this->searchcolumns : array();
         if ($restored) {
             $this->columns = $this->get_columns($this->columns);
             $this->filters = $this->get_filters($this->filters);
+            $this->searchcolumns = $this->get_search_columns($this->searchcolumns);
         } else {
             $this->columns = $this->get_columns();
             $this->filters = $this->get_filters();
+            $this->searchcolumns = $this->get_search_columns();
         }
         $this->_joinlist = $this->src->joinlist;
 
         $this->process_filters();
+        $this->ready = true;
     }
 
 
+    /**
+     * Return if reportbuilder is ready to work.
+     * @return bool
+     */
+    public function is_ready() {
+        return $this->ready;
+    }
     /**
      * Shortcut to function in report source.
      *
@@ -322,7 +358,6 @@ class reportbuilder {
      */
     function include_js() {
         global $CFG, $PAGE, $SESSION;
-        require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
         $dialog = false;
         $treeview = false;
@@ -752,6 +787,7 @@ class reportbuilder {
             $type = $filter->type;
             $value = $filter->value;
             $advanced = $filter->advanced;
+            $region = $filter->region;
             $name = "{$filter->type}-{$filter->value}";
 
             // To properly support multiple languages - only use value in database if it's different from the default.
@@ -766,11 +802,10 @@ class reportbuilder {
                     $defaultnames[$filter->type . '-' . $filter->value] : null;
             }
             // Only include filter if a valid object is returned.
-            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $this)) {
+            if ($filterobj = rb_filter_type::get_filter($type, $value, $advanced, $region, $this)) {
                 $filterobj->filterid = $filter->id;
                 $filterobj->filtername = $filtername;
                 $filterobj->customname = isset($filter->customname) ? $filter->customname : 0;
-                $filterobj->advanced = $advanced;
                 // Change label if there is a customname for this filter.
                 $filterobj->label = ($filter->customname == 1) ? $filtername : $filterobj->label;
                 $out[$name] = $filterobj;
@@ -782,6 +817,22 @@ class reportbuilder {
             }
         }
         return $out;
+    }
+
+    /**
+     * Gets any search columns set for the current report from the database
+     *
+     * @param array $searchcolumns predefined set of search columns
+     * @return array Array of search columns for current report or empty array if none set
+     */
+    public function get_search_columns(array $searchcolumns = array()) {
+        global $DB;
+
+        if (empty($searchcolumns)) {
+            $searchcolumns = $DB->get_records('report_builder_search_cols', array('reportid' => $this->_id));
+        }
+
+        return $searchcolumns;
     }
 
     /**
@@ -806,16 +857,20 @@ class reportbuilder {
 
         if (!empty($SESSION->reportbuilder[$this->_id])) {
             foreach ($SESSION->reportbuilder[$this->_id] as $fname => $data) {
-                if (!array_key_exists($fname, $this->filters)) {
-                    continue; // filter not used in this report
+                if ($fname == 'toolbarsearchtext') {
+                    if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
+                        list($where_sqls[], $params) = $this->get_toolbar_sql_filter($data);
+                        $filterparams = array_merge($filterparams, $params);
+                    }
+                } else if (array_key_exists($fname, $this->filters)) {
+                    $filter = $this->filters[$fname];
+                    if ($filter->grouping != 'none') {
+                        list($having_sqls[], $params) = $filter->get_sql_filter($data);
+                    } else {
+                        list($where_sqls[], $params) = $filter->get_sql_filter($data);
+                    }
+                    $filterparams = array_merge($filterparams, $params);
                 }
-                $filter = $this->filters[$fname];
-                if ($filter->grouping != 'none') {
-                    list($having_sqls[], $params) = $filter->get_sql_filter($data);
-                } else {
-                    list($where_sqls[], $params) = $filter->get_sql_filter($data);
-                }
-                $filterparams = array_merge($filterparams, $params);
             }
         }
 
@@ -833,41 +888,159 @@ class reportbuilder {
     /**
      * Same as fetch_sql_filters() but returns array of strings
      * describing active filters instead of SQL
+     *
+     * @return array of strings
      */
     function fetch_text_filters() {
         global $SESSION;
         $out = array();
         if (!empty($SESSION->reportbuilder[$this->_id])) {
             foreach ($SESSION->reportbuilder[$this->_id] as $fname => $data) {
-                if (!array_key_exists($fname, $this->filters)) {
-                    continue; // filter not used in this report
+                if ($fname == 'toolbarsearchtext') {
+                    if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
+                        $out[] = $this->get_toolbar_text_filter($data);
+                    }
+                } else if (array_key_exists($fname, $this->filters)) {
+                    $field = $this->filters[$fname];
+                    $out[] = $field->get_label($data);
                 }
-                $field = $this->filters[$fname];
-                $out[] = $field->get_label($data);
             }
         }
         return $out;
     }
 
-    function process_filters() {
+    /**
+     * Determine if there are columns defined for the toolbar search for this report
+     *
+     * @return bool true if there are toolbar search columns defined
+     */
+    private function has_toolbar_filter() {
+        $columns = $this->get_search_columns();
+        return (!empty($columns));
+    }
+
+    /**
+     * Returns the condition to be used with SQL where
+     *
+     * @param string $toolbarsearchtext filter settings
+     * @return array containing filtering condition SQL clause and params
+     */
+    private function get_toolbar_sql_filter($toolbarsearchtext) {
         global $CFG;
+
+        require_once($CFG->dirroot . '/totara/core/searchlib.php');
+
+        $keywords = totara_search_parse_keywords($toolbarsearchtext);
+        $columns = $this->get_search_columns();
+
+        if (empty($keywords) || empty($columns)) {
+            return array('1=1', array());
+        }
+
+        $dbfields = array();
+        foreach ($columns as $column) {
+            if ($this->is_cached()) {
+                $dbfields[] = $column->type . '_' . $column->value;
+            } else {
+                $columnobject = self::get_single_item($this->columnoptions, $column->type, $column->value);
+                $dbfields[] = $columnobject->field;
+            }
+        }
+
+        return totara_search_get_keyword_where_clause($keywords, $dbfields, SQL_PARAMS_NAMED);
+    }
+
+    /**
+     * Returns a human friendly description of the toolbar search criteria
+     *
+     * @param array $toolbarsearchtext the text that is being looked for
+     * @return string active toolbar search criteria
+     */
+    private function get_toolbar_text_filter($toolbarsearchtext) {
+        $columns = $this->get_search_columns();
+
+        $numberoffields = count($columns);
+
+        if ($numberoffields == 0) {
+            return '';
+
+        } else if ($numberoffields == 1) {
+            $column = reset($columns);
+            $columnobject = self::get_single_item($this->columnoptions, $column->type, $column->value);
+            $a = new stdClass();
+            $a->searchtext = $toolbarsearchtext;
+            $a->column = $columnobject->name;
+            return get_string('toolbarsearchtextiscontainedinsingle', 'totara_reportbuilder', $a);
+
+        } else {
+            $result = get_string('toolbarsearchtextiscontainedinmultiple', 'totara_reportbuilder', $toolbarsearchtext);
+            $columnnames = array();
+            foreach ($columns as $column) {
+                $columnobject = self::get_single_item($this->columnoptions, $column->type, $column->value);
+                $columnnames[] = $columnobject->name;
+            }
+            $result .= implode(', ', $columnnames);
+            return $result;
+        }
+    }
+
+    private function process_filters() {
+        global $CFG, $SESSION;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
-        $mform = new report_builder_search_form($this->get_current_url(), array('fields' => $this->filters));
-        $adddata = $mform->get_data(false);
-        $clearfiltersparam = optional_param('clearfilters', 0, PARAM_INT);
-        if ($adddata || $clearfiltersparam) {
-            foreach ($this->filters as $field) {
-                if (isset($adddata->submitgroup['clearfilter']) || $clearfiltersparam) {
+        $clearfilters = optional_param('clearfilters', 0, PARAM_INT);
+        $mformstandard = new report_builder_standard_search_form($this->get_current_url(),
+                array('fields' => $this->get_standard_filters()));
+        $adddatastandard = $mformstandard->get_data(false);
+        if ($adddatastandard || $clearfilters) {
+            foreach ($this->get_standard_filters() as $field) {
+                if (isset($adddatastandard->submitgroupstandard['clearstandardfilters']) || $clearfilters) {
                     // Clear out any existing filters.
                     $field->unset_data();
                 } else {
-                    $data = $field->check_data($adddata);
+                    $data = $field->check_data($adddatastandard);
                     if ($data === false) {
                         // Unset existing result if field has been set back to "not set" position.
                         $field->unset_data();
                     } else {
                         $field->set_data($data);
                     }
+                }
+            }
+        }
+        $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
+                array('report' => $this, 'fields' => $this->get_sidebar_filters()));
+        $adddatasidebar = $mformsidebar->get_data(false);
+        if ($adddatasidebar || $clearfilters) {
+            foreach ($this->get_sidebar_filters() as $field) {
+                if (isset($adddatasidebar->submitgroupsidebar['clearsidebarfilters']) || $clearfilters) {
+                    // Clear out any existing filters.
+                    $field->unset_data();
+                } else {
+                    $data = $field->check_data($adddatasidebar);
+                    if ($data === false) {
+                        // Unset existing result if field has been set back to "not set" position.
+                        $field->unset_data();
+                    } else {
+                        $field->set_data($data);
+                    }
+                }
+            }
+        }
+        $mformtoolbar = new report_builder_toolbar_search_form($this->get_current_url());
+        $adddatatoolbar = $mformtoolbar->get_data(false);
+        if ($adddatatoolbar || $clearfilters) {
+            if (isset($adddatatoolbar->cleartoolbarsearchtext) || $clearfilters) {
+                // Clear out any existing data.
+                unset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']);
+                unset($_POST['toolbarsearchtext']);
+            } else {
+                $data = $adddatatoolbar->toolbarsearchtext;
+                if (empty($data)) {
+                    // Unset existing result if field has been set back to "not set" position.
+                    unset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']);
+                    unset($_POST['toolbarsearchtext']);
+                } else {
+                    $SESSION->reportbuilder[$this->_id]['toolbarsearchtext'] = $data;
                 }
             }
         }
@@ -1151,7 +1324,9 @@ class reportbuilder {
                 $out[] = $res;
             } else if ($all) {
                 // When all parameters required, they are not restricted to particular value.
-                $out[] = new rb_param($name, $this->_paramoptions);
+                if (!empty($param->field)) {
+                    $out[] = new rb_param($name, $this->_paramoptions);
+                }
             } else if (isset($var) || $clearfiltersparam) {
                 if (isset($var)) {
                     // This url param exists, add to params to use.
@@ -1179,11 +1354,62 @@ class reportbuilder {
      *
      * @return Nothing returned but prints the search box
      */
-    function display_search() {
+    public function display_search() {
         global $CFG;
+
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
-        $mform = new report_builder_search_form($this->get_current_url(), array('fields' => $this->filters));
-        $mform->display();
+        $mformstandard = new report_builder_standard_search_form($this->get_current_url(),
+                array('fields' => $this->get_standard_filters()));
+        $mformstandard->display();
+    }
+
+
+    /**
+     * Wrapper for displaying search form from filtering class
+     *
+     * @return Nothing returned but prints the search box
+     */
+    public function display_sidebar_search() {
+        global $CFG, $PAGE;
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        $mformsidebar = new report_builder_sidebar_search_form($this->get_current_url(),
+                array('report' => $this, 'fields' => $this->get_sidebar_filters()), 'post', '', array('class' => 'rb-sidebar'));
+        $mformsidebar->display();
+
+        // If is_capable is not implemented on an embedded report then don't activate instant filters.
+        // Instead, we force the user to use standard form submission (the same as when javascript is not available).
+        if ($this->embedobj && !method_exists($this->embedobj, 'is_capable')) {
+            return;
+        }
+
+        local_js();
+        $jsmodule = array(
+            'name' => 'totara_reportbuilder_instantfilter',
+            'fullpath' => '/totara/reportbuilder/js/instantfilter.js',
+            'requires' => array('json'));
+        $PAGE->requires->js_init_call('M.totara_reportbuilder_instantfilter.init', array('id' => $this->_id), true, $jsmodule);
+    }
+
+
+    public function get_standard_filters() {
+        $result = array();
+        foreach ($this->filters as $key => $filter) {
+            if ($filter->region == rb_filter_type::RB_FILTER_REGION_STANDARD) {
+                $result[$key] = $filter;
+            }
+        }
+        return $result;
+    }
+
+    public function get_sidebar_filters() {
+        $result = array();
+        foreach ($this->filters as $key => $filter) {
+            if ($filter->region == rb_filter_type::RB_FILTER_REGION_SIDEBAR) {
+                $result[$key] = $filter;
+            }
+        }
+        return $result;
     }
 
     /** Returns true if the current user has permission to view this report
@@ -1400,7 +1626,7 @@ class reportbuilder {
                 $value = $param->value;
                 $type = $param->type;
                 // don't include if param not set to anything
-                if (!isset($value) || strlen(trim($value)) == 0) {
+                if (!isset($value) || strlen(trim($value)) == 0 || $param->field == '') {
                     continue;
                 }
 
@@ -1836,12 +2062,21 @@ class reportbuilder {
         $filterjoins = array();
         foreach ($this->filters as $filter) {
             $value = $filter->value;
-            // don't include joins if param not set
+            // Don't include joins if param not set.
             if (!isset($value) || $value == '') {
                 continue;
             }
             $filterjoins = array_merge($filterjoins,
                 $this->get_joins($filter, 'filter'));
+        }
+        foreach ($this->searchcolumns as $searchcolumn) {
+            $value = $searchcolumn->value;
+            // Don't include joins if param not set.
+            if (!isset($value) || $value == '') {
+                continue;
+            }
+            $filterjoins = array_merge($filterjoins,
+                $this->get_joins($searchcolumn, 'searchcolumn'));
         }
         return $filterjoins;
     }
@@ -1853,11 +2088,10 @@ class reportbuilder {
      * @return array An array of arrays containing filter join information
      */
     function get_filter_joins() {
-        $shortname = $this->shortname;
         global $SESSION;
         $filterjoins = array();
-        // check session variable for any active filters
-        // if they exist we need to make sure we have included joins for them too
+        // Check session variable for any active filters.
+        // If they exist we need to make sure we have included joins for them too.
         if (isset($SESSION->reportbuilder[$this->_id]) &&
             is_array($SESSION->reportbuilder[$this->_id])) {
             foreach ($SESSION->reportbuilder[$this->_id] as $fname => $unused) {
@@ -1868,6 +2102,16 @@ class reportbuilder {
 
                 $filterjoins = array_merge($filterjoins,
                     $this->get_joins($filter, 'filter'));
+            }
+        }
+        // Check session variable for toolbar search text.
+        // If it exists we need to make sure we have included joins for it too.
+        if (isset($SESSION->reportbuilder[$this->_id]) &&
+            isset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext'])) {
+            foreach ($this->searchcolumns as $searchcolumn) {
+                $columnoption = $this->get_single_item($this->columnoptions, $searchcolumn->type, $searchcolumn->value);
+                $filterjoins = array_merge($filterjoins,
+                    $this->get_joins($columnoption, 'searchcolumn'));
             }
         }
         return $filterjoins;
@@ -2260,6 +2504,7 @@ class reportbuilder {
             $filter->id = $filterinfo->id;
             $filter->filtername = $filterinfo->filtername;
             $filter->customname = $filterinfo->customname;
+            $filter->region = $filterinfo->region;
             $filters[] = $filter;
         }
         // save columns
@@ -2332,6 +2577,11 @@ class reportbuilder {
                               $this->get_content_fields(),
                               $this->get_alias_fields($this->filters),
                               $this->get_alias_fields($this->_params));
+        // Include all search columns (but not their extrafields).
+        foreach ($this->searchcolumns as $searchcolumn) {
+            $searchcolumnoption = $this->get_single_item($this->columnoptions, $searchcolumn->type, $searchcolumn->value);
+            $fields[] = $searchcolumnoption->field . " AS " . $searchcolumnoption->type . "_" . $searchcolumnoption->value;
+        }
         $fields = array_unique($fields);
         $joins = $this->collect_joins(reportbuilder::FILTERALL);
 
@@ -2401,7 +2651,132 @@ class reportbuilder {
             $where[] = $this->src->sourcewhere;
         }
         $sql = $this->collect_sql($fields, $this->src->base, $joins, $where, $group, $having, $countonly, $allgrouped);
-         return array($sql, $sqlparams, array());
+        return array($sql, $sqlparams, array());
+    }
+
+    /**
+     * Add counts indicating how many records match each option in the sidebar.
+     * Only filter types which define get_showcount_params will show anything.
+     *
+     * @param type $mform form to add the counts onto, which already has filters added
+     */
+    public function add_filter_counts($mform) {
+        global $DB;
+
+        $iscached = $this->is_cached();
+        $isgrouped = $this->grouped;
+        $filters = $this->get_sidebar_filters();
+        $fields = array();
+        $extrajoins = array();
+
+        // Find all the showcount filters.
+        $showcountfilters = array();
+        foreach ($filters as $filter) {
+            $showcountparams = $filter->get_showcount_params();
+            if ($showcountparams !== false) {
+                $showcountfilters[] = $filter;
+
+                if ($iscached) {
+                    // Get these extra fields from the base query.
+                    $fields[] = $filter->fieldalias;
+                } else {
+                    // Get any required fields from the base query.
+                    if (isset($showcountparams['basefields'])) {
+                        $fields = array_merge($fields, $showcountparams['basefields']);
+                    }
+                    if ($isgrouped) {
+                        $fields[] = "{$filter->field} AS {$filter->fieldalias}";
+                    }
+
+                    // Compile a list of extra joins (which will supply the fields above) that should be added to the base query.
+                    if (isset($showcountparams['dependency']) && $showcountparams['dependency'] != 'base') {
+                        $dependency = $this->get_single_join($showcountparams['dependency'], 'filtercount');
+                        $this->get_dependency_joins($extrajoins, $dependency);
+                        if ($isgrouped) {
+                            $extrajoins[] = $dependency;
+                        }
+                    }
+                    if ($isgrouped) {
+                        $extrajoins[] = $this->get_single_join($filter->joins, 'filtercount');
+                    }
+                }
+
+                // Temporarily deactivate the filter so that it is not included in the base sql query.
+                $filter->save_temp_data(null);
+            }
+        }
+
+        // If the base query uses grouping then we need to include all column fields (so that each field can be grouped).
+        if ($isgrouped && !$iscached) {
+            $fields = array_unique(array_merge($fields, $this->get_column_fields()));
+        }
+
+        // If there are none then return, because we do not want to generate an empty query.
+        if (empty($showcountfilters)) {
+            return;
+        }
+
+        // Get all joins for required child tables and active filters.
+        if (!$iscached) {
+            // Grouped reports will include all joins in the base query.
+            $basejoins = $this->collect_joins(self::FILTER, !$isgrouped);
+            $joins = array_merge($basejoins, $extrajoins);
+        } else {
+            $joins = array();
+        }
+
+        // Get all conditions for active filters (except the ones we deactivated).
+        list($where, $group, $having, $sqlparams, $allgrouped) = $this->collect_restrictions(true);
+
+        // Apply any SQL specified by the source.
+        if (!$iscached && !empty($this->src->sourcewhere)) {
+            $where[] = $this->src->sourcewhere;
+        }
+
+        // Get the base sql query with all other joins and (active) filters applied.
+        if ($iscached) {
+            $base = $this->cacheschedule->cachetable;
+        } else {
+            $base = $this->src->base;
+        }
+        $basesql = $this->collect_sql($fields, $base, $joins, $where, $group, $having, false, $allgrouped);
+
+        // Restore all saved filters before we start constructing the main query (must restore ALL filters before the next loop).
+        foreach ($showcountfilters as $filter) {
+            $filter->restore_temp_data();
+        }
+
+        $countscolumns = array();
+        $filtersplustotalscolumns = array("filters.*");
+        $filterscolumns = array("base.id");
+        $showcountjoins = array();
+
+        // Get sql snipets and params for each showcount filter.
+        foreach ($showcountfilters as $filter) {
+            list($addcountscolumns, $addfiltersplustotalscolumn, $addfilterscolumns, $addshowcountjoins, $addsqlparams) =
+                    $filter->get_counts_sql($showcountfilters);
+            $countscolumns = array_merge($countscolumns, $addcountscolumns);
+            $filtersplustotalscolumns[] = $addfiltersplustotalscolumn;
+            $filterscolumns = array_merge($filterscolumns, $addfilterscolumns);
+            $showcountjoins = array_merge($showcountjoins, $addshowcountjoins);
+            $sqlparams = array_merge($sqlparams, $addsqlparams);
+        }
+
+        // Remove duplicate joins.
+        $uniqueshowcountjoins = array_unique($showcountjoins);
+
+        // Construct the main query.
+        $sql = "SELECT\n" . implode(",\n", $countscolumns) . "\nFROM\n(\n" .
+               "   SELECT " . implode(",\n", $filtersplustotalscolumns) . "\n   FROM\n   (\n" .
+               "      SELECT " . implode(",\n", $filterscolumns) . "\n      FROM (\n\n" . $basesql . "\n      ) base\n" .
+                         implode("\n", $uniqueshowcountjoins) . "\n      GROUP BY base.id\n" .
+               "   ) filters\n" . ") filtersplustotals";
+        $counts = $DB->get_record_sql($sql, $sqlparams);
+
+        // Put the counts into the form.
+        foreach ($showcountfilters as $filter) {
+            $filter->set_counts($mform, $counts);
+        }
     }
 
     /**
@@ -2606,9 +2981,10 @@ class reportbuilder {
     /**
      * Return the number of filtered records in this report
      *
+     * @param bool $nocache Ignore cache
      * @return integer Filtered record count
      */
-    function get_filtered_count() {
+    public function get_filtered_count($nocache = false) {
         global $DB;
 
         // Don't do the calculation if the results are initially hidden.
@@ -2617,7 +2993,7 @@ class reportbuilder {
         }
 
         // Use cached value if present.
-        if (empty($this->_filteredcount)) {
+        if (empty($this->_filteredcount) || $nocache) {
             list($sql, $params) = $this->build_query(true, true);
             $this->_filteredcount = $DB->count_records_sql($sql, $params);
         }
@@ -2671,12 +3047,9 @@ class reportbuilder {
      * @return No return value but prints the current data table
      */
     function display_table() {
-        global $DB, $OUTPUT;
+        global $SESSION, $DB, $OUTPUT, $PAGE;
 
-        if ($this->is_initially_hidden()) {
-            echo get_string('initialdisplay_pending', 'totara_reportbuilder');
-            return;
-        }
+        $initiallyhidden = $this->is_initially_hidden();
 
         define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
         define('SHOW_ALL_PAGE_SIZE', 9999);
@@ -2704,10 +3077,10 @@ class reportbuilder {
             }
         }
 
-        // prevent notifications boxes inside the table
-        echo $OUTPUT->container_start('nobox');
+        // Prevent notifications boxes inside the table.
+        echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow', $this->_id);
 
-        // Output cache information if needed
+        // Output cache information if needed.
         if ($cache) {
             $usertz = totara_get_clean_timezone();
             $lastreport = userdate($cache['lastreport'], '', $usertz);
@@ -2720,7 +3093,17 @@ class reportbuilder {
             $html .= html_writer::end_tag('div');
             echo $html;
         }
-        $table = new flexible_table($shortname);
+
+        // Start the table.
+        $table = new totara_table($shortname);
+        if ($this->toolbarsearch && $this->has_toolbar_filter()) {
+            $toolbarsearchtext = isset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']) ?
+                    $SESSION->reportbuilder[$this->_id]['toolbarsearchtext'] : '';
+            $mform = new report_builder_toolbar_search_form($this->report_url(),
+                    array('toolbarsearchtext' => $toolbarsearchtext), 'post', '', null, true, 'toolbarsearch');
+            $table->add_toolbar_content($mform->render());
+        }
+
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
         $table->define_baseurl($this->get_current_url());
@@ -2768,41 +3151,58 @@ class reportbuilder {
         $table->setup();
         $table->initialbars(true);
         $table->pagesize($perpage, $countfiltered);
+        $table->add_toolbar_pagination('right');
 
-        // get the ORDER BY SQL fragment from table
-        $order = $this->get_report_sort($table);
-        try {
-            if ($records = $DB->get_recordset_sql($sql.$order, $params, $table->get_page_start(), $perpage)) {
-                $count = $this->get_filtered_count();
-                $location = 0;
-                foreach ($records as $record) {
-                    $record_data = $this->process_data_row($record);
-                    if (++$location == $count % $perpage || $location == $perpage) {
-                        $table->add_data($record_data, 'last');
-                    } else {
-                        $table->add_data($record_data);
-                    }
-                }
-            } else if ($data === false) {
-                print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
-            }
-        } catch (dml_read_exception $e) {
-            if ($this->is_cached()) {
-                print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder');
+        if ($initiallyhidden) {
+            $table->set_no_records_message(get_string('initialdisplay_pending', 'totara_reportbuilder'));
+        } else {
+            if ($this->is_report_filtered()) {
+                $table->set_no_records_message(get_string('norecordswithfilter', 'totara_reportbuilder'));
             } else {
-                print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
+                $table->set_no_records_message(get_string('norecordsinreport', 'totara_reportbuilder'));
+            }
+            // Get the ORDER BY SQL fragment from table.
+            $order = $this->get_report_sort($table);
+            try {
+                if ($records = $DB->get_recordset_sql($sql.$order, $params, $table->get_page_start(), $perpage)) {
+                    $count = $this->get_filtered_count();
+                    $location = 0;
+                    foreach ($records as $record) {
+                        $record_data = $this->process_data_row($record);
+                        if (++$location == $count % $perpage || $location == $perpage) {
+                            $table->add_data($record_data, 'last');
+                        } else {
+                            $table->add_data($record_data);
+                        }
+                    }
+                } else if ($data === false) {
+                    print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
+                }
+            } catch (dml_read_exception $e) {
+                if ($this->is_cached()) {
+                    print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder');
+                } else {
+                    print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
+                }
             }
         }
 
         // display the table
         $table->print_html();
 
+        local_js();
+        $jsmodule = array(
+            'name' => 'totara_reportbuilder_expand',
+            'fullpath' => '/totara/reportbuilder/js/expand.js',
+            'requires' => array('json'));
+        $PAGE->requires->js_init_call('M.totara_reportbuilder_expand.init', array(), true, $jsmodule);
+
         // end of .nobox div
         echo $OUTPUT->container_end();
     }
 
     /**
-     * If a redirect url has been displayed in the source then output a redirect link.
+     * If a redirect url has been specified in the source then output a redirect link.
      */
     public function display_redirect_link() {
         if (isset($this->src->redirecturl)) {
@@ -2816,6 +3216,16 @@ class reportbuilder {
     }
 
     /**
+     *
+     */
+    public function get_expand_content($expandname) {
+        $func = 'rb_expand_' . $expandname;
+        if (method_exists($this->src, $func)) {
+            return $this->src->$func();
+        }
+    }
+
+    /**
      * Determine if the report should be hidden due to the initialdisplay setting.
      */
     public function is_initially_hidden() {
@@ -2823,15 +3233,17 @@ class reportbuilder {
             return $this->_isinitiallyhidden;
         }
 
-        $searched = optional_param_array('submitgroup', array(), PARAM_ALPHANUM);
-        $override_initial = isset($searched['addfilter']);
+        $searchedstandard = optional_param_array('submitgroupstandard', array(), PARAM_ALPHANUM);
+        $searchedsidebar = optional_param_array('submitgroupstandard', array(), PARAM_ALPHANUM);
+        $toolbarsearch = optional_param('toolbarsearchbutton', false, PARAM_TEXT);
+        $overrideinitial = isset($searchedstandard['addfilter']) || isset($searchedsidebar['addfilter']) || $toolbarsearch;
+
         $this->_isinitiallyhidden = ($this->initialdisplay == RB_INITIAL_DISPLAY_HIDE &&
-                !$override_initial &&
+                !$overrideinitial &&
                 !$this->is_report_filtered());
 
         return $this->_isinitiallyhidden;
     }
-
 
     /**
      * Get column identifiers of columns that should be hidden on page load
@@ -2917,7 +3329,9 @@ class reportbuilder {
                     if (method_exists($this->src, $func)) {
                         // Get extrafields for column and rename them before passing them to display function.
                         $extrafields = $this->get_extrafields_row($record, $column);
-                        if ($column->displayfunc == 'customfield_textarea' || $column->displayfunc == 'customfield_file' || $column->displayfunc == 'tinymce_textarea') {
+                        if (in_array($column->displayfunc, array('customfield_textarea',
+                            'customfield_multiselect_icon', 'customfield_multiselect_text',
+                            'customfield_file', 'tinymce_textarea'))) {
                             $tabledata[] = $this->src->$func($field, $record->$field, $extrafields, $isexport);
                         } else if (($column->displayfunc == 'nice_date' || $column->displayfunc == 'nice_datetime') && $excel) {
                             $tabledata[] = $record->$field;
@@ -3467,39 +3881,145 @@ class reportbuilder {
      *
      * @return array An Array with $type-$value as key and $label as value
      */
-    function get_filters_select() {
-        $filters = $this->filteroptions;
+    public function get_filters_select($onlyinstant = false) {
         $ret = array();
         if (!isset($this->filteroptions)) {
             return $ret;
         }
 
-        // are we handling a 'group' source?
+        $filters = $this->filteroptions;
+
+        // Are we handling a 'group' source?
         if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
-            // use original source name (minus any suffix)
+            // Use original source name (minus any suffix).
             $sourcename = $matches[1];
         } else {
-            // standard source
+            // Standard source.
             $sourcename = $this->source;
         }
 
         foreach ($filters as $filter) {
-            $langstr = 'type_' . $filter->type;
-            // is there a type string in the source file?
-            if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
-                $section = get_string($langstr, 'rb_source_' . $sourcename);
-            // how about in report builder?
-            } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
-                $section = get_string($langstr, 'totara_reportbuilder');
-            } else {
-            // fall back on original approach to cope with dynamic types in feedback sources
-                $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $filter->type));
-            }
+            if (!$onlyinstant || in_array($filter->filtertype, array('date', 'select', 'multicheck'))) {
+                $langstr = 'type_' . $filter->type;
+                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+                    // Is there a type string in the source file?
+                    $section = get_string($langstr, 'rb_source_' . $sourcename);
+                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+                    // How about in report builder?
+                    $section = get_string($langstr, 'totara_reportbuilder');
+                } else {
+                    // Fall back on original approach to cope with dynamic types in feedback sources.
+                    $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $filter->type));
+                }
 
-            $key = $filter->type . '-' . $filter->value;
-            $ret[$section][$key] = format_string($filter->label);
+                $key = $filter->type . '-' . $filter->value;
+                $ret[$section][$key] = $filter->label;
+            }
         }
         return $ret;
+    }
+
+    /**
+     * Parses the search columns data for this source into a data structure
+     * suitable for an HTML select pulldown.
+     *
+     * @return array An Array with $type-$value as key and $label as value
+     */
+    public function get_search_columns_select() {
+        $ret = array();
+        if (!isset($this->columnoptions)) {
+            return $ret;
+        }
+
+        $columnoptions = $this->columnoptions;
+
+        // Are we handling a 'group' source?
+        if (preg_match('/^(.+)_grp_([0-9]+|all)$/', $this->source, $matches)) {
+            // Use original source name (minus any suffix).
+            $sourcename = $matches[1];
+        } else {
+            // Standard source.
+            $sourcename = $this->source;
+        }
+
+        foreach ($columnoptions as $columnoption) {
+            if ($columnoption->is_searchable()) {
+                $langstr = 'type_' . $columnoption->type;
+                if (get_string_manager()->string_exists($langstr, 'rb_source_' . $sourcename)) {
+                    // Is there a type string in the source file?
+                    $section = get_string($langstr, 'rb_source_' . $sourcename);
+                } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
+                    // How about in report builder?
+                    $section = get_string($langstr, 'totara_reportbuilder');
+                } else {
+                    // Fall back on original approach to cope with dynamic types in feedback sources.
+                    $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $columnoption->type));
+                }
+
+                $key = $columnoption->type . '-' . $columnoption->value;
+                $ret[$section][$key] = format_string($columnoption->name);
+            }
+        }
+        return $ret;
+    }
+
+    public function get_all_filters_select() {
+        // Standard filters.
+        $allstandardfilters = array_merge(
+                array(get_string('new') => array(0 => get_string('addanotherfilter', 'totara_reportbuilder'))),
+                $this->get_filters_select());
+        $unusedstandardfilters = $allstandardfilters;
+        foreach ($allstandardfilters as $okey => $optgroup) {
+            foreach ($optgroup as $typeval => $filtername) {
+                $typevalarr = explode('-', $typeval);
+                foreach ($this->filters as $curfilter) {
+                    if (($curfilter->region == rb_filter_type::RB_FILTER_REGION_STANDARD ||
+                         $curfilter->region == rb_filter_type::RB_FILTER_REGION_SIDEBAR) &&
+                         $curfilter->type == $typevalarr[0] && $curfilter->value == $typevalarr[1]) {
+                        unset($unusedstandardfilters[$okey][$typeval]);
+                    }
+                }
+            }
+        }
+
+        // Sidebar filters.
+        $allsidebarfilters = array_merge(
+                array(get_string('new') => array(0 => get_string('addanotherfilter', 'totara_reportbuilder'))),
+                $this->get_filters_select(true));
+        $unusedsidebarfilters = $allsidebarfilters;
+        foreach ($allsidebarfilters as $okey => $optgroup) {
+            foreach ($optgroup as $typeval => $filtername) {
+                $typevalarr = explode('-', $typeval);
+                foreach ($this->filters as $curfilter) {
+                    if (($curfilter->region == rb_filter_type::RB_FILTER_REGION_STANDARD ||
+                         $curfilter->region == rb_filter_type::RB_FILTER_REGION_SIDEBAR) &&
+                         $curfilter->type == $typevalarr[0] && $curfilter->value == $typevalarr[1]) {
+                        unset($unusedsidebarfilters[$okey][$typeval]);
+                    }
+                }
+            }
+        }
+
+        // Search columns.
+        $allsearchcolumns = array_merge(
+            array(get_string('new') => array(0 => get_string('addanothersearchcolumn', 'totara_reportbuilder'))),
+            $this->get_search_columns_select());
+        // Remove already-added search columns from the new search column selectors.
+        $unusedsearchcolumns = $allsearchcolumns;
+        foreach ($allsearchcolumns as $okey => $optgroup) {
+            foreach ($optgroup as $typeval => $searchcolumnname) {
+                $typevalarr = explode('-', $typeval);
+                foreach ($this->searchcolumns as $cursearchcolumn) {
+                    if ($cursearchcolumn->type == $typevalarr[0] && $cursearchcolumn->value == $typevalarr[1]) {
+                        unset($unusedsearchcolumns[$okey][$typeval]);
+                    }
+                }
+            }
+        }
+
+        return compact('allstandardfilters', 'unusedstandardfilters',
+                       'allsidebarfilters', 'unusedsidebarfilters',
+                       'allsearchcolumns', 'unusedsearchcolumns');
     }
 
     /**
@@ -3635,6 +4155,21 @@ class reportbuilder {
         $transaction->allow_commit();
 
         $this->filters = $this->get_filters();
+        return true;
+    }
+
+    /**
+     * Given a search column id, removes that search column from the current report
+     *
+     * @param integer $searchcolumnid ID of the search column to be removed
+     * @return boolean True on success, false otherwise
+     */
+    public function delete_search_column($searchcolumnid) {
+        global $DB;
+
+        $DB->delete_records('report_builder_search_cols', array('id' => $searchcolumnid));
+
+        $this->searchcolumns = $this->get_search_columns();
         return true;
     }
 
@@ -4282,6 +4817,10 @@ function sql_group_concat($field, $delimiter=', ', $unique=false) {
             $distinct = $unique ? 'TRUE' : 'FALSE';
             $sql = " GROUP_CONCAT($field, '$delimiter', $distinct) ";
             break;
+        case 'mssql':
+            $distinct = $unique ? 'DISTINCT' : '';
+            $sql = " dbo.GROUP_CONCAT_D($distinct $field, '$delimiter') ";
+        break;
     }
 
     return $sql;
@@ -4977,6 +5516,9 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
         $error = 'Bad columns';
         return false;
     }
+    if (!isset($embed->toolbarsearchcolumns) || !is_array($embed->toolbarsearchcolumns)) {
+        $embed->toolbarsearchcolumns = array();
+    }
     // hide embedded reports from report manager by default
     $embed->hidden = isset($embed->hidden) ? $embed->hidden : 1;
     $embed->accessmode = isset($embed->accessmode) ? $embed->accessmode : 0;
@@ -5024,14 +5566,28 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
             $todb->reportid = $newid;
             $todb->type = $filter['type'];
             $todb->value = $filter['value'];
-            $todb->advanced = $filter['advanced'];
-            $todb->filtername = '';
-            $todb->customname = 0; // Initially no filters are customised.
+            $todb->advanced = isset($filter['advanced']) ? $filter['advanced'] : 0;
+            if (isset($filter['fieldname'])) {
+                $todb->filtername = $filter['fieldname'];
+                $todb->customname =  1;
+            } else {
+                $todb->filtername = '';
+                $todb->customname =  0;
+            }
             $todb->sortorder = $so;
+            $todb->region = isset($filter['region']) ? $filter['region'] : rb_filter_type::RB_FILTER_REGION_STANDARD;
             $DB->insert_record('report_builder_filters', $todb);
             $so++;
         }
-        // add content restrictions
+        // Add toolbar search columns.
+        foreach ($embed->toolbarsearchcolumns as $toolbarsearchcolumn) {
+            $todb = new stdClass();
+            $todb->reportid = $newid;
+            $todb->type = $toolbarsearchcolumn['type'];
+            $todb->value = $toolbarsearchcolumn['value'];
+            $DB->insert_record('report_builder_search_cols', $todb);
+        }
+        // Add content restrictions.
         foreach ($embed->contentsettings as $option => $settings) {
             $classname = $option . '_content';
             if (class_exists('rb_' . $classname)) {

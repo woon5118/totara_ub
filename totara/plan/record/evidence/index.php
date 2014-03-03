@@ -47,10 +47,6 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_url('/totara/plan/record/evidence/index.php', array('userid' => $userid, 'format' => $format, 'status' => $rolstatus));
 
-if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
-    print_error('error:cannotviewpage', 'totara_plan');
-}
-
 if ($USER->id == $userid) {
     $strheading = get_string('recordoflearning', 'totara_core');
     $usertype = 'learner';
@@ -108,6 +104,7 @@ echo $OUTPUT->heading($heading);
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

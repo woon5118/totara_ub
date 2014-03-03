@@ -54,7 +54,7 @@ class customfield_define_menu extends customfield_define_base {
         return $err;
     }
 
-    function define_save_preprocess($data) {
+    function define_save_preprocess($data, $old = null) {
         $data->param1 = trim(str_replace("\r", '', $data->param1));
 
         return $data;

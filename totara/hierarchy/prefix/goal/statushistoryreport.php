@@ -47,9 +47,6 @@ $url->params($data);
 
 admin_externalpage_setup('goalreport', '', null, $url);
 
-$systemcontext = context_system::instance();
-require_capability('totara/hierarchy:viewgoalreport', $systemcontext);
-
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if (!$report = reportbuilder_get_embedded_report('goal_status_history', $data, false, $sid)) {
@@ -80,6 +77,7 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->include_js();
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

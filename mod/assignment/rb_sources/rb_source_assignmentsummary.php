@@ -93,16 +93,33 @@ class rb_source_assignmentsummary extends rb_base_source {
     protected function _define_columnoptions() {
         $a = array();
 
-        // assignment columns
-        $cols = array('name', 'intro', 'maxgrade');
-        foreach ($cols as $col) {
-            $a[] = new rb_column_option(
-                'base',
-                $col,
-                $this->_get_string("assignment{$col}"),
-                "base.assignment_{$col}"
-            );
-        }
+        // Assignment name.
+        $a[] = new rb_column_option(
+            'base',
+            'name',
+            $this->_get_string("assignmentname"),
+            "base.assignment_name",
+            array('dbdatatype' => 'char',
+                  'outputformat' => 'text')
+        );
+
+        // Assignment intro.
+        $a[] = new rb_column_option(
+            'base',
+            'intro',
+            $this->_get_string("assignmentintro"),
+            "base.assignment_intro",
+            array('dbdatatype' => 'text',
+                  'outputformat' => 'text')
+        );
+
+        // Assignment maxgrade.
+        $a[] = new rb_column_option(
+            'base',
+            'maxgrade',
+            $this->_get_string("assignmentmaxgrade"),
+            "base.assignment_maxgrade"
+        );
 
         // assignment type
         $a[] = new rb_column_option(

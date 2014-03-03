@@ -170,7 +170,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                         'fileid' => 'sessions.id',
                         'context' => '\'context_module\'',
                         'recordid' => 'sessions.facetoface'
-                    )
+                    ),
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(
@@ -202,7 +204,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'session',
                 'discountcode',
                 get_string('discountcode', 'rb_source_facetoface_sessions'),
-                'base.discountcode'
+                'base.discountcode',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'session',
@@ -211,6 +215,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'sessions.normalcost',
                 array(
                     'joins' => 'sessions',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(
@@ -220,6 +226,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'sessions.discountcost',
                 array(
                     'joins' => 'sessions',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(
@@ -227,7 +235,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'name',
                 get_string('ftfname', 'rb_source_facetoface_sessions'),
                 'facetoface.name',
-                array('joins' => 'facetoface')
+                array('joins' => 'facetoface',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'facetoface',
@@ -300,28 +310,36 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'cancellationreason',
                 get_string('cancellationreason', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.note',
-                array('joins' => 'cancellationstatus')
+                array('joins' => 'cancellationstatus',
+                      'dbdatatype' => 'text',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'name',
                 get_string('roomname', 'rb_source_facetoface_sessions'),
                 'room.name',
-                array('joins' => 'room')
+                array('joins' => 'room',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'building',
                 get_string('building', 'rb_source_facetoface_sessions'),
                 'room.building',
-                array('joins' => 'room')
+                array('joins' => 'room',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
                 'address',
                 get_string('address', 'rb_source_facetoface_sessions'),
                 'room.address',
-                array('joins' => 'room')
+                array('joins' => 'room',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'room',
@@ -335,7 +353,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'description',
                 get_string('roomdescription', 'rb_source_facetoface_sessions'),
                 'room.description',
-                array('joins' => 'room')
+                array('joins' => 'room',
+                      'dbdatatype' => 'text',
+                      'outputformat' => 'text')
             ),
         );
 
@@ -695,7 +715,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                     $key,
                     get_string('sessionx', 'rb_source_facetoface_sessions', $name),
                     $key.'.data',
-                    array('joins' => $key)
+                    array('joins' => $key,
+                          'dbdatatype' => 'char',
+                          'outputformat' => 'text')
                 );
             }
             return true;
@@ -742,6 +764,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'joins' => $userkey,
                     'grouping' => 'comma_list_unique',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             );
         }

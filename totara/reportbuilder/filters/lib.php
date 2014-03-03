@@ -22,15 +22,18 @@
  * @package totara
  * @subpackage reportbuilder
  */
-require_once($CFG->dirroot . '/totara/reportbuilder/filters/filter_forms.php');
 
 /**
  * The base filter class. All abstract classes must be implemented.
  */
 class rb_filter_type {
+    const RB_FILTER_REGION_STANDARD = 0;
+    const RB_FILTER_REGION_SIDEBAR = 1;
+
     public $type;
     public $value;
     public $advanced;
+    public $region;
     public $filtertype;
     public $label;
     /**
@@ -57,14 +60,16 @@ class rb_filter_type {
      * @param string $value The filter value (from the db or embedded source)
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
+     * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
      *
      * @return filter_* object
      */
-    function __construct($type, $value, $advanced, $report) {
+    public function __construct($type, $value, $advanced, $region, $report) {
         $this->type = $type;
         $this->value = $value;
         $this->advanced = $advanced;
+        $this->region = $region;
         $this->report = $report;
         $this->name = "{$type}-{$value}";
 
@@ -288,7 +293,7 @@ class rb_filter_type {
      *
      * @return @object A filter_[type] object or false
      */
-    static function get_filter($type, $value, $advanced, $report) {
+    public static function get_filter($type, $value, $advanced, $region, $report) {
         global $CFG;
 
         // figure out what sort of filter it is
@@ -305,7 +310,7 @@ class rb_filter_type {
             return false;
         }
 
-        return new $classname($type, $value, $advanced, $report);
+        return new $classname($type, $value, $advanced, $region, $report);
     }
 
 
@@ -357,10 +362,19 @@ class rb_filter_type {
      */
     function set_data($data) {
         global $SESSION;
-
         $fieldname = $this->name;
-
         $SESSION->reportbuilder[$this->report->_id][$fieldname] = $data;
+    }
+
+    /**
+     * Has data
+     *
+     * @return bool true if the filter is active.
+     */
+    public function has_data() {
+        global $SESSION;
+        $fieldname = $this->name;
+        return isset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
     }
 
     /**
@@ -387,6 +401,16 @@ class rb_filter_type {
     }
 
     /**
+     * Get showcount params.
+     *
+     * @return returns the showcount parameters, otherwise false.
+     * If true then filter needs to define save_temp_data, restore_temp_data, set_counts.
+     */
+    public function get_showcount_params() {
+        return false;
+    }
+
+    /**
      * Adds controls specific to this filter in the form.
      * @param object $mform a MoodleForm object to setup
      */
@@ -401,6 +425,13 @@ class rb_filter_type {
      */
     function get_label($data) {
         print_error('abstractmethodcalled', 'totara_reportbuilder', '', 'get_label()');
+    }
+
+    public static function get_all_regions() {
+        $regions = array();
+        $regions[self::RB_FILTER_REGION_STANDARD] = 'standard';
+        $regions[self::RB_FILTER_REGION_SIDEBAR] = 'sidebar';
+        return $regions;
     }
 }
 

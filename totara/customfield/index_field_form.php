@@ -78,6 +78,7 @@ class field_form extends moodleform {
 
     //double-check that filepickers have unique set to off
     function set_data($field) {
+        $this->field->define_load_preprocess($field);
         if($field->datatype == 'file' && $field->forceunique == 1) {
             $field->forceunique = 0;
         }

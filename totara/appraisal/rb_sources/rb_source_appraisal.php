@@ -157,7 +157,9 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('userappraisalactivestagenamecolumn', 'rb_source_appraisal'),
                 'activestage.name',
                 array('joins' => 'activestage',
-                      'defaultheading' => get_string('userappraisalactivestagenameheading', 'rb_source_appraisal'))
+                      'defaultheading' => get_string('userappraisalactivestagenameheading', 'rb_source_appraisal'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'userappraisal',
@@ -174,7 +176,9 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('appraisalnamecolumn', 'rb_source_appraisal'),
                 'appraisal.name',
                 array('joins' => 'appraisal',
-                      'defaultheading' => get_string('appraisalnameheading', 'rb_source_appraisal'))
+                      'defaultheading' => get_string('appraisalnameheading', 'rb_source_appraisal'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'appraisal',

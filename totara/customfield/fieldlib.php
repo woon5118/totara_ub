@@ -124,7 +124,8 @@ class customfield_base {
             // field not present in form, probably locked and invisible - skip it
             return;
         }
-        $itemnew->{$this->inputname} = $this->edit_save_data_preprocess($itemnew->{$this->inputname});
+        $rawdata = $itemnew->{$this->inputname};
+        $itemnew->{$this->inputname} = $this->edit_save_data_preprocess($rawdata);
 
         $data = new stdClass();
         $data->{$prefix.'id'} = $itemnew->id;
@@ -135,8 +136,9 @@ class customfield_base {
             $data->id = $dataid;
             $DB->update_record($tableprefix.'_info_data', $data);
         } else {
-            $DB->insert_record($tableprefix.'_info_data', $data);
+            $this->dataid = $DB->insert_record($tableprefix.'_info_data', $data);
         }
+        $this->edit_save_data_postprocess($rawdata);
     }
 
     /**
@@ -217,6 +219,14 @@ class customfield_base {
         return $data;
     }
 
+    /**
+     * Hook for child classes to process the data after it gets saved in database (dataid is set)
+     * @param   mixed
+     * @return  null
+     */
+    public function edit_save_data_postprocess($data) {
+        return null;
+    }
     /**
      * Loads an object with data for this field ready for the edit form
      * form
@@ -497,29 +507,6 @@ function customfield_get_fields($item, $tableprefix, $prefix) {
     return $out;
 }
 
-
-/**
- * Return the HTML to display a set of table rows containing the custom fields
- *
- * Just the table rows are returned, no HTML table tags
- *
- * @param integer $itemid ID of the item the fields belong to
- * @param string $tableprefix Prefix to append '_info_field' to
- * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
- *
- * @return string HTML to display the table rows
- */
-function customfield_display_fields($itemid, $tableprefix, $prefix) {
-    global $DB;
-
-    $fields = $DB->get_fields($itemid, $tableprefix, $prefix);
-
-    foreach ($fields as $field => $data) {
-        echo html_writer::tag('tr',
-                html_writer::tag('th', $field, array('class' => 'label c0')) .
-                html_writer::tag('td', $data, array('class' => 'info c1')));
-    }
-}
 
 /**
  * Returns an object with the custom fields set for the given id

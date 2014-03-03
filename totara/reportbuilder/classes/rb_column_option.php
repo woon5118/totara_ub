@@ -252,6 +252,23 @@ class rb_column_option {
     public $columngenerator;
 
     /**
+     * String indicating the data type of this column when retrieved from the database. Valid options are:
+     * 'unspecified' (default if parameter is not specified)
+     * 'char'
+     * 'text'
+     * Other formats may be defined in the future.
+     */
+    public $dbdatatype;
+
+    /**
+     * String indicating the format that the column will output. Valid options are:
+     * 'unspecified' (default if parameter is not specified)
+     * 'text'
+     * Other formats may be defined in the future.
+     */
+    public $outputformat;
+
+    /**
      * Generate a new column option instance
      *
      * Options provided by an associative array, e.g.:
@@ -282,7 +299,9 @@ class rb_column_option {
             'nosort' => false,
             'hidden' => 0,
             'selectable' => true,
-            'columngenerator' => null
+            'columngenerator' => null,
+            'dbdatatype' => 'unspecified',
+            'outputformat' => 'unspecified'
         );
         $options = array_merge($defaults, $options);
 
@@ -296,6 +315,17 @@ class rb_column_option {
             $this->$property = $options[$property];
         }
 
+    }
+
+    /**
+     * Determines if this column option can be used in the toolbar search.
+     *
+     * @return bool true if it can be searched
+     */
+    public function is_searchable() {
+        return (($this->dbdatatype == 'char' || $this->dbdatatype == 'text') &&
+                $this->outputformat == 'text' &&
+                $this->grouping == 'none');
     }
 
 } // end of rb_column_option class

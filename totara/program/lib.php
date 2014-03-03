@@ -1919,7 +1919,7 @@ function prog_format_seconds($seconds, $timeonly = false) {
 }
 
 /**
- * Returns list of programs current $USER is assigned to.
+ * Returns list of programs user is assigned to.
  *
  * @param int $userid ID of a user
  * @param string|array $fields Fields to return
@@ -1927,10 +1927,10 @@ function prog_format_seconds($seconds, $timeonly = false) {
  * @return array
  */
 function prog_get_all_users_programs($userid, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB, $USER;
+    global $DB;
 
     // Guest account does not have any programs.
-    if (isguestuser() or !isloggedin()) {
+    if (isguestuser($userid) || !isloggedin()) {
         return(array());
     }
 

@@ -82,7 +82,7 @@ class customfield_define_datetime extends customfield_define_base {
      * @param   object   data from the add/edit custom field form
      * @return  object   processed data object
      */
-    function define_save_preprocess($data) {
+    function define_save_preprocess($data, $old = null) {
         if (empty($data->param3)) {
             $data->param3 = NULL;
         }

@@ -109,6 +109,7 @@ echo $output->print_description($report->description, $report->_id);
 
 // print filters
 $report->display_search();
+$report->display_sidebar_search();
 
 // print saved search buttons if appropriate
 echo $report->display_saved_search_options();
@@ -125,4 +126,3 @@ if ($graph) {
 $output->export_select($report->_id, $sid);
 
 echo $output->footer();
-

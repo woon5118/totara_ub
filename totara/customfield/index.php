@@ -39,10 +39,13 @@ $id             = optional_param('id', 0, PARAM_INT); // id of a custom field
 $sitecontext = context_system::instance();
 
 // use $prefix to determine where to get custom field data from
-if ($prefix == 'course') {
-    $shortprefix = 'course';
+if (in_array($prefix, array('course', 'program'))) {
+    if ($prefix == 'program') {
+        $tableprefix = $shortprefix = 'prog';
+    } else {
+        $tableprefix = $shortprefix = $prefix;
+    }
     $adminpagename = 'coursecustomfields';
-    $tableprefix = $shortprefix;
 
     $can_add = has_capability('totara/core:create'.$prefix.'customfield', $sitecontext);
     $can_edit = has_capability('totara/core:update'.$prefix.'customfield', $sitecontext);
@@ -88,15 +91,16 @@ if ($typeid) {
 
 } else if ($prefix == 'course') {
     $pagetitle = format_string(get_string('coursecustomfields', 'totara_customfield'));
-    $PAGE->navbar->add(get_string('administration'));
-    $PAGE->navbar->add(get_string('courses'));
     $PAGE->navbar->add(get_string('coursecustomfields', 'totara_customfield'));
+} else if ($prefix == 'program') {
+    $pagetitle = format_string(get_string('programcertcustomfields', 'totara_customfield'));
+    $PAGE->navbar->add(get_string('programcertcustomfields', 'totara_customfield'));
 }
 
 $navlinks = $PAGE->navbar->has_items();
 
 // set the capability prefix
-$capability_prefix = ($shortprefix == 'course') ? 'core' : 'hierarchy';
+$capability_prefix = (in_array($prefix, array('course', 'program'))) ? 'core' : 'hierarchy';
 
 admin_externalpage_setup($adminpagename, '', array('prefix' => $prefix));
 
@@ -158,12 +162,16 @@ switch ($action) {
         break;
     default:
 }
-// Display page header
 
+// Display page header.
 echo $OUTPUT->header();
 
-// Print return to type link
-if ($prefix != 'course') {
+if (in_array($prefix, array('course', 'program'))) {
+    // Show tab.
+    $currenttab = $prefix;
+    include_once('tabs.php');
+} else {
+    // Print return to type link.
     $url = $OUTPUT->action_link(new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => $prefix, 'typeid' => $typeid)),
                                 "&laquo; " . get_string('alltypes', 'totara_hierarchy'));
     echo html_writer::tag('p', $url);
@@ -171,10 +179,12 @@ if ($prefix != 'course') {
 
 if ($prefix == 'course') {
     $heading = get_string('coursecustomfields', 'totara_customfield');
-    echo $OUTPUT->heading($heading, 1);
+} else if ($prefix == 'program') {
+    $heading = get_string('programcertcustomfields', 'totara_customfield');
 } else {
-    echo $OUTPUT->heading(format_string($type->fullname), 1);
+    $heading = format_string($type->fullname);
 }
+echo $OUTPUT->heading($heading, 1);
 
 // show custom fields for the given type
 $table = new html_table();
@@ -184,13 +194,15 @@ if ($can_edit || $can_delete) {
 }
 if ($prefix == 'course') {
     $table->id = 'customfields_course';
+} else if ($prefix == 'program') {
+    $table->id = 'customfields_program';
 } else {
     $table->id = 'customfields_'.$hierarchy->prefix;
 }
 $table->data = array();
 
-$select = ($typeid) ? array('typeid' => $typeid) : null;
-$fields = $DB->get_records($tableprefix.'_info_field', $select, 'sortorder ASC');
+$where = ($typeid) ? array('typeid' => $typeid) : array();
+$fields = customfield_get_defined_fields($tableprefix, $where);
 
 $fieldcount = count($fields);
 
@@ -211,7 +223,7 @@ echo html_writer::empty_tag('br');
 $options = customfield_list_datatypes();
 
 if ($can_add) {
-    if ($prefix == 'course') {
+    if (in_array($prefix, array('course', 'program'))) {
         $select = new single_select(new moodle_url('/totara/customfield/index.php', array('prefix' => $prefix, 'id' => 0, 'action' => 'editfield', 'datatype' => '')), 'datatype', $options, '', array(''=>'choosedots'), 'newfieldform');
         $select->set_label(get_string('createnewcustomfield', 'totara_customfield'));
         echo $OUTPUT->render($select);

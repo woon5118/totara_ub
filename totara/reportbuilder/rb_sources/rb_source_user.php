@@ -223,6 +223,8 @@ class rb_source_user extends rb_base_source {
                                 'userpic_imagealt' => 'base.imagealt',
                                 'userpic_email' => 'base.email'
                             ),
+                            'dbdatatype' => 'char',
+                            'outputformat' => 'text'
                         )
         );
 

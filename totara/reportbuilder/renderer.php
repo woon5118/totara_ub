@@ -490,6 +490,40 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Returns HTML for a button that lets users show and hide report columns
+     * interactively within the report
+     *
+     * JQuery, dialog code and showhide.js.php should be included in page
+     * when this is used (see code in report.php)
+     *
+     * @param int $reportid
+     * @param string $reportshortname the report short name
+     * @return string HTML to display the button
+     */
+    public function expand_container($content) {
+        $html = '';
+
+        // We put the data in a container so that jquery can search inside it.
+        $html .= html_writer::start_div('rb-expand-container');
+
+        // We need to construct a table with one row and one column so that the row can be inserted into the existing table.
+        $cell = new html_table_cell(html_writer::span($content));
+        $cell->attributes['class'] = 'rb-expand-cell';
+
+        $row = new html_table_row(array($cell));
+        $row->attributes['class'] = 'rb-expand-row';
+
+        $table = new html_table();
+        $table->data = array($row);
+        $html .= html_writer::table($table);
+
+        // Close the container.
+        $html .= html_writer::end_div();
+
+        return $html;
+    }
+
+    /**
      * Print the description of a report
      *
      * @param string $description
@@ -532,7 +566,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $a->unfiltered = $countall;
             $heading = get_string('xofy' . $resultstr, 'totara_reportbuilder', $a);
         }
-        return $heading;
+        return html_writer::span($heading, 'rb-record-count');
     }
 
     /**

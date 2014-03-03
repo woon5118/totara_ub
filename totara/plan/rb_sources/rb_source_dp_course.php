@@ -46,7 +46,25 @@ class rb_source_dp_course extends rb_base_source {
     public function __construct() {
         global $DB;
 
-        $this->base = "(select distinct ".
+        $this->base = self::get_base_sql();
+        $this->joinlist = $this->define_joinlist();
+        $this->columnoptions = $this->define_columnoptions();
+        $this->filteroptions = $this->define_filteroptions();
+        $this->contentoptions = $this->define_contentoptions();
+        $this->paramoptions = $this->define_paramoptions();
+        $this->defaultcolumns = $this->define_defaultcolumns();
+        $this->defaultfilters = array();
+        $this->requiredcolumns = array();
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
+        parent::__construct();
+    }
+
+    /**
+     * Get base sql for course record of learning.
+     */
+    public static function get_base_sql() {
+        global $DB;
+        return "(select distinct ".
                 $DB->sql_concat_join(
                         "','",
                         array(
@@ -71,16 +89,6 @@ class rb_source_dp_course extends rb_base_source {
                 "from {dp_plan_course_assign} pca1 ".
                 "inner join {dp_plan} p1 ".
                 "on pca1.planid = p1.id)";
-        $this->joinlist = $this->define_joinlist();
-        $this->columnoptions = $this->define_columnoptions();
-        $this->filteroptions = $this->define_filteroptions();
-        $this->contentoptions = $this->define_contentoptions();
-        $this->paramoptions = $this->define_paramoptions();
-        $this->defaultcolumns = $this->define_defaultcolumns();
-        $this->defaultfilters = array();
-        $this->requiredcolumns = array();
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
-        parent::__construct();
     }
 
     //
@@ -229,7 +237,9 @@ from
                 'dp_course.planname',
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_course'),
-                    'joins' => 'dp_course'
+                    'joins' => 'dp_course',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -292,7 +302,9 @@ from
                 get_string('coursepriority', 'rb_source_dp_course'),
                 'priority.name',
                 array(
-                    'joins' => 'priority'
+                    'joins' => 'priority',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -325,7 +337,9 @@ from
                 'dp_template.shortname',
                 array(
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_course'),
-                    'joins' => 'dp_template'
+                    'joins' => 'dp_template',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(

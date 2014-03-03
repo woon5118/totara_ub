@@ -108,6 +108,7 @@ echo $renderer->print_description($report->description, $report->_id);
 echo html_writer::tag('p', get_string('teammembers_text', 'totara_core'));
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

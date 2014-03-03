@@ -76,6 +76,7 @@ class rb_cohort_associations_enrolled_embedded_cache_test extends reportcache_ad
      */
     protected function setUp() {
         parent::setup();
+        $this->setAdminUser();
         $this->getDataGenerator()->reset();
         // Common parts of test cases:
         // Create report record in database
@@ -126,6 +127,50 @@ class rb_cohort_associations_enrolled_embedded_cache_test extends reportcache_ad
 
         $r = array_shift($result);
         $this->assertEquals($this->course1->fullname, $r->associations_nameiconlink);
+    }
+
+    public function test_is_capable() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $syscontext = context_system::instance();
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array(), false, 0);
+        $embeddedobject = $report->embedobj;
+        $roleuser = $DB->get_record('role', array('shortname'=>'user'));
+        $userid = $this->users[1]->id;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user cannot access report.
+        $this->assertFalse($embeddedobject->is_capable($userid, $report),
+                'user should not be able to access report');
+
+        // Test user with only manage capability cannot access report.
+        assign_capability('moodle/cohort:manage', CAP_ALLOW, $roleuser->id, $syscontext);
+        $syscontext->mark_dirty();
+        $this->assertFalse($embeddedobject->is_capable($userid, $report),
+                'user with capability moodle/cohort:manage should not be able to access report');
+        assign_capability('moodle/cohort:manage', CAP_INHERIT, $roleuser->id, $syscontext);
+
+        // Test user with only view capability cannot access report.
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $roleuser->id, $syscontext);
+        $syscontext->mark_dirty();
+        $this->assertFalse($embeddedobject->is_capable($userid, $report),
+                'user with capability moodle/cohort:view should not be able to access report');
+        assign_capability('moodle/cohort:view', CAP_INHERIT, $roleuser->id, $syscontext);
+
+        // Test user with both view and manage capability can access report.
+        assign_capability('moodle/cohort:manage', CAP_ALLOW, $roleuser->id, $syscontext);
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $roleuser->id, $syscontext);
+        $syscontext->mark_dirty();
+        $this->assertTrue($embeddedobject->is_capable($userid, $report),
+                'user with capability moodle/cohort:view and moodle/cohort:manage cannot access report');
+        assign_capability('moodle/cohort:manage', CAP_INHERIT, $roleuser->id, $syscontext);
+        assign_capability('moodle/cohort:view', CAP_INHERIT, $roleuser->id, $syscontext);
     }
 
     /**

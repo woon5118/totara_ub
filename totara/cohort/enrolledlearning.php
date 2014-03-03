@@ -33,14 +33,12 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $context = context_system::instance();
-require_capability('moodle/cohort:manage', $context);
 
 $id     = optional_param('id', false, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // Export format.
 $debug  = optional_param('debug', false, PARAM_BOOL);
 
-require_capability('moodle/cohort:view', $context);
 $PAGE->set_context($context);
 
 $url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id, 'format' => $format, 'debug' => $debug));
@@ -134,6 +132,7 @@ echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

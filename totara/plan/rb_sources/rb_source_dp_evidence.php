@@ -122,7 +122,10 @@ class rb_source_dp_evidence extends rb_base_source {
                 'evidence',
                 'name',
                 get_string('name', 'rb_source_dp_evidence'),
-                'base.name'
+                'base.name',
+                array(
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -147,6 +150,8 @@ class rb_source_dp_evidence extends rb_base_source {
                 array(
                     'displayfunc' => 'description',
                     'nosort' => true,
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -179,7 +184,9 @@ class rb_source_dp_evidence extends rb_base_source {
             'evidence',
             'institution',
             get_string('institution', 'rb_source_dp_evidence'),
-            'base.institution'
+            'base.institution',
+            array('dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -205,7 +212,9 @@ class rb_source_dp_evidence extends rb_base_source {
             'evidence',
             'evidencetypename',
             get_string('evidencetype', 'rb_source_dp_evidence'),
-            'base.evidencetypename'
+            'base.evidencetypename',
+            array('dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(

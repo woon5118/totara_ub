@@ -48,12 +48,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
 }
 
-// Users can only view their own and their staff's pages.
-// Or if they are an admin.
 $context = context_system::instance();
-if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', $context)) {
-    print_error('error:cannotviewpage', 'totara_plan');
-}
 
 $urlparms = array('userid' => $userid, 'status' => $rolstatus);
 if ($compid) {
@@ -142,6 +137,7 @@ echo $OUTPUT->heading($heading);
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

@@ -463,10 +463,7 @@ class course_edit_form extends moodleform {
             }
         }
 
-        if (!empty($data['id'])) {
-            /// Check custom fields
-            $errors += customfield_validation((object)$data, 'course', 'course');
-        }
+        $errors += customfield_validation((object)$data, 'course', 'course');
 
         $errors = array_merge($errors, enrol_course_edit_validation($data, $this->context));
 

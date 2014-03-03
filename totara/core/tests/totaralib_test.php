@@ -124,4 +124,43 @@ class totaralib_test extends advanced_testcase {
         // Expect false when the 'managerid' being inspected has no staff.
         $this->assertFalse(totara_get_staff($this->user->id));
     }
+
+    public function test_totara_create_icon_picker() {
+        $this->resetAfterTest();
+
+        // Test with js.
+        $mform = new MoodleQuickForm('mform', 'post', '');
+        $picker = totara_create_icon_picker($mform, 'edit', 'course', 'default', 0, '_tst');
+        $this->assertArrayHasKey('icon_tst', $picker);
+        $this->assertArrayHasKey('currenticon_tst', $picker);
+        $this->assertCount(2, $picker);
+        $this->assertInstanceOf('MoodleQuickForm_hidden', $picker['icon_tst']);
+        $this->assertInstanceOf('MoodleQuickForm_static', $picker['currenticon_tst']);
+        // Check for link to choose icon.
+        $this->assertFalse(strpos($picker['currenticon_tst']->_text, '<a') === false);
+
+        $mform = new MoodleQuickForm('mform', 'post', '');
+        $picker = totara_create_icon_picker($mform, '', 'course', '', 0, '_tst');
+        $this->assertArrayHasKey('currenticon_tst', $picker);
+        $this->assertCount(1, $picker);
+        $this->assertInstanceOf('MoodleQuickForm_static', $picker['currenticon_tst']);
+        // No link to choose icon, only preview.
+        $this->assertTrue(strpos($picker['currenticon_tst']->_text, '<a') === false);
+
+        // Test with nojs.
+        $mform = new MoodleQuickForm('mform', 'post', '');
+        $picker = totara_create_icon_picker($mform, 'edit', 'course', '', 1, '_tst');
+        $this->assertArrayHasKey('icon_tst', $picker);
+        $this->assertArrayHasKey('currenticon_tst', $picker);
+        $this->assertCount(2, $picker);
+        $this->assertInstanceOf('MoodleQuickForm_select', $picker['icon_tst']);
+        $this->assertInstanceOf('MoodleQuickForm_static', $picker['currenticon_tst']);
+        $this->assertContainsOnly('array', $picker['icon_tst']->_options);
+
+        $mform = new MoodleQuickForm('mform', 'post', '');
+        $picker = totara_create_icon_picker($mform, '', 'course', '', 1, '_tst');
+        $this->assertArrayHasKey('currenticon_tst', $picker);
+        $this->assertCount(1, $picker);
+        $this->assertInstanceOf('MoodleQuickForm_static', $picker['currenticon_tst']);
+    }
 }

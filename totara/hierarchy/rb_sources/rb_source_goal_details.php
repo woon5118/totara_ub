@@ -107,7 +107,9 @@ class rb_source_goal_details extends rb_base_source {
                 get_string('goalnamecolumn', 'rb_source_goal_details'),
                 'goal.fullname',
                 array('joins' => 'goal',
-                      'defaultheading' => get_string('goalnameheading', 'rb_source_goal_details'))
+                      'defaultheading' => get_string('goalnameheading', 'rb_source_goal_details'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'goal',
@@ -115,7 +117,9 @@ class rb_source_goal_details extends rb_base_source {
                 get_string('goalframeworknamecolumn', 'rb_source_goal_details'),
                 'goalframework.fullname',
                 array('joins' => 'goalframework',
-                      'defaultheading' => get_string('goalframeworknameheading', 'rb_source_goal_details'))
+                      'defaultheading' => get_string('goalframeworknameheading', 'rb_source_goal_details'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'goal',
@@ -123,7 +127,9 @@ class rb_source_goal_details extends rb_base_source {
                 get_string('goaluserstatuscolumn', 'rb_source_goal_details'),
                 'scalevalue.name',
                 array('joins' => 'scalevalue',
-                      'defaultheading' => get_string('goaluserstatusheading', 'rb_source_goal_details'))
+                      'defaultheading' => get_string('goaluserstatusheading', 'rb_source_goal_details'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'goal',

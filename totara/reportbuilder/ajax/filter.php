@@ -40,13 +40,26 @@ switch ($action) {
         $filtername = optional_param('filtername', '', PARAM_TEXT);
         $customname = optional_param('customname', 0, PARAM_BOOL);
         $advanced = optional_param('advanced', 0, PARAM_BOOL);
+        $regiontext = optional_param('region', 0, PARAM_TEXT);
+
+        switch ($regiontext) {
+            case 'standard':
+                $region = rb_filter_type::RB_FILTER_REGION_STANDARD;
+                break;
+            case 'sidebar':
+                $region = rb_filter_type::RB_FILTER_REGION_SIDEBAR;
+                break;
+            default:
+                echo false;
+                exit;
+        }
 
         $filter = explode('-', $filter);
         $ftype = $filter[0];
         $fvalue = $filter[1];
 
         /// Prevent duplicates
-        $params = array('reportid' => $reportid, 'type' => $ftype, 'value' => $fvalue,
+        $params = array('reportid' => $reportid, 'region' => $region, 'type' => $ftype, 'value' => $fvalue,
                         'customname' => $customname, 'filtername' => $filtername);
         if ($DB->record_exists('report_builder_filters', $params)) {
             echo false;
@@ -59,9 +72,11 @@ switch ($action) {
         $todb->type = $ftype;
         $todb->value = $fvalue;
         $todb->advanced = $advanced;
+        $todb->region = $region;
         $todb->customname = $customname;
         $todb->filtername = $filtername;
-        $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1', array('reportid' => $reportid));
+        $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1',
+                array('reportid' => $reportid, 'region' => $region));
         if (!$sortorder) {
             $sortorder = 1;
         }
@@ -77,9 +92,6 @@ switch ($action) {
         if ($filter = $DB->get_record('report_builder_filters', array('id' => $fid))) {
             $DB->delete_records('report_builder_filters', array('id' => $fid));
             reportbuilder_set_status($reportid);
-            // Check filtername for multilang spans. Need to set context to use format_string.
-            $PAGE->set_context(context_user::instance($USER->id));
-            $filter->filtername = format_string($filter->filtername);
             echo json_encode((array)$filter);
         } else {
             echo false;
@@ -93,10 +105,11 @@ switch ($action) {
         $sortorder = ($action == 'movedown') ? 'ASC' : 'DESC';
 
         $filter = $DB->get_record('report_builder_filters', array('id' => $fid));
+        $region = $filter->region;
         $sql = "SELECT * FROM {report_builder_filters}
-            WHERE reportid = ? AND sortorder $operator ?
+            WHERE reportid = ? AND region = ? AND sortorder $operator ?
             ORDER BY sortorder $sortorder";
-        if (!$sibling = $DB->get_record_sql($sql, array($reportid, $filter->sortorder), IGNORE_MULTIPLE)) {
+        if (!$sibling = $DB->get_record_sql($sql, array($reportid, $region, $filter->sortorder), IGNORE_MULTIPLE)) {
             echo false;
             exit;
         }

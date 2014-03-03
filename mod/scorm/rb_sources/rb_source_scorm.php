@@ -109,14 +109,18 @@ class rb_source_scorm extends rb_base_source {
                 'title',
                 get_string('scormtitle', 'rb_source_scorm'),
                 'scorm.name',
-                array('joins' => 'scorm')
+                array('joins' => 'scorm',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'sco',
                 'title',
                 get_string('title', 'rb_source_scorm'),
                 'sco.title',
-                array('joins' => 'sco')
+                array('joins' => 'sco',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'sco',
@@ -136,6 +140,8 @@ class rb_source_scorm extends rb_base_source {
                 array(
                     'joins' => 'sco_status',
                     'displayfunc' => 'ucfirst',
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(

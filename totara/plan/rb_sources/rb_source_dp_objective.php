@@ -133,7 +133,9 @@ class rb_source_dp_objective extends rb_base_source {
                 'dp.name',
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_objective'),
-                    'joins' => 'dp'
+                    'joins' => 'dp',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -186,7 +188,9 @@ class rb_source_dp_objective extends rb_base_source {
                 'template.fullname',
                 array(
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_objective'),
-                    'joins' => 'template'
+                    'joins' => 'template',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -214,7 +218,10 @@ class rb_source_dp_objective extends rb_base_source {
                 'objective',
                 'fullname',
                 get_string('fullname', 'rb_source_dp_objective'),
-                'base.fullname'
+                'base.fullname',
+                array(
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -237,14 +244,20 @@ class rb_source_dp_objective extends rb_base_source {
                 'objective',
                 'shortname',
                 get_string('shortname', 'rb_source_dp_objective'),
-                'base.shortname'
+                'base.shortname',
+                array(
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
                 'objective',
                 'description',
                 get_string('description', 'rb_source_dp_objective'),
-                'base.description'
+                'base.description',
+                array(
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -263,7 +276,9 @@ class rb_source_dp_objective extends rb_base_source {
                 get_string('objpriority', 'rb_source_dp_objective'),
                 'priority.name',
                 array(
-                    'joins' => 'priority'
+                    'joins' => 'priority',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -283,7 +298,9 @@ class rb_source_dp_objective extends rb_base_source {
                 get_string('objproficiency', 'rb_source_dp_objective'),
                 'objective_scale_value.name',
                 array(
-                    'joins' => 'objective_scale_value'
+                    'joins' => 'objective_scale_value',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 

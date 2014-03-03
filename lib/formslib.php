@@ -2732,6 +2732,9 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         }
         $html =str_replace('{id}', 'fgroup_' . $group->getAttribute('id'), $html);
         $html =str_replace('{name}', $group->getName(), $html);
+        if ($cssclass = $group->getAttribute('class')) {
+            $html = str_replace('{type}', '{type} ' . $cssclass, $html);
+        }
         $html =str_replace('{type}', 'fgroup', $html);
 
         $this->_templates[$group->getName()]=$html;

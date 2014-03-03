@@ -130,7 +130,9 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'userfullname',
                 get_string('columnbaseimportuserfullname', 'rb_source_completionimport_certification'),
                 'importuser.userfullname',
-                array('joins' => 'importuser')
+                array('joins' => 'importuser',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -138,7 +140,9 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'username',
                 get_string('columnbaseimportusername', 'rb_source_completionimport_certification'),
                 'importuser.username',
-                array('joins' => 'importuser')
+                array('joins' => 'importuser',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -162,21 +166,27 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'base',
                 'username',
                 get_string('columnbaseusername', 'rb_source_completionimport_certification'),
-                'base.username'
+                'base.username',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'certificationshortname',
                 get_string('columnbasecertificationshortname', 'rb_source_completionimport_certification'),
-                'base.certificationshortname'
+                'base.certificationshortname',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'certificationidnumber',
                 get_string('columnbasecertificationidnumber', 'rb_source_completionimport_certification'),
-                'base.certificationidnumber'
+                'base.certificationidnumber',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(

@@ -130,7 +130,9 @@ class rb_source_completionimport_course extends rb_base_source {
                 'userfullname',
                 get_string('columnbaseimportuserfullname', 'rb_source_completionimport_course'),
                 'importuser.userfullname',
-                array('joins' => 'importuser')
+                array('joins' => 'importuser',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -138,7 +140,9 @@ class rb_source_completionimport_course extends rb_base_source {
                 'username',
                 get_string('columnbaseimportusername', 'rb_source_completionimport_course'),
                 'importuser.username',
-                array('joins' => 'importuser')
+                array('joins' => 'importuser',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -162,21 +166,27 @@ class rb_source_completionimport_course extends rb_base_source {
                 'base',
                 'username',
                 get_string('columnbaseusername', 'rb_source_completionimport_course'),
-                'base.username'
+                'base.username',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'courseshortname',
                 get_string('columnbasecourseshortname', 'rb_source_completionimport_course'),
-                'base.courseshortname'
+                'base.courseshortname',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(
                 'base',
                 'courseidnumber',
                 get_string('columnbasecourseidnumber', 'rb_source_completionimport_course'),
-                'base.courseidnumber'
+                'base.courseidnumber',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
 
         $columnoptions[] = new rb_column_option(

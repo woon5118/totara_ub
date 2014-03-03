@@ -69,6 +69,7 @@ class rb_cohort_members_embedded_cache_test extends reportcache_advanced_testcas
      */
     protected function setUp() {
         parent::setup();
+        $this->setAdminUser();
         $this->getDataGenerator()->reset();
         // Common parts of test cases:
         // Create report record in database
@@ -138,5 +139,33 @@ class rb_cohort_members_embedded_cache_test extends reportcache_advanced_testcas
 
         $result = $this->get_report_result($this->report_builder_data['shortname'],  array('cohortid' => $this->cohort3->id), $usecache);
         $this->assertCount(0, $result);
+    }
+
+    public function test_is_capable() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $syscontext = context_system::instance();
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array(), false, 0);
+        $embeddedobject = $report->embedobj;
+        $roleuser = $DB->get_record('role', array('shortname'=>'user'));
+        $userid = $this->users[1]->id;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user cannot access report.
+        $this->assertFalse($embeddedobject->is_capable($userid, $report),
+                'user should not be able to access report');
+
+        // Test user with view capability can access report.
+        assign_capability('moodle/cohort:view', CAP_ALLOW, $roleuser->id, $syscontext);
+        $syscontext->mark_dirty();
+        $this->assertTrue($embeddedobject->is_capable($userid, $report),
+                'user with capability moodle/cohort:view cannot access report');
+        assign_capability('moodle/cohort:view', CAP_INHERIT, $roleuser->id, $syscontext);
     }
 }

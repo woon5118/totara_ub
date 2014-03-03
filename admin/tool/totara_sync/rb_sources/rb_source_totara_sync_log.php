@@ -80,7 +80,9 @@ class rb_source_totara_sync_log extends rb_base_source {
                 'totara_sync_log',
                 'element',
                 get_string('element', 'tool_totara_sync'),
-                "base.element"
+                "base.element",
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'totara_sync_log',
@@ -93,13 +95,17 @@ class rb_source_totara_sync_log extends rb_base_source {
                 'totara_sync_log',
                 'action',
                 get_string('action', 'tool_totara_sync'),
-                "base.action"
+                "base.action",
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'totara_sync_log',
                 'info',
                 get_string('info', 'tool_totara_sync'),
-                "base.info"
+                "base.info",
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
         );
 

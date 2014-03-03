@@ -114,7 +114,9 @@ class rb_source_comp_status_history extends rb_base_source {
                 get_string('compnamecolumn', 'rb_source_comp_status_history'),
                 'competency.fullname',
                 array('defaultheading' => get_string('compnameheading', 'rb_source_comp_status_history'),
-                      'joins' => 'competency')
+                      'joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'history',
@@ -122,7 +124,9 @@ class rb_source_comp_status_history extends rb_base_source {
                 get_string('compscalevaluecolumn', 'rb_source_comp_status_history'),
                 'scalevalue.name',
                 array('joins' => 'scalevalue',
-                      'defaultheading' => get_string('compscalevalueheading', 'rb_source_comp_status_history'))
+                      'defaultheading' => get_string('compscalevalueheading', 'rb_source_comp_status_history'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'history',

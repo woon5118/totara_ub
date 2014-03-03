@@ -958,5 +958,27 @@ function xmldb_totara_core_upgrade($oldversion) {
         set_config('enablelearningplans', '1');
         totara_upgrade_mod_savepoint(true, 2014010700, 'totara_core');
     }
+
+    if ($oldversion < 2014030500) {
+        $table = new xmldb_table('course_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'course_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        // Set the comment for the table 'course_info_data_param'.
+        $table->setComment('Custom course fields data parameters');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014030500, 'totara_core');
+    }
+
     return true;
 }

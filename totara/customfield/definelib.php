@@ -166,11 +166,13 @@ class customfield_define_base {
      */
     function define_save($data, $tableprefix) {
         global $DB, $TEXTAREA_OPTIONS;
-        $data = $this->define_save_preprocess($data); /// hook for child classes
-        $old = false;
+        $old = null;
+
         if (!empty($data->id)) {
             $old = $DB->get_record($tableprefix.'_info_field', array('id' => $data->id));
         }
+        $data->tableprefix = $tableprefix;
+        $data = $this->define_save_preprocess($data, $old); // Hook for child classes.
         if (!$old) {
             $data->sortorder = $DB->count_records_select($tableprefix.'_info_field', '') + 1;
             } else {
@@ -196,10 +198,23 @@ class customfield_define_base {
      * before it is saved. This method is a hook for the child
      * classes to override.
      * @param   object   data from the add/edit custom field form
+     * @param   object   previous data record
      * @return  object   processed data object
      */
-    function define_save_preprocess($data) {
+    function define_save_preprocess($data, $old = null) {
         /// do nothing - override if necessary
+        return $data;
+    }
+
+    /**
+     * Preprocess data from the add/edit custom field form
+     * before it is loaded. This method is a hook for the child
+     * classes to override.
+     * @param   object   data from the add/edit custom field table
+     * @return  object   processed data object
+     */
+    public function define_load_preprocess($data) {
+        // Do nothing - override if necessary.
         return $data;
     }
 

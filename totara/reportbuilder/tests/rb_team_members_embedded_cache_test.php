@@ -126,4 +126,21 @@ class rb_team_members_embedded_cache_test extends reportcache_advanced_testcase 
         }
     }
 
+    public function test_is_capable() {
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array(), false, 0);
+        $embeddedobject = $report->embedobj;
+        $userid = $this->users[1]->id;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user can access report.
+        $this->assertTrue($embeddedobject->is_capable($userid, $report),
+                'user cannot access report');
+    }
 }

@@ -147,7 +147,9 @@ class rb_source_program_completion extends rb_base_source {
             'organisation',
             get_string('completionorgname', 'rb_source_program_completion'),
             'completion_organisation.fullname',
-            array('joins' => 'completion_organisation')
+            array('joins' => 'completion_organisation',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] =new rb_column_option(
             'progcompletion',
@@ -174,7 +176,9 @@ class rb_source_program_completion extends rb_base_source {
             'position',
             get_string('completionposname', 'rb_source_program_completion'),
             'completion_position.fullname',
-            array('joins' => 'completion_position')
+            array('joins' => 'completion_position',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
 
         // include some standard columns

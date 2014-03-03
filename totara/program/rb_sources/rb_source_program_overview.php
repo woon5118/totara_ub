@@ -251,6 +251,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplorganisation.shortname',
             array(
                 'joins' => 'cplorganisation',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
 
         );
@@ -262,6 +264,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplorganisation.fullname',
             array(
                 'joins' => 'cplorganisation',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
 
@@ -272,6 +276,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplorganisation_type.fullname',
             array(
                 'joins' => 'cplorganisation_type',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
 
@@ -283,6 +289,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplposition.fullname',
             array(
                 'joins' => 'cplposition',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
 
         );
@@ -294,6 +302,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplposition_type.fullname',
             array(
                 'joins' => 'cplposition_type',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
 
         );
@@ -305,6 +315,8 @@ class rb_source_program_overview extends rb_base_source {
             'cplposition.idnumber',
             array(
                 'joins' => 'cplposition',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
 
         );
@@ -416,6 +428,8 @@ class rb_source_program_overview extends rb_base_source {
                 'grouping' => 'comma_list',
                 'displayfunc' => 'list_to_newline',
                 'style' => array('white-space' => 'pre'),
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
 
@@ -445,6 +459,8 @@ class rb_source_program_overview extends rb_base_source {
                 'grouping' => 'comma_list',
                 'displayfunc' => 'list_to_newline',
                 'style' => array('white-space' => 'pre'),
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
 

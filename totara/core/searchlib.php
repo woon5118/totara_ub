@@ -85,10 +85,12 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
                 $TOTARA_SEARCH_PARAM_COUNTER++;
             }
         }
-        // look for each keyword in any field
-        $queries[] = '(' . implode(' OR ', $matches) . ')';
+        // Look for each keyword in any field.
+        if (!empty($matches)) {
+            $queries[] = '(' . implode(' OR ', $matches) . ')';
+        }
     }
-    // all keywords must be found in at least one field
+    // All keywords must be found in at least one field.
     return array(implode(' AND ', $queries), $params);
 }
 

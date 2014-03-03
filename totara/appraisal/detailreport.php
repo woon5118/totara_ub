@@ -34,8 +34,6 @@ $debug = optional_param('debug', 0, PARAM_INT);
 $url = new moodle_url('/totara/appraisal/detailreport.php', array('format' => $format, 'debug' => $debug));
 admin_externalpage_setup('reportappraisals', '', null, $url);
 
-$systemcontext = context_system::instance();
-require_capability('totara/appraisal:manageappraisals', $systemcontext);
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if (!$report = reportbuilder_get_embedded_report('appraisal_detail', null, false, $sid)) {
@@ -78,6 +76,7 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->include_js();
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

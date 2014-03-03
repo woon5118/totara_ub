@@ -59,11 +59,6 @@ if (!empty($certifid) && (!$certification = $DB->get_record('prog', array('certi
 }
 
 $context = context_system::instance();
-// Users can only view their own and their staff's pages.
-// Or if they are an admin.
-if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', $context)) {
-    print_error('error:cannotviewpage', 'totara_plan');
-}
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/record/certifications.php', $pageparams));
@@ -144,6 +139,7 @@ echo $OUTPUT->heading($heading);
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

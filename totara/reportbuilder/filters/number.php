@@ -29,21 +29,6 @@
 class rb_filter_number extends rb_filter_type {
 
     /**
-     * Constructor
-     *
-     * @param string $type The filter type (from the db or embedded source)
-     * @param string $value The filter value (from the db or embedded source)
-     * @param integer $advanced If the filter should be shown by default (0) or only
-     *                          when advanced options are shown (1)
-     * @param reportbuilder object $report The report this filter is for
-     *
-     * @return rb_filter_number object
-     */
-    function __construct($type, $value, $advanced, $report) {
-        parent::__construct($type, $value, $advanced, $report);
-    }
-
-    /**
      * Returns an array of comparison operators
      * @return array of comparison operators
      */

@@ -33,9 +33,8 @@ $debug = optional_param('debug', 0, PARAM_INT);
 $url = new moodle_url('/totara/hierarchy/prefix/goal/summaryreport.php', array('format' => $format, 'debug' => $debug));
 admin_externalpage_setup('goalreport', '', null, $url);
 
-$systemcontext = context_system::instance();
-require_capability('totara/hierarchy:viewgoalreport', $systemcontext);
-$canedit = has_capability('totara/hierarchy:editgoalreport', $systemcontext);
+$context = context_system::instance();
+$canedit = has_capability('totara/hierarchy:editgoalreport', $context);
 
 if (!$report = reportbuilder_get_embedded_report('goal_summary', null, false, $sid)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
@@ -83,14 +82,13 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->include_js();
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();
 
-if ($countfiltered > 0) {
-    echo $renderer->showhide_button($report->_id, $report->shortname);
-    $report->display_table();
-    $renderer->export_select($report->_id, $sid);
-}
+echo $renderer->showhide_button($report->_id, $report->shortname);
+$report->display_table();
+$renderer->export_select($report->_id, $sid);
 
 echo $renderer->footer();
