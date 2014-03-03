@@ -123,7 +123,7 @@ class mod_facetoface_notification_form extends moodleform {
             $mform->addElement('select', 'template', get_string('template', 'facetoface'), $tpls);
         }
 
-        // Display message content settings
+        // Display message content settings.
         $mform->addElement('text', 'title', get_string('title', 'facetoface'), array('size' => 50));
         $mform->addRule('title', null, 'required', null, 'client');
         $mform->setType('title', PARAM_TEXT);
@@ -141,16 +141,15 @@ class mod_facetoface_notification_form extends moodleform {
             $mform->setType('ccmanager', PARAM_INT);
 
             $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
-            $mform->setType('managerprefix', PARAM_RAW);
-            $mform->disabledIf('managerprefix', 'ccmanager', 'notchecked');
+            $mform->setType('managerprefix_editor', PARAM_RAW);
         } else {
             if ($notification->ccmanager) {
                 $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
-                $mform->setType('managerprefix', PARAM_RAW);
+                $mform->setType('managerprefix_editor', PARAM_RAW);
             }
         }
 
-        // Enable checkbox
+        // Enable checkbox.
         $mform->addElement('checkbox', 'status', get_string('status'));
         $mform->setType('status', PARAM_INT);
 

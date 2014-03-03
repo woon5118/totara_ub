@@ -481,7 +481,8 @@ abstract class prog_assignment_category {
                     // Check if we actually need an update..
                     if ($original_object->includechildren != $object->includechildren ||
                         $original_object->completiontime != $object->completiontime ||
-                        $original_object->completionevent != $object->completionevent) {
+                        $original_object->completionevent != $object->completionevent ||
+                        $original_object->completioninstance != $object->completioninstance) {
 
                         if (!$DB->update_record('prog_assignment', $object)) {
                             print_error('error:updatingprogramassignment', 'totara_program');

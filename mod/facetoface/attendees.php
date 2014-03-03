@@ -143,27 +143,14 @@ if (has_capability('mod/facetoface:takeattendance', $context)) {
     if (in_array('attendees', $available_actions) || in_array('cancellations', $available_actions) || in_array('waitlist', $available_actions)) {
         $available_actions[] = 'messageusers';
     }
-
-    // If a user can take attendance, they can approve staff's booking requests
-    if ($facetoface->approvalreqd) {
-        $allowed_actions[] = 'approvalrequired';
-    }
 }
-
-$can_view_session = !empty($allowed_actions);
 
 $attendees = array();
 $cancellations = array();
 $requests = array();
 
-// If a user can take attendance, they can approve staff's booking requests
-if (in_array('approvalrequired', $allowed_actions)) {
-    $requests = facetoface_get_requests($session->id);
-    if ($requests) {
-        $available_actions[] = 'approvalrequired';
-    }
-    // Check if the user is manager with staff
-} else if ($facetoface->approvalreqd && $staff = totara_get_staff()) {
+// Check if the user is manager with staff
+if ($facetoface->approvalreqd && $staff = totara_get_staff()) {
     // Lets check to see what state their staff are in
 
     // Check if any staff have requests awaiting approval
@@ -172,7 +159,6 @@ if (in_array('approvalrequired', $allowed_actions)) {
         $requests = array_intersect_key($get_requests, array_flip($staff));
 
         if ($requests) {
-            $can_view_session = true;
             $allowed_actions[] = 'approvalrequired';
             $available_actions[] = 'approvalrequired';
         }
@@ -190,7 +176,6 @@ if (in_array('approvalrequired', $allowed_actions)) {
         $attendees = array_intersect_key($get_attendees, array_flip($staff));
 
         if ($attendees) {
-            $can_view_session = true;
             $allowed_actions[] = 'attendees';
             $available_actions[] = 'attendees';
         }
@@ -202,7 +187,6 @@ if (in_array('approvalrequired', $allowed_actions)) {
         $cancellations = array_intersect_key($get_cancellations, array_flip($staff));
 
         if ($cancellations) {
-            $can_view_session = true;
             $allowed_actions[] = 'cancellations';
             $available_actions[] = 'cancellations';
         }
@@ -214,11 +198,17 @@ if (in_array('approvalrequired', $allowed_actions)) {
         $declines = array_intersect_key($get_declines, array_flip($staff));
 
         if ($declines) {
-            $can_view_session = true;
             $allowed_actions[] = 'approvalrequired';
             $available_actions[] = 'approvalrequired';
         }
     }
+}
+
+$can_view_session = !empty($allowed_actions);
+if (!$can_view_session) {
+    $return = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
+    redirect($return);
+    die();
 }
 
 /***************************************************************************

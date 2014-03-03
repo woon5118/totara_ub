@@ -4286,8 +4286,9 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                 $user->auth = $auth;
             }
             if (empty($user->firstaccess)) { //prevent firstaccess from remaining 0 for manual account that never required confirmation
-                $DB->set_field('user','firstaccess', $user->timemodified, array('id' => $user->id));
-                $user->firstaccess = $user->timemodified;
+                $now = time();
+                $DB->set_field('user','firstaccess', $now, array('id' => $user->id));
+                $user->firstaccess = $now;
                 events_trigger('user_firstaccess', $user);
             }
 
