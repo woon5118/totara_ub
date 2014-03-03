@@ -616,11 +616,14 @@ input[type="checkbox"] {
     margin: 0 0 0 5px;
 }
 .mform fieldset {
-    padding:10px 0 10px;
+    padding:5px 0;
     border:none;
 }
 .mform fieldset.collapsible legend a.fheader {
     margin-left: 0;
+    font-size: 13px;
+    color: #087bb1;
+    font-weight: bold;
 }
 .mform fieldset legend {
     width:100%;
@@ -628,9 +631,9 @@ input[type="checkbox"] {
     padding-bottom:3px;
     border-bottom:1px solid #BFBFBF;
     margin-left: 0;
-}
-.mform fieldset div {
-    margin:5px 0;
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: inherit;
 }
 .mform .required,
 .mform .fdescription.required {
