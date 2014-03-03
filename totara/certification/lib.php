@@ -204,10 +204,11 @@ function assign_certification_stage($certificationid, $userid) {
  * user (eg admin) - why?)
  *
  * @param int $courseid
+ * @param int $userid
  * @return boolean (false if not a course&user)
  */
-function inprogress_certification_stage($courseid) {
-    global $DB, $USER;
+function inprogress_certification_stage($courseid, $userid) {
+    global $DB;
     $certificationids = find_certif_from_course($courseid);
 
     if (!count($certificationids)) {
@@ -220,7 +221,7 @@ function inprogress_certification_stage($courseid) {
             FROM {certif_completion} cfc
             WHERE cfc.certifid $usql AND cfc.userid = ?";
 
-    $params[] = $USER->id;
+    $params[] = $userid;
 
     $completion_records = $DB->get_records_sql($sql, $params);
 
