@@ -204,10 +204,11 @@ function assign_certification_stage($certificationid, $userid) {
  * user (eg admin) - why?)
  *
  * @param int $courseid
+ * @param int $userid
  * @return boolean (false if not a course&user)
  */
-function inprogress_certification_stage($courseid) {
-    global $DB, $USER;
+function inprogress_certification_stage($courseid, $userid) {
+    global $DB;
     $certificationids = find_certif_from_course($courseid);
 
     if (!count($certificationids)) {
@@ -220,7 +221,7 @@ function inprogress_certification_stage($courseid) {
             FROM {certif_completion} cfc
             WHERE cfc.certifid $usql AND cfc.userid = ?";
 
-    $params[] = $USER->id;
+    $params[] = $userid;
 
     $completion_records = $DB->get_records_sql($sql, $params);
 
@@ -292,8 +293,11 @@ function recertify_window_opens_stage() {
             FROM {certif_completion} cfc
             JOIN {certif} cf on cf.id = cfc.certifid
             JOIN {prog} p on p.certifid = cf.id
-            WHERE cfc.timewindowopens < ? AND cfc.status = ?
-            AND cfc.renewalstatus = ?";
+            JOIN {user} u on u.id = cfc.userid
+            WHERE cfc.timewindowopens < ?
+                  AND cfc.status = ?
+                  AND cfc.renewalstatus = ?
+                  AND u.deleted = 0";
 
     $certificationcompletions = $DB->get_records_sql($sql, array(time(), CERTIFSTATUS_COMPLETED, CERTIFRENEWALSTATUS_NOTDUE));
 
@@ -345,11 +349,13 @@ function recertify_window_abouttoclose_stage() {
             JOIN {certif} cf on cf.id = cfc.certifid
             JOIN {prog} p ON p.certifid = cf.id
             JOIN {prog_message} pm ON pm.programid = p.id
+            JOIN {user} u ON u.id = cfc.userid
             WHERE cfc.status {$statussql}
                   AND cfc.renewalstatus = ?
                   AND ? > (cfc.timeexpires - pm.triggertime)
                   AND ? < cfc.timeexpires
-                  AND pm.messagetype = ?";
+                  AND pm.messagetype = ?
+                  AND u.deleted = 0";
 
     $now = time();
     $params = array_merge($statusparams, array(CERTIFRENEWALSTATUS_DUE, $now, $now, MESSAGETYPE_RECERT_WINDOWDUECLOSE));
@@ -378,8 +384,10 @@ function recertify_expires_stage() {
             FROM {certif_completion} cfc
             JOIN {certif} cf ON cf.id = cfc.certifid
             JOIN {prog} p ON p.certifid = cf.id
+            JOIN {user} u ON u.id = cfc.userid
             WHERE ? > cfc.timeexpires
                 AND cfc.renewalstatus = ?
+                AND u.deleted = 0
                 AND cfc.status {$statussql}";
 
     $params = array_merge(array(time(), CERTIFRENEWALSTATUS_DUE), $statusparams);
