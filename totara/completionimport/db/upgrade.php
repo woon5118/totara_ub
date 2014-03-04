@@ -36,6 +36,23 @@ require_once($CFG->dirroot.'/totara/core/db/utils.php');
  */
 function xmldb_totara_completionimport_upgrade($oldversion) {
     global $DB;
+    $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
+
+    if ($oldversion < 2014030400) {
+        // Add index to username column to improve query performance.
+
+        $table = new xmldb_table('totara_compl_import_course');
+        $index = new xmldb_index('compimpcou_username_ix', XMLDB_INDEX_NOTUNIQUE, array('username'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $table = new xmldb_table('totara_compl_import_cert');
+        $index = new xmldb_index('compimpcer_username_ix', XMLDB_INDEX_NOTUNIQUE, array('username'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+    }
 
     return true;
 }

@@ -25,6 +25,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="importuserid" UNIQUE="false" FIELDS="importuserid"/>
+        <INDEX NAME="compimpcou_username_ix" UNIQUE="false" FIELDS="username"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="totara_compl_import_cert" COMMENT="Intermediary file for importing certification completion data">
@@ -47,6 +48,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="importuserid" UNIQUE="false" FIELDS="importuserid"/>
+        <INDEX NAME="compimpcer_username_ix" UNIQUE="false" FIELDS="username"/>
       </INDEXES>
     </TABLE>
   </TABLES>

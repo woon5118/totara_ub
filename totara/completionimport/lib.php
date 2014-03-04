@@ -268,7 +268,7 @@ function import_csv($tempfilename, $importname, $importtime) {
  * @param int $importtime time of this import
  */
 function import_data_checks($importname, $importtime) {
-    global $DB;
+    global $DB, $CFG;
 
     list($sqlwhere, $stdparams) = get_importsqlwhere($importtime, '');
 
@@ -290,12 +290,17 @@ function import_data_checks($importname, $importtime) {
         $DB->execute($sql, $params);
 
         // Missing User names.
-        $params = array_merge($stdparams, array('errorstring' => 'usernamenotfound;'));
+        // Reference to mnethostid in subquery allows us to benefit from an index on user table.
+        // This tool does not support importing historic records from networked sites
+        // so local site id alway used.
+        $params = array_merge($stdparams,
+            array('errorstring' => 'usernamenotfound;', 'mnetlocalhostid' => $CFG->mnet_localhost_id));
         $sql = "UPDATE {{$tablename}}
                 SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . "
                 {$sqlwhere}
                 AND " . $DB->sql_isnotempty($tablename, 'username', true, false) . "
-                AND NOT EXISTS (SELECT {user}.id FROM {user} WHERE {user}.username = {{$tablename}}.username)";
+                AND NOT EXISTS (SELECT {user}.id FROM {user}
+                WHERE {user}.username = {{$tablename}}.username AND {user}.mnethostid = :mnetlocalhostid)";
         $DB->execute($sql, $params);
     }
 
@@ -627,7 +632,7 @@ function import_course($importname, $importtime) {
         $enrolid = 0;
 
         foreach ($courses as $course) {
-            if (empty($enrolid) || ($enrolid != $course->enrolid) || (($enrolcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
+            if (empty($enrolid) || ($enrolid != $course->enrolid) || (($enrolcount % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
                 // Delete any existing course completions we are overriding.
                 if (!empty($deletedcompletions)) {
                     $DB->delete_records_list('course_completions', 'id', $deletedcompletions);
@@ -747,6 +752,7 @@ function import_course($importname, $importtime) {
 
             $updateids[] = $course->importid;
 
+            $enrolcount++;
         }
     }
     $courses->close();
