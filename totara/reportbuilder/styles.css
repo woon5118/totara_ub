@@ -42,3 +42,36 @@ div.multicheck-items fieldset.felement span {
 .rb-inline {
     display: inline-block;
 }
+
+#team_members .user_namewithlinks a {
+    padding-left: 5px;
+    float: left;
+}
+#team_members .user_namewithlinks .name {
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 8px;
+}
+
+#team_members .user_namewithlinks ul {
+    clear: left;
+    margin: 0;
+    padding-top: 2px;
+}
+
+#team_members .user_namewithlinks ul li {
+    float:left;
+    list-style-type: none;
+}
+
+#team_members .user_namewithlinks li a {
+    border-left: 1px solid #bbbbbb;
+    font-size: 10px;
+    line-height: 10px;
+    margin: 2px;
+}
+
+#team_members .user_namewithlinks li:first-child a {
+    border-left: none;
+    margin-left: 0;
+}
