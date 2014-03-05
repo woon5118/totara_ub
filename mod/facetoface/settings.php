@@ -121,7 +121,7 @@ $calendarfilters = array(
     'capacity'   => get_string('capacity', 'facetoface')
 );
 $calendarfilters = $calendarfilters + $customfields;
-$settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array(), $calendarfilters));
+$settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
 
 // List of existing custom fields.
 $html = facetoface_list_of_customfields();
