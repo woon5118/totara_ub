@@ -30,7 +30,7 @@ require_once "$CFG->dirroot/mod/facetoface/lib.php";
 if ($data = data_submitted()) {
     // Check that the setting has changed before taking action.
     $oldvalue = get_config(null, 'facetoface_displaysessiontimezones');
-    if ($data->s__facetoface_displaysessiontimezones != $oldvalue) {
+    if (isset($data->s__facetoface_displaysessiontimezones) && $data->s__facetoface_displaysessiontimezones != $oldvalue) {
         // Force saving of setting before doing update of events.
         set_config('facetoface_displaysessiontimezones', $data->s__facetoface_displaysessiontimezones);
         $sessions = $DB->get_records('facetoface_sessions');
