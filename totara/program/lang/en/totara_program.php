@@ -146,6 +146,7 @@ $string['completedcourserpl'] = 'Course marked as completed by record of prior l
 $string['completewithin'] = 'Complete within';
 $string['completewithinevent'] = 'Complete within {$a->num} {$a->period} of {$a->event} {$a->instance}';
 $string['completioncriteria'] = 'Completion criteria';
+$string['completioncriterianotdefined'] = 'Completion criteria not defined';
 $string['completiondate'] = 'Completion date';
 $string['completionofcourse'] = 'completion of course';
 $string['completionofprogram'] = 'completion of program';
@@ -391,8 +392,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -413,8 +429,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -438,8 +469,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -717,8 +763,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';

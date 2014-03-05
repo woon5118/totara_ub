@@ -181,13 +181,133 @@ abstract class prog_message {
         }
     }
 
-    public function replacevars($text) {
+    /**
+     * Set replacement variables used when sending a message.
+     *
+     * @param object $recipient A user record
+     * @param array $options An optional array containing options for the message
+     * @return void.
+     */
+    public function set_replacementvars($recipient, $options = array()) {
         global $DB;
-        if ($programfullname = $DB->get_field('prog', 'fullname', array('id' => $this->programid))) {
-            $this->replacementvars['programfullname'] = $programfullname;
+
+        $userid = $recipient->id;
+        $programid = $this->programid;
+        $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
+
+        // Only send the message if it has not already been sent to the recipient.
+        if ($DB->get_record('prog_messagelog', array('messageid' => $this->id, 'userid' => $userid, 'coursesetid' => $coursesetid))) {
+            return true;
         }
 
-        foreach ($this->replacementvars as $search=>$replace) {
+        // Get text to scan for placeholders.
+        $messagedata = $this->studentmessagedata->subject . $this->studentmessagedata->fullmessage;
+        if ($manager = totara_get_manager($recipient->id)) {
+            $messagedata .= $this->managermessagedata->subject . $this->managermessagedata->fullmessage;
+        }
+
+        // Placeholders available.
+        $placeholders = array('setlabel', 'programfullname', 'certificationfullname', 'duedate',
+            'completioncriteria', 'userfullname', 'username', 'managername', 'manageremail');
+
+        // Scan for placeholders in the message and delete those which are not used.
+        foreach ($placeholders as $key => $value) {
+            if (!strpos($messagedata, "%{$value}%")) {
+                unset($placeholders[$key]);
+            }
+        }
+
+        // Initialise data needed to calculate completion fields.
+        if (in_array('duedate', $placeholders) || in_array('completioncriteria', $placeholders)) {
+            $formatdate = get_string('datepickerlongyearphpuserdate', 'totara_core');
+            $deletecompletionfield = false;
+            if ($assignment = $DB->get_record('prog_user_assignment', array('programid' => $programid, 'userid' => $userid))) {
+                if (!$progassignment = $DB->get_record('prog_assignment', array('id' => $assignment->assignmentid))) {
+                    $deletecompletionfield = true;
+                }
+            } else {
+                $deletecompletionfield = true;
+            }
+
+            // If program assignment record not found, delete completion date and completion criteria from placeholders.
+            if ($deletecompletionfield) {
+                if ($pos = array_search('duedate', $placeholders)) {
+                    unset($placeholders[$pos]);
+                }
+                if ($pos = array_search('completioncriteria', $placeholders)) {
+                    unset($placeholders[$pos]);
+                }
+            }
+        }
+
+        // Get program fullname needed for programfullname and certificationfullname options.
+        if (in_array('programfullname', $placeholders) || in_array('certificationfullname', $placeholders)) {
+            if ($programfullname = $DB->get_field('prog', 'fullname', array('id' => $programid))) {
+                $programfullname = format_string($programfullname, true, array('context' => context_user::instance($userid)));
+            }
+        }
+
+        foreach ($placeholders as $placeholder) {
+            switch ($placeholder) {
+                case 'programfullname';
+                    $this->replacementvars['programfullname'] = $programfullname;
+                    break;
+                case 'setlabel';
+                    $setlabel = $DB->get_field('prog_courseset', 'label', array('id' => $coursesetid));
+                    $this->replacementvars['setlabel'] = ($setlabel) ? $setlabel : '';
+                    break;
+                case 'certificationfullname';
+                    $this->replacementvars['certificationfullname'] = $programfullname;
+                    break;
+                case 'duedate';
+                    // Get completion date.
+                    $program = new program($programid);
+                    $completiontime = $program->make_timedue($userid, $progassignment);
+                    $duedate = get_string('duedatenotset', 'totara_program');
+                    if ($completiontime && $completiontime != COMPLETION_TIME_NOT_SET) {
+                        $duedate = userdate($completiontime, $formatdate, $recipient->timezone, false);
+                    }
+                    $this->replacementvars['duedate']   = $duedate;
+                    break;
+                case 'completioncriteria';
+                    $time = $progassignment->completiontime;
+                    $event = $progassignment->completionevent;
+                    $instance = $progassignment->completioninstance;
+
+                    // Get completion criteria.
+                    if ($progassignment->completionevent == COMPLETION_EVENT_NONE) {
+                        $ccriteria = get_string('completioncriterianotdefined', 'totara_program');
+                        if ($time != COMPLETION_TIME_NOT_SET) {
+                            $formatedtime = trim(userdate($time, $formatdate, $recipient->timezone, false));
+                            $ccriteria = prog_assignment_category::build_completion_string($formatedtime, $event, $instance);
+                        }
+                    } else {
+                        $parts = program_utilities::duration_explode($time);
+                        $formatedtime = $parts->num . ' ' . $parts->period;
+                        $ccriteria = prog_assignment_category::build_completion_string($formatedtime, $event, $instance);
+                    }
+                    $this->replacementvars['completioncriteria'] =  $ccriteria;
+                    break;
+                case 'userfullname';
+                    $this->replacementvars['userfullname'] = fullname($recipient);
+                    break;
+                case 'username';
+                    $this->replacementvars['username'] = $recipient->username;
+                    break;
+                case 'managername';
+                    $this->replacementvars['managername'] = ($manager) ? fullname($manager) : '';
+                    break;
+                case 'manageremail';
+                    $this->replacementvars['manageremail'] = ($manager) ? obfuscate_mailto($manager->email) : '';
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public function replacevars($text) {
+        foreach ($this->replacementvars as $search => $replace) {
             $text = str_replace("%$search%", $replace, $text);
         }
 
@@ -504,35 +624,25 @@ abstract class prog_noneventbased_message extends prog_message {
      * @return bool Success
      */
     public function send_message($recipient, $sender=null, $options=array()) {
-        global $CFG, $DB, $USER;
+        global $CFG, $USER;
 
         $result = true;
 
-        $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
-
-        // retrieve the course set label if we know the id (this is so that it can be substituted in the message)
-        if ($setlabel = $DB->get_field('prog_courseset', 'label', array('id' => $coursesetid))) {
-            $this->replacementvars['setlabel'] = $setlabel;
-        }
-
-        if (!empty($recipient)) {
-            $this->replacementvars['userfullname'] = fullname($recipient);
-        }
-
         $manager = totara_get_manager($recipient->id);
+        $this->set_replacementvars($recipient, $options);
 
-        //verify the $sender of the email
+        // Verify the $sender of the email.
         if ($sender == null) { //null check on $sender, default to manager or no-reply accordingly
             $sender = ($manager && $manager->id == $USER->id) ? $manager : generate_email_supportuser();
         } else if ($sender->id == $USER->id) { //make sure $sender is currently logged in
             $sender = $USER;
         } else if ($manager && $USER->id == $manager->id) { //$sender is not logged in, see if it is their manager
             $sender = $manager;
-        } else { //last option, the no-reply address
+        } else { // Last option, the no-reply address.
             $sender = generate_email_supportuser();
         }
 
-        // send the message to the learner
+        // Send the message to the learner.
         $studentdata = new stdClass();
         $studentdata->userto = $recipient;
         $studentdata->userfrom = $sender;
@@ -541,7 +651,7 @@ abstract class prog_noneventbased_message extends prog_message {
         $studentdata->contexturl = $this->studentmessagedata->contexturl;
         $result = $result && tm_alert_send($studentdata);
 
-        // send the message to the manager
+        // Send the message to the manager.
         if ($result && $this->notifymanager && $manager) {
             $managerdata = new stdClass();
             $managerdata->userto = $manager;
@@ -627,31 +737,11 @@ abstract class prog_eventbased_message extends prog_message {
     public function send_message($recipient, $sender=null, $options=array()) {
         global $CFG, $DB, $USER;
 
-        $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
-
-        // only send the message if it has not already been sent to the recipient
-        // as we don't want the same program due message to be sent more than once
-        if ($message_log = $DB->get_record('prog_messagelog', array('messageid' => $this->id, 'userid' => $recipient->id, 'coursesetid' => $coursesetid))) {
-            return true;
-        }
-
-        // retrieve the course set label if we know the id (this is so that it can be substituted in the message)
-        if ($setlabel = $DB->get_field('prog_courseset', 'label', array('id' => $coursesetid))) {
-            $this->replacementvars['setlabel'] = $setlabel;
-        }
-
-        // retrieve the program fullname
-        // (easier to do whether certif or not)
-        if ($fullname = $DB->get_field('prog', 'fullname', array('id' => $this->programid))) {
-            $this->replacementvars['certificationfullname'] = $fullname;
-        }
-
-        if (!empty($recipient)) {
-            $this->replacementvars['userfullname'] = fullname($recipient);
-        }
         $result = true;
 
+        $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
         $manager = totara_get_manager($recipient->id);
+        $this->set_replacementvars($recipient, $options);
 
         //verify the $sender of the email
         if ($sender == null) { //null check on $sender, default to manager or no-reply accordingly
