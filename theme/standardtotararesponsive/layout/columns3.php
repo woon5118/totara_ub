@@ -31,6 +31,7 @@ $hascustommenu = !empty($custommenu);
 
 $haslogininfo = (empty($PAGE->layout_options['nologininfo']));
 $showmenu = empty($PAGE->layout_options['nocustommenu']);
+$haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
 
 if ($showmenu && !$hascustommenu) {
     // load totara menu
@@ -76,6 +77,9 @@ echo $OUTPUT->doctype() ?>
                     <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
                     <?php if ($haslogininfo) { ?>
                         <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
+                    <?php }
+                    if ($haslangmenu) { ?>
+                        <li><?php echo $OUTPUT->lang_menu(); ?></li>
                     <?php } ?>
                 </ul>
                 <?php if ($showmenu) { ?>
