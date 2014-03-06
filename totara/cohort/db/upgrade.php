@@ -654,5 +654,17 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014021700, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2014031900) {
+        // Find and fix all missing course_completions records for courses enrolled via an Audience.
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+        $sql = "SELECT DISTINCT courseid FROM {enrol} WHERE enrol = ?";
+        if ($courses = $DB->get_fieldset_sql($sql, array('cohort'))) {
+            foreach ($courses as $courseid) {
+                completion_start_user_bulk($courseid);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2014031900, 'totara', 'cohort');
+    }
+
     return true;
 }

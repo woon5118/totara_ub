@@ -1419,6 +1419,7 @@ abstract class enrol_plugin {
             $ue->enrol    = $name;
             $ue->userids  = $userids;
             events_trigger('user_enrolled_bulk', $ue);
+            completion_start_user_bulk($courseid);
         }
 
         if ($roleid) {
