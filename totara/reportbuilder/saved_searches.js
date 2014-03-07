@@ -79,21 +79,26 @@ M.totara_reportbuilder_savedsearches = M.totara_reportbuilder_savedsearches || {
             });
         }
 
-        var path = M.cfg.wwwroot + '/totara/reportbuilder/';
-        var handler = new totaraDialog_saved_search_handler();
-        var name = 'searchlist';
-        var buttons = {};
-        buttons[M.util.get_string('close', 'form')] = function() { handler._cancel() };
+        var managebutton = $('input[name=rb_manage_search]');
 
-        totaraDialogs[name] = new totaraDialog(
-            name,
-            'show-' + name + '-dialog',
-            {
-                buttons: buttons,
-                title: '<h2>' + M.util.get_string('managesavedsearches', 'totara_reportbuilder') + '</h2>'
-            },
-            path + 'savedsearches.php?id=' + id.toString(),
-            handler
-        );
+        if (typeof managebutton.attr('id') != 'undefined') {
+            var path = M.cfg.wwwroot + '/totara/reportbuilder/';
+            var handler = new totaraDialog_saved_search_handler();
+            var name = 'searchlist';
+            var id = managebutton.attr('id').substr('show-searchlist-dialog-'.length);
+            var buttons = {};
+            buttons[M.util.get_string('close', 'form')] = function() { handler._cancel() };
+
+            totaraDialogs[name] = new totaraDialog(
+                name,
+                'show-' + name + '-dialog-' + id,
+                {
+                    buttons: buttons,
+                    title: '<h2>' + M.util.get_string('managesavedsearches', 'totara_reportbuilder') + '</h2>'
+                },
+                path + 'savedsearches.php?id=' + id.toString(),
+                handler
+            );
+        }
     }
 }
