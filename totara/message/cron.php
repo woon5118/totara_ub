@@ -73,7 +73,13 @@ function message_cron() {
     //delete the message records
     $DB->delete_records_list('message', 'id', $deleted);
     // tidy up orphaned metadata records - shouldn't be any - but odd things could happen with core messages cron
-    $DB->delete_records_select('message_metadata', 'messageid NOT IN (SELECT id FROM {message}) AND messagereadid NOT IN (SELECT id FROM {message_read})');
+    $sql = "DELETE FROM {message_metadata} WHERE id IN(
+                SELECT mm.id
+                    FROM {message_metadata} mm
+                    LEFT JOIN {message} m ON mm.messageid = m.id
+                    LEFT JOIN {message_read} mr ON mm.messagereadid = mr.id
+                    WHERE m.id IS NULL AND mr.id IS NULL)";
+    $DB->execute($sql);
 
     return true;
 }
