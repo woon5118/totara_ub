@@ -520,6 +520,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
 
         // Close the container.
         $html .= html_writer::end_div();
+
+        return $html;
     }
 
     /**
