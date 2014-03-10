@@ -139,6 +139,14 @@ div#totaramenu ul li.selected li.selected a:hover {
     /* no change */
 }
 
+#page-navbar .singlebutton {
+    float: left;
+}
+
+.dir-rtl #page-navbar .singlebutton {
+    float: right;
+}
+
 @media screen and (max-width:979px) {
   div#totaramenu ul li {
     float: none;
