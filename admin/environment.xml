@@ -9,9 +9,9 @@
     <DATABASE level="required">
       <VENDOR name="mysql" version="5.0.25" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="9.0" />
-      <VENDOR name="odbc_mssql" version="9.0" />
-      <VENDOR name="mssql_n" version="9.0" />
+      <VENDOR name="mssql" version="10.0" />
+      <VENDOR name="odbc_mssql" version="10.0" />
+      <VENDOR name="mssql_n" version="10.0" />
       <VENDOR name="oracle" version="10.2" />
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
@@ -119,9 +119,9 @@
     <DATABASE level="required">
       <VENDOR name="mysql" version="5.1.33" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="9.0" />
-      <VENDOR name="odbc_mssql" version="9.0" />
-      <VENDOR name="mssql_n" version="9.0" />
+      <VENDOR name="mssql" version="10.0" />
+      <VENDOR name="odbc_mssql" version="10.0" />
+      <VENDOR name="mssql_n" version="10.0" />
       <VENDOR name="oracle" version="10.2" />
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
@@ -235,9 +235,9 @@
     <DATABASE level="required">
       <VENDOR name="mysql" version="5.1.33" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="9.0" />
-      <VENDOR name="odbc_mssql" version="9.0" />
-      <VENDOR name="mssql_n" version="9.0" />
+      <VENDOR name="mssql" version="10.0" />
+      <VENDOR name="odbc_mssql" version="10.0" />
+      <VENDOR name="mssql_n" version="10.0" />
       <VENDOR name="oracle" version="10.2" />
       <VENDOR name="sqlite" version="2.0" />
     </DATABASE>
@@ -352,7 +352,7 @@
       <VENDOR name="mariadb" version="5.3.5" />
       <VENDOR name="mysql" version="5.1.33" />
       <VENDOR name="postgres" version="8.3" />
-      <VENDOR name="mssql" version="9.0" />
+      <VENDOR name="mssql" version="10.0" />
       <VENDOR name="oracle" version="10.2" />
     </DATABASE>
     <PHP version="5.3.3" level="required">
