@@ -677,7 +677,7 @@ class facetoface_notification extends data_object {
         if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
             $event->attachment = null; // Leave out the ical attachments in the third-parties notification.
             $recipients = array_map('trim', explode(',', $this->_facetoface->thirdparty));
-            $thirdparty = $user;
+            $thirdparty = clone $user;
             $thirdparty->firstname = ''; $thirdparty->lastname = ''; // Avoid showing user's name to third-party recipient.
             foreach ($recipients as $recipient) {
                 $thirdparty->email = $recipient;
