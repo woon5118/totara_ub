@@ -221,6 +221,23 @@ table.generalbox :last-child .last td:last-child {
     border-bottom-right-radius: 5px;
 }
 
+/*fields in totaratables */
+.totaratable .mform .fitem .fitemtitle,
+.totaratable .mform .fitem .felement {
+    width: auto;
+    float: left;
+}
+.dir-rtl .totaratable .mform .fitem .fitemtitle,
+.dir-rtl .totaratable .mform .fitem .felement {
+    float: right;
+}
+.totaratable .mform .fitem .fsubmit {
+    padding: 0;
+}
+.totaratable .mform .fsubmit input {
+    margin: 0;
+}
+
 .action-icon img.iconsmall,
 .action-icon img.smallicon,
 .action-icon.iconsmall {
@@ -678,8 +695,8 @@ input[type="checkbox"] {
 .mform .fitem div.fitemtitle {
     text-align:left;
     font-weight:bold;
-    width:22%;
     margin-top:2px;
+    width: auto;
 }
 .dir-rtl .mform .fitem .fitemtitle {
     text-align: right;
@@ -687,14 +704,14 @@ input[type="checkbox"] {
 .mform .fitem .felement {
     width: 74%;
     float: right;
-    margin-left: 0 !important;
+    margin-left: 0;
 }
 .dir-rtl .mform .fitem .felement {
     float: left;
-    margin-right: 0 !important;
+    margin-right: 0;
 }
 .mform .fitem fieldset {
-    padding: 0 !important;
+    padding: 0;
 }
 .mform .fitem .feditor {
     clear: none;
