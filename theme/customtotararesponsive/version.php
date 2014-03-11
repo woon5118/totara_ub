@@ -18,29 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage theme
+ * @author Brian Barnes <brian.barnes@totaralms.com>
+ * @package theme
+ * @subpackage customtotara
  */
 
-$THEME->name = 'customtotara';
-$THEME->parents = array('standardtotara', 'standard', 'base');
-$THEME->sheets = array(
-    'core',     /** Must come first**/
-    'navigation',
-    'admin',
-    'blocks',
-    'calendar',
-    'course',
-    'user',
-    'dock',
-    'grade',
-    'message',
-    'modules',
-    'question',
-    'pagelayout',
-    'settings'
-);
+defined('MOODLE_INTERNAL') || die;
 
-$THEME->enable_dock = true;
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->csspostprocess = 'theme_customtotara_process_css';
+$plugin->version   = 2014031200; // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2013050100; // Requires this Moodle version
+$plugin->component = 'theme_customtotararesponsive'; // Full name of the plugin (used for diagnostics)

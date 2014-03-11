@@ -18,12 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
+ * @author Brian Barnes <brian.barnes@totaralms.com>
  * @package totara
  * @subpackage theme
  */
 
-$THEME->name = 'customtotara';
-$THEME->parents = array('standardtotara', 'standard', 'base');
+$THEME->name = 'customtotararesponsive';
+$THEME->parents = array('standardtotararesponsive', 'bootstrapbase');
 $THEME->sheets = array(
     'core',     /** Must come first**/
     'navigation',
@@ -43,4 +44,4 @@ $THEME->sheets = array(
 
 $THEME->enable_dock = true;
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->csspostprocess = 'theme_customtotara_process_css';
+$THEME->csspostprocess = 'theme_customtotararesponsive_process_css';
