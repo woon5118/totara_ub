@@ -285,7 +285,11 @@ M.totara_completionrpl = M.totara_completionrpl || {
             var classname = $(this).parent('td').attr('class');
 
             classname = classname.split('cmid-');
-            cmid = classname[1];
+            if (typeof classname[1] !== 'undefined') {
+                cmid = classname[1];
+            } else {
+                cmid = 0;
+            }
         });
 
         // Save RPL data

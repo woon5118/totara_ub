@@ -93,25 +93,26 @@ if (!$rpl_enabled) {
 }
 
 // Contains the values that will be stored in the DB (course_modules_completion table).
-$data = new StdClass;
-$data->id = 0;
-$data->userid = $user->id;
-$data->viewed = 0;
-$data->coursemoduleid = $cmid;
+if (!empty($cmid)) {
+    $data = new stdClass();
+    $data->id = 0;
+    $data->userid = $user->id;
+    $data->viewed = 0;
+    $data->coursemoduleid = $cmid;
+    $data->completionstate = strlen($rpl) ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
+    $data->timemodified = time();
+    $cm = get_coursemodule_from_id(null, $cmid, null, false, MUST_EXIST);
+    $info->internal_set_data($cm, $data);
+}
 
 // Complete
 if (strlen($rpl)) {
     $completion->rpl = addslashes($rpl);
     $completion->mark_complete();
-    $data->completionstate = COMPLETION_COMPLETE;
 // If no RPL, uncomplete user, and let aggregation do its thing
 } else {
     $completion->delete();
-    $data->completionstate = COMPLETION_INCOMPLETE;
 }
-$data->timemodified = time();
-$cm = get_coursemodule_from_id(null, $cmid, null, false, MUST_EXIST);
-$info->internal_set_data($cm, $data);
 
 // Redirect, if requested (not an ajax request)
 if ($redirect) {
