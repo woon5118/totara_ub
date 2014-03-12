@@ -21,7 +21,7 @@
  * Strings for component 'theme_standardtotararesponsive', language 'en'
  *
  * @package   theme_standardtotararesponsive
- * @author Paul Walker <paul.walker@catalyst-eu.net>
+ * @author Mark Webster <mark.webster@catalyst-eu.net>
  */
 $string['pluginname'] = 'Standard Totara Responsive';
 $string['region-side-post'] = 'Right';

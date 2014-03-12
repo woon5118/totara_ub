@@ -775,6 +775,10 @@ input[type="checkbox"] {
 /**
  * Overriding base
  */
+.pagelayout-popup #page {
+    padding-top: 10px;
+}
+
 .pagelayout-frontpage #page-header {
     margin:0 0;
     width:100%;

@@ -56,13 +56,24 @@ $THEME->layouts = array(
     'noblocks' => array(
         'file' => 'columns1.php',
         'regions' => array(),
-        'options' => array('noblocks'=>true, 'langmenu'=>true),
+        'options' => array('noblocks' => true, 'langmenu' => true),
     ),
     'login' => array(
         'file' => 'columns1.php',
         'regions' => array(),
         'options' => array('nologininfo' => true, 'nocustommenu' => true, 'nonavbar' => true, 'langmenu' => true),
-    )
+    ),
+    'popup' => array(
+        'file' => 'popup.php',
+        'regions' => array(),
+        'options' => array('nofooter' => true, 'nonavbar' => true),
+    ),
+    // The pagelayout used for reports.
+    'report' => array(
+        'file' => 'columns2.php',
+        'regions' => array('side-pre'),
+        'options' => array('langmenu' => true),
+    ),
 );
 
 $THEME->enable_dock = false;
