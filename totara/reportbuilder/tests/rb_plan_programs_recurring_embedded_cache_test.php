@@ -63,8 +63,10 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
      * - Add user2 to program1 and program2
      */
     protected function setUp() {
-        global $CFG;
+        global $CFG, $DB, $POSITION_CODES, $POSITION_TYPES;
+
         parent::setup();
+        $this->setAdminUser();
         $this->resetAfterTest(true);
         $this->preventResetByRollback();
         $this->cleanup();
@@ -77,6 +79,7 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
         $this->user1 = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();
         $this->user3 = $this->getDataGenerator()->create_user();
+        $this->user4 = $this->getDataGenerator()->create_user();
 
         $this->program1 = $this->getDataGenerator()->create_program();
         $this->program2 = $this->getDataGenerator()->create_program();
@@ -99,6 +102,27 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
 
         //No need to enroll users to courses and add courses to program as report doesn't check this.
         //However, it might be needed in future
+
+        $syscontext = context_system::instance();
+
+        // Assign user2 to be user1's manager and remove viewallmessages from manager role.
+        $assignment = new position_assignment(
+            array(
+                'userid'    => $this->user1->id,
+                'type'      => $POSITION_CODES[reset($POSITION_TYPES)]
+            )
+        );
+        $assignment->managerid = $this->user2->id;
+        assign_user_position($assignment, true);
+        $rolemanager = $DB->get_record('role', array('shortname'=>'manager'));
+        assign_capability('totara/plan:accessanyplan', CAP_PROHIBIT, $rolemanager->id, $syscontext);
+
+        // Assign user3 to course creator role and add viewallmessages to course creator role.
+        $rolecoursecreator = $DB->get_record('role', array('shortname'=>'coursecreator'));
+        role_assign($rolecoursecreator->id, $this->user3->id, $syscontext);
+        assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
+
+        $syscontext->mark_dirty();
     }
 
     protected function tearDown() {
@@ -179,5 +203,34 @@ class rb_plan_programs_recurring_embedded_cache_test extends reportcache_advance
         $todb->recurringcourseid = $courseid;
 
         $DB->insert_record('prog_completion_history', $todb);
+    }
+
+    public function test_is_capable() {
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array('userid' => $this->user1->id), false, 0);
+        $embeddedobject = $report->embedobj;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user1 can access report for self.
+        $this->assertTrue($embeddedobject->is_capable($this->user1->id, $report),
+                'user cannot access their own report');
+
+        // Test user1's manager can access report (we have removed accessanyplan from manager role).
+        $this->assertTrue($embeddedobject->is_capable($this->user2->id, $report),
+                'manager cannot access report');
+
+        // Test user3 can access report using accessanyplan (we give 'coursecreator' role access to accessanyplan).
+        $this->assertTrue($embeddedobject->is_capable($this->user3->id, $report),
+                'user with accessanyplan cannot access report');
+
+        // Test that user4 cannot access the report for another user.
+        $this->assertFalse($embeddedobject->is_capable($this->user4->id, $report),
+                'user should not be able to access another user\'s report');
     }
 }

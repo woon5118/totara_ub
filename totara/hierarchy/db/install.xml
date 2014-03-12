@@ -269,6 +269,20 @@
          <KEY NAME="comptypeinfodata_com_fk" TYPE="foreign" FIELDS="competencyid" REFTABLE="comp" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="comp_type_info_data_param" COMMENT="Custom competencies fields data parameters">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="comptypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="comp_type_info_data" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="comptypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+        </INDEXES>
+    </TABLE>
     <TABLE NAME="comp_type_info_field" COMMENT="Stores the custom fields for each competency type">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -459,6 +473,20 @@
         <KEY NAME="postypeinfodata_pos_fk" TYPE="foreign" FIELDS="positionid" REFTABLE="pos" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="pos_type_info_data_param" COMMENT="Custom positions fields data parameters">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="postypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="pos_type_info_data" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="postypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+        </INDEXES>
+    </TABLE>
     <TABLE NAME="pos_type_info_field" COMMENT="Stores the custom fields for each position type">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -592,6 +620,20 @@
       <INDEXES>
         <INDEX NAME="orgtype_fie_ix" UNIQUE="false" FIELDS="fieldid"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="org_type_info_data_param" COMMENT="Custom organisations fields data parameters">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="orgtypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="org_type_info_data" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="orgtypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+        </INDEXES>
     </TABLE>
     <TABLE NAME="org_type_info_field" COMMENT="Stores the custom fields for each organisation type">
       <FIELDS>
@@ -759,6 +801,20 @@
         <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="goal_type_info_field" REFFIELDS="id"/>
         <KEY NAME="goaltypeinfodata_goa_fk" TYPE="foreign" FIELDS="goalid" REFTABLE="goal" REFFIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="goal_type_info_data_param" COMMENT="Custom organisations fields data parameters">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+            <FIELD NAME="value" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            <KEY NAME="goaltypeinfodatapara_dat_fk" TYPE="foreign" FIELDS="dataid" REFTABLE="goal_type_info_data" REFFIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="goaltypeinfodatapara_val_ix" UNIQUE="false" FIELDS="value"/>
+        </INDEXES>
     </TABLE>
     <TABLE NAME="goal_type_info_field" COMMENT="Stores the custom fields for each goal type">
       <FIELDS>

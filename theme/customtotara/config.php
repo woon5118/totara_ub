@@ -23,7 +23,7 @@
  */
 
 $THEME->name = 'customtotara';
-$THEME->parents = array('standardtotara', 'standard', 'base');
+$THEME->parents = array('standardtotararesponsive', 'bootstrapbase');
 $THEME->sheets = array(
     'core',     /** Must come first**/
     'navigation',

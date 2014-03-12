@@ -223,6 +223,8 @@ class rb_source_user extends rb_base_source {
                                 'userpic_imagealt' => 'base.imagealt',
                                 'userpic_email' => 'base.email'
                             ),
+                            'dbdatatype' => 'char',
+                            'outputformat' => 'text'
                         )
         );
 
@@ -415,41 +417,30 @@ class rb_source_user extends rb_base_source {
 
         require_once($CFG->dirroot . '/totara/plan/lib.php');
         $show_plan_link = !empty($CFG->enablelearningplans) && dp_can_view_users_plans($userid);
-        $links = $show_plan_link ? ($plan_link.'&nbsp;|&nbsp;') : '';
-        $links .= $profile_link.'&nbsp;|&nbsp;';
-        $links .= $booking_link.'&nbsp;|&nbsp;';
-        $links .= $rol_link.'&nbsp;|&nbsp;';
+        $links = html_writer::start_tag('ul');
+        $links .= $show_plan_link ? html_writer::tag('li', $plan_link) : '';
+        $links .= html_writer::tag('li', $profile_link);
+        $links .= html_writer::tag('li', $booking_link);
+        $links .= html_writer::tag('li', $rol_link);
         // Hide link for temporary managers.
         $tempman = totara_get_manager($userid, null, false, true);
         if ((!$tempman || $tempman->id != $USER->id) && $CFG->enableappraisals) {
-            $links .= $appraisal_link.'&nbsp;|&nbsp;';
+            $links .= html_writer::tag('li', $appraisal_link);
         }
 
         if (!empty($CFG->enablefeedback360)) {
-            $links .= $feedback_link.'&nbsp;|&nbsp;';
+            $links .= html_writer::tag('li', $feedback_link);
         }
 
         if (!empty($CFG->enablegoals)) {
-            $links .= $goal_link.'&nbsp;|&nbsp;';
+            $links .= html_writer::tag('li', $goal_link);
         }
-        $links .= $required_link;
+        $links .= html_writer::tag('li', $required_link);
+        $links .= html_writer::end_tag('ul');
 
-        $table = new html_table();
-        $table->attributes['class'] = 'namewithlinks-layout';
-        $cells = array();
-        $cell = new html_table_cell($user_pic);
-        $cell->attributes['class'] = 'user-picture';
-        $cells[] = $cell;
-        $cell = new html_table_cell($user);
-        $cell->attributes['class'] = 'user-name';
-        $cells[] = $cell;
-        $table->data[] = new html_table_row($cells);
-        $cell = new html_table_cell($links);
-        $cell->attributes['class'] = 'user-links';
-        $cell->colspan = 2;
-        $table->data[] = new html_table_row(array($cell));
+        $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)), $user, array('class' => 'name'));
 
-        $return = html_writer::table($table);
+        $return = $user_pic . $user_tag . $links;
 
         return $return;
     }

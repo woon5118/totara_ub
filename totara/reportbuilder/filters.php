@@ -31,6 +31,7 @@ $id = required_param('id', PARAM_INT); // Report builder id.
 $d = optional_param('d', null, PARAM_TEXT); // Delete.
 $m = optional_param('m', null, PARAM_TEXT); // Move.
 $fid = optional_param('fid', null, PARAM_INT); // Filter id.
+$searchcolumnid = optional_param('searchcolumnid', null, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_INT); // Confirm delete.
 
 admin_externalpage_setup('rbmanagereports');
@@ -42,19 +43,31 @@ $returnurl = new moodle_url('/totara/reportbuilder/filters.php', array('id' => $
 $report = new reportbuilder($id, null, false, null, null, true);
 
 
-$headings = array();
+// Check filterheadings and searchcolumnheadings for multilang spans. Need to set context to use format_string.
+$PAGE->set_context(context_user::instance($USER->id));
+
+$filterheadings = array();
 foreach ($report->src->filteroptions as $option) {
     $key = $option->type . '-' . $option->value;
-    $headings[$key] = $option->label;
+    $filterheadings[$key] = format_string($option->label);
+}
+
+$searchcolumnheadings = array();
+foreach ($report->src->columnoptions as $option) {
+    if ($option->is_searchable()) {
+        $key = $option->type . '-' . $option->value;
+        $searchcolumnheadings[$key] = format_string($option->name);
+    }
 }
 
 // Include jquery.
 local_js();
-$PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'delete', 'moveup',
+$PAGE->requires->strings_for_js(array('saving', 'confirmfilterdelete', 'confirmsearchcolumndelete', 'delete', 'moveup',
     'movedown', 'add', 'initialdisplay_error'), 'totara_reportbuilder');
 $args = array('args' => '{"user_sesskey":"'.$USER->sesskey.'", "rb_reportid":'.$id.',
-    "rb_filters":'.count($report->filters).', "rb_initial_display":'.$report->initialdisplay.',
-    "rb_filter_headings":'.json_encode($headings).'}');
+    "rb_filters":'.count($report->filters).', "rb_search_columns":'.count($report->searchcolumns).',
+    "rb_initial_display":'.$report->initialdisplay.', "rb_filter_headings":'.json_encode($filterheadings).',
+    "rb_search_column_headings":'.json_encode($searchcolumnheadings).'}');
 $jsmodule = array(
     'name' => 'totara_reportbuilderfilters',
     'fullpath' => '/totara/reportbuilder/filters.js',
@@ -74,10 +87,23 @@ if ($d and $confirm) {
             if ($report->delete_filter($fid)) {
                 add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
                     'Delete Filter: Report ID=' . $id . ', Filter ID=' . $fid);
-                totara_set_notification(get_string('filter_deleted', 'totara_reportbuilder'), $returnurl,
+                totara_set_notification(get_string('filterdeleted', 'totara_reportbuilder'), $returnurl,
                     array('class' => 'notifysuccess'));
             } else {
                 totara_set_notification(get_string('error:filter_not_deleted', 'totara_reportbuilder'), $returnurl);
+            }
+        }
+    } else if (isset($searchcolumnid)) {
+        if ($report->initialdisplay && count($report->filters) <= 1) {
+                totara_set_notification(get_string('initialdisplay_error', 'totara_reportbuilder'), $returnurl);
+        } else {
+            if ($report->delete_search_column($searchcolumnid)) {
+                add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
+                    'Delete Search Column: Report ID=' . $id . ', Search Column ID=' . $searchcolumnid);
+                totara_set_notification(get_string('searchcolumndeleted', 'totara_reportbuilder'), $returnurl,
+                    array('class' => 'notifysuccess'));
+            } else {
+                totara_set_notification(get_string('error:search_column_not_deleted', 'totara_reportbuilder'), $returnurl);
             }
         }
     }
@@ -91,6 +117,10 @@ if ($d) {
         $confirmurl = new moodle_url('/totara/reportbuilder/filters.php',
             array('d' => '1', 'id' => $id, 'fid' => $fid, 'confirm' => '1', 'sesskey' => $USER->sesskey));
         echo $output->confirm(get_string('confirmfilterdelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
+    } else if (isset($searchcolumnid)) {
+        $confirmurl = new moodle_url('/totara/reportbuilder/filters.php',
+            array('d' => '1', 'id' => $id, 'searchcolumnid' => $searchcolumnid, 'confirm' => '1', 'sesskey' => $USER->sesskey));
+        echo $output->confirm(get_string('confirmsearchcolumndelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
     }
 
     echo $output->footer();
@@ -102,14 +132,17 @@ if ($m && isset($fid)) {
     if ($report->move_filter($fid, $m)) {
         add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
             'Moved Filter: Report ID=' . $id . ', Filter ID=' . $fid);
-        totara_set_notification(get_string('filter_moved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
+        totara_set_notification(get_string('filtermoved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         totara_set_notification(get_string('error:filter_not_moved', 'totara_reportbuilder'), $returnurl);
     }
 }
 
 // Form definition.
-$mform = new report_builder_edit_filters_form(null, compact('id', 'report'));
+$data = $report->get_all_filters_select();
+$data['id'] = $id;
+$data['report'] = $report;
+$mform = new report_builder_edit_filters_form(null, $data);
 
 // Form results check.
 if ($mform->is_cancelled()) {
@@ -121,6 +154,7 @@ if ($fromform = $mform->get_data()) {
         print_error('error:unknownbuttonclicked', 'totara_reportbuilder', $returnurl);
     }
     if (build_filters($id, $fromform)) {
+        $DB->set_field('report_builder', 'toolbarsearch', !$fromform->toolbarsearchdisabled, array('id' => $id));
         reportbuilder_set_status($id);
         add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
             'Filter Settings: Report ID=' . $id);
@@ -152,7 +186,8 @@ require_once('tabs.php');
 $mform->display();
 
 // Include JS vars.
-$js = "var rb_reportid = {$id}; var rb_filter_headings = " . json_encode($headings) . ';';
+$js = "var rb_reportid = {$id}; var rb_filter_headings = " . json_encode($filterheadings) .
+        "; var rb_search_column_headings = " . json_encode($searchcolumnheadings) . ";";
 echo html_writer::script($js);
 
 echo $output->footer();
@@ -169,8 +204,9 @@ function build_filters($id, $fromform) {
     global $DB;
 
     $transaction = $DB->start_delegated_transaction();
-    $oldfilters = $DB->get_records('report_builder_filters', array('reportid' => $id));
+
     // See if existing filters have changed.
+    $oldfilters = $DB->get_records('report_builder_filters', array('reportid' => $id));
     foreach ($oldfilters as $fid => $oldfilter) {
         $filtername = "filter{$fid}";
         $advancedname = "advanced{$fid}";
@@ -194,25 +230,59 @@ function build_filters($id, $fromform) {
             $DB->update_record('report_builder_filters', $todb);
         }
     }
+
+    // See if existing search columns have changed.
+    $oldsearchcolumns = $DB->get_records('report_builder_search_cols', array('reportid' => $id));
+    foreach ($oldsearchcolumns as $searchcolumnid => $oldsearchcolumn) {
+        $searchcolumnname = "searchcolumn{$searchcolumnid}";
+        // Update db only if search column has changed.
+        if (isset($fromform->$searchcolumnname) &&
+            ($fromform->$searchcolumnname != $oldsearchcolumn->type.'-'.$oldsearchcolumn->value)) {
+            $todb = new stdClass();
+            $todb->id = $searchcolumnid;
+            $parts = explode('-', $fromform->$searchcolumnname);
+            $todb->type = $parts[0];
+            $todb->value = $parts[1];
+            $DB->update_record('report_builder_search_cols', $todb);
+        }
+    }
+
     // Add any new filters.
-    if (isset($fromform->newfilter) && $fromform->newfilter != '0') {
-        $name = isset($fromform->newfiltername) ? $fromform->newfiltername : '';
+    $regions = rb_filter_type::get_all_regions();
+    foreach ($regions as $regionkey => $regioncode) {
+        if (isset($fromform->{'new'.$regioncode.'filter'}) && $fromform->{'new'.$regioncode.'filter'} != '0') {
+            $name = isset($fromform->{'new' . $regioncode . 'filtername'}) ? $fromform->{'new' . $regioncode . 'filtername'} : '';
+            $todb = new stdClass();
+            $todb->reportid = $id;
+            $todb->advanced = isset($fromform->{'new' . $regioncode . 'advanced'}) ?
+                    $fromform->{'new' . $regioncode . 'advanced'} : 0;
+            $parts = explode('-', $fromform->{'new' . $regioncode . 'filter'});
+            $todb->region = $regionkey;
+            $todb->type = $parts[0];
+            $todb->value = $parts[1];
+            $todb->filtername = $name;
+            $todb->customname = isset($fromform->{'new' . $regioncode . 'customname'}) ?
+                    $fromform->{'new' . $regioncode . 'customname'} : 0;
+            $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1',
+                    array('reportid' => $id, 'region' => $regionkey));
+            if (!$sortorder) {
+                $sortorder = 1;
+            }
+            $todb->sortorder = $sortorder;
+            $DB->insert_record('report_builder_filters', $todb);
+        }
+    }
+
+    // Add any new search columns.
+    if (isset($fromform->newsearchcolumn) && $fromform->newsearchcolumn != '0') {
         $todb = new stdClass();
         $todb->reportid = $id;
-        $todb->advanced = isset($fromform->newadvanced) ? $fromform->newadvanced : 0;
-        $parts = explode('-', $fromform->newfilter);
+        $parts = explode('-', $fromform->newsearchcolumn);
         $todb->type = $parts[0];
         $todb->value = $parts[1];
-        $todb->filtername = $name;
-        $todb->customname = $fromform->newcustomname;
-        $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1', array('reportid' => $id));
-        if (!$sortorder) {
-            $sortorder = 1;
-        }
-        $todb->sortorder = $sortorder;
-        $DB->insert_record('report_builder_filters', $todb);
+        $DB->insert_record('report_builder_search_cols', $todb);
     }
+
     $transaction->allow_commit();
     return true;
 }
-

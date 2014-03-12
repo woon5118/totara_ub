@@ -31,6 +31,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
 require_once($CFG->libdir . '/testing/generator/data_generator.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
+require_once($CFG->dirroot . '/totara/customfield/definelib.php');
+require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
 
 abstract class reportcache_advanced_testcase extends advanced_testcase {
     protected static $generator = null;
@@ -161,7 +164,8 @@ class reportcache_testing_data_generator extends testing_data_generator {
                          'visible' => 1,
                          'summary' => '',
                          'endnote' => '',
-                         'audiencevisible' => 2
+                         'audiencevisible' => 2,
+                         'certifid' => null
                         );
         $properties = array_merge($default, $data);
 
@@ -286,7 +290,7 @@ class reportcache_testing_data_generator extends testing_data_generator {
      * @return stdClass Program record
      */
     public function create_plan($userid, $record = array()) {
-        global $DB, $CFG;
+        global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
         if (is_object($record)) {
@@ -314,5 +318,69 @@ class reportcache_testing_data_generator extends testing_data_generator {
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
 
         return $plan;
+    }
+
+    /**
+     * Add multi-select custom field. All fields have default icon and are not default
+     *
+     * @param array $cfdef Format: array('fieldname' => array('option1', 'option2', ...), ...)
+     * @param string $tableprefix
+     * @return array id's of custom fields. Format: array('fieldname' => id, ...)
+     */
+    public function add_multiselect_cf($cfdef, $tableprefix) {
+        global $DB;
+        $result = array();
+        foreach ($cfdef as $name => $options) {
+            $data = new stdClass();
+            $data->id = 0;
+            $data->datatype = 'multiselect';
+            $data->fullname = $name;
+            $data->description = '';
+            $data->defaultdata = '';
+            $data->forceunique = 0;
+            $data->hidden = 0;
+            $data->locked = 0;
+            $data->required = 0;
+            $data->description_editor = array('text' => '', 'format' => 0);
+            $data->multiselectitem = array();
+            foreach ($options as $opt) {
+                $data->multiselectitem[] = array('option' => $opt, 'icon' => 'default',
+                        'default' => 0, 'delete' => 0);
+            }
+            $formfield = new customfield_define_multiselect();
+            $formfield->define_save($data, $tableprefix);
+            $sql = "SELECT id FROM {{$tableprefix}_info_field} WHERE ".
+                    $DB->sql_compare_text('fullname') . ' = ' . $DB->sql_compare_text(':fullname');
+
+            $result[$name] = $DB->get_field_sql($sql, array('fullname' => $name));
+        }
+        return $result;
+    }
+
+    /**
+     * Enable one or more option for selected customfield
+     *
+     * @param stdClass $item - course/prog or other supported object
+     * @param int $id - customfeild id
+     * @param array $options - option names to enable
+     * @param string $prefix
+     * @param string $tableprefix
+     */
+    public function set_multiselect_cf($item, $cfid, array $options, $prefix, $tableprefix) {
+        $field = new customfield_multiselect($cfid, $item, $prefix, $tableprefix);
+        $field->inputname = 'cftest';
+
+        $data = new stdClass();
+        $data->id = $item->id;
+        $cfdata = array();
+        foreach ($field->options as $key => $option) {
+            if (in_array($option['option'], $options)) {
+                $cfdata[$key] = 1;
+            } else {
+                $cfdata[$key] = 0;
+            }
+        }
+        $data->cftest = $cfdata;
+        $field->edit_save_data($data, $prefix, $tableprefix);
     }
 }

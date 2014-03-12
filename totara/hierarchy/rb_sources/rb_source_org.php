@@ -103,26 +103,34 @@ class rb_source_org extends rb_base_source {
                 'org',
                 'idnumber',
                 get_string('idnumber', 'rb_source_org'),
-                "base.idnumber"
+                "base.idnumber",
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'fullname',
                 get_string('name', 'rb_source_org'),
                 "base.fullname",
-                array('displayfunc' => 'orgnamelink')
+                array('displayfunc' => 'orgnamelink',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'shortname',
                 get_string('shortname', 'rb_source_org'),
-                "base.shortname"
+                "base.shortname",
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'description',
                 get_string('description', 'rb_source_org'),
-                "base.description"
+                "base.description",
+                array('dbdatatype' => 'text',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
@@ -140,14 +148,18 @@ class rb_source_org extends rb_base_source {
                 'orgtype',
                 get_string('type', 'rb_source_org'),
                 'orgtype.fullname',
-                array('joins' => 'orgtype')
+                array('joins' => 'orgtype',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'framework',
                 get_string('framework', 'rb_source_org'),
                 "framework.fullname",
-                array('joins' => 'framework')
+                array('joins' => 'framework',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
@@ -161,21 +173,27 @@ class rb_source_org extends rb_base_source {
                 'parentidnumber',
                 get_string('parentidnumber', 'rb_source_org'),
                 'parent.idnumber',
-                array('joins' => 'parent')
+                array('joins' => 'parent',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'parentfullname',
                 get_string('parentfullname', 'rb_source_org'),
                 'parent.fullname',
-                array('joins' => 'parent')
+                array('joins' => 'parent',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',
                 'comps',
                 get_string('competencies', 'rb_source_org'),
                 'comps.list',
-                array('joins' => 'comps')
+                array('joins' => 'comps',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'org',

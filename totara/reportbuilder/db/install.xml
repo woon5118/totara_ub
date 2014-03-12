@@ -20,6 +20,7 @@
         <FIELD NAME="defaultsortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="4" SEQUENCE="false" COMMENT="Integer representing the direction that default sorting should be done"/>
         <FIELD NAME="embedded" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates whether the report is an embedded report. Set to 1 for embedded, 0 otherwise."/>
         <FIELD NAME="initialdisplay" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicated whether to wait for filters to be applied before generating the report"/>
+        <FIELD NAME="toolbarsearch" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Indicates if toolbarsearch should be enabled"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for report builder"/>
@@ -54,10 +55,23 @@
         <FIELD NAME="advanced" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If none zero then the filter is an advanced option"/>
         <FIELD NAME="filtername" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false" COMMENT="Visible name describing the filter to report users"/>
         <FIELD NAME="customname" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates whether the user has customised a name or if they are still using the default filter name value"/>
+        <FIELD NAME="region" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates whether filter appears at the top or in the sidebar"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="repobuilfilt_rep_fk" TYPE="foreign" FIELDS="reportid" REFTABLE="report_builder" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="report_builder_search_cols" COMMENT="Defines search columns belonging to each report">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="reportid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="repobuilsear_rep_fk" TYPE="foreign" FIELDS="reportid" REFTABLE="report_builder" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="report_builder_settings" COMMENT="Contains settings for individual reports">

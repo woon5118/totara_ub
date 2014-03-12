@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Yuliya Bozhko <yuliya.bozhko@totaralms.com>
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
  * @package totara
  * @subpackage totara_core
  */
@@ -53,33 +54,48 @@ M.totara_iconpicker = M.totara_iconpicker || {
             throw new Error('M.totara_iconpicker.init()-> jQuery dependency required for this module to function.');
         }
 
-        // Create a dialog to handle stuff
-        var handler = new totaraDialog_handler_selectable(M.totara_iconpicker.config.selected_icon);
-        var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
-            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.close(); };
-        var dialog = new totaraDialog(
-                'icon-dialog',
-                'show-icon-dialog',
-                {
-                    buttons: buttonsObj,
-                    title: '<h2>'+M.util.get_string('chooseicon', 'totara_program')+'</h2>'
-                },
-                M.cfg.wwwroot + '/totara/core/icons.php?type=' + M.totara_iconpicker.config.type,
-                handler
-            );
+        // Create a dialog to handle icon selection.
+        var btnids = ['show-icon-dialog'];
+        if (!$('#show-icon-dialog').length){
+            btnids = [];
+            $('.show-icon-dialog').each(function(indx, btnelem) {
+                btnids.push($(btnelem).attr('id'));
+            });
+        }
 
-        dialog.base_url = dialog.default_url;
-        dialog.old_open = dialog.open;
-        dialog.open = function() {
-            this.old_open();
-        };
+        $(btnids).each(function(idx, btnid) {
+            var handler = new totaraDialog_handler_selectable(M.totara_iconpicker.config.selected_icon);
+            var suffix = ($('#' + btnid).data('ind') === undefined) ? '' : $('#' + btnid).data('ind');
+            var buttonsObj = {};
+                buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+                buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.close(); };
+            var dialog = new totaraDialog(
+                    'icon-dialog' + suffix,
+                    btnid,
+                    {
+                        buttons: buttonsObj,
+                        title: '<h2>' + M.util.get_string('chooseicon', 'totara_program') + '</h2>'
+                    },
+                    M.cfg.wwwroot + '/totara/core/icons.php?type=' + M.totara_iconpicker.config.type,
+                    handler
+                );
+            dialog.suffix = suffix;
+            dialog.base_url = dialog.default_url;
+            dialog.old_open = dialog.open;
+            dialog.open = function() {
+                this.old_open();
+            };
+            dialog.close = function() {
+                var response = $(".ui-selected").attr('id');
+                handler._updatePage(response);
+            };
+            totaraDialogs['icon-dialog' + suffix] = dialog;
 
-        dialog.close = function() {
-            var response = $(".ui-selected").attr('id');
-            handler._updatePage(response);
-        };
-
-        totaraDialogs['icon-dialog'] = dialog;
+            // Render default icon.
+            if ($("#icon" + suffix).length && $("#icon" + suffix).val().length) {
+                defaulticon = $("#icon" + suffix).val();
+                dialog.handler._updatePage(defaulticon);
+            }
+        });
     }
 };

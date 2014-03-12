@@ -178,6 +178,8 @@ class rb_source_dp_certification extends rb_base_source {
                 'base.fullname',
                 array(
                     'joins' => 'base',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -205,6 +207,8 @@ class rb_source_dp_certification extends rb_base_source {
                 'base.shortname',
                 array(
                     'joins' => 'base',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -215,6 +219,8 @@ class rb_source_dp_certification extends rb_base_source {
                 'base.idnumber',
                 array(
                     'joins' => 'base',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 

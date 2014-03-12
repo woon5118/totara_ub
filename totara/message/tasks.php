@@ -47,11 +47,6 @@ $PAGE->set_context($context);
 $PAGE->set_url('/totara/message/tasks.php');
 $PAGE->set_pagelayout('noblocks');
 
-// Users can only view their own and their staff's pages
-// Or if they are an admin.
-if (($USER->id != $id && !totara_is_manager($id) && !has_capability('totara/message:viewallmessages',$context))) {
-    print_error('youcannotview', 'totara_message');
-}
 $strheading = get_string('tasks', 'totara_message');
 
 $shortname = 'tasks';
@@ -111,6 +106,7 @@ if (empty($report->description)) {
 echo $output->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

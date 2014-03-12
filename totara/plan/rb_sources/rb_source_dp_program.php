@@ -127,21 +127,27 @@ class rb_source_dp_program extends rb_base_source {
             'fullname',
             get_string('programname', 'totara_program'),
             "base.fullname",
-            array('joins' => 'base')
+            array('joins' => 'base',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'program',
             'shortname',
             get_string('programshortname', 'totara_program'),
             "base.shortname",
-            array('joins' => 'base')
+            array('joins' => 'base',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'program',
             'idnumber',
            get_string('programidnumber', 'totara_program'),
             "base.idnumber",
-            array('joins' => 'base')
+            array('joins' => 'base',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'program',

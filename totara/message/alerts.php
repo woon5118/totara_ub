@@ -40,21 +40,18 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '',PARAM_TEXT); //export format
 
 // Default to current user.
-$id = $USER->id;
+$userid = $USER->id;
 
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/message/alerts.php');
 $PAGE->set_pagelayout('noblocks');
-// Users can only view their own and their staff's pages or if they are an admin.
-if (($USER->id != $id && !totara_is_manager($id) && !has_capability('totara/message:viewallmessages',$context))) {
-    print_error('youcannotview', 'totara_message');
-}
+
 $strheading = get_string('alerts', 'totara_message');
 
 $shortname = 'alerts';
 $data = array(
-    'userid' => $id,
+    'userid' => $userid,
 );
 if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
@@ -112,6 +109,7 @@ if (empty($report->description)) {
 echo $output->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

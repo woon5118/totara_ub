@@ -131,6 +131,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'prog.fullname',
                 array(
                     'joins' => 'prog',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -168,6 +170,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'prog.shortname',
                 array(
                     'joins' => 'prog',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 
@@ -178,6 +182,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'prog.idnumber',
                 array(
                     'joins' => 'prog',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
 

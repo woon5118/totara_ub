@@ -39,6 +39,7 @@ class rb_source_courses extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
+        $this->defaulttoolbarsearchcolumns = $this->define_defaultsearchcolumns();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_courses');
 
@@ -65,7 +66,7 @@ class rb_source_courses extends rb_base_source {
             ),
         );
 
-        // include some standard joins
+        // Include some standard joins.
         $this->add_course_category_table_to_joinlist($joinlist,
             'base', 'category');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'base', 'id');
@@ -85,7 +86,7 @@ class rb_source_courses extends rb_base_source {
             ),
         );
 
-        // include some standard columns
+        // Include some standard columns.
         $this->add_course_fields_to_columns($columnoptions, 'base');
         $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base');
         $this->add_tag_fields_to_columns('course', $columnoptions);
@@ -104,11 +105,18 @@ class rb_source_courses extends rb_base_source {
                 array(            // options
                     'selectfunc' => 'modules_list',
                     'concat' => true, // Multicheck filter need to know that we work with concatenated values
+                    'simplemode' => true,
+                    'showcounts' => array(
+                            'joins' => array("LEFT JOIN (SELECT course, name FROM {course_modules} cm " .
+                                                          "LEFT JOIN {modules} m ON m.id = cm.module) course_mods_filter ".
+                                                    "ON base.id = course_mods_filter.course"),
+                            'dataalias' => 'course_mods_filter',
+                            'datafield' => 'name')
                 )
             )
         );
 
-        // include some standard filters
+        // Include some standard filters.
         $this->add_course_fields_to_filters($filteroptions, 'base', 'id');
         $this->add_course_category_fields_to_filters($filteroptions, 'base', 'category');
         $this->add_tag_fields_to_filters('course', $filteroptions);
@@ -164,11 +172,26 @@ class rb_source_courses extends rb_base_source {
             array(
                 'type' => 'course_category',
                 'value' => 'id',
-                'advanced' => 0,
+                'region' => rb_filter_type::RB_FILTER_REGION_SIDEBAR,
             ),
         );
 
         return $defaultfilters;
+    }
+
+    protected function define_defaultsearchcolumns() {
+        $defaultsearchcolumns = array(
+            array(
+                'type' => 'course',
+                'value' => 'fullname',
+            ),
+            array(
+                'type' => 'course',
+                'value' => 'summary',
+            ),
+        );
+
+        return $defaultsearchcolumns;
     }
 
     protected function define_requiredcolumns() {

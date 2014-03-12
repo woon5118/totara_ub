@@ -565,15 +565,19 @@ function tm_message_dismiss($id) {
  * saved against this message
  *
  * @param int $id message id
+ * @param string $reasonfordecision Reason for granting the request
  * @return boolean success
  */
-function tm_message_task_accept($id) {
+function tm_message_task_accept($id, $reasonfordecision) {
     global $DB;
 
     $message = $DB->get_record('message', array('id' => $id));
     if ($message) {
         // get the event data
         $eventdata = totara_message_eventdata($id, 'onaccept');
+        if (!empty($reasonfordecision)) {
+            $eventdata->data['reasonfordecision'] = $reasonfordecision;
+        }
         // grab the onaccept handler
         if (isset($eventdata->action)) {
             $plugin = tm_message_workflow_object($eventdata->action);
@@ -634,16 +638,19 @@ function tm_message_task_link($id) {
  * saved against this message
  *
  * @param int $id message id
+ * @param string $reasonfordecision Reason for rejecting the request
  * @return boolean success
  */
-function tm_message_task_reject($id) {
+function tm_message_task_reject($id, $reasonfordecision) {
     global $DB;
 
     $message = $DB->get_record('message', array('id' => $id));
     if ($message) {
-        // get the event data
+        // Get the event data.
         $eventdata = totara_message_eventdata($id, 'onreject');
-
+        if (!empty($reasonfordecision)) {
+            $eventdata->data['reasonfordecision'] = $reasonfordecision;
+        }
         // grab the onaccept handler
         if (isset($eventdata->action)) {
             $plugin = tm_message_workflow_object($eventdata->action);

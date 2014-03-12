@@ -121,6 +121,9 @@ abstract class rb_base_source {
             case '{course}':
                 $joindata['add_custom_course_fields'] = 'base';
                 break;
+            case '{prog}':
+                $joindata['add_custom_prog_fields'] = 'base';
+                break;
             case '{org}':
                 $joindata['add_custom_organisation_fields'] = 'base';
                 break;
@@ -198,6 +201,33 @@ abstract class rb_base_source {
                 redirect($this->redirecturl);
             }
         }
+    }
+
+
+    /**
+     * Create a link that when clicked will display additional information inserted in a box below the clicked row.
+     *
+     * @param string|stringable $columnvalue the value to display in the column
+     * @param string $expandname the name of the function (prepended with 'rb_expand_') that will generate the contents
+     * @param array $params any parameters that the content generator needs
+     * @param string|moodle_url $alternateurl url to link to in case js is not available
+     * @param array $attributes
+     * @return type
+     */
+    protected function create_expand_link($columnvalue, $expandname, $params, $alternateurl = '', $attributes = array()) {
+        global $OUTPUT;
+
+        // Serialize the data so that it can be passed as a single value.
+        $paramstring = http_build_query($params);
+
+        $attributes['class'] = 'rb-display-expand';
+        $attributes['data-name'] = $expandname;
+        $attributes['data-param'] = $paramstring;
+        $attributes['style'] = 'background-image:url(' . $OUTPUT->pix_url('i/info') . ')';
+
+        // Create the result.
+        $link = html_writer::link($alternateurl, format_string($columnvalue), array('class' => 'rb-display-expand-link'));
+        return html_writer::div($link, 'rb-display-expand', $attributes);
     }
 
 
@@ -698,6 +728,42 @@ abstract class rb_base_source {
         return $displaytext;
     }
 
+    /**
+     * Properly format totara customfield multi-select data for display as icons
+     * @param string $field fieldname from SQL query
+     * @param integer $data contents of field from database
+     * @param object $row Object containing all other fields for this row
+     * @param boolean $isexport
+     * @return string icon of selected options
+     */
+    public function rb_display_customfield_multiselect_icon($field, $data, $row, $isexport = false) {
+        global $CFG;
+
+        if ($isexport) {
+            return $this->rb_display_customfield_multiselect_text($field, $data, $row, $isexport);
+        }
+
+        require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
+
+        return customfield_multiselect::display_item_data($row->{$field . '_json'}, array('display' => 'list-icons'));
+    }
+
+    /**
+     * Properly format totara customfield multi-select data for display as text titles
+     * @param string $field fieldname from SQL query
+     * @param integer $data contents of field from database
+     * @param object $row Object containing all other fields for this row
+     * @param boolean $isexport
+     * @return string icon of selected options
+     */
+    public function rb_display_customfield_multiselect_text($field, $data, $row, $isexport = false) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
+
+        return customfield_multiselect::display_item_data($row->{$field . '_json'}, array('display' => 'list-text'));
+    }
+
     function rb_display_link_user_icon($user, $row, $isexport = false) {
         global $OUTPUT;
 
@@ -750,7 +816,208 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Convert a course name into an expanding link.
+     *
+     * @param string $course
+     * @param array $row
+     * @param bool $isexport
+     * @return html|string
+     */
+    public function rb_display_course_expand($course, $row, $isexport = false) {
+        if ($isexport) {
+            return format_string($course);
+        }
 
+        $attr = (isset($row->course_visible) && $row->course_visible == 0) ? array('class' => 'dimmed') : array();
+        $alturl = new moodle_url('/course/view.php', array('id' => $row->course_id));
+        return $this->create_expand_link($course, 'course_details', array('expandcourseid' => $row->course_id), $alturl, $attr);
+    }
+
+    /**
+     * Convert a program/certification name into an expanding link.
+     *
+     * @param string $program
+     * @param array $row
+     * @param bool $isexport
+     * @return html|string
+     */
+    public function rb_display_program_expand($program, $row, $isexport = false) {
+        if ($isexport) {
+            return format_string($program);
+        }
+
+        $attr = (isset($row->prog_visible) && $row->prog_visible == 0) ? array('class' => 'dimmed')
+                : array();
+        $alturl = new moodle_url('/totara/program/view.php', array('id' => $row->prog_id));
+        return $this->create_expand_link($program, 'prog_details',
+                array('expandprogid' => $row->prog_id), $alturl, $attr);
+    }
+
+    /**
+     * Enpanding content to display when clicking a course.
+     * Will be placed inside a table cell which is the width of the table.
+     * Call required_param to get any param data that is needed.
+     *
+     * @return string
+     */
+    public function rb_expand_course_details() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+
+        $formdata = array();
+
+        $courseid = required_param('expandcourseid', PARAM_INT);
+        $userid = $USER->id;
+
+        $course = $DB->get_record('course', array('id' => $courseid));
+        $formdata['summary'] = $course->summary;
+
+        $coursecontext = context_course::instance($course->id, MUST_EXIST);
+        $enrolled = is_enrolled($coursecontext);
+        $formdata['url'] = new moodle_url('/course/view.php', array('id' => $courseid));
+
+        if ($enrolled) {
+            $ccompl = new completion_completion(array('userid' => $userid, 'course' => $courseid));
+            $complete = $ccompl->is_complete();
+            if ($complete) {
+                $sql = 'SELECT gg.*
+                          FROM {grade_grades} gg
+                          JOIN {grade_items} gi
+                            ON gg.itemid = gi.id
+                         WHERE gg.userid = ?
+                           AND gi.courseid = ?';
+                $grade = $DB->get_record_sql($sql, array($userid, $courseid));
+                $coursecompletion = $DB->get_record('course_completions', array('userid' => $userid, 'course' => $courseid));
+                $coursecompletedon = userdate($coursecompletion->timecompleted, get_string('strfdateshortmonth', 'langconfig'));
+
+                $formdata['status'] = get_string('coursestatuscomplete', 'totara_reportbuilder');
+                $formdata['progress'] = get_string('coursecompletedon', 'totara_reportbuilder', $coursecompletedon);
+                if ($grade) {
+                    if (!isset($grade->finalgrade)) {
+                        $formdata['grade'] = '-';
+                    } else {
+                        $formdata['grade'] = get_string('xpercent', 'totara_core', $grade->finalgrade);
+                    }
+                }
+            } else {
+                $formdata['status'] = get_string('coursestatusenrolled', 'totara_reportbuilder');
+
+                list($statusdpsql, $statusdpparams) = $this->get_dp_status_sql($userid, $courseid);
+                $statusdp = $DB->get_record_sql($statusdpsql, $statusdpparams);
+                $progress = totara_display_course_progress_icon($userid, $courseid,
+                    $statusdp->course_completion_statusandapproval);
+                // Highlight if the item has not yet been approved.
+                if ($statusdp->approved == DP_APPROVAL_UNAPPROVED
+                        || $statusdp->approved == DP_APPROVAL_REQUESTED) {
+                    $progress .= $this->rb_display_plan_item_status($statusdp->approved);
+                }
+                $formdata['progress'] = $progress;
+
+                // Course not finished, so no end date for course.
+                $formdata['enddate'] = '';
+            }
+            $formdata['action'] =  get_string('launchcourse', 'totara_program');
+        } else {
+            $formdata['status'] = get_string('coursestatusnotenrolled', 'totara_reportbuilder');
+
+            $instances = enrol_get_instances($courseid, true);
+            $plugins = enrol_get_plugins(true);
+
+            $cansignup = false;
+            $enrolmethodlist = array();
+            foreach ($instances as $instance) {
+                if (!isset($plugins[$instance->enrol])) {
+                    continue;
+                }
+                $plugin = $plugins[$instance->enrol];
+                if (enrol_is_enabled($instance->enrol)) {
+                    $enrolmethodlist[] = $plugin->get_instance_name($instance);
+                    if (in_array($instance->enrol, array('self', 'guest'))) {
+                        if ($plugin->show_enrolme_link($instance)) {
+                            $cansignup = true;
+                        }
+                    }
+                }
+            }
+            $enrolmethodstr = implode(', ', $enrolmethodlist);
+            $realuser = session_get_realuser();
+
+            // Enrolling methods.
+
+            if ($cansignup) {
+                $formdata['enroltype'] = get_string('courseenrolavailable', 'totara_reportbuilder');
+                $formdata['action'] = get_string('enrol', 'enrol');
+                $formdata['url'] = new moodle_url('/enrol/index.php', array('id' => $courseid));
+            } else if (is_viewing($coursecontext, $realuser->id) || is_siteadmin($realuser->id)) {
+                $formdata['enroltype'] = $enrolmethodstr;
+                $formdata['action'] = get_string('viewcourse', 'totara_program');
+                $formdata['url'] = new moodle_url('/course/view.php', array('id' => $courseid));
+            } else {
+                $formdata['enroltype'] = $enrolmethodstr;
+                $formdata['action'] = get_string('notenrollable', 'enrol');
+                $formdata['url'] = '';
+            }
+        }
+
+        $mform = new report_builder_course_expand_form(null, $formdata);
+
+        return $mform->render();
+    }
+
+    /**
+     * Enpanding content to display when clicking a course.
+     * Will be placed inside a table cell which is the width of the table.
+     * Call required_param to get any param data that is needed.
+     *
+     * @return string
+     */
+    public function rb_expand_prog_details() {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+
+        $progid = required_param('expandprogid', PARAM_INT);
+        $userid = $USER->id;
+
+        $formdata = (array)$DB->get_record('prog', array('id' => $progid));
+
+        $formdata['assigned'] = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+
+        $mform = new report_builder_program_expand_form(null, $formdata);
+
+        return $mform->render();
+    }
+
+    /**
+     * Get course progress status for user according his record of learning
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return array
+     */
+    public function get_dp_status_sql($userid, $courseid) {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/plan/rb_sources/rb_source_dp_course.php');
+        // Use base query from rb_source_dp_course, and column/joins of statusandapproval.
+        $base_sql = rb_source_dp_course::get_base_sql();
+        $sql = "SELECT CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
+                            THEN dp_course.completionstatus
+                            ELSE course_completion.status
+                            END AS course_completion_statusandapproval,
+                       dp_course.approved AS approved
+                 FROM ".$base_sql. " base
+                 LEFT JOIN {course_completions} course_completion
+                   ON (base.courseid = course_completion.course
+                  AND base.userid = course_completion.userid)
+                 LEFT JOIN (SELECT p.userid AS userid, p.status AS planstatus,
+                                   pc.courseid AS courseid, pc.approved AS approved,
+                                   pc.completionstatus AS completionstatus
+                              FROM {dp_plan} p
+                             INNER JOIN {dp_plan_course_assign} pc ON p.id = pc.planid) dp_course
+                   ON dp_course.userid = base.userid AND dp_course.courseid = base.courseid
+                WHERE base.userid = ? AND base.courseid = ?";
+        return array($sql, array($userid, $courseid));
+    }
     // convert a course name into a link to that course
     function rb_display_link_course($course, $row, $isexport = false) {
         global $CFG;
@@ -844,6 +1111,21 @@ abstract class rb_base_source {
         $icon = $OUTPUT->pix_icon('/msgicons/' . $image . '-regular', $alt, 'totara_core', array('title' => $alt));
 
         return $icon;
+    }
+
+    /**
+     * Display course type text
+     * @param string $type
+     * @param array $row
+     * @param bool $isexport
+     * @return string
+     */
+    public function rb_display_course_type($type, $row, $isexport = false) {
+        $types = $this->rb_filter_course_types();
+        if (isset($types[$type])) {
+            return $types[$type];
+        }
+        return '';
     }
 
     // convert a course category name into a link to that category's page
@@ -1328,6 +1610,20 @@ abstract class rb_base_source {
 
         return $out;
     }
+
+    /**
+     *
+     * @return array possible course types
+     */
+    public function rb_filter_course_types() {
+        global $TOTARA_COURSE_TYPES;
+        $coursetypeoptions = array();
+        foreach ($TOTARA_COURSE_TYPES as $k => $v) {
+            $coursetypeoptions[$v] = get_string($k, 'totara_core');
+        }
+        return $coursetypeoptions;
+    }
+
     //
     //
     // Generic grouping methods for aggregation
@@ -1466,7 +1762,9 @@ abstract class rb_base_source {
             'fullname',
             get_string('userfullname', 'totara_reportbuilder'),
             $DB->sql_fullname("$join.firstname", "$join.lastname"),
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -1513,7 +1811,9 @@ abstract class rb_base_source {
                 'extrafields' => array(
                     'emailstop' => "$join.emailstop",
                     'maildisplay' => "$join.maildisplay",
-                )
+                ),
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
         // Only include this column if email is among fields allowed
@@ -1532,6 +1832,8 @@ abstract class rb_base_source {
                     // Users must have viewuseridentity to see the
                     // unobscured email address.
                     'capability' => 'moodle/site:viewuseridentity',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             );
         }
@@ -1572,7 +1874,6 @@ abstract class rb_base_source {
             'lastname' => get_string('userlastname', 'totara_reportbuilder'),
             'username' => get_string('username', 'totara_reportbuilder'),
             'idnumber' => get_string('useridnumber', 'totara_reportbuilder'),
-            'id' => get_string('userid', 'totara_reportbuilder'),
             'phone1' => get_string('userphone', 'totara_reportbuilder'),
             'institution' => get_string('userinstitution', 'totara_reportbuilder'),
             'department' => get_string('userdepartment', 'totara_reportbuilder'),
@@ -1585,9 +1886,18 @@ abstract class rb_base_source {
                 $field,
                 $name,
                 "$join.$field",
-                array('joins' => $join)
+                array('joins' => $join,
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             );
         }
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'id',
+            get_string('userid', 'totara_reportbuilder'),
+            "$join.id",
+            array('joins' => $join)
+        );
 
         // add country option
         $columnoptions[] = new rb_column_option(
@@ -1782,7 +2092,9 @@ abstract class rb_base_source {
             'fullname',
             get_string('coursename', 'totara_reportbuilder'),
             "$join.fullname",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'course',
@@ -1796,6 +2108,18 @@ abstract class rb_base_source {
                 'extrafields' => array('course_id' => "$join.id",
                                        'course_visible' => "$join.visible",
                                        'course_audiencevisible' => "$join.audiencevisible")
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'courseexpandlink',
+            get_string('courseexpandlink', 'totara_reportbuilder'),
+            "$join.fullname",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'course_expand',
+                'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
+                'extrafields' => array('course_id' => "$join.id", 'course_visible' => "$join.visible")
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1855,14 +2179,18 @@ abstract class rb_base_source {
             'shortname',
             get_string('courseshortname', 'totara_reportbuilder'),
             "$join.shortname",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'course',
             'idnumber',
             get_string('courseidnumber', 'totara_reportbuilder'),
             "$join.idnumber",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'course',
@@ -1914,7 +2242,9 @@ abstract class rb_base_source {
                     'component' => '\'course\'',
                     'context' => '\'context_course\'',
                     'recordid' => "$join.id"
-                )
+                ),
+                'dbdatatype' => 'text',
+                'outputformat' => 'text'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1926,6 +2256,17 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'course_type_icon',
                 'defaultheading' => get_string('coursetypeicon', 'totara_reportbuilder'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course',
+            'coursetype',
+            get_string('coursetype', 'totara_reportbuilder'),
+            "$join.coursetype",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'course_type',
+                'defaultheading' => get_string('coursetype', 'totara_reportbuilder'),
             )
         );
         // add language option
@@ -1995,6 +2336,20 @@ abstract class rb_base_source {
         );
         $filteroptions[] = new rb_filter_option(
             'course',
+            'coursetype',
+            get_string('coursetype', 'totara_reportbuilder'),
+            'multicheck',
+            array(
+                'selectfunc' => 'course_types',
+                'simplemode' => true,
+                'showcounts' => array(
+                        'joins' => array("LEFT JOIN {course} coursetype_filter ON base.id = coursetype_filter.id"),
+                        'dataalias' => 'coursetype_filter',
+                        'datafield' => 'coursetype')
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'course',
             'language',
             get_string('courselanguage', 'totara_reportbuilder'),
             'select',
@@ -2005,8 +2360,6 @@ abstract class rb_base_source {
         );
         return true;
     }
-
-
 
     /**
      * Adds the program table to the $joinlist array
@@ -2039,44 +2392,51 @@ abstract class rb_base_source {
      *                              Passed by reference and updated by
      *                              this method
      * @param string $join Name of the join that provides the 'program' table
+     * @param string $langfile Source for translation, totara_program or totara_certification
      *
      * @return True
      */
-    protected function add_program_fields_to_columns(&$columnoptions, $join='program') {
+    protected function add_program_fields_to_columns(&$columnoptions, $join = 'program', $langfile = 'totara_program') {
         global $DB;
 
         $columnoptions[] = new rb_column_option(
             'prog',
             'fullname',
-            get_string('programname', 'totara_program'),
+            get_string('programname', $langfile),
             "$join.fullname",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'prog',
             'shortname',
-            get_string('programshortname', 'totara_program'),
+            get_string('programshortname', $langfile),
             "$join.shortname",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'prog',
             'idnumber',
-            get_string('programidnumber', 'totara_program'),
+            get_string('programidnumber', $langfile),
             "$join.idnumber",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'prog',
             'id',
-            get_string('programid', 'totara_program'),
+            get_string('programid', $langfile),
             "$join.id",
             array('joins' => $join)
         );
         $columnoptions[] = new rb_column_option(
             'prog',
             'summary',
-            get_string('programsummary', 'totara_program'),
+            get_string('programsummary', $langfile),
             $DB->sql_compare_text("$join.summary", 1024),
             array(
                 'joins' => $join,
@@ -2087,7 +2447,9 @@ abstract class rb_base_source {
                     'context' => '\'context_program\'',
                     'recordid' => "$join.id",
                     'fileid' => 0
-                )
+                ),
+                'dbdatatype' => 'text',
+                'outputformat' => 'text'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2113,16 +2475,29 @@ abstract class rb_base_source {
         $columnoptions[] = new rb_column_option(
             'prog',
             'proglinkicon',
-            get_string('prognamelinkedicon', 'totara_program'),
+            get_string('prognamelinkedicon', $langfile),
             "$join.fullname",
             array(
                 'joins' => $join,
                 'displayfunc' => 'link_program_icon',
-                'defaultheading' => get_string('programname', 'totara_program'),
+                'defaultheading' => get_string('programname', $langfile),
                 'extrafields' => array(
                     'program_id' => "$join.id",
                     'program_icon' => "$join.icon"
                 )
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'prog',
+            'progexpandlink',
+            get_string('programexpandlink', $langfile),
+            "$join.fullname",
+            array(
+                'joins' => $join,
+                'displayfunc' => 'program_expand',
+                'defaultheading' => get_string('programname', $langfile),
+                'extrafields' => array('prog_id' => "$join.id", 'prog_visible' => "$join.visible",
+                    'prog_certifid' => "$join.certifid")
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2154,31 +2529,32 @@ abstract class rb_base_source {
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
+     * @param string $langfile Source for translation, totara_program or totara_certification
      * @return True
      */
-    protected function add_program_fields_to_filters(&$filteroptions) {
+    protected function add_program_fields_to_filters(&$filteroptions, $langfile = 'totara_program') {
         $filteroptions[] = new rb_filter_option(
             'prog',
             'fullname',
-            get_string('programname', 'totara_program'),
+            get_string('programname', $langfile),
             'text'
         );
         $filteroptions[] = new rb_filter_option(
             'prog',
             'shortname',
-            get_string('programshortname', 'totara_program'),
+            get_string('programshortname', $langfile),
             'text'
         );
         $filteroptions[] = new rb_filter_option(
             'prog',
             'idnumber',
-            get_string('programidnumber', 'totara_program'),
+            get_string('programidnumber', $langfile),
             'text'
         );
         $filteroptions[] = new rb_filter_option(
             'prog',
             'summary',
-            get_string('programsummary', 'totara_program'),
+            get_string('programsummary', $langfile),
             'textarea'
         );
         $filteroptions[] = new rb_filter_option(
@@ -2242,7 +2618,9 @@ abstract class rb_base_source {
                 'name',
                 get_string('coursecategory', 'totara_reportbuilder'),
                 "$catjoin.name",
-                array('joins' => $catjoin)
+                array('joins' => $catjoin,
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
                 'course_category',
@@ -2387,7 +2765,10 @@ abstract class rb_base_source {
             'organisationidnumber',
             get_string('usersorgidnumber', 'totara_reportbuilder'),
             "$org.idnumber",
-            array('joins' => $org, 'selectable' => true)
+            array('joins' => $org,
+                  'selectable' => true,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2401,7 +2782,9 @@ abstract class rb_base_source {
             'organisation',
             get_string('usersorgname', 'totara_reportbuilder'),
             "$org.fullname",
-            array('joins' => $org)
+            array('joins' => $org,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2409,7 +2792,9 @@ abstract class rb_base_source {
             get_string('organisationtype', 'totara_reportbuilder'),
             'org_type.fullname',
             array(
-                'joins' => 'org_type'
+                'joins' => 'org_type',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2431,7 +2816,10 @@ abstract class rb_base_source {
             'positionidnumber',
             get_string('usersposidnumber', 'totara_reportbuilder'),
             "$pos.idnumber",
-            array('joins' => $pos, 'selectable' => true)
+            array('joins' => $pos,
+                  'selectable' => true,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2445,7 +2833,9 @@ abstract class rb_base_source {
             'position',
             get_string('userspos', 'totara_reportbuilder'),
             "$pos.fullname",
-            array('joins' => $pos)
+            array('joins' => $pos,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2453,7 +2843,9 @@ abstract class rb_base_source {
             get_string('positiontype', 'totara_reportbuilder'),
             'pos_type.fullname',
             array(
-                'joins' => 'pos_type'
+                'joins' => 'pos_type',
+                 'dbdatatype' => 'char',
+                'outputformat' => 'text'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2468,7 +2860,9 @@ abstract class rb_base_source {
             'title',
             get_string('usersjobtitle', 'totara_reportbuilder'),
             "$posassign.fullname",
-            array('joins' => $posassign)
+            array('joins' => $posassign,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2612,7 +3006,7 @@ abstract class rb_base_source {
     protected function add_custom_fields_for($cf_prefix, $join, $joinfield,
         array &$joinlist, array &$columnoptions, array &$filteroptions) {
 
-        global $DB;
+        global $CFG, $DB;
 
         $seek = false;
         foreach ($joinlist as $object) {
@@ -2633,14 +3027,13 @@ abstract class rb_base_source {
             throw new ReportBuilderException(get_string('error:missingdependencytable', 'totara_reportbuilder', $a));
         }
 
-        // build the table names for this sort of custom field data
+        // Build the table names for this sort of custom field data.
         $fieldtable = $cf_prefix.'_info_field';
         $datatable = $cf_prefix.'_info_data';
 
-        // check if there are any visible custom fields of this type
+        // Check if there are any visible custom fields of this type.
         if ($cf_prefix == 'user') {
-            // for user fields include them all - below we require
-            // moodle/user:update to actually display the column
+            // For user fields include them all - below we require moodle/user:update to actually display the column.
             $items = $DB->get_recordset($fieldtable);
         } else {
             $items = $DB->get_recordset($fieldtable, array('hidden' => '0'));
@@ -2651,15 +3044,13 @@ abstract class rb_base_source {
             return false;
         }
 
-        $selfunc = rb_filter_option::select_width_limiter();
         foreach ($items as $record) {
             $id   = $record->id;
             $joinname = "{$cf_prefix}_{$id}";
             $value = "custom_field_{$id}";
             $name = isset($record->fullname) ? $record->fullname : $record->name;
             $column_options = array('joins' => $joinname);
-            // if profile field isn't available to everyone require
-            // a capability to display the column
+            // If profile field isn't available to everyone require a capability to display the column.
             if ($cf_prefix == 'user' && $record->visible != PROFILE_VISIBLE_ALL) {
                 $column_options['capability'] = 'moodle/user:update';
             }
@@ -2667,6 +3058,111 @@ abstract class rb_base_source {
             $filter_options = array();
 
             $columnsql = $DB->sql_compare_text("{$joinname}.data", 1024);
+
+            if ($record->datatype == 'multiselect') {
+                $filtertype = 'multicheck';
+
+                require_once($CFG->dirroot . '/totara/customfield/definelib.php');
+                require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
+                require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class.php');
+
+                $cfield = new customfield_define_multiselect();
+                $cfield->define_load_preprocess($record);
+                $filter_options['concat'] = true;
+                $filter_options['simplemode'] = true;
+
+                $joinlist[] = new rb_join(
+                        $joinname,
+                        'LEFT',
+                        '(SELECT '.sql_group_concat(sql_cast2char('cfidp.value'), '|', true).' AS data,
+                                 cfid.'.$joinfield.' AS joinid, '.sql_cast2char('cfid.data').' AS jsondata
+                            FROM {'.$datatable.'} cfid
+                            LEFT JOIN {'.$datatable.'_param} cfidp ON (cfidp.dataid = cfid.id)
+                           WHERE cfid.fieldid = '.$id.'
+                           GROUP BY cfid.'.$joinfield.', '.sql_cast2char('cfid.data').')',
+                        "$joinname.joinid = {$join}.id ",
+                        REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                        $join
+                    );
+
+                $columnoptions[] = new rb_column_option(
+                        $cf_prefix,
+                        $value.'_icon',
+                        get_string('multiselectcolumnicon', 'totara_customfield', $name),
+                        "$joinname.data",
+                        array('joins' => $joinname,
+                              'displayfunc' => 'customfield_multiselect_icon',
+                              'extrafields' => array(
+                                  "{$cf_prefix}_{$value}_icon_json" => "{$joinname}.jsondata"
+                              ),
+                              'defaultheading' => $name
+                        )
+                    );
+
+                $columnoptions[] = new rb_column_option(
+                        $cf_prefix,
+                        $value.'_text',
+                        get_string('multiselectcolumntext', 'totara_customfield', $name),
+                        "$joinname.data",
+                        array('joins' => $joinname,
+                              'displayfunc' => 'customfield_multiselect_text',
+                              'extrafields' => array(
+                                  "{$cf_prefix}_{$value}_text_json" => "{$joinname}.jsondata"
+                              ),
+                              'defaultheading' => $name
+                        )
+                    );
+
+                $selectchoices = array();
+                foreach ($record->multiselectitem as $selectchoice) {
+                    $selectchoices[md5($selectchoice['option'])] = $selectchoice['option'];
+                }
+                $filter_options['selectchoices'] = $selectchoices;
+                $filter_options['showcounts'] = array(
+                        'joins' => array(
+                                "LEFT JOIN (SELECT id, {$joinfield} FROM {{$cf_prefix}_info_data} " .
+                                            "WHERE fieldid = {$id}) {$cf_prefix}_idt_{$id} " .
+                                       "ON base_{$cf_prefix}_idt_{$id} = {$cf_prefix}_idt_{$id}.{$joinfield}",
+                                "LEFT JOIN {{$cf_prefix}_info_data_param} {$cf_prefix}_idpt_{$id} " .
+                                       "ON {$cf_prefix}_idt_{$id}.id = {$cf_prefix}_idpt_{$id}.dataid"),
+                        'basefields' => array("{$join}.id AS base_{$cf_prefix}_idt_{$id}"),
+                        'dependency' => $join,
+                        'dataalias' => "{$cf_prefix}_idpt_{$id}",
+                        'datafield' => "value");
+                $filteroptions[] = new rb_filter_option(
+                        $cf_prefix,
+                        $value.'_text',
+                        get_string('multiselectcolumntext', 'totara_customfield', $name),
+                        $filtertype,
+                        $filter_options
+                    );
+
+                $iconselectchoices = array();
+                foreach ($record->multiselectitem as $selectchoice) {
+                    $iconselectchoices[md5($selectchoice['option'])] =
+                            customfield_multiselect::get_item_string($selectchoice['option'], $selectchoice['icon'], 'list-icon');
+                }
+                $filter_options['selectchoices'] = $iconselectchoices;
+                $filter_options['showcounts'] = array(
+                        'joins' => array(
+                                "LEFT JOIN (SELECT id, {$joinfield} FROM {{$cf_prefix}_info_data} " .
+                                            "WHERE fieldid = {$id}) {$cf_prefix}_idi_{$id} " .
+                                       "ON base_{$cf_prefix}_idi_{$id} = {$cf_prefix}_idi_{$id}.{$joinfield}",
+                                "LEFT JOIN {{$cf_prefix}_info_data_param} {$cf_prefix}_idpi_{$id} " .
+                                       "ON {$cf_prefix}_idi_{$id}.id = {$cf_prefix}_idpi_{$id}.dataid"),
+                        'basefields' => array("{$join}.id AS base_{$cf_prefix}_idi_{$id}"),
+                        'dependency' => $join,
+                        'dataalias' => "{$cf_prefix}_idpi_{$id}",
+                        'datafield' => "value");
+                $filteroptions[] = new rb_filter_option(
+                        $cf_prefix,
+                        $value.'_icon',
+                        get_string('multiselectcolumnicon', 'totara_customfield', $name),
+                        $filtertype,
+                        $filter_options
+                    );
+                continue;
+            }
 
             switch ($record->datatype) {
                 case 'file':
@@ -2686,12 +3182,16 @@ abstract class rb_base_source {
                     $column_options['extrafields'] = array(
                             "{$cf_prefix}_custom_field_{$id}_itemid" => "{$joinname}.id"
                     );
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
                     break;
 
                 case 'menu':
                     $filtertype = 'select';
                     $filter_options['selectchoices'] = $this->list_to_array($record->param1,"\n");
                     $filter_options['simplemode'] = true;
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
                     break;
 
                 case 'checkbox':
@@ -2714,34 +3214,45 @@ abstract class rb_base_source {
                         $column_options['displayfunc'] = 'nice_date';
                     }
                     break;
+
+                case 'text':
+                    $column_options['dbdatatype'] = 'text';
+                    $column_options['outputformat'] = 'text';
+                    break;
+
+                default:
+                    // Unsupported customfields.
+                    continue 2;
             }
 
-            $joinlist[] = new rb_join($joinname,
-                                      'LEFT',
-                                      "{{$datatable}}",
-                                      "{$joinname}.{$joinfield} = {$join}.id AND {$joinname}.fieldid = {$id}",
-                                      REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                                      $join
-                                      );
-            $columnoptions[] = new rb_column_option($cf_prefix,
-                                                     $value,
-                                                     $name,
-                                                     $columnsql,
-                                                     $column_options
-                                                     );
+            $joinlist[] = new rb_join(
+                    $joinname,
+                    'LEFT',
+                    "{{$datatable}}",
+                    "{$joinname}.{$joinfield} = {$join}.id AND {$joinname}.fieldid = {$id}",
+                    REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                    $join
+                );
+            $columnoptions[] = new rb_column_option(
+                    $cf_prefix,
+                    $value,
+                    $name,
+                    $columnsql,
+                    $column_options
+                );
 
             if ($record->datatype == 'file') {
-                //no filter options for files yet
+                // No filter options for files yet.
                 continue;
             } else {
-                $filteroptions[] = new rb_filter_option( $cf_prefix,
-                                                         $value,
-                                                         $name,
-                                                         $filtertype,
-                                                         $filter_options
-                                                         );
+                $filteroptions[] = new rb_filter_option(
+                        $cf_prefix,
+                        $value,
+                        $name,
+                        $filtertype,
+                        $filter_options
+                    );
             }
-
 
         }
 
@@ -2790,6 +3301,24 @@ abstract class rb_base_source {
                                             $filteroptions);
     }
 
+    /**
+     * Adds course custom fields to the report
+     *
+     * @param array $joinlist
+     * @param array $columnoptions
+     * @param array $filteroptions
+     * @param string $basetable
+     * @return boolean
+     */
+    protected function add_custom_prog_fields(array &$joinlist, array &$columnoptions,
+        array &$filteroptions, $basetable = 'prog') {
+        return $this->add_custom_fields_for('prog',
+                                            $basetable,
+                                            'programid',
+                                            $joinlist,
+                                            $columnoptions,
+                                            $filteroptions);
+    }
 
     /**
      * Adds custom organisation fields to the report
@@ -2932,21 +3461,27 @@ abstract class rb_base_source {
             'managername',
             get_string('usersmanagername', 'totara_reportbuilder'),
             $DB->sql_fullname("$manager.firstname", "$manager.lastname"),
-            array('joins' => $manager)
+            array('joins' => $manager,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
             'managerfirstname',
             get_string('usersmanagerfirstname', 'totara_reportbuilder'),
             "$manager.firstname",
-            array('joins' => $manager)
+            array('joins' => $manager,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
             'managerlastname',
             get_string('usersmanagerlastname', 'totara_reportbuilder'),
             "$manager.lastname",
-            array('joins' => $manager)
+            array('joins' => $manager,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'user',
@@ -2960,7 +3495,9 @@ abstract class rb_base_source {
             'manageridnumber',
             get_string('usersmanageridnumber', 'totara_reportbuilder'),
             "$manager.idnumber",
-            array('joins' => $manager)
+            array('joins' => $manager,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         return true;
     }
@@ -3094,7 +3631,9 @@ abstract class rb_base_source {
             'tagnames',
             get_string('tags', 'totara_reportbuilder'),
             "$tagnames.namelist",
-            array('joins' => $tagnames)
+            array('joins' => $tagnames,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
 
         // create a on/off field for every official tag
@@ -3157,6 +3696,15 @@ abstract class rb_base_source {
             array(            // options
                 'selectchoices' => $this->rb_filter_tags_list(),
                 'concat' => true, // Multicheck filter needs to know that we are working with concatenated values
+                'showcounts' => array(
+                        'joins' => array("LEFT JOIN (SELECT ti.itemid, ti.tagid FROM {{$type}} base " .
+                                                      "LEFT JOIN {tag_instance} ti ON base.id = ti.itemid " .
+                                                            "AND ti.itemtype = '{$type}'" .
+                                                      "LEFT JOIN {tag} tag ON ti.tagid = tag.id " .
+                                                            "AND tag.tagtype = 'official')\n {$type}_tagids_filter " .
+                                                "ON base.id = {$type}_tagids_filter.itemid"),
+                        'dataalias' => $type.'_tagids_filter',
+                        'datafield' => 'tagid')
             )
         );
         return true;

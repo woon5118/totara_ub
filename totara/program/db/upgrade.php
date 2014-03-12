@@ -265,5 +265,85 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014022000, 'totara_program');
     }
 
+    // Add customfield support to programs.
+    if ($oldversion < 2014030500) {
+        // Define table prog_info_field to be created.
+        $table = new xmldb_table('prog_info_field');
+
+        // Adding fields to table prog_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
+
+        // Adding keys to table prog_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for prog_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table prog_info_data to be created.
+        $table = new xmldb_table('prog_info_data');
+
+        // Adding fields to table prog_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table prog_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('fieldid', XMLDB_KEY_FOREIGN, array('fieldid'), 'prog_info_field', array('id'));
+
+        // Conditionally launch create table for prog_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('prog_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'prog_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014030500, 'totara_program');
+    }
+
+    if ($oldversion < 2014030600) {
+        // Add reason for denying or approving a program extension.
+        $table = new xmldb_table('prog_extension');
+        $field = new xmldb_field('reasonfordecision', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014030600, 'totara_program');
+    }
+
     return true;
 }

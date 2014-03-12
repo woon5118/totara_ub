@@ -133,10 +133,10 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $clone = $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'));
                 if ($feedback360->status == feedback360::STATUS_ACTIVE) {
                     $edit_error = get_string('error:feedback360noteditable', 'totara_feedback360');
-                    $edit = ' ' . $this->output->pix_icon('/t/edit_gray', $edit_error) . ' ';
+                    $edit = $this->output->pix_icon('/t/edit_gray', $edit_error, 'moodle', array('class' => 'disabled iconsmall'));
 
                     $delete_error = get_string('error:feedback360isactive', 'totara_feedback360');
-                    $delete = ' ' . $this->output->pix_icon('/t/delete_gray', $delete_error) . ' ';
+                    $delete = $this->output->pix_icon('/t/delete_gray', $delete_error, 'moodle', array('class' => 'disabled iconsmall'));
                 } else {
                     $edit = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
                     $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
@@ -529,7 +529,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $deleteurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'delete',
                     'id' => $quest->id, 'feedback360id' => $feedback360->id));;
 
-                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'smallicon js-show-inline move'));
+                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'iconsmall js-show-inline move'));
                 $editlink = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle'), null,
                     array('class' => 'action-icon edit'));
                 $clonelink = $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'), null,

@@ -51,6 +51,7 @@ $THEME->layouts = array(
         'file' => 'columns1.php',
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
+        'options' => array('langmenu' => true)
     ),
     'noblocks' => array(
         'file' => 'columns1.php',
@@ -60,7 +61,7 @@ $THEME->layouts = array(
     'login' => array(
         'file' => 'columns1.php',
         'regions' => array(),
-        'options' => array('nologininfo' => true, 'nocustommenu' => true, 'nonavbar' => true),
+        'options' => array('nologininfo' => true, 'nocustommenu' => true, 'nonavbar' => true, 'langmenu' => true),
     )
 );
 

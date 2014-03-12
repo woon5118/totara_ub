@@ -37,6 +37,7 @@ class reportbuilderlib_test extends advanced_testcase {
     protected function setUp() {
         global $DB,$CFG;
         parent::setup();
+        $this->setAdminUser();
 
         //create all the dummy data to put into the phpunit database tables
         $this->rb_data = new stdclass();
@@ -572,6 +573,7 @@ class reportbuilderlib_test extends advanced_testcase {
 
         // db version of report
         $this->rb = new reportbuilder(1);
+        $this->resetAfterTest(true);
     }
 
     function test_reportbuilder_initialize_db_instance() {
@@ -1306,5 +1308,175 @@ class reportbuilderlib_test extends advanced_testcase {
 
         $this->resetAfterTest(true);
     }
-}
 
+    public function test_get_search_columns() {
+        global $DB;
+        // Add two reports.
+        $rb2data = array(array('id' => 2, 'fullname' => 'Courses', 'shortname' => 'mycourses',
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1),
+                         array('id' => 3, 'fullname' => 'Courses2', 'shortname' => 'mycourses2',
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+
+        $rbsearchcolsdata = array(
+                        array('id' => 100, 'reportid' => 1, 'type' => 'course', 'value' => 'fullname',
+                              'heading' => 'A', 'sortorder' => 1),
+                        array('id' => 101, 'reportid' => 1, 'type' => 'course', 'value' => 'summary',
+                              'heading' => 'B', 'sortorder' => 2),
+                        array('id' => 102, 'reportid' => 2, 'type' => 'course', 'value' => 'fullname',
+                              'heading' => 'C', 'sortorder' => 1));
+
+        // Add search columns to two reports.
+        $this->loadDataSet($this->createArrayDataSet(array(
+            'report_builder' => $rb2data,
+            'report_builder_search_cols' => $rbsearchcolsdata)));
+
+        // Test result for reports with/without search columns.
+        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $cols1 = $report1->get_search_columns();
+        $this->assertCount(2, $cols1);
+        $this->assertArrayHasKey(100, $cols1);
+        $this->assertArrayHasKey(101, $cols1);
+
+        $report3 = reportbuilder_get_embedded_report('mycourses2', array(), false, 0);
+        $cols3 = $report3->get_search_columns();
+        $this->assertEmpty($cols3);
+    }
+
+    public function test_delete_search_column() {
+        global $DB;
+        // Add two reports.
+        $rb2data = array(array('id' => 2, 'fullname' => 'Courses', 'shortname' => 'mycourses',
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+
+        $rbsearchcolsdata = array(
+                        array('id' => 100, 'reportid' => 2, 'type' => 'course', 'value' => 'coursetypeicon',
+                              'heading' => 'A', 'sortorder' => 1),
+                        array('id' => 101, 'reportid' => 2, 'type' => 'course', 'value' => 'courselink',
+                              'heading' => 'B', 'sortorder' => 2));
+
+        // Add search columns to two reports.
+        $this->loadDataSet($this->createArrayDataSet(array(
+            'report_builder' => $rb2data,
+            'report_builder_search_cols' => $rbsearchcolsdata)));
+
+        // Test result for reports with/without search columns.
+        $report2 = reportbuilder_get_embedded_report('mycourses', array(), false, 0);
+        $report2->delete_search_column(100);
+        $cols2 = $report2->get_search_columns();
+        $this->assertCount(1, $cols2);
+        $this->assertArrayHasKey(101, $cols2);
+    }
+
+    public function test_get_search_columns_select() {
+        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $cols1 = $report1->get_search_columns_select();
+        // Current test report has at least three groups. Check some items inside aswell.
+        $this->assertGreaterThanOrEqual(3, count($cols1));
+        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
+        $compstr = get_string('type_competency', 'rb_source_dp_competency');
+        $userstr = get_string('type_user', 'totara_reportbuilder');
+        $this->assertArrayHasKey($compevidstr, $cols1);
+        $this->assertArrayHasKey($compstr, $cols1);
+        $this->assertArrayHasKey($userstr, $cols1);
+
+        $this->assertArrayHasKey('competency_evidence-organisation', $cols1[$compevidstr]);
+        $this->assertArrayHasKey('competency-fullname', $cols1[$compstr]);
+        $this->assertArrayHasKey('user-fullname', $cols1[$userstr]);
+    }
+
+    /**
+     * Also test get_sidebar_filters
+     */
+    public function test_get_standard_filters() {
+        global $DB;
+        // Add reports.
+        $rb2data = array(array('id' => 59, 'fullname' => 'Courses', 'shortname' => 'mycourses',
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1),
+                         array('id' => 3, 'fullname' => 'Courses2', 'shortname' => 'mycourses2',
+                         'source' => 'courses', 'hidden' => 1, 'embedded' => 1));
+        $rbfiltersdata = array(
+            array('id' => 171, 'reportid' => 59, 'type' => 'course', 'value' => 'coursetype',
+                  'sortorder' => 1, 'advanced' => 0, 'region' => rb_filter_type::RB_FILTER_REGION_SIDEBAR),
+            array('id' => 172, 'reportid' => 59, 'type' => 'course', 'value' => 'mods',
+                  'sortorder' => 2, 'advanced' => 1, 'region' => rb_filter_type::RB_FILTER_REGION_SIDEBAR),
+            array('id' => 173, 'reportid' => 59, 'type' => 'course', 'value' => 'startdate',
+                  'sortorder' => 3, 'advanced' => 0, 'region' => rb_filter_type::RB_FILTER_REGION_STANDARD),
+            array('id' => 174, 'reportid' => 59, 'type' => 'course', 'value' => 'name_and_summary',
+                  'sortorder' => 4, 'advanced' => 1, 'region' => rb_filter_type::RB_FILTER_REGION_STANDARD)
+            );
+        // Add filters to report.
+        $this->loadDataSet($this->createArrayDataSet(array(
+            'report_builder' => $rb2data,
+            'report_builder_filters' => $rbfiltersdata)));
+
+        // Report 59 has two sidebar filters.
+        $report59 = reportbuilder_get_embedded_report('mycourses', array(), false, 0);
+        $side59 = $report59->get_sidebar_filters();
+        $this->assertCount(2, $side59);
+        $this->assertArrayHasKey('course-coursetype', $side59);
+        $this->assertArrayHasKey('course-mods', $side59);
+
+        // Report 59 has two standard filters.
+        $std59 = $report59->get_standard_filters();
+        $this->assertCount(2, $std59);
+        $this->assertArrayHasKey('course-startdate', $std59);
+        $this->assertArrayHasKey('course-name_and_summary', $std59);
+
+        // Report 3 doesn't have filters.
+        $report3 = reportbuilder_get_embedded_report('mycourses2', array(), false, 0);
+        $side3 = $report3->get_sidebar_filters();
+        $std3 = $report3->get_standard_filters();
+        $this->assertEmpty($side3);
+        $this->assertEmpty($std3);
+    }
+
+    public function test_get_all_filter_joins() {
+        $report = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $joins = $report->get_all_filter_joins();
+
+        $this->assertNotEmpty($joins);
+        $this->assertContainsOnlyInstancesOf('rb_join', $joins);
+    }
+
+    public function test_get_filters_select() {
+        $report = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $filters = $report->get_filters_select();
+
+        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
+        $compstr = get_string('type_competency', 'rb_source_dp_competency');
+        $userstr = get_string('type_user', 'totara_reportbuilder');
+        $this->assertArrayHasKey($compevidstr, $filters);
+        $this->assertArrayHasKey($compstr, $filters);
+        $this->assertArrayHasKey($userstr, $filters);
+
+        $this->assertArrayHasKey('competency_evidence-completeddate', $filters[$compevidstr]);
+        $this->assertArrayHasKey('competency-fullname', $filters[$compstr]);
+        $this->assertArrayHasKey('user-fullname', $filters[$userstr]);
+    }
+
+    public function test_get_all_filters_select() {
+        $report1 = reportbuilder_get_embedded_report('test_report', array(), false, 0);
+        $filters = $report1->get_all_filters_select();
+
+        $this->assertArrayHasKey('allstandardfilters', $filters);
+        $this->assertArrayHasKey('unusedstandardfilters', $filters);
+        $this->assertArrayHasKey('allsidebarfilters', $filters);
+        $this->assertArrayHasKey('unusedsidebarfilters', $filters);
+        $this->assertArrayHasKey('allsearchcolumns', $filters);
+        $this->assertArrayHasKey('unusedsearchcolumns', $filters);
+
+        // Check couple filters that should be in every category.
+        $userstr = get_string('type_user', 'totara_reportbuilder');
+        $compevidstr = get_string('type_competency_evidence', 'rb_source_competency_evidence');
+        foreach ($filters as $key => $filter) {
+            if (strpos($key, 'unused') === false) {
+                $this->assertArrayHasKey($compevidstr, $filter);
+                $this->assertGreaterThan(0, $filter[$compevidstr]);
+            }
+            // Check only rare-used filter. If it dissappear choose another filter for test.
+            $this->assertArrayHasKey($userstr, $filter);
+            $this->assertGreaterThan(0, $filter[$userstr]);
+        }
+
+    }
+}

@@ -265,7 +265,7 @@ if ($templates) {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/plan/template/general.php', array('id' => $template->id)), new pix_icon('t/edit', $str_edit));
 
         if ($template->isdefault == 1) {
-            $buttons[] = $OUTPUT->pix_icon('t/delete_gray', $str_remove_default, null, array('class' => 'disabled_action_icon'));
+            $buttons[] = $OUTPUT->pix_icon('t/delete_grey', $str_remove_default, 'totara_core', array('class' => 'action-icon iconsmall'));
         } else {
             $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/plan/template/index.php', array('delete' => $template->id)), new pix_icon('t/delete', $str_remove));
         }

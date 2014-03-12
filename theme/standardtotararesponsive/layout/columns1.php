@@ -14,12 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-if (!empty($PAGE->theme->settings->frontpagelogo)) {
-    $logourl = $PAGE->theme->settings->frontpagelogo;
-} else if (!empty($PAGE->theme->settings->logo)) {
-    $logourl = $PAGE->theme->settings->logo;
+if (!empty($PAGE->theme->settings->logo)) {
+    $logourl = $PAGE->theme->setting_file_url('logo', 'logo');
 } else {
     $logourl = $OUTPUT->pix_url('logo', 'theme');
+}
+
+if (!empty($PAGE->theme->settings->favicon)) {
+    $faviconurl = $PAGE->theme->setting_file_url('favicon', 'favicon');
+} else {
+    $faviconurl = $OUTPUT->favicon();
 }
 
 $custommenu = $OUTPUT->custom_menu();
@@ -27,6 +31,7 @@ $hascustommenu = !empty($custommenu);
 
 $haslogininfo = (empty($PAGE->layout_options['nologininfo']));
 $showmenu = empty($PAGE->layout_options['nocustommenu']);
+$haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
 
 if ($showmenu && !$hascustommenu) {
     // load totara menu
@@ -39,7 +44,7 @@ echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
     <title><?php echo $OUTPUT->page_title(); ?></title>
-    <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
+    <link rel="shortcut icon" href="<?php echo $faviconurl; ?>" />
     <?php echo $OUTPUT->standard_head_html() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -66,6 +71,9 @@ echo $OUTPUT->doctype() ?>
                     <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
                     <?php if ($haslogininfo) { ?>
                         <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
+                    <?php }
+                    if ($haslangmenu) { ?>
+                        <li><?php echo $OUTPUT->lang_menu(); ?></li>
                     <?php } ?>
                 </ul>
                 <?php if ($showmenu) { ?>

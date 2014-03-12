@@ -29,6 +29,14 @@ require_once($CFG->libdir. '/coursecatlib.php');
 $categoryid = optional_param('categoryid', 0, PARAM_INT); // Category id
 $viewtype = optional_param('viewtype', 'program', PARAM_TEXT); // Type of a page, program or certification.
 
+if (!empty($CFG->enhancedcatalog)) {
+    if ($viewtype == 'program') {
+        redirect(new moodle_url('/totara/coursecatalog/programs.php'));
+    } else {
+        redirect(new moodle_url('/totara/coursecatalog/certifications.php'));
+    }
+}
+
 $site = get_site();
 
 if ($categoryid) {
@@ -61,7 +69,7 @@ if ($categoryid && !$category->visible && !has_capability('moodle/category:viewh
     throw new moodle_exception('unknowncategory');
 }
 
-$PAGE->set_totara_menu_selected('findcourses');
+$PAGE->set_totara_menu_selected('findlearning');
 $PAGE->set_heading(format_string($site->fullname));
 $content = $programrenderer->program_category($categoryid, $viewtype);
 

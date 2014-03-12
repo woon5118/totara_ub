@@ -162,7 +162,6 @@ if ($fromform = $mform->get_data()) {
             }
         }
         // create filters for new report based on default filters
-        $src = reportbuilder::get_source_object($fromform->source);
         if (isset($src->defaultfilters) && is_array($src->defaultfilters)) {
             $defaultfilters = $src->defaultfilters;
             $so = 1;
@@ -173,8 +172,19 @@ if ($fromform = $mform->get_data()) {
                 $todb->value = $option['value'];
                 $todb->advanced = isset($option['advanced']) ? $option['advanced'] : 0;
                 $todb->sortorder = $so;
+                $todb->region = isset($option['region']) ? $option['region'] : rb_filter_type::RB_FILTER_REGION_STANDARD;
                 $DB->insert_record('report_builder_filters', $todb);
                 $so++;
+            }
+        }
+        // Create toolbar search columns for new report based on default toolbar search columns.
+        if (isset($src->defaulttoolbarsearchcolumns) && is_array($src->defaulttoolbarsearchcolumns)) {
+            foreach ($src->defaulttoolbarsearchcolumns as $option) {
+                $todb = new stdClass();
+                $todb->reportid = $newid;
+                $todb->type = $option['type'];
+                $todb->value = $option['value'];
+                $DB->insert_record('report_builder_search_cols', $todb);
             }
         }
         $transaction->allow_commit();

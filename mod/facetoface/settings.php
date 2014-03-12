@@ -27,6 +27,20 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
+if ($data = data_submitted()) {
+    // Check that the setting has changed before taking action.
+    $oldvalue = get_config(null, 'facetoface_displaysessiontimezones');
+    if (isset($data->s__facetoface_displaysessiontimezones) && $data->s__facetoface_displaysessiontimezones != $oldvalue) {
+        // Force saving of setting before doing update of events.
+        set_config('facetoface_displaysessiontimezones', $data->s__facetoface_displaysessiontimezones);
+        $sessions = $DB->get_records('facetoface_sessions');
+        foreach ($sessions as $s) {
+            $session = facetoface_get_session($s->id);
+            facetoface_update_calendar_entries($session);
+        }
+    }
+}
+
 $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'), "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/",30));
 
 // Load roles
@@ -43,6 +57,8 @@ $settings->add(new admin_setting_configmultiselect('facetoface_session_roles', n
 $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'), new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
 
 $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'), new lang_string('setting:notificationdisable', 'facetoface'), 0));
+
+$settings->add(new admin_setting_configcheckbox('facetoface_displaysessiontimezones', new lang_string('setting:displaysessiontimezones_caption', 'facetoface'), new lang_string('setting:displaysessiontimezones', 'facetoface'), 1));
 
 $settings->add(new admin_setting_heading('facetoface_multiplesessions_header', get_string('multiplesessionsheading', 'facetoface'), ''));
 

@@ -321,7 +321,7 @@ class goal extends hierarchy {
                 AND a.scaleid = s.id
         ", array($frameworkid));
 
-        $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc)?$scaledesc:get_string('none'));
+        $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));
         $mform->addHelpButton('scalename', 'goalscale', 'totara_hierarchy');
 
         $mform->addElement('text', 'targetdateselector', get_string('goaltargetdate', 'totara_hierarchy'),

@@ -43,20 +43,12 @@ if ($contextid) {
     $context = context_system::instance();
 }
 
-if ($context->contextlevel != CONTEXT_COURSECAT and $context->contextlevel != CONTEXT_SYSTEM) {
-    print_error('invalidcontext');
-}
-
 $category = null;
 if ($context->contextlevel == CONTEXT_COURSECAT) {
     $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
 }
 
 $manager = has_capability('moodle/cohort:manage', $context);
-$canassign = has_capability('moodle/cohort:assign', $context);
-if (!$manager) {
-    require_capability('moodle/cohort:view', $context);
-}
 
 $strcohorts = get_string('cohorts', 'cohort');
 
@@ -98,6 +90,7 @@ if ($report->is_cached()) {
     }
 }
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

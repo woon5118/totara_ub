@@ -715,7 +715,7 @@ function print_category_edit(html_table $table, coursecat $category, $viewtype =
         $str->hide = new lang_string('hide');
         $str->show = new lang_string('show');
         $str->cohorts = new lang_string('cohorts', 'cohort');
-        $str->spacer = $OUTPUT->spacer().' ';
+        $str->spacer = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
     }
 
     if ($category->id) {

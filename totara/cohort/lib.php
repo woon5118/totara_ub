@@ -380,9 +380,15 @@ class cohort {
             if ($can_edit) {
                 $params = array('goalid' => $assignment->goalid, 'assigntype' => GOAL_ASSIGNMENT_AUDIENCE, 'modid' => $cohort->id);
                 $url = new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php', $params);
-                $delete =$OUTPUT->action_icon($url, new pix_icon('t/delete', $remove), null,
-                    array('id' => 'goalassigdel', 'class' => 'iconsmall', 'title' => $remove));
+
+                $delete = $OUTPUT->action_icon(
+                    $url,
+                    new pix_icon('t/delete', $remove, null, array('class' => 'iconsmall')),
+                    null,
+                    array('id' => 'goalassigdel', 'title' => $remove));
                 $row[] = new html_table_cell($delete);
+            } else {
+                $delete = null;
             }
 
             $table->data[] = new html_table_row($row);
@@ -663,6 +669,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
     $cmcount = 0;
     $numadd = 0;
     $numdel = 0;
+    $currentcohortroles = totara_get_cohort_roles($cohortid); // Current roles assigned to this cohort.
     foreach ($changedmembers as $mem) {
         $cmcount++;
         if ($mem->addme) {
@@ -682,6 +689,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
                 $newmembers[$i] = (object)array('cohortid' => $cohortid, 'userid' => $rec->id, 'timeadded' => $now);
             }
             $DB->insert_records_via_batch('cohort_members', $newmembers);
+            totara_set_role_assignments_cohort($currentcohortroles, $cohortid, array_keys($newmembers));
             totara_cohort_notify_add_users($cohortid, array_keys($newmembers), $delaymessages);
             $numadd += count($newmembers);
             unset($newmembers);
@@ -696,6 +704,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
                 'cohort_members',
                 "cohortid = :cohortid AND userid ".$sqlin, $params
             );
+            totara_unset_role_assignments_cohort($currentcohortroles, $cohortid, $delids);
             totara_cohort_notify_del_users($cohortid, $delids, $delaymessages);
             $numdel += count($delids);
             unset($delids);
@@ -716,6 +725,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
             $newmembers[$i] = (object)array('cohortid' => $cohortid, 'userid' => $rec->id, 'timeadded' => $now);
         }
         $DB->insert_records_via_batch('cohort_members', $newmembers);
+        totara_set_role_assignments_cohort($currentcohortroles, $cohortid, array_keys($newmembers));
         totara_cohort_notify_add_users($cohortid, array_keys($newmembers), $delaymessages);
         $numadd += count($newmembers);
         unset($newmembers);
@@ -730,6 +740,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
             'cohort_members',
             "cohortid = :cohortid AND userid ".$sqlin, $params
         );
+        totara_unset_role_assignments_cohort($currentcohortroles, $cohortid, $delids);
         totara_cohort_notify_del_users($cohortid, $delids, $delaymessages);
         $numdel += count($delids);
         unset($delids);
@@ -1476,6 +1487,186 @@ function totara_update_broken_field($cohortids, $status) {
     }
 
     return false;
+}
+
+/**
+ * Get members of a cohort
+ *
+ * @param int $cohortid The cohort id
+ *
+ * @return array List of userids(members) assigned to the cohort
+ */
+function totara_get_members_cohort($cohortid) {
+    global $DB;
+
+    return $DB->get_records('cohort_members', array('cohortid' => $cohortid), '', 'userid');
+}
+
+/**
+ * Get roles assigned to a cohort
+ *
+ * @param int $cohortid The cohort id where the roles are assigned.
+ *
+ * @return array List of roleids assigned to the cohort.
+ */
+function totara_get_cohort_roles($cohortid) {
+    global $DB;
+
+    return $DB->get_records('cohort_role', array('cohortid' => $cohortid), '', 'roleid, contextid');
+}
+
+/**
+ * Deletes role(s) assigned to a cohort
+ *
+ * @param array $roleids Array containing roles ids to be deleted
+ * @param int $cohortid The cohort which the roles are assigned to
+ * @param int $contexid The context id in which the roles are assigned
+ *
+ * @return bool True success, false otherwise.
+ */
+function totara_delete_roles_cohort($roleids, $cohortid) {
+    global $DB;
+    $success = true;
+
+    if (!empty($roleids)) {
+        list($sql, $params) = $DB->get_in_or_equal(array_keys($roleids));
+        $params[] = $cohortid;
+        $select = "roleid {$sql} AND cohortid = ?";
+        $success = $DB->delete_records_select('cohort_role', $select, $params);
+    }
+
+    return $success;
+}
+
+/**
+ * Processor function to be passed in to {@link insert_records_via_batch()}. Used by
+ * {@link totara_create_roles_cohort()}.
+ *
+ * @param object $role Object containing role id and the context id of the current record.
+ * @param object $templateobject An object containing the other fields to be inserted.
+ *
+ * @return object The object to insert into the database for this role.
+ */
+function totara_process_role_cohort($role, $templateobject) {
+    $templateobject->roleid = $role->roleid;
+    $templateobject->contextid = $role->contextid;
+    return $templateobject;
+}
+
+/**
+ * Saves role(s) assigned to a cohort
+ *
+ * @param array $roleids Array of object containing role id and context id
+ * @param int $cohortid The cohort which the roles will be assigned to
+ *
+ * @return bool True success, false otherwise
+ */
+function totara_create_roles_cohort($roleids, $cohortid) {
+    global $DB, $USER;
+
+    $now = time();
+    $cohortrole = new stdClass();
+    $cohortrole->cohortid = $cohortid;
+    $cohortrole->usermodified = $USER->id;
+    $cohortrole->timecreated = $now;
+    $cohortrole->timemodified = $now;
+
+    return $DB->insert_records_via_batch('cohort_role', $roleids, 'totara_process_role_cohort', array($cohortrole));
+}
+
+/**
+ * Un-assign roles to members that were previously assigned to a cohort in the role_assignments table
+ *
+ * @param array $roles Roles to be unassigned - Array of object containing role id and context id
+ * @param int $cohortid The cohort where the roles were assigned
+ * @param array $members The members of the cohort to which the role(s) will be removed
+ *
+ * @return void
+ */
+function totara_unset_role_assignments_cohort($roles, $cohortid, $members) {
+    foreach ($roles as $role) {
+        $params = array(
+            'roleid' => $role->roleid,
+            'userids' => $members,
+            'contextid' => $role->contextid,
+            'component' => 'totara_cohort',
+            'itemid' => $cohortid
+        );
+        role_unassign_all_bulk($params);
+    }
+}
+
+/**
+ * Assign roles to members of a cohort in the role_assignments table
+ *
+ * @param array $roles Roles to be assigned - Array of object containing role id and context id
+ * @param int $cohortid The cohort where the roles were assigned
+ * @param array $members The members of the cohort to which the role(s) will be assigned
+ *
+ * @return void
+ */
+function totara_set_role_assignments_cohort($roles, $cohortid, $members) {
+    foreach ($roles as $role) {
+        role_assign_bulk($role->roleid, $members, $role->contextid, 'totara_cohort', $cohortid);
+    }
+}
+
+/**
+ * Assign roles to members of a cohort
+ *
+ * @param array $roles Roles to be assigned - Array of object containing role id and context id
+ * @param int $cohortid The cohort where the roles were assigned
+ * @param array $members The members of the cohort to which the role(s) will be assigned
+ *
+ * @return bool
+ */
+function totara_assign_roles_cohort($roles, $cohortid, $members) {
+    global $DB;
+
+    try {
+        $transaction = $DB->start_delegated_transaction();
+
+        if (!empty($members)) {
+            totara_set_role_assignments_cohort($roles, $cohortid, $members);
+        }
+        totara_create_roles_cohort($roles, $cohortid);
+
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Un-assign roles to members of a cohort
+ *
+ * @param array $roles Roles to be unassigned - Array of object containing role id and context id
+ * @param int $cohortid The cohort where the roles were assigned
+ * @param array $members The members of the cohort to which the role(s) will be removed
+ *
+ * @return bool
+ */
+function totara_unassign_roles_cohort($roles, $cohortid, $members) {
+    global $DB;
+
+    try {
+        $transaction = $DB->start_delegated_transaction();
+
+        if (!empty($members)) {
+            totara_unset_role_assignments_cohort($roles, $cohortid, $members);
+        }
+        totara_delete_roles_cohort($roles, $cohortid);
+
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+        return false;
+    }
+
+    return true;
 }
 
 class totara_cohort_visible_learning_cohorts extends totara_cohort_course_cohorts {

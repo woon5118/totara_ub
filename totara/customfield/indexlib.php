@@ -253,6 +253,19 @@ function customfield_edit_field($id, $datatype, $typeid=0, $redirect, $tablepref
 
 
 /**
+ * Get list of fields that have been defined.
+ *
+ * @param string $tableprefix
+ * @param array $where
+ * @return array of records
+ */
+function customfield_get_defined_fields($tableprefix,  array $where = array()) {
+    global $DB;
+    return $DB->get_records($tableprefix.'_info_field', $where, 'sortorder ASC');
+}
+
+
+/**
  * Reorder the custom fields, with each type getting it's own sort numbering
  *
  * @param string $tableprefix

@@ -645,8 +645,6 @@ if ($show_table) {
 
         foreach ($rows as $attendee) {
             $data = array();
-            $optionid = 'submissionid_' . $attendee->submissionid;
-            $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
             $attendee_url = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
             if ($download) {
                 $data[] = format_string(fullname($attendee));
@@ -656,6 +654,9 @@ if ($show_table) {
             $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
 
             if ($action == 'takeattendance') {
+                $optionid = 'submissionid_' . $attendee->submissionid;
+                $checkoptionid = 'check_submissionid_' . $attendee->submissionid;
+
                 // Show current status
                 if ($attendee->statuscode == MDL_F2F_STATUS_BOOKED) {
                     $attendee->statuscode = (string) MDL_F2F_STATUS_NOT_SET;

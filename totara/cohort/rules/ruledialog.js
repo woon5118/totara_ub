@@ -99,11 +99,11 @@ M.totara_cohortrules = M.totara_cohortrules || {
              var type = radioname;
              var id = '';
 
-            if (radioname === 'cohortoperator') {
-                id = cohortid;
+             if (radioname === 'cohortoperator') {
+                 id = cohortid;
              } else if (radioname.substr(0, 15) === 'rulesetoperator') {
                  type = 'rulesetoperator';
-                 // Pattern for ruleset operators. e.g. rulesetoperator[422]
+                 // Pattern for ruleset operators. e.g. rulesetoperator[422].
                  var match = radioname.match(/\[(\d+)\]/);
                  if (match) {
                      id = match[1];
@@ -111,6 +111,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
              } else {
                  return;
              }
+
              // Updating operators via AJAX.
              $.ajax({
                  type: "POST",
@@ -205,6 +206,9 @@ M.totara_cohortrules = M.totara_cohortrules || {
             var idtype = select.attr('data-idtype');
             var id = select.attr('data-id');
 
+            // Validate completion date rules.
+            validate_completion();
+
             var dialog = totaraDialogs['cohortrule' + ruleHandlerMap[ruletype]];
             var url = dialog.cohort_base_url;
             var handler = dialog.handler;
@@ -237,6 +241,9 @@ M.totara_cohortrules = M.totara_cohortrules || {
             var ruleid = link.attr('data-ruleid');
             var ruletype = link.attr('data-ruletype');
 
+            // Validate completion date rules.
+            validate_completion();
+
             // Get the appropriate dialog
             var dialog = totaraDialogs['cohortrule' + ruleHandlerMap[ruletype]];
             var url = dialog.cohort_base_url;
@@ -254,6 +261,101 @@ M.totara_cohortrules = M.totara_cohortrules || {
     }
 }
 
+
+// Function to validate completion date field.
+var funccompletiondate =  function(element) {
+    element = $(element);
+    var parent = element.parent();
+    if (!element.val().match(M.util.get_string('datepickerlongyearregexjs', 'totara_core'))){
+        parent.addClass('error');
+        if ($('#id_error_completiondate').length == 0) {
+            parent.prepend('<span id="id_error_completiondate" class="error">' +
+                M.util.get_string('error:baddate','totara_cohort') +
+                '</span>');
+        }
+        return false;
+    } else {
+        $('#id_error_completiondate').remove();
+        parent.removeClass('error');
+        return true;
+    }
+};
+
+// Function to validate completion duration field.
+var funccompletionduration = function(element) {
+    element = $(element);
+    var parent = element.parent();
+    if (!element.val().match(/[1-9]+[0-9]*/)){
+        parent.addClass('error');
+        if ( $('#id_error_completiondurationdate').length == 0 ) {
+            parent.prepend('<span id="id_error_completiondurationdate" class="error">' +
+                M.util.get_string('error:badduration','totara_cohort') +
+                '</span>');
+        }
+        return false;
+    } else {
+        $('#id_error_completiondurationdate').remove();
+        parent.removeClass('error');
+        return true;
+    }
+};
+
+function validate_completion() {
+    Y.on("contentready", initial_validation, '#form_course_program_date')
+}
+
+function initial_validation() {
+    $('#completiondate').datepicker(
+        {
+            dateFormat: M.util.get_string('datepickerlongyeardisplayformat','totara_core'),
+            showOn: 'both',
+            buttonImage: M.util.image_url('t/calendar'),
+            buttonImageOnly: true,
+            beforeShow: function() { $('#ui-datepicker-div').css('z-index', 1600); },
+            constrainInput: true
+        }
+    );
+
+    // Validate radio button options.
+    if ($('#fixedordynamic1').is(':checked')) {
+        $('#completiondurationdate').prop('disabled', true);
+        $('#completiondate').get(0).cohort_validation_func = funccompletiondate;
+    }
+
+    if ($('#fixedordynamic2').is(':checked')) {
+        $('#completiondate').prop('disabled', true);
+        $('#completiondurationdate').get(0).cohort_validation_func = funccompletionduration;
+    }
+}
+
+// Validate completion date field when changing.
+$(document).on('change', '#completiondate', function(element) {
+    $('#completiondate').get(0).cohort_validation_func = funccompletiondate;
+});
+
+// Validate duration field when changing.
+$(document).on('change', '#completiondurationdate', function() {
+    $('#completiondurationdate').get(0).cohort_validation_func = funccompletionduration;
+});
+
+// Validate when radio buttons selected.
+$(document).on('click', 'input[name="fixeddynamic"]', function(event) {
+    if ($(this).val() == 1) { // Fixed date.
+        $('#fixedordynamic1').addClass('cohorttreeviewsubmitfield');
+        $('#fixedordynamic2').removeClass('cohorttreeviewsubmitfield');
+        $('#completiondate').prop('disabled', false);
+        $('#completiondurationdate').prop('disabled', true);
+        $('#completiondate').get(0).cohort_validation_func = funccompletiondate;
+        $('#completiondurationdate').get(0).cohort_validation_func = null;
+    } else { // Relative date.
+        $('#fixedordynamic2').addClass('cohorttreeviewsubmitfield');
+        $('#fixedordynamic1').removeClass('cohorttreeviewsubmitfield');
+        $('#completiondurationdate').prop('disabled', false);
+        $('#completiondate').prop('disabled', true);
+        $('#completiondurationdate').get(0).cohort_validation_func = funccompletionduration;
+        $('#completiondate').get(0).cohort_validation_func = null;
+    }
+});
 
 // A function to handle the responses generated by cohort handlers
 var cohort_handler_responsefunc = function(response) {

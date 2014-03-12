@@ -30,7 +30,6 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 $context = context_system::instance();
-require_capability('moodle/cohort:view', $context);
 
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // export format
@@ -60,6 +59,7 @@ echo $OUTPUT->heading(get_string('orphanedusers', 'totara_cohort'));
 echo $OUTPUT->container(get_string('orphanhelptext', 'totara_cohort'));
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

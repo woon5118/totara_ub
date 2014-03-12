@@ -265,9 +265,11 @@ if ($values) {
             }
 
             if ($canupdatescales) {
-            $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/goal/scale/editvalue.php',
-                array('id' => $value->id, 'prefix' => 'goal')), new pix_icon('t/edit', $str_edit), null,
-                array('class' => 'iconsmall', 'title' => $str_edit));
+            $buttons[] = $OUTPUT->action_icon(
+                new moodle_url('/totara/hierarchy/prefix/goal/scale/editvalue.php', array('id' => $value->id, 'prefix' => 'goal')),
+                new pix_icon('t/edit', $str_edit),
+                null,
+                array('class' => 'action-icon', 'title' => $str_edit));
             }
 
             if (!$scale_used && $candeletescales) {
@@ -275,16 +277,16 @@ if ($values) {
                     // Prevent deleting default value.
                     $buttons[] = $OUTPUT->pix_icon('t/delete_grey',
                             get_string('error:nodeletegoalscalevaluedefault', 'totara_hierarchy'), 'totara_core',
-                            array('class' => 'iconsmall'));
+                            array('class' => 'iconsmall action-icon'));
                 } else if ($value->id == $onlyprof) {
                     // Prevent deleting last proficient value.
                     $buttons[] = $OUTPUT->pix_icon('t/delete_grey',
                             get_string('error:nodeletegoalscalevalueonlyprof', 'totara_hierarchy'), 'totara_core',
-                            array('class' => 'iconsmall'));
+                            array('class' => 'iconsmall action-icon'));
                 } else {
                     $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/goal/scale/deletevalue.php',
                         array('id' => $value->id, 'prefix' => 'goal')), new pix_icon('t/delete', $str_delete), null,
-                        array('class' => 'iconsmall', 'title' => $str_delete));
+                        array('class' => 'action-icon', 'title' => $str_delete));
                 }
             }
 
@@ -292,7 +294,7 @@ if ($values) {
             if ($count > 1 && !$scale_used && $canupdatescales) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php',
                     array('id' => $scale->id, 'moveup' => $value->id, 'prefix' => 'goal')),
-                    new pix_icon('t/up', $str_moveup), null, array('class' => 'iconsmall', 'title' => $str_moveup));
+                    new pix_icon('t/up', $str_moveup), null, array('class' => 'action-icon', 'title' => $str_moveup));
             } else {
                 $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }
@@ -301,7 +303,7 @@ if ($values) {
             if ($count < $numvalues && !$scale_used && $canupdatescales) {
                 $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php',
                     array('id' => $scale->id, 'movedown' => $value->id, 'prefix' => 'goal')),
-                    new pix_icon('t/down', $str_movedown), null, array('class' => 'iconsmall', 'title' => $str_movedown));
+                    new pix_icon('t/down', $str_movedown), null, array('class' => 'action-icon', 'title' => $str_movedown));
             } else {
                 $buttons[] = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
             }

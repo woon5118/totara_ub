@@ -109,7 +109,9 @@ class rb_source_goal_status_history extends rb_base_source {
                 'fullname',
                 get_string('goalnamecolumn', 'rb_source_goal_status_history'),
                 'base.fullname',
-                array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_status_history'))
+                array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_status_history'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'item',
@@ -125,7 +127,9 @@ class rb_source_goal_status_history extends rb_base_source {
                 get_string('goalscalevaluecolumn', 'rb_source_goal_status_history'),
                 'scalevalue.name',
                 array('joins' => 'scalevalue',
-                      'defaultheading' => get_string('goalscalevalueheading', 'rb_source_goal_status_history'))
+                      'defaultheading' => get_string('goalscalevalueheading', 'rb_source_goal_status_history'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'history',
@@ -143,7 +147,9 @@ class rb_source_goal_status_history extends rb_base_source {
                 array('defaultheading' => get_string('goalusermodifiedheading', 'rb_source_goal_status_history'),
                       'joins' => 'usermodified',
                       'displayfunc' => 'link_user',
-                      'extrafields' => array('user_id' => 'usermodified.id'))
+                      'extrafields' => array('user_id' => 'usermodified.id'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             )
         );
 
@@ -296,7 +302,7 @@ class rb_source_goal_status_history extends rb_base_source {
         $goalscalevalues = $DB->get_records_sql($sql);
 
         foreach ($goalscalevalues as $goalscalevalue) {
-            $scalevalues[$goalscalevalue->id] = $goalscalevalue->scalename . ': ' . $goalscalevalue->name;
+            $scalevalues[$goalscalevalue->id] = format_string($goalscalevalue->scalename) . ': ' . format_string($goalscalevalue->name);
         }
 
         return $scalevalues;

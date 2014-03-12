@@ -96,7 +96,9 @@ class rb_source_site_logs extends rb_base_source {
                 'log',
                 'module',
                 get_string('module', 'rb_source_site_logs'),
-                'base.module'
+                'base.module',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'log',
@@ -108,7 +110,9 @@ class rb_source_site_logs extends rb_base_source {
                 'log',
                 'action',
                 get_string('action', 'rb_source_site_logs'),
-                $DB->sql_fullname('base.module', 'base.action')
+                $DB->sql_fullname('base.module', 'base.action'),
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'log',
@@ -125,13 +129,17 @@ class rb_source_site_logs extends rb_base_source {
                 'log',
                 'url',
                 get_string('url', 'rb_source_site_logs'),
-                'base.url'
+                'base.url',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'log',
                 'info',
                 get_string('info', 'rb_source_site_logs'),
-                'base.info'
+                'base.info',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
         );
 

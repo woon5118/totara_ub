@@ -660,13 +660,11 @@ function totara_display_course_progress_icon($userid, $courseid, $status) {
  * @return  void
 */
 function totara_add_icon_picker(&$mform, $action, $type, $currenticon='default', $nojs=0, $fieldset=true) {
-    global $CFG, $OUTPUT;
+    global $CFG;
     //get all icons of this type from core
     $replace = array('.png' => '', '_' => ' ', '-' => ' ');
-    $iconhtml = $OUTPUT->pix_icon('/' . $type . 'icons/' . $currenticon,
-                            ucwords(strtr($currenticon, $replace)),
-                            'totara_core',
-                            array('class' => "course_icon", 'id' => "icon_preview"));
+    $iconhtml = totara_icon_picker_preview($type, $currenticon);
+
     if ($fieldset) {
         $mform->addElement('header', 'iconheader', get_string($type.'icon', 'totara_core'));
     }
@@ -696,6 +694,81 @@ function totara_add_icon_picker(&$mform, $action, $type, $currenticon='default',
     if ($fieldset) {
         $mform->setExpanded('iconheader');
     }
+}
+
+/**
+ *  Adds the current icon and icon select dropdown to a moodle form
+ *  replaces all the old totara/icon classes
+ *
+ * @access  public
+ * @param   object $mform Reference to moodle form object.
+ * @param   string $action Form action - add, edit or view.
+ * @param   string $type Program, course or message icons.
+ * @param   string $currenticon Value currently stored in db.
+ * @param   int    $nojs 1 if Javascript is disabled.
+ * @param   mixed  $ind index to add to icon title
+ * @return  array of created elements
+ */
+function totara_create_icon_picker(&$mform, $action, $type, $currenticon = '', $nojs = 0, $ind = '') {
+    global $CFG;
+    $return = array();
+    if ($currenticon == '') {
+        $currenticon = 'default';
+    }
+    // Get all icons of this type from core.
+    $replace = array('.png' => '', '_' => ' ', '-' => ' ');
+    $iconhtml = totara_icon_picker_preview($type, $currenticon, $ind);
+
+    if ($nojs == 1) {
+        $return['currenticon'.$ind] = $mform->createElement('static', 'currenticon',
+                get_string('currenticon', 'totara_core'), $iconhtml);
+        if ($action == 'add' || $action == 'edit') {
+            $path = $CFG->dirroot . '/totara/core/pix/' . $type . 'icons';
+            foreach (scandir($path) as $icon) {
+                if ($icon == '.' || $icon == '..') {
+                    continue;
+                }
+                $iconfile = str_replace('.png', '', $icon);
+                $iconname = strtr($icon, $replace);
+                $icons[$iconfile] = ucwords($iconname);
+            }
+            $return['icon'.$ind] = $mform->createElement('select', 'icon',
+                    get_string('icon', 'totara_core'), $icons);
+            $mform->setDefault('icon', $currenticon);
+        }
+    } else {
+        $linkhtml = '';
+        if ($action == 'add' || $action == 'edit') {
+            $linkhtml = html_writer::tag('a', get_string('chooseicon', 'totara_program'),
+                    array('href' => '#', 'data-ind'=> $ind, 'id' => 'show-icon-dialog' . $ind,
+                          'class' => 'show-icon-dialog'));
+            $return['icon'.$ind] = $mform->createElement('hidden', 'icon', '',
+                    array('id'=>'icon' . $ind));
+        }
+        $return['currenticon' . $ind] = $mform->createElement('static', 'currenticon', '',
+                get_string('icon', 'totara_program') . $iconhtml . $linkhtml);
+    }
+    return $return;
+}
+
+/**
+ * Render preview of icon
+ *
+ * @param string $type type of icon (course or program)
+ * @param string $currenticon current icon
+ * @param string $ind index of icon on page (when several icons previewed)
+ * @param string $alt alternative text for icon
+ * @return string HTML
+ */
+function totara_icon_picker_preview($type, $currenticon, $ind = '', $alt = '') {
+    global $OUTPUT;
+    $replace = array('.png' => '', '_' => ' ', '-' => ' ');
+    $alt = ($alt != '') ? $alt : ucwords(strtr($currenticon, $replace));
+    $iconhtml = $OUTPUT->pix_icon('/' . $type . 'icons/' . $currenticon,
+                            $alt,
+                            'totara_core',
+                            array('class' => "course_icon", 'id' => "icon_preview" . $ind));
+    return $iconhtml;
 }
 /**
 * print out the Totara My Learning nav section
@@ -1391,7 +1464,7 @@ function sql_cast2char($fieldname) {
             $sql = ' CAST(' . $fieldname . ' AS VARCHAR) ';
             break;
         case 'mssql':
-            $sql = ' CAST(' . $fieldname . ' AS NVARCHAR(20)) ';
+            $sql = ' CAST(' . $fieldname . ' AS NVARCHAR(MAX)) ';
             break;
         case 'oracle':
             $sql = ' TO_CHAR(' . $fieldname . ') ';
@@ -1697,25 +1770,35 @@ function totara_build_menu() {
         );
     }
 
+    $findcoursesstr = get_string('findlearning', 'totara_core');
+    if (!empty($CFG->enhancedcatalog)) {
+        $findcoursesurl = new moodle_url('/totara/coursecatalog/courses.php');
+        $findprogsurl = new moodle_url('/totara/coursecatalog/programs.php');
+        $findcertsurl = new moodle_url('/totara/coursecatalog/certifications.php');
+    } else {
+        $findcoursesurl = new moodle_url('/course/index.php');
+        $findprogsurl = new moodle_url('/totara/program/index.php');
+        $findcertsurl = new moodle_url('/totara/program/index.php', array('viewtype' => 'certification'));
+    }
     $tree[] = (object)array(
-        'name' => 'findcourses',
-        'linktext' => get_string('findcourses', 'totara_core'),
+        'name' => 'findlearning',
+        'linktext' => $findcoursesstr,
         'parent' => null,
-        'url' => '/course/index.php'
+        'url' => $findcoursesurl
     );
 
     $tree[] = (object)array(
         'name' => 'course',
         'linktext' => get_string('courses'),
-        'parent' => 'findcourses',
-        'url' => '/course/index.php'
+        'parent' => 'findlearning',
+        'url' => $findcoursesurl
     );
 
     $tree[] = (object)array(
         'name' => 'program',
         'linktext' => get_string('programs', 'totara_program'),
-        'parent' => 'findcourses',
-        'url' => '/totara/program/index.php'
+        'parent' => 'findlearning',
+        'url' => $findprogsurl
     );
 
     $plugins = get_plugin_list('totara');
@@ -1723,8 +1806,8 @@ function totara_build_menu() {
         $tree[] = (object)array(
             'name' => 'certification',
             'linktext' => get_string('certifications', 'totara_certification'),
-            'parent' => 'findcourses',
-            'url' => '/totara/program/index.php?viewtype=certification'
+            'parent' => 'findlearning',
+            'url' => $findcertsurl
         );
     }
 

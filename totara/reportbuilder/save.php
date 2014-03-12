@@ -33,7 +33,6 @@ require_once('report_forms.php');
 require_login();
 
 $id = optional_param('id', null, PARAM_INT); // id for report to save
-$returnurl = $CFG->wwwroot . '/totara/reportbuilder/report.php?id='.$id;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/reportbuilder/save.php', array('id' => $id));
@@ -43,6 +42,8 @@ $report = new reportbuilder($id);
 if (!$report->is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
+
+$returnurl = $report->report_url();
 
 $mform = new report_builder_save_form(null, compact('id', 'report'));
 
@@ -57,12 +58,13 @@ if ($fromform = $mform->get_data()) {
     // handle form submission
     $todb = new stdClass();
     $todb->reportid = $fromform->id;
-    $todb->userid = $fromform->userid;
+    $todb->userid = $fromform->creatoruserid;
     $todb->search = $fromform->search;
     $todb->name = $fromform->name;
     $todb->ispublic = $fromform->ispublic;
     $DB->insert_record('report_builder_saved', $todb);
-    redirect($CFG->wwwroot . '/totara/reportbuilder/savedsearches.php?id='.$id);
+
+    redirect($returnurl);
 }
 
 $fullname = $report->fullname;

@@ -1056,3 +1056,24 @@ select.totara-expanded-width {
     float: left;
 }
 
+#hierarchy-bulk-actions-form > div {
+    float: left;
+}
+.dir-rtl #hierarchy-bulk-actions-form > div {
+    float: right;
+}
+#hierarchy-bulk-actions-form > div.span5 {
+    width: 40%
+}
+#hierarchy-bulk-actions-form > div.controls {
+    width: 100px;
+    margin-top: 225px;
+    text-align: center;
+}
+#hierarchy-bulk-actions-form .controls input {
+    clear: left;
+    margin: 5px auto;
+}
+#hierarchy-bulk-actions-form > div.span9 {
+    padding-top: 15px;
+}

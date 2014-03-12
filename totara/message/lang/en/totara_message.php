@@ -58,6 +58,7 @@ $string['objective'] = 'Objective';
 $string['pluginname'] = 'Totara Messages';
 $string['program'] = 'Program';
 $string['quiz'] = 'Quiz';
+$string['reasonfordecision'] = 'Reason (Grant/Deny):';
 $string['recordsall'] = '{$a} records shown';
 $string['recordsshown'] = '{$a->countfiltered}/{$a->countall} records shown';
 $string['reject'] = 'Reject';

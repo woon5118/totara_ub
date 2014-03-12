@@ -99,14 +99,18 @@ class rb_source_totaramessages extends rb_base_source {
                 'subject',
                 get_string('subject', 'rb_source_totaramessages'),
                 'msg.subject',
-                array('joins' => 'msg')
+                array('joins' => 'msg',
+                      'dbdatatype' => 'text',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
-                'message_values',         // type
-                'statement',              // value
-                get_string('statement', 'rb_source_totaramessages'),              // name
-                'msg.fullmessagehtml',        // field
-                array('joins' => 'msg')   // options
+                'message_values',
+                'statement',
+                get_string('statement', 'rb_source_totaramessages'),
+                'msg.fullmessagehtml',
+                array('joins' => 'msg',
+                      'dbdatatype' => 'text',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'message_values',

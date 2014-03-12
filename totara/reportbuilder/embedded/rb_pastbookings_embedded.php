@@ -103,4 +103,17 @@ class rb_pastbookings_embedded extends rb_base_embedded {
 
         parent::__construct();
     }
+
+    /**
+     * Check if the user is capable of accessing this report.
+     * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting report params
+     * some other way so that the embedded report will be compatible with the scheduler (in the future).
+     *
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
+    public function is_capable($reportfor, $report) {
+        return true;
+    }
 }

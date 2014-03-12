@@ -277,6 +277,16 @@ M.totara_completionrpl = M.totara_completionrpl || {
             });
         }
 
+        // Course module id.
+        var cmid;
+
+        // Get the course module id depending on which activity is clicked by the user.
+        $('a.rpledit').click(function() {
+            var classname = $(this).parent('td').attr('class');
+
+            classname = classname.split('cmid-');
+            cmid = classname[1];
+        });
 
         // Save RPL data
         var fnc_saverpl = function(cell, user, rpl) {
@@ -290,7 +300,7 @@ M.totara_completionrpl = M.totara_completionrpl || {
             // Callback for saving RPL.
             var callback = {
                     method: 'GET',
-                    data: 'type='+type+'&course='+courseid+'&user='+user+'&rpl='+rpl,
+                    data: 'type='+type+'&course='+courseid+'&user='+user+'&rpl='+rpl+'&cmid='+cmid,
                     arguments: { success : user },
                     on: {
                         success: function(id, o, args) {

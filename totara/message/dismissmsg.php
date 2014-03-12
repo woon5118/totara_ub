@@ -122,5 +122,17 @@ if ($msg->contexturl && $msg->contexturlname) {
     $cell->attributes['class'] = 'totara-msgs-action-right';
     $cells []= $cell;
 }
+// Create input reason for declining/approving the request.
+if ($eventdata && $eventdata->action != 'facetoface') {
+    $cells = array();
+    $cell = new html_table_cell(html_writer::tag('label', get_string('reasonfordecision', 'totara_message'), array('for' => 'dismiss-reasonfordecision')));
+    $cell->attributes['class'] = 'totara-msgs-action-left';
+    $cells []= $cell;
+    $reasonfordecision = html_writer::empty_tag('input', array('class' => 'reasonfordecision', 'type' => 'text', 'name' => 'reasonfordecision', 'id' => 'reasonfordecision', 'size' => '80', 'maxlength' => '255'));
+    $cell = new html_table_cell($reasonfordecision);
+    $cell->attributes['class'] = 'totara-msgs-action-right';
+    $cells []= $cell;
+    $tab->data[] = new html_table_row($cells);
+}
 print html_writer::table($tab);
 print html_writer::end_tag('div');

@@ -95,7 +95,9 @@ class rb_source_goal_summary extends rb_base_source {
                 'name',
                 get_string('goalnamecolumn', 'rb_source_goal_summary'),
                 'base.fullname',
-                array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_summary'))
+                array('defaultheading' => get_string('goalnameheading', 'rb_source_goal_summary'),
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'goal',

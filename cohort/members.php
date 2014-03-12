@@ -33,7 +33,6 @@ $format = optional_param('format','',PARAM_TEXT); //export format
 $debug  = optional_param('debug', false, PARAM_BOOL);
 
 $context = context_system::instance();
-require_capability('moodle/cohort:view', $context);
 
 $PAGE->set_context($context);
 
@@ -69,6 +68,7 @@ if (isset($id)) {
 }
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

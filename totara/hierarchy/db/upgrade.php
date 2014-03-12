@@ -948,5 +948,81 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013120200, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2014030400) {
+        // Competencies customfield parameters.
+        $table = new xmldb_table('comp_type_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'comp_type_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        // Set the comment for the table 'comp_type_info_data_param'.
+        $table->setComment('Custom competency fields data parameters');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Positions customfield parameters.
+        $table = new xmldb_table('pos_type_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'pos_type_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        // Set the comment for the table 'pos_type_info_data_param'.
+        $table->setComment('Custom position fields data parameters');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Organisations customfield parameters.
+        $table = new xmldb_table('org_type_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'org_type_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        // Set the comment for the table 'org_type_info_data_param'.
+        $table->setComment('Custom organisation fields data parameters');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Goals customfield parameters.
+        $table = new xmldb_table('goal_type_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, array('dataid'), 'goal_type_info_data', array('id'));
+        $table->add_index('value', null, array('value'));
+
+        // Set the comment for the table 'goal_type_info_data_param'.
+        $table->setComment('Custom goal fields data parameters');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2014030400, 'totara', 'hierarchy');
+    }
+
     return true;
 }

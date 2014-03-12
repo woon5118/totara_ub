@@ -554,16 +554,21 @@ abstract class dp_base_component {
      * to approval confirmation
      */
     public function display_approval_list($pendingitems) {
-        $table = new html_table();
-        $table->attributes['class'] = 'fullwidth generaltable';
+        $controls = html_writer::start_tag('div', array('class' => 'fullwidth generaltable', 'style' => 'display: table'));
+
         foreach ($pendingitems as $item) {
-            $row = array();
             // @todo write abstracted display_item_name() and use here
-            $row[] = format_string($item->fullname);
-            $row[] = $this->display_approval_options($item, $item->approved);
-            $table->data[] = $row;
+            $controls .= html_writer::start_tag('div', array('style' => 'display: table-row'));
+            $controls .= html_writer::tag('div', format_string($item->fullname), array('style' => 'display: table-cell'));
+            $controls .= html_writer::tag('div', $this->display_approval_options($item, $item->approved), array('style' => 'display: table-cell'));
+            $controls .= html_writer::start_div('', array('style' => 'display: table-cell'));
+            $controls .= get_string('reasonfordecision', 'totara_message');
+            $controls .= html_writer::empty_tag('input', array('type' => 'text', 'name' => "reasonfordecision_{$this->component}[$item->id]"));
+            $controls .= html_writer::end_div();
+            $controls .= html_writer::end_tag('div');
         }
-        return html_writer::table($table, true);
+        $controls .= html_writer::end_tag('div');
+        return $controls;
     }
 
 
@@ -952,11 +957,12 @@ abstract class dp_base_component {
         $a->updates = text_to_html($approval->text, 75, false);
         $a->updateshtml = $approval->text;
         $a->name = $approval->itemname;
+        $reasonfordecision = $approval->reasonfordecision;
 
-        // did they edit it themselves?
+        // Did they edit it themselves?
         $stringmanager = get_string_manager();
         if ($USER->id == $this->plan->userid) {
-            // notify their manager
+            // Notify their manager.
             if ($this->plan->is_active()) {
                 if ($manager = totara_get_manager($this->plan->userid)) {
                     $event->userto = $manager;
@@ -964,16 +970,28 @@ abstract class dp_base_component {
                     $event->subject = $stringmanager->get_string('component'.$type.'shortmanager', 'totara_plan', $a, $manager->lang);
                     $event->fullmessage = $stringmanager->get_string('component'.$type.'longmanager', 'totara_plan', $a, $manager->lang);
                     $event->fullmessagehtml = $stringmanager->get_string('component'.$type.'longmanagerhtml', 'totara_plan', $a, $manager->lang);
+                    if (!empty($reasonfordecision)) {
+                        $breakline = html_writer::empty_tag('br') . html_writer::empty_tag('br');
+                        $decision = $stringmanager->get_string('reasongivenfordecision', 'totara_plan', $reasonfordecision, $manager->lang);
+                        $event->fullmessage .= $breakline . $decision;
+                        $event->fullmessagehtml .= $breakline . $decision;
+                    }
                     tm_alert_send($event);
                 }
             }
         } else {
-            // notify user that someone else did it
+            // Notify user that someone else did it.
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $event->userto = $userto;
             $event->subject = $stringmanager->get_string('component'.$type.'shortlearner', 'totara_plan', $a, $userto->lang);
             $event->fullmessage = $stringmanager->get_string('component'.$type.'longlearner', 'totara_plan', $a, $userto->lang);
             $event->fullmessagehtml = $stringmanager->get_string('component'.$type.'longlearnerhtml', 'totara_plan', $a, $userto->lang);
+            if (!empty($reasonfordecision)) {
+                $breakline = html_writer::empty_tag('br') . html_writer::empty_tag('br');
+                $decision = $stringmanager->get_string('reasongivenfordecision', 'totara_plan', $reasonfordecision, $userto->lang);
+                $event->fullmessage .= $breakline . $decision;
+                $event->fullmessagehtml .= $breakline . $decision;
+            }
             tm_alert_send($event);
         }
     }
@@ -1678,7 +1696,6 @@ abstract class dp_base_component {
      * @return string The html for an approval picker
      */
     function display_approval_options($obj, $approvalstatus) {
-        global $OUTPUT;
         $name = "approve_{$this->component}[{$obj->id}]";
 
         $options = array(

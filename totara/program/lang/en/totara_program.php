@@ -146,6 +146,7 @@ $string['completedcourserpl'] = 'Course marked as completed by record of prior l
 $string['completewithin'] = 'Complete within';
 $string['completewithinevent'] = 'Complete within {$a->num} {$a->period} of {$a->event} {$a->instance}';
 $string['completioncriteria'] = 'Completion criteria';
+$string['completioncriterianotdefined'] = 'Completion criteria not defined';
 $string['completiondate'] = 'Completion date';
 $string['completionofcourse'] = 'completion of course';
 $string['completionofprogram'] = 'completion of program';
@@ -295,7 +296,7 @@ $string['extensionaccepttext'] = 'Extension Granted';
 $string['extensionbeforenow'] = 'Cannot request extension that is earlier than current date';
 $string['extensiondate'] = 'Extension date';
 $string['extensiondenied'] = 'Extension denied';
-$string['extensiondeniedmessage'] = 'Your request for an extension has been refused.';
+$string['extensiondeniedmessage'] = 'Your extension request for the program {$a} has been refused.';
 $string['extensionearlierthanduedate'] = 'Cannot request extension that is before current program due date';
 $string['extensiongranted'] = 'Extension granted';
 $string['extensiongrantedmessage'] = 'You have been granted an extension until {$a}.';
@@ -391,8 +392,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -413,8 +429,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -438,8 +469,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -533,6 +579,7 @@ $string['prog_unenrolment_message'] = 'Un-enrolment message';
 $string['progmessageupdated'] = 'Program messages updated (not yet saved)';
 $string['prognamelinkedicon'] = 'Program name and linked icon';
 $string['program'] = 'Program';
+$string['programexpandlink'] = 'Program Name (expanding details)';
 $string['program:accessanyprogram'] = 'Access any program';
 $string['program:configureassignments'] = 'Configure program assignments';
 $string['program:configurecontent'] = 'Configure program content';
@@ -608,6 +655,7 @@ $string['programoverviewfiles_help'] = 'Program summary files, such as images, a
 $string['programrecurring'] = 'Program recurring';
 $string['programs'] = 'Programs';
 $string['programscomplete'] = 'Programs complete';
+$string['programscerts'] = 'Programs / Certifications';
 $string['programshortname'] = 'Program short name';
 $string['programshortname_help'] = 'The program shortname will be used in several places where the full name isn\'t appropriate (such us in the subject line of an alert message).';
 $string['programsinthiscategory'] = 'Programs in this category ({$a})';
@@ -623,6 +671,8 @@ If the program is not visble, it will not appear in program listings or search r
 $string['programvisible'] = 'Program Visible';
 $string['progress'] = 'Progress';
 $string['reason'] = 'Extension reason';
+$string['reasonapprovedmessage'] = 'The reason given for approving the extension was: {$a}';
+$string['reasondeniedmessage'] = 'The reason given for denying the extension was: {$a}';
 $string['reasonforextension'] = 'Reason for extension';
 $string['recurrence'] = 'Recurrence';
 $string['recurrence_help'] = 'Recurrence defines the time period when the recurring course must be repeated. Recurrence can be specified by any number of days, weeks or months.';
@@ -713,8 +763,23 @@ In program messages, certain variables can be inserted into the subject and/or b
 %userfullname%
 :   This will be replaced by the recipient\'s full name
 
+%username%
+:   This will be replaced by the user\'s username
+
 %programfullname%
 :   This will be replaced by the program\'s full name
+
+%completioncriteria%
+:   This will be replaced by the completion criteria set in the assignment tab
+
+%duedate%
+:   This will be replaced by the date assigned to the user to complete the program
+
+%managername%
+:   This will be replaced by the manager\'s name
+
+%manageremail%
+:   This will be replaced by the manager\'s email
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
@@ -737,6 +802,7 @@ $string['xsrequiredlearning'] = '{$a}\'s Required Learning';
 $string['xweeks'] = '{$a} Week(s)';
 $string['xyears'] = '{$a} Year(s)';
 $string['years'] = 'Year(s)';
+$string['youareassigned'] = 'You are assigned to this program';
 $string['youareviewingxsrequiredlearning'] = 'You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> required learning.';
 $string['youhaveadded'] = 'You have added {$a->itemnames} to this program<br />
 <br />

@@ -1416,6 +1416,8 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
 
     $i = $i - 1; // will be incremented BEFORE each row is written
 
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
     foreach ($sessions as $session) {
         $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->id), '', 'fieldid, data');
 
@@ -1430,8 +1432,9 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         if ($session->datetimeknown) {
             // Display only the first date
             $sessionobj = facetoface_format_session_times($session->timestart, $session->timefinish, $session->sessiontimezone);
-            $starttime = $sessionobj->starttime . ' ' . $sessionobj->timezone;
-            $finishtime = $sessionobj->endtime . ' ' . $sessionobj->timezone;
+            $sessiontimezone = !empty($displaytimezones) ? $sessionobj->timezone : '';
+            $starttime = $sessionobj->starttime . ' ' . $sessiontimezone;
+            $finishtime = $sessionobj->endtime . ' ' . $sessiontimezone;
 
             if (method_exists($worksheet, 'write_date')) {
                 // Needs the patch in MDL-20781
@@ -2207,6 +2210,8 @@ function facetoface_take_individual_attendance($submissionid, $grading) {
  */
 function facetoface_format_session_times($start, $end, $tz) {
 
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
     $formattedsession = new stdClass();
     $tzknown = false;
     if (!empty($tz)) {
@@ -2219,7 +2224,9 @@ function facetoface_format_session_times($start, $end, $tz) {
     $formattedsession->starttime = userdate($start, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
     $formattedsession->enddate = userdate($end, get_string('sessiondateformat', 'facetoface'), $targetTZ);
     $formattedsession->endtime = userdate($end, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
-    if ($tzknown) {
+    if (empty($displaytimezones)) {
+        $formattedsession->timezone = '';
+    } else if ($tzknown) {
         $formattedsession->timezone = get_string(strtolower($targetTZ), 'timezones');
     } else {
         $formattedsession->timezone = get_string('sessiontimezoneunknown', 'facetoface');
@@ -2292,9 +2299,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         }
                         $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
                         if ($sessionobj->startdate == $sessionobj->enddate) {
-                            $sessiondates .= get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
+                            $sessiondatelangkey = !empty($sessionobj->timezone) ? 'sessionstartdateandtime' : 'sessionstartdateandtimewithouttimezone';
+                            $sessiondates .= get_string($sessiondatelangkey, 'facetoface', $sessionobj);
                         } else {
-                            $sessiondates .= get_string('sessionstartfinishdateandtime', 'facetoface', $sessionobj);
+                            $sessiondatelangkey = !empty($sessionobj->timezone) ? 'sessionstartfinishdateandtime' : 'sessionstartfinishdateandtimewithouttimezone';
+                            $sessiondates .= get_string($sessiondatelangkey, 'facetoface', $sessionobj);
                         }
                     }
                 } else {
@@ -2395,9 +2404,11 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     } else {
                         $sessionobj = facetoface_format_session_times($session->sessiondates[0]->timestart, $session->sessiondates[0]->timefinish, $session->sessiondates[0]->sessiontimezone);
                         if ($sessionobj->startdate == $sessionobj->enddate) {
-                            $sessiondate = get_string('sessionstartdateandtime', 'facetoface', $sessionobj);
+                            $sessiondatelangkey = !empty($sessionobj->timezone) ? 'sessionstartdateandtime' : 'sessionstartdateandtimewithouttimezone';
+                            $sessiondate = get_string($sessiondatelangkey, 'facetoface', $sessionobj);
                         } else {
-                            $sessiondate .= get_string('sessionstartfinishdateandtime', 'facetoface', $sessionobj);
+                            $sessiondatelangkey = !empty($sessionobj->timezone) ? 'sessionstartfinishdateandtime' : 'sessionstartfinishdateandtimewithouttimezone';
+                            $sessiondate .= get_string($sessiondatelangkey, 'facetoface', $sessionobj);
                         }
                         if (count($session->sessiondates) > 1) {
                             $multidate = html_writer::start_tag('br') . get_string('multidate', 'facetoface');
@@ -2990,6 +3001,8 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $table->data[] = array(str_replace(' ', '&nbsp;', format_string($field->name)), $data);
     }
 
+    $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
     $strdatetime = str_replace(' ', '&nbsp;', get_string('sessiondatetime', 'facetoface'));
     if ($session->datetimeknown) {
         $html = '';
@@ -3003,7 +3016,9 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             } else {
                 $html .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . ', ';
             }
-            $html .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
+
+            $sessiontimezonestr = !empty($displaytimezones) ? $sessionobj->timezone : '';
+            $html .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessiontimezonestr;
         }
         $table->data[] = array($strdatetime, $html);
     } else {

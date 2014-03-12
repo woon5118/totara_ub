@@ -3,6 +3,35 @@
 
 Totara LMS Changelog
 
+Release 2.5.9 (4th March 2014):
+==================================================
+
+Improvements:
+    T-11874    Enabled multimedia filter in Appraisal stage descriptions and fixed-text questions
+
+Bug Fixes:
+    T-11344    Fixed RPL not marking activities as complete
+    T-11855    Deleted users are now excluded when certification stages are calculated
+    T-11739    Fixed the handling of non UTF-8 encoded file uploads in Totara Sync
+    T-11865    Fixed 'In progress' state not being set in certifications when cron is run
+    T-11869    Fixed parameter validation for tm_message_send in Messaging
+    T-11843    Fixed the wrong date being set in the firstaccess field when users first log in
+    T-11886    Fixed the manage feedback link in the site administration block checking appraisals capabilities
+    T-11665    Tasks and alerts blocks now respect the "show blocks when empty" setting
+    T-11880    Fixed header tabs wrap when screen resolution is between 769px and 1050px
+    T-11875    Fixed program assignment completion relative to program enrolment
+    T-11831    Fixed PHP notice for Feedback Summary report in Report Builder
+    T-11838    Fixed position start date rule in dynamic Audiences
+    T-11836    Fixed wrong csv encoding type being set when uploading completion records for Courses/Certifications
+    T-11860    Fixed a missing setType in report export form
+    T-11857    Fixed Facetoface notification templates not saving 'Manager copy' and 'Status' values
+    T-11797    Fixed nullability of positionid field in prog_pos_assignment to prevent errors on upgrade from 1.1 to 2.2
+    T-11832    Fixed 'Set time relative to event' option not saving different instances of the same event
+    T-11848    Fixed Facetoface room booking when one session finishes and other starts at the same time
+    T-11833    Fixed issue where core totara themes weren't referencing image.php correctly
+    T-11846    Fixed permissions checks on the Facetoface attendees page
+
+
 Release 2.5.8 (18th February 2014):
 ==================================================
 

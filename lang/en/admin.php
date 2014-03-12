@@ -163,6 +163,7 @@ $string['configcourseoverviewfileslimit'] = 'The maximum number of files that ca
 $string['configcourserequestnotify'] = 'Type username of user to be notified when new course requested.';
 $string['configcourserequestnotify2'] = 'Users who will be notified when a course is requested. Only users who can approve course requests are listed here.';
 $string['configcoursesperpage'] = 'Enter the number of courses to be displayed per page in a course listing.';
+$string['configcoursesperpageenhcatenabled'] = 'Enhanced catalog is enabled. To change the number of records displayed, edit the report, go to the "General" tab, and change the "Number of records per page".';
 $string['configcourseswithsummarieslimit'] = 'The maximum number of courses to display in a course listing including summaries before falling back to a simpler listing.';
 $string['configcronclionly'] = 'If this is set, then the cron script can only be run from the command line instead of via the web.  This overrides the cron password setting below.';
 $string['configcronremotepassword'] = 'This means that the cron.php script cannot be run from a web browser without supplying the password using the following form of URL:<pre>
@@ -752,6 +753,7 @@ $string['modeditingmenu'] = 'Activity editing menus';
 $string['modeditingmenu_desc'] = 'If enabled many of the activity editing icons shown when viewing a course with editing on will be displayed within a drop-down menu. This reduces the content on screen when editing a course by hiding the icons until they are needed.';
 $string['modsettings'] = 'Manage activities';
 $string['modulesecurity'] = 'Module security';
+$string['mssqlinsufficientpermissions'] = 'MSSQL DB user required additional permissions: {$a}';
 $string['multilangforceold'] = 'Force old multilang syntax: &lt;span&gt; without the class="multilang" and &lt;lang&gt;';
 $string['mustenablestats'] = 'Statistics have not yet been enabled on this site.';
 $string['mycoursesperpage'] = 'Number of courses';

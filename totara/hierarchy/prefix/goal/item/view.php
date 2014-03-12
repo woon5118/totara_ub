@@ -33,6 +33,10 @@ require_login();
 $goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
 $userid = $goalpersonal->userid;
 $context = context_user::instance($userid);
+$PAGE->set_context($context);
+
+$strmygoals = get_string('mygoals', 'totara_hierarchy');
+$mygoalsurl = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', array('userid' => $userid));
 
 $goal = new goal();
 if (!$permissions = $goal->get_permissions(null, $userid)) {
@@ -45,7 +49,7 @@ extract($permissions);
 $edit_params = array('goalpersonalid' => $goalpersonalid, 'userid' => $userid);
 $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', $edit_params);
 
-$name = $goalpersonal->name;
+$name = format_string($goalpersonal->name);
 $scale = $DB->get_record('goal_scale', array('id' => $goalpersonal->scaleid));
 
 // Set up the scale value selector.
@@ -54,7 +58,7 @@ if (!empty($goalpersonal->scaleid)) {
         $scalevalues = $DB->get_records('goal_scale_values', array('scaleid' => $goalpersonal->scaleid));
         $options = array();
         foreach ($scalevalues as $scalevalue) {
-            $options[$scalevalue->id] = $scalevalue->name;
+            $options[$scalevalue->id] = format_string($scalevalue->name);
         }
 
         $attributes = array(
@@ -78,9 +82,9 @@ if (!empty($goalpersonal->scaleid)) {
     $scalevalue = '';
 }
 
-$strmygoals = get_string('mygoals', 'totara_hierarchy');
-
 // Set up the page.
+$PAGE->navbar->add($strmygoals, $mygoalsurl);
+$PAGE->navbar->add($name);
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/item/view.php'), array('goalpersonalid' => $goalpersonalid));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');

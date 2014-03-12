@@ -35,12 +35,13 @@ class rb_filter_multicheck extends rb_filter_type {
      * @param string $value The filter value (from the db or embedded source)
      * @param integer $advanced If the filter should be shown by default (0) or only
      *                          when advanced options are shown (1)
+     * @param integer $region Which region this filter appears in.
      * @param reportbuilder object $report The report this filter is for
      *
      * @return rb_filter_multicheck object
      */
-    function __construct($type, $value, $advanced, $report) {
-        parent::__construct($type, $value, $advanced, $report);
+    public function __construct($type, $value, $advanced, $region, $report) {
+        parent::__construct($type, $value, $advanced, $region, $report);
 
         if (!isset($this->options['selectfunc'])) {
             if (!isset($this->options['selectchoices'])) {
@@ -48,12 +49,21 @@ class rb_filter_multicheck extends rb_filter_type {
                 $this->options['selectchoices'] = array();
             }
         }
+
         if (!isset($this->options['attributes'])) {
             $this->options['attributes'] = array();
         }
 
         if (!isset($this->options['concat'])) {
             $this->options['concat'] = false;
+        }
+
+        if (!isset($this->options['simplemode'])) {
+            $this->options['simplemode'] = false;
+        }
+        // Override simplemode when instantfiltering in the sidebar with counts.
+        if (isset($this->options['showcounts']) && $this->region == rb_filter_type::RB_FILTER_REGION_SIDEBAR) {
+            $this->options['simplemode'] = true;
         }
     }
 
@@ -73,10 +83,11 @@ class rb_filter_multicheck extends rb_filter_type {
      */
     function setupForm(&$mform) {
         global $OUTPUT, $SESSION;
-        $label = format_string($this->label);
+        $grplabel = $label = format_string($this->label);
         $advanced = $this->advanced;
         $options = $this->options['selectchoices'];
         $attr = $this->options['attributes'];
+        $simplemode = $this->options['simplemode'];
 
         // don't display the filter if there are no options
         if (count($options) == 0) {
@@ -87,19 +98,27 @@ class rb_filter_multicheck extends rb_filter_type {
             return;
         }
 
-        $mform->addElement('select', $this->name . '_op', $label, $this->get_operators());
+        if ($simplemode) {
+            $mform->addElement('hidden', $this->name . '_op', 1);
+        } else {
+            $mform->addElement('select', $this->name . '_op', $label, $this->get_operators());
+            $mform->addHelpButton($this->name . '_op', 'filtercheckbox', 'filters');
+            $grplabel = '';
+        }
         $mform->setType($this->name . '_op', PARAM_INT);
-        $mform->addHelpButton($this->name . '_op', 'filtercheckbox', 'filters');
 
         // this class is used by the CSS to arrange the checkboxes nicely
         $mform->addElement('html', $OUTPUT->container_start('multicheck-items'));
         $objs = array();
         foreach ($options as $id => $name) {
-            $objs[] =& $mform->createElement('advcheckbox', $this->name . '[' . $id . ']', null, $name, array_merge(array('group' => 1), $attr));
+            $elem = $mform->createElement('advcheckbox', $this->name . '[' . $id . ']', null, $name,
+                    array_merge(array('group' => 1), $attr));
+            $elem->updateAttributes(array('data-ind' => $id));
+            $objs[] = $elem;
             $mform->setType($this->name . '[' . $id . ']', PARAM_TEXT);
             $mform->disabledIf($this->name . '[' . $id . ']', $this->name . '_op', 'eq', 0);
         }
-        $mform->addGroup($objs, $this->name . '_grp', '&nbsp;', '', false);
+        $mform->addGroup($objs, $this->name . '_grp', $grplabel, '', false);
         $mform->addElement('html', $OUTPUT->container_end());
 
         if ($advanced) {
@@ -118,7 +137,163 @@ class rb_filter_multicheck extends rb_filter_type {
         if (isset($defaults['value'])) {
             $mform->setDefault($this->name, $defaults['value']);
         }
+    }
 
+    /**
+     * Update form elements with counts of each filter element will give if set
+     * @param moodlequickform $mform
+     */
+    public function set_counts($mform, $counts) {
+        $options = $this->options['selectchoices'];
+        $grpname = $this->name . '_grp';
+        $filteruniquename = $this->options['showcounts']['dataalias'];
+
+        if ($mform->elementExists($grpname)) {
+            $group = $mform->getElement($grpname);
+            $elements = $group->getElements();
+
+            foreach ($elements as $elem) {
+                $ind = $elem->getAttribute('data-ind');
+                if (isset($options[$ind])) {
+                    $fieldname = strtolower("mcc_{$filteruniquename}_{$ind}");
+                    if (!isset($counts->$fieldname)) {
+                        $countname = "{$options[$ind]} (0)";
+                    } else {
+                        $countname = "{$options[$ind]} ({$counts->$fieldname})";
+                    }
+                    $elem->setText($countname);
+                }
+            }
+        }
+    }
+
+    private function is_option_set($option) {
+        global $SESSION;
+
+        return isset($SESSION->reportbuilder[$this->report->_id][$this->name]) &&
+               $SESSION->reportbuilder[$this->report->_id][$this->name]['value'][$option];
+    }
+
+    /**
+     * Get showcount params.
+     *
+     * @return returns the showcount parameters, otherwise false.
+     * If true then filter needs to define save_temp_data, restore_temp_data, set_counts.
+     */
+    public function get_showcount_params() {
+        return isset($this->options['showcounts']) ? $this->options['showcounts'] : false;
+    }
+
+    /**
+     * Generate the sql snipets needed to construct the sidebar filter record counts.
+     *
+     * @param array of rb_filters $otherfilters (includes this filter!)
+     * @return array of (array of strings, string, array of strings, array of strings, array of strings)
+     */
+    public function get_counts_sql($otherfilters) {
+        $countscolumns = array();
+        $filterscolumns = array();
+        $optionsfound = array();
+        $sqlparams = array();
+
+        $iscached = $this->report->is_cached();
+        $isgrouped = $this->report->grouped;
+        $showcountparams = $this->options['showcounts'];
+        $filteruniquename = $showcountparams['dataalias'];
+
+        foreach ($this->options['selectchoices'] as $option => $unused) {
+            $fxvy = strtolower("{$filteruniquename}_{$option}");
+
+            // Set up countscolumns.
+            $otherfiltercondition = "";
+            foreach ($otherfilters as $otherfilter) {
+                if ($otherfilter != $this) {
+                    $otheruniquename = $otherfilter->options['showcounts']['dataalias'];
+                    $otherfxt = "total_{$otheruniquename}";
+                    $inactivename = "i_{$filteruniquename}_" . md5("{$otheruniquename}_{$option}");
+                    $shorterinactivename = strtolower(substr($inactivename, 0, 30));
+                    $otherfiltercondition .= "            * ({$otherfxt} + :{$shorterinactivename})\n";
+
+                    // Set up the filter parameters.
+                    if ($otherfilter->has_data()) {
+                        $sqlparams[$shorterinactivename] = 0;
+                    } else {
+                        $sqlparams[$shorterinactivename] = 1;
+                    }
+                }
+            }
+            $countscolumns[] = "   SUM( CASE WHEN ({$fxvy}\n{$otherfiltercondition}" .
+                               "        ) > 0 THEN 1 ELSE 0 END ) AS mcc_{$fxvy}";
+
+            $shortercheckedname = substr("c_{$fxvy}", 0, 30);
+
+            // Set up the option parameters.
+            $sqlparams[$shortercheckedname] = $this->is_option_set($option);
+
+            // Set up filterscolumns.
+            if ($iscached || $isgrouped) {
+                $data = array('operator' => 1, 'value' => array($option => 1)); // Enable only this option.
+                list($optionsql, $optionparams) = $this->get_sql_filter($data, $isgrouped);
+                $sqlparams = array_merge($sqlparams, $optionparams);
+                $filterscolumns[] = "         SUM(CASE WHEN {$optionsql} THEN 1 ELSE 0 END ) AS {$fxvy}";
+            } else {
+                $filterscolumns[] = "         SUM(CASE WHEN {$showcountparams['dataalias']}." .
+                                    "{$showcountparams['datafield']} = '{$option}' THEN 1 ELSE 0 END ) AS {$fxvy}";
+            }
+
+            // Set up optionsfound for filtersplustotalscolumns.
+            $optionsfound[] = "      (:{$shortercheckedname} * {$fxvy})";
+        }
+
+        // Set up filtersplustotalscolumns.
+        $fxt = "total_{$filteruniquename}";
+        $filtersplustotalscolumn = implode(" +\n", $optionsfound) . " AS " . $fxt;
+
+        // Set up showcountjoins.
+        $showcountjoins = array();
+        if (!$iscached && !$isgrouped) { // Grouped reports will include all joins in the base query.
+            foreach ($showcountparams['joins'] as $countjoin) {
+                $showcountjoins[] = "      {$countjoin}";
+            }
+        }
+
+        return array($countscolumns, $filtersplustotalscolumn, $filterscolumns, $showcountjoins, $sqlparams);
+    }
+
+
+    /**
+     * Save temporary saved data
+     *
+     * @param int $data the data to set
+     */
+    public function save_temp_data() {
+        global $SESSION;
+
+        $fieldname = $this->name;
+        if (!isset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'])) {
+            $SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'] =
+                    isset($SESSION->reportbuilder[$this->report->_id][$fieldname]) ?
+                    $SESSION->reportbuilder[$this->report->_id][$fieldname] : false;
+        }
+        unset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+    }
+
+    /**
+     * Restores temporary saved filter data
+     */
+    public function restore_temp_data() {
+        global $SESSION;
+
+        $fieldname = $this->name;
+        if (isset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'])) {
+            if ($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'] === false) {
+                unset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+            } else {
+                $SESSION->reportbuilder[$this->report->_id][$fieldname] =
+                        $SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'];
+            }
+            unset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was']);
+        }
     }
 
     /**
@@ -129,8 +304,17 @@ class rb_filter_multicheck extends rb_filter_type {
     function check_data($formdata) {
         $field    = $this->name;
         $operator = $field . '_op';
-
         if (isset($formdata->$operator) && $formdata->$operator != 0) {
+            $found = false;
+            foreach ($formdata->$field as $data) {
+                if ($data) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                return false;
+            }
             return array('operator' => (int)$formdata->$operator,
                          'value'    => (array)$formdata->$field);
         }
@@ -142,14 +326,16 @@ class rb_filter_multicheck extends rb_filter_type {
      * Returns the condition to be used with SQL where
      *
      * @param array $data filter settings
+     * @param bool $usefieldalias use fieldalias rather than field - used for counting with grouped reports
      * @return array containing filtering condition SQL clause and params
      */
-    function get_sql_filter($data) {
+    function get_sql_filter($data, $usefieldalias = false) {
         global $DB;
 
         $operator = $data['operator'];
         $items    = $data['value'];
-        $query    = $this->field;
+        $query = $usefieldalias ? $this->fieldalias : $this->field;
+        $simplemode = $this->options['simplemode'];
 
         switch($operator) {
             case 1:
@@ -163,32 +349,29 @@ class rb_filter_multicheck extends rb_filter_type {
                 return array(' 1=1 ', array());
         }
 
-        // split by comma and look for any items
-        // within list
+        // Query is of the form "1|2|3|4", by concatenating pipes to
+        // either end we can match any item with a single LIKE, instead
+        // of having to handle end matches separately.
+        if ($this->options['concat']) {
+            $query = $DB->sql_concat("'|'", $query, "'|'");
+        }
+
         $res = array();
         $params = array();
         if (is_array($items)) {
             $count = 1;
             foreach ($items as $id => $selected) {
                 if ($selected) {
-                    $uniqueparam = rb_unique_param("fmcequal_{$count}_");
-                    $filter = "( {$query} = :{$uniqueparam}";
-                    $params[$uniqueparam] = $id;
                     if ($this->options['concat']) {
-                        $uniqueparam = rb_unique_param("fmcendswith_{$count}_");
-                        $filter .=  " OR \n " . $DB->sql_like($query, ":{$uniqueparam}");
-                        $params[$uniqueparam] = '%|' . $DB->sql_like_escape($id);
-
-                        $uniqueparam = rb_unique_param("fmcstartswith_{$count}_");
-                        $filter .= " OR \n " . $DB->sql_like($query, ":{$uniqueparam}");
-                        $params[$uniqueparam] = $DB->sql_like_escape($id) . '|%';
-
-                        $uniqueparam = rb_unique_param("fmccontains{$count}_");
-                        $filter .= " OR \n " . $DB->sql_like($query, ":{$uniqueparam}");
+                        $uniqueparam = rb_unique_param("fmccontains_{$count}_");
+                        $filter = "( " . $DB->sql_like($query,
+                            ":{$uniqueparam}") . ") \n";
                         $params[$uniqueparam] = '%|' . $DB->sql_like_escape($id) . '|%';
+                    } else {
+                        $uniqueparam = rb_unique_param("fmcequal_{$count}_");
+                        $filter = "( {$query} = :{$uniqueparam} )\n";
+                        $params[$uniqueparam] = $id;
                     }
-
-                    $filter .= " )\n";
 
                     $res[] = $filter;
 
@@ -196,10 +379,15 @@ class rb_filter_multicheck extends rb_filter_type {
                 }
             }
         }
-        // none selected
+        // None selected.
         if (count($res) == 0) {
-            // using 1=0 instead of FALSE for MSSQL support
-            return array(' 1=0 ', array());
+            // Using 1=1 instead of TRUE for MSSQL support.
+            if ($simplemode) {
+                // When using simplemode we perform no filtering if nothing is selected.
+                return array(' 1=1 ', array());
+            } else {
+                return array(' 1=0 ', array());
+            }
         }
 
         return array('(' . implode($glue, $res) . ')', $params);

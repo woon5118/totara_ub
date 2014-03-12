@@ -261,6 +261,24 @@ class program_edit_form extends moodleform {
         $programicon = ($program && !empty($program->icon)) ? $program->icon : 'default';
         totara_add_icon_picker($mform, $action, 'program', $programicon, $nojs, false);
 
+        // Customfield support.
+        if (!$program) {
+            $program = new stdClass();
+        }
+        if (empty($program->id)) {
+            $program->id = 0;
+        }
+        if (in_array($action, array('add', 'edit'))) {
+            customfield_definition($mform, $program, 'program', 0, 'prog');
+        } else {
+            $customfields = customfield_get_fields($program, 'prog', 'program');
+            $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
+            foreach ($customfields as $cftitle => $cfvalue) {
+                $mform->addElement('static', null, $cftitle, $cfvalue);
+            }
+            $mform->setExpanded('customfields');
+        }
+
         if ($action == 'add') {
             $buttonarray = array();
             $buttonarray[] = $mform->createElement('submit', 'savechanges', get_string('savechanges'), 'class="savechanges-overview program-savechanges"');
@@ -312,6 +330,17 @@ class program_edit_form extends moodleform {
         }
 
         return $errors;
+    }
+
+    public function definition_after_data() {
+        global $DB;
+
+        $mform = $this->_form;
+
+        $progid = $mform->elementExists('id') ? $mform->getElementValue('id') : 0;
+        if ($program = $DB->get_record('prog', array('id' => $progid))) {
+            customfield_definition_after_data($mform, $program, 'program', 0, 'prog');
+        }
     }
 
 }

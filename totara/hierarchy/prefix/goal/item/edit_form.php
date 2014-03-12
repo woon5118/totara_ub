@@ -100,7 +100,7 @@ class goal_edit_personal_form extends moodleform {
         $scales = $DB->get_records('goal_scale', array());
         $scaledesc = array(0 => get_string('none'));
         foreach ($scales as $scale) {
-            $scaledesc[$scale->id] = $scale->name;
+            $scaledesc[$scale->id] = format_string($scale->name);
         }
         $mform->addElement('select', 'scaleid', get_string('scale'), ($scaledesc) ? $scaledesc : get_string('none'));
         $mform->addHelpButton('scaleid', 'goalscale', 'totara_hierarchy');

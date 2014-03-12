@@ -38,7 +38,7 @@ class framework_edit_form extends moodleform {
         $scales_raw = competency_scales_available();
 
         foreach ($scales_raw as $scale) {
-            $scales[$scale->id] = $scale->name;
+            $scales[$scale->id] = format_string($scale->name);
         }
 
         /// Add some extra hidden fields

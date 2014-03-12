@@ -101,6 +101,8 @@ class rb_source_dp_plan extends rb_base_source {
                 'base.name',
                 array(
                     'defaultheading' => get_string('plan', 'rb_source_dp_plan'),
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -126,7 +128,9 @@ class rb_source_dp_plan extends rb_base_source {
                             'filearea' => '\'dp_plan\'',
                             'component' => '\'totara_plan\'',
                             'fileid' => 'base.id'
-                    )
+                    ),
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -173,7 +177,9 @@ class rb_source_dp_plan extends rb_base_source {
                 'template.fullname',
                 array(
                     'defaultheading' => get_string('plantemplate', 'rb_source_dp_plan'),
-                    'joins' => 'template'
+                    'joins' => 'template',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
         );
         $columnoptions[] = new rb_column_option(

@@ -67,6 +67,7 @@ class grade_export_fusion extends grade_export {
         global $CFG, $OUTPUT;
 
         $export_tracking = $this->track_exports();
+        $errors = array();
 
         $this->tablename .= ' ' . date("Y-m-d H:i:s", strtotime('+0 days'));
         if (!$oauth->table_exists($this->tablename)) {
@@ -83,7 +84,7 @@ class grade_export_fusion extends grade_export {
                 $column = self::clean_column_name($this->format_column_name($grade_item));
                 $columns[$column] = 'NUMBER';
             }
-            $result = $oauth->create_table($this->tablename, $columns);
+            $errors = $oauth->create_table($this->tablename, $columns);
         }
 
         /// Print all the lines of data.
@@ -109,7 +110,21 @@ class grade_export_fusion extends grade_export {
         $gui->close();
         $geub->close();
 
-        $result = $oauth->insert_rows($this->tablename, $rows);
+        $errors = array_merge($errors, $oauth->insert_rows($this->tablename, $rows));
+
+        if (!empty($errors)) {
+            $errormessages = array();
+
+            foreach ($errors as $error) {
+                $errormessages[] = $error->message;
+            }
+
+            $brtag = html_writer::empty_tag('br');
+            $errordetails = implode($brtag, $errormessages);
+            $url = new moodle_url('/grade/report/grader/index.php', array('id' => $this->course->id));
+
+            totara_set_notification(get_string('error:fusionexport', 'gradeexport_fusion', format_string($errordetails)), $url);
+        }
 
         $table = $oauth->table_by_name($this->tablename, true);
         $table_id = $table->tableId;

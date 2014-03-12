@@ -146,7 +146,9 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'organisation',
                 get_string('completionorgname', 'rb_source_course_completion_by_org'),
                 'completion_organisation.fullname',
-                array('joins' => 'completion_organisation')
+                array('joins' => 'completion_organisation',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             // aggregated columns
             new rb_column_option(
@@ -156,7 +158,9 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 $DB->sql_fullname('auser.firstname', 'auser.lastname'),
                 array(
                     'joins' => 'auser',
-                    'grouping' => 'comma_list_unique'
+                    'grouping' => 'comma_list_unique',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(

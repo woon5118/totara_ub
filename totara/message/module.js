@@ -77,7 +77,7 @@ M.totara_message = M.totara_message || {
                         // the handler must be returned by a wrapper function to
                         // close over the referenced values of each jargs key
                         buttonsObj[a] = (function(action, redirect) {
-                                            return function() { handler._confirm(action, redirect); };
+                                            return function() { handler._confirm(action, redirect, true); };
                                          })(jargs[a].action, jargs[a].clean_redirect);
                     }
                 }
@@ -256,14 +256,21 @@ totaraDialog_handler_confirm.prototype = new totaraDialog_handler();
  *
  * @param string URL to send confirmed messages to
  * @param string returnTo to send user back to after confirm complete
+ * @param bool extrabutton Indicates if this call was made from an extrabutton
  * @return void
  */
-totaraDialog_handler_confirm.prototype._confirm = function(url, returnto) {
+totaraDialog_handler_confirm.prototype._confirm = function(url, returnto, extrabutton) {
+    var addreasonparam = false;
 
-    // set the returnto
+    // Set the returnto.
     this.setReturnTo(returnto);
 
-    // grab message ids if available
+    var reasonfordecision = $('#reasonfordecision', this._container);
+    if (((url.indexOf("reject") >= 0 || (url.indexOf("accept") >= 0)) && extrabutton && reasonfordecision.val().length > 0)) {
+        addreasonparam = true;
+    }
+
+    // Grab message ids if available.
     msgids = [];
 
     $('form#totara_messages input[type="checkbox"]:checked').each(
@@ -272,7 +279,10 @@ totaraDialog_handler_confirm.prototype._confirm = function(url, returnto) {
                 });
     url = url+'&msgids='+msgids.join(',');
 
-    // Send to server
+    // Send to server.
+    if (addreasonparam) {
+        url = url+"&reasonfordecision=" + encodeURIComponent(reasonfordecision.val());
+    }
     this._dialog._request(url, {object: this, method: '_redirect'});
 };
 

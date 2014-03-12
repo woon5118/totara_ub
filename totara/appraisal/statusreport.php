@@ -27,19 +27,20 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
-$appraisalid = optional_param('appraisalid', 0, PARAM_INT);
 $filterstatus = optional_param('filterstatus', null, PARAM_TEXT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
-$url = new moodle_url('/totara/appraisal/statusreport.php', array('appraisalid' => $appraisalid,
-    'format' => $format, 'debug' => $debug));
+$url = new moodle_url('/totara/appraisal/statusreport.php', array('format' => $format, 'debug' => $debug));
 
 admin_externalpage_setup('reportappraisals', '', null, $url);
 
-$systemcontext = context_system::instance();
-require_capability('totara/appraisal:manageappraisals', $systemcontext);
+if (!$report = reportbuilder_get_embedded_report('appraisal_status', null, false, $sid)) {
+    print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+}
+
+$appraisalid = $report->get_param_value('appraisalid');
 
 if (!$appraisalid) {
     echo $OUTPUT->header();
@@ -51,14 +52,6 @@ if (!$appraisalid) {
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 $appraisal = new appraisal($appraisalid);
-
-$data = array(
-    'appraisalid' => $appraisalid,
-);
-
-if (!$report = reportbuilder_get_embedded_report('appraisal_status', $data, false, $sid)) {
-    print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
-}
 
 if ($format != '') {
     $report->export_data($format);
@@ -89,6 +82,7 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->include_js();
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

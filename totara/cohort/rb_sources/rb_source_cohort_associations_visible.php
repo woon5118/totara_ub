@@ -115,7 +115,9 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             'name',
             get_string('associationname', 'totara_cohort'),
             'associations.name',
-            array('joins' => 'associations')
+            array('joins' => 'associations',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'associations',
@@ -170,14 +172,18 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             'name',
             get_string('name', 'totara_cohort'),
             'cohort.name',
-            array('joins' => 'cohort')
+            array('joins' => 'cohort',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'cohort',
             'idnumber',
             get_string('idnumber', 'totara_cohort'),
             'cohort.idnumber',
-            array('joins' => 'cohort')
+            array('joins' => 'cohort',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'associations',

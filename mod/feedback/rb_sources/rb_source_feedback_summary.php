@@ -154,7 +154,9 @@ class rb_source_feedback_summary extends rb_base_source {
                 'name',
                 get_string('feedbackactivity', 'rb_source_feedback_questions'),
                 'feedback.name',
-                array('joins' => 'feedback')
+                array('joins' => 'feedback',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'trainer',
@@ -168,7 +170,9 @@ class rb_source_feedback_summary extends rb_base_source {
                 'fullname',
                 get_string('trainerfullname', 'rb_source_feedback_questions'),
                 $DB->sql_fullname('trainer.firstname', 'trainer.lastname'),
-                array('joins' => 'trainer')
+                array('joins' => 'trainer',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'trainer',
@@ -182,7 +186,9 @@ class rb_source_feedback_summary extends rb_base_source {
                 'organisation',
                 get_string('trainerorg', 'rb_source_feedback_questions'),
                 'trainer_organisation.fullname',
-                array('joins' => 'trainer_organisation')
+                array('joins' => 'trainer_organisation',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'trainer',
@@ -196,7 +202,9 @@ class rb_source_feedback_summary extends rb_base_source {
                 'position',
                 get_string('trainerpos', 'rb_source_feedback_questions'),
                 'trainer_position.fullname',
-                array('joins' => 'trainer_position')
+                array('joins' => 'trainer_position',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
         );
         // include some standard columns

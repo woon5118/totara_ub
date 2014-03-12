@@ -834,7 +834,7 @@ class competency extends hierarchy {
         $mform->addHelpButton('aggregationmethod', 'competencyaggregationmethod', 'totara_hierarchy');
         $mform->addRule('aggregationmethod', get_string('aggregationmethod', 'totara_hierarchy'), 'required', null);
 
-        $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc)?$scaledesc:get_string('none'));
+        $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));
         $mform->addHelpButton('scalename', 'competencyscale', 'totara_hierarchy');
 
         $mform->addElement('hidden', 'proficiencyexpected', 1);

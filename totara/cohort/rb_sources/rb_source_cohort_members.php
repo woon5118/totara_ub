@@ -101,11 +101,13 @@ class rb_source_cohort_members extends rb_base_source {
         $columnoptions = array();
 
         $columnoptions[] = new rb_column_option(
-            'cohort',   // which table? Type
-            'name', // alias for the field
-            get_string('name', 'totara_cohort'), // name for the column
-            'cohort.name', // table alias and field name
-            array('joins'=>array('cohort'))
+            'cohort', // Which table? Type.
+            'name', // Alias for the field.
+            get_string('name', 'totara_cohort'), // Name for the column.
+            'cohort.name', // Table alias and field name.
+            array('joins'=>array('cohort'),
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text') // Options.
         );
         $columnoptions[] = new rb_column_option(
             'cohort',
@@ -125,7 +127,9 @@ class rb_source_cohort_members extends rb_base_source {
             'idnumber',
             get_string('idnumber', 'totara_cohort'),
             'cohort.idnumber',
-            array('joins'=>array('cohort'))
+            array('joins'=>array('cohort'),
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
             'cohort',

@@ -149,7 +149,7 @@ if (!empty($deleteid)) {
                     new moodle_url("/totara/plan/evidencetypes/index.php", array('moveup' => $item->id)),
                     new pix_icon('t/up', get_string('moveup')));
         } else {
-            $buttons[] = $OUTPUT->spacer();
+            $buttons[] = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
         }
 
         // If value can be moved down
@@ -158,7 +158,7 @@ if (!empty($deleteid)) {
                     new moodle_url("/totara/plan/evidencetypes/index.php", array('movedown' => $item->id)),
                     new pix_icon('t/down', get_string('movedown')));
         } else {
-            $buttons[] = $OUTPUT->spacer();
+            $buttons[] = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
         }
         $line[] = implode($buttons, ' ');
 

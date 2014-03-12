@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once('edit_form.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php');
+require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
 require_login();
 
@@ -185,6 +186,9 @@ if ($data = $form->get_data()) {
         $newid = $DB->insert_record('prog', $program_todb);
         $program = new program($newid);
         $transaction->allow_commit();
+
+        $data->id = $newid;
+        customfield_save_data($data, 'program', 'prog');
 
         // Create message manager to add default messages.
         $messagemanager = new prog_messages_manager($newid, true);

@@ -42,11 +42,6 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_core');
 }
 
-// Users can only view their own and their staff's pages.
-if ($USER->id != $userid && !totara_is_manager($userid) && !is_siteadmin()) {
-    print_error('error:cannotviewthispage', 'totara_core');
-}
-
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
@@ -117,6 +112,7 @@ echo $OUTPUT->heading($heading);
 print $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
+$report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();

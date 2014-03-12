@@ -1968,6 +1968,58 @@ class admin_setting_heading extends admin_setting {
 
 
 /**
+ * A setting element that just shows the setting name and description.
+ * Can be used when a setting is disabled by another setting.
+ */
+class admin_setting_nothing extends admin_setting {
+
+    /**
+     * @param string $name unique ascii name, either 'mysetting' for settings that in config,
+     *                     or 'myplugin/mysetting' for ones in config_plugins.
+     * @param string $visiblename localised
+     * @param string $description long localised info
+     */
+    public function __construct($name, $visiblename, $description) {
+        $this->nosave = true;
+        parent::__construct($name, $visiblename, $description, '');
+    }
+
+    /**
+     * Always returns true.
+     * @return bool Always returns true
+     */
+    public function get_setting() {
+        return true;
+    }
+
+    /**
+     * Always returns true.
+     * @return bool Always returns true
+     */
+    public function get_defaultsetting() {
+        return true;
+    }
+
+    /**
+     * Never write settings.
+     * @return string Always returns an empty string
+     */
+    public function write_setting($data) {
+        // Do not write any setting.
+        return '';
+    }
+
+    /**
+     * Return an XHTML string for the setting.
+     * @return string Returns an XHTML string
+     */
+    public function output_html($data, $query='') {
+        return format_admin_setting($this, $this->visiblename, '', $this->description, true);
+    }
+}
+
+
+/**
  * The most flexibly setting, user is typing text
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

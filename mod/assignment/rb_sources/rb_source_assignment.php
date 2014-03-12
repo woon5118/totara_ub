@@ -115,19 +115,29 @@ class rb_source_assignment extends rb_base_source {
     protected function _define_columnoptions() {
         $a = array();
 
-        // assignment columns
-        $cols = array('name', 'intro');
-        foreach ($cols as $col) {
-            $a[] = new rb_column_option(
-                'assignment',
-                $col,
-                $this->_get_string("assignment{$col}"),
-                "assignment.{$col}",
-                array('joins' => 'assignment')
-            );
-        }
+        // Assignment name.
+        $a[] = new rb_column_option(
+            'assignment',
+            'name',
+            $this->_get_string("assignmentname"),
+            "assignment.name",
+            array('joins' => 'assignment',
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
+        );
 
-        // assignment type
+        // Assignment intro.
+        $a[] = new rb_column_option(
+            'assignment',
+            'intro',
+            $this->_get_string("assignmentintro"),
+            "assignment.intro",
+            array('joins' => 'assignment',
+                  'dbdatatype' => 'text',
+                  'outputformat' => 'text')
+        );
+
+        // Assignment type.
         $a[] = new rb_column_option(
             'assignment',
             'assignmenttype',
@@ -159,7 +169,9 @@ class rb_source_assignment extends rb_base_source {
             'base',
             'comment',
             $this->_get_string('submissioncomment'),
-            'base.submissioncomment'
+            'base.submissioncomment',
+            array('dbdatatype' => 'text',
+                  'outputformat' => 'text')
         );
 
         // last modified

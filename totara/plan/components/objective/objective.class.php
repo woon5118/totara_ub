@@ -451,6 +451,7 @@ class dp_objective_component extends dp_base_component {
         $priorities = optional_param_array('priorities_objective', array(), PARAM_INT);
         $proficiencies = optional_param_array('proficiencies', array(), PARAM_INT);
         $approved_objectives = optional_param_array('approve_objective', array(), PARAM_INT);
+        $reasonfordecision = optional_param_array('reasonfordecision_objective', array(), PARAM_TEXT);
         $currenturl = qualified_me();
         $currentuser = $this->plan->userid;
         $stored_records = array();
@@ -530,14 +531,17 @@ class dp_objective_component extends dp_base_component {
                 if (!$approved) {
                     continue;
                 }
+                $reason = isset($reasonfordecision[$id]) ? $reasonfordecision[$id] : '' ;
                 if (array_key_exists($id, $stored_records)) {
                     // add to the existing update object
                     $stored_records[$id]->approved = $approved;
+                    $todb->reasonfordecision = $reason;
                 } else {
                     // create a new update object
                     $todb = new stdClass();
                     $todb->id = $id;
                     $todb->approved = $approved;
+                    $todb->reasonfordecision = $reason;
                     $stored_records[$id] = $todb;
                 }
             }
@@ -620,6 +624,7 @@ class dp_objective_component extends dp_base_component {
                     $approval->itemname = $orig_objectives[$itemid]->fullname;
                     $approval->before = $orig_objectives[$itemid]->approved;
                     $approval->after = $record->approved;
+                    $approval->reasonfordecision = $record->reasonfordecision;
                     $approvals[] = $approval;
                 }
             }  // foreach

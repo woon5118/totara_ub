@@ -143,9 +143,11 @@ function dp_objective_display_table($objectives, $editingon=0) {
 
                 if ($can_delete) {
                     if ($scale_used) {
-                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeleteobjectivescaleinuse', 'totara_plan'), 'totara_core');
+                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeleteobjectivescaleinuse', 'totara_plan'), 'totara_core',
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeleteobjectivescaleinuse', 'totara_plan')));
                     } else if ($scale_assigned) {
-                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeleteobjectivescaleassigned', 'totara_plan'), 'totara_core');
+                        $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeleteobjectivescaleassigned', 'totara_plan'), 'totara_core',
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeleteobjectivescaleassigned', 'totara_plan')));
                     } else {
                         $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/plan/objectivescales/index.php', array('delete' => $objective->id)), new pix_icon('t/delete', $strdelete));
                     }

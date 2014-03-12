@@ -54,6 +54,8 @@ class mod_facetoface_session_form extends moodleform {
         $customfields = $this->_customdata['customfields'];
         facetoface_add_customfields_to_form($mform, $customfields);
 
+        $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+
         $formarray  = array();
         $formarray[] = $mform->createElement('selectyesno', 'datetimeknown', get_string('sessiondatetimeknown', 'facetoface'));
         $formarray[] = $mform->createElement('static', 'datetimeknownhint', '', html_writer::tag('span', get_string('datetimeknownhinttext','facetoface'), array('class' => 'hint-text')));
@@ -66,7 +68,11 @@ class mod_facetoface_session_form extends moodleform {
         $timezones = totara_get_clean_timezone_list(true);
         $timezones[get_string('sessiontimezoneunknown', 'facetoface')] = get_string('sessiontimezoneunknown', 'facetoface');
         $repeatarray[] = &$mform->createElement('hidden', 'sessiondateid', 0);
-        $repeatarray[] = $mform->createElement('select', 'sessiontimezone', get_string('sessiontimezone', 'facetoface'), $timezones);
+        if (!empty($displaytimezones)) {
+            $repeatarray[] = $mform->createElement('select', 'sessiontimezone', get_string('sessiontimezone', 'facetoface'), $timezones);
+        } else {
+            $repeatarray[] = $mform->createElement('hidden', 'sessiontimezone', $this->_customdata['defaulttimezone']);
+        }
         $repeatarray[] = &$mform->createElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'));
         $repeatarray[] = &$mform->createElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'));
         $checkboxelement = &$mform->createElement('checkbox', 'datedelete', '', get_string('dateremove', 'facetoface'));
@@ -79,11 +85,13 @@ class mod_facetoface_session_form extends moodleform {
         $repeatoptions = array();
         $repeatoptions['timestart']['disabledif'] = array('datetimeknown', 'eq', 0);
         $repeatoptions['timefinish']['disabledif'] = array('datetimeknown', 'eq', 0);
-        $repeatoptions['sessiontimezone']['disabledif'] = array('datetimeknown', 'eq', 0);
-        $repeatoptions['sessiontimezone']['default'] = $this->_customdata['defaulttimezone'];
+        if (!empty($displaytimezones)) {
+            $repeatoptions['sessiontimezone']['disabledif'] = array('datetimeknown', 'eq', 0);
+            $repeatoptions['sessiontimezone']['default'] = $this->_customdata['defaulttimezone'];
+        }
+        $mform->setType('sessiontimezone', PARAM_TEXT);
         $mform->setType('timestart', PARAM_INT);
         $mform->setType('timefinish', PARAM_INT);
-        $mform->setType('sessiontimezone', PARAM_TEXT);
         $mform->setType('sessiondateid', PARAM_INT);
         $this->repeat_elements($repeatarray, $repeatcount, $repeatoptions, 'date_repeats', 'date_add_fields',
                                1, get_string('dateadd', 'facetoface'), true);

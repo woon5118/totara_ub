@@ -103,9 +103,9 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $options = '';
             if (has_capability('totara/appraisal:manageappraisals', $systemcontext, $userid)) {
                 if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-                    $options .= $this->output->pix_icon('/t/edit_gray', $strnoteditable) . ' ';
+                    $options .= $this->output->pix_icon('/t/edit_gray', $strnoteditable, 'moodle', array('class' => 'disabled iconsmall'));
                     $options .= $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'));
-                    $options .= $this->output->pix_icon('/t/delete_gray', $strcannotdelete, 'moodle');
+                    $options .= $this->output->pix_icon('/t/delete_gray', $strcannotdelete, 'moodle', array('class' => 'disabled iconsmall'));
                 } else {
                     $options .= $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
                     $options .= $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'));
@@ -804,7 +804,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                     $deleteurl->param('hasredisplay', 'true');
                 }
 
-                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'smallicon js-show-inline move'));
+                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'iconsmall js-show-inline move'));
                 $editlink = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle'), null,
                         array('class' => 'action-icon edit'));
                 $deletelink = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'), null,
@@ -878,12 +878,12 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 if ($quest->hasredisplay) {
                     $deleteurl->param('hasredisplay', 'true');
                     $redisplayed = $this->output->pix_icon('link', get_string('hasredisplayitems', 'totara_appraisal'),
-                            'totara_appraisal', array('class' => 'action-icon smallicon redirect'));
+                            'totara_appraisal', array('class' => 'action-icon iconsmall redirect'));
                 } else {
                     $redisplayed = '';
                 }
 
-                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'smallicon js-show-inline move'));
+                $dragdrop = $this->pix_icon('/i/dragdrop', '', 'moodle', array('class' => 'iconsmall js-show-inline move'));
                 $viewlink = $this->output->action_icon($editurl, new pix_icon('/t/preview', $strview, 'moodle'), null,
                     array('class' => 'action-icon view'));
                 $editlink = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle'), null,

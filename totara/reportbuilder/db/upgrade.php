@@ -312,5 +312,56 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014021100, 'totara_reportbuilder');
     }
 
+    // Add table and fields for report builder search regions - standard, sidebar, toolbar.
+    if ($oldversion < 2014030200) {
+
+        // Define table report_builder_search_cols to be created.
+        $table = new xmldb_table('report_builder_search_cols');
+
+        // Adding fields to table report_builder_search_cols.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table report_builder_search_cols.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('repobuilsear_rep_fk', XMLDB_KEY_FOREIGN, array('reportid'), 'report_builder', array('id'));
+
+        // Conditionally launch create table for report_builder_search_cols.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define field region to be added to report_builder_filters.
+        $table = new xmldb_table('report_builder_filters');
+        $field = new xmldb_field('region', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'customname');
+
+        // Conditionally launch add field region.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field toolbarsearch to be added to report_builder.
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('toolbarsearch', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1', 'initialdisplay');
+
+        // Conditionally launch add field toolbarsearch.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014030200, 'totara', 'reportbuilder');
+    }
+
+    // For upgrade (not fresh install) version we leave default course/programs catalog.
+    // For fresh installs - new course/programs catalog
+    if ($oldversion < 2014030500) {
+        set_config('upgradetofaceted', 1);
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014030500, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

@@ -202,10 +202,10 @@ function competency_scale_display_table($scales) {
                 if ($can_delete) {
                     if ($scale_used) {
                         $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletecompetencyscaleinuse', 'totara_hierarchy'), 'totara_core',
-                            array('class' => 'iconsmall', 'title' => get_string('error:nodeletecompetencyscaleinuse', 'totara_hierarchy')));
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeletecompetencyscaleinuse', 'totara_hierarchy')));
                     } else if ($scale_assigned) {
                         $buttons[] = $OUTPUT->pix_icon('t/delete_grey', get_string('error:nodeletecompetencyscaleassigned', 'totara_hierarchy'), 'totara_core',
-                            array('class' => 'iconsmall', 'title' => get_string('error:nodeletecompetencyscaleassigned', 'totara_hierarchy')));
+                            array('class' => 'iconsmall action-icon', 'title' => get_string('error:nodeletecompetencyscaleassigned', 'totara_hierarchy')));
                     } else {
                         $buttons[] = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/scale/delete.php', array('id' => $scale->id, 'prefix' => 'competency')),
                             new pix_icon('t/delete', $strdelete), null, array('title' => $strdelete));

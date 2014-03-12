@@ -68,6 +68,8 @@ class rb_findprograms_embedded_cache_test extends reportcache_advanced_testcase 
         $this->program1 = $this->getDataGenerator()->create_program(array('fullname'=> 'Program level 1'));
         $this->program2 = $this->getDataGenerator()->create_program(array('fullname'=> 'Program 2'));
         $this->program3 = $this->getDataGenerator()->create_program(array('fullname'=> 'Program level 3'));
+
+        $this->user1 = $this->getDataGenerator()->create_user();
     }
 
     /**
@@ -98,6 +100,23 @@ class rb_findprograms_embedded_cache_test extends reportcache_advanced_testcase 
              $this->assertNotContains($r->id, $was);
              $was[] = $r->id;
         }
+    }
 
+    public function test_is_capable() {
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array(), false, 0);
+        $embeddedobject = $report->embedobj;
+        $userid = $this->user1->id;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user can access report.
+        $this->assertTrue($embeddedobject->is_capable($userid, $report),
+                'user cannot access report');
     }
 }

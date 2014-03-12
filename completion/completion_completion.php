@@ -256,7 +256,7 @@ class completion_completion extends data_object {
         }
 
         // Mark as in progress for the certification
-        inprogress_certification_stage($this->course);
+        inprogress_certification_stage($this->course, $this->userid);
     }
 
     /**

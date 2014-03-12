@@ -29,7 +29,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Builds session list table given an array of sessions
      */
-    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions) {
+    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions, $displaytimezones) {
         $output = '';
 
         $tableheader = array();
@@ -39,7 +39,11 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
         }
         $tableheader[] = get_string('date', 'facetoface');
-        $tableheader[] = get_string('time', 'facetoface');
+        if (!empty($displaytimezones)) {
+            $tableheader[] = get_string('timeandtimezone', 'facetoface');
+        } else {
+            $tableheader[] = get_string('time', 'facetoface');
+        }
         $tableheader[] = get_string('room', 'facetoface');
         if ($viewattendees) {
             $tableheader[] = get_string('capacity', 'facetoface');
@@ -99,7 +103,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     } else {
                         $allsessiondates .= $sessionobj->startdate . ' - ' . $sessionobj->enddate;
                     }
-                    $allsessiontimes .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
+                    $sessiontimezonetext = !empty($displaytimezones) ? $sessionobj->timezone : '';
+                    $allsessiontimes .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessiontimezonetext;
                 }
             } else {
                 $allsessiondates = get_string('wait-listed', 'facetoface');

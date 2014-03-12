@@ -167,3 +167,29 @@ tr.mygoals_header {
 div.companygoals.detailswrapper {
     display:inline;
 }
+
+.dir-rtl #hierarchy-bulk-actions-form > div {
+    float: right;
+}
+
+#hierarchy-bulk-actions-form .available select,
+#hierarchy-bulk-actions-form .selected select {
+    width: 98%;
+}
+
+#hierarchy-bulk-actions-form > div.controls {
+    margin-top: 225px;
+    text-align: center;
+}
+
+#hierarchy-bulk-actions-form > div.controls div {
+    text-align: center;
+}
+#hierarchy-bulk-actions-form .action input {
+    margin: 3px 5px 0;
+}
+@media (max-width: 768px) {
+    #hierarchy-bulk-actions-form > div.controls {
+        margin-top: 5px;
+    }
+}

@@ -170,7 +170,13 @@ class fusion_grade_export_oauth_fusion {
         $this->googleapi->setHeader('Content-Type: application/json');
         $response = $this->googleapi->post($this->table_api, $json_data, $curl_options);
 
-        return $response;
+        // Decode JSON response.
+        $response = json_decode($response);
+        if (isset($response->error)) {
+            return $response->error->errors;
+        }
+
+        return array();
     }
 
     /**
@@ -190,7 +196,12 @@ class fusion_grade_export_oauth_fusion {
         foreach ($rows as $row) {
             $values = array();
             foreach ($row as $value) {
-                $values[] = "$value";
+                $value = str_replace(",", "", $value); // Hack to stop commas crashing import.
+                $value = str_replace("\n", "", $value); // Strip out newlines.
+
+                $value = htmlentities($value);
+
+                $values[] = $value;
             }
             $lines[] = implode(", ", $values);
         }
@@ -205,6 +216,12 @@ class fusion_grade_export_oauth_fusion {
         $this->googleapi->setHeader('Content-Type: application/octet-stream');
         $response = $this->googleapi->post($this->upload_api . $table_id . '/import', $data);
 
-        return $response;
+        // Decode JSON response.
+        $response = json_decode($response);
+        if (isset($response->error)) {
+            return $response->error->errors;
+        }
+
+        return array();
     }
 }

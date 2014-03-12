@@ -74,6 +74,7 @@ class rb_totarasynclog_embedded_cache_test extends reportcache_advanced_testcase
      */
     protected function setUp() {
         parent::setup();
+        $this->setAdminUser();
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data),
                                                            'report_builder_columns' => $this->report_builder_columns_data,
                                                            'report_builder_filters' => $this->report_builder_filters_data)));
@@ -86,6 +87,8 @@ class rb_totarasynclog_embedded_cache_test extends reportcache_advanced_testcase
 
             $this->logs[] = $this->create_synclog($data);
         }
+
+        $this->user1 = $this->getDataGenerator()->create_user();
     }
 
     /**
@@ -119,6 +122,34 @@ class rb_totarasynclog_embedded_cache_test extends reportcache_advanced_testcase
              $was[] = $r->id;
         }
 
+    }
+
+    public function test_is_capable() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Set up report and embedded object for is_capable checks.
+        $syscontext = context_system::instance();
+        $shortname = $this->report_builder_data['shortname'];
+        $report = reportbuilder_get_embedded_report($shortname, array(), false, 0);
+        $embeddedobject = $report->embedobj;
+        $roleuser = $DB->get_record('role', array('shortname'=>'user'));
+        $userid = $this->user1->id;
+
+        // Test admin can access report.
+        $this->assertTrue($embeddedobject->is_capable(2, $report),
+                'admin cannot access report');
+
+        // Test user cannot access report.
+        $this->assertFalse($embeddedobject->is_capable($userid, $report),
+                'user should not be able to access report');
+
+        // Test user with manage capability can access report.
+        assign_capability('tool/totara_sync:manage', CAP_ALLOW, $roleuser->id, $syscontext);
+        $syscontext->mark_dirty();
+        $this->assertTrue($embeddedobject->is_capable($userid, $report),
+                'user with capability tool/totara_sync:manage cannot access report');
+        assign_capability('tool/totara_sync:manage', CAP_INHERIT, $roleuser->id, $syscontext);
     }
 
     /**

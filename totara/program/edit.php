@@ -32,6 +32,7 @@ require_once('lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once('edit_form.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php');
+require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
 $id = required_param('id', PARAM_INT); // program id
 $action = optional_param('action', 'view', PARAM_TEXT);
@@ -44,6 +45,9 @@ $systemcontext = context_system::instance();
 $program = new program($id);
 $iscertif = $program->certifid ? true : false;
 $programcontext = $program->get_context();
+$PAGE->set_context($programcontext);
+
+customfield_load_data($program, 'program', 'prog');
 
 // Redirect to delete page if deleting.
 if ($action == 'delete') {
@@ -55,7 +59,6 @@ if (!has_capability('totara/program:configuredetails', $programcontext)) {
 }
 
 $PAGE->set_url(new moodle_url('/totara/program/edit.php', array('id' => $id, 'action' => $action)));
-$PAGE->set_context($programcontext);
 $PAGE->set_title(format_string($program->fullname));
 $PAGE->set_heading(format_string($program->fullname));
 
@@ -174,6 +177,9 @@ if ($data = $detailsform->get_data()) {
 
         // Save program data
         $DB->update_record('prog', $data);
+
+        $data->id = $program->id;
+        customfield_save_data($data, 'program', 'prog');
 
         if (isset($data->savechanges)) {
             $nexturl = $viewurl;

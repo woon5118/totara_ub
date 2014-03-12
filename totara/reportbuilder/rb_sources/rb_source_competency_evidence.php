@@ -106,11 +106,13 @@ class rb_source_competency_evidence extends rb_base_source {
 
         $columnoptions = array(
             new rb_column_option(
-                'competency_evidence',  // type
-                'proficiency',          // value
-                get_string('proficiency', 'rb_source_competency_evidence'), // name
-                'scale_values.name',    // field
-                array('joins' => 'scale_values') // options
+                'competency_evidence',  // Type.
+                'proficiency',          // Value.
+                get_string('proficiency', 'rb_source_competency_evidence'), // Name.
+                'scale_values.name',    // Field.
+                array('joins' => 'scale_values',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text') // Options.
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -150,7 +152,9 @@ class rb_source_competency_evidence extends rb_base_source {
                 'organisation',
                 get_string('completionorgname', 'rb_source_competency_evidence'),
                 'completion_organisation.fullname',
-                array('joins' => 'completion_organisation')
+                array('joins' => 'completion_organisation',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
@@ -177,41 +181,53 @@ class rb_source_competency_evidence extends rb_base_source {
                 'position',
                 get_string('completionposname', 'rb_source_competency_evidence'),
                 'completion_position.fullname',
-                array('joins' => 'completion_position')
+                array('joins' => 'completion_position',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'assessor',
                 get_string('assessorname', 'rb_source_competency_evidence'),
                 $DB->sql_fullname("assessor.firstname", "assessor.lastname"),
-                array('joins' => 'assessor')
+                array('joins' => 'assessor',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency_evidence',
                 'assessorname',
                 get_string('assessororg', 'rb_source_competency_evidence'),
-                'base.assessorname'
+                'base.assessorname',
+                array('dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'fullname',
                 get_string('competencyname', 'rb_source_competency_evidence'),
                 'competency.fullname',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'shortname',
                 get_string('competencyshortname', 'rb_source_competency_evidence'),
                 'competency.shortname',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
                 'idnumber',
                 get_string('competencyid', 'rb_source_competency_evidence'),
                 'competency.idnumber',
-                array('joins' => 'competency')
+                array('joins' => 'competency',
+                      'dbdatatype' => 'char',
+                      'outputformat' => 'text')
             ),
             new rb_column_option(
                 'competency',
@@ -561,7 +577,7 @@ class rb_source_competency_evidence extends rb_base_source {
     // in column definition
     function rb_display_link_competency($comp, $row) {
         $compid = $row->competency_id;
-        $url = new moodle_url('/hierarchy/item/view.php', array('prefix' => 'competency', 'id' => $compid));
+        $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'competency', 'id' => $compid));
         return html_writer::link($url, $comp);
     }
 
@@ -574,9 +590,15 @@ class rb_source_competency_evidence extends rb_base_source {
     function rb_filter_proficiency_list() {
         global $DB;
 
-        // include all possible scale values (from every scale)
-        return $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
+        $values = $DB->get_records_menu('comp_scale_values', null, 'scaleid, sortorder', 'id, name');
 
+        $scales = array();
+        foreach ($values as $value) {
+            $scales[] = format_string($value);
+        }
+
+        // include all possible scale values (from every scale)
+        return $scales;
     }
 
 } // end of rb_source_competency_evidence class
