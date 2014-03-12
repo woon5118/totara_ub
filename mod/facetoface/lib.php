@@ -214,6 +214,7 @@ function facetoface_set_completion($facetoface, $userid, $completionstate = COMP
     }
 
     $completion->update_state($cm, $completionstate, $userid);
+    $completion->invalidatecache($facetoface->course, $userid, true);
 }
 
 /**
