@@ -72,7 +72,8 @@ class scheduler {
      */
     protected $map = array('frequency' => 'frequency',
                            'schedule' => 'schedule',
-                           'nextevent' => 'nextevent');
+                           'nextevent' => 'nextevent',
+                           'timezone' => 'timezone');
 
     protected $time = 0;
     /**
@@ -128,56 +129,66 @@ class scheduler {
     /**
      * Calculate next time of execution
      *
+     * @param int $timestamp Current date
+     * @param bool $is_cron True if the next report is calculated via cron, false otherwise
      * @return scheduler $this
      */
-    public function next() {
+    public function next($timestamp = null, $is_cron = true) {
         if (!isset($this->subject->{$this->map['frequency']})) {
             return $this;
         }
+
         $this->changed = true;
-        $calendardays = calendar_get_days();
-        $init = !isset($this->subject->{$this->map['nextevent']});
-        $cache = property_exists($this->subject, 'cachetable');
         $frequency = $this->subject->{$this->map['frequency']};
         $schedule = $this->subject->{$this->map['schedule']};
+        $usertz = totara_get_clean_timezone($this->subject->{$this->map['timezone']});
 
-        $timemonth = date('n', $this->time);
+        if (is_null($timestamp)) {
+            $datetime = new DateTime('now', new DateTimeZone($usertz));
+            $timestamp = strtotime($datetime->format('Y-m-d H:i:s'));
+        }
+        $this->set_time($timestamp);
         $timeday = date('j', $this->time);
+        $timemonth = date('n', $this->time);
         $timeyear = date('Y', $this->time);
 
         switch ($frequency) {
             case self::DAILY:
-                if (!$cache) {
-                    // If the scheduled hour has passed then set the offset to 86400 (1 day).
-                    $offset = ($init && date('G', $this->time) <= $schedule) ? 0 : 86400;
-                } else {
-                    $offset = (date('G', $this->time) < $schedule) ? 0 : 86400;
-                }
-                // Calculate next report time (startofcurrentday + offset + hourofschedule).
+                $offset = (date('G', $this->time) < $schedule) ? 0 : DAYSECS;
                 $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear) + $offset + ($schedule * 60 * 60);
                 break;
-
             case self::WEEKLY:
-                if ($init && strftime('%A', $this->time) == $calendardays[$schedule]) {
-                    // If the today is the day then set the next reportdate to today.
+                $calendardays = calendar_get_days();
+                if (($calendardays[$schedule]['fullname'] == strftime('%A', $this->time)) && (!$is_cron)) {
                     $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
                 } else {
-                    $nextevent = strtotime('next '. $calendardays[$schedule]['fullname'], $this->time);
+                    $nextevent = strtotime('next ' . $calendardays[$schedule]['fullname'], $this->time);
                 }
                 break;
-
             case self::MONTHLY:
-                if ($init && date('j', $this->time) == $schedule) {
-                    // If the schedule is due to run today then nextreport is the start of today.
+                if (($timeday == $schedule) && (!$is_cron)) {
                     $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
                 } else {
-                    $nextevent = self::get_next_monthly($this->time, $schedule);
+                    $offset = ($timeday >= $schedule) ? 1 : 0;
+                    $newmonth = $timemonth + $offset;
+                    if ($newmonth < 13) {
+                        $newyear = $timeyear;
+                    } else {
+                        $newyear = $timeyear + 1;
+                        $newmonth = 1;
+                    }
+
+                    $daysinmonth = date('t', mktime(0, 0, 0, $newmonth, 3, $newyear));
+                    $newday = ($schedule > $daysinmonth) ? $daysinmonth : $schedule;
+                    $nextevent = mktime(0, 0, 0, $newmonth, $newday, $newyear);
                 }
                 break;
-            default:
-                $nextevent = 0;
         }
-        $this->subject->{$this->map['nextevent']} = $nextevent;
+        // Make the appropriate conversion in case the user is using a different timezone from the server.
+        $datetime = new DateTime(date('Y-m-d H:i:s', $nextevent), new DateTimeZone($usertz));
+        $datetime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+        $this->subject->{$this->map['nextevent']} = strtotime($datetime->format('Y-m-d H:i:s'));
+
         return $this;
     }
 
@@ -240,7 +251,7 @@ class scheduler {
                 break;
             case self::WEEKLY:
                 $out .= get_string('weekly', 'totara_reportbuilder') . ' ' . get_string('on', 'totara_reportbuilder') . ' ';
-                $out .= get_string($calendardays[$schedule], 'calendar');
+                $out .= get_string($calendardays[$schedule]['fullname'], 'calendar');
                 break;
             case self::MONTHLY:
                 $out .= get_string('monthly', 'totara_reportbuilder') . ' ' . get_string('onthe', 'totara_reportbuilder') . ' ';
@@ -278,6 +289,7 @@ class scheduler {
         if ($data['initschedule']) {
             $this->subject->{$this->map['nextevent']} = $this->time - 1;
         } else {
+            $this->subject->{$this->map['timezone']} = $data['timezone'];
             $this->next();
         }
     }
@@ -318,50 +330,5 @@ class scheduler {
             }
         }
         return $obj;
-    }
-
-    /**
-     *  Calculates the next specified day of a month
-     *  eg. the 3rd of next month
-     *
-     * @param integer $time The timestamp to do the calcuation from
-     * @param integer $day The date of the month to calculate
-     *
-     * @return integer Calculated date at midnight
-     */
-    protected static function get_next_monthly($time, $day) {
-        $currentday = date('j', $time);
-        $currentmonth = date('n', $time);
-        $currentyear = date('Y', $time);
-
-        // If the day we want hasn't already passed, the next day will
-        // be in the current month. Otherwise it will be in the following
-        // month - offset it accordingly.
-        if ($currentday >= $day) {
-            $offset = 1;
-        } else {
-            $offset = 0;
-        }
-        $newmonth = $currentmonth+$offset;
-
-        if ($newmonth == 13) { // The end of the year.
-            $newyear = $currentyear+1;
-            $newmonth = 1;
-        } else {
-            $newyear = $currentyear;
-        }
-
-        $daysinmonth = date('t', mktime(0, 0, 0, $newmonth, 3, $newyear));
-        // If the new day is greater than the days in the month,
-        // then set it to be the last day of the month.
-        if ($day > $daysinmonth) {
-            $newday = $daysinmonth;
-        } else {
-            $newday = $day;
-        }
-
-        $nexttime = mktime(0, 0, 0, $newmonth, $newday, $newyear);
-
-        return $nexttime;
     }
 }

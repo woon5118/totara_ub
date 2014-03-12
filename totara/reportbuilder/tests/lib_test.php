@@ -1244,29 +1244,6 @@ class reportbuilderlib_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    function test_reportbuilder_get_next_monthly() {
-        //TODO enable when T-10473 is fixed
-        $this->markTestSkipped('Re-enable this test when T-10473 is fixed.');
-
-        // Use reflection class to allow us to test protected method:
-        // http://stackoverflow.com/questions/249664/best-practices-to-test-protected-methods-with-phpunit
-        $class = new ReflectionClass('scheduler');
-        $method = $class->getMethod('get_next_monthly');
-        $method->setAccessible(true);
-
-        $scheduler = new scheduler();
-        $firstresult = $method->invokeArgs($scheduler, array(1287313200, 20));
-        $this->assertEquals(1287486000, $firstresult);
-
-        $secondresult = $method->invokeArgs($scheduler, array(1287509000, 20));
-        $this->assertEquals(1290164400, $secondresult);
-
-        $thirdresult = $method->invokeArgs($scheduler, array(1287658800, 20));
-        $this->assertEquals(1290164400, $thirdresult);
-
-        $this->resetAfterTest(true);
-    }
-
     function test_reportbuilder_create_attachment() {
         global $CFG;
 

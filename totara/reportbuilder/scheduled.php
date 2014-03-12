@@ -127,6 +127,12 @@ function add_scheduled_report($fromform) {
     global $DB, $USER;
 
     if (isset($fromform->reportid) && isset($fromform->format) && isset($fromform->frequency)) {
+        $report = new stdClass();
+        $report->schedule = $fromform->schedule;
+        $report->frequency = $fromform->frequency;
+        $scheduler = new scheduler($report);
+        $nextevent = $scheduler->next(null, false);
+
         $transaction = $DB->start_delegated_transaction();
         $todb = new stdClass();
         if ($id = $fromform->id) {
@@ -139,15 +145,15 @@ function add_scheduled_report($fromform) {
         $todb->exporttofilesystem = $fromform->emailsaveorboth;
         $todb->frequency = $fromform->frequency;
         $todb->schedule = $fromform->schedule;
+        $todb->nextreport = $nextevent->get_scheduled_time();
         if (!$id) {
             $newid = $DB->insert_record('report_builder_schedule', $todb);
         } else {
-            $todb->nextreport = null;
             $DB->update_record('report_builder_schedule', $todb);
             $newid = $todb->id;
         }
-
         $transaction->allow_commit();
+
         return $newid;
     }
     return false;

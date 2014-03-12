@@ -173,10 +173,12 @@ function process_scheduled_reports() {
 
     require_once($CFG->dirroot . '/calendar/lib.php');
 
-    $sql = "SELECT rbs.*, rb.fullname
+    $sql = "SELECT rbs.*, rb.fullname, u.timezone
             FROM {report_builder_schedule} rbs
             JOIN {report_builder} rb
-            ON rbs.reportid = rb.id";
+            ON rbs.reportid = rb.id
+            JOIN {user} u
+            ON rbs.userid = u.id";
 
     $scheduledreports = $DB->get_records_sql($sql);
 
