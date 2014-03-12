@@ -701,7 +701,7 @@ class totara_core_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     public function print_totara_user_profile($userid) {
-        global $USER;
+        global $USER, $CFG;
 
         $currentuser = ($userid == $USER->id);
 
