@@ -2,10 +2,12 @@
 
 // This file defines settingpages and externalpages under the "appearance" category
 
-if ($hassiteconfig
-    or has_capability('totara/core:appearance', $systemcontext)
-) { // speedup for non-admins, add all capabilities used on this page
+$capabilities = array(
+    'moodle/my:configsyspages',
+    'moodle/tag:manage'
+);
 
+if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // speedup for non-admins, add all caps used on this page
     $ADMIN->add('appearance', new admin_category('themes', new lang_string('themes')));
     // "themesettings" settingpage
     $temp = new admin_settingpage('themesettings', new lang_string('themesettings', 'admin'),  array('totara/core:appearance'));
@@ -27,7 +29,7 @@ if ($hassiteconfig
     $ADMIN->add('themes', new admin_externalpage('elementlibrary', new lang_string('elementlibrary','totara_core'), $CFG->wwwroot . '/elementlibrary/index.php', array('totara/core:appearance')));
 
     // settings for each theme
-    foreach (get_plugin_list('theme') as $theme => $themedir) {
+    foreach (core_component::get_plugin_list('theme') as $theme => $themedir) {
         $settings_path = "$themedir/settings.php";
         if (file_exists($settings_path)) {
             $settings = new admin_settingpage('themesetting'.$theme, new lang_string('pluginname', 'theme_'.$theme), array('totara/core:appearance'));
@@ -188,10 +190,12 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configcheckbox('doctonewwindow', new lang_string('doctonewwindow', 'admin'), new lang_string('configdoctonewwindow', 'admin'), 0));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_externalpage('mypage', new lang_string('mypage', 'admin'), $CFG->wwwroot . '/my/indexsys.php', array('totara/core:appearance'));
+    $temp = new admin_externalpage('mypage', new lang_string('mypage', 'admin'), $CFG->wwwroot . '/my/indexsys.php',  
+        array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php', array('totara/core:appearance'));
+    $temp = new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php',
+            array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.
@@ -216,10 +220,12 @@ if ($hassiteconfig
     $setting->set_updatedcallback('js_reset_all_caches');
     $temp->add($setting);
     $temp->add(new admin_setting_configcheckbox('modchooserdefault', new lang_string('modchooserdefault', 'admin'), new lang_string('configmodchooserdefault', 'admin'), 1));
+    $temp->add(new admin_setting_configcheckbox('modeditingmenu', new lang_string('modeditingmenu', 'admin'), new lang_string('modeditingmenu_desc', 'admin'), 1));
+    $temp->add(new admin_setting_configcheckbox('blockeditingmenu', new lang_string('blockeditingmenu', 'admin'), new lang_string('blockeditingmenu_desc', 'admin'), 1));
     $ADMIN->add('appearance', $temp);
 
     // link to tag management interface
-    $ADMIN->add('appearance', new admin_externalpage('managetags', new lang_string('managetags', 'tag'), "$CFG->wwwroot/tag/manage.php", array('totara/core:appearance')));
+    $ADMIN->add('appearance', new admin_externalpage('managetags', new lang_string('managetags', 'tag'), $CFG->wwwroot.'/tag/manage.php', array('totara/core:appearance')));
 
     $temp = new admin_settingpage('additionalhtml', new lang_string('additionalhtml', 'admin'), array('totara/core:appearance'));
     $temp->add(new admin_setting_heading('additionalhtml_heading', new lang_string('additionalhtml_heading', 'admin'), new lang_string('additionalhtml_desc', 'admin')));

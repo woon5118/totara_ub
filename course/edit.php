@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,7 +17,7 @@
 /**
  * Edit course settings
  *
- * @package    moodlecore
+ * @package    core_course
  * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,10 +37,9 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/program/lib.php');
 
-$id         = optional_param('id', 0, PARAM_INT);       // course id
-$categoryid = optional_param('category', 0, PARAM_INT); // course category - can be changed in edit form
-$returnto = optional_param('returnto', 0, PARAM_ALPHANUM); // generic navigation return page switch
-$nojs = optional_param('nojs', 0, PARAM_INT);
+$id = optional_param('id', 0, PARAM_INT); // Course id.
+$categoryid = optional_param('category', 0, PARAM_INT); // Course category - can be changed in edit form.
+$returnto = optional_param('returnto', 0, PARAM_ALPHANUM); // Generic navigation return page switch.
 
 $PAGE->set_pagelayout('admin');
 $pageparams = array('id'=>$id);
@@ -50,10 +48,11 @@ if (empty($id)) {
 }
 $PAGE->set_url('/course/edit.php', $pageparams);
 
-// basic access control checks
-if ($id) { // editing course
+// Basic access control checks.
+if ($id) {
+    // Editing course.
     if ($id == SITEID){
-        // don't allow editing of  'site course' using this form
+        // Don't allow editing of  'site course' using this from.
         print_error('cannoteditsiteform');
     }
 
@@ -67,8 +66,8 @@ if ($id) { // editing course
     require_capability('moodle/course:update', $coursecontext);
 
     customfield_load_data($course, 'course', 'course');
-
-} else if ($categoryid) { // creating new course in this category
+} else if ($categoryid) {
+    // Creating new course in this category.
     $course = null;
     require_login();
     $category = $DB->get_record('course_categories', array('id'=>$categoryid), '*', MUST_EXIST);
@@ -134,33 +133,35 @@ $currenticon = isset($course->icon) ? $course->icon : 'default';
 $iconargs = array('args' => '{"selected_icon":"' . $currenticon . '","type":"course"}');
 $PAGE->requires->js_init_call('M.totara_iconpicker.init', $iconargs, false, $iconjsmodule);
 
-// Prepare course and the editor
+// Prepare course and the editor.
 $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes, 'trusttext'=>false, 'noclean'=>true);
 $overviewfilesoptions = course_overviewfiles_options($course);
 if (!empty($course)) {
-    //add context for editor
+    // Add context for editor.
     $editoroptions['context'] = $coursecontext;
+    $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'course', 'summary', 0);
     $course = file_prepare_standard_editor($course, 'summary', $editoroptions, $coursecontext, 'course', 'summary', 0);
     if ($overviewfilesoptions) {
         file_prepare_standard_filemanager($course, 'overviewfiles', $overviewfilesoptions, $coursecontext, 'course', 'overviewfiles', 0);
     }
 
-    // Inject current aliases
+    // Inject current aliases.
     $aliases = $DB->get_records('role_names', array('contextid'=>$coursecontext->id));
     foreach($aliases as $alias) {
         $course->{'role_'.$alias->roleid} = $alias->name;
     }
 
 } else {
-    //editor should respect category context if course context is not set.
+    // Editor should respect category context if course context is not set.
     $editoroptions['context'] = $catcontext;
+    $editoroptions['subdirs'] = 0;
     $course = file_prepare_standard_editor($course, 'summary', $editoroptions, null, 'course', 'summary', null);
     if ($overviewfilesoptions) {
         file_prepare_standard_filemanager($course, 'overviewfiles', $overviewfilesoptions, null, 'course', 'overviewfiles', 0);
     }
 }
 
-// first create the form
+// First create the form.
 $editform = new course_edit_form(NULL, array('course'=>$course, 'category'=>$category, 'editoroptions'=>$editoroptions, 'returnto'=>$returnto));
 if ($editform->is_cancelled()) {
         switch ($returnto) {
@@ -168,10 +169,10 @@ if ($editform->is_cancelled()) {
                 $url = new moodle_url($CFG->wwwroot.'/course/index.php', array('categoryid' => $categoryid));
                 break;
             case 'catmanage':
-                $url = new moodle_url($CFG->wwwroot.'/course/manage.php', array('categoryid' => $categoryid));
+                $url = new moodle_url($CFG->wwwroot.'/course/management.php', array('categoryid' => $categoryid));
                 break;
             case 'topcatmanage':
-                $url = new moodle_url($CFG->wwwroot.'/course/manage.php');
+                $url = new moodle_url($CFG->wwwroot.'/course/management.php');
                 break;
             case 'topcat':
                 $url = new moodle_url($CFG->wwwroot.'/course/');
@@ -187,10 +188,9 @@ if ($editform->is_cancelled()) {
         redirect($url);
 
 } else if ($data = $editform->get_data()) {
-    // process data if submitted
-
+    // Process data if submitted.
     if (empty($course->id)) {
-        // In creating the course
+        // In creating the course.
         $course = create_course($data, $editoroptions);
         if ($usetags) {
             if (isset($data->otags)) {
@@ -203,28 +203,27 @@ if ($editform->is_cancelled()) {
         $data->id = $course->id;
         customfield_save_data($data, 'course', 'course');
 
-        // Get the context of the newly created course
+        // Get the context of the newly created course.
         $context = context_course::instance($course->id, MUST_EXIST);
 
         if (!empty($CFG->creatornewroleid) and !is_viewing($context, NULL, 'moodle/role:assign') and !is_enrolled($context, NULL, 'moodle/role:assign')) {
-            // deal with course creators - enrol them internally with default role
+            // Deal with course creators - enrol them internally with default role.
             enrol_try_internal_enrol($course->id, $USER->id, $CFG->creatornewroleid);
-
         }
         if (!is_enrolled($context)) {
-            // Redirect to manual enrolment page if possible
+            // Redirect to manual enrolment page if possible.
             $instances = enrol_get_instances($course->id, true);
             foreach($instances as $instance) {
                 if ($plugin = enrol_get_plugin($instance->enrol)) {
                     if ($plugin->get_manual_enrol_link($instance)) {
-                        // we know that the ajax enrol UI will have an option to enrol
-                        $url = new moodle_url('/enrol/users.php', array('id'=>$course->id));
+                        // We know that the ajax enrol UI will have an option to enrol.
+                        redirect(new moodle_url('/enrol/users.php', array('id'=>$course->id)));
                     }
                 }
             }
         }
     } else {
-        // Save any changes to the files used in the editor
+        // Save any changes to the files used in the editor.
         update_course($data, $editoroptions);
         if ($usetags) {
             if (isset($data->otags)) {
@@ -286,8 +285,7 @@ if ($editform->is_cancelled()) {
     redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
 }
 
-
-// Print the form
+// Print the form.
 
 $site = get_site();
 

@@ -29,7 +29,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('lib.php');
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 $sid        = required_param('session', PARAM_INT);

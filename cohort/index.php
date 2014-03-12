@@ -64,6 +64,7 @@ $PAGE->set_context($context);
 
 if ($category) {
     $PAGE->set_pagelayout('report');
+    $PAGE->set_context($context);
     $PAGE->set_url('/cohort/index.php', array('contextid'=>$context->id));
     $PAGE->set_title($strcohorts);
     $PAGE->set_heading($COURSE->fullname);

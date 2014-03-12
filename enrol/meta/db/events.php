@@ -25,15 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/* List of handlers */
-$handlers = array (
-    'role_assigned' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'role_assigned'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
+// List of observers.
+$observers = array(
+/*
     'role_assigned_bulk' => array (
         'handlerfile'      => '/enrol/meta/locallib.php',
         'handlerfunction'  => array('enrol_meta_handler', 'role_assigned_bulk'),
@@ -102,5 +96,29 @@ $handlers = array (
         'handlerfunction'  => array('enrol_meta_handler', 'course_deleted'),
         'schedule'         => 'instant',
         'internal'         => 1,
+*/
+    array(
+        'eventname'   => '\core\event\user_enrolment_created',
+        'callback'    => 'enrol_meta_observer::user_enrolment_created',
+    ),
+    array(
+        'eventname'   => '\core\event\user_enrolment_deleted',
+        'callback'    => 'enrol_meta_observer::user_enrolment_deleted',
+    ),
+    array(
+        'eventname'   => '\core\event\user_enrolment_updated',
+        'callback'    => 'enrol_meta_observer::user_enrolment_updated',
+    ),
+    array(
+        'eventname'   => '\core\event\role_assigned',
+        'callback'    => 'enrol_meta_observer::role_assigned',
+    ),
+    array(
+        'eventname'   => '\core\event\role_unassigned',
+        'callback'    => 'enrol_meta_observer::role_unassigned',
+    ),
+    array(
+        'eventname'   => '\core\event\course_deleted',
+        'callback'    => 'enrol_meta_observer::course_deleted',
     ),
 );

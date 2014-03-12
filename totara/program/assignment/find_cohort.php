@@ -25,7 +25,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content.class.php');
 require_once("{$CFG->dirroot}/totara/program/lib.php");
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 // Get program id and check capabilities

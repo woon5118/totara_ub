@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_required_learnin
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_plan_evidence.class.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib.php');
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 $questionid = required_param('id', PARAM_INT);

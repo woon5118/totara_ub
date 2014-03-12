@@ -40,7 +40,7 @@ class user_filtering {
                                 'nevermodified'=>1, 'username'=>1, 'auth'=>1, 'mnethostid'=>1, 'totarasync'=>1);
         }
 
-        $systemcontext = get_system_context();
+        $systemcontext = context_system::instance();
         if (has_capability('totara/core:seedeletedusers', $systemcontext)) {
             $fieldnames['deleted'] = 1;
         }
@@ -128,7 +128,7 @@ class user_filtering {
             case 'deleted':   return new user_filter_yesno('deleted', get_string('deleted', 'totara_core'), $advanced, 'deleted');
             case 'totarasync':  return new user_filter_yesno('totarasync', get_string('totarasync', 'tool_totara_sync'), $advanced, 'totarasync');
             case 'auth':
-                $plugins = get_plugin_list('auth');
+                $plugins = core_component::get_plugin_list('auth');
                 $choices = array();
                 foreach ($plugins as $auth => $unused) {
                     $choices[$auth] = get_string('pluginname', "auth_{$auth}");

@@ -44,7 +44,7 @@ $PAGE->set_pagelayout('noblocks');
 $PAGE->set_totara_menu_selected('learningplans');
 
 //Permissions check
-$systemcontext = get_system_context();
+$systemcontext = context_system::instance();
 if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
         print_error('error:nopermissions', 'totara_plan');
 }

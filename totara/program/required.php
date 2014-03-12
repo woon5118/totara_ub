@@ -33,7 +33,7 @@ $userid = optional_param('userid', $USER->id, PARAM_INT); // show required learn
 $programid = optional_param('id', 0, PARAM_INT);
 $filter = optional_param('filter', 'all', PARAM_TEXT);
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/program/required.php');
 $PAGE->set_pagelayout('noblocks');
 

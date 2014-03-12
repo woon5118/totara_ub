@@ -58,7 +58,7 @@ $leftcols = 1 + count($extrafields);
 function csv_quote($value) {
     global $excel;
     if ($excel) {
-        return textlib::convert('"'.str_replace('"',"'",$value).'"','UTF-8','UTF-16LE');
+        return core_text::convert('"'.str_replace('"',"'",$value).'"','UTF-8','UTF-16LE');
     } else {
         return '"'.str_replace('"',"'",$value).'"';
     }
@@ -133,7 +133,7 @@ if ($csv && $grandtotal && count($activities)>0) { // Only show CSV if there are
 
     $shortname = format_string($course->shortname, true, array('context' => $context));
     header('Content-Disposition: attachment; filename=progress.'.
-        preg_replace('/[^a-z0-9-]/','_',textlib::strtolower(strip_tags($shortname))).'.csv');
+        preg_replace('/[^a-z0-9-]/','_',core_text::strtolower(strip_tags($shortname))).'.csv');
     // Unicode byte-order mark for Excel
     if ($excel) {
         header('Content-Type: text/csv; charset=UTF-16LE');
@@ -305,9 +305,10 @@ if (!$csv) {
 }
 
 // Activities
+$formattedactivities = array();
 foreach($activities as $activity) {
-    $activity->datepassed = $activity->completionexpected && $activity->completionexpected <= time();
-    $activity->datepassedclass=$activity->datepassed ? 'completion-expired' : '';
+    $datepassed = $activity->completionexpected && $activity->completionexpected <= time();
+    $datepassedclass = $datepassed ? 'completion-expired' : '';
 
     if ($activity->completionexpected) {
         $datetext=userdate($activity->completionexpected,get_string('strftimedate','langconfig'));
@@ -333,6 +334,10 @@ foreach($activities as $activity) {
         }
         print '</th>';
     }
+    $formattedactivities[$activity->id] = (object)array(
+        'datepassedclass' => $datepassedclass,
+        'displayname' => $displayname,
+    );
 }
 
 if ($csv) {
@@ -388,19 +393,18 @@ foreach($progress as $user) {
             ($activity->completion==COMPLETION_TRACKING_AUTOMATIC ? 'auto' : 'manual').
             '-'.$completiontype;
 
-        $modcontext = context_module::instance($activity->id);
         $describe = get_string('completion-' . $completiontype, 'completion');
         $a=new StdClass;
         $a->state=$describe;
         $a->date=$date;
         $a->user=fullname($user);
-        $a->activity = format_string($activity->name, true, array('context' => $modcontext));
+        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $activity->context));
         $fulldescribe=get_string('progress-title','completion',$a);
 
         if ($csv) {
             print $sep.csv_quote($describe).$sep.csv_quote($date);
         } else {
-            print '<td class="completion-progresscell '.$activity->datepassedclass.'">'.
+            print '<td class="completion-progresscell '.$formattedactivities[$activity->id]->datepassedclass.'">'.
                 '<img src="'.$OUTPUT->pix_url('i/'.$completionicon).
                 '" alt="'.$describe.'" title="'.$fulldescribe.'" /></td>';
         }

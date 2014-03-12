@@ -46,7 +46,7 @@ $categoryid = (int) substr($categoryid, 3);
 ///
 /// Load plan
 ///
-require_capability('totara/plan:accessplan', get_system_context());
+require_capability('totara/plan:accessplan', context_system::instance());
 
 $plan = new development_plan($id);
 $component = $plan->get_component('program');

@@ -186,6 +186,15 @@ if ($form->is_cancelled()) {
     // Log changes.
     add_to_log($course->id, 'course', 'completion updated', 'completion.php?id='.$course->id);
 
+    // Trigger an event for course module completion changed.
+    $event = \core\event\course_completion_updated::create(
+            array(
+                'courseid' => $course->id,
+                'context' => context_course::instance($course->id)
+                )
+            );
+    $event->trigger();
+
     // If any criteria created, bulk start users
     completion_start_user_bulk($course->id);
 

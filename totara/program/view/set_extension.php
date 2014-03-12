@@ -22,7 +22,7 @@
  */
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 echo $PAGE->get_renderer('totara_program')->display_set_extension();

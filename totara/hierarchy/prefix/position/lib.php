@@ -657,7 +657,7 @@ class position_assignment extends data_object {
 function pos_add_nav_positions_links($courseid, $userid, $usersetting) {
     global $CFG, $USER, $POSITION_CODES, $POSITION_TYPES;
 
-    $systemcontext   = get_system_context();
+    $systemcontext   = context_system::instance();
     $usercontext = context_user::instance($userid);
     $coursecontext = context_course::instance($courseid);
 

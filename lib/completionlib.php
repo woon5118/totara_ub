@@ -1255,7 +1255,20 @@ class completion_info {
         }
         $transaction->allow_commit();
 
-        events_trigger('activity_completion_changed', $data);
+        $cmcontext = context_module::instance($data->coursemoduleid, MUST_EXIST);
+        $coursecontext = $cmcontext->get_parent_context();
+
+        // Trigger an event for course module completion changed.
+        $event = \core\event\course_module_completion_updated::create(
+            array('objectid' => $data->id,
+                'userid' => $USER->id,
+                'context' => $cmcontext,
+                'courseid' => $coursecontext->instanceid,
+                'other' => array('relateduserid' => $data->userid)
+                )
+            );
+        $event->add_record_snapshot('course_modules_completion', $data);
+        $event->trigger();
 
         if ($data->userid == $USER->id) {
             $SESSION->completioncache[$cm->course][$cm->id] = $data;
@@ -1378,7 +1391,8 @@ class completion_info {
                 context_course::instance($this->course->id),
                 'moodle/course:isincompletionreports', $groupid, true);
 
-        $sql = 'SELECT u.id, u.firstname, u.lastname, u.idnumber';
+        $allusernames = get_all_user_name_fields(true, 'u');
+        $sql = 'SELECT u.id, u.idnumber, ' . $allusernames;
         if ($extracontext) {
             $sql .= get_extra_user_fields_sql($extracontext, 'u', '', array('idnumber'));
         }

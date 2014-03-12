@@ -38,7 +38,7 @@ $day        = optional_param('cal_d', strftime('%d', $timenow), PARAM_INT);
 $month      = optional_param('cal_m', strftime('%m', $timenow), PARAM_INT);
 $year       = optional_param('cal_y', strftime('%Y', $timenow), PARAM_INT);
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 $baseparams = array('cal_d' => $day, 'cal_m' => $month, 'cal_y' => $year);

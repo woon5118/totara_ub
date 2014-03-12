@@ -1,19 +1,50 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// This file defines settingpages and externalpages under the "courses" category
-
-if ($hassiteconfig
- or has_capability('moodle/backup:backupcourse', $systemcontext)
- or has_capability('moodle/category:manage', $systemcontext)
- or has_capability('moodle/course:create', $systemcontext)
- or has_capability('moodle/site:approvecourse', $systemcontext)
- or has_capability('moodle/course:update', $systemcontext)
- or has_capability('totara/program:configuredetails', $systemcontext)
- or has_capability('totara/program:createprogram', $systemcontext)
-) { // speedup for non-admins, add all caps used on this page
-
-    $ADMIN->add('courses', new admin_externalpage('coursemgmt', new lang_string('managecourses', 'admin'), $CFG->wwwroot . '/course/manage.php',
-            array('moodle/category:manage', 'moodle/course:create')));
+/**
+ * This file defines settingpages and externalpages under the "courses" category
+ *
+ * @package core
+ * @copyright 2002 onwards Martin Dougiamas (http://dougiamas.com)
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+$capabilities = array(
+    'moodle/backup:backupcourse',
+    'moodle/category:manage',
+    'moodle/course:create',
+    'moodle/site:approvecourse',
+    'moodle/course:update',
+    'totara/program:configuredetails',
+    'totara/program:createprogram'
+);
+if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
+    // Speedup for non-admins, add all caps used on this page.
+    $ADMIN->add('courses',
+        new admin_externalpage('coursemgmt', new lang_string('coursemgmt', 'admin'),
+            $CFG->wwwroot . '/course/management.php',
+            array('moodle/category:manage', 'moodle/course:create')
+        )
+    );
+ 
+    $ADMIN->add('courses',
+        new admin_externalpage('addcategory', new lang_string('addcategory', 'admin'),
+            new moodle_url('/course/editcategory.php', array('parent' => 0)),
+            array('moodle/category:manage')
+        )
+    );
 
     $ADMIN->add('courses', new admin_externalpage('programmgmt', new lang_string('manageprograms', 'admin'), $CFG->wwwroot . '/totara/program/manage.php',
                     array('totara/program:createprogram', 'totara/program:configuredetails')));
@@ -27,7 +58,6 @@ if ($hassiteconfig
 
     // Course Default Settings Page.
     // NOTE: these settings must be applied after all other settings because they depend on them.
-
 
     // Main course settings.
     $temp = new admin_settingpage('coursesettings', new lang_string('coursesettings'));
@@ -73,7 +103,6 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configselect('moodlecourse/coursedisplay', new lang_string('coursedisplay'),
         new lang_string('coursedisplay_help'), COURSE_DISPLAY_SINGLEPAGE, $choices));
 
-
     // Appearance.
     $temp->add(new admin_setting_heading('appearancehdr', new lang_string('appearance'), ''));
 
@@ -90,7 +119,6 @@ if ($hassiteconfig
         new lang_string('coursehelpshowgrades'), 1, array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
     $temp->add(new admin_setting_configselect('moodlecourse/showreports', new lang_string('showreports'), '', 0,
         array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
-
 
     // Files and uploads.
     $temp->add(new admin_setting_heading('filesanduploadshdr', new lang_string('filesanduploads'), ''));
@@ -109,7 +137,6 @@ if ($hassiteconfig
     }
     $temp->add(new admin_setting_configselect('moodlecourse/maxbytes', new lang_string('maximumupload'),
         new lang_string('coursehelpmaximumupload'), key($choices), $choices));
-
 
     // Completion tracking.
     $temp->add(new admin_setting_heading('progress', new lang_string('completion','completion'), ''));
@@ -160,13 +187,13 @@ if ($hassiteconfig
     $temp->add(new admin_setting_users_with_capability('courserequestnotify', new lang_string('courserequestnotify', 'admin'), new lang_string('configcourserequestnotify2', 'admin'), array(), 'moodle/site:approvecourse'));
     $ADMIN->add('courses', $temp);
 
-/// Pending course requests.
+    // Pending course requests.
     if (!empty($CFG->enablecourserequests)) {
         $ADMIN->add('courses', new admin_externalpage('coursespending', new lang_string('pendingrequests'),
                 $CFG->wwwroot . '/course/pending.php', array('moodle/site:approvecourse')));
     }
 
-    // Add a category for backups
+    // Add a category for backups.
     $ADMIN->add('courses', new admin_category('backups', new lang_string('backups','admin')));
 
     // Create a page for general backups configuration and defaults.
@@ -203,6 +230,7 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configcheckbox_with_lock('backup/backup_general_userscompletion', new lang_string('generaluserscompletion','backup'), new lang_string('configgeneraluserscompletion','backup'), array('value'=>1, 'locked'=>0)));
     $temp->add(new admin_setting_configcheckbox_with_lock('backup/backup_general_logs', new lang_string('generallogs','backup'), new lang_string('configgenerallogs','backup'), array('value'=>0, 'locked'=>0)));
     $temp->add(new admin_setting_configcheckbox_with_lock('backup/backup_general_histories', new lang_string('generalhistories','backup'), new lang_string('configgeneralhistories','backup'), array('value'=>0, 'locked'=>0)));
+    $temp->add(new admin_setting_configcheckbox_with_lock('backup/backup_general_questionbank', new lang_string('generalquestionbank','backup'), new lang_string('configgeneralquestionbank','backup'), array('value'=>1, 'locked'=>0)));
     $ADMIN->add('backups', $temp);
 
     // Create a page for general import configuration and defaults.
@@ -277,11 +305,10 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configcheckbox('backup/backup_auto_userscompletion', new lang_string('generaluserscompletion','backup'), new lang_string('configgeneraluserscompletion','backup'), 1));
     $temp->add(new admin_setting_configcheckbox('backup/backup_auto_logs', new lang_string('generallogs', 'backup'), new lang_string('configgenerallogs', 'backup'), 0));
     $temp->add(new admin_setting_configcheckbox('backup/backup_auto_histories', new lang_string('generalhistories','backup'), new lang_string('configgeneralhistories','backup'), 0));
-
+    $temp->add(new admin_setting_configcheckbox('backup/backup_auto_questionbank', new lang_string('generalquestionbank','backup'), new lang_string('configgeneralquestionbank','backup'), 1));
 
     //$temp->add(new admin_setting_configcheckbox('backup/backup_auto_messages', new lang_string('messages', 'message'), new lang_string('backupmessageshelp','message'), 0));
     //$temp->add(new admin_setting_configcheckbox('backup/backup_auto_blogs', new lang_string('blogs', 'blog'), new lang_string('backupblogshelp','blog'), 0));
 
     $ADMIN->add('backups', $temp);
-
-} // end of speedup
+}

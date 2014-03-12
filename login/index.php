@@ -25,6 +25,7 @@
  */
 
 require('../config.php');
+require_once('lib.php');
 
 // Try to prevent searching for sites that allow sign-up.
 if (!isset($CFG->additionalhtmlhead)) {
@@ -142,7 +143,7 @@ if ($frm && !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey
 
 if ($frm and isset($frm->username)) {                             // Login WITH cookies
 
-    $frm->username = trim(textlib::strtolower($frm->username));
+    $frm->username = trim(core_text::strtolower($frm->username));
 
     if (is_enabled_auth('none') ) {
         if ($frm->username !== clean_param($frm->username, PARAM_USERNAME)) {
@@ -224,31 +225,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
             set_moodle_cookie($USER->username);
         }
 
-    /// Prepare redirection
-        if (user_not_fully_set_up($USER)) {
-            $urltogo = $CFG->wwwroot.'/user/edit.php';
-            // We don't delete $SESSION->wantsurl yet, so we get there later
-
-        } else if (isset($SESSION->wantsurl) and (strpos($SESSION->wantsurl, $CFG->wwwroot) === 0 or strpos($SESSION->wantsurl, str_replace('http://', 'https://', $CFG->wwwroot)) === 0)) {
-            $urltogo = $SESSION->wantsurl;    /// Because it's an address in this site
-            unset($SESSION->wantsurl);
-
-        } else {
-            // no wantsurl stored or external - go to homepage
-            $urltogo = $CFG->wwwroot.'/';
-            unset($SESSION->wantsurl);
-        }
-
-        // If the url to go to is the same as the site page, check for default homepage.
-        if ($urltogo == ($CFG->wwwroot . '/')) {
-            $home_page = get_home_page();
-            // Go to my-moodle page instead of site homepage if defaulthomepage set to homepage_my
-            if ($home_page == HOMEPAGE_MY && !is_siteadmin() && !isguestuser()) {
-                if ($urltogo == $CFG->wwwroot or $urltogo == $CFG->wwwroot.'/' or $urltogo == $CFG->wwwroot.'/index.php') {
-                    $urltogo = $CFG->wwwroot.'/my/';
-                }
-            }
-        }
+        $urltogo = core_login_get_return_url();
 
     /// check if user password has expired
     /// Currently supported only for ldap-authentication module
@@ -277,6 +254,9 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
                 exit;
             }
         }
+
+        // Discard any errors before the last redirect.
+        unset($SESSION->loginerrormsg);
 
         // test the session actually works by redirecting to self
         $SESSION->wantsurl = $urltogo;
@@ -364,6 +344,23 @@ $potentialidps = array();
 foreach($authsequence as $authname) {
     $authplugin = get_auth_plugin($authname);
     $potentialidps = array_merge($potentialidps, $authplugin->loginpage_idp_list($SESSION->wantsurl));
+}
+
+if (!empty($SESSION->loginerrormsg)) {
+    // We had some errors before redirect, show them now.
+    $errormsg = $SESSION->loginerrormsg;
+    unset($SESSION->loginerrormsg);
+
+} else if ($testsession) {
+    // No need to redirect here.
+    unset($SESSION->loginerrormsg);
+
+} else if ($errormsg or !empty($frm->password)) {
+    // We must redirect after every password submission.
+    if ($errormsg) {
+        $SESSION->loginerrormsg = $errormsg;
+    }
+    redirect(new moodle_url('/login/index.php'));
 }
 
 $PAGE->set_title("$site->fullname: $loginsite");

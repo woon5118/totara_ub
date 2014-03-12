@@ -62,7 +62,7 @@ foreach ($currentlist as $rec) {
 ///
 /// Permissions check
 ///
-require_capability('totara/plan:accessplan', get_system_context());
+require_capability('totara/plan:accessplan', context_system::instance());
 
 if (!$component->can_update_items()) {
     notice(get_string('error:cannotupdateitems', 'totara_plan'));

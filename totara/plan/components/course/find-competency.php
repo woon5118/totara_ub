@@ -27,7 +27,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->dirroot.'/totara/plan/components/competency/dialog_content_linked_competencies.class.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
-$PAGE->set_context(get_system_context());
+$PAGE->set_context(context_system::instance());
 require_login();
 
 ///
@@ -40,7 +40,7 @@ $courseid = required_param('courseid', PARAM_INT);
 ///
 /// Load plan
 ///
-require_capability('totara/plan:accessplan', get_system_context());
+require_capability('totara/plan:accessplan', context_system::instance());
 
 $plan = new development_plan($planid);
 $component = $plan->get_component('course');

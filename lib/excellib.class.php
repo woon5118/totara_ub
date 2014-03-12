@@ -116,6 +116,25 @@ class MoodleExcelWorkbook {
             $filename = $filename.'.xlsx';
         }
 
+        if (strpos($CFG->wwwroot, 'https://') === 0) { //https sites - watch out for IE! KB812935 and KB316431
+            header('Cache-Control: max-age=10');
+            header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
+            header('Pragma: ');
+        } else { //normal http - prevent caching at all cost
+            header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0');
+            header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
+            header('Pragma: no-cache');
+        }
+
+        if (core_useragent::is_ie()) {
+            $filename = rawurlencode($filename);
+        } else {
+            $filename = s($filename);
+        }
+
+        header('Content-Type: '.$mimetype);
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+
         $objWriter = PHPExcel_IOFactory::createWriter($this->objPHPExcel, $this->type);
         if (!$this->save) {
             if (strpos($CFG->wwwroot, 'https://') === 0) { // Https sites - watch out for IE! KB812935 and KB316431.
@@ -176,7 +195,7 @@ class MoodleExcelWorksheet {
         // Replace any characters in the name that Excel cannot cope with.
         $name = strtr($name, '[]*/\?:', '       ');
         // Shorten the title if necessary.
-        $name = textlib::substr($name, 0, 31);
+        $name = core_text::substr($name, 0, 31);
 
         if ($name === '') {
             // Name is required!
@@ -454,8 +473,7 @@ class MoodleExcelWorksheet {
 /**
  * Define and operate over one Format.
  *
- * A big part of this class acts as a wrapper over the PEAR
- * Spreadsheet_Excel_Writer_Workbook and OLE libraries
+ * A big part of this class acts as a wrapper over other libraries
  * maintaining Moodle functions isolated from underlying code.
  *
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}

@@ -269,25 +269,21 @@ class completion_completion extends data_object {
      * @return void
      */
     public function mark_complete($timecomplete = null) {
-        global $CFG, $DB;
+        global $USER;
 
-        // Never change a completion time
-        if (!$this->timecompleted) {
-
-            // Use current time if nothing supplied
-            if (!$timecomplete) {
-                $timecomplete = time();
-            }
-
-            // Set time complete
-            $this->timecompleted = $timecomplete;
+        // Never change a completion time.
+        if ($this->timecompleted) {
+            return;
         }
 
-        // Set time started.
-        if (!$this->timestarted) {
-            $this->timestarted = $timecomplete;
+        // Use current time if nothing supplied.
+        if (!$timecomplete) {
+            $timecomplete = time();
         }
 
+        // Set time complete.
+        $this->timecompleted = $timecomplete;
+                
         // Get user's positionid and organisationid if not already set
         if ($this->positionid === null) {
             require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
@@ -297,16 +293,21 @@ class completion_completion extends data_object {
             $this->organisationid = $ids['organisationid'];
         }
 
-        // Save record
+        // Save record.
         if ($result = $this->_save()) {
-            events_trigger('course_completed', $this->get_record_data());
-
-            $eventdata = new stdClass();
-            $eventdata->criteriatype = COMPLETION_CRITERIA_TYPE_COURSE;
-            $eventdata->courseinstance = $this->course;
-            $eventdata->userid = $this->userid;
-            events_trigger('completion_criteria_calc', $eventdata);
-
+            $data = $this->get_record_data();
+            $event = \core\event\course_completed::create(
+                array(
+                    'objectid' => $data->id,
+                    'userid' => $USER->id,
+                    'context' => context_course::instance($data->course),
+                    'courseid' => $data->course,
+                    'other' => array('relateduserid' => $data->userid)
+                    )
+                );
+            $event->add_record_snapshot('course_completions', $data);
+            $event->trigger();
+ 
             $data = array();
             $data['userid'] = $this->userid;
             $data['eventtype'] = STATS_EVENT_COURSE_COMPLETE;

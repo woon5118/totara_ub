@@ -25,15 +25,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/* List of handlers */
-$handlers = array (
-    'role_assigned' => array (
-        'handlerfile'      => '/enrol/category/locallib.php',
-        'handlerfunction'  => array('enrol_category_handler', 'role_assigned'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
+$observers = array (
+
+    array (
+        'eventname' => '\core\event\role_assigned',
+        'callback'  => 'enrol_category_observer::role_assigned',
     ),
 
+    array (
+        'eventname' => '\core\event\role_unassigned',
+        'callback'  => 'enrol_category_observer::role_unassigned',
+    ),
+
+/*
     'role_assigned_bulk' => array (
         'handlerfile'      => '/enrol/category/locallib.php',
         'handlerfunction'  => array('enrol_category_handler', 'role_assigned_bulk'),
@@ -54,4 +58,5 @@ $handlers = array (
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
+*/
 );

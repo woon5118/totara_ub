@@ -23,7 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-
+$systemcontext = context_system::instance();
 if (has_capability('tool/totara_sync:manage', $systemcontext)) {
     require_once($CFG->dirroot.'/admin/tool/totara_sync/lib.php');
 

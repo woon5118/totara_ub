@@ -16,6 +16,7 @@
 
 /**
  * This file contains the moodle hooks for the assign module.
+ *
  * It delegates most functions to the assignment class.
  *
  * @package   mod_assign
@@ -59,8 +60,9 @@ function assign_delete_instance($id) {
  * This function is used by the reset_course_userdata function in moodlelib.
  * This function will remove all assignment submissions and feedbacks in the database
  * and clean up any related data.
- * @param $data the data submitted from the reset course.
- * @return array status array
+ *
+ * @param stdClass $data the data submitted from the reset course.
+ * @return array
  */
 function assign_reset_userdata($data) {
     global $CFG, $DB;
@@ -81,17 +83,6 @@ function assign_reset_userdata($data) {
             $assignment = new assign($context, $cm, $course);
             $status = array_merge($status, $assignment->reset_userdata($data));
         }
-    }
-    // Updating dates - shift may be negative too.
-    if ($data->timeshift) {
-        shift_course_mod_dates('assign',
-                                array('duedate', 'allowsubmissionsfromdate', 'cutoffdate'),
-                                $data->timeshift,
-                                $data->courseid);
-
-        $status[] = array('component' => get_string('modulenameplural', 'assign'),
-                          'item' => get_string('datechanged'),
-                          'error' => false);
     }
     return $status;
 }
@@ -120,7 +111,7 @@ function assign_reset_gradebook($courseid, $type='') {
 /**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the assignment.
- * @param $mform form passed by reference
+ * @param moodleform $mform form passed by reference
  */
 function assign_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'assignheader', get_string('modulenameplural', 'assign'));
@@ -142,7 +133,7 @@ function assign_reset_course_form_defaults($course) {
  *
  * This is done by calling the update_instance() method of the assignment type class
  * @param stdClass $data
- * @param $form
+ * @param stdClass $form - unused
  * @return object
  */
 function assign_update_instance(stdClass $data, $form) {
@@ -293,11 +284,11 @@ function assign_get_coursemodule_info($coursemodule) {
  * @param stdClass $currentcontext Current context of block
  */
 function assign_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    $module_pagetype = array(
+    $modulepagetype = array(
         'mod-assign-*' => get_string('page-mod-assign-x', 'assign'),
         'mod-assign-view' => get_string('page-mod-assign-view', 'assign'),
     );
-    return $module_pagetype;
+    return $modulepagetype;
 }
 
 /**
@@ -501,6 +492,7 @@ function assign_print_overview($courses, &$htmlarray) {
  * @param mixed $course the course to print activity for
  * @param bool $viewfullnames boolean to determine whether to show full names or not
  * @param int $timestart the time the rendering started
+ * @return bool true if activity was printed, false otherwise.
  */
 function assign_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
@@ -508,8 +500,9 @@ function assign_print_recent_activity($course, $viewfullnames, $timestart) {
     // Do not use log table if possible, it may be huge.
 
     $dbparams = array($timestart, $course->id, 'assign');
-    if (!$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified, cm.id AS cmid, asb.userid,
-                                                     u.firstname, u.lastname, u.email, u.picture
+    $namefields = user_picture::fields('u', null, 'userid');
+    if (!$submissions = $DB->get_records_sql("SELECT asb.id, asb.timemodified, cm.id AS cmid,
+                                                     $namefields
                                                 FROM {assign_submission} asb
                                                      JOIN {assign} a      ON a.id = asb.assignment
                                                      JOIN {course_modules} cm ON cm.instance = a.id
@@ -518,7 +511,7 @@ function assign_print_recent_activity($course, $viewfullnames, $timestart) {
                                                WHERE asb.timemodified > ? AND
                                                      a.course = ? AND
                                                      md.name = ?
-                                            ORDER BY asb.timemodified ASC', $dbparams)) {
+                                            ORDER BY asb.timemodified ASC", $dbparams)) {
          return false;
     }
 
@@ -669,10 +662,10 @@ function assign_get_recent_mod_activity(&$activities,
     }
 
     $groupmode       = groups_get_activity_groupmode($cm, $course);
-    $cm_context      = context_module::instance($cm->id);
-    $grader          = has_capability('moodle/grade:viewall', $cm_context);
-    $accessallgroups = has_capability('moodle/site:accessallgroups', $cm_context);
-    $viewfullnames   = has_capability('moodle/site:viewfullnames', $cm_context);
+    $cmcontext      = context_module::instance($cm->id);
+    $grader          = has_capability('moodle/grade:viewall', $cmcontext);
+    $accessallgroups = has_capability('moodle/site:accessallgroups', $cmcontext);
+    $viewfullnames   = has_capability('moodle/site:viewfullnames', $cmcontext);
 
     if (is_null($modinfo->get_groups())) {
         // Load all my groups and cache it in modinfo.
@@ -871,7 +864,7 @@ function assign_cron() {
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
     assign::cron();
 
-    $plugins = get_plugin_list('assignsubmission');
+    $plugins = core_component::get_plugin_list('assignsubmission');
 
     foreach ($plugins as $name => $plugin) {
         $disabled = get_config('assignsubmission_' . $name, 'disabled');
@@ -881,7 +874,7 @@ function assign_cron() {
             $class::cron();
         }
     }
-    $plugins = get_plugin_list('assignfeedback');
+    $plugins = core_component::get_plugin_list('assignfeedback');
 
     foreach ($plugins as $name => $plugin) {
         $disabled = get_config('assignfeedback_' . $name, 'disabled');

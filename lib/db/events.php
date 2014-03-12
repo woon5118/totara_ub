@@ -33,10 +33,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/* List of handlers */
+/* List of legacy event handlers */
 
 $handlers = array(
-
 /*
  * portfolio queued event - for non interactive file transfers
  * NOTE: this is a HACK, please do not add any more things like this here
@@ -45,7 +44,7 @@ $handlers = array(
  * TODO: this has to be moved into separate queueing framework....
  * TODO: MDL-25508, MDL-41541
  */
-
+/*
     'portfolio_send' => array (
         'handlerfile'      => '/lib/portfoliolib.php',
         'handlerfunction'  => 'portfolio_handle_event',    // argument to call_user_func(), could be an array
@@ -82,11 +81,26 @@ $handlers = array(
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
-
+*/
 /* no more here please, core should not consume any events!!!!!!! */
 );
 
+$observers = array(
 
+    array(
+        'eventname'   => '\core\event\course_module_completion_updated',
+        'callback'    => 'core_badges_observer::course_module_criteria_review',
+    ),
+    array(
+        'eventname'   => '\core\event\course_completed',
+        'callback'    => 'core_badges_observer::course_criteria_review',
+    ),
+    array(
+        'eventname'   => '\core\event\user_updated',
+        'callback'    => 'core_badges_observer::profile_criteria_review',
+    )
+
+);
 
 
 /* List of events thrown from Moodle core
