@@ -80,6 +80,7 @@ $string['core:undeleteuser'] = 'Undelete user';
 $string['core:updatecoursecustomfield'] = 'Update a course custom field';
 $string['core:updateprogramcustomfield'] = 'Update a program custom field';
 $string['core:updateuseridnumber'] = 'Update user ID number';
+$string['core:viewrecordoflearning'] = 'View a learners Record of Learning';
 $string['couldntreaddataforblockid'] = 'Could not read data for blockid={$a}';
 $string['couldntreaddataforcourseid'] = 'Could not ready data for courseid={$a}';
 $string['coursecategoryicon'] = 'Category icon';

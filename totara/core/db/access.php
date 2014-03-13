@@ -161,4 +161,14 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+    // View Record of Learning for other users.
+    'totara/core:viewrecordoflearning' => array(
+        'riskbitmask'   => RISK_PERSONAL,
+        'captype'       => 'read',
+        'contextlevel'  => CONTEXT_USER,
+        'archetypes' => array(
+            'staffmanager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'totara/plan:accessanyplan'
+    ),
 );

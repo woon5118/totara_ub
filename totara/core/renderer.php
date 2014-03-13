@@ -712,12 +712,12 @@ class totara_core_renderer extends plugin_renderer_base {
         global $USER, $CFG;
 
         $currentuser = ($userid == $USER->id);
-
+        $usercontext = context_user::instance($userid);
         // Display hierarchy information.
         profile_display_hierarchy_fields($userid);
-
+        $canviewROL = has_capability('totara/core:viewrecordoflearning', $usercontext);
         // Record of learning.
-        if ($currentuser || totara_is_manager($userid) || is_siteadmin()) {
+        if ($currentuser || totara_is_manager($userid) || $canviewROL) {
             $strrol = get_string('recordoflearning', 'totara_core');
             $urlrol = new moodle_url('/totara/plan/record/index.php', array('userid' => $userid));
             echo html_writer::tag('dt', $strrol);

@@ -127,6 +127,7 @@ class rb_plan_courses_embedded extends rb_base_embedded {
         // Users can only view their own and their staff's pages or if they are an admin.
         return ($reportfor == $subjectid ||
                 totara_is_manager($subjectid, $reportfor) ||
-                has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor));
+                has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor) ||
+                has_capability('totara/core:viewrecordoflearning', context_user::instance($reportfor), $reportfor));
     }
 }
