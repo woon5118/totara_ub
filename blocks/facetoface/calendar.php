@@ -225,8 +225,6 @@ else {
 echo $OUTPUT->container_end();
 echo $OUTPUT->box_end();
 
-print_tooltips($sessionsbydate);
-
 echo $OUTPUT->footer();
 
 function get_display_info($d, $m, $y) {
@@ -1059,49 +1057,3 @@ function print_waitlisted_content($waitlistedsessions) {
 
     print $html;
 }
-
-function print_tooltips($sessions) {
-    $jstooltip = "";
-
-    $currentday = 0;
-    $sessionlist = array();
-    foreach ($sessions as $session) {
-        $timestart = $session->timestart;
-        $day = strftime('%Y%m%d', $timestart);
-
-        if ($currentday < $day) {
-            if ($currentday > 0) {
-                $html = tooltip_contents($sessionlist);
-                $jstooltip .= " if (Y.one('#cell$currentday')) {
-                                    Y.one('#cell$currentday').setAttribute('tooltip', '$html').setAttribute('tooltip:alignment', 'bottom'); }\n";
-            }
-
-            $sessionlist = array();
-            $currentday = $day;
-        }
-        $sessionlist[] = format_string($session->name);
-    }
-
-    // Print last tooltip.
-    $html = tooltip_contents($sessionlist);
-    $jstooltip .= " if (Y.one('#cell$currentday')) {
-                        Y.one('#cell$currentday').setAttribute('tooltip', '$html').setAttribute('tooltip:alignment', 'bottom'); }\n";
-
-    $js = "Y.use('gallery-yui-tooltip', 'node', function(Y) { $jstooltip var t = new Y.Tooltip().render(); }); \n";
-    echo html_writer::script($js);
-}
-
-function tooltip_contents($sessionlist) {
-    global $OUTPUT;
-
-    $html = get_string('tooltipheading', 'block_facetoface');
-    $html .= html_writer::start_tag('ul');
-    foreach ($sessionlist as $session) {
-        $sessionname = str_replace('"', '\"', $session);
-        $html .= html_writer::tag('li', $sessionname);
-    }
-    $html .= html_writer::end_tag('ul');
-
-    return $OUTPUT->container($html, 'tooltip');
-}
-
