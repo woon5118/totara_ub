@@ -168,7 +168,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             rename($filepath, $storefilepath);
         } else if ($fileaccess == FILE_ACCESS_UPLOAD) {
             $fs = get_file_storage();
-            $systemcontext = get_context_instance(CONTEXT_SYSTEM);
+            $systemcontext = context_system::instance();
             $fieldid = get_config('totara_sync', 'sync_user_itemid');
 
             // Check the file exist

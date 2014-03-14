@@ -1082,7 +1082,7 @@
         <INDEX NAME="path" UNIQUE="false" FIELDS="path" HINTS="varchar_pattern_ops"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="context_temp" COMMENT="Used by build_context_path() in upgrade and cron to keep context depths and paths in sync.">
+    <TABLE NAME="context_temp" COMMENT="Used by context_helper::build_all_paths() in upgrade and cron to keep context depths and paths in sync.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This id isn't autonumeric/sequence. It's the context-&gt;id"/>
         <FIELD NAME="path" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>

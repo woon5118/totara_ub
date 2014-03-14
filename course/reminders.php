@@ -23,7 +23,7 @@ if ($courseid) { // editing course
         print_error('error:courseidincorrect', 'totara_core');
     }
     require_login($course->id);
-    $coursecontext = get_context_instance(CONTEXT_COURSE, $course->id);
+    $coursecontext = context_course::instance($course->id);
     require_capability('moodle/course:update', $coursecontext);
 }
 else {
@@ -33,7 +33,7 @@ else {
 
 $PAGE->set_url('/course/reminders.php');
 $PAGE->set_course($course);
-$PAGE->set_context(get_context_instance(CONTEXT_COURSE, $course->id));
+$PAGE->set_context(context_course::instance($course->id));
 $PAGE->set_pagelayout('admin');
 
 // Get all course reminders

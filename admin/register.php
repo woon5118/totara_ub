@@ -10,7 +10,7 @@
 
     $renderer = $PAGE->get_renderer('core', 'register');
 
-    require_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM));
+    require_capability('moodle/site:config', context_system::instance());
 
     if (!$site = get_site()) {
         redirect("index.php");

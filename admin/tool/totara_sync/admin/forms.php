@@ -240,8 +240,8 @@ class totara_sync_source_files_form extends moodleform {
             get_string('displayname:'.$source->get_name(), 'tool_totara_sync'), 'size="40"');
 
             if (get_config('totara_sync', 'fileaccess') == FILE_ACCESS_UPLOAD) {
-                $usercontext = get_context_instance(CONTEXT_USER, $USER->id);
-                $systemcontext = get_context_instance(CONTEXT_SYSTEM);
+                $usercontext = context_user::instance($USER->id);
+                $systemcontext = context_system::instance();
                 $fs = get_file_storage();
 
                 //check for existing draft area to prevent massive duplication
@@ -304,7 +304,7 @@ class totara_sync_source_files_form extends moodleform {
         }
         $draftid = $values[$elname];
         $fs = get_file_storage();
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $context = context_user::instance($USER->id);
         if (!$files = $fs->get_area_files($context->id, 'user', 'draft', $draftid, 'id DESC', false)) {
             return false;
         }

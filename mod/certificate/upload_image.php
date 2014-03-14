@@ -47,7 +47,7 @@ $PAGE->navbar->add($struploadimage);
 $supportedtypes = array('.jpe', '.jpeIE', '.jpeg', '.jpegIE', '.jpg', '.jpgIE', '.png', '.pngIE');
 
 $filetypes = array('border', 'watermark', 'seal', 'signature');
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = context_system::instance();
 $options = array('subdirs' => 0,
                  'maxbytes' => $CFG->maxbytes,
                  'maxfiles' => -1,

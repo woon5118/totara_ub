@@ -1382,7 +1382,7 @@ abstract class enrol_plugin {
         if ($instance->enrol !== $name) {
             throw new coding_exception('invalid enrol instance!');
         }
-        $context = get_context_instance(CONTEXT_COURSE, $instance->courseid, MUST_EXIST);
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
 
         // Remove duplicates
         list($sqlin, $sqlinparams) = $DB->get_in_or_equal(array_map(function($item) { return $item->userid; },
@@ -1612,7 +1612,7 @@ abstract class enrol_plugin {
         if (empty($userids)) {
             return;
         }
-        $context = get_context_instance(CONTEXT_COURSE, $instance->courseid, MUST_EXIST);
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
 
         list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
         $sql = "SELECT *

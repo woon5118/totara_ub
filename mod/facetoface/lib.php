@@ -4323,7 +4323,7 @@ function facetoface_eventhandler_role_unassigned($ra) {
 
     $now = time();
 
-    $ctx = get_context_instance_by_id($ra->contextid);
+    $ctx = context::instance_by_id($ra->contextid);
     if ($ctx->contextlevel == CONTEXT_COURSE) {
         // get all face-to-face activites in the course
         $activities = $DB->get_records('facetoface', array('course' => $ctx->instanceid));

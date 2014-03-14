@@ -4328,7 +4328,7 @@ function undelete_user($user) {
     $updateuser->timemodified = time();
 
     // Call get_context_insance to create context if it doesn't exist.
-    get_context_instance(CONTEXT_USER, $user->id);
+    context_user::instance($user->id);
 
     if ($DB->update_record('user', $updateuser)) {
         events_trigger('user_undeleted', $user);

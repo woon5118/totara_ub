@@ -638,7 +638,7 @@ function prog_move_programs($programids, $categoryid) {
 
                     $context   = context_program::instance($program->id);
                     $newparent = context_coursecat::instance($program->category);
-                    context_moved($context, $newparent);
+                    context::update_moved($context, $newparent);
                 }
             }
             prog_fix_program_sortorder();
@@ -1758,7 +1758,7 @@ class program_in_list implements IteratorAggregate {
      *     context preloading
      */
     public function __construct(stdClass $record) {
-        context_instance_preload($record);
+        context_helper::preload_from_record($record);
         $this->record = new stdClass();
         foreach ($record as $key => $value) {
             $this->record->$key = $value;

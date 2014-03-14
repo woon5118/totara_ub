@@ -68,7 +68,7 @@ if ($data = $form->get_data()) {
             }
 
             //delete the draftfile - at this point it should be safe to assume $USER is the uploader
-            $draft_context = get_context_instance(CONTEXT_USER, $USER->id);
+            $draft_context = context_user::instance($USER->id);
             $fs->delete_area_files($draft_context->id, 'user', 'draft', $draftid);
         }
    }

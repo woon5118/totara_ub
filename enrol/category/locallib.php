@@ -148,7 +148,7 @@ class enrol_category_handler {
 
         foreach ($rs as $instance) {
             $coursecontext = context_course::instance($instance->courseid);
-            $contextids = get_parent_contexts($coursecontext);
+            $contextids = $coursecontext->get_parent_context_ids();
             array_pop($contextids); // Remove system context, we are interested in categories only.
 
             list($contextids, $contextparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'c');

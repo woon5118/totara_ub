@@ -48,7 +48,7 @@ class theme_kiwifruit_core_renderer extends theme_standardtotara_core_renderer {
         $loginapge = ((string)$PAGE->url === get_login_url());
         $course = $PAGE->course;
 
-        if (session_is_loggedinas()) {
+        if (\core\session\manager::is_loggedinas()) {
             $realuser = session_get_realuser();
             $fullname = fullname($realuser, true);
             $realuserinfo = " [<a href=\"$CFG->wwwroot/course/loginas.php?id=$course->id&amp;sesskey=".sesskey()."\">$fullname</a>] ";
@@ -62,7 +62,7 @@ class theme_kiwifruit_core_renderer extends theme_standardtotara_core_renderer {
             // $course->id is not defined during installation
             return '';
         } else if (isloggedin()) {
-            $context = get_context_instance(CONTEXT_COURSE, $course->id);
+            $context = context_course::instance($course->id);
 
             $fullname = fullname($USER, true);
 
@@ -107,7 +107,7 @@ class theme_kiwifruit_core_renderer extends theme_standardtotara_core_renderer {
                         } else {
                             $loggedinas .= get_string('failedloginattemptsall', '', $count);
                         }
-                        if (file_exists("$CFG->dirroot/report/log/index.php") and has_capability('report/log:view', get_context_instance(CONTEXT_SYSTEM))) {
+                        if (file_exists("$CFG->dirroot/report/log/index.php") and has_capability('report/log:view', context_system::instance())) {
                             $loggedinas .= ' <a href="'.$CFG->wwwroot.'/report/log/index.php'.
                                                  '?chooselog=1&amp;id=1&amp;modid=site_errors">'.get_string('logs').'</a>';
                         }

@@ -1086,7 +1086,7 @@ function certificate_get_images($type) {
 
 function certificate_retrieve_uploads($imagetype) {
     $fs = get_file_storage();
-    $context = get_context_instance(CONTEXT_SYSTEM);
+    $context = context_system::instance();
     $files = $fs->get_area_files($context->id, 'mod_certificate', $imagetype);
     $uploads = array();
 
@@ -1589,7 +1589,7 @@ function certificate_print_image($pdf, $certificate, $type, $x, $y, $w, $h) {
 }
 
 function upload_exists($filearea, $filename) {
-    $context = get_context_instance(CONTEXT_SYSTEM);
+    $context = context_system::instance();
     $fs = get_file_storage();
     $files = $fs->get_area_files($context->id, 'mod_certificate', $filearea, 3);
     foreach ($files as $file) {
