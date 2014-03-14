@@ -55,7 +55,7 @@ class theme_standardtotararesponsive_core_renderer extends core_renderer {
         $loginpage = ((string)$this->page->url === get_login_url());
         $course = $this->page->course;
 
-        if (session_is_loggedinas()) {
+        if (\core\session\manager::is_loggedinas()) {
             $realuser = session_get_realuser();
             $fullname = fullname($realuser, true);
             if ($withlinks) {
@@ -74,7 +74,7 @@ class theme_standardtotararesponsive_core_renderer extends core_renderer {
             // Note $course->id is not defined during installation.
             return '';
         } else if (isloggedin()) {
-            $context = get_context_instance(CONTEXT_COURSE, $course->id);
+            $context = CONTEXT_COURSE::instance($course->id);
 
             $fullname = fullname($USER, true);
             // Since Moodle 2.0 this link always goes to the public profile page (not the course profile page).
@@ -133,7 +133,7 @@ class theme_standardtotararesponsive_core_renderer extends core_renderer {
                             $loggedinas .= get_string('failedloginattemptsall', '', $count);
                         }
                         if (file_exists("$CFG->dirroot/report/log/index.php") and
-                            has_capability('report/log:view', get_context_instance(CONTEXT_SYSTEM))) {
+                            has_capability('report/log:view', CONTEXT_SYSTEM::instance())) {
                             $loggedinas .= ' (<a href="'.$CFG->wwwroot.'/report/log/index.php'.
                                                  '?chooselog=1&amp;id=1&amp;modid=site_errors">'.get_string('logs').'</a>)';
                         }
