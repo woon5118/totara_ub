@@ -286,14 +286,14 @@ class rb_source_cohort extends rb_base_source {
 
     protected function define_paramoptions() {
         $paramoptions = array(
-                        new rb_param_option(
-                                'cohortid', // Parameter name.
-                                'base.id'  // Field.
-                        ),
-                        new rb_param_option(
-                                'contextid', // Parameter name.
-                                '' // No field because we don't want to filter by this param.
-                        )
+            new rb_param_option(
+                'cohortid', // Parameter name.
+                'base.id'  // Field.
+            ),
+            new rb_param_option(
+                'contextid', // Parameter name.
+                'base.contextid'  // Field.
+            ),
         );
         return $paramoptions;
     }

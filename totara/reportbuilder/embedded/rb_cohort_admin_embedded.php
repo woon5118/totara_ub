@@ -29,6 +29,8 @@ class rb_cohort_admin_embedded extends rb_base_embedded {
     public $hidden, $accessmode, $accesssettings, $shortname;
 
     public function __construct($data) {
+        $contextid = array_key_exists('contextid', $data) ? $data['contextid'] : null;
+
         $this->url = '/cohort/index.php';
         $this->source = 'cohort';
         $this->shortname = 'cohort_admin';
@@ -95,8 +97,13 @@ class rb_cohort_admin_embedded extends rb_base_embedded {
             ),
         );
 
-        // no restrictions
+        // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
+
+        // Set the context.
+        if (isset($contextid)) {
+            $this->embeddedparams['contextid'] = $contextid;
+        }
 
         parent::__construct();
     }

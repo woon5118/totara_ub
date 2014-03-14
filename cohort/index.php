@@ -57,14 +57,16 @@ $PAGE->set_context($context);
 if ($category) {
     $PAGE->set_pagelayout('report');
     $PAGE->set_context($context);
-    $PAGE->set_url('/cohort/index.php', array('contextid'=>$context->id));
+    $PAGE->set_url('/cohort/index.php', array('contextid' => $context->id));
     $PAGE->set_title($strcohorts);
     $PAGE->set_heading($COURSE->fullname);
 } else {
     admin_externalpage_setup('cohorts', '', null, '', array('pagelayout'=>'report'));
 }
 
-$report = reportbuilder_get_embedded_report('cohort_admin', null, false, $sid);
+$data = array('contextid' => $context->id);
+
+$report = reportbuilder_get_embedded_report('cohort_admin', $data, false, $sid);
 if (!empty($format)) {
     $report->export_data($format);
     die;
