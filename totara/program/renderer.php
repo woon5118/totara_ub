@@ -504,6 +504,19 @@ class totara_program_renderer extends plugin_renderer_base {
         // Category name.
         $categoryname = $coursecat->get_formatted_name();
         $categorycount = totara_get_category_item_count($coursecat->id, $type);
+        // Don't show category if there is nothing to show and the user is not a site admin
+        // or a user with capabilities to add course to this category.
+        $categorycontext = context_coursecat::instance($coursecat->id);
+        if ($type == 'program') {
+            $createcapability = 'totara/program:createprogram';
+        } else {
+            $createcapability = 'totara/certification:createcertification';
+        }
+        $capabilities = array('moodle/category:viewhiddencategories', 'moodle/category:manage', $createcapability);
+        $nohascapabilities = !is_siteadmin() && !has_any_capability($capabilities, $categorycontext);
+        if (!empty($CFG->audiencevisibility) && $categorycount == 0 && $nohascapabilities) {
+            return '';
+        }
         $categoryname = html_writer::link(new moodle_url('/totara/program/index.php',
                         array('categoryid' => $coursecat->id, 'viewtype' => $type)),
                         $categoryname);

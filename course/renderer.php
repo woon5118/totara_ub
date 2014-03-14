@@ -1618,9 +1618,17 @@ class core_course_renderer extends plugin_renderer_base {
             'data-type' => self::COURSECAT_TYPE_CATEGORY,
         ));
 
-        // category name
+        // Category name.
         $categoryname = $coursecat->get_formatted_name();
         $categorycount = totara_get_category_item_count($coursecat->id, 'course');
+        // Don't show category if there is nothing to show and the user is not a site admin
+        // or a user with capabilities to add course to this category.
+        $categorycontext = context_coursecat::instance($coursecat->id);
+        $capabilities = array('moodle/course:create', 'moodle/category:viewhiddencategories', 'moodle/category:manage');
+        $nohascapabilities = !is_siteadmin() && !has_any_capability($capabilities, $categorycontext);
+        if (!empty($CFG->audiencevisibility) && $categorycount == 0 && $nohascapabilities) {
+            return '';
+        }
         $categoryname = html_writer::link(new moodle_url('/course/index.php',
                 array('categoryid' => $coursecat->id)),
                 $categoryname);
