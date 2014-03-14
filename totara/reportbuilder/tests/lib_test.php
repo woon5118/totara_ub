@@ -30,6 +30,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 
 class reportbuilderlib_test extends advanced_testcase {
@@ -797,7 +798,7 @@ class reportbuilderlib_test extends advanced_testcase {
         $todb->value = 1;
         $DB->insert_record('report_builder_settings', $todb);
         $todb->name = 'who';
-        $todb->value = 'own';
+        $todb->value = rb_user_content::USER_OWN;
         $DB->insert_record('report_builder_settings', $todb);
         $rb = new reportbuilder(1);
         $restrictions = $rb->get_content_restrictions();
@@ -842,7 +843,7 @@ class reportbuilderlib_test extends advanced_testcase {
         $todb->value = 1;
         $DB->insert_record('report_builder_settings', $todb);
         $todb->name = 'who';
-        $todb->value = 'own';
+        $todb->value = rb_user_content::USER_OWN;
         $DB->insert_record('report_builder_settings', $todb);
         $rb = new reportbuilder(1);
         // should return the appropriate text description if content mode = 1

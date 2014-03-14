@@ -38,17 +38,17 @@ abstract class rb_base_content {
      *                           Typically this will be $USER->id, except
      *                           in the case of scheduled reports run by cron
      */
-    function __construct($reportfor=null) {
+    public function __construct($reportfor=null) {
         $this->reportfor = $reportfor;
     }
 
     /*
      * All sub classes must define the following functions
      */
-    abstract function sql_restriction($field, $reportid);
-    abstract function text_restriction($title, $reportid);
-    abstract function form_template(&$mform, $reportid, $title);
-    abstract function form_process($reportid, $fromform);
+    abstract public function sql_restriction($fields, $reportid);
+    abstract public function text_restriction($title, $reportid);
+    abstract public function form_template(&$mform, $reportid, $title);
+    abstract public function form_process($reportid, $fromform);
 
 }
 
@@ -70,7 +70,7 @@ class rb_current_pos_content extends rb_base_content {
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($field, $reportid) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
@@ -123,7 +123,7 @@ class rb_current_pos_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
         global $DB;
 
         $userid = $this->reportfor;
@@ -157,7 +157,7 @@ class rb_current_pos_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -196,7 +196,7 @@ class rb_current_pos_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -235,7 +235,7 @@ class rb_current_org_content extends rb_base_content {
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($field, $reportid) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
@@ -288,7 +288,7 @@ class rb_current_org_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
         global $DB;
 
         $userid = $this->reportfor;
@@ -323,7 +323,7 @@ class rb_current_org_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -363,7 +363,7 @@ class rb_current_org_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -399,7 +399,7 @@ class rb_completed_org_content extends rb_base_content {
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($field, $reportid) {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
@@ -452,7 +452,7 @@ class rb_completed_org_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
         global $DB;
 
         $userid = $this->reportfor;
@@ -490,7 +490,7 @@ class rb_completed_org_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -530,7 +530,7 @@ class rb_completed_org_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -554,55 +554,113 @@ class rb_completed_org_content extends rb_base_content {
 
 /*
  * Restrict content by a particular user or group of users
- *
- * Pass in an integer that represents a user's moodle id
  */
 class rb_user_content extends rb_base_content {
+
+    const USER_OWN = 1;
+    const USER_DIRECT_REPORTS = 2;
+    const USER_INDIRECT_REPORTS = 4;
+
     /**
      * Generate the SQL to apply this content restriction
      *
-     * @param string $field SQL field to apply the restriction against
+     * @param array $fields SQL fields to apply the restriction against
+     *
+     *              Pass in the following data via $fields:
+     *              'userid' = A moodle userid
+     *              'managerid' = The userid of a person's manager
+     *              'managerpath' = The managerpath field from the pos_assignment table
+     *              'postype' = The integer position type from the pos_assignment table
      * @param integer $reportid ID of the report
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($fields, $reportid) {
         global $DB;
 
         $userid = $this->reportfor;
+        $managerpath = $DB->get_field('pos_assignment', 'managerpath',
+            array('userid' => $userid, 'type' => POSITION_TYPE_PRIMARY)
+        );
+        if (!$managerpath) {
+            $managerpath = "/{$userid}";
+        }
+
+        $useridfield = $fields['userid'];
+        $manageridfield = $fields['managerid'];
+        $managerpathfield = $fields['managerpath'];
+        $postypefield = $fields['postype'];
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
-
         $who = isset($settings['who']) ? $settings['who'] : null;
-        $uniqueparam = rb_unique_param('cur');
-        if ($who == 'own') {
-            // show own records
-            return array("{$field} = :{$uniqueparam}", array($uniqueparam => $userid));
-        } else if ($who == 'reports') {
-            // show staff records
-            if ($staff = totara_get_staff($userid)) {
-                list($isql, $iparams) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED, $uniqueparam.'_');
-                return array("{$field} {$isql}", $iparams);
+
+        // Generate SQL for matching a user's own records.
+        $uniqueparam = rb_unique_param('curown');
+        $ownsql = "{$useridfield} = :{$uniqueparam}";
+        $ownparams = array($uniqueparam => $userid);
+
+        // Generate SQL for matching direct reports.
+        $uniqueparam = rb_unique_param('curdir');
+        $uniqueparam2 = rb_unique_param('curdir');
+        $directsql = "({$manageridfield} = :{$uniqueparam} AND {$postypefield} = :{$uniqueparam2})";
+        $directparams = array(
+            $uniqueparam => $userid,
+            $uniqueparam2 => POSITION_TYPE_PRIMARY
+        );
+
+        // Generate SQL for matching all reports (direct and indirect).
+        $uniqueparam3 = rb_unique_param('curall');
+        $uniqueparam4 = rb_unique_param('curall');
+        $sqllike = $DB->sql_like($managerpathfield, ":{$uniqueparam3}");
+        $allreportssql = "({$sqllike} AND {$postypefield} = :{$uniqueparam4})";
+        $allreportsparams = array(
+            $uniqueparam3 => $DB->sql_like_escape($managerpath) . '/%',
+            $uniqueparam4 => POSITION_TYPE_PRIMARY
+        );
+
+        $sql = '';
+        $params = array();
+
+        if (($who & self::USER_INDIRECT_REPORTS) == self::USER_INDIRECT_REPORTS) {
+            if (($who & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
+                // Both direct and indirect reports wanted, we can use the
+                // SQL for all reports from above.
+                $sql = $allreportssql;
+                $params = $allreportsparams;
             } else {
-                // using 1=0 instead of FALSE for MSSQL support
-                return array('1=0', array());
-            }
-        } else if ($who == 'ownandreports') {
-            // show own and staff records
-            if ($staff = totara_get_staff($userid)) {
-                $staff[] = $userid;
-                list($isql, $iparams) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED, $uniqueparam.'_');
-                return array("{$field} {$isql}", $iparams);
-            } else {
-                return array("{$field} = :{$uniqueparam}", array($uniqueparam => $userid));
+                // Only indirect reports wanted. We must remove the direct reports.
+                $sql = "( {$allreportssql} AND NOT {$directsql} )";
+                $params = array_merge($allreportsparams, $directparams);
             }
         } else {
-            // anything unexpected
-            // using 1=0 instead of FALSE for MSSQL support
+            if (($who & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
+                // Just the direct reports.
+                $sql = $directsql;
+                $params = $directparams;
+            }
+        }
+
+        // Add in the user's own records if necessary.
+        if (($who & self::USER_OWN) == self::USER_OWN) {
+            if (empty($sql)) {
+                $sql = $ownsql;
+                $params = $ownparams;
+            } else {
+                $sql = "( {$sql} OR {$ownsql} )";
+                $params = array_merge($params, $ownparams);
+            }
+        }
+
+        // If $sql is still empty then no options are selected.
+        if (empty($sql)) {
+            // Using 1=0 instead of FALSE for MSSQL support.
             return array('1=0', array());
         }
+
+        return array($sql, $params);
+
     }
 
     /**
@@ -613,29 +671,40 @@ class rb_user_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
         global $DB;
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
         $settings = reportbuilder::get_all_settings($reportid, $type);
+        $who = isset($settings['who']) ? $settings['who'] : 0;
         $userid = $this->reportfor;
 
         $user = $DB->get_record('user', array('id' => $userid));
-        switch ($settings['who']) {
-        case 'own':
-            return $title . ' ' . get_string('is', 'totara_reportbuilder') . ' "' .
+
+        $strings = array();
+
+        if (($who & self::USER_OWN) == self::USER_OWN) {
+            $strings[] = $title . ' ' . get_string('is', 'totara_reportbuilder') . ' "' .
                 fullname($user) . '"';
-        case 'reports':
-            return $title . ' ' . get_string('reportsto', 'totara_reportbuilder') . ' "' .
+        }
+
+        if (($who & self::USER_DIRECT_REPORTS) == self::USER_DIRECT_REPORTS) {
+            $strings[] = $title . ' ' . get_string('reportsdirectlyto', 'totara_reportbuilder') . ' "' .
                 fullname($user) . '"';
-        case 'ownandreports':
-            return $title . ' ' . get_string('is', 'totara_reportbuilder') . ' "' .
-                fullname($user) . '"' . get_string('or', 'totara_reportbuilder') .
-                get_string('reportsto', 'totara_reportbuilder') . ' "' . fullname($user) . '"';
-        default:
+        }
+
+        if (($who & self::USER_INDIRECT_REPORTS) == self::USER_INDIRECT_REPORTS) {
+            $strings[] = $title . ' ' . get_string('reportsindirectlyto', 'totara_reportbuilder') . ' "' .
+                fullname($user) . '"';
+        }
+
+        if (empty($strings)) {
             return $title . ' ' . get_string('isnotfound', 'totara_reportbuilder');
         }
+
+        return implode(get_string('or', 'totara_reportbuilder'), $strings);
+
     }
 
 
@@ -646,7 +715,7 @@ class rb_user_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
 
         // get current settings
         // remove rb_ from start of classname
@@ -661,16 +730,26 @@ class rb_user_content extends rb_base_content {
             get_string('showbasedonx', 'totara_reportbuilder', lcfirst($title)));
         $mform->disabledIf('user_enable', 'contentenabled', 'eq', 0);
         $mform->setDefault('user_enable', $enable);
-        $radiogroup = array();
-        $radiogroup[] =& $mform->createElement('radio', 'user_who', '',
-            get_string('userownrecords', 'totara_reportbuilder'), 'own');
-        $radiogroup[] =& $mform->createElement('radio', 'user_who', '',
-            get_string('userstaffrecords', 'totara_reportbuilder'), 'reports');
-        $radiogroup[] =& $mform->createElement('radio', 'user_who', '',
-            get_string('both', 'totara_reportbuilder'), 'ownandreports');
-        $mform->addGroup($radiogroup, 'user_who_group',
+        $checkgroup = array();
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_OWN.']', '',
+            get_string('userownrecords', 'totara_reportbuilder'), null, array(0, 1));
+        $mform->setType('user_who['.self::USER_OWN.']', PARAM_INT);
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_DIRECT_REPORTS.']', '',
+            get_string('userdirectreports', 'totara_reportbuilder'), null, array(0, 1));
+        $mform->setType('user_who['.self::USER_DIRECT_REPORTS.']', PARAM_INT);
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_INDIRECT_REPORTS.']', '',
+            get_string('userindirectreports', 'totara_reportbuilder'), null, array(0, 1));
+        $mform->setType('user_who['.self::USER_INDIRECT_REPORTS.']', PARAM_INT);
+
+        $mform->addGroup($checkgroup, 'user_who_group',
             get_string('includeuserrecords', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
-        $mform->setDefault('user_who', $who);
+        $usergroups = array(self::USER_OWN, self::USER_DIRECT_REPORTS, self::USER_INDIRECT_REPORTS);
+        foreach ($usergroups as $usergroup) {
+            // Bitwise comparison.
+            if (($who & $usergroup) == $usergroup) {
+                $mform->setDefault('user_who['.$usergroup.']', 1);
+            }
+        }
         $mform->disabledIf('user_who_group', 'contentenabled', 'eq', 0);
         $mform->disabledIf('user_who_group', 'user_enable', 'notchecked');
         $mform->addHelpButton('user_header', 'reportbuilderuser', 'totara_reportbuilder');
@@ -685,7 +764,7 @@ class rb_user_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -696,11 +775,19 @@ class rb_user_content extends rb_base_content {
         $status = $status && reportbuilder::update_setting($reportid, $type,
             'enable', $enable);
 
-        // who radio option
+        // Who checkbox option.
+        // Enabled options are stored as user_who[key] = 1 when enabled.
+        // Key is a bitwise value to be summed and stored.
+        $whovalue = 0;
         $who = isset($fromform->user_who) ?
-            $fromform->user_who : 0;
+            $fromform->user_who : array();
+        foreach ($who as $key => $option) {
+            if ($option) {
+                $whovalue += $key;
+            }
+        }
         $status = $status && reportbuilder::update_setting($reportid, $type,
-            'who', $who);
+            'who', $whovalue);
 
         return $status;
     }
@@ -721,7 +808,7 @@ class rb_date_content extends rb_base_content {
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($field, $reportid) {
         global $DB;
         $now = time();
         $financialyear = get_config('reportbuilder', 'financialyear');
@@ -794,7 +881,7 @@ class rb_date_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
 
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -841,7 +928,7 @@ class rb_date_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
         // get current settings
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -893,7 +980,7 @@ class rb_date_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         $status = true;
         // remove rb_ from start of classname
         $type = substr(get_class($this), 3);
@@ -935,7 +1022,7 @@ class rb_tag_content extends rb_base_content {
      *
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
-    function sql_restriction($field, $reportid) {
+    public function sql_restriction($field, $reportid) {
         global $DB;
 
         // remove rb_ from start of classname
@@ -1038,7 +1125,7 @@ class rb_tag_content extends rb_base_content {
      *
      * @return string Human readable description of the restriction
      */
-    function text_restriction($title, $reportid) {
+    public function text_restriction($title, $reportid) {
         global $DB;
 
         // remove rb_ from start of classname
@@ -1100,7 +1187,7 @@ class rb_tag_content extends rb_base_content {
      * @param integer $reportid ID of the report being adjusted
      * @param string $title Name of the field the restriction is acting on
      */
-    function form_template(&$mform, $reportid, $title) {
+    public function form_template(&$mform, $reportid, $title) {
         global $DB;
 
         // remove rb_ from start of classname
@@ -1185,7 +1272,7 @@ class rb_tag_content extends rb_base_content {
      *
      * @return boolean True if form was successfully processed
      */
-    function form_process($reportid, $fromform) {
+    public function form_process($reportid, $fromform) {
         global $DB;
 
         $status = true;

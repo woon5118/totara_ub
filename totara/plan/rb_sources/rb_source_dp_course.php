@@ -554,7 +554,17 @@ from
         );
 
         // Include the rb_user_content content options for this report
-        $contentoptions[] = new rb_content_option('user', get_string('users'), 'base.userid', 'base');
+        $contentoptions[] = new rb_content_option(
+            'user',
+            get_string('users'),
+            array(
+                'userid' => 'base.userid',
+                'managerid' => 'position_assignment.managerid',
+                'managerpath' => 'position_assignment.managerpath',
+                'postype' => 'position_assignment.type',
+            ),
+            'position_assignment'
+        );
         return $contentoptions;
     }
 

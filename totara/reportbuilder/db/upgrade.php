@@ -363,5 +363,34 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014030500, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014031400) {
+
+        require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
+        $changes = array(
+            'own' => rb_user_content::USER_OWN,
+            'reports' => rb_user_content::USER_DIRECT_REPORTS,
+            'ownandreports' => (rb_user_content::USER_OWN | rb_user_content::USER_DIRECT_REPORTS)
+        );
+        // Update both 'value' and 'cachedvalue'.
+        $sql = "UPDATE {report_builder_settings}
+            SET value = :newval
+            WHERE type = :type AND name = :name AND value = :oldval";
+        $sql2 = "UPDATE {report_builder_settings}
+            SET cachedvalue = :newval
+            WHERE type = :type AND name = :name AND cachedvalue = :oldval";
+        $params = array('type' => 'user_content', 'name' => 'who');
+
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($changes as $oldval => $newval) {
+            $params['oldval'] = $oldval;
+            $params['newval'] = $newval;
+            $DB->execute($sql, $params);
+            $DB->execute($sql2, $params);
+        }
+        $transaction->allow_commit();
+
+        // Report builder savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014031400, 'totara_reportbuilder');
+    }
     return true;
 }

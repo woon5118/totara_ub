@@ -607,9 +607,11 @@ When **Show records by user** is selected the report will show different records
 
 **Include records from a particular user** controls what records a user viewing the report can see:
 
-*   When set to **A user\'s own records** the user can see their own records only.
-*   When set to **Records for user\'s direct reports** the user can see the records belonging to any user who reports to them (A user is assigned a manager in their user profile on the \'Positions tab\').
-*   When set to **Both** the user can view both their own records and those of their direct reports.';
+*   When **A user\'s own records** is checked the user can see their own records.
+*   When **Records for user\'s direct reports** is checked the user can see the records belonging to any user who reports to them (A user is assigned a manager in their user profile on the \'Positions tab\').
+*   When **Records for user\'s indirect reports** is checked the user can see the records belonging to any user who reports any user below them in the management hierarchy, excluding their direct reports.
+
+If multiple options are selected the user sees records that match any of the selected options.';
 $string['reportcachingdisabled'] = 'Report caching is disabled. You can enable it <a href="{$a}">here</a>';
 $string['reportcolumns'] = 'Report Columns';
 $string['reportconfirmdelete'] = 'Are you sure you want to delete this report?';
@@ -620,10 +622,11 @@ $string['reportmustbedefined'] = 'Report must be defined';
 $string['reportname'] = 'Report Name';
 $string['reportperformance'] = 'Performance settings';
 $string['reports'] = 'Reports';
+$string['reportsdirectlyto'] = 'reports directly to';
+$string['reportsindirectlyto'] = 'reports indirectly to';
 $string['reportsettings'] = 'Report Settings';
 $string['reportshortname'] = 'Short Name';
 $string['reportshortnamemustbedefined'] = 'Report shortname must be defined';
-$string['reportsto'] = 'reports to';
 $string['reporttitle'] = 'Report Title';
 $string['reporttype'] = 'Report type';
 $string['reportupdated'] = 'Report Updated';
@@ -795,6 +798,7 @@ $string['usercity'] = 'User\'s City';
 $string['usercohortids'] = 'User audience IDs';
 $string['usercountry'] = 'User\'s Country';
 $string['userdepartment'] = 'User\'s Department';
+$string['userdirectreports'] = 'Records for user\'s direct reports';
 $string['useremail'] = 'User\'s Email';
 $string['useremailprivate'] = 'Email is private';
 $string['useremailunobscured'] = 'User\'s Email (ignoring user display setting)';
@@ -807,6 +811,7 @@ $string['usergeneratedreports'] = 'User generated Reports';
 $string['userid'] = 'User ID';
 $string['useridnumber'] = 'User ID Number';
 $string['userincohort'] = 'User is a member of audience';
+$string['userindirectreports'] = 'Records for user\'s indirect reports';
 $string['userinstitution'] = 'User\'s Institution';
 $string['userlang'] = 'User\'s Preferred Language';
 $string['userlastlogin'] = 'User Last Login';
@@ -831,7 +836,6 @@ $string['userspos'] = 'User\'s Position';
 $string['usersposid'] = 'User\'s Position ID';
 $string['usersposidnumber'] = 'User\'s Position ID Number';
 $string['userspospathids'] = 'User\'s Position Path IDs';
-$string['userstaffrecords'] = 'Records for user\'s direct reports';
 $string['userstatus'] = 'User Status';
 $string['usertimecreated'] = 'User Creation Time';
 $string['usertimemodified'] = 'User Last Modified';

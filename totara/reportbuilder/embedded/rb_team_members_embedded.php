@@ -22,6 +22,9 @@
  * @subpackage reportbuilder
  */
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
+
 class rb_team_members_embedded extends rb_base_embedded {
 
     public $url, $source, $fullname, $filters, $columns;
@@ -76,7 +79,7 @@ class rb_team_members_embedded extends rb_base_embedded {
         $this->contentsettings = array(
             'user' => array(
                 'enable' => 1,
-                'who' => 'reports'
+                'who' => rb_user_content::USER_DIRECT_REPORTS
             )
         );
 

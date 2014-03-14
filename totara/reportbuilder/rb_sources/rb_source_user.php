@@ -306,7 +306,13 @@ class rb_source_user extends rb_base_source {
             new rb_content_option(
                 'user',
                 get_string('user', 'rb_source_user'),
-                'base.id'
+                array(
+                    'userid' => 'base.id',
+                    'managerid' => 'position_assignment.managerid',
+                    'managerpath' => 'position_assignment.managerpath',
+                    'postype' => 'position_assignment.type',
+                ),
+                'position_assignment'
             ),
             new rb_content_option(
                 'current_pos',

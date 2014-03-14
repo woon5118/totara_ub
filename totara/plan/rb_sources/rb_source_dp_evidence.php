@@ -330,7 +330,17 @@ class rb_source_dp_evidence extends rb_base_source {
         );
 
         // Include the rb_user_content content options for this report
-        $contentoptions[] = new rb_content_option('user', get_string('users'), 'dp.userid', 'dp');
+        $contentoptions[] = new rb_content_option(
+            'user',
+            get_string('users'),
+            array(
+                'userid' => 'dp.userid',
+                'managerid' => 'position_assignment.managerid',
+                'managerpath' => 'position_assignment.managerpath',
+                'postype' => 'position_assignment.type',
+            ),
+            array('dp', 'position_assignment')
+        );
         return $contentoptions;
     }
 

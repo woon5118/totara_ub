@@ -60,26 +60,22 @@ class rb_content_option {
     public $title;
 
     /**
-     * The database field to apply the restriction against
+     * The database fields to apply the restriction against
+     *
+     * A string or array of strings each containing an SQL snippet.
+     * If an array is passed the array key is used internally to
+     * identify the field. In queries the key is prefixed with
+     * 'rb_content_option_' to prevent collisions with other aliases.
+     * The alias is also used for the column name when caching a report.
      *
      * @access public
-     * @var string
+     * @var array|string
      */
-    public $field;
-
-    /**
-     * The alias for database field used in cache and query
-     *
-     * It must not contain separators (like .) and be unique for different fields or
-     * same fields in different tables
-     *
-     * @var string
-     */
-    public $fieldalias;
+    public $fields;
 
     /**
      * The names of any {@link rb_join::$name} required to get access
-     * to the {@link rb_content_option::$field}. This can be a string
+     * to the {@link rb_content_option::$fields}. This can be a string
      * or an array of strings if multiple joins are required.
      *
      * Their is no need to include join dependencies, these will
@@ -95,17 +91,21 @@ class rb_content_option {
      *
      * @param string $classname Name of the content restriction class
      * @param string $title Human readable description of the field
-     * @param string $field Database field to apply the restriction to
+     * @param array $fields Database fields to apply the restriction to
      * @param mixed $joins {@link rb_join::$name} required to access
      *             {@link rb_content_option::$field}
      */
-    function __construct($classname, $title, $field, $joins=null) {
+    function __construct($classname, $title, $fields, $joins=null) {
 
         $this->classname = $classname;
         $this->title = $title;
-        $this->field = $field;
+        // If only one field provided, convert to an array.
+        // This provides backward compatibility in the case of a single field.
+        if (!is_array($fields)) {
+            $fields = array('field' => $fields);
+        }
+        $this->fields = $fields;
         $this->joins = $joins;
-        $this->fieldalias = get_class($this).'_'.str_replace('.', '_', $field);
     }
 
 } // end of rb_content_option class

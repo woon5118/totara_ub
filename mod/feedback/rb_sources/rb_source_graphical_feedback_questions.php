@@ -450,7 +450,13 @@ class rb_source_graphical_feedback_questions extends rb_base_source {
             new rb_content_option(
                 'user',
                 get_string('theuser', 'rb_source_graphical_feedback_questions'),
-                'base.userid'
+                array(
+                    'userid' => 'base.userid',
+                    'managerid' => 'position_assignment.managerid',
+                    'managerpath' => 'position_assignment.managerpath',
+                    'postype' => 'position_assignment.type',
+                ),
+                'position_assignment'
             ),
             new rb_content_option(
                 'current_pos',

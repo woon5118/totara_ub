@@ -3,13 +3,12 @@
  * This file is part of Totara LMS
  *
  * Copyright (C) 2010 onwards Totara Learning Solutions LTD
- * Copyright (C) 1999 onwards Martin Dougiamas 
- * 
- * This program is free software; you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
- * the Free Software Foundation; either version 3 of the License, or     
- * (at your option) any later version.                                   
- *                                                                       
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +19,7 @@
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
- * @subpackage reportbuilder 
+ * @subpackage reportbuilder
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -415,7 +414,17 @@ class rb_source_dp_objective extends rb_base_source {
         );
 
         // Include the rb_user_content content options for this report
-        $contentoptions[] = new rb_content_option('user', get_string('users'), 'dp.userid', 'dp');
+        $contentoptions[] = new rb_content_option(
+            'user',
+            get_string('users'),
+            array(
+                'userid' => 'dp.userid',
+                'managerid' => 'position_assignment.managerid',
+                'managerpath' => 'position_assignment.managerpath',
+                'postype' => 'position_assignment.type',
+            ),
+            array('dp', 'position_assignment')
+        );
         return $contentoptions;
     }
 

@@ -299,8 +299,13 @@ class rb_source_facetoface_summary extends rb_base_source {
             new rb_content_option(
                 'user',
                 get_string('user', 'rb_source_facetoface_sessions'),
-                'attendees.userid',
-                'attendees'
+                array(
+                    'userid' => 'attendees.userid',
+                    'managerid' => 'position_assignment.managerid',
+                    'managerpath' => 'position_assignment.managerpath',
+                    'postype' => 'position_assignment.type',
+                ),
+                array('attendees', 'position_assignment')
             ),
         );
         return $contentoptions;

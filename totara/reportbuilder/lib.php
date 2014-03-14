@@ -1678,7 +1678,23 @@ class reportbuilder {
                 $name = $option->classname;
                 $classname = 'rb_' . $name . '_content';
                 $settingname = $name . '_content';
-                $field = ($cache) ? $option->fieldalias : $option->field;
+
+                $fields = array();
+                foreach ($option->fields as $key => $field) {
+                    if ($cache) {
+                        $fields[$key] = 'rb_content_option_' . $key;
+                    } else {
+                        $fields[$key] = $field;
+                    }
+                }
+                // Collapse array to string if it consists of only one element
+                // with a specific key.
+                // This provides backward compatibility in case fields is just
+                // a string instead of an array.
+                if (count($fields) == 1 && isset($fields['field'])) {
+                    $fields = $fields['field'];
+                }
+
                 if (class_exists($classname)) {
                     $class = new $classname($this->reportfor);
 
@@ -1686,7 +1702,7 @@ class reportbuilder {
                         'enable', $cache)) {
                         // this content option is enabled
                         // call function to get SQL snippet
-                        list($out[], $contentparams) = $class->sql_restriction($field, $reportid);
+                        list($out[], $contentparams) = $class->sql_restriction($fields, $reportid);
                         $params = array_merge($params, $contentparams);
                     }
                 } else {
@@ -1971,7 +1987,9 @@ class reportbuilder {
                 $settingname = $name . '_content';
                 if (class_exists($classname)) {
                     if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
-                            $fields[] = $option->field . ' AS ' . $option->fieldalias;
+                        foreach ($option->fields as $alias => $field) {
+                            $fields[] = $field . ' AS rb_content_option_' . $alias;
+                        }
                     }
                 }
             }

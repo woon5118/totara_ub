@@ -236,7 +236,13 @@ class rb_source_goal_status_history extends rb_base_source {
             new rb_content_option(
                 'user',
                 get_string('user', 'rb_source_goal_status_history'),
-                'base.userid'
+                array(
+                    'userid' => 'base.userid',
+                    'managerid' => 'position_assignment.managerid',
+                    'managerpath' => 'position_assignment.managerpath',
+                    'postype' => 'position_assignment.type',
+                ),
+                'position_assignment'
             ),
             new rb_content_option(
                 'date',
