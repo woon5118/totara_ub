@@ -258,13 +258,13 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
                    WHERE cc.userid = u.id
                      AND cc.course {$sqlin1}
                      AND cc.timecompleted > 0
-                  ) AND  {$duration} {$operator} (
-                     SELECT MAX(cc.timecompleted) - MIN(cc.timestarted)
+                  ) AND (
+                     SELECT ((MAX(cc.timecompleted) - MIN(cc.timestarted)) / ". DAYSECS .")
                        FROM {course_completions} cc
                       WHERE cc.userid = u.id
                         AND cc.course {$sqlin2}
                         AND cc.timecompleted > 0
-                  ))";
+                  ) {$operator} {$duration})";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
@@ -290,15 +290,15 @@ class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sql
                      AND pc.coursesetid = 0
                      AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
                      AND pc.timecompleted > 0
-                  ) AND  {$duration} {$operator} (
-                     SELECT MAX(pc.timecompleted) - MIN(pc.timestarted)
+                  ) AND (
+                     SELECT ((MAX(pc.timecompleted) - MIN(pc.timestarted)) / ". DAYSECS .")
                        FROM {prog_completion} pc
                       WHERE pc.userid = u.id
                         AND pc.programid {$sqlin2}
                         AND pc.coursesetid = 0
                         AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
                         AND pc.timecompleted > 0
-                  ))";
+                  ) {$operator} {$duration})";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
