@@ -133,11 +133,7 @@ class theme_standardtotararesponsive_core_renderer extends core_renderer {
                             $loggedinas .= get_string('failedloginattemptsall', '', $count);
                         }
                         if (file_exists("$CFG->dirroot/report/log/index.php") and
-<<<<<<< HEAD
                             has_capability('report/log:view', context_system::instance())) {
-=======
-                            has_capability('report/log:view', CONTEXT_SYSTEM::instance())) {
->>>>>>> 05b9a76614cc685d32756375eea38c866cf59757
                             $loggedinas .= ' (<a href="'.$CFG->wwwroot.'/report/log/index.php'.
                                                  '?chooselog=1&amp;id=1&amp;modid=site_errors">'.get_string('logs').'</a>)';
                         }
