@@ -416,7 +416,7 @@ class columns_test extends reportcache_advanced_testcase {
     );
 
     protected $files_data = array(
-        'id' => 1, 'contextid' => 1, 'itemid' => 1, 'filepath' => '/totara/', 'filename' => 'icon.gif', 'filesize' => 8,
+        'contextid' => 1, 'itemid' => 1, 'filepath' => '/totara/', 'filename' => 'icon.gif', 'filesize' => 8,
         'filearea' => 'course', 'status' => 1, 'timecreated' => 0, 'timemodified' => 0, 'sortorder' => 1,
     );
 

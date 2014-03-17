@@ -369,9 +369,11 @@ class appraisal_message_test extends appraisal_testcase {
             $UNITTEST->running = true;
         }
         $this->resetAfterTest();
+        $this->preventResetByRollback();
 
         $oldlog = ini_get('error_log');
         ini_set('error_log', "$CFG->dataroot/testlog.log"); // Prevent standard logging.
+        unset_config('noemailever');
 
         $user = $this->getDataGenerator()->create_user();
         list($appraisal) = $this->prepare_appraisal_with_users(array(), array($user));
@@ -419,10 +421,18 @@ class appraisal_message_test extends appraisal_testcase {
 
         $wastime = time() - 1;
         $appraisal->validate();
-        ob_start();
+
+        // Make sure we are redirecting emails.
+        $sink = $this->redirectEmails();
+        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
+
         $appraisal->activate();
-        $output = ob_get_clean();
-        $this->assertContains('noemailever', $output);
+
+        // Get the email that we just sent.
+        $emails = $sink->get_messages();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
+
         $nowtime = time() + 1;
 
         $msgapprnowtest = new appraisal_message($msgapprnowid);
@@ -443,10 +453,16 @@ class appraisal_message_test extends appraisal_testcase {
         $this->assertEquals(0, $msgstageaheadtest->wastriggered);
         // Check event stage completion - immediate (completed).
         $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $user->id, $user->id, appraisal::ROLE_LEARNER);
-        ob_start();
+
+        // Redirect emails.
+        $sink2 = $this->redirectEmails();
+
         $this->answer_question($appraisal, $roleassignment, 0, 'completestage');
-        $output = ob_get_clean();
-        $this->assertContains('noemailever', $output);
+
+        $emails = $sink2->get_messages();
+        $this->assertCount(1, $sink2->get_messages());
+        $sink2->close();
+
         $msgstageiscomptest = new appraisal_message($msgstagecompid);
         $this->assertEquals(1, $msgstageiscomptest->wastriggered);
 

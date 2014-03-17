@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->libdir . '/textlib.class.php');
-
 class csv_iterator extends SplFileObject
 {
     /**

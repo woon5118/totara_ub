@@ -167,8 +167,7 @@ class core_form_datetimeselector_testcase extends basic_testcase {
             ksort($exportvalues);
             $expectedvalues = array('dateselector' => $vals['timestamp'], 'dateselector_raw' => $rawvalue);
             ksort($expectedvalues);
-
-            $this->assertSame(array('dateselector' => $vals['timestamp']), $el->exportValue($submitvalues),
+            $this->assertSame($exportvalues, $expectedvalues,
                     "Please check if timezones are updated (Site adminstration -> location -> update timezone)");
         }
 

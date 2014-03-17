@@ -4077,7 +4077,7 @@ function remove_temp_roles($context, array $accessdata) {
  * @return context system context (null if context table not created yet)
  */
 function get_system_context($cache = true) {
-    debugging('context_system::instance() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
+    debugging('get_system_context() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
     return context_system::instance(0, IGNORE_MISSING, $cache);
 }
 

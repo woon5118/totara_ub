@@ -114,6 +114,7 @@ class core_test_generator_testcase extends advanced_testcase {
         }
 
         $this->resetAfterTest(true);
+        $this->setAdminUser();
         $generator = $this->getDataGenerator();
 
         $page = $generator->create_module('page', array('course'=>$SITE->id));

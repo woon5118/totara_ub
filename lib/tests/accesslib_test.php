@@ -2590,8 +2590,8 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('get_context_instance() is deprecated, please use context_xxxx::instance() instead.', DEBUG_DEVELOPER);
         get_context_instance_by_id($record->id);
         $this->assertDebuggingCalled('get_context_instance_by_id() is deprecated, please use context::instance_by_id($id) instead.', DEBUG_DEVELOPER);
-        context_system::instance();
-        $this->assertDebuggingCalled('context_system::instance() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
+        get_system_context();
+        $this->assertDebuggingCalled('get_system_context() is deprecated, please use context_system::instance() instead.', DEBUG_DEVELOPER);
         get_parent_contexts($context);
         $this->assertDebuggingCalled('get_parent_contexts() is deprecated, please use $context->get_parent_context_ids() instead.', DEBUG_DEVELOPER);
         get_parent_contextid($context);

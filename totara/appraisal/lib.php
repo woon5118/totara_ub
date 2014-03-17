@@ -3906,9 +3906,21 @@ class appraisal_message {
                     $message = $this->get_message($role);
                     $rcptuserid = $assignedroles[$role]->userid;
                     $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
-                    $fromaddress = $CFG->noreplyaddress;
+
+                    // Create a message.
+                    $eventdata = new stdClass();
+                    $eventdata->component         = 'moodle';
+                    $eventdata->name              = 'instantmessage';
+                    $eventdata->userfrom          = totara_generate_email_user($CFG->noreplyaddress);
+                    $eventdata->userto            = $rcpt;
+                    $eventdata->subject           = $message->name;
+                    $eventdata->fullmessage       = $message->content;
+                    $eventdata->fullmessageformat = FORMAT_PLAIN;
+                    $eventdata->fullmessagehtml   = $message->content;
+                    $eventdata->smallmessage      = $message->content;
+
                     if (!isset($sentaddress[$rcpt->email]) || !in_array($message->id, $sentaddress[$rcpt->email])) {
-                        email_to_user($rcpt, $fromaddress, $message->name, $message->content);
+                        message_send($eventdata);
 
                         if (!isset($sentaddress[$rcpt->email])) {
                             $sentaddress[$rcpt->email] = array();

@@ -575,6 +575,12 @@ class core_modinfolib_testcase extends advanced_testcase {
         $CFG->enableavailability = true;
         get_fast_modinfo($course, 0, true);
 
+        // Set up a student user.
+        $student = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
+        role_assign($studentrole->id, $student->id, $coursecontext);
+        $this->setUser($student);
+
         // The unavailable, hidden entirely activity should now be restricted.
         $cm_info = get_fast_modinfo($course)->instances['assign'][$assign1->id];
         $this->assertFalse($cm_info->available);

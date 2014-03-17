@@ -194,6 +194,7 @@ class core_files_externallib_testcase extends advanced_testcase {
         $record->course = $course->id;
         $record->name = "Mod data upload test";
         $record->intro = "Some intro of some sort";
+        $coursecontext = context_course::instance($course->id);
 
         // Create a database module.
         $module = $this->getDataGenerator()->create_module('data', $record);
@@ -223,7 +224,7 @@ class core_files_externallib_testcase extends advanced_testcase {
         // Insert the information about the file.
         $contentid = $DB->insert_record('data_content', $datacontent);
         // Required information for uploading a file.
-        $context = context_module::instance($module->id);
+        $modulecontext = context_module::instance($module->id);
         $usercontext = context_user::instance($USER->id);
         $component = 'mod_data';
         $filearea = 'content';
@@ -232,7 +233,7 @@ class core_files_externallib_testcase extends advanced_testcase {
         $filecontent = base64_encode("Let us create a nice simple file.");
 
         $filerecord = array();
-        $filerecord['contextid'] = $context->id;
+        $filerecord['contextid'] = $modulecontext->id;
         $filerecord['component'] = $component;
         $filerecord['filearea'] = $filearea;
         $filerecord['itemid'] = $itemid;
@@ -248,7 +249,7 @@ class core_files_externallib_testcase extends advanced_testcase {
         // Use the web service function to return the information about the file that we just uploaded.
         // The first time is with a valid context ID.
         $filename = '';
-        $testfilelisting = core_files_external::get_files($context->id, $component, $filearea, $itemid, '/', $filename);
+        $testfilelisting = core_files_external::get_files($modulecontext->id, $component, $filearea, $itemid, '/', $filename);
 
         // With the information that we have provided we should get an object exactly like the one below.
         $testdata = array();
@@ -265,34 +266,34 @@ class core_files_externallib_testcase extends advanced_testcase {
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Miscellaneous');
-        $testdata['parents']['2'] = array('contextid' => 15,
+        $testdata['parents']['2'] = array('contextid' => $coursecontext->id,
                                           'component' => null,
                                           'filearea' => null,
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Test course 1');
-        $testdata['parents']['3'] = array('contextid' => 20,
+        $testdata['parents']['3'] = array('contextid' => $modulecontext->id,
                                           'component' => null,
                                           'filearea' => null,
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Mod data upload test (Database)');
-        $testdata['parents']['4'] = array('contextid' => 20,
+        $testdata['parents']['4'] = array('contextid' => $modulecontext->id,
                                           'component' => 'mod_data',
                                           'filearea' => 'content',
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Fields');
         $testdata['files'] = array();
-        $testdata['files']['0'] = array('contextid' => 20,
+        $testdata['files']['0'] = array('contextid' => $modulecontext->id,
                                         'component' => 'mod_data',
                                         'filearea' => 'content',
                                         'itemid' => '1',
                                         'filepath' => '/',
                                         'filename' => 'Simple4.txt',
-                                        'url' => 'http://www.example.com/moodle/pluginfile.php/20/mod_data/content/1/Simple4.txt',
+                                        'url' => "http://www.example.com/moodle/pluginfile.php/{$modulecontext->id}/mod_data/content/1/Simple4.txt",
                                         'isdir' => false,
-                                        'timemodified' => $timemodified);
+                                        'timemodified' => "{$timemodified}");
         // Make sure that they are the same.
         $this->assertEquals($testfilelisting, $testdata);
 

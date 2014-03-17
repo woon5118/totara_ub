@@ -94,10 +94,12 @@ class feedback360_responder_test extends feedback360_testcase {
 
     public function test_by_email() {
         global $CFG, $DB;
+        $this->preventResetByRollback();
         $this->resetAfterTest();
 
         $oldlog = ini_get('error_log');
         ini_set('error_log', "$CFG->dataroot/testlog.log"); // Prevent standard logging.
+        unset_config('noemailever');
 
         list($fdbck, $users) = $this->prepare_feedback_with_users();
         $fdbck->activate();
@@ -106,10 +108,18 @@ class feedback360_responder_test extends feedback360_testcase {
         $email = 'somebody@example.com';
         $userassignment = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id,
             'userid' => $user->id));
-        ob_start();
+
+        // Make sure we are redirecting emails.
+        $sink = $this->redirectEmails();
+        $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
+
         feedback360_responder::update_external_assignments(array($email), array(), $userassignment->id, $time);
-        $output = ob_get_clean();
-        $this->assertContains('noemailever', $output);
+
+        // Get the email that we just sent.
+        $emails = $sink->get_messages();
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
+
         $emailassignmentrecord = $DB->get_record('feedback360_email_assignment', array('email' => $email), '*', MUST_EXIST);
         $byemail = feedback360_responder::by_email($email, $emailassignmentrecord->token);
         $this->assertEquals($fdbck->id, $byemail->feedback360id);

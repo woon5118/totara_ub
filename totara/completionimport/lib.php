@@ -155,7 +155,6 @@ function check_fields_exist($filename, $importname) {
     global $CFG;
 
     require_once($CFG->libdir . '/csvlib.class.php');
-    require_once($CFG->libdir . '/textlib.class.php');
 
     $errors = array();
     $pluginname = 'totara_completionimport_' . $importname;

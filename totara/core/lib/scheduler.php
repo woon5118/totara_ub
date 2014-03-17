@@ -39,6 +39,9 @@
  * Also, it has tight integration with Scheduler form element, and as result it's easily to integrate
  * them.
  */
+global $CFG;
+require_once($CFG->dirroot . '/calendar/lib.php');
+
 class scheduler {
     /**
      *  Schedule constants
@@ -159,7 +162,7 @@ class scheduler {
                     // If the today is the day then set the next reportdate to today.
                     $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
                 } else {
-                    $nextevent = strtotime('next '. $calendardays[$schedule], $this->time);
+                    $nextevent = strtotime('next '. $calendardays[$schedule]['fullname'], $this->time);
                 }
                 break;
 

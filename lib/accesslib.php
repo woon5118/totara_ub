@@ -2777,9 +2777,11 @@ function get_default_role_archetype_allows($type, $archetype) {
             'editingteacher' => array('teacher', 'student'),
             'teacher'        => array(),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
         'override' => array(
             'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage'),
@@ -2787,9 +2789,11 @@ function get_default_role_archetype_allows($type, $archetype) {
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array(),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
         'switch' => array(
             'manager'        => array('editingteacher', 'teacher', 'student', 'guest'),
@@ -2797,9 +2801,11 @@ function get_default_role_archetype_allows($type, $archetype) {
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array('student', 'guest'),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
     );
 

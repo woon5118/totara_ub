@@ -1492,7 +1492,20 @@ class feedback360_responder {
 
             // Send the email requesting feedback from external email.
             $userto = totara_generate_email_user($email);
-            email_to_user($userto, $userfrom, $emailsubject, $emailplain, $emailhtml);
+
+            // Create a message.
+            $message = new stdClass();
+            $message->component         = 'moodle';
+            $message->name              = 'instantmessage';
+            $message->userfrom          = $userfrom;
+            $message->userto            = $userto;
+            $message->subject           = $emailsubject;
+            $message->fullmessage       = $emailplain;
+            $message->fullmessageformat = FORMAT_PLAIN;
+            $message->fullmessagehtml   = $emailhtml;
+            $message->smallmessage      = $emailplain;
+
+            message_send($message);
         }
 
         foreach ($cancellations as $email) {

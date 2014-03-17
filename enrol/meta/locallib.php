@@ -239,7 +239,7 @@ class enrol_meta_handler {
      * @param stdClass $ra
      * @return bool success
      */
-    public static function role_assigned($ra) {
+    public static function role_assigned(\core\event\role_assigned $ra) {
         if (!enrol_is_enabled('meta')) {
             return true;
         }
@@ -280,7 +280,7 @@ class enrol_meta_handler {
      * @param stdClass $ra
      * @return bool success
      */
-    public static function role_unassigned($ra) {
+    public static function role_unassigned(\core\event\role_unassigned $ra) {
         if (!enrol_is_enabled('meta')) {
             // all roles are removed via cron automatically
             return true;
@@ -426,7 +426,7 @@ class enrol_meta_handler {
      * @param stdClass $course
      * @return bool success
      */
-    public static function course_deleted($course) {
+    public static function course_deleted(\core\event\course_deleted $course) {
         global $DB;
 
         // NOTE: do not test if plugin enabled, we want to keep disabling instances with invalid course links

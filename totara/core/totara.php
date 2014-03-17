@@ -2182,13 +2182,14 @@ function totara_setup() {
  * @return object email user object
  */
 function totara_generate_email_user($emailaddress) {
-    $emailuser = new stdClass();
-    $emailuser->id = 0;
+    $emailuser = core_user::get_noreply_user();
     $emailuser->email = $emailaddress;
     $emailuser->firstname = $emailaddress;
     $emailuser->lastname = '';
+    $emailuser->lang = 'en';
     $emailuser->maildisplay = true;
     $emailuser->mailformat = 1;
+    $emailuser->emailstop = false;
 
     return $emailuser;
 }

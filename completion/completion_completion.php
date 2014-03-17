@@ -269,7 +269,7 @@ class completion_completion extends data_object {
      * @return void
      */
     public function mark_complete($timecomplete = null) {
-        global $USER;
+        global $USER, $CFG, $DB;
 
         // Never change a completion time.
         if ($this->timecompleted) {
@@ -283,7 +283,7 @@ class completion_completion extends data_object {
 
         // Set time complete.
         $this->timecompleted = $timecomplete;
-                
+
         // Get user's positionid and organisationid if not already set
         if ($this->positionid === null) {
             require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
@@ -307,7 +307,7 @@ class completion_completion extends data_object {
                 );
             $event->add_record_snapshot('course_completions', $data);
             $event->trigger();
- 
+
             $data = array();
             $data['userid'] = $this->userid;
             $data['eventtype'] = STATS_EVENT_COURSE_COMPLETE;
