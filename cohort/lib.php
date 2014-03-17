@@ -39,7 +39,7 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     global $DB, $USER;
 
     if (!isset($cohort->name)) {
-        throw new coding_exception(get_string('error:missingcohortname', 'totara_cohort'));
+        throw new coding_exception('Missing cohort name in cohort_add_cohort().');
     }
     if (!isset($cohort->idnumber)) {
         $cohort->idnumber = NULL;

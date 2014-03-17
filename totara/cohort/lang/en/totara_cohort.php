@@ -238,7 +238,6 @@ $string['error:couldnotapprovechanges'] = 'Error while approving changes';
 $string['error:couldnotcancelchanges'] = 'Error while cancelling changes';
 $string['error:couldnotupdateglobalsettings'] = 'There was an error while updating the global settings';
 $string['error:dateformat'] = 'Please enter a date in the format {$a}';
-$string['error:missingcohortname'] = 'Missing audience name in cohort_add_cohort().';
 $string['error:mustpickonevalue'] = 'You must specify at least one value';
 $string['error:noeditdynamiccohort'] = 'This is a dynamic audience. You cannot directly edit its members.';
 $string['error:noresponsefromajax'] = 'Error: No response from Ajax';
