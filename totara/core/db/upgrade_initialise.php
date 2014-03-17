@@ -63,3 +63,32 @@ if ($CFG->version < 2013051402.00) {
         print_upgrade_separator();
     }
 }
+
+// Remove old/unused themes.
+if ($CFG->version < 2013111801.00) {
+    $plugins = array('theme_mymobiletotara', 'theme_canvas');
+    $pluginman = core_plugin_manager::instance();
+
+    foreach ($plugins as $uninstall) {
+        $pluginfo = $pluginman->get_plugin_info($uninstall);
+
+        // Make sure we know the plugin.
+        if (!is_null($pluginfo) && $pluginman->can_uninstall_plugin($pluginfo->component)) {
+            $pluginname = $pluginman->plugin_name($pluginfo->component);
+
+            echo $OUTPUT->heading(get_string('uninstalling', 'core_plugin', array('name' => $pluginname)));
+
+            $progress = new progress_trace_buffer(new text_progress_trace(), false);
+            $pluginman->uninstall_plugin($pluginfo->component, $progress);
+            $progress->finished();
+
+            echo $OUTPUT->notification($success, 'notifysuccess');
+
+            // Reset op code caches.
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+            print_upgrade_separator();
+        }
+    }
+}
