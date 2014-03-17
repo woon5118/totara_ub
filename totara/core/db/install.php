@@ -218,7 +218,18 @@ function xmldb_totara_core_install() {
 
     // Disable editing execpaths by default for security.
     set_config('preventexecpath', '1');
-
+    // Then provide default values to prevent them appearing on the upgradesettings page.
+    set_config('geoipfile', $CFG->dataroot . 'geoip/GeoLiteCity.dat');
+    set_config('location', '', 'enrol_flatfile');
+    set_config('filter_tex_pathlatex', '/usr/bin/latex');
+    set_config('filter_tex_pathdvips', '/usr/bin/dvips');
+    set_config('filter_tex_pathconvert', '/usr/bin/convert');
+    set_config('pathtodu', '');
+    set_config('pathtoclam', '');
+    set_config('aspellpath', '');
+    set_config('pathtodot', '');
+    set_config('quarantinedir', '');
+    set_config('backup_auto_destination', '', 'backup');
     // Adding some totara upgrade code from lib/db/upgrade.php to
     // avoid conflicts every time we upgrade moodle.
     // This can be removed once we reach the verion of Moodle that

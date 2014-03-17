@@ -980,5 +980,20 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014030500, 'totara_core');
     }
 
+    if ($oldversion < 2014031901) {
+        // Fix defaults on executable config settings disabled in 2.5.7.
+        if (!get_config('core', 'geoipfile')) {set_config('geoipfile', $CFG->dataroot . 'geoip/GeoLiteCity.dat');}
+        if (!get_config('enrol_flatfile', 'location')) {set_config('location', '', 'enrol_flatfile');}
+        if (!get_config('core', 'filter_tex_pathlatex')) {set_config('filter_tex_pathlatex', ' /usr/bin/latex');}
+        if (!get_config('core', 'filter_tex_pathdvips')) {set_config('filter_tex_pathdvips', ' /usr/bin/dvips');}
+        if (!get_config('core', 'filter_tex_pathconvert')) {set_config('filter_tex_pathconvert', '/usr/bin/convert');}
+        if (!get_config('core', 'pathtodu')) {set_config('pathtodu', '');}
+        if (!get_config('core', 'pathtoclam')) {set_config('pathtoclam', '');}
+        if (!get_config('core', 'aspellpath')) {set_config('aspellpath', '');}
+        if (!get_config('core', 'pathtodot')) {set_config('pathtodot', '');}
+        if (!get_config('core', 'quarantinedir')) {set_config('quarantinedir', '');}
+        if (!get_config('backup', 'backup_auto_destination')) {set_config('backup_auto_destination', '', 'backup');}
+        totara_upgrade_mod_savepoint(true, 2014031901, 'totara_core');
+    }
     return true;
 }
