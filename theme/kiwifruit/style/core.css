@@ -100,7 +100,9 @@ h6.main {
 }
 h1.main,
 h2.main,
-h2.header {
+h2.header,
+#region-main h1,
+#region-main h2 {
     font-size:200%;
     font-size:1.9em;
     font-weight:300;
@@ -110,6 +112,7 @@ h2.header {
     line-height:1.4em;
     letter-spacing:-1px;
     background:#b1bb1a;
+    text-align: left;
 }
 h1.main a,
 h2.main a,
