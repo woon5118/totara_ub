@@ -85,7 +85,7 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
         //Weekly selector
         $weeklyselect = array();
         for ($i = 0; $i < 7; $i++) {
-            $weeklyselect[$i] = get_string($CALENDARDAYS[$i], 'calendar');
+            $weeklyselect[$i] = $CALENDARDAYS[$i]['fullname'];
         }
 
         $monthlyselect = array();

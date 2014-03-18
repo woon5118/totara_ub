@@ -460,7 +460,7 @@ function show_month_detailed($baseparams, $display, $m, $y, $courses, $groups, $
     for($i = $display->minwday; $i <= $display->maxwday; ++$i) {
         // This uses the % operator to get the correct weekday no matter what shift we have
         // applied to the $display->minwday : $display->maxwday range from the default 0 : 6
-        $day = $calendardays[$i % 7];
+        $day = $calendardays[$i % 7]['fullname'];
         echo html_writer::tag('th', get_string($day, 'calendar'), array('scope' => 'col'));
     }
 
