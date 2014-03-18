@@ -949,7 +949,7 @@ abstract class rb_base_source {
                 }
             }
             $enrolmethodstr = implode(', ', $enrolmethodlist);
-            $realuser = session_get_realuser();
+            $realuser = \core\session\manager::get_realuser();
 
             // Enrolling methods.
 

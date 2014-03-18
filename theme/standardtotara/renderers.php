@@ -57,7 +57,7 @@ class theme_standardtotara_core_renderer extends core_renderer {
         $course = $this->page->course;
 
         if (\core\session\manager::is_loggedinas()) {
-            $realuser = session_get_realuser();
+            $realuser = \core\session\manager::get_realuser();
             $fullname = fullname($realuser, true);
             if ($withlinks) {
                 $realuserinfo = " [<a href=\"$CFG->wwwroot/course/loginas.php?id=$course->id&amp;sesskey=".sesskey()."\">$fullname</a>] ";

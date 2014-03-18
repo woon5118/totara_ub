@@ -49,7 +49,7 @@ class theme_kiwifruit_core_renderer extends theme_standardtotara_core_renderer {
         $course = $PAGE->course;
 
         if (\core\session\manager::is_loggedinas()) {
-            $realuser = session_get_realuser();
+            $realuser = \core\session\manager::get_realuser();
             $fullname = fullname($realuser, true);
             $realuserinfo = " [<a href=\"$CFG->wwwroot/course/loginas.php?id=$course->id&amp;sesskey=".sesskey()."\">$fullname</a>] ";
         } else {

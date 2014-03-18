@@ -187,7 +187,7 @@ class pdf extends TCPDF {
         }
 
         if (strpos($file, $CFG->wwwroot.'/pluginfile.php') !== false || strpos($file, $CFG->wwwroot.'/draftfile.php') !== false) {
-            session_get_instance()->write_close();
+            \core\session\manager::write_close();
 
             $curlhandler = new curl();
             $logfile = fopen('/tmp/curl.txt', 'w+');

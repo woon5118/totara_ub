@@ -4224,7 +4224,7 @@ function totara_appraisal_pluginfile($course, $cm, $context, $filearea, $args, $
         send_file_not_found();
     }
 
-    session_get_instance()->write_close();
+    \core\session\manager::write_close();
     send_stored_file($file, 60*60, 0, $forcedownload, $options);
 }
 

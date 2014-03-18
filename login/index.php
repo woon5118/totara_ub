@@ -206,7 +206,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
 
         // if multiple logins not permitted, clear out any existing sessions for this user
         if (!empty($CFG->preventmultiplelogins)) {
-            session_kill_user($user->id);
+            \core\session\manager::kill_user_sessions($user->id);
         }
 
         complete_user_login($user);
