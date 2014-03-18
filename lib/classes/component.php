@@ -799,12 +799,24 @@ $cache = '.var_export($cache, true).';
      * @return string full path to plugin directory; null if not found
      */
     public static function get_plugin_directory($plugintype, $pluginname) {
+        global $CFG;
+
         if (empty($pluginname)) {
             // Invalid plugin name, sorry.
             return null;
         }
 
         self::init();
+
+        // Hack for rb_source language files.
+        if ($plugintype == 'rb_source') {
+            require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+            foreach (reportbuilder::find_source_dirs() as $dir) {
+                if (file_exists($dir.$plugintype.'_'.$pluginname.'.php')) {
+                    return $dir;
+                }
+            }
+        }
 
         if (!isset(self::$plugins[$plugintype][$pluginname])) {
             return null;
@@ -876,7 +888,9 @@ $cache = '.var_export($cache, true).';
                 $type   = 'mod';
                 $plugin = $component;
             }
-
+        } else if (preg_match('/^rb_source_/', $component)) {
+            $type = 'rb_source';
+            $plugin = str_replace('rb_source_', '', $component);
         } else {
             list($type, $plugin) = explode('_', $component, 2);
             if ($type === 'moodle') {
