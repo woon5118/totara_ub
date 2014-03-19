@@ -491,6 +491,9 @@ p.errormessage {
 .langmenu select {
     height: 20px;
 }
+.mform select {
+    max-width: 250px;
+}
 
 /* Profileblock */
 
