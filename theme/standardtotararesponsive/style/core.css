@@ -542,10 +542,6 @@ fieldset.surround legend,
 .coursebox .info h3.name {
     margin-right: 25px;
 }
-.coursebox .info .enrolmenticons {
-    position: absolute;
-    right: 0;
-}
 .coursebox .content .summary {
     float: none;
     width: auto;
