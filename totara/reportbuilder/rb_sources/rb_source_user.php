@@ -151,7 +151,11 @@ class rb_source_user extends rb_base_source {
                             'extrafields' => array(
                                 'userpic_picture' => 'base.picture',
                                 'userpic_firstname' => 'base.firstname',
+                                'userpic_firstnamephonetic' => 'base.firstnamephonetic',
+                                'userpic_middlename' => 'base.middlename',
                                 'userpic_lastname' => 'base.lastname',
+                                'userpic_lastnamephonetic' => 'base.lastnamephonetic',
+                                'userpic_alternatename' => 'base.alternatename',
                                 'userpic_imagealt' => 'base.imagealt',
                                 'userpic_email' => 'base.email'
                             )
@@ -219,7 +223,11 @@ class rb_source_user extends rb_base_source {
                                 'user_id' => 'base.id',
                                 'userpic_picture' => 'base.picture',
                                 'userpic_firstname' => 'base.firstname',
+                                'userpic_firstnamephonetic' => 'base.firstnamephonetic',
+                                'userpic_middlename' => 'base.middlename',
                                 'userpic_lastname' => 'base.lastname',
+                                'userpic_lastnamephonetic' => 'base.lastnamephonetic',
+                                'userpic_alternatename' => 'base.alternatename',
                                 'userpic_imagealt' => 'base.imagealt',
                                 'userpic_email' => 'base.email'
                             ),
@@ -393,7 +401,11 @@ class rb_source_user extends rb_base_source {
         $picuser->picture = $row->userpic_picture;
         $picuser->imagealt = $row->userpic_imagealt;
         $picuser->firstname = $row->userpic_firstname;
+        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+        $picuser->middlename = $row->userpic_middlename;
         $picuser->lastname = $row->userpic_lastname;
+        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+        $picuser->alternatename = $row->userpic_alternatename;
         $picuser->email = $row->userpic_email;
         $user_pic = $OUTPUT->user_picture($picuser, array('courseid' => 1));
 

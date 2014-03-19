@@ -620,43 +620,21 @@ class reportbuilder {
 
         $sourcepaths = array();
 
-        // search for mod/*/rb_sources/ directories
-        foreach (get_list_of_plugins('mod') as $mod) {
-            $dir = "{$CFG->dirroot}/mod/$mod/rb_sources/";
-            if (file_exists($dir) && is_dir($dir)) {
-                $sourcepaths[] = $dir;
-            }
-        }
+        $locations = array(
+            'mod',
+            'block',
+            'tool',
+            'totara',
+            'local',
+        );
 
-        // search for blocks/*/rb_sources/ directories
-        foreach (get_list_of_plugins('blocks', 'db') as $block) {
-            $dir = "{$CFG->dirroot}/blocks/$block/rb_sources/";
-            if (file_exists($dir) && is_dir($dir)) {
-                $sourcepaths[] = $dir;
-            }
-        }
-
-        // search for admin/tool/*/rb_sources/ directories
-        foreach (get_list_of_plugins('admin/tool', 'db') as $tool) {
-            $dir = "{$CFG->dirroot}/admin/tool/$tool/rb_sources/";
-            if (file_exists($dir) && is_dir($dir)) {
-                $sourcepaths[] = $dir;
-            }
-        }
-
-        // search for totara/*/rb_sources/ directories
-        foreach (get_list_of_plugins('totara', 'db') as $totaramod) {
-            $dir = "{$CFG->dirroot}/totara/$totaramod/rb_sources/";
-            if (file_exists($dir) && is_dir($dir)) {
-                $sourcepaths[] = $dir;
-            }
-        }
-
-        // search for local/*/rb_sources/ directories for local customisations
-        foreach (get_list_of_plugins('local', 'db') as $localmod) {
-            $dir = "{$CFG->dirroot}/local/$localmod/rb_sources/";
-            if (file_exists($dir) && is_dir($dir)) {
-                $sourcepaths[] = $dir;
+        // Search for rb_sources directories for each plugin type.
+        foreach ($locations as $modtype) {
+            foreach (core_component::get_plugin_list($modtype) as $mod => $path) {
+                $dir = "$path/rb_sources/";
+                if (file_exists($dir) && is_dir($dir)) {
+                    $sourcepaths[] = $dir;
+                }
             }
         }
 

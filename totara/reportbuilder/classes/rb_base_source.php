@@ -783,7 +783,11 @@ abstract class rb_base_source {
         $picuser->picture = $row->userpic_picture;
         $picuser->imagealt = $row->userpic_imagealt;
         $picuser->firstname = $row->userpic_firstname;
+        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+        $picuser->middlename = $row->userpic_middlename;
         $picuser->lastname = $row->userpic_lastname;
+        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+        $picuser->alternatename = $row->userpic_alternatename;
         $picuser->email = $row->userpic_email;
 
         return $OUTPUT->user_picture($picuser, array('courseid' => 1)) . "&nbsp;" . html_writer::link($url, $user);
@@ -805,7 +809,11 @@ abstract class rb_base_source {
         $picuser->picture = $row->userpic_picture;
         $picuser->imagealt = $row->userpic_imagealt;
         $picuser->firstname = $row->userpic_firstname;
+        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+        $picuser->middlename = $row->userpic_middlename;
         $picuser->lastname = $row->userpic_lastname;
+        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+        $picuser->alternatename = $row->userpic_alternatename;
         $picuser->email = $row->userpic_email;
 
         // don't show picture in spreadsheet
@@ -1792,7 +1800,11 @@ abstract class rb_base_source {
                     'user_id' => "$join.id",
                     'userpic_picture' => "$join.picture",
                     'userpic_firstname' => "$join.firstname",
+                    'userpic_firstnamephonetic' => "$join.firstnamephonetic",
+                    'userpic_middlename' => "$join.middlename",
                     'userpic_lastname' => "$join.lastname",
+                    'userpic_lastnamephonetic' => "$join.lastnamephonetic",
+                    'userpic_alternatename' => "$join.alternatename",
                     'userpic_email' => "$join.email",
                     'userpic_imagealt' => "$join.imagealt"
                 ),
@@ -1872,7 +1884,9 @@ abstract class rb_base_source {
         // auto-generate columns for user fields
         $fields = array(
             'firstname' => get_string('userfirstname', 'totara_reportbuilder'),
+            'firstnamephonetic' => get_string('userfirstnamephonetic', 'totara_reportbuilder'),
             'lastname' => get_string('userlastname', 'totara_reportbuilder'),
+            'lastnamephonetic' => get_string('userlastnamephonetic', 'totara_reportbuilder'),
             'username' => get_string('username', 'totara_reportbuilder'),
             'idnumber' => get_string('useridnumber', 'totara_reportbuilder'),
             'phone1' => get_string('userphone', 'totara_reportbuilder'),
