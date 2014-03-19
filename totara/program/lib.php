@@ -638,7 +638,7 @@ function prog_move_programs($programids, $categoryid) {
 
                     $context   = context_program::instance($program->id);
                     $newparent = context_coursecat::instance($program->category);
-                    context::update_moved($context, $newparent);
+                    $context->update_moved($newparent);
                 }
             }
             prog_fix_program_sortorder();
