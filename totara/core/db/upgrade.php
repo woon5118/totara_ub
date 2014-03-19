@@ -993,6 +993,8 @@ function xmldb_totara_core_upgrade($oldversion) {
         if (!get_config('core', 'pathtodot')) {set_config('pathtodot', '');}
         if (!get_config('core', 'quarantinedir')) {set_config('quarantinedir', '');}
         if (!get_config('backup', 'backup_auto_destination')) {set_config('backup_auto_destination', '', 'backup');}
+        if (!get_config('assignfeedback_editpdf', 'gspath')) {set_config('gspath', '/usr/bin/gs', 'assignfeedback_editpdf');}
+        if (!get_config('reportbuilder', 'exporttofilesystempath')) {set_config('exporttofilesystempath', '', 'reportbuilder');}
         totara_upgrade_mod_savepoint(true, 2014031901, 'totara_core');
     }
     return true;

@@ -230,6 +230,8 @@ function xmldb_totara_core_install() {
     set_config('pathtodot', '');
     set_config('quarantinedir', '');
     set_config('backup_auto_destination', '', 'backup');
+    set_config('gspath', '/usr/bin/gs', 'assignfeedback_editpdf');
+    set_config('exporttofilesystempath', '', 'reportbuilder');
     // Adding some totara upgrade code from lib/db/upgrade.php to
     // avoid conflicts every time we upgrade moodle.
     // This can be removed once we reach the verion of Moodle that
