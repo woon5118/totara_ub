@@ -68,6 +68,9 @@ $search_info->fullname = 'fullname';
 $search_info->sql = null;
 $search_info->params = null;
 
+// Check if user has capability to view emails.
+$canviewemail = in_array('email', get_extra_user_fields(context_system::instance()));
+
 /**
  * Use whitelist for table to prevent people messing with the query
  * Required variables from each case statement:
@@ -96,7 +99,9 @@ switch ($searchtype) {
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
 
         $search_info->fullname = $DB->sql_fullname('firstname', 'lastname');
-        $search_info->email = 'email';
+        if ($canviewemail) {
+            $search_info->email = 'email';
+        }
 
         // exclude deleted, guest users and self
         $guest = guest_user();
@@ -332,7 +337,9 @@ switch ($searchtype) {
 
         $search_info->id = 'pa.managerid';
         $search_info->fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
-        $search_info->email = 'email';
+        if ($canviewemail) {
+            $search_info->email = 'email';
+        }
         $search_info->sql = "
             FROM {pos_assignment} pa
             INNER JOIN {user} u
@@ -422,7 +429,9 @@ switch ($searchtype) {
 
         $search_info->id = 'u.id';
         $search_info->fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
-        $search_info->email = 'email';
+        if ($canviewemail) {
+            $search_info->email = 'email';
+        }
         $search_info->sql = "FROM {user} u
                             WHERE {$searchsql} {$managersql}
                               AND u.deleted = 0
