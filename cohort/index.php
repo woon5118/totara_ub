@@ -84,6 +84,10 @@ $count = ($fullcount != $filteredcount) ? " ($filteredcount/$fullcount)" : " ($f
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
 echo $OUTPUT->heading(get_string('cohortsin', 'cohort', $context->get_context_name()).$count);
+
+if ($manager) {
+    echo $OUTPUT->single_button(new moodle_url('/cohort/edit.php', array('contextid'=>$context->id)), get_string('addcohort', 'cohort'));
+}
 // check if report is cached and warn user
 if ($report->is_cached()) {
     $cohorts = cohort_get_cohorts($context->id);
@@ -99,8 +103,5 @@ echo $report->display_saved_search_options();
 
 $report->display_table();
 $output->export_select($report->_id, $sid);
-if ($manager) {
-    echo $OUTPUT->single_button(new moodle_url('/cohort/edit.php', array('contextid'=>$context->id)), get_string('add'));
-}
 
 echo $OUTPUT->footer();
