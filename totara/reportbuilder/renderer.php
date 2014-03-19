@@ -50,29 +50,42 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                              get_string('options', 'totara_reportbuilder'));
         $data = array();
         foreach ($reports as $report) {
-            $row = array();
-            $strsettings = get_string('settings', 'totara_reportbuilder');
-            $strdelete = get_string('delete', 'totara_reportbuilder');
-            $viewurl = new moodle_url(reportbuilder_get_report_url($report));
-            $editurl = new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
-            $deleteurl = new moodle_url('/totara/reportbuilder/index.php', array('id' => $report->id, 'd' => 1));
+            try {
+                $row = array();
+                $strsettings = get_string('settings', 'totara_reportbuilder');
+                $strdelete = get_string('delete', 'totara_reportbuilder');
+                $viewurl = new moodle_url(reportbuilder_get_report_url($report));
+                $editurl = new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
+                $deleteurl = new moodle_url('/totara/reportbuilder/index.php', array('id' => $report->id, 'd' => 1));
 
-            $row[] = html_writer::link($editurl, format_string($report->fullname)) . ' (' .
-                html_writer::link($viewurl, get_string('view')) . ')';
+                $row[] = html_writer::link($editurl, format_string($report->fullname)) . ' (' .
+                    html_writer::link($viewurl, get_string('view')) . ')';
 
-            $src = reportbuilder::get_source_object($report->source);
-            $srcname = $src->sourcetitle;
-            $row[] = $srcname;
+                $src = reportbuilder::get_source_object($report->source);
+                $srcname = $src->sourcetitle;
+                $row[] = $srcname;
 
-            $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
-            $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
-            $cache = '';
-            if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
-                 $cache = $this->cachenow_button($report->id, true);
+                $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
+                $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+                $cache = '';
+                if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
+                    $cache = $this->cachenow_button($report->id, true);
+                }
+                $row[] = "{$settings}{$cache}{$delete}";
+
+                $data[] = $row;
+            } catch (Exception $e) {
+                $row = array();
+                $deleteurl = new moodle_url('/totara/reportbuilder/index.php', array('id' => $report->id, 'd' => 1));
+                $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+                $spacer = $this->output->spacer(array('width' => '11', 'height' => '11'));
+
+                $row[] = format_string($report->fullname);
+                $row[] = $e->getMessage();
+                $row[] = "{$spacer}{$delete}";
+
+                $data[] = $row;
             }
-            $row[] = "{$settings}{$cache}{$delete}";
-
-            $data[] = $row;
         }
 
         $reportstable = new html_table();
