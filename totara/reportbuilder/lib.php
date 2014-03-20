@@ -5336,14 +5336,18 @@ function reportbuilder_get_report_url($report) {
  */
 function reportbuilder_get_embedded_report_object($embedname, $data=array()) {
     global $CFG;
-    $sourcepath = $CFG->dirroot . '/totara/reportbuilder/embedded/';
 
-    $classfile = $sourcepath . 'rb_' . $embedname . '_embedded.php';
-    if (is_readable($classfile)) {
-        include_once($classfile);
-        $classname = 'rb_' . $embedname . '_embedded';
-        if (class_exists($classname)) {
-            return new $classname($data);
+    $sourcepaths = reportbuilder::find_source_dirs();
+    $sourcepaths[] = $CFG->dirroot . '/totara/reportbuilder/embedded/';
+
+    foreach ($sourcepaths as $sourcepath) {
+        $classfile = $sourcepath . 'rb_' . $embedname . '_embedded.php';
+        if (is_readable($classfile)) {
+            include_once($classfile);
+            $classname = 'rb_' . $embedname . '_embedded';
+            if (class_exists($classname)) {
+                return new $classname($data);
+            }
         }
     }
     // file or class not found
@@ -5387,19 +5391,22 @@ function reportbuilder_get_embedded_report($embedname, $data = array(), $nocache
  */
 function reportbuilder_get_all_embedded_reports() {
     global $CFG;
-    $sourcepath = $CFG->dirroot . '/totara/reportbuilder/embedded/';
 
     $embedded = array();
-    if ($dh = opendir($sourcepath)) {
-        while(($file = readdir($dh)) !== false) {
-            if (is_dir($file) ||
-                !preg_match('|^rb_(.*)_embedded\.php$|', $file, $matches)) {
-                continue;
-            }
-            $name = $matches[1];
-            $embed = false;
-            if ($embed = reportbuilder_get_embedded_report_object($name)) {
-                $embedded[] = $embed;
+    $sourcepaths = reportbuilder::find_source_dirs();
+    $sourcepaths[] = $CFG->dirroot . '/totara/reportbuilder/embedded/';
+    foreach ($sourcepaths as $sourcepath) {
+        if ($dh = opendir($sourcepath)) {
+            while(($file = readdir($dh)) !== false) {
+                if (is_dir($file) ||
+                    !preg_match('|^rb_(.*)_embedded\.php$|', $file, $matches)) {
+                        continue;
+                    }
+                $name = $matches[1];
+                $embed = false;
+                if ($embed = reportbuilder_get_embedded_report_object($name)) {
+                    $embedded[] = $embed;
+                }
             }
         }
     }
