@@ -48,7 +48,14 @@
 }
 
 .course_category_tree .courses > .paging.paging-morelink:hover {background-color:inherit;}
-.coursebox > .info > .name a {display:block;background-repeat:no-repeat;padding-left:40px;background-position:left top;line-height:2em;}
+.coursebox > .info > .name a,
+.coursebox > .info > .coursename a {
+    display:block;
+    background-repeat:no-repeat;
+    padding-left:40px;
+    background-position:left top;
+    line-height:2em;
+}
 
 /* Remove collapsible style images from everywhere except for index page */
 /* This overrides Moodle course core style */
