@@ -91,7 +91,7 @@ if ($courseid != SITEID && !empty($courseid)) {
 
 require_course_login($course);
 
-$calendar = new calendar_information($day, $mon, $yr);
+$calendar = new calendar_information($day, $mon, $year);
 
 $calendar->prepare_for_view($course, $courses);
 
