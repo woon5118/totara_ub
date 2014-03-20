@@ -52,3 +52,8 @@ div.datepicker-wrapper {
 table.namewithlinks-layout {
     width: 100%;
 }
+
+.block_totara_my_team_nav .content span {
+    padding-left: 5px;
+    font-style: italic;
+}

@@ -191,22 +191,14 @@ class totara_core_renderer extends plugin_renderer_base {
         if (empty($numteammembers) || $numteammembers == 0) {
             return '';
         }
-        $table = new html_table();
-        $cells = array();
+
         $text = get_string('viewmyteam','totara_core');
         $icon = new pix_icon('teammembers', $text, 'totara_core');
         $url = new moodle_url('/my/teammembers.php');
-        $cellcontent = $this->output->action_icon($url, $icon);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        $cellcontent = html_writer::link($url, $text);
-        $cellcontent .= html_writer::empty_tag('br');
-        $cellcontent .= get_string('numberofstaff', 'totara_core', $numteammembers);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        $row = new html_table_row($cells);
-        $table->data[] = $row;
-        return html_writer::table($table);
+        $content = $this->output->action_icon($url, $icon);
+        $content .= html_writer::link($url, $text);
+        $content .= html_writer::tag('span', get_string('numberofstaff', 'totara_core', $numteammembers));
+        return $content;
     }
 
     /**
