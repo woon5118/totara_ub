@@ -56,7 +56,7 @@ $badversions = array('search/version.php',
 );
 
 //get the Totara version this patch is for (should be a bumped version number)
-require_once($CFG->dirroot . '/version.php');
+require($CFG->dirroot . '/version.php');
 if (!isset($TOTARA)) {
     //some sort of problem
     echo "ERROR: cannot determine site branch version number\n";
@@ -84,9 +84,9 @@ if (!isset($TOTARA->version)) {
     if (strpos($TOTARA->version, '+') === false) {
         echo "WARNING: TOTARA->version is not bumped!\n";
     }
-    // Make sure the version is 2.5.x.
+    // Make sure the version is 2.6.x.
     // This needs to be updated the the correct range if using the code on other stable branches.
-    if (!(version_compare($TOTARA->version, "2.5.0", ">=") && version_compare($TOTARA->version, "2.6.0", "<"))) {
+    if (!(version_compare($TOTARA->version, "2.6.0", ">=") && version_compare($TOTARA->version, "2.7.0", "<"))) {
         echo "ERROR: TOTARA->version is for a different branch!\n";
     }
 }
