@@ -1752,22 +1752,26 @@ abstract class rb_base_source {
     }
 
 
-     /**
+    /**
      * Adds some common user field to the $columnoptions array
      *
      * @param array &$columnoptions Array of current column options
      *                              Passed by reference and updated by
      *                              this method
      * @param string $join Name of the join that provides the 'user' table
+     * @param string $groupname The group to add fields to. If you are defining
+     *                          a custom group name, you must define a language
+     *                          string with the key "type_{$groupname}" in your
+     *                          report source language file.
      *
      * @return True
      */
     protected function add_user_fields_to_columns(&$columnoptions,
-        $join='auser') {
+        $join='auser', $groupname = 'user') {
         global $DB, $CFG;
 
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'fullname',
             get_string('userfullname', 'totara_reportbuilder'),
             $DB->sql_fullname("$join.firstname", "$join.lastname"),
@@ -1776,7 +1780,7 @@ abstract class rb_base_source {
                   'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'namelink',
             get_string('usernamelink', 'totara_reportbuilder'),
             $DB->sql_fullname("$join.firstname", "$join.lastname"),
@@ -1788,7 +1792,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'namelinkicon',
             get_string('usernamelinkicon', 'totara_reportbuilder'),
             $DB->sql_fullname("$join.firstname", "$join.lastname"),
@@ -1812,7 +1816,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'email',
             get_string('useremail', 'totara_reportbuilder'),
             // use CASE to include/exclude email in SQL
@@ -1834,7 +1838,7 @@ abstract class rb_base_source {
         if (!empty($CFG->showuseridentity) &&
             in_array('email', explode(',', $CFG->showuseridentity))) {
             $columnoptions[] = new rb_column_option(
-                'user',
+                $groupname,
                 'emailunobscured',
                 get_string('useremailunobscured', 'totara_reportbuilder'),
                 "$join.email",
@@ -1851,7 +1855,7 @@ abstract class rb_base_source {
             );
         }
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'lastlogin',
             get_string('userlastlogin', 'totara_reportbuilder'),
             // See MDL-22481 for why currentlogin is used instead of lastlogin
@@ -1862,7 +1866,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'firstaccess',
             get_string('userfirstaccess', 'totara_reportbuilder'),
             "$join.firstaccess",
@@ -1897,7 +1901,7 @@ abstract class rb_base_source {
         );
         foreach ($fields as $field => $name) {
             $columnoptions[] = new rb_column_option(
-                'user',
+                $groupname,
                 $field,
                 $name,
                 "$join.$field",
@@ -1916,7 +1920,7 @@ abstract class rb_base_source {
 
         // add country option
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'country',
             get_string('usercountry', 'totara_reportbuilder'),
             "$join.country",
@@ -1928,7 +1932,7 @@ abstract class rb_base_source {
 
         // add deleted option
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'deleted',
             get_string('userstatus', 'totara_reportbuilder'),
             "CASE WHEN $join.deleted = 0 and $join.suspended = 1 THEN 2 ELSE $join.deleted END",
@@ -1938,7 +1942,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'timecreated',
             get_string('usertimecreated', 'totara_reportbuilder'),
             "$join.timecreated",
@@ -1948,7 +1952,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'timemodified',
             get_string('usertimemodified', 'totara_reportbuilder'),
             "$join.timemodified",
@@ -1968,9 +1972,13 @@ abstract class rb_base_source {
      * @param array &$filteroptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
+     * @param string $groupname Name of group to filter. If you are defining
+     *                          a custom group name, you must define a language
+     *                          string with the key "type_{$groupname}" in your
+     *                          report source language file.
      * @return True
      */
-    protected function add_user_fields_to_filters(&$filteroptions) {
+    protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user') {
         // auto-generate filters for user fields
         $fields = array(
             'fullname' => get_string('userfullname', 'totara_reportbuilder'),
@@ -1987,7 +1995,7 @@ abstract class rb_base_source {
         );
         foreach ($fields as $field => $name) {
             $filteroptions[] = new rb_filter_option(
-                'user',
+                $groupname,
                 $field,
                 $name,
                 'text'
@@ -1997,7 +2005,7 @@ abstract class rb_base_source {
         // pulldown with list of countries
         $select_width_options = rb_filter_option::select_width_limiter();
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'country',
             get_string('usercountry', 'totara_reportbuilder'),
             'select',
@@ -2008,7 +2016,7 @@ abstract class rb_base_source {
             )
         );
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'deleted',
             get_string('userstatus', 'totara_reportbuilder'),
             'select',
@@ -2022,7 +2030,7 @@ abstract class rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'lastlogin',
             get_string('userlastlogin', 'totara_reportbuilder'),
             'date',
@@ -2032,7 +2040,7 @@ abstract class rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'firstaccess',
             get_string('userfirstaccess', 'totara_reportbuilder'),
             'date',
@@ -2042,7 +2050,7 @@ abstract class rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'timecreated',
             get_string('usertimecreated', 'totara_reportbuilder'),
             'date',
@@ -2052,7 +2060,7 @@ abstract class rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-            'user',
+            $groupname,
             'timemodified',
             get_string('usertimemodified', 'totara_reportbuilder'),
             'date',
