@@ -57,3 +57,8 @@ table.namewithlinks-layout {
     padding-left: 5px;
     font-style: italic;
 }
+
+.block_totara_my_team_nav a img.smallicon {
+    height: auto;
+    width: auto;
+}
