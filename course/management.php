@@ -256,7 +256,9 @@ if ($action !== false && confirm_sesskey()) {
                     $notification = get_string('coursecategorydeleted', '', $category->get_formatted_name());
                     $deletedcourses = $category->delete_full(true);
                     foreach ($deletedcourses as $course) {
-                        echo $renderer->notification(get_string('coursedeleted', '', $course->shortname), 'notifysuccess');
+                        if (!empty($course)) {
+                            echo $renderer->notification(get_string('coursedeleted', '', $course->shortname), 'notifysuccess');
+                        }
                     }
                     echo $renderer->notification($notification, 'notifysuccess');
                     echo $renderer->continue_button($continueurl);

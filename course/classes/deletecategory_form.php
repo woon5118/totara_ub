@@ -84,10 +84,10 @@ class core_course_deletecategory_form extends moodleform {
         if ($this->coursecat->has_courses()) {
             $contents .= '<li>' . get_string('courses') . '</li>';
         }
-        if (prog_has_programs($this->_category)) {
+        if (prog_has_programs($this->coursecat)) {
             $contents .= '<li>' . get_string('programs', 'totara_program') . '</li>';
         }
-        if (certif_has_certifications($this->_category)) {
+        if (certif_has_certifications($this->coursecat)) {
             $contents .= '<li>' . get_string('certifications', 'totara_certification') . '</li>';
         }
         if (question_context_has_any_questions($categorycontext)) {
