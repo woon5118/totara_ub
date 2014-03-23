@@ -208,7 +208,7 @@ class cohort_rule_sqlhandler_completion_date_course extends cohort_rule_sqlhandl
                    WHERE cc.userid = u.id
                      AND cc.course {$sqlin}
                      AND cc.timecompleted > 0
-                     AND cc.timecompleted {$operator} {$date}
+                     AND cc.timecompleted {$comparison}
                   )";
         $sqlhandler->params = $params;
         return $sqlhandler;
@@ -232,7 +232,7 @@ class cohort_rule_sqlhandler_completion_date_program extends cohort_rule_sqlhand
                      AND pc.coursesetid = 0
                      AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
                      AND pc.timecompleted > 0
-                     AND pc.timecompleted {$operator} {$date}
+                     AND pc.timecompleted {$comparison}
                   )";
         $sqlhandler->params = $params;
         return $sqlhandler;
@@ -264,7 +264,7 @@ class cohort_rule_sqlhandler_completion_duration_course extends cohort_rule_sqlh
                       WHERE cc.userid = u.id
                         AND cc.course {$sqlin2}
                         AND cc.timecompleted > 0
-                  ) {$operator} {$duration})";
+                  ) {$comparison})";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
@@ -298,7 +298,7 @@ class cohort_rule_sqlhandler_completion_duration_program extends cohort_rule_sql
                         AND pc.coursesetid = 0
                         AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
                         AND pc.timecompleted > 0
-                  ) {$operator} {$duration})";
+                  ) {$comparison})";
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
