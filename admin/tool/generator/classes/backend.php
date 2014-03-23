@@ -121,6 +121,18 @@ abstract class tool_generator_backend {
     }
 
     /**
+     * Extract number from the value.
+     * @param $field
+     * @param $value
+     * @return array $matches
+     */
+    public static function get_number_match($field, $value) {
+        $matches = array();
+        preg_match('~^' . $field . '([0-9]{6})$~', $value, $matches);
+        return $matches;
+    }
+
+    /**
      * Displays information as part of progress.
      * @param string $langstring Part of langstring (after progress_)
      * @param mixed $a Optional lang string parameters
