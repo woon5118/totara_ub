@@ -80,7 +80,8 @@ $mform = new core_course_editcategory_form(null, array(
     'categoryid' => $id,
     'parent' => $category->parent,
     'context' => $context,
-    'itemid' => $itemid
+    'itemid' => $itemid,
+    'type' => $type
 ));
 $mform->set_data(file_prepare_standard_editor(
     $category,
