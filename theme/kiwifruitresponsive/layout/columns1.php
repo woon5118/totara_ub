@@ -138,12 +138,14 @@ echo $OUTPUT->doctype() ?>
 <?php if ($hasfooter) { ?>
   <div id="page-footer">
     <div class="footer-content">
-      <?php if ($hascustommenu) { ?>
-      <div id="custommenu"><?php echo $custommenu; ?></div>
-      <?php } else { ?>
-      <div id="totaramenu"><?php echo $totaramenu; ?>
-  <div class="clear"></div>
-  </div>
+      <?php if ($showmenu) { ?>
+          <?php if ($hascustommenu) { ?>
+          <div id="custommenu"><?php echo $custommenu; ?></div>
+          <?php } else { ?>
+          <div id="totaramenu"><?php echo $totaramenu; ?>
+            <div class="clear"></div>
+          </div>
+          <?php } ?>
       <?php } ?>
       <div class="footer-powered"><a href="http://www.totaralms.com/" target="_blank"><img class="logo" src="<?php echo $CFG->wwwroot.'/theme/'.$PAGE->theme->name ?>/pix/logo-ftr.png" alt="Logo" /></a></div>
     <div class="footer-backtotop"><a href="#">Back to top</a></div>
