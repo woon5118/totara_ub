@@ -487,20 +487,16 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
             }
         } else {
             // enrol link if possible
-            if (is_viewing($coursecontext)) {
-                // better not show any enrol link, this is intended for managers and inspectors
-            } else {
-                foreach ($instances as $instance) {
-                    if (!isset($plugins[$instance->enrol])) {
-                        continue;
-                    }
-                    $plugin = $plugins[$instance->enrol];
-                    if ($plugin->show_enrolme_link($instance)) {
-                        $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
-                        $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                        $coursenode->add(get_string('enrolmentoptions', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/useradd', ''));
-                        break;
-                    }
+            foreach ($instances as $instance) {
+                if (!isset($plugins[$instance->enrol])) {
+                    continue;
+                }
+                $plugin = $plugins[$instance->enrol];
+                if ($plugin->show_enrolme_link($instance)) {
+                    $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
+                    $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
+                    $coursenode->add(get_string('enrolmentoptions', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/useradd', ''));
+                    break;
                 }
             }
         }
