@@ -532,6 +532,7 @@ p.errormessage {
     margin:0 10px 0 0;
     background-color: transparent;
     float: left;
+    clear: left;
 }
 .dir-rtl #navbar .breadcrumb {
     margin:0 0 0 10px;
