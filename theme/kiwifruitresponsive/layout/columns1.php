@@ -30,6 +30,12 @@ if (!empty($PAGE->theme->settings->frontpagelogo)) {
     $logourl = $OUTPUT->pix_url('logo', 'theme');
 }
 
+if (!empty($PAGE->theme->settings->favicon)) {
+    $faviconurl = $PAGE->theme->setting_file_url('favicon', 'favicon');
+} else {
+    $faviconurl = $OUTPUT->favicon();
+}
+
 $custommenu = $OUTPUT->custom_menu();
 $hascustommenu = !empty($custommenu);
 $hasfooter = (empty($PAGE->layout_options['nofooter']));
@@ -49,7 +55,7 @@ echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
     <title><?php echo $OUTPUT->page_title(); ?></title>
-    <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
+    <link rel="shortcut icon" href="<?php echo $faviconurl; ?>" />
     <?php echo $OUTPUT->standard_head_html() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans|Open+Sans:300|Open+Sans:400|Open+Sans:700"/>

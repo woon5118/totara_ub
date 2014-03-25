@@ -25,11 +25,17 @@
 $hasfooter = (!isset($PAGE->layout_options['nofooter']) || !$PAGE->layout_options['nofooter'] );
 $hasnavbar = (!isset($PAGE->layout_options['nonavbar']) || !$PAGE->layout_options['nonavbar'] );
 
+if (!empty($PAGE->theme->settings->favicon)) {
+    $faviconurl = $PAGE->theme->setting_file_url('favicon', 'favicon');
+} else {
+    $faviconurl = $OUTPUT->favicon();
+}
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
     <title><?php echo $OUTPUT->page_title(); ?></title>
-    <link rel="shortcut icon" href="<?php echo $OUTPUT->favicon(); ?>" />
+    <link rel="shortcut icon" href="<?php echo $faviconurl; ?>" />
     <?php echo $OUTPUT->standard_head_html() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
