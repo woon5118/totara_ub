@@ -451,7 +451,7 @@ p.errormessage {
 #page-header #logo,
 #page-header #logo.custom {
     float:left;
-    margin:27px 0 0;
+    margin:27px 10px 0 0;
 }
 .dir-rtl #page-header #logo,
 .dir-rtl #page-header #logo.custom {
