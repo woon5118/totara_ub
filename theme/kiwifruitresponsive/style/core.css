@@ -1293,6 +1293,7 @@ body.popup {
  * Moodle Tabs
  */
 .tabtree {
+    margin-top: 10px;
     margin-bottom:40px;
     position:relative;
 }
@@ -1440,6 +1441,10 @@ tabrow1 {
 }
 .tabtree .tabrow0 li.selected .tabrow1 a:hover {
     text-decoration:underline;
+}
+
+div.tabtree2 {
+    margin-bottom: 40px;
 }
 /**
  * Profile section

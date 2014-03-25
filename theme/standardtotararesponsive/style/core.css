@@ -911,7 +911,7 @@ div.tabtree2 {
     border: none;
     color: #333333;
 }
-.tabtree .tabrow0 li.here .empty {
+.tabtree .tabrow0 div {
     display:block;
     overflow:hidden;
     padding:0px;
