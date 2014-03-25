@@ -1183,13 +1183,14 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
                      LEFT JOIN';
     }
 
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
     $sql = "
         SELECT
             {$reservedfields}
             u.id,
             su.id AS submissionid,
-            u.firstname,
-            u.lastname,
+            {$usernamefields},
             u.email,
             s.discountcost,
             su.discountcode,
@@ -3666,6 +3667,8 @@ function facetoface_add_customfields_to_form(&$mform, $customfields, $alloptiona
 function facetoface_get_cancellations($sessionid) {
     global $CFG, $DB;
 
+    $usernamefields = get_all_user_name_fields(true, 'u');
+
     $instatus = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_REQUESTED);
     list($insql, $inparams) = $DB->get_in_or_equal($instatus);
     // Nasty SQL follows:
@@ -3675,8 +3678,7 @@ function facetoface_get_cancellations($sessionid) {
             SELECT
                 u.id,
                 su.id AS signupid,
-                u.firstname,
-                u.lastname,
+                {$usernamefields},
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
                 " . $DB->sql_compare_text('c.note', 255) . " AS cancelreason
@@ -3760,7 +3762,8 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
 
     // If no select SQL supplied, use default
     if (!$select) {
-        $select = "u.id, su.id AS signupid, u.firstname, u.lastname, ss.timecreated, u.email";
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        $select = "u.id, su.id AS signupid, {$usernamefields}, ss.timecreated, u.email";
         if ($includereserved) {
             $select = "su.id, ".$select;
         }
