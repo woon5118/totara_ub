@@ -36,6 +36,8 @@ class scheduler_test extends PHPUnit_Framework_TestCase {
      * Test basic scheduler functionality
      */
     public function test_scheduler_basic() {
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
         $row = new stdClass();
         $row->data = 'Some data';
         $row->schedule = 0;
@@ -55,6 +57,7 @@ class scheduler_test extends PHPUnit_Framework_TestCase {
         $this->assertGreaterThan(time(), $scheduler->get_scheduled_time());
         $this->assertTrue($scheduler->is_changed());
         $this->assertFalse($scheduler->is_time());
+        date_default_timezone_set($tz);
     }
 
     /**
