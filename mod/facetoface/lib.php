@@ -3702,8 +3702,7 @@ function facetoface_get_cancellations($sessionid) {
             GROUP BY
                 su.id,
                 u.id,
-                u.firstname,
-                u.lastname,
+                {$usernamefields},
                 c.timecreated,
                 " . $DB->sql_compare_text('c.note', 255) . "
             ORDER BY
