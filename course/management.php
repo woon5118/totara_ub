@@ -235,7 +235,6 @@ if ($action !== false && confirm_sesskey()) {
             if (!$category->can_delete()) {
                 throw new moodle_exception('permissiondenied', 'error', '', null, 'coursecat::can_resort');
             }
-            require_once($CFG->dirroot.'/course/delete_category_form.php');
             $mform = new core_course_deletecategory_form(null, $category);
             if ($mform->is_cancelled()) {
                 redirect($PAGE->url);
@@ -254,7 +253,7 @@ if ($action !== false && confirm_sesskey()) {
                         $continueurl->param('categoryid', $category->parent);
                     }
                     $notification = get_string('coursecategorydeleted', '', $category->get_formatted_name());
-                    $deletedcourses = $category->delete_full(true);
+                    list($deletedcourses, $deletedprograms) = $category->delete_full(true);
                     foreach ($deletedcourses as $course) {
                         if (!empty($course)) {
                             echo $renderer->notification(get_string('coursedeleted', '', $course->shortname), 'notifysuccess');
@@ -513,4 +512,5 @@ echo $renderer->grid_end();
 
 // End of the management form.
 echo $renderer->management_form_end();
+echo $renderer->management_buttons($categoryid);
 echo $renderer->footer();

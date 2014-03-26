@@ -70,3 +70,6 @@
 .course_category_tree .category.with_children>.info .name {background-image:none;}
 .course_category_tree .category.with_children.collapsed>.info .name {background-image:none;}
 .dir-rtl .course_category_tree .category.with_children.collapsed>.info .name {background-image:none;}
+
+/* Changing margin bottom in course category list */
+#course-category-listings {margin-bottom:20px;}

@@ -400,7 +400,7 @@ if ($canmanage) {
     echo $OUTPUT->single_button($url, $title, 'get');
 
     // Print button for switching to courses management.
-    $url = new moodle_url('/course/manage.php', array('categoryid' => $id, 'viewtype' => $viewtype));
+    $url = new moodle_url('/course/management.php', array('categoryid' => $id));
     $coursecaps = array('moodle/course:create', 'moodle/course:delete', 'moodle/course:update');
     if (has_any_capability($coursecaps, $context)) {
         $title = get_string('managecoursesinthiscat', 'totara_program');
