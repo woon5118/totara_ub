@@ -290,6 +290,50 @@ table#hierarchy-bulk-action td.action-column div.fitem div.fitemtitle {
 .buttons .singlebutton div {
     display: inline;
 }
+
+.messagesettingcomponent th,
+.messagesettingcomponent td {
+    width: 75px;
+}
+.messagesettingcomponent th:first-child,
+.messagesettingcomponent td:first-child {
+    width: auto;
+}
+
+@media screen and (max-width: 768px) {
+    .messagesettingcomponent th,
+    .messagesettingcomponent td {
+        width: 50px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .messagesettingcomponent th,
+    .messagesettingcomponent td {
+        width: auto;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    .messagesettingcomponent th,
+    .messagesettingcomponent td {
+        width: 125px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .messagesettingcomponent th,
+    .messagesettingcomponent td {
+        width: 150px;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    .messagesettingcomponent th,
+    .messagesettingcomponent td {
+        width: 200px;
+    }
+}
 /*IE7 fixes*/
 body.ie7 table#hierarchy-bulk-action td.label-column {
     word-wrap: normal;
