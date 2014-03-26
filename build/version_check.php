@@ -76,19 +76,27 @@ if (!isset($TOTARA->build)) {
     }
     test_date_format("TOTARA->build", $blddate . $bldbump);
 }
-// Check the TOTARA version variable
+
 if (!isset($TOTARA->version)) {
     echo "ERROR: TOTARA->version not set in version.php\n";
-} else {
-    //Warn if version does not have a bump
-    if (strpos($TOTARA->version, '+') === false) {
-        echo "WARNING: TOTARA->version is not bumped!\n";
-    }
-    // Make sure the version is 2.6.x.
-    // This needs to be updated the the correct range if using the code on other stable branches.
-    if (!(version_compare($TOTARA->version, "2.6.0", ">=") && version_compare($TOTARA->version, "2.7.0", "<"))) {
-        echo "ERROR: TOTARA->version is for a different branch!\n";
-    }
+    die;
+}
+
+// Check the TOTARA version variable
+
+// Warn if version does not have a bump (unless we are in alpha or beta state).
+$isunstable = (bool) strpbrk(substr($TOTARA->version, -1), 'ab');
+if (strpos($TOTARA->version, '+') === false && !$isunstable) {
+    echo "WARNING: TOTARA->version is not bumped!\n";
+}
+
+// Strip out '+', 'a', 'b', etc. leaving just numbers and dots.
+$tversion = preg_replace('/[^0-9\.]/', '', $TOTARA->version);
+
+// Make sure the version is 2.6.x.
+// This needs to be updated the the correct range if using the code on other stable branches.
+if (!(version_compare($tversion, "2.6.0", ">=") && version_compare($TOTARA->version, "2.7.0", "<"))) {
+    echo "ERROR: TOTARA->version is for a different branch!\n";
 }
 
 if ($filepath == 'version.php') {
@@ -96,8 +104,6 @@ if ($filepath == 'version.php') {
     die();
 }
 
-// Strip out '+', 'a', 'b', etc. leaving just numbers and dots.
-$tversion = preg_replace('/[^0-9\.]/', '', $TOTARA->version);
 
 //get the version in this patch
 $file_array = file($CFG->dirroot . '/' . $filepath);
