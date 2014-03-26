@@ -91,7 +91,8 @@ if ($USER->id == $userid) {
 $PAGE->navbar->add($strviewrequest);
 
 // Get all the associated resp_assignments to go through and form the table.
-$resp_sql = "SELECT ra.*, ea.email, u.firstname, u.lastname
+$usernamefields = get_all_user_name_fields(true, 'u');
+$resp_sql = "SELECT ra.*, ea.email, {$usernamefields}
              FROM {feedback360_resp_assignment} ra
              LEFT JOIN {feedback360_email_assignment} ea
              ON ra.feedback360emailassignmentid = ea.id
