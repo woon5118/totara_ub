@@ -894,7 +894,6 @@ $string['setting:hidediscount'] = 'Hide only the discount code field.';
 $string['setting:hidediscount_caption'] = 'Hide discount:';
 $string['setting:sitenotices'] = 'Notices only appear on the Face-to-face Calendar found {$a}';
 $string['setting:sitenoticeshere'] = 'here';
-$string['setting:isfilter'] = 'Display as a filter'; // I guess this needs to be removed for 2.6.
 $string['setting:possiblevalues'] = 'List of possible values';
 $string['setting:reservecanceldays'] = 'Reservation cancellation days (default)';
 $string['setting:reservecanceldays_desc'] = 'The number of days in advance of the session that reservations will be automatically cancelled, if not confirmed.';
