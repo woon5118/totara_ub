@@ -77,6 +77,9 @@ class user_position_assignment_form extends moodleform {
             $organisation_title = $DB->get_field('org', 'fullname', array('id' => $organisationid));
         }
 
+        // The fields required to display the name of a user.
+        $usernamefields = get_all_user_name_fields(true, 'u');
+
         // Get manager title.
         $manager_title = '';
         $manager_id = 0;
@@ -85,8 +88,7 @@ class user_position_assignment_form extends moodleform {
                 $manager = $DB->get_record_sql(
                     "SELECT
                         u.id,
-                        u.firstname,
-                        u.lastname
+                        {$usernamefields}
                      FROM
                         {user} u
                      WHERE
@@ -102,8 +104,7 @@ class user_position_assignment_form extends moodleform {
             $manager = $DB->get_record_sql(
                 "SELECT
                     u.id,
-                    u.firstname,
-                    u.lastname,
+                    {$usernamefields},
                     ra.id AS ra
                  FROM
                     {user} u
@@ -127,8 +128,7 @@ class user_position_assignment_form extends moodleform {
             $appraiser = $DB->get_record_sql(
                 "SELECT
                     u.id,
-                    u.firstname,
-                    u.lastname
+                    {$usernamefields}
                  FROM
                     {user} u
                  WHERE
