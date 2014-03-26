@@ -255,7 +255,8 @@ class totara_assign_core {
         // Get WHERE clause to restrict by search if required.
         list($searchsql, $searchparams) = $this->get_user_search_where_sql($search, 'u');
 
-        $sql = "SELECT u.id, u.firstname, u.lastname FROM {user} u {$joinsql} {$searchsql}";
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        $sql = "SELECT u.id, {$usernamefields} FROM {user} u {$joinsql} {$searchsql}";
         $params = array_merge($params, $searchparams);
 
         $sql .= " ORDER BY u.firstname, u.lastname";
