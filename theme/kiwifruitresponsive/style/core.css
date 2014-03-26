@@ -1057,6 +1057,14 @@ fieldset {
     width:100% !important;
 }
 
+.mform .moodleSkin .mceStatusbar {
+    height: 30px;
+}
+
+.mform .moodleSkin .mceStatusbar a.mceResize {
+    margin-top: 14px;
+}
+
 /**
  * Course Pages
  */
