@@ -72,6 +72,7 @@ $THEME->layouts = array(
     'report' => array(
         'file' => 'columns2.php',
         'regions' => array('side-pre'),
+        'defaultregion' => 'side-pre',
         'options' => array('langmenu' => true),
     ),
 );

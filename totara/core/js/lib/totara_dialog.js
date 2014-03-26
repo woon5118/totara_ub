@@ -107,6 +107,8 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
      * @return  void
      */
     this.setup = function() {
+        // Set up obj for closure
+        var obj = this;
 
         var height = $(window).height() * 0.8;
 
@@ -119,7 +121,10 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
             modal: true,
             resizable: false,
             zIndex: 1500,
-            dialogClass: 'totara-dialog'
+            dialogClass: 'totara-dialog',
+            open: function() {
+                $(this).parent().find("span.ui-dialog-title").html("<span class='title'>" + obj.config.title + "</span>");
+            }
         };
 
         // Instantiate the Dialog
@@ -133,9 +138,6 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         if (this.handler != undefined) {
             this.handler._setup(this);
         }
-
-        // Set up obj for closure
-        var obj = this;
 
         // Bind hide() event to closing dialog
         // Need this to make sure hide() is called on ESCAPE and dialog closure with [X] button

@@ -64,18 +64,8 @@ $('#column-checkboxes input').click(function() {
     var sel = '#' + shortname + ' td.' + $(this).attr('name');
     var value = $(this).is(':checked') ? 1 : 0;
 
-    if (navigator.userAgent.match(/msie [8]/i)) {
-        $(selheader).each(function(i, elem) {
-            $(elem).toggle($(elem).css('display') == 'none');
-        });
-        $(sel).each(function(i, elem) {
-            $(elem).toggle($(elem).css('display') == 'none');
-        });
-    }
-    else {
-        $(selheader).toggle();
-        $(sel).toggle();
-    }
+    $(selheader).toggle();
+    $(sel).toggle();
 
     $.ajax({
         url: '<?php print $CFG->wwwroot; ?>/totara/reportbuilder/showhide_save.php',

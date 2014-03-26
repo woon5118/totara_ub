@@ -336,7 +336,7 @@ class totara_dialog_content {
             if ($total > $maxitems) {
                 $html .= '<li class="last"><span class="empty">';
                 $html .= get_string('error:morethanxitemsatthislevel', 'totara_core', $maxitems);
-                $html .= ' <a href="#search-tab" onclick="$(\'#dialog-tabs\').tabs(\'select\', 1);return false;">';
+                $html .= ' <a href="#search-tab" onclick="$(\'#dialog-tabs\').tabs(\'option\', \'active\', 1);return false;">';
                 $html .= get_string('trysearchinginstead', 'totara_core');
                 $html .= '</a>';
                 $html .= '</span></li>'.PHP_EOL;

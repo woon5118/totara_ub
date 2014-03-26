@@ -118,7 +118,7 @@ div.totara-dialog {
     overflow:visible !important;
     border: 1px solid #DDDDDD;
     padding: 0.5em;
-
+    z-index: 1;
 }
     div.totara-dialog div.ui-dialog-titlebar {
         overflow: visible;

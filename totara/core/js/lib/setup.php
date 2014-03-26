@@ -47,20 +47,19 @@ function local_js($options = array()) {
     // Include required javascript libraries
     // jQuery component and UI bundle found here: http://jqueryui.com/download
     // Core, Widget, Position, Dialog, Tabs, Datepicker, Effects Core, Effects "Fade"
-    $PAGE->requires->js('/totara/core/js/lib/jquery-1.9.1.min.js');
-
+    $PAGE->requires->js('/totara/core/js/lib/jquery-2.1.0.min.js');
 
     // If UI
     if (in_array(TOTARA_JS_UI, $options)) {
 
-        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.9.2.custom.min.js');
+        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.10.4.custom.min.js');
 
     }
 
     // If dialog
     if (in_array(TOTARA_JS_DIALOG, $options)) {
 
-        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.9.2.custom.min.js');
+        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.10.4.custom.min.js');
 
         // Load required strings into the JS global namespace in the form
         // M.str.COMPONENT.IDENTIFIER, eg; M.str.totara_core['save']. Can also
@@ -95,7 +94,7 @@ function local_js($options = array()) {
     // If datepicker enabled
     if (in_array(TOTARA_JS_DATEPICKER, $options)) {
 
-        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.9.2.custom.min.js');
+        $PAGE->requires->js('/totara/core/js/lib/jquery-ui-1.10.4.custom.min.js');
 
         $PAGE->requires->strings_for_js(array('datepickerlongyeardisplayformat', 'datepickerlongyearplaceholder', 'datepickerlongyearregexjs'), 'totara_core');
         $PAGE->requires->string_for_js('thisdirection', 'langconfig');
