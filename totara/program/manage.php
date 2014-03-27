@@ -408,22 +408,28 @@ if ($canmanage) {
     echo $OUTPUT->single_button($url, $title, 'get');
     if ($viewtype == 'program') {
         // Print button for switching to certification management.
-        $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id, 'viewtype' => 'certification'));
-        $programcaps = array('totara/certification:createcertification',
-                             'totara/certification:deletecertification',
-                             'totara/certification:configurecertification');
-        if (has_any_capability($programcaps, $context)) {
-            $title = get_string('managecertifsinthiscat', 'totara_certification');
+        if (totara_feature_visible('certifications')) {
+            $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id, 'viewtype' => 'certification'));
+            $programcaps = array('totara/certification:createcertification',
+                                 'totara/certification:deletecertification',
+                                 'totara/certification:configurecertification');
+            if (has_any_capability($programcaps, $context)) {
+                $title = get_string('managecertifsinthiscat', 'totara_certification');
+            }
+            echo $OUTPUT->single_button($url, $title, 'get');
         }
-        echo $OUTPUT->single_button($url, $title, 'get');
     } else {
         // Print button for switching to program management.
-        $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id));
-        $programcaps = array('totara/program:createprogram', 'totara/program:deleteprogram', 'totara/program:configuredetails');
-        if (has_any_capability($programcaps, $context)) {
-            $title = get_string('manageprogramsinthiscat', 'totara_program');
+        if (totara_feature_visible('programs')) {
+            $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $id));
+            $programcaps = array('totara/program:createprogram',
+                                 'totara/program:deleteprogram',
+                                 'totara/program:configuredetails');
+            if (has_any_capability($programcaps, $context)) {
+                $title = get_string('manageprogramsinthiscat', 'totara_program');
+            }
+            echo $OUTPUT->single_button($url, $title, 'get');
         }
-        echo $OUTPUT->single_button($url, $title, 'get');
     }
     echo $OUTPUT->container_end();
 }
@@ -671,8 +677,10 @@ if ($canmanage && $numprograms > 1 && empty($searchcriteria)) {
     echo $OUTPUT->single_button($url, get_string('resortprogramsbyname', 'totara_program'), 'get');
 }
 
+$cancreateprog = has_capability('totara/program:createprogram', $context) && !totara_feature_disabled('programs');
+$cancreatecert = has_capability('totara/certification:createcertification', $context) && !totara_feature_disabled('certifications');
 if (empty($searchcriteria)) {
-    if ($viewtype == 'program' && has_capability('totara/program:createprogram', $context)) {
+    if ($viewtype == 'program' && $cancreateprog) {
         // Print button to create a new program.
         $url = new moodle_url('/totara/program/add.php');
         if ($coursecat->id) {
@@ -681,7 +689,7 @@ if (empty($searchcriteria)) {
             $url->params(array('category' => $CFG->defaultrequestcategory));
         }
         echo $OUTPUT->single_button($url, get_string('addnewprogram', 'totara_program'), 'get');
-    } else if ($viewtype == 'certification' && has_capability('totara/certification:createcertification', $context)) {
+    } else if ($viewtype == 'certification' && $cancreatecert) {
         // Print button to create a new certification.
         $url = new moodle_url('/totara/certification/add.php');
         if ($coursecat->id) {
