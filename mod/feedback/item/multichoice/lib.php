@@ -338,7 +338,12 @@ class feedback_item_multichoice extends feedback_item_base {
         echo '<div class="feedback_item_presentation_'.$align.'">';
         $index = 1;
         $checked = '';
-        echo '<ul>';
+        if ($info->subtype == 'r' || $info->subtype == 'c') {
+            // if (r)adio buttons or (c)heckboxes
+            echo '<fieldset>';
+            echo '<ul>';
+        }
+
         if ($info->horizontal) {
             $hv = 'h';
         } else {
@@ -377,7 +382,11 @@ class feedback_item_multichoice extends feedback_item_base {
                 $this->print_item_dropdown($presentation, $item, false, $info, $align);
                 break;
         }
-        echo '</ul>';
+        if ($info->subtype == 'r' || $info->subtype == 'c') {
+            // if (r)adio buttons or (c)heckboxes
+            echo '</ul>';
+            echo '</fieldset>';
+        }
         echo '</div>';
     }
 
@@ -439,7 +448,11 @@ class feedback_item_multichoice extends feedback_item_base {
         //print the presentation
         echo '<div class="feedback_item_presentation_'.$align.$highlight.'">';
 
-        echo '<ul>';
+        if ($info->subtype == 'r' || $info->subtype == 'c') {
+            // if (r)adio buttons or (c)heckboxes
+            echo '<fieldset>';
+            echo '<ul>';
+        }
         if ($info->horizontal) {
             $hv = 'h';
         } else {
@@ -484,7 +497,11 @@ class feedback_item_multichoice extends feedback_item_base {
                 $this->print_item_dropdown($presentation, $item, $value, $info, $align);
                 break;
         }
-        echo '</ul>';
+        if ($info->subtype == 'r' || $info->subtype == 'c') {
+            // if (r)adio buttons or (c)heckboxes
+            echo '</ul>';
+            echo '</fieldset>';
+        }
         echo '</div>';
     }
 
@@ -775,8 +792,7 @@ class feedback_item_multichoice extends feedback_item_base {
         }
 
         ?>
-        <li class="feedback_item_select_<?php echo $hv.'_'.$align;?>">
-            <label class="accesshide" for="<?php echo $item->typ .'_' . $item->id;?>"><?php echo $item->name; ?></label>
+        <div class="feedback_item_select_<?php echo $hv.'_'.$align;?>">
             <select  id="<?php echo $item->typ .'_' . $item->id;?>" name="<?php echo $item->typ .'_' . $item->id;?>[]" size="1">
                 <option value="0">&nbsp;</option>
                 <?php
@@ -800,7 +816,7 @@ class feedback_item_multichoice extends feedback_item_base {
                 }
                 ?>
             </select>
-        </li>
+        </div>
         <?php
     }
 

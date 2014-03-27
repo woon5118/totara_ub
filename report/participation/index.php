@@ -258,8 +258,9 @@ if (!empty($instanceid) && !empty($roleid)) {
         $params['groupid'] = $currentgroup;
     }
 
-    $sql = "SELECT ra.userid, u.firstname, u.lastname, u.idnumber, l.actioncount AS count
-            FROM (SELECT DISTINCT userid FROM {role_assignments} WHERE contextid $relatedcontexts AND roleid = :roleid ) ra
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT ra.userid, $usernamefields, u.idnumber, l.actioncount AS count
+            FROM (SELECT DISTINCT userid FROM {role_assignments} WHERE contextid $relatedctxsql AND roleid = :roleid ) ra
             JOIN {user} u ON u.id = ra.userid
             $groupsql
             LEFT JOIN (

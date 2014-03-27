@@ -56,11 +56,15 @@ if ($id) {
         print_error('cannoteditsiteform');
     }
 
-    $course = course_get_format($id)->get_course();
+    // Login to the course and retrieve also all fields defined by course format.
+    $course = get_course($id);
     if ($usetags) {
         $course->otags = array_keys(tag_get_tags_array('course', $course->id, 'official'));
     }
+
     require_login($course);
+    $course = course_get_format($course)->get_course();
+
     $category = $DB->get_record('course_categories', array('id'=>$course->category), '*', MUST_EXIST);
     $coursecontext = context_course::instance($course->id);
     require_capability('moodle/course:update', $coursecontext);
