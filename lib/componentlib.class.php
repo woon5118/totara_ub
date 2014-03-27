@@ -227,12 +227,6 @@ class component_installer {
             return false;
         }
 
-    /// Check for correct sourcebase (this will be out in the future)
-        if (!PHPUNIT_TEST and $this->sourcebase != 'http://download.moodle.org') {
-            $this->errorstring='wrongsourcebase';
-            return false;
-        }
-
     /// Check the zip file is a correct one (by extension)
         if (stripos($this->zipfilename, '.zip') === false) {
             $this->errorstring='wrongzipfilename';
