@@ -1552,6 +1552,7 @@ div.tabtree2 {
 }
 .loginbox .loginerrors {
     width:100%;
+    font-weight: bold;
 }
 .dir-ltr .loginbox .loginerrors {
     margin-left:-20px;
