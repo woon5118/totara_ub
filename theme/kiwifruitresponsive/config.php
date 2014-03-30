@@ -27,7 +27,7 @@ $THEME->name = 'kiwifruitresponsive';
 $THEME->parents = array('standardtotararesponsive', 'bootstrapbase');
 $THEME->parents_exclude_sheets = array('standardtotararesponsive', 'admin');
 $THEME->sheets = array(
-    'core', 'blocks', 'navigation', 'course', 'dock', 'css3', 'ie7', 'custom'
+    'fonts', 'core', 'blocks', 'navigation', 'course', 'dock', 'css3', 'ie7', 'custom'
 );
 
 $THEME->enable_dock = false;

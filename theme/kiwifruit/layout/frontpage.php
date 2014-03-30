@@ -88,7 +88,6 @@ echo $OUTPUT->doctype() ?>
 <meta name="description" content="<?php p(strip_tags(format_text($sitesummary, FORMAT_HTML))) ?>" />
 <link rel="shortcut icon" href="<?php echo $faviconurl; ?>" />
 <?php echo $OUTPUT->standard_head_html() ?>
-<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans|Open+Sans:300|Open+Sans:400|Open+Sans:600|Open+Sans:700">
 </head>
 <body <?php echo $OUTPUT->body_attributes($bodyclasses); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html() ?>
