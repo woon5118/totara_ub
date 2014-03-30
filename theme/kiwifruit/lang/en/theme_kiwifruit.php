@@ -35,4 +35,4 @@ $string['favicon'] = 'Favicon';
 $string['favicondesc'] = 'Select or upload the image file to be used as the site\'s favicon, the icon must be *.ico format';
 $string['customcss'] = 'Custom CSS';
 $string['customcssdesc'] = 'Any CSS you enter here will be added to every page allowing you to easily customise this theme.';
-$string['choosereadme'] = 'Kiwifruit is a fluid width theme, based on standardtotara.';
+$string['choosereadme'] = 'Kiwifruit is a fluid width theme, based on standardtotara. This theme will be deprecated in the near future and will be replaced by the Kiwifruit responsive theme which is currently experimental.';

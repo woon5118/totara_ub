@@ -25,7 +25,7 @@
  * Strings for component 'theme_customtotara', language 'en', branch 'MOODLE_20_STABLE'
  */
 $string['pluginname'] = 'Custom Totara';
-$string['choosereadme'] = 'This is a highly customisable totara theme, suitable for creating a branded look via the theme settings page.';
+$string['choosereadme'] = 'This is a highly customisable totara theme, suitable for creating a branded look via the theme settings page. This theme has been deprecated and will be removed in Totara 2.7. Please use Custom Totara Responsive instead.';
 $string['logo'] = 'Logo';
 $string['logodesc'] = 'Select or upload the image file to be used as the site\'s logo';
 $string['favicon'] = 'Favicon';

@@ -26,4 +26,4 @@
 $string['pluginname'] = 'Standard Totara';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
-$string['choosereadme'] = 'This theme is a simple but clean totara theme, suitable for use as a base when building new themes.';
+$string['choosereadme'] = 'This theme is a simple but clean totara theme, suitable for use as a base when building new themes. This theme has been deprecated and will be removed in Totara 2.7. Please use Standard Totara Responsive instead.';
