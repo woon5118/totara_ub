@@ -49,6 +49,7 @@ $showsidepost = $hassidepost && !$PAGE->blocks->region_completely_docked('side-p
 $haslogininfo = (empty($PAGE->layout_options['nologininfo']));
 $showmenu = empty($PAGE->layout_options['nocustommenu']);
 $sitesummary = isset($SITE->summary) ? $SITE->summary : '';
+$left = (!right_to_left());
 
 if ($showmenu && !$hascustommenu) {
     // load totara menu
@@ -151,17 +152,17 @@ echo $OUTPUT->doctype() ?>
     </div>
 
     <div id="page-content" class="row-fluid">
-        <div id="<?php echo $regionbsid ?>" class="span9">
-            <section id="region-main" class="span8 pull-right">
+        <div id="region-bs-main-and-pre" class="span9 <?php echo ($left ? '' : 'pull-right'); ?>">
+            <section id="region-main" class="span8 <?php echo ($left ? 'pull-right' : ''); ?>">
                 <?php
                 echo $OUTPUT->course_content_header();
                 echo $OUTPUT->main_content();
                 echo $OUTPUT->course_content_footer();
                 ?>
             </section>
-            <?php echo $OUTPUT->blocks('side-pre', 'span4 desktop-first-column'); ?>
+            <?php echo $OUTPUT->blocks('side-pre', 'span4' . ($left ? ' desktop-first-column' : '')); ?>
         </div>
-        <?php echo $OUTPUT->blocks('side-post', 'span3'); ?>
+        <?php echo $OUTPUT->blocks('side-post', 'span3' . (!$left ? ' desktop-first-column pull-left' : '')); ?>
     </div>
   </div>
 </div>
