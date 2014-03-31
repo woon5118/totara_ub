@@ -394,7 +394,15 @@ class program {
         if (!empty($message_queue)) {
             // Send all the queued messages.
             foreach ($message_queue as $userid => $eventdata) {
-                events_trigger('program_assigned', $eventdata);
+
+                $event = \totara_program\event\program_assigned::create(
+                    array(
+                        'objectid' => $eventdata->programid,
+                        'context' => context_program::instance($eventdata->programid),
+                        'userid' => $eventdata->userid,
+                    )
+                );
+                $event->trigger();
             }
         }
 
@@ -620,10 +628,14 @@ class program {
             }
 
             // trigger this event for any listening handlers to catch
-            $eventdata = new stdClass();
-            $eventdata->programid = $this->id;
-            $eventdata->userid = $userid;
-            events_trigger('program_unassigned', $eventdata);
+            $event = \totara_program\event\program_unassigned::create(
+                array(
+                    'objectid' => $this->id,
+                    'context' => context_program::instance($this->id),
+                    'userid' => $userid,
+                )
+            );
+            $event->trigger();
         }
 
         return true;
@@ -826,11 +838,6 @@ class program {
                 // get the user's position/organisation at time of completion
                 require_once("{$CFG->dirroot}/totara/hierarchy/prefix/position/lib.php");
                 $posids = pos_get_current_position_data($userid);
-
-                // set up the event data
-                $eventdata = new stdClass();
-                $eventdata->program = $this;
-                $eventdata->userid = $userid;
             }
         }
 
@@ -848,8 +855,18 @@ class program {
 
             $update_success = $DB->update_record('prog_completion', $completion);
             if ($progcompleted_eventtrigger) {
-                // trigger an event to notify any listeners that this program has been completed
-                events_trigger('program_completed', $eventdata);
+                // Trigger an event to notify any listeners that this program has been completed.
+                $event = \totara_program\event\program_completed::create(
+                    array(
+                        'objectid' => $this->id,
+                        'context' => context_program::instance($this->id),
+                        'userid' => $userid,
+                        'other' => array(
+                            'certifid' => $this->certifid,
+                        ),
+                    )
+                );
+                $event->trigger();
             }
 
             return $update_success;
@@ -878,8 +895,18 @@ class program {
 
             $insert_success = $DB->insert_record('prog_completion', $completion);
             if ($progcompleted_eventtrigger) {
-                // trigger an event to notify any listeners that this program has been completed
-                events_trigger('program_completed', $eventdata);
+                // Trigger an event to notify any listeners that this program has been completed.
+                $event = \totara_program\event\program_completed::create(
+                    array(
+                        'objectid' => $this->id,
+                        'context' => context_program::instance($this->id),
+                        'userid' => $userid,
+                        'other' => array(
+                            'certifid' => $this->certifid,
+                        )
+                    )
+                );
+                $event->trigger();
             }
 
             return $insert_success;

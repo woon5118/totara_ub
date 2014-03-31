@@ -258,7 +258,17 @@ class appraisal {
         $DB->set_field('appraisal_user_assignment', 'activestageid', reset($stages)->id, array('appraisalid' => $this->id));
 
         $this->set_status(self::STATUS_ACTIVE);
-        events_trigger('appraisal_activation', $this);
+        $event = \totara_appraisal\event\appraisal_activation::create(
+            array(
+                'objectid' => $this->id,
+                'context' => context_system::instance(),
+                'other' => array(
+                    'time' => time(),
+                )
+            )
+        );
+        $event->add_record_snapshot('appraisal', $this);
+        $event->trigger();
     }
 
 
@@ -413,7 +423,7 @@ class appraisal {
 
         if (isset($formdata->sendalert) && $formdata->sendalert) {
             $alert = new stdClass();
-            $alert->userfrom = core_user::get_support_user();
+            $alert->userfrom = generate_email_supportuser();
             $alert->fullmessageformat = FORMAT_HTML;
             $formdata->alertbody = $formdata->alertbody_editor['text'];
 
@@ -1954,7 +1964,19 @@ class appraisal_stage {
             $appraisal = new appraisal($this->appraisalid);
             $appraisal->complete_for_user($subjectid);
         }
-        events_trigger('appraisal_stage_completion', $this);
+
+        $event = \totara_appraisal\event\appraisal_stage_completion::create(
+            array(
+                'objectid' => $this->appraisalid,
+                'context' => context_system::instance(),
+                'userid' => $subjectid,
+                'other' => array(
+                    'stageid' => $this->id,
+                    'time' => time(),
+                )
+            )
+        );
+        $event->trigger();
     }
 
 
@@ -4106,15 +4128,14 @@ class appraisal_event_handler {
      * If message is not immediate - add sheduled event
      * Also process stage_due as technically it's not an event but scheduled action
      *
-     * @param appraisal $appraisal
-     * @param int $time current time (server time will be used if not set)
+     * @param \totara_appraisal\event\appraisal_activation $event
      */
-    public static function appraisal_activation($appraisal, $time = 0) {
+    public static function appraisal_activation(\totara_appraisal\event\appraisal_activation $event) {
         global $DB;
-        if (!$time) {
-            $time = time();
-        }
-        $appraisalid = $appraisal->id;
+
+        $time = $event->other['time'];
+        $appraisalid = $event->objectid;
+
         $sql = "SELECT id FROM {appraisal_event} WHERE triggered = 0 AND event IN (?, ?) AND appraisalid = ?";
         $params = array(appraisal_message::EVENT_APPRAISAL_ACTIVATION, appraisal_message::EVENT_STAGE_DUE, $appraisalid);
         $events = $DB->get_records_sql($sql, $params);
@@ -4128,14 +4149,13 @@ class appraisal_event_handler {
     /**
      * Stage complete message handler
      *
-     * @param stdClass $event
+     * @param \totara_appraisal\event\appraisal_stage_completion $event
      */
-    public static function appraisal_stage_completed($stage, $time = 0) {
+    public static function appraisal_stage_completion(\totara_appraisal\event\appraisal_stage_completion $event) {
         global $DB;
-        if (!$time) {
-            $time = time();
-        }
-        $stageid = $stage->id;
+
+        $time = $event->other['time'];
+        $stageid = $event->other['stageid'];
         $sql = "SELECT id FROM {appraisal_event} WHERE triggered = 0 AND event = ? AND appraisalstageid = ?";
         $params = array(appraisal_message::EVENT_STAGE_COMPLETE, $stageid);
         $events = $DB->get_records_sql($sql, $params);
@@ -4143,7 +4163,6 @@ class appraisal_event_handler {
             self::process_event(new appraisal_message($id), $time);
         }
     }
-
 
     /**
      * Send or schedule messages according time and settings

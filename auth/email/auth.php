@@ -103,7 +103,13 @@ class auth_plugin_email extends auth_plugin_base {
         position_save_data($user);
 
         $user = $DB->get_record('user', array('id' => $user->id));
-        events_trigger('user_created', $user);
+        $event = \core\event\user_created::create(
+            array(
+                'objectid' => $user->id,
+                'context' => context_user::instance($user->id),
+            )
+        );
+        $event->trigger();
 
         if (! send_confirmation_email($user)) {
             print_error('auth_emailnoemail','auth_email');
@@ -155,7 +161,19 @@ class auth_plugin_email extends auth_plugin_base {
                     $DB->set_field("user", "firstaccess", $now, array("id"=>$user->id));
 
                     $user->firstaccess = $now;
-                    events_trigger('user_firstaccess', $user);
+
+                    $event = \totara_core\event\user_firstlogin::create(
+                        array(
+                            'objectid' => $user->id,
+                            'context' => context_user::instance($user->id),
+                            'other' => array(
+                                'username' => $user->username,
+                                'firstaccess' => $now,
+                            ),
+                        )
+                    );
+                    $event->add_record_snapshot('user', $user);
+                    $event->trigger();
                 }
                 return AUTH_CONFIRM_OK;
             }

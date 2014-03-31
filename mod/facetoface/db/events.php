@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Alastair Munro <alastair.munro@totaralms.com>
+ * @author David Curry <david.curry@totaralms.com>
  * @package mod_facetoface
  */
 
@@ -28,21 +29,20 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
-$handlers = array (
-    'user_deleted' => array(
-        'handlerfile'       => '/mod/facetoface/lib.php',
-        'handlerfunction'   => 'facetoface_eventhandler_user_deleted',
-        'schedule'          => 'instant'
+$observers = array(
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback' => 'facetoface_event_handler::user_deleted',
+        'includefile' => '/mod/facetoface/lib.php',
     ),
-    'user_suspended' => array(
-        'handlerfile'       => '/mod/facetoface/lib.php',
-        'handlerfunction'   => 'facetoface_eventhandler_user_suspended',
-        'schedule'          => 'instant'
+    array(
+        'eventname' => '\totara_core\event\user_suspended',
+        'callback' => 'facetoface_event_handler::user_suspended',
+        'includefile' => '/mod/facetoface/lib.php',
     ),
-    'user_unenrolled' => array(
-        'handlerfile'       => '/mod/facetoface/lib.php',
-        'handlerfunction'   => 'facetoface_eventhandler_user_unenrolled',
-        'schedule'          => 'instant'
+    array(
+        'eventname' => '\core\event\user_enrolment_deleted',
+        'callback' => 'facetoface_event_handler::user_unenrolled',
+        'includefile' => '/mod/facetoface/lib.php',
     ),
 );
-

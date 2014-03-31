@@ -25,3 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Organisation Hierarchies';
+$string['eventadded'] = 'Organisation Created';
+$string['eventdeleted'] = 'Organisation Deleted';
+$string['eventupdated'] = 'Organisation Updated';

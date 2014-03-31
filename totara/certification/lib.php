@@ -100,54 +100,60 @@ $CERTIFPATHSUF = array(
     CERTIFPATH_RECERT => '_rc',
 );
 
+class certification_event_handler {
 
-// Event handlers.
+    /**
+     * User is assigned to a program event handler
+     *
+     * @param \totara_program\event\program_assigned $event
+     */
+    public static function assigned(\totara_program\event\program_assigned $event) {
+        global $DB;
 
-/**
- * User is assigned to a program event handler
- *
- * @param object $eventdata Object containing event data
- */
-function program_assigned_handler($eventdata) {
-    global $DB;
+        $programid = $event->objectid;
+        $userid = $event->userid;
+        $prog = $DB->get_record('prog', array('id' => $programid));
 
-    $prog = $DB->get_record('prog', array('id' => $eventdata->programid));
-
-    if ($prog->certifid) {
-        assign_certification_stage($prog->certifid, $eventdata->userid);
-    }
-}
-
-/**
- * User is unassigned to a program event handler
- * Delete certification completion record
- *
- * @param object $eventdata Object containing event data
- */
-function program_unassigned_handler($eventdata) {
-    global $DB;
-
-    $prog = $DB->get_record('prog', array('id' => $eventdata->programid));
-
-    if ($prog->certifid) {
-        $params = array('certifid' => $prog->certifid, 'userid' => $eventdata->userid);
-        if ($completionrecord = $DB->get_record('certif_completion', $params)) {
-            if (!in_array($completionrecord->status, array(CERTIFSTATUS_UNSET, CERTIFSTATUS_ASSIGNED))) {
-                copy_certif_completion_to_hist($prog->certifid, $eventdata->userid, true);
-            }
-            $DB->delete_records('certif_completion', $params);
+        if ($prog->certifid) {
+            assign_certification_stage($prog->certifid, $userid);
         }
     }
-}
 
-/**
- * Program completion event handler
- *
- * @param StdClass $eventdata Object containing event data
- */
-function program_completion_handler($eventdata) {
-    if ($eventdata->program->certifid) {
-        complete_certification_stage($eventdata->program->certifid, $eventdata->userid);
+    /**
+     * User is unassigned to a program event handler
+     * Delete certification completion record
+     *
+     * @param \totara_program\event\program_unassigned $event
+     */
+    public static function unassigned(\totara_program\event\program_unassigned $event) {
+        global $DB;
+
+        $programid = $event->objectid;
+        $userid = $event->userid;
+        $prog = $DB->get_record('prog', array('id' => $programid));
+
+        if ($prog->certifid) {
+            $params = array('certifid' => $prog->certifid, 'userid' => $userid);
+            if ($completionrecord = $DB->get_record('certif_completion', $params)) {
+                if (!in_array($completionrecord->status, array(CERTIFSTATUS_UNSET, CERTIFSTATUS_ASSIGNED))) {
+                    copy_certif_completion_to_hist($prog->certifid, $userid, true);
+                }
+                $DB->delete_records('certif_completion', $params);
+            }
+        }
+    }
+
+    /**
+     * Program completion event handler
+     *
+     * @param \totara_program\event\program_completed $event
+     */
+    public static function completed(\totara_program\event\program_completed $event) {
+        global $DB;
+
+        if (!empty($event->other['certifid'])) {
+            complete_certification_stage($event->other['certifid'], $event->userid);
+        }
     }
 }
 

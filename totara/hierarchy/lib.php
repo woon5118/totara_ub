@@ -137,33 +137,43 @@ function totara_hierarchy_install_default_comp_scale() {
     return true;
 }
 
-/**
- * Handler function called when a user_deleted event is triggered
- * Placed here so we can use this function for all hierarchy types.
- *
- * @param object $user  The user object for the deleted user.
- */
-function hierarchy_eventhandler_user_deleted($user) {
-    global $DB, $POSITION_TYPES;
+class hierarchy_event_handler {
 
-    // Remove any existing temporary manager records related to the deleted user.
-    $DB->delete_records('temporary_manager', array('tempmanagerid' => $user->id));
-    $DB->delete_records('temporary_manager', array('userid' => $user->id));
+    /**
+     * Handler function called when a user_deleted event is triggered
+     * Placed here so we can use this function for all hierarchy types.
+     *
+     * @param \core\event\user_deleted $event    The user object for the deleted user.
+     */
+    public static function user_deleted(\core\event\user_deleted $event) {
+        global $DB, $POSITION_TYPES;
 
-    // Check if the deleted user is any other users primary manager and update them appropriately.
-    foreach ($POSITION_TYPES as $typeid => $typename) {
-        $teammembers = totara_get_staff($user->id, $typeid);
-        if (!empty($teammembers)) {
-            foreach ($teammembers as $member) {
-                $pa = new position_assignment(array('userid' => $member, 'type' => $typeid));
-                $pa->managerid = null;
-                $pa->save(true);
+        $userid = $event->objectid;
+
+        // Remove any existing temporary manager records related to the deleted user.
+        $DB->delete_records('temporary_manager', array('tempmanagerid' => $userid));
+        $DB->delete_records('temporary_manager', array('userid' => $userid));
+
+        // Check if the deleted user is any other users primary manager and update them appropriately.
+        foreach ($POSITION_TYPES as $typeid => $typename) {
+            $teammembers = totara_get_staff($userid, $typeid);
+            if (!empty($teammembers)) {
+                foreach ($teammembers as $member) {
+                    $pa = new position_assignment(array('userid' => $member, 'type' => $typeid));
+                    $pa->managerid = null;
+                    $pa->save(true);
+                }
             }
         }
-    }
 
-    // Remove the deleted user's position assignments.
-    $DB->delete_records('pos_assignment', array('userid' => $user->id));
+        // Remove the deleted user from any appraisal roles.
+        $appsql = "UPDATE {pos_assignment} SET appraiserid = NULL WHERE appraiserid = :uid";
+        $appparam = array('uid' => $userid);
+        $DB->execute($appsql, $appparam);
+
+        // Remove the deleted user's position assignments.
+        $DB->delete_records('pos_assignment', array('userid' => $userid));
+    }
 }
 
 /**
@@ -915,7 +925,7 @@ class hierarchy {
      * @return boolean success or failure
      */
     public function delete_hierarchy_item($id, $triggerevent = true) {
-        global $DB;
+        global $DB, $USER;
 
         if (!$DB->record_exists($this->shortprefix, array('id' => $id))) {
             return false;
@@ -945,7 +955,16 @@ class hierarchy {
         // Raise an event for each item deleted to let other parts of the system know
         if ($triggerevent) {
             foreach ($deleted_list as $deleted_item) {
-                events_trigger("{$this->prefix}_deleted", $deleted_item);
+
+                $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_deleted';
+                $event = $eventname::create(
+                    array(
+                        'objectid' => $id,
+                        'context' => context_system::instance(),
+                        'userid' => $USER->id,
+                    )
+                );
+                $event->trigger();
             }
         }
 
@@ -1476,7 +1495,8 @@ class hierarchy {
      * @return object|false A copy of the new item, or false if it could not be added
      */
     function add_hierarchy_item($item, $parentid, $frameworkid = null, $usetransaction = true, $triggerevent = true, $removedesc = true) {
-        global $DB;
+        global $DB, $USER;
+
         // figure out the framework if not provided
         if (!isset($frameworkid)) {
             // try and use hierarchy's frameworkid, if not look it up based on parent
@@ -1538,7 +1558,15 @@ class hierarchy {
 
         // trigger an event if required
         if ($triggerevent) {
-            events_trigger("{$this->prefix}_added", $newitem);
+            $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_added';
+            $event = $eventname::create(
+                array(
+                    'objectid' => $newitem->id,
+                    'context' => context_system::instance(),
+                    'userid' => $USER->id,
+                )
+            );
+            $event->trigger();
         }
 
         return $newitem;
@@ -1614,7 +1642,15 @@ class hierarchy {
 
         // Raise an event to let other parts of the system know
         if ($triggerevent) {
-            events_trigger("{$this->prefix}_updated", $updateditem);
+                $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_updated';
+                $event = $eventname::create(
+                    array(
+                        'objectid' => $updateditem->id,
+                        'context' => context_system::instance(),
+                        'userid' => $USER->id,
+                    )
+                );
+                $event->trigger();
         }
 
         return $updateditem;

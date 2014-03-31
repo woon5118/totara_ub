@@ -19,32 +19,27 @@
  *
  * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
  * @subpackage totara_appraisal
  */
 
 /**
- * this file should be used for all the custom event definitions and handers.
- * event names should all start with totara_.
+ * This file should be used for all appraisal event definitions and handers.
  */
-
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
 }
 
-$handlers = array(
-    // Must be equal to: appraisal_message::EVENT_APPRAISAL_ACTIVATION.
-    'appraisal_activation' => array(
-        'handlerfile'      => '/totara/appraisal/lib.php',
-        'handlerfunction'  => array('appraisal_event_handler', 'appraisal_activation'),
-        'schedule'         => 'instant',
-        'internal'         => 1
+$observers = array(
+    array(
+        'eventname' => '\totara_appraisal\event\appraisal_activation',
+        'callback'=> 'appraisal_event_handler::appraisal_activation',
+        'includefile' => '/totara/appraisal/lib.php',
     ),
-    // Must be equal to: appraisal_message::EVENT_STAGE_COMPLETE.
-    'appraisal_stage_completion' => array(
-        'handlerfile'      => '/totara/appraisal/lib.php',
-        'handlerfunction'  => array('appraisal_event_handler', 'appraisal_stage_completed'),
-        'schedule'         => 'instant',
-        'internal'         => 1
-    )
+    array(
+        'eventname' => '\totara_appraisal\event\appraisal_stage_completion',
+        'callback'=> 'appraisal_event_handler::appraisal_stage_completion',
+        'includefile' => '/totara/appraisal/lib.php',
+    ),
 );

@@ -25,3 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Competency Hierarchies';
+$string['eventadded'] = 'Competency Created';
+$string['eventdeleted'] = 'Competency Deleted';
+$string['eventupdated'] = 'Competency Updated';

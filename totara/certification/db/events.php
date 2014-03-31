@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Jon Sharp <jon.sharp@catalyst-eu.net>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
  * @subpackage certification
  *
@@ -28,23 +29,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array (
-    'program_assigned' => array (
-        'handlerfile'      => '/totara/certification/lib.php',
-        'handlerfunction'  => 'program_assigned_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+$observers = array(
+    array(
+        'eventname' => '\totara_program\event\program_assigned',
+        'callback' => 'certification_event_handler::assigned',
+        'includefile' => 'totara/certification/lib.php',
     ),
-    'program_unassigned' => array (
-        'handlerfile'      => '/totara/certification/lib.php',
-        'handlerfunction'  => 'program_unassigned_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname' => '\totara_program\event\program_unassigned',
+        'callback' => 'certification_event_handler::unassigned',
+        'includefile' => 'totara/certification/lib.php',
     ),
-    'program_completed' => array (
-        'handlerfile'      => '/totara/certification/lib.php',
-        'handlerfunction'  => 'program_completion_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname' => '\totara_program\event\program_completed',
+        'callback' => 'certification_event_handler::completed',
+        'includefile' => 'totara/certification/lib.php',
     ),
 );

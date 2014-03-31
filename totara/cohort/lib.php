@@ -404,141 +404,46 @@ class cohort {
 /******************************************************************************
  * Cohort event handlers, called from /totara/cohort/db/events.php
  ******************************************************************************/
-
-/**
- * Event handler for when a user custom profiler field is deleted.
- * @global object $CFG
- * @param object $profilefield
- * @return boolean
- */
-function cohort_profilefield_deleted_handler($profilefield) {
-    global $DB;
-    // todo: rewrite for new dynamic cohorts
-    return true;
-    /*
-    // Get all cohorts which use this custom profile field
-    $like_sql = $DB->sql_like('cri.profilefield', '?');
-    $sql = "
-        SELECT cohort.* FROM {cohort} cohort
-        INNER JOIN {cohort_criteria} cri ON cri.cohortid = cohort.id
-        WHERE {$like_sql}";
-    $cohorts = $DB->get_records_sql($sql, array($DB->sql_concat('customfield', $profilefield->id)));
-
-    // Update any cohorts that were found
-    if (!empty($cohorts)) {
-        foreach ($cohorts as $cohort) {
-            cohort_housekeep_dynamic_cohort($cohort);
-        }
+class totaracohort_event_handler {
+    /**
+     * Event handler for when a user custom profiler field is deleted.
+     *
+     * @param \totara_customfield\event\profilefield_deleted $event
+     * @return boolean
+     */
+    public static function profilefield_deleted(\totara_customfield\event\profilefield_deleted $event) {
+        // TODO: rewrite for new dynamic cohorts.
+        return true;
     }
-    return true;*/
+
+    /**
+     * Event handler for when a position is updated or deleted
+     *
+     * Cohorts that have this position directly attached to them, and cohorts which
+     * are attached to a parent of this position are affected.
+     *
+     * @param \core\event\base $event - using base since this is called by update and create
+     * @return boolean
+     */
+    public static function position_updated(\core\event\base $event) {
+        // TODO: rewrite for new dynamic cohorts.
+        return true;
+    }
+
+    /**
+     * Event handler for when an organisation is updated
+     *
+     * Cohorts that have this organisation directly attached to them, and cohorts which
+     * are attached to a parent of this organisation are affected.
+     *
+     * @param \core\event\base $event - using base since this is called by update and create
+     * @return boolean
+     */
+    public static function organisation_updated(\core\event\base $event) {
+        // TODO: rewrite for new dynamic cohorts.
+        return true;
+    }
 }
-
-/**
- * Event handler for when a position is updated or deleted
- *
- * Cohorts that have this position directly attached to them, and cohorts which
- * are attached to a parent of this position are affected.
- *
- * @global object $CFG
- * @param object $position
- * @return boolean
- */
-function cohort_position_updated_handler($position) {
-    global $CFG, $DB;
-    // todo: rewrite for new dynamic cohorts
-    return true;
-    /*
-    // We will check the path of the position to determine what other positions/cohorts are affected
-    // If this position has changed parent then check the old path for affected cohorts too
-    $check_old_path_sql = '';
-    $params = array();
-
-    // Get cohorts that use this position or a parent of this position
-
-    $sql = "
-        SELECT cohort.* FROM {cohort} cohort
-        INNER JOIN {cohort_criteria} cri ON cri.cohortid = cohort.id
-        LEFT JOIN {pos} pos on pos.id = cri.positionid
-        WHERE cri.positionid = ? OR
-        (
-            cri.positionincludechildren = 1
-            AND";
-    $params[] = $position->id;
-    $path_like_sql = $DB->sql_like('?', '?');
-    $params[] = $position->path;
-    $params[] = $DB->sql_concat("pos.path","'%'");
-    $sql .= " ($path_like_sql";
-
-    if (isset($position->oldpath)) {
-        $old_path_like_sql = $DB->sql_like('?', '?');
-        $params[] = $position->oldpath;
-        $check_old_path_sql = " OR $old_path_like_sql";
-        $params[] = $DB->sql_concat("pos.path","'%'");
-    }
-    $sql .= $check_old_path_sql . "))";
-    $cohorts = $DB->get_records_sql($sql, $params);
-    // Update any cohorts that were found
-    if (!empty($cohorts)) {
-        foreach ($cohorts as $cohort) {
-            cohort_housekeep_dynamic_cohort($cohort);
-        }
-    }
-    return true;*/
-}
-
-/**
- * Event handler for when an organisation is updated
- *
- * Cohorts that have this organisation directly attached to them, and cohorts which
- * are attached to a parent of this organisation are affected.
- *
- * @global object $CFG
- * @param object $organisation
- * @return boolean
- */
-function cohort_organisation_updated_handler($organisation) {
-    global $CFG, $DB;
-    // todo: rewrite for new dynamic cohorts
-    return true;
-    /*
-    // We will check the path of the organisation to determine what other organisation/cohorts are affected
-    // If this organisation has changed parent then check the old path for affected cohorts too
-    $check_old_path_sql = '';
-    $params = array();
-
-    // Get cohorts that use this organisation or a parent of this organisation
-    $sql = "
-        SELECT cohort.* FROM {cohort} cohort
-        INNER JOIN {cohort_criteria} cri ON cri.cohortid = cohort.id
-        LEFT JOIN {org} org on org.id = cri.organisationid
-        WHERE cri.organisationid = ? OR
-        (
-            cri.orgincludechildren = 1
-            AND";
-    $params[] = $organisation->id;
-    $path_like_sql = $DB->sql_like('?', '?');
-    $params[] = $organisation->path;
-    $params[] = $DB->sql_concat("org.path","'%'");
-    $sql .= " ($path_like_sql";
-    if (isset($organisation->oldpath)) {
-        $old_path_like_sql = $DB->sql_like('?', '?');
-        $params[] = $organisation->oldpath;
-        $check_old_path_sql = " OR $old_path_like_sql";
-        $params[] = $DB->sql_concat("org.path","'%'");
-    }
-    $sql .= $check_old_path_sql . "))";
-
-    $cohorts = $DB->get_records_sql($sql, $params);
-    // Update any cohorts that are found
-    if (!empty($cohorts)) {
-        foreach ($cohorts as $cohort) {
-            cohort_housekeep_dynamic_cohort($cohort);
-        }
-    }
-
-    return true;*/
-}
-
 
 /**
  * Get the where clause for a dynamic cohort's query. The where clause will assume that

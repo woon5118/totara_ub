@@ -18,39 +18,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
  * @subpackage program
  */
 
-$handlers = array (
-    'program_assigned' => array (
-         'handlerfile'      => '/totara/program/lib.php',
-         'handlerfunction'  => 'prog_eventhandler_program_assigned',
-         'schedule'         => 'instant'
-     ),
-    'program_unassigned' => array (
-         'handlerfile'      => '/totara/program/lib.php',
-         'handlerfunction'  => 'prog_eventhandler_program_unassigned',
-         'schedule'         => 'instant'
-     ),
-    'program_completed' => array (
-         'handlerfile'      => '/totara/program/lib.php',
-         'handlerfunction'  => 'prog_eventhandler_program_completed',
-         'schedule'         => 'instant'
-     ),
-    'program_courseset_completed' => array (
-         'handlerfile'      => '/totara/program/lib.php',
-         'handlerfunction'  => 'prog_eventhandler_courseset_completed',
-         'schedule'         => 'instant'
-     ),
-    'user_firstaccess' => array (
-         'handlerfile'      => '/totara/program/lib.php',
-         'handlerfunction'  => 'prog_assignments_firstlogin',
-         'schedule'         => 'instant'
-     ),
-     'user_deleted' => array(
-         'handlerfile'       => '/totara/program/lib.php',
-         'handlerfunction'   => 'prog_eventhandler_user_deleted',
-         'schedule'          => 'instant'
-     ),
+/**
+ * this file should be used for all program event definitions and handers.
+ */
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+}
+
+$observers = array(
+    array(
+        'eventname' => '\totara_program\event\program_assigned',
+        'callback' => 'program_event_handler::assigned',
+        'includefile' => '/totara/program/lib.php'
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_unassigned',
+        'callback' => 'program_event_handler::unassigned',
+        'includefile' => '/totara/program/lib.php'
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_completed',
+        'callback' => 'program_event_handler::completed',
+        'includefile' => '/totara/program/lib.php'
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_courseset_completed',
+        'callback' => 'program_event_handler::courseset_completed',
+        'includefile' => '/totara/program/lib.php'
+    ),
+    array(
+        'eventname' => '\totara_core\event\user_firstlogin',
+        'callback' => 'program_event_handler::assignments_firstlogin',
+        'includefile' => '/totara/program/lib.php'
+    ),
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback' => 'program_event_handler::user_deleted',
+        'includefile' => '/totara/program/lib.php'
+    ),
 );

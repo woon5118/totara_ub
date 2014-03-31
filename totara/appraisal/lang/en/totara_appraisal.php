@@ -224,6 +224,7 @@ $string['eventrecipients'] = 'Recipients';
 $string['eventsendroleall'] = 'Send same message to all roles';
 $string['eventsendroleeach'] = 'Send different message for each role';
 $string['eventsendstagecompleted'] = 'Only send to people if their stage is';
+$string['eventstagecompleted'] = 'Appraisal Stage Completed';
 $string['eventstageiscomplete'] = 'complete';
 $string['eventstageisincomplete'] = 'incomplete';
 $string['eventstage'] = '{$a} Stage';

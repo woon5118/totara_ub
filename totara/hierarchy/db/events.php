@@ -22,10 +22,12 @@
  * @subpackage hierarchy
  */
 
-$handlers = array (
-     'user_deleted' => array(
-         'handlerfile'       => '/totara/hierarchy/lib.php',
-         'handlerfunction'   => 'hierarchy_eventhandler_user_deleted',
-         'schedule'          => 'instant'
-     ),
+defined('MOODLE_INTERNAL') || die();
+
+$observers = array (
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback' => 'hierarchy_event_handler::user_deleted',
+        'includefile' => '/totara/hierarchy/lib.php',
+    ),
 );

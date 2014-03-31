@@ -4334,7 +4334,18 @@ function undelete_user($user) {
     context_user::instance($user->id, IGNORE_MISSING);
 
     if ($DB->update_record('user', $updateuser)) {
-        events_trigger('user_undeleted', $user);
+        $event = \totara_core\event\user_undeleted::create(
+            array(
+                'objectid' => $user->id,
+                'context' => context_user::instance($user->id),
+                'other' => array(
+                    'username' => $user->username,
+                )
+            )
+        );
+        $event->add_record_snapshot('user', $user);
+        $event->trigger();
+
         return true;
     } else {
         return false;
@@ -4461,7 +4472,19 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                 $now = time();
                 $DB->set_field('user','firstaccess', $now, array('id' => $user->id));
                 $user->firstaccess = $now;
-                events_trigger('user_firstaccess', $user);
+
+                $event = \totara_core\event\user_firstlogin::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                        'other' => array(
+                            'username' => $user->username,
+                            'firstaccess' => $now,
+                        ),
+                    )
+                );
+                $event->add_record_snapshot('user', $user);
+                $event->trigger();
             }
 
             // If the existing hash is using an out-of-date algorithm (or the legacy md5 algorithm), then we should update to

@@ -31,32 +31,30 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); //  It must be included from a Moodle page
 }
 
-$handlers = array (
-
-    /* Cohort event handlers */
-    'profilefield_deleted' => array (
-         'handlerfile'      => '/cohort/lib.php',
-         'handlerfunction'  => 'cohort_profilefield_deleted_handler',
-         'schedule'         => 'instant'
-     ),
-    'position_updated' => array (
-         'handlerfile'      => '/cohort/lib.php',
-         'handlerfunction'  => 'cohort_position_updated_handler',
-         'schedule'         => 'instant'
-     ),
-    'position_deleted' => array ( // Call the updated function as these need to do the same thing
-         'handlerfile'      => '/cohort/lib.php',
-         'handlerfunction'  => 'cohort_position_updated_handler',
-         'schedule'         => 'instant'
-     ),
-    'organisation_updated' => array (
-         'handlerfile'      => '/cohort/lib.php',
-         'handlerfunction'  => 'cohort_organisation_updated_handler',
-         'schedule'         => 'instant'
-     ),
-    'organisation_deleted' => array ( // Call the updated function as these need to do the same thing
-         'handlerfile'      => '/cohort/lib.php',
-         'handlerfunction'  => 'cohort_organisation_updated_handler',
-         'schedule'         => 'instant'
-     ),
+$observers = array(
+    array(
+        'eventname' => '\totara_customfield\event\profilefield_deleted',
+        'callback' => 'customfield_event_handler::profilefield_deleted',
+        'includefile' => '/totara/customfield/lib.php',
+    ),
+    array( // Call the updated function as these need to do the same thing.
+        'eventname' => '\totara_hierarchy\event\position_deleted',
+        'callback' => 'totaracohort_event_handler::position_updated',
+        'includefile' => '/totara/cohort/lib.php',
+    ),
+    array(
+        'eventname' => '\totara_hierarchy\event\position_updated',
+        'callback' => 'totaracohort_event_handler::position_updated',
+        'includefile' => '/totara/cohort/lib.php',
+    ),
+    array( // Call the updated function as these need to do the same thing.
+        'eventname' => '\totara_hierarchy\event\organisation_deleted',
+        'callback' => 'totaracohort_event_handler::organisation_updated',
+        'includefile' => '/totara/cohort/lib.php',
+    ),
+    array(
+        'eventname' => '\totara_hierarchy\event\organisation_updated',
+        'callback' => 'totaracohort_event_handler::organisation_updated',
+        'includefile' => '/totara/cohort/lib.php',
+    ),
 );

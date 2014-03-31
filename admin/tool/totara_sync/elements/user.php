@@ -280,10 +280,25 @@ class totara_sync_element_user extends totara_sync_element {
                 $transaction->allow_commit();
 
                 if ($suspenduser) {
-                    events_trigger('user_suspended', $user);
+                    $event = \totara_core\event\user_suspended::create(
+                        array(
+                            'objectid' => $user->id,
+                            'context' => context_user::instance($user->id),
+                            'other' => array(
+                                'username' => $user->username,
+                            )
+                        )
+                    );
+                    $event->trigger();
                 }
 
-                events_trigger('user_updated', $user);
+                $event = \core\event\user_updated::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                    )
+                );
+                $event->trigger();
             }
             $rsupdateaccounts->close();
             unset($user, $pos_assignment, $posdata); // Free memory.
@@ -354,7 +369,13 @@ class totara_sync_element_user extends totara_sync_element {
 
         $transaction->allow_commit();
 
-        events_trigger('user_created', $user);
+        $event = \core\event\user_created::create(
+            array(
+                'objectid' => $user->id,
+                'context' => context_user::instance($user->id),
+            )
+        );
+        $event->trigger();
 
         return true;
     }

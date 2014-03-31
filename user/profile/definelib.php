@@ -303,7 +303,13 @@ function profile_delete_field($id) {
     profile_reorder_fields();
 
     /// Trigger an event to let other parts of the system know
-    events_trigger('profilefield_deleted', (object)array('id'=>$id));
+    $event = \totara_customfield\event\profilefield_deleted::create(
+        array(
+            'objectid' => $id,
+            'context' => context_system::instance(),
+        )
+    );
+    $event->trigger();
 }
 
 /**

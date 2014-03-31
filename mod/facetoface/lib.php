@@ -3817,92 +3817,97 @@ function facetoface_supports($feature) {
     }
 }
 
+class facetoface_event_handler {
 
-/**
- * Event that is triggered when a user is deleted.
- *
- * Cancels a user from any future sessions when they are deleted
- * this is to make sure deleted users aren't using space in sessions
- * when there is limited capacity.
- *
- * @param object $user
- */
-function facetoface_eventhandler_user_deleted($user) {
-    global $DB;
+    /**
+     * Event that is triggered when a user is deleted.
+     *
+     * Cancels a user from any future sessions when they are deleted
+     * this is to make sure deleted users aren't using space in sessions
+     * when there is limited capacity.
+     *
+     * @param \core\event\user_deleted $event
+     */
+    public static function user_deleted(\core\event\user_deleted $event) {
+        global $DB;
 
-    if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
-        foreach ($signups as $signup) {
-            $session = facetoface_get_session($signup->sessionid);
-            // Using $null, null fails because of passing by reference.
-            facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
-        }
-    }
-    return true;
-}
-
-/**
- * Event that is triggered when a user is suspended.
- *
- * Cancels a user from any future sessions when they are suspended
- * this is to make sure suspended users aren't using space in sessions
- * when there is limited capacity.
- *
- * @param object $user
- */
-function facetoface_eventhandler_user_suspended($user) {
-    global $DB;
-
-    if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
-        foreach ($signups as $signup) {
-            $session = facetoface_get_session($signup->sessionid);
-            // Using $null, null fails because of passing by reference.
-            facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
-        }
-    }
-    return true;
-}
-
-/**
- * Event that is triggered when a user is unenrolled from a course
- *
- * Cancels a user from any future sessions when they are unenrolled from a course,
- * this is to make sure unenrolled users aren't using space in sessions
- * when there is limited capacity
- *
- * @param object $data
- */
-function facetoface_eventhandler_user_unenrolled($data) {
-    global $DB;
-
-    $uid = $data->userid;
-    $cid = $data->courseid;
-
-    // Get all the facetofaces associated with the course.
-    $f2fs = $DB->get_fieldset_select('facetoface', 'id', 'course = :cid', array('cid' => $cid));
-
-    if (!empty($f2fs)) {
-        // Get all the sessions for the facetofaces.
-        list($insql, $inparams) = $DB->get_in_or_equal($f2fs);
-        $sql = "SELECT id FROM {facetoface_sessions} WHERE facetoface {$insql}";
-        $sessids = $DB->get_fieldset_sql($sql, $inparams);
-        $strvar = new stdClass();
-        $strvar->coursename = $DB->get_field('course', 'fullname', array('id' => $cid));
-
-        foreach ($sessids as $sessid) {
-            // Check if user is enrolled on any sessions in the future.
-            if ($user = facetoface_get_attendee($sessid, $uid)) {
-                if (empty($strvar->username)) {
-                    $strvar->username = fullname($user);
-                }
-
-                // And cancel them.
-                $sess = facetoface_get_session($sessid); // Get the proper session object, complete with dates.
-                facetoface_user_cancel($sess, $uid, false, $null, get_string('cancellationreasoncourseunenrollment', 'mod_facetoface', $strvar));
+        $userid = $event->objectid;
+        if ($signups = $DB->get_records('facetoface_signups', array('userid' => $userid))) {
+            foreach ($signups as $signup) {
+                $session = facetoface_get_session($signup->sessionid);
+                // Using $null, null fails because of passing by reference.
+                facetoface_user_cancel($session, $userid, false, $null, get_string('userdeletedcancel', 'facetoface'));
             }
         }
+        return true;
     }
 
-    return true;
+    /**
+     * Event that is triggered when a user is suspended.
+     *
+     * Cancels a user from any future sessions when they are suspended
+     * this is to make sure suspended users aren't using space in sessions
+     * when there is limited capacity.
+     *
+     * @param \totara_core\event\user_suspended $event
+     */
+    public static function user_suspended(\totara_core\event\user_suspended $event) {
+        global $DB;
+
+        $userid = $event->objectid;
+
+        if ($signups = $DB->get_records('facetoface_signups', array('userid' => $userid))) {
+            foreach ($signups as $signup) {
+                $session = facetoface_get_session($signup->sessionid);
+                // Using $null, null fails because of passing by reference.
+                facetoface_user_cancel($session, $userid, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Event that is triggered when a user is unenrolled from a course
+     *
+     * Cancels a user from any future sessions when they are unenrolled from a course,
+     * this is to make sure unenrolled users aren't using space in sessions
+     * when there is limited capacity
+     *
+     * @param \core\event\user_enrolment_deleted $event
+     */
+    public static function user_unenrolled(\core\event\user_enrolment_deleted $event) {
+        global $DB;
+
+        $uid = $event->relateduserid;
+        $cid = $event->courseid;
+
+        // Get all the facetofaces associated with the course.
+        $f2fs = $DB->get_fieldset_select('facetoface', 'id', 'course = :cid', array('cid' => $cid));
+
+        if (!empty($f2fs)) {
+            // Get all the sessions for the facetofaces.
+            list($insql, $inparams) = $DB->get_in_or_equal($f2fs);
+            $sql = "SELECT id FROM {facetoface_sessions} WHERE facetoface {$insql}";
+            $sessids = $DB->get_fieldset_sql($sql, $inparams);
+            $strvar = new stdClass();
+            $strvar->coursename = $DB->get_field('course', 'fullname', array('id' => $cid));
+
+            foreach ($sessids as $sessid) {
+                // Check if user is enrolled on any sessions in the future.
+                if ($user = facetoface_get_attendee($sessid, $uid)) {
+                    if (empty($strvar->username)) {
+                        $strvar->username = fullname($user);
+                    }
+
+                    // And cancel them.
+                    $sess = facetoface_get_session($sessid); // Get the proper session object, complete with dates.
+                    facetoface_user_cancel($sess, $uid, false, $null, get_string('cancellationreasoncourseunenrollment', 'mod_facetoface', $strvar));
+                }
+            }
+        }
+
+        return true;
+    }
 }
 
 /**

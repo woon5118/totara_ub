@@ -205,11 +205,6 @@ abstract class course_set {
 
                 // flag that we need to trigger the courseset_completed event
                 $eventtrigger = true;
-
-                // set up the event data
-                $eventdata = new stdClass();
-                $eventdata->courseset = $this;
-                $eventdata->userid = $userid;
             }
         }
 
@@ -230,7 +225,17 @@ abstract class course_set {
                 if ($eventtrigger) {
                     // trigger an event to notify any listeners that this course
                     // set has been completed
-                    events_trigger('program_courseset_completed', $eventdata);
+                    $event = \totara_program\event\program_courseset_completed::create(
+                        array(
+                            'objectid' => $this->programid,
+                            'contextid' => context_program::instance($this->programid),
+                            'userid' => $userid,
+                            'other' => array(
+                                'coursesetid' => $this->id
+                            )
+                        )
+                    );
+                    $event->trigger();
                 }
             }
 
@@ -256,7 +261,17 @@ abstract class course_set {
                 if ($eventtrigger) {
                     // trigger an event to notify any listeners that this course
                     // set has been completed
-                    events_trigger('program_courseset_completed', $eventdata);
+                    $event = \totara_program\event\program_courseset_completed::create(
+                        array(
+                            'objectid' => $this->programid,
+                            'contextid' => context_program::instance($this->programid),
+                            'userid' => $userid,
+                            'other' => array(
+                                'coursesetid' => $this->id
+                            )
+                        )
+                    );
+                    $event->trigger();
                 }
             }
 

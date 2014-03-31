@@ -99,8 +99,8 @@ class rb_source_program_overview_test extends reportcache_advanced_testcase {
         $programs = array();
         $courses = array();
 
-        // Remove event handlers (mail sending) as they take more than 16 hours to perform for 10000 users * 10 programs.
-        $DB->delete_records('events_handlers', array('eventname' => 'program_assigned'));
+        // Redirect event handlers (mail sending) as they take more than 16 hours to perform for 10000 users * 10 programs.
+        $sink = $this->redirectEvents();
 
         $this->output_log("Create users ($usernum)...");
         for ($i = 0; $i < $usernum; $i++) {

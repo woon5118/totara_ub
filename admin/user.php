@@ -169,8 +169,24 @@
                 \core\session\manager::kill_user_sessions($user->id);
                 user_update_user($user, false);
 
-                events_trigger('user_updated', $user);
-                events_trigger('user_suspended', $user);
+                $event = \core\event\user_updated::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                    )
+                );
+                $event->trigger();
+
+                $event = \totara_core\event\user_suspended::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                        'other' => array(
+                            'username' => $user->username,
+                        )
+                    )
+                );
+                $event->trigger();
             }
         }
         redirect($returnurl);

@@ -137,10 +137,14 @@ abstract class prog_exception {
 
         //Event trigger to send notification when
         //exception is resolved
-        $eventdata = new stdClass();
-        $eventdata->programid = $this->programid;
-        $eventdata->userid = $this->userid;
-        events_trigger('program_assigned', $eventdata);
+        $event = \totara_program\event\program_assigned::create(
+            array(
+                'objectid' => $this->programid,
+                'context' => context_program::instance($this->programid),
+                'userid' => $this->userid,
+            )
+        );
+        $event->trigger();
 
         return prog_exception::delete_exception($this->id);
     }
@@ -184,12 +188,14 @@ abstract class prog_exception {
 
         $DB->update_record('prog_user_assignment', $learner_assign_todb);
 
-        //Event trigger to send notification when
-        //exception is resolved
-        $eventdata = new stdClass();
-        $eventdata->programid = $this->programid;
-        $eventdata->userid = $this->userid;
-        events_trigger('program_assigned', $eventdata);
+        $event = \totara_program\event\program_assigned::create(
+            array(
+                'objectid' => $this->programid,
+                'context' => context_program::instance($this->programid),
+                'userid' => $this->userid,
+            )
+        );
+        $event->trigger();
 
         return prog_exception::delete_exception($this->id);
     }

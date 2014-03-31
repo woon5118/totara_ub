@@ -25,3 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Position Hierarchies';
+$string['eventadded'] = 'Position Created';
+$string['eventdeleted'] = 'Position Deleted';
+$string['eventupdated'] = 'Position Updated';

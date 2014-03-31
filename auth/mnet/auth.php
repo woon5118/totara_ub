@@ -361,7 +361,19 @@ class auth_plugin_mnet extends auth_plugin_base {
         $localuser->mnethostid = $remotepeer->id;
         if (empty($localuser->firstaccess)) { // Now firstaccess, grab it here
             $localuser->firstaccess = time();
-            events_trigger('user_firstaccess', $localuser);
+
+            $event = \totara_core\event\user_firstlogin::create(
+                array(
+                    'objectid' => $localuser->id,
+                    'context' => context_user::instance($localuser->id),
+                    'other' => array(
+                        'username' => $localuser->username,
+                        'firstaccess' => $localuser->firstaccess,
+                    ),
+                )
+            );
+            $event->add_record_snapshot('user', $localuser);
+            $event->trigger();
         }
         user_update_user($localuser, false);
 

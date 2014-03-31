@@ -25,3 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Goal Hierarchies';
+$string['eventadded'] = 'Goal Created';
+$string['eventdeleted'] = 'Goal Deleted';
+$string['eventupdated'] = 'Goal Updated';
