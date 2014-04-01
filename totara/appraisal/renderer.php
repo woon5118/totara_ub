@@ -1625,6 +1625,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $description = html_writer::tag('div', get_string('previewinfo', 'totara_appraisal', $a->rolename));
 
         // Combine and display.
-        return html_writer::tag('div', $heading . $rolecontrol . $description, array('class' => "plan_box notifymessage"));
+        return html_writer::tag('div', $heading . $rolecontrol . $description, array('class' => "plan_box notifymessage", 'id' => 'preview-appraisal-notification'));
     }
 }

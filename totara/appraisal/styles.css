@@ -493,3 +493,6 @@ form.print-stages-form .fitem .fitemtitle {
 .redisplay-notification-nomargin .notifyproblem {
     margin: 0 !important;
 }
+#preview-appraisal-notification {
+    min-height: 115px
+}
