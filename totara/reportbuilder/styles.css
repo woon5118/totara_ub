@@ -187,12 +187,10 @@ form[id^="toolbarsearch"].mform .fsubmit {
     background-repeat: no-repeat;
     background-position: 0 5px;
     cursor: pointer;
-    width: 11px;
 }
 
 .rb-display-expand-link {
     margin-left: 20px;
-    white-space: nowrap;
 }
 #rb-search-controls {
     float: right;

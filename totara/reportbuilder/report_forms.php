@@ -1098,6 +1098,7 @@ class report_builder_sidebar_search_form extends moodleform {
         $mform->disable_form_change_checker();
 
         if ($fields && is_array($fields) && count($fields) > 0) {
+            $mform->_attributes['class'] = 'span3 mform rb-sidebar desktop-first-column';
             $mform->addElement('header', 'newfiltersidebar', get_string('filterby', 'totara_reportbuilder'));
 
             foreach ($fields as $ft) {
