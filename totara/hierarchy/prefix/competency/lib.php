@@ -625,7 +625,7 @@ class competency extends hierarchy {
      * @return string
      */
     function print_linked_evidence_list($courseid) {
-        global $CFG, $DB, $OUTPUT;
+        global $CFG, $DB, $OUTPUT, $PAGE;
 
         $system_context = context_system::instance();
 
@@ -753,7 +753,8 @@ class competency extends hierarchy {
                     $row->cells[] = $cell;
 
                     $cell = new html_table_cell();
-                    $cell->text = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php', array('id' => $evidence->id, 'course' => $courseid)),
+                    $cell->text = $OUTPUT->action_icon(new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php',
+                            array('id' => $evidence->id, 'course' => $courseid, 'returnurl' => $PAGE->url->out())),
                         new pix_icon('t/delete', $str_remove), null, array('class' => 'iconsmall', 'alt' => $str_remove, 'title' => $str_remove));
                     $row->cells[] = $cell;
                 }

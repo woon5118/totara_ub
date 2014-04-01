@@ -61,13 +61,15 @@ admin_externalpage_setup($hierarchy->prefix.'manage');
 /// Display page
 ///
 
-echo $OUTPUT->header();
+$return = optional_param('returnurl', '', PARAM_LOCALURL);
 
 // Cancel/return url
-if (!$course) {
-    $return = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix={$hierarchy->prefix}&id={$item->competencyid}";
-} else {
-    $return = "{$CFG->wwwroot}/course/competency.php?id={$course}";
+if (empty($return)) {
+    if (!$course) {
+        $return = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $hierarchy->prefix, 'id' => $item->competencyid));
+    } else {
+        $return = new moodle_url('/course/competency.php', array('id' => $course));
+    }
 }
 
 
@@ -81,12 +83,15 @@ if (!$delete) {
         $message .= format_string($compname .' ('. $item->get_type().')');
     }
 
-    $action = "{$CFG->wwwroot}/totara/hierarchy/prefix/{$hierarchy->prefix}/evidenceitem/remove.php?id={$item->id}&amp;delete=".md5($item->timemodified)."&amp;sesskey={$USER->sesskey}";
+    $actionurlparams = array('id' => $item->id, 'delete' => md5($item->timemodified), 'sesskey' => $USER->sesskey, 'returnurl' => $return);
 
     // If called from the course view
     if ($course) {
-        $action .= "&amp;course={$course}";
+        $actionurlparams['course'] = $course;
     }
+    $action = new moodle_url("/totara/hierarchy/prefix/{$hierarchy->prefix}/evidenceitem/remove.php", $actionurlparams);
+
+    echo $OUTPUT->header();
 
     echo $OUTPUT->confirm($message, $action, $return);
 
@@ -113,6 +118,4 @@ add_to_log(SITEID, 'competency', 'delete evidence', "item/view.php?id={$item->id
 
 $message = get_string('removed'.$hierarchy->prefix.'evidenceitem', 'totara_hierarchy', format_string($compname .' ('. $item->get_type().')'));
 
-echo $OUTPUT->heading($message);
-echo $OUTPUT->continue_button($return);
-echo $OUTPUT->footer();
+totara_set_notification($message, $return, array('class' => 'notifysuccess'));
