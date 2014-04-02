@@ -394,7 +394,7 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('user_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
         $table->add_key('goal_fk', XMLDB_KEY_FOREIGN, array('goalid'), 'goal', array('id'));
-        $table->add_key('scvl_fk', XMLDB_KEY_FOREIGN, array('scalevalueid'), 'goal_scale_value', array('id'));
+        $table->add_key('scvl_fk', XMLDB_KEY_FOREIGN, array('scalevalueid'), 'goal_scale_values', array('id'));
 
         // Adding comment to table goal_record.
         $table->setComment('Track current status of a user within goals');
@@ -799,7 +799,7 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
                 new xmldb_key('compreco_com_fk', XMLDB_KEY_FOREIGN, array('competencyid'), 'comp', 'id'),
                 new xmldb_key('compreco_pos_fk', XMLDB_KEY_FOREIGN, array('positionid'), 'pos', 'id'),
                 new xmldb_key('compreco_org_fk', XMLDB_KEY_FOREIGN, array('organisationid'), 'org', 'id'),
-                new xmldb_key('compreco_ass_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'userid', 'id'),
+                new xmldb_key('compreco_ass_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'user', 'id'),
                 new xmldb_key('compreco_pro_fk', XMLDB_KEY_FOREIGN, array('proficiency'), 'comp_scale_values', 'id')),
             'comp_record_history' => array(
                 new xmldb_key('comprecohist_use_fk', XMLDB_KEY_FOREIGN, array('userid'), 'user', 'id'),
@@ -1022,6 +1022,24 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2014030400, 'totara', 'hierarchy');
+    }
+
+    if ($oldversion < 2014041500) {
+        // Fix a bad reference in a goal_record foreign key.
+        $table = new xmldb_table('goal_record');
+        $oldkey = new xmldb_key('scvl_fk', XMLDB_KEY_FOREIGN, array('scalevalueid'), 'goal_scale_value', 'id');
+        $newkey = new xmldb_key('scvl_fk', XMLDB_KEY_FOREIGN, array('scalevalueid'), 'goal_scale_values', 'id');
+        $dbman->drop_key($table, $oldkey);
+        $dbman->add_key($table, $newkey);
+
+        // Fix a bad reference in a comp_record foreign key.
+        $table = new xmldb_table('comp_record');
+        $oldkey = new xmldb_key('compreco_ass_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'userid', 'id');
+        $newkey = new xmldb_key('compreco_ass_fk', XMLDB_KEY_FOREIGN, array('assessorid'), 'user', 'id');
+        $dbman->drop_key($table, $oldkey);
+        $dbman->add_key($table, $newkey);
+
+        upgrade_plugin_savepoint(true, 2014041500, 'totara', 'hierarchy');
     }
 
     return true;

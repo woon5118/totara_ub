@@ -54,7 +54,7 @@
         <KEY NAME="compreco_com_fk" TYPE="foreign" FIELDS="competencyid" REFTABLE="comp" REFFIELDS="id"/>
         <KEY NAME="compreco_pos_fk" TYPE="foreign" FIELDS="positionid" REFTABLE="pos" REFFIELDS="id"/>
         <KEY NAME="compreco_org_fk" TYPE="foreign" FIELDS="organisationid" REFTABLE="org" REFFIELDS="id"/>
-        <KEY NAME="compreco_ass_fk" TYPE="foreign" FIELDS="assessorid" REFTABLE="userid" REFFIELDS="id"/>
+        <KEY NAME="compreco_ass_fk" TYPE="foreign" FIELDS="assessorid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="compreco_pro_fk" TYPE="foreign" FIELDS="proficiency" REFTABLE="comp_scale_values" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -772,7 +772,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="goal_fk" TYPE="foreign" FIELDS="goalid" REFTABLE="goal" REFFIELDS="id"/>
-        <KEY NAME="scvl_fk" TYPE="foreign" FIELDS="scalevalueid" REFTABLE="goal_scale_value" REFFIELDS="id"/>
+        <KEY NAME="scvl_fk" TYPE="foreign" FIELDS="scalevalueid" REFTABLE="goal_scale_values" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="goal_type" COMMENT="Goal types are used to manage custom fields">
