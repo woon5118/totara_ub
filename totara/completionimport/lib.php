@@ -98,11 +98,19 @@ function get_shortnameoridnumber($relatedtable, $importtable, $shortnamefield, $
     global $DB;
 
     $notemptyshortname = $DB->sql_isnotempty($importtable, "{$importtable}.{$shortnamefield}", true, false);
+    $notemptyidnumber = $DB->sql_isnotempty($importtable, "{$importtable}.{$idnumberfield}", true, false);
     $emptyshortname = $DB->sql_isempty($importtable, "{$importtable}.{$shortnamefield}", true, false);
     $shortnameoridnumber = "
-        (({$notemptyshortname} AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield})
-        OR
-        ({$emptyshortname} AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield}))";
+        CASE
+            WHEN ({$notemptyshortname} AND {$notemptyidnumber}) THEN
+                {$notemptyshortname} AND {$notemptyidnumber}
+                AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield}
+                AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield}
+            WHEN ({$notemptyshortname} AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield}) THEN
+                ({$notemptyshortname} AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield})
+            WHEN ({$emptyshortname} AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield}) THEN
+                ({$emptyshortname} AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield})
+        END ";
     return $shortnameoridnumber;
 }
 
@@ -638,13 +646,6 @@ function import_course($importname, $importtime) {
                     $DB->delete_records_list('course_completions', 'id', $deletedcompletions);
                     $deletedcompletions = array();
                 }
-                // New enrol record or reached the next batch insert.
-                if (!empty($users)) {
-                    // Batch enrol users.
-                    $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
-                    $enrolcount = 0;
-                    $users = array();
-                }
 
                 if (!empty($completions)) {
                     // Batch import completions.
@@ -656,6 +657,14 @@ function import_course($importname, $importtime) {
                     // Batch import completions.
                     $DB->insert_records_via_batch('course_completion_history', $completion_history);
                     $completion_history = array();
+                }
+
+                // New enrol record or reached the next batch insert.
+                if (!empty($users)) {
+                    // Batch enrol users.
+                    $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
+                    $enrolcount = 0;
+                    $users = array();
                 }
 
                 if (!empty($updateids)) {
@@ -762,14 +771,6 @@ function import_course($importname, $importtime) {
         $deletedcompletions = array();
     }
 
-    // Add any remaining records.
-    if (!empty($users)) {
-        // Batch enrol users.
-        $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
-        $enrolcount = 0;
-        $users = array();
-    }
-
     if (!empty($completions)) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completions', $completions);
@@ -780,6 +781,14 @@ function import_course($importname, $importtime) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completion_history', $completion_history);
         $completion_history = array();
+    }
+
+    // Add any remaining records.
+    if (!empty($users)) {
+        // Batch enrol users.
+        $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
+        $enrolcount = 0;
+        $users = array();
     }
 
     if (!empty($updateids)) {

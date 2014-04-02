@@ -120,7 +120,7 @@ class importcertification_testcase extends advanced_testcase {
         $sql = "SELECT  {$uniqueid} AS uniqueid,
                         u.username,
                         p.shortname AS certificationshortname,
-                        p.id AS certificationidnumber
+                        p.idnumber AS certificationidnumber
                 FROM    {user} u,
                         {prog} p";
         $imports = $DB->get_recordset_sql($sql, null, 0, CERT_HISTORY_IMPORT_CSV_ROWS);
