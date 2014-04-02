@@ -101,13 +101,16 @@
    width:16px;
    height:16px;
 }
-#region-main .block_totara_tasks .header {
+#region-main .block_totara_tasks h2,
+#region-main .block_totara_tasks .title {
    background-color:#2fbce8;
 }
-#region-main .block_totara_quicklinks .header {
+#region-main .block_totara_quicklinks h2,
+#region-main .block_totara_quicklinks .title {
    background-color:#ee2b74;
 }
-#region-main .block_totara_alerts .header {
+#region-main .block_totara_alerts h2,
+#region-main .block_totara_alerts .title {
    background-color:#004958;
 }
 .block_totara_alerts table.fullwidth {
@@ -129,12 +132,16 @@
     width:20px;
     height:auto;
 }
-#region-main .block_completionstatus .header,
-#region-main .block_totara_recent_learning .header {
+#region-main .block_completionstatus h2,
+#region-main .block_completionstatus .title,
+#region-main .block_totara_recent_learning h2,
+#region-main .block_totara_recent_learning .title {
    background-color:#f47920;
 }
-#region-main .block_course_list .header,
-#region-main .block_course_overview .header {
+#region-main .block_course_list h2,
+#region-main .block_course_list .title,
+#region-main .block_course_overview h2,
+#region-main .block_course_overview .title {
    background-color:#a22485;
 }
 .block_course_list .content .coursebox,
