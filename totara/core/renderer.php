@@ -148,26 +148,26 @@ class totara_core_renderer extends plugin_renderer_base {
     * @return html_writer::table
     */
     public function print_report_manager($reports, $canedit) {
+        if (count($reports) == 0) {
+            return '';
+        }
 
-        $counter = 0;
-        $table = new html_table();
-        $table->attributes['class'] = 'reportmanager';
+        $output = html_writer::start_tag('ul', array('class' => 'reportmanager'));
         foreach ($reports as $report) {
             // show reports user has permission to view, that are not hidden
-            $class = ($counter % 2) ? 'noshade' : 'shade';
-            $counter++;
+            $output .= html_writer::start_tag('li');
             $cells = array();
             $text = format_string($report->fullname);
-            $icon = html_writer::empty_tag('img', array('src' => $this->output->pix_url('report_icon', 'totara_reportbuilder'),
-                                'alt'=> $text));
+            $icon = html_writer::empty_tag(
+                    'img',
+                    array('src' => $this->output->pix_url('report_icon', 'totara_reportbuilder'),
+                    'alt'=> $text)
+            );
             $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $report->id));
             $attributes = array('href' => $url);
-            $cellcontent = html_writer::tag('a', $icon, $attributes);
-            $cell = new html_table_cell($cellcontent);
-            $cell->attributes['class'] = 'icon';
-            $cells[] = $cell;
+            $output .= html_writer::tag('a', $icon, $attributes);
             $attributes = array('href' => $url);
-            $cellcontent = html_writer::tag('a', $text, $attributes);
+            $output .= html_writer::tag('a', $text, $attributes);
             // if admin with edit mode on show settings button too
             if ($canedit) {
                 $text = get_string('settings','totara_core');
@@ -175,17 +175,14 @@ class totara_core_renderer extends plugin_renderer_base {
                                                 'alt'=> $text));
                 $url = new moodle_url('/totara/reportbuilder/general.php?id='.$report->id);
                 $attributes = array('href' => $url);
-                $cellcontent .= '&nbsp;' . html_writer::tag('a', $icon, $attributes);
+                $output .= '&nbsp;' . html_writer::tag('a', $icon, $attributes);
             }
-            $cell = new html_table_cell($cellcontent);
-            $cell->attributes['class'] = 'text';
-            $cells[] = $cell;
-            $row = new html_table_row($cells);
-            $row->attributes['class'] = $class;
-            $table->data[] = $row;
+
+            $output .= html_writer::end_tag('li');
         }
 
-        return html_writer::table($table);
+        $output .= html_writer::end_tag('ul');
+        return $output;
     }
     /**
     * Returns markup for displaying saved scheduled reports
