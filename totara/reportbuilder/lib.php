@@ -3385,26 +3385,17 @@ class reportbuilder {
      * @return string HTML to display a pulldown menu with saved search options
      */
     function view_saved_menu() {
-        global $USER, $DB, $OUTPUT;
+        global $USER, $OUTPUT;
         $id = $this->_id;
         $sid = $this->_sid;
-        $savedoptions = array();
+
         if ($this->embedded) {
             $common = new moodle_url($this->get_current_url());
         } else {
             $common = new moodle_url('/totara/reportbuilder/report.php', array('id' => $id));
         }
-        // Are there saved searches for this report and user?
-        $saved = $DB->get_records('report_builder_saved', array('reportid' => $id, 'userid' => $USER->id));
-        foreach ($saved as $item) {
-            $savedoptions[$item->id] = format_string($item->name);
-        }
-        // are there public saved searches for this report?
-        $saved = $DB->get_records('report_builder_saved', array('reportid' => $id, 'ispublic' => 1));
-        foreach ($saved as $item) {
-            $savedoptions[$item->id] = format_string($item->name);
-        }
 
+        $savedoptions = $this->get_saved_searches($id, $USER->id);
         if (count($savedoptions) > 0) {
             $select = new single_select($common, 'sid', $savedoptions, $sid);
             $select->label = get_string('viewsavedsearch', 'totara_reportbuilder');
@@ -3415,6 +3406,27 @@ class reportbuilder {
         }
     }
 
+    /**
+     * Returns an array of available saved seraches for this report and user
+     * @param int $reportid look for saved searches for this report
+     * @param int $userid Check for saved searches belonging to this user
+     * @return array search id => search name
+     */
+    function get_saved_searches($reportid, $userid) {
+        global $DB;
+        $savedoptions = array();
+        // Are there saved searches for this report and user?
+        $saved = $DB->get_records('report_builder_saved', array('reportid' => $reportid, 'userid' => $userid));
+        foreach ($saved as $item) {
+            $savedoptions[$item->id] = format_string($item->name);
+        }
+        // Are there public saved searches for this report?
+        $saved = $DB->get_records('report_builder_saved', array('reportid' => $reportid, 'ispublic' => 1));
+        foreach ($saved as $item) {
+            $savedoptions[$item->id] = format_string($item->name);
+        }
+        return $savedoptions;
+    }
 
     /**
      * Diplays a table containing the save search button and pulldown

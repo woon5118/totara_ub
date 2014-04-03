@@ -58,8 +58,7 @@ if ($id == 0) {
 
 $report = new reportbuilder($schedule->reportid);
 
-$savedsearches = $DB->get_records_menu('report_builder_saved',
-        array('reportid' => $schedule->reportid, 'userid' => $USER->id), '', 'id, name');
+$savedsearches = $report->get_saved_searches($schedule->reportid, $USER->id);
 if (!isset($report->src->redirecturl)) {
     $savedsearches[0] = get_string('alldata', 'totara_reportbuilder');
 }
