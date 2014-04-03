@@ -25,7 +25,8 @@ class block_totara_my_learning_nav extends block_base {
         }
 
         $this->content = new stdClass;
-        $this->content->text = totara_print_my_learning_nav(true);
+        $renderer = $this->page->get_renderer('block_totara_my_learning_nav');
+        $this->content->text = $renderer->my_learning_nav();
         $this->content->footer = '';
 
         return $this->content;

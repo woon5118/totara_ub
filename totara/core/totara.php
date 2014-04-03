@@ -795,16 +795,6 @@ function totara_icon_picker_preview($type, $currenticon, $ind = '', $alt = '') {
 
     return $iconhtml;
 }
-/**
-* print out the Totara My Learning nav section
-*/
-function totara_print_my_learning_nav() {
-    global $PAGE;
-
-    $renderer = $PAGE->get_renderer('totara_core');
-    $content = $renderer->print_my_learning_nav();
-    return $content;
-}
 
 /**
 * print out the Totara My Team nav section

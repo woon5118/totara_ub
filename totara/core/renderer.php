@@ -124,66 +124,6 @@ class totara_core_renderer extends plugin_renderer_base {
     }
 
     /**
-    * print out the Totara My Learning nav section
-    * @return html_writer::table
-    */
-    public function print_my_learning_nav() {
-        global $USER;
-        if (!isloggedin() || isguestuser()) {
-            return '';
-        }
-
-        $usercontext = context_user::instance($USER->id);
-        $table = new html_table();
-        if (has_capability('totara/plan:accessplan', $usercontext)) {
-            $cells = array();
-            $text = get_string('developmentplan', 'totara_core');
-            $icon = new pix_icon('plan', $text, 'totara_core');
-            $url = new moodle_url('/totara/plan/index.php');
-            $cellcontent = $this->output->action_icon($url, $icon);
-            $cell = new html_table_cell($cellcontent);
-            $cells[] = $cell;
-            //second cell is another link to same location so we can reuse $text
-            $cellcontent = html_writer::link($url, $text);
-            $cell = new html_table_cell($cellcontent);
-            $cells[] = $cell;
-            $row = new html_table_row($cells);
-            $table->data[] = $row;
-        }
-
-        $cells = array();
-        $text = get_string('bookings', 'totara_core');
-        $icon = new pix_icon('bookings', $text, 'totara_core');
-        $url = new moodle_url('/my/bookings.php?userid=' . $USER->id);
-        $attributes = array('href' => $url);
-        $cellcontent = $this->output->action_icon($url, $icon);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        //second cell is another link to same location so we can reuse $text
-        $cellcontent = html_writer::link($url, $text);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        $row = new html_table_row($cells);
-        $table->data[] = $row;
-
-        $cells = array();
-        $text = get_string('recordoflearning', 'totara_core');
-        $icon = new pix_icon('record', $text, 'totara_core');
-        $url = new moodle_url('/totara/plan/record/index.php?userid='.$USER->id);
-        $cellcontent = $this->output->action_icon($url, $icon);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        //second cell is another link to same location so we can reuse $text
-        $cellcontent = html_writer::link($url, $text);
-        $cell = new html_table_cell($cellcontent);
-        $cells[] = $cell;
-        $row = new html_table_row($cells);
-        $table->data[] = $row;
-
-        return html_writer::table($table);
-    }
-
-    /**
     * print out the Totara My Team nav section
     * @return html_writer::table
     */
