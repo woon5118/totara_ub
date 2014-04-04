@@ -360,7 +360,7 @@ function tm_alert_send($eventdata) {
         $result = email_to_user(
             $eventdata->userto,
             $userfrom,
-            format_string($eventdata->subject),
+            $eventdata->subject,
             html_to_text($eventdata->fullmessage),
             $fullmessagehtml,
             $attachment,
