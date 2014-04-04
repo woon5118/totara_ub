@@ -136,6 +136,7 @@ $string['america/chihuahua'] = 'America/Chihuahua';
 $string['america/indiana/knox'] = 'America/Indiana/Knox';
 $string['america/indiana/marengo'] = 'America/Indiana/Marengo';
 $string['america/indianapolis'] = 'America/Indianapolis';
+$string['america/indiana/indianapolis'] = 'America/Indiana/Indianapolis';
 $string['america/indiana/vevay'] = 'America/Indiana/Vevay';
 $string['america/inuvik'] = 'America/Inuvik';
 $string['america/iqaluit'] = 'America/Iqaluit';

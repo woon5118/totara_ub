@@ -1016,5 +1016,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014032000, 'totara_core');
     }
 
+    if ($oldversion < 2014041500) {
+        // Fix incorrect timezone information for Indianapolis.
+        $sql = "UPDATE {user} SET timezone = ? WHERE timezone = ?";
+        $DB->execute($sql, array('America/Indiana/Indianapolis', 'America/Indianapolis'));
+        $sql = "UPDATE {facetoface_sessions_dates} SET sessiontimezone = ? WHERE sessiontimezone = ?";
+        $DB->execute($sql, array('America/Indiana/Indianapolis', 'America/Indianapolis'));
+        totara_upgrade_mod_savepoint(true, 2014041500, 'totara_core');
+    }
+
     return true;
 }
