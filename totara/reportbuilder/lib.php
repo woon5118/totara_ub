@@ -356,19 +356,18 @@ class reportbuilder {
      * Include javascript code needed by report builder
      */
     function include_js() {
-        global $CFG, $PAGE, $SESSION;
+        global $CFG, $PAGE;
 
-        $dialog = false;
-        $treeview = false;
+        // Array of options for local_js
+        $code = array();
 
         // Get any required js files that are specified by the source.
         $js = $this->src->get_required_jss();
 
         // Only include show/hide code for tabular reports.
-        $graph = (substr($this->source, 0,
-            strlen('graphical_feedback_questions')) ==
-            'graphical_feedback_questions');
+        $graph = (substr($this->source, 0, strlen('graphical_feedback_questions')) == 'graphical_feedback_questions');
         if (!$graph) {
+            $code[] = TOTARA_JS_DIALOG;
             $jsdetails = new stdClass();
             $jsdetails->initcall = 'M.totara_reportbuilder_showhide.init';
             $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_showhide',
@@ -390,55 +389,7 @@ class reportbuilder {
                 'form' => array('close')
             );
             $js[] = $jsdetails;
-
-            $dialog = true;
         }
-
-        // include JS for dialogs if required for filters
-        foreach ($this->filters as $filter) {
-            if (in_array($filter->filtertype, array('hierarchy', 'hierarchy_multi', 'cohort'))) {
-                $jsdetails = new stdClass();
-                $jsdetails->initcall = 'M.totara_reportbuilder_filterdialogs.init';
-                $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_filterdialogs',
-                    'fullpath' => '/totara/reportbuilder/filter_dialogs.js');
-                $jsdetails->strings = array(
-                    'totara_hierarchy' => array('chooseposition', 'selected', 'chooseorganisation', 'currentlyselected', 'selectcompetency'),
-                    'totara_reportbuilder' => array('chooseorgplural', 'chooseposplural', 'choosecompplural'),
-                    'totara_cohort' => array('choosecohorts')
-                );
-
-                // add currently selected as args
-                $cargs = array();
-                foreach ($this->filters as $f) {
-                    if ($f->filtertype != 'hierarchy') {
-                        continue;
-                    }
-                    $title = $f->type . '-' . $f->value;
-                    $currentlyselected = json_encode(dialog_display_currently_selected(
-                        get_string('currentlyselected', 'totara_hierarchy'), $title));
-                    $cargs[] = "\"{$title}-currentlyselected\":{$currentlyselected}";
-                }
-                if (!empty($cargs)) {
-                    $cargs = implode(', ', $cargs);
-                    $jsdetails->args = array('args' => '{' . $cargs . '}');
-                }
-
-                $js[] = $jsdetails;
-
-                $dialog = $treeview = true;
-                break;
-            }
-        }
-
-
-        $code = array();
-        if ($dialog) {
-            $code[] = TOTARA_JS_DIALOG;
-        }
-        if ($treeview) {
-            $code[] = TOTARA_JS_TREEVIEW;
-        }
-
 
         local_js($code);
         foreach ($js as $jsdetails) {
@@ -453,6 +404,19 @@ class reportbuilder {
                 false, $jsdetails->jsmodule);
         }
 
+
+        // Load Js for these filters.
+        foreach ($this->filters as $filter) {
+            $classname = get_class($filter);
+            $filtertype = $filter->filtertype;
+            $filterpath = $CFG->dirroot.'/totara/reportbuilder/filters/'.$filtertype.'.php';
+            if (file_exists($filterpath)) {
+                require_once $filterpath;
+                if (method_exists($classname, 'include_js')) {
+                    call_user_func(array($filter, 'include_js'));
+                }
+            }
+        }
     }
 
 

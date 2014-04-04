@@ -238,5 +238,36 @@ class rb_filter_hierarchy extends rb_filter_type {
 
         return get_string('selectlabel', 'filters', $a);
     }
-}
 
+    /**
+     * Include Js for this filter
+     *
+     */
+    public function include_js() {
+        global $PAGE;
+
+        $code = array();
+        $code[] = TOTARA_JS_DIALOG;
+        $code[] = TOTARA_JS_TREEVIEW;
+        local_js($code);
+
+        $jsdetails = new stdClass();
+        $jsdetails->initcall = 'M.totara_reportbuilder_filterdialogs.init';
+        $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_filterdialogs',
+            'fullpath' => '/totara/reportbuilder/filter_dialogs.js');
+        $jsdetails->strings = array(
+            'totara_hierarchy' => array('chooseposition', 'selected', 'chooseorganisation', 'currentlyselected', 'selectcompetency'),
+            'totara_reportbuilder' => array('chooseorgplural', 'chooseposplural', 'choosecompplural'),
+        );
+        $title = $this->type . '-' . $this->value;
+        $currentlyselected = json_encode(dialog_display_currently_selected(get_string('currentlyselected', 'totara_hierarchy'), $title));
+        $carg = "\"{$title}-currentlyselected\":{$currentlyselected}";
+        $jsdetails->args = array('args' => '{' . $carg . '}');
+
+        foreach ($jsdetails->strings as $scomponent => $sstrings) {
+            $PAGE->requires->strings_for_js($sstrings, $scomponent);
+        }
+
+        $PAGE->requires->js_init_call($jsdetails->initcall, $jsdetails->args, false, $jsdetails->jsmodule);
+    }
+}

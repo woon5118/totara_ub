@@ -195,6 +195,33 @@ class rb_filter_cohort extends rb_filter_type {
 
         return get_string('selectlabelnoop', 'filters', $a);
     }
+
+    /**
+     * Include Js for this filter
+     *
+     */
+    public function include_js() {
+        global $PAGE;
+
+        $code = array();
+        $code[] = TOTARA_JS_DIALOG;
+        $code[] = TOTARA_JS_TREEVIEW;
+        local_js($code);
+
+        $jsdetails = new stdClass();
+        $jsdetails->initcall = 'M.totara_reportbuilder_filterdialogs.init';
+        $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_filterdialogs',
+            'fullpath' => '/totara/reportbuilder/filter_dialogs.js');
+        $jsdetails->strings = array(
+            'totara_cohort' => array('choosecohorts')
+        );
+
+        foreach ($jsdetails->strings as $scomponent => $sstrings) {
+            $PAGE->requires->strings_for_js($sstrings, $scomponent);
+        }
+
+        $PAGE->requires->js_init_call($jsdetails->initcall, null, false, $jsdetails->jsmodule);
+    }
 }
 
 /**
