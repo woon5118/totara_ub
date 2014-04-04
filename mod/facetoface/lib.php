@@ -2245,6 +2245,15 @@ function facetoface_approve_requests($data) {
             continue;
         }
 
+        // Double-check request exists and not already approved or declined.
+        $params = array(
+            'signupid' => $attendee->submissionid,
+            'statuscode' => MDL_F2F_STATUS_REQUESTED,
+            'superceded' => 0);
+        if (!$DB->record_exists('facetoface_signups_status', $params)) {
+            continue;
+        }
+
         // Update status
         switch ($value) {
 
