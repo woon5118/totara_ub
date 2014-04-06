@@ -1223,11 +1223,11 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      *
      * @param appraisal $appraisal
      * @param object $userassignment
-     * @param array $urlparams
+     * @param boolean $showprint
      * @param boolean $preview
      * @return string HTML
      */
-    public function display_appraisal_actions($appraisal, $userassignment, $urlparams, $showprint, $preview) {
+    public function display_appraisal_actions($appraisal, $userassignment, $showprint, $preview) {
         $out = '';
         $buttons = '';
 
@@ -1238,11 +1238,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $savepdfbutton['disabled'] = 'disabled';
             }
             $buttons .= html_writer::empty_tag('input', $savepdfbutton);
-        } else {
-            $viewurl = new moodle_url('/totara/appraisal/myappraisal.php', $urlparams);
-            $viewstr = get_string('view', 'totara_appraisal');
-            $viewbutton = new single_button($viewurl, $viewstr, 'get');
-            $buttons .= $this->output->render($viewbutton);
         }
 
         if ($showprint) {
@@ -1374,6 +1369,11 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $button = new single_button($pagesurl, get_string('preview', 'totara_appraisal'), 'get');
             $action .= $this->output->render($button);
         } else if ($stage->is_completed($userassignment)) {
+            if (isset($stage->firstpage)) {
+                $pagesurl->param('pageid', $stage->firstpage);
+                $button = new single_button($pagesurl, get_string('view', 'totara_appraisal'), 'get');
+                $action .= $this->output->render($button);
+            }
             $action .= $this->output->pix_icon('tick2', get_string('completed', 'totara_appraisal'), 'totara_appraisal',
                     array('class' => 'stage-complete'));
         } else if ($stage->id == $userassignment->activestageid) {
@@ -1460,7 +1460,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $out .= $this->display_appraisal_header($appraisal, $userassignment, $preview);
 
         // Buttons to the right of the title and status.
-        $out .= $this->display_appraisal_actions($appraisal, $userassignment, $urlparams, $showprint, $preview);
+        $out .= $this->display_appraisal_actions($appraisal, $userassignment, $showprint, $preview);
 
         // Check to see if there are any stages to display.
         if (empty($stages)) {

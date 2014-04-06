@@ -56,10 +56,6 @@ if (!$appraisal->can_access($roleassignment)) {
     throw new moodle_exception('error:cannotaccessappraisal');
 }
 
-// Now that permissions have been checked, set up some more variables.
-$notifications = '';
-$stages = appraisal_stage::get_stages($appraisalid);
-
 // Set system context.
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
@@ -254,8 +250,6 @@ if ($preview) {
     echo $renderer->display_viewing_appraisal_header($subject);
 }
 
-echo $notifications;
-
 // Output page content.
 if ($action == 'stages') {
     $usercontext = context_user::instance($subjectid);
@@ -265,6 +259,14 @@ if ($action == 'stages') {
         $showprint = has_capability('totara/appraisal:printstaffappraisals', $usercontext);
     }
 
+    $stages = appraisal_stage::get_stages($appraisalid);
+    foreach ($stages as $stage) {
+        $pages = appraisal_page::get_applicable_pages($stage->id, $role, 0, false);
+        if (!empty($pages)) {
+            $firstpage = reset($pages);
+            $stage->firstpage = $firstpage->id;
+        }
+    }
     echo $renderer->display_stages($appraisal, $stages, $roleassignment, $showprint, $preview);
 } else {
     if (isset($form)) {
@@ -276,7 +278,6 @@ if ($action == 'stages') {
     } else {
         echo $renderer->display_pages($visiblepages, $page, $roleassignment, $preview);
     }
-
 }
 
 // End page output.
