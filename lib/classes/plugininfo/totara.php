@@ -23,7 +23,7 @@
 
 namespace core\plugininfo;
 
-use moodle_url;
+use core\plugininfo\base;
 
 defined('MOODLE_INTERNAL') || die();
 
