@@ -620,40 +620,6 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013103000, 'totara', 'cohort');
     }
 
-    if ($oldversion < 2014021700) {
-        // Define table cohort_role to be created.
-        $table = new xmldb_table('cohort_role');
-
-        // Adding fields to table cohort_role.
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-
-        // Adding keys to table cohort_role.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('cohortid', XMLDB_KEY_FOREIGN, array('cohortid'), 'cohort', array('id'));
-        $table->add_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
-        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
-
-        // Adding indexes to table cohort_role.
-        $table->add_index('uix_co_rol_ctx', XMLDB_INDEX_UNIQUE, array('cohortid', 'roleid', 'contextid'));
-
-        // Adding comment to table cohort_role.
-        $table->setComment('A table to store roles assigned to a cohort');
-
-        // Conditionally launch create table for cohort_role.
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // Cohort savepoint reached.
-        upgrade_plugin_savepoint(true, 2014021700, 'totara', 'cohort');
-    }
-
     if ($oldversion < 2014031900) {
         // Find and fix all missing course_completions records for courses enrolled via an Audience.
         require_once($CFG->dirroot . '/completion/completion_completion.php');
@@ -664,6 +630,42 @@ function xmldb_totara_cohort_upgrade($oldversion) {
             }
         }
         upgrade_plugin_savepoint(true, 2014031900, 'totara', 'cohort');
+    }
+
+    if ($oldversion < 2014040700) {
+        // Define table cohort_role to be created.
+        $table = new xmldb_table('cohort_role');
+
+        // Conditionally launch create table for cohort_role.
+        if (!$dbman->table_exists($table)) {
+
+            // Adding fields to table cohort_role.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+            // Adding keys to table cohort_role.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('cohortid', XMLDB_KEY_FOREIGN, array('cohortid'), 'cohort', array('id'));
+            $table->add_key('roleid', XMLDB_KEY_FOREIGN, array('roleid'), 'role', array('id'));
+            $table->add_key('usermodified', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
+
+            // Adding indexes to table cohort_role.
+            $table->add_index('uix_co_rol_ctx', XMLDB_INDEX_UNIQUE, array('cohortid', 'roleid', 'contextid'));
+
+            // Adding comment to table cohort_role.
+            $table->setComment('A table to store roles assigned to a cohort');
+
+            // Creating the table.
+            $dbman->create_table($table);
+        }
+
+        // Cohort savepoint reached.
+        upgrade_plugin_savepoint(true, 2014040700, 'totara', 'cohort');
     }
 
     return true;
