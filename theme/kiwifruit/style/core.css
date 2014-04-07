@@ -81,25 +81,6 @@ h6 {
     font-size:1em;
     margin:5px 0 5px;
 }
-h1.main,
-h2.main,
-h3.main,
-h4.main,
-h5.main,
-h6.main {
-    font-weight:400;
-    text-align:left;
-}
-.dir-rtl h1.main,
-.dir-rtl h2.main,
-.dir-rtl h3.main,
-.dir-rtl h4.main,
-.dir-rtl h5.main,
-.dir-rtl h6.main {
-    text-align:right;
-}
-h1.main,
-h2.main,
 h2.header,
 #region-main h1,
 #region-main h2 {
@@ -114,8 +95,7 @@ h2.header,
     background:#b1bb1a;
     text-align: left;
 }
-h1.main a,
-h2.main a,
+
 h2.header a {
     color:#FFFFFF;
 }

@@ -80,23 +80,6 @@ h6 {
     font-size:1em;
     margin:5px 0 5px;
 }
-h1.main,
-h2.main,
-h3.main,
-h4.main,
-h5.main,
-h6.main {
-    font-weight:400;
-    text-align:left;
-}
-.dir-rtl h1.main,
-.dir-rtl h2.main,
-.dir-rtl h3.main,
-.dir-rtl h4.main,
-.dir-rtl h5.main,
-.dir-rtl h6.main {
-    text-align:right;
-}
 h2,
 h1 {
     font-size:200%;
@@ -111,8 +94,8 @@ h1 {
     border-radius: 5px;
     text-align: left;
 }
-h1.main a,
-h2.main a,
+h1 a,
+h2 a,
 h2.header a {
     color:#FFFFFF;
 }

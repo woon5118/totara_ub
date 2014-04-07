@@ -76,22 +76,6 @@ h6 {
     font-size:1em;
     margin:5px 0 5px;
 }
-h1.main,
-h2.main,
-h3.main,
-h4.main,
-h5.main,
-h6.main {
-    text-align: left;
-}
-.dir-rtl h1.main,
-.dir-rtl h2.main,
-.dir-rtl h3.main,
-.dir-rtl h4.main,
-.dir-rtl h5.main,
-.dir-rtl h6.main {
-    text-align: right;
-}
 h1.centered,
 h2.centered,
 h3.centered,
