@@ -999,28 +999,37 @@ class program {
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
 
         $courseset_group_completed = false;
-
-        foreach ($courseset_groups as $courseset_group) {
-
+        $maxcompletedgroup = -1;
+        $coursegroup = -1;
+        // Find the last completed groupset, and which groupset the course is in.
+        foreach ($courseset_groups as $groupkey => $courseset_group) {
+            $thisgroupcomplete = false;
             foreach ($courseset_group as $courseset) {
-
-                // if this set contains the course, the user can enter the course
-                if ($courseset->contains_course($courseid)) {
-
-                    // create completion record if it does not exist
-                    $courseset->update_courseset_complete($userid, array());
-
-                    return true;
+                if ($courseset->is_courseset_complete($userid)) {
+                    $thisgroupcomplete = true;
+                    $maxcompletedgroup = $groupkey;
                 }
-
-                $courseset_group_completed = $courseset_group_completed===true ? $courseset_group_completed : $courseset->is_courseset_complete($userid);
+                if ($courseset->contains_course($courseid)) {
+                    $coursegroup = $groupkey;
+                }
+                if ($thisgroupcomplete && $courseset->contains_course($courseid)) {
+                    // Create completion record if it does not exist.
+                    $courseset->update_courseset_complete($userid, array());
+                }
             }
-
-            // if this course set group is not complete there is not point in
-            // continuing because the user can not enter any of the courses
-            // in the following course set groups
-            if (!$courseset_group_completed) {
-                return false;
+        }
+        // Allow access if the course is in the first group...
+        if ($maxcompletedgroup == -1 && $coursegroup == 0) {
+            return true;
+        }
+        if ($maxcompletedgroup >= 0 && $coursegroup >= 0) {
+            // Or an already completed group...
+            if ($coursegroup <= $maxcompletedgroup) {
+                return true;
+            }
+            // Or the next uncompleted group.
+            if ($coursegroup == ($maxcompletedgroup+1)) {
+                return true;
             }
         }
         return false;
