@@ -100,17 +100,16 @@ function get_shortnameoridnumber($relatedtable, $importtable, $shortnamefield, $
     $notemptyshortname = $DB->sql_isnotempty($importtable, "{$importtable}.{$shortnamefield}", true, false);
     $notemptyidnumber = $DB->sql_isnotempty($importtable, "{$importtable}.{$idnumberfield}", true, false);
     $emptyshortname = $DB->sql_isempty($importtable, "{$importtable}.{$shortnamefield}", true, false);
+    $emptyidnumber = $DB->sql_isempty($importtable, "{$importtable}.{$idnumberfield}", true, false);
     $shortnameoridnumber = "
-        CASE
-            WHEN ({$notemptyshortname} AND {$notemptyidnumber}) THEN
-                {$notemptyshortname} AND {$notemptyidnumber}
-                AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield}
-                AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield}
-            WHEN ({$notemptyshortname} AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield}) THEN
-                ({$notemptyshortname} AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield})
-            WHEN ({$emptyshortname} AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield}) THEN
-                ({$emptyshortname} AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield})
-        END ";
+        ({$notemptyshortname} AND {$notemptyidnumber}
+            AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield}
+            AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield})
+        OR ({$notemptyshortname} AND {$emptyidnumber}
+            AND {$relatedtable}.shortname = {$importtable}.{$shortnamefield})
+        OR ({$emptyshortname} AND {$notemptyidnumber}
+            AND {$relatedtable}.idnumber = {$importtable}.{$idnumberfield})
+        ";
     return $shortnameoridnumber;
 }
 
