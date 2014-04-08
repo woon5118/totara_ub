@@ -151,6 +151,8 @@ class facetoface_notification extends data_object {
 
     public $usermodified;
 
+    private $_event;
+
     private $_facetoface;
 
     private $_ical_attachment;
@@ -423,11 +425,11 @@ class facetoface_notification extends data_object {
             $count = 0;
             foreach ($recipients as $recipient) {
                 $count++;
-                $newevent = $this->set_newevent($recipient, $recipient->sessionid);
-                $this->send_to_user($newevent, $recipient, $recipient->sessionid);
-                $this->send_to_manager($newevent, $recipient, $recipient->sessionid);
-                $this->send_to_thirdparty($newevent, $recipient, $recipient->sessionid);
-                @unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $newevent->attachment);
+                $this->set_newevent($recipient, $recipient->sessionid);
+                $this->send_to_user($recipient, $recipient->sessionid);
+                $this->send_to_manager($recipient, $recipient->sessionid);
+                $this->send_to_thirdparty($recipient, $recipient->sessionid);
+                $this->delete_ical_attachment();
             }
             echo get_string('sentxnotifications', 'facetoface', $count) . "\n";
 
@@ -462,18 +464,24 @@ class facetoface_notification extends data_object {
         $this->_facetoface = $facetoface;
     }
 
+    public function delete_ical_attachment() {
+        if (!empty($this->_ical_attachment)) {
+            @unlink($this->_ical_attachment->filename);
+            @rmdir($this->_ical_attachment->dir2);
+            @rmdir($this->_ical_attachment->dir1);
+        }
+    }
 
     /**
      * Send to a single user
      *
      * @access  public
-     * @param   object  $newevent
      * @param   object  $user       User object
      * @param   int     $sessionid
      * @param   int     $sessiondate The specific sessiondate which this message is for.
      * @return  void
      */
-    public function send_to_user($newevent, $user, $sessionid, $sessiondate = null) {
+    public function send_to_user($user, $sessionid, $sessiondate = null) {
         global $CFG, $USER, $DB;
 
         // Check notification or system notification is enabled.
@@ -481,30 +489,30 @@ class facetoface_notification extends data_object {
             return;
         }
 
-        $success = tm_alert_send($newevent);
+        $success = message_send($this->_event);
         if ($success) {
             if (!empty($sessiondate)) {
-                $uid = (empty($newevent->ical_uids) ? '' : array_shift($newevent->ical_uids));
+                $uid = (empty($this->_event->ical_uids) ? '' : array_shift($this->_event->ical_uids));
                 $hist = new stdClass();
                 $hist->notificationid = $this->id;
                 $hist->sessionid = $sessionid;
                 $hist->userid = $user->id;
                 $hist->sessiondateid = $sessiondate->id;
                 $hist->ical_uid = $uid;
-                $hist->ical_method = $newevent->ical_method;
+                $hist->ical_method = $this->_event->ical_method;
                 $hist->timecreated = time();
                 $DB->insert_record('facetoface_notification_hist', $hist);
             } else {
                 $dates = $this->_sessions[$sessionid]->sessiondates;
                 foreach ($dates as $session_date) {
-                    $uid = (empty($newevent->ical_uids) ? '' : array_shift($newevent->ical_uids));
+                    $uid = (empty($this->_event->ical_uids) ? '' : array_shift($this->_event->ical_uids));
                     $hist = new stdClass();
                     $hist->notificationid = $this->id;
                     $hist->sessionid = $sessionid;
                     $hist->userid = $user->id;
                     $hist->sessiondateid = $session_date->id;
                     $hist->ical_uid = $uid;
-                    $hist->ical_method = $newevent->ical_method;
+                    $hist->ical_method = $this->_event->ical_method;
                     $hist->timecreated = time();
                     $DB->insert_record('facetoface_notification_hist', $hist);
                 }
@@ -561,50 +569,62 @@ class facetoface_notification extends data_object {
                 $sessionid
             );
         }
+        $plaintext = format_text_email($body, FORMAT_HTML);
 
-        $newevent = new stdClass();
-        $newevent->userto      = $user;
-        $newevent->userfrom    = $USER;
-        $newevent->roleid      = $CFG->learnerroleid;
-        $newevent->fullmessage = $body;
-        $newevent->subject     = $subject;
-        $newevent->icon        = 'facetoface-regular';
-        $newevent->managerprefix = $managerprefix;
+        $this->_event = new stdClass();
+        $this->_event->component   = 'totara_message';
+        $this->_event->name        = 'alert';
+        $this->_event->userto      = $user;
+        $this->_event->userfrom    = $USER;
+        $this->_event->roleid      = $CFG->learnerroleid;
+        $this->_event->subject     = $subject;
+        $this->_event->fullmessage       = $plaintext;
+        $this->_event->fullmessageformat = FORMAT_PLAIN;
+        $this->_event->fullmessagehtml   = nl2br($body);
+        $this->_event->smallmessage      = $plaintext;
+
+        $this->_event->icon        = 'facetoface-regular';
+
+        $plaintext = format_text_email($managerprefix, FORMAT_HTML);
+        $this->_event->manager = new stdClass();
+        $this->_event->manager->fullmessage       = $plaintext;
+        $this->_event->manager->fullmessagehtml   = nl2br($managerprefix);
+        $this->_event->manager->smallmessage      = $plaintext;
 
         // Speciality icons.
         if ($this->type == MDL_F2F_NOTIFICATION_AUTO) {
             switch ($this->conditiontype) {
             case MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION:
-                $newevent->icon = 'facetoface-remove';
+                $this->_event->icon = 'facetoface-remove';
                 break;
             case MDL_F2F_CONDITION_BOOKING_CONFIRMATION:
-                $newevent->icon = 'facetoface-add';
+                $this->_event->icon = 'facetoface-add';
                 break;
             case MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE:
-                $newevent->icon = 'facetoface-update';
+                $this->_event->icon = 'facetoface-update';
                 break;
             case MDL_F2F_CONDITION_DECLINE_CONFIRMATION://KINEO #198 ad decline message
-                $newevent->icon = 'facetoface-decline';
+                $this->_event->icon = 'facetoface-decline';
                 break;
             }
         }
 
         // Override normal email processor behaviour in order to handle attachments.
-        $newevent->sendemail = TOTARA_MSG_EMAIL_MANUAL;
-        $newevent->msgtype   = TOTARA_MSG_TYPE_FACE2FACE;
-        $newevent->urgency   = TOTARA_MSG_URGENCY_NORMAL;
+        $this->_event->sendemail = TOTARA_MSG_EMAIL_YES;
+        $this->_event->msgtype   = TOTARA_MSG_TYPE_FACE2FACE;
+        $this->_event->urgency   = TOTARA_MSG_URGENCY_NORMAL;
         $ical_content = '';
         $ical_uids = null;
         $ical_method = '';
 
         if (!empty($this->_ical_attachment) && $this->conditiontype != MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION) {
-            $newevent->attachment = $this->_ical_attachment->file;
+            $this->_event->attachment = $this->_ical_attachment->file;
 
             if ($this->conditiontype == MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION ||
                 $this->conditiontype == MDL_F2F_CONDITION_DECLINE_CONFIRMATION) {
-                $newevent->attachmentname = 'cancel.ics';
+                $this->_event->attachname = 'cancel.ics';
             } else {
-                $newevent->attachmentname = 'invite.ics';
+                $this->_event->attachname = 'invite.ics';
             }
 
             $ical_content = $this->_ical_attachment->content;
@@ -616,22 +636,19 @@ class facetoface_notification extends data_object {
                 $ical_method = $matches[1];
             }
         }
-        $newevent->ical_uids  = $ical_uids;
-        $newevent->ical_method  = $ical_method;
-
-        return $newevent;
+        $this->_event->ical_uids  = $ical_uids;
+        $this->_event->ical_method  = $ical_method;
     }
 
     /**
      * Send to a manager
      *
      * @access  public
-     * @param   object  $event
      * @param   object  $user       User object
      * @param   int     $sessionid
      * @return  void
      */
-    public function send_to_manager($event, $user, $sessionid) {
+    public function send_to_manager($user, $sessionid) {
         global $CFG, $DB;
 
         if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
@@ -640,10 +657,14 @@ class facetoface_notification extends data_object {
 
         // Check if notification is to be cc'd to manager.
         if ($this->ccmanager && $manager = totara_get_manager($user->id)) {
+
+            $event = clone $this->_event;
+
             $event->userto = $manager;
             $event->roleid = $CFG->managerroleid;
-            $event->fullmessage = $event->managerprefix;
-            $event->fullmessagehtml = '';
+            $event->fullmessage       = $event->manager->fullmessage;
+            $event->fullmessagehtml   = $event->manager->fullmessagehtml;
+            $event->smallmessage      = $event->manager->smallmessage;
 
             if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST) {
                 // Do the facetoface workflow event.
@@ -658,11 +679,11 @@ class facetoface_notification extends data_object {
                 $onreject->text = $strmgr->get_string('rejectinstruction', 'facetoface', null, $manager->lang);
                 $onreject->data = array('userid' => $user->id, 'session' => $this->_sessions[$sessionid], 'facetoface' => $this->_facetoface);
                 $event->onreject = $onreject;
-                $event->sendemail = TOTARA_MSG_EMAIL_YES;
 
-                tm_task_send($event);
+                $event->name = 'task';
+                message_send($event);
             } else {
-                tm_alert_send($event);
+                message_send($event);
             }
         }
     }
@@ -671,12 +692,11 @@ class facetoface_notification extends data_object {
      * Send to a third party
      *
      * @access  public
-     * @param   object  $event
      * @param   object  $user       User object
      * @param   int     $sessionid
      * @return  void
      */
-    public function send_to_thirdparty($event, $user, $sessionid) {
+    public function send_to_thirdparty($user, $sessionid) {
 
         if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             return true;
@@ -684,15 +704,15 @@ class facetoface_notification extends data_object {
 
         // Third-party notification.
         if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
+            $event = clone $this->_event;
             $event->attachment = null; // Leave out the ical attachments in the third-parties notification.
             $recipients = array_map('trim', explode(',', $this->_facetoface->thirdparty));
-            $thirdparty = clone $user;
-            $thirdparty->firstname = ''; $thirdparty->lastname = ''; // Avoid showing user's name to third-party recipient.
             foreach ($recipients as $recipient) {
-                $thirdparty->email = $recipient;
-                $event->userto = $thirdparty;
-                $event->fullmessagehtml = ''; // Avoid repeating footer at the end of the email.
-                tm_alert_send($event);
+                $event->userto = \totara_core\totara_user::get_external_user($recipient);
+                $event->fullmessage       = $event->manager->fullmessage;
+                $event->fullmessagehtml   = $event->manager->fullmessagehtml;
+                $event->smallmessage      = $event->manager->smallmessage;
+                message_send($event);
             }
         }
     }
@@ -849,13 +869,13 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
                 $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid);
                 $notice->set_ical_attachment($ical_attach);
             }
-            $newevent = $notice->set_newevent($user, $session->id, $sessiondate);
+            $notice->set_newevent($user, $session->id, $sessiondate);
             if ($session->notifyuser) {
-                $notice->send_to_user($newevent, $user, $session->id, $sessiondate);
+                $notice->send_to_user($user, $session->id, $sessiondate);
             }
-            $notice->send_to_manager($newevent, $user, $session->id);
-            $notice->send_to_thirdparty($newevent, $user, $session->id);
-            @unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $newevent->attachment);
+            $notice->send_to_manager($user, $session->id);
+            $notice->send_to_thirdparty($user, $session->id);
+            $notice->delete_ical_attachment();
         }
         // Restore session dates.
         $session->sessiondates = $sessiondates;
@@ -864,13 +884,13 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
             $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid);
             $notice->set_ical_attachment($ical_attach);
         }
-        $newevent = $notice->set_newevent($user, $session->id);
+        $notice->set_newevent($user, $session->id);
         if ($session->notifyuser) {
-            $notice->send_to_user($newevent, $user, $session->id);
+            $notice->send_to_user($user, $session->id);
         }
-        $notice->send_to_manager($newevent, $user, $session->id);
-        $notice->send_to_thirdparty($newevent, $user, $session->id);
-        @unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $newevent->attachment);
+        $notice->send_to_manager($user, $session->id);
+        $notice->send_to_thirdparty($user, $session->id);
+        $notice->delete_ical_attachment();
     }
     return '';
 }
