@@ -80,10 +80,9 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
 
         $newids = array();
         foreach ($userstoassign as $adduser) {
-            if (cohort_add_member($cohort->id, $adduser->id)) {
-                add_to_log(SITEID, 'cohort', 'add member', 'cohort/members.php?id='.$cohort->id, "userid={$adduser->id}");
-                $newids[$adduser->id] = $adduser->id;
-            }
+            cohort_add_member($cohort->id, $adduser->id);
+            add_to_log(SITEID, 'cohort', 'add member', 'cohort/members.php?id='.$cohort->id, "userid={$adduser->id}");
+            $newids[$adduser->id] = $adduser->id;
         }
         // Assign roles to new users.
         totara_set_role_assignments_cohort($currentcohortroles, $cohort->id, array_keys($newids));

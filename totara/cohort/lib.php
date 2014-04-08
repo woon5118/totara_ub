@@ -1108,11 +1108,12 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
         return true;
     }
 
+    if (!count($userids)) {
+        return true;
+    }
+
     if ($delaymessages) {
         // Don't send the messages now. Do a bulk insert to queue them for later sending.
-        if (!count($userids)) {
-            return true;
-        }
         $now = time();
         $msg = new stdClass();
         $msg->cohortid = $cohortid;
@@ -1126,7 +1127,8 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
     }
 
     $memberlist = array();
-    $users = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, '', 'id, firstname, lastname');
+    $usernamefields = get_all_user_name_fields(true);
+    $users = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, '', 'id, ' . $usernamefields);
     foreach ($users as $user) {
         $memberlist[] = fullname($user);
     }
@@ -1141,7 +1143,8 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
     unset($memberlist);
 
     //$fields = "u.id, u.username, u.firstname, u.lastname, u.maildisplay, u.mailformat, u.maildigest, u.emailstop, u.imagealt, u.email, u.city, u.country, u.lastaccess, u.lastlogin, u.picture, u.timezone, u.theme, u.lang, u.trackforums, u.mnethostid";
-    $fields = "id, username, firstname, lastname, maildisplay, mailformat, maildigest, emailstop, imagealt, email, city, country, lastaccess, lastlogin, picture, timezone, theme, lang, trackforums, mnethostid";
+    $fields  = "id, username, maildisplay, mailformat, maildigest, emailstop, imagealt, email, city, country, lastaccess, lastlogin, picture, timezone, theme, lang, trackforums, mnethostid, ";
+    $fields .= $usernamefields;
     switch ($cohort->alertmembers) {
         case COHORT_ALERT_AFFECTED:
             $towho = 'toaffected';
