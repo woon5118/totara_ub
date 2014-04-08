@@ -1,15 +1,70 @@
 /**
  * Totara Navigation
  */
-div#main_menu {
+#login-info {
+    width: 100%;
+    background-color: #ffffff;
+    text-align: right;
+}
+.dir-rtl #login-info {
+    text-align: left;
+}
+#login-info .logininfo {
+    padding-right: 20px;
+    color: #999999;
+}
+.dir-rtl #login-info .logininfo {
+    padding-left: 20px;
+}
+#login-info a {
+    color: #999999;
+    text-decoration: underline;
+}
+#login-info a:hover {
+    color: #b8b8b7;
+}
+#login-info .loginstatus {
+    background-color: #999999;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 3px 7px 4px;
+    margin-left: 2px;
+}
+#login-info .loginstatus:hover {
+    background-color: #bbbbbb;
+    color: #ffffff;
+}
+/* Langmenu */
+select.langmenu {
+    float: right;
+    margin: 4px 0 0 0;
+    height: 32px;
+}
+.dir-rtl .langmenu {
     float:left;
-    width:auto;
-    margin-top:26px;
 }
-.dir-rtl div#main_menu {
-    float:right;
+#main-menu {
+    clear:both;
+    background: #b1bb1a;
+    height: 60px;
+    margin-bottom: 5px;
 }
-div#totaramenu ul li {
+#main-menu .logo {
+    float: left;
+    padding: 0 20px 0 15px;
+}
+.dir-rtl #main-menu .logo {
+    float: right;
+    padding: 0 15px 0 20px;
+}
+div#totaramenu {
+    clear: none;
+}
+div#totaramenu ul li,
+.dir-rtl div#totaramenu ul li {
+    /* .dir-rtl needed here as otherwise it gets overwritten from standard totara responsive */
    font-weight:700;
    margin:-4px 0 0;
 }
@@ -325,13 +380,18 @@ div#custommenu ul li ul ul li {
     box-shadow:none;
     background:transparent;
 }
-#page-header .btn-navbar {
+#main-menu .btn-navbar {
     float: right;
-    margin: 45px 5px 0 0;
+    margin: 20px 5px 0 0;
     padding-top: 8px
 }
 
-#page-header .btn-navbar .icon-bar {
+.dir-rtl #main-menu .btn-navbar {
+    float: left;
+    margin-left: 5px;
+}
+
+#main-menu .btn-navbar .icon-bar {
     border-top: 1px solid #b1bb1a;
     display: block;
     height: 3px;
@@ -339,28 +399,40 @@ div#custommenu ul li ul ul li {
 }
 
 @media screen and (max-width: 979px) {
-    #page-header .headermenu {
-        display: none;
+    div#main-menu ul li ul {
+        margin: 0 5px;
+        background: transparent url([[pix:theme|menu-sub-bg]]) no-repeat 10% 0;
     }
-
-    #page-header .headermenu.active {
-        display: block;
-    }
-    div#main_menu ul li ul li {
+    div#main-menu ul li ul li,
+    div#main-menu ul li ul li:last-child a {
         box-shadow: none;
     }
 
-    div#main_menu ul li a {
-        color: #b1bb1a;
-        text-align: left;
-        padding: 5px 0 10px;
+    div#main-menu ul li ul li:last-child a {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
     }
+    div#main-menu ul li ul li:first-child a {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+    div#main-menu ul li a {
+        color: #ffffff;
+        text-align: left;
+        padding: 5px 5px 10px;
+    }
+
     div#totaramenu > ul > li.last > a {
         border-bottom: none;
+        border-radius: 0;
+    }
+    #main-menu {
+        height: auto;
+        border-radius: 3px;
     }
 }
 @media screen and (min-width: 980px) {
-    #page-header .btn-navbar {
+    #main-menu .btn-navbar {
         display: none;
     }
 }

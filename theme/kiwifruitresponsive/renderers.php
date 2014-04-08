@@ -26,6 +26,68 @@
  * Overriding core rendering functions for kiwifruitresponsive
  */
 class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararesponsive_core_renderer {
+    public function kiwifruit_header() {
+        global $OUTPUT, $PAGE, $CFG;
+        $output = '';
+        $output .= html_writer::tag('div', $OUTPUT->login_info(), array('id' => 'login-info'));
+
+        $output .= html_writer::start_tag('div', array('id' => 'main-menu'));
+
+        // Small responsive button.
+        $output .= $this->responsive_button();
+
+        // Find the logo.
+        if (!empty($PAGE->theme->settings->frontpagelogo)) {
+            $logourl = $PAGE->theme->settings->frontpagelogo;
+        } else if (!empty($PAGE->theme->settings->logo)) {
+            $logourl = $PAGE->theme->settings->logo;
+        } else {
+            $logourl = $OUTPUT->pix_url('logo', 'theme');
+        }
+
+        if ($logourl) {
+            $logo = html_writer::empty_tag('img', array('src' => $logourl, 'alt' => get_string('logo', 'theme_kiwifruitresponsive')));
+            $output .= html_writer::tag('a', $logo, array('href' => $CFG->wwwroot, 'class' => 'logo'));
+        }
+
+        // The menu.
+        $output .= html_writer::start_tag('div', array('id' => 'totaramenu', 'class' => 'nav-collapse'));
+        if (empty($PAGE->layout_options['nocustommenu'])) {
+            $custommenu = $OUTPUT->custom_menu();
+            if ($custommenu) {
+                $output .= $custommenu;
+            } else {
+                $menudata = totara_build_menu();
+                $totara_core_renderer = $PAGE->get_renderer('totara_core');
+                $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
+                $output .= $totaramenu;
+            }
+        }
+
+        // Language Menu.
+        $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
+        if ($haslangmenu) {
+            $output .= $OUTPUT->lang_menu();
+        }
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+        return $output;
+    }
+
+    public function responsive_button() {
+        $attrs = array(
+            'class' => 'btn btn-navbar',
+            'data-toggle' => 'collapse',
+            'data-target' => '.nav-collapse, .langmenu'
+        );
+        $output = html_writer::start_tag('a', $attrs);
+        $output .= html_writer::tag('span', '', array('class' => 'icon-bar')); // Chrome doesn't like self closing spans.
+        $output .= html_writer::tag('span', '', array('class' => 'icon-bar'));
+        $output .= html_writer::tag('span', '', array('class' => 'icon-bar'));
+        $output .= html_writer::end_tag('a');
+
+        return $output;
+    }
 
     /**
      * Return the standard string that says whether you are logged in (and switched

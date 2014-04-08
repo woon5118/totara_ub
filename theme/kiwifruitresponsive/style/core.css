@@ -3,11 +3,11 @@
 }
 html {
     height:100%;
-    background:#BFBFB3 url([[pix:theme|nav-bg-tile]]) repeat-x center top;
+    background:#bfbfb3;
 }
 body,
 body.popup {
-    background:#F2F3E1 url([[pix:theme|nav-bg-tile]]) repeat-x center top;
+    background:#f2f3e1;
 }
 body,
 h1,
@@ -107,6 +107,11 @@ h5.centered,
 h6.centered {
     text-align:center;
 }
+
+.pagelayout-redirect {
+    background: #f2f3e1;
+}
+
 th.header,
 td.header,
 div.header,
@@ -606,45 +611,6 @@ p.errormessage {
 }
 .dir-rtl .headermenu a.link-as-button {
     margin:0 7px 0 0;
-}
-
-/* Langmenu */
-select.langmenu {
-    float: right;
-    margin: 8px 0 0 0;
-    height: 32px;
-}
-.dir-rtl .langmenu {
-    float:left;
-    margin:7px 0 0 0;
-}
-
-/* Profileblock */
-
-.dir-ltr #profileblock {
-    float:right;
-    text-align:right;
-}
-.dir-rtl #profileblock {
-    float:left;
-    text-align:left;
-    left:0px;
-}
-#profileblock .loginstatus {
-    color:#FFFFFF;
-    letter-spacing:-0.7px;
-    text-transform:uppercase;
-    text-decoration:none;
-    margin:0 0 0 5px;
-    padding:6px 10px 8px;
-    background:#999999;
-}
-.dir-rtl #profileblock .loginstatus {
-    margin:0 5px 0 0;
-}
-#profileblock .loginstatus:hover {
-    text-decoration:none;
-    background:#BBBBBB;
 }
 
 /**

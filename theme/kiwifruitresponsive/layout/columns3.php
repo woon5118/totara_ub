@@ -22,14 +22,6 @@
  * @subpackage theme
  */
 
-if (!empty($PAGE->theme->settings->frontpagelogo)) {
-    $logourl = $PAGE->theme->settings->frontpagelogo;
-} else if (!empty($PAGE->theme->settings->logo)) {
-    $logourl = $PAGE->theme->settings->logo;
-} else {
-    $logourl = $OUTPUT->pix_url('logo', 'theme');
-}
-
 if (!empty($PAGE->theme->settings->favicon)) {
     $faviconurl = $PAGE->theme->setting_file_url('favicon', 'favicon');
 } else {
@@ -38,7 +30,6 @@ if (!empty($PAGE->theme->settings->favicon)) {
 
 $custommenu = $OUTPUT->custom_menu();
 $hascustommenu = !empty($custommenu);
-$haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
 $hassidepre = $PAGE->blocks->region_has_content('side-pre', $OUTPUT);
 $hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
 $hasnavbar = (empty($PAGE->layout_options['nonavbar']) && $PAGE->has_navbar());
@@ -46,7 +37,6 @@ $hasfooter = (empty($PAGE->layout_options['nofooter']));
 
 $showsidepre = $hassidepre && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT);
 $showsidepost = $hassidepost && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT);
-$haslogininfo = (empty($PAGE->layout_options['nologininfo']));
 $showmenu = empty($PAGE->layout_options['nocustommenu']);
 $sitesummary = isset($SITE->summary) ? $SITE->summary : '';
 $left = (!right_to_left());
@@ -56,12 +46,6 @@ if ($showmenu && !$hascustommenu) {
     $menudata = totara_build_menu();
     $totara_core_renderer = $PAGE->get_renderer('totara_core');
     $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
-}
-
-if (right_to_left()) {
-    $regionbsid = 'region-bs-main-and-post';
-} else {
-    $regionbsid = 'region-bs-main-and-pre';
 }
 
 $bodyclasses = array();
@@ -99,49 +83,7 @@ echo $OUTPUT->doctype() ?>
 
 <!-- START OF HEADER -->
 
-    <div id="page-header" class="clearfix">
-      <div class="page-header-inner">
-        <div id="page-header-wrapper" class="clearfix">
-          <?php if ($logourl == NULL) { ?>
-          <div id="logo"><a href="<?php echo $CFG->wwwroot; ?>">&nbsp;</a></div>
-          <?php } else { ?>
-          <div id="logo" class="custom"><a href="<?php echo $CFG->wwwroot; ?>"><img class="logo" src="<?php echo $logourl;?>" alt="Logo" /></a></div>
-          <?php } ?>
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse, .headermenu">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <div class="headermenu" data-toggle="collapse">
-            <?php if ($haslogininfo || $haslangmenu) { ?>
-              <div id="profileblock">
-                <?php
-                if ($haslogininfo) {
-                    echo $OUTPUT->login_info();
-                }
-                if ($haslangmenu) {
-                    echo $OUTPUT->lang_menu();
-                }
-                ?>
-              </div>
-            <?php } ?>
-          </div>
-
-        <?php if (!empty($courseheader)) { ?>
-        <div id="course-header"><?php echo $courseheader; ?></div>
-        <?php } ?>
-        <?php if ($showmenu) { ?>
-        <div id="main_menu" class="clearfix nav-collapse collapse">
-          <?php if ($hascustommenu) { ?>
-          <div id="custommenu"><?php echo $custommenu; ?></div>
-          <?php } else { ?>
-          <div id="totaramenu"><?php echo $totaramenu; ?></div>
-          <?php } ?>
-        </div>
-        <?php } ?>
-        </div>
-      </div>
-    </div>
+    <?php echo $OUTPUT->kiwifruit_header(); ?>
 
     <div id="navbar" class="clearfix">
         <div class="breadcrumb"><?php echo $OUTPUT->navbar(); ?></div>
