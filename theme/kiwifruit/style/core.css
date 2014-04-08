@@ -154,6 +154,9 @@ tr.r0 {
 tr.r1 {
    background:#f7f7f7;
 }
+.pagelayout-report #page-content {
+    overflow: hidden;
+}
 .generalbox,
 .totarabox,
 .admin .generalbox,
