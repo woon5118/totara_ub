@@ -3943,7 +3943,7 @@ class appraisal_message {
                     $eventdata = new stdClass();
                     $eventdata->component         = 'moodle';
                     $eventdata->name              = 'instantmessage';
-                    $eventdata->userfrom          = totara_generate_email_user($CFG->noreplyaddress);
+                    $eventdata->userfrom          = core_user::get_noreply_user();
                     $eventdata->userto            = $rcpt;
                     $eventdata->subject           = $message->name;
                     $eventdata->fullmessage       = $message->content;

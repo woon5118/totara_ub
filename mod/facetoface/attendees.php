@@ -368,10 +368,7 @@ if ($form = data_submitted()) {
             }
 
             // Send messages.
-            $fromaddress = get_config(NULL, 'facetoface_fromaddress');
-            if (!$fromaddress) {
-                $fromaddress = '';
-            }
+            $facetofaceuser = \mod_facetoface\facetoface_user::get_facetoface_user();
 
             $emailcount = 0;
             $emailerrors = 0;
@@ -379,7 +376,7 @@ if ($form = data_submitted()) {
                 $body = $data->body['text'];
                 $bodyplain = html_to_text($body);
 
-                if (email_to_user($recipient, $fromaddress, $data->subject, $bodyplain, $body) === true) {
+                if (email_to_user($recipient, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
                     $emailcount += 1;
 
                     // Check if we are sending to managers and if user has a manager assigned.
@@ -391,7 +388,7 @@ if ($form = data_submitted()) {
                     $body = get_string('messagesenttostaffmember', 'facetoface', fullname($recipient))."\n\n".$data->body['text'];
                     $bodyplain = html_to_text($body);
 
-                    if (email_to_user($manager, $fromaddress, $data->subject, $bodyplain, $body) === true) {
+                    if (email_to_user($manager, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
                         $emailcount += 1;
                     }
                 } else {

@@ -5189,7 +5189,7 @@ function reportbuilder_send_scheduled_report($sched) {
 
     $message = $strmgr->get_string('scheduledreportmessage', 'totara_reportbuilder', $messagedetails, $user->lang);
 
-    $fromaddress = $CFG->noreplyaddress;
+    $fromaddress = core_user::get_noreply_user();
     $emailed = false;
 
     if ($sched->exporttofilesystem != REPORT_BUILDER_EXPORT_SAVE) {

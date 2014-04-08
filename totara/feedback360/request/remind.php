@@ -125,7 +125,7 @@ if (!empty($confirmation)) {
                 }
 
                 // Send the feedback reminder email.
-                $userto = totara_generate_email_user($email_assignment->email);
+                $userto = \totara_core\totara_user::get_external_user($email_assignment->email);
                 email_to_user($userto, $sendfrom, $emailsubject, $emailplain, $emailhtml);
             } else {
                 // Internal user, send them an alert.

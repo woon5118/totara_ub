@@ -399,7 +399,7 @@ function totara_sync_notify() {
             date_format_string($lastnotify, $dateformat)) . ". Sending notifications...";
     $supportuser = core_user::get_support_user();
     foreach ($notifyemails as $emailaddress) {
-        $userto = totara_generate_email_user(trim($emailaddress));
+        $userto = \totara_core\totara_user::get_external_user(trim($emailaddress));
         email_to_user($userto, $supportuser, $subject, $message);
     }
 

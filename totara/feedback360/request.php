@@ -356,7 +356,7 @@ if ($mform->is_cancelled()) {
             }
 
             foreach ($emailkeep as $email) {
-                $userto = totara_generate_email_user($email);
+                $userto = \totara_core\totara_user::get_external_user($email);
                 email_to_user($userto, $sendas, $emailsubject, $email_str, $email_str);
             }
         }

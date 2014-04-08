@@ -24,7 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/totara/core/totara.php');
+require_once($CFG->dirroot . '/totara/core/totara.php');
+require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
 
 /**
  *  * Resize an image to fit within the given rectange, maintaing aspect ratio

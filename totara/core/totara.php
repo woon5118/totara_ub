@@ -2220,25 +2220,6 @@ function totara_setup() {
 }
 
 /**
- * Generate a user object to which an email can be sent with email_to_user
- *
- * @param string emailaddress
- * @return object email user object
- */
-function totara_generate_email_user($emailaddress) {
-    $emailuser = core_user::get_noreply_user();
-    $emailuser->email = $emailaddress;
-    $emailuser->firstname = $emailaddress;
-    $emailuser->lastname = '';
-    $emailuser->lang = 'en';
-    $emailuser->maildisplay = true;
-    $emailuser->mailformat = 1;
-    $emailuser->emailstop = false;
-
-    return $emailuser;
-}
-
-/**
  * Checks if idnumber already exists.
  * Used when adding new or updating exisiting records.
  *
