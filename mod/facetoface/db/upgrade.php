@@ -1944,6 +1944,147 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014050400, 'facetoface');
     }
 
+    if ($oldversion < 2014061600) {
+
+        // Create the a userid field for the facetoface_notification_sent table.
+        $table = new xmldb_table('facetoface_notification_sent');
+        $field = new xmldb_field('userid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, null, null);
+
+        // Only run the upgrade if the userid field doesn't exist.
+        if (!$dbman->field_exists($table, $field)) {
+            // Set time to unlimited as this could take a while.
+            set_time_limit(0);
+
+            // Wrap this in a transaction so we can't possibly wipe old records without adding the new.
+            $transaction = $DB->start_delegated_transaction();
+
+            // Get all facetoface notification sent records to be updated.
+            $sql = "SELECT fns.*, fn.facetofaceid, fn.type, fn.conditiontype,
+                        fn.booked, fn.waitlisted, fn.cancelled, fn.status, fn.issent
+                    FROM {facetoface_notification_sent} fns
+                    JOIN {facetoface_notification} fn
+                    ON fns.notificationid = fn.id
+                    WHERE fn.issent != 0
+                    ORDER BY fn.facetofaceid, fns.sessionid";
+            $notifications = $DB->get_records_sql($sql);
+            $notificationssent = array();
+
+            $total = count($notifications);
+            if ($total > 0) {
+                $index = 0;
+                $pbar = new progress_bar('notificationsentupgrade', 500, true);
+            }
+
+            // Clear the old records out of the table before putting the new records in.
+            $DB->delete_records('facetoface_notification_sent');
+
+            // Add the userid field and foreign key to the facetoface_notification_sent table.
+            $dbman->add_field($table, $field);
+            $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+            // Create new sent records for ALL previous records to prevent resending spam.
+            foreach ($notifications as $notification) {
+                $index++;
+                $recipients = array();
+                $status = array();
+
+                // Attempt to match the correct set of recipients.
+                switch ($notification->type) {
+                    case MDL_F2F_NOTIFICATION_MANUAL :
+                    case MDL_F2F_NOTIFICATION_SCHEDULED :
+                        // Manual and scheduled notifications are user made and should have one of these set.
+                        if (!empty($notification->booked)) {
+                            // Need to check which type of booked recipients.
+                            if ($notification->booked == MDL_F2F_RECIPIENTS_ALLBOOKED) {
+                                $status[] = MDL_F2F_STATUS_BOOKED;
+                            } else if ($notification->booked == MDL_F2F_RECIPIENTS_ATTENDED) {
+                                // Exclude partially attended, see _get_recipients() in the facetoface notification class.
+                                $status[] = MDL_F2F_STATUS_FULLY_ATTENDED;
+                            } else if ($notification->booked == MDL_F2F_RECIPIENTS_NOSHOWS) {
+                                $status[] = MDL_F2F_STATUS_NO_SHOW;
+                            }
+                        }
+
+                        if (!empty($notification->waitlisted)) {
+                            $status[] = MDL_F2F_STATUS_WAITLISTED;
+                        }
+
+                        if (!empty($notification->cancelled)) {
+                            $status[] = MDL_F2F_STATUS_USER_CANCELLED;
+                        }
+
+                        // Default to all users if we don't have the data, to stop any potential resending.
+                        if (empty($status)) {
+                            $status[] = MDL_F2F_STATUS_BOOKED;
+                            $status[] = MDL_F2F_STATUS_WAITLISTED;
+                        }
+
+                        break;
+                    case MDL_F2F_NOTIFICATION_AUTO :
+                        $trainers = array();
+                        $trainers[] = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
+                        $trainers[] = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
+                        $trainers[] = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
+
+                        if (in_array($notification->conditiontype, $trainers)) {
+                            $params = array('sessionid' => $notification->sessionid);
+                            $recipients = $DB->get_fieldset_select('facetoface_session_roles', 'userid', $params);
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION) {
+                            $status[] = MDL_F2F_STATUS_USER_CANCELLED;
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST) {
+                            $status[] = MDL_F2F_STATUS_REQUESTED;
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_BOOKING_CONFIRMATION) {
+                            $status[] = MDL_F2F_STATUS_APPROVED;
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_DECLINE_CONFIRMATION) {
+                            $status[] = MDL_F2F_STATUS_DECLINED;
+                        } else if ($notification->conditiontype == MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION) {
+                            $status[] = MDL_F2F_STATUS_WAITLISTED;
+                        } else {
+                            $status[] = MDL_F2F_STATUS_WAITLISTED;
+                            $status[] = MDL_F2F_STATUS_BOOKED;
+                        }
+                        break;
+                }
+
+                // Don't bother getting any recipients if there aren't any status set.
+                if (!empty($status)) {
+                    list($statussql, $statusparams) = $DB->get_in_or_equal($status);
+                    $sql = "SELECT DISTINCT fs.userid
+                            FROM {facetoface_signups} fs
+                            JOIN {facetoface_signups_status} fss
+                            ON fss.signupid = fs.id
+                            WHERE fs.sessionid = ?
+                            AND fss.superceded <> 1
+                            AND fss.statuscode {$statussql}";
+                    $params = array_merge(array($notification->sessionid), $statusparams);
+                    $recipients = $DB->get_records_sql($sql, $params);
+                }
+
+                foreach ($recipients as $recipient) {
+                    // Create records to be added to the facetoface_notification_sent table.
+                    $record = new stdClass;
+                    $record->notificationid = $notification->notificationid;
+                    $record->sessionid = $notification->sessionid;
+                    $record->userid = $recipient->userid;
+                    $notificationssent[] = $record;
+                }
+                $pbar->update($index, $total, "Creating new notification sent data - record $index/$total");
+            }
+
+            // Split array into chuncks of 500 and bulk insert.
+            $todbs = array_chunk($notificationssent, 500);
+            foreach ($todbs as $todb) {
+                $DB->insert_records_via_batch('facetoface_notification_sent', $todb);
+            }
+
+            $transaction->allow_commit();
+        }
+
+
+        upgrade_mod_savepoint(true, 2014061600, 'facetoface');
+    }
+
     return $result;
 }
 

@@ -280,6 +280,16 @@ class facetoface_notification extends data_object {
             $params[] = $sessionid;
         }
 
+        $where .= ' AND NOT EXISTS
+            (SELECT id FROM
+               {facetoface_notification_sent} ns
+             WHERE
+                 ns.userid = u.id
+             AND ns.sessionid = s.id
+             AND ns.notificationid = ?
+            ) ';
+        $params[] = $this->id;
+
         // Generate SQL
         $sql = '
             SELECT
@@ -352,26 +362,18 @@ class facetoface_notification extends data_object {
                 {facetoface_signups_status}
              sus ON su.id = sus.signupid
             AND sus.superceded = 0
-            LEFT JOIN
-                {facetoface_notification_sent} ns
-             ON ns.notificationid = ?
-            AND ns.sessionid = s.id
-            WHERE
-                s.facetoface = ?
-            AND ns.id IS NULL
+            WHERE s.facetoface = ?
         ';
 
-        $recordset = $DB->get_recordset_sql($sql, array($this->id, $this->facetofaceid));
+        $recordset = $DB->get_recordset_sql($sql, array($this->facetofaceid));
         if (!$recordset) {
-            echo "No sessions found\n";
+            echo "No sessions found for scheduled notification\n";
             return false;
         }
 
         $time = time();
-        $count = 0;
         $sent = 0;
         foreach ($recordset as $session) {
-            $count++;
             // Check if they aren't ready to have their notification sent
             switch ($this->conditiontype) {
                 case MDL_F2F_CONDITION_BEFORE_SESSION:
@@ -399,15 +401,9 @@ class facetoface_notification extends data_object {
             $this->send_to_users($session->id);
         }
 
-        echo "Sent notifications for {$sent} sessions\n";
+        echo "Checked scheduled notification for {$sent} session(s)\n";
 
         $recordset->close();
-
-        // If no sessions returned, or we sent notifications for every one, we are done
-        if (!$count || $count == $sent) {
-            $this->issent = MDL_F2F_NOTIFICATION_STATE_FULLY_SENT;
-            $this->update();
-        }
     }
 
 
@@ -432,7 +428,9 @@ class facetoface_notification extends data_object {
         $recipients = $this->_get_recipients($sessionid);
 
         if (!$recipients->valid()) {
-            echo get_string('norecipients', 'facetoface') . "\n";
+            if (!CLI_SCRIPT) {
+                echo get_string('norecipients', 'facetoface') . "\n";
+            }
         } else {
             $count = 0;
             foreach ($recipients as $recipient) {
@@ -446,24 +444,6 @@ class facetoface_notification extends data_object {
             echo get_string('sentxnotifications', 'facetoface', $count) . "\n";
 
             $recipients->close();
-        }
-
-        // Mark as sent
-        if (!$sessionid) {
-            $this->issent = MDL_F2F_NOTIFICATION_STATE_FULLY_SENT;
-            $this->update();
-        } else {
-            // If not already set to partially sent, do so now
-            if ($this->issent == MDL_F2F_NOTIFICATION_STATE_NOT_SENT) {
-                $this->issent = MDL_F2F_NOTIFICATION_STATE_PARTIALLY_SENT;
-                $this->update();
-            }
-
-            // Mark session as sent
-            $sent = new stdClass();
-            $sent->sessionid = $sessionid;
-            $sent->notificationid = $this->id;
-            $DB->insert_record('facetoface_notification_sent', $sent);
         }
     }
 
@@ -529,6 +509,13 @@ class facetoface_notification extends data_object {
                     $DB->insert_record('facetoface_notification_hist', $hist);
                 }
             }
+
+            // Mark notification as sent for user.
+            $sent = new stdClass();
+            $sent->sessionid = $sessionid;
+            $sent->notificationid = $this->id;
+            $sent->userid = $user->id;
+            $DB->insert_record('facetoface_notification_sent', $sent);
         }
     }
 

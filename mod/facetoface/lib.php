@@ -976,7 +976,7 @@ function facetoface_cron($testing = false) {
 
     // Send notifications if enabled.
     $notificationdisable = get_config(null, 'facetoface_notificationdisable');
-    if (!empty($notificationdisable)) {
+    if (empty($notificationdisable)) {
         // Find "instant" manual notifications that haven't yet been sent.
         if (!$testing) {
             mtrace('Checking for instant Face-to-face notifications');
@@ -992,16 +992,16 @@ function facetoface_cron($testing = false) {
             }
         }
 
-        // Find scheduled notifications that haven't yet been sent.
+        // Find scheduled notifications that haven't yet been sent
         if (!$testing) {
             mtrace('Checking for scheduled Face-to-face notifications');
         }
         $sched = $DB->get_records_select(
             'facetoface_notification',
             'scheduletime IS NOT NULL
-            AND issent <> ?
+            AND type = ?
             AND status = 1',
-            array(MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
+            array(MDL_F2F_NOTIFICATION_SCHEDULED));
         if ($sched) {
             foreach ($sched as $notif) {
                 $notification = new facetoface_notification((array)$notif, false);
@@ -1054,7 +1054,7 @@ function facetoface_remove_reservations_after_deadline($testing) {
 
         // Send notifications if enabled.
         $notificationdisable = get_config(null, 'facetoface_notificationdisable');
-        if (!empty($notificationdisable)) {
+        if (empty($notificationdisable)) {
             $notifyparams = array(
                 'type' => MDL_F2F_NOTIFICATION_AUTO,
                 'conditiontype' => MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED,
