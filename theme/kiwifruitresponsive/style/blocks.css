@@ -101,14 +101,23 @@
    width:16px;
    height:16px;
 }
-#region-main .block_totara_tasks h2 {
+#region-main .block_totara_tasks h2,
+#region-main .block_totara_tasks .title {
    background-color:#2fbce8;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
-#region-main .block_totara_quicklinks h2 {
+#region-main .block_totara_quicklinks h2,
+#region-main .block_totara_quicklinks .title {
    background-color:#ee2b74;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
-#region-main .block_totara_alerts h2 {
+#region-main .block_totara_alerts h2,
+#region-main .block_totara_alerts .title {
    background-color:#004958;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
 .block_totara_alerts table.fullwidth {
     border:none;
@@ -130,12 +139,20 @@
     height:auto;
 }
 #region-main .block_completionstatus h2,
-#region-main .block_totara_recent_learning h2 {
+#region-main .block_completionstatus .title,
+#region-main .block_totara_recent_learning h2,
+#region-main .block_totara_recent_learning .title {
    background-color:#f47920;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
 #region-main .block_course_list h2,
-#region-main .block_course_overview h2 {
+#region-main .block_course_list .title,
+#region-main .block_course_overview h2,
+#region-main .block_course_overview .title {
    background-color:#a22485;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
 .block_course_list .content .coursebox,
 .block_course_overview .content .coursebox {
