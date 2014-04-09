@@ -1915,3 +1915,6 @@ div.totara-dialog td.select #search-tab #fgroup_id_searchgroup {
     right: auto;
     text-align: left;
 }
+.ui-dialog .ui-dialog-titlebar-close span {
+    margin: 1px;
+}
