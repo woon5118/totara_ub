@@ -65,6 +65,8 @@ class block_totara_certifications extends block_base {
             $intro = html_writer::tag('p', get_string('intro', 'block_totara_certifications'), array('class' => 'intro'));
 
             $table = new html_table();
+            $table->head = array(get_string('certification', 'totara_certification'), get_string('duedate', 'totara_program'));
+            $table->align = array('left', 'left');
             $table->attributes['class'] = 'certifications_block';
 
             foreach ($renewals as $renewal) {
