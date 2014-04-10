@@ -205,7 +205,7 @@ class rb_filter_type {
         $field = $option->field;
         $grouping = !empty($option->grouping) ? $option->grouping: 'none';
 
-        // now apply grouping to field
+        // Now apply grouping to field.
         $src = $this->report->src;
         if ($grouping == 'none') {
             return $field;
@@ -214,7 +214,7 @@ class rb_filter_type {
             if (!method_exists($src, $groupfunc)) {
                 throw new ReportBuilderException(get_string('groupingfuncnotinfieldoftypeandvalue',
                     'totara_reportbuilder',
-                    (object)array('groupfunc' => $groupfunc, 'type' => $type, 'value' => $value)));
+                    (object)array('groupfunc' => $groupfunc, 'type' => $option->type, 'value' => $option->value)));
             }
             return $src->$groupfunc($field);
         }
