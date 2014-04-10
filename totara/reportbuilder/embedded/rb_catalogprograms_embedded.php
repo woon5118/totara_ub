@@ -79,4 +79,19 @@ class rb_catalogprograms_embedded extends rb_base_embedded {
     public function is_capable($reportfor, $report) {
         return true;
     }
+
+    public function get_extrabuttons() {
+        global $OUTPUT, $CFG;
+
+        $defaultcat = $CFG->defaultrequestcategory;
+        $catcontext = context_coursecat::instance($defaultcat);
+
+        if (has_capability('totara/program:createprogram', $catcontext)) {
+            $createurl = new moodle_url("/totara/program/add.php", array('category' => $defaultcat));
+            $createbutton = new single_button($createurl, get_string('addprogram', 'totara_coursecatalog'), 'get');
+            return $OUTPUT->render($createbutton);
+        }
+
+        return false;
+    }
 }

@@ -94,4 +94,19 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
     public function is_capable($reportfor, $report) {
         return true;
     }
+
+    public function get_extrabuttons() {
+        global $OUTPUT, $CFG;
+
+        $defaultcat = $CFG->defaultrequestcategory;
+        $catcontext = context_coursecat::instance($defaultcat);
+
+        if (has_capability('moodle/course:create', $catcontext)) {
+            $createurl = new moodle_url("/course/edit.php", array('category' => $defaultcat));
+            $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get');
+            return $OUTPUT->render($createbutton);
+        }
+
+        return false;
+    }
 }

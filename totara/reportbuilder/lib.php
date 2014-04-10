@@ -3111,6 +3111,10 @@ class reportbuilder {
             $mform = new report_builder_toolbar_search_form($this->report_url(),
                     array('toolbarsearchtext' => $toolbarsearchtext), 'post', '', null, true, 'toolbarsearch');
             $table->add_toolbar_content($mform->render());
+
+            if ($this->embedded && $content = $this->embedobj->get_extrabuttons()) {
+                $table->add_toolbar_content($content, 'right');
+            }
         }
 
         $table->define_columns($tablecolumns);

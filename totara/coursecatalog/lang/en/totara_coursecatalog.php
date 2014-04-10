@@ -22,6 +22,9 @@
  * @subpackage totara_coursecatalog
  */
 
+$string['addcertification'] = 'Create Certification';
+$string['addcourse'] = 'Create Course';
+$string['addprogram'] = 'Create Program';
 $string['backtoallcategory'] = 'Back to all Categories';
 $string['backtoallcourse'] = 'Back to all courses';
 $string['backtoallprogram'] = 'Back to all programs';

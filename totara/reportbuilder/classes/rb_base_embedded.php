@@ -97,4 +97,13 @@ class rb_base_embedded {
         // column matching that type/value pair not found
         return false;
     }
+
+    /**
+     * Get extra buttons for the top right of the tables toolbar.
+     *
+     * @return string The rendered output for the buttons
+     */
+    function get_extrabuttons() {
+        return false;
+    }
 }
