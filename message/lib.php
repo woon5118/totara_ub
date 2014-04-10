@@ -368,7 +368,7 @@ function message_get_contacts($user1=null, $user2=null) {
     $strangersql = "SELECT $userfields, count(m.id) as messagecount
                       FROM {message} m
                       JOIN {user} u  ON u.id = m.useridfrom
-           LEFT OUTER JOIN {message_contacts} mc ON mc.contactid = m.useridfrom AND mc.userid = m.useridto
+                      LEFT OUTER JOIN {message_contacts} mc ON mc.contactid = m.useridfrom AND mc.userid = m.useridto
                      WHERE mc.id IS NULL AND m.useridto = ?
                        AND (m.id IS NULL OR NOT EXISTS (SELECT md.messageid FROM {message_metadata} md WHERE md.messageid = m.id))
                   GROUP BY $userfields
@@ -2071,20 +2071,13 @@ function message_format_message($message, $format='', $keywords='', $class='othe
     }
     $time = userdate($message->timecreated, $dateformat);
 
-    //if supplied display small messages as fullmessage may contain boilerplate text that shouldnt appear in the messaging UI
-    if (!empty($message->smallmessage)) {
-        $messagetext = $message->smallmessage;
-    } else {
-        $messagetext = $message->fullmessage;
-    }
-    //dont escape html tags by calling s() if html format or they will display in the UI
-    $messagetext = html_to_text(format_text(s($messagetext), FORMAT_HTML, $options));
-
-    $messagetext .= message_format_contexturl($message);
+    $messagetext = message_format_message_text($message, false);
 
     if ($keywords) {
         $messagetext = highlight($keywords, $messagetext);
     }
+
+    $messagetext .= message_format_contexturl($message);
 
     $messagetext = clean_text($messagetext, FORMAT_HTML);
 
@@ -2439,7 +2432,7 @@ function get_message_providers() {
 
     $pluginman = core_plugin_manager::instance();
 
-    $providers = $DB->get_records('message_providers', null, 'component desc, name asc');
+    $providers = $DB->get_records('message_providers', null, 'name');
 
     // Remove all the providers whose plugins are disabled or don't exist
     foreach ($providers as $providerid => $provider) {
