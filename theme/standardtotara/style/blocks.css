@@ -87,3 +87,12 @@
     width: 155px;
 }
 
+.block_totara_certifications .name {
+    width: 120px;
+    display: inline-block;
+    padding-right: 3px;
+}
+.block_totara_certifications .due {
+    width: 50px;
+    display: inline-block;
+}

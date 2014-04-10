@@ -46,6 +46,7 @@ class block_totara_certifications extends block_base {
         $this->content->items = array();
         $this->content->icons = array();
         $this->content->footer = '';
+        $certifications = array();
 
         $sql = "SELECT p.id as pid, p.fullname, cfc.timewindowopens, cfc.certifpath
                 FROM {prog} p
@@ -59,49 +60,39 @@ class block_totara_certifications extends block_base {
 
         $renewals = $DB->get_records_sql($sql, array($USER->id, CERTIFPATH_CERT, CERTIFPATH_RECERT, CERTIFRENEWALSTATUS_DUE));
 
-        if (!$renewals) {
-            $this->content->text = get_string('nocertifications', 'block_totara_certifications');
-        } else {
-            $intro = html_writer::tag('p', get_string('intro', 'block_totara_certifications'), array('class' => 'intro'));
+        foreach ($renewals as $renewal) {
+            $certification = new stdClass();
+            $url = new moodle_url('/totara/program/required.php', array('id' => $renewal->pid));
+            $link = html_writer::link($url, $renewal->fullname, array('title' => $renewal->fullname));
+            $certification->description = $link;
 
-            $table = new html_table();
-            $table->head = array(get_string('certification', 'totara_certification'), get_string('duedate', 'totara_program'));
-            $table->align = array('left', 'left');
-            $table->attributes['class'] = 'certifications_block';
-
-            foreach ($renewals as $renewal) {
-                $url = new moodle_url('/totara/program/required.php', array('id' => $renewal->pid));
-                $link = html_writer::link($url, $renewal->fullname, array('title' => $renewal->fullname));
-                $cell1 = new html_table_cell($link);
-                $cell1->attributes['class'] = 'certification';
-
-                if ($renewal->certifpath == CERTIFPATH_CERT) {
-                    $prog_completion = $DB->get_record('prog_completion',
-                                    array('programid' => $renewal->pid, 'userid' => $USER->id, 'coursesetid' => 0));
-                    if ($prog_completion) {
-                        $duedatestr = (empty($prog_completion->timedue) || $prog_completion->timedue == COMPLETION_TIME_NOT_SET)
-                            ? get_string('duedatenotset', 'totara_program')
-                            : userdate($prog_completion->timedue, get_string('strftimedate', 'langconfig'));
-                    } else {
-                        $duedatestr =  get_string('duedatenotset', 'totara_program');
-                    }
-
-                    $cell2 = new html_table_cell($duedatestr);
-                    $cell2->attributes['class'] = 'timedue';
+            if ($renewal->certifpath == CERTIFPATH_CERT) {
+                $prog_completion = $DB->get_record('prog_completion',
+                                array('programid' => $renewal->pid, 'userid' => $USER->id, 'coursesetid' => 0));
+                if ($prog_completion) {
+                    $duedatestr = (empty($prog_completion->timedue) || $prog_completion->timedue == COMPLETION_TIME_NOT_SET)
+                        ? get_string('duedatenotset', 'totara_program')
+                        : userdate($prog_completion->timedue, get_string('strftimedate', 'langconfig'));
                 } else {
-                    $cell2 = new html_table_cell(userdate($renewal->timewindowopens, get_string('strftimedate', 'langconfig')));
-                    $cell2->attributes['class'] = 'timewindowopens';
+                    $duedatestr =  get_string('duedatenotset', 'totara_program');
                 }
-
-                $table->data[] = new html_table_row(array($cell1, $cell2));
+                $certification->date = $duedatestr;
+                $certification->due = true;
+            } else {
+                $certification->date = userdate($renewal->timewindowopens, get_string('strftimedate', 'langconfig'));
+                $certification->due = false;
             }
-            $this->content->text = $intro . html_writer::table($table);
 
-            // Display 'required' list, certifications only.
-            $url = new moodle_url('/totara/program/required.php', array('userid' => $USER->id, 'filter' => 'certification'));
+            $certifications[] = $certification;
+        }
+        // Display 'required' list, certifications only.
+        $url = new moodle_url('/totara/program/required.php', array('userid' => $USER->id, 'filter' => 'certification'));
+        if (count($certifications) > 0) {
             $this->content->footer = html_writer::link($url, get_string('allmycertifications', 'block_totara_certifications'));
         }
 
+        $renderer = $this->page->get_renderer('block_totara_certifications');
+        $this->content->text = $renderer->display_certifications($certifications);
         return $this->content;
     }
 }

@@ -40,6 +40,12 @@
     border: none;
     background:#FFF;
 }
+.block .content h3 {
+    padding-left: 0;
+}
+.dir-rtl .block .content h3 {
+    padding-right: 0;
+}
 .block .header .block_action {
     float: right;
     width: 30px;
