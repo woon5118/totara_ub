@@ -776,7 +776,24 @@ echo html_writer::link($url, get_string('goback', 'facetoface')) . html_writer::
  */
 if ($action == 'approvalrequired') {
     echo html_writer::empty_tag('br', array('id' => 'unapproved'));
-
+    $numattendees = facetoface_get_num_attendees($session->id);
+    $numwaiting = count($requests);
+    $availablespaces = $session->capacity - $numattendees;
+    $allowoverbook = $session->allowoverbook;
+    $canoverbook = has_capability('mod/facetoface:overbook', $contextmodule);
+    // Are there more users waiting than spaces available?
+    // Note this does not apply to people with overbook capability (see facetoface_session_has_capacity).
+    if (!$canoverbook && ($numwaiting > $availablespaces)) {
+        $stringmodifier = ($availablespaces > 0) ? 'over' : 'no';
+        $stringidentifier = ($allowoverbook) ? "approval{$stringmodifier}capacitywaitlist" : "approval{$stringmodifier}capacity";
+        $overcapacitymessage = get_string($stringidentifier, 'facetoface', array('waiting' => $numwaiting, 'available' => $availablespaces));
+        echo $OUTPUT->notification($overcapacitymessage, 'notifynotice');
+    }
+    // If they cannot overbook and no spaces are available, disable the ability to approve more requests.
+    $approvaldisabled = array();
+    if (!$canoverbook && ($availablespaces <= 0 && !$allowoverbook)) {
+         $approvaldisabled['disabled'] = 'disabled';
+    }
     $actionurl = clone($baseurl);
 
     echo html_writer::start_tag('form', array('action' => $actionurl, 'method' => 'post'));
@@ -797,9 +814,9 @@ if ($action == 'approvalrequired') {
         $attendee_link = new moodle_url('/user/view.php', array('id' => $attendee->id, 'course' => $course->id));
         $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
         $data[] = userdate($attendee->timerequested, get_string('strftimedatetime'));
-        $data[] = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked'));
-        $data[] = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1'));
-        $data[] = html_writer::empty_tag('input', array_merge(array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));
+        $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
+        $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
+        $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));
         $table->data[] = $data;
     }
 

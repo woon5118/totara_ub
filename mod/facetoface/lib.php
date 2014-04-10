@@ -1906,8 +1906,13 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         if ($current_status == MDL_F2F_STATUS_APPROVED) {
             $new_status = $statuscode;
         } else if ($session->datetimeknown) {
-            // Otherwise, send manager request.
-            $new_status = MDL_F2F_STATUS_REQUESTED;
+            // If currently on the waitlist they have already been approved, no need to approve them again.
+            if ($current_status == MDL_F2F_STATUS_WAITLISTED) {
+                $new_status = $statuscode;
+            } else {
+                // Otherwise, send manager request.
+                $new_status = MDL_F2F_STATUS_REQUESTED;
+            }
         } else {
             $new_status = MDL_F2F_STATUS_WAITLISTED;
         }
