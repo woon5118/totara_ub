@@ -1502,7 +1502,12 @@ div.badge .expireimage { width: 100px; height: 100px; left: 20px; top: 0px; }
 #page-badges-award .recipienttable tr td.potential { width: 42%; }
 #page-badges-criteria_settings .selectcourse { min-width: 200px; max-width: 600px; }
 
-.statustable { margin-bottom: 0px; }
+#issued-badge-table .activatebadge {
+    display: inline-block;
+}
+#issued-badge-table div.activatebadge {
+    margin-left: 3px;
+}
 .statusbox { border-color: #BBBBBB; }
 .statusbox.active { background-color: #D9F991; }
 .statusbox.inactive { background-color: #FFEBA8; }

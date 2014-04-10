@@ -487,10 +487,8 @@ class core_badges_renderer extends plugin_renderer_base {
         $heading = get_string('localbadges', 'badges', format_string($SITE->fullname, true, array('context' => context_system::instance())));
         $localhtml .= html_writer::tag('legend', $this->output->heading_with_help($heading, 'localbadgesh', 'badges'));
         if ($badges->badges) {
-            $table = new html_table();
-            $table->attributes['class'] = 'statustable';
-            $table->data[] = array($this->output->heading(get_string('badgesearned', 'badges', $badges->totalcount), 4, 'activatebadge'), $downloadall);
-            $downloadbutton = html_writer::table($table);
+            $downloadbutton = $this->output->heading(get_string('badgesearned', 'badges', $badges->totalcount), 4, 'activatebadge');
+            $downloadbutton .= $downloadall;
 
             $htmllist = $this->print_badges_list($badges->badges, $USER->id);
             $localhtml .= $backpackconnect . $downloadbutton . $searchform . $htmlpagingbar . $htmllist . $htmlpagingbar;
