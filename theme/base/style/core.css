@@ -1508,10 +1508,15 @@ div.badge .expireimage { width: 100px; height: 100px; left: 20px; top: 0px; }
 #issued-badge-table div.activatebadge {
     margin-left: 3px;
 }
-.statusbox { border-color: #BBBBBB; }
+.statusbox { border-color: #BBBBBB; padding: 5px;text-align: center;}
 .statusbox.active { background-color: #D9F991; }
 .statusbox.inactive { background-color: #FFEBA8; }
-.activatebadge { margin: 0px; text-align: left; vertical-align: middle; }
+.statusbox .activatebadge {
+    display: inline-block;
+}
+.statusbox .activatebadge input[type=submit]{
+    margin: 3px;
+}
 .dir-rtl .activatebadge { text-align: right; }
 .addcourse { float: right; }
 .dir-rtl .addcourse { float: left; }

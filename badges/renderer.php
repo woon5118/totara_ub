@@ -673,8 +673,6 @@ class core_badges_renderer extends plugin_renderer_base {
     */
     public function print_badge_status_box(badge $badge) {
         if (has_capability('moodle/badges:configurecriteria', $badge->get_context())) {
-            $table = new html_table();
-            $table->attributes['class'] = 'boxaligncenter statustable';
 
             if (!$badge->has_criteria()) {
                 $criteriaurl = new moodle_url('/badges/criteria.php', array('id' => $badge->id));
@@ -686,7 +684,8 @@ class core_badges_renderer extends plugin_renderer_base {
                 } else {
                     $action = '';
                 }
-                $row = array($status, $action);
+
+                $message = $status . $action;
             } else {
                 $status = get_string('statusmessage_' . $badge->status, 'badges');
                 if ($badge->is_active()) {
@@ -700,12 +699,13 @@ class core_badges_renderer extends plugin_renderer_base {
                                       'return' => $this->page->url->out_as_local_url(false))),
                             get_string('activate', 'badges'), 'POST', array('class' => 'activatebadge'));
                 }
-                $row = array($status . $this->output->help_icon('status', 'badges'), $action);
+
+                $message = $status . $this->output->help_icon('status', 'badges') . $action;
+
             }
-            $table->data[] = $row;
 
             $style = $badge->is_active() ? 'generalbox statusbox active' : 'generalbox statusbox inactive';
-            return $this->output->box(html_writer::table($table), $style);
+            return $this->output->box($message, $style);
         }
 
         return null;
