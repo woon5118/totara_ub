@@ -48,14 +48,8 @@ function evidence_display_attachment($userid, $evidenceid) {
     if (!empty($files)) {
         foreach ($files as $file) {
             $filename = $file->get_filename();
-            $fileurl = new moodle_url(
-                    '/pluginfile.php/' .
-                    $file->get_contextid() .
-                    '/totara_plan/attachment' .
-                    $file->get_filepath() .
-                    $file->get_itemid() .
-                    '/' .
-                    $filename);
+            $path = '/'.$file->get_contextid().'/totara_plan/attachment'.$file->get_filepath().$file->get_itemid().'/'.$filename;
+            $fileurl = moodle_url::make_file_url('/pluginfile.php', $path);
 
             $mimetype = $file->get_mimetype();
             $fileicon = html_writer::empty_tag('img', array('class' => 'icon',
