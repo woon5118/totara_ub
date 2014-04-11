@@ -205,6 +205,18 @@ if ($usernew = $userform->get_data()) {
         // force logout if user just suspended
         if (isset($usernew->suspended) and $usernew->suspended and !$user->suspended) {
             \core\session\manager::kill_user_sessions($user->id);
+
+            // And trigger a user suspended event.
+            $event = \totara_core\event\user_suspended::create(
+                array(
+                    'objectid' => $user->id,
+                    'context' => context_user::instance($user->id),
+                    'other' => array(
+                        'username' => $user->username,
+                    )
+                )
+            );
+            $event->trigger();
         }
     }
 
