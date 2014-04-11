@@ -3495,6 +3495,11 @@ class reportbuilder {
         global $CFG, $DB;
 
         require_once("$CFG->libdir/odslib.class.php");
+
+        // Increasing the execution time to no limit.
+        set_time_limit(0);
+        raise_memory_limit(MEMORY_HUGE);
+
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
         $filename = clean_filename($fullname . '_report.ods');
 
@@ -3586,6 +3591,10 @@ class reportbuilder {
 
         require_once("$CFG->libdir/excellib.class.php");
 
+        // Increasing the execution time to no limit.
+        set_time_limit(0);
+        raise_memory_limit(MEMORY_HUGE);
+
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
         $filename = clean_filename($fullname . '_report.xls');
 
@@ -3675,6 +3684,10 @@ class reportbuilder {
         global $DB, $CFG;
 
         require_once("{$CFG->libdir}/csvlib.class.php");
+
+        // Increasing the execution time to no limit.
+        set_time_limit(0);
+        raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
         $filename = clean_filename($fullname . '_report.csv');
