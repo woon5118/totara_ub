@@ -1384,7 +1384,7 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
         }
 
         if ($scorm->completionstatusrequired & $nstatus) {
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else {
             return completion_info::aggregate_completion_states($type, $result, false);
         }
@@ -1406,7 +1406,7 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
         }
 
         if ($scorm->completionscorerequired <= $maxscore) {
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else {
             return completion_info::aggregate_completion_states($type, $result, false);
         }
