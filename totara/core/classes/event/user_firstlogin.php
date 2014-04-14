@@ -80,7 +80,7 @@ class user_firstlogin extends \core\event\base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array(SITEID, 'user', 'firstaccess', "index.php", $this->other['username']);
+        return array(SITEID, 'user', 'firstaccess', "view.php?id=".$this->objectid, $this->other['username']);
     }
 
     /**

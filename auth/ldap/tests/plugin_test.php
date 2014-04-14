@@ -275,7 +275,7 @@ class auth_ldap_plugin_testcase extends advanced_testcase {
         $this->assertEquals('user', $event->objecttable);
         $this->assertEquals('2', $event->objectid);
         $this->assertEquals(context_user::instance(2)->id, $event->contextid);
-        $expectedlog = array(SITEID, 'user', 'firstaccess', 'index.php', $user->username);
+        $expectedlog = array(SITEID, 'user', 'firstaccess', "view.php?id=".$user->id, $user->username);
         $this->assertEventLegacyLogData($expectedlog, $event);
 
         $event = $events[1];
