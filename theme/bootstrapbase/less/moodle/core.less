@@ -1904,32 +1904,6 @@ a.criteria-action {
     padding: 0px 3px;
     float: right;
 }
-table.issuedbadgebox {
-    width: 750px;
-    background-color: #FFFFFF;
-}
-table.badgeissuedimage {
-    width: 150px;
-    text-align: center;
-}
-table.badgeissuedinfo {
-    width: 600px;
-}
-table.badgeissuedinfo .bvalue {
-    text-align: left;
-    vertical-align: middle;
-}
-table.badgeissuedinfo .bfield {
-    width: 125px;
-    text-align: left;
-    font-style: italic;
-}
-.dir-rtl {
-    table.badgeissuedinfo .bvalue,
-    table.badgeissuedinfo .bfield {
-        text-align: right;
-    }
-}
 ul.badges {
     margin: 0;
     list-style: none;
@@ -1960,13 +1934,15 @@ ul.badges {
     position: relative;
 }
 div.badge {
+    background-color: transparent;
+    padding: 0;
     position: relative;
     display: block;
 }
 div.badge .expireimage {
     width: 100px;
     height: 100px;
-    left: 20px;
+    left: 0px;
     top: 0px;
 }
 .expireimage {

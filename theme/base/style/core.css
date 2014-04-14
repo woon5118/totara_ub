@@ -1443,6 +1443,21 @@ body.jsenabled .formlisting {
 /**
  * Badges styles
  */
+#badge h3 {
+    clear: left;
+    text-align: left;
+    padding-top: 10px;
+}
+#badge .span2,
+#badge .span10 {
+    float: left;
+}
+#badge .span2 {
+    width: 200px;
+}
+#badge .row-fluid {
+    clear: left;
+}
 #page-badges-view .collection { width: 90%; margin: 1em auto; }
 #page-badges-index .collection { width: 85%; margin: 1em auto; }
 
@@ -1470,13 +1485,6 @@ table.collection .name { text-align: left; vertical-align: middle; }
 
 a.criteria-action { padding: 0px 3px; float: right; }
 .dir-rtl a.criteria-action { float: left; }
-table.issuedbadgebox { width: 750px; background-color: white; }
-table.badgeissuedimage { width: 150px; text-align: center; }
-table.badgeissuedinfo { width: 600px; }
-table.badgeissuedinfo .bvalue { text-align: left; vertical-align: middle; }
-.dir-rtl table.badgeissuedinfo .bvalue { text-align: right; }
-table.badgeissuedinfo .bfield { width: 125px; text-align: left; font-style: italic; }
-.dir-rtl table.badgeissuedinfo .bfield { text-align: right; }
 
 ul.badges { margin: 0; list-style: none; }
 .badges li { position: relative; display: inline-block; padding-bottom: 2em; text-align: center; vertical-align: top; width: 150px; }
@@ -1487,7 +1495,7 @@ ul.badges { margin: 0; list-style: none; }
 .badges li .badge-actions { position: relative; }
 
 div.badge { position: relative; display: block; }
-div.badge .expireimage { width: 100px; height: 100px; left: 20px; top: 0px; }
+div.badge .expireimage { width: 100px; height: 100px; left: 0px; top: 0px; }
 .expireimage { width: 90px; height: 90px; left: 30px; top: 0px; position: absolute; z-index:10; filter: alpha(opacity = 85); -moz-opacity: 0.85; -khtml-opacity: 0.85; opacity: 0.85;}
 
 .badge-profile { vertical-align: top; }
