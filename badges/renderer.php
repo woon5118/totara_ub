@@ -151,13 +151,14 @@ class core_badges_renderer extends plugin_renderer_base {
         // Issuer details.
         $display .= html_writer::start_tag('fieldset', array('class' => 'generalbox'));
         $display .= html_writer::tag('legend', get_string('issuerdetails', 'badges'), array('class' => 'bold'));
-
-        $issuertable = new html_table();
-        $issuertable->attributes = array('class' => 'clearfix', 'id' => 'badgeissuer');
-        $issuertable->data[] = array(get_string('issuername', 'badges') . ":", $badge->issuername);
-        $issuertable->data[] = array(get_string('contact', 'badges') . ":",
-                html_writer::tag('a', $badge->issuercontact, array('href' => 'mailto:' . $badge->issuercontact)));
-        $display .= html_writer::table($issuertable);
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('issuername', 'badges') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('div', $badge->issuername, array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('contact', 'badges') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('div', html_writer::tag('a', $badge->issuercontact, array('href' => 'mailto:' . $badge->issuercontact)), array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
         $display .= html_writer::end_tag('fieldset');
 
         // Issuance details if any.
