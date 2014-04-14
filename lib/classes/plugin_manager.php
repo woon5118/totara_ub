@@ -1127,8 +1127,9 @@ class core_plugin_manager {
                 'nonzero', 'overlay', 'serenity', 'sky_high', 'splash',
                 'standard', 'standardold'
                 // Totara:
-                , 'standardtotara', 'customtotara', 'mymobiletotara'
-                , 'kiwifruit', 'standardtotararesponsive'
+                , 'standardtotara', 'customtotara'
+                , 'kiwifruit', 'kiwifruitresponsive', 'standardtotararesponsive'
+                , 'customtotararesponsive'
             ),
 
             'tool' => array(

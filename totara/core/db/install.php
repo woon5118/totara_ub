@@ -25,8 +25,8 @@
 function xmldb_totara_core_install() {
     global $CFG, $DB, $SITE;
 
-    // switch to new default theme in totara 2.2
-    set_config('theme', 'standardtotara');
+    // switch to new default theme in totara 2.6
+    set_config('theme', 'standardtotararesponsive');
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
     $systemcontext = context_system::instance();
