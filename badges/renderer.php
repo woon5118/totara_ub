@@ -138,14 +138,22 @@ class core_badges_renderer extends plugin_renderer_base {
         $display .= html_writer::start_tag('fieldset', array('class' => 'generalbox'));
         $display .= html_writer::tag('legend', get_string('badgedetails', 'badges'), array('class' => 'bold'));
 
-        $detailstable = new html_table();
-        $detailstable->attributes = array('class' => 'clearfix', 'id' => 'badgedetails');
-        $detailstable->data[] = array(get_string('name') . ":", $badge->name);
-        $detailstable->data[] = array(get_string('description', 'badges') . ":", $badge->description);
-        $detailstable->data[] = array(get_string('createdon', 'search') . ":", userdate($badge->timecreated));
-        $detailstable->data[] = array(get_string('badgeimage', 'badges') . ":",
-                print_badge_image($badge, $context, 'large'));
-        $display .= html_writer::table($detailstable);
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('name') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('p', $badge->name, array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('description', 'badges') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('p', $badge->description, array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('createdon', 'search') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('p', $badge->timecreated, array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
+        $display .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+        $display .= html_writer::tag('label', get_string('badgeimage', 'badges') . ':', array('class' => 'span2'));
+        $display .= html_writer::tag('div', print_badge_image($badge, $context, 'large'), array('class' => 'span10'));
+        $display .= html_writer::end_tag('div');
         $display .= html_writer::end_tag('fieldset');
 
         // Issuer details.
