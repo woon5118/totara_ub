@@ -7,12 +7,12 @@ div.multicheck-items fieldset.felement span {
 }
 
 /* show/hide button alignment */
-.dir-ltr .rb-showhide.boxalignright {
-    clear: both;
+.dir-ltr .rb-showhide {
+    clear: right;
     text-align: right;
 }
-.dir-rtl .rb-showhide.boxalignright {
-    clear: both;
+.dir-rtl .rb-showhide {
+    clear: left;
     text-align: left;
 }
 
@@ -98,7 +98,7 @@ form[id^="toolbarsearch"].mform .fsubmit {
     margin: 5px;
     padding-right: 10px;
 }
-.dir-rtl .rb-sidebar {
+.dir-rtl .rb-sidebar.desktop-first-column {
     float: right;
     padding-left: 10px;
 }
@@ -194,6 +194,9 @@ form[id^="toolbarsearch"].mform .fsubmit {
 }
 #rb-search-controls {
     float: right;
+}
+.dir-rtl #rb-search-controls {
+    float: left;
 }
 #rb-search-controls > div {
     display: inline-block;

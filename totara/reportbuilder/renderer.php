@@ -489,7 +489,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $html = html_writer::script($js);
 
         // hide if javascript disabled
-        $html .= html_writer::start_tag('div', array('class' => 'rb-showhide boxalignright'));
+        $html .= html_writer::start_tag('div', array('class' => 'rb-showhide'));
         $html .= html_writer::start_tag('form');
         $html .= html_writer::empty_tag('input', array('type' => 'button',
             'class' => 'rb-hidden',
