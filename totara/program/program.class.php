@@ -172,7 +172,7 @@ class program {
      * @return bool Success
      */
     public function delete() {
-        global $DB;
+        global $DB, $USER;
         $result = true;
 
         // First delete this program from any users' learning plans
@@ -214,6 +214,18 @@ class program {
         $DB->delete_records('prog', array('id' => $this->id));
 
         $transaction->allow_commit();
+
+        $event = \totara_program\event\program_deleted::create(
+            array(
+                'objectid' => $this->id,
+                'context' => context_program::instance($this->id),
+                'userid' => $USER->id,
+                'other' => array(
+                    'certifid' => empty($this->certifid) ? 0 : $this->certifid,
+                ),
+            )
+        );
+        $event->trigger();
 
         return true;
     }

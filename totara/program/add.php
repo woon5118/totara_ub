@@ -245,6 +245,7 @@ if ($data = $form->get_data()) {
         }
 
         // Certification
+        $newcertid = 0;
         if ($data->iscertif) {
             $certification_todb = new stdClass;
             $certification_todb->learningcomptype = CERTIFTYPE_PROGRAM;
@@ -252,8 +253,6 @@ if ($data = $form->get_data()) {
             $certification_todb->windowperiod = '1 month';
             $certification_todb->recertifydatetype = CERTIFRECERT_EXPIRY;
             $certification_todb->timemodified = time();
-
-            $newcertid = 0;
 
             // TODO move to prog transaction?
             $transaction = $DB->start_delegated_transaction();
@@ -273,13 +272,25 @@ if ($data = $form->get_data()) {
             }
 
             $successmsg = get_string('certifprogramcreatesuccess', 'totara_certification');
-      } else {
-          $successmsg = get_string('programcreatesuccess', 'totara_program');
-      }
+        } else {
+            $successmsg = get_string('programcreatesuccess', 'totara_program');
+        }
 
-      // Call prog_fix_program_sortorder to ensure new program is displayed properly and the counts are updated.
-      // Needs to be called at the very end!
-      prog_fix_program_sortorder($data->category);
+        // Call prog_fix_program_sortorder to ensure new program is displayed properly and the counts are updated.
+        // Needs to be called at the very end!
+        prog_fix_program_sortorder($data->category);
+
+        $event = \totara_program\event\program_created::create(
+            array(
+                'objectid' => $newid,
+                'context' => context_program::instance($newid),
+                'userid' => $USER->id,
+                'other' => array(
+                    'certifid' => $newcertid,
+                ),
+            )
+        );
+        $event->trigger();
 
       totara_set_notification($successmsg, $viewurl, array('class' => 'notifysuccess'));
     }

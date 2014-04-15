@@ -117,6 +117,23 @@ if ($data = data_submitted()) {
     $prog_update->usermodified = $USER->id;
     $DB->update_record('prog', $prog_update);
 
+    $eventdata = array();
+    foreach ($assignments as $assignment) {
+        $eventdata[] = (array) $assignment;
+    }
+
+    $event = \totara_program\event\program_assignmentsupdated::create(
+        array(
+            'objectid' => $id,
+            'context' => context_program::instance($id),
+            'userid' => $USER->id,
+            'other' => array(
+                'assignments' => $eventdata,
+            ),
+        )
+    );
+    $event->trigger();
+
     if (isset($data->savechanges)) {
         totara_set_notification(get_string('programassignmentssaved', 'totara_program'), 'edit_assignments.php?id='.$id,
                                                                                         array('class' => 'notifysuccess'));

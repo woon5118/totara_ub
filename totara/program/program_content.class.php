@@ -364,7 +364,7 @@ class prog_content {
     }
 
     public function save_content() {
-        global $DB;
+        global $DB, $USER;
         $this->fix_set_sortorder($this->coursesets);
         $program_plugin = enrol_get_plugin('totara_program');
         // first delete any course sets from the database that have been marked for deletion
@@ -396,11 +396,25 @@ class prog_content {
         }
 
         // then save the new and changed course sets
+        $coursesetids = array();
         foreach ($this->coursesets as $courseset) {
+            $coursesetids[] = $courseset->id;
             if (!$courseset->save_set()) {
                 return false;
             }
         }
+
+        $event = \totara_program\event\program_contentupdated::create(
+            array(
+                'objectid' => $this->programid,
+                'context' => context_program::instance($this->programid),
+                'userid' => $USER->id,
+                'other' => array(
+                    'coursesets' => $coursesetids,
+                ),
+            )
+        );
+        $event->trigger();
 
         return true;
     }

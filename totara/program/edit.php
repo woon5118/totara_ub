@@ -224,6 +224,18 @@ if ($data = $detailsform->get_data()) {
             }
         }
 
+        $event = \totara_program\event\program_updated::create(
+            array(
+                'objectid' => $program->id,
+                'context' => context_program::instance($program->id),
+                'userid' => $USER->id,
+                'other' => array(
+                    'certifid' => empty($program->certifid) ? 0 : $program->certifid,
+                ),
+            )
+        );
+        $event->trigger();
+
         totara_set_notification(get_string('programdetailssaved', 'totara_program'), $nexturl, array('class' => 'notifysuccess'));
     }
 
