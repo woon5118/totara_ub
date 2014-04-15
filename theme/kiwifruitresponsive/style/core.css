@@ -1552,12 +1552,18 @@ div.tabtree2 {
     margin-right:-20px;
 }
 .loginbox {
-    max-width:395px;
     min-height:345px;
     border:5px solid #004958;
-    margin:20px auto 20px auto;
+    margin:20px auto;
     padding:0;
     background:#004958;
+}
+.loginbox.onecolumn {
+    max-width:395px;
+}
+.loginbox.twocolumns {
+    margin:20px auto;
+    max-width: 800px;
 }
 .loginbox h2 {
     font-size:2em;
@@ -1576,16 +1582,24 @@ div.tabtree2 {
 }
 .loginbox.twocolumns .loginpanel,
 .loginbox.twocolumns .signuppanel {
-    width:47%;
+    width:45%;
     margin:0;
     padding:10px;
     border:none;
 }
+@media screen and (max-width: 768px) {
+    .loginbox.twocolumns .loginpanel,
+    .loginbox.twocolumns .signuppanel {
+        width:auto;
+    }
+}
 .loginbox.twocolumns .signuppanel {
-    margin:0;
+    margin: 20px;
     padding:10px;
     background:#F3F3F3;
+    float: right;
 }
+
 .loginbox .loginsub {
     max-width:295px;
     margin-left:auto;
