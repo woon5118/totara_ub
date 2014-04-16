@@ -248,6 +248,7 @@ class rb_filter_multicheck extends rb_filter_type {
 
         // Set up filtersplustotalscolumns.
         $fxt = "total_{$filteruniquename}";
+        $optionsfound = empty($optionsfound) ? array('0') : $optionsfound;
         $filtersplustotalscolumn = implode(" +\n", $optionsfound) . " AS " . $fxt;
 
         // Set up showcountjoins.

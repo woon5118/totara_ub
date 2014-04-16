@@ -2774,17 +2774,20 @@ class reportbuilder {
         // Remove duplicate joins.
         $uniqueshowcountjoins = array_unique($showcountjoins);
 
-        // Construct the main query.
-        $sql = "SELECT\n" . implode(",\n", $countscolumns) . "\nFROM\n(\n" .
-               "   SELECT " . implode(",\n", $filtersplustotalscolumns) . "\n   FROM\n   (\n" .
-               "      SELECT " . implode(",\n", $filterscolumns) . "\n      FROM (\n\n" . $basesql . "\n      ) base\n" .
-                         implode("\n", $uniqueshowcountjoins) . "\n      GROUP BY base.id\n" .
-               "   ) filters\n" . ") filtersplustotals";
-        $counts = $DB->get_record_sql($sql, $sqlparams);
+        // Only run the count sql if there is something to count.
+        if (!empty($countscolumns)) {
+            // Construct the main query.
+            $sql = "SELECT\n" . implode(",\n", $countscolumns) . "\nFROM\n(\n" .
+                   "   SELECT " . implode(",\n", $filtersplustotalscolumns) . "\n   FROM\n   (\n" .
+                   "      SELECT " . implode(",\n", $filterscolumns) . "\n      FROM (\n\n" . $basesql . "\n      ) base\n" .
+                             implode("\n", $uniqueshowcountjoins) . "\n      GROUP BY base.id\n" .
+                   "   ) filters\n" . ") filtersplustotals";
+            $counts = $DB->get_record_sql($sql, $sqlparams);
 
-        // Put the counts into the form.
-        foreach ($showcountfilters as $filter) {
-            $filter->set_counts($mform, $counts);
+            // Put the counts into the form.
+            foreach ($showcountfilters as $filter) {
+                $filter->set_counts($mform, $counts);
+            }
         }
     }
 
