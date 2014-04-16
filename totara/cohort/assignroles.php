@@ -135,7 +135,7 @@ foreach ($assignableroles as $roleid => $rolename) {
     $checked = in_array($roleid, $rolesassigned);
     $checkbox = html_writer::checkbox('roles['.$roleid.']', $contextid, $checked, '', array('class' => 'selectedroles'));
     $data[] = $checkbox;
-    $url = new moodle_url($CFG->admin. '/roles/assign.php', array('contextid' => $contextid, 'roleid' => $roleid));
+    $url = new moodle_url('/' . $CFG->admin . '/roles/assign.php', array('contextid' => $contextid, 'roleid' => $roleid));
     $data[] = html_writer::link($url, $rolename);
     $data[] = $context->get_context_name();
     $table->add_data($data);
