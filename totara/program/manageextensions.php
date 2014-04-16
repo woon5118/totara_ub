@@ -30,7 +30,7 @@ require_login();
 
 $userid = optional_param('userid', 0, PARAM_INT);
 $extensions = optional_param_array('extension', array(), PARAM_INT);
-$reasons = optional_param_array('reasondecision', array(), PARAM_ALPHANUMEXT);
+$reasons = optional_param_array('reasondecision', array(), PARAM_TEXT);
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url("/totara/program/manageextensions.php", array('userid' => $userid)));
