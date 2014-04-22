@@ -552,7 +552,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $html .= html_writer::empty_tag('input', array('type' => 'button',
             'class' => 'boxalignright',
             'name' => 'rb_manage_search',
-            'id' => 'show-searchlist-dialog-' . $report->id,
+            'id' => 'show-searchlist-dialog-' . $report->_id,
             'value' => get_string('managesavedsearches', 'totara_reportbuilder')
         ));
         $html .= html_writer::end_tag('form');
