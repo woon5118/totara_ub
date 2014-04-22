@@ -42,7 +42,9 @@ $pageparams = array('importname' => $importname, 'importuserid' => $importuserid
 require_login();
 
 // Check if certifications are enabled.
-check_certification_enabled();
+if ($importname === 'certification') {
+    check_certification_enabled();
+}
 
 $context = context_system::instance();
 $PAGE->set_context($context);
