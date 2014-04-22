@@ -228,10 +228,11 @@ abstract class course_set {
                     $event = \totara_program\event\program_courseset_completed::create(
                         array(
                             'objectid' => $this->programid,
-                            'contextid' => context_program::instance($this->programid),
+                            'context' => context_program::instance($this->programid),
                             'userid' => $userid,
                             'other' => array(
-                                'coursesetid' => $this->id
+                                'coursesetid' => $this->id,
+                                'certifid' => 0,
                             )
                         )
                     );
@@ -264,10 +265,11 @@ abstract class course_set {
                     $event = \totara_program\event\program_courseset_completed::create(
                         array(
                             'objectid' => $this->programid,
-                            'contextid' => context_program::instance($this->programid),
+                            'context' => context_program::instance($this->programid),
                             'userid' => $userid,
                             'other' => array(
-                                'coursesetid' => $this->id
+                                'coursesetid' => $this->id,
+                                'certifid' => 0,
                             )
                         )
                     );

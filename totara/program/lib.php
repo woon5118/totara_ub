@@ -1127,6 +1127,7 @@ class program_event_handler {
         $programid = $event->objectid;
         $userid = $event->userid;
 
+        $program = new program($programid);
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
 
@@ -1156,7 +1157,7 @@ class program_event_handler {
 
         $programid = $event->objectid;
         $userid = $event->userid;
-        $coursetid = $event->other['coursesetid'];
+        $coursesetid = $event->other['coursesetid'];
         $program = new program($programid);
 
         $messagesmanager = $program->get_messagesmanager();

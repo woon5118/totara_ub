@@ -862,7 +862,7 @@ class program {
                         'context' => context_program::instance($this->id),
                         'userid' => $userid,
                         'other' => array(
-                            'certifid' => $this->certifid,
+                            'certifid' => isset($this->certifid) ? $this->certifid : 0,
                         ),
                     )
                 );

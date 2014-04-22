@@ -32,7 +32,7 @@ class program_completed extends \core\event\base {
      * Initialise the event data.
      */
     protected function init() {
-        $this->data['objecttable'] = 'program';
+        $this->data['objecttable'] = 'prog';
         $this->data['crud'] = 'u';
         $this->data['level'] = self::LEVEL_OTHER;
     }
