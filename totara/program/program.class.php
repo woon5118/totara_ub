@@ -1524,6 +1524,8 @@ class program {
      */
     public function display_current_status() {
         global $PAGE, $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
         $data = new stdClass();
         $data->assignments = $this->assignments->count_active_user_assignments();
         $data->exceptions = $this->assignments->count_user_assignment_exceptions();
