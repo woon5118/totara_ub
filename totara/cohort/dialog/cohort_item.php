@@ -24,7 +24,6 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
-require_once($CFG->dirroot .'/lib/pear/HTML/AJAX/JSON.php');
 
 require_login();
 $context = context_system::instance();
@@ -49,7 +48,7 @@ foreach ($itemids as $itemid) {
     $rowhtml = html_writer::start_tag('tr');
     $colcount = 0;
     foreach ($row as $cell) {
-        $rowhtml .= html_writer::tag('td', $cell, array('class' => 'col'.$colcount));
+        $rowhtml .= html_writer::tag('td', $cell, array('class' => 'cell'.$colcount));
         $colcount++;
     }
     $rowhtml .= html_writer::end_tag('tr');
