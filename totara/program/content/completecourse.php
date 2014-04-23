@@ -36,7 +36,7 @@ $programid = required_param('progid', PARAM_INT);
 
 require_login();
 
-if (!$program = new program($id)) {
+if (!$program = new program($programid)) {
     print_error('error:programid', 'totara_program');
 }
 
