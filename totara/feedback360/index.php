@@ -117,8 +117,10 @@ if ($viewrequestee) {
 }
 
 if ($viewrequested) {
-    // Join to user so we have their name for later.
-    $sql = "SELECT re.*, ua.feedback360id, ua.timedue, ua.userid as assignedby, u.firstname, u.lastname
+
+    // Join to user so we have all their user name fields for later.
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT re.*, ua.feedback360id, ua.timedue, ua.userid as assignedby, {$usernamefields}
             FROM {feedback360_resp_assignment} re
             JOIN {feedback360_user_assignment} ua
             ON re.feedback360userassignmentid = ua.id
