@@ -79,11 +79,6 @@ define('REPORT_BUILDER_EXPORT_FUSION', 8);
 define('REPORT_BUILDER_EXPORT_PDF_PORTRAIT', 16);
 define('REPORT_BUILDER_EXPORT_PDF_LANDSCAPE', 32);
 
-/**
- * PDF export memory limit (in MBs).
- */
-define('REPORT_BUILDER_EXPORT_PDF_MEMORY_LIMIT', 1024);
-
 /*
  * Initial Display Options
  */
@@ -129,11 +124,15 @@ define('REPORT_CACHING_TIMEOUT', 3600);
  *  Pdf export constants.
  *
  */
-define('PDF_FONT_SIZE_DATA', 10);
-define('PDF_FONT_SIZE_RECORD', 14);
-define('PDF_FONT_SIZE_TITLE', 20);
-define('PDF_MARGIN_FOOTER', 10);
-define('PDF_MARGIN_BOTTOM', 20);
+define('REPORT_BUILDER_PDF_FONT_SIZE_DATA', 10);
+define('REPORT_BUILDER_PDF_FONT_SIZE_RECORD', 14);
+define('REPORT_BUILDER_PDF_FONT_SIZE_TITLE', 20);
+define('REPORT_BUILDER_PDF_MARGIN_FOOTER', 10);
+define('REPORT_BUILDER_PDF_MARGIN_BOTTOM', 20);
+/**
+ * PDF export memory limit (in MBs).
+ */
+define('REPORT_BUILDER_EXPORT_PDF_MEMORY_LIMIT', 1024);
 
 /**
  * Main report builder object class definition
@@ -3776,8 +3775,8 @@ class reportbuilder {
         $pdf->setTitle($filename);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
+        $pdf->SetFooterMargin(REPORT_BUILDER_PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(true, REPORT_BUILDER_PDF_MARGIN_BOTTOM);
         $pdf->AddPage();
 
         // Get current language to set the font properly.
@@ -3788,15 +3787,15 @@ class reportbuilder {
             $pdf->setRTL(true);
         }
 
-        $pdf->SetFont($font, 'B', PDF_FONT_SIZE_TITLE);
+        $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_TITLE);
         $pdf->Write(0, format_string($this->fullname), '', 0, 'L', true, 0, false, false, 0);
 
         $resultstr = $count == 1 ? 'record' : 'records';
         $recordscount = get_string('x' . $resultstr, 'totara_reportbuilder', $count);
-        $pdf->SetFont($font, 'B', PDF_FONT_SIZE_RECORD);
+        $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_RECORD);
         $pdf->Write(0, $recordscount, '', 0, 'L', true, 0, false, false, 0);
 
-        $pdf->SetFont($font, '', PDF_FONT_SIZE_DATA);
+        $pdf->SetFont($font, '', REPORT_BUILDER_PDF_FONT_SIZE_DATA);
 
         if (is_array($restrictions) && count($restrictions) > 0) {
             $pdf->Write(0, get_string('reportcontents', 'totara_reportbuilder'), '', 0, 'L', true, 0, false, false, 0);
