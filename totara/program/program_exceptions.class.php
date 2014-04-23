@@ -234,7 +234,9 @@ class prog_exceptions_manager {
     public function search_exceptions($page='all', $searchterm='', $exceptiontype='', $count=false) {
         global $DB;
 
-        $fields = 'ex.*, us.firstname as firstname, us.lastname as lastname, us.id as userid';
+        $usernamefields = get_all_user_name_fields(true, 'us', null, 'user_');
+
+        $fields = "ex.*, {$usernamefields}, us.id as userid";
         if ($count) {
             $fields = 'COUNT(ex.id)';
         }
@@ -284,12 +286,14 @@ class prog_exceptions_manager {
 
             $user = new stdClass();
             $user->id = $exception->userid;
-            $user->firstname = $exception->firstname;
-            $user->lastname = $exception->lastname;
+            foreach (get_all_user_name_fields() as $field) {
+                $varname = "user_{$field}";
+                $user->$field = $exception->$varname;
+            }
             $rowdata->exceptionid = $exception->id;
             $rowdata->user = $user;
-            $rowdata->firstname = $exception->firstname;
-            $rowdata->lastname = $exception->lastname;
+            $rowdata->firstname = $user->firstname;
+            $rowdata->lastname = $user->lastname;
             $rowdata->selected = isset($selectedexceptions[$exception->id]) ? true : false;
 
             if (isset($this->exceptiontype_descriptors[$exception->exceptiontype])) {
