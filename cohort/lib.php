@@ -421,7 +421,7 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('editmembers','totara_cohort'));
     }
 
-    if ($canview) {
+    if ($canview && $canmanage) {
         $toprow[] = new tabobject('enrolledlearning', new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $cohortid)),
             get_string('enrolledlearning', 'totara_cohort'));
     }
