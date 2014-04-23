@@ -189,9 +189,19 @@ form[id^="toolbarsearch"].mform .fsubmit {
     cursor: pointer;
 }
 
+.dir-rtl .rb-display-expand {
+    background-position: right;
+}
+
 .rb-display-expand-link {
     margin-left: 20px;
 }
+
+.dir-rtl .rb-display-expand-link {
+    margin-right: 20px;
+    margin-left: 0;
+}
+
 #rb-search-controls {
     float: right;
 }
