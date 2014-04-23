@@ -39,22 +39,36 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
     if ( typeof $ === 'undefined') {
       throw new Error('M.totara_appraisal_stage.init()-> jQuery dependency required for this module to function.');
     }
-    Y.on('form:updateState', function(e) {
-        $('#'+e+' .hide-disabled').parent('div').parent('div').show();
-        $('#'+e+' .hide-disabled[disabled=disabled]').parent('div').parent('div').hide();
-    });
+
+    // Adding custom dependency checkers without changing form.js code.
+    M.form.dependencyManager.prototype._dependency_eqhide = function(elements, value) {
+        result = M.form.dependencyManager.prototype._dependency_eq(elements, value);
+        if (result.lock) {
+            result.hide = true;
+        }
+        return result;
+    }
+
+    M.form.dependencyManager.prototype._dependency_notcheckedhide = function(elements, value) {
+        result = M.form.dependencyManager.prototype._dependency_notchecked(elements, value);
+        if (result.lock) {
+            result.hide = true;
+        }
+        return result;
+    }
 
     $('select[name=eventid]', '#'+formid).change(function() {
-        M.totara_appraisal_message.checkTiming($('#'+formid));
+        M.totara_appraisal_message.checkTiming(formid);
     });
     $('select[name=eventtype]', '#'+formid).change(function() {
-        M.totara_appraisal_message.checkTiming($('#'+formid));
+        M.totara_appraisal_message.checkTiming(formid);
     });
 
-    M.totara_appraisal_message.checkTiming($('#'+formid));
+    M.totara_appraisal_message.checkTiming(formid);
   },
 
-  checkTiming: function(form) {
+  checkTiming: function(formid) {
+      form = $('#'+formid);
       var eventid = $('select[name=eventid]', form);
       var eventtype = $('select[name=eventtype]', form);
       var eventradio = $('input[name="timinggrp[timing]"]', form);
@@ -67,6 +81,10 @@ M.totara_appraisal_message = M.totara_appraisal_message || {
           eventradio.filter('input[value=-1]').prop('disabled', true);
       } else {
           eventradio.filter('input[value=-1]').prop('disabled', false);
+      }
+
+      if (M.form.updateFormState !== undefined) {
+        M.form.updateFormState(formid);
       }
   }
 }

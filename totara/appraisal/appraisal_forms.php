@@ -722,7 +722,9 @@ class appraisal_message_form extends moodleform {
                 array('class' => 'appraisal-event-body hide-disabled'));
         $mform->setType('messagebody[0]', PARAM_CLEANHTML);
         $mform->disabledIf('messagetitle[0]', 'messagetoall', 'eq', 'each');
+        $mform->disabledIf('messagetitle[0]', 'messagetoall', 'eqhide', 'each');
         $mform->disabledIf('messagebody[0]', 'messagetoall', 'eq', 'each');
+        $mform->disabledIf('messagebody[0]', 'messagetoall', 'eqhide', 'each');
 
         foreach ($roles as $role => $rolename) {
             $name = get_string($rolename, 'totara_appraisal');
@@ -735,9 +737,13 @@ class appraisal_message_form extends moodleform {
                     array('class' => 'appraisal-event-body hide-disabled'));
             $mform->setType("messagebody[$role]", PARAM_CLEANHTML);
             $mform->disabledIf("messagetitle[$role]", 'messagetoall', 'eq', 'all');
+            $mform->disabledIf("messagetitle[$role]", 'messagetoall', 'eqhide', 'all');
             $mform->disabledIf("messagebody[$role]", 'messagetoall', 'eq', 'all');
-            $mform->disabledIf("messagetitle[$role]", "rolegrp[$role]");
-            $mform->disabledIf("messagebody[$role]", "rolegrp[$role]");
+            $mform->disabledIf("messagebody[$role]", 'messagetoall', 'eqhide', 'all');
+            $mform->disabledIf("messagetitle[$role]", "rolegrp[$role]", 'notchecked');
+            $mform->disabledIf("messagetitle[$role]", "rolegrp[$role]", 'notcheckedhide');
+            $mform->disabledIf("messagebody[$role]", "rolegrp[$role]", 'notchecked');
+            $mform->disabledIf("messagebody[$role]", "rolegrp[$role]", 'notcheckedhide');
         }
         if ($readonly) {
             $mform->addElement('static', 'backlink', '', html_writer::link(new moodle_url('/totara/appraisal/message.php',

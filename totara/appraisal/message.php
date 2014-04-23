@@ -109,6 +109,13 @@ switch ($action) {
             $form->set_data($data);
             $form->filter_frozen_messages();
         }
+
+        // Init form core js before appraisal.
+        $args = $form->_form->getLockOptionObject();
+        if (count($args[1]) > 0) {
+            $PAGE->requires->js_init_call('M.form.initFormDependencies', $args, true, moodleform::get_js_module());
+        }
+
         $jsmodule = array(
             'name' => 'totara_appraisal_message',
             'fullpath' => '/totara/appraisal/js/message.js',
