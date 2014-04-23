@@ -72,6 +72,7 @@ div#totaramenu ul li.selected li a:hover {
 #page-footer div#totaramenu {
     float:right;
     text-align:right;
+    z-index: 0;
 }
 .dir-rtl #page-footer div#totaramenu {
     float:left;
