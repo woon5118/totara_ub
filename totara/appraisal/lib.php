@@ -337,10 +337,10 @@ class appraisal {
         // Get user info and roles for all users involved
         // in this appraisal who have at least one role
         // missing.
+        $usernamefields = get_all_user_name_fields(true, 'u');
         $select = "SELECT
             u.id,
-            u.firstname,
-            u.lastname,
+            {$usernamefields},
             pa.managerid,
             pa2.managerid AS teamleadid,
             pa.appraiserid";
