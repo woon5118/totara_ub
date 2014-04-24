@@ -54,10 +54,12 @@ $COHORT_ALERT = array(
 
 define('COHORT_ASSN_ITEMTYPE_COURSE', 50);
 define('COHORT_ASSN_ITEMTYPE_PROGRAM', 45);
+define('COHORT_ASSN_ITEMTYPE_CERTIF', 55);
 global $COHORT_ASSN_ITEMTYPES;
 $COHORT_ASSN_ITEMTYPES = array(
     COHORT_ASSN_ITEMTYPE_COURSE => 'course',
-    COHORT_ASSN_ITEMTYPE_PROGRAM => 'program'
+    COHORT_ASSN_ITEMTYPE_PROGRAM => 'program',
+    COHORT_ASSN_ITEMTYPE_CERTIF => 'certification',
 );
 
 // This should be extended when adding other tabs.
@@ -140,12 +142,15 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
                 $assid = $enrolplugin->add_instance($course, array('customint1' => $cohortid, 'roleid' => $CFG->learnerroleid));
                 return $assid;
                 break;
+            case COHORT_ASSN_ITEMTYPE_CERTIF:
+                $itemtype = COHORT_ASSN_ITEMTYPE_CERTIF;
             case COHORT_ASSN_ITEMTYPE_PROGRAM:
+                $itemtype = isset($itemtype) ? $itemtype : COHORT_ASSN_ITEMTYPE_CERTIF;
                 $progassociations = array_map(
                     function($assoc) {
                         return $assoc->instanceid;
                     },
-                    totara_cohort_get_associations($cohortid, COHORT_ASSN_ITEMTYPE_PROGRAM)
+                    totara_cohort_get_associations($cohortid, $itemtype)
                 );
                 if (in_array($instanceid, $progassociations)) {
                     return true;
@@ -265,6 +270,22 @@ function totara_cohort_get_associations($cohortid, $instancetype=null, $value=nu
                     JOIN {prog} p ON cas.instanceid = p.id AND cas.instancetype = ?
                     WHERE cas.cohortid = ?";
                 $sqlparams = array(COHORT_ASSN_ITEMTYPE_PROGRAM, $cohortid);
+            } else {
+                $sql = "SELECT pa.id, p.id AS instanceid, p.fullname, 'program' AS type
+                    FROM {prog_assignment} pa
+                    JOIN {prog} p ON pa.programid = p.id
+                    WHERE pa.assignmenttype = ?
+                    AND pa.assignmenttypeid = ?";
+                $sqlparams = array(ASSIGNTYPE_COHORT, $cohortid);
+            }
+            break;
+        case COHORT_ASSN_ITEMTYPE_CERTIF:
+            if ($value == COHORT_ASSN_VALUE_VISIBLE) {
+                $sql = "SELECT cas.id, cas.instanceid, p.fullname, 'program' AS type
+                    FROM {cohort_visibility} cas
+                    JOIN {prog} p ON cas.instanceid = p.id AND cas.instancetype = ?
+                    WHERE cas.cohortid = ?";
+                $sqlparams = array(COHORT_ASSN_ITEMTYPE_CERTIF, $cohortid);
             } else {
                 $sql = "SELECT pa.id, p.id AS instanceid, p.fullname, 'program' AS type
                     FROM {prog_assignment} pa

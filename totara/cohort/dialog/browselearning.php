@@ -25,6 +25,7 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_courses.class.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_programs.class.php');
+require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_certifications.class.php');
 require_once("{$CFG->dirroot}/cohort/lib.php");
 
 $sitecontext = context_system::instance();
@@ -59,6 +60,9 @@ switch ($type) {
     case COHORT_ASSN_ITEMTYPE_PROGRAM:
         $dialog = new totara_dialog_content_programs($categoryid);
         break;
+    case COHORT_ASSN_ITEMTYPE_CERTIF:
+        $dialog = new totara_dialog_content_certifications($categoryid);
+        break;
     default:
         print_error('learningtypenotrecognised');
         break;
@@ -79,6 +83,9 @@ switch ($type) {
         break;
     case COHORT_ASSN_ITEMTYPE_PROGRAM:
         $dialog->load_programs();
+        break;
+    case COHORT_ASSN_ITEMTYPE_CERTIF:
+        $dialog->load_certifications();
         break;
     default:
         break;
