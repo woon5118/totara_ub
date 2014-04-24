@@ -329,6 +329,10 @@ class program_edit_form extends moodleform {
             $errors['idnumber'] = get_string('idnumberexists', 'totara_core');
         }
 
+        // Validate any custom fields, this requires the ID to be set.
+        $data['id'] = $id;
+        $errors += customfield_validation((object)$data, 'program', 'prog');
+
         return $errors;
     }
 
