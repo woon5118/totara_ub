@@ -193,18 +193,28 @@ function process_scheduled_reports() {
         if ($schedule->is_time()) {
             $schedule->next();
 
-            if (get_config('reportbuilder', 'exporttofilesystem') == 0) {
-                $exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
-            } else {
-                $exporttofilesystem  = $report->exporttofilesystem;
-            }
+            // If exporting to file is turned off at system level, do not save reports.
+            $exportsetting = get_config('reportbuilder', 'exporttofilesystem');
+            $exporttofilesystem = $origexportsetting = $report->exporttofilesystem;
 
             switch ($exporttofilesystem) {
                 case REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE:
-                    mtrace('ReportID:(' . $report->id . ') Option: Email and save scheduled report to file.');
+                    if ($exportsetting == 0) {
+                        // Export turned off, email only.
+                        $report->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
+                        mtrace('ReportID:(' . $report->id . ') Option: Email and save but save disabled so email only');
+                    } else {
+                        mtrace('ReportID:(' . $report->id . ') Option: Email and save scheduled report to file.');
+                    }
                     break;
                 case REPORT_BUILDER_EXPORT_SAVE:
-                    mtrace('ReportID:(' . $report->id . ') Option: Save scheduled report to file system only.');
+                    if ($exportsetting == 0) {
+                        // Export turned off, ignore.
+                        mtrace('ReportID:(' . $report->id . ') Option: Save scheduled report but export disabled, skipping');
+                        continue 2;
+                    } else{
+                        mtrace('ReportID:(' . $report->id . ') Option: Save scheduled report to file system only.');
+                    }
                     break;
                 default:
                     mtrace('ReportID:(' . $report->id . ') Option: Email scheduled report.');
@@ -221,6 +231,10 @@ function process_scheduled_reports() {
 
             add_to_log(SITEID, 'reportbuilder', 'dailyreport', null, "$reportname (ID $report->id)");
 
+            // Restore original export setting if we have changed it because file export is disabled.
+            if ($report->exporttofilesystem != $origexportsetting) {
+                $report->exporttofilesystem = $origexportsetting;
+            }
             if (!$DB->update_record('report_builder_schedule', $report)) {
                 mtrace('Failed to update next report field for scheduled report id:' . $report->id);
             }
