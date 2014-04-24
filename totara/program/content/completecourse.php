@@ -84,7 +84,7 @@ $completion = new completion_completion(array('userid' => $userid, 'course' => $
 if ($completion->is_complete()) {
     // Toggle as incomplete
     $completion->delete();
-    redirect($progurl, get_string('incompletecourse', 'totara_program'));
+    totara_set_notification(get_string('incompletecourse', 'totara_program'), $progurl, array('class' => 'notifysuccess'));
 }
 
 $mform = new completecourse_form();
@@ -101,7 +101,7 @@ if ($mform->is_cancelled()) {
     } else {
         $message = get_string('completedcoursemanual', 'totara_program');
     }
-    redirect($progurl, $message);
+    totara_set_notification($message, $progurl, array('class' => 'notifysuccess'));
 } else {
     $data = new stdClass();
     $data->courseid = $courseid;
