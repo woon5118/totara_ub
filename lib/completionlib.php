@@ -674,7 +674,7 @@ class completion_info {
             $current->timemodified    = time();
             // If module_get_completion_state set time of completion then use it.
             if (isset($cm->timecompleted)) {
-                $current->timecompleted = $cm->timecompleted;
+                $current->timecompleted = ($newstate == COMPLETION_INCOMPLETE) ? null : $cm->timecompleted;
             }
             $this->internal_set_data($cm, $current);
         }

@@ -99,6 +99,44 @@ function choice_user_complete($course, $user, $mod, $choice) {
 }
 
 /**
+ * Archives user's assignments for a course
+ *
+ * @param int $userid
+ * @param int $courseid
+ */
+function choice_archive_completion($userid, $courseid) {
+    global $DB;
+
+    $sql = "SELECT ca.id AS answerid,
+                    c.id AS choiceid
+            FROM {choice_answers} ca
+            JOIN {choice} c ON c.id = ca.choiceid AND c.course = :courseid
+            WHERE ca.userid = :userid";
+    $params = array('userid' => $userid, 'courseid' => $courseid);
+
+    if ($submissions = $DB->get_records_sql($sql, $params)) {
+        $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+        // Answers to be deleted.
+        $deleteanswers = array();
+        // Create the course completion info.
+        $completion = new completion_info($course);
+
+        foreach ($submissions as $submission) {
+            $cm = get_coursemodule_from_instance('choice', $submission->choiceid, $course->id);
+            $deleteanswers[] = $submission->answerid;
+            // Reset viewed.
+            $completion->set_module_viewed_reset($cm, $userid);
+            // And reset completion, in case viewed is not a required condition.
+            $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+        }
+        $DB->delete_records_list('choice_answers', 'id', $deleteanswers);
+        $completion->invalidatecache($courseid, $userid, true);
+    }
+
+    return true;
+}
+
+/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -802,7 +840,7 @@ function choice_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
-
+        case FEATURE_ARCHIVE_COMPLETION:      return true;
         default: return null;
     }
 }
