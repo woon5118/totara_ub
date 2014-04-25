@@ -658,6 +658,9 @@ abstract class rb_base_source {
                     case 'course':
                         $prefix = 'course';
                         break;
+                    case 'prog':
+                        $prefix = 'prog';
+                        break;
                     default:
                         //unknown prefix
                         return '';
@@ -711,6 +714,9 @@ abstract class rb_base_source {
                     break;
                 case 'course':
                     $prefix = 'course';
+                    break;
+                case 'prog':
+                    $prefix = 'prog';
                     break;
                 default:
                     //unknown prefix
