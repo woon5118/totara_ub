@@ -1562,6 +1562,11 @@ class moodle_page {
                     }
                 break;
 
+                case 'totarapdf':
+                    // Enforce standardtotara theme in PDF outputs.
+                    return 'standardtotara';
+                break;
+
                 case 'session':
                     if (!empty($SESSION->theme)) {
                         return $SESSION->theme;
