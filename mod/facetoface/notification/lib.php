@@ -315,6 +315,11 @@ class facetoface_notification extends data_object {
     public function send_scheduled() {
         global $CFG, $DB;
 
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            return false;
+        }
+
         echo "Checking for sessions to send notification to\n";
 
         // Find due scheduled notifications
@@ -402,6 +407,10 @@ class facetoface_notification extends data_object {
     public function send_to_users($sessionid = null) {
         global $DB;
 
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            return false;
+        }
         // Hack to force ignore cancelled users
         $this->cancelled = false;
 
@@ -810,6 +819,11 @@ class facetoface_notification extends data_object {
  */
 function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE) {
     global $DB, $CFG;
+
+    $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+    if (!empty($notificationdisable)) {
+        return false;
+    }
 
     $user = $DB->get_record('user', array('id' => $userid));
     if (!$user) {

@@ -936,38 +936,43 @@ function facetoface_notify_reserved_session_deleted($facetoface, $session) {
 function facetoface_cron($testing = false) {
     global $DB;
 
-    // Find "instant" manual notifications that haven't yet been sent
-    if (!$testing) {
-        mtrace('Checking for instant Face-to-face notifications');
-    }
-    $manual = $DB->get_records_select(
-        'facetoface_notification',
-        'type = ? AND issent <> ? AND status = 1',
-        array(MDL_F2F_NOTIFICATION_MANUAL, MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
-    if ($manual) {
-        foreach ($manual as $notif) {
-            $notification = new facetoface_notification((array)$notif, false);
-            $notification->send_to_users();
+    // Send notifications if enabled.
+    $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+    if (!empty($notificationdisable)) {
+        // Find "instant" manual notifications that haven't yet been sent.
+        if (!$testing) {
+            mtrace('Checking for instant Face-to-face notifications');
+        }
+        $manual = $DB->get_records_select(
+            'facetoface_notification',
+            'type = ? AND issent <> ? AND status = 1',
+            array(MDL_F2F_NOTIFICATION_MANUAL, MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
+        if ($manual) {
+            foreach ($manual as $notif) {
+                $notification = new facetoface_notification((array)$notif, false);
+                $notification->send_to_users();
+            }
+        }
+
+        // Find scheduled notifications that haven't yet been sent.
+        if (!$testing) {
+            mtrace('Checking for scheduled Face-to-face notifications');
+        }
+        $sched = $DB->get_records_select(
+            'facetoface_notification',
+            'scheduletime IS NOT NULL
+            AND issent <> ?
+            AND status = 1',
+            array(MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
+        if ($sched) {
+            foreach ($sched as $notif) {
+                $notification = new facetoface_notification((array)$notif, false);
+                $notification->send_scheduled();
+            }
         }
     }
 
-    // Find scheduled notifications that haven't yet been sent
-    if (!$testing) {
-        mtrace('Checking for scheduled Face-to-face notifications');
-    }
-    $sched = $DB->get_records_select(
-        'facetoface_notification',
-        'scheduletime IS NOT NULL
-        AND issent <> ?
-        AND status = 1',
-        array(MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
-    if ($sched) {
-        foreach ($sched as $notif) {
-            $notification = new facetoface_notification((array)$notif, false);
-            $notification->send_scheduled();
-        }
-    }
-
+    // Find any reservations that are too close to the start of the session and delete them.
     facetoface_remove_reservations_after_deadline($testing);
 
     return true;
@@ -1009,17 +1014,21 @@ function facetoface_remove_reservations_after_deadline($testing) {
         $DB->delete_records_list('facetoface_signups_status', 'signupid', $signupids);
         $DB->delete_records_list('facetoface_signups', 'id', $signupids);
 
-        $notifyparams = array(
-            'type' => MDL_F2F_NOTIFICATION_AUTO,
-            'conditiontype' => MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED,
-        );
-        foreach ($tonotify as $facetofaceid => $sessions) {
-            $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
-            $notifyparams['facetofaceid'] = $facetoface->id;
-            foreach ($sessions as $sessionid => $managers) {
-                $session = facetoface_get_session($sessionid);
-                foreach ($managers as $managerid) {
-                    facetoface_send_notice($facetoface, $session, $managerid, $notifyparams);
+        // Send notifications if enabled.
+        $notificationdisable = get_config(null, 'facetoface_notificationdisable');
+        if (!empty($notificationdisable)) {
+            $notifyparams = array(
+                'type' => MDL_F2F_NOTIFICATION_AUTO,
+                'conditiontype' => MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED,
+            );
+            foreach ($tonotify as $facetofaceid => $sessions) {
+                $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
+                $notifyparams['facetofaceid'] = $facetoface->id;
+                foreach ($sessions as $sessionid => $managers) {
+                    $session = facetoface_get_session($sessionid);
+                    foreach ($managers as $managerid) {
+                        facetoface_send_notice($facetoface, $session, $managerid, $notifyparams);
+                    }
                 }
             }
         }
