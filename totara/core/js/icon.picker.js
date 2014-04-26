@@ -88,15 +88,18 @@ M.totara_iconpicker = M.totara_iconpicker || {
             dialog.close = function() {
                 var id = $(".ui-selected").attr('id');
                 var source = $(".ui-selected > img").attr('src');
-                $data = {'id':id, 'src':source}
-                handler._updatePage($data);
+                var data = {'id':id, 'src':source};
+                handler._updatePage(data);
             };
             totaraDialogs['icon-dialog' + suffix] = dialog;
 
             // Render default icon.
             if ($("#icon" + suffix).length && $("#icon" + suffix).val().length) {
-                defaulticon = $("#icon" + suffix).val();
-                dialog.handler._updatePage(defaulticon);
+                source = $("#icon" + suffix).val();
+                id = source.replace(/^.*(\\|\/|\:)/, '');
+
+                var data = {'id':id, 'src':source};
+                dialog.handler._updatePage(data);
             }
         });
     }

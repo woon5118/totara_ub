@@ -42,7 +42,7 @@ class customfield_define_multiselect extends customfield_define_base {
                 array('class' => 'delete'));
 
             $form->addElement('group', 'multiselectitem['.$menuind.']', $title, $group, array('&nbsp;&nbsp;'));
-            $form->setType('multiselectitem['.$menuind.'][icon]', PARAM_ALPHANUMEXT);
+            $form->setType('multiselectitem['.$menuind.'][icon]', PARAM_TEXT);
             $form->setType('multiselectitem['.$menuind.'][option]', PARAM_MULTILANG);
             $form->setType('multiselectitem['.$menuind.'][delete]', PARAM_INT);
             // Show title only once.
