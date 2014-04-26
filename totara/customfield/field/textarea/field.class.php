@@ -28,9 +28,9 @@ class customfield_textarea extends customfield_base {
         global $TEXTAREA_OPTIONS;
         $cols = $this->field->param1;
         $rows = $this->field->param2;
+        $context = context_system::instance();
         // Create the form field.
         if ($this->is_locked()) {
-            $context = context_system::instance();
             if ($this->data == $this->field->defaultdata) {
                 $data = file_rewrite_pluginfile_urls($this->field->defaultdata, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
             } else {
@@ -39,6 +39,11 @@ class customfield_textarea extends customfield_base {
             $mform->addElement('static', 'freezedisplay', format_string($this->field->fullname), format_text($data, FORMAT_MOODLE));
         } else {
             $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
+            // Set default if adding new.
+            if ($this->itemid == 0 && !empty($this->field->defaultdata)) {
+                $data = file_rewrite_pluginfile_urls($this->field->defaultdata, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
+                $mform->setDefault($this->inputname, array('text' => $data));
+            }
             $mform->setType($this->inputname, PARAM_CLEANHTML);
         }
     }
@@ -60,6 +65,19 @@ class customfield_textarea extends customfield_base {
             $this->inputname = $this->inputname . '_editor';
         }
     }
+
+    /**
+    * Tweaks the edit form
+    * @param   object   instance of the moodleform class
+    * $return  boolean
+    */
+    function edit_after_data(&$mform) {
+        parent::edit_after_data($mform);
+        if (!empty($this->data)) {
+            $mform->setDefault($this->inputname, array('text' => $this->data));
+        }
+    }
+
     /**
     * Saves the data coming from form
     * @param   mixed   data coming from the form
