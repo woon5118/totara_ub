@@ -51,7 +51,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
             // Remove any existing expanded contents.
             $('.rb-expand-row').remove();
             // Unmark any links as clicked.
-            $('.rb-display-table-container a').attr({clicked: null});
+            $('.rb-display-table-container div').attr({clicked: null});
             // Insert the content in the following row. We calculate colspan using the clicked row.
             var content = $(data).find('.rb-expand-row');
             var colspan = $(that).closest('tr').find('td').length;
