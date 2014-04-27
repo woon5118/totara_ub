@@ -338,8 +338,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             $hascapability = has_capability('moodle/course:update', context_course::instance($row->insid));
         } else if ($type == COHORT_ASSN_ITEMTYPE_PROGRAM) {
             $programcontext = context_program::instance($row->insid);
-            $hascapability = has_capability('totara/program:configureprogram', $programcontext) ||
-                has_capability('totara/program:configuredetails', $programcontext);
+            $hascapability = has_capability('totara/program:configuredetails', $programcontext);
         }
 
         if (isset($hascapability) && $hascapability) { // Has capability to change the visibility of learning contents.

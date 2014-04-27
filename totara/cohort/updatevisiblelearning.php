@@ -37,9 +37,7 @@ if (!empty($CFG->audiencevisibility)) {
         if ($DB->update_record('course', array('id' => $id, 'audiencevisible' => $value))) {
             echo json_encode(array('update' => 'course', 'id' => $id, 'value' => $value));
         }
-    } else if ($type == COHORT_ASSN_ITEMTYPE_PROGRAM &&
-            (has_capability('totara/program:configureprogram', context_program::instance($id)) ||
-             has_capability('totara/program:configuredetails', context_program::instance($id)))) {
+    } else if ($type == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability('totara/program:configuredetails', context_program::instance($id))) {
         if ($DB->update_record('prog', array('id' => $id, 'audiencevisible' => $value))) {
             echo json_encode(array('update' => 'prog', 'id' => $id, 'value' => $value));
         }
