@@ -158,6 +158,7 @@ $string['type_program'] = 'Program';
 $string['type_unset'] = 'Unset';
 $string['unset'] = 'Unset';
 $string['viewallcertifications'] = 'View all certifications';
+$string['viewcertification'] = 'View certification';
 $string['weeks'] = 'Week(s)';
 $string['windowopen'] = 'Open';
 $string['windowopenin1day'] = 'Opens in 1 day';

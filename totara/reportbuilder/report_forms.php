@@ -1207,16 +1207,20 @@ class report_builder_program_expand_form extends moodleform {
             $mform->addElement('static', 'summary', get_string('summary', 'totara_program'), $prog['summary']);
         }
 
-        if ($prog['assigned']) {
-            if ($prog['certifid']) {
+        if ($prog['certifid']) {
+            $type = 'certification';
+            if ($prog['assigned']) {
                 $mform->addElement('static', 'status', get_string('status'), get_string('youareassigned', 'totara_certification'));
-            } else {
+            }
+        } else {
+            $type = 'program';
+            if ($prog['assigned']) {
                 $mform->addElement('static', 'status', get_string('status'), get_string('youareassigned', 'totara_program'));
             }
         }
 
         $url = new moodle_url('/totara/program/view.php', array('id' => $prog['id']));
-        $mform->addElement('static', 'view', '', html_writer::link($url, get_string('viewprogram', 'totara_program'),
+        $mform->addElement('static', 'view', '', html_writer::link($url, get_string('view' . $type, 'totara_' . $type),
                 array('class' => 'link-as-button')));
     }
 }
