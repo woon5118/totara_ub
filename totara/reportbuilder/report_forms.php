@@ -313,12 +313,12 @@ class report_builder_edit_filters_form extends moodleform {
                     $deleteurl = new moodle_url('/totara/reportbuilder/filters.php',
                             array('d' => '1', 'id' => $id, 'fid' => $filterid));
                     $mform->addElement('html', html_writer::link($deleteurl, $OUTPUT->pix_icon('/t/delete', $strdelete),
-                            array('title' => $strdelete, 'class' => 'deletefilterbtn')));
+                            array('title' => $strdelete, 'class' => 'deletefilterbtn action-icon')));
                     if ($i != 1) {
                         $moveupurl = new moodle_url('/totara/reportbuilder/filters.php',
                                 array('m' => 'up', 'id' => $id, 'fid' => $filterid));
                         $mform->addElement('html', html_writer::link($moveupurl, $OUTPUT->pix_icon('/t/up', $strmoveup),
-                                array('title' => $strmoveup, 'class' => 'movefilterupbtn')));
+                                array('title' => $strmoveup, 'class' => 'movefilterupbtn action-icon')));
                     } else {
                         $mform->addElement('html', $spacer);
                     }
@@ -326,7 +326,7 @@ class report_builder_edit_filters_form extends moodleform {
                         $movedownurl = new moodle_url('/totara/reportbuilder/filters.php',
                                 array('m' => 'down', 'id' => $id, 'fid' => $filterid));
                         $mform->addElement('html', html_writer::link($movedownurl, $OUTPUT->pix_icon('/t/down', $strmovedown),
-                                array('title' => $strmovedown, 'class' => 'movefilterdownbtn')));
+                                array('title' => $strmovedown, 'class' => 'movefilterdownbtn action-icon')));
                     } else {
                         $mform->addElement('html', $spacer);
                     }
