@@ -572,6 +572,10 @@ p.errormessage {
     margin: 0;
 }
 
+.breadcrumb-button .singlebutton {
+    display: inline-block;
+}
+
 /* Headermenu */
 
 .headermenu {
