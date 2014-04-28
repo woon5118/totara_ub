@@ -114,7 +114,13 @@ class feedback360_test extends feedback360_testcase {
         $this->assertTrue($dbman->table_exists('feedback360_quest_data_'.$fdbcktest->id));
         $assign = new totara_assign_feedback360('feedback360', $fdbcktest);
         $this->assertTrue($assign->assignments_are_stored());
-        $this->assertCount(1, $assign->get_current_users());
+        // The function get_current_users() returns a recordset so need to loop through to count.
+        $users = $assign->get_current_users();
+        $count = 0;
+        foreach ($users as $user) {
+            $count++;
+        }
+        $this->assertEquals(1, $count);
     }
 
     public function test_validate() {

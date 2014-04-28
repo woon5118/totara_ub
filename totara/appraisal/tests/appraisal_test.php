@@ -122,7 +122,14 @@ class appraisal_test extends appraisal_testcase {
         $this->assertTrue($dbman->table_exists('appraisal_quest_data_'.$appraisal1->id));
         $assign2 = new totara_assign_appraisal('appraisal', $appraisal1);
         $this->assertTrue($assign2->assignments_are_stored());
-        $this->assertCount(2, $assign2->get_current_users());
+        // The function get_current_users() returns a recordset so need to loop through to count.
+        $users = $assign2->get_current_users();
+        $count = 0;
+        foreach ($users as $user) {
+            $count++;
+        }
+        $this->assertEquals(2, $count);
+
     }
 
     public function test_appraisal_validate_wrong_status() {
