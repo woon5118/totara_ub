@@ -101,8 +101,7 @@ td,
 }
 .dir-rtl th,
 .dir-rtl td,
-.dir-rtl .formtable tbody th,
-.dir-rtl .generaltable th.header {
+.dir-rtl .formtable tbody th {
     text-align: right;
 }
 .generaltable,
@@ -115,14 +114,26 @@ td,
 .generaltable.mdl-align {
     margin:0 auto;
 }
+
 .flexible td,
 .generaltable td,
 .flexible th,
 .generaltable th {
     border: none;
     border-top:1px solid #dddddd;
-    border-left:1px solid #dddddd;
     vertical-align:top;
+}
+.dir-ltr .flexible td,
+.dir-ltr .generaltable td,
+.dir-ltr .flexible th,
+.dir-ltr .generaltable th {
+    border-left:1px solid #dddddd;
+}
+.dir-rtl .flexible td,
+.dir-rtl .generaltable td,
+.dir-rtl .flexible th,
+.dir-rtl .generaltable th {
+    border-right:1px solid #dddddd;
 }
 .flexible tr:first-child td,
 .generaltable tr:first-child td,
@@ -130,11 +141,17 @@ td,
 .generaltable tr:first-child th {
     border-top: none
 }
-.flexible td:first-child,
-.generaltable td:first-child,
-.flexible th:first-child,
-.generaltable th:first-child {
+.dir-ltr .flexible td:first-child,
+.dir-ltr .generaltable td:first-child,
+.dir-ltr .flexible th:first-child,
+.dir-ltr .generaltable th:first-child {
     border-left: none;
+}
+.dir-rtl .flexible td:first-child,
+.dir-rtl .generaltable td:first-child,
+.dir-rtl .flexible th:first-child,
+.dir-rtl .generaltable th:first-child {
+    border-right: none;
 }
 .flexible thead tr:last-child th,
 .generaltable thead tr:last-child th {
@@ -187,7 +204,7 @@ table.invisiblepadded th.header {
 table.invisiblepadded td {
    padding: 5px;
 }
-/* ensure rounded corners are kept with background colors */
+/* Ensure rounded corners are kept with background colors. */
 table.generalbox :first-child tr:first-child th:first-child,
 table.generalbox :first-child tr:first-child td:first-child {
     border-top-left-radius: 4px;
@@ -205,20 +222,38 @@ table.generalbox :last-child .last td:last-child {
     border-bottom-right-radius: 4px;
 }
 
-/*fields in totaratables */
-.totaratable .mform .fitem .fitemtitle,
-.totaratable .mform .fitem .felement {
+.dir-rtl table.generalbox :first-child tr:first-child th:first-child,
+.dir-rtl table.generalbox :first-child tr:first-child td:first-child {
+    border-top-right-radius: 4px;
+}
+.dir-rtl table.generalbox :first-child tr:first-child th:last-child,
+.dir-rtl table.generalbox :first-child tr:first-child td:last-child {
+    border-top-left-radius: 4px;
+}
+.dir-rtl table.generalbox :last-child .last th:first-child,
+.dir-rtl table.generalbox :last-child .last td:first-child {
+    border-bottom-right-radius: 4px;
+}
+.dir-rtl table.generalbox :last-child .last th:last-child,
+.dir-rtl table.generalbox :last-child .last td:last-child {
+    border-bottom-left-radius: 4px;
+}
+
+/* Form elements in totaratables toolbar. */
+.totaratable .toolbar .mform .fitem .fitemtitle,
+.totaratable .toolbar .mform .fitem .felement {
     width: auto;
     float: left;
 }
-.dir-rtl .totaratable .mform .fitem .fitemtitle,
-.dir-rtl .totaratable .mform .fitem .felement {
+.dir-rtl .totaratable .toolbar .mform .fitem .fitemtitle,
+.dir-rtl .totaratable .toolbar .mform .fitem .felement {
+    width: auto;
     float: right;
 }
-.totaratable .mform .fitem .fsubmit {
+.totaratable .toolbar .mform .fitem .fsubmit {
     padding: 0;
 }
-.totaratable .mform .fsubmit input {
+.totaratable .toolbar .mform .fsubmit input {
     margin: 0;
 }
 
@@ -725,7 +760,7 @@ input[type="checkbox"] {
     margin-top:2px;
     width: auto;
 }
-.dir-rtl .mform .fitem .fitemtitle {
+.dir-rtl .mform .fitem div.fitemtitle {
     text-align: right;
 }
 .mform .fitem .felement {
