@@ -623,7 +623,7 @@ class development_plan {
 
         // Delete
         if ($this->get_setting('delete') == DP_PERMISSION_ALLOW) {
-            echo $OUTPUT->action_icon(new moodle_url('/totara/plan/action.php', array('id' => $this->id, 'delete' => 1, 'sesskey' => sesskey())), new pix_icon('/i/cross_red_big', get_string('delete')));
+            echo $OUTPUT->action_icon(new moodle_url('/totara/plan/action.php', array('id' => $this->id, 'delete' => 1, 'sesskey' => sesskey())), new pix_icon('/i/invalid', get_string('delete')));
         }
 
         $out = ob_get_contents();

@@ -282,13 +282,13 @@ function totara_message_accept_reject_action($id) {
 
         // Construct HTML for accept button
         $out .= html_writer::tag('form',
-            html_writer::empty_tag('input', array('id' => "acceptmsg'.$id.'-dialog", 'type' => 'image', 'name' => 'tm_accept_msg', 'class' => 'iconsmall action', 'src' => $OUTPUT->pix_url('t/accept'), 'title' => $onaccept_str, 'alt' => $onaccept_str, 'style' => 'display:none;'))
+            html_writer::empty_tag('input', array('id' => "acceptmsg'.$id.'-dialog", 'type' => 'image', 'name' => 'tm_accept_msg', 'class' => 'iconsmall action', 'src' => $OUTPUT->pix_url('i/valid'), 'title' => $onaccept_str, 'alt' => $onaccept_str, 'style' => 'display:none;'))
         );
         $out .= html_writer::tag('noscript',
             html_writer::tag('form',
                 html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $id)) .
                 html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'returnto', 'value' => $returnto)) .
-                html_writer::empty_tag('input', array('type' => 'image', 'class' => 'iconsmall action', 'src' => $OUTPUT->pix_url('t/accept'), 'title' => $onaccept_str, 'alt' => $onaccept_str)),
+                html_writer::empty_tag('input', array('type' => 'image', 'class' => 'iconsmall action', 'src' => $OUTPUT->pix_url('i/valid'), 'title' => $onaccept_str, 'alt' => $onaccept_str)),
             array('action' => $CFG->wwwroot . '/totara/message/accept.php?id=' . $id, 'method' => 'post'))
         );
     }

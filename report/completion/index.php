@@ -200,7 +200,7 @@ if ($csv) {
             'course'      => $course->id,
             'pix_rply'    => $OUTPUT->pix_url('i/completion-rpl-y', 'totara_core')->out(),
             'pix_rpln'    => $OUTPUT->pix_url('i/completion-rpl-n', 'totara_core')->out(),
-            'pix_cross'   => $OUTPUT->pix_url('i/cross_red_big')->out(),
+            'pix_cross'   => $OUTPUT->pix_url('i/invalid')->out(),
             'pix_loading' => $OUTPUT->pix_url('loading_small', 'totara_core')->out(),
         ))
     );
@@ -599,7 +599,7 @@ if (!$csv) {
 
         if (in_array($criterion->id, $criteria_with_rpl)) {
             print '<img src="'.$OUTPUT->pix_url('i/course').'" class="icon" alt="'.get_string('rpl', 'completion').'" title="'.get_string('activityrpl', 'completion').'" />';
-            print '<a href="#" class="rplexpand rpl-'.$criterion->id.'" title="'.get_string('showrpls', 'completion').'"><img src="'.$OUTPUT->pix_url('i/one').'" class="icon" alt="+"/></a>';
+            print '<a href="#" class="rplexpand rpl-'.$criterion->id.'" title="'.get_string('showrpls', 'completion').'"><img src="'.$OUTPUT->pix_url('t/more').'" class="icon" alt="+"/></a>';
         }
 
         print '</th>';
@@ -611,7 +611,7 @@ if (!$csv) {
 
     if ($CFG->enablecourserpl) {
         print '<img src="'.$OUTPUT->pix_url('i/course').'" class="icon" alt="'.get_string('rpl', 'completion').'" title="'.get_string('courserpl', 'completion').'" />';
-        print '<a href="#" class="rplexpand rpl-course" title="'.get_string('showrpls', 'completion').'"><img src="'.$OUTPUT->pix_url('i/one').'" class="icon" alt="+"/></a>';
+        print '<a href="#" class="rplexpand rpl-course" title="'.get_string('showrpls', 'completion').'"><img src="'.$OUTPUT->pix_url('t/more').'" class="icon" alt="+"/></a>';
     }
 
     print '</th>';

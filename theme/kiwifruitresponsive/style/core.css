@@ -1880,7 +1880,7 @@ div.totara-dialog td.select #search-tab p {
 }
 div.totara-dialog .selected span:hover span.deletebutton {
    width:9%;
-   background: transparent url([[pix:core|i/cross_red_small]]) no-repeat center 3px
+   background: transparent url([[pix:core|i/invalid]]) no-repeat center 3px
 }
 
 /* dialog search form (improve spacing) */

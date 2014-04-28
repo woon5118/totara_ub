@@ -201,7 +201,7 @@ YAHOO.util.Event.onDOMReady(function () {
             });
 
             // Create delete button
-            var cancel = $('<a href="#" class="icon rpldelete" title="Delete this RPL"><img src="<?php echo $OUTPUT->pix_url('i/cross_red_big', 'moodle'); ?>')" alt="Delete" /></a>');
+            var cancel = $('<a href="#" class="icon rpldelete" title="Delete this RPL"><img src="<?php echo $OUTPUT->pix_url('i/invalid', 'moodle'); ?>')" alt="Delete" /></a>');
             cancel.click(function(event) {
 
                 event.preventDefault();

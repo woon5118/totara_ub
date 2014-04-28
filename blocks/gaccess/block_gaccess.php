@@ -128,7 +128,7 @@ class block_gaccess extends block_list {
             }
             else {
                 // Default to a check graphic
-                $icon = "<img src=\"".$OUTPUT->pix_url('i/tick_green_small')."\" alt=\"$service\" />";
+                $icon = "<img src=\"".$OUTPUT->pix_url('i/valid')."\" alt=\"$service\" />";
             }
             $this->content->items[] = "<a ".$target.". title=\"".$gs['service']."\"  href=\"".$gs['relayurl']."\">".$icon . '&nbsp;' . $gs['service']."</a>";
         }

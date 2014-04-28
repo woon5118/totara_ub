@@ -282,7 +282,7 @@ class rb_source_dp_program extends rb_base_source {
     function rb_display_mandatory_status($id) {
         global $OUTPUT;
         if (!empty($id)) {
-            return $OUTPUT->pix_icon('/i/tick_green_big', get_string('yes'));
+            return $OUTPUT->pix_icon('/i/valid', get_string('yes'));
         }
         return get_string('no');
     }
