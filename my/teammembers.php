@@ -113,8 +113,6 @@ $report->display_sidebar_search();
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();
 
-echo html_writer::empty_tag('br');
-
 $report->display_table();
 
 // Export button.

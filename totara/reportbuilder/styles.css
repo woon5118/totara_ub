@@ -35,7 +35,9 @@ div.multicheck-items fieldset.felement span {
 .rb-inline {
     display: inline-block;
 }
-
+#my-teammembers-content .rb-display-table-container {
+    clear: both;
+}
 #team_members .user_namewithlinks a {
     padding-left: 5px;
     float: left;
