@@ -453,7 +453,11 @@ class rb_source_user extends rb_base_source {
         if (totara_feature_visible('goals')) {
             $links .= html_writer::tag('li', $goal_link);
         }
-        $links .= html_writer::tag('li', $required_link);
+
+        if (totara_feature_visible('programs') || totara_feature_visible('certifications')) {
+            $links .= html_writer::tag('li', $required_link);
+        }
+
         $links .= html_writer::end_tag('ul');
 
         $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)), $user, array('class' => 'name'));
