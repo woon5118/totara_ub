@@ -1090,6 +1090,7 @@ fieldset {
     border:none;
     margin:0 0 10px;
     background:#FFFFFF;
+    padding: 5px;
 }
 .path-course-view ul.topics li.content,
 .course-content ul.topics li.section .content {
