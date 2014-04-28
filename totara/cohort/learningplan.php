@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
+// Check if Learning plans are enabled.
+check_learningplan_enabled();
+
 $context = context_system::instance();
 require_capability('moodle/cohort:view', $context);
 require_capability('totara/plan:cancreateplancohort', $context);

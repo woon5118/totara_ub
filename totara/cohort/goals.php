@@ -30,6 +30,8 @@ require_once($CFG->dirroot . '/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
+// Check if Goals are enabled.
+goal::check_feature_enabled();
 
 $context = context_system::instance();
 require_capability('moodle/cohort:view', $context);
