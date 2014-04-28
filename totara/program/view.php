@@ -42,8 +42,12 @@ if (!$program = new program($id)) {
 // Check if programs or certifications are enabled.
 if ($program->certifid) {
     check_certification_enabled();
+    $identifier = 'editcertif';
+    $component = 'totara_certification';
 } else {
     check_program_enabled();
+    $identifier = 'editprogramdetails';
+    $component = 'totara_program';
 }
 
 $PAGE->set_context(context_program::instance($program->id));
@@ -98,7 +102,7 @@ echo $OUTPUT->header();
 
 if ($isadmin) {
     echo $OUTPUT->single_button(new moodle_url('/totara/program/edit.php', array('id' => $program->id)),
-        get_string('editprogramdetails', 'totara_program'), 'GET', array('class' => 'navbutton'));
+        get_string($identifier, $component), 'GET', array('class' => 'navbutton'));
 }
 
 // Program page content.
