@@ -40,11 +40,11 @@
 }
 
 .courses .coursebox.even:hover {
-    background-color:#f6f6f6 !important;
+    background-color:#f6f6f6;
 }
 
 .courses .coursebox.odd:hover {
-    background-color:transparent !important;
+    background-color:transparent;
 }
 
 .course_category_tree .courses > .paging.paging-morelink:hover {background-color:inherit;}
