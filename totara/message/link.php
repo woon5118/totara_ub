@@ -46,8 +46,6 @@ if (!$message || $message->useridto != $USER->id) {
     print_error('notyours', 'totara_message', null, $msgid);
 }
 
-tm_message_mark_message_read($message, time());
-
 if ($returnto) {
     redirect($returnto);
 }
