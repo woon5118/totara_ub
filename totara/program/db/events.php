@@ -33,32 +33,26 @@ if (!defined('MOODLE_INTERNAL')) {
 $observers = array(
     array(
         'eventname' => '\totara_program\event\program_assigned',
-        'callback' => 'program_event_handler::assigned',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::assigned',
     ),
     array(
         'eventname' => '\totara_program\event\program_unassigned',
-        'callback' => 'program_event_handler::unassigned',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::unassigned',
     ),
     array(
         'eventname' => '\totara_program\event\program_completed',
-        'callback' => 'program_event_handler::completed',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::completed',
     ),
     array(
         'eventname' => '\totara_program\event\program_courseset_completed',
-        'callback' => 'program_event_handler::courseset_completed',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::courseset_completed',
     ),
     array(
         'eventname' => '\totara_core\event\user_firstlogin',
-        'callback' => 'program_event_handler::assignments_firstlogin',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::assignments_firstlogin',
     ),
     array(
         'eventname' => '\core\event\user_deleted',
-        'callback' => 'program_event_handler::user_deleted',
-        'includefile' => '/totara/program/lib.php'
+        'callback' => 'totara_program_observer::user_deleted',
     ),
 );

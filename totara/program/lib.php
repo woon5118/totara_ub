@@ -1048,236 +1048,6 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
     return $programs;
 }
 
-class program_event_handler {
-
-    /**
-     * Handler function called when a program_assigned event is triggered
-     *
-     * @param \totara_program\event\program_assigned $event
-     * @return bool Success status
-     */
-    public static function assigned(\totara_program\event\program_assigned $event) {
-        global $DB;
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-
-        try {
-            $program = new program($programid);
-        } catch (ProgramException $e) {
-            return true;
-        }
-
-        $messagesmanager = $program->get_messagesmanager();
-        $messages = $messagesmanager->get_messages();
-        $completed = $program->is_program_complete($userid);
-        // send notifications to user and (optionally) the user's manager
-        foreach ($messages as $message) {
-            if ($message->messagetype == MESSAGETYPE_ENROLMENT) {
-                if (($user = $DB->get_record('user', array('id' => $userid))) && !$completed) {
-                    $message->send_message($user);
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Handler function called when a program_unassigned event is triggered
-     *
-     * @param \totara_program\event\program_unassigned $event
-     * @return bool Success status
-     */
-    public static function unassigned(\totara_program\event\program_unassigned $event) {
-        global $DB;
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-
-        try {
-            $program = new program($programid);
-        } catch (ProgramException $e) {
-            return true;
-        }
-
-        $messagesmanager = $program->get_messagesmanager();
-        $messages = $messagesmanager->get_messages();
-
-        // send notifications to user and (optionally) the user's manager
-        foreach ($messages as $message) {
-            if ($message->messagetype == MESSAGETYPE_UNENROLMENT) {
-                if ($user = $DB->get_record('user', array('id' => $userid))) {
-                    $message->send_message($user);
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Handler function called when a program_completed event is triggered
-     *
-     * @param \totara_program\event\program_completed $event
-     * @return bool Success status
-     */
-    public static function completed(\totara_program\event\program_completed $event) {
-        global $CFG, $DB;
-        require_once($CFG->dirroot.'/totara/plan/lib.php');
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-
-        $program = new program($programid);
-        $messagesmanager = $program->get_messagesmanager();
-        $messages = $messagesmanager->get_messages();
-
-        // send notification to user
-        foreach ($messages as $message) {
-            if ($message->messagetype == MESSAGETYPE_PROGRAM_COMPLETED) {
-                if ($user = $DB->get_record('user', array('id' => $userid))) {
-                    $message->send_message($user);
-                }
-            }
-        }
-
-        // auto plan completion hook
-        dp_plan_item_updated($userid, 'program', $program->id);
-
-        return true;
-    }
-
-    /**
-     * Handler function called when a courseset_completed event is triggered
-     *
-     * @param \totara_program\event\program_courseset_completed $event
-     * @return bool Success status
-     */
-    public static function courseset_completed(\totara_program\event\program_courseset_completed $event) {
-        global $DB;
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-        $coursesetid = $event->other['coursesetid'];
-        $program = new program($programid);
-
-        $messagesmanager = $program->get_messagesmanager();
-        $messages = $messagesmanager->get_messages();
-
-        // send notification to user
-        foreach ($messages as $message) {
-            if ($message->messagetype == MESSAGETYPE_COURSESET_COMPLETED) {
-                if ($user = $DB->get_record('user', array('id' => $userid))) {
-                    $message->send_message($user, null, array('coursesetid' => $coursesetid));
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Event that is triggered when a user is deleted.
-     *
-     * Cancels a user from any programs they are associated with, tables to clear are
-     * prog_assignment
-     * prog_future_user_assignment
-     * prog_user_assignment
-     * prog_exception
-     * prog_extension
-     * prog_messagelog
-     *
-     * @param \core\event\user_deleted $event
-     *
-     */
-    public static function user_deleted(\core\event\user_deleted $event) {
-        global $DB;
-
-        $userid = $event->objectid;
-
-        // We don't want to send messages or anything so just wipe the records from the DB.
-        $transaction = $DB->start_delegated_transaction();
-
-        // Delete all the individual assignments for the user.
-        $DB->delete_records('prog_assignment', array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $userid));
-
-        // Delete any future assignments for the user.
-        $DB->delete_records('prog_future_user_assignment', array('userid' => $userid));
-
-        // Delete all the program user assignments for the user.
-        $DB->delete_records('prog_user_assignment', array('userid' => $userid));
-
-        // Delete all the program exceptions for the user.
-        $DB->delete_records('prog_exception', array('userid' => $userid));
-
-        // Delete all the program extensions for the user.
-        $DB->delete_records('prog_extension', array('userid' => $userid));
-
-        // Delete all the program message logs for the user.
-        $DB->delete_records('prog_messagelog', array('userid' => $userid));
-
-        $transaction->allow_commit();
-    }
-
-    /*
-     * This function is to cope with program assignments set up
-     *  with completion deadlines 'from first login' where the
-     *  user had not yet logged in.
-     *
-     * Also used by program_hourly_cron
-     *
-     * @param \totara_core\event\user_firstlogin $event
-     * @return boolean True if all the update_learner_assignments() succeeded or there was nothing to do
-     */
-    public static function assignments_firstlogin(\totara_core\event\user_firstlogin $event) {
-        global $DB;
-
-        $status = true;
-        $userid = $event->objectid;
-
-        // future assignments for this user that can now be processed
-        // (because this user has logged in)
-        // we are looking for:
-        // - future assignments for this user
-        // - that relate to a "first login" assignment
-        $rs = $DB->get_recordset_sql(
-            "SELECT pfua.* FROM
-                {prog_future_user_assignment} pfua
-            LEFT JOIN
-                {prog_assignment} pa
-                ON pfua.assignmentid = pa.id
-            WHERE
-                pfua.userid = ?
-                AND pa.completionevent = ?"
-        , array($userid, COMPLETION_EVENT_FIRST_LOGIN));
-        // group the future assignments by 'programid'
-        $pending_by_program = totara_group_records($rs, 'programid');
-
-        if ($pending_by_program) {
-            foreach ($pending_by_program as $programid => $assignments) {
-
-                // update each program
-                $program = new program($programid);
-                if ($program->update_learner_assignments()) {
-                    // if the update succeeded, delete the future assignments related to this program
-                    $future_assignments_to_delete = array();
-                    foreach ($assignments as $assignment) {
-                        $future_assignments_to_delete[] = $assignment->id;
-                    }
-                    if (!empty($future_assignments_to_delete)) {
-                        list($deleteids_sql, $deleteids_params) = $DB->get_in_or_equal($future_assignments_to_delete);
-                        $DB->delete_records_select('prog_future_user_assignment', "id {$deleteids_sql}", $deleteids_params);
-                    }
-                } else {
-                    $status = false;
-                }
-            }
-        }
-
-        return $status;
-    }
-}
-
-
 function prog_store_position_assignment($assignment) {
     global $DB;
     // Need to check this since this is not necessarily set now.
@@ -1585,6 +1355,65 @@ function prog_update_completion($userid, program $program = null) {
         }
     }
 }
+
+/**
+ * This function is to cope with program assignments set up
+ * with completion deadlines 'from first login' where the
+ * user had not yet logged in.
+ *
+ * Used by program_hourly_cron and user_firstlogin events
+ *
+ * @param int $user User object to check first firstlogin for
+ * @return boolean True if all the update_learner_assignments() succeeded or there was nothing to do
+ */
+function prog_assignments_firstlogin($user) {
+    global $DB;
+
+    $status = true;
+
+    /* Future assignments for this user that can now be processed
+     * (because this user has logged in)
+     * we are looking for:
+     * - future assignments for this user
+     * - that relate to a "first login" assignment
+     */
+    $rs = $DB->get_recordset_sql(
+        "SELECT pfua.* FROM
+            {prog_future_user_assignment} pfua
+        LEFT JOIN
+            {prog_assignment} pa
+            ON pfua.assignmentid = pa.id
+        WHERE
+            pfua.userid = ?
+            AND pa.completionevent = ?"
+    , array($user->id, COMPLETION_EVENT_FIRST_LOGIN));
+    // Group the future assignments by 'programid'.
+    $pending_by_program = totara_group_records($rs, 'programid');
+
+    if ($pending_by_program) {
+        foreach ($pending_by_program as $programid => $assignments) {
+
+            // Update each program.
+            $program = new program($programid);
+            if ($program->update_learner_assignments()) {
+                // If the update succeeded, delete the future assignments related to this program.
+                $future_assignments_to_delete = array();
+                foreach ($assignments as $assignment) {
+                    $future_assignments_to_delete[] = $assignment->id;
+                }
+                if (!empty($future_assignments_to_delete)) {
+                    list($deleteids_sql, $deleteids_params) = $DB->get_in_or_equal($future_assignments_to_delete);
+                    $DB->delete_records_select('prog_future_user_assignment', "id {$deleteids_sql}", $deleteids_params);
+                }
+            } else {
+                $status = false;
+            }
+        }
+    }
+
+    return $status;
+}
+
 /**
  * Run the program cron
  */
