@@ -32,6 +32,9 @@ require_once($CFG->dirroot . '/totara/plan/components/evidence/evidence.class.ph
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
 
+// Check if programs are enabled.
+check_program_enabled();
+
 require_login();
 
 $id = required_param('id', PARAM_INT); // plan id

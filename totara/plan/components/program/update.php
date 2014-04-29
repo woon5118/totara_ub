@@ -25,9 +25,13 @@
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
+require_once($CFG->dirroot.'/totara/program/lib.php');
 
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
+
+// Check if programs are enabled.
+check_program_enabled();
 
 require_login();
 

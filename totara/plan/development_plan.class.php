@@ -238,7 +238,9 @@ class development_plan {
             ORDER BY sortorder";
         $params = array_merge($inparams, array($this->templateid));
         $active_components = $DB->get_records_sql($sql, $params);
-
+        if (totara_feature_disabled('programs')) {
+            $active_components = totara_search_for_value($active_components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
+        }
         foreach ($active_components as $component) {
             $componentname = "component_{$component->component}";
             $components[$component->component] = $this->$componentname;
