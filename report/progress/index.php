@@ -323,7 +323,7 @@ foreach($activities as $activity) {
         print $sep.csv_quote(strip_tags($activity->name)).$sep.csv_quote($datetext);
     } else {
         $formattedactivityname = format_string($activity->name, true, array('context' => $context));
-        print '<th scope="col" class="ie-vertical '.$activity->datepassedclass.'">'.
+        print '<th scope="col" class="ie-vertical '.$datepassedclass.'">'.
             '<div class="ie-vertical"><a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
             '/view.php?id='.$activity->id.'" title="' . $formattedactivityname . '">'.
             '<img class="ie-size" src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
@@ -336,7 +336,7 @@ foreach($activities as $activity) {
     }
     $formattedactivities[$activity->id] = (object)array(
         'datepassedclass' => $datepassedclass,
-        'displayname' => $displayname,
+        'displayname' => $formattedactivityname,
     );
 }
 
@@ -364,7 +364,6 @@ foreach($progress as $user) {
 
     // Progress for each activity
     foreach($activities as $activity) {
-
         // Get progress information and state
         if (array_key_exists($activity->id,$user->progress)) {
             $thisprogress=$user->progress[$activity->id];
@@ -393,12 +392,13 @@ foreach($progress as $user) {
             ($activity->completion==COMPLETION_TRACKING_AUTOMATIC ? 'auto' : 'manual').
             '-'.$completiontype;
 
+        $modcontext = context_module::instance($activity->id);
         $describe = get_string('completion-' . $completiontype, 'completion');
         $a=new StdClass;
         $a->state=$describe;
         $a->date=$date;
         $a->user=fullname($user);
-        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $activity->context));
+        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $modcontext));
         $fulldescribe=get_string('progress-title','completion',$a);
 
         if ($csv) {
