@@ -356,7 +356,7 @@ function scorm_get_manifest($blocks, $scoes) {
                                                     }
                                                 }
                                                 if (!empty($mapinfos)) {
-                                                    $objectivesdata->mapinfos = $mapinfos;
+                                                    $objectivedata->mapinfos = $mapinfos;
                                                 }
                                             }
                                         break;
