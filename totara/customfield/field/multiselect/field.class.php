@@ -185,7 +185,7 @@ class customfield_multiselect extends customfield_base {
         if ($this->is_hidden()) {
             return array();
         }
-        $formdata = $itemnew->{$this->inputname};
+        $formdata = isset($itemnew->{$this->inputname}) ? $itemnew->{$this->inputname} : array();
         $values = $this->prepare_data($formdata);
         $groupname = 'grp_'.$this->fieldid.'_0';
         if ($this->is_unique() && count($values)) {
