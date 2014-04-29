@@ -47,8 +47,15 @@
 ----------------------------------*/
 
 /* Overlays */
-.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
+.ui-widget-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #666666;
+    opacity: .25;
+}
 
 /*!
  * jQuery UI CSS Framework 1.8.20
@@ -295,7 +302,6 @@
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br { -moz-border-radius-bottomright: 0; -webkit-border-bottom-right-radius: 0; -khtml-border-bottom-right-radius: 0; border-bottom-right-radius: 0; }
 
 /* Overlays */
-.ui-widget-overlay { background: #666666 url([[pix:totara_core|jquery_ui_dialog/ui-bg_flat_50_666666_40x100]]) 50% 50% repeat-x; opacity: .25;filter:Alpha(Opacity=25); }
 .ui-widget-shadow { margin: 0 0 0 0; padding: 0; background: #aaaaaa url([[pix:totara_core|jquery_ui_dialog/ui-bg_flat_0_aaaaaa_40x100]]) 50% 50% repeat-x; opacity: 0;filter:Alpha(Opacity=0); -moz-border-radius: 0; -khtml-border-radius: 0; -webkit-border-radius: 0; border-radius: 0; }
 /*!
  * jQuery UI Resizable 1.8.20
