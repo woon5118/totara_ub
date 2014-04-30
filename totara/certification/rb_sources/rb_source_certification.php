@@ -38,7 +38,7 @@ class rb_source_certification extends rb_source_program {
 
         // Include some standard columns.
         $this->add_program_fields_to_columns($columnoptions, 'base', 'totara_certification');
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base');
+        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base', 'certifcount');
         $this->add_cohort_program_fields_to_columns($columnoptions);
 
         return $columnoptions;

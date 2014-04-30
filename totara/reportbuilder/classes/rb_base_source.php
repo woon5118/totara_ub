@@ -1154,7 +1154,21 @@ abstract class rb_base_source {
             return '';
         }
         $attr = (isset($row->cat_visible) && $row->cat_visible == 0) ? array('class' => 'dimmed') : array();
-        $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+        $columns = array('coursecount' => 'course', 'programcount' => 'program', 'certifcount' => 'certification');
+        foreach ($columns as $field => $viewtype) {
+            if (isset($row->{$field})) {
+                break;
+            }
+        }
+        switch ($viewtype) {
+            case 'program':
+            case 'certification':
+                $url = new moodle_url('/totara/program/index.php', array('categoryid' => $catid, 'viewtype' => $viewtype));
+                break;
+            default:
+                $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+                break;
+        }
         return html_writer::link($url, $category, $attr);
     }
 
@@ -2641,7 +2655,7 @@ abstract class rb_base_source {
      * @return True
      */
     protected function add_course_category_fields_to_columns(&$columnoptions,
-        $catjoin='course_category', $coursejoin='course') {
+        $catjoin='course_category', $coursejoin='course', $column='coursecount') {
         $columnoptions[] = new rb_column_option(
                 'course_category',
                 'name',
@@ -2660,7 +2674,7 @@ abstract class rb_base_source {
                     'joins' => $catjoin,
                     'displayfunc' => 'link_course_category',
                     'defaultheading' => get_string('category', 'totara_reportbuilder'),
-                    'extrafields' => array('cat_id' => "$catjoin.id", 'cat_visible' => "$catjoin.visible")
+                    'extrafields' => array('cat_id' => "$catjoin.id", 'cat_visible' => "$catjoin.visible", $column => "{$catjoin}.{$column}")
                 )
         );
         $columnoptions[] = new rb_column_option(
