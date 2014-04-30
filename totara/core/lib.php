@@ -27,6 +27,62 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/totara/core/totara.php');
 require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
 
+/* Core event handler classes.
+ *
+ */
+class totara_core_event_handler {
+    /**
+    * Triggered by the module_completion event, this function
+    * checks if the criteria exists, if it is applicable to the user
+    * and then reviews the user's state in it.
+    *
+    * @param   object      $eventdata
+    * @return  boolean
+    */
+    public static function criteria_course_calc(\totara_core\event\module_completion $event) {
+        global $CFG, $DB;
+        include_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $eventdata = $event->get_data();
+        // Check if applicable course criteria exists.
+        $criteria = completion_criteria::factory($eventdata['other']);
+        $params = array_intersect_key($eventdata['other'], array_flip($criteria->required_fields));
+
+        $criteria = $DB->get_records('course_completion_criteria', $params);
+        if (!$criteria) {
+            return true;
+        }
+
+        // Loop through, and see if the criteria apply to this user.
+        foreach ($criteria as $criterion) {
+
+            $course = new stdClass();
+            $course->id = $criterion->course;
+            $cinfo = new completion_info($course);
+
+
+            if (!$cinfo->is_tracked_user($eventdata['other']['userid'])) {
+                continue;
+            }
+
+            // Load criterion.
+            $criterion = completion_criteria::factory((array) $criterion);
+
+            // Load completion record.
+            $data = array(
+                'criteriaid'    => $criterion->id,
+                'userid'        => $eventdata['other']['userid'],
+                'course'        => $criterion->course
+            );
+            $completion = new completion_criteria_completion($data);
+
+            // Review and mark complete if necessary.
+            $criterion->review($completion);
+        }
+
+        return true;
+    }
+}
 /**
  *  * Resize an image to fit within the given rectange, maintaing aspect ratio
  *

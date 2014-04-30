@@ -40,7 +40,11 @@ class core_completionlib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        $dbman = $DB->get_manager();
         $DB = $this->getMock(get_class($DB));
+        $DB->expects($this->any())
+            ->method('get_manager')
+            ->will($this->returnValue($dbman));
         $CFG->enablecompletion = COMPLETION_ENABLED;
         $USER = (object)array('id' =>314159);
     }
@@ -133,6 +137,7 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_update_state() {
+        global $DB;
         $this->mock_setup();
 
         $c = $this->getMock('completion_info', array('is_enabled', 'get_data', 'internal_get_state', 'internal_set_data'), array((object)array('id'=>42)));
@@ -220,6 +225,10 @@ class core_completionlib_testcase extends advanced_testcase {
         $c->expects($this->at(3))
             ->method('internal_set_data')
             ->with($cm, $changed);
+        $DB->expects($this->once())
+            ->method('get_field')
+            ->with('course_modules_completion', 'id', $this->anything())
+            ->will($this->returnValue('1'));
         $c->update_state($cm, COMPLETION_COMPLETE_PASS);
     }
 

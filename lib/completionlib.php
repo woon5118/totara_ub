@@ -681,13 +681,19 @@ class completion_info {
 
         // Notify course completion.
         if (in_array($newstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
-            $eventdata = new stdClass();
-            $eventdata->criteriatype = COMPLETION_CRITERIA_TYPE_ACTIVITY;
-            $eventdata->moduleinstance = $cm->id;
-            $eventdata->userid = $userid ? $userid : $USER->id;
-            $eventdata->course = $this->course->id;
-            $eventdata->module = $DB->get_field('modules', 'name', array('id' => $cm->module));
-            events_trigger('completion_criteria_calc', $eventdata);
+            $userid = $userid ? $userid : $USER->id;
+            $event = \totara_core\event\module_completion::create(
+                array(
+                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id, 'userid' => $userid)),
+                    'other' => array(
+                            'moduleinstance' => $cm->id,
+                            'userid' => $userid,
+                            'course' => $this->course->id,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY,
+                            ),
+                )
+            );
+            $event->trigger();
         }
     }
 

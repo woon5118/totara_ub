@@ -778,7 +778,7 @@ class grade_grade extends grade_object {
      * @param bool $deleted True if grade was actually deleted
      */
     function notify_changed($deleted) {
-        global $CFG;
+        global $CFG, $DB;
 
         // Ignore during restore
         // TODO There should be a proper way to determine when we are in restore
@@ -807,12 +807,18 @@ class grade_grade extends grade_object {
 
         // If course grade, notify course completion.
         if ($this->grade_item->itemtype == 'course') {
-
-            $eventdata = new stdClass();
-            $eventdata->criteriatype = COMPLETION_CRITERIA_TYPE_GRADE;
-            $eventdata->userid = $this->userid;
-            $eventdata->course = $this->grade_item->courseid;
-            events_trigger('completion_criteria_calc', $eventdata);
+            $event = \totara_core\event\module_completion::create(
+                array(
+                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $this->grade_item->iteminstance, 'userid' => $this->userid)),
+                    'other' => array(
+                            'moduleinstance' => $this->grade_item->iteminstance,
+                            'userid' => $this->userid,
+                            'course' => $this->grade_item->courseid,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE,
+                            ),
+                )
+            );
+            $event->trigger();
 
             return;
         }

@@ -182,6 +182,7 @@ $string['error:usernotfound'] = 'User not found';
 $string['errorfindingcategory'] = 'Error finding the category';
 $string['errorfindingprogram'] = 'Error finding the program';
 $string['eventfirstaccess'] = 'First access';
+$string['eventmodulecompletion'] = 'Activity completion';
 $string['eventundeleted'] = 'User undeleted';
 $string['eventusersuspended'] = 'User suspended';
 $string['f2fbookings'] = 'Face to Face Bookings';
