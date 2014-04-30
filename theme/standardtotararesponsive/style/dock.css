@@ -3,23 +3,30 @@
  * see also css3.css for gradient
  */
 
+.has_dock header {
+    padding-left: 25px;
+}
+
+#dock {
+    width: 30px;
+}
 #dock .dockeditem {
     background: transparent;
-    padding: 1px 0 1px 3px;
 }
-#dock .dockeditem_container {
-    margin-left: 4px;
-}
-#dock .dockeditem .dockedtitle {
+
+#dock .dockedtitle {
     border: 1px solid #DDD;
     background: #FFF;
+    width: auto;
+    height: auto;
 }
 #dock .dockeditem .dockedtitle.activeitem {
     background: #FFF;
     border: 1px solid #DDD;
 }
-#dock .dockeditem .dockedtitle h2 {
-    margin: 10px 3px;
+#dock .dockedtitle h2 {
+    line-height: 15px;
+    padding: 11px 0;
 }
 #dock .controls {
     bottom: auto;
