@@ -118,7 +118,7 @@ class totara_program_observer {
         }
 
         // Auto plan completion hook.
-        dp_plan_item_updated($userid, 'program', $program->id);
+        dp_plan_item_updated($userid, 'program', $programid);
 
         return true;
     }
