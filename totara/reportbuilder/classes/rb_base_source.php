@@ -885,7 +885,9 @@ abstract class rb_base_source {
         $userid = $USER->id;
 
         $course = $DB->get_record('course', array('id' => $courseid));
-        $formdata['summary'] = $course->summary;
+
+        $chelper = new coursecat_helper();
+        $formdata['summary'] = $chelper->get_course_formatted_summary(new course_in_list($course));
 
         $coursecontext = context_course::instance($course->id, MUST_EXIST);
         $enrolled = is_enrolled($coursecontext);
@@ -989,15 +991,19 @@ abstract class rb_base_source {
     public function rb_expand_prog_details() {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/totara/program/renderer.php');
 
         $progid = required_param('expandprogid', PARAM_INT);
         $userid = $USER->id;
 
-        $formdata = (array)$DB->get_record('prog', array('id' => $progid));
+        $formdata = $DB->get_record('prog', array('id' => $progid));
 
-        $formdata['assigned'] = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+        $phelper = new programcat_helper();
+        $formdata->summary = $phelper->get_program_formatted_summary(new program_in_list($formdata));
 
-        $mform = new report_builder_program_expand_form(null, $formdata);
+        $formdata->assigned = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+
+        $mform = new report_builder_program_expand_form(null, (array)$formdata);
 
         return $mform->render();
     }
