@@ -1313,7 +1313,7 @@ abstract class enrol_plugin {
         }
 
         if ($inserted) {
-            // Trigger event.
+            // Trigger events.
             $event = \core\event\user_enrolment_created::create(
                     array(
                         'objectid' => $ue->id,
@@ -1324,6 +1324,19 @@ abstract class enrol_plugin {
                         )
                     );
             $event->trigger();
+            // Totara "completion starts on enrol" event.
+            $completionevent = \totara_core\event\user_enrolment::create(
+                    array(
+                        'objectid'  => $ue->id,
+                        'context'   => $context,
+                        'other' => array(
+                                   'courseid'  => $courseid,
+                                    'userid'    => $ue->userid,
+                                    'timestart' => $ue->timestart
+                                   )
+                        )
+                    );
+            $completionevent->trigger();
         }
 
         if ($roleid) {

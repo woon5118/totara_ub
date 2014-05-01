@@ -31,12 +31,63 @@ require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
  *
  */
 class totara_core_event_handler {
+
+    /**
+    * Triggered by the user_enrolled event,  this function is run when a user is enrolled in the course
+    * and creates a completion_completion record for the user if completion is enabled for this course
+    *
+    * @param   object      $event
+    * @return  boolean
+    */
+    public static function user_enrolment(\totara_core\event\user_enrolment $event) {
+        global $CFG, $DB;
+        include_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $eventdata = $event->get_data();
+
+        $courseid = $eventdata['other']['courseid'];
+        $userid = $eventdata['other']['userid'];
+        $timestart = $eventdata['other']['timestart'];
+
+        // Load course
+        if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+            debugging('Could not load course id '.$courseid);
+            return true;
+        }
+
+        // Create completion object.
+        $cinfo = new completion_info($course);
+
+        // Check completion is enabled for this site and course.
+        if (!$cinfo->is_enabled()) {
+            return true;
+        }
+
+        // If no start on enrol, don't create a record
+        if (empty($course->completionstartonenrol)) {
+            return true;
+        }
+
+        // Create completion record
+        $data = array(
+            'userid'    => $userid,
+            'course'    => $course->id
+        );
+        $completion = new completion_completion($data);
+        $completion->mark_enrolled($timestart);
+
+        // Review criteria
+        completion_handle_criteria_recalc($course->id, $userid);
+
+        return true;
+    }
+
     /**
     * Triggered by the module_completion event, this function
     * checks if the criteria exists, if it is applicable to the user
     * and then reviews the user's state in it.
     *
-    * @param   object      $eventdata
+    * @param   object      $event
     * @return  boolean
     */
     public static function criteria_course_calc(\totara_core\event\module_completion $event) {

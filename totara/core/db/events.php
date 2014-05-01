@@ -31,10 +31,16 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+
 $observers = array (
     array(
         'eventname' => '\totara_core\event\module_completion',
         'callback' => 'totara_core_event_handler::criteria_course_calc',
+        'includefile' => '/totara/core/lib.php'
+    ),
+    array(
+        'eventname' => '\totara_core\event\user_enrolment',
+        'callback' => 'totara_core_event_handler::user_enrolment',
         'includefile' => '/totara/core/lib.php'
     ),
 );

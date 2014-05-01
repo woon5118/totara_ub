@@ -560,56 +560,6 @@ function completion_status_aggregate($method, $data, &$state) {
     }
 }
 
-
-/**
- * This function is run when a user is enrolled in the course
- * and creates a completion_completion record for the user if
- * completion is enabled for this course
- *
- * @param   object      $eventdata
- * @return  boolean
- */
-function completion_start_user(stdClass $eventdata) {
-    global $DB;
-
-    $courseid = $eventdata->courseid;
-    $userid = $eventdata->userid;
-    $timestart = $eventdata->timestart;
-
-    // Load course
-    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-        debugging('Could not load course id '.$courseid);
-        return true;
-    }
-
-    // Create completion object.
-    $cinfo = new completion_info($course);
-
-    // Check completion is enabled for this site and course.
-    if (!$cinfo->is_enabled()) {
-        return true;
-    }
-
-    // If no start on enrol, don't create a record
-    if (empty($course->completionstartonenrol)) {
-        return true;
-    }
-
-    // Create completion record
-    $data = array(
-        'userid'    => $userid,
-        'course'    => $course->id
-    );
-    $completion = new completion_completion($data);
-    $completion->mark_enrolled($timestart);
-
-    // Review criteria
-    completion_handle_criteria_recalc($course->id, $userid);
-
-    return true;
-}
-
-
 /**
  * Triggered by changing course completion criteria, this function
  * bulk marks users as started in the course completion system.
