@@ -8,6 +8,7 @@ New requirements in Totara 2.6:
 
 * PHP version 5.4 required for Windows. PHP version 5.3.3 still supported on Linux.
 * PHP zlib and OPcache modules now recommended.
+* MSSQL only: Database user requires additional permissions: ALTER SETTINGS(SERVER)
 * MariaDB 5.3.5 now required (was 5.2 in Totara 2.5).
 
 NOTE: To upgrade to Totara 2.6 you must be on Totara 2.2.22 or later. If your version
