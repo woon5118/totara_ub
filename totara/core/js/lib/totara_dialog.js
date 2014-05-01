@@ -1560,27 +1560,13 @@ totaraDialog_handler_selectable.prototype.every_load = function() {
 totaraDialog_handler_selectable.prototype._updatePage = function(response) {
     var suffix = (typeof this._dialog.suffix === 'undefined') ? '' : this._dialog.suffix;
 
-    if (typeof response.id === 'undefined') {
-        response.id = response;
-        var src = $('#icon' + suffix).attr('src');
-        // Parse URL to check if it uses slash arguments or not.
-        var parser = document.createElement('a');
-        parser.href = src;
-        if (parser.search == '') {
-            src = src.substring(0, src.lastIndexOf("/") + 1) + response.id;
-        } else {
-            src = src.replace(/image=(.*?)icons%2F(.*?)(&.*?){0,1}$/, 'image=$1'+'icons%2F'+response+'$3');
-        }
-        response.src = src;
-    }
-
     // Replace any items on the main page with their content (if IDs match).
     if (suffix === '') {
         // Ordinary course or program icons.
         $('input[name=icon]').val(response.id);
     } else {
         // Multi-select icons.
-        $('#icon' + suffix).val(response.src);
+        $('#icon' + suffix).val(response.id);
     }
     $('#icon_preview' + suffix).attr('src', response.src);
     $('#icon_preview' + suffix).attr('title', (response.id).replace(/-|_/g, " ").toTitleCase());
