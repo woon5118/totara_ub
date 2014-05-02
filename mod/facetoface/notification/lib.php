@@ -665,6 +665,8 @@ class facetoface_notification extends data_object {
             $event->fullmessage       = $event->manager->fullmessage;
             $event->fullmessagehtml   = $event->manager->fullmessagehtml;
             $event->smallmessage      = $event->manager->smallmessage;
+            // Do not send iCal attachment.
+            $event->attachment = $event->attachname = null;
 
             if ($this->conditiontype == MDL_F2F_CONDITION_BOOKING_REQUEST) {
                 // Do the facetoface workflow event.
