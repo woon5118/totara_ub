@@ -22,7 +22,7 @@
  * @subpackage tool_totara_timezonefix
  */
 
-$plugin->version   = 2013013000; // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2014050500; // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2011092100; // Requires this Moodle version
 $plugin->component = 'tool_totara_timezonefix'; // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;      // Disable cron for this tool

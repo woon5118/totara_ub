@@ -959,7 +959,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014010700, 'totara_core');
     }
 
-    if ($oldversion < 2014030500) {
+    if ($oldversion < 2014030800) {
         $table = new xmldb_table('course_info_data_param');
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
@@ -977,7 +977,7 @@ function xmldb_totara_core_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        totara_upgrade_mod_savepoint(true, 2014030500, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014030800, 'totara_core');
     }
 
     if ($oldversion < 2014031901) {
