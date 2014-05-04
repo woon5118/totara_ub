@@ -1834,24 +1834,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2013120100, 'facetoface');
     }
 
-    if ($oldversion < 2014021000) {
-        $del_users = $DB->get_records('user', array('deleted' => 1));
-        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
-
-        foreach ($del_users as $user) {
-            // Cancel already deleted users facetoface signups.
-            facetoface_eventhandler_user_deleted($user);
-        }
-
-        foreach ($sus_users as $user) {
-            // Cancel already suspended users facetoface signups.
-            facetoface_eventhandler_user_suspended($user);
-        }
-
-        // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014021000, 'facetoface');
-    }
-
     if ($oldversion < 2014021300) {
         $table = new xmldb_table('facetoface_session_field');
         $field = new xmldb_field('isfilter');
@@ -1930,6 +1912,36 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014022000, 'facetoface');
+    }
+
+    if ($oldversion < 2014050400) {
+        $del_users = $DB->get_records('user', array('deleted' => 1));
+        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
+
+        foreach ($del_users as $user) {
+            // Cancel already deleted users facetoface signups.
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+                foreach ($signups as $signup) {
+                    $session = facetoface_get_session($signup->sessionid);
+                    // Using $null, null fails because of passing by reference.
+                    facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
+                }
+            }
+        }
+
+        foreach ($sus_users as $user) {
+            // Cancel already suspended users facetoface signups.
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+                foreach ($signups as $signup) {
+                    $session = facetoface_get_session($signup->sessionid);
+                    // Using $null, null fails because of passing by reference.
+                    facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+                }
+            }
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014050400, 'facetoface');
     }
 
     return $result;
