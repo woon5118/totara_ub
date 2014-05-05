@@ -466,7 +466,7 @@ $string['values'] = 'Values';
 $string['viewmembers'] = 'Members';
 $string['visibility'] = 'Visibility';
 $string['visibleall'] = 'Visible to all users';
-$string['visibleaudience'] = 'Visible to members of the selected audiences';
+$string['visibleaudience'] = 'Visible to enrolled users and members of the selected audiences';
 $string['visiblelearning'] = 'Visible learning';
 $string['visiblelearning_help'] = 'This setting determines whether the course, program or certification appears in the corresponding list.
 
@@ -475,7 +475,7 @@ If "Visible to members of the selected audiences" is selected then it will be vi
 Users that are enrolled will be able to see it, not matter what visibility setting is selected.
 
 Users granted the \'manageaudiencevisibility\' capability (managers by default) can see all courses, programs and certifications.';
-$string['visiblenone'] = 'Hidden from all users';
+$string['visiblenone'] = 'Visible to enrolled users';
 $string['youhaveadded'] = 'You have added {$a->itemnames} to this program<br />
 <br />
 <strong>This will asign {$a->affectedusers} users to the program</strong><br />
