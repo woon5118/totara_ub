@@ -28,6 +28,7 @@ require_login();
 
 $id = required_param('id', PARAM_INT); // The program id
 $htmltype = required_param('htmltype', PARAM_TEXT); // The type of html to return
+$nojs = optional_param('nojs', 0, PARAM_INT);
 
 $program = new program($id);
 
@@ -179,14 +180,30 @@ if ($htmltype == 'multicourseset') { // if a new mulitcourse set is being added
         }
     }
 
-    $courselisthtml = $newcourseset->print_courses();
-    $deletedcourseshtml = $newcourseset->print_deleted_courses();
+    if ($nojs) {
+        $deletedcourseshtml = $newcourseset->print_deleted_courses();
+        $newcourseset->save_courses();
+        $returnurl = new moodle_url('/totara/program/edit_content.php', array('id' => $id));
+        redirect($returnurl);
+    } else {
+        $courselisthtml = $newcourseset->print_courses();
+        $deletedcourseshtml = $newcourseset->print_deleted_courses();
+        $data = array(
+            'courselisthtml'        => $courselisthtml,
+            'deletedcourseshtml'    => $deletedcourseshtml
+        );
 
-    $data = array(
-        'courselisthtml'        => $courselisthtml,
-        'deletedcourseshtml'    => $deletedcourseshtml
-    );
+        echo json_encode($data);
+    }
+} else if ($htmltype == 'removecourse') {
 
-    echo json_encode($data);
+    $courseid = required_param('courseid', PARAM_INT); // the selected course id
+    $coursesetid = required_param('coursesetid', PARAM_INT);
 
+    if ($setob = $DB->get_record('prog_courseset', array('id' => $coursesetid))) {
+        $DB->delete_records('prog_courseset_course', array('courseid' => $courseid, 'coursesetid' => $coursesetid));
+    }
+
+    $returnurl = new moodle_url('/totara/program/edit_content.php', array('id' => $id));
+    redirect($returnurl);
 }

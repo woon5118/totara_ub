@@ -654,7 +654,11 @@ class multi_course_set extends course_set {
 
         if (isset($formdata->$courseid_elementname)) {
             $courseid = $formdata->$courseid_elementname;
-
+            foreach ($this->courses as $course) {
+                if ($courseid == $course->id) {
+                    return true;
+                }
+            }
             $course = $DB->get_record('course', array('id' => $courseid));
             $this->courses[] = $course;
             return true;
@@ -1238,7 +1242,7 @@ class multi_course_set extends course_set {
         $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
         $templatehtml .= html_writer::tag('div', '', array('class' => 'fitemtitle'));
         $templatehtml .= html_writer::start_tag('div', array('class' => 'courseadder felement'));
-        $courseoptions = $DB->get_records_menu('course', null, 'fullname ASC', 'id,fullname');
+        $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
         if (count($courseoptions) > 0) {
             if ($updateform) {
                 $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);
@@ -1303,11 +1307,11 @@ class multi_course_set extends course_set {
                 $cell->attributes['class'] = $cellclass;
                 $cells[] = $cell;
                 $content = html_writer::start_tag('div', array('class' => 'totara-item-group delete_item'));
-                $content .= html_writer::start_tag('a',
-                                array('class' => 'totara-item-group-icon coursedeletelink', 'href' => 'javascript:;',
-                                      'data-coursesetid' => $this->id, 'data-coursesetprefix' => $prefix,
-                                      'data-coursetodelete_id' => $course->id)
-                            );
+                $url = new moodle_url('/totara/program/content/get_html.php', array('id' => $this->programid, 'htmltype' => 'removecourse',
+                    'courseid' => $course->id, 'coursesetid' => $this->id, 'coursesetprefix' => $prefix, 'sortorder' => $this->sortorder,
+                    'completiontype' => $this->completiontype, 'nojs' => '1'));
+                $content .= html_writer::start_tag('a', array('class' => 'totara-item-group-icon coursedeletelink', 'href' => $url,
+                    'data-coursesetid' => $this->id, 'data-coursesetprefix' => $prefix, 'data-coursetodelete_id' => $course->id));
                 $content .= $OUTPUT->pix_icon('t/delete', get_string('delete'));
                 $content .= html_writer::end_tag('a');
                 $content .= format_string($course->fullname);
