@@ -878,6 +878,7 @@ abstract class rb_base_source {
     public function rb_expand_course_details() {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/course/renderer.php');
 
         $formdata = array();
 
