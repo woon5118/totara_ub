@@ -22,3 +22,4 @@
  */
 
 $string['sourcetitle'] = 'Programs';
+$string['availablecontent'] = 'Only show available Programs';
