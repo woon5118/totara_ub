@@ -197,22 +197,24 @@ class customfield_multiselect extends customfield_base {
                 $options[] = md5($value['option']);
             }
             list($optionssql, $optionsparams) = $DB->get_in_or_equal($options, SQL_PARAMS_NAMED);
+
+            $field = "{$prefix}id";
             // Fetch all fields that have all options of current field.
             $sqlfields = "SELECT dataid, COUNT(cidp.id) AS cnt_id FROM {{$tableprefix}_info_data} cid
                             LEFT JOIN {{$tableprefix}_info_data_param} cidp ON (cid.id = cidp.dataid)
                            WHERE cid.fieldid = :fieldid
                              AND (cidp.value {$optionssql})
-                             AND cid.courseid != :courseid
+                             AND cid.{$field} != :instanceid
                            GROUP BY dataid
                           HAVING COUNT(cidp.id) = :cnt";
-            $fieldparams = array('fieldid' => $this->fieldid, 'cnt' => $count, 'courseid' => $itemnew->id);
+            $fieldparams = array('fieldid' => $this->fieldid, 'cnt' => $count, 'instanceid' => $itemnew->id);
             $params = array_merge($fieldparams, $optionsparams);
             $matchmincnt = $DB->get_records_sql($sqlfields, $params);
 
             foreach ($matchmincnt as $match) {
                 // Now check that fetched fields don't have any other options.
                 $sqlexact = "SELECT COUNT(id) AS cnt_id
-                               FROM {course_info_data_param}
+                               FROM {{$tableprefix}_info_data_param}
                               WHERE dataid = ?";
                 $matchexact = $DB->get_field_sql($sqlexact, array($match->dataid));
                 if ($matchexact == $count) {
