@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara LMS
  *
@@ -17,22 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Paul Walker <paul.walker@catalyst-eu.net>
  * @author Brian Barnes <brian.barnes@totaralms.com>
  * @package totara
  * @subpackage theme
  */
 
-$THEME->name = 'kiwifruitresponsive';
-$THEME->parents = array('standardtotararesponsive', 'bootstrapbase');
-$THEME->parents_exclude_sheets = array('standardtotararesponsive', 'admin');
-$THEME->sheets = array(
-    'fonts', 'core', 'blocks', 'navigation', 'course', 'dock', 'css3', 'ie7', 'custom'
-);
+/**
+ * Causes the dock to be attached to the page and scroll with it, rather than being stuck to the side of the browser.
+ */
+YUI().use('event', function (Y) {
+    var body = Y.one('html');
+    Y.on('scroll', dockscroll);
 
-$THEME->enable_dock = true;
-$THEME->rendererfactory = 'theme_overridden_renderer_factory';
-$THEME->csspostprocess = 'theme_kiwifruitresponsive_process_css';
-$THEME->javascripts_footer = array(
-    'core'
-);
+    function dockscroll(e) {
+        var dock = Y.one('#dock');
+        dock.removeClass('dock-fixed');
+        if (window.scrollY > dock.get('offsetTop')) {
+            dock.addClass('dock-fixed');
+        }
+    }
+});

@@ -5,14 +5,6 @@
 body.has_dock {
     margin:0;
 }
-.dir-ltr body.has_dock #page-header #logo,
-.dir-ltr body.has_dock #page-header #logo.custom {
-    margin-left:30px;
-}
-.dir-rtl body.has_dock #page-header #logo,
-.dir-rtl body.has_dock #page-header #logo.custom {
-    margin-right:30px;
-}
 body.has_dock #page-content-wrapper {
     padding:0 0 0 0;
 }
@@ -22,36 +14,41 @@ body.has_dock #page-content-wrapper {
 .dir-rtl body.has_dock #page-content-wrapper {
     border-right:30px solid #FFFFFF
 }
-body.has_dock #page-content {
-    max-width:1410px;
+body.has_dock #page,
+body.has_dock #page-footer {
+    padding-left: 30px;
 }
-.dir-ltr body.has_dock #page-footer .footer-powered {
-    margin-left:30px;
-}
-.dir-rtl body.has_dock #page-footer .footer-powered {
-    margin-right:30px;
-}
-#dock {
-    position:fixed;
+#dock,
+.dir-rtl #dock {
+    position: absolute;
     z-index:100;
-    margin-top:136px;
     background:#FFFFFF;
     border:none;
+    top:87px;
+    bottom: 0;
+}
+#dock.dock-fixed {
+    position: fixed;
+    top: 0;
 }
 #dock .controls {
-    bottom:12em;
-    position:absolute;
+    bottom:12px;
+    position:fixed;
     padding:0.3em 0;
     background:transparent url([[pix:theme|dock-to-block-bg]]) no-repeat center center;
+    left: 2px;
+    width: 25px;
 }
-#dock .buttons_container {
-    height:100%;
-    margin-top:-146px;
-    background:transparent;
+.dir-rtl #dock .controls {
+    right: 2px;
+    left: 0;
+}
+#dock .controls img {
+    vertical-align: initial;
 }
 #dock .dockeditem_container {
-    padding-top:97px;
-    margin:0;
+    padding-top: 0;
+    margin: 0;
 }
 #dock .dockeditem {
     padding:0;
@@ -70,13 +67,14 @@ body.has_dock #page-content {
     color:#9c9b9b;
     border:none;
     border-bottom:1px solid #C4C0C0;
+    border-radius: 0;
+    margin: 0;
 }
 #dock .dockeditem .dockedtitle h2 {
     font-size:0.9em;
     color:#9c9b9b;
-    margin:1px 0;
-    padding:15px 4px;
-    background:#FFFFFF;
+    background-color: transparent;
+    margin-bottom: 0;
 }
 #dock .dockeditem .dockedtitle.activeitem,
 #dock .dockeditem .dockedtitle.activeitem h2 {
@@ -91,4 +89,8 @@ body.has_dock #page-content {
 }
 #dock .dockeditempanel_hd .hidepanelicon {
     display:none;
+}
+
+#dockeditempanel .dockeditempanel_hd h2 {
+    background-color: transparent;
 }
