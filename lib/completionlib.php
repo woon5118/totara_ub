@@ -880,6 +880,7 @@ class completion_info {
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion data for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
      * @return int The number of users who have completion data stored for this
      *     course, 0 if none
      */
@@ -915,10 +916,11 @@ class completion_info {
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion records for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
      * @return int The number of users who have completion records stored for this
      *     course, 0 if none
      */
-    public function count_course_completions_data($user_id = null) {
+    public function count_course_completions_data($user_id = null, $countrpl = true) {
         global $DB;
 
         $sql = '
@@ -930,6 +932,9 @@ class completion_info {
         course = ?
         ';
 
+        if ($countrpl == false) {
+            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
+        }
         $params = array($this->course_id);
 
         // Limit data to a single user if an ID is supplied
@@ -949,6 +954,7 @@ class completion_info {
      * course completion records then it should be locked as they
      * will be deleted when an unlocked form is saved.
      *
+     * @param bool $countrpl count records completed via RPL
      * @return boolean
      */
     public function is_course_locked($countrpl = true) {
@@ -979,7 +985,7 @@ class completion_info {
         $params = array_merge(array($this->course_id), $inparams);
         $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
         // Do not remove RPL activity completion records.
-        $DB->delete_records_select('course_completion_crit_compl', "(rpl = '' OR rpl IS NULL)", array());
+        $DB->delete_records_select('course_completion_crit_compl', "course = :course AND (rpl = '' OR rpl IS NULL)", array('course' => $this->course_id));
 
         // Remove stats data.
         $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);
