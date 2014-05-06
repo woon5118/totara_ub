@@ -174,12 +174,12 @@ $string['configcronremotepassword'] = 'This means that the cron.php script canno
 $string['configcurlcache'] = 'Time-to-live for cURL cache, in seconds.';
 $string['configcustommenuitems'] = 'You can configure a custom menu here to be shown by themes. Each line consists of some menu text, a link URL (optional), a tooltip title (optional) and a language code or comma-separated list of codes (optional, for displaying the line to users of the specified language only), separated by pipe characters. You can specify a structure using hyphens. For example:
 <pre>
--Totara community|http://www.community.totaralms.com
--Totara support|http://www.support.totaralms.com
--Totara development|http://dev.totaralms.com
---Totara help|http://www.help.totaralms.com
--Totara News|http://www.totaralms.com/about-totara/news
--Totara Partners|http://www.totaralms.com/partners
+Totara community|http://community.totaralms.com
+Totara support|http://support.totaralms.com
+Totara development|http://dev.totaralms.com
+-Totara help|http://help.totaralms.com
+Totara News|http://www.totaralms.com/about-totara/news
+Totara Partners|http://www.totaralms.com/partners
 </pre>';
 $string['configdbsessions'] = 'If enabled, this setting will use the database to store information about current sessions. Note that changing this setting now will log out all current users (including you). If you are using MySQL please make sure that \'max_allowed_packet\' in my.cnf (or my.ini) is at least 4M. Other session drivers can be configured directly in config.php, see config-dist.php for more information. This option disappears if you specify session driver in config.php file.';
 $string['configdebug'] = 'If you turn this on, then PHP\'s error_reporting will be increased so that more warnings are printed.  This is only useful for developers.';
