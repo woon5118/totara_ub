@@ -1232,7 +1232,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             s.id = ?
         AND ss.statuscode {$statussql}
         AND ss.superceded != 1
-        ORDER BY ss.timecreated ASC";
+        ORDER BY u.firstname, u.lastname ASC";
 
     $params = array_merge(array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $sessionid), $statusparams);
 
