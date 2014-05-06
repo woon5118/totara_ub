@@ -3,6 +3,15 @@
 
 Totara LMS Changelog
 
+
+Release 2.6.0.1 (7th May 2014):
+==================================================
+
+Bug Fixes:
+
+    T-12880    Fix critical error causing deletion of course completion criteria data
+    T-12149    Fix navigation menu when adding course custom fields
+
 Release 2.6.0 (5th May 2014):
 ==================================================
 
