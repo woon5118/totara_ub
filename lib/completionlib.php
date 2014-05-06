@@ -968,24 +968,30 @@ class completion_info {
      */
     public function delete_course_completion_data($userid = null) {
         global $DB, $CFG;
-
         require_once("{$CFG->dirroot}/blocks/totara_stats/locallib.php");
 
         $transaction = $DB->start_delegated_transaction();
-        // Find all RPL completions for this course.
-        $sql = "SELECT userid FROM {course_completions}
-                 WHERE course = ? AND status = ?";
-        if ($rpl = $DB->get_fieldset_sql($sql, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
-            list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
-            $insql = ' AND userid ' . $insql;
+
+        if (empty($userid)) {
+            // Find all RPL completions for this course.
+            $sql = "SELECT userid FROM {course_completions}
+                     WHERE course = ? AND status = ?";
+            if ($rpl = $DB->get_fieldset_sql($sql, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
+                list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
+                $insql = ' AND userid ' . $insql;
+            } else {
+                $insql = '';
+                $inparams = array();
+            }
         } else {
-            $insql = '';
-            $inparams = array();
+            $insql = ' AND userid = ?';
+            $inparams = array($userid);
         }
+
         $params = array_merge(array($this->course_id), $inparams);
         $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
         // Do not remove RPL activity completion records.
-        $DB->delete_records_select('course_completion_crit_compl', "course = :course AND (rpl = '' OR rpl IS NULL)", array('course' => $this->course_id));
+        $DB->delete_records_select('course_completion_crit_compl', "course = ? AND (rpl = '' OR rpl IS NULL) {$insql}", $params);
 
         // Remove stats data.
         $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);
