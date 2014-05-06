@@ -68,6 +68,7 @@ if (in_array($prefix, array('course', 'program'))) {
 
 $PAGE->set_url('/totara/customfield/index.php');
 $PAGE->set_context($sitecontext);
+$PAGE->set_pagelayout('admin');
 
 $redirectoptions = array('prefix' => $prefix);
 if ($typeid) {
