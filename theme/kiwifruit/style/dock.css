@@ -14,7 +14,10 @@ body.has_dock {
     margin-right:30px;
 }
 body.has_dock #page-content-wrapper {
-    padding:0 0 0 0;
+    padding:0 0 0 30px;
+}
+body.has_dock.dir-rtl  #page-content-wrapper {
+    padding:0 30px 0 0;
 }
 .dir-ltr body.has_dock #page-content-wrapper {
     border-left:30px solid #FFFFFF
@@ -32,11 +35,18 @@ body.has_dock #page-content {
     margin-right:30px;
 }
 #dock {
-    position:fixed;
+    position:absolute;
     z-index:100;
-    margin-top:136px;
+    margin-top: 88px;
     background:#FFFFFF;
     border:none;
+    bottom: 0;
+}
+#dock.dock-fixed {
+    position: fixed;
+    top: 0;
+    margin-top: 0;
+    bottom:0;
 }
 #dock .controls {
     bottom:12em;
@@ -45,12 +55,9 @@ body.has_dock #page-content {
     background:transparent url([[pix:theme|dock-to-block-bg]]) no-repeat center center;
 }
 #dock .buttons_container {
-    height:100%;
-    margin-top:-146px;
     background:transparent;
 }
 #dock .dockeditem_container {
-    padding-top:97px;
     margin:0;
 }
 #dock .dockeditem {
@@ -75,7 +82,7 @@ body.has_dock #page-content {
     font-size:0.9em;
     color:#9c9b9b;
     margin:1px 0;
-    padding:15px 4px;
+    padding:9px 0px;
     background:#FFFFFF;
 }
 #dock .dockeditem .dockedtitle.activeitem,
