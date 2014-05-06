@@ -4292,6 +4292,18 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         return $result;
     }
 
+    if ($user->deleted) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:userdeleted', 'facetoface', fullname($user));
+        return $result;
+    }
+
+    if ($user->suspended) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:usersuspended', 'facetoface', fullname($user));
+        return $result;
+    }
+
     $result['name'] = fullname($user);
 
     if (isguestuser($user)) {
