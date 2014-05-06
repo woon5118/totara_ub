@@ -251,7 +251,7 @@ class scheduler {
                 break;
             case self::WEEKLY:
                 $out .= get_string('weekly', 'totara_reportbuilder') . ' ' . get_string('on', 'totara_reportbuilder') . ' ';
-                $out .= get_string($calendardays[$schedule]['fullname'], 'calendar');
+                $out .= $calendardays[$schedule]['fullname'];
                 break;
             case self::MONTHLY:
                 $out .= get_string('monthly', 'totara_reportbuilder') . ' ' . get_string('onthe', 'totara_reportbuilder') . ' ';
