@@ -480,7 +480,7 @@ class feedback360 {
                 $message = get_string('cancellationemail', 'totara_feedback360', $stringvars);
             }
             // Send a cancellation email.
-            $userto = totara_generate_email_user($email);
+            $userto = \totara_core\totara_user::get_external_user($email);
             email_to_user($userto, $userfrom, $subject, strip_tags($message), $message);
         } else {
             $DB->delete_records('feedback360_resp_assignment', array('id' => $resp_assignment->id));
@@ -1500,7 +1500,7 @@ class feedback360_responder {
             }
 
             // Send the email requesting feedback from external email.
-            $userto = totara_generate_email_user($email);
+            $userto = \totara_core\totara_user::get_external_user($email);
 
             // Create a message.
             $message = new stdClass();

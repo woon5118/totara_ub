@@ -102,8 +102,9 @@ class customfield_multiselect extends customfield_base {
             $grp = 0;
             while ($grp < $this->groupsize) {
                 if (isset($this->options[$ind])) {
+                    $iconhtml = totara_icon_picker_preview('course', $this->options[$ind]['icon']);
                     $chkgrp[] = $mform->createElement('advcheckbox', $this->inputname . '[' . $ind . ']', '',
-                            format_string($this->options[$ind]['option']));
+                            $iconhtml . format_string($this->options[$ind]['option']));
                 }
                 $grp++;
                 $ind++;

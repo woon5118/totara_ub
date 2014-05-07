@@ -51,7 +51,7 @@ if (!empty($updateids)) {
         $logaction = 'add '
             . $COHORT_ASSN_VALUES[$value]
             . ' '
-            . (($type == COHORT_ASSN_ITEMTYPE_COURSE) ? 'course' : 'program');
+            . ($COHORT_ASSN_ITEMTYPES[$type]);
         add_to_log(SITEID, 'cohort', $logaction, 'cohort/view.php?id='.$cohortid, "itemid={$instanceid};associationid={$assnid}");
     }
 }

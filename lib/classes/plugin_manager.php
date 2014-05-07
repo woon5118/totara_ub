@@ -943,6 +943,8 @@ class core_plugin_manager {
                 'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'manual', 'mnet',
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'radius',
                 'shibboleth', 'webservice'
+                // Totara
+                , 'gauth'
             ),
 
             'block' => array(
@@ -961,7 +963,7 @@ class core_plugin_manager {
                 ,'totara_addtoplan', 'totara_alerts',
                 'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
                 'totara_recent_learning', 'totara_report_manager', 'totara_stats',
-                'totara_tasks', 'facetoface', 'totara_certifications'
+                'totara_tasks', 'facetoface', 'totara_certifications', 'gaccess',
             ),
 
             'booktool' => array(
@@ -1033,6 +1035,11 @@ class core_plugin_manager {
 
             'gradingform' => array(
                 'rubric', 'guide'
+            ),
+
+            // Totara
+            'hierarchy' => array(
+                'competency', 'goal', 'organisation', 'position'
             ),
 
             'local' => array(
@@ -1146,7 +1153,7 @@ class core_plugin_manager {
             'totara' => array(
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
-                'certification', 'completionimport'
+                'certification', 'completionimport', 'mssql'
             ),
 
             'webservice' => array(

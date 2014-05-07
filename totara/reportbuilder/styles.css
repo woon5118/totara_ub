@@ -143,6 +143,15 @@ form[id^="toolbarsearch"].mform .fsubmit {
     clear: right;
 }
 
+.rb-sidebar.mform .fitem .fstatic {
+    width: auto;
+    float: left;
+}
+.dir-rtl .rb-sidebar.mform .fitem .fstatic {
+    width: auto;
+    float: right;
+}
+
 /* Time */
 .rb-sidebar .fdate_time_selector select,
 .rb-sidebar .fdate_time_selector input {

@@ -69,7 +69,7 @@ class rb_source_program extends rb_base_source {
 
         // include some standard columns
         $this->add_program_fields_to_columns($columnoptions, 'base');
-        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base');
+        $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'base', 'programcount');
         $this->add_cohort_program_fields_to_columns($columnoptions);
 
         return $columnoptions;

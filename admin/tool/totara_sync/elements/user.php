@@ -331,6 +331,7 @@ class totara_sync_element_user extends totara_sync_element {
         $user->totarasync = 1;
         $user->mnethostid = $CFG->mnet_localhost_id;
         $user->lang = $CFG->lang;
+        $user->timecreated = time();
         $this->set_sync_user_fields($user, $suser);
 
         try {

@@ -94,11 +94,11 @@ M.totara_iconpicker = M.totara_iconpicker || {
             totaraDialogs['icon-dialog' + suffix] = dialog;
 
             // Render default icon.
-            if ($("#icon" + suffix).length && $("#icon" + suffix).val().length) {
-                source = $("#icon" + suffix).val();
-                id = source.replace(/^.*(\\|\/|\:)/, '');
+            if ($("#src" + suffix).length && $("#src" + suffix).val().length) {
+                id = $("#icon" + suffix).val();
+                src = $("#src" + suffix).val();
 
-                var data = {'id':id, 'src':source};
+                var data = {'id':id, 'src':src};
                 dialog.handler._updatePage(data);
             }
         });

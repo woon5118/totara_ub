@@ -674,20 +674,26 @@ class completion_info {
             $current->timemodified    = time();
             // If module_get_completion_state set time of completion then use it.
             if (isset($cm->timecompleted)) {
-                $current->timecompleted = $cm->timecompleted;
+                $current->timecompleted = ($newstate == COMPLETION_INCOMPLETE) ? null : $cm->timecompleted;
             }
             $this->internal_set_data($cm, $current);
         }
 
         // Notify course completion.
         if (in_array($newstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
-            $eventdata = new stdClass();
-            $eventdata->criteriatype = COMPLETION_CRITERIA_TYPE_ACTIVITY;
-            $eventdata->moduleinstance = $cm->id;
-            $eventdata->userid = $userid ? $userid : $USER->id;
-            $eventdata->course = $this->course->id;
-            $eventdata->module = $DB->get_field('modules', 'name', array('id' => $cm->module));
-            events_trigger('completion_criteria_calc', $eventdata);
+            $userid = $userid ? $userid : $USER->id;
+            $event = \totara_core\event\module_completion::create(
+                array(
+                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id, 'userid' => $userid)),
+                    'other' => array(
+                            'moduleinstance' => $cm->id,
+                            'userid' => $userid,
+                            'course' => $this->course->id,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY,
+                            ),
+                )
+            );
+            $event->trigger();
         }
     }
 
@@ -874,6 +880,7 @@ class completion_info {
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion data for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
      * @return int The number of users who have completion data stored for this
      *     course, 0 if none
      */
@@ -909,10 +916,11 @@ class completion_info {
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion records for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
      * @return int The number of users who have completion records stored for this
      *     course, 0 if none
      */
-    public function count_course_completions_data($user_id = null) {
+    public function count_course_completions_data($user_id = null, $countrpl = true) {
         global $DB;
 
         $sql = '
@@ -924,6 +932,9 @@ class completion_info {
         course = ?
         ';
 
+        if ($countrpl == false) {
+            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
+        }
         $params = array($this->course_id);
 
         // Limit data to a single user if an ID is supplied
@@ -943,6 +954,7 @@ class completion_info {
      * course completion records then it should be locked as they
      * will be deleted when an unlocked form is saved.
      *
+     * @param bool $countrpl count records completed via RPL
      * @return boolean
      */
     public function is_course_locked($countrpl = true) {
@@ -973,7 +985,7 @@ class completion_info {
         $params = array_merge(array($this->course_id), $inparams);
         $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
         // Do not remove RPL activity completion records.
-        $DB->delete_records_select('course_completion_crit_compl', "(rpl = '' OR rpl IS NULL)", array());
+        $DB->delete_records_select('course_completion_crit_compl', "course = :course AND (rpl = '' OR rpl IS NULL)", array('course' => $this->course_id));
 
         // Remove stats data.
         $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);

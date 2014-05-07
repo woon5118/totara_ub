@@ -23,6 +23,7 @@
 
 $string['abouttocreate'] = 'You are about to create a new audience called "{$a}"';
 $string['actions'] = 'Actions';
+$string['addcertifications'] = 'Add Certifications';
 $string['addcohort'] = 'Create New Audience';
 $string['addcourses'] = 'Add courses';
 $string['addenrolledlearning'] = 'Add enrolled learning items';
@@ -52,6 +53,7 @@ $string['assignmemberstocohort'] = 'Assign members to audience';
 $string['assignroles'] = 'Assign Roles';
 $string['assignto'] = 'Audience \'{$a}\' members';
 $string['assignvisiblelearning'] = 'Add visible learning';
+$string['associationcertificationsonly'] = 'Show certifications only';
 $string['associationprogramsonly'] = 'Show programs only';
 $string['associationactionsenrolled'] = 'Actions';
 $string['associationactionsvisible'] = 'Actions';

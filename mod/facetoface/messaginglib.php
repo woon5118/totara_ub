@@ -188,12 +188,30 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
     $template .= "{$VEVENTS}";
     $template .= "END:VCALENDAR\r\n";
 
+    $ical = new stdClass();
     $tempfilename = md5($template);
-    $tempfilepathname = $CFG->dataroot . '/' . $tempfilename;
+    // Create dirs according stored_file->get_pathname_by_contenthash()
+    $dir1 = core_text::substr($tempfilename, 0, 2);
+    $dir2 = core_text::substr($tempfilename, 2, 2);
+    $ical->dir1 = $CFG->dataroot . '/filedir/' . $dir1;
+    if (!is_dir($ical->dir1)) {
+        mkdir($ical->dir1, 0777);
+    }
+    $ical->dir2 = $CFG->dataroot . '/filedir/' . $dir1 . '/' . $dir2;
+    if (!is_dir($ical->dir2)) {
+        mkdir($ical->dir2, 0777);
+    }
+    $tempfilepathname = $CFG->dataroot . '/filedir/' . $dir1 . '/' . $dir2 . '/' . $tempfilename;
     file_put_contents($tempfilepathname, $template);
 
-    $ical = new stdClass();
-    $ical->file = $tempfilename;
+    // Prepare data for message_send()
+    $fr = new stdClass();
+    $fr->contenthash = $tempfilename;
+    $fs = get_file_storage();
+    $file = new stored_file($fs, $fr, $CFG->dataroot . '/filedir');
+
+    $ical->filename = $tempfilepathname;
+    $ical->file = $file;
     $ical->content = $template;
     return $ical;
 }

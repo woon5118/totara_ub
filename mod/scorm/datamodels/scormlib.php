@@ -356,7 +356,9 @@ function scorm_get_manifest($blocks, $scoes) {
                                                     }
                                                 }
                                                 if (!empty($mapinfos)) {
-                                                    $objectivedata->mapinfos = $mapinfos;
+                                                    // This typo should be left as it is, because fixing this could cause
+                                                    // fatal errors and other bugs in SCORM 2004 packages. MDL-45334
+                                                    $objectivesdata->mapinfos = $mapinfos;
                                                 }
                                             }
                                         break;

@@ -92,7 +92,11 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             UNION
 
             SELECT p.id, p.id AS instanceid,
-                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_PROGRAM . " AS instancetype, p.audiencevisible
+            p.fullname AS name, p.icon, " .
+            " CASE WHEN p.certifid > 0 THEN " . COHORT_ASSN_ITEMTYPE_CERTIF .
+            " ELSE " . COHORT_ASSN_ITEMTYPE_PROGRAM .
+            " END AS instancetype" .
+            ", p.audiencevisible
             FROM {prog} p )",
             'base.instancetype = associations.instancetype AND base.instanceid = associations.instanceid',
             REPORT_BUILDER_RELATION_MANY_TO_ONE
@@ -225,6 +229,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
                 'selectchoices' => array(
                     COHORT_ASSN_ITEMTYPE_COURSE => get_string('associationcoursesonly', 'totara_cohort'),
                     COHORT_ASSN_ITEMTYPE_PROGRAM  => get_string('associationprogramsonly', 'totara_cohort'),
+                    COHORT_ASSN_ITEMTYPE_CERTIF  => get_string('associationcertificationsonly', 'totara_cohort'),
                 ),
                 'simplemode' => true,
             )
@@ -314,6 +319,9 @@ class rb_source_cohort_associations_visible extends rb_base_source {
             case COHORT_ASSN_ITEMTYPE_PROGRAM:
                 $ret = get_string('program', 'totara_program');
                 break;
+            case COHORT_ASSN_ITEMTYPE_CERTIF:
+                $ret = get_string('certification', 'totara_certification');
+                break;
             default:
                 $ret = '';
         }
@@ -336,7 +344,7 @@ class rb_source_cohort_associations_visible extends rb_base_source {
         $type = $row->type;
         if ($type == COHORT_ASSN_ITEMTYPE_COURSE) {
             $hascapability = has_capability('moodle/course:update', context_course::instance($row->insid));
-        } else if ($type == COHORT_ASSN_ITEMTYPE_PROGRAM) {
+        } else if (in_array($type, array(COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_ITEMTYPE_CERTIF))) {
             $programcontext = context_program::instance($row->insid);
             $hascapability = has_capability('totara/program:configuredetails', $programcontext);
         }

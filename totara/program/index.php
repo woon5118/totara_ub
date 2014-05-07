@@ -29,7 +29,7 @@ require_once($CFG->libdir. '/coursecatlib.php');
 $categoryid = optional_param('categoryid', 0, PARAM_INT); // Category id
 $viewtype = optional_param('viewtype', 'program', PARAM_TEXT); // Type of a page, program or certification.
 
-if (!empty($CFG->enhancedcatalog)) {
+if (!empty($CFG->enhancedcatalog) && !$categoryid) {
     if ($viewtype == 'program') {
         redirect(new moodle_url('/totara/coursecatalog/programs.php'));
     } else {

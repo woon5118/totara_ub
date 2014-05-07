@@ -36,13 +36,15 @@ class customfield_define_multiselect extends customfield_define_base {
             $group[] = $form->createElement('text', 'option');
             $icon = totara_create_icon_picker($form, 'edit', 'course', '', 0, $menuind);
             $group = array_merge($group, $icon);
+            $group[] = $form->createElement('hidden', 'src', '', array('id' => 'src' . $menuind));
             $group[] = $form->createElement('advcheckbox', 'default', '',
                     get_string('defaultselected', 'totara_customfield'), array('class' => 'makedefault'));
             $group[] = $form->createElement('advcheckbox', 'delete', '', get_string('delete'),
                 array('class' => 'delete'));
 
             $form->addElement('group', 'multiselectitem['.$menuind.']', $title, $group, array('&nbsp;&nbsp;'));
-            $form->setType('multiselectitem['.$menuind.'][icon]', PARAM_TEXT);
+            $form->setType('multiselectitem['.$menuind.'][src]', PARAM_TEXT);
+            $form->setType('multiselectitem['.$menuind.'][icon]', PARAM_ALPHANUMEXT);
             $form->setType('multiselectitem['.$menuind.'][option]', PARAM_MULTILANG);
             $form->setType('multiselectitem['.$menuind.'][delete]', PARAM_INT);
             // Show title only once.
@@ -111,10 +113,15 @@ class customfield_define_multiselect extends customfield_define_base {
                 }
             }
         }
+
         // Then filter out deleted items.
         $param1 = array_filter($data->multiselectitem, function($item) {
             return ($item['delete'] == 0 && $item['option'] != '');
         });
+        // Remove the src field (we calculate it when needed).
+        foreach (array_keys($param1) as $key) {
+            unset($param1[$key]['src']);
+        }
         $data->param1 = json_encode(array_values($param1));
 
         return $data;
@@ -123,6 +130,10 @@ class customfield_define_multiselect extends customfield_define_base {
     public function define_load_preprocess($data) {
         if (isset($data->param1) && $data->param1 != '') {
             $data->multiselectitem = json_decode($data->param1, true);
+            foreach ($data->multiselectitem as $key => $item) {
+                list($src, $alt) = totara_icon_url_and_alt('course', $item['icon']);
+                $data->multiselectitem[$key]['src'] = $src;
+            }
         }
         return $data;
     }

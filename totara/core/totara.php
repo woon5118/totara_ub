@@ -764,17 +764,34 @@ function totara_create_icon_picker(&$mform, $action, $type, $currenticon = '', $
  * @return string HTML
  */
 function totara_icon_picker_preview($type, $currenticon, $ind = '', $alt = '') {
+    list($src, $alt) = totara_icon_url_and_alt($type, $currenticon, $alt);
+
+    $iconhtml = html_writer::empty_tag('img', array('src' => $src, 'id' => 'icon_preview' . $ind,
+            'class' => "course_icon", 'alt' => $alt, 'title' => $alt));
+
+    return $iconhtml;
+}
+
+/**
+ * Get the url and alternate text of icon.
+ *
+ * @param string $type type of icon (course or program)
+ * @param string $icon icon key (name for built-in icon or hash for user image)
+ * @param string $alt alternative text for icon (overrides calculated alt text)
+ * @return string HTML
+ */
+function totara_icon_url_and_alt($type, $icon, $alt = '') {
     global $OUTPUT, $DB, $PAGE;
 
     $component = 'totara_core';
     $src = '';
 
     // See if icon is a custom icon.
-    if ($customicon = $DB->get_record('files', array('pathnamehash' => $currenticon))) {
+    if ($customicon = $DB->get_record('files', array('pathnamehash' => $icon))) {
         $fs = get_file_storage();
         $context = context_system::instance();
         if ($file = $fs->get_file($context->id, $component, $type, $customicon->itemid, '/', $customicon->filename)) {
-            $currenticon = $customicon->filename;
+            $icon = $customicon->filename;
             $src = moodle_url::make_pluginfile_url($file->get_contextid(), $component,
                 $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $customicon->filename, true);
         }
@@ -782,18 +799,17 @@ function totara_icon_picker_preview($type, $currenticon, $ind = '', $alt = '') {
 
     if (empty($src)) {
         $iconpath = $type . 'icons/';
-        $imagelocation = $PAGE->theme->resolve_image_location($iconpath. $currenticon, $component);
-        if (empty($currenticon) || empty($imagelocation)) {
-            $currenticon = 'default';
+        $imagelocation = $PAGE->theme->resolve_image_location($iconpath. $icon, $component);
+        if (empty($icon) || empty($imagelocation)) {
+            $icon = 'default';
         }
-        $src = $OUTPUT->pix_url('/' . $iconpath . $currenticon, $component);
+        $src = $OUTPUT->pix_url('/' . $iconpath . $icon, $component);
     }
 
     $replace = array('.png' => '', '_' => ' ', '-' => ' ');
-    $alt = ($alt != '') ? $alt : ucwords(strtr($currenticon, $replace));
-    $iconhtml = html_writer::empty_tag('img', array('src' => $src, 'id' => 'icon_preview' . $ind, 'class' => "course_icon", 'alt' => $alt));
+    $alt = ($alt != '') ? $alt : ucwords(strtr($icon, $replace));
 
-    return $iconhtml;
+    return array($src, $alt);
 }
 
 /**
@@ -2217,25 +2233,6 @@ function totara_setup() {
         $CFG->moodlepageclassfile = $CFG->dirroot.'/totara/core/pagelib.php';
         $CFG->moodlepageclass = 'totara_page';
     }
-}
-
-/**
- * Generate a user object to which an email can be sent with email_to_user
- *
- * @param string emailaddress
- * @return object email user object
- */
-function totara_generate_email_user($emailaddress) {
-    $emailuser = core_user::get_noreply_user();
-    $emailuser->email = $emailaddress;
-    $emailuser->firstname = $emailaddress;
-    $emailuser->lastname = '';
-    $emailuser->lang = 'en';
-    $emailuser->maildisplay = true;
-    $emailuser->mailformat = 1;
-    $emailuser->emailstop = false;
-
-    return $emailuser;
 }
 
 /**

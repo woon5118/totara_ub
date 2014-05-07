@@ -34,10 +34,15 @@ $value = required_param('value', PARAM_INT);
 
 if (!empty($CFG->audiencevisibility)) {
     if ($type == COHORT_ASSN_ITEMTYPE_COURSE && has_capability('moodle/course:update', context_course::instance($id))) {
+
+        // Update the database record and echo the result.
         if ($DB->update_record('course', array('id' => $id, 'audiencevisible' => $value))) {
             echo json_encode(array('update' => 'course', 'id' => $id, 'value' => $value));
         }
-    } else if ($type == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability('totara/program:configuredetails', context_program::instance($id))) {
+    } else if (in_array($type, array(COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_ITEMTYPE_CERTIF))
+               && has_capability('totara/program:configuredetails', context_program::instance($id))) {
+
+        // Update the database record and echo the result.
         if ($DB->update_record('prog', array('id' => $id, 'audiencevisible' => $value))) {
             echo json_encode(array('update' => 'prog', 'id' => $id, 'value' => $value));
         }

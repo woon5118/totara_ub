@@ -878,6 +878,7 @@ abstract class rb_base_source {
     public function rb_expand_course_details() {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/course/renderer.php');
 
         $formdata = array();
 
@@ -885,7 +886,9 @@ abstract class rb_base_source {
         $userid = $USER->id;
 
         $course = $DB->get_record('course', array('id' => $courseid));
-        $formdata['summary'] = $course->summary;
+
+        $chelper = new coursecat_helper();
+        $formdata['summary'] = $chelper->get_course_formatted_summary(new course_in_list($course));
 
         $coursecontext = context_course::instance($course->id, MUST_EXIST);
         $enrolled = is_enrolled($coursecontext);
@@ -989,15 +992,19 @@ abstract class rb_base_source {
     public function rb_expand_prog_details() {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
+        require_once($CFG->dirroot . '/totara/program/renderer.php');
 
         $progid = required_param('expandprogid', PARAM_INT);
         $userid = $USER->id;
 
-        $formdata = (array)$DB->get_record('prog', array('id' => $progid));
+        $formdata = $DB->get_record('prog', array('id' => $progid));
 
-        $formdata['assigned'] = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+        $phelper = new programcat_helper();
+        $formdata->summary = $phelper->get_program_formatted_summary(new program_in_list($formdata));
 
-        $mform = new report_builder_program_expand_form(null, $formdata);
+        $formdata->assigned = $DB->record_exists('prog_user_assignment', array('userid' => $userid, 'programid' => $progid));
+
+        $mform = new report_builder_program_expand_form(null, (array)$formdata);
 
         return $mform->render();
     }
@@ -1154,7 +1161,21 @@ abstract class rb_base_source {
             return '';
         }
         $attr = (isset($row->cat_visible) && $row->cat_visible == 0) ? array('class' => 'dimmed') : array();
-        $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+        $columns = array('coursecount' => 'course', 'programcount' => 'program', 'certifcount' => 'certification');
+        foreach ($columns as $field => $viewtype) {
+            if (isset($row->{$field})) {
+                break;
+            }
+        }
+        switch ($viewtype) {
+            case 'program':
+            case 'certification':
+                $url = new moodle_url('/totara/program/index.php', array('categoryid' => $catid, 'viewtype' => $viewtype));
+                break;
+            default:
+                $url = new moodle_url('/course/index.php', array('categoryid' => $catid));
+                break;
+        }
         return html_writer::link($url, $category, $attr);
     }
 
@@ -2641,7 +2662,7 @@ abstract class rb_base_source {
      * @return True
      */
     protected function add_course_category_fields_to_columns(&$columnoptions,
-        $catjoin='course_category', $coursejoin='course') {
+        $catjoin='course_category', $coursejoin='course', $column='coursecount') {
         $columnoptions[] = new rb_column_option(
                 'course_category',
                 'name',
@@ -2660,7 +2681,7 @@ abstract class rb_base_source {
                     'joins' => $catjoin,
                     'displayfunc' => 'link_course_category',
                     'defaultheading' => get_string('category', 'totara_reportbuilder'),
-                    'extrafields' => array('cat_id' => "$catjoin.id", 'cat_visible' => "$catjoin.visible")
+                    'extrafields' => array('cat_id' => "$catjoin.id", 'cat_visible' => "$catjoin.visible", $column => "{$catjoin}.{$column}")
                 )
         );
         $columnoptions[] = new rb_column_option(

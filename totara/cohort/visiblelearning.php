@@ -77,6 +77,7 @@ $jsmodule = array(
         'fullpath' => '/totara/cohort/dialog/learningitem.js',
         'requires' => array('json'));
 $args = array('args' => '{"cohortid":' . $cohort->id . ',' .
+            '"COHORT_ASSN_ITEMTYPE_CERTIF":' . COHORT_ASSN_ITEMTYPE_CERTIF . ',' .
             '"COHORT_ASSN_ITEMTYPE_PROGRAM":' . COHORT_ASSN_ITEMTYPE_PROGRAM . ',' .
             '"COHORT_ASSN_ITEMTYPE_COURSE":' . COHORT_ASSN_ITEMTYPE_COURSE . ',' .
             '"COHORT_ASSN_VALUE_VISIBLE":' . COHORT_ASSN_VALUE_VISIBLE . ',' .
@@ -100,17 +101,27 @@ echo cohort_print_tabs('visiblelearning', $cohort->id, $cohort->cohorttype, $coh
 if ($canedit) {
     echo html_writer::start_tag('div', array('class' => 'buttons'));
 
-    // Add courses.
-    echo html_writer::start_tag('div', array('class' => 'singlebutton'));
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-course-learningitem-dialog',
-        'value' => get_string('addcourses', 'totara_cohort')));
-    echo html_writer::end_tag('div');
+    if (has_capability('moodle/course:update', context_system::instance())) {
+        // Add courses.
+        echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+        echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-course-learningitem-dialog',
+            'value' => get_string('addcourses', 'totara_cohort')));
+        echo html_writer::end_tag('div');
+    }
 
-    // Add programs.
-    echo html_writer::start_tag('div', array('class' => 'singlebutton'));
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
-        'value' => get_string('addprograms', 'totara_cohort')));
-    echo html_writer::end_tag('div');
+    if (has_capability('totara/program:configuredetails', context_system::instance())) {
+        // Add programs.
+        echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+        echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
+            'value' => get_string('addprograms', 'totara_cohort')));
+        echo html_writer::end_tag('div');
+
+        // Add certifications.
+        echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+        echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
+            'value' => get_string('addcertifications', 'totara_cohort')));
+        echo html_writer::end_tag('div');
+    }
 
     echo html_writer::end_tag('div');
 }

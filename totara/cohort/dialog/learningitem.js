@@ -63,7 +63,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var assgnval = this.config.assign_value ? this.config.assign_value : this.config.COHORT_ASSN_VALUE_ENROLLED;
         var assgnstring = this.config.assign_string ? this.config.assign_string : 'enrolled';
 
-        // init courses dialog
+        // Init courses dialog.
         var csaveurl = url + 'updatelearning.php?type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE + '&cohortid=' + this.config.cohortid + '&sesskey=' + 
             M.cfg.sesskey + '&v=' + assgnval + '&u=';
         var chandler = new totaraDialog_handler_cohortlearning();
@@ -83,7 +83,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             chandler
         );
 
-        // init programs dialog
+        // Init programs dialog.
         var psaveurl = url + 'updatelearning.php?type=' + this.config.COHORT_ASSN_ITEMTYPE_PROGRAM + '&cohortid=' + this.config.cohortid + '&sesskey=' +
             M.cfg.sesskey + '&v=' + assgnval + '&u=';
         var phandler = new totaraDialog_handler_cohortlearning();
@@ -101,6 +101,26 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             },
             url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_PROGRAM,
             phandler
+        );
+
+        // Init certifications dialog.
+        var pcsaveurl = url + 'updatelearning.php?type=' + this.config.COHORT_ASSN_ITEMTYPE_CERTIF + '&cohortid=' + this.config.cohortid + '&sesskey=' +
+            M.cfg.sesskey + '&v=' + assgnval + '&u=';
+        var pchandler = new totaraDialog_handler_cohortlearning();
+        pchandler.baseurl = url;
+        var pcbuttons = {};
+        pcbuttons[M.util.get_string('cancel','moodle')] = function() { pchandler._cancel() }
+        pcbuttons[M.util.get_string('save','totara_core')] = function() { pchandler._save(pcsaveurl) }
+
+        totaraDialogs['learningitemcertifications'] = new totaraDialog(
+            'learningitemcertifications',
+            'add-certification-learningitem-dialog',
+            {
+                buttons: pcbuttons,
+                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learning', 'totara_cohort') + '</h2>'
+            },
+            url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_CERTIF,
+            pchandler
         );
 
         this.init_deletelisteners();
