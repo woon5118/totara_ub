@@ -131,7 +131,8 @@ echo dp_display_plans($planuser, array(DP_PLAN_STATUS_APPROVED), array('enddate'
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start('', 'dp-plans-list-unapproved-plans');
-echo dp_display_plans($planuser, array(DP_PLAN_STATUS_UNAPPROVED), array('status'), get_string('unapprovedplans', 'totara_plan'));
+echo dp_display_plans($planuser, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING),
+    array('status'), get_string('unapprovedplans', 'totara_plan'));
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start('', 'dp-plans-list-completed-plans');

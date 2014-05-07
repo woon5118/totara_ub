@@ -178,6 +178,7 @@ $string['allprogramssubhead'] = 'All Programs';
 $string['allteammembers'] = 'All Team Members';
 $string['alreadyassignedtoplan'] = 'Already assigned to this plan';
 $string['approval'] = 'Approval';
+$string['approvalrequested'] = '(Approval Requested)';
 $string['approvalrequestsent'] = 'Approval request sent for plan "{$a}"';
 $string['approve'] = 'Approve';
 $string['approved'] = 'Approved';
