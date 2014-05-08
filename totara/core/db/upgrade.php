@@ -1025,5 +1025,78 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014041500, 'totara_core');
     }
 
+    if ($oldversion < 2014051200) {
+        // Re-aggregate all course completion criteria due to T-12280. This may be slow for large sites.
+
+        // Don't run again if this upgrade has occurred before.
+        $hasrun = get_config('totara_core', 'completion_reaggregation_fix_has_run');
+        if (empty($hasrun)) {
+
+            $previousversion = get_config('totara_core', 'previous_version');
+            if (empty($previousversion)) {
+                $previousversionknown = false;
+            } else {
+                $previousversionknown = true;
+
+                $affected25site =
+                    (version_compare($previousversion, '2.5.10', '>=') &&
+                    version_compare($previousversion, '2.5.13', '<'));
+
+                $affected26site =
+                    (version_compare($previousversion, '2.6.0', '>=') &&
+                    version_compare($previousversion, '2.6.1', '<'));
+            }
+
+            // Only run if previous version was affected.
+            // If the previous version isn't known it won't be affected as $CFG->previous_version
+            // is set in all affected versions.
+            if ($previousversionknown && ($affected25site || $affected26site)) {
+
+                $countsql = 'SELECT COUNT(crc.id) ';
+                $selectsql = 'SELECT crc.* ';
+                $fromsql = '
+                    FROM
+                        {course_completions} crc
+                    INNER JOIN
+                        {course} c
+                     ON crc.course = c.id
+                    WHERE
+                        c.enablecompletion = 1
+                ';
+
+                $count = $DB->count_records_sql($countsql . $fromsql);
+
+                if ($count) {
+                    $pbar = new progress_bar('reaggregatecompletions', 500, true);
+                    $rs = $DB->get_recordset_sql($selectsql . $fromsql);
+
+                    $i = 0;
+                    // Grab records for current user/course.
+                    foreach ($rs as $record) {
+                        $i++;
+                        // Load completion object (without hitting db again).
+                        $completion = new completion_completion((array) $record, false);
+
+                        // Recalculate course's criteria.
+                        completion_handle_criteria_recalc($completion->course, $completion->userid);
+
+                        // Aggregate the criteria and complete if necessary.
+                        $completion->aggregate();
+                        $pbar->update($i, $count, "Reaggregating completion data - record $i/$count.");
+                    }
+                    $pbar->update($count, $count, "Reaggregating completion data - done!");
+
+                    $rs->close();
+                }
+
+            }
+
+            // Record that we've run this upgrade now.
+            set_config('completion_reaggregation_fix_has_run', 1, 'totara_core');
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014051200, 'totara_core');
+    }
+
     return true;
 }
