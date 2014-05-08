@@ -1898,8 +1898,8 @@ ul.badges {
     position: absolute;
 }
 .badges li .badge-image {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     left: 10px;
     top: 0px;
     z-index: 1;
@@ -1907,26 +1907,66 @@ ul.badges {
 .badges li .badge-actions {
     position: relative;
 }
-div.badge {
+.badges li .expireimage {
+    width: 100px;
+    height: 100px;
+    left: 25px;
+    top: 0px;
+    position: absolute;
+    z-index: 10;
+    opacity: 0.85;
+}
+#badge-image {
     background-color: transparent;
     padding: 0;
     position: relative;
-    display: block;
+    min-width: 100px;
+    width: 20%;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 17px;
+
+    .expireimage {
+        width: 100px;
+        height: 100px;
+        left: 0px;
+        top: 0px;
+        .opacity(85);
+        position: absolute;
+        z-index:10;
+    }
 }
-div.badge .expireimage {
-    width: 100px;
-    height: 100px;
-    left: 0px;
-    top: 0px;
+.dir-rtl #badge-image {
+    float: right;
+
+    .expireimage {
+        left: 41px;
+    }
 }
-.expireimage {
-    .opacity(85);
-    width: 90px; height: 90px;
-    left: 30px;
-    top: 0px;
-    position: absolute;
-    z-index:10;
+#badge-details {
+    display: inline-block;
+    width: 79%;
 }
+
+#badge-overview dl,
+#badge-details dl {
+    margin: 0;
+
+    dt {
+        clear: both;
+        display: inline-block;
+        vertical-align: top;
+        width: 20%;
+        min-width: 100px;
+    }
+    dd {
+        display: inline-block;
+        vertical-align: top;
+        width: 79%;
+        margin-left: 1%;
+    }
+}
+
 .badge-profile {
     vertical-align: top;
 }

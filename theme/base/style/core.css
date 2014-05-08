@@ -1449,20 +1449,39 @@ body.jsenabled .formlisting {
 /**
  * Badges styles
  */
+#badge-overview h3,
 #badge h3 {
-    clear: left;
+    clear: both;
     text-align: left;
     padding-top: 10px;
 }
-#badge .span2,
-#badge .span10 {
-    float: left;
+.dir-rtl #badge h3 {
+    text-align: right;
 }
-#badge .span2 {
+#badge-image,
+#badge-details {
+    display: inline-block;
+}
+#badge-image {
     width: 200px;
+    vertical-align: top;
 }
-#badge .row-fluid {
-    clear: left;
+#badge-overview dl,
+#badge-details dl {
+    margin: 0;
+}
+#badge-overview dt,
+#badge-details dt {
+    font-weight: bold;
+    clear: both;
+    float: left;
+    width: 20%;
+}
+#badge-overview dd,
+#badge-details dd {
+    float: left;
+    width: 75%;
+
 }
 #page-badges-view .collection { width: 90%; margin: 1em auto; }
 #page-badges-index .collection { width: 85%; margin: 1em auto; }
@@ -1496,13 +1515,13 @@ ul.badges { margin: 0; list-style: none; }
 .badges li { position: relative; display: inline-block; padding-bottom: 2em; text-align: center; vertical-align: top; width: 150px; }
 .badges li .badge-name { display: block; padding: 5px; }
 .badges li > img { position: absolute; }
-.badges li .badge-image { width: 90px; height: 90px; left: 10px; top: 0px; z-index: 1; }
+.badges li .badge-image { width: 100px; height: 100px; left: 10px; top: 0px; z-index: 1; }
 .dir-rtl .badges li .badge-image { right: 10px; }
 .badges li .badge-actions { position: relative; }
 
 div.badge { position: relative; display: block; }
 div.badge .expireimage { width: 100px; height: 100px; left: 0px; top: 0px; }
-.expireimage { width: 90px; height: 90px; left: 30px; top: 0px; position: absolute; z-index:10; filter: alpha(opacity = 85); -moz-opacity: 0.85; -khtml-opacity: 0.85; opacity: 0.85;}
+.expireimage { width: 100px; height: 100px; left: 25px; top: 0px; position: absolute; z-index:10; filter: alpha(opacity = 85); -moz-opacity: 0.85; -khtml-opacity: 0.85; opacity: 0.85;}
 
 .badge-profile { vertical-align: top; }
 .connected { color: #006600; }
