@@ -1799,9 +1799,10 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
             $ret = get_string('userreportsto', 'totara_cohort');
         }
 
+        $usernamefields = get_all_user_name_fields(true, 'u');
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->managerid);
         $sqlparams[] = $ruleid;
-        $sql = "SELECT u.id, u.firstname, u.lastname, crp.id AS paramid
+        $sql = "SELECT u.id, {$usernamefields}, crp.id AS paramid
             FROM {user} u
             INNER JOIN {cohort_rule_params} crp ON u.id = " . $DB->sql_cast_char2int('crp.value') . "
             WHERE u.id {$sqlin}
