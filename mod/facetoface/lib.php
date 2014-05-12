@@ -3548,11 +3548,11 @@ function facetoface_get_trainer_roles($coursecontext) {
 function facetoface_get_trainers($sessionid, $roleid = null) {
     global $CFG, $DB;
 
+    $usernamefields = get_all_user_name_fields(true, 'u');
     $sql = "
         SELECT
             u.id,
-            u.firstname,
-            u.lastname,
+            {$usernamefields},
             r.roleid
         FROM
             {facetoface_session_roles} r

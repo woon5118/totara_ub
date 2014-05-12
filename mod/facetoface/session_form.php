@@ -202,7 +202,8 @@ class mod_facetoface_session_form extends moodleform {
                 $rolename = format_string($rolenames[$role->id]->localname);
 
                 // Attempt to load users with this role in this context.
-                $rs = get_role_users($role->id, $context, true, 'u.id, u.firstname, u.lastname', 'u.id ASC');
+                $usernamefields = get_all_user_name_fields(true, 'u');
+                $rs = get_role_users($role->id, $context, true, "u.id, {$usernamefields}", 'u.id ASC');
 
                 if (!$rs) {
                     continue;
