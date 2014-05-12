@@ -2489,7 +2489,6 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         $this->assertTimeCurrent($user->firstaccess);
         $this->assertTimeCurrent($user->lastaccess);
-        $this->assertTimeCurrent($user->timemodified);
 
         $this->assertTimeCurrent($USER->firstaccess);
         $this->assertTimeCurrent($USER->lastaccess);

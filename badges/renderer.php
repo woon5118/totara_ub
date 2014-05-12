@@ -326,17 +326,6 @@ class core_badges_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('div', get_string('name'), array('class' => 'span2'));
             $output .= html_writer::tag('div', fullname($userinfo), array('class' => 'span10'));
             $output .= html_writer::end_tag('div');
-            if (empty($userinfo->backpackemail)) {
-                $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
-                $output .= html_writer::tag('div', get_string('email'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', obfuscate_mailto($userinfo->accountemail), array('class' => 'span10'));
-                $output .= html_writer::end_tag('div');
-            } else {
-                $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
-                $output .= html_writer::tag('div', get_string('email'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', obfuscate_mailto($userinfo->backpackemail), array('class' => 'span10'));
-                $output .= html_writer::end_tag('div');
-            }
         }
 
         $output .= $this->output->heading(get_string('issuerdetails', 'badges'), 3);
@@ -449,22 +438,14 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('recipientdetails', 'badges'), 3);
         // Technically, we should alway have a user at this point, but added an extra check just in case.
         if ($userinfo) {
-            $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
-            $output .= html_writer::tag('div', get_string('name'), array('class' => 'span2'));
-            $output .= html_writer::tag('div', fullname($userinfo), array('class' => 'span10'));
-            $output .= html_writer::end_tag('div');
+            $notify = '';
             if (!$ibadge->valid) {
                 $notify = $this->output->notification(get_string('recipientvalidationproblem', 'badges'), 'notifynotice');
-                $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
-                $output .= html_writer::tag('div', get_string('email'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', obfuscate_mailto($userinfo->email) . $notify, array('class' => 'span10'));
-                $output .= html_writer::end_tag('div');
-            } else {
-                $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
-                $output .= html_writer::tag('div', get_string('email'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', obfuscate_mailto($userinfo->email), array('class' => 'span10'));
-                $output .= html_writer::end_tag('div');
             }
+            $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
+            $output .= html_writer::tag('div', get_string('name'), array('class' => 'span2'));
+            $output .= html_writer::tag('div', fullname($userinfo) . $notify, array('class' => 'span10'));
+            $output .= html_writer::end_tag('div');
         } else {
             $notify = $this->output->notification(get_string('recipientidentificationproblem', 'badges'), 'notifynotice');
             $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
@@ -1005,10 +986,8 @@ class issued_badge implements renderable {
         if ($rec) {
             // Get a recipient from database.
             $namefields = get_all_user_name_fields(true, 'u');
-            $user = $DB->get_record_sql("SELECT u.id, $namefields, u.deleted,
-                                                u.email AS accountemail, b.email AS backpackemail
-                        FROM {user} u LEFT JOIN {badge_backpack} b ON u.id = b.userid
-                        WHERE u.id = :userid", array('userid' => $rec->userid));
+            $user = $DB->get_record_sql("SELECT u.id, $namefields, u.deleted, u.email
+                        FROM {user} u WHERE u.id = :userid", array('userid' => $rec->userid));
             $this->recipient = $user;
             $this->visible = $rec->visible;
             $this->badgeid = $rec->badgeid;
