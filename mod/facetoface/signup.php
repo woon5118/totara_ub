@@ -196,7 +196,7 @@ if (!facetoface_session_has_capacity($session, $context, MDL_F2F_STATUS_WAITLIST
 echo facetoface_print_session($session, $viewattendees);
 
 if ($signedup) {
-    if (!($session->datetimeknown && facetoface_has_session_started($session, $timenow))) {
+    if (!($session->datetimeknown && facetoface_has_session_started($session, $timenow)) && $session->allowcancellations) {
         // Cancellation link.
         echo html_writer::link(new moodle_url('cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $backtoallsessions)), get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
         echo ' &ndash; ';

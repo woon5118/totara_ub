@@ -75,6 +75,12 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->disabledIf('selfapprovaltandc', 'approvalreqd', 'eq', 0);
         $mform->addHelpButton('selfapprovaltandc', 'selfapprovaltandc', 'facetoface');
 
+        if (has_capability('mod/facetoface:configurecancellation', $this->context)) {
+            $mform->addElement('advcheckbox', 'allowcancellationsdefault', get_string('allowcancellationsdefault', 'facetoface'));
+            $mform->setDefault('allowcancellationsdefault', 1);
+            $mform->addHelpButton('allowcancellationsdefault', 'allowcancellationsdefault', 'facetoface');
+        }
+
         $mform->addElement('advcheckbox', 'multiplesessions', get_string('multiplesessions', 'facetoface'), '',
                 array('group' => 1), array(0, 1));
         $mform->setType('multiplesessions', PARAM_BOOL);

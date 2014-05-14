@@ -2670,6 +2670,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                         $cancellink = html_writer::tag('tr', html_writer::tag('td', html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking))));
                     }
                 }
+                $cancellink = $session->allowcancellations ? $cancellink : '';
 
                 // Get room data.
                 $roomtext = '';

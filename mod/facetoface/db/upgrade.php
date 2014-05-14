@@ -2245,12 +2245,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     }
 
     // Add new 'mincapacity' and 'cutoff' fields.
-    if ($oldversion < 2014092302) {
+    if ($oldversion < 2014100900) {
 
         $table = new xmldb_table('facetoface_sessions');
 
         $field = new xmldb_field('mincapacity', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'usermodified');
         $field->setComment('The minimum number of people for this session to take place.');
+
+        // Conditionally launch add field mincapacity.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -2258,11 +2260,36 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Field defaults to 24 hours (86400 seconds).
         $field = new xmldb_field('cutoff', XMLDB_TYPE_INTEGER, '10', null, null, null, '86400', 'mincapacity');
         $field->setComment('The number of seconds before the session start by which the minimum capacity should be reached');
+
+        // Conditionally launch add field cutoff.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2014092302, 'facetoface');
+        upgrade_mod_savepoint(true, 2014100900, 'facetoface');
+    }
+
+    if ($oldversion < 2014100901) {
+        // Define field allowcancellationsdefault to be added to facetoface.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('allowcancellationsdefault', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'reservedays');
+
+        // Conditionally launch add field allowcancellationsdefault.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field allowcancellations to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('allowcancellations', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'roomid');
+
+        // Conditionally launch add field allowcancellations.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014100901, 'facetoface');
     }
 
     return $result;

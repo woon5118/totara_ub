@@ -175,6 +175,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $status = get_string('bookingfull', 'facetoface');
                 $sessionfull = true;
             }
+            $allowcancellation = $allowcancellation && $session->allowcancellations;
 
             $sessionrow[] = $status;
 
@@ -224,19 +225,25 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
 
             if ($isbookedsession) {
-                $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
-                $options .= html_writer::empty_tag('br');
-                $options .= html_writer::link('cancelsignup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                $options .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
+                if ($session->allowcancellations) {
+                    $options .= html_writer::empty_tag('br');
+                    $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                    $options .= html_writer::link($cancelurl, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                }
             } else if (!$sessionstarted and !$bookedsession) {
                 if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                     $options .= get_string('none', 'facetoface');
                 } else {
-                    $options .= html_writer::link('signup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('signup', 'facetoface'));
+                    $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                    $options .= html_writer::link($signupurl, get_string('signup', 'facetoface'));
                 }
             }
             if (empty($options)) {
                 if ($sessionstarted && $allowcancellation) {
-                    $options = html_writer::link('cancelsignup.php?s='.$session->id.'&backtoallsessions='.$session->facetoface, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                    $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
+                    $options = html_writer::link($cancelurl, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
                 } else {
                     $options = get_string('none', 'facetoface');
                 }

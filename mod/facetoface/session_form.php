@@ -36,6 +36,7 @@ class mod_facetoface_session_form extends moodleform {
         global $CFG, $DB;
 
         $mform =& $this->_form;
+        $context = context_course::instance($this->_customdata['course']->id);
 
         $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->addElement('hidden', 'f', $this->_customdata['f']);
@@ -161,6 +162,13 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('checkbox', 'allowoverbook', get_string('allowoverbook', 'facetoface'));
         $mform->addHelpButton('allowoverbook', 'allowoverbook', 'facetoface');
 
+        if (has_capability('mod/facetoface:configurecancellation', $context)) {
+            $mform->addElement('advcheckbox', 'allowcancellations', get_string('allowcancellations', 'facetoface'));
+            $mform->setDefault('allowcancellations', $this->_customdata['facetoface']->allowcancellationsdefault);
+            $mform->addHelpButton('allowcancellations', 'allowcancellations', 'facetoface');
+        }
+
+
         // Show minimum capacity and cut-off (for when this should be reached).
         $mform->addElement('checkbox', 'enablemincapacity', get_string('enablemincapacity', 'facetoface'));
         $mform->setDefault('enablemincapacity', 0);
@@ -214,7 +222,6 @@ class mod_facetoface_session_form extends moodleform {
         }
 
         // Choose users for trainer roles
-        $context = context_course::instance($this->_customdata['course']->id);
         $roles = facetoface_get_trainer_roles($context);
 
         if ($roles) {

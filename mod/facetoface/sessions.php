@@ -135,6 +135,8 @@ $customfields = facetoface_get_session_customfields();
 
 $sessionid = isset($session->id) ? $session->id : 0;
 
+$canconfigurecancellation = has_capability('mod/facetoface:configurecancellation', $context);
+
 $details = new stdClass();
 $details->id = $sessionid;
 $details->details = isset($session->details) ? $session->details : '';
@@ -218,6 +220,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     $todb->mincapacity = $fromform->mincapacity;
     $todb->cutoff = $fromform->cutoff;
+
+    if ($canconfigurecancellation) {
+        $todb->allowcancellations = $fromform->allowcancellations;
+    }
 
     $transaction = $DB->start_delegated_transaction();
 
@@ -307,6 +313,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $toform->normalcost = $session->normalcost;
     $toform->discountcost = $session->discountcost;
     $toform->selfapproval = $session->selfapproval;
+
+    if ($canconfigurecancellation) {
+        $toform->allowcancellations = $session->allowcancellations;
+    }
 
     if ($session->sessiondates) {
         $i = 0;
