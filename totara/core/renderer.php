@@ -165,9 +165,7 @@ class totara_core_renderer extends plugin_renderer_base {
             );
             $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $report->id));
             $attributes = array('href' => $url);
-            $output .= html_writer::tag('a', $icon, $attributes);
-            $attributes = array('href' => $url);
-            $output .= html_writer::tag('a', $text, $attributes);
+            $output .= html_writer::tag('a', $icon . $text, $attributes);
             // if admin with edit mode on show settings button too
             if ($canedit) {
                 $text = get_string('settings','totara_core');
