@@ -118,6 +118,7 @@ $string['notset'] = 'Not set';
 $string['nofileselected'] = 'No file selected';
 $string['pluginname'] = 'Customfields';
 $string['programcertcustomfields'] = 'Program and Certification custom fields';
+$string['requiredandlockednotallowed'] = 'The combination of required and locked is not allowed. Please, change one of them';
 $string['returntoframework'] = 'Return to Framework';
 $string['shortname'] = 'Short name (must be unique)';
 $string['shortnamenotunique'] = 'This short name is already in use';
