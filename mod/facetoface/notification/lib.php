@@ -329,7 +329,8 @@ class facetoface_notification extends data_object {
             SELECT
                 s.id,
                 sd.timestart,
-                sd.timefinish
+                sd.timefinish,
+                sus.statuscode
             FROM
                 {facetoface_sessions} s
             INNER JOIN
@@ -344,6 +345,13 @@ class facetoface_notification extends data_object {
                         sessionid
                 ) sd
              ON sd.sessionid = s.id
+            INNER JOIN
+                {facetoface_signups} su
+             ON s.id = su.sessionid
+            INNER JOIN
+                {facetoface_signups_status}
+             sus ON su.id = sus.signupid
+            AND sus.superceded = 0
             LEFT JOIN
                 {facetoface_notification_sent} ns
              ON ns.notificationid = ?
@@ -370,6 +378,10 @@ class facetoface_notification extends data_object {
                     if ($session->timestart < $time ||
                        ($session->timestart - $this->scheduletime) > $time) {
                         continue 2;
+                    // If the user has cancelled and this notification is not
+                    // triggered by a cancellation state, skip the notification.
+                    } else if ($session->statuscode == MDL_F2F_STATUS_USER_CANCELLED && $this->cancelled == 0) {
+                         continue 2;
                     }
                     break;
                 case MDL_F2F_CONDITION_AFTER_SESSION:
