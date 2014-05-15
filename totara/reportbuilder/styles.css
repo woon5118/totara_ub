@@ -222,9 +222,14 @@ form[id^="toolbarsearch"].mform .fsubmit {
 #rb-search-controls > div {
     display: inline-block;
 }
+
 .rb-display-table-container {
     clear: right;
 }
 .dir-rtl .rb-display-table-container {
     clear: left;
+}
+
+.jsenabled #fgroup_id_submitgroupsidebar {
+    display: none;
 }

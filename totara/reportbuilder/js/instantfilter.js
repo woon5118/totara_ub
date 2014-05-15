@@ -56,9 +56,6 @@ M.totara_reportbuilder_instantfilter = M.totara_reportbuilder_instantfilter || {
             throw new Error('M.totara_reportbuilder_instantfilter.init()-> jQuery dependency required for this module to function.');
         }
 
-        // Since we know js works, we hide the sidebar submit buttons.
-        $('#fgroup_id_submitgroupsidebar').css('display', 'none');
-
         $('.rb-sidebar input, .rb-sidebar select').change(function (event) {
             // Abort any call to instantreport that is already active.
             if (xhr) {
