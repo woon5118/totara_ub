@@ -312,6 +312,7 @@ $string['roleaccessnotice'] = 'If a role cannot answer or view other\'s answers 
 $string['roleadministrator'] = 'Administrator';
 $string['roleappraiser'] = 'Appraiser';
 $string['roleall'] = 'All';
+$string['rolecurrentlyempty'] = 'Role currently empty';
 $string['rolelearner'] = 'Learner';
 $string['rolemanager'] = 'Manager';
 $string['roleteamlead'] = 'Manager\'s Manager';

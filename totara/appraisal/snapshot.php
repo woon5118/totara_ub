@@ -120,7 +120,8 @@ if ($action == 'snapshot') {
 echo $renderer->header();
 
 // Print appraisal header.
-echo $renderer->heading($appraisal->name, 1);
+$roleassignments = $appraisal->get_all_assignments($userassignment->userid);
+echo $renderer->display_appraisal_header($appraisal, $userassignment, $roleassignments);
 $appdesc = new stdClass();
 $appdesc->description = $appraisal->description;
 $appdesc->descriptionformat = FORMAT_HTML;
@@ -151,11 +152,7 @@ foreach ($stageslist as $stageid => $stagedata) {
             foreach ($assignments as $assignment) {
                 $form->set_data($appraisal->get_answers($page->id, $assignment));
             }
-            if ($action == 'snapshot') {
-                $form->display();
-            } else {
-                $form->display();
-            }
+            $form->display();
             $form->reset_form_sent();
         }
     }

@@ -1196,11 +1196,29 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      *
      * @param appraisal $appraisal
      * @param object $userassignment
+     * @param array of objects $roleassignments
      * @param boolean $preview
      * @return string HTML
      */
-    public function display_appraisal_header($appraisal, $userassignment, $preview) {
+    public function display_appraisal_header($appraisal, $userassignment, $roleassignments, $preview = false) {
+        global $DB;
+
         $out = html_writer::tag('h3', format_string($appraisal->name));
+
+        // Display the list of participants.
+        $rolestringkeys = Appraisal::get_roles();
+        $participants = array();
+        foreach ($appraisal->get_roles_involved() as $role) {
+            $rolestring = get_string($rolestringkeys[$role], 'totara_appraisal');
+            if (empty($roleassignments[$role]) || empty($roleassignments[$role]->userid)) {
+                $participants[] = $rolestring . ": " . get_string('rolecurrentlyempty', 'totara_appraisal');
+            } else {
+                $user = $DB->get_record('user', array('id' => $roleassignments[$role]->userid));
+                $participants[] = $rolestring . ": " . fullname($user);
+            }
+        }
+        $out .= html_writer::tag('div', html_writer::tag('label', 'Participants:') .
+                    html_writer::alist($participants), array('class' => 'appraisal-participants'));
 
         if (!$preview) {
             if ($appraisal->status == appraisal::STATUS_CLOSED) {
@@ -1227,7 +1245,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @param boolean $preview
      * @return string HTML
      */
-    public function display_appraisal_actions($appraisal, $userassignment, $showprint, $preview) {
+    public function display_appraisal_actions($appraisal, $userassignment, $showprint, $preview = false) {
         $out = '';
         $buttons = '';
 
@@ -1266,7 +1284,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @param string $actions HTML of actions to be inserted into the right column
      * @return string HTML
      */
-    public function display_stage($appraisal, $stage, $userassignment, $roleassignment, $actions, $preview) {
+    public function display_stage($appraisal, $stage, $userassignment, $roleassignment, $actions, $preview = false) {
         global $USER, $TEXTAREA_OPTIONS;
 
         // Initialise some variables.
@@ -1360,7 +1378,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @param boolean $preview
      * @return string HTML
      */
-    public function display_stage_actions_for_stages($appraisal, $stage, $userassignment, $roleassignment, $urlparams, $preview) {
+    public function display_stage_actions_for_stages($appraisal, $stage, $userassignment, $roleassignment,
+            $urlparams, $preview = false) {
         $pagesurl = new moodle_url('/totara/appraisal/myappraisal.php', $urlparams);
 
         $action = '';
@@ -1447,17 +1466,18 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @return string HTML
      */
     public function display_stages($appraisal, $stages, $roleassignment, $showprint, $preview = false) {
+        // Initialise some variables.
         $out = '';
         $userassignment = $roleassignment->get_user_assignment();
-        // Initialise some variables.
         $urlparams = array('role' => $roleassignment->appraisalrole, 'subjectid' => $userassignment->userid,
                 'appraisalid' => $appraisal->id, 'action' => 'pages');
         if ($preview) {
             $urlparams['preview'] = 1;
         }
+        $roleassignments = $appraisal->get_all_assignments($userassignment->userid);
 
         // Title and status.
-        $out .= $this->display_appraisal_header($appraisal, $userassignment, $preview);
+        $out .= $this->display_appraisal_header($appraisal, $userassignment, $roleassignments, $preview);
 
         // Buttons to the right of the title and status.
         $out .= $this->display_appraisal_actions($appraisal, $userassignment, $showprint, $preview);
