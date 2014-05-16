@@ -1115,9 +1115,12 @@ This warning is often caused by unzipping a standard Totara package over a previ
 This warning can also be caused by an incomplete checkout or update operation from a GIT repository, in which case you may just have to wait for the operation complete, or perhaps run the appropriate clean up command and retry the operation.
 
 You can find more information in upgrade documentation at <a href="{$a}">{$a}</a>.';
-$string['upgradesure'] = '<p>Your Totara files have been changed, and you are about to automatically upgrade your server to this version:</p>
-<p><strong>{$a}</strong></p>
-<p>Once you do this you can not go back again. Please note that this process can take a long time.</p>
+$string['upgradesure'] = '<p>Your Totara files have been changed, and you are about to automatically upgrade your server from this version:</p>
+<p><strong>{$a->oldversion}</strong></p>
+<p>to this version: </p>
+<p><strong>{$a->newversion}</strong></p>
+<p>Once you do this you can not go back again.</p>
+<p>Please note that this process can take a long time.</p>
 <p>Are you sure you want to upgrade this server to this version?</p>';
 $string['upgradetimedout'] = 'Upgrade timed out, please restart the upgrade.';
 $string['upgrade197notice'] = '<p>Moodle 1.9.7 contains a number of security fixes to user passwords and backups to protect the user data on your site. As a result some of your settings and permissions relating to backups may have changed.<br />
