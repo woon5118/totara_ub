@@ -68,8 +68,13 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Verify users were created.
         $this->assertEquals(5, $DB->count_records('user')); // Guest + Admin + these users.
 
+        // Set default settings for courses.
+        $coursedefaults = array(
+            'enablecompletion' => COMPLETION_ENABLED,
+            'completionstartonenrol' => 1,
+            'completionprogressonview' => 1);
+
         // Create three courses
-        $coursedefaults = array('enablecompletion' => COMPLETION_ENABLED, 'completionstartonenrol' => 1, 'completionprogressonview' => 1);
         for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $this->{"course".$i} = $this->getDataGenerator()->create_course($coursedefaults, array('createsections' => true));
             $this->{"completioninfo".$i} = new completion_info($this->{"course".$i});
@@ -246,8 +251,111 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
+        // Case #1: Activity completion made by users.
         // Make users to complete course1 via criteria completion.
-        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'),'Record count mismatch for completion');
+        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'), 'Record count mismatch for completion');
+        $this->assertEquals(0, $DB->count_records('certificate_issues'));
+        $course = $this->course1;
+        foreach ($this->users as $user) {
+            // Create a certificate for the user - this replicates a user going to mod/certificate/view.php.
+            certificate_get_issue($course, $user, $this->certificate1, $this->coursemodule1);
+            $params = array('userid' => $user->id, 'coursemoduleid' => $this->coursemodule1->id);
+
+            // Check it isn't complete.
+            $completionstate = $DB->get_field('course_modules_completion', 'completionstate', $params);
+            $this->assertEmpty($completionstate);
+
+            // Complete the certificate.
+            $this->completioninfo1->set_module_viewed($this->coursemodule1, $user->id);
+
+            // Check its completed.
+            $completionstate = $DB->get_field('course_modules_completion', 'completionstate', $params, MUST_EXIST);
+            $this->assertEquals(COMPLETION_COMPLETE, $completionstate);
+
+            // Call function to complete the activities for the courses.
+            $params = array(
+                'userid'     => $user->id,
+                'course'     => $course->id,
+                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+            );
+            $completion = new completion_criteria_completion($params);
+            $completion->mark_complete();
+        }
+        // Check records in course_completion_crit_compl.
+        $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
+        $this->assertEquals(5, $DB->count_records('course_completions'));
+
+        // Call delete_course_completion_data for course1.
+        $completion = new completion_info($course);
+        $completion->delete_course_completion_data();
+
+        // There shouldn't be records for course1, because it was not completed via RPL.
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $this->course1->id)));
+        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl', array('course' => $this->course1->id)));
+        // But should exists two records for course3.
+        $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course3->id)));
+
+        // Case #2: Course completion made via RPL.
+        // Now lets complete course3 for user1 and user3 via RPL.
+        $userstocomplete = array($this->user1, $this->user3);
+        foreach ($userstocomplete as $user) {
+            $completionrpl = new completion_completion(array('userid' => $user->id, 'course' => $this->course3->id));
+            $completionrpl->rpl = 'Course completed via rpl';
+            $completionrpl->status = COMPLETION_STATUS_COMPLETEVIARPL;
+            $completionrpl->mark_complete();
+        }
+
+        // Verify course3 has been marked as completed for user1 and user3.
+        $completion = new completion_info($this->course3);
+        $this->assertTrue($completion->is_course_complete($this->user1->id));
+        $this->assertTrue($completion->is_course_complete($this->user3->id));
+        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
+
+        // Delete completion for course3.
+        $completion->delete_course_completion_data();
+        // As it was completed via RPL no records should be deleted in the course_completions table (T-11817).
+        $this->assertEquals(2, $DB->count_records('course_completions'), array('course' => $this->course3->id));
+
+        // Case #3: Activity completion made via RPL.
+        // Let's complete activities via RPL for all users in course1.
+        foreach ($this->users as $user) {
+            $completionrpl = new completion_criteria_completion(array(
+                'userid' => $user->id,
+                'course' => $this->course1->id,
+                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+            ));
+            $completionrpl->rpl = 'Activity completed via RPL';
+            $completionrpl->mark_complete();
+        }
+
+        // Ensure Course1 was not completed via RPL.
+        $params = array($this->course1->id, COMPLETION_STATUS_COMPLETEVIARPL);
+        $this->assertEquals(3, $DB->count_records_select('course_completions', 'course = ? AND status != ?', $params));
+        // Check records before calling to delete_course_completion_data function.
+        $this->assertEquals(3, $DB->count_records('course_completion_crit_compl', array('course' => $this->course1->id)));
+
+        // Delete completion for course1.
+        $completion = new completion_info($this->course1);
+        $completion->delete_course_completion_data();
+        // Because the activity was completed via RPL the completion records should be intact.
+        $this->assertEquals(3, $DB->count_records('course_completion_crit_compl', array('course' => $this->course1->id)));
+        // Course completions for the course should be deleted as they weren't completed via RPL.
+        $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $this->course1->id)));
+    }
+
+    /** This function will test the delete_course_completion_data_user function should behave as follow:
+     *  All course completion records (including those marked via RPL) for the user given should be deleted
+     *  when this function is called
+     */
+    public function test_delete_course_completion_data_user() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Case #1: Activity completion made by users.
+        // Make users to complete course1 via criteria completion.
+        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'), 'Record count mismatch for completion');
         $this->assertEquals(0, $DB->count_records('certificate_issues'));
         $course = $this->course1;
         foreach ($this->users as $user) {
@@ -278,9 +386,9 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Check records in course_completion_crit_compl.
         $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
 
-        // Call delete_course_completion_data with user1 id.
+        // Call delete_course_completion_data_user with user1 id.
         $completion = new completion_info($course);
-        $completion->delete_course_completion_data($this->user1->id);
+        $completion->delete_course_completion_data_user($this->user1->id);
 
         $this->assertEquals(4, $DB->count_records('course_completions'));
         // Now should be two records in completions. One for user2 and other for user3 in course1.
@@ -295,26 +403,52 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $this->assertTrue($DB->record_exists('course_completions', $conditions));
         $this->assertTrue($DB->record_exists('course_completion_crit_compl', $conditions));
 
-        // Now lets complete course3 for user1 and user3 via rpl.
+        // Case #2: Course completion made via RPL.
+        // Now lets complete course3 for user1 and user3 via RPL.
         $userstocomplete = array($this->user1, $this->user3);
         foreach ($userstocomplete as $user) {
             $completionrpl = new completion_completion(array('userid' => $user->id, 'course' => $this->course3->id));
-            $completionrpl->rpl = 'completed via rpl';
+            $completionrpl->rpl = 'Course completed via RPL';
             $completionrpl->status = COMPLETION_STATUS_COMPLETEVIARPL;
             $completionrpl->mark_complete();
         }
 
-        // Verify course3 has been mark as completed for user1 and user3.
+        // Verify course3 has been marked as completed for user1 and user3.
         $completion = new completion_info($this->course3);
         $this->assertTrue($completion->is_course_complete($this->user1->id));
         $this->assertTrue($completion->is_course_complete($this->user3->id));
-
-        // Delete completion for course3. As they were completed via rpl and no userid has been passed as parameter,
-        // no records should be deleted in the course_completions table (T-11817).
-        $completion->delete_course_completion_data();
         $this->assertEquals(4, $DB->count_records('course_completions'));
-
-        // As the course was completed via rpl but the activity completion wasn't mark via rpl, the records are deleted.
         $this->assertEquals(0, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
+
+        // Delete completion records for course3-user1.
+        // Changes should be reflected in course_completions table.
+        $completion->delete_course_completion_data_user($this->user1->id);
+        $this->assertEquals(3, $DB->count_records('course_completions'));
+        $this->assertEquals(0, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
+
+        // Case #3: Activity completion made via RPL.
+        // Let's complete activities via RPL for user1 and user3 in course3.
+        foreach ($userstocomplete as $user) {
+            $completionrpl = new completion_criteria_completion(array(
+                'userid' => $user->id,
+                'course' => $this->course3->id,
+                'criteriaid' => COMPLETION_CRITERIA_TYPE_ACTIVITY
+            ));
+            $completionrpl->rpl = 'Activity completed via RPL';
+            $completionrpl->mark_complete();
+        }
+
+        // Check records in course_completion_crit_compl before deleting.
+        $this->assertEquals(2, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
+
+        // Delete completion for user1-course3.
+        // Note that it doesn't matter that the user completed the activity via RPl, the activity completion is deleted.
+        $completion = new completion_info($this->course3);
+        $completion->delete_course_completion_data_user($this->user1->id);
+        $this->assertEquals(1, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
+        $this->assertEquals(3, $DB->count_records('course_completions'));
+        $conditions = array('userid' => $this->user1->id, 'course' => $this->course3->id);
+        $this->assertFalse($DB->record_exists('course_completions', $conditions));
+        $this->assertFalse($DB->record_exists('course_completion_crit_compl', $conditions));
     }
 }
