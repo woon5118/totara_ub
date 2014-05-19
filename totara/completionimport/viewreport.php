@@ -37,7 +37,16 @@ $timecreated = optional_param('timecreated', null, PARAM_INT);
 $importuserid = optional_param('importuserid', null, PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $sid = optional_param('sid', '0', PARAM_INT);
-$pageparams = array('importname' => $importname, 'importuserid' => $importuserid, 'timecreated' => $timecreated);
+$debug = optional_param('debug', 0, PARAM_INT);
+$clearfilters = optional_param('clearfilters', 0, PARAM_INT);
+
+$pageparams = array('importname' => $importname, 'clearfilters' => $clearfilters);
+if (!empty($importuserid)) {
+    $pageparams['importuserid'] = $importuserid;
+}
+if (!empty($timecreated)) {
+    $pageparams['timecreated'] = $timecreated;
+}
 
 require_login();
 
@@ -81,7 +90,9 @@ $countall = $report->get_full_count();
 
 $heading = $renderer->print_result_count_string($countfiltered, $countall);
 echo $OUTPUT->heading($heading);
-
+if ($debug) {
+    $report->debug($debug);
+}
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();

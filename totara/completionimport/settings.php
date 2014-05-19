@@ -40,14 +40,14 @@ $ADMIN->add('totara_completionimport',
         new admin_externalpage(
                 'totara_completionimport_course',
                 get_string('report_course', 'totara_completionimport'),
-                new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'course')),
+                new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'course', 'clearfilters' => 1)),
                 array('totara/completionimport:import')));
 
 $ADMIN->add('totara_completionimport',
         new admin_externalpage(
                 'totara_completionimport_certification',
                 get_string('report_certification', 'totara_completionimport'),
-                new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'certification')),
+                new moodle_url('/totara/completionimport/viewreport.php', array('importname' => 'certification', 'clearfilters' => 1)),
                 array('totara/completionimport:import'),
                 totara_feature_disabled('certifications')
         ));
