@@ -1485,7 +1485,7 @@ class program {
 
         $program = new program($programid);
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon'));
+            'class' => 'course_icon', 'alt' => ''));
 
         if ($program->is_accessible()) {
             $html = $OUTPUT->action_link(
