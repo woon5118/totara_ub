@@ -3,6 +3,36 @@
 
 Totara LMS Changelog
 
+Release 2.6.1 (20th May 2014):
+==================================================
+
+Improvements:
+    T-12195    Improved error handling in F2F bulk add attendees
+    T-12238    The alerts block is now a list instead of a table
+    T-12313    Removed request approval button in Learning Plans while request is pending
+    T-12375    Improved accessibility by combining links under My Reports
+    T-12399    Improved look of the events filter on the calendar page
+    T-12433    Show participants in appraisal overview page and pdf snapshots
+
+Bug Fixes:
+    T-12307    Fixed days not being translated in weekly scheduled reports
+    T-12306    Added styling back into the program assignments page
+    T-12017    Fixed alternate name fields for external badges
+    T-12017    Fixed alternate name fields for trainer roles in face to face
+    T-12017    Fixed alternate name fields on manager rules
+    T-12234    Fixed highlight effect on Kiwifruit themes
+    T-12446    Fixed display issue where save search button was overlaying column headers
+    T-12326    Recover activity completion, grade and previous course completion data
+    T-12314    Fixed unknown column error when creating a program with multi_select custom field
+    T-12434    The search and clear button on the find courses now are hidden immediately
+    T-12278    Fixed facetoface attendance export not showing data if a users do not have a manager assigned to them
+    T-12248    Fixed SCORM redirect when it is opened in a new window
+    T-12318    Fixed issue where custom field menus did not work as expected in responsive themes
+    T-12310    Fixed display of custom field images in the enhanced catalog
+    T-12153    Fixed the setting of users timecreated field when new users are created by Totara Sync
+    T-12160    Fixed breadcrumbs when viewing staffs record of learning
+    T-12204    Fixed incorrect error message being displayed when uploading huge files
+
 
 Release 2.6.0.1 (7th May 2014):
 ==================================================
