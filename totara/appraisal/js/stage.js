@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Webster <mark.webster@catalyst-eu.net>
+ * @author Brian Barnes <brian.barnes@totaralms.com>
  * @package totara
  * @subpackage reportbuilder
  */
@@ -149,49 +150,46 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
 
     /**
      * Modal popup for generic single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
-     * @param content The desired contents of the panel
+     * @param content The desired contents of the dialog
      * @param {String} func optional Function to be called upon submitting the form
      * @param {Array} args optional Array of arguments to be sent to the optional function
      */
     function modalForm(content, func, args) {
       var func = func || false;
       var args = args || false;
-      this.Y.use('panel', function(Y) {
-        var panel = new Y.Panel({
-          headerContent: null,
-          bodyContent: content,
-          width        : 500,
-          zIndex       : 5,
-          centered     : true,
-          modal        : true,
-          render       : true,
-        });
-        var $content = $('#' + panel.get('id'));
-        $content.find('input[type="text"]').eq(0).focus();
-        $content.find('#id_submitbutton').on('click', function() {
-          var $theFrm = $content.find('form.mform');
-          var apprObj = $theFrm.serialize();
-          apprObj += ('&submitbutton=' + $(this).attr('value'));
-          $.post($theFrm.attr('action'), apprObj).done(function(data){
-            if (data == 'success') {
-              if(func) {
-                var theFunc = eval('(' + func + ')');
-                theFunc.apply(null, Array.prototype.slice.call(args));
-              }
-              panel.destroy(true);
-            } else {
-              panel.destroy(true);
-              modalForm(data, func, args);
-            }
-          });
-          return false;
-        });
-        $content.find('#id_cancel').on('click', function() {
-          panel.destroy(true);
-          return false;
-        });
-        panel.show();
+      var dialogue = new M.core.dialogue({
+        headerContent: null,
+        bodyContent  : content,
+        width        : 500,
+        centered     : true,
+        modal        : true,
+        render       : true
       });
+      var $content = $('#' + dialogue.get('id'));
+      $content.find('input[type="text"]').eq(0).focus();
+      $content.find('#id_submitbutton').on('click', function() {
+        var $theFrm = $content.find('form.mform');
+        var apprObj = $theFrm.serialize();
+        apprObj += ('&submitbutton=' + $(this).attr('value'));
+        $.post($theFrm.attr('action'), apprObj).done(function(data){
+          if (data == 'success') {
+            if(func) {
+              var theFunc = eval('(' + func + ')');
+              theFunc.apply(null, Array.prototype.slice.call(args));
+            }
+            dialogue.destroy(true);
+          } else {
+            dialogue.destroy(true);
+            modalForm(data, func, args);
+          }
+        });
+        return false;
+      });
+      $content.find('#id_cancel').on('click', function() {
+        dialogue.destroy(true);
+        return false;
+      });
+      Y.one('.moodle-dialogue-base fieldset.hidden').removeClass('hidden');
     }
 
     /**
@@ -200,29 +198,28 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
      */
     function modalError(msg) {
       var msg = msg || "An unknown error occurred.";
-      this.Y.use('panel', function(Y) {
-        var panel = new Y.Panel({
-          bodyContent: msg,
-          width        : 300,
-          zIndex       : 5,
-          centered     : true,
-          modal        : true,
-          render       : true,
-          buttons: [
-            {
-              name: "confirm",
-              value  : M.util.get_string('ok','moodle'),
-              section: Y.WidgetStdMod.FOOTER,
-              action : function (e) {
-                e.preventDefault();
-                panel.destroy(true);
-              }
-            }
-          ]
-        });
-        panel.getButton("confirm").removeClass("yui3-button");
-        panel.show();
+      var dialogue = new M.core.dialogue({
+        bodyContent: msg,
+        width        : 300,
+        zIndex       : 5,
+        centered     : true,
+        modal        : true,
+        render       : true
       });
+      dialogue.addButton({
+        name: "confirm",
+        value  : M.util.get_string('ok','moodle'),
+        section: Y.WidgetStdMod.FOOTER,
+        events : {
+          click :function (e) {
+            e.preventDefault();
+            dialogue.destroy(true);
+          }
+        }
+      });
+      dialogue.getButton("confirm").removeClass("yui3-button");
+      Y.one('.moodle-dialogue-base fieldset.hidden').removeClass('hidden');
+      dialogue.show();
     }
 
     function updateRoles(sID) {
@@ -248,86 +245,80 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
      * @param {String} url The URL to load into the content area upon success
      */
     function modalAddEditQuestion(content, url) {
-      this.Y.use('panel', function(Y){
-        var panel = new Y.Panel({
-          headerContent: null,
-          bodyContent  : content,
-          width        : 800,
-          zIndex       : 5,
-          centered     : true,
-          modal        : true,
-          focusOn      : []
-        });
-        panel.render();
-        panel.show();
-        panel.on('visibleChange', function(e) {
-          if (e.newVal == false) {
-            panel.destroy();
-          }
-        });
-        if (panel.get("y") < 10) {
-          panel.set("y", 10);
+      var dialogue = new M.core.dialogue({
+        headerContent: null,
+        bodyContent  : content,
+        width        : 800,
+        centered     : true,
+        modal        : true,
+        render       : true
+      });
+
+      dialogue.on('visibleChange', function(e) {
+        if (e.newVal == false) {
+          dialogue.destroy();
         }
-        var $content = $('#' + panel.get('id'));
-        $content.find('script').each(function() {
-            $.globalEval($(this).html());
-        });
-        $content.find('input[type="text"]').eq(0).focus();
-        if (prevRoles.length) {
-          $roles = $content.find('input[id^="id_roles_"]');
-          $content.find('#id_cloneprevroles').on('click', function() {
-            $roles.each(function(){
-              var $this = $(this);
-              $this.off('click.props');
-              if (prevRoles.indexOf($this.attr('id')) != -1) {
-                if (!$this.prop('checked')) {
-                  $this.click();
-                  $this.prop('checked', true);
-                }
-              } else {
-                if ($this.prop('checked')) {
-                  $this.click();
-                  $this.prop('checked', false);
-                }
+      });
+      var $content = $('#' + dialogue.get('id'));
+      $content.find('script').each(function() {
+        $.globalEval($(this).html());
+      });
+      $content.find('input[type="text"]').eq(0).focus();
+      if (prevRoles.length) {
+        $roles = $content.find('input[id^="id_roles_"]');
+        $content.find('#id_cloneprevroles').on('click', function() {
+          $roles.each(function(){
+            var $this = $(this);
+            $this.off('click.props');
+            if (prevRoles.indexOf($this.attr('id')) != -1) {
+              if (!$this.prop('checked')) {
+                $this.click();
+                $this.prop('checked', true);
               }
-              $this.on('click.props', function(){
-                $content.find('#id_cloneprevroles').prop('checked', false);
-              });
+            } else {
+              if ($this.prop('checked')) {
+                $this.click();
+                $this.prop('checked', false);
+              }
+            }
+            $this.on('click.props', function(){
+              $content.find('#id_cloneprevroles').prop('checked', false);
             });
           });
-        }
-        $content.find('#id_submitbutton').on('click', function() {
-          if (tinymce.activeEditor) {
-            tinymce.activeEditor.save();
-          }
-          var $theFrm = $content.find('form.mform');
+        });
+      }
 
-          // Save all tinyMCE editors.
-          // TODO: T-11236 Find way for event propagation.
-          if (tinyMCE) {
-            for (edId in tinyMCE.editors) {
-              tinyMCE.editors[edId].save();
-            }
+      $content.find('#id_submitbutton').on('click', function() {
+        if (tinymce.activeEditor) {
+          tinymce.activeEditor.save();
+        }
+        var $theFrm = $content.find('form.mform');
+        // Save all tinyMCE editors.
+        // TODO: T-11236 Find way for event propagation.
+        if (tinyMCE) {
+          for (edId in tinyMCE.editors) {
+            tinyMCE.editors[edId].save();
           }
-          var apprObj = $theFrm.serialize();
-          apprObj += ('&submitbutton=' + $(this).attr('value'));
-          $.post($theFrm.attr('action'), apprObj).done(function(data){
-            if (data == 'success') {
-              pageContent(url);
-              updateRoles(stageID);
-              panel.destroy(true);
-            } else {
-              panel.destroy(true);
-              modalAddEditQuestion(data, url);
-            }
-          });
-          return false;
+        }
+        var apprObj = $theFrm.serialize();
+        apprObj += ('&submitbutton=' + $(this).attr('value'));
+        $.post($theFrm.attr('action'), apprObj).done(function(data){
+          if (data == 'success') {
+            pageContent(url);
+            updateRoles(stageID);
+            dialogue.destroy(true);
+          } else {
+            dialogue.destroy(true);
+            modalAddEditQuestion(data, url);
+          }
         });
-        $content.find('#id_cancel').on('click', function() {
-          panel.destroy(true);
-          return false;
-        });
+        return false;
       });
+      $content.find('#id_cancel').on('click', function() {
+        dialogue.destroy(true);
+        return false;
+      });
+      Y.one('.moodle-dialogue-base fieldset.hidden').removeClass('hidden');
     }
 
     /**
@@ -338,70 +329,71 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
     function modalDelete(url, el, func, args) {
       var $el = el || false;
       var theFunc;
-      this.Y.use('panel', function(Y) {
-          var bodyContent;
-          var hasRedisplay = url.match(/hasredisplay=([^&]+)/);
-          if (hasRedisplay) {
-              bodyContent = M.util.get_string('confirmdeleteitemwithredisplay', 'totara_appraisal');
-          } else {
-              bodyContent = M.util.get_string('confirmdeleteitem', 'totara_appraisal');
-          }
-          var panel = new Y.Panel({
-          bodyContent  : bodyContent,
-          width        : 300,
-          zIndex       : 5,
-          centered     : true,
-          modal        : true,
-          render       : true,
-          buttons: [
-            {
-              name: "confirm",
-              value  : M.util.get_string('yes','moodle'),
-              section: Y.WidgetStdMod.FOOTER,
-              action : function (e) {
-                e.preventDefault();
-                $.get(url, {sesskey: M.totara_appraisal_stage.config.sesskey, confirm: 1}).done(function(data){
-                  if (data == 'success') {
-                    if ($el) {
-                      $el.slideUp(250, function(){
-                        $el.remove();
-                        if(func) {
-                          theFunc = eval('(' + func + ')');
-                          theFunc.apply(null, Array.prototype.slice.call(args));
-                        }
-                      });
-                    } else {
-                      if(func) {
-                        theFunc = eval('(' + func + ')');
-                        theFunc.apply(null, Array.prototype.slice.call(args));
-                      }
-                    }
-                    updateRoles(stageID);
-                  } else {
-                    modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
-                  }
-                }).fail(function(){
-                  modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
-                });
-                panel.destroy(true);
-              }
-            },
-            {
-              name: "deny",
-              value  : M.util.get_string('no','moodle'),
-              section: Y.WidgetStdMod.FOOTER,
-              action : function (e) {
-                e.preventDefault();
-                panel.destroy(true);
-              }
-            }
-          ]
-        });
-        panel.getButton("confirm").removeClass("yui3-button");
-        panel.getButton("deny").removeClass("yui3-button");
-        panel.show();
-
+      var bodyContent;
+      var hasRedisplay = url.match(/hasredisplay=([^&]+)/);
+      if (hasRedisplay) {
+          bodyContent = M.util.get_string('confirmdeleteitemwithredisplay', 'totara_appraisal');
+      } else {
+          bodyContent = M.util.get_string('confirmdeleteitem', 'totara_appraisal');
+      }
+      var dialogue = new M.core.dialogue({
+        bodyContent  : bodyContent,
+        width        : 300,
+        zIndex       : 5,
+        centered     : true,
+        modal        : true,
+        render       : true
       });
+
+      dialogue.addButton({
+        name: "confirm",
+        value  : M.util.get_string('yes','moodle'),
+        section: Y.WidgetStdMod.FOOTER,
+        events : {
+          click: function (e) {
+            e.preventDefault();
+            $.get(url, {sesskey: M.totara_appraisal_stage.config.sesskey, confirm: 1}).done(function(data){
+              if (data == 'success') {
+                if ($el) {
+                  $el.slideUp(250, function(){
+                    $el.remove();
+                    if(func) {
+                      theFunc = eval('(' + func + ')');
+                      theFunc.apply(null, Array.prototype.slice.call(args));
+                    }
+                  });
+                } else {
+                  if(func) {
+                    theFunc = eval('(' + func + ')');
+                    theFunc.apply(null, Array.prototype.slice.call(args));
+                  }
+                }
+                updateRoles(stageID);
+              } else {
+                modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
+              }
+            }).fail(function(){
+              modalError(M.util.get_string('error:cannotdelete','totara_appraisal'));
+            });
+            dialogue.destroy(true);
+          }
+        }
+      });
+
+      dialogue.addButton({
+        name: "deny",
+        value  : M.util.get_string('no','moodle'),
+        section: Y.WidgetStdMod.FOOTER,
+        events : {
+          click: function (e) {
+            e.preventDefault();
+            dialogue.destroy(true);
+          }
+        }
+      });
+      dialogue.getButton("confirm").removeClass("yui3-button");
+      dialogue.getButton("deny").removeClass("yui3-button");
+      dialogue.show();
     }
 
     /**
