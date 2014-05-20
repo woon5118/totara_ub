@@ -40,6 +40,7 @@ $string['addanothersearchcolumn'] = 'Add another search column...';
 $string['addcohorts'] = 'Add audiences';
 $string['addedscheduledreport'] = 'Added new scheduled report';
 $string['addscheduledreport'] = 'Add scheduled report';
+$string['addnewscheduled'] = 'Add scheduled';
 $string['advanced'] = 'Advanced?';
 $string['alldata'] = 'All data';
 $string['allofthefollowing'] = 'All of the following';
