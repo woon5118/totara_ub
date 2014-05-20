@@ -56,7 +56,7 @@ M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
 
         // Add hooks to visibility of learning content.
         // Update when visibility drop-down list change.
-        $(document).on('change', 'select', function() {
+        $(document).on('change', 'table#cohort_associations_visible form select', function() {
             var idlearningcontent = $(this).attr('name');
             var learningcontenttype = $('#type' + idlearningcontent).val();
             var learningvisibilityvalue = $(this).val();
