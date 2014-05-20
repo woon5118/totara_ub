@@ -750,7 +750,7 @@ class dp_competency_component extends dp_base_component {
 
         $class = ($approved) ? '' : 'dimmed';
         $icon = $this->determine_item_icon($item);
-        $img = $OUTPUT->pix_icon("/msgicons/" . $icon, format_string($item->fullname), 'totara_core', array('class' => 'competency-state-icon'));
+        $img = $OUTPUT->pix_icon("/msgicons/" . $icon, '', 'totara_core', array('class' => 'competency-state-icon'));
 
         $link = $OUTPUT->action_link(
                 new moodle_url('/totara/plan/components/' . $this->component . '/view.php',array('id' => $this->plan->id, 'itemid' => $item->id)),
