@@ -374,6 +374,19 @@ function cohort_rules_list(){
                 s($field->name)
             );
         }
+        $pos = new position();
+        $postypes = $pos->get_types();
+        array_walk($postypes, function(&$item) { $item = $item->fullname; });
+        $postypes[0] = get_string('unclassified', 'totara_hierarchy');
+        $rules[] = new cohort_rule_option(
+            'pos',
+            'postype',
+            new cohort_rule_ui_menu(
+                get_string('ruledesc-pos-postype', 'totara_cohort'),
+                $postypes
+            ),
+            new cohort_rule_sqlhandler_in_posfield('typeid', false)
+        );
 
         // Organizations!
         // Organization by direct selection
@@ -456,6 +469,19 @@ function cohort_rules_list(){
                 s($field->name)
             );
         }
+        $org = new organisation();
+        $orgtypes = $org->get_types();
+        array_walk($orgtypes, function(&$item) { $item = $item->fullname; });
+        $orgtypes[0] = get_string('unclassified', 'totara_hierarchy');
+        $rules[] = new cohort_rule_option(
+            'org',
+            'orgtype',
+            new cohort_rule_ui_menu(
+                get_string('ruledesc-org-orgtype', 'totara_cohort'),
+                $orgtypes
+            ),
+            new cohort_rule_sqlhandler_in_posorgfield('typeid', false)
+        );
 
         // Learning (i.e. course & program completion)
         // Completion of all/any/none/not-all courses in a list
