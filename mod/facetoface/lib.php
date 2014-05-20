@@ -1229,7 +1229,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             s.id = ?
         AND ss.statuscode {$statussql}
         AND ss.superceded != 1
-        ORDER BY ss.timecreated ASC";
+        ORDER BY u.firstname, u.lastname ASC";
 
     $params = array_merge(array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $sessionid), $statusparams);
 
@@ -1458,7 +1458,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             f.course AS courseid,
             ss.grade,
             sign.timecreated,
-            u2.email AS managersemail
+            manager.email AS managersemail
         FROM
             {facetoface} f
         JOIN
@@ -1493,20 +1493,27 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         JOIN
             {user} u
             ON u.id = su.userid
-        JOIN
-            {pos_assignment} pa
-            ON pa.userid = u.id
-        JOIN
-            {user} u2
-            ON u2.id = pa.managerid
+        LEFT JOIN
+            (
+            SELECT
+                pa.userid AS userid,
+                u2.email AS email
+            FROM
+                {pos_assignment} pa
+            INNER JOIN
+                {user} u2
+                ON u2.id = pa.managerid
+            WHERE
+                pa.type = ?
+            ) manager
+         ON u.id = manager.userid
         WHERE
             f.id = ?
         AND ss.superceded != 1
         AND ss.statuscode >= ?
-        AND pa.type = ?
         ORDER BY
             s.id, u.firstname, u.lastname
-    ", array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $facetofaceid, MDL_F2F_STATUS_APPROVED, POSITION_TYPE_PRIMARY));
+    ", array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $facetofaceid, POSITION_TYPE_PRIMARY, MDL_F2F_STATUS_APPROVED));
 
     if ($signups) {
         // Get all grades at once
@@ -3552,11 +3559,11 @@ function facetoface_get_trainer_roles($coursecontext) {
 function facetoface_get_trainers($sessionid, $roleid = null) {
     global $CFG, $DB;
 
+    $usernamefields = get_all_user_name_fields(true, 'u');
     $sql = "
         SELECT
             u.id,
-            u.firstname,
-            u.lastname,
+            {$usernamefields},
             r.roleid
         FROM
             {facetoface_session_roles} r
@@ -4294,6 +4301,18 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $result['name'] = '';
         $a = array('fieldname' => get_string($bulkaddsource, 'facetoface'), 'value' => $userid);
         $result['result'] = get_string('userdoesnotexist', 'facetoface', $a);
+        return $result;
+    }
+
+    if ($user->deleted) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:userdeleted', 'facetoface', fullname($user));
+        return $result;
+    }
+
+    if ($user->suspended) {
+        $result['name'] = fullname($user);
+        $result['result'] = get_string('error:usersuspended', 'facetoface', fullname($user));
         return $result;
     }
 

@@ -67,18 +67,6 @@ class customfield_textarea extends customfield_base {
     }
 
     /**
-    * Tweaks the edit form
-    * @param   object   instance of the moodleform class
-    * $return  boolean
-    */
-    function edit_after_data(&$mform) {
-        parent::edit_after_data($mform);
-        if (!empty($this->data)) {
-            $mform->setDefault($this->inputname, array('text' => $this->data));
-        }
-    }
-
-    /**
     * Saves the data coming from form
     * @param   mixed   data coming from the form
     * @param   string  name of the prefix (ie, competency)

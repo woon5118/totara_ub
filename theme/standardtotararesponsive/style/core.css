@@ -1019,6 +1019,36 @@ div.tabtree2 {
     left: 0;
 }
 
+/**
+ * Styles for 'totara-item-group' and related. Used in programs to surround individual items.
+ */
+.totara-item-group {
+    background-color: #f7f8e8;
+    border: 1px solid #d0d676;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    padding: 6px 10px;
+    width: 90%;
+    overflow: auto;
+    color: #000;
+    margin: 3px 0px;
+}
+
+.totara-item-group .totara-item-group-icon {
+    border: none;
+    background: none;
+    padding: 5px 0 0 0;
+    line-height: 11px;
+}
+
+.dir-ltr .totara-item-group .totara-item-group-icon {
+    float: right;
+}
+.dir-rtl .totara-item-group .totara-item-group-icon {
+    float: left;
+}
+
 @media screen and (max-width:768px) {
     .tabtree {
         clear: both;

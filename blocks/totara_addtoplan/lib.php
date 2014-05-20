@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 function totara_block_addtoplan_get_content($courseid, $userid) {
     global $CFG, $DB, $OUTPUT;
 
-    $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_APPROVED));
+    $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING, DP_PLAN_STATUS_APPROVED));
 
     $course_include = $CFG->dirroot . '/totara/plan/components/course/course.class.php';
     if (file_exists($course_include)) {

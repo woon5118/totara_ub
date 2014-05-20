@@ -530,12 +530,18 @@ class development_plan {
     public function display_progress() {
         global $CFG, $OUTPUT, $PAGE;
 
-        if ($this->status == DP_PLAN_STATUS_UNAPPROVED) {
+        if ($this->status == DP_PLAN_STATUS_UNAPPROVED || $this->status == DP_PLAN_STATUS_PENDING) {
             $out = get_string('planstatusunapproved', 'totara_plan');
-            // Approval request
-            if ($this->get_setting('approve') == DP_PERMISSION_REQUEST) {
+            if ($this->status == DP_PLAN_STATUS_UNAPPROVED) {
+                // Approval request
+                if ($this->get_setting('approve') == DP_PERMISSION_REQUEST) {
+                    $out .= html_writer::empty_tag('br');
+                    $url = new moodle_url('/totara/plan/action.php', array('id' => $this->id, 'approvalrequest' => 1, 'sesskey' => sesskey()));
+                    $out .= $OUTPUT->action_link($url, get_string('requestapproval', 'totara_plan'));
+                }
+            } else {
                 $out .= html_writer::empty_tag('br');
-                $out .= $OUTPUT->action_link(new moodle_url('/totara/plan/action.php', array('id' => $this->id, 'approvalrequest' => 1, 'sesskey' => sesskey())), get_string('requestapproval', 'totara_plan'));
+                $out .= get_string('approvalrequested', 'totara_plan');
             }
 
 
@@ -604,7 +610,7 @@ class development_plan {
         ob_start();
 
         // Approval
-        if ($this->status == DP_PLAN_STATUS_UNAPPROVED) {
+        if ($this->status == DP_PLAN_STATUS_UNAPPROVED || $this->status == DP_PLAN_STATUS_PENDING) {
 
             // Approve/Decline
             if (in_array($this->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
@@ -927,7 +933,7 @@ class development_plan {
      */
     public function display_plan_message_box() {
         global $OUTPUT;
-        $unapproved = ($this->status == DP_PLAN_STATUS_UNAPPROVED);
+        $unapproved = ($this->status == DP_PLAN_STATUS_UNAPPROVED || $this->status == DP_PLAN_STATUS_PENDING);
         $completed = ($this->status == DP_PLAN_STATUS_COMPLETE);
         $viewingasmanager = $this->role == 'manager';
         $pending = $this->get_pending_items();
@@ -1048,7 +1054,11 @@ class development_plan {
             $out .= '&nbsp;' . html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'decline', 'value' => get_string('decline', 'totara_plan')));
             $out .= html_writer::end_div();
         } else if ($canrequestapproval) {
-            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
+            if ($this->status == DP_PLAN_STATUS_UNAPPROVED) {
+                $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
+            } else {
+                $out .= " " . get_string('approvalrequested', 'totara_plan');
+            }
         }
 
         $out .= html_writer::end_tag('form');
@@ -1377,6 +1387,7 @@ class development_plan {
             $event->data = $data;
 
             tm_workflow_send($event);
+            $this->set_status(DP_PLAN_STATUS_PENDING, DP_PLAN_REASON_APPROVAL_REQUESTED);
 
             // Send alert to learner also
             $this->send_alert(true, 'learningplan-request', 'plan-request-learner-short', 'plan-request-learner-long');

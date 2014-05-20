@@ -64,7 +64,7 @@ class block_totara_addtoplan extends block_base {
         }
 
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        $plans = dp_get_plans($USER->id, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_APPROVED));
+        $plans = dp_get_plans($USER->id, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING, DP_PLAN_STATUS_APPROVED));
         $plans = array_keys($plans);
 
         // If they have no active plan, then we don't need to display this block to them.

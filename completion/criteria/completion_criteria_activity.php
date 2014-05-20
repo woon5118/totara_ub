@@ -150,8 +150,17 @@ class completion_criteria_activity extends completion_criteria {
         // If the activity is complete
         if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
             if ($mark) {
-                // If course module indicated it's completion time, this time will be used. Otherwise current time will set.
-                $timecompleted = (isset($data->timecompleted)) ? $data->timecompleted : null;
+                if (isset($data->timecompleted)) {
+                    // If course module indicated it's completion time, this time will be used.
+                    // Face-to-face uses this to set time of completion to session end date.
+                    $timecompleted = $data->timecompleted;
+                } else if (isset($data->timemodified)) {
+                    // Otherwise use the last modified time in the course_modules_completion record.
+                    $timecompleted = $data->timemodified;
+                } else {
+                    // Otherwise current time will set.
+                    $timecompleted = null;
+                }
                 $completion->mark_complete($timecompleted);
             }
 

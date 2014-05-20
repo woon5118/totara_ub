@@ -78,7 +78,7 @@ $title = format_string($course->fullname) . ': ' . $page;
 $PAGE->navbar->add(get_string('courses'));
 $PAGE->navbar->add($course->shortname, new moodle_url('/course/view.php', array('id'=>$course->id)));
 $PAGE->navbar->add($page);
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/blocks/completionstatus/details.php', array('course' => $course->id, 'user' => $user->id));
 $PAGE->set_title(get_string('course') . ': ' . $course->fullname);
 $PAGE->set_heading($title);

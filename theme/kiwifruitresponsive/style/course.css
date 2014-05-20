@@ -4,3 +4,8 @@
 
 .dir-rtl .course-content ul.section li.activity span.autocompletion,
 .dir-rtl .course-content ul.section li.activity form.togglecompletion {right:auto;left:0px;}
+
+.courses .coursebox.even:hover,
+.courses .coursebox.odd:hover {
+    background-color: #eaebd9;
+}

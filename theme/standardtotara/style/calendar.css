@@ -111,3 +111,6 @@
 .ie.path-calendar .maincalendar .calendar-controls h1.current {
     margin: 0px 0 5px;
 }
+.block .calendar_filters li span img {
+    padding: 3px;
+}

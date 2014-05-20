@@ -39,6 +39,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 // Plan status values
 define('DP_PLAN_STATUS_UNAPPROVED', 10);
+define('DP_PLAN_STATUS_PENDING', 30);
 define('DP_PLAN_STATUS_APPROVED', 50);
 define('DP_PLAN_STATUS_COMPLETE', 100);
 
@@ -91,6 +92,7 @@ define('DP_PLAN_REASON_AUTO_COMPLETE_DATE', 50);
 define('DP_PLAN_REASON_AUTO_COMPLETE_ITEMS', 60);
 define('DP_PLAN_REASON_MANUAL_REACTIVATE', 80);
 define('DP_PLAN_REASON_MANUAL_DECLINE', 90);
+define('DP_PLAN_REASON_APPROVAL_REQUESTED', 100);
 
 // Types of competency evidence items
 define('PLAN_LINKTYPE_MANDATORY', 1);
@@ -585,8 +587,8 @@ function dp_print_workflow_diff($diff_array) {
 function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $cols=array('enddate', 'status', 'completed'), $firstcolheader='') {
     global $CFG, $USER, $DB;
 
-    $statuses = is_array($statuses) ? implode(',', $statuses) : $statuses;
-    $statuses_undrsc = str_replace(',', '_', $statuses);
+    $statuses_string = is_array($statuses) ? implode(',', $statuses) : $statuses;
+    $statuses_undrsc = str_replace(',', '_', $statuses_string);
     $cols = is_array($cols) ? $cols : array($cols);
 
     // Construct sql query
@@ -764,7 +766,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     }
 
     // Display unapproved plans
-    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED))) {
+    if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING))) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
             $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');

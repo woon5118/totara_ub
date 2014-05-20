@@ -5,6 +5,9 @@
 #page-report-completion-index .export-actions {
     text-align: center;
 }
+#page-report-completion-index.dir-rtl #completion-progress th svg {
+    direction: ltr;
+}
 .ie8 div.ie-vertical-completion {
     writing-mode: tb-lr;
     max-height: 24% !important;

@@ -29,11 +29,12 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
-require_once($CFG->libdir . '/testing/generator/data_generator.php');
+require_once($CFG->libdir  . '/testing/generator/data_generator.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
 require_once($CFG->dirroot . '/totara/customfield/definelib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
+require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 abstract class reportcache_advanced_testcase extends advanced_testcase {
     protected static $generator = null;
@@ -150,7 +151,6 @@ class reportcache_testing_data_generator extends testing_data_generator {
         $default = array('fullname' => 'Program ' . self::$ind,
                          'availablefrom' => 0,
                          'availableuntil' => 0,
-                         'sortorder' => $sortorder,
                          'timecreated' => $now,
                          'timemodified' => $now,
                          'usermodified' => 2,
@@ -254,7 +254,9 @@ class reportcache_testing_data_generator extends testing_data_generator {
      * @param int $program id Program id
      * @param array $courseids of int Course id
      */
-    public function add_courseset_program($programid, $courseids) {
+    public function add_courseset_program($programid, $courseids, $certifpath = CERTIFPATH_CERT) {
+        global $CERTIFPATHSUF;
+
         $rawdata = new stdClass();
         $rawdata->id = $programid;
         $rawdata->contentchanged = 1;
@@ -270,15 +272,26 @@ class reportcache_testing_data_generator extends testing_data_generator {
         $rawdata->{'999completiontype'} = 1;
         $rawdata->{'999timeallowedperiod'} = 2;
         $rawdata->{'999timeallowednum'} = 1;
-        $rawdata->setprefixes_ce = 999;
-        $rawdata->certifpath_ce = 1;
-        $rawdata->iscertif = 0;
-        $rawdata->{'999certifpath'} = 1;
-        $rawdata->contenttype_ce = 1;
+
+        if ($certifpath === CERTIFPATH_RECERT) { // Re-certification path.
+            $rawdata->setprefixes_rc = 999;
+            $rawdata->certifpath_rc = CERTIFPATH_RECERT;
+            $rawdata->iscertif = 1;
+            $rawdata->contenttype_rc = 1;
+            $rawdata->{'999certifpath'} = 2;
+            $rawdata->contenttype_rc = 1;
+        } else { // Certification path.
+            $rawdata->setprefixes_ce = 999;
+            $rawdata->certifpath_ce = CERTIFPATH_CERT;
+            $rawdata->iscertif = 0;
+            $rawdata->{'999certifpath'} = 1;
+            $rawdata->contenttype_ce = 1;
+        }
 
         $program = new program($programid);
         $programcontent = $program->get_content();
         $programcontent->setup_content($rawdata);
+        $programcontent->add_set($rawdata->{'contenttype' . $CERTIFPATHSUF[$certifpath]});
         $programcontent->save_content();
     }
 

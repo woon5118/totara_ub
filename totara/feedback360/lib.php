@@ -309,7 +309,7 @@ class feedback360 {
 
         $params = ($userid == 0) ? array() : array('userid' => $userid);
 
-        return $DB->get_records('feedback360', $params);
+        return $DB->get_records('feedback360', $params, 'status, name ASC');
     }
 
     /**

@@ -835,7 +835,7 @@ abstract class dp_base_component {
             $assigned_ids[$item->$item_id_name] = $item->$item_id_name;
         }
         $sendalert = (count(array_diff($items, $assigned_ids)) || count(array_diff($assigned_ids, $items)))
-            && $this->plan->status != DP_PLAN_STATUS_UNAPPROVED;
+            && $this->plan->status != DP_PLAN_STATUS_UNAPPROVED && $this->plan->status != DP_PLAN_STATUS_PENDING;
         $updates = '';
 
         $transaction = $DB->start_delegated_transaction();
