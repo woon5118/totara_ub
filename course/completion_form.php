@@ -142,12 +142,13 @@ class course_completion_form extends moodleform {
 
         // Get applicable courses (prerequisites).
         $courses = $DB->get_records_sql("
-                SELECT DISTINCT c.id, c.category, c.fullname, cc.id AS selected
+                SELECT DISTINCT c.id, c.category, c.sortorder, c.fullname, cc.id AS selected
                   FROM {course} c
              LEFT JOIN {course_completion_criteria} cc ON cc.courseinstance = c.id AND cc.course = {$course->id}
             INNER JOIN {course_completion_criteria} ccc ON ccc.course = c.id
                  WHERE c.enablecompletion = ".COMPLETION_ENABLED."
-                       AND c.id <> {$course->id}");
+                       AND c.id <> {$course->id}
+              ORDER BY c.sortorder");
 
         if (!empty($courses)) {
             // Get category list.
