@@ -45,7 +45,8 @@ $finishattempt = optional_param('finishattempt', false, PARAM_BOOL);
 $timeup        = optional_param('timeup',        0,      PARAM_BOOL); // True if form was submitted by timer.
 $scrollpos     = optional_param('scrollpos',     '',     PARAM_RAW);
 
-$transaction = $DB->start_delegated_transaction();
+// We cannot use transactions here because of the MDL-30029 issue in messagelib.php.
+//$transaction = $DB->start_delegated_transaction();
 $attemptobj = quiz_attempt::create($attemptid);
 
 // Set $nexturl now.
@@ -150,7 +151,7 @@ if (!$finishattempt) {
         $attemptobj->process_going_overdue($timenow, true);
     }
 
-    $transaction->allow_commit();
+//    $transaction->allow_commit();
     if ($becomingoverdue) {
         redirect($attemptobj->summary_url());
     } else {
@@ -189,5 +190,5 @@ try {
 }
 
 // Send the user to the review page.
-$transaction->allow_commit();
+//$transaction->allow_commit();
 redirect($attemptobj->review_url());
