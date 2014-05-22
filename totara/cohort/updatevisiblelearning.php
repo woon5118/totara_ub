@@ -39,8 +39,8 @@ if (!empty($CFG->audiencevisibility)) {
         if ($DB->update_record('course', array('id' => $id, 'audiencevisible' => $value))) {
             echo json_encode(array('update' => 'course', 'id' => $id, 'value' => $value));
         }
-    } else if (in_array($type, array(COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_ITEMTYPE_CERTIF))
-               && has_capability('totara/program:configuredetails', context_program::instance($id))) {
+    } else if (($type == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability('totara/program:configuredetails', context_program::instance($id)))
+                || ($type == COHORT_ASSN_ITEMTYPE_CERTIF && has_capability('totara/certification:configuredetails', context_program::instance($id)))) {
 
         // Update the database record and echo the result.
         if ($DB->update_record('prog', array('id' => $id, 'audiencevisible' => $value))) {
