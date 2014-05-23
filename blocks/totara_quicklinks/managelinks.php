@@ -116,6 +116,7 @@ $managefeeds = new moodle_url('/blocks/totara_quicklinks/managelinks.php', $urlp
 $PAGE->navbar->add(get_string('blocks'));
 $PAGE->navbar->add(get_string('managelinks', 'block_totara_quicklinks'), $managefeeds);
 echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('managelinks', 'block_totara_quicklinks'), 1, null, 'managelinks');
 
 $table = new flexible_table('totara-quicklinks-display-links');
 
