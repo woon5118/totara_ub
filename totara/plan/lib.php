@@ -642,7 +642,7 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     }
 
     // Actions
-    $tableheaders[] = '';
+    $tableheaders[] = get_string('actions', 'totara_plan');
     $tablecols[] = 'actioncontrols';
 
     $baseurl = $CFG->wwwroot . '/totara/plan/index.php';
