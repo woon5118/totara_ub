@@ -24,6 +24,7 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
+require_once('add_form.php');
 
 require_login();
 
@@ -155,20 +156,10 @@ foreach ($links as $link) {
 
     $table->add_data(array($linktitle, $linkurl, $linkicons));
 }
-
-// Add link form
-$addtitle = html_writer::start_tag("form", array('action' => "managelinks.php", 'name' => "addlink", 'method' => "post"))
-    . html_writer::empty_tag('input', array('type' => "hidden", 'name' => "blockaction", 'value' => "add"))
-    . html_writer::empty_tag('input', array('type' => "hidden", 'name' => "blockinstanceid", 'value' => $blockinstanceid))
-    . html_writer::empty_tag('input', array('type' => "hidden", 'name' => "sesskey", 'value' => sesskey()))
-    . html_writer::empty_tag('input', array('type' => "text", 'id' => "linktitle", 'name' => "linktitle"));
-$addurl = html_writer::empty_tag('input', array('type' => "text", 'id' => "linkurl",'name' => 'linkurl'));
-$addicon = $OUTPUT->single_button(null, get_string('add'), 'post', array('id' => "btnAddLink", 'name' => "btnAddLink"))
-    . html_writer::end_tag('form');
-
-$table->add_data(array($addtitle, $addurl, $addicon));
-
 $table->print_html();
+
+$mform = new totara_quicklinks_add_quicklink_form(null, array('blockinstanceid' => $blockinstanceid));
+$mform->display();
 
 //If we have a return url then print back button
 if ($returnurl) {

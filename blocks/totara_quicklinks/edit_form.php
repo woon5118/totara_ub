@@ -46,7 +46,6 @@ class block_totara_quicklinks_edit_form extends block_edit_form {
         $mform->addElement('static', 'linkstable', get_string('links', 'block_totara_quicklinks'),
             html_writer::tag('table', html_writer::tag('tr', html_writer::tag('td', $titlestr) . html_writer::tag('td', $urlstr)) . $content));
 
-
         $blockcontext = context_block::instance($this->block->instance->id);
         if (has_capability('block/totara_quicklinks:manageownlinks', $blockcontext)) {
             $mform->addElement('static', 'managelinks', '', html_writer::link(new moodle_url('/blocks/totara_quicklinks/managelinks.php',
