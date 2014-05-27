@@ -190,7 +190,7 @@ div.totara-dialog {
                 div.totara-dialog ul.treeview li span.unclickable,
                 div.totara-dialog ul.treeview li span.unclickable a,
                 div.totara-dialog .selected span.unremovable a {
-                    color: #999999;
+                    color: #777777;
                     cursor: text;
                     text-decoration: none;
                 }
