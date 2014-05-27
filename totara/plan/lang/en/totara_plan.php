@@ -571,6 +571,7 @@ $string['launchprogram'] = 'Launch program';
 $string['learner'] = 'Learner';
 $string['learning'] = 'Learning';
 $string['learningplan'] = 'Learning Plan';
+$string['learningplan:name:tab'] = 'Learning Plan: {$a->name} - {$a->tab}';
 $string['learningplans'] = 'Learning Plans';
 $string['learningplansdisabled'] = 'Learning Plans are not enabled on this site.';
 $string['linkedcompetencies'] = 'Linked competencies';

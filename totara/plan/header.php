@@ -48,7 +48,14 @@ else {
 }
 
 $fullname = $this->name;
-$pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fullname);
+if ($is_component) {
+    $titleargs = new stdclass();
+    $titleargs->name = $fullname;
+    $titleargs->tab = get_string($currenttab . 'plural', 'totara_plan');
+    $pagetitle = format_string(get_string('learningplan:name:tab', 'totara_plan', $titleargs));
+} else {
+    $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fullname);
+}
 
 //Javascript include
 local_js(array(
@@ -76,7 +83,7 @@ echo $OUTPUT->container_start('', 'dp-plan-content');
 echo $this->display_plan_message_box();
 
 $heading = html_writer::tag('span', get_string('plan', 'totara_plan') . ':', array('class' => 'dp-plan-prefix'));
-echo $OUTPUT->heading($heading . ' ' . $fullname);
+echo $OUTPUT->heading($heading . ' ' . $fullname, 1);
 
 print $this->display_tabs($currenttab);
 
