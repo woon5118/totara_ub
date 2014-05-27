@@ -216,6 +216,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
         $update = true;
         $todb->id = $session->id;
         $sessionid = $session->id;
+        $olddates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
         if (!facetoface_update_session($todb, $sessiondates)) {
             add_to_log($course->id, 'facetoface', 'update session (FAILED)', "sessions.php?s=$session->id", $facetoface->id, $cm->id);
             print_error('error:couldnotupdatesession', 'facetoface', $returnurl);
@@ -255,6 +256,14 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if ($update) {
         // Now that we have updated the session record fetch the rest of the data we need.
         facetoface_update_attendees($session);
+
+        // Send any necessary datetime change notifications.
+        if (facetoface_session_dates_check($olddates, $sessiondates)) {
+            $attendees = facetoface_get_attendees($session->id);
+            foreach ($attendees as $user) {
+                facetoface_send_datetime_change_notice($facetoface, $session, $user->id);
+            }
+        }
     }
 
     // Save trainer roles.

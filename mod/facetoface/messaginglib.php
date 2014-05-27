@@ -84,6 +84,11 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
     // Get user object if only id is given
     $user = (is_object($user) ? $user : $DB->get_record('user', array('id' => $user)));
 
+    // Handle a lack of session dates gracefully, there should atleast be an empty record.
+    if (empty($session->sessiondates)) {
+        $session->sessiondates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
+    }
+
     // First, generate all the VEVENT blocks
     $VEVENTS = '';
     foreach ($session->sessiondates as $date) {
