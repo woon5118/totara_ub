@@ -381,15 +381,19 @@ h2.headingblock {
     padding:10px 30px 10px 10px !important;
 }
 .notifysuccess {
-    background:#F6FFC4 url([[pix:theme|tick]]) no-repeat 8px 11px;
-    color:#468847;
-    background-color:#DFF0D8;
+    background:#dff0d8 url([[pix:theme|tick]]) no-repeat 8px 11px;
+    color:#337733;
     border-color:#C2D6B2;
+}
+.notifymessage {
+    color: #3060a0;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: #BBD7E4;
 }
 .notice,
 .notifynotice {
-    background:#FFFBE7 url([[pix:theme|notifynotice]]) no-repeat 8px 11px;
-    color:#BB8931;
+    background:#fffbe7 url([[pix:theme|notifynotice]]) no-repeat 8px 11px;
+    color:#885600;
     border-color:#F1E5B1;
 }
 .notifynotice table {
