@@ -78,8 +78,7 @@ if (reportbuilder_get_reports()){
     echo $OUTPUT->container_start(null, 'scheduledreports_section');
     echo $OUTPUT->container_start(null, 'scheduledreports_section_inner');
     echo html_writer::empty_tag('br');
-    echo html_writer::tag('a', '', array('name' => 'scheduled'));
-    echo $OUTPUT->heading(get_string('scheduledreports', 'totara_reportbuilder'), 1);
+    echo $OUTPUT->heading(get_string('scheduledreports', 'totara_reportbuilder'), 2, null, 'scheduled');
 
     totara_print_scheduled_reports();
     echo $OUTPUT->container_end();
