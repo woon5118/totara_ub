@@ -1313,12 +1313,6 @@ function totara_date_parse_from_format ($format, $date) {
     }
 }
 
-function get_totara_menu($header=true) {
-    global $CFG, $USER;
-    //$CFG and $USER are used by totara_menu.php
-    include($CFG->dirroot.'/totara/core/totara_menu.php');
-}
-
 
 /**
  * Check if the HTTP request was of type POST
