@@ -207,7 +207,9 @@ if (!empty($delete)) {
 
         if (!$confirm && empty($ajax)) {
             // Show confirmation message
+            $PAGE->set_title(get_string('deleteplan', 'totara_plan'));
             echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('deleteplan', 'totara_plan'), 1);
             $confirmurl = new moodle_url(qualified_me());
             $confirmurl->param('confirm', 'true');
             $confirmurl->param('referer', $referer);
