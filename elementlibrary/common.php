@@ -45,8 +45,6 @@ echo html_writer::tag('i', 'old fashioned italics');
 echo ' Lorum Ipsum ';
 echo html_writer::tag('u', 'underlined but not a link');
 echo ' Lorum Ipsum ';
-echo html_writer::tag('blink', 'blinking text');
-echo ' Lorum Ipsum ';
 echo html_writer::tag('abbr', 'Abbr. txt.', array('title' => 'Abbreviated text'));
 echo ' Lorum Ipsum ';
 echo html_writer::tag('acronym', 'RADAR acronym text', array('title' => 'radio detecting and ranging'));
