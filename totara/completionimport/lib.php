@@ -596,6 +596,7 @@ function import_course($importname, $importtime) {
     $errors = array();
     $updateids = array();
     $users = array();
+    $enrolledusers = array();
     $completions = array();
     $deletedcompletions = array();
     $completion_history = array();
@@ -628,7 +629,7 @@ function import_course($importname, $importtime) {
             LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = u.id)
             LEFT JOIN {course_completions} cc ON cc.userid = u.id AND cc.course = c.id
             {$sqlwhere}
-            ORDER BY e.id, i.rownumber"; // Note order by enrolid.
+            ORDER BY courseid, userid, completiondate desc, grade desc";
 
     $courses = $DB->get_recordset_sql($sql, $params);
     if ($courses->valid()) {
@@ -637,6 +638,8 @@ function import_course($importname, $importtime) {
         $timeend = 0;
         $enrolcount = 1;
         $enrolid = 0;
+        $currentuser = 0;
+        $currentcourse = 0;
 
         foreach ($courses as $course) {
             if (empty($enrolid) || ($enrolid != $course->enrolid) || (($enrolcount % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
@@ -661,6 +664,7 @@ function import_course($importname, $importtime) {
                 // New enrol record or reached the next batch insert.
                 if (!empty($users)) {
                     // Batch enrol users.
+                    $instance = $DB->get_record('enrol', array('id' => $enrolid));
                     $plugin->enrol_user_bulk($instance, $users, $instance->roleid, $timestart, $timeend);
                     $enrolcount = 0;
                     $users = array();
@@ -696,7 +700,16 @@ function import_course($importname, $importtime) {
                 // User isn't already enrolled or has been suspended, so add them to the enrol list.
                 $user = new stdClass();
                 $user->userid = $course->userid;
-                $users[] = $user;
+                $user->courseid = $course->courseid;
+                // Only add users if they have not been marked already to be enrolled.
+                if (!array_key_exists($user->userid, $enrolledusers) || !in_array($user->courseid, $enrolledusers[$user->userid])) {
+                    $users[] = $user;
+                    if (array_key_exists($user->userid, $enrolledusers)) {
+                        array_push($enrolledusers[$user->userid], $user->courseid);
+                    } else {
+                        $enrolledusers[$user->userid] = array($user->courseid);
+                    }
+                }
                 $timeenrolled = $timecompleted;
                 $timestarted = $timecompleted;
             } else if (!empty($timecompleted)) {
@@ -708,7 +721,6 @@ function import_course($importname, $importtime) {
                     $timestarted = $timecompleted;
                 }
             }
-
             // Create completion record.
             $completion = new stdClass();
             $completion->rpl = get_string('rpl', 'totara_completionimport', $course->grade);
@@ -723,28 +735,23 @@ function import_course($importname, $importtime) {
 
             $priorkey = "{$completion->userid}_{$completion->course}";
             $historyrecord = null;
-            if (empty($course->coursecompletionid) && (!array_key_exists($priorkey, $completions))) {
-                // No completion exists, add record.
-                $completions[$priorkey] = $completion;
-            } else if (array_key_exists($priorkey, $completions)) {
-                if ($completion->timecompleted > $completions[$priorkey]->timecompleted) {
-                    $historyrecord = $completions[$priorkey];
-                    $completions[$priorkey] = $completion;
-                } else {
-                    // Older record. Put it into history.
-                    $historyrecord = $completion;
-                }
-            } else if ($completion->timecompleted >= $course->currenttimecompleted) {
-                if ($overridecurrentcompletion) {
-                    // Completion exists but we are overriding, add to deleted array.
+
+            // Now that records have been ordered we know everytime we enter here means it's a new completion record.
+            if ($course->userid != $currentuser || $course->courseid != $currentcourse) {
+                // User or course has changed or they are empty. Update the current user and course.
+                $currentuser = $course->userid;
+                $currentcourse = $course->courseid;
+                if (empty($course->coursecompletionid)) {
+                    $completions[$priorkey] = $completion; // Completion should be the first record
+                } else if ($completion->timecompleted >= $course->currenttimecompleted && $overridecurrentcompletion) {
                     $deletedcompletions[] = $course->coursecompletionid;
                     $completions[$priorkey] = $completion;
                 }
             } else {
-                // Existing record - put it into history.
                 $historyrecord = $completion;
             }
 
+            // Save historical records.
             if (!is_null($historyrecord)) {
                 $priorhistorykey = "{$historyrecord->course}_{$historyrecord->userid}_{$historyrecord->timecompleted}";
                 $history = new StdClass();
@@ -759,7 +766,6 @@ function import_course($importname, $importtime) {
             }
 
             $updateids[] = $course->importid;
-
             $enrolcount++;
         }
     }
