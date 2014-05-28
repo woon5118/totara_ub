@@ -4,7 +4,8 @@
 
 $capabilities = array(
     'moodle/my:configsyspages',
-    'moodle/tag:manage'
+    'moodle/tag:manage',
+    'totara/core:editmainmenu',
 );
 
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // speedup for non-admins, add all caps used on this page
@@ -137,6 +138,10 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // sp
     $temp->add(new admin_setting_configcheckbox('navadduserpostslinks', new lang_string('navadduserpostslinks', 'admin'), new lang_string('navadduserpostslinks_help', 'admin'), 1));
 
     $ADMIN->add('appearance', $temp);
+
+     // Totara navigation.
+    $ADMIN->add('appearance', new admin_externalpage('totaranavigation', new lang_string('totaranavigation', 'totara_core'),
+            new moodle_url('/totara/core/menu/index.php'), array('totara/core:editmainmenu')));
 
     // "htmlsettings" settingpage
     $temp = new admin_settingpage('htmlsettings', new lang_string('htmlsettings', 'admin'), array('totara/core:appearance'));

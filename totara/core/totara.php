@@ -1666,7 +1666,6 @@ function totara_get_nav_select_classes($navstructure, $primary_selected, $second
     return $selected;
 }
 
-
 /**
  * Builds Totara menu, returns an array of objects that
  * represent the stucture of the menu
@@ -1677,222 +1676,57 @@ function totara_get_nav_select_classes($navstructure, $primary_selected, $second
  * @return Array of menu item objects
  */
 function totara_build_menu() {
-    global $USER, $SESSION, $CFG, $reportbuilder_permittedreports;
-
-    if (isset($SESSION->viewtype) && $SESSION->viewtype == 'program') {
-        $findcourse_type = 'program';
-    } else {
-        $findcourse_type = 'course';
-    }
-
-    require_once($CFG->dirroot . '/totara/plan/lib.php');
-    $canviewlearningplans = totara_feature_visible('learningplans') && dp_can_view_users_plans($USER->id);
-    $requiredlearninglink = prog_get_tab_link($USER->id);
-
-    require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-    if (!isset($reportbuilder_permittedreports) || !is_array($reportbuilder_permittedreports)) {
-        $reportbuilder_permittedreports = reportbuilder::get_permitted_reports();
-    }
-    $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
-
-    $viewprograms = totara_feature_visible('programs');
-    $viewcertifications = totara_feature_visible('certifications');
-
+    $rs = \totara_core\totara\menu\menu::get_nodes();
     $tree = array();
-
-    $tree[] = (object)array(
-        'name' => 'home',
-        'linktext' => get_string('home'),
-        'parent' => null,
-        'url' => '/index.php'
-    );
-
-    $tree[] = (object)array(
-        'name' => 'mylearning',
-        'linktext' => get_string('mylearning', 'totara_core'),
-        'parent' => null,
-        'url' => '/my/'
-    );
-
-
-    // My Appraisals tab.
-    require_once($CFG->dirroot . '/totara/appraisal/lib.php');
-    require_once($CFG->dirroot . '/totara/feedback360/lib.php');
-    require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
-    $isappraisalenabled = totara_feature_visible('appraisals');
-    $viewownappraisals = $isappraisalenabled && appraisal::can_view_own_appraisals($USER->id);
-    $viewappraisals = $isappraisalenabled && ($viewownappraisals || appraisal::can_view_staff_appraisals($USER->id));
-    $viewfeedback360s = totara_feature_visible('feedback360') && feedback360::can_view_feedback360s($USER->id);
-    $viewgoals = totara_feature_visible('goals') && goal::can_view_goals($USER->id);
-    if ($viewappraisals || $viewfeedback360s || $viewgoals) {
-        if ($viewownappraisals) {
-            $tree[] = (object)array(
-                'name' => 'appraisals',
-                'linktext' => get_string('appraisals', 'totara_appraisal'),
-                'parent' => null,
-                'url' => '/totara/appraisal/myappraisal.php?latest=1'
-            );
-            $tree[] = (object)array(
-                'name' => 'latestappraisal',
-                'linktext' => get_string('latestappraisal', 'totara_appraisal'),
-                'parent' => 'appraisals',
-                'url' => '/totara/appraisal/myappraisal.php?latest=1'
-            );
-        } else if ($viewappraisals) {
-            $tree[] = (object)array(
-                'name' => 'appraisals',
-                'linktext' => get_string('appraisals', 'totara_appraisal'),
-                'parent' => null,
-                'url' => '/totara/appraisal/index.php'
-            );
-        } else if ($viewfeedback360s) {
-            $tree[] = (object)array(
-                'name' => 'appraisals',
-                'linktext' => get_string('appraisals', 'totara_appraisal'),
-                'parent' => null,
-                'url' => '/totara/feedback360/index.php'
-            );
-        } else if ($viewgoals) {
-            $tree[] = (object)array(
-                'name' => 'appraisals',
-                'linktext' => get_string('appraisals', 'totara_appraisal'),
-                'parent' => null,
-                'url' => '/totara/hierarchy/prefix/goal/mygoals.php'
-            );
+    foreach ($rs as $id => $item) {
+        // If parent exists and parent visibility is always hide then hide all children.
+        if (!is_null($item->parentvisibility) && $item->parentvisibility == \totara_core\totara\menu\menu::HIDE_ALWAYS) {
+            continue;
+        // Otherwise, if parent is show when required, check if it is currently visible.
+        } else if ($item->parentvisibility == \totara_core\totara\menu\menu::SHOW_WHEN_REQUIRED) {
+            $classname = $item->parent;
+            if (!is_null($classname) && class_exists($classname)) {
+                $parentnode = new $classname(array());
+                if ($parentnode->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
+                    continue;
+                }
+            }
+        }
+        $node = \totara_core\totara\menu\menu::node_instance($item);
+        // Silently ignore bad nodes - they might have been removed
+        // from the code but not purged from the DB yet.
+        if ($node === false) {
+            continue;
+        }
+        // Check each node's visibility.
+        if ($node->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
+            continue;
         }
 
-        if ($viewappraisals) {
-            $tree[] = (object)array(
-                'name' => 'allappraisals',
-                'linktext' => get_string('allappraisals', 'totara_appraisal'),
-                'parent' => 'appraisals',
-                'url' => '/totara/appraisal/index.php'
-            );
-        }
-
-        if ($viewfeedback360s) {
-            $tree[] = (object)array(
-                'name' => 'feedback360',
-                'linktext' => get_string('feedback360', 'totara_feedback360'),
-                'parent' => 'appraisals',
-                'url' => '/totara/feedback360/index.php'
-            );
-        }
-
-        if ($viewgoals) {
-            $tree[] = (object)array(
-                'name' => 'mygoals',
-                'linktext' => get_string('mygoals', 'totara_hierarchy'),
-                'parent' => 'appraisals',
-                'url' => '/totara/hierarchy/prefix/goal/mygoals.php'
-            );
-        }
-    }
-
-    if ($canviewlearningplans) {
         $tree[] = (object)array(
-            'name' => 'learningplans',
-            'linktext' => get_string('learningplans', 'totara_core'),
-            'parent' => 'mylearning',
-            'url' => '/totara/plan/index.php'
+            'name'     => $node->get_name(),
+            'linktext' => $node->get_title(),
+            'parent'   => $node->get_parent(),
+            'url'      => $node->get_url(),
+            'target'   => $node->get_targetattr()
         );
     }
-
-    $tree[] = (object)array(
-        'name' => 'mybookings',
-        'linktext' => get_string('mybookings', 'totara_core'),
-        'parent' => 'mylearning',
-        'url' => '/my/bookings.php'
-    );
-
-    $tree[] = (object)array(
-        'name' => 'recordoflearning',
-        'linktext' => get_string('recordoflearning', 'totara_core'),
-        'parent' => 'mylearning',
-        'url' => '/totara/plan/record/index.php'
-    );
-
-    if ($requiredlearninglink &&
-        (totara_feature_visible('programs') || totara_feature_visible('certifications'))) {
-        $tree[] = (object)array(
-            'name' => 'requiredlearning',
-            'linktext' => get_string('requiredlearning', 'totara_program'),
-            'parent' => 'mylearning',
-            'url' => $requiredlearninglink
-        );
-    }
-
-    if ($staff = totara_get_staff() || is_siteadmin()) {
-
-        $tree[] = (object)array(
-            'name' => 'myteam',
-            'linktext' => get_string('myteam', 'totara_core'),
-            'parent' => null,
-            'url' => '/my/teammembers.php'
-        );
-
-    }
-
-    if ($hasreports) {
-        $tree[] = (object)array(
-            'name' => 'myreports',
-            'linktext' => get_string('myreports', 'totara_core'),
-            'parent' => null,
-            'url' => '/my/reports.php'
-        );
-    }
-
-    $findcoursesstr = get_string('findlearning', 'totara_core');
-    if (!empty($CFG->enhancedcatalog)) {
-        $findcoursesurl = new moodle_url('/totara/coursecatalog/courses.php');
-        $findprogsurl = new moodle_url('/totara/coursecatalog/programs.php');
-        $findcertsurl = new moodle_url('/totara/coursecatalog/certifications.php');
-    } else {
-        $findcoursesurl = new moodle_url('/course/index.php');
-        $findprogsurl = new moodle_url('/totara/program/index.php');
-        $findcertsurl = new moodle_url('/totara/program/index.php', array('viewtype' => 'certification'));
-    }
-    $tree[] = (object)array(
-        'name' => 'findlearning',
-        'linktext' => $findcoursesstr,
-        'parent' => null,
-        'url' => $findcoursesurl
-    );
-
-    $tree[] = (object)array(
-        'name' => 'course',
-        'linktext' => get_string('courses'),
-        'parent' => 'findlearning',
-        'url' => $findcoursesurl
-    );
-
-    if ($viewprograms) {
-        $tree[] = (object)array(
-            'name' => 'program',
-            'linktext' => get_string('programs', 'totara_program'),
-            'parent' => 'findlearning',
-            'url' => $findprogsurl
-        );
-    }
-
-    $plugins = get_plugin_list('totara');
-    if (isset($plugins['certification']) && $viewcertifications) {
-        $tree[] = (object)array(
-            'name' => 'certification',
-            'linktext' => get_string('certifications', 'totara_certification'),
-            'parent' => 'findlearning',
-            'url' => $findcertsurl
-        );
-    }
-
-    $tree[] = (object)array(
-        'name' => 'calendar',
-        'linktext' => get_string('calendar', 'totara_core'),
-        'parent' => null,
-        'url' => '/calendar/view.php'
-    );
 
     return $tree;
+}
+
+function totara_upgrade_menu() {
+    $TOTARAMENU = new \totara_core\totara\menu\build();
+    $plugintypes = core_component::get_plugin_types();
+    foreach ($plugintypes as $plugin => $path) {
+        $pluginname = core_component::get_plugin_list_with_file($plugin, 'db/totaramenu.php');
+        if (!empty($pluginname)) {
+            foreach ($pluginname as $name => $file) {
+                require_once($file);
+            }
+        }
+    }
+    $TOTARAMENU->upgrade();
 }
 
 /**

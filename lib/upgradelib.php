@@ -1621,6 +1621,8 @@ function upgrade_noncore($verbose) {
         foreach ($plugintypes as $type=>$location) {
             upgrade_plugins($type, 'print_upgrade_part_start', 'print_upgrade_part_end', $verbose);
         }
+        // Upgrade totara navigation menu.
+        totara_upgrade_menu();
         // Update cache definitions. Involves scanning each plugin for any changes.
         cache_helper::update_definitions();
         // Mark the site as upgraded.

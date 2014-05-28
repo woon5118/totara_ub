@@ -492,7 +492,7 @@ class totara_core_renderer extends plugin_renderer_base {
                 $output .= html_writer::start_tag('li', array('class' => $class));
                 $url = new moodle_url($menuitem->url);
 
-                $output .= $this->output->action_link($url, $menuitem->linktext);
+                $output .= $this->output->action_link($url, $menuitem->linktext, null, array('target' => $menuitem->target));
 
                 $output .= $this->print_totara_menu($menudata, $menuitem->name, $selected_items);
                 $output .= html_writer::end_tag('li');

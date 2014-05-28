@@ -720,6 +720,7 @@ $string['requestextension'] = '(Request an extension)';
 $string['requiredlearning'] = 'Required Learning';
 $string['requiredlearninginstructions'] = 'Your required learning is shown below.';
 $string['requiredlearninginstructionsuser'] = '{$a}\'s required learning is shown below.';
+$string['requiredlearningmenu'] = 'Required Learning';
 $string['resortprogramsbyname'] = 'Re-sort programs by name';
 $string['returntoprogram'] = 'Return to program';
 $string['rolprogramsourcename'] = 'Record of Learning: Programs';

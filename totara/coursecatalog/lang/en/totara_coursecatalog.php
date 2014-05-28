@@ -39,6 +39,7 @@ $string['catalogprograms'] = 'Enhanced catalog: programs';
 $string['certifications'] = 'Certifications';
 $string['completiontotrack'] = 'Completion to track';
 $string['coursecatalog:manageaudiencevisibility'] = 'Manage audience-based visibility';
+$string['courses'] = 'Courses';
 $string['deletedreminder'] = 'Successfully deleted reminder "{$a}"';
 $string['deletereminder'] = 'Delete reminder "{$a}"';
 $string['dontsend'] = 'Don\'t send this message';
@@ -59,6 +60,7 @@ As you maybe aware your involvement with your staff member around this training 
 
 There are no further reminders of this but please be aware that the return rates are noted and reported at the business unit & business group level.';
 $string['escalationsubjectdefault'] = 'Outstanding Course evaluation from [firstname] [lastname]';
+$string['findlearning'] = 'Find Learning';
 $string['invitation'] = 'Invitation';
 $string['invitationmessage'] = 'Message';
 $string['invitationmessage_help'] = 'This is the message for the invitation email.

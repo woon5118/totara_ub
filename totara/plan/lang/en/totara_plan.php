@@ -883,6 +883,7 @@ $string['reactivateplantext'] = 'If you want to make changes or continue using t
 $string['reasonapprovedplanrequest'] = 'The reason given for approving the plan was: {$a}';
 $string['reasondeclinedplanrequest'] = 'The reason given for declining the plan was: {$a}';
 $string['reasongivenfordecision'] = 'The reason given for this decision was: {$a}';
+$string['recordoflearning'] = 'Record of Learning';
 $string['recordoflearningcertifications'] = 'Record of Learning: Certifications';
 $string['recordoflearningcertificationshistory'] = 'Record of Learning: Previous Certifications';
 $string['recordoflearningcompetencies'] = 'Record of Learning: Competencies';

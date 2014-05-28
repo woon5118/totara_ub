@@ -1252,5 +1252,38 @@ function xmldb_totara_core_upgrade($oldversion) {
         }
         totara_upgrade_mod_savepoint(true, 2014101402, 'totara_core');
     }
+
+    if ($oldversion < 2014102000) {
+
+        $table = new xmldb_table('totara_navigation');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('title', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('url', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('classname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('depth', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('path', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('customtitle', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('visibility', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('targetattr', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        $table->add_index('parentid', XMLDB_INDEX_NOTUNIQUE, array('parentid'));
+        $table->add_index('sortorder', XMLDB_INDEX_NOTUNIQUE, array('sortorder'));
+
+        $table->setComment('Totara navigation menu');
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014102000, 'totara_core');
+    }
+
     return true;
 }

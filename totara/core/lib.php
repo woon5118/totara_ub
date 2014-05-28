@@ -515,3 +515,124 @@ function totara_resize_images_filearea($contextid, $component, $filearea, $itemi
     }
     return $resizedimages ;
 }
+
+/**
+ * Create recursively totara menu table
+ *
+ * @param html_table $table to add data to.
+ * @param totara_core_menu $item to render
+ * @param int $depth of the category.
+ * @param bool $up true if this category can be moved up.
+ * @param bool $down true if this category can be moved down.
+ */
+function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\menu $item, $depth = 0, $up = false, $down = false) {
+    global $OUTPUT;
+
+    static $str = null;
+
+    if (is_null($str)) {
+        $str = new stdClass;
+        $str->edit = new lang_string('edit');
+        $str->delete = new lang_string('delete');
+        $str->moveup = new lang_string('moveup');
+        $str->movedown = new lang_string('movedown');
+        $str->hide = new lang_string('hide');
+        $str->show = new lang_string('show');
+        $str->spacer = $OUTPUT->spacer(array('width' => 11, 'height' => 11));
+    }
+
+    if ($item->id) {
+        $node = \totara_core\totara\menu\menu::node_instance($item->get_property());
+        if ($node === false) {
+            // Bad node, don't display.
+            return;
+        }
+        $dimmed = ($item->visibility ? '' : ' dimmed');
+        $url = '/totara/core/menu/index.php';
+        $itemurl = new moodle_url($node->get_url());
+        $itemurl = html_writer::link($itemurl, $itemurl, array('class' => $dimmed));
+        $itemtitle = $node->get_title();
+        $attributes = array();
+        $attributes['title'] = $str->edit;
+        $attributes['class'] = 'totara_item_depth'.$depth.$dimmed;
+        $itemtitle = html_writer::link(new moodle_url('/totara/core/menu/edit.php',
+                array('id' => $item->id)), $itemtitle, $attributes);
+
+        $icons = array();
+        // Edit category.
+        $icons[] = $OUTPUT->action_icon(
+                        new moodle_url('/totara/core/menu/edit.php', array('id' => $item->id)),
+                        new pix_icon('t/edit', $str->edit, 'moodle', array('class' => 'iconsmall')),
+                        null, array('title' => $str->edit)
+        );
+        // Change visibility.
+        if ($item->visibility != \totara_core\totara\menu\menu::HIDE_ALWAYS) {
+            $icons[] = $OUTPUT->action_icon(
+                            new moodle_url($url, array('hideid' => $item->id, 'sesskey' => sesskey())),
+                            new pix_icon('t/hide', $str->hide, 'moodle', array('class' => 'iconsmall')),
+                            null, array('title' => $str->hide)
+            );
+        } else {
+            $icons[] = $OUTPUT->action_icon(
+                            new moodle_url($url, array('showid' => $item->id, 'sesskey' => sesskey())),
+                            new pix_icon('t/show', $str->show, 'moodle', array('class' => 'iconsmall')),
+                            null, array('title' => $str->show)
+            );
+        }
+        // Move up/down.
+        if ($up) {
+            $icons[] = $OUTPUT->action_icon(
+                            new moodle_url($url, array('moveup' => $item->id, 'sesskey' => sesskey())),
+                            new pix_icon('t/up', $str->moveup, 'moodle', array('class' => 'iconsmall')),
+                            null, array('title' => $str->moveup)
+            );
+        } else {
+            $icons[] = $str->spacer;
+        }
+        if ($down) {
+            $icons[] = $OUTPUT->action_icon(
+                            new moodle_url($url, array('movedown' => $item->id, 'sesskey' => sesskey())),
+                            new pix_icon('t/down', $str->movedown, 'moodle', array('class' => 'iconsmall')),
+                            null, array('title' => $str->movedown)
+            );
+        } else {
+            $icons[] = $str->spacer;
+        }
+        // Delete item.
+        if ($item->custom == \totara_core\totara\menu\menu::DB_ITEM) {
+            $icons[] = $OUTPUT->action_icon(
+                            new moodle_url('/totara/core/menu/delete.php', array('id' => $item->id)),
+                            new pix_icon('t/delete', $str->delete, 'moodle', array('class' => 'iconsmall')),
+                            null, array('title' => $str->delete)
+            );
+        }
+
+        $table->data[] = new html_table_row(array(
+                         new html_table_cell($itemtitle),
+                         new html_table_cell($itemurl),
+                         new html_table_cell(\totara_core\totara\menu\menu::get_visibility($item->visibility)),
+                         new html_table_cell(join(' ', $icons)),
+        ));
+    }
+
+    if ($items = $item->get_children()) {
+
+        // Print all the children recursively.
+        $countitems = count($items);
+        $count = 0;
+        $first = true;
+        $last  = false;
+        foreach ($items as $node) {
+
+            $count++;
+            if ($count == $countitems) {
+                $last = true;
+            }
+            $up    = $first ? false : true;
+            $down  = $last  ? false : true;
+            $first = false;
+
+            totara_menu_table_load($table, $node, $depth+1, $up, $down);
+        }
+    }
+}

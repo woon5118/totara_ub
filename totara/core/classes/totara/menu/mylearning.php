@@ -17,14 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara
- * @subpackage totara_core
+ * Totara navigation edit page.
+ *
+ * @package    totara
+ * @subpackage navigation
+ * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
  */
+namespace totara_core\totara\menu;
 
-defined('MOODLE_INTERNAL') || die();
+use \totara_core\totara\menu\menu as menu;
 
-$plugin->version  = 2014102000;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires = 2014051202;       // Requires this Moodle version
-$plugin->cron = 600;                  // Period for cron to check this module (secs)
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+class mylearning extends \totara_core\totara\menu\item {
+
+    protected function get_default_title() {
+        return get_string('mylearning', 'totara_core');
+    }
+
+    protected function get_default_url() {
+        return '/my/index.php';
+    }
+
+    public function get_default_sortorder() {
+        return 20000;
+    }
+
+    public function get_default_visibility() {
+        return menu::SHOW_WHEN_REQUIRED;
+    }
+
+}

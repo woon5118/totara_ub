@@ -466,3 +466,18 @@ function totara_preupgrade($totarainfo) {
     }
     print_upgrade_part_end('totara_core', false, true);
 }
+
+/*
+ * Function called after upgrades have run
+ * Used for upgrades that require everything else to run beforehand
+ *
+ * @param $totarainfo Info obtained from totara_version_info function.
+ * @return void.
+ */
+function totara_postupgrade($totarainfo) {
+    print_upgrade_part_start('totara_core', false, true);
+
+    totara_upgrade_menu();
+
+    print_upgrade_part_end('totara_core', false, true);
+}
