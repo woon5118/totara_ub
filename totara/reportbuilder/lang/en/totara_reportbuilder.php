@@ -154,6 +154,7 @@ $string['deletedonly'] = 'Deleted users only';
 $string['deletedscheduledreport'] = 'Successfully deleted Scheduled Report \'{$a}\'';
 $string['deleteduser'] = 'Deleted user';
 $string['deletereport'] = 'Report Deleted';
+$string['deletescheduledreport'] = 'Delete scheduled report?';
 $string['descending'] = 'Descending (Z to A, 9 to 1)';
 $string['disabled'] = 'Disabled?';
 $string['editingsavedsearch'] = 'Editing saved search';
