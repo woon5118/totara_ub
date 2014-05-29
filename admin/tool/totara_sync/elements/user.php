@@ -477,7 +477,8 @@ class totara_sync_element_user extends totara_sync_element {
         global $CFG;
 
         $fields = array('address', 'city', 'country', 'department', 'description',
-            'email', 'firstname', 'institution', 'lang', 'lastname', 'phone1', 'phone2',
+            'email', 'firstname', 'institution', 'lang', 'lastname', 'firstnamephonetic',
+            'lastnamephonetic', 'middlename', 'alternatename', 'phone1', 'phone2',
             'timemodified', 'timezone', 'url', 'username', 'suspended', 'emailstop');
 
         $requiredfields = array('username', 'firstname', 'lastname', 'email');
