@@ -1202,6 +1202,7 @@ function certificate_get_date($certificate, $certrecord, $course, $userid = null
  * @param int $userid userid
  */
 function certificate_get_date_completed($certificate, $certrecord, $course, $userid) {
+    global $DB;
     // Set certificate date to current time, can be overwritten later
     $date = $certrecord->timecreated;
 
@@ -1221,6 +1222,7 @@ function certificate_get_date_completed($certificate, $certrecord, $course, $use
             $date = $modinfo->dategraded;
         }
     }
+    return $date;
 }
 
 /**
