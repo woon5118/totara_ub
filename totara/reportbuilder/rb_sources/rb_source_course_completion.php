@@ -222,7 +222,7 @@ class rb_source_course_completion extends rb_base_source {
                 'grade_grades.finalgrade',
                 array(
                     'joins' => 'grade_grades',
-                    'extrafields' => array('rplgrade' => 'base.rplgrade'),
+                    'extrafields' => array('rplgrade' => 'base.rplgrade', 'course_completion_status' => 'base.status'),
                     'displayfunc' => 'course_grade_percent',
                 )
             ),
