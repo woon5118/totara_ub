@@ -114,164 +114,61 @@ body.dir-rtl .totaratable .toolbar-right-table {
     /* actually the underlay */
     opacity: 0.5;
 }
-
-div.totara-dialog {
-    overflow:visible !important;
-    border: 1px solid #DDDDDD;
-    padding: 0.5em;
-    z-index: 1;
+.totara-dialog h3 {
+    font-weight: bold;
+    font-size: 13px;
+    padding: 2px;
+    line-height: 20px;
 }
-    div.totara-dialog div.ui-dialog-titlebar {
-        overflow: visible;
-        position: relative;
+#dialog-tabs {
+    border: none;
+}
+.totara-dialog .selected {
+    border-left: 1px solid #cccccc;
+}
+.totara-dialog .selected div {
+    padding-left: 3px;
+}
+.totara-dialog .treeview .unclickable,
+.totara-dialog .treeview .unclickable a {
+    color: #777777;
+}
+.totara-dialog .selected .unremovable .deletebutton,
+.totara-dialog .selected .unremovable .addbutton {
+    background:none;
+}
+.totara-dialog .selected span span.addbutton,
+.totara-dialog .selected span span.deletebutton {
+    background: none repeat scroll 0 0 transparent;
+    cursor: pointer;
+    float: right;
+    display: inline; /* IE margin-doubling fix */
+    margin: 0;
+    overflow: hidden;
+    text-indent: -999px;
+    width: 17px;
+}
+/* Handle hovers */
+.totara-dialog .selected div:hover span.deletebutton {
+    background-image: url([[pix:totara_core|jquery_ui_dialog/ui-icons_000000_256x240]]);
+    background-position:-80px -128px;
+    background-repeat: no-repeat;
+}
+.totara-dialog .selected div:hover span.addbutton {
+    background-image: url([[pix:moodle|t/add]]);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+.totara-dialog .deletebutton,
+.totara-dialog .addbutton {
+    background:none;
+    display: none;
+}
+@-moz-document url-prefix() {
+    .mozilla div.totara-dialog td.select #search-tab fieldset select {
+        padding-top: 5px;
     }
-    div.totara-dialog div.ui-dialog-content {
-        overflow: auto;
-    }
-    div.totara-dialog div.ui-dialog-content table.dialog-content {
-        height: 100%;
-        margin-bottom: 0; /* avoids scrollbars due to default margin applied to tables */
-        width: 100%;
-    }
-        /* Treeview and Select table cell */
-        div.totara-dialog div.ui-dialog-content table.dialog-content td.select {
-            padding-right: 10px;
-            vertical-align: top;
-            width: 70%;
-        }
-        div.totara-dialog div.ui-dialog-content .header p {
-            margin:0 0 5px 0;
-            font-weight:bold;
-        }
-        div.totara-dialog td.select div#dialog-tabs {
-            border: medium none;
-            height: 37px;
-            width: 100%;
-        }
-            div.totara-dialog td.select div#dialog-tabs ul.ui-tabs-nav {
-                margin: 0 0 10px;
-                padding: 0;
-            }
-            div.totara-dialog td.select #search-tab,
-            div.totara-dialog td.select #browse-tab {
-                border: medium none;
-            }
-            div.totara-dialog td.select #search-tab fieldset {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-            }
-                div.totara-dialog td.select #search-tab form.mform,
-                div.totara-dialog td.select #search-tab table#dialog-search-table {
-                    width: 100%;
-                }
-                    div.totara-dialog td.select select {
-                        width:100%;
-                    }
-                    div.totara-dialog td.select select,
-                    div.totara-dialog td.select #search-tab fieldset input,
-                    div.totara-dialog td.select #search-tab fieldset select,
-                    div.totara-dialog td.select #search-tab fieldset button {
-                        font-size: 0.85em;
-                    }
-                    @-moz-document url-prefix() {
-                        .mozilla div.totara-dialog td.select #search-tab fieldset select {
-                            padding-top: 5px;
-                        }
-                    }
-                    div.totara-dialog td.select #search-tab table#dialog-search-table td.querybox input {
-                        width: 95%;
-                    }
-
-            div.totara-dialog div.treeview-wrapper,
-            div.totara-dialog div#column-checkboxes {
-                margin-top: 5px;
-                overflow: auto;
-            }
-                div.totara-dialog ul.treeview li {
-                    min-height:16px;
-                    padding-top: 2px;
-                    font-size: 13px;
-                }
-                div.totara-dialog ul.treeview li span a {
-                    margin:0 5px;
-                    display:block;
-                }
-                div.totara-dialog ul.treeview li span.empty a {
-                    display:inline;
-                    margin:0;
-                }
-                div.totara-dialog ul.treeview li span.unclickable,
-                div.totara-dialog ul.treeview li span.unclickable a,
-                div.totara-dialog .selected span.unremovable a {
-                    color: #777777;
-                    cursor: text;
-                    text-decoration: none;
-                }
-                    div.totara-dialog ul.treeview span.deletebutton {
-                        display: none;
-                    }
-                div.totara-dialog .selected span.unremovable span.deletebutton,
-                div.totara-dialog .selected span.unremovable span.addbutton {
-                    background:none;
-                }
-
-        /* table cell containing results from td.select operations */
-        div.totara-dialog table.dialog-content td.selected {
-            border-left: 1px solid #CCCCCC;
-            padding-left: 10px;
-            vertical-align: top;
-            width: 30%;
-        }
-
-    div.totara-dialog .selected div.treeview-selected-item {
-        display: none !important;
-    }
-
-        div.totara-dialog .selected span {
-            display: block;
-            font-size: 12px;
-            margin-bottom: 10px;
-            overflow: auto;
-            width: 100%;
-            word-break:break-all;
-        }
-            div.totara-dialog .selected span a {
-                cursor: text;
-                display: block;
-                float: left;
-                text-decoration: none;
-                width: 80%;
-                outline:none;
-                word-break:normal ;
-            }
-            div.totara-dialog .selected span span.addbutton,
-            div.totara-dialog .selected span span.deletebutton {
-                background: none repeat scroll 0 0 transparent;
-                cursor: pointer;
-                float: right;
-                display: inline; /* IE margin-doubling fix */
-                margin: 0;
-                overflow: hidden;
-                text-indent: -999px;
-                width: 10%;
-            }
-            /* Handle hovers */
-            div.totara-dialog .selected span:hover span.deletebutton {
-                background-image: url([[pix:totara_core|jquery_ui_dialog/ui-icons_000000_256x240]]);
-                background-position:-80px -128px;
-                background-repeat: no-repeat;
-            }
-            div.totara-dialog .selected span:hover span.addbutton {
-                background-image: url([[pix:moodle|t/add]]);
-                background-position: right center;
-                background-repeat: no-repeat;
-            }
-        div.totara-dialog .selected p {
-            font-weight: bold;
-            margin-bottom:10px;
-            padding:0;
-        }
+}
 
 /* Dialog buttons */
 div.ui-dialog .ui-dialog-buttonpane button {

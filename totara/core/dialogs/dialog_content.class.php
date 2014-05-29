@@ -214,6 +214,7 @@ class totara_dialog_content {
      * @return  string  $markup Markup to print
      */
     public function generate_markup() {
+        global $OUTPUT;
         header('Content-Type: text/html; charset=UTF-8');
 
         // Skip container if only displaying search results
@@ -225,20 +226,18 @@ class totara_dialog_content {
             return $this->generate_treeview();
         }
 
-        $markup = '<table class="dialog-content"><tbody><tr>';
+        $markup = html_writer::start_tag('div', array('class' => 'row-fluid'));
 
         // Open select container
-        $markup .= '<td class="select">';
-        $markup .= '<div class="header">';
+        $width = ($this->type == self::TYPE_CHOICE_MULTI) ? 'span8' : 'span12';
+        $markup .= html_writer::start_tag('div', array('class' => $width . ' select'));
 
         // Show select header
         if (!empty($this->select_title)) {
-            $markup .= '<p>'.get_string($this->select_title, $this->lang_file).'</p>';
+            $markup .= $OUTPUT->heading(get_string($this->select_title, $this->lang_file), 3);
         }
 
-        $markup .= '</div>';
-
-        $markup .= '<div id="dialog-tabs" class="dialog-content-select">';
+        $markup .= html_writer::start_tag('div', array('id' => 'dialog-tabs', 'class' => 'dialog-content-select'));
 
         $markup .= '<ul class="tabs dialog-nobind">';
         $markup .= '  <li><a href="#browse-tab">'.get_string('browse', 'totara_core').'</a></li>';
@@ -267,29 +266,26 @@ class totara_dialog_content {
         }
 
         // Close select container
-        $markup .= '</div></td>';
+        $markup .= html_writer::end_tag('div');
+        $markup .= html_writer::end_tag('div');
 
         // If multi-select, show selected pane
         if ($this->type === self::TYPE_CHOICE_MULTI) {
-
-            $id = strlen($this->selected_id) ? 'id="'.$this->selected_id.'"' : '';
-            $markup .= '<td class="selected dialog-nobind" '.$id.'>';
+            $markup .= html_writer::start_tag('div', array('class' => 'span4 selected dialog-nobind', 'id' => $this->selected_id));
 
             // Show title
             if (!empty($this->selected_title)) {
-                $markup .= '<p>';
-                $markup .= get_string($this->selected_title, $this->lang_file);
-                $markup .= '</p>';
+                $markup .= $OUTPUT->heading(get_string($this->selected_title, $this->lang_file), 3);
             }
 
             // Populate pane
             $markup .= $this->populate_selected_items_pane($this->selected_items);
 
-            $markup .= '</td>';
+            $markup .= html_writer::end_tag('div');
         }
 
         // Close container for content
-        $markup .= '</tr></tbody></table>';
+        $markup .= html_writer::end_tag('div');
 
         return $markup;
     }

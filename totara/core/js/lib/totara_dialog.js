@@ -111,13 +111,16 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
         var obj = this;
 
         var height = $(window).height() * 0.8;
+        var width = $(window).width() * 0.8;
+        width = Math.max(width, $(window).width() - 50);
+        width = Math.min(width, 800);
 
         var default_config = {
             autoOpen: false,
             closeOnEscape: true,
             draggable: false,
             height: height,
-            width: '700px',
+            width: width + 'px',
             modal: true,
             resizable: false,
             zIndex: 1500,
@@ -494,6 +497,19 @@ totaraDialog_handler.prototype._load = function(dialog) {
             this.first_load();
         }
 
+        var containerHeight = this._container.height();
+        var h3MarginBottom = parseFloat($('.select h3', this._container).css('margin-bottom'), 10) || 0;
+        var tabsMarginTop = parseFloat($('#dialog-tabs', this._container).css('margin-bottom'), 10) || 0;
+        var browseHeight = containerHeight
+                - $('.select h3', this._container).outerHeight(true)
+                - $('.select .tabs', this._container).outerHeight(true)
+                - ($('#dialog-tabs').outerHeight(true) - $('#dialog-tabs').height())
+                + Math.min(h3MarginBottom, tabsMarginTop);
+
+        $('#browse-tab').outerHeight(browseHeight);
+        $('#search-tab').outerHeight(browseHeight);
+        $('.selected.dialog-nobind', this._container).outerHeight(this._container.height());
+
         this._loaded = true;
     }
 
@@ -668,23 +684,11 @@ totaraDialog_handler_treeview.prototype = new totaraDialog_handler();
  * @return void
  */
 totaraDialog_handler_treeview.prototype.setup_tabs = function(e, ui) {
-
-    // Resize treeview containers if we haven't already
-    // Get container
-    var selcontainer = $('td.select', this._container);
-
-    // Get container height minus height of header, height of tab bar
-    var containerheight = selcontainer.outerHeight() - $('div.header', selcontainer).outerHeight() - $('div#dialog-tabs', selcontainer).outerHeight();
-
-    // Resize browse treeview, minus padding
-    $('div#browse-tab .treeview-wrapper', this._container).height(containerheight - $('select.simpleframeworkpicker', this._container).outerHeight() - 15);
-
-    // Resize search container
-    $('div#search-tab .treeview-wrapper', this._container).height(containerheight - $('#search-tab .mform', selcontainer).outerHeight() - $('div.search-paging', this._container).outerHeight() - 24);
+    var selcontainer = $('.select', this._container);
 
     // If showing search tab, focus search box
     if (ui && ui.index == 1) {
-        $('div#search-tab #dialog-search-table #id_query', this._container).focus();
+        $('#id_query', this._container).focus();
     }
 }
 

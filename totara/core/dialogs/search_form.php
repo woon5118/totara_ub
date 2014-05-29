@@ -92,15 +92,12 @@ class dialog_search_form extends moodleform {
 
         // Create actual form elements
         $searcharray = array();
-        $searcharray[] =& $mform->createElement('static', 'tablestart', '', '<table id="dialog-search-table"><tbody><tr><td class="querybox">');
 
         // Query box
         $query = $this->_customdata['query'];
         $searcharray[] =& $mform->createElement('text', 'query', get_string('search', 'totara_core'), 'maxlength="254"');
         $mform->setType('query', PARAM_TEXT);
         $mform->setDefault('query', $query);
-
-        $searcharray[] =& $mform->createElement('static', 'tabledivider1', '', '</td><td>');
 
         // Hierarchy specific code
         // Show framework selector
@@ -124,17 +121,14 @@ class dialog_search_form extends moodleform {
                 'onChange'=>"if(document.all) this.className='totara-limited-width-150';"
             );
 
-            $searcharray[] =& $mform->createElement('select', 'frameworkid', '', $options, $attr);
+            $searcharray[] =& $mform->createElement('select', 'frameworkid', get_string('framework', 'totara_core'), $options, $attr);
             $mform->setDefault('frameworkid', $frameworkid);
-            $searcharray[] =& $mform->createElement('static', 'tabledivider2', '', '</td><td>');
         }
-
 
         // Show search button and close markup
         // Pad search string to make it look nicer
         $strsearch = '    '.get_string('search').'    ';
         $searcharray[] =& $mform->createElement('submit', 'dialogsearchsubmitbutton', $strsearch);
-        $searcharray[] =& $mform->createElement('static', 'tableend', '', '</td></tr></tbody></table>');
         $mform->addGroup($searcharray, 'searchgroup', '', array(' '), false);
 
     }

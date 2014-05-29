@@ -1899,13 +1899,6 @@ div.totara-dialog td.select #browse-tab {
 #dialog-search-table {
     margin-bottom:0;
 }
-#dialog-search-table td {
-    padding:0 5px 0 0;
-    margin-bottom:0px;
-}
-.dir-rtl #dialog-search-table td {
-    padding:0 0 0 5px;
-}
 div.totara-dialog td.select select {
     width:auto;
     margin-top:3px;
@@ -1955,7 +1948,9 @@ div.totara-dialog td.select #search-tab #fgroup_id_searchgroup {
     right: auto;
     text-align: left;
 }
-
 .ui-dialog-content dl {
     color: #eeeeee;
+}
+.totara-dialog h3 {
+    color: #ffffff;
 }

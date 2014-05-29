@@ -1692,6 +1692,10 @@ div.totara-dialog .ui-dialog-titlebar h2 {
     color:#FFFFFF;
     margin-bottom:5px;
 }
+.totara-dialog h3 {
+    color: #ffffff;
+    font-weight: bold;
+}
 div.yui3-dd-draggable div.uep-header h2,
 .user-enroller-panel .uep-header .close {
     margin:15px;
@@ -1860,16 +1864,6 @@ div.totara-dialog td.select #browse-tab {
     padding:0;
     margin-top:-10px;
     background:#F5F5F5;
-}
-#dialog-search-table {
-    margin-bottom:0;
-}
-#dialog-search-table td {
-    padding:0 5px 0 0;
-    margin-bottom:0px;
-}
-.dir-rtl #dialog-search-table td {
-    padding:0 0 0 5px;
 }
 div.totara-dialog td.select select {
     width:auto;

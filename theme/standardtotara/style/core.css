@@ -825,6 +825,21 @@ div.tabtree2 {
 .ui-dialog .dialog-content .header {
     background: none;
 }
+.totara-dialog .select {
+    width: 70%;
+    float: left;
+}
+.totara-dialog .selected {
+    width: 28%;
+    float: left;
+}
+.totara-dialog h3 {
+    font-size: 13px;
+    text-align: left;
+}
+#dialog-tabs {
+    border: none;
+}
 /* Dialog RTL */
 .dir-rtl .ui-dialog .ui-dialog-title {
     float: right;
@@ -935,13 +950,6 @@ div.tabtree2 {
 div.totara-dialog td.select #search-tab,
 div.totara-dialog td.select #browse-tab {
     padding: 0;
-}
-#dialog-search-table {
-    margin-bottom: 0;
-}
-#dialog-search-table td {
-    padding: 0 5px 0 0;
-    margin-bottom: 0px;
 }
 /*Icon picker for programs and courses*/
 #icon-selectable {
