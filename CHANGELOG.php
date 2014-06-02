@@ -3,8 +3,49 @@
 
 Totara LMS Changelog
 
+Release 2.6.2 (3rd June 2014):
+==================================================
+
+Security Fixes:
+    T-12441    Fixed potential XSS vulnerability in quicklinks block
+
+Improvements:
+    T-11961    Added ability to assign Audience members based on position & organisation types
+    T-12326    Extended execution time on completion reaggregation script
+    T-12483    Added new alternate name fields when importing users with totara_sync
+    T-12364    Improved contrast on Hierarchy selected items to meet Accessibility guidelines
+
+Bug Fixes:
+    T-12467    Fixed display of SCORM packages on secure HTTPS sites
+    T-12463    Fixed critical SCORM error where subsequent attempts after an initial failed attempt are not recorded
+    T-12471    Fixed display of grades in Course Completion Report for grades uploaded by completion import tool
+    T-12469    Fixed sending of notifications when a Facetoface booking date/time is changed
+    T-12121    Fixed transaction error when quiz completion triggers sending of messages
+    T-12307    Fixed days not being translated in weekly scheduled reports
+    T-12327    Fixed issue with dialog boxes being too wide for some screens
+    T-12179    Fixed choosing of position on email self-registration when Javascript is disabled
+    T-12263    Fixed Javascript for type filter dropdown in Audience Visibility
+    T-12451    Fixed sort order of dependent courses in Course Completion settings
+    T-12461    Fixed display of move and settings admin options for Quicklinks block
+    T-12184    Fixed capitalisation of Program and Certification columns in Course Catalog
+    T-12455    Fixed changing of visibility of a Certification on Audience Visible Learning tab
+    T-12368    Fixed hidden labels in Hierarchy search dialog
+    T-12371    Fixed alt attribute on course icons
+    T-12362    Fixed alt and title attributes on competency icons
+    T-12376    Fixed labels when creating a scheduled report in ReportBuilder
+    T-12379    Fixed page title when deleting scheduled report
+    T-12349    Fixed page title when deleting a Learning Plan
+    T-12348    Fixed table column header on list of Learning Plans
+    T-12237    Fixed HTML table in Alerts information popup dialog
+    T-12473    Removed redundant get_totara_menu function in totara_core
+    T-12478    Removed blink tag from element library
+
+
 Release 2.6.1 (20th May 2014):
 ==================================================
+
+Security Fixes:
+    MoodleHQ    http://docs.moodle.org/dev/Moodle_2.6.3_release_notes
 
 Improvements:
     T-12195    Improved error handling in F2F bulk add attendees
@@ -41,6 +82,7 @@ Bug Fixes:
 
     T-12880    Fix critical error causing deletion of course completion criteria data
     T-12149    Fix navigation menu when adding course custom fields
+
 
 Release 2.6.0 (5th May 2014):
 ==================================================
