@@ -839,6 +839,7 @@ $string['usersposid'] = 'User\'s Position ID';
 $string['usersposidnumber'] = 'User\'s Position ID Number';
 $string['userspospathids'] = 'User\'s Position Path IDs';
 $string['userstatus'] = 'User Status';
+$string['usertempreports'] = 'Records for user\'s temporary reports';
 $string['usertimecreated'] = 'User Creation Time';
 $string['usertimemodified'] = 'User Last Modified';
 $string['value'] = 'Value';
