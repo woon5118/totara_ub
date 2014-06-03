@@ -144,6 +144,7 @@ $string['feedback360aboutuser'] = 'Feedback about {$a}';
 $string['feedback360aboutyou'] = 'Feedback about you';
 $string['feedback360activated'] = 'Successfully activated Feedback';
 $string['feedback360activenochangesallowed'] = 'This 360 Feedback is active, no changes can be made to learner assignments';
+$string['feedback360closednochangesallowed'] = 'This 360 Feedback is closed, no changes can be made to learner assignments';
 $string['feedback360cloned'] = 'Successfully cloned Feedback';
 $string['feedback360closed'] = 'Successfully closed Feedback';
 $string['feedback360created'] = 'Successfully created Feedback';

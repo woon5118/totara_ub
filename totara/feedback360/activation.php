@@ -39,8 +39,6 @@ admin_externalpage_setup('managefeedback360');
 $systemcontext = context_system::instance();
 require_capability('totara/feedback360:manageactivation', $systemcontext);
 
-$output = $PAGE->get_renderer('totara_feedback360');
-
 $feedback360 = new feedback360($id);
 
 switch ($action) {
@@ -48,7 +46,6 @@ switch ($action) {
         $errors = $feedback360->validate();
         if (empty($errors) && $confirm) {
             require_sesskey();
-
             $feedback360->activate();
             totara_set_notification(get_string('feedback360activated', 'totara_feedback360', $feedback360->name),
                          new moodle_url('/totara/feedback360/manage.php'), array('class' => 'notifysuccess'));
@@ -57,15 +54,14 @@ switch ($action) {
     case 'close':
         if ($confirm) {
             require_sesskey();
-
-            $feedback360->cancel_requests();
-            $feedback360->set_status(feedback360::STATUS_CLOSED);
+            $feedback360->close();
             totara_set_notification(get_string('feedback360closed', 'totara_feedback360', $feedback360->name),
                          new moodle_url('/totara/feedback360/manage.php'), array('class' => 'notifysuccess'));
         }
     break;
 }
 
+$output = $PAGE->get_renderer('totara_feedback360');
 echo $output->header();
 echo $output->heading($feedback360->name);
 

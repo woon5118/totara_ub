@@ -360,17 +360,14 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $feedback360 = new feedback360($id);
 
         $preview = $this->preview_feedback360_button($id);
-
+        $activate = '';
         if ($feedback360->status == feedback360::STATUS_ACTIVE) {
             $activate = $this->output->action_link($closeurl, get_string('closenow', 'totara_feedback360'));
         } else if ($feedback360->status == feedback360::STATUS_DRAFT || $feedback360->status == feedback360::STATUS_CLOSED) {
             $activate = $this->output->action_link($activateurl,  get_string('activatenow', 'totara_feedback360'));
-        } else {
-            $activate = '';
         }
 
-        $out = '';
-        $out .= html_writer::start_tag('div', array('class' => 'additional_actions'));
+        $out  = html_writer::start_tag('div', array('class' => 'additional_actions'));
         $out .= $strstatusat;
         $out .= $strstatusnow . ' ';
         $out .= $activate;

@@ -388,20 +388,8 @@ class feedback360 {
         }
     }
 
-    public function cancel_requests() {
-        global $DB;
-
-        // Get all user assignments for the feedback360 form.
-        $user_assignments = $DB->get_records('feedback360_user_assignment', array('feedback360id' => $this->id));
-
-        foreach ($user_assignments as $user_assignment) {
-
-            // Cancel the resp/email assignmenst associated with the user assignment.
-            if (self::cancel_user_assignment($user_assignment->id)) {
-                // If there is nothing left, remove the user assignment.
-                $DB->delete_records('feedback360_user_assignment', array('id' => $user_assignment->id));
-            }
-        }
+    public function close() {
+        $this->set_status(self::STATUS_CLOSED);
     }
 
     public static function cancel_user_assignment($userassignmentid, $asmanager = false) {

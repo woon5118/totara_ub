@@ -179,14 +179,13 @@ class feedback360_test extends feedback360_testcase {
         $this->assertCount(2, $userass);
         $this->assertCount(1, $respass);
 
-        $fdbck->cancel_requests();
-        $this->assertDebuggingCalled();
+        $fdbck->close();
         // Check that there no user/resp assignments.
         $respass2 = $DB->get_records('feedback360_resp_assignment', array('feedback360userassignmentid' => current($userass)->id));
         $userass2 = $DB->get_records('feedback360_user_assignment', array('feedback360id' => $fdbck->id));
 
-        $this->assertEmpty($userass2);
-        $this->assertEmpty($respass2);
+        $this->assertNotEmpty($userass2);
+        $this->assertNotEmpty($respass2);
     }
 
     public function test_cancel_resp_assignment() {
