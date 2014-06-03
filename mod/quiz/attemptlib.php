@@ -1441,7 +1441,8 @@ class quiz_attempt {
     public function process_finish($timestamp, $processsubmitted) {
         global $DB;
 
-        $transaction = $DB->start_delegated_transaction();
+        // We cannot use transactions here because of the MDL-30029 issue in messagelib.php.
+        // $transaction = $DB->start_delegated_transaction();
 
         if ($processsubmitted) {
             $this->quba->process_all_actions($timestamp);
@@ -1467,7 +1468,7 @@ class quiz_attempt {
             $this->get_access_manager($timestamp)->current_attempt_finished();
         }
 
-        $transaction->allow_commit();
+        // $transaction->allow_commit();
     }
 
     /**

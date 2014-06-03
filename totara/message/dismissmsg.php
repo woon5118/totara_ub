@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Piers Harding <piers@catalyst.net.nz>
+ * @author Brian Barnes <brian.barnes@totaralms.com>
  * @package totara
  * @subpackage message
  */
@@ -64,75 +65,38 @@ $fromname = fullname($from) . " ({$from->email})";
 $subject = format_string($msg->subject);
 
 if ($isfacetoface && !$DB->record_exists('facetoface_sessions', array('id' => $eventdata->data['session']->id))) {
-        $subject .= ' (' . html_writer::tag('b', get_string('f2fsessiondeleted', 'block_totara_tasks')) . ')';
+        $subject .= ' (' . html_writer::tag('strong', get_string('f2fsessiondeleted', 'block_totara_tasks')) . ')';
 } else if ($isfacetoface && !$canbook) {
-        $subject .= ' (' . html_writer::tag('b', get_string('f2fsessionfull', 'block_totara_tasks')) . ')';
+        $subject .= ' (' . html_writer::tag('strong', get_string('f2fsessionfull', 'block_totara_tasks')) . ')';
 }
 global $TOTARA_MESSAGE_TYPES;
 $msgtype = get_string($TOTARA_MESSAGE_TYPES[$metadata->msgtype], 'totara_message');
 $icon = $OUTPUT->pix_icon('msgicons/' . $metadata->icon, format_string($msgtype), 'totara_core', array('class' => 'msgicon',  'alt' => format_string($msgtype)));
 
-$tab = new html_table();
-$tab->attributes['class'] = 'fullwidth invisiblepadded';
-$tab->data  = array();
-print html_writer::start_tag('div', array('id' => 'totara-msgs-dismiss'));
+echo html_writer::start_tag('div', array('id' => 'totara-msgs-dismiss'));
+echo html_writer::start_tag('dl', array('class' => 'list'));
 
 if (!empty($msg->subject)) {
-    $cells = array();
-    $cell = new html_table_cell(html_writer::tag('label', get_string('subject', 'forum'), array('for' => 'dismiss-subject')));
-    $cell->attributes['class'] = 'totara-msgs-action-left';
-    $cells []= $cell;
-    $cell = new html_table_cell(html_writer::tag('div', $subject, array('id' => 'dismiss-subject')));
-    $cell->attributes['class'] = 'totara-msgs-action-right';
-    $cells []= $cell;
-    $tab->data[] = new html_table_row($cells);
+    echo html_writer::tag('dt', get_string('subject', 'forum'));
+    echo html_writer::tag('dd', $subject);
 }
-$cells = array();
-$cell = new html_table_cell(html_writer::tag('label', get_string('type', 'block_totara_alerts'), array('for' => 'dismiss-type')));
-$cell->attributes['class'] = 'totara-msgs-action-left';
-$cells []= $cell;
-$cell = new html_table_cell(html_writer::tag('div', $icon, array('id' => 'dismiss-type')));
-$cell->attributes['class'] = 'totara-msgs-action-right';
-$cells []= $cell;
-$tab->data[] = new html_table_row($cells);
+echo html_writer::tag('dt', get_string('type', 'block_totara_alerts'));
+echo html_writer::tag('dd', $icon);
 
-$cells = array();
-$cell = new html_table_cell(html_writer::tag('label', get_string('from', 'block_totara_alerts'), array('for' => 'dismiss-from')));
-$cell->attributes['class'] = 'totara-msgs-action-left';
-$cells []= $cell;
-$cell = new html_table_cell(html_writer::tag('div', $fromname, array('id' => 'dismiss-from')));
-$cell->attributes['class'] = 'totara-msgs-action-right';
-$cells []= $cell;
-$tab->data[] = new html_table_row($cells);
+echo html_writer::tag('dt', get_string('from', 'block_totara_alerts'));
+echo html_writer::tag('dd', $fromname);
 
-$cells = array();
-$cell = new html_table_cell(html_writer::tag('label', get_string('statement', 'block_totara_alerts'), array('for' => 'dismiss-statement')));
-$cell->attributes['class'] = 'totara-msgs-action-left';
-$cells []= $cell;
-$cell = new html_table_cell(html_writer::tag('div', $msg->fullmessagehtml, array('id' => 'dismiss-statement')));
-$cell->attributes['class'] = 'totara-msgs-action-right';
-$cells []= $cell;
-$tab->data[] = new html_table_row($cells);
+echo html_writer::tag('dt', get_string('statement', 'block_totara_alerts'));
+echo html_writer::tag('dd', $msg->fullmessagehtml);
+
 if ($msg->contexturl && $msg->contexturlname) {
-    $cells = array();
-    $cell = new html_table_cell(html_writer::tag('label', get_string('statement', 'block_totara_alerts'), array('for' => 'dismiss-context')));
-    $cell->attributes['class'] = 'totara-msgs-action-left';
-    $cells []= $cell;
-    $cell = new html_table_cell(html_writer::tag('div', html_writer::tag('a', $msg->contexturlname, array('href' => $msg->contexturl)), array('id' => 'dismiss-context')));
-    $cell->attributes['class'] = 'totara-msgs-action-right';
-    $cells []= $cell;
+    echo html_writer::tag('dt', get_string('statement', 'block_totara_alerts'));
+    echo html_writer::tag('dd', html_writer::tag('a', $msg->contexturlname, array('href' => $msg->contexturl)));
 }
+echo html_writer::end_tag('dl');
 // Create input reason for declining/approving the request.
 if ($eventdata && $eventdata->action != 'facetoface') {
-    $cells = array();
-    $cell = new html_table_cell(html_writer::tag('label', get_string('reasonfordecision', 'totara_message'), array('for' => 'dismiss-reasonfordecision')));
-    $cell->attributes['class'] = 'totara-msgs-action-left';
-    $cells []= $cell;
-    $reasonfordecision = html_writer::empty_tag('input', array('class' => 'reasonfordecision', 'type' => 'text', 'name' => 'reasonfordecision', 'id' => 'reasonfordecision', 'size' => '80', 'maxlength' => '255'));
-    $cell = new html_table_cell($reasonfordecision);
-    $cell->attributes['class'] = 'totara-msgs-action-right';
-    $cells []= $cell;
-    $tab->data[] = new html_table_row($cells);
+    echo html_writer::tag('label', get_string('reasonfordecision', 'totara_message'), array('for' => 'dismiss-reasonfordecision'));
+    echo html_writer::empty_tag('input', array('class' => 'reasonfordecision', 'type' => 'text', 'name' => 'reasonfordecision', 'id' => 'reasonfordecision', 'size' => '80', 'maxlength' => '255'));
 }
-print html_writer::table($tab);
-print html_writer::end_tag('div');
+echo html_writer::end_tag('div');

@@ -569,7 +569,12 @@ function profile_signup_position($mform, $nojs) {
     // Position details.
     if ($nojs) {
         $allpositions = $DB->get_records_menu('pos', null, 'frameworkid,sortthread', 'id,fullname');
-        $mform->addElement('select', 'positionid', get_string('chooseposition', 'totara_hierarchy'), $allpositions);
+        if (is_array($allpositions) && !empty($allpositions)) {
+            $mform->addElement('select', 'positionid', get_string('chooseposition', 'totara_hierarchy'),
+                array(0 => get_string('chooseposition', 'totara_hierarchy')) + $allpositions);
+        } else {
+            $mform->addElement('static', 'positionid', get_string('chooseposition', 'totara_hierarchy'), get_string('noposition', 'totara_hierarchy') );
+        }
         $mform->addHelpButton('positionid', 'chooseposition', 'totara_hierarchy');
     } else {
         $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),

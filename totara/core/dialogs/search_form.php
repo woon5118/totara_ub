@@ -96,7 +96,7 @@ class dialog_search_form extends moodleform {
 
         // Query box
         $query = $this->_customdata['query'];
-        $searcharray[] =& $mform->createElement('text', 'query', '', 'maxlength="254"');
+        $searcharray[] =& $mform->createElement('text', 'query', get_string('search', 'totara_core'), 'maxlength="254"');
         $mform->setType('query', PARAM_TEXT);
         $mform->setDefault('query', $query);
 

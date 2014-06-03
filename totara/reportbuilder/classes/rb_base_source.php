@@ -1078,7 +1078,7 @@ abstract class rb_base_source {
                     'dimmed' : '';
         }
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($courseid, TOTARA_ICON_TYPE_COURSE),
-            'class' => 'course_icon'));
+            'class' => 'course_icon', 'alt' => ''));
         $link = $OUTPUT->action_link(
             new moodle_url('/course/view.php', array('id' => $courseid)),
             $icon . $course, null, array('class' => $cssclass)
@@ -1445,7 +1445,7 @@ abstract class rb_base_source {
         $programid = $row->program_id;
         $programicon = !empty($row->program_icon) ? $row->program_icon : 'default';
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon'));
+            'class' => 'course_icon', 'alt' => ''));
         $link = $OUTPUT->action_link(
             new moodle_url('/totara/program/view.php', array('id' => $programid)),
             $icon . $program, null, array('class' => 'course_icon')

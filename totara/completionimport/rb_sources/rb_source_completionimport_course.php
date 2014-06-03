@@ -439,13 +439,12 @@ class rb_source_completionimport_course extends rb_base_source {
         $out = array();
         $sql = "SELECT DISTINCT timecreated
                 FROM {totara_compl_import_course}
-                WHERE importerror = :importerror OR importevidence = :importevidence
+                WHERE importerror = :importerror
                 ORDER BY timecreated DESC";
-        $times = $DB->get_records_sql($sql, array('importerror' => 1, 'importevidence' => 1));
+        $times = $DB->get_records_sql($sql, array('importerror' => 0));
         foreach ($times as $time) {
             $out[$time->timecreated] = userdate($time->timecreated, get_string('strftimedatetimeshort', 'langconfig'));
         }
         return $out;
     }
-
 }

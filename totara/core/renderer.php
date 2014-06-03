@@ -590,7 +590,7 @@ class totara_core_renderer extends plugin_renderer_base {
             $url = moodle_url::make_pluginfile_url($file->get_contextid(), 'totara_core',
                 $file->get_filearea(), $itemid, $file->get_filepath(), $filename, true);
             $out .= html_writer::start_tag('li', array('id' => $file->get_pathnamehash(), 'iconname' => $filename));
-            $out .= html_writer::empty_tag('img', array('src' => $url, 'class' => 'course_icon'));
+            $out .= html_writer::empty_tag('img', array('src' => $url, 'class' => 'course_icon', 'alt' => ''));
             $out .= html_writer::end_tag('li');
         }
         // Totara icons.

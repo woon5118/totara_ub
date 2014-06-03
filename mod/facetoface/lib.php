@@ -666,6 +666,44 @@ function facetoface_update_session($session, $sessiondates) {
     return $session->id;
 }
 
+/**
+ * A function to check if the dates in a session have been changed at all.
+ *
+ * @param array $olddates   The dates the session used to be set to
+ * @param array $newdates   The dates the session is now set to
+ *
+ * @return boolean
+ */
+function facetoface_session_dates_check($olddates, $newdates) {
+    // Dates have changed if the amount of dates has changed.
+    if (count($olddates) != count($newdates)) {
+        return true;
+    }
+
+    // Dates have changed if the time zone has changed.
+    if (current($olddates)->sessiontimezone != current($newdates)->sessiontimezone) {
+        return true;
+    }
+
+    // Try to match them up, keeping in mind they might not be in the same order.
+    foreach ($olddates as $oldkey => $olddate) {
+        foreach ($newdates as $newkey => $newdate) {
+            if ($olddate->timestart == $newdate->timestart && $olddate->timefinish == $newdate->timefinish) {
+                unset($olddates[$oldkey]);
+                unset($newdates[$newkey]);
+            }
+        }
+    }
+
+    if (!empty($olddates) || !empty($newdates)) {
+        // They didn't all match up, something changed.
+        return true;
+    } else {
+        // They match, nothing to worry about.
+        return false;
+    }
+}
+
 function facetoface_update_calendar_entries($session, $facetoface = null){
     global $USER, $DB;
 

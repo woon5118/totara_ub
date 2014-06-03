@@ -252,12 +252,21 @@ class cohort_rule_sqlhandler_in_posfield extends cohort_rule_sqlhandler_in {
                           AND ( ";
 
         $query = "p.{$field}";
-        $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
-        $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
 
         return $sqlhandler;
     }
 }
+
 
 /**
  * SQL snippet for a pos custom field, for the user's primary position
@@ -309,8 +318,16 @@ class cohort_rule_sqlhandler_in_posorgfield extends cohort_rule_sqlhandler_in {
                          AND ( ";
 
         $query = "o.{$field}";
-        $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
-        $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+
+        if ($this->ischarfield) {
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+        } else {
+            $sqlhandler = new stdClass();
+            list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'iu'.$this->ruleid, ($not != 'not'));
+            $sqlhandler->sql = "{$sql} {$query} {$sqlin} ) ) ";
+            $sqlhandler->params = $params;
+        }
 
         return $sqlhandler;
     }

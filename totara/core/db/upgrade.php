@@ -1051,6 +1051,8 @@ function xmldb_totara_core_upgrade($oldversion) {
             // If the previous version isn't known it won't be affected as $CFG->previous_version
             // is set in all affected versions.
             if ($previousversionknown && ($affected25site || $affected26site)) {
+                // Set time to unlimited as this could take a while.
+                set_time_limit(0);
 
                 $countsql = 'SELECT COUNT(crc.id) ';
                 $selectsql = 'SELECT crc.* ';

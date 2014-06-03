@@ -83,13 +83,16 @@ M.totara_message = M.totara_message || {
                 }
             }
 
+            var dialogueWidth = Y.one('body').get("winWidth") - 50;
+            dialogueWidth = Math.min(dialogueWidth, 600);
+
             totaraDialogs[name] = new totaraDialog(
                 name,
                 name+'-dialog',
                 {
                     buttons: buttonsObj,
                     title: '<h2>'+M.util.get_string('reviewitems', 'block_totara_alerts')+'</h2>',
-                    width: 600,
+                    width: dialogueWidth,
                     height: 400
                 },
                 url+'dismissmsg.php?id='+id+'&sesskey='+sesskey,

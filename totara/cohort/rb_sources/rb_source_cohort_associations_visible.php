@@ -351,9 +351,8 @@ class rb_source_cohort_associations_visible extends rb_base_source {
 
         if (isset($hascapability) && $hascapability) { // Has capability to change the visibility of learning contents.
             $output = html_writer::start_tag('form', array('id' => 'changevisibilityaudience' . $row->insid));
-            $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'id' => 'type' . $row->insid, 'value' => $type));
             $output .= html_writer::select($COHORT_VISIBILITY,
-                $row->insid,
+                '_'.$type.'_'.$row->insid,
                 $status,
                 false);
             $output .= html_writer::end_tag('form');

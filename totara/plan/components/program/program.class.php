@@ -751,7 +751,7 @@ class dp_program_component extends dp_base_component {
 
         $itemicon = ($item && !empty($item->icon)) ? $item->icon : 'default';
         $img = html_writer::empty_tag('img', array('src' => totara_get_icon($item->programid, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon'));
+            'class' => 'course_icon', 'alt' => ''));
         if ($approved && $accessible) {
             $link = $OUTPUT->action_link(
                     new moodle_url('/totara/plan/components/' . $this->component . '/view.php',array('id' => $this->plan->id, 'itemid' => $item->id, 'userid' => $extraparams)),
@@ -790,7 +790,7 @@ class dp_program_component extends dp_base_component {
         $out = '';
         $itemicon = (!empty($item->icon)) ? $item->icon : 'default';
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($item->id, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon'));
+            'class' => 'course_icon', 'alt' => ''));
         $out .= $OUTPUT->heading($icon . format_string($item->fullname), 3);
 
         $program = new program($item->id);

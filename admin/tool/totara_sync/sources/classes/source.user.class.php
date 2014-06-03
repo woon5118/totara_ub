@@ -54,6 +54,10 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'deleted',
             'firstname',
             'lastname',
+            'firstnamephonetic',
+            'lastnamephonetic',
+            'middlename',
+            'alternatename',
             'email',
             'emailstop',
             'city',
@@ -204,6 +208,18 @@ abstract class totara_sync_source_user extends totara_sync_source {
         }
         if (!empty($this->config->import_lastname)) {
             $table->add_field('lastname', XMLDB_TYPE_CHAR, '100');
+        }
+        if (!empty($this->config->import_firstnamephonetic)) {
+            $table->add_field('firstnamephonetic', XMLDB_TYPE_CHAR, '255');
+        }
+        if (!empty($this->config->import_lastnamephonetic)) {
+            $table->add_field('lastnamephonetic', XMLDB_TYPE_CHAR, '255');
+        }
+        if (!empty($this->config->import_middlename)) {
+            $table->add_field('middlename', XMLDB_TYPE_CHAR, '255');
+        }
+        if (!empty($this->config->import_alternatename)) {
+            $table->add_field('alternatename', XMLDB_TYPE_CHAR, '255');
         }
         if (!empty($this->config->import_email)) {
             $table->add_field('email', XMLDB_TYPE_CHAR, '100');
