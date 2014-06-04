@@ -390,11 +390,13 @@ class rb_source_dp_evidence extends rb_base_source {
 
         // Check user's permissions to edit this item
         $usercontext = context_user::instance($row->userid);
-        if ($row->readonly) {
+        $canaccess = has_capability('totara/plan:accessanyplan', $usercontext);
+        $canedit = has_capability('totara/plan:editsiteevidence', $usercontext);
+        if ($row->readonly && !($canaccess || $canedit)) {
             $out .= get_string('evidence_readonly', 'totara_plan');
         } else if ($USER->id == $row->userid ||
                 totara_is_manager($row->userid) ||
-                has_capability('totara/plan:accessanyplan', $usercontext)) {
+                $canaccess || $canedit) {
 
             $out .= $OUTPUT->action_icon(
                         new moodle_url('/totara/plan/record/evidence/edit.php',
