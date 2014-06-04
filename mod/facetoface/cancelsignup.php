@@ -82,7 +82,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
                     $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsentmgr', 'facetoface');
                 }
                 else {
-                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsent', 'facetoface');
+                    $msg = ($CFG->facetoface_notificationdisable ? 'cancellationnotsent' : 'cancellationsent');
+                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string($msg, 'facetoface');
                 }
             } else {
                 print_error($error, 'facetoface');
