@@ -56,7 +56,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->add_program_table_to_joinlist($joinlist, 'base', 'programid');
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_manager_tables_to_joinlist($joinlist, 'base', 'userid');
+        $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
 
         $joinlist[] = new rb_join(
