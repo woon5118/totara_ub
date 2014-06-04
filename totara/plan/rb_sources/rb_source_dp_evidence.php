@@ -334,12 +334,12 @@ class rb_source_dp_evidence extends rb_base_source {
             'user',
             get_string('users'),
             array(
-                'userid' => 'dp.userid',
+                'userid' => 'base.userid',
                 'managerid' => 'position_assignment.managerid',
                 'managerpath' => 'position_assignment.managerpath',
                 'postype' => 'position_assignment.type',
             ),
-            array('dp', 'position_assignment')
+            'position_assignment'
         );
         return $contentoptions;
     }
