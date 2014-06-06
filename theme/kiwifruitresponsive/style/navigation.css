@@ -421,7 +421,9 @@ div#custommenu ul li ul ul li {
         text-align: left;
         padding: 5px 5px 10px;
     }
-
+    .dir-rtl div#main-menu ul li a {
+        text-align: right;
+    }
     div#totaramenu > ul > li.last > a {
         border-bottom: none;
         border-radius: 0;
