@@ -116,7 +116,7 @@ $string['cohortbrokenrulesnotice'] = 'Some broken rules have been found. While t
 $string['cohortbrokenrulesubject'] = 'Some broken rules have been found';
 $string['cohortbugheading'] = 'There was a bug in Totara 2.4.8 - 2.4.12 which may have affected your
 site. <a href="http://community.totaralms.com/mod/forum/discuss.php?d=3407" target="_blank">Click here</a> for more information about this issue.';
-$string['cohortbugfixingxrules'] = 'The system has been able to fix {$a} cohort rule(s) automatically.';
+$string['cohortbugfixingxrules'] = 'The system has been able to fix {$a} audience rule(s) automatically.';
 $string['cohortbugnounfixable'] = 'All the detected issues were able to be fixed. No more action is required.';
 $string['cohortbugneedfixing'] = 'The system has determined that the following rules may have been affected, but is unable to fix them automatically. Once the upgrade is complete, please review these
 rules and verify they are correct.';
@@ -272,7 +272,7 @@ $string['includechildren'] = 'Include children';
 $string['includechildrenno'] = 'Don\'t include children';
 $string['includechildrenyes'] = 'Include children';
 $string['incohort'] = 'In audience(s)';
-$string['instructions:assignmentroles'] = 'When selecting a role, all members of this cohort will be assigned to it in the system context.';
+$string['instructions:assignmentroles'] = 'When selecting a role, all members of this audience will be assigned to it in the system context.';
 $string['isempty'] = ' is empty ';
 $string['isequalto'] = ' is equal to ';
 $string['isnotequalto'] = ' is not equal to ';
@@ -455,7 +455,7 @@ $string['type_help'] = '<p>The audience type can be \'set\' or \'dynamic\'.</p>
 <p>The members of a set audience can be changed at any time, and the rules that define a dynamic audience can also be changed, leading to the audience membership being updated.</p>';
 $string['typeunknown'] = '{$a}';
 $string['updateoperatorsbutton'] = 'Update "and/or" operators in current draft';
-$string['updateroles'] = 'Assign selected role(s) to this cohort';
+$string['updateroles'] = 'Assign selected role(s) to this audience';
 $string['updatedrolesuccessful'] = 'Roles have been updated';
 $string['updatedroleunsuccessful'] = 'There was an error while saving role(s)';
 $string['useriscohortmember'] = 'User is a member of any of these audiences:';
