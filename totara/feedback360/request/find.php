@@ -30,7 +30,7 @@ $selected = optional_param('selected', null, PARAM_SEQUENCE);
 
 $formid = optional_param('formid', 0, PARAM_INT);
 $nojs = optional_param('nojs', false, PARAM_BOOL);
-$returnurl = urldecode(optional_param('returnurl', '', PARAM_LOCALURL));
+$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 $systemcontext = context_system::instance();
 $usercontext = context_user::instance($userid);
