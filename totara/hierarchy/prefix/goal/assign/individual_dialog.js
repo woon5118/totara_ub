@@ -62,8 +62,8 @@ M.totara_assignindividual = M.totara_assignindividual || {
             // Dialog & handler for hierarchy picker.
             var thandler = new totaraDialog_handler_assigngoaltreeview();
             var tbuttons = {};
-            tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
             tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save(); }
+            tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
             var tdialog = new totaraDialog(
                 'assigngoaltreeviewdialog',
                 'nobutton',

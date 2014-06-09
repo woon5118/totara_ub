@@ -262,7 +262,6 @@ div.totara-dialog {
 /* Dialog buttons */
 div.ui-dialog .ui-dialog-buttonpane button {
     cursor: pointer;
-    float: right;
 }
 
 

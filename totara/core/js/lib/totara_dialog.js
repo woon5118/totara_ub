@@ -1607,8 +1607,8 @@ totaraSingleSelectDialog = function(name, title, find_url, value_element, text_e
     }
     handler.external_function = handler_extra;
 
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
     buttonObj[M.util.get_string('ok', 'moodle')] = function() { handler._save() };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
@@ -1637,8 +1637,8 @@ totaraMultiSelectDialog = function(name, title, find_url, save_url) {
     var handler = new totaraDialog_handler_treeview_multiselect();
 
     var buttonObj = {};
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
     buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
@@ -1672,8 +1672,8 @@ totaraMultiSelectDialogRbFilter = function(name, title, find_url, save_url) {
     var handler = new totaraDialog_handler_treeview_multiselect_rb_filter();
 
     var buttonObj = {};
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
     buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     totaraDialogs[name] = new totaraDialog(
         name,
