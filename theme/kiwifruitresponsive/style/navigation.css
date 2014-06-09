@@ -178,43 +178,11 @@ div#totaramenu ul li.selected li a:hover {
     text-decoration:underline;
     background:transparent;
 }
-#page-footer div#totaramenu ul li ul {
-    display:none;
-    width:auto;
-    margin:17px 0 10px;
-    padding:0;
-    box-shadow:none;
-    background:transparent;
-}
-#page-footer div#totaramenu ul li ul li,
-#page-footer div#totaramenu ul li.selected li {
-    width:auto;
-    margin:0;
-}
-#page-footer div#totaramenu ul li ul li a,
-#page-footer div#totaramenu ul li.selected li a {
-    font-size:1em;
-    line-height:1.2em;
-    color:#555555;
-    border:none;
-    margin:0 0 0 10px;
-    padding:0 0 0 10px;
-    background:transparent url([[pix:theme|arw-ftr]]) no-repeat 0 3px;
-}
-.dir-rtl #page-footer div#totaramenu ul li ul li a,
-.dir-rtl #page-footer div#totaramenu ul li.selected li a {
-    margin:0 10px 0 0;
-    padding:0 10px 0 0;
-}
-
-#page-footer div#totaramenu ul li ul li a:hover,
-#page-footer div#totaramenu ul li ul li.selected a:hover {
-    color:#666666;
-    text-decoration:underline;
-    background:transparent url([[pix:theme|arw-ftr]]) no-repeat 0 3px;
-}
 #page-footer div#totaramenu ul li.last a {
     border:none;
+}
+#page-footer div#totaramenu ul ul {
+    display: none;
 }
 .dir-ltr #page-footer div#totaramenu ul li.last a {
     padding-right:0;
@@ -370,14 +338,6 @@ div#custommenu ul li ul ul li {
 #page-footer div#custommenu ul li.selected a:hover {
     color:#DDDDDD;
     text-decoration:underline;
-    background:transparent;
-}
-#page-footer div#custommenu ul li ul {
-    display:none;
-    width:auto;
-    margin:17px 0 10px;
-    padding:0;
-    box-shadow:none;
     background:transparent;
 }
 #main-menu .btn-navbar {
