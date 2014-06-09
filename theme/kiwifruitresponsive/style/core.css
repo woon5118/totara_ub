@@ -707,6 +707,7 @@ img.smallicon {
 .dir-rtl #dp-plans-menu ul li,
 .dir-rtl #recordoflearning-menu ul li {
     background-position:right;
+    background-image: url([[pix:theme|arw-cal-rtl]]);
     padding:0 20px 0 0;
 }
 #dp-plan-content,
