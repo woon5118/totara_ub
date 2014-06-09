@@ -2772,7 +2772,7 @@ function get_default_role_archetype_allows($type, $archetype) {
 
     $defaults = array(
         'assign' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student'),
             'teacher'        => array(),
@@ -2784,7 +2784,7 @@ function get_default_role_archetype_allows($type, $archetype) {
             'assessor'       => array(),
         ),
         'override' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array(),
@@ -2796,7 +2796,7 @@ function get_default_role_archetype_allows($type, $archetype) {
             'assessor'       => array(),
         ),
         'switch' => array(
-            'manager'        => array('editingteacher', 'teacher', 'student', 'guest'),
+            'manager'        => array('editingteacher', 'teacher', 'student', 'guest', 'staffmanager'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array('student', 'guest'),
@@ -4695,7 +4695,7 @@ function role_get_name(stdClass $role, $context = null, $rolenamedisplay = ROLEN
         // Empty role->name means we want to see localised role name based on shortname,
         // only default roles are supposed to be localised.
         switch ($role->shortname) {
-            case 'manager':         $original = get_string('manager', 'role'); break;
+            case 'manager':         $original = get_string('sitemanager', 'totara_core'); break;
             case 'coursecreator':   $original = get_string('coursecreators'); break;
             case 'editingteacher':  $original = get_string('editingtrainer'); break;
             case 'teacher':         $original = get_string('trainer'); break;
