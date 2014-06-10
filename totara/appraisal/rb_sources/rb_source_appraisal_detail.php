@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '/rb_source_appraisal.php');
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 
 class rb_source_appraisal_detail extends rb_source_appraisal {
-    public $base, $joinlist, $columnoption, $filteroptions, $paramoptions;
+    public $base, $joinlist, $columnoptions, $filteroptions, $paramoptions;
     public $contentoptions, $defaultcolumns, $defaultfilters, $embeddedparams;
     public $sourcetitle, $shortname, $cacheable;
 
@@ -167,7 +167,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
                 'roleall',
                 'totalsall',
                 get_string('totalsfromall', 'rb_source_appraisal_detail'),
-                'roleappraiser.data_',
+                'roleall.data_',
                 array('joins' => array('rolelearner', 'rolemanager', 'roleteamlead', 'roleappraiser'),
                       'columngenerator' => 'allroletotals')
             )
@@ -189,10 +189,14 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
                 array('detailreportid' => $report->_id)),
                 get_string('selectappraisal', 'totara_appraisal'));
 
-        // If the id was not specified then redirect to the selection page.
-        if (!$this->appraisalid) {
+        if ($this->appraisalid) {
+            // Set up joins specific to this appraisal.
+            $table = "{appraisal_quest_data_{$this->appraisalid}}";
+        } else {
+            // Either the user needs to be redirected to the report selection page.
             $this->needs_redirect();
-            return;
+            // Or we are on the column editing page and need to provide placeholder joins so that column validation doesn't fail.
+            $table = "";
         }
 
         // Configure the appriasal-specific joins.
@@ -200,7 +204,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             new rb_join(
                 'rolelearner',
                 'LEFT',
-                "{appraisal_quest_data_{$this->appraisalid}}",
+                $table,
                 'rolelearner.appraisalroleassignmentid = aralearner.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'aralearner'
@@ -208,7 +212,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             new rb_join(
                 'rolemanager',
                 'LEFT',
-                "{appraisal_quest_data_{$this->appraisalid}}",
+                $table,
                 'rolemanager.appraisalroleassignmentid = aramanager.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'aramanager'
@@ -216,7 +220,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             new rb_join(
                 'roleteamlead',
                 'LEFT',
-                "{appraisal_quest_data_{$this->appraisalid}}",
+                $table,
                 'roleteamlead.appraisalroleassignmentid = arateamlead.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'arateamlead'
@@ -224,7 +228,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             new rb_join(
                 'roleappraiser',
                 'LEFT',
-                "{appraisal_quest_data_{$this->appraisalid}}",
+                $table,
                 'roleappraiser.appraisalroleassignmentid = araappraiser.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'araappraiser'
@@ -325,6 +329,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             }
 
             // Display each role.
+            $originaltype = $columnoption->type;
+            $originalfield = $columnoption->field;
             foreach ($roles as $role) {
                 if (isset($questionrecords[$role][$allquestionrecord->id])) {
                     $columnoption->type = $allroles[$role];
@@ -333,6 +339,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
                             $this->get_columns_for_question($question, $columnoption, $hidden, ($role == $lastincludedrole)));
                 }
             }
+            $columnoption->type = $originaltype;
+            $columnoption->field = $originalfield;
         }
 
         return $results;
@@ -441,11 +449,15 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
         $allroles = appraisal::get_roles();
 
         $results = array();
+        $originaltype = $columnoption->type;
+        $originalfield = $columnoption->field;
         foreach ($roles as $role) {
             $columnoption->type = $allroles[$role];
             $columnoption->field = $allroles[$role] . ".data_";
             $results = array_merge($results, $this->rb_cols_generator_totals($columnoption, $hidden));
         }
+        $columnoption->type = $originaltype;
+        $columnoption->field = $originalfield;
 
         return $results;
     }
