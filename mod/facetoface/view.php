@@ -30,6 +30,7 @@ global $DB, $OUTPUT;
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param('f', 0, PARAM_INT); // facetoface ID
 $location = optional_param('location', '', PARAM_TEXT); // location
+$roomid = optional_param('roomid', 0, PARAM_INT);
 $download = optional_param('download', '', PARAM_ALPHA); // download attendance
 
 if ($id) {
@@ -113,7 +114,26 @@ if (count($locations) > 2) {
     echo html_writer::end_tag('div'). html_writer::end_tag('form');
 }
 
-print_session_list($course->id, $facetoface, $location);
+$rooms = facetoface_get_rooms($facetoface->id);
+if (count($rooms) > 3 || !empty($roomid)) {
+    $roomselect = array();
+    foreach ($rooms as $rid => $room) {
+        $roomdetails = '';
+        $roomdetails .= format_string($room->name);
+        if (!empty($room->building)) {
+            $roomdetails .= ' - '.get_string('building', 'facetoface').': '.format_string($room->building);
+        }
+        if (!empty($room->address)) {
+            $roomdetails .= ' - '.get_string('address', 'facetoface').': '.format_string($room->address);
+        }
+        $roomselect[$rid] = $roomdetails;
+    }
+
+    echo $OUTPUT->single_select($PAGE->url, 'roomid', $roomselect, $roomid, array('' => get_string('filterbyroom', 'facetoface').'...'));
+}
+
+$sessions = facetoface_get_sessions($facetoface->id, $location, $roomid);
+print_session_list($course->id, $facetoface, $sessions);
 
 if (has_capability('mod/facetoface:viewattendees', $context)) {
     echo $OUTPUT->heading(get_string('exportattendance', 'facetoface'));
@@ -130,7 +150,7 @@ if (has_capability('mod/facetoface:viewattendees', $context)) {
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);
 
-function print_session_list($courseid, $facetoface, $location) {
+function print_session_list($courseid, $facetoface, $sessions) {
     global $CFG, $USER, $DB, $OUTPUT, $PAGE;
 
     $f2f_renderer = $PAGE->get_renderer('mod_facetoface');
@@ -155,7 +175,7 @@ function print_session_list($courseid, $facetoface, $location) {
     $previousarray = array();
     $upcomingtbdarray = array();
 
-    if ($sessions = facetoface_get_sessions($facetoface->id, $location)) {
+    if ($sessions) {
         foreach ($sessions as $session) {
 
             $sessionstarted = false;
@@ -266,3 +286,4 @@ function get_locations($facetofaceid) {
 
     return array();
 }
+

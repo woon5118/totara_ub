@@ -1152,7 +1152,7 @@ function facetoface_get_session($sessionid) {
  * @param integer $facetofaceid ID of the activity
  * @param string $location location filter (optional)
  */
-function facetoface_get_sessions($facetofaceid, $location='') {
+function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
     global $CFG,$DB;
 
     $fromclause = "FROM {facetoface_sessions} s";
@@ -1164,13 +1164,20 @@ function facetoface_get_sessions($facetofaceid, $location='') {
         $locationwhere .= " AND d.data = ?";
         $locationparams[] = $location;
     }
+    $roomwhere = '';
+    $roomparams = array();
+    if (!empty($roomid)) {
+        $roomwhere = ' AND s.roomid = ? ';
+        $roomparams[] = $roomid;
+    }
     $sessions = $DB->get_records_sql("SELECT s.*
                                    $fromclause
                         LEFT OUTER JOIN (SELECT sessionid, min(timestart) AS mintimestart
                                            FROM {facetoface_sessions_dates} GROUP BY sessionid) m ON m.sessionid = s.id
                                   WHERE s.facetoface = ?
                                         $locationwhere
-                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams));
+                                        $roomwhere
+                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams, $roomparams));
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
@@ -5672,4 +5679,22 @@ function facetoface_format_session_dates($session) {
         $ret = html_writer::tag('em', get_string('wait-listed', 'facetoface'));
     }
     return $ret;
+}
+
+/**
+ * Get the relevant session rooms for a facetoface activity
+ *
+ * @param int $facetofaceid
+ *
+ * @return array containing facetoface_room table db objects
+ */
+function facetoface_get_rooms($facetofaceid) {
+    global $DB;
+
+    $sql = "SELECT DISTINCT r.id, r.name, r.building, r.address
+        FROM {facetoface_sessions} s
+        JOIN {facetoface_room} r ON s.roomid = r.id
+        WHERE s.facetoface = ?";
+
+    return $DB->get_records_sql($sql, array($facetofaceid));
 }
