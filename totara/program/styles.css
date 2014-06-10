@@ -392,6 +392,37 @@ div#prog-completion-relative-date label {
     margin-top: 5px;
     margin-bottom: 5px;
 }
-
-
-
+.course_list {
+    list-style-type: none;
+    margin: 0;
+}
+@media screen and (min-width: 1200px) {
+    .course_list {
+        margin: 0 0 0 -5%;
+    }
+}
+.course_list li {
+    width: 100%;
+    clear: left;
+}
+.course_list .operator {
+    float: left;
+    width: 5%;
+    display: inline-block;
+    padding: 10px 0;
+}
+.course_list .totara-item-group {
+    width: 90%;
+    float: left;
+}
+.course_list li .notifyproblem {
+    clear: left;
+    width: 87%;
+    margin: 0 0 0 5%;
+}
+@media screen and (max-width: 512px) {
+    .course_list li .notifyproblem {
+        margin: 0;
+        width: 85%;
+    }
+}

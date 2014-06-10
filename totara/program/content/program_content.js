@@ -546,7 +546,8 @@ M.totara_programcontent = M.totara_programcontent || {
             var completiontypestr = M.util.get_string('and', 'totara_program');
         }
 
-        $('.operator'+prefix).html(completiontypestr);
+        $('#' + prefix + 'courselist .operator').html(completiontypestr);
+        $('#' + prefix + 'courselist li:first-child .operator').html('&nbsp;');
 
         return true;
    },
