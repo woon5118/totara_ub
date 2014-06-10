@@ -1164,7 +1164,7 @@ function facetoface_notify_under_capacity() {
         $coursecontext = context_course::instance($facetoface->course);
         $usernamefields = get_all_user_name_fields(true, 'u');
         $users = get_users_by_capability($coursecontext, 'moodle/course:manageactivities',
-                                         "u.id, $usernamefields, u.email, u.maildisplay");
+             "u.id, $usernamefields, u.email, u.maildisplay, u.suspended, u.deleted, u.emailstop, u.auth");
         foreach ($users as $user) {
             $eventdata->userto = $user;
             tm_alert_send($eventdata);
