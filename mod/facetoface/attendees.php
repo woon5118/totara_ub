@@ -587,7 +587,10 @@ if ($show_table) {
             $statusoptions = get_attendance_status();
         }
 
-        echo html_writer::tag('div', '', array('class' => 'hide', 'id' => 'noticeupdate'));
+        if (!$download) {
+            echo html_writer::tag('div', '', array('class' => 'hide', 'id' => 'noticeupdate'));
+        }
+
         $table = new totara_table('facetoface-attendees');
         $baseurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id, 'sesskey' => sesskey(), 'onlycontent' => true));
         if ($action) {
@@ -607,7 +610,10 @@ if ($show_table) {
         $headers[] = get_string('timesignedup', 'facetoface');
         $columns[] = 'timesignedup';
 
-        if ($action == 'takeattendance') {
+        $hidecost = get_config(null, 'facetoface_hidecost');
+        $hidediscount = get_config(NULL, 'facetoface_hidediscount');
+
+        if ($action == 'takeattendance' && !$download) {
             $chooseoption = get_string('select','facetoface');
             $selectlist = html_writer::select($F2F_SELECT_OPTIONS, 'bulk_select', '', false);
             array_unshift($headers, $chooseoption . $selectlist);
@@ -620,10 +626,10 @@ if ($show_table) {
             $headers[] = get_string('cancelreason', 'facetoface');
             $columns[] = 'cancellationreason';
         } else {
-            if (!get_config(null, 'facetoface_hidecost')) {
+            if (!$hidecost) {
                 $headers[] = get_string('cost', 'facetoface');
                 $columns[] = 'cost';
-                if (!get_config(null, 'facetoface_hidediscount')) {
+                if (!$hidediscount) {
                     $headers[] = get_string('discountcode', 'facetoface');
                     $columns[] = 'discountcode';
                 }
@@ -690,7 +696,11 @@ if ($show_table) {
                 }
                 $data[] = $reserved.$cancelicon;
             }
-            $data[] = userdate($attendee->timesignedup, get_string('strftimedatetime'));
+
+            $timesignedup = userdate($attendee->timesignedup, get_string('strftimedatetime'));
+
+            // Strip the comma if we are exporting to CSV
+            $data[] = $download == 'csv' ? str_replace(',', '', $timesignedup) : $timesignedup;
 
             if ($action == 'takeattendance') {
                 $optionid = 'submissionid_' . $attendee->submissionid;
@@ -708,18 +718,26 @@ if ($show_table) {
                     $select = html_writer::select($statusoptions, $optionid, $status, false);
                     $data[] = $select;
                 } else {
+                    if (!$hidecost) {
+                        $data[] = facetoface_cost($attendee->id, $session->id, $session);
+                        if (!$hidediscount) {
+                            $data[] = $attendee->discountcode;
+                        }
+                    }
+
                     $data[] = get_string('status_' . facetoface_get_status($attendee->statuscode), 'facetoface');
                 }
             } else if ($action == 'cancellations') {
                 $data[] = userdate($attendee->timecancelled, get_string('strftimedatetime'));
                 $data[] = isset($attendee->cancelreason) ? format_string($attendee->cancelreason) : get_string('none');
             } else {
-                if (!get_config(NULL, 'facetoface_hidecost')) {
+                if (!$hidecost) {
                     $data[] = facetoface_cost($attendee->id, $session->id, $session);
-                    if (!get_config(NULL, 'facetoface_hidediscount')) {
+                    if (!$hidediscount) {
                         $data[] = $attendee->discountcode;
                     }
                 }
+
                 $data[] = str_replace(' ', '&nbsp;', get_string('status_'.facetoface_get_status($attendee->statuscode), 'facetoface'));
             }
             if (!$download) {
