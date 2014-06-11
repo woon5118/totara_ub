@@ -1117,11 +1117,12 @@ totaraDialog_handler_treeview_singleselect.prototype.setup_delete = function() {
 
     var textel = $('#'+this.text_element_id);
     var idel = $('input[name='+this.value_element_name+']');
-    var deletebutton = $('<span class="dialog-singleselect-deletable">'+M.util.get_string('delete', 'totara_core')+'</span>');
+    var deletebutton = $('<a href="#" class="dialog-singleselect-deletable">'+M.util.get_string('delete', 'totara_core')+'</a>');
     var handler = this;
 
     // Setup handler
-    deletebutton.click(function() {
+    deletebutton.click(function(e) {
+        e.preventDefault()
         idel.val('');
         textel.removeClass('nonempty');
         textel.empty();

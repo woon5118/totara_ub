@@ -291,7 +291,7 @@ a.noscript-button {
 }
 
 /* button for removing Positions once added by dialog */
-span.dialog-singleselect-deletable {
+.dialog-singleselect-deletable {
     vertical-align: middle;
     cursor: pointer;
     display: inline-block;
