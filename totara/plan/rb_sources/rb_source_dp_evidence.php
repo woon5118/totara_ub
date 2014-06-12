@@ -151,7 +151,10 @@ class rb_source_dp_evidence extends rb_base_source {
                     'displayfunc' => 'description',
                     'nosort' => true,
                     'dbdatatype' => 'text',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'extrafields' => array(
+                        'evidence_id' => 'base.id',
+                    ),
                 )
         );
 
@@ -420,7 +423,7 @@ class rb_source_dp_evidence extends rb_base_source {
 
     public function rb_display_description($description, $row) {
         $description = file_rewrite_pluginfile_urls($description, 'pluginfile.php',
-                context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $row->id);
+                context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $row->evidence_id );
         return(format_text($description, FORMAT_HTML));
     }
 
