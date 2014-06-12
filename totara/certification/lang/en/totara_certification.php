@@ -106,6 +106,7 @@ $string['learningcomptype'] = 'Learning component';
 $string['legend:recertfailrecertmessage'] = 'FAILURE TO RECERTIFY MESSAGE';
 $string['legend:recertwindowdueclosemessage'] = 'RECERTIFICATION WINDOW DUE TO CLOSE MESSAGE';
 $string['legend:recertwindowopenmessage'] = 'RECERTIFICATION WINDOW OPEN MESSAGE';
+$string['managecertifications'] = 'Manage certifications';
 $string['managecertifsinthiscat'] = 'Manage certifications in this category';
 $string['months'] = 'Month(s)';
 $string['moveselectedcertificationsto'] = 'Move selected certifications to...';

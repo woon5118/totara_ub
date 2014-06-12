@@ -523,7 +523,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $categoryname .= html_writer::tag('span', ' (' . $categorycount . ')',
                         array('title' => get_string('numberofprograms', 'totara_program')));
         $content .= html_writer::start_tag('div', array('class' => 'info'));
-        $content .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $categoryname, array('class' => 'name'));
+        $content .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $categoryname, array('class' => 'categoryname'));
         $content .= html_writer::end_tag('div');
 
         // Add category content to the output.
@@ -713,8 +713,10 @@ class totara_program_renderer extends plugin_renderer_base {
         if (!$coursecat->id) {
             if (can_edit_in_category()) {
                 // Add 'Manage' button instead of program search form.
+                $titlebutton = ($viewtype == 'program' ? get_string('manageprograms', 'admin') :
+                                                         get_string('managecertifications', 'totara_certification'));
                 $managebutton = $this->single_button(new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)),
-                                get_string('manageprograms', 'admin'), 'get');
+                                $titlebutton, 'get');
                 $this->page->set_button($managebutton);
             }
             if (coursecat::count_all() == 1) {
@@ -723,7 +725,8 @@ class totara_program_renderer extends plugin_renderer_base {
                 $strfulllistofprograms = get_string('fulllistofprograms', 'totara_program');
                 $this->page->set_title("$site->shortname: $strfulllistofprograms");
             } else {
-                $this->page->set_title("$site->shortname: {$label}");
+                $this->page->set_title($label);
+                $this->page->navbar->add($label, new moodle_url('/totara/program/index.php', array('viewtype' => $viewtype)));
             }
         } else {
             $this->page->set_title("$site->shortname: ". $coursecat->get_formatted_name());
@@ -762,23 +765,25 @@ class totara_program_renderer extends plugin_renderer_base {
         $programdisplayoptions['limit'] = $perpage;
         $catdisplayoptions['limit'] = $perpage;
         $hasitems = ($viewtype == 'program') ? prog_has_programs($coursecat) : certif_has_certifications($coursecat);
-        //TODO: might need to fix certifications here...
-        if ($browse === 'programs' || !$coursecat->has_children()) {
-            $programdisplayoptions['offset'] = $page * $perpage;
-            $programdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => 'programs'));
-            $catdisplayoptions['nodisplay'] = true;
-            $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories'));
-            $catdisplayoptions['viewmoretext'] = new lang_string('viewallsubcategories');
-        } else if ($browse === 'categories' || !$hasitems && $coursecat->id != 0) {
+        if ($browse === 'categories' || !$hasitems && $coursecat->id != 0) {
             $programdisplayoptions['nodisplay'] = true;
             $catdisplayoptions['offset'] = $page * $perpage;
-            $catdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => 'categories'));
-            $programdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'programs'));
-            $programdisplayoptions['viewmoretext'] = new lang_string('viewallprograms', 'totara_program');
+            $catdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => $browse, 'viewtype' => $viewtype));
+            $programdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('viewtype' => $viewtype));
+            $programdisplayoptions['viewmoretext'] = new lang_string("viewall{$viewtype}s", "totara_{$viewtype}");
         } else {
-            // We have a category that has both subcategories and programs, display pagination separately.
-            $programdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'programs', 'page' => 1));
-            $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories', 'page' => 1));
+            $browse = ($viewtype === 'certification' ? 'certifications' : 'programs');
+            if (!$coursecat->has_children()) {
+                $programdisplayoptions['offset'] = $page * $perpage;
+                $programdisplayoptions['paginationurl'] = new moodle_url($baseurl, array('browse' => $browse, 'viewtype' => $viewtype));
+                $catdisplayoptions['nodisplay'] = true;
+                $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories', 'viewtype' => $viewtype));
+                $catdisplayoptions['viewmoretext'] = new lang_string('viewallsubcategories');
+            } else {
+                // We have a category that has both subcategories and programs, display pagination separately.
+                $programdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => $browse, 'viewtype' => $viewtype, 'page' => 1));
+                $catdisplayoptions['viewmoreurl'] = new moodle_url($baseurl, array('browse' => 'categories', 'viewtype' => $viewtype, 'page' => 1));
+            }
         }
         $chelper->set_programs_display_options($programdisplayoptions)->set_categories_display_options($catdisplayoptions);
 
