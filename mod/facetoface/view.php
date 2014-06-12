@@ -136,13 +136,13 @@ $sessions = facetoface_get_sessions($facetoface->id, $location, $roomid);
 print_session_list($course->id, $facetoface, $sessions);
 
 if (has_capability('mod/facetoface:viewattendees', $context)) {
-    echo $OUTPUT->heading(get_string('exportattendance', 'facetoface'));
     echo html_writer::start_tag('form', array('action' => 'view.php', 'method' => 'get'));
     echo html_writer::start_tag('div') . html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'f', 'value' => $facetoface->id));
-    echo get_string('format', 'facetoface') . '&nbsp;';
-    $formats = array('excel' => get_string('excelformat', 'facetoface'),
-                     'ods' => get_string('odsformat', 'facetoface'));
-    echo html_writer::select($formats, 'download', 'excel', '');
+    echo get_string('exportattendance', 'facetoface') . '&nbsp;';
+    $formats = array(0 => get_string('format', 'mod_facetoface'),
+                    'excel' => get_string('excelformat', 'facetoface'),
+                    'ods' => get_string('odsformat', 'facetoface'));
+    echo html_writer::select($formats, 'download', 0, '');
     echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('exporttofile', 'facetoface')));
     echo html_writer::end_tag('div'). html_writer::end_tag('form');
 }
