@@ -1337,7 +1337,7 @@ abstract class dp_base_component {
             $tooltip = get_string('nocomments', 'totara_plan');
             $commentclass = 'comments-icon-none';
         }
-        return $OUTPUT->action_link(new moodle_url("/totara/plan/components/{$this->component}/view.php", array('id' => $this->plan->id, 'itemid' => $item->id.'#comments')),
+        return $OUTPUT->action_link(new moodle_url("/totara/plan/components/{$this->component}/view.php", array('id' => $this->plan->id, 'itemid' => $item->id), 'comments'),
             $count, null, array('class' => $commentclass, 'title' => $tooltip));
     }
 
