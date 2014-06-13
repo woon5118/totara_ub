@@ -999,9 +999,9 @@ function facetoface_cron($testing = false) {
         $sched = $DB->get_records_select(
             'facetoface_notification',
             'scheduletime IS NOT NULL
-            AND type = ?
+            AND (type = ? OR type = ?)
             AND status = 1',
-            array(MDL_F2F_NOTIFICATION_SCHEDULED));
+            array(MDL_F2F_NOTIFICATION_SCHEDULED, MDL_F2F_NOTIFICATION_AUTO));
         if ($sched) {
             foreach ($sched as $notif) {
                 $notification = new facetoface_notification((array)$notif, false);
