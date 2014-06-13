@@ -920,6 +920,7 @@ $string['signupfor'] = 'Sign-up for {$a}';
 $string['signupforsession'] = 'Sign-up for an available upcoming session';
 $string['signupforthissession'] = 'Sign-up for this Face-to-face session';
 $string['sign-ups'] = 'Sign-ups';
+$string['sitelogseditattendees'] = 'Facetoface "{$a->f2fname}", session "{$a->sessionid}": {$a->usercount} learners edited with {$a->errorcount} errors';
 $string['sitenoticesheading'] = 'Site Notices';
 $string['startdateafter'] = 'Start date after';
 $string['finishdatebefore'] = 'Finish date before';

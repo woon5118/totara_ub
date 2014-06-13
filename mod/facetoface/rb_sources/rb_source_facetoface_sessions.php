@@ -122,6 +122,14 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'bookedby.id = base.bookedby',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
+            new rb_join(
+                'creator',
+                'LEFT',
+                '{user}',
+                'status.createdby = creator.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'status'
+            ),
         );
 
 
@@ -258,6 +266,17 @@ class rb_source_facetoface_sessions extends rb_base_source {
                     'defaultheading' => get_string('ftfname', 'rb_source_facetoface_sessions'),
                     'extrafields' => array('activity_id' => 'sessions.facetoface'),
                 )
+            ),
+            new rb_column_option(
+                'status',
+                'createdby',
+                get_string('createdby', 'rb_source_facetoface_sessions'),
+                $DB->sql_fullname('creator.firstname', 'creator.lastname'),
+                array(
+                    'joins' => 'creator',
+                    'displayfunc' => 'link_f2f_actionedby',
+                    'extrafields' => array('actionedbyid' => 'creator.id')
+                    )
             ),
             new rb_column_option(
                 'date',
@@ -520,6 +539,12 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'room',
                 'description',
                 get_string('roomdescription', 'rb_source_facetoface_sessions'),
+                'text'
+            ),
+            new rb_filter_option(
+                'status',
+                'createdby',
+                get_string('createdby', 'rb_source_facetoface_sessions'),
                 'text'
             ),
         );
@@ -983,6 +1008,13 @@ class rb_source_facetoface_sessions extends rb_base_source {
         global $OUTPUT;
         $bookedbyid = $row->bookedby_id;
         return $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $bookedbyid)), $name);
+    }
+
+    // Output the actioning users name (linked to their profile).
+    function rb_display_link_f2f_actionedby($name, $row) {
+        global $OUTPUT;
+        $actionedbyid = $row->actionedbyid;
+        return $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $actionedbyid)), $name);
     }
 
     // Override user display function to show 'Reserved' for reserved spaces.
