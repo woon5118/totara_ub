@@ -195,11 +195,6 @@ abstract class prog_message {
         $programid = $this->programid;
         $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
 
-        // Only send the message if it has not already been sent to the recipient.
-        if ($DB->get_record('prog_messagelog', array('messageid' => $this->id, 'userid' => $userid, 'coursesetid' => $coursesetid))) {
-            return true;
-        }
-
         // Get text to scan for placeholders.
         $messagedata = $this->studentmessagedata->subject . $this->studentmessagedata->fullmessage;
         if ($manager = totara_get_manager($recipient->id)) {
@@ -212,7 +207,7 @@ abstract class prog_message {
 
         // Scan for placeholders in the message and delete those which are not used.
         foreach ($placeholders as $key => $value) {
-            if (!strpos($messagedata, "%{$value}%")) {
+            if (strpos($messagedata, "%{$value}%") === false) {
                 unset($placeholders[$key]);
             }
         }
@@ -310,7 +305,6 @@ abstract class prog_message {
         foreach ($this->replacementvars as $search => $replace) {
             $text = str_replace("%$search%", $replace, $text);
         }
-
         return $text;
     }
 
@@ -740,6 +734,11 @@ abstract class prog_eventbased_message extends prog_message {
         $result = true;
 
         $coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
+        // Only send the message if it has not already been sent to the recipient.
+        if ($DB->get_record('prog_messagelog', array('messageid' => $this->id, 'userid' => $recipient->id, 'coursesetid' => $coursesetid), 'id', IGNORE_MULTIPLE)) {
+            return true;
+        }
+
         $manager = totara_get_manager($recipient->id);
         $this->set_replacementvars($recipient, $options);
 
