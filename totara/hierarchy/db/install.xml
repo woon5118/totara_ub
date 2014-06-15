@@ -327,6 +327,7 @@
         <FIELD NAME="depthlevel" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="sortthread" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="totarasync" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara sync flag from totara_sync"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -334,6 +335,9 @@
         <KEY NAME="pos_typ_fk" TYPE="foreign" FIELDS="typeid" REFTABLE="pos_type" REFFIELDS="id"/>
         <KEY NAME="pos_par_fk" TYPE="foreign" FIELDS="parentid" REFTABLE="pos" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="totarasync" UNIQUE="false" FIELDS="totarasync" COMMENT="Totara sync index from totara_sync"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="pos_assignment" COMMENT="Tracks a users current position assignments">
       <FIELDS>
@@ -529,6 +533,7 @@
         <FIELD NAME="depthlevel" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="sortthread" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="totarasync" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara sync flag from totara_sync"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -536,6 +541,9 @@
         <KEY NAME="org_par_fk" TYPE="foreign" FIELDS="parentid" REFTABLE="org" REFFIELDS="id"/>
         <KEY NAME="org_typ_fk" TYPE="foreign" FIELDS="typeid" REFTABLE="org_type" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="totarasync" UNIQUE="false" FIELDS="totarasync" COMMENT="Totara sync index from totara_sync"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="org_competencies" COMMENT="Track competencies assigned to a particular organisation">
       <FIELDS>
