@@ -98,7 +98,8 @@ $resp_sql = "SELECT ra.*, ea.email, {$usernamefields}
              ON ra.feedback360emailassignmentid = ea.id
              JOIN {user} u
              ON ra.userid = u.id
-             WHERE ra.feedback360userassignmentid = :uaid";
+             WHERE ra.feedback360userassignmentid = :uaid
+             AND u.deleted = 0";
 $resp_params = array('uaid' => $user_assignment->id);
 $resp_assignments = $DB->get_records_sql($resp_sql, $resp_params);
 

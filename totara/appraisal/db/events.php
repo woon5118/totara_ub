@@ -42,4 +42,9 @@ $observers = array(
         'callback'=> 'appraisal_event_handler::appraisal_stage_completion',
         'includefile' => '/totara/appraisal/lib.php',
     ),
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback'=> 'appraisal_event_handler::appraisal_user_deleted',
+        'includefile' => '/totara/appraisal/lib.php',
+    ),
 );

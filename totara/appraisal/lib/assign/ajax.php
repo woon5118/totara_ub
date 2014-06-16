@@ -57,18 +57,19 @@ $users->close();
 $groupinfo = $assignclass->get_group_assignedvia_details(array_keys($userdata));
 $aadata = array();
 foreach ($userdata as $userid => $user) {
-    $url = new moodle_url('/user/view.php', array('id' => $user->id));
-    $link = html_writer::link($url, fullname($user));
-
-    $assignvia = array();
-    if (!empty($groupinfo)) {
-        foreach ($groupinfo[$userid] as $groupid => $groupstring) {
-            $assignvia[] = $groupstring;
+    // Check for deleted users.
+    if (isset($groupinfo[$userid])) {
+        $url = new moodle_url('/user/view.php', array('id' => $user->id));
+        $link = html_writer::link($url, fullname($user));
+        $assignvia = array();
+        if (!empty($groupinfo)) {
+            foreach ($groupinfo[$userid] as $groupid => $groupstring) {
+                $assignvia[] = $groupstring;
+            }
         }
+        $assignviastring = implode(', ', $assignvia);
+        $aadata[] = array($link, $assignviastring);
     }
-    $assignviastring = implode(', ', $assignvia);
-
-    $aadata[] = array($link, $assignviastring);
 }
 
 $output = array(

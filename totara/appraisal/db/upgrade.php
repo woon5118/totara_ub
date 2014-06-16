@@ -55,5 +55,38 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013080501, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2014061600) {
+        require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+        $usercount = $DB->count_records('user', array('deleted' => 1));
+        if ($usercount > 0) {
+            // This could take some time and use a lot of resources.
+            set_time_limit(0);
+            raise_memory_limit(MEMORY_EXTRA);
+            $i = 0;
+            $deletedusers = $DB->get_recordset('user', array('deleted' => 1), null, 'id, username, firstname, lastname, email, idnumber, picture, mnethostid');
+            $context = context_system::instance();
+            $pbar = new progress_bar('fixdeleteduserappraisal', 500, true);
+            $pbar->update($i, $usercount, "Fixing Appraisals for deleted users - {$i}/{$usercount}.");
+            foreach ($deletedusers as $user) {
+                $event = \core\event\user_deleted::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => $context,
+                        'other' => array(
+                            'username' => $user->username,
+                            'email' => $user->email,
+                            'idnumber' => $user->idnumber,
+                            'picture' => $user->picture,
+                            'mnethostid' => $user->mnethostid
+                        )
+                ));
+                appraisal_event_handler::appraisal_user_deleted($event);
+                $i++;
+                $pbar->update($i, $usercount, "Fixing Appraisals for deleted users - {$i}/{$usercount}.");
+            }
+            $deletedusers->close();
+        }
+        upgrade_plugin_savepoint(true, 2014061600, 'totara', 'appraisal');
+    }
     return true;
 }
