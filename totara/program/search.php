@@ -68,8 +68,10 @@ if ($CFG->forcelogin) {
 
 if ($viewtype == 'program') {
     $strprograms = new lang_string('programs', 'totara_program');
+    $strprogram = new lang_string('program', 'totara_program');
 } else {
     $strprograms = new lang_string('certifications', 'totara_certification');
+    $strprogram = new lang_string('certification', 'totara_certification');
 }
 $strsearch = new lang_string('search');
 $strsearchresults = new lang_string('searchresults');
@@ -81,9 +83,9 @@ if (!empty($search)) {
 }
 
 if (empty($searchcriteria)) {
-    $PAGE->set_title("$site->fullname : $strsearch");
+    $PAGE->set_title("$site->fullname : $strprogram $strsearch");
 } else {
-    $PAGE->set_title("$site->fullname : $strsearchresults");
+    $PAGE->set_title("$site->fullname : $strprogram $strsearchresults");
     // Link to manage search results should be visible if user have system or category level capability.
     if ((can_edit_in_category() || !empty($usercatlist))) {
         $aurl = new moodle_url('/totara/program/manage.php', $searchcriteria);
