@@ -88,7 +88,7 @@ $pagetitle = get_string('learningplans', 'totara_plan');
 dp_get_plan_base_navlinks($planuser);
 
 $PAGE->set_title($heading);
-$PAGE->set_heading($pagetitle);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 // Plan menu

@@ -77,7 +77,7 @@ $fullname = $report->fullname;
 $pagetitle = format_string(get_string('report', 'totara_core').': '.$fullname);
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
 $PAGE->navbar->add($strheading);
 

@@ -42,24 +42,34 @@ a:hover {
 /**
  * Headings
  */
-h1,
-h2,
 h3,
 h4,
 h5,
 h6 {
     color:#444444;
 }
-h1 {
+h1,
+h2 {
     font-size:1.9em;
-    margin:5px 0 15px;
+    color:#FFFFFF;
+    line-height:1.4em;
+    letter-spacing:-1px;
+    background:#b1bb1a;
+    margin:0 0 15px;
+    border-radius: 5px;
+    padding:0em 0.5em 0.1em 0.5em;
+}
+#pageheading {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute;
+}
+.pagelayout-course #pageheading,
+.pagelayout-incourse #pageheading {
+    clip: auto;
+    position: relative;
 }
 h2 {
-    font-size:1.5em;
     line-height:1.1em;
-    border:none;
-    padding:0;
-    margin:5px 0 15px;
 }
 h3 {
     font-size:1.35em;
@@ -79,19 +89,6 @@ h5 {
 h6 {
     font-size:1em;
     margin:5px 0 5px;
-}
-h2,
-h1 {
-    font-size:200%;
-    font-size:1.9em;
-    font-weight:300;
-    color:#FFFFFF;
-    padding:0em 0.5em 0.1em 0.5em;
-    margin:0 0 15px;
-    line-height:1.4em;
-    letter-spacing:-1px;
-    background:#b1bb1a;
-    border-radius: 5px;
 }
 h2 a,
 h2 a:visited,

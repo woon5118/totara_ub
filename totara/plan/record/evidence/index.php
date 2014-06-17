@@ -83,7 +83,7 @@ $PAGE->navbar->add(get_string($menunavitem, 'totara_core'), $url);
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);
-$PAGE->set_heading($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_button($report->edit_button());
 $PAGE->set_totara_menu_selected($menuitem);
 
@@ -93,7 +93,7 @@ echo dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 
-echo $OUTPUT->heading($strheading.' : '.$strsubheading, 1);
+echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
 dp_print_rol_tabs($rolstatus, 'evidence', $userid);
 

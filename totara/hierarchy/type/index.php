@@ -139,7 +139,7 @@ if ($types) {
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading(get_string('types', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false), 1);
+echo $OUTPUT->heading(get_string('types', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false));
 
 // Add type button
 if ($can_add) {
@@ -173,7 +173,7 @@ if ($unclassified) {
 if ($showbulkform) {
     echo html_writer::empty_tag('br');
     echo html_writer::tag('a', '', array('name' => 'bulkreclassify'));
-    echo $OUTPUT->heading(get_string('bulktypechanges', 'totara_hierarchy'), 1);
+    echo $OUTPUT->heading(get_string('bulktypechanges', 'totara_hierarchy'));
 
     echo $OUTPUT->container(get_string('bulktypechangesdesc', 'totara_hierarchy'));
 

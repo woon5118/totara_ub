@@ -145,7 +145,7 @@ switch ($action) {
         }
         $optionsyes = array ('id'=>$id, 'confirm'=>1, 'action'=>'deletefield', 'sesskey'=>sesskey(), 'typeid'=>$typeid);
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('deletefield', 'totara_customfield'), '1');
+        echo $OUTPUT->heading(get_string('deletefield', 'totara_customfield'));
         $formcontinue = new single_button(new moodle_url($redirect, $optionsyes), get_string('yes'), 'post');
         $formcancel = new single_button(new moodle_url($redirect, $redirectoptions), get_string('no'), 'get');
         echo $OUTPUT->confirm($deletestr, $formcontinue, $formcancel);
@@ -189,7 +189,7 @@ if ($prefix == 'course') {
 } else {
     $heading = format_string($type->fullname);
 }
-echo $OUTPUT->heading($heading, 1);
+echo $OUTPUT->heading($heading);
 
 // show custom fields for the given type
 $table = new html_table();

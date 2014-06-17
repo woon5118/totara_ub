@@ -82,7 +82,7 @@ $PAGE->set_heading($strheading);
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
 echo $output->header();
-echo $output->heading($strheading, 1);
+echo $output->heading($strheading, 2);
 echo html_writer::tag('p', html_writer::link("{$CFG->wwwroot}/my/", "<< " . get_string('mylearning', 'totara_core')));
 
 $countfiltered = $report->get_filtered_count();
@@ -90,12 +90,12 @@ $countall = $report->get_full_count();
 
 // Display heading including filtering stats.
 if ($countfiltered == $countall) {
-    echo $output->heading(get_string('recordsall', 'totara_message', $countall));
+    echo $output->heading(get_string('recordsall', 'totara_message', $countall), 3);
 } else {
     $a = new stdClass();
     $a->countfiltered = $countfiltered;
     $a->countall = $countall;
-    echo $output->heading(get_string('recordsshown', 'totara_message', $a));
+    echo $output->heading(get_string('recordsshown', 'totara_message', $a), 3);
 }
 
 if (empty($report->description)) {

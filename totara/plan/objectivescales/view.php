@@ -194,7 +194,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->single_button('/totara/plan/objectivescales/index.php', get_string('allobjectivescales', 'totara_plan'), 'get');
 
 // Display info about scale
-echo $OUTPUT->heading(get_string('objectivescalex', 'totara_plan', format_string($objective->name)), 1);
+echo $OUTPUT->heading(get_string('objectivescalex', 'totara_plan', format_string($objective->name)));
 $objective->description = file_rewrite_pluginfile_urls($objective->description, 'pluginfile.php', $context->id, 'totara_plan', 'dp_objective_scale', $objective->id);
 echo html_writer::tag('p', format_text($objective->description, FORMAT_HTML));
 

@@ -79,14 +79,14 @@ $PAGE->navbar->add($strheading, $indexurl);
 $PAGE->navbar->add(get_string('allevidence', 'totara_plan'));
 
 $PAGE->set_title($strheading);
-$PAGE->set_heading($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 echo dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 
-echo $OUTPUT->heading($strheading, 1);
+echo $OUTPUT->heading($strheading);
 
 dp_print_rol_tabs($rolstatus, 'evidence', $userid);
 

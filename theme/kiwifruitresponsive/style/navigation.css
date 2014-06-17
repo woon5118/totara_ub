@@ -393,11 +393,16 @@ div#custommenu ul li ul ul li {
     }
     #main-menu {
         height: auto;
-        border-radius: 3px;
     }
 }
 @media screen and (min-width: 980px) {
     #main-menu .btn-navbar {
         display: none;
+    }
+}
+@media screen and (max-width: 767px) {
+    #main-menu {
+        border-bottom-right-radius: 3px;
+        border-bottom-left-radius: 3px;
     }
 }

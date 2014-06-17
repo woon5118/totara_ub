@@ -98,7 +98,7 @@ class item_bulkaction_form extends moodleform {
 
         $mform->addElement('html', html_writer::start_tag('div', array('id' => 'hierarchy-bulk-actions-form')));
         $mform->addElement('html', html_writer::start_tag('div', array('class' => 'span5 available'))); // Left column.
-        $mform->addElement('html', html_writer::tag('h3', $available_str));
+        $mform->addElement('html', $OUTPUT->heading($available_str, 3));
 
         $mform->addElement('text', 'search', '',
             array('placeholder' => get_string('searchavailable', 'totara_hierarchy')));
@@ -141,7 +141,7 @@ class item_bulkaction_form extends moodleform {
         $mform->addElement('html', html_writer::end_tag('div')); // Center column.
 
         $mform->addElement('html', html_writer::start_tag('div', array('class' => 'span5 selected'))); // Right column.
-        $mform->addElement('html', html_writer::tag('h3', $selected_str));
+        $mform->addElement('html', $OUTPUT->heading($selected_str, 3));
         $mform->addElement('submit', 'remove_all_items',
             get_string('clearselection', 'totara_hierarchy'), $remove_attr);
 

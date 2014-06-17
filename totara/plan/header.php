@@ -34,7 +34,7 @@
  * - $currenttab        Current tab
  * - $navlinks          Additional breadcrumbs (optional)
  */
-global $PAGE, $OUTPUT;
+global $PAGE, $OUTPUT, $SITE;
 (defined('MOODLE_INTERNAL') && isset($this)) || die();
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
@@ -58,7 +58,7 @@ if ($is_component) {
 }
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading($pagetitle);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 // Run post header hook (if this is a component)
@@ -76,7 +76,7 @@ echo $OUTPUT->container_start('', 'dp-plan-content');
 echo $this->display_plan_message_box();
 
 $heading = html_writer::tag('span', get_string('plan', 'totara_plan') . ':', array('class' => 'dp-plan-prefix'));
-echo $OUTPUT->heading($heading . ' ' . $fullname, 1);
+echo $OUTPUT->heading($heading . ' ' . $fullname);
 
 print $this->display_tabs($currenttab);
 

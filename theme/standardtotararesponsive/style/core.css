@@ -50,6 +50,26 @@ h1 {
     font-size:1.9em;
     margin:5px 0 15px;
 }
+header h1 {
+    float: left;
+    padding: 10px;
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute;
+    margin: 10px 0;
+}
+.dir-rtl header h1 {
+    float: right;
+}
+.pagelayout-course header h1,
+.pagelayout-incourse header h1 {
+    clip: auto;
+    position: relative;
+}
+@media screen and (max-width: 540px) {
+    h1 {
+        clear: left;
+    }
+}
 h2 {
     font-size:1.5em;
     line-height:1em;
@@ -873,6 +893,7 @@ input[type="checkbox"] {
     width:100%;
     border-bottom: 0;
 }
+.navbar
 .navbar .breadcrumb {
     font-weight: normal;
     font-size: .9em;
@@ -884,6 +905,9 @@ input[type="checkbox"] {
 }
 .navbar .navbutton {
     margin-top:-2px;
+}
+.navbar .nav {
+    clear: none;
 }
 .navbar .nav li {
     float: right;

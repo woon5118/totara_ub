@@ -88,30 +88,28 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </a>
-            <div class="nav-collapse collapse">
-                <ul class="nav <?php echo $left ? "pull-right" : "pull-left" ?>">
-                    <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
-                    <?php if ($haslogininfo) { ?>
-                        <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
-                    <?php }
-                    if ($haslangmenu) { ?>
-                        <li><?php echo $OUTPUT->lang_menu(); ?></li>
-                    <?php } ?>
-                </ul>
-                <?php if ($showmenu) { ?>
-                    <?php if ($hascustommenu) { ?>
-                    <div id="custommenu"><?php echo $custommenu; ?></div>
-                    <?php } else { ?>
-                    <div id="totaramenu"><?php echo $totaramenu; ?></div>
-                    <?php } ?>
+            <ul class="nav nav-collapse collapse <?php echo $left ? "pull-right" : "pull-left" ?>">
+                <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
+                <?php if ($haslogininfo) { ?>
+                    <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
+                <?php }
+                if ($haslangmenu) { ?>
+                    <li><?php echo $OUTPUT->lang_menu(); ?></li>
                 <?php } ?>
-            </div>
+            </ul>
+            <?php echo $OUTPUT->page_heading(); ?>
+            <?php if ($showmenu) { ?>
+                <?php if ($hascustommenu) { ?>
+                <div id="custommenu" class="nav-collapse collapse"><?php echo $custommenu; ?></div>
+                <?php } else { ?>
+                <div id="totaramenu" class="nav-collapse collapse"><?php echo $totaramenu; ?></div>
+                <?php } ?>
+            <?php } ?>
         </div>
     </nav>
 </header>
 
 <div id="page" class="container-fluid">
-
     <header id="page-header" class="clearfix">
         <div id="page-navbar" class="clearfix">
             <div class="breadcrumb-nav"><?php echo $OUTPUT->navbar(); ?></div>

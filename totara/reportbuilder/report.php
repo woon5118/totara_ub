@@ -78,6 +78,7 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());
 $PAGE->navbar->add(get_string('myreports', 'totara_reportbuilder'), new moodle_url('/my/reports.php'));
 $PAGE->navbar->add($fullname);
+$PAGE->set_heading(format_string($SITE->fullname));
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 

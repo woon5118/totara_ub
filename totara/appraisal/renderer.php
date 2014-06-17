@@ -943,7 +943,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         if (!$stage) {
             return '';
         }
-        $header = $this->heading(get_string('managestage', 'totara_appraisal', format_string($stage->name)));
+        $header = $this->heading(get_string('managestage', 'totara_appraisal', format_string($stage->name)), 3);
         $contentpane = html_writer::tag('div', '', array('id' => 'appraisal-questions',
             'class' => 'appraisal-content'));
         $create_page = $this->create_new_page_link($stage);

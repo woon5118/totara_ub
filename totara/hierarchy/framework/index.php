@@ -64,7 +64,6 @@ if ($canmanage) {
     $PAGE->set_context($sitecontext);
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($detailsstr);
-    $PAGE->set_heading($detailsstr);
 }
 
 ///
@@ -183,7 +182,7 @@ $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'));
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading(get_string($prefix.'frameworks', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'frameworks', 'totara_hierarchy', false), 1);
+echo $OUTPUT->heading(get_string($prefix.'frameworks', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'frameworks', 'totara_hierarchy', false));
 
 // Editing buttons.
 if ($cancreateframeworks) {

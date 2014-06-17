@@ -41,6 +41,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('my-reports');
 $PAGE->set_title($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_url(new moodle_url('/my/reports.php'));
 $PAGE->set_totara_menu_selected('myreports');
 $PAGE->navbar->add($strheading);
@@ -63,12 +64,11 @@ if ($PAGE->user_allowed_editing()) {
 } else {
     $USER->editing = 0;
 }
-
 echo $OUTPUT->header();
 
 add_to_log(SITEID, 'my', 'reports', 'reports.php');
 
-echo $OUTPUT->heading($strheading, 1);
+echo $OUTPUT->heading($strheading);
 
 echo $OUTPUT->container_start(null, 'myreports_section');
 echo totara_print_report_manager();
@@ -86,5 +86,3 @@ if (reportbuilder_get_reports()){
 }
 
 echo $OUTPUT->footer();
-
-?>

@@ -166,7 +166,7 @@ $args = array('args' => '{"templates":' . $json_templates . '}');
 $PAGE->requires->js_init_call('M.totara_plan_template.init', $args, false, $jsmodule);
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading($heading);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 // Plan menu

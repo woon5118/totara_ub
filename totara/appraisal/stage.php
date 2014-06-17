@@ -193,14 +193,14 @@ echo $output->appraisal_management_tabs($appraisal->id, 'content');
 
 switch ($action) {
     case 'delete':
-        echo $output->heading(get_string('deletestage', 'totara_appraisal', $stage->name));
+        echo $output->heading(get_string('deletestage', 'totara_appraisal', $stage->name),3);
         echo $output->confirm_delete_stage($stage->id);
         break;
     case 'edit':
         echo $mform->display();
         break;
     default:
-        echo $output->heading(get_string('stages', 'totara_appraisal'));
+        echo $output->heading(get_string('stages', 'totara_appraisal'), 3);
         echo $output->create_stage_button($appraisal);
         echo $output->appraisal_stages_table($stages, 0, $id);
         echo $output->stage_page_container($stage, $pages);

@@ -125,7 +125,7 @@ $PAGE->navbar->add(get_string('pendingitems', 'totara_plan'));
 ///
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 
 $output = $PAGE->get_renderer('totara_plan');
 

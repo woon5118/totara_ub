@@ -19,6 +19,10 @@ body {
     padding-top: 0;
 }
 
+.pagelayout-maintenance h1 {
+    margin: 5px;
+}
+
 @media screen and (max-width: 767px) {
   #page-footer {
     margin-right: -20px;

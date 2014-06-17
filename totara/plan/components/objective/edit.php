@@ -199,6 +199,7 @@ dp_get_plan_base_navlinks($plan->userid);
 $PAGE->navbar->add($fullname, new moodle_url('/totara/plan/view.php', array('id' => $planid)));
 $PAGE->navbar->add(get_string($component->component, 'totara_plan'));
 $PAGE->set_title($pagetitle);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 // Plan menu
@@ -207,7 +208,6 @@ echo dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');
 print $plan->display_plan_message_box();
-echo $OUTPUT->heading($fullname);
 print $plan->display_tabs($componentname);
 
 switch($action) {

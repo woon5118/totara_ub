@@ -29,6 +29,7 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
     public function kiwifruit_header() {
         global $OUTPUT, $PAGE, $CFG, $SITE;
         $output = '';
+        $output .= html_writer::start_tag('header');
         $output .= html_writer::tag('div', $OUTPUT->login_info(), array('id' => 'login-info'));
 
         $output .= html_writer::start_tag('div', array('id' => 'main-menu'));
@@ -78,6 +79,7 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
         }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('header');
         return $output;
     }
 
@@ -187,5 +189,16 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
         }
 
         return $loggedinas;
+    }
+
+    /**
+     * Gets HTML for the page heading.
+     *
+     * @since Moodle 2.5.1 2.6
+     * @param string $tag The tag to encase the heading in. h1 by default.
+     * @return string HTML.
+     */
+    public function page_heading($tag = 'h1') {
+        return html_writer::tag($tag, $this->page->heading, array('id' => 'pageheading'));
     }
 }

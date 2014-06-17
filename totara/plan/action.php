@@ -85,7 +85,7 @@ $PAGE->set_url(new moodle_url('/totara/plan/action.php', $pageparams));
 /// Load plan
 ///
 $plan = new development_plan($id);
-
+$PAGE->set_heading(format_string($SITE->fullname));
 
 ///
 /// Permissions check
@@ -208,7 +208,7 @@ if (!empty($delete)) {
             // Show confirmation message
             $PAGE->set_title(get_string('confirmdeleteplantitle', 'totara_plan', $plan->name));
             echo $OUTPUT->header();
-            echo $OUTPUT->heading(get_string('deleteplan', 'totara_plan'), 1);
+            echo $OUTPUT->heading(get_string('deleteplan', 'totara_plan'));
             $confirmurl = new moodle_url(qualified_me());
             $confirmurl->param('confirm', 'true');
             $confirmurl->param('referer', $referer);

@@ -124,7 +124,6 @@ if ($canmanage) {
     $PAGE->set_context($sitecontext);
     $PAGE->set_pagelayout('admin');
     $PAGE->set_title($detailsstr);
-    $PAGE->set_heading($detailsstr);
 }
 
 $PAGE->navbar->add(format_string($framework->fullname));

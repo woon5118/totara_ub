@@ -232,7 +232,7 @@ if ($preview) {
 $heading = get_string('myappraisals', 'totara_appraisal');
 $renderer = $PAGE->get_renderer('totara_appraisal');
 $PAGE->set_title($heading);
-$PAGE->set_heading($heading);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $renderer->header();
 
 // Output special headers.

@@ -97,7 +97,7 @@ foreach ($category_breadcrumbs as $crumb) {
 $PAGE->navbar->add($heading);
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 if ($isadmin) {

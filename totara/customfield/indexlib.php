@@ -180,7 +180,7 @@ function customfield_list_datatypes() {
 
 
 function customfield_edit_field($id, $datatype, $typeid=0, $redirect, $tableprefix, $prefix, $navlinks=false) {
-    global $CFG, $DB, $OUTPUT, $PAGE, $TEXTAREA_OPTIONS;
+    global $CFG, $DB, $OUTPUT, $PAGE, $TEXTAREA_OPTIONS, $SITE;
 
     if (!$field = $DB->get_record($tableprefix.'_info_field', array('id' => $id))) {
         $field = new stdClass();
@@ -239,12 +239,12 @@ function customfield_edit_field($id, $datatype, $typeid=0, $redirect, $tablepref
             echo $OUTPUT->header();
         } else {
             $PAGE->set_title($pagetitle);
-            $PAGE->set_heading('');
+            $PAGE->set_heading(format_string($SITE->fullname));
             $PAGE->set_focuscontrol('');
             $PAGE->set_cacheable(true);
             echo $OUTPUT->header();
         }
-        echo $OUTPUT->heading($strheading, '1');
+        echo $OUTPUT->heading($strheading);
         $fieldform->display();
         echo $OUTPUT->footer();
         die;

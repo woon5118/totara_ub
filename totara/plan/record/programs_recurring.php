@@ -113,7 +113,7 @@ $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', 
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 
 $ownplan = $USER->id == $userid;
 
@@ -127,7 +127,7 @@ echo dp_display_plans_menu($userid, 0, $usertype, 'courses', 'none');
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 
-echo $OUTPUT->heading($strheading, 1);
+echo $OUTPUT->heading($strheading);
 
 $currenttab = 'programs';
 dp_print_rol_tabs($rolstatus, $currenttab, $userid);

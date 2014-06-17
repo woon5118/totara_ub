@@ -56,7 +56,7 @@ echo $OUTPUT->single_button(
         get_string('allevidencetypes', 'totara_plan'), 'get');
 
 // Display info about evidence type
-echo $OUTPUT->heading(get_string('evidencetypex', 'totara_plan', format_string($item->name)), 1);
+echo $OUTPUT->heading(get_string('evidencetypex', 'totara_plan', format_string($item->name)));
 
 $item->description = file_rewrite_pluginfile_urls($item->description, 'pluginfile.php', $context->id, 'totara_plan', 'dp_evidence_type', $item->id);
 echo html_writer::tag('p', format_text($item->description, FORMAT_HTML));

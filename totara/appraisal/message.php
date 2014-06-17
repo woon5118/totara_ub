@@ -149,9 +149,9 @@ echo $output->appraisal_management_tabs($appraisal->id, 'messages');
 switch ($action) {
     case 'edit':
         if ($messageid) {
-            echo $output->heading(get_string('messageedit', 'totara_appraisal'));
+            echo $output->heading(get_string('messageedit', 'totara_appraisal'), 3);
         } else {
-            echo $output->heading(get_string('messagecreate', 'totara_appraisal'));
+            echo $output->heading(get_string('messagecreate', 'totara_appraisal'), 3);
         }
         $form->display();
         break;
@@ -161,7 +161,7 @@ switch ($action) {
         }
         break;
     default:
-        echo $output->heading(get_string('messagesheading', 'totara_appraisal'));
+        echo $output->heading(get_string('messagesheading', 'totara_appraisal'), 3);
         if ($isdraft) {
             echo $output->create_message_button($id);
         }

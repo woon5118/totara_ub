@@ -140,7 +140,7 @@ echo $OUTPUT->header();
 if ($framework->id == 0) {
     echo $OUTPUT->heading(get_string($prefix.'addnewframework', 'totara_hierarchy'));
 } else {
-    echo $OUTPUT->heading(format_string($framework->fullname), 1);
+    echo $OUTPUT->heading(format_string($framework->fullname));
 }
 
 /// Finally display THE form

@@ -172,7 +172,7 @@ class totara_program_renderer extends plugin_renderer_base {
         $dropdown_options = array();
         $out = '';
         $out .= html_writer::start_tag('form', array('name' => 'form_prog_assignments', 'method' => 'post'));
-        $out .= $this->output->heading(get_string('programassignments', 'totara_program'));
+        $out .= $this->output->heading(get_string('programassignments', 'totara_program'), 3);
 
         // Show the program time required so people know the minimum to set completion to.
         $program = new program($id);

@@ -189,7 +189,7 @@ echo $OUTPUT->action_link(new moodle_url('/totara/hierarchy/framework/index.php'
     '&laquo; ' . get_string('allgoalscales', 'totara_hierarchy'));
 
 // Display info about scale.
-echo $OUTPUT->heading(get_string('scalex', 'totara_hierarchy', format_string($scale->name)), 1);
+echo $OUTPUT->heading(get_string('scalex', 'totara_hierarchy', format_string($scale->name)));
 $scale->description = file_rewrite_pluginfile_urls($scale->description, 'pluginfile.php', $sitecontext->id,
     'totara_hierarchy', 'goal_scale', $scale->id);
 echo html_writer::tag('p', $scale->description);

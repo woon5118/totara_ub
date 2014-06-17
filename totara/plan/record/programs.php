@@ -137,7 +137,7 @@ $PAGE->navbar->add($strsubheading);
 
 $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 
 $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
@@ -148,7 +148,7 @@ echo dp_display_plans_menu($userid, 0, $usertype, 'courses', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 
-echo $OUTPUT->heading($strheading.' : '.$strsubheading, 1);
+echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
 $currenttab = 'programs';
 dp_print_rol_tabs($rolstatus, $currenttab, $userid);

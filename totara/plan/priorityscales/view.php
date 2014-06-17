@@ -195,7 +195,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->single_button(new moodle_url('/totara/plan/priorityscales/index.php'), get_string('allpriorityscales', 'totara_plan'), 'get');
 
 // Display info about scale
-echo $OUTPUT->heading(get_string('priorityscalex', 'totara_plan', format_string($priority->name)), 1);
+echo $OUTPUT->heading(get_string('priorityscalex', 'totara_plan', format_string($priority->name)));
 $priority->description = file_rewrite_pluginfile_urls($priority->description, 'pluginfile.php', $context->id, 'totara_plan', 'dp_priority_scale', $priority->id);
 echo html_writer::tag('p', format_text($priority->description, FORMAT_HTML));
 

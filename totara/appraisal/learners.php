@@ -109,7 +109,7 @@ if ($appraisal->status == appraisal::STATUS_ACTIVE) {
 
 echo $output->appraisal_management_tabs($appraisal->id, 'learners');
 
-echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'));
+echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'), 3);
 
 if ($canassign) {
     if ($appraisal->status == appraisal::STATUS_CLOSED) {
@@ -126,7 +126,7 @@ $currentassignments = $assign->get_current_assigned_groups();
 
 echo $output->display_assigned_groups($currentassignments, $appraisalid);
 
-echo $output->heading(get_string('assigncurrentusers', 'totara_appraisal'));
+echo $output->heading(get_string('assigncurrentusers', 'totara_appraisal'), 3);
 
 // If the appraisal is active notify the user that changes are not live.
 if ($appraisal->status == appraisal::STATUS_ACTIVE) {

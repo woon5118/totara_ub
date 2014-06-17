@@ -93,15 +93,15 @@ $PAGE->set_pagelayout('noblocks');
 $heading = get_string('myappraisals', 'totara_appraisal');
 $renderer = $PAGE->get_renderer('totara_appraisal');
 $PAGE->set_title($heading);
-$PAGE->set_heading($heading);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 if ($subjectid == $USER->id) {
-    echo $OUTPUT->heading(get_string('allappraisals', 'totara_appraisal'), 1);
+    echo $OUTPUT->heading(get_string('allappraisals', 'totara_appraisal'));
 } else {
     $user = $DB->get_record('user', array('id' => $subjectid), '*', MUST_EXIST);
     $a = fullname($user);
-    echo $OUTPUT->heading(get_string('allappraisalsfor', 'totara_appraisal', $a), 1);
+    echo $OUTPUT->heading(get_string('allappraisalsfor', 'totara_appraisal', $a));
 }
 
 if (count($rolesplayed) > 1) {

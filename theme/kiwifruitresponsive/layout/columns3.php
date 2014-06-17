@@ -97,6 +97,7 @@ echo $OUTPUT->doctype() ?>
         <div id="region-bs-main-and-pre" class="span9 <?php echo ($left ? '' : 'pull-right'); ?>">
             <section id="region-main" class="span8 <?php echo ($left ? 'pull-right' : ''); ?>">
                 <?php
+                echo $OUTPUT->page_heading();
                 echo $OUTPUT->course_content_header();
                 echo $OUTPUT->main_content();
                 echo $OUTPUT->course_content_footer();

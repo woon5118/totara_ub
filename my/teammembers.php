@@ -87,7 +87,7 @@ if ($PAGE->user_allowed_editing()) {
 
 $PAGE->set_totara_menu_selected('myteam');
 $PAGE->set_title($strheading);
-$PAGE->set_heading($strheading);
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_button($report->edit_button().$editbutton);
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');

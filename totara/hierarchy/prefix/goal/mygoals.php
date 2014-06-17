@@ -62,7 +62,7 @@ if (totara_is_manager($userid)) {
 }
 $PAGE->navbar->add($strmygoals);
 $PAGE->set_title($strmygoals);
-$PAGE->set_heading($strmygoals);
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
 

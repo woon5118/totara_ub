@@ -57,7 +57,7 @@ $PAGE->navbar->add($fullname, new moodle_url("/totara/coursecatalog/courses.php"
 $PAGE->navbar->add(get_string('search'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading($fullname);
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 if ($debug) {
