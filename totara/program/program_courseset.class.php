@@ -654,7 +654,11 @@ class multi_course_set extends course_set {
 
         if (isset($formdata->$courseid_elementname)) {
             $courseid = $formdata->$courseid_elementname;
-
+            foreach ($this->courses as $course) {
+                if ($courseid == $course->id) {
+                    return true;
+                }
+            }
             $course = $DB->get_record('course', array('id' => $courseid));
             $this->courses[] = $course;
             return true;
@@ -1230,7 +1234,7 @@ class multi_course_set extends course_set {
         $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
         $templatehtml .= html_writer::tag('div', '', array('class' => 'fitemtitle'));
         $templatehtml .= html_writer::start_tag('div', array('class' => 'courseadder felement'));
-        $courseoptions = $DB->get_records_menu('course', null, 'fullname ASC', 'id,fullname');
+        $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
         if (count($courseoptions) > 0) {
             if ($updateform) {
                 $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);

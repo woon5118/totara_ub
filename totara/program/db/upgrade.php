@@ -287,7 +287,6 @@ function xmldb_totara_program_upgrade($oldversion) {
         $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
-        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
 
         // Adding keys to table prog_info_field.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
@@ -343,6 +342,18 @@ function xmldb_totara_program_upgrade($oldversion) {
 
         // Main savepoint reached.
         totara_upgrade_mod_savepoint(true, 2014030600, 'totara_program');
+    }
+
+    if ($oldversion < 2014061600) {
+        // Drop unused categoryid field accidentally added during 2.6 (2014030500) upgrade.
+        $table = new xmldb_table('prog_info_field');
+        $field = new xmldb_field('categoryid', XMLDB_TYPE_INTEGER, 20);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014061600, 'totara_program');
     }
 
     return true;

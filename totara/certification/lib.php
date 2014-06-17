@@ -648,13 +648,29 @@ function send_certif_message($progid, $userid, $msgtype) {
     $messagesmanager = new prog_messages_manager($progid);
     $messages = $messagesmanager->get_messages();
 
+    $now = time();
+    $certif = $DB->get_record_sql("SELECT cc.*
+                                     FROM {certif_completion} cc
+                                     JOIN {prog} p ON p.certifid = cc.certifid
+                                    WHERE p.id = ? AND cc.userid = ?", array($progid, $userid));
     // If messagetype set up for this program, send notifications to user and the user's manager (if set on message).
     foreach ($messages as $message) {
         if ($message->messagetype == $msgtype) {
+            if ($msgtype == MESSAGETYPE_RECERT_WINDOWDUECLOSE) {
+                // ONLY send the ones that are due.
+                if($now > ($certif->timeexpires - $message->triggertime) && $now < $certif->timeexpires) {
+                    $sent = $DB->get_records('prog_messagelog', array('messageid' => $message->id, 'userid' => $userid));
+                    // DON'T send them more than once.
+                    if(empty($sent)) {
+                        $message->send_message($user);
+                    }
+                }
+            } else {
                $message->send_message($user); // Prog_eventbased_message.send_message() program_message.class.php.
                // This function checks prog_messagelog for existing record, checking messageid and userid (and coursesetid(=0))
                // messageid is id of message in prog_message (ie for this prog and message type)
                // if exists, the message is not sent.
+            }
         }
     }
 }

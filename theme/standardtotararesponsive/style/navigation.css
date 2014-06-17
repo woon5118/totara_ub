@@ -66,8 +66,12 @@ div#custommenu ul ul {
 div#totaramenu ul ul li,
 div#custommenu ul ul li {
     font-size:0.8em;
-    float:none /*!important*/;
+    float:none;
     margin:0;
+}
+.dir-rtl #totaramenu ul ul li,
+.dir-rtl #custommenu ul ul li {
+    float: none;
 }
 
 div#totaramenu ul ul li a,

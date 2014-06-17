@@ -17,7 +17,7 @@ Feature: Block appearances
     And I log in as "admin"
     And I navigate to "Theme selector" node in "Site administration > Appearance > Themes"
     And I click on "Change theme" "button" in the "Default" "table_row"
-    And I click on "Use theme" "button" in the "Afterburner" "table_row"
+    And I click on "Use theme" "button" in the "Kiwifruit Responsive" "table_row"
     And I press "Continue"
     And I am on homepage
     And I follow "Course 1"

@@ -972,7 +972,7 @@ function facetoface_cron($testing = false) {
 
     // Send notifications if enabled.
     $notificationdisable = get_config(null, 'facetoface_notificationdisable');
-    if (!empty($notificationdisable)) {
+    if (empty($notificationdisable)) {
         // Find "instant" manual notifications that haven't yet been sent.
         if (!$testing) {
             mtrace('Checking for instant Face-to-face notifications');
@@ -988,16 +988,16 @@ function facetoface_cron($testing = false) {
             }
         }
 
-        // Find scheduled notifications that haven't yet been sent.
+        // Find scheduled notifications that haven't yet been sent
         if (!$testing) {
             mtrace('Checking for scheduled Face-to-face notifications');
         }
         $sched = $DB->get_records_select(
             'facetoface_notification',
             'scheduletime IS NOT NULL
-            AND issent <> ?
+            AND type = ?
             AND status = 1',
-            array(MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
+            array(MDL_F2F_NOTIFICATION_SCHEDULED));
         if ($sched) {
             foreach ($sched as $notif) {
                 $notification = new facetoface_notification((array)$notif, false);
@@ -1050,7 +1050,7 @@ function facetoface_remove_reservations_after_deadline($testing) {
 
         // Send notifications if enabled.
         $notificationdisable = get_config(null, 'facetoface_notificationdisable');
-        if (!empty($notificationdisable)) {
+        if (empty($notificationdisable)) {
             $notifyparams = array(
                 'type' => MDL_F2F_NOTIFICATION_AUTO,
                 'conditiontype' => MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED,
@@ -1148,7 +1148,7 @@ function facetoface_get_session($sessionid) {
  * @param integer $facetofaceid ID of the activity
  * @param string $location location filter (optional)
  */
-function facetoface_get_sessions($facetofaceid, $location='') {
+function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
     global $CFG,$DB;
 
     $fromclause = "FROM {facetoface_sessions} s";
@@ -1160,13 +1160,20 @@ function facetoface_get_sessions($facetofaceid, $location='') {
         $locationwhere .= " AND d.data = ?";
         $locationparams[] = $location;
     }
+    $roomwhere = '';
+    $roomparams = array();
+    if (!empty($roomid)) {
+        $roomwhere = ' AND s.roomid = ? ';
+        $roomparams[] = $roomid;
+    }
     $sessions = $DB->get_records_sql("SELECT s.*
                                    $fromclause
                         LEFT OUTER JOIN (SELECT sessionid, min(timestart) AS mintimestart
                                            FROM {facetoface_sessions_dates} GROUP BY sessionid) m ON m.sessionid = s.id
                                   WHERE s.facetoface = ?
                                         $locationwhere
-                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams));
+                                        $roomwhere
+                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams, $roomparams));
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
@@ -5678,4 +5685,22 @@ function facetoface_format_session_dates($session) {
         $ret = html_writer::tag('em', get_string('wait-listed', 'facetoface'));
     }
     return $ret;
+}
+
+/**
+ * Get the relevant session rooms for a facetoface activity
+ *
+ * @param int $facetofaceid
+ *
+ * @return array containing facetoface_room table db objects
+ */
+function facetoface_get_rooms($facetofaceid) {
+    global $DB;
+
+    $sql = "SELECT DISTINCT r.id, r.name, r.building, r.address
+        FROM {facetoface_sessions} s
+        JOIN {facetoface_room} r ON s.roomid = r.id
+        WHERE s.facetoface = ?";
+
+    return $DB->get_records_sql($sql, array($facetofaceid));
 }

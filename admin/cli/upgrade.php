@@ -152,7 +152,7 @@ if (isset($maturity)) {
 }
 
 if ($interactive) {
-    echo html_to_text(get_string('cliupgradesure', 'totara_core', $totarainfo))."\n";
+    echo html_to_text(get_string('upgradesure', 'admin', $totarainfo))."\n";
     $prompt = get_string('cliyesnoprompt', 'admin');
     $input = cli_input($prompt, '', array(get_string('clianswerno', 'admin'), get_string('cliansweryes', 'admin')));
     if ($input == get_string('clianswerno', 'admin')) {

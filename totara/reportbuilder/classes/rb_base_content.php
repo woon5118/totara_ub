@@ -560,6 +560,7 @@ class rb_user_content extends rb_base_content {
     const USER_OWN = 1;
     const USER_DIRECT_REPORTS = 2;
     const USER_INDIRECT_REPORTS = 4;
+    const USER_TEMP_REPORTS = 8;
 
     /**
      * Generate the SQL to apply this content restriction
@@ -610,6 +611,18 @@ class rb_user_content extends rb_base_content {
             $uniqueparam2 => POSITION_TYPE_PRIMARY
         );
 
+        // Generate SQL for matching temporary reports.
+        $tempsql = '';
+        $tempparams = array();
+        if (($who & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
+            $tempmanids = $DB->get_fieldset_select('temporary_manager', 'userid',
+                'tempmanagerid = :tmid AND expirytime > :extm', array('tmid' => $userid, 'extm' => time()));
+            if (!empty($tempmanids)) {
+                list($tempsql, $tempparams) = $DB->get_in_or_equal($tempmanids, SQL_PARAMS_NAMED);
+                $tempsql = $useridfield . ' ' . $tempsql;
+            }
+        }
+
         // Generate SQL for matching all reports (direct and indirect).
         $uniqueparam3 = rb_unique_param('curall');
         $uniqueparam4 = rb_unique_param('curall');
@@ -650,6 +663,17 @@ class rb_user_content extends rb_base_content {
             } else {
                 $sql = "( {$sql} OR {$ownsql} )";
                 $params = array_merge($params, $ownparams);
+            }
+        }
+
+        // Add in the user's temporary reports if necessary.
+        if (($who & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
+            if (empty($sql)) {
+                $sql = $tempsql;
+                $params = $tempparams;
+            } else {
+                $sql = "( {$sql} OR {$tempsql} )";
+                $params = array_merge($params, $tempparams);
             }
         }
 
@@ -740,10 +764,13 @@ class rb_user_content extends rb_base_content {
         $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_INDIRECT_REPORTS.']', '',
             get_string('userindirectreports', 'totara_reportbuilder'), null, array(0, 1));
         $mform->setType('user_who['.self::USER_INDIRECT_REPORTS.']', PARAM_INT);
+        $checkgroup[] =& $mform->createElement('advcheckbox', 'user_who['.self::USER_TEMP_REPORTS.']', '',
+            get_string('usertempreports', 'totara_reportbuilder'), null, array(0, 1));
+        $mform->setType('user_who['.self::USER_TEMP_REPORTS.']', PARAM_INT);
 
         $mform->addGroup($checkgroup, 'user_who_group',
             get_string('includeuserrecords', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
-        $usergroups = array(self::USER_OWN, self::USER_DIRECT_REPORTS, self::USER_INDIRECT_REPORTS);
+        $usergroups = array(self::USER_OWN, self::USER_DIRECT_REPORTS, self::USER_INDIRECT_REPORTS, self::USER_TEMP_REPORTS);
         foreach ($usergroups as $usergroup) {
             // Bitwise comparison.
             if (($who & $usergroup) == $usergroup) {

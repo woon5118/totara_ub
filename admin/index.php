@@ -327,7 +327,7 @@ if (!$cache && ($version > $CFG->version
         $PAGE->set_heading($strdatabasechecking);
         $PAGE->set_cacheable(false);
 
-        echo $output->upgrade_confirm_page(get_string('cliupgradesure', 'totara_core', $totarainfo), $maturity, $testsite);
+        echo $output->upgrade_confirm_page($totarainfo, $maturity, $testsite);
         die();
 
     } else if (empty($confirmrelease)){

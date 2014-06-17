@@ -151,7 +151,10 @@ class rb_source_dp_evidence extends rb_base_source {
                     'displayfunc' => 'description',
                     'nosort' => true,
                     'dbdatatype' => 'text',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'extrafields' => array(
+                        'evidence_id' => 'base.id',
+                    ),
                 )
         );
 
@@ -334,12 +337,12 @@ class rb_source_dp_evidence extends rb_base_source {
             'user',
             get_string('users'),
             array(
-                'userid' => 'dp.userid',
+                'userid' => 'base.userid',
                 'managerid' => 'position_assignment.managerid',
                 'managerpath' => 'position_assignment.managerpath',
                 'postype' => 'position_assignment.type',
             ),
-            array('dp', 'position_assignment')
+            'position_assignment'
         );
         return $contentoptions;
     }
@@ -390,11 +393,13 @@ class rb_source_dp_evidence extends rb_base_source {
 
         // Check user's permissions to edit this item
         $usercontext = context_user::instance($row->userid);
-        if ($row->readonly) {
+        $canaccess = has_capability('totara/plan:accessanyplan', $usercontext);
+        $canedit = has_capability('totara/plan:editsiteevidence', $usercontext);
+        if ($row->readonly && !($canaccess || $canedit)) {
             $out .= get_string('evidence_readonly', 'totara_plan');
         } else if ($USER->id == $row->userid ||
                 totara_is_manager($row->userid) ||
-                has_capability('totara/plan:accessanyplan', $usercontext)) {
+                $canaccess || $canedit) {
 
             $out .= $OUTPUT->action_icon(
                         new moodle_url('/totara/plan/record/evidence/edit.php',
@@ -418,7 +423,7 @@ class rb_source_dp_evidence extends rb_base_source {
 
     public function rb_display_description($description, $row) {
         $description = file_rewrite_pluginfile_urls($description, 'pluginfile.php',
-                context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $row->id);
+                context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $row->evidence_id );
         return(format_text($description, FORMAT_HTML));
     }
 

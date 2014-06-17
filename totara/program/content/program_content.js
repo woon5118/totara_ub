@@ -473,7 +473,8 @@ M.totara_programcontent = M.totara_programcontent || {
         });
 
         // delegate course deletion to delete buttons rendered or created dynamically
-        $('.edit-program .coursedeletelink').click(function(){
+        $('.edit-program .coursedeletelink').click(function(event){
+            event.preventDefault();
             module.deleteCourse(this.getAttribute('data-coursesetid'),
                                 this.getAttribute('data-coursesetprefix'),
                                 this.getAttribute('data-coursetodelete_id'));

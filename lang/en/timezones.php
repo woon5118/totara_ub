@@ -244,6 +244,7 @@ $string['asia/kamchatka'] = 'Asia/Kamchatka';
 $string['asia/karachi'] = 'Asia/Karachi';
 $string['asia/kashgar'] = 'Asia/Kashgar';
 $string['asia/katmandu'] = 'Asia/Katmandu';
+$string['asia/kolkata'] = 'Asia/Kolkata';
 $string['asia/krasnoyarsk'] = 'Asia/Krasnoyarsk';
 $string['asia/kuala_lumpur'] = 'Asia/Kuala_Lumpur';
 $string['asia/kuching'] = 'Asia/Kuching';

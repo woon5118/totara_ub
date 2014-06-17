@@ -46,76 +46,45 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
-    // rename the moodle 'manager' fullname to "Site Manager" to make it
-    // distinct from the totara "Staff Manager"
-    if ($managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager', 'name' => get_string('manager', 'role')))) {
-        $todb = new stdClass();
-        $todb->id = $managerroleid;
-        $todb->name = get_string('sitemanager', 'totara_core');
-        $DB->update_record('role', $todb);
-    }
-
     // Create totara roles.
-    $manager             = $DB->get_record('role', array('shortname' => 'manager'));
-    $managerrole         = $manager->id;
     $staffmanagerrole    = create_role('', 'staffmanager', '', 'staffmanager');
     $assessorrole        = create_role('', 'assessor', '', 'assessor');
     $regionalmanagerrole = create_role('', 'regionalmanager', '');
     $regionaltrainerrole = create_role('', 'regionaltrainer', '');
 
-    $defaultallowassigns = array(
-        array($managerrole, $staffmanagerrole),
-        array($managerrole, $assessorrole),
-        array($managerrole, $regionalmanagerrole),
-        array($managerrole, $regionaltrainerrole)
-    );
-    foreach ($defaultallowassigns as $allow) {
-        list($fromroleid, $toroleid) = $allow;
-        allow_assign($fromroleid, $toroleid);
+    $newroles = array($staffmanagerrole, $assessorrole, $regionalmanagerrole, $regionaltrainerrole);
+
+    foreach ($DB->get_records('role') as $role) {
+        // Add allow* defaults related to all new roles.
+        foreach (array('assign', 'override', 'switch') as $type) {
+            $function = 'allow_'.$type;
+            $allows = get_default_role_archetype_allows($type, $role->archetype);
+            foreach ($allows as $allowid) {
+                if (!in_array($allowid, $newroles) and !in_array($role->id, $newroles)) {
+                    // Add only entries related to new roles!
+                    continue;
+                }
+                $function($role->id, $allowid);
+            }
+        }
+
+        if (in_array($role->id, $newroles)) {
+            // Set context levels for all new roles.
+            set_role_contextlevels($role->id, get_default_contextlevels($role->shortname));
+
+            // Reset existing permissions for all new roles.
+            $defaultcaps = get_default_capabilities($role->archetype);
+            foreach($defaultcaps as $cap => $permission) {
+                assign_capability($cap, $permission, $role->id, $systemcontext->id);
+            }
+        }
     }
 
-    $defaultallowoverrides = array(
-        array($managerrole, $staffmanagerrole),
-        array($managerrole, $assessorrole),
-        array($managerrole, $regionalmanagerrole),
-        array($managerrole, $regionaltrainerrole)
-    );
-    foreach ($defaultallowoverrides as $allow) {
-        list($fromroleid, $toroleid) = $allow;
-        allow_override($fromroleid, $toroleid); // There is a rant about this in MDL-15841.
-    }
-
-    $defaultallowswitch = array(
-        array($managerrole, $staffmanagerrole),
-    );
-    foreach ($defaultallowswitch as $allow) {
-        list($fromroleid, $toroleid) = $allow;
-        allow_switch($fromroleid, $toroleid);
-    }
-
-    set_role_contextlevels($staffmanagerrole,   get_default_contextlevels('staffmanager'));
-    assign_capability('moodle/user:viewdetails', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/user:viewuseractivitiesreport', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/cohort:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/comment:view', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/comment:delete', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/comment:post', CAP_ALLOW, $staffmanagerrole, $systemcontext->id, true);
-    $systemcontext->mark_dirty();
-    set_role_contextlevels($assessorrole,       get_default_contextlevels('teacher'));
-
-    $role_to_modify = array(
-        'editingteacher' => 'editingtrainer',
-        'teacher' => 'trainer',
-        'student' => 'learner'
-    );
-
-    $DB->update_record('role', array('id' => $assessorrole, 'archetype' => 'assessor'));
-    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $assessorrole, $systemcontext->id, true);
-    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionalmanagerrole, $systemcontext->id, true);
-    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionaltrainerrole, $systemcontext->id, true);
-
-    foreach ($role_to_modify as $old => $new) {
-        if ($old_role = $DB->get_record('role', array('shortname' => $old))) {
+    // Reset legacy custom roles names for standard roles,
+    // we want to use the lang strings from now on.
+    $resetnames = array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user');
+    foreach ($resetnames as $shortname) {
+        if ($old_role = $DB->get_record('role', array('shortname' => $shortname))) {
             $new_role = new stdClass();
             $new_role->id = $old_role->id;
             $new_role->name = '';
@@ -124,6 +93,13 @@ function xmldb_totara_core_install() {
             $DB->update_record('role', $new_role);
         }
     }
+
+    // Extra capability tweaks for new roles without archetypes,
+    // these cannot be reset to defaults because they do not have archetype.
+    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionalmanagerrole, $systemcontext->id);
+    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionaltrainerrole, $systemcontext->id);
+
+    $systemcontext->mark_dirty();
 
     // Set up blocks.
     totara_reset_mymoodle_blocks();

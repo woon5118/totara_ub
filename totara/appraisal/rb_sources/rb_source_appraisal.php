@@ -186,6 +186,7 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('appraisalstatuscolumn', 'rb_source_appraisal'),
                 'appraisal.status',
                 array('joins' => 'appraisal',
+                      'displayfunc' => 'appraisalstatus',
                       'defaultheading' => get_string('appraisalstatusheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -300,6 +301,20 @@ class rb_source_appraisal extends rb_base_source {
      */
     public function rb_display_status($status, $row) {
         return get_string($status, 'rb_source_appraisal');
+    }
+
+     /**
+     * Convert appraisal status code string to human readable string.
+     * @param string $status status code string
+     * @param object $row other fields in the record (unused)
+     *
+     * @return string
+     */
+    public function rb_display_appraisalstatus($status, $row) {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+
+        return appraisal::display_status($status);
     }
 
     /**

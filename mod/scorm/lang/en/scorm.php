@@ -21,6 +21,14 @@
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+$string['popup_simple'] = 'New window (simple)';
+$string['popup_simple_notice'] = '<p>Your content is playing in another window.</p><p><strong>Do not close this page until the content is finished playing.</strong></p>';
+$string['popup_simple_closenotice'] = 'A content window is open.\\\nThat window will also be closed.';
+$string['popup_simple_popupblockednotice'] = '<p><strong>Your content did not launch.</strong></p><p>Make sure popups are enabled for this site and try again.</p>';
+$string['popup_simple_popupmanuallaunch'] = 'Click to Launch Manually';
+$string['popup_simple_redirectingnotice'] = 'Progress is being saved. Redirecting to course page...';
+
 $string['toc'] = 'TOC';
 $string['navigation'] = 'Navigation';
 $string['aicchacptimeout'] = 'AICC HACP timeout';

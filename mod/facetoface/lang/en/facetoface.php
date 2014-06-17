@@ -302,6 +302,7 @@ $string['field:text'] = 'Text';
 $string['field:multiselect'] = 'Multiple selection';
 $string['field:select'] = 'Menu of choices';
 $string['fielddeleteconfirm'] = 'Delete field \'{$a}\' and all session data associated with it?';
+$string['filterbyroom'] = 'Filter by Room';
 $string['floor'] = 'Floor';
 $string['format'] = 'Format';
 $string['full'] = 'Date is fully occupied';

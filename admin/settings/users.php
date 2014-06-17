@@ -213,5 +213,6 @@ if ($hassiteconfig
     $ADMIN->add('roles', new admin_externalpage('defineroles', new lang_string('defineroles', 'role'), "$CFG->wwwroot/$CFG->admin/roles/manage.php", 'moodle/role:manage'));
     $ADMIN->add('roles', new admin_externalpage('assignroles', new lang_string('assignglobalroles', 'role'), "$CFG->wwwroot/$CFG->admin/roles/assign.php?contextid=".$systemcontext->id, 'moodle/role:assign'));
     $ADMIN->add('roles', new admin_externalpage('checkpermissions', new lang_string('checkglobalpermissions', 'role'), "$CFG->wwwroot/$CFG->admin/roles/check.php?contextid=".$systemcontext->id, array('moodle/role:assign', 'moodle/role:safeoverride', 'moodle/role:override', 'moodle/role:manage')));
+    $ADMIN->add('roles', new admin_externalpage('roledefaults', new lang_string('roledefaults', 'totara_core'), "$CFG->wwwroot/$CFG->admin/roles/roledefaults.php", 'moodle/role:manage'));
 
 } // end of speedup

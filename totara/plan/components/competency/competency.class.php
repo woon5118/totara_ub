@@ -882,8 +882,12 @@ class dp_competency_component extends dp_base_component {
                 $linkedcourses[$compid] = array();
 
                 // Loop through and clean/add each courseid.
-                foreach ($courses as $courseid) {
-                    $linkedcourses[$compid][] = clean_param($courseid, PARAM_INT);
+                foreach ($courses as $courseid => $v) {
+                    $cid = clean_param($courseid, PARAM_INT);
+                    // Clean_param will return 0 if there is non-integer data in the POST.
+                    if ($cid > 0) {
+                        $linkedcourses[$compid][$cid] = $cid;
+                    }
                 }
             }
         }

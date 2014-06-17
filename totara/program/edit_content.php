@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once('edit_content_form.php');
 
 $id = required_param('id', PARAM_INT); // program id
+$submitdata = false;
 
 require_login();
 
@@ -112,6 +113,8 @@ if ($rawdata = data_submitted()) {
     } else if ($setnumber = $programcontent->check_set_action('delete', $rawdata)) {
         if (!$programcontent->delete_set($setnumber)) {
             echo $OUTPUT->notification(get_string('error:deleteset', 'totara_program'));
+        } else {
+            $submitdata = true;
         }
     } else if ($setnumber = $programcontent->check_set_action('update', $rawdata)) {
         $programcontent->update_set($setnumber);
@@ -122,14 +125,20 @@ if ($rawdata = data_submitted()) {
     } else if ($setnumber = $programcontent->check_set_action('addcourse', $rawdata)) {
         if (!$programcontent->add_course($setnumber, $rawdata)) {
             echo $OUTPUT->notification(get_string('error:setunabletoaddcourse', 'totara_program'));
+        } else {
+            $submitdata = true;
         }
     } else if ($setnumber = $programcontent->check_set_action('addcompetency', $rawdata)) {
         if (!$programcontent->add_competency($setnumber, $rawdata)) {
             echo $OUTPUT->notification(get_string('error:setunableaddcompetency', 'totara_program'));
+        } else {
+            $submitdata = true;
         }
     } else if ($action = $programcontent->check_set_action('deletecourse', $rawdata)) {
         if (!$programcontent->delete_course($action->setnumber, $action->courseid, $rawdata)) {
             echo $OUTPUT->notification(get_string('error:setunabletodeletecourse', 'totara_program', $action->setnumber));
+        } else {
+            $submitdata = true;
         }
     }
 
@@ -155,7 +164,7 @@ if (!$rawdata) {
 
 // This is where we validate and check the submitted data before saving it
 if ($data = $contenteditform->get_data()) {
-    if (isset($data->savechanges)) {
+    if (isset($data->savechanges) || $submitdata) {
 
         // first set up the program content with the validated and checked submitted data
         if (!$programcontent->setup_content($data)) {
@@ -181,7 +190,7 @@ if ($data = $contenteditform->get_data()) {
             $prog_update->usermodified = $USER->id;
             $DB->update_record('prog', $prog_update);
 
-            if (isset($data->savechanges)) {
+            if (isset($data->savechanges) || $submitdata) {
                 totara_set_notification(get_string('programcontentsaved', 'totara_program'),
                     'edit_content.php?id='.$id, array('class' => 'notifysuccess'));
             }

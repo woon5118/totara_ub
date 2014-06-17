@@ -53,13 +53,6 @@ $string['choosetempmanager_help'] = 'A temporary manager can be assigned. The as
 Click **Choose temporary manager** to select a temporary manager.
 
 If the name you are looking for does not appear in the list, it might be that the user does not have the necessary rights to act as a temporary manager.';
-$string['cliupgradesure'] = 'Your Totara files have been changed, and you are about to automatically upgrade your server from this version:
-<br /><br /><strong>{$a->oldversion}</strong>
-<br /><br />to this version: <br /><br />
-<strong>{$a->newversion}</strong> <br /><br />
-Once you do this you can not go back again. <br /><br />
-Please note that this process can take a long time. <br /><br />
-Are you sure you want to upgrade this server to this version?';
 $string['column'] = 'Column';
 $string['competency_typeicon'] = 'Competency type icon';
 $string['completed'] = 'Completed';
@@ -274,6 +267,8 @@ $string['report'] = 'Report';
 $string['reportedat'] = 'Reported at';
 $string['requiresjs'] = 'This {$a} requires Javascript to be enabled.';
 $string['returntocourse'] = 'Return to the course';
+$string['roledefaults'] = 'Default role settings';
+$string['roledefaultsnochanges'] = 'No role changes detected';
 $string['save'] = 'Save';
 $string['search'] = 'Search';
 $string['searchcourses'] = 'Search Courses';

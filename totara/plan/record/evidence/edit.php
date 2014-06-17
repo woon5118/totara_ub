@@ -60,13 +60,16 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
 }
 
+$canaccess = has_capability('totara/plan:accessanyplan', $systemcontext);
+$canedit = has_capability('totara/plan:editsiteevidence', $systemcontext);
+
 if (!empty($evidenceid)) {
     // Editing or deleting, check record exists
     if (!$item = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
         print_error('error:evidenceidincorrect', 'totara_plan');
     } else {
         // Check if its readonly
-        if ($item->readonly) {
+        if ($item->readonly && !($canaccess || $canedit)) {
             print_error('evidence_readonly', 'totara_plan');
         }
         // Check that the user owns this evidence
@@ -75,7 +78,7 @@ if (!empty($evidenceid)) {
 }
 
 // users can only view their own and their staff's pages
-if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
+if ($USER->id != $userid && !totara_is_manager($userid) && !($canaccess || $canedit)) {
     print_error('error:cannotviewpage', 'totara_plan');
 }
 

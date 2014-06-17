@@ -92,7 +92,6 @@ h1 {
     letter-spacing:-1px;
     background:#b1bb1a;
     border-radius: 5px;
-    text-align: left;
 }
 h1 a,
 h2 a,
@@ -510,7 +509,6 @@ p.errormessage {
 }
 
 #navbar {
-    margin:-5px 0 2px;
     padding:0 0 10px;
     border:none;
     background:transparent;
@@ -525,6 +523,7 @@ p.errormessage {
 }
 .dir-rtl #navbar .breadcrumb {
     margin:0 0 0 10px;
+    float: right;
 }
 #navbar .breadcrumb ul {
     color:#B8B8B7;
@@ -573,7 +572,7 @@ p.errormessage {
     padding: 0.3em 0.6em;
 }
 .dir-rtl #navbar .breadcrumb-button input {
-    margin: 0;
+    margin: 5px 0 0 5px;
 }
 
 .breadcrumb-button .singlebutton {
@@ -712,6 +711,7 @@ img.smallicon {
 .dir-rtl #dp-plans-menu ul li,
 .dir-rtl #recordoflearning-menu ul li {
     background-position:right;
+    background-image: url([[pix:theme|arw-cal-rtl]]);
     padding:0 20px 0 0;
 }
 #dp-plan-content,
