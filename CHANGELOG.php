@@ -3,6 +3,44 @@
 
 Totara LMS Changelog
 
+
+Release 2.6.3 (17th June 2014):
+==================================================
+
+Database Upgrades:
+    T-12541    Removed unused categoryid column from table prog_info_field
+    T-12034    Fixed sending of Facetoface notifications where messages were not sent to every user in a session
+
+Improvements:
+    T-12466    Added 'Asia/Kolkota' lang string to timezone language pack
+    T-12385    Added content filter to user reports to allow temporary managers to see their staff
+    T-12530    Added room filter to Facetoface session view page
+    T-12544    Added admin page to check current role capabilities against the installation defaults
+
+Bug Fixes:
+    T-12303    Fixed duplicated text on upgrade screen
+    T-12431    Fixed setup of Totara-specific roles on new installs
+    T-12263    Fixed Audience Visible Learning tab type selector
+    T-12510    Fixed Audience language strings where cohort was still being used
+    T-12162    Fixed custom fields from being both required and locked
+    T-12534    Fixed sending of duplicated notifications without variable substitution in Program messages
+    T-12491    Fixed Program Overview report to show correct Manager info
+    T-12097    Fixed behaviour of Program content tab when javascript is disabled
+    T-12519    Fixed certification pagination wrongly linking to programs
+    T-12480    Fixed assigning of incorrect course IDs when approving a Learning Plan competency linked to a course
+    T-12505    Fixed alignment of navigation elements in RTL languages in Kiwifruitresponsive theme
+    T-12493    Fixed display of menu in RTL languages in Standardtotararesponsive theme
+    T-12506    Fixed RTL arrow image on My Learning page in Kiwifruitresponsive theme
+    T-12501    Fixed deprecated function warning when closing an Appraisal
+    T-12513    Fixed display of Appraisal status code in Appraisal Summary report
+    T-12512    Fixed column options in Appraisal Details report
+    T-12492    Fixed Record of Learning Evidence report when using "show records based on users" option
+    T-12526    Fixed PHP undefined property error in Record of Learning Evidence report
+    T-12525    Fixed errors with Facetoface attendance report export to CSV
+    T-12320    Fixed Facetoface iCal attachment line breaks in long descriptions
+    T-11816    Fixed display of Articulate Storyline SCORMS in iPads - use new display setting of "New Window (simple)"
+
+
 Release 2.6.2 (3rd June 2014):
 ==================================================
 
