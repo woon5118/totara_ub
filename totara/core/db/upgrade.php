@@ -1133,7 +1133,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_core_fix_old_upgraded_mssql();
         upgrade_plugin_savepoint(true, 2014082700, 'totara', 'core');
     }
-    
+
     // This is 2.6.x upgrade line - rewrite all version in t2-integration on each merge from 2.6 release until we merge Moodle 2.7
 
     if ($oldversion < 2014090300) {
@@ -1142,6 +1142,20 @@ function xmldb_totara_core_upgrade($oldversion) {
             set_config('tempmanagerrestrictselection', (int) $CFG->tempmanagerrestrictselection);
         }
         totara_upgrade_mod_savepoint(true, 2014090300, 'totara_core');
+    }
+
+    if ($oldversion < 2014090900) {
+        // Define field categoryid to be dropped from course_info_field.
+        $table = new xmldb_table('course_info_field');
+        $field = new xmldb_field('categoryid');
+
+        // Conditionally launch drop field categoryid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Core savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014090900, 'totara_core');
     }
 
     return true;
