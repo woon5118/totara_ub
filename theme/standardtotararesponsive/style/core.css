@@ -1381,9 +1381,11 @@ select.totara-limited-width {
     position: static;
 }
 /* expand while selecting option (IE only) */
+.ie select.totara-limited-width:hover,
+.ie select.totara-limited-width:focus,
 select.totara-expanded-width {
     width: auto;
-    position: absolute;
+    min-width: 200px;
 }
 
 #rb-search-controls .singleselect label {
