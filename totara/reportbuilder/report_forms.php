@@ -604,7 +604,7 @@ class report_builder_edit_columns_form extends moodleform {
             foreach ($newcolumnsselect as $okey => $optgroup) {
                 foreach ($optgroup as $typeval => $heading) {
                     $typevalarr = explode('-', $typeval);
-                    foreach ($report->columns as $curcol) {
+                    foreach ($columns as $curcol) {
                         if ($curcol->type == $typevalarr[0] && $curcol->value == $typevalarr[1]) {
                             unset($cleanednewcolselect[$okey][$typeval]);
                         }
