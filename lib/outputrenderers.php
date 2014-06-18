@@ -2867,9 +2867,13 @@ EOD;
         $separator = get_separator();
         for ($i=0;$i < $itemcount;$i++) {
             $item = $items[$i];
+            $item->last = false;
             $item->hideicon = true;
             if ($i===0) {
                 $content = html_writer::tag('li', $this->render($item));
+            } else if ($i === $itemcount - 1) {
+                $item->last = true;
+                $content = html_writer::tag('li', $separator . $this->render($item));
             } else {
                 $content = html_writer::tag('li', $separator.$this->render($item));
             }
@@ -2912,7 +2916,7 @@ EOD;
                 $link->text = $content;
             }
             $content = $this->render($link);
-        } else if ($item->action instanceof moodle_url) {
+        } else if ($item->action instanceof moodle_url && !(isset($item->last) && $item->last)) {
             $attributes = array();
             if ($title !== '') {
                 $attributes['title'] = $title;
