@@ -45,6 +45,10 @@ define('COHORT_BROKEN_RULE_NOTIFIED', 2);
 
 define('COHORT_MEMBER_SELECTOR_MAX_ROWS', 1000);
 
+define('COHORT_OPERATOR_TYPE_COHORT', 25);
+define('COHORT_OPERATOR_TYPE_RULESET', 50);
+
+
 global $COHORT_ALERT;
 $COHORT_ALERT = array(
     COHORT_ALERT_NONE => get_string('alertmembersnone', 'totara_cohort'),
@@ -464,6 +468,62 @@ class totaracohort_event_handler {
         // TODO: rewrite for new dynamic cohorts.
         return true;
     }
+}
+
+/**
+ * Update cohort operator or ruleset operator.
+ *
+ * @param $cohortid Cohort id where the operator will be updated.
+ * @param $id Object id to be updated. Cohortid or Rulesetid
+ * @param $type Operator type to be updated. Must be one of these: COHORT_OPERATOR_TYPE_COHORT, COHORT_OPERATOR_TYPE_RULESET
+ * @param $operatorvalue Operator value AND(0) or OR(10)
+ * @return boolean $result True if success, false otherwise
+ */
+function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
+    global $DB, $USER;
+
+    $sql = "SELECT c.idnumber, c.draftcollectionid, crc.rulesetoperator, crc.status
+        FROM {cohort} c
+        INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
+        WHERE c.id = ?";
+    $cohort = $DB->get_record_sql($sql, array($cohortid), '*', MUST_EXIST);
+    $result = false;
+
+    if (!$cohort || !in_array($type, array(COHORT_OPERATOR_TYPE_COHORT, COHORT_OPERATOR_TYPE_RULESET)) || empty($id)) {
+        return $result;
+    }
+
+    if ($type === COHORT_OPERATOR_TYPE_COHORT) {
+        // Update cohort operator.
+        if ($operatorvalue != $cohort->rulesetoperator) {
+            $rulecollection = new stdClass();
+            $rulecollection->id = $cohort->draftcollectionid;
+            $rulecollection->rulesetoperator = $operatorvalue;
+            $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
+            $rulecollection->timemodified = time();
+            $rulecollection->modifierid = $USER->id;
+            $result = $DB->update_record('cohort_rule_collections', $rulecollection);
+        }
+    } else if ($type === COHORT_OPERATOR_TYPE_RULESET) {
+        $operator = $DB->get_field('cohort_rulesets', 'operator', array('id' => $id));
+        if ($operator != $operatorvalue) {
+            // Update ruleset operator.
+            $ruleset = new stdClass();
+            $ruleset->id = $id;
+            $ruleset->operator = $operatorvalue;
+            $ruleset->timemodified = time();
+            $ruleset->modifierid = $USER->id;
+            $result = $DB->update_record('cohort_rulesets', $ruleset);
+
+            // Update cohort rule collection.
+            $rulecollection = new stdClass;
+            $rulecollection->id = $cohort->draftcollectionid;
+            $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
+            $result = $result && $DB->update_record('cohort_rule_collections', $rulecollection);
+        }
+    }
+
+    return $result;
 }
 
 /**
@@ -1604,6 +1664,51 @@ function totara_unassign_roles_cohort($roles, $cohortid, $members) {
     }
 
     return true;
+}
+
+/**
+ * Assign or unassign roles to/from a cohort.
+ *
+ * @param int $cohortid Cohort ID
+ * @param array $roles An array of the roles to be assigned,
+ * with the ID of the role as key and context (in which it will be assigned) as their value
+ *
+ * @return bool $success True if the assigned/unassigned process has been success, false otherwise
+ */
+function totara_cohort_process_assigned_roles($cohortid, $roles) {
+    $success = true;
+
+    // Make an array of object to use it later when inserting via batch.
+    $selectedroles = array();
+    foreach ($roles as $key => $value) {
+        $roleobj = new stdClass();
+        $roleobj->roleid = $key;
+        $roleobj->contextid = $value;
+        $selectedroles[$key] = $roleobj;
+    }
+
+    // Get members of the cohort.
+    $memberids = array();
+    if ($members = totara_get_members_cohort($cohortid)) {
+        $memberids = array_keys($members);
+    }
+
+    // Current roles assigned to this cohort.
+    $currentroles = totara_get_cohort_roles($cohortid);
+
+    // Unassign roles.
+    if (!empty($currentroles)) {
+        $rolestounassign = array_diff_key($currentroles, $selectedroles);
+        $success = totara_unassign_roles_cohort($rolestounassign, $cohortid, $memberids);
+    }
+
+    // Assign roles.
+    $rolestoassign = array_diff_key($selectedroles, $currentroles);
+    if (!empty($rolestoassign)) {
+        $success = $success && totara_assign_roles_cohort($rolestoassign, $cohortid, $memberids);
+    }
+
+    return $success;
 }
 
 class totara_cohort_visible_learning_cohorts extends totara_cohort_course_cohorts {

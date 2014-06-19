@@ -448,3 +448,79 @@ function cohort_rules_clone_collection($collid, $status=null, $usetrans=true, $c
 
     return $newcollectionid;
 }
+
+/**
+ * Changes params of a specific cohort rule
+ *
+ * @param string $rulegroup Group where the rule belongs to
+ * @param string $rulename Name of the type of rule we are dealing with
+ * @param int $ruleid ID of the rule that needs to be changed
+ * @param array $params Array containing the params of the rule and the values that need to be changed
+ *
+ * @return  bool  True if it changes the rule, false otherwise
+ */
+function cohort_change_params_rule($rulegroup, $rulename, $ruleid, $params) {
+    $rule = cohort_rules_get_rule_definition($rulegroup, $rulename);
+    if (!$rule) {
+        return false;
+    }
+    $ui = $rule->ui;
+    $sqlhandler = $rule->sqlhandler;
+    $sqlhandler->fetch($ruleid);
+    foreach ($params as $name => $value) {
+        $ui->{$name} = $sqlhandler->{$name} = $value;
+    }
+
+    return $sqlhandler->write();
+}
+
+/**
+ * Deletes param of a specific cohort rule and update rule collection.
+ * If the param is the only one in the rule then it also deletes the rule.
+ * If the the rule is the only one in the ruleset, then it deletes the ruleset.
+ *
+ * @param object $ruleparam The rule param object to delete.
+ *
+ * @return  Array $return  Action executed.
+ */
+function cohort_delete_param($ruleparam) {
+    global $DB, $USER;
+
+    $sql = "SELECT crc.id AS collectionid, crs.id AS rulesetid, cr.id AS ruleid
+        FROM {cohort_rule_params} crp
+        INNER JOIN {cohort_rules} cr ON crp.ruleid = cr.id
+        INNER JOIN {cohort_rulesets} crs ON cr.rulesetid = crs.id
+        INNER JOIN {cohort_rule_collections} crc ON crs.rulecollectionid = crc.id
+        WHERE crp.id = ?";
+    $ruledetails = $DB->get_record_sql($sql, array($ruleparam->id));
+
+    // Delete param.
+    $DB->delete_records('cohort_rule_params', array('id' => $ruleparam->id));
+
+    $return = array('action' => 'delruleparam', 'ruleparamid' => $ruleparam->id);
+
+    // Delete rule if no more params.
+    if (!$DB->record_exists('cohort_rule_params', array('ruleid' => $ruledetails->ruleid, 'name' => $ruleparam->name))) {
+        // Delete any orphan params first.
+        $DB->delete_records('cohort_rule_params', array('ruleid' => $ruledetails->ruleid));
+
+        $DB->delete_records('cohort_rules', array('id' => $ruledetails->ruleid));
+        $return = array('action' => 'delrule', 'ruleid' => $ruledetails->ruleid);
+
+        // Delete ruleset if no more rules.
+        if (!$DB->record_exists('cohort_rules', array('rulesetid' => $ruledetails->rulesetid))) {
+            $DB->delete_records('cohort_rulesets', array('id' => $ruledetails->rulesetid));
+            $return = array('action' => 'delruleset', 'rulesetid' => $ruledetails->rulesetid);
+        }
+    }
+
+    // Update rule collection status.
+    $colldetails = new stdClass;
+    $colldetails->id = $ruledetails->collectionid;
+    $colldetails->timemodified = time();
+    $colldetails->modifierid = $USER->id;
+    $colldetails->status = COHORT_COL_STATUS_DRAFT_CHANGED;
+    $DB->update_record('cohort_rule_collections', $colldetails);
+
+    return $return;
+}

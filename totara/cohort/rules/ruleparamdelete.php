@@ -40,41 +40,8 @@ if (!$ruleparam = $DB->get_record('cohort_rule_params', array('id' => $ruleparam
     exit;
 }
 
-$sql = "SELECT crc.id AS collectionid, crs.id AS rulesetid, cr.id AS ruleid
-    FROM {cohort_rule_params} crp
-    INNER JOIN {cohort_rules} cr ON crp.ruleid = cr.id
-    INNER JOIN {cohort_rulesets} crs ON cr.rulesetid = crs.id
-    INNER JOIN {cohort_rule_collections} crc ON crs.rulecollectionid = crc.id
-    WHERE crp.id = ?";
-$ruledetails = $DB->get_record_sql($sql, array($ruleparam->id));
-
-// Delete param
-$DB->delete_records('cohort_rule_params', array('id' => $ruleparam->id));
-$return = json_encode(array('action' => 'delruleparam', 'ruleparamid' => $ruleparam->id));
-
-// Delete rule if no more params
-if (!$DB->record_exists('cohort_rule_params', array('ruleid' => $ruledetails->ruleid, 'name' => $ruleparam->name))) {
-    // Delete any orphan params first
-    $DB->delete_records('cohort_rule_params', array('ruleid' => $ruledetails->ruleid));
-
-    $DB->delete_records('cohort_rules', array('id' => $ruledetails->ruleid));
-    $return = json_encode(array('action' => 'delrule', 'ruleid' => $ruledetails->ruleid));
-
-    // Delete ruleset if no more rules
-    if (!$DB->record_exists('cohort_rules', array('rulesetid' => $ruledetails->rulesetid))) {
-        $DB->delete_records('cohort_rulesets', array('id' => $ruledetails->rulesetid));
-        $return = json_encode(array('action' => 'delruleset', 'rulesetid' => $ruledetails->rulesetid));
-    }
-}
+$return = json_encode(cohort_delete_param($ruleparam));
 
 echo $return;
 
 add_to_log(SITEID, 'cohort', 'delete rule param ' . $ruleparam->id, 'totara/cohort/rules.php');
-
-// update rule collection status
-$colldetails = new stdClass;
-$colldetails->id = $ruledetails->collectionid;
-$colldetails->timemodified = time();
-$colldetails->modifierid = $USER->id;
-$colldetails->status = COHORT_COL_STATUS_DRAFT_CHANGED;
-$DB->update_record('cohort_rule_collections', $colldetails);
