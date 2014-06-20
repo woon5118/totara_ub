@@ -169,7 +169,7 @@ function cohort_rules_list(){
                 case 'menu':
                     $options = explode("\n", $field->param1);
                     $dialogs[] = new cohort_rule_ui_menu(
-                        get_string('usersx', 'totara_cohort', $field->name),
+                        get_string('usersx', 'totara_cohort', format_string($field->name)),
                         array_combine($options, $options)
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
@@ -177,10 +177,10 @@ function cohort_rules_list(){
                 case 'text':
                     // text input
                     $dialogui = new cohort_rule_ui_text(
-                        get_string('usersx', 'totara_cohort', $field->name),
+                        get_string('usersx', 'totara_cohort', format_string($field->name)),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
-                    $dialogui->selectoptionstr = s($field->name) . ' (' . get_string('text', 'totara_cohort') . ')';
+                    $dialogui->selectoptionstr = format_string($field->name) . ' (' . get_string('text', 'totara_cohort') . ')';
                     $dialogs[] = $dialogui;
                     $sqlhandler_text = new cohort_rule_sqlhandler_in_usercustomfield($field->name, $field->datatype);
 
@@ -193,10 +193,10 @@ function cohort_rules_list(){
                     $sql->valuefield = "{$DB->sql_compare_text('data', 255)}";
                     $sql->sqlparams = array($id);
                     $dialogui = new cohort_rule_ui_menu(
-                        get_string('usersx', 'totara_cohort', $field->name),
+                        get_string('usersx', 'totara_cohort', format_string($field->name)),
                         $sql
                     );
-                    $dialogui->selectoptionstr = s($field->name) . ' (' . get_string('choose', 'totara_cohort') . ')';
+                    $dialogui->selectoptionstr = format_string($field->name) . ' (' . get_string('choose', 'totara_cohort') . ')';
                     $dialogs[] = $dialogui;
 
                     $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
@@ -204,13 +204,13 @@ function cohort_rules_list(){
                     break;
                 case 'datetime':
                     $dialogs[] = new cohort_rule_ui_date(
-                        get_string('usersx', 'totara_cohort', $field->name)
+                        get_string('usersx', 'totara_cohort', format_string($field->name))
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_date_usercustomfield($id);
                     break;
                 case 'checkbox':
                     $dialogs[] = new cohort_rule_ui_checkbox(
-                        get_string('usersx', 'totara_cohort', $field->name),
+                        get_string('usersx', 'totara_cohort', format_string($field->name)),
                         array(
                             1 => get_string('checkboxyes','totara_cohort'),
                             0 => get_string('checkboxno', 'totara_cohort')
@@ -230,7 +230,7 @@ function cohort_rules_list(){
                     "customfield{$id}_{$i}",
                     $dialog,
                     (get_class($dialog) == 'cohort_rule_ui_text' ) ? $sqlhandler_text : $sqlhandler,
-                    !empty($dialog->selectoptionstr) ? $dialog->selectoptionstr : s($field->name)
+                    !empty($dialog->selectoptionstr) ? $dialog->selectoptionstr : format_string($field->name)
                 );
             }
         }
