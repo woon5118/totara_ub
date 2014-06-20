@@ -2032,6 +2032,7 @@ class appraisal_stage {
                     ON ara.id = asd.appraisalroleassignmentid
                  WHERE aua.userid = ?
                    AND aua.appraisalid = ?
+                   AND ara.userid <> 0
                  ORDER BY ara.appraisalrole';
         $completiondata = $DB->get_records_sql($sql, array($this->id, $subjectid, $this->appraisalid));
         return array_intersect_key($completiondata, $roles);
@@ -3334,7 +3335,12 @@ class appraisal_question extends question_storage {
             if (isset($otherassignments[$eachrole]) && ($rights & appraisal::ACCESS_CANANSWER) == appraisal::ACCESS_CANANSWER) {
                 $isviewonlyquestion = false;
                 // Show role user icon.
-                $subject = $DB->get_record('user', array('id' => $otherassignments[$eachrole]->userid));
+                $subjectid = $otherassignments[$eachrole]->userid;
+                if ($subjectid == 0) {
+                    continue;
+                }
+
+                $subject = $DB->get_record('user', array('id' => $subjectid));
 
                 // Add information about other roles to element.
                 $questioninfo = new question_manager($subject->id, $otherassignments[$eachrole]->id);
@@ -4173,6 +4179,26 @@ class appraisal_event_handler {
             $DB->delete_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassignmentid));
         }
         $DB->delete_records('appraisal_user_assignment', array('userid' => $userid));
+
+        // First mark the stages as complete for the users role assignments.
+        $sql = "SELECT ara.id, aua.activestageid
+                  FROM {appraisal_role_assignment} ara
+                  JOIN {appraisal_user_assignment} aua
+                    ON ara.appraisaluserassignmentid = aua.id
+                 WHERE ara.userid = ?";
+        $roleassignments = $DB->get_records_sql($sql, array($userid));
+
+        foreach ($roleassignments as $roleid => $stage) {
+            $stage = new appraisal_stage($stage->activestageid);
+            $roleassignment = new appraisal_role_assignment($roleid);
+
+            $stage->complete_for_role($roleassignment);
+        }
+
+        // Then flag their role assignments as deleted, but keep any existing data.
+        $sql = "UPDATE {appraisal_role_assignment} SET userid = 0 WHERE userid = ?";
+        $DB->execute($sql, array($userid));
+
         $transaction->allow_commit();
     }
 
