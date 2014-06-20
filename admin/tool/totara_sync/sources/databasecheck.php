@@ -22,11 +22,18 @@
  * @subpackage totara_sync
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot.'/admin/tool/totara_sync/sources/databaselib.php');
 
-$PAGE->set_context(context_system::instance());
+$systemcontext = context_system::instance();
+$PAGE->set_context($systemcontext);
+$PAGE->set_url('/admin/tool/totara_sync/sources/databasecheck.php');
+
 require_login();
+require_capability('tool/totara_sync:manage', $systemcontext);
+require_sesskey();
 
 $dbtype = required_param('dbtype', PARAM_ALPHANUMEXT);
 $dbhost = optional_param('dbhost', '', PARAM_ALPHANUMEXT);
@@ -34,21 +41,18 @@ $dbname = required_param('dbname', PARAM_ALPHANUMEXT);
 $dbuser = required_param('dbuser', PARAM_ALPHANUMEXT);
 $dbpass = optional_param('dbpass', '', PARAM_ALPHANUMEXT);
 
+echo $OUTPUT->header(); // Send headers.
+
 try {
    $connection = @setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass);
 } catch (Exception $e) {
-    // Echo false to return a success or failure to Javascript, even if this
-    // condition fails return false will still indicate true to JS so we echo
-    // a value to use a check
-    echo 'false';
-    return false;
+    echo json_encode(array('success' => false));
+    exit();
 }
 
 //Check that we can query the db
 if ($connection->get_records_sql('SELECT 1')) {
-    echo 'true';
-    return true;
+    echo json_encode(array('success' => true));
+} else {
+    echo json_encode(array('success' => false));
 }
-
-echo 'false';
-return false;
