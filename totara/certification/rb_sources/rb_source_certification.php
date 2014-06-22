@@ -26,8 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program.php');
+require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 class rb_source_certification extends rb_source_program {
+
+    /**
+     * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().
+     */
+    protected $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+
     public function __construct() {
         parent::__construct();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification');

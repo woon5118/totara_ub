@@ -26,10 +26,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
 class rb_source_program extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
+
+    protected $instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
 
     function __construct() {
         global $CFG;
@@ -165,7 +170,7 @@ class rb_source_program extends rb_base_source {
         $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
         $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
         $report->set_post_config_restrictions(totara_visibility_where($reportfor,
-                $fieldbaseid, $fieldvisible, $fieldaudvis, COHORT_ASSN_ITEMTYPE_PROGRAM));
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $this->instancetype));
     }
 
 } // End of rb_source_courses class.
