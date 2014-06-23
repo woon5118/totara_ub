@@ -32,6 +32,7 @@
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 class totara_assign_core {
+
     /**
      * Reference to the module.
      *
@@ -147,6 +148,24 @@ class totara_assign_core {
     }
 
     /**
+     * Get the name of a group assignment
+     *
+     * @param  string  grouptype
+     * @param  int     groupid    The id of the group assignment
+     * @return string
+     */
+    public function get_group_instance_name($grouptype, $groupid) {
+        $groups = $this->get_assignable_grouptypes();
+
+        if (!in_array($grouptype, $groups)) {
+            print_error('error:invalidgrouptype', 'totara_core');
+        }
+
+        $group = $this->load_grouptype($grouptype);
+        return $group->get_instance_name($groupid);
+    }
+
+    /**
      * Delete an assigned group
      * @access  public
      * @param $grouptype string grouptype prefix e.g. 'org'
@@ -240,26 +259,38 @@ class totara_assign_core {
      * @param $search string A search string to limit the results by (matches user firstname or lastname).
      * @param $limitfrom int
      * @param $limitnum int
+     * @param $active boolean A flag that makes the function return only the active users.
      * @return recordset Containing basic information about users.
      */
-    public function get_current_users($search=null, $limitfrom=null, $limitnum=null) {
+    public function get_current_users($search=null, $limitfrom=null, $limitnum=null, $forcegroup=false) {
         global $DB;
         // How the current user list is calculated depends of the status.
         // It could be static (from a table) or dynamic (calculated).
-        if ($this->assignments_are_stored()) {
-            list($joinsql, $params) = $this->get_users_from_assignments_sql('u', 'id');
+        $liveassignments = $this->assignments_are_stored() && !$forcegroup;
+        if ($liveassignments) {
+            list($joinsql, $params, $joinalias) = $this->get_users_from_assignments_sql('u', 'id');
         } else {
-            list($joinsql, $params) = $this->get_users_from_groups_sql('u', 'id');
+            list($joinsql, $params, $joinalias) = $this->get_users_from_groups_sql('u', 'id');
         }
 
         // Get WHERE clause to restrict by search if required.
         list($searchsql, $searchparams) = $this->get_user_search_where_sql($search, 'u');
+        $searchsql = !empty($searchsql) ? $searchsql : "1 = 1";
+
+        // Get WHERE clause for any further restrictions.
+        list($extrasql, $extraparams) = $this->get_user_extra_search_where_sql('u', $joinalias, $liveassignments);
+        $extrasql = !empty($extrasql) ? $extrasql : "1 = 1";
+
+        // Combine the two WHERE clauses.
+        $wheresql = "WHERE {$searchsql} AND {$extrasql}";
+        $whereparams = array_merge($searchparams, $extraparams);
 
         $usernamefields = get_all_user_name_fields(true, 'u');
-        $sql = "SELECT u.id, {$usernamefields} FROM {user} u {$joinsql} {$searchsql}";
-        $params = array_merge($params, $searchparams);
+        $sql = "SELECT u.id, {$usernamefields} FROM {user} u {$joinsql} {$wheresql}";
+        $params = array_merge($params, $whereparams);
 
         $sql .= " ORDER BY u.firstname, u.lastname";
+
         return $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
     }
 
@@ -276,18 +307,28 @@ class totara_assign_core {
         global $DB;
         // How the current user list is calculated depends of the status.
         // It could be static (from a table) or dynamic (calculated).
-        if ($this->assignments_are_stored()) {
-            list($joinsql, $params) = $this->get_users_from_assignments_sql('u', 'id');
+        $liveassignments = $this->assignments_are_stored();
+        if ($liveassignments) {
+            list($joinsql, $params, $joinalias) = $this->get_users_from_assignments_sql('u', 'id');
         } else {
-            list($joinsql, $params) = $this->get_users_from_groups_sql('u', 'id');
+            list($joinsql, $params, $joinalias) = $this->get_users_from_groups_sql('u', 'id');
         }
 
         // Get WHERE clause to restrict by search if required.
         list($searchsql, $searchparams) = $this->get_user_search_where_sql($search, 'u');
+        $searchsql = !empty($searchsql) ? $searchsql : "1 = 1";
+
+        // Get WHERE clause for any further restrictions.
+        list($extrasql, $extraparams) = $this->get_user_extra_search_where_sql('u', $joinalias, $liveassignments);
+        $extrasql = !empty($extrasql) ? $extrasql : "1 = 1";
+
+        // Combine the two WHERE clauses.
+        $wheresql = "WHERE {$searchsql} AND {$extrasql}";
+        $whereparams = array_merge($searchparams, $extraparams);
 
         // Do the count.
-        $sql = "SELECT COUNT(*) FROM {user} u {$joinsql} {$searchsql}";
-        $params = array_merge($params, $searchparams);
+        $sql = "SELECT COUNT(*) FROM {user} u {$joinsql} {$wheresql}";
+        $params = array_merge($params, $whereparams);
 
         return $DB->count_records_sql($sql, $params);
     }
@@ -311,12 +352,37 @@ class totara_assign_core {
 
         $likeparam = '%' . $DB->sql_like_escape($search) . '%';
 
-        $sql = " WHERE (" .
+        $sql = "(" .
             $DB->sql_like("{$useralias}.firstname", '?', false, false) .
             " OR " .
             $DB->sql_like("{$useralias}.lastname", '?', false, false) .
             ")";
         $params = array($likeparam, $likeparam);
+
+        return array($sql, $params);
+    }
+
+    /**
+     * Over ride in module code to add specific module related search queries.
+     * It should look something like this.
+     *
+     * @param  $useralias       string  The alias of the user table.
+     * @param  $joinalias       string  The alias of the joined table.
+     * @param  $liveassignments boolean Flags which $joinalias table is being used.
+     *
+     * @return string  The additional where statement.
+     */
+    public function get_user_extra_search_where_sql($useralias, $joinalias, $liveassignments) {
+
+        // If the extra search is on the $useralias table it is safe to put here.
+        $sql = "";
+        $params = array();
+
+        if ($liveassignments) {
+            // Extra search where clause on the $joinalias user_assignments table.
+        } else {
+            // Extra search where clause on the $joinalias group_assignments table.
+        }
 
         return array($sql, $params);
     }
@@ -330,7 +396,7 @@ class totara_assign_core {
      *
      * Example usage:
      *
-     * list($assignsql, $assignparams) = $assign->get_users_from_assignments('u', 'id');
+     * list($assignsql, $assignparams, tablealias) = $assign->get_users_from_assignments('u', 'id');
      *
      * // return names of all users currently assigned
      * $sql = "SELECT u.firstname,u.lastname FROM {user} u $assignsql";
@@ -340,7 +406,7 @@ class totara_assign_core {
      *                       You MUST use a table alias, not just the table's name.
      * @param $field  string The name of the field containing user ids in the table you are joining to.
      *
-     * @return array  An array containing an SQL snippet and parameters to restrict the users.
+     * @return array  An array containing an SQL snippet, parameters to restrict the users and the table alias.
      */
     public function get_users_from_assignments_sql($table, $field) {
         $module = self::$module;
@@ -359,7 +425,7 @@ class totara_assign_core {
 
         $params = array($this->moduleinstanceid);
 
-        return array($sql, $params);
+        return array($sql, $params, $uaalias);
     }
 
 
@@ -373,7 +439,7 @@ class totara_assign_core {
      *
      * Example usage:
      *
-     * list($assignsql, $assignparams) = $assign->get_users_from_groups_sql('u', 'id');
+     * list($assignsql, $assignparams, $tablealias) = $assign->get_users_from_groups_sql('u', 'id');
      *
      * // return names of all users currently assigned
      * $sql = "SELECT u.firstname,u.lastname FROM {user} u $assignsql";
@@ -383,7 +449,7 @@ class totara_assign_core {
      *                       You MUST use a table alias, not just the table's name.
      * @param $field  string The name of the field containing user ids in the table you are joining to.
      *
-     * @return array  An array containing an SQL snippet and parameters to restrict the users.
+     * @return array  An array containing an SQL snippeti, parameters to restrict the users and table alias.
      */
     public function get_users_from_groups_sql($table, $field) {
         $module = self::$module;
@@ -401,7 +467,7 @@ class totara_assign_core {
         if (empty($assignedgroups)) {
             $sql = "JOIN (SELECT 0 AS userid) {$sqalias}
                 ON {$sqalias}.userid = {$table}.{$field}";
-            return array($sql, array());
+            return array($sql, array(), $sqalias);
         }
 
         $sqls = array();
@@ -423,7 +489,7 @@ class totara_assign_core {
         // Now join to the UNIONed queries as a subquery.
         $sql = " JOIN (\n{$allgroupsql}\n) {$sqalias}
             ON {$sqalias}.userid = {$table}.{$field}";
-        return array($sql, $params);
+        return array($sql, $params, $sqalias);
     }
 
 
@@ -465,16 +531,59 @@ class totara_assign_core {
 
 
     /**
+     * Get all users that are currently assigned (in group tables) but have not been stored (in assignment table).
+     *
+     * @access public
+     * @param $limitfrom int
+     * @param $limitnum int
+     * @return recordset Containing basic information about users.
+     */
+    public function get_unstored_users($limitfrom=null, $limitnum=null) {
+        global $DB;
+
+        list($assignjoinsql, $assignparams) = $this->get_users_from_assignments_sql('u', 'id');
+        list($groupjoinsql, $groupparams) = $this->get_users_from_groups_sql('u', 'id');
+
+        $params = array_merge($groupparams, $assignparams);
+
+        $sql = "SELECT u.id, u.firstname, u.lastname FROM {user} u " . $groupjoinsql . "
+                WHERE u.id NOT IN (SELECT u.id FROM {user} u " . $assignjoinsql . ")";
+
+        return $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+    }
+
+
+    /**
+     * Get all users that are currently stored (in assignment table) but are not assigned (in group tables).
+     *
+     * @access public
+     * @param $limitfrom int
+     * @param $limitnum int
+     * @return recordset Containing basic information about users.
+     */
+    public function get_removed_users($limitfrom=null, $limitnum=null) {
+        global $DB;
+
+        list($assignjoinsql, $assignparams, $assignalias) = $this->get_users_from_assignments_sql('u', 'id');
+        list($groupjoinsql, $groupparams, $groupalias) = $this->get_users_from_groups_sql('u', 'id');
+
+        $params = array_merge($assignparams, $groupparams);
+
+        $sql = "SELECT u.id, u.firstname, u.lastname, {$assignalias}.id as userassignmentid
+                FROM {user} u " . $assignjoinsql . "
+                WHERE u.id NOT IN (SELECT u.id FROM {user} u " . $groupjoinsql . ")";
+
+        return $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+    }
+
+
+    /**
      * Get the users according to the current state of the assigned groups and store to module_user_assignment
      * @access public
      * @return void
      */
-    public function store_user_assignments() {
+    public function store_user_assignments($newusers = null, $processor = null) {
         global $DB;
-
-        if ($this->is_locked()) {
-            print_error('error:assignmentmoduleinstancelocked', 'totara_core');
-        }
 
         $module = self::$module;
         $modulekey = "{$module}id";
@@ -483,19 +592,25 @@ class totara_assign_core {
 
         $transaction = $DB->start_delegated_transaction();
 
-        // Clear out the user assignment table first to prevent duplicates.
-        $DB->delete_records($tablename, array($modulekey => $moduleinstanceid));
+        if (!$newusers) {
+            // Clear out the user assignment table first to prevent duplicates.
+            $DB->delete_records($tablename, array($modulekey => $moduleinstanceid));
 
-        // Get recordset containing current user ids.
-        $allusers = $this->get_current_users();
+            // Get recordset containing current user ids.
+            $users = $this->get_current_users();
+        } else {
+            $users = $newusers;
+        }
 
-        // Define a processor function to reformat the data on the fly.
-        $processor = function($record, $modulekey, $moduleinstanceid) {
-            $todb = new stdClass();
-            $todb->$modulekey = $moduleinstanceid;
-            $todb->userid = $record->id;
-            return $todb;
-        };
+        if (empty($processor)) {
+            // Define a default processor function to reformat the data on the fly.
+            $processor = function($record, $modulekey, $moduleinstanceid) {
+                $todb = new stdClass();
+                $todb->$modulekey = $moduleinstanceid;
+                $todb->userid = $record->id;
+                return $todb;
+            };
+        }
 
         // Pass required data into the processor as an argument.
         $processordata = array(
@@ -504,9 +619,9 @@ class totara_assign_core {
         );
 
         // Accept the recordset and save to user_assignment table in batches.
-        $DB->insert_records_via_batch($tablename, $allusers, $processor, $processordata);
+        $DB->insert_records_via_batch($tablename, $users, $processor, $processordata);
 
-        $allusers->close();
+        $users->close();
 
         $transaction->allow_commit();
     }
@@ -586,6 +701,7 @@ abstract class totara_assign_core_grouptype {
 
     abstract public function generate_item_selector($hidden=array(), $groupinstanceid=false);
     abstract public function handle_item_selector($data);
+    abstract public function get_instance_name($instanceid);
 
     public function __construct($assignobject) {
         // Store the whole assignment object from totara_assign or child class of totara_assign.
@@ -915,9 +1031,10 @@ class totara_assign_ui_picker_hierarchy extends totara_dialog_content_hierarchy_
  * @param   $module string The Totara module
  * @param   $itemid int id of the object the dialogs will be assigning groups to
  * @param   $datatable boolean Whether to start up the Javascript for a datatable
+ * @param   $notice string The html output of a notice to display on change
  * @return  void
  */
-function totara_setup_assigndialogs($module, $itemid, $datatable = false) {
+function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notice = "") {
     global $CFG, $PAGE;
     // Setup custom javascript.
     $jselements = array(
@@ -935,7 +1052,8 @@ function totara_setup_assigndialogs($module, $itemid, $datatable = false) {
         'name' => 'totara_assigngroups',
         'fullpath' => '/totara/core/lib/assign/assigngroup_dialog.js',
         'requires' => array('json'));
-    $args = array('args' => '{"module":"'.$module.'","sesskey":"'.sesskey().'"}');
+    $args = array('args' => '{"module":"'.$module.'","sesskey":"'.sesskey().'","notice":"'.addslashes_js($notice).'"}');
+
     $PAGE->requires->js_init_call('M.totara_assigngroupdialog.init', $args, false, $jsmodule);
 
     if ($datatable) {

@@ -59,6 +59,24 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
     }
 
     /**
+     * Gets the name of a hierarchy pos/org based off the group assignment id
+     *
+     * @param  int  $instanceid The id of the group assignment record
+     * @return string
+     */
+    public function get_instance_name($instanceid) {
+        global $DB;
+
+        $sql = "SELECT h.fullname
+                  FROM {{$this->tablename}} grp
+                  JOIN {{$this->grouptype}} h
+                    ON grp.{$this->grouptype}id = h.id
+                 WHERE grp.id = ?";
+
+        return format_string($DB->get_field_sql($sql, array($instanceid)));
+    }
+
+    /**
      * Instantiate and display the dialog class content
      * @access public
      * @param $urlparams array Parameters to be passed to the code handling the dialog submission

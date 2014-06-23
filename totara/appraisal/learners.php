@@ -33,6 +33,7 @@ appraisal::check_feature_enabled();
 
 // Get the appraisal id.
 $appraisalid = required_param('appraisalid', PARAM_INT);
+$update = optional_param('update', false, PARAM_BOOL);
 $module = 'appraisal';
 $appraisal = new appraisal($appraisalid);
 $assign = new totara_assign_appraisal($module, $appraisal);
@@ -42,23 +43,68 @@ $systemcontext = context_system::instance();
 $canassign = has_capability('totara/appraisal:assignappraisaltogroup', $systemcontext);
 $canviewusers = has_capability('totara/appraisal:viewassignedusers', $systemcontext);
 
+admin_externalpage_setup('manageappraisals');
+$title = $PAGE->title . ': ' . $appraisal->name;
+$PAGE->set_title($title);
+$PAGE->set_heading($appraisal->name);
+$PAGE->navbar->add($appraisal->name);
+$output = $PAGE->get_renderer('totara_appraisal');
+
+$grouptypes = $assign->get_assignable_grouptype_names();
+$returnparams = array('appraisalid' => $appraisalid);
+$returnurl = new moodle_url('/totara/appraisal/learners.php', $returnparams);
+
 $deleteid = optional_param('deleteid', null, PARAM_ALPHANUMEXT);
-if ($deleteid && $canassign && ($appraisal->status == appraisal::STATUS_DRAFT)) {
+$confirm = optional_param('confirm', false, PARAM_BOOL);
+if ($deleteid && $canassign && (!appraisal::is_closed($appraisalid))) {
+    list($grp, $aid) = explode("_", $deleteid);
+
+    if (appraisal::is_active($appraisalid) && !$confirm) {
+
+        $deleteparams = array('appraisalid' => $appraisalid, 'deleteid' => $deleteid, 'confirm' => true, 'sesskey' => sesskey());
+        $deleteurl = new moodle_url('/totara/appraisal/learners.php', $deleteparams);
+
+        $confirmparams = new stdClass();
+        $confirmparams->grouptype = $grouptypes[$grp];
+        $confirmparams->groupname = $assign->get_group_instance_name($grp, $aid);
+        $confirmparams->appraisalname = $appraisal->name;
+        $confirmstr = get_string('confirmdeletegroup', 'totara_appraisal', $confirmparams);
+
+        echo $output->header();
+        echo $output->confirm($confirmstr, $deleteurl, $returnurl);
+        echo $output->footer();
+
+        exit();
+    } else {
+        if (!confirm_sesskey()) {
+            print_error('confirmsesskeybad', 'error');
+        }
+        $assign->delete_assigned_group($grp, $aid);
+        redirect($returnurl);
+    }
+}
+
+if ($update && $canassign) {
     if (!confirm_sesskey()) {
         print_error('confirmsesskeybad', 'error');
     }
-    list($grp, $aid) = explode("_", $deleteid);
-    $assign->delete_assigned_group($grp, $aid);
+
+    $appraisal->check_assignment_changes();
+    redirect($returnurl);
 }
 
-admin_externalpage_setup('manageappraisals');
+$notlivenotice = $output->display_notlive_notice($appraisalid, $canassign);
 // Setup the JS.
-totara_setup_assigndialogs($module, $appraisalid, $canviewusers);
-$output = $PAGE->get_renderer('totara_appraisal');
+totara_setup_assigndialogs($module, $appraisalid, $canviewusers, $notlivenotice);
 echo $output->header();
 if ($appraisal->id) {
     echo $output->heading($appraisal->name);
     echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
+}
+
+if ($appraisal->status == appraisal::STATUS_ACTIVE) {
+    $warnings = $appraisal->validate_roles(true);
+    echo $output->display_learner_warnings($appraisal->id, $warnings, $canviewusers);
 }
 
 echo $output->appraisal_management_tabs($appraisal->id, 'learners');
@@ -66,13 +112,13 @@ echo $output->appraisal_management_tabs($appraisal->id, 'learners');
 echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'));
 
 if ($canassign) {
-    if ($appraisal->status == appraisal::STATUS_DRAFT) {
+    if ($appraisal->status == appraisal::STATUS_CLOSED) {
+        echo get_string('appraisalclosednochangesallowed', 'totara_appraisal');
+    } else {
         $options = array_merge(array("" => get_string('assigngroup', 'totara_core')),
-                $assign->get_assignable_grouptype_names());
+                $grouptypes);
         echo html_writer::select($options, 'groupselector', null, null,
                 array('class' => 'group_selector', 'itemid' => $appraisalid));
-    } else {
-        echo get_string('appraisalactivenochangesallowed', 'totara_appraisal');
     }
 }
 
@@ -82,8 +128,21 @@ echo $output->display_assigned_groups($currentassignments, $appraisalid);
 
 echo $output->heading(get_string('assigncurrentusers', 'totara_appraisal'));
 
+// If the appraisal is active notify the user that changes are not live.
+if ($appraisal->status == appraisal::STATUS_ACTIVE) {
+    $userassignments = $assign->get_current_users();
+    $groupassignments = $assign->get_current_users(null, null, null, true);
+    $differences = $appraisal->compare_assignments($userassignments, $groupassignments);
+    echo html_writer::start_tag('div', array('id' => 'notlivenotice'));
+    if ($differences) {
+        echo $notlivenotice;
+    }
+    echo html_writer::end_tag('div');
+}
+
 if ($canviewusers) {
     echo $output->display_user_datatable();
 }
+
 
 echo $output->footer();

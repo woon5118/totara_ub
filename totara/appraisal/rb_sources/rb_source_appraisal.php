@@ -113,6 +113,9 @@ class rb_source_appraisal extends rb_base_source {
     }
 
     protected function define_columnoptions() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+
         $columnoptions = array(
             new rb_column_option(
                 'userappraisal',
@@ -142,10 +145,13 @@ class rb_source_appraisal extends rb_base_source {
                 'userappraisal',
                 'status',
                 get_string('userappraisalstatuscolumn', 'rb_source_appraisal'),
-                "CASE WHEN base.timecompleted IS NOT NULL THEN 'statuscomplete' " .
-                     "WHEN appraisal.status = 2 THEN 'statusincomplete' " .
-                     "WHEN activestage.timedue < " . time() . " THEN 'statusoverdue' " .
-                     "ELSE 'statusontarget' " .
+                "CASE WHEN base.status = " . appraisal::STATUS_COMPLETED . " AND base.timecompleted IS NOT NULL THEN 'statuscomplete' " .
+                     "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND appraisal.status = " . appraisal::STATUS_ACTIVE . " THEN 'statuscancelled' " .
+                     "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND (appraisal.status = " . appraisal::STATUS_CLOSED .
+                            " OR appraisal.status = " . appraisal::STATUS_COMPLETED . " ) THEN 'statusincomplete' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " THEN 'statusoverdue' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue >= " . time() . " THEN 'statusontarget' " .
+                     "ELSE 'statusdraft' " .
                 "END",
                 array('joins' => array('appraisal', 'activestage'),
                       'displayfunc' => 'status',
@@ -231,7 +237,14 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('userappraisalstatuscolumn', 'rb_source_appraisal'),
                 'select',
                 array('selectfunc' => 'status')
-            )
+            ),
+            new rb_filter_option(
+                'appraisal',
+                'status',
+                get_string('appraisalstatuscolumn', 'rb_source_appraisal'),
+                'select',
+                array('selectfunc' => 'appraisalstatus')
+            ),
         );
 
         $this->add_user_fields_to_filters($filteroptions);
@@ -245,11 +258,14 @@ class rb_source_appraisal extends rb_base_source {
         $paramoptions = array(
             new rb_param_option('appraisalid', 'base.appraisalid'),
             new rb_param_option('filterstatus',
-                "CASE WHEN base.timecompleted IS NOT NULL THEN 'statuscomplete'
-                      WHEN appraisal.status = 2 THEN 'statusincomplete'
-                      WHEN activestage.timedue < " . time() . " THEN 'statusoverdue'
-                      ELSE 'statusontarget'
-                 END", array('appraisal', 'activestage'), 'string')
+                "CASE WHEN base.status = " . appraisal::STATUS_COMPLETED . " AND base.timecompleted IS NOT NULL THEN 'statuscomplete' " .
+                     "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND appraisal.status = " . appraisal::STATUS_ACTIVE . " THEN 'statuscancelled' " .
+                     "WHEN base.status = " . appraisal::STATUS_CLOSED . " AND (appraisal.status = " . appraisal::STATUS_CLOSED .
+                            " OR appraisal.status = " . appraisal::STATUS_COMPLETED . " ) THEN 'statusincomplete' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue < " . time() . " THEN 'statusoverdue' " .
+                     "WHEN base.status = " . appraisal::STATUS_ACTIVE . " AND activestage.timedue >= " . time() . " THEN 'statusontarget' " .
+                     "ELSE 'statusdraft' " .
+                "END", array('appraisal', 'activestage'), 'string')
         );
 
         return $paramoptions;
@@ -303,7 +319,7 @@ class rb_source_appraisal extends rb_base_source {
         return get_string($status, 'rb_source_appraisal');
     }
 
-     /**
+    /**
      * Convert appraisal status code string to human readable string.
      * @param string $status status code string
      * @param object $row other fields in the record (unused)
@@ -358,9 +374,23 @@ class rb_source_appraisal extends rb_base_source {
         $statuses = array();
 
         $statuses['statuscomplete'] = get_string('statuscomplete', 'rb_source_appraisal');
+        $statuses['statuscancelled'] = get_string('statuscancelled', 'rb_source_appraisal');
         $statuses['statusincomplete'] = get_string('statusincomplete', 'rb_source_appraisal');
         $statuses['statusoverdue'] = get_string('statusoverdue', 'rb_source_appraisal');
         $statuses['statusontarget'] = get_string('statusontarget', 'rb_source_appraisal');
+
+        return $statuses;
+    }
+
+    public function rb_filter_appraisalstatus() {
+        global $CFG;
+        require_once($CFG->dirroot . "/totara/appraisal/lib.php");
+
+        $statuses = array();
+        $statuses[appraisal::STATUS_DRAFT] = appraisal::display_status(appraisal::STATUS_DRAFT);
+        $statuses[appraisal::STATUS_ACTIVE] = appraisal::display_status(appraisal::STATUS_ACTIVE);
+        $statuses[appraisal::STATUS_CLOSED] = appraisal::display_status(appraisal::STATUS_CLOSED);
+        $statuses[appraisal::STATUS_COMPLETED] = appraisal::display_status(appraisal::STATUS_COMPLETED);
 
         return $statuses;
     }

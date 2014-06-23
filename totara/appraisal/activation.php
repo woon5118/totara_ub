@@ -45,7 +45,7 @@ $appraisal = new appraisal($id);
 
 switch ($action) {
     case 'activate':
-        $errors = $appraisal->validate();
+        list($errors, $warnings) = $appraisal->validate();
         if (empty($errors) && $confirm) {
             if (!confirm_sesskey()) {
                 print_error('confirmsesskeybad', 'error');
@@ -86,7 +86,7 @@ echo $output->header();
 switch ($action) {
     case 'activate':
         echo $output->heading($appraisal->name);
-        echo $output->confirm_appraisal_activation($appraisal, $errors);
+        echo $output->confirm_appraisal_activation($appraisal, $errors, $warnings);
         break;
     case 'close':
         echo $output->heading(get_string('closeappraisal', 'totara_appraisal'));

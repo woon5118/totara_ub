@@ -53,6 +53,7 @@ $stageschecked = (isset($_REQUEST['stages']) && is_array($_REQUEST['stages'])) ?
 $printstages = array_keys(array_filter($stageschecked));
 $action = optional_param('action', '', PARAM_ACTION);
 
+$subject = $DB->get_record('user', array('id' => $subjectid));
 if ($action == 'stages') {
     if ($subjectid == $USER->id) {
         require_capability('totara/appraisal:printownappraisals', $systemcontext);
@@ -85,6 +86,7 @@ if (!$appraisal->can_access($roleassignment)) {
 }
 $assignments = $appraisal->get_all_assignments($subjectid);
 $otherassignments = $assignments;
+
 unset($otherassignments[$roleassignment->appraisalrole]);
 
 $PAGE->set_url(new moodle_url('/totara/appraisal/snapshot.php', array('role' => $role,
@@ -103,67 +105,19 @@ $PAGE->set_heading($heading);
 $nouserpic = false;
 
 if ($action == 'snapshot') {
-    $ob_was = 0;
     $nouserpic = true;
-    $ob_level = ob_get_level();
-    // IIS always return true for ob_get_level().
-    while ($ob_level != $ob_was && $ob_level > 0) {
-        $ob_was = $ob_level;
-        ob_flush();
-        $ob_level = ob_get_level();
-    }
     require_once($CFG->libdir . '/dompdf/lib.php');
     set_time_limit('300');
-    ob_start();
 }
 
-echo $renderer->header();
-
-// Print appraisal header.
-$roleassignments = $appraisal->get_all_assignments($userassignment->userid);
-echo $renderer->display_appraisal_header($appraisal, $userassignment, $roleassignments);
-$appdesc = new stdClass();
-$appdesc->description = $appraisal->description;
-$appdesc->descriptionformat = FORMAT_HTML;
-$appdesc = file_prepare_standard_editor($appdesc, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-        'totara_appraisal', 'appraisal', $appraisal->id);
-echo $appdesc->description_editor['text'];
-$subject = $DB->get_record('user', array('id' => $subjectid));
-echo $renderer->display_viewing_appraisal_header($subject, 'youareprintingxsappraisal', $role);
-$stageslist = appraisal_stage::get_stages($appraisal->id, array($role));
-
-foreach ($stageslist as $stageid => $stagedata) {
-    if (empty($printstages) || in_array($stageid, $printstages)) {
-        // Print stage.
-        $stage = new appraisal_stage($stageid);
-        echo $renderer->display_stage($appraisal, $stage, $userassignment, $roleassignment, '', false);
-
-        $pages = appraisal_page::get_applicable_pages($stageid, $role, 0, false);
-        foreach ($pages as $page) {
-            // Print page.
-            echo $renderer->heading($page->name);
-
-            // Print form.
-            $form = new appraisal_answer_form(null, array('appraisal' => $appraisal, 'page' => $page,
-            'userassignment' => $userassignment, 'roleassignment' => $roleassignment,
-            'otherassignments' => $otherassignments, 'spaces' => $spaces, 'nouserpic' => $nouserpic,
-            'action' => 'print', 'preview' => false, 'islastpage' => false, 'readonly' => true));
-
-            foreach ($assignments as $assignment) {
-                $form->set_data($appraisal->get_answers($page->id, $assignment));
-            }
-            $form->display();
-            $form->reset_form_sent();
-        }
-    }
-}
+$out = "";
+$out .= $renderer->header();
+$out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
 
 if ($action == 'snapshot') {
-    $html = ob_get_contents();
-    ob_end_clean();
     $filename = 'appraisal_'.$appraisal->id.'_'.date("Y-m-d_His").'_'.$roles[$role].'.pdf';
     $pdf = new totara_dompdf();
-    $pdf->load_html($html);
+    $pdf->load_html($out);
     $pdf->render();
 
     file_put_contents($CFG->tempdir.'/'.$filename, $pdf->output());
@@ -180,6 +134,7 @@ if ($action == 'snapshot') {
     echo html_writer::tag('div', get_string('snapshotdone', 'totara_appraisal', $strsource),
             array('class'=>'notifysuccess dialog-nobind'));
 } else {
+    echo $out;
     echo $renderer->footer();
 }
 

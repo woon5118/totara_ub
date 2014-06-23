@@ -63,6 +63,24 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
     }
 
     /**
+     * Gets the name of a cohort based off the group assignment id
+     *
+     * @param  int  $instanceid The id of the group assignment record
+     * @return string
+     */
+    public function get_instance_name($instanceid) {
+        global $DB;
+
+        $sql = "SELECT c.name
+                  FROM {{$this->tablename}} grp
+                  JOIN {cohort} c
+                    ON grp.cohortid = c.id
+                 WHERE grp.id = ?";
+
+        return format_string($DB->get_field_sql($sql, array($instanceid)));
+    }
+
+    /**
      * Instantiate and display the dialog class content
      * @access public
      * @param $urlparams array Parameters to be passed to the code handling the dialog submission

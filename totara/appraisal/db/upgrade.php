@@ -28,6 +28,8 @@
  */
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
+require_once($CFG->dirroot.'/totara/appraisal/lib.php');
+
 /**
  * Local database upgrade script
  *
@@ -80,7 +82,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
                             'mnethostid' => $user->mnethostid
                         )
                 ));
-                appraisal_event_handler::appraisal_user_deleted($event);
+                totara_appraisal_observer::user_deleted($event);
                 $i++;
                 $pbar->update($i, $usercount, "Fixing Appraisals for deleted users - {$i}/{$usercount}.");
             }
@@ -88,5 +90,70 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         }
         upgrade_plugin_savepoint(true, 2014061600, 'totara', 'appraisal');
     }
+
+    if ($oldversion < 2014062300) {
+        $table = new xmldb_table('appraisal_user_assignment');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $transaction = $DB->start_delegated_transaction();
+
+            $dbman->add_field($table, $field);
+
+            // Migrate status from appraisal status.
+            $appraisals = $DB->get_records('appraisal');
+            foreach ($appraisals as $appraisal) {
+                $sql = "UPDATE {appraisal_user_assignment} SET status = ? WHERE appraisalid = ?";
+                $params = array($appraisal->status, $appraisal->id);
+                $DB->execute($sql, $params);
+            }
+
+            // Finally set the status for all completed users at once.
+            $sql = "UPDATE {appraisal_user_assignment} SET status = ? WHERE timecompleted IS NOT NULL";
+            $params = array(appraisal::STATUS_COMPLETED);
+            $DB->execute($sql, $params);
+
+            $transaction->allow_commit();
+        }
+
+        upgrade_plugin_savepoint(true, 2014062300, 'totara', 'appraisal');
+    }
+
+    if ($oldversion < 2014062301) {
+
+        // Define table appraisal_role_changes to be created.
+        $table = new xmldb_table('appraisal_role_changes');
+
+        // Adding fields to table appraisal_role_changes.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userassignmentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('originaluserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('newuserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('role', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+
+        // Adding keys to table appraisal_role_changes.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for appraisal_role_changes.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2014062301, 'totara', 'appraisal');
+    }
+
+    if ($oldversion < 2014062302) {
+        // Adding a timecreated field to appraisals role assignments.
+        $table = new xmldb_table('appraisal_role_assignment');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2014062302, 'totara', 'appraisal');
+    }
+
     return true;
 }

@@ -81,6 +81,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                     array('id' => $appraisal->id, 'action' => 'close'));
             $editurl = new moodle_url('/totara/appraisal/general.php',
                     array('id' => $appraisal->id));
+            $assignurl = new moodle_url('/totara/appraisal/learners.php',
+                    array('appraisalid' => $appraisal->id));
             $deleteurl = new moodle_url('/totara/appraisal/manage.php',
                     array('id' => $appraisal->id, 'action' => 'delete'));
             $cloneurl = new moodle_url('/totara/appraisal/manage.php',
@@ -103,7 +105,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $options = '';
             if (has_capability('totara/appraisal:manageappraisals', $systemcontext, $userid)) {
                 if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-                    $options .= $this->output->pix_icon('/t/edit_gray', $strnoteditable, 'moodle', array('class' => 'disabled iconsmall'));
+                    $options .= $this->output->action_icon($assignurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
                     $options .= $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'));
                     $options .= $this->output->pix_icon('/t/delete_gray', $strcannotdelete, 'moodle', array('class' => 'disabled iconsmall'));
                 } else {
@@ -283,6 +285,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $tableheader = array(get_string('name', 'totara_appraisal'),
                              get_string('overdue', 'totara_appraisal'),
                              get_string('ontarget', 'totara_appraisal'),
+                             get_string('cancelled', 'totara_appraisal'),
                              get_string('complete', 'totara_appraisal'),
                              get_string('reports', 'totara_appraisal'));
 
@@ -311,7 +314,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             if (!($appraisal->usersoverdue > 0)) {
                 $appraisal->usersoverdue = 0;
             }
-            $appraisal->usersontarget = $appraisal->userstotal - $appraisal->userscomplete - $appraisal->usersoverdue;
+            $appraisal->usersontarget = $appraisal->userstotal - $appraisal->userscomplete - $appraisal->usersoverdue - $appraisal->userscancelled;
             if ($appraisal->usersoverdue > 0) {
                 $statusreporturl->param('filterstatus', 'statusoverdue');
                 $row[] = html_writer::link($statusreporturl, $appraisal->usersoverdue);
@@ -322,6 +325,13 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             if ($appraisal->usersontarget > 0) {
                 $statusreporturl->param('filterstatus', 'statusontarget');
                 $row[] = html_writer::link($statusreporturl, $appraisal->usersontarget);
+            } else {
+                $row[] = '0';
+            }
+
+            if ($appraisal->userscancelled > 0) {
+                $statusreporturl->param('filterstatus', 'statuscancelled');
+                $row[] = html_writer::link($statusreporturl, $appraisal->userscancelled);
             } else {
                 $row[] = '0';
             }
@@ -532,7 +542,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $row[] = get_string('none', 'totara_appraisal');
             }
 
-            if (($appraisal->status == appraisal::STATUS_ACTIVE) && !empty($appraisal->timecompleted)) {
+            if (!empty($appraisal->timecompleted)) {
                 $row[] = appraisal::display_status(appraisal::STATUS_COMPLETED);
             } else {
                 $row[] = appraisal::display_status($appraisal->status);
@@ -952,16 +962,26 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @param array $errors
      * @return string HTML
      */
-    public function confirm_appraisal_activation($appraisal, $errors) {
+    public function confirm_appraisal_activation($appraisal, $errors, $warnings) {
         $out = '';
         if (!empty($errors)) {
             $out .= $this->heading(get_string('appraisalinvalid', 'totara_appraisal'));
+            // Output the errors to the screen.
             $out .= html_writer::tag('p', get_string('appraisalfixerrors', 'totara_appraisal'));
             $errordesc = array();
             foreach ($errors as $error) {
                 $errordesc[] = html_writer::tag('li', $error);
             }
             $out .= html_writer::tag('ul', implode('', $errordesc), array('class' => 'appraisalerrorlist'));
+            // Output the warnings to the screen.
+            if (!empty($warnings)) {
+                $out .= html_writer::tag('p', get_string('appraisalfixwarnings', 'totara_appraisal'));
+                $warndesc = array();
+                foreach ($warnings as $warn) {
+                    $warndesc[] = html_writer::tag('li', $warn);
+                }
+                $out .= html_writer::tag('ul', implode('', $warndesc), array('class' => 'appraisalerrorlist'));
+            }
             $buttons = array();
             $buttons[] = $this->output->single_button(new moodle_url('/totara/appraisal/stage.php',
                     array('appraisalid' => $appraisal->id)), get_string('backtoappraisal', 'totara_appraisal',
@@ -969,7 +989,17 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $out .= html_writer::tag('div', implode(' ', $buttons), array('class' => 'buttons'));
         } else {
             $out .= html_writer::tag('p', get_string('appraisallastwarning', 'totara_appraisal'));
-            $out .= html_writer::tag('p', get_string('confirmactivateappraisal', 'totara_appraisal'));
+            // Output the warnings to the screen.
+            if (!empty($warnings)) {
+                $out .= html_writer::tag('p', get_string('confirmactivatewarning', 'totara_appraisal'));
+                $warndesc = array();
+                foreach ($warnings as $warn) {
+                    $warndesc[] = html_writer::tag('li', $warn);
+                }
+                $out .= html_writer::tag('ul', implode('', $warndesc), array('class' => 'appraisalerrorlist'));
+            } else {
+                $out .= html_writer::tag('p', get_string('confirmactivateappraisal', 'totara_appraisal'));
+            }
             $buttons = array();
             $buttons[] = $this->output->single_button(new moodle_url('/totara/appraisal/activation.php',
                     array('action' => 'activate', 'confirm' => 1, 'id' => $appraisal->id)),
@@ -1157,7 +1187,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $row[] = new html_table_cell($includechildren);
                 $row[] = new html_table_cell($assign->groupusers);
                 // Only show delete if appraisal is draft status.
-                if ($appraisal->status == appraisal::STATUS_DRAFT) {
+                if (!appraisal::is_closed($itemid)) {
                     $delete = $this->output->action_icon(
                             new moodle_url('/totara/appraisal/learners.php',
                             array('appraisalid' => $itemid, 'deleteid' => $assign->id, 'sesskey' => sesskey())),
@@ -1190,6 +1220,66 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         return $out;
     }
 
+    /**
+     * Returns the markup for the learner assignments not live notification.
+     *
+     * @param   int         The id of the appraisal we are display warnings for.
+     * @param   boolean     Flag whether the user should see the update assignments button.
+     * @return  string      HTML
+     */
+    public function display_notlive_notice($appraisalid, $canassign = false) {
+
+        // Not live notification text.
+        $out = get_string('changesnotlive', 'totara_appraisal');
+
+        if ($canassign) {
+            // Update learner assignments button.
+            $updatestr = get_string('updatenow', 'totara_appraisal');
+            $updateparams = array('appraisalid' => $appraisalid, 'update' => true, 'sesskey' => sesskey());
+            $updateurl = new moodle_url('/totara/appraisal/learners.php', $updateparams);
+            $updatebutton = new single_button($updateurl, $updatestr, 'get');
+            $updatebutton->class .= ' update_assignment_records';
+            $out .= $this->render($updatebutton);
+        }
+
+        return $this->container($out, 'notifynotice');
+    }
+
+    /**
+     * Returns the markup for the learner assignments error warning.
+     *
+     * @param   int         The id of the appraisal we are display warnings for.
+     * @param   array       An array of the warnings we are displaying.
+     * @param   boolean     Flag whether the user should see the link to more information.
+     * @return  string      HTML
+     */
+    public function display_learner_warnings($appraisalid, $warnings, $canview = false) {
+
+        if (empty($warnings)) {
+            return '';
+        }
+
+        if (!empty($warnings['learners'])) {
+            // Display the no learners assigned warning.
+            $out = get_string('appraisalinvalid:learners', 'totara_appraisal');
+        } else if (!empty($warnings)) {
+            // The only other warnings are role warnings.
+            if ($canview) {
+                // Add the link to list all the role warings.
+                $infostr = get_string('missingroleslink', 'totara_appraisal');
+                $infourl = new moodle_url('/totara/appraisal/missing.php', array('appraisalid' => $appraisalid));
+                $infolink = html_writer::link($infourl->out(), $infostr, array('class' => 'missingroleslink'));
+
+                $out = get_string('missingrolesinfo', 'totara_appraisal', $infolink);
+            } else {
+                // Just the plain warning without a link.
+                $out = get_string('missingroles', 'totara_appraisal');
+            }
+        }
+
+        return $this->container($out, 'notifyproblem');
+    }
+
 
     /**
      * Displays the header for the given appraisal. Includes appraisal status for the given user.
@@ -1206,33 +1296,82 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $out = html_writer::tag('h3', format_string($appraisal->name));
 
         // Display the list of participants.
-        $rolestringkeys = Appraisal::get_roles();
+        $rolestringkeys = appraisal::get_roles();
+        $actual = appraisal::get_live_role_assignments($userassignment->userid);
         $participants = array();
         foreach ($appraisal->get_roles_involved() as $role) {
             $rolestring = get_string($rolestringkeys[$role], 'totara_appraisal');
             if (empty($roleassignments[$role]) || empty($roleassignments[$role]->userid)) {
-                $participants[] = $rolestring . ": " . get_string('rolecurrentlyempty', 'totara_appraisal');
+                $participant = $rolestring . ": " . get_string('rolecurrentlyempty', 'totara_appraisal');
             } else {
                 $user = $DB->get_record('user', array('id' => $roleassignments[$role]->userid));
-                $participants[] = $rolestring . ": " . fullname($user);
+                $participant = $rolestring . ": " . fullname($user);
             }
+
+            if ($appraisal->status == appraisal::STATUS_ACTIVE && $roleassignments[$role]->userid != $actual[$role]) {
+                $participant .= $this->container(get_string('rolehaschanged', 'totara_appraisal'), 'rolechangedwarning');
+            }
+
+            $participants[] = $participant;
         }
         $out .= html_writer::tag('div', html_writer::tag('label', 'Participants:') .
                     html_writer::alist($participants), array('class' => 'appraisal-participants'));
 
         if (!$preview) {
-            if ($appraisal->status == appraisal::STATUS_CLOSED) {
-                $icon = $this->output->pix_icon('i/invalid', get_string('closed', 'totara_appraisal'));
-                $out .= html_writer::tag('p', $icon . get_string('closedon', 'totara_appraisal',
-                        userdate($appraisal->timefinished, get_string('strftimedate', 'langconfig'))));
-            } else if (!empty($userassignment->timecompleted)) {
+            if (!empty($userassignment->timecompleted)) {
                 $icon = $this->output->pix_icon('i/valid', get_string('completed', 'totara_appraisal'));
                 $out .= html_writer::tag('p', $icon . get_string('completedon', 'totara_appraisal',
-                        userdate($userassignment->timecompleted, get_string('strftimedate', 'langconfig'))));
+                    userdate($userassignment->timecompleted, get_string('strftimedate', 'langconfig'))));
+            } else if ($appraisal->status == appraisal::STATUS_CLOSED) {
+                $icon = $this->output->pix_icon('i/invalid', get_string('closed', 'totara_appraisal'));
+                $out .= html_writer::tag('p', $icon . get_string('closedon', 'totara_appraisal',
+                    userdate($appraisal->timefinished, get_string('strftimedate', 'langconfig'))));
+            } else if ($userassignment->status == appraisal::STATUS_CLOSED) {
+                $icon = $this->output->pix_icon('i/invalid', get_string('closed', 'totara_appraisal'));
+                $userfullname = fullname($userassignment->user);
+                $out .= html_writer::tag('p', $icon . get_string('appraisalclosedforuser', 'totara_appraisal', $userfullname));
             }
+
         }
 
         return html_writer::tag('div', $out, array('class' => 'appraisal-title'));
+    }
+
+    public function display_missing_roles($userassignmentid, $appraisalid) {
+        global $DB;
+
+        // Get roles required for the appraisal.
+        $appraisal = new appraisal($appraisalid);
+        $requiredroles = $appraisal->get_roles_involved(appraisal::ACCESS_MUSTANSWER);
+
+        if (empty($requiredroles)) {
+            return "";
+        }
+
+        // Check required roles are not empty.
+        list($insql, $inparam) = $DB->get_in_or_equal($requiredroles);
+        $missingsql = "SELECT *
+                         FROM {appraisal_role_assignment}
+                        WHERE appraisaluserassignmentid = ?
+                        AND userid = 0
+                        AND appraisalrole {$insql}";
+        $missingparams = array_merge(array($userassignmentid), $inparam);
+        $missingroles = $DB->get_records_sql($missingsql, $missingparams);
+
+        if (empty($missingroles)) {
+            return "";
+        }
+
+        $out = html_writer::tag('p', get_string('rolesmissing', 'totara_appraisal'));
+
+        $allroles = appraisal::get_roles();
+        $out .= html_writer::start_tag('ul');
+        foreach ($missingroles as $role) {
+            $out .= html_writer::tag('li', get_string($allroles[$role->appraisalrole], 'totara_appraisal'));
+        }
+        $out .= html_writer::end_tag('ul');
+
+        return $this->container($out, 'missingroles notifyproblem');
     }
 
 
@@ -1304,7 +1443,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         if ($preview) {
             $info .= html_writer::tag('h4', get_string('inprogress', 'totara_appraisal'));
             $stagestatus = 'appraisal-stage-inprogress';
-        } else if ($appraisal->status == appraisal::STATUS_CLOSED && !$stage->is_completed($userassignment)) {
+        } else if ((($appraisal->status == appraisal::STATUS_CLOSED && !$stage->is_completed($userassignment)) ||
+                    ($userassignment->is_closed() && !$stage->is_completed($userassignment)))) {
             $info .= html_writer::tag('h4', get_string('incomplete', 'totara_appraisal'));
             if ($stageinprogress) {
                 $stagestatus = 'appraisal-stage-completed';
@@ -1332,8 +1472,9 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         if ($preview) {
             $rolescompletion = $stage->get_roles_involved(appraisal::ACCESS_CANANSWER);
         } else {
-            $rolescompletion = $stage->get_completion($userassignment->userid, appraisal::ACCESS_CANANSWER);
+            $rolescompletion = $stage->get_mandatory_completion($userassignment->userid);
         }
+
         $lines = '';
         foreach ($rolescompletion as $rolecompletion) {
             // Icon.
@@ -1387,7 +1528,11 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $pagesurl->param('stageid', $stage->id);
             $button = new single_button($pagesurl, get_string('preview', 'totara_appraisal'), 'get');
             $action .= $this->output->render($button);
+        } else if ($userassignment->is_closed()) {
+            $button = new single_button($pagesurl, get_string('view', 'totara_appraisal'), 'get');
+            $action .= $this->output->render($button);
         } else if ($stage->is_completed($userassignment)) {
+
             if (isset($stage->firstpage)) {
                 $pagesurl->param('pageid', $stage->firstpage);
                 $button = new single_button($pagesurl, get_string('view', 'totara_appraisal'), 'get');
@@ -1487,14 +1632,21 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             return $out . get_string('nostages', 'totara_appraisal');
         }
 
+        $out .= html_writer::start_tag('div', array('class' => 'stagelist'));
+
+        // If appropriate display the missing roles warning above the stages.
+        if ($userassignment->status == appraisal::STATUS_ACTIVE) {
+            $out .= $this->display_missing_roles($userassignment->id, $userassignment->appraisalid);
+        }
+
         // Stages list.
         $stagelist = array();
         foreach ($stages as $stage) {
             $stageactions = $this->display_stage_actions_for_stages($appraisal, $stage, $userassignment, $roleassignment,
                     $urlparams, $preview);
-            $stagelist[] = $this->display_stage($appraisal, $stage, $userassignment, $roleassignment, $stageactions, $preview);
+            $out .= $this->display_stage($appraisal, $stage, $userassignment, $roleassignment, $stageactions, $preview);
         }
-        $out .= html_writer::tag('div', implode("\n", $stagelist), array('class' => 'stagelist'));
+        $out .= html_writer::end_tag('div');
 
         return $out;
     }
@@ -1646,5 +1798,65 @@ class totara_appraisal_renderer extends plugin_renderer_base {
 
         // Combine and display.
         return html_writer::tag('div', $heading . $rolecontrol . $description, array('class' => "plan_box notifymessage", 'id' => 'preview-appraisal-notification'));
+    }
+
+    /**
+     * Returns the base markup for a snapshot export.
+     *
+     * @return string HTML
+     */
+    public function display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces = 0) {
+        global $CFG, $TEXTAREA_OPTIONS;
+
+        require_once($CFG->libdir . '/dompdf/lib.php');
+        require_once($CFG->dirroot . '/totara/appraisal/appraisal_forms.php');
+
+        // Set up.
+        $out = "";
+        $role = $roleassignment->appraisalrole;
+        $roles = $appraisal::get_roles();
+        $assignments = $appraisal->get_all_assignments($subject->id);
+        $otherassignments = $assignments;
+        $nouserpic = true;
+
+        $out .= $this->display_appraisal_header($appraisal, $userassignment, $assignments);
+
+        $appdesc = new stdClass();
+        $appdesc->description = $appraisal->description;
+        $appdesc->descriptionformat = FORMAT_HTML;
+        $appdesc = file_prepare_standard_editor($appdesc, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+                'totara_appraisal', 'appraisal', $appraisal->id);
+        $out .= $appdesc->description_editor['text'];
+        $out .= $this->display_viewing_appraisal_header($subject, 'youareprintingxsappraisal', $role);
+        $stageslist = appraisal_stage::get_stages($appraisal->id, array($role));
+
+        foreach ($stageslist as $stageid => $stagedata) {
+            if (empty($printstages) || in_array($stageid, $printstages)) {
+                // Print stage.
+                $stage = new appraisal_stage($stageid);
+                $out .= $this->display_stage($appraisal, $stage, $userassignment, $roleassignment, '', false);
+
+                $pages = appraisal_page::get_applicable_pages($stageid, $role, 0, false);
+                foreach ($pages as $page) {
+                    // Print page.
+                    $out .= $this->heading($page->name);
+
+                    // Print form.
+                    $form = new appraisal_answer_form(null, array('appraisal' => $appraisal, 'page' => $page,
+                    'userassignment' => $userassignment, 'roleassignment' => $roleassignment,
+                    'otherassignments' => $otherassignments, 'spaces' => $spaces, 'nouserpic' => $nouserpic,
+                    'action' => 'print', 'preview' => false, 'islastpage' => false, 'readonly' => true));
+
+                    foreach ($assignments as $assignment) {
+                        $form->set_data($appraisal->get_answers($page->id, $assignment));
+                    }
+
+                    $out .= $form->render();
+                    $form->reset_form_sent();
+                }
+            }
+        }
+
+        return $out;
     }
 }

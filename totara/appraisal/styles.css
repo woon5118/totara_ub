@@ -496,3 +496,18 @@ form.print-stages-form .fitem .fitemtitle {
 #preview-appraisal-notification {
     min-height: 115px
 }
+.update_assignment_records {
+    margin-top: -5px;
+    float: right;
+}
+
+.dir-rtl .update_assignment_records {
+    float: left;
+}
+
+.rolechangedwarning {
+    display: inline-block;
+    margin-left: 20px;
+    padding-left: 20px;
+    background: url([[pix:theme|notifynotice]]) no-repeat;
+}

@@ -24,12 +24,17 @@
 
 $string['appraisalnamecolumn'] = 'Appraisal Name';
 $string['appraisalnameheading'] = 'Appraisal name';
+$string['appraisalstatusactive'] = 'Appraisal Active';
+$string['appraisalstatusclosed'] = 'Appraisal Closed';
 $string['appraisalstatuscolumn'] = 'Appraisal Status';
+$string['appraisalstatuscomplete'] = 'Appraisal Complete';
+$string['appraisalstatusdraft'] = 'Appraisal Draft';
 $string['appraisalstatusheading'] = 'Appraisal status';
 $string['appraisaltimefinishedcolumn'] = 'Appraisal Time Finished';
 $string['appraisaltimefinishedheading'] = 'Appraisal finished';
 $string['appraisaltimestartedcolumn'] = 'Appraisal Time Started';
 $string['appraisaltimestartedheading'] = 'Appraisal started';
+$string['cancelled'] = 'Assignment Cancelled';
 $string['completiondate'] = 'The completion date';
 $string['embeddedactivestagenameheading'] = 'Active stage';
 $string['embeddedmanagerheading'] = 'Manager';
@@ -40,7 +45,10 @@ $string['embeddedpreviousstagetimecompletedheading'] = 'Previous stage time comp
 $string['embeddedstatusheading'] = 'Status';
 $string['selectanappraisal'] = 'To view this report, first <a href="{$a}">select an appraisal</a> you want to view.';
 $string['sourcetitle'] = 'Appraisal Status';
+$string['statuscancelled'] = 'Assignment Cancelled';
+$string['statusclosed'] = 'Appraisal Closed';
 $string['statuscomplete'] = 'Complete';
+$string['statusdraft'] = 'Pending';
 $string['statusincomplete'] = 'Incomplete';
 $string['statusontarget'] = 'On Target';
 $string['statusoverdue'] = 'Overdue';

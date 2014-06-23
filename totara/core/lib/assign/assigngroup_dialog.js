@@ -52,9 +52,8 @@ M.totara_assigngroupdialog = M.totara_assigngroupdialog || {
                 }
             }
         }
-
         // check jQuery dependency is available
-        if (typeof $ === 'undefined') {
+        if (typeof $ == 'undefined') {
             throw new Error('M.totara_assigngroupdialog.init()-> jQuery dependency required for this module.');
         }
 
@@ -126,9 +125,12 @@ M.totara_assigngroupdialog = M.totara_assigngroupdialog || {
 var assigngroup_handler_responsefunc = function(response) {
 
     if (response.substr(0,4) == 'DONE') {
+        if (response.lastIndexOf('updatestr') != -1) {
+            var start = response.lastIndexOf('updatestr');
+        }
+
         // Get all root elements in response
         var els = $(response.substr(4));
-
         // If we're adding a new group, insert it
         if (this.responsetype == 'newgroup') {
             this.responsegoeshere.replaceWith(els);
@@ -138,6 +140,11 @@ var assigngroup_handler_responsefunc = function(response) {
             if (oTable) {
                 oTable.fnClearTable();
             }
+        }
+
+        var notice = document.getElementById('notlivenotice');
+        if (notice !== null ) {
+            notice.innerHTML = M.totara_assigngroupdialog.config.notice;
         }
 
         // Close dialog

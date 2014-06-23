@@ -45,6 +45,7 @@ $assignclass = new $assignclassname($module, $appraisal);
 $users = $assignclass->get_current_users($ssearch, $idisplaystart, $idisplaylength);
 $igrandtotal = $assignclass->get_current_users_count();
 $idisplaytotal = $assignclass->get_current_users_count($ssearch);
+$emptyassignments = get_string('emptyassignments', 'totara_appraisal');
 
 // Since we only have one page we can save to an array.
 $userdata = array();
@@ -55,21 +56,25 @@ $users->close();
 
 // Get group info for the users on this page.
 $groupinfo = $assignclass->get_group_assignedvia_details(array_keys($userdata));
+
 $aadata = array();
 foreach ($userdata as $userid => $user) {
-    // Check for deleted users.
-    if (isset($groupinfo[$userid])) {
-        $url = new moodle_url('/user/view.php', array('id' => $user->id));
-        $link = html_writer::link($url, fullname($user));
-        $assignvia = array();
-        if (!empty($groupinfo)) {
-            foreach ($groupinfo[$userid] as $groupid => $groupstring) {
-                $assignvia[] = $groupstring;
-            }
+    $url = new moodle_url('/user/view.php', array('id' => $user->id));
+    $link = html_writer::link($url, fullname($user));
+
+    $assignvia = array();
+    if (!empty($groupinfo[$userid])) {
+        foreach ($groupinfo[$userid] as $groupid => $groupstring) {
+            $assignvia[] = $groupstring;
         }
-        $assignviastring = implode(', ', $assignvia);
-        $aadata[] = array($link, $assignviastring);
     }
+    if (empty($assignvia)) {
+        $assignviastring = $emptyassignments;
+    } else {
+        $assignviastring = implode(', ', $assignvia);
+    }
+
+    $aadata[] = array($link, $assignviastring);
 }
 
 $output = array(

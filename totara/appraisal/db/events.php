@@ -34,17 +34,14 @@ if (!defined('MOODLE_INTERNAL')) {
 $observers = array(
     array(
         'eventname' => '\totara_appraisal\event\appraisal_activation',
-        'callback'=> 'appraisal_event_handler::appraisal_activation',
-        'includefile' => '/totara/appraisal/lib.php',
+        'callback' => 'totara_appraisal_observer::appraisal_activation',
     ),
     array(
         'eventname' => '\totara_appraisal\event\appraisal_stage_completion',
-        'callback'=> 'appraisal_event_handler::appraisal_stage_completion',
-        'includefile' => '/totara/appraisal/lib.php',
+        'callback' => 'totara_appraisal_observer::appraisal_stage_completion',
     ),
     array(
         'eventname' => '\core\event\user_deleted',
-        'callback'=> 'appraisal_event_handler::appraisal_user_deleted',
-        'includefile' => '/totara/appraisal/lib.php',
+        'callback' => 'totara_appraisal_observer::user_deleted',
     ),
 );

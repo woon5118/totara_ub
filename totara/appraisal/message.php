@@ -135,6 +135,11 @@ switch ($action) {
 }
 
 $output = $PAGE->get_renderer('totara_appraisal');
+
+$title = $PAGE->title . ': ' . $appraisal->name;
+$PAGE->set_title($title);
+$PAGE->set_heading($appraisal->name);
+$PAGE->navbar->add($appraisal->name);
 echo $output->header();
 echo $output->heading($appraisal->name);
 echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
