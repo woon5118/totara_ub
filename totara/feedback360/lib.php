@@ -1547,6 +1547,63 @@ class feedback360_responder {
 class feedback360_exception extends Exception {
 }
 
+/**
+ * Listener for feedback360 specific events.
+ */
+class feedback360_event_handler {
+    /**
+     * User deleted message handler
+     *
+     * @param \totara_appraisal\event\appraisal_user_deleted $event
+     */
+    public static function feedback360_user_deleted(\core\event\user_deleted $event) {
+        global $DB;
+
+        $userid = $event->objectid;
+        // Wipe data in feedback360 assigned to this user.
+        $transaction = $DB->start_delegated_transaction();
+        $userassignments = $DB->get_records('feedback360_user_assignment', array('userid' => $userid));
+        $assignments = array();
+        // Find all the responses from other users TO this user.
+        foreach ($userassignments as $userassignment) {
+            $assignmentid = $userassignment->id;
+            $assignments[] = $assignmentid;
+            $feedback360id = $userassignment->feedback360id;
+            // Check for related email_assignments and delete them.
+            $sql = "SELECT feedback360emailassignmentid FROM {feedback360_resp_assignment}
+                     WHERE feedback360userassignmentid = ?
+                       AND feedback360emailassignmentid IS NOT NULL";
+            if ($emails = $DB->get_fieldset_sql($sql, array($assignmentid))) {
+                $DB->delete_records_list('feedback360_email_assignment', 'id', $emails);
+            }
+            // Get all resp_assignments from other users TO this user and clean up scale and question data.
+            if ($responses = $DB->get_records('feedback360_resp_assignment', array('feedback360userassignmentid' => $assignmentid))) {
+                foreach ($responses as $response) {
+                    $DB->delete_records('feedback360_scale_data', array('feedback360respassignmentid' => $response->id));
+                    $DB->delete_records('feedback360_quest_data_' . $feedback360id, array('feedback360respassignmentid' => $response->id));
+                }
+            }
+        }
+        // Now remove all the resp_assignments above in one query.
+        $DB->delete_records_list('feedback360_resp_assignment', 'feedback360userassignmentid', $assignments);
+
+        // Clean up responses for other users requested FROM this user.
+        $sql = "SELECT fra.id, fua.feedback360id FROM {feedback360_resp_assignment} fra
+                  JOIN {feedback360_user_assignment} fua ON fra.feedback360userassignmentid = fua.id
+                 WHERE fra.userid = ?";
+            if ($responses = $DB->get_records_sql($sql, array($userid))) {
+            foreach ($responses as $response) {
+                $feedback360id = $response->feedback360id;
+                $DB->delete_records('feedback360_scale_data', array('feedback360respassignmentid' => $response->id));
+                $DB->delete_records('feedback360_quest_data_' . $feedback360id, array('feedback360respassignmentid' => $response->id));
+            }
+        }
+        // Finally clean up this users assignments and responses.
+        $DB->delete_records('feedback360_resp_assignment', array('userid' => $userid));
+        $DB->delete_records('feedback360_user_assignment', array('userid' => $userid));
+        $transaction->allow_commit();
+    }
+}
 
 /**
  * Serves the folder files.

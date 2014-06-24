@@ -32,5 +32,10 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
 }
 
-$handlers = array (
+$observers = array (
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback'=> 'feedback360_event_handler::feedback360_user_deleted',
+        'includefile' => '/totara/feedback360/lib.php',
+    ),
 );

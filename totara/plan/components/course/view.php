@@ -205,7 +205,7 @@ if ($objectivesenabled) {
 echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
 
 // Comments
-echo $OUTPUT->heading(get_string('comments', 'totara_plan'), 3);
+echo $OUTPUT->heading(get_string('comments', 'totara_plan'), 3, null, 'comments');
 require_once($CFG->dirroot.'/comment/lib.php');
 comment::init();
 $options = new stdClass;

@@ -55,7 +55,7 @@ $includechildren = optional_param('includechildren', false, PARAM_BOOL);
 
 // No javascript parameters.
 $nojs = optional_param('nojs', false, PARAM_BOOL);
-$returnurl = urldecode(optional_param('returnurl', '', PARAM_LOCALURL));
+$returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 $context = context_system::instance();
 $strfindgoals = get_string('findgoals', 'totara_hierarchy');
 

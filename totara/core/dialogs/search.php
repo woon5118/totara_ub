@@ -36,17 +36,12 @@ $page       = optional_param('page', 0, PARAM_INT); // results page number
 $searchtype = $this->searchtype;
 
 // Trim whitespace off search query
-$query = urldecode(trim($query));
-
-// Clean query to remove xss vulnerabilities
-// urlencoded parameters will be missed by standard optional_param cleaning, so need to double-check after decoding
-// e.g. a urlencoded <script> in the query will appear to optional_param as %3Cscript%3E and be ignored
-$query = clean_param($query, PARAM_TEXT);
+$query = trim($query);
 
 // This url
 $data = array(
     'search'        => true,
-    'query'         => urlencode($query),
+    'query'         => $query,
     'searchtype'    => $searchtype,
     'page'          => $page
 );

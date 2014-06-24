@@ -4119,8 +4119,7 @@ class appraisal_message {
 
 
 /**
- * Listener for appraisal specific events
- * This class registered as listener in /totara/event/listeners.php
+ * Listener for appraisal specific events.
  */
 class appraisal_event_handler {
     /**
@@ -4145,6 +4144,37 @@ class appraisal_event_handler {
         }
     }
 
+    /**
+     * User deleted message handler
+     *
+     * @param \totara_appraisal\event\appraisal_user_deleted $event
+     */
+    public static function appraisal_user_deleted(\core\event\user_deleted $event) {
+        global $DB;
+
+        $userid = $event->objectid;
+        $transaction = $DB->start_delegated_transaction();
+        $context = context_system::instance();
+        $fs = get_file_storage();
+        // Wipe data in appraisals assigned to this user.
+        $userassignments = $DB->get_records('appraisal_user_assignment', array('userid' => $userid));
+        foreach ($userassignments as $userassignment) {
+            $appraisalid = $userassignment->appraisalid;
+            $userassignmentid = $userassignment->id;
+            // Get all role assignments for this userassignment.
+            $roleassignments = $DB->get_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassignmentid));
+            foreach ($roleassignments as $roleassignment) {
+                $roleassignmentid = $roleassignment->id;
+                $DB->delete_records('appraisal_scale_data', array('appraisalroleassignmentid' => $roleassignmentid));
+                $DB->delete_records('appraisal_quest_data_' . $appraisalid, array('appraisalroleassignmentid' => $roleassignmentid));
+                $DB->delete_records('appraisal_stage_data', array('appraisalroleassignmentid' => $roleassignmentid));
+                $fs->delete_area_files($context->id, 'totara_appraisal', 'snapshot_', $appraisalid, $roleassignmentid);
+            }
+            $DB->delete_records('appraisal_role_assignment', array('appraisaluserassignmentid' => $userassignmentid));
+        }
+        $DB->delete_records('appraisal_user_assignment', array('userid' => $userid));
+        $transaction->allow_commit();
+    }
 
     /**
      * Stage complete message handler
