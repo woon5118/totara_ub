@@ -60,7 +60,8 @@
     vertical-align: middle;
     white-space: nowrap;
     padding: 4px;
-    background-color: #f3f3f3 !important;
+    background-color: #f3f3f3;
+    display: inline-block;
 }
 
 /* Align the toolbar items, swapping sides in RTL languages */

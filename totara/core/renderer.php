@@ -352,26 +352,21 @@ class totara_core_renderer extends plugin_renderer_base {
             }
             echo html_writer::start_tag('tr', array('class' => $trclass));
             echo html_writer::start_tag('td', array('class' => 'toolbar', 'colspan' => $numcolumns));
-            // nested tables are unfortunately necessary to get IE support without nasty CSS hacks
 
-            // put right side first so it floats on top of left side when insufficent horizontal space
-            if (!empty($row['right'])) {
-                echo html_writer::start_tag('table', array('class' => 'toolbar-right-table'));
-                echo html_writer::start_tag('tr', array('class' => 'toolbar-row'));
-                foreach (array_reverse($row['right']) as $item) {
-                    echo html_writer::tag('td', $item, array('class' => 'toolbar-cell'));
-                }
-                echo html_writer::end_tag('tr');
-                echo html_writer::end_tag('table');
-            }
             if (!empty($row['left'])) {
-                echo html_writer::start_tag('table', array('class' => 'toolbar-left-table'));
-                echo html_writer::start_tag('tr', array('class' => 'toolbar-row'));
+                echo html_writer::start_tag('div', array('class' => 'toolbar-left-table'));
                 foreach ($row['left'] as $item) {
-                    echo html_writer::tag('td', $item, array('class' => 'toolbar-cell'));
+                    echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
                 }
-                echo html_writer::end_tag('tr');
-                echo html_writer::end_tag('table');
+                echo html_writer::end_tag('div');
+            }
+
+            if (!empty($row['right'])) {
+                echo html_writer::start_tag('div', array('class' => 'toolbar-right-table'));
+                foreach (array_reverse($row['right']) as $item) {
+                    echo html_writer::tag('div', $item, array('class' => 'toolbar-cell'));
+                }
+                echo html_writer::end_tag('div');
             }
             echo html_writer::end_tag('td');
             echo html_writer::end_tag('tr');
