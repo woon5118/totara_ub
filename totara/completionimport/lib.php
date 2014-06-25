@@ -601,6 +601,8 @@ function import_course($importname, $importtime) {
     $stats = array();
     $deletedcompletions = array();
     $completion_history = array();
+    $historicalduplicate = array();
+    $historicalrecordindb = array();
 
     $pluginname = 'totara_completionimport_' . $importname;
     $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
@@ -689,6 +691,18 @@ function import_course($importname, $importtime) {
                     $updateids = array();
                 }
 
+                if (!empty($historicalduplicate)) {
+                    // Update records as duplicated.
+                    update_errors_import($historicalduplicate, 'duplicate;', $tablename);
+                    $historicalduplicate = array();
+                }
+
+                if (!empty($historicalrecordindb)) {
+                    // Update records as already in db.
+                    update_errors_import($historicalrecordindb, 'completiondatesame;', $tablename);
+                    $historicalrecordindb = array();
+                }
+
                 // Reset enrol instance after enroling the users.
                 $enrolid = $course->enrolid;
                 $instance = $DB->get_record('enrol', array('id' => $enrolid));
@@ -775,9 +789,19 @@ function import_course($importname, $importtime) {
                 $history->userid = $historyrecord->userid;
                 $history->timecompleted = $historyrecord->timecompleted;
                 $history->grade = $historyrecord->rplgrade;
-                if (!array_key_exists($priorhistorykey, $completion_history) &&
-                    !$DB->record_exists('course_completion_history', (array) $history)) {
-                    $completion_history[$priorhistorykey] = $history;
+                if (!array_key_exists($priorhistorykey, $completion_history)) {
+                    $params = array(
+                        'courseid' => $history->courseid,
+                        'userid' => $history->userid,
+                        'timecompleted' => $history->timecompleted
+                    );
+                    if (!$DB->record_exists('course_completion_history', $params)) {
+                        $completion_history[$priorhistorykey] = $history;
+                    } else {
+                        $historicalrecordindb[] = $course->importid;
+                    }
+                } else {
+                    $historicalduplicate[] =  $course->importid;
                 }
             }
 
@@ -827,6 +851,18 @@ function import_course($importname, $importtime) {
                 WHERE id {$insql}";
         $DB->execute($sql, $params);
         $updateids = array();
+    }
+
+    if (!empty($historicalduplicate)) {
+        // Update records as duplicated.
+        update_errors_import($historicalduplicate, 'duplicate;', $tablename);
+        $historicalduplicate = array();
+    }
+
+    if (!empty($historicalrecordindb)) {
+        // Update records as already in db.
+        update_errors_import($historicalrecordindb, 'completiondatesame;', $tablename);
+        $historicalrecordindb = array();
     }
 
     return $errors;
@@ -1472,4 +1508,29 @@ function reset_import($importname) {
     } else {
         echo $OUTPUT->notification(get_string('resetfailed', 'totara_completionimport', $importname), 'notifyproblem');
     }
+}
+
+/**
+ * Update errors ocurred in the historic import.
+ *
+ * @param array $records Array of ids that need to be updated with the error message
+ * @param string $errormessage message for the error ocurred
+ * @param string $tablename Name of the import table
+ * @return bool result of the update operation
+ */
+function update_errors_import($records, $errormessage, $tablename) {
+    global $DB;
+
+    if (empty($records)) {
+        return false;
+    }
+
+    list($insql, $params) = $DB->get_in_or_equal($records, SQL_PARAMS_NAMED, 'param');
+    $params['errorstring'] = $errormessage;
+    $params['importerror'] = 1;
+    $sql = "UPDATE {{$tablename}}
+            SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
+                importerror = :importerror
+            WHERE id {$insql}";
+    return $DB->execute($sql, $params);
 }
