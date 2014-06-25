@@ -178,7 +178,7 @@ if (!isset($maturity)) {
 //setup totara version variables
 $totarainfo = totara_version_info($version, $release);
 if (!empty($totarainfo->totaraupgradeerror)){
-    print_error($totarainfo->totaraupgradeerror, 'totara_core');
+    print_error($totarainfo->totaraupgradeerror, 'totara_core', '', $totarainfo);
 }
 
 // Turn off xmlstrictheaders during upgrade.

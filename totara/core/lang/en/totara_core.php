@@ -144,6 +144,7 @@ $string['error:assignmentmoduleinstancelocked'] = 'You cannot make changes to an
 $string['error:assignmentprefixnotfound'] = 'Assignment class for group type {$a} not found';
 $string['error:assigntablenotexist'] = 'Assignment table {$a} does not exist!';
 $string['error:autoupdatedisabled'] = 'Automatic checking for Moodle updates is currently disabled in Totara';
+$string['error:cannotupgradefromnewermoodle'] = 'You cannot upgrade to Totara {$a->newtotaraversion} from this version of Moodle. Please use a newer version of Totara which is based on Moodle core {$a->oldversion} or above.';
 $string['error:cannotupgradefrommoodle'] = 'You cannot upgrade to Totara 2.4 from a Moodle version prior to 2.2.7. Please upgrade to Totara 2.2.13+ or Moodle 2.2.7+ first.';
 $string['error:cannotupgradefromtotara'] = 'You cannot upgrade to Totara 2.4 from this version of Totara. Please upgrade to Totara 2.2.13 or greater first.';
 $string['error:categoryidincorrect'] = 'Category ID was incorrect';
