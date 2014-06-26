@@ -5850,9 +5850,9 @@ class admin_setting_configdaymonthpicker extends admin_setting {
         // Default settings.
         $default = $this->get_defaultsetting();
 
-        if (!is_null($default)) {
-            $defaultday = substr($default, 0, 2);
-            $defaultmonth = substr($default, 2, 2);
+        if (is_array($default)) {
+            $defaultday = $default['d'];
+            $defaultmonth = $default['m'];
             $defaultinfo = date('j F', mktime(0, 0, 0, $defaultmonth, $defaultday, 0));
         } else {
             $defaultinfo = null;
