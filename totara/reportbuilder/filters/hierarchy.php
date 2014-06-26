@@ -261,8 +261,9 @@ class rb_filter_hierarchy extends rb_filter_type {
         );
         $title = $this->type . '-' . $this->value;
         $currentlyselected = json_encode(dialog_display_currently_selected(get_string('currentlyselected', 'totara_hierarchy'), $title));
-        $carg = "\"{$title}-currentlyselected\":{$currentlyselected}";
-        $jsdetails->args = array('args' => '{' . $carg . '}');
+        $arg = "\"{$title}-currentlyselected\":{$currentlyselected}";
+        $jsdetails->args = array('args' => '{"filter_to_load":"hierarchy",' . $arg . ',"hierarchytype":"' .
+                                            $this->options['hierarchytype'] . '"}');
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);

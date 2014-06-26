@@ -444,6 +444,26 @@ switch ($searchtype) {
         $search_info->params = $params;
         break;
 
+    /**
+     * Badge search
+     */
+    case 'badge':
+        // Generate search SQL
+        $keywords = totara_search_parse_keywords($query);
+        $fields = array('name', 'description', 'issuername');
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+
+        $search_info->fullname = "{badge}.name";
+        $search_info->sql = "
+            FROM
+                {badge}
+            WHERE
+                {$searchsql}
+        ";
+        $search_info->order = ' ORDER BY name ASC';
+        $search_info->params = $params;
+        break;
+
 
     case 'this':
         $keywords = totara_search_parse_keywords($query);

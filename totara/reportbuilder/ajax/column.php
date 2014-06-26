@@ -68,10 +68,16 @@ switch ($action) {
         break;
     case 'delete':
         $colid = required_param('cid', PARAM_INT);
+        $sql = 'SELECT rbc.*, rb.source
+                FROM {report_builder_columns} rbc
+                JOIN {report_builder} rb ON rbc.reportid = rb.id
+                WHERE rbc.id = ?';
+        $params = array($colid);
 
-        if ($column = $DB->get_record('report_builder_columns', array('id' => $colid))) {
+        if ($column = $DB->get_record_sql($sql, $params)) {
             $DB->delete_records('report_builder_columns', array('id' => $colid));
             reportbuilder_set_status($reportid);
+            $column->optgroup_label = get_string('type_' . $column->type, 'rb_source_' . $column->source);
             echo json_encode((array) $column);
         } else {
             echo false;

@@ -207,12 +207,13 @@ class rb_filter_hierarchy_multi extends rb_filter_type {
             'totara_hierarchy' => array('chooseposition', 'selected', 'chooseorganisation', 'currentlyselected', 'selectcompetency'),
             'totara_reportbuilder' => array('chooseorgplural', 'chooseposplural', 'choosecompplural')
         );
+        $jsdetails->args = array('args' => '{"filter_to_load":"hierarchy_multi"}');
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);
         }
 
-        $PAGE->requires->js_init_call($jsdetails->initcall, null, false, $jsdetails->jsmodule);
+        $PAGE->requires->js_init_call($jsdetails->initcall, $jsdetails->args, false, $jsdetails->jsmodule);
     }
 }
 

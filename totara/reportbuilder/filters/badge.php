@@ -1,4 +1,4 @@
-<?php //$Id$
+<?php
 /*
  * This file is part of Totara LMS
  *
@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Eugene Venter <eugene@catalyst.net.nz>
  * @package totara
  * @subpackage reportbuilder
  */
@@ -24,18 +25,18 @@
 require_once($CFG->dirroot.'/totara/reportbuilder/filters/lib.php');
 
 /**
- * Filter based on selecting multiple cohorts via a dialog
+ * Filter based on selecting multiple badges via a dialog
  */
-class rb_filter_cohort extends rb_filter_type {
+class rb_filter_badge extends rb_filter_type {
 
     /**
      * Returns an array of comparison operators
      * @return array of comparison operators
      */
-    function get_operators() {
-        return array(0 => get_string('isanyvalue','filters'),
-                     1 => get_string('matchesanyselected','filters'),
-                     2 => get_string('matchesallselected','filters'));
+    public function get_operators() {
+        return array(0 => get_string('isanyvalue', 'filters'),
+                     1 => get_string('matchesanyselected', 'filters'),
+                     2 => get_string('matchesallselected', 'filters'));
     }
 
     /**
@@ -48,9 +49,9 @@ class rb_filter_cohort extends rb_filter_type {
         $advanced = $this->advanced;
 
         $mform->addElement('static', $this->name.'_list', $label,
-            // container for currently selected cohorts
+            // Container for currently selected badges.
             '<div class="list-' . $this->name . '">' .
-            '</div>' . display_add_cohort_link($this->name));
+            '</div>' . display_add_badge_link($this->name));
 
         if ($advanced) {
             $mform->setAdvanced($this->name.'_list');
@@ -59,7 +60,7 @@ class rb_filter_cohort extends rb_filter_type {
         $mform->addElement('hidden', $this->name, '');
         $mform->setType($this->name, PARAM_SEQUENCE);
 
-        // set default values
+        // Set default values.
         if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
             $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
         }
@@ -69,19 +70,19 @@ class rb_filter_cohort extends rb_filter_type {
 
     }
 
-    function definition_after_data(&$mform) {
+    public function definition_after_data(&$mform) {
         global $DB;
         if ($ids = $mform->getElementValue($this->name)) {
 
-            if ($cohorts = $DB->get_records_select('cohort', "id IN ($ids)")) {
+            if ($badges = $DB->get_records_select('badge', "id IN ($ids)")) {
                 $out = html_writer::start_tag('div', array('class' => "list-".$this->name));
-                foreach ($cohorts as $cohort) {
-                    $out .= display_selected_cohort_item($cohort, $this->name);
+                foreach ($badges as $badge) {
+                    $out .= display_selected_badge_item($badge, $this->name);
                 }
                 $out .= html_writer::end_tag('div');
 
-                // link to add cohorts
-                $out .= display_add_cohort_link($this->name);
+                // Link to add badges.
+                $out .= display_add_badge_link($this->name);
 
                 $mform->setDefault($this->name.'_list', $out);
             }
@@ -93,11 +94,11 @@ class rb_filter_cohort extends rb_filter_type {
      * @param object $formdata data submited with the form
      * @return mixed array filter data or false when filter not set
      */
-    function check_data($formdata) {
-        $field    = $this->name;
+    public function check_data($formdata) {
+        $field = $this->name;
 
         if (isset($formdata->$field) && !empty($formdata->$field) ) {
-            return array('value'    => $formdata->$field);
+            return array('value' => $formdata->$field);
         }
 
         return false;
@@ -108,20 +109,19 @@ class rb_filter_cohort extends rb_filter_type {
      * @param array $data filter settings
      * @return string the filtering condition or null if the filter is disabled
      */
-    function get_sql_filter($data) {
+    public function get_sql_filter($data) {
         global $DB;
 
-        $items    = explode(',', $data['value']);
-        $query    = $this->get_field();
+        $items = explode(',', $data['value']);
+        $query = $this->get_field();
 
-        // don't filter if none selected
+        // Don't filter if none selected.
         if (empty($items)) {
-            // return 1=1 instead of TRUE for MSSQL support
+            // Return 1=1 instead of TRUE for MSSQL support.
             return array(' 1=1 ', array());
         }
 
-        // split by comma and look for any items
-        // within list
+        // Split by comma and look for any items within list.
         $res = array();
         $params = array();
         if (is_array($items)) {
@@ -150,17 +150,16 @@ class rb_filter_cohort extends rb_filter_type {
                     "    {$containslike} )\n";
 
                 $count++;
-
             }
         }
 
-        // none selected - match everything
+        // None selected - match everything.
         if (count($res) == 0) {
-            // using 1=1 instead of TRUE for MSSQL support
+            // Using 1=1 instead of TRUE for MSSQL support.
             return array(' 1=1 ', array());;
         }
 
-        // combine with OR logic (match any cohort)
+        // Combine with OR logic (match any badge).
         return array('(' . implode(' OR ', $res) . ')', $params);
     }
 
@@ -169,9 +168,9 @@ class rb_filter_cohort extends rb_filter_type {
      * @param array $data filter settings
      * @return string active filter label
      */
-    function get_label($data) {
+    public function get_label($data) {
         global $DB;
-        $value     = $data['value'];
+        $value = $data['value'];
         $values = explode(',', $value);
         $label = $this->label;
 
@@ -180,18 +179,18 @@ class rb_filter_cohort extends rb_filter_type {
         }
 
         $a = new stdClass();
-        $a->label    = $label;
+        $a->label = $label;
 
         $selected = array();
         list($insql, $inparams) = $DB->get_in_or_equal($values);
-        if ($cohorts = $DB->get_records_select('cohort', "id {$insql}", $inparams)) {
-            foreach ($cohorts as $cohort) {
-                $selected[] = '"' . format_string($cohort->name) . '"';
+        if ($badges = $DB->get_records_select('badge', "id {$insql}", $inparams)) {
+            foreach ($badges as $badge) {
+                $selected[] = '"' . format_string($badge->name) . '"';
             }
         }
 
         $orstring = get_string('or', 'totara_reportbuilder');
-        $a->value    = implode($orstring, $selected);
+        $a->value = implode($orstring, $selected);
 
         return get_string('selectlabelnoop', 'filters', $a);
     }
@@ -213,9 +212,9 @@ class rb_filter_cohort extends rb_filter_type {
         $jsdetails->jsmodule = array('name' => 'totara_reportbuilder_filterdialogs',
             'fullpath' => '/totara/reportbuilder/filter_dialogs.js');
         $jsdetails->strings = array(
-            'totara_cohort' => array('choosecohorts')
+            'badges' => array('choosebadges')
         );
-        $jsdetails->args = array('args' => '{"filter_to_load":"cohort"}');
+        $jsdetails->args = array('args' => '{"filter_to_load":"badge", "reportid":"' . $this->report->id . '"}');
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);
@@ -226,20 +225,24 @@ class rb_filter_cohort extends rb_filter_type {
 }
 
 /**
- * Given a cohort object returns the HTML to display it as a filter selection
+ * Given a badge object returns the HTML to display it as a filter selection
  *
- * @param object $cohort A cohort object containing id and name properties
+ * @param object $badge A badge object containing id and name properties
  * @param string $filtername The identifying name of the current filter
  *
  * @return string HTML to display a selected item
  */
-function display_selected_cohort_item($cohort, $filtername) {
-    global $OUTPUT;
+function display_selected_badge_item($badge, $filtername) {
+    global $CFG, $OUTPUT;
+    require_once($CFG->libdir.'/badgeslib.php');
     $strdelete = get_string('delete');
     $out = html_writer::start_tag('div', array('data-filtername' => $filtername,
-                                               'data-id' => $cohort->id,
+                                               'data-id' => $badge->id,
                                                'class' => 'multiselect-selected-item'));
-    $out .= format_string($cohort->name);
+    $bclass = new badge($badge->id);
+    $bcontext = $bclass->get_context();
+    $out .= print_badge_image($bclass, $bcontext) . format_string($badge->name) . ' (' .
+                                get_string("badgestatus_{$badge->status}", 'badges') . ')';
     $out .= html_writer::link('#', html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'),
                                                           'alt' => $strdelete,
                                                           'class' => 'delete-icon')), array('title' => $strdelete));
@@ -248,14 +251,14 @@ function display_selected_cohort_item($cohort, $filtername) {
 }
 
 /**
- * Helper function to display the 'add cohorts' link to the filter
+ * Helper function to display the 'add badges' link to the filter
  *
  * @param string $filtername Name of the form element
  *
  * @return string HTML to display the link
  */
-function display_add_cohort_link($filtername) {
-    return html_writer::start_tag('div', array('class' => 'rb-cohort-add-link')) .
-           html_writer::link('#', get_string('addcohorts', 'totara_reportbuilder'), array('id' => 'show-'.$filtername.'-dialog')) .
+function display_add_badge_link($filtername) {
+    return html_writer::start_tag('div', array('class' => 'rb-badge-add-link')) .
+           html_writer::link('#', get_string('addbadges', 'totara_reportbuilder'), array('id' => 'show-'.$filtername.'-dialog')) .
            html_writer::end_tag('div');
 }

@@ -37,6 +37,7 @@ $string['add'] = 'Add';
 $string['addanothercolumn'] = 'Add another column...';
 $string['addanotherfilter'] = 'Add another filter...';
 $string['addanothersearchcolumn'] = 'Add another search column...';
+$string['addbadges'] = 'Add badges';
 $string['addcohorts'] = 'Add audiences';
 $string['addedscheduledreport'] = 'Added new scheduled report';
 $string['addscheduledreport'] = 'Add scheduled report';

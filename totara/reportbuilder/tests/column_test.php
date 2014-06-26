@@ -493,6 +493,12 @@ class columns_test extends reportcache_advanced_testcase {
         'organisationid' => 1, 'positionid' => 1, 'assessorid' => 1, 'assessorname' => 'Name', 'fullname' => 'fullname', 'visible' => 1, 'type' => 1,
     );
 
+    protected $badges_issued = array(
+        'id' => 1, 'dateexpire' => 1432153671, 'dateissued' => 1332153671, 'issuernotified' => 1332153671, 'uniquehash' => '1-2', 'userid' => 2,
+        'idchar' => '', 'badgeimage' => '', 'issuername' => 'Issuer', 'issuercontact' => 'issuer@contac.com', 'name' => 'Badge1', 'type' => 1,
+        'status' => 1,
+    );
+
 
     protected function setUp() {
         parent::setup();
@@ -590,6 +596,7 @@ class columns_test extends reportcache_advanced_testcase {
             'certif_completion' => array($this->certif_completion_data),
             'certif_completion_history' => array($this->certif_completion_history_data),
             'course_completion_history' => array($this->course_completion_history_data),
+            'badge_issued' => array($this->badges_issued),
         )));
     }
 

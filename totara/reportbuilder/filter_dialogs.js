@@ -23,27 +23,27 @@
  */
 
 /**
- * Javascript file containing JQuery bindings for hierarchy dialog filters
+ * Javascript file containing JQuery bindings for hierarchy dialog filters.
  */
 
 M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
 
     Y: null,
-    // optional php params and defaults defined here, args passed to init method
-    // below will override these values
+    // Optional php params and defaults defined here, args passed to init method
+    // below will override these values.
     config: {},
 
     /**
-     * module initialisation method called by php js_init_call()
+     * Module initialisation method called by php js_init_call().
      *
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
     init: function(Y, args) {
-        // save a reference to the Y instance (all of its dependencies included)
+        // Save a reference to the Y instance (all of its dependencies included).
         this.Y = Y;
 
-        // if defined, parse args into this module's config object
+        // If defined, parse args into this module's config object.
         if (args) {
             var jargs = Y.JSON.parse(args);
             for (var a in jargs) {
@@ -53,174 +53,34 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
             }
         }
 
-        // check jQuery dependency is available
+        // Check jQuery dependency is available.
         if (typeof $ === 'undefined') {
             throw new Error('M.totara_reportbuilder_filterdialogs.init()-> jQuery dependency required for this module to function.');
         }
 
-        // do setup
+        // Do setup.
         this.rb_init_filter_dialogs();
     },
 
     rb_init_filter_dialogs: function() {
         config = this.config;
 
-        $('input.rb-filter-choose-pos').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
+        switch (config.filter_to_load) {
+            case "hierarchy":
+                this.rb_load_hierarchy_filters();
+                break;
+            case "badge":
+                this.rb_load_badge_filters();
+                break;
+            case "hierarchy_multi":
+                this.rb_load_hierarchy_multi_filters();
+                break;
+            case "cohort":
+                this.rb_load_cohort_filters();
+                break;
+        }
 
-            ///
-            /// Position dialog
-            ///
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
-
-                totaraSingleSelectDialog(
-                    id,
-                    M.util.get_string('chooseposition', 'totara_hierarchy') + config[id + '-currentlyselected'],
-                    url+'position.php?',
-                    id,
-                    id+'title'
-                );
-
-                // disable popup buttons if first pulldown is set to
-                // 'any value'
-                if ($('select[name='+id+'_op]').val() == 0) {
-                    $('input[name='+id+'_rec]').prop('disabled',true);
-                    $('#show-'+id+'-dialog').prop('disabled',true);
-                }
-            })();
-
-        });
-
-        $('input.rb-filter-choose-org').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
-
-            ///
-            /// Organisation dialog
-            ///
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
-
-                totaraSingleSelectDialog(
-                    id,
-                    M.util.get_string('chooseorganisation', 'totara_hierarchy') + config[id + '-currentlyselected'],
-                    url+'find.php?',
-                    id,
-                    id + 'title'
-                );
-
-                // disable popup buttons if first pulldown is set to
-                // 'any value'
-                if ($('select[name='+id+'_op]').val() == 0) {
-                    $('input[name='+id+'_rec]').prop('disabled',true);
-                    $('#show-'+id+'-dialog').prop('disabled',true);
-                }
-            })();
-
-        });
-
-        $('input.rb-filter-choose-comp').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
-
-            ///
-            /// Competency dialog
-            ///
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/competency/assign/';
-
-                totaraSingleSelectDialog(
-                    id,
-                    M.util.get_string('selectcompetency', 'totara_hierarchy')  + config[id + '-currentlyselected'],
-                    url+'find.php?',
-                    id,
-                    id+'title'
-                );
-
-                // disable popup buttons if first pulldown is set to
-                // 'any value'
-                if ($('select[name='+id+'_op]').val() == 0) {
-                    $('input[name='+id+'_rec]').prop('disabled',true);
-                    $('#show-'+id+'-dialog').prop('disabled',true);
-                }
-            })();
-
-        });
-
-
-
-        // bind multi-organisation report filter
-        $('div.rb-org-add-link a').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
-
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assignfilter/';
-
-                totaraMultiSelectDialogRbFilter(
-                    id,
-                    M.util.get_string('chooseorgplural', 'totara_reportbuilder'),
-                    url+'find.php?',
-                    url+'save.php?filtername='+id+'&ids='
-                );
-
-            })();
-
-        });
-
-
-        // bind multi-position report filter
-        $('div.rb-pos-add-link a').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
-
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assignfilter/';
-
-                totaraMultiSelectDialogRbFilter(
-                    id,
-                    M.util.get_string('chooseposplural', 'totara_reportbuilder'),
-                    url+'find.php?',
-                    url+'save.php?filtername='+id+'&ids='
-                );
-
-            })();
-
-        });
-
-
-        // bind multi-competency report filter
-        $('div.rb-comp-add-link a').each(function(i, el) {
-            var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
-            id = id.substr(5, id.length - 12);
-
-            (function() {
-                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/competency/assignfilter/';
-
-                totaraMultiSelectDialogRbFilter(
-                    id,
-                    M.util.get_string('choosecompplural', 'totara_reportbuilder'),
-                    url+'find.php?',
-                    url+'save.php?filtername='+id+'&ids='
-                );
-
-            })();
-
-        });
-
-        ///
-        /// Cohorts
-        ///
-
-        // activate the 'delete' option next to any selected items in filters
+        // Activate the 'delete' option next to any selected items in filters.
         $(document).on('click', '.multiselect-selected-item a', function(event) {
             event.preventDefault();
 
@@ -229,22 +89,177 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
             var id = container.data('id');
             var hiddenfield = $('input[name='+filtername+']');
 
-            // take this element's ID out of the hidden form field
+            // Take this element's ID out of the hidden form field.
             var ids = hiddenfield.val();
             var id_array = ids.split(',');
             var new_id_array = $.grep(id_array, function(n, i) { return n != id });
             var new_ids = new_id_array.join(',');
             hiddenfield.val(new_ids);
 
-            // remove this element from the DOM
+            // Remove this element from the DOM.
             container.remove();
+        });
+    },
 
+    rb_load_hierarchy_filters: function() {
+
+        switch (config.hierarchytype) {
+            case 'org':
+                $('input.rb-filter-choose-org').each(function(i, el) {
+                    var id = $(this).attr('id');
+                    // Remove 'show-' and '-dialog' from ID.
+                    id = id.substr(5, id.length - 12);
+
+                    ///
+                    /// Organisation dialog.
+                    ///
+                    (function() {
+                        var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assign/';
+
+                        totaraSingleSelectDialog(
+                            id,
+                            M.util.get_string('chooseorganisation', 'totara_hierarchy') + config[id + '-currentlyselected'],
+                            url + 'find.php?',
+                            id,
+                            id + 'title'
+                        );
+
+                        // Disable popup buttons if first pulldown is set to 'any value'.
+                        if ($('select[name=' + id + '_op]').val() == 0) {
+                            $('input[name=' + id + '_rec]').prop('disabled', true);
+                            $('#show-' + id + '-dialog').prop('disabled', true);
+                        }
+                    })();
+                });
+
+                break;
+
+            case 'pos':
+                $('input.rb-filter-choose-pos').each(function(i, el) {
+                    var id = $(this).attr('id');
+                    // Remove 'show-' and '-dialog' from ID.
+                    id = id.substr(5, id.length - 12);
+
+                    ///
+                    /// Position dialog.
+                    ///
+                    (function() {
+                        var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assign/';
+
+                        totaraSingleSelectDialog(
+                            id,
+                            M.util.get_string('chooseposition', 'totara_hierarchy') + config[id + '-currentlyselected'],
+                            url + 'position.php?',
+                            id,
+                            id + 'title'
+                        );
+
+                        // Disable popup buttons if first pulldown is set to 'any value'.
+                        if ($('select[name=' + id + '_op]').val() == 0) {
+                            $('input[name=' + id + '_rec]').prop('disabled',true);
+                            $('#show-' + id + '-dialog').prop('disabled',true);
+                        }
+                    })();
+                });
+
+                break;
+
+            case 'comp':
+                $('input.rb-filter-choose-comp').each(function(i, el) {
+                    var id = $(this).attr('id');
+                    // Remove 'show-' and '-dialog' from ID.
+                    id = id.substr(5, id.length - 12);
+
+                    ///
+                    /// Competency dialog.
+                    ///
+                    (function() {
+                        var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/competency/assign/';
+
+                        totaraSingleSelectDialog(
+                            id,
+                            M.util.get_string('selectcompetency', 'totara_hierarchy')  + config[id + '-currentlyselected'],
+                            url + 'find.php?',
+                            id,
+                            id + 'title'
+                        );
+
+                        // Disable popup buttons if first pulldown is set to 'any value'.
+                        if ($('select[name=' + id + '_op]').val() == 0) {
+                            $('input[name=' + id + '_rec]').prop('disabled',true);
+                            $('#show-' + id + '-dialog').prop('disabled',true);
+                        }
+                    })();
+                });
+
+                break;
+        }
+
+    },
+
+    rb_load_hierarchy_multi_filters: function() {
+
+        // Bind multi-organisation report filter.
+        $('div.rb-org-add-link a').each(function(i, el) {
+            var id = $(this).attr('id');
+            // Remove 'show-' and '-dialog' from ID.
+            id = id.substr(5, id.length - 12);
+
+            (function() {
+                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/organisation/assignfilter/';
+
+                totaraMultiSelectDialogRbFilter(
+                    id,
+                    M.util.get_string('chooseorgplural', 'totara_reportbuilder'),
+                    url + 'find.php?',
+                    url + 'save.php?filtername=' + id + '&ids='
+                );
+            })();
         });
 
-        // loop through every 'add cohort' link binding to a dialog
+        // Bind multi-position report filter.
+        $('div.rb-pos-add-link a').each(function(i, el) {
+            var id = $(this).attr('id');
+            // Remove 'show-' and '-dialog' from ID.
+            id = id.substr(5, id.length - 12);
+
+            (function() {
+                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/position/assignfilter/';
+
+                totaraMultiSelectDialogRbFilter(
+                    id,
+                    M.util.get_string('chooseposplural', 'totara_reportbuilder'),
+                    url + 'find.php?',
+                    url + 'save.php?filtername=' + id + '&ids='
+                );
+            })();
+        });
+
+
+        // Bind multi-competency report filter.
+        $('div.rb-comp-add-link a').each(function(i, el) {
+            var id = $(this).attr('id');
+            // Remove 'show-' and '-dialog' from ID.
+            id = id.substr(5, id.length - 12);
+
+            (function() {
+                var url = M.cfg.wwwroot + '/totara/hierarchy/prefix/competency/assignfilter/';
+
+                totaraMultiSelectDialogRbFilter(
+                    id,
+                    M.util.get_string('choosecompplural', 'totara_reportbuilder'),
+                    url + 'find.php?',
+                    url + 'save.php?filtername=' + id + '&ids='
+                );
+            })();
+        });
+    },
+
+    rb_load_cohort_filters: function() {
+        // Loop through every 'add cohort' link binding to a dialog.
         $('div.rb-cohort-add-link a').each(function(i, el) {
             var id = $(this).attr('id');
-            // remove 'show-' and '-dialog' from ID
+            // Remove 'show-' and '-dialog' from ID.
             id = id.substr(5, id.length - 12);
 
             (function() {
@@ -254,11 +269,29 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
                     id,
                     M.util.get_string('choosecohorts', 'totara_cohort'),
                     url + 'find_cohort.php',
-                    url + 'save_cohort.php?filtername='+id+'&ids='
+                    url + 'save_cohort.php?filtername=' + id + '&ids='
                 );
             })();
-
         });
+    },
 
-    }  // init_filter_dialogs
+    rb_load_badge_filters: function() {
+        // Loop through every 'add badge' link binding to a dialog.
+        $('div.rb-badge-add-link a').each(function(i, el) {
+            var id = $(this).attr('id');
+            // Remove 'show-' and '-dialog' from ID.
+            id = id.substr(5, id.length - 12);
+
+            (function() {
+                var url = M.cfg.wwwroot + '/totara/reportbuilder/ajax/';
+
+                totaraMultiSelectDialogRbFilter(
+                    id,
+                    M.util.get_string('choosebadges', 'badges'),
+                    url + 'find_badge.php?reportid=' + config.reportid + '&sesskey=' + M.cfg.sesskey,
+                    url + 'save_badge.php?filtername=' + id + '&sesskey=' + M.cfg.sesskey + '&ids='
+                );
+            })();
+        });
+    }
 }
