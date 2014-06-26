@@ -191,6 +191,7 @@ function xmldb_totara_core_install() {
     set_config('updateautodeploy', false);
     set_config('updateautocheck', false);
     set_config('updatenotifybuilds', false);
+    set_config('updateminmaturity', MATURITY_STABLE);
 
     // Disable editing execpaths by default for security.
     set_config('preventexecpath', '1');
