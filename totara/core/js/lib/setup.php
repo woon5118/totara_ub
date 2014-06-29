@@ -47,7 +47,13 @@ function local_js($options = array()) {
     // Include required javascript libraries
     // jQuery component and UI bundle found here: http://jqueryui.com/download
     // Core, Widget, Position, Dialog, Tabs, Datepicker, Effects Core, Effects "Fade"
-    $PAGE->requires->js('/totara/core/js/lib/jquery-2.1.0.min.js');
+
+    // Serve up latest jQuery if using something better than IE8.
+    if (!core_useragent::is_ie() || core_useragent::check_ie_version(9)) {
+        $PAGE->requires->js('/totara/core/js/lib/jquery-2.1.0.min.js');
+    } else {
+        $PAGE->requires->js('/totara/core/js/lib/jquery-1.9.1.min.js');
+    }
 
     // If UI
     if (in_array(TOTARA_JS_UI, $options)) {
