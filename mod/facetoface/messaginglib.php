@@ -193,29 +193,21 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
     $template .= "{$VEVENTS}";
     $template .= "END:VCALENDAR\r\n";
 
-    $ical = new stdClass();
-    $tempfilename = md5($template);
-    // Create dirs according stored_file->get_pathname_by_contenthash()
-    $dir1 = core_text::substr($tempfilename, 0, 2);
-    $dir2 = core_text::substr($tempfilename, 2, 2);
-    $ical->dir1 = $CFG->dataroot . '/filedir/' . $dir1;
-    if (!is_dir($ical->dir1)) {
-        mkdir($ical->dir1, 0777);
-    }
-    $ical->dir2 = $CFG->dataroot . '/filedir/' . $dir1 . '/' . $dir2;
-    if (!is_dir($ical->dir2)) {
-        mkdir($ical->dir2, 0777);
-    }
-    $tempfilepathname = $CFG->dataroot . '/filedir/' . $dir1 . '/' . $dir2 . '/' . $tempfilename;
-    file_put_contents($tempfilepathname, $template);
-
-    // Prepare data for message_send()
-    $fr = new stdClass();
-    $fr->contenthash = $tempfilename;
+    // TODO: this is stolen from file_get_unused_draft_itemid(), replace once messaging accepts real files or strings.
+    $contextid = context_user::instance($user->id)->id;
     $fs = get_file_storage();
-    $file = new stored_file($fs, $fr, $CFG->dataroot . '/filedir');
+    $draftitemid = rand(1, 999999999);
+    while ($files = $fs->get_area_files($contextid, 'user', 'draft', $draftitemid)) {
+        $draftitemid = rand(1, 999999999);
+    }
+    // TODO: let's just fake the draft area here because it will get automatically cleanup up later in cron if necessary.
+    $file = $fs->create_file_from_string(
+        array('contextid' => $contextid, 'component' => 'user', 'filearea' => 'draft',
+              'itemid' => $draftitemid, 'filepath' => '/', 'filename' => 'ical.ics'),
+        $template
+    );
 
-    $ical->filename = $tempfilepathname;
+    $ical = new stdClass();
     $ical->file = $file;
     $ical->content = $template;
     return $ical;
