@@ -888,7 +888,9 @@ function import_certification($importname, $importtime) {
             JOIN {prog} p ON {$shortnameoridnumber}
             {$sqlwhere}
             AND NOT EXISTS (SELECT pa.id FROM {prog_user_assignment} pa
-                WHERE pa.programid = p.id AND pa.userid = u.id)";
+                WHERE pa.programid = p.id AND pa.userid = u.id)
+            AND NOT EXISTS (SELECT pfa.id FROM {prog_future_user_assignment} pfa
+                WHERE pfa.programid = p.id AND pfa.userid = u.id )";
 
     $assignments = $DB->get_recordset_sql($sql, $params);
 
@@ -896,8 +898,7 @@ function import_certification($importname, $importtime) {
     $assignments->close();
 
     // Now get the records to import.
-    $params = $stdparams;
-    $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttype2' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
+    $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
     $sql = "SELECT DISTINCT i.id as importid,
                     i.completiondate,
                     p.id AS progid,
@@ -911,19 +912,21 @@ function import_certification($importname, $importtime) {
                     cc.id AS ccid,
                     pc.id AS pcid,
                     pua.id AS puaid,
+                    pfa.id AS pfaid,
                     cc.timecompleted AS currenttimecompleted
             FROM {{$tablename}} i
             LEFT JOIN {prog} p ON {$shortnameoridnumber}
             LEFT JOIN {certif} c ON c.id = p.certifid
             LEFT JOIN {user} u ON u.username = i.username
             LEFT JOIN {prog_assignment} pa ON pa.programid = p.id
-                                        AND ((pa.assignmenttype = :assignmenttype
-                                            AND pa.assignmenttypeid = u.id)
-                                        OR (pa.assignmenttype != :assignmenttype2))
+            LEFT JOIN {prog_user_assignment} pua ON pua.assignmentid = pa.id AND pua.userid = u.id AND pua.programid = p.id
+            LEFT JOIN {prog_future_user_assignment} pfa ON pfa.assignmentid = pa.id AND pfa.userid = u.id AND pfa.programid = p.id
             LEFT JOIN {certif_completion} cc ON cc.certifid = c.id AND cc.userid = u.id
             LEFT JOIN {prog_completion} pc ON pc.programid = p.id AND pc.userid = u.id AND pc.coursesetid = 0
-            LEFT JOIN {prog_user_assignment} pua ON pua.assignmentid = pa.id AND pua.userid = u.id AND pua.programid = p.id
             {$sqlwhere}
+            AND ((pa.assignmenttype = :assignmenttype AND pa.assignmenttypeid = u.id)
+              OR (pfa.userid = u.id AND pfa.assignmentid IS NOT NULL)
+              OR (pua.userid = u.id AND pua.assignmentid IS NOT NULL))
             ORDER BY p.id";
 
     $insertcount = 1;
@@ -1133,17 +1136,19 @@ function import_certification($importname, $importtime) {
             $puadata->timeassigned = time();
             $puadata->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
 
-            if (empty($program->puaid)) {
-                if (!isset($priorua[$priorkey])) {
-                    $pua[] = $puadata;
-                    $priorua[$priorkey] = $puadata;
-                }
-            } else {
-                // Do not waste time updating record again if we have already processed this user.
-                if (!isset($priorua[$priorkey])) {
-                    $puadata->id = $program->puaid;
-                    $DB->update_record('prog_user_assignment', $puadata);
-                    $priorua[$priorkey] = $puadata;
+            if (empty($program->pfaid)) {
+                if (empty($program->puaid)) {
+                    if (!isset($priorua[$priorkey])) {
+                        $pua[] = $puadata;
+                        $priorua[$priorkey] = $puadata;
+                    }
+                } else {
+                    // Do not waste time updating record again if we have already processed this user.
+                    if (!isset($priorua[$priorkey])) {
+                        $puadata->id = $program->puaid;
+                        $DB->update_record('prog_user_assignment', $puadata);
+                        $priorua[$priorkey] = $puadata;
+                    }
                 }
             }
 
