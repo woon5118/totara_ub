@@ -23,9 +23,28 @@
  */
 
 function tcohort_cron() {
+
+    // Check if we need to sync audience memberships.
+    $trace = new text_progress_trace();
+    $syncmembers = true;
     $timenow = time();
-    mtrace(date("H:i:s", $timenow).' Sending queued cohort notifications...');
+    $hourlycron = 60 * 60; // one hour.
+    $lasthourlycron = get_config('totara_cohort', 'lasthourlycron');
+    if ($lasthourlycron && ($timenow - $lasthourlycron <= $hourlycron)) {
+        // Not enough time has elapsed to rerun hourly cron.
+        $trace->output("No need to run cohort member hourly sync - has already been run recently.");
+        if (isset($CFG->debugcron) && $CFG->debugcron) {
+            $trace->output("DEBUG - run cohort member syncing anyway");
+        } else {
+            $syncmembers = false;
+        }
+    }
+    if ($syncmembers) {
+        $trace->output(date("H:i:s", time()).' Syncing dynamic audience members');
+        totara_cohort_check_and_update_dynamic_cohort_members(null, $trace);
+    }
+
+    $trace->output(date("H:i:s", time()).' Sending queued cohort notifications...');
     totara_cohort_send_queued_notifications();
-    mtrace(date("H:i:s", $timenow). ' Finished sending queued cohort notifications...');
-    $timenow = time();
+    $trace->output(date("H:i:s", time()). ' Finished sending queued cohort notifications...');
 }

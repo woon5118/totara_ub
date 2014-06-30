@@ -869,6 +869,14 @@ function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progre
             $trace->output($e->getMessage());
         }
     } // foreach
+
+    // Set lastrun time to be checked by totara_cohort cron - if $courseid is null we have arrived here from cron.
+    if (empty($courseid)) {
+        $timenow = time();
+        if (!set_config('lasthourlycron', $timenow, 'totara_cohort')) {
+            $trace->output("Error: could not update lasthourlycron timestamp for totara_cohort plugin.");
+        }
+    }
 }
 
 
