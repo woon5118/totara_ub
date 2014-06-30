@@ -152,6 +152,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
                         if (!$unfinished) {
                             // Mark this appraisal as complete.
                             $DB->set_field('appraisal', 'status', appraisal::STATUS_COMPLETED, array('id' => $role->appraisalid));
+                            $DB->set_field('appraisal', 'timefinished', $now, array('id' => $role->appraisalid));
                         }
                     }
                 }
