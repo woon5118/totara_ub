@@ -318,6 +318,7 @@ JS;
         $strvar->join = $COHORT_RULES_OP_IN_LIST[$this->equal];
 
         // Show list of values only if the rule is different from "is_empty"
+        $strvar->vars = '';
         if ($this->equal != COHORT_RULES_OP_IN_ISEMPTY) {
             $strvar->vars = '"' . htmlspecialchars(implode('", "', $this->listofvalues)) . '"';
         }
@@ -807,7 +808,7 @@ JS;
                 break;
         }
 
-        $strvar->vars = ' ' . get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
+        $strvar->vars = get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
 
         return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
@@ -1480,7 +1481,7 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
                 $a = $this->date;
                 break;
         }
-        $strvar->join = ' ' . get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a) . ' ';
+        $strvar->join = get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a);
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
