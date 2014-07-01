@@ -59,6 +59,13 @@ function xmldb_totara_mssql_install() {
 }
 
 /**
+ * Retry the install if it failed previously.
+ */
+function xmldb_totara_mssql_install_recovery() {
+    xmldb_totara_mssql_install();
+}
+
+/**
  * Check that database user has enought permission for database upgrade
  * @param  $result
  */
