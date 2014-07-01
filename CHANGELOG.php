@@ -4,6 +4,37 @@
 Totara LMS Changelog
 
 
+Release 2.6.4 (1st July 2014):
+==================================================
+
+Improvements:
+    T-12605        Added logic to serve older versions of jquery to older versions of IE
+    T-12497        Improved internationalisation for the display of audience rules
+    T-12527        Added username of creator to Facetoface report and improved logging of attendees actions
+
+Database Upgrades:
+    T-12578        Added the ability to continue appraisals with missing roles
+    T-11887        Fixed display of appraisals after a user has been deleted
+
+Bug Fixes:
+    T-12521        Fixed dynamic audiences not updating if the cohort enrolment plugin is disabled
+    T-12538        Fixed category drop down selector not working correctly when creating programs
+    T-12570        Fixed the sending of Program messages when completion is set relative to an action
+    T-12479        Fixed the activate link incorrectly showing while viewing closed feedback360
+    T-12509        Fixed historical course completion records not showing on the my team tab
+    T-12563        Changed the default "temporary manager restrict selection" setting to "all users" for new installs
+    T-12572        Added check to ensure generator columns can not be added to the same report multiple times
+    T-12498        Fixed the display of custom field names for audience rules
+    T-12156        Fixed cancellation message when F2F activity email notifications are turned off
+    T-12571        Fixed the view hidden courses capability in the enhanced catalog
+    T-12488        Fixed dynamic audiences showing on the 'add to audiences' option in bulk user actions
+    T-12465        Fixed duplicate records issue when importing more than 250 course completion records
+    T-12500        Fixed the incorrect use of urldecode function on page parameters
+    T-12372        Fixed learning plan comments linking to the wrong components
+    T-12387        Fixed the page title for program/certification searches
+    T-12531        Fixed the formatting of the heading for facetoface attendance exports
+
+
 Release 2.6.3 (17th June 2014):
 ==================================================
 
