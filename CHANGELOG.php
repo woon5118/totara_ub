@@ -47,6 +47,7 @@ Improvements:
     T-12385    Added content filter to user reports to allow temporary managers to see their staff
     T-12530    Added room filter to Facetoface session view page
     T-12544    Added admin page to check current role capabilities against the installation defaults
+    T-12494    Added ability to edit/delete evidence items created through course completion upload - Requires role with totara/plan:accessanyplan or totara/plan:editsiteevidence capabilities
 
 Bug Fixes:
     T-12303    Fixed duplicated text on upgrade screen
@@ -67,6 +68,7 @@ Bug Fixes:
     T-12512    Fixed column options in Appraisal Details report
     T-12492    Fixed Record of Learning Evidence report when using "show records based on users" option
     T-12526    Fixed PHP undefined property error in Record of Learning Evidence report
+    T-12242    Fixed file saving on scheduled reports when "Export to filesystem" is disabled at site level
     T-12525    Fixed errors with Facetoface attendance report export to CSV
     T-12320    Fixed Facetoface iCal attachment line breaks in long descriptions
     T-11816    Fixed display of Articulate Storyline SCORMS in iPads - use new display setting of "New Window (simple)"
@@ -88,7 +90,9 @@ Bug Fixes:
     T-12467    Fixed display of SCORM packages on secure HTTPS sites
     T-12463    Fixed critical SCORM error where subsequent attempts after an initial failed attempt are not recorded
     T-12471    Fixed display of grades in Course Completion Report for grades uploaded by completion import tool
+    T-12444    Fixed course completion import report sometimes returning zero records
     T-12469    Fixed sending of notifications when a Facetoface booking date/time is changed
+    T-12277    Fixed Face-to-face reminders still being sent to users who have cancelled from a session
     T-12121    Fixed transaction error when quiz completion triggers sending of messages
     T-12307    Fixed days not being translated in weekly scheduled reports
     T-12327    Fixed issue with dialog boxes being too wide for some screens
@@ -123,6 +127,7 @@ Improvements:
     T-12375    Improved accessibility by combining links under My Reports
     T-12399    Improved look of the events filter on the calendar page
     T-12433    Show participants in appraisal overview page and pdf snapshots
+    T-12201    Improved clarity of Audience Visibility language strings
 
 Bug Fixes:
     T-12307    Fixed days not being translated in weekly scheduled reports
@@ -133,9 +138,11 @@ Bug Fixes:
     T-12234    Fixed highlight effect on Kiwifruit themes
     T-12446    Fixed display issue where save search button was overlaying column headers
     T-12326    Recover activity completion, grade and previous course completion data
+    T-12246    Fixed course completion data reset for all users when a course is used as content in a certification
     T-12314    Fixed unknown column error when creating a program with multi_select custom field
     T-12434    The search and clear button on the find courses now are hidden immediately
     T-12278    Fixed facetoface attendance export not showing data if a users do not have a manager assigned to them
+    T-12254    Fixed sort order of Facetoface attendees and requested users in Feedback360
     T-12248    Fixed SCORM redirect when it is opened in a new window
     T-12318    Fixed issue where custom field menus did not work as expected in responsive themes
     T-12310    Fixed display of custom field images in the enhanced catalog
