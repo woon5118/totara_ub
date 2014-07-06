@@ -23,6 +23,7 @@
  */
 
 function tcohort_cron() {
+    global $CFG;
 
     // Check if we need to sync audience memberships.
     $trace = new text_progress_trace();
