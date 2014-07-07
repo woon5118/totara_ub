@@ -262,9 +262,6 @@ class program {
     public function update_learner_assignments() {
         global $DB, $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
-//         // Get the total time allowed for this program
-//         $total_time_allowed = $this->content->get_total_time_allowance(CERTIFPATH_CERT);
-
         // Get program assignments
         $prog_assignments = $this->assignments->get_assignments();
         if (!$prog_assignments) {
@@ -345,6 +342,12 @@ class program {
 
                         // Create user assignment object
                         $current_assignment = new user_assignment($user->id, $user_assign_data->assignmentid, $this->id);
+
+                        // Skip resolved and dismissed exceptions to allow users to override group duedates.
+                        $skipstatus = array(PROGRAM_EXCEPTION_RESOLVED, PROGRAM_EXCEPTION_DISMISSED);
+                        if (isset($user_assign_data->exceptionstatus) && in_array($user_assign_data->exceptionstatus, $skipstatus)) {
+                            continue;
+                        }
 
                         if (!empty($current_assignment->completion) && $timedue != $current_assignment->completion->timedue) {
                             // The timedue has changed, we'll need to update it and check for exceptions.
