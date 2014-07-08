@@ -201,6 +201,20 @@ class facetoface_notification extends data_object {
         }
     }
 
+    /**
+    * Delete notification and any associated sent message data.
+    *
+    * @access public
+    * @return bool
+    */
+    public function delete() {
+        global $DB;
+        //Delete message sent and history data.
+        $DB->delete_records('facetoface_notification_sent', array('notificationid' => $this->id));
+        $DB->delete_records('facetoface_notification_hist', array('notificationid' => $this->id));
+        // Call main delete function in parent data_object class.
+        parent::delete();
+    }
 
     /**
      * Get timestamp from schedule data
