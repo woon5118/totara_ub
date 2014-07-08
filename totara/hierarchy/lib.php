@@ -1584,12 +1584,10 @@ class hierarchy {
      * @param object $newitem An object containing details to be updated
      *                        Only a parentid is required to update the items location, other data such as
      *                        depthlevel, sortthread, path, etc will be handled internally
-     * @deprecated boolean $escapeitem If true, the $newitem object will be escaped before being passed to
-     *                            update_record(). If passing data from a form that has already been escaped,
-     *                            this should be set to false. If passing in a raw object from a get_records()
-     *                            call, this should be true (the default)
      * @param boolean $usetransaction If true this function will use transactions (optional, default: true)
      * @param boolean $triggerevent If true, this command will trigger a "{$prefix}_added" event handler.
+     * @param boolean $removedesc If true this sets the description field to null,
+     *                            descriptions should be set by post-update editor operations
      *
      * @return object|false The updated item, or false if it could not be updated
      */
