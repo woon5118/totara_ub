@@ -551,7 +551,28 @@ class position_assignment extends data_object {
      * @return object data_object instance or false if none found.
      */
     public static function fetch($params) {
-        return self::fetch_helper('pos_assignment', __CLASS__, $params);
+        global $DB;
+        $position_assignment = self::fetch_helper('pos_assignment', __CLASS__, $params);
+        // If a record has been returned, do basic sanity checking.
+        if ($position_assignment) {
+            // If there is a manager assigned, check manager is valid.
+            if (!empty($position_assignment->managerid)) {
+                $validmanager = $DB->get_field('user', 'deleted', array('id' => $position_assignment->managerid));
+                if ($validmanager != 0) {
+                    $position_assignment->managerid = null;
+                    $position_assignment->reportstoid = null;
+                    $position_assignment->managerpath = null;
+                }
+            }
+            // If there is an appraiser assigned, check appraiser is valid.
+            if (!empty($position_assignment->appraiserid)) {
+                $validmanager = $DB->get_field('user', 'deleted', array('id' => $position_assignment->appraiserid));
+                if ($validmanager != 0) {
+                    $position_assignment->appraiserid = null;
+                }
+            }
+        }
+        return $position_assignment;
     }
 
     public function save($managerchanged = true) {

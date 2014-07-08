@@ -161,6 +161,8 @@ class hierarchy_event_handler {
                 foreach ($teammembers as $member) {
                     $pa = new position_assignment(array('userid' => $member, 'type' => $typeid));
                     $pa->managerid = null;
+                    $pa->reportstoid = null;
+                    $pa->managerpath = null;
                     $pa->save(true);
                 }
             }
