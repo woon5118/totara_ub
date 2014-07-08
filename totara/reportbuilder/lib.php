@@ -3612,9 +3612,9 @@ class reportbuilder {
         $row = 0;
         $col = 0;
         $dateformat = $workbook->add_format();
-        $dateformat->set_num_format('dd mmm yyyy');
+        $dateformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATE);
         $datetimeformat = $workbook->add_format();
-        $datetimeformat->set_num_format('dd mmm yyyy h:mm');
+        $datetimeformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
         if (is_array($restrictions) && count($restrictions) > 0) {
             $worksheet[0]->write($row, 0, get_string('reportcontents', 'totara_reportbuilder'));

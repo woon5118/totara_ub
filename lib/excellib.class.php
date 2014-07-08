@@ -48,6 +48,13 @@ class MoodleExcelWorkbook {
     protected $type;
 
     /**
+     * Define values for use with set_num_format function
+     * to set standard date and date time format
+    */
+    const NUMBER_FORMAT_STANDARD_DATE = 14;
+    const NUMBER_FORMAT_STANDARD_DATETIME = 22;
+
+    /**
      * Constructs one Moodle Workbook.
      *
      * @param string $filename The name of the file
