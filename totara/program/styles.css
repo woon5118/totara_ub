@@ -397,7 +397,8 @@ div#prog-completion-relative-date label {
     margin: 0;
 }
 @media screen and (min-width: 1200px) {
-    .course_list {
+    /* ul needed here as otherwise this affects the course listing block */
+    ul.course_list {
         margin: 0 0 0 -5%;
     }
 }
