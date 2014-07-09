@@ -1916,8 +1916,10 @@ abstract class rb_base_source {
         $fields = array(
             'firstname' => get_string('userfirstname', 'totara_reportbuilder'),
             'firstnamephonetic' => get_string('userfirstnamephonetic', 'totara_reportbuilder'),
+            'middlename' => get_string('usermiddlename', 'totara_reportbuilder'),
             'lastname' => get_string('userlastname', 'totara_reportbuilder'),
             'lastnamephonetic' => get_string('userlastnamephonetic', 'totara_reportbuilder'),
+            'alternatename' => get_string('useralternatename', 'totara_reportbuilder'),
             'username' => get_string('username', 'totara_reportbuilder'),
             'idnumber' => get_string('useridnumber', 'totara_reportbuilder'),
             'phone1' => get_string('userphone', 'totara_reportbuilder'),
@@ -2009,8 +2011,12 @@ abstract class rb_base_source {
         // auto-generate filters for user fields
         $fields = array(
             'fullname' => get_string('userfullname', 'totara_reportbuilder'),
-            'firstname' => get_string('firstname'),
-            'lastname' => get_string('lastname'),
+            'firstname' => get_string('userfirstname', 'totara_reportbuilder'),
+            'firstnamephonetic' => get_string('userfirstnamephonetic', 'totara_reportbuilder'),
+            'middlename' => get_string('usermiddlename', 'totara_reportbuilder'),
+            'lastname' => get_string('userlastname', 'totara_reportbuilder'),
+            'lastnamephonetic' => get_string('userlastnamephonetic', 'totara_reportbuilder'),
+            'alternatename' => get_string('useralternatename', 'totara_reportbuilder'),
             'username' => get_string('username'),
             'idnumber' => get_string('useridnumber', 'totara_reportbuilder'),
             'phone1' => get_string('userphone', 'totara_reportbuilder'),
