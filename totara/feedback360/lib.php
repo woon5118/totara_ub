@@ -1633,7 +1633,7 @@ function totara_feedback360_pluginfile($course, $cm, $context, $filearea, $args,
     }
 
     \core\session\manager::write_close();
-    send_stored_file($file, 60*60, 0, $forcedownload, $options);
+    send_stored_file($file, 60*60, 0, true, $options);
 }
 
 
