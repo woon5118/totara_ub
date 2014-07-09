@@ -87,9 +87,12 @@ class totara_question_renderer extends plugin_renderer_base {
         $anyitemset = reset($itemgroup);
         $anyitem = reset($anyitemset);
         if (isset($anyitem->planname)) {
-            $title = get_string('reviewnamewithplan', 'totara_question', $anyitem);
+            $a = new stdClass();
+            $a->fullname = format_string($anyitem->fullname);
+            $a->planname = format_string($anyitem->planname);
+            $title = get_string('reviewnamewithplan', 'totara_question', $a);
         } else {
-            $title = $anyitem->fullname;
+            $title = format_string($anyitem->fullname);
         }
         $form->addElement('html', html_writer::tag('h3', $title . $deleteicon,
                 array('class' => $form_prefix . '_' . $prefix . '_review')));

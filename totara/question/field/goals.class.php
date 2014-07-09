@@ -233,7 +233,7 @@ class question_goals extends reviewrating {
             // Check the appropriate permissions.
             if ($item->scope == goal::SCOPE_PERSONAL) {
                 // Check the personal permissions.
-                $caneditstatus = $can_edit[$goalitem->assigntype];
+                $caneditstatus = $can_edit_personal;
 
             } else {
                 // Check the company permissions.
@@ -247,13 +247,13 @@ class question_goals extends reviewrating {
                 $scalevalues = $DB->get_records('goal_scale_values', array('scaleid' => $scalevalue->scaleid));
                 $options = array();
                 foreach ($scalevalues as $scalevalue) {
-                    $options[$scalevalue->id] = $scalevalue->name;
+                    $options[$scalevalue->id] = format_string($scalevalue->name);
                 }
                 $name = $this->get_prefix_form() . '_scalevalueid_' . $item->itemid . '_' . $item->scope;
                 $form->addElement('select', $name, get_string('goalstatus', 'totara_question'), $options);
                 $form->setDefault($name, $scalevalueid);
             } else {
-                $form->addElement('static', '', get_string('goalstatus', 'totara_question'), $scalevalue->name);
+                $form->addElement('static', '', get_string('goalstatus', 'totara_question'), format_string($scalevalue->name));
             }
         }
     }
@@ -484,7 +484,7 @@ class question_goals extends reviewrating {
                     $todb->scalevalueid = $scalevalueid;
                     if ($goal->scope == goal::SCOPE_COMPANY && $can_edit_company) {
                         goal::update_goal_item($todb, goal::SCOPE_COMPANY);
-                    } else if ($goal->scope == goal::SCOPE_PERSONAL && $can_edit[$goal->assigntype]) {
+                    } else if ($goal->scope == goal::SCOPE_PERSONAL && $can_edit_personal) {
                         goal::update_goal_item($todb, goal::SCOPE_PERSONAL);
                     }
                 }

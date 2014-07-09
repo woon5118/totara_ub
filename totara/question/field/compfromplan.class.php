@@ -82,7 +82,7 @@ class question_compfromplan extends reviewrating {
             $scalevalueid = $comprecord->proficiency;
             $scalevalue = $DB->get_record('comp_scale_values', array('id' => $scalevalueid));
             $scaleid = $scalevalue->scaleid;
-            $scalevaluename = $scalevalue->name;
+            $scalevaluename = format_string($scalevalue->name);
         } else {
             $comp = $DB->get_record('comp', array('id' => $compassign->competencyid));
             $compscaleassign = $DB->get_record('comp_scale_assignments', array('frameworkid' => $comp->frameworkid));
@@ -96,7 +96,7 @@ class question_compfromplan extends reviewrating {
             $options = array();
             $options[0] = get_string('notset', 'totara_hierarchy');
             foreach ($scalevalues as $value) {
-                $options[$value->id] = $value->name;
+                $options[$value->id] = format_string($value->name);
             }
             $name = $this->get_prefix_form() . '_scalevalueid_' . $item->itemid;
             $form->addElement('select', $name, get_string('competencystatus', 'totara_question'), $options);
