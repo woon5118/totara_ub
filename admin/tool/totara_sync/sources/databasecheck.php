@@ -39,7 +39,9 @@ $dbtype = required_param('dbtype', PARAM_ALPHANUMEXT);
 $dbhost = optional_param('dbhost', '', PARAM_ALPHANUMEXT);
 $dbname = required_param('dbname', PARAM_ALPHANUMEXT);
 $dbuser = required_param('dbuser', PARAM_ALPHANUMEXT);
-$dbpass = optional_param('dbpass', '', PARAM_ALPHANUMEXT);
+// Passwords contain strange characters we dont clean it
+// this is only used to login to the database so should be safe.
+$dbpass = optional_param('dbpass', '', PARAM_RAW);
 
 echo $OUTPUT->header(); // Send headers.
 
