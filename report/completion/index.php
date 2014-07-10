@@ -127,17 +127,38 @@ if (!$completion->has_criteria()) {
     print_error('err_nocriteria', 'completion', $CFG->wwwroot.'/course/report.php?id='.$course->id);
 }
 
-// Get criteria and put in correct order
+// Get criteria and put in correct order.
 $criteria = array();
 
 foreach ($completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE) as $criterion) {
     $criteria[] = $criterion;
 }
+// Obtain the display order of activity modules.
+$sections = $DB->get_records('course_sections', array('course' => $course->id), 'section ASC', 'id, sequence');
+$moduleorder = array();
+foreach ($sections as $section) {
+    if (!empty($section->sequence)) {
+        $moduleorder = array_merge(array_values($moduleorder), array_values(explode(',', $section->sequence)));
+    }
+}
 
-foreach ($completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY) as $criterion) {
-    $criteria[] = $criterion;
-    if ($criterion->module && completion_module_rpl_enabled($criterion->module)) {
-        $criteria_with_rpl[] = $criterion->id;
+$modulecriteria = array();
+$activitycriteria = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_ACTIVITY);
+// Order resulting criteria by module.
+foreach ($activitycriteria as $criterion) {
+    if (!empty($criterion->moduleinstance)) {
+        $modulecriteria[$criterion->moduleinstance] = $criterion;
+    }
+}
+
+// Compare to the course module order to put the activities in the same order as on the course view.
+foreach($moduleorder as $module) {
+    // Some modules may not have completion criteria and can be ignored.
+    if (isset($modulecriteria[$module])) {
+        $criteria[] = $modulecriteria[$module];
+        if (completion_module_rpl_enabled($modulecriteria[$module]->module)) {
+            $criteria_with_rpl[] = $modulecriteria[$module]->id;
+        }
     }
 }
 
