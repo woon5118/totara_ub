@@ -104,12 +104,28 @@ class totara_sync_element_user extends totara_sync_element {
 
         $this->addlog(get_string('syncstarted', 'tool_totara_sync'), 'info', 'usersync');
 
-        if (!$synctable = $this->get_source_sync_table()) {
-            throw new totara_sync_exception('user', 'usersync', 'couldnotgetsourcetable');
+        try {
+            // This can go wrong in many different ways - catch as a generic exception.
+            $synctable = $this->get_source_sync_table();
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            if (debugging()) {
+                $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
+            }
+            totara_sync_log($this->get_name(), $msg, 'error', 'unknown');
+            return false;
         }
 
-        if (!$synctable_clone = $this->get_source_sync_table_clone($synctable)) {
-            throw new totara_sync_exception('user', 'usersync', 'couldnotcreateclonetable');
+        try {
+            // This can go wrong in many different ways - catch as a generic exception.
+            $synctable_clone = $this->get_source_sync_table_clone($synctable);
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            if (debugging()) {
+                $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
+            }
+            totara_sync_log($this->get_name(), $msg, 'error', 'unknown');
+            return false;
         }
 
         $this->set_customfieldsdb();
