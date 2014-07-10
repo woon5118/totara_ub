@@ -531,6 +531,49 @@ abstract class prog_assignment_category {
     }
 
     /**
+     * Remove user assignments from programs where users not longer belong to the category assignment.
+     *
+     * @param int $programid Program ID where users are assigned
+     * @param int $assignmenttypeid
+     * @param array $userids Array of user IDs that we want to remove
+     * @return bool $success
+     */
+    function remove_outdated_assignments($programid, $assignmenttypeid, $userids) {
+        global $DB;
+        $success = false;
+
+        // Do nothing if it's not a group assignment or the id of the assignment type is not given or no users are passed.
+        if ($this->id == ASSIGNTYPE_INDIVIDUAL) {
+            return $success;
+        }
+
+        if (empty($programid)) {
+            return $success;
+        }
+
+        if (empty($assignmenttypeid)) {
+            return $success;
+        }
+
+        if (empty($userids)) {
+            return $success;
+        }
+
+        list($sql, $params) = $DB->get_in_or_equal($userids);
+        $params[] = $programid;
+        $params[] = $this->id;
+        $params[] = $assignmenttypeid;
+
+        $sql = "DELETE FROM {prog_user_assignment}
+            WHERE userid {$sql}
+              AND programid = ?
+              AND assignmentid IN (SELECT id FROM {prog_assignment} WHERE assignmenttype = ? AND assignmenttypeid = ?)";
+        $success = $DB->execute($sql, $params);
+
+        return $success;
+    }
+
+    /**
      * Called when an assignment of this category is going to be added
      * @param $object
      */

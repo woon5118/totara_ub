@@ -288,13 +288,34 @@ class program {
                 $fassignusers = array();
                 $fassigncount = 0;
 
-                // Create instance of assignment type so we can call functions on it
+                // Create instance of assignment type so we can call functions on it.
                 $assignment_class = new $ASSIGNMENT_CATEGORY_CLASSNAMES[$assign->assignmenttype]();
 
-                // Get affected users
+                // Get affected users.
                 $affected_users = $assignment_class->get_affected_users_by_assignment($assign);
 
-                //get user assignments for current assignment
+                // Delete user assigned that no longer match the category assignment.
+                if (!empty($user_assignments)) {
+                    // Get prog_user_assignment records for this assignment.
+                    $select = "programid = ? AND assignmentid = ?";
+                    $params = array($this->id, $assign->id);
+                    $userassignments = $DB->get_fieldset_select('prog_user_assignment', 'userid', $select, $params);
+
+                    // Transform $affected_users into an array of ids.
+                    $useraffected = array();
+                    foreach ($affected_users as $user) {
+                        $useraffected[] = $user->id;
+                    }
+
+                    // Get users that no longer match the category assignment.
+                    $userstoremove = array_diff($userassignments, $useraffected);
+
+                    if (!empty($userstoremove)) {
+                        $assignment_class->remove_outdated_assignments($this->id, $assign->assignmenttypeid, $userstoremove);
+                    }
+                }
+
+                // Get user assignments for current assignment.
                 foreach ($affected_users as $user) {
                     $assigned_user_ids[] = $user->id;
                     $timedue = $this->make_timedue($user->id, $assign);
