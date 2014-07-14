@@ -114,19 +114,21 @@ class totara_sync_element_user extends totara_sync_element {
 
         $this->set_customfieldsdb();
 
+        $issane = $this->check_sanity($synctable, $synctable_clone);
+
         // Delete obsolete users.
         if (!empty($this->config->allow_delete)) {
             if (empty($this->config->sourceallrecords)) {
                 // Get records with "deleted" flag set.
                 $sql = "SELECT u.id, u.idnumber, u.auth
                          FROM {{$synctable}} s
-                   INNER JOIN {user} u ON (s.idnumber = u.idnumber)
+                   INNER JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
                         WHERE u.totarasync=1 AND u.deleted = 0 AND s.deleted = 1";
             } else {
                 // All records provided by source - get missing user records.
                 $sql = "SELECT u.id, u.idnumber, u.auth
                           FROM {user} u
-               LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber=s.idnumber)
+               LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
                          WHERE u.totarasync=1 AND s.idnumber IS NULL AND u.deleted=0";
             }
 
@@ -151,14 +153,12 @@ class totara_sync_element_user extends totara_sync_element {
             $DB->execute("DELETE FROM {{$synctable_clone}} WHERE deleted = 1");
         }
 
-        $issane = $this->check_sanity($synctable, $synctable_clone);
-
         if (!empty($this->config->allow_update)) {
             // This must be done before creating new accounts because once the accounts are created this query would return them as well,
             // even when they do not need to be updated.
             $sql = "SELECT s.*, u.id AS uid
                       FROM {user} u
-                INNER JOIN {{$synctable}} s ON (u.idnumber=s.idnumber)
+                INNER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
                      WHERE u.totarasync=1
                        AND (s.timemodified = 0 OR u.timemodified != s.timemodified)";  // If no timemodified, always update.
             $rsupdateaccounts = $DB->get_recordset_sql($sql);
@@ -166,7 +166,7 @@ class totara_sync_element_user extends totara_sync_element {
 
         if (!empty($this->config->allow_create)) {
             // Get accounts that must be created.
-            $sql = "SELECT s.*
+            $sql = "SELECT DISTINCT s.*
                       FROM {{$synctable}} s
            LEFT OUTER JOIN {user} u ON (s.idnumber=u.idnumber)
                      WHERE (u.idnumber IS NULL)";
@@ -178,7 +178,7 @@ class totara_sync_element_user extends totara_sync_element {
                            WHERE idnumber IN (
                           SELECT s.idnumber
                             FROM {user} u
-                      INNER JOIN {{$synctable}} s ON (u.idnumber=s.idnumber))");
+                      INNER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != ''))");
 
             if ($rscreateaccounts->valid()) {
                 // Create missing accounts.
@@ -195,7 +195,7 @@ class totara_sync_element_user extends totara_sync_element {
                 // Create user assignments.
                 $sql = "SELECT sc.*, u.id as uid
                           FROM {{$synctable_clone}} sc
-                    INNER JOIN {user} u ON (sc.idnumber=u.idnumber)";
+                    INNER JOIN {user} u ON (sc.idnumber = u.idnumber AND u.idnumber != '')";
                 $rscreateassignments = $DB->get_recordset_sql($sql);
                 foreach ($rscreateassignments as $suser) {
                     try {
@@ -858,7 +858,7 @@ class totara_sync_element_user extends totara_sync_element {
         $sql = "SELECT id, idnumber
                   FROM {{$synctable}}
                  WHERE $field = ''";
-        if (empty($this->config->sourceallrecords)) {
+        if (empty($this->config->sourceallrecords) && $field != 'idnumber') {
             $sql .= ' AND deleted = ?'; // Avoid users that will be deleted.
             $params[0] = 0;
         }
