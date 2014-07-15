@@ -35,6 +35,7 @@ class plan_edit_form extends moodleform {
         global $CFG, $USER, $DB, $TEXTAREA_OPTIONS;
 
         $mform =& $this->_form;
+        $mform->addElement('header', 'details', get_string('plandetails', 'totara_plan'));
         $action = $this->_customdata['action'];
         if (isset($this->_customdata['plan'])) {
             $plan = $this->_customdata['plan'];

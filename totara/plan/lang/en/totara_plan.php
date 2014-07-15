@@ -804,6 +804,7 @@ $string['plandeclinedtryagain'] = 'This plan has been declined. If desired, you 
 $string['plandeletefail'] = 'Could not delete plan "{$a}"';
 $string['plandeletesuccess'] = 'Successfully deleted plan "{$a}"';
 $string['plandescription'] = 'Plan description';
+$string['plandetails'] = 'Plan details';
 $string['planhasunapproveditem'] = 'This plan has a draft item:';
 $string['planhasunapproveditems'] = 'This plan has draft items:';
 $string['planidnotfound'] = 'Plan ID of \'{$a}\' not found';
