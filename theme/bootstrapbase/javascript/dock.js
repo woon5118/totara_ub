@@ -1,13 +1,12 @@
-
--/**
-- * Customise the dock for this theme.
-- *
-- * Tasks we do within this function:
-- *   - Add 'block' as a class to the dock panel so that its items are styled the same as they are when being displayed
-- *     in page as blocks.
-- *   - Constrain the width of the docked block to the window width using a responsible max-width.
-- *   - Handle the opening/closing of the Bootstrap collapsible navbar on small screens.
-- */
+/**
+ * Customise the dock for this theme.
+ *
+ * Tasks we do within this function:
+ *   - Add 'block' as a class to the dock panel so that its items are styled the same as they are when being displayed
+ *     in page as blocks.
+ *   - Constrain the width of the docked block to the window width using a responsible max-width.
+ *   - Handle the opening/closing of the Bootstrap collapsible navbar on small screens.
+ */
 function customise_dock_for_theme(dock) {
     // Add the "block" class to docked blocks.
     // This prevents having to restyle all docked blocks and simply use standard block styling.

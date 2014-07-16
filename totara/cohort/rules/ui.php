@@ -312,15 +312,18 @@ JS;
         if (!isset($this->equal) || !isset($this->listofvalues)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
-        $ret = ucfirst($this->description);
-        $ret .= $COHORT_RULES_OP_IN_LIST[$this->equal];
+
+        $strvar = new stdClass();
+        $strvar->desc = $this->description;
+        $strvar->join = $COHORT_RULES_OP_IN_LIST[$this->equal];
 
         // Show list of values only if the rule is different from "is_empty"
+        $strvar->vars = '';
         if ($this->equal != COHORT_RULES_OP_IN_ISEMPTY) {
-            $ret .= '"' . htmlspecialchars(implode('", "', $this->listofvalues)) . '"';
+            $strvar->vars = '"' . htmlspecialchars(implode('", "', $this->listofvalues)) . '"';
         }
 
-        return $ret;
+        return get_string('ruleformat-descjoinvars', 'totara_cohort', $strvar);
     }
 
     /**
@@ -463,8 +466,10 @@ JS;
         if (!isset($this->equal) || !isset($this->listofvalues)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
-        $ret = ucfirst($this->description);
-        $ret .= get_string("is{$COHORT_RULES_OP_IN[$this->equal]}to", 'totara_cohort');
+
+        $strvar = new stdClass();
+        $strvar->desc = $this->description;
+        $strvar->join = get_string("is{$COHORT_RULES_OP_IN[$this->equal]}to", 'totara_cohort');
 
         if (is_object($this->options)) {
             $selected = $this->options_from_sqlobj($this->options, $this->listofvalues);
@@ -472,9 +477,9 @@ JS;
             $selected = array_intersect_key($this->options, array_flip($this->listofvalues));
         }
         // append the list of selected items
-        $ret .= '"' . htmlspecialchars(implode('", "', $selected)) .'"';
+        $strvar->vars = '"' . htmlspecialchars(implode('", "', $selected)) .'"';
 
-        return $ret;
+        return get_string('ruleformat-descjoinvars', 'totara_cohort', $strvar);
     }
 
     /**
@@ -786,7 +791,10 @@ JS;
         if (!isset($this->operator) || !isset($this->date)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
-        $ret = ucfirst($this->description);
+
+        $strvar = new stdClass();
+        $strvar->desc = $this->description;
+
         switch ($this->operator) {
             case COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE:
             case COHORT_RULE_DATE_OP_AFTER_FIXED_DATE:
@@ -799,8 +807,10 @@ JS;
                 $a = $this->date;
                 break;
         }
-        $ret .= ' ' . get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
-        return $ret;
+
+        $strvar->vars = get_string("dateis{$COHORT_RULE_DATE_OP[$this->operator]}", 'totara_cohort', $a);
+
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 
     /**
@@ -1001,10 +1011,11 @@ class cohort_rule_ui_picker_hierarchy extends cohort_rule_ui {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
 
-        $ret = ucfirst($this->description);
-        $ret .= get_string("is{$COHORT_RULES_OP_IN[$this->equal]}to", 'totara_cohort');
+        $strvar = new stdClass();
+        $strvar->desc = $this->description;
+        $strvar->join = get_string("is{$COHORT_RULES_OP_IN[$this->equal]}to", 'totara_cohort');
         if ($this->includechildren) {
-            $ret .= get_string('orachildof', 'totara_cohort');
+            $strvar->ext = get_string('orachildof', 'totara_cohort');
         }
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofvalues);
@@ -1031,9 +1042,13 @@ class cohort_rule_ui_picker_hierarchy extends cohort_rule_ui {
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $items);
+        $strvar->vars = implode($paramseparator, $items);
 
-        return $ret;
+        if (!empty($strvar->ext)) {
+            return get_string('ruleformat-descjoinextvars', 'totara_cohort', $strvar);
+        } else {
+            return get_string('ruleformat-descjoinvars', 'totara_cohort', $strvar);
+        }
     }
 }
 
@@ -1196,19 +1211,20 @@ class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picke
         if (!isset($this->operator) || !isset($this->listofids)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
-        $ret = '';
+
+        $strvar = new stdClass();
         switch ($this->operator) {
             case COHORT_RULE_COMPLETION_OP_ALL:
-                $ret .= get_string('ccdescall', 'totara_cohort');
+                $strvar->desc = get_string('ccdescall', 'totara_cohort');
                 break;
             case COHORT_RULE_COMPLETION_OP_ANY:
-                $ret .= get_string('ccdescany', 'totara_cohort');
+                $strvar->desc = get_string('ccdescany', 'totara_cohort');
                 break;
             case COHORT_RULE_COMPLETION_OP_NOTALL:
-                $ret .= get_string('ccdescnotall', 'totara_cohort');
+                $strvar->desc = get_string('ccdescnotall', 'totara_cohort');
                 break;
             default:
-                $ret .= get_string('ccdescnotany', 'totara_cohort');
+                $strvar->desc = get_string('ccdescnotany', 'totara_cohort');
         }
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
@@ -1230,8 +1246,9 @@ class cohort_rule_ui_picker_course_allanynotallnone extends cohort_rule_ui_picke
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $courselist);
-        return $ret;
+        $strvar->vars .= implode($paramseparator, $courselist);
+
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1322,7 +1339,9 @@ JS;
                 $descstr = 'ccdurationdescmorethan';
                 break;
         }
-        $ret = get_string($descstr, 'totara_cohort', $this->date);
+
+        $strvar = new stdClass();
+        $strvar->desc = get_string($descstr, 'totara_cohort', $this->date);
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
@@ -1343,9 +1362,9 @@ JS;
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $courselist);
+        $strvar->vars = implode($paramseparator, $courselist);
 
-        return $ret;
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1447,7 +1466,9 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
         if (!isset($this->operator) || !isset($this->listofids)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
-        $ret = ucfirst($this->description);
+
+        $strvar = new stdClass();
+        $strvar->desc = $this->description;
         switch ($this->operator) {
             case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
             case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
@@ -1460,7 +1481,7 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
                 $a = $this->date;
                 break;
         }
-        $ret .= ' ' . get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a) . ' ';
+        $strvar->join = get_string("dateis{$COHORT_RULE_COMPLETION_OP[$this->operator]}", 'totara_cohort', $a);
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
@@ -1491,9 +1512,9 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $courselist);
+        $strvar->vars = implode($paramseparator, $courselist);
 
-        return $ret;
+        return get_string('ruleformat-descjoinvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1563,7 +1584,9 @@ class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_pick
             default:
                 $getstr = 'pcdescnotany';
         }
-        $ret = get_string($getstr, 'totara_cohort');
+
+        $strvar = new stdClass();
+        $strvar->desc = get_string($getstr, 'totara_cohort');
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
@@ -1584,9 +1607,9 @@ class cohort_rule_ui_picker_program_allanynotallnone extends cohort_rule_ui_pick
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $proglist);
+        $strvar->vars = implode($paramseparator, $proglist);
 
-        return $ret;
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1676,7 +1699,9 @@ JS;
                 $getstr = 'pcdurationdescmorethan';
                 break;
         }
-        $ret = get_string($getstr, 'totara_cohort', $this->date);
+
+        $strvar = new stdClass();
+        $strvar->desc = get_string($getstr, 'totara_cohort', $this->date);
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->listofids);
         $sqlparams[] = $ruleid;
@@ -1697,9 +1722,9 @@ JS;
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $proglist);
+        $strvar->vars = implode($paramseparator, $proglist);
 
-        return $ret;
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1793,10 +1818,11 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
             return get_string('error:rulemissingparams', 'totara_cohort');
         }
 
+        $strvar = new stdClass();
         if ($this->isdirectreport) {
-            $ret = get_string('userreportsdirectlyto', 'totara_cohort');
+            $strvar->desc = get_string('userreportsdirectlyto', 'totara_cohort');
         } else {
-            $ret = get_string('userreportsto', 'totara_cohort');
+            $strvar->desc = get_string('userreportsto', 'totara_cohort');
         }
 
         $usernamefields = get_all_user_name_fields(true, 'u');
@@ -1820,9 +1846,9 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
         sort($userlist);
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $userlist);
+        $strvar->vars = implode($paramseparator, $userlist);
 
-        return $ret;
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }
 
@@ -1950,10 +1976,11 @@ class cohort_rule_ui_cohortmember extends cohort_rule_ui {
     public function getRuleDescription($ruleid, $static=true) {
         global $DB;
 
+        $strvar = new stdClass();
         if ($this->incohort) {
-            $ret = get_string('useriscohortmember', 'totara_cohort');
+            $strvar->desc = get_string('useriscohortmember', 'totara_cohort');
         } else {
-            $ret = get_string('userisnotcohortmember', 'totara_cohort');
+            $strvar->desc = get_string('userisnotcohortmember', 'totara_cohort');
         }
 
         list($sqlin, $sqlparams) = $DB->get_in_or_equal($this->cohortids);
@@ -1979,8 +2006,8 @@ class cohort_rule_ui_cohortmember extends cohort_rule_ui {
         };
 
         $paramseparator = html_writer::tag('span', ', ', array('class' => 'ruleparamseparator'));
-        $ret .= implode($paramseparator, $cohortlist);
+        $strvar->vars = implode($paramseparator, $cohortlist);
 
-        return $ret;
+        return get_string('ruleformat-descvars', 'totara_cohort', $strvar);
     }
 }

@@ -26,6 +26,7 @@ $string['sourcetitle'] = 'Face-to-face sessions';
 $string['address'] = 'Address';
 $string['bookedby'] = 'Booked by';
 $string['building'] = 'Building';
+$string['createdby'] = 'Actioned By';
 $string['roomcapacity'] = 'Room capacity';
 $string['discountcode'] = 'Discount code';
 $string['normalcost'] = 'Normal cost';

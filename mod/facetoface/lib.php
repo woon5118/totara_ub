@@ -995,9 +995,9 @@ function facetoface_cron($testing = false) {
         $sched = $DB->get_records_select(
             'facetoface_notification',
             'scheduletime IS NOT NULL
-            AND type = ?
+            AND (type = ? OR type = ?)
             AND status = 1',
-            array(MDL_F2F_NOTIFICATION_SCHEDULED));
+            array(MDL_F2F_NOTIFICATION_SCHEDULED, MDL_F2F_NOTIFICATION_AUTO));
         if ($sched) {
             foreach ($sched as $notif) {
                 $notification = new facetoface_notification((array)$notif, false);
@@ -1404,7 +1404,7 @@ function facetoface_download_attendance($facetofacename, $facetofaceid, $locatio
         $downloadfilename .= '.xls';
         $workbook = new MoodleExcelWorkbook('-');
         $dateformat = $workbook->add_format();
-        $dateformat->set_num_format('d mmm yy'); // TODO: use format specified in language pack
+        $dateformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATE);
     }
 
     $workbook->send($downloadfilename);
@@ -4808,10 +4808,6 @@ function facetoface_download_xls($fields, $datarows, $file=null) {
     $worksheet[0] = $workbook->add_worksheet('');
     $row = 0;
     $col = 0;
-    $dateformat = $workbook->add_format();
-    $dateformat->set_num_format('dd mmm yyyy');
-    $datetimeformat = $workbook->add_format();
-    $datetimeformat->set_num_format('dd mmm yyyy h:mm');
 
     foreach ($fields as $field) {
         $worksheet[0]->write($row, $col, strip_tags($field));

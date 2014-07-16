@@ -228,6 +228,23 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                 }
             }
 
+            // Optional date fields.
+            $datefields = array('posstartdate', 'posenddate');
+
+            foreach ($datefields as $datefield) {
+                if (isset($extdbrow[$datefield])) {
+                    if (empty($extdbrow[$datefield])) {
+                        $dbrow[$datefield] = $now;
+                    } else {
+                        // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
+                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow[$datefield]));
+                        if ($parsed_date) {
+                            $dbrow[$datefield] = $parsed_date;
+                        }
+                    }
+                }
+            }
+
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->customfields)) {
                 $cfield_data = array();

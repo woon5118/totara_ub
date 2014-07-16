@@ -267,7 +267,7 @@ function totara_course_is_viewable($courseid, $userid = null) {
  */
 function totara_visibility_where($userid = null, $fieldbaseid = 'course.id',
         $fieldvisible = 'course.visible', $fieldaudvis = 'course.audiencevisible', $instancetype = COHORT_ASSN_ITEMTYPE_COURSE) {
-    global $CFG, $USER;
+    global $CFG, $USER, $COHORT_ASSN_ITEMTYPES;
 
     if (!$userid) {
         $userid = $USER->id;
@@ -278,10 +278,20 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id',
         return array('1=1', array());
 
     } else if (empty($CFG->audiencevisibility)) {
-        // Normal visibility.
-        $sqlnormalvisible = "{$fieldvisible} = :tcvwnormalvisible";
-        return array($sqlnormalvisible, array('tcvwnormalvisible' => 1));
-
+        if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE && has_capability('moodle/course:viewhiddencourses',
+                context_system::instance(), $userid)) {
+            return array('1=1', array());
+        } else if ($instancetype == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability('totara/program:viewhiddenprograms',
+                context_system::instance(), $userid)) {
+            return array('1=1', array());
+        } else if ($instancetype == COHORT_ASSN_ITEMTYPE_CERTIF && has_capability('totara/certification:viewhiddencertifications',
+                context_system::instance(), $userid)) {
+            return array('1=1', array());
+        } else {
+            // Normal visibility.
+            $sqlnormalvisible = "{$fieldvisible} = :tcvwnormalvisible";
+            return array($sqlnormalvisible, array('tcvwnormalvisible' => 1));
+        }
     } else {
         // Audience visibility all.
         $sqlall = "{$fieldaudvis} = :tcvwaudvisall";

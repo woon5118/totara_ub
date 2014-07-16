@@ -109,6 +109,8 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
      * @return bool
      */
     function onQuickFormEvent($event, $arg, &$caller) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
         $scheduler_options = scheduler::get_options();
         switch ($event) {
             case 'updateValue':

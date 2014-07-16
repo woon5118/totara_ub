@@ -66,6 +66,8 @@ if ($canassign) {
     if ($feedback360->status == feedback360::STATUS_DRAFT) {
         $options = array_merge(array("" => get_string('assigngroup', 'totara_core')), $assign->get_assignable_grouptype_names());
         echo html_writer::select($options, 'groupselector', null, null, array('class' => 'group_selector', 'itemid' => $itemid));
+    } else if ($feedback360->status == feedback360::STATUS_CLOSED) {
+        echo get_string('feedback360closednochangesallowed', 'totara_feedback360');
     } else {
         echo get_string('feedback360activenochangesallowed', 'totara_feedback360');
     }

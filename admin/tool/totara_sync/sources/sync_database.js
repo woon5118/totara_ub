@@ -66,7 +66,8 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
                                 '&dbname=' + dbname +
                                 '&dbhost=' + dbhost +
                                 '&dbuser=' + dbuser +
-                                '&dbpass=' + dbpass;
+                                '&dbpass=' + dbpass +
+                                '&sesskey=' + M.cfg.sesskey;
 
             // Run script to check DB connectivity and display success or failure message
             $.getJSON(url, function(data) {
@@ -74,7 +75,7 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
                 // with MySQL where success is reported when passing no params to connect
                 // function of database layer
                 if (dbname != '' && dbuser != '') {
-                    if (data == true) {
+                    if (data.success) {
                         if ($('.db_connect_message').length > 0) {
                             $('.db_connect_message').replaceWith('<p class="db_connect_message">' + M.util.get_string('dbtestconnectsuccess', 'tool_totara_sync') + '</p>');
                         } else {

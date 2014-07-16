@@ -177,6 +177,12 @@ function totara_version_info($version, $release) {
         //upgrading from moodle, require at least v2.2.7
         $a->totaraupgradeerror = 'error:cannotupgradefrommoodle';
         return $a;
+    } else if ($version < $CFG->version) {
+        // The original Moodle install is newer than Totara.
+        $a->oldversion = $CFG->version;
+        $a->newversion = $version;
+        $a->totaraupgradeerror = 'error:cannotupgradefromnewermoodle';
+        return $a;
     }
 
     // If a Moodle core upgrade:

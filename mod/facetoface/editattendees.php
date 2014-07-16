@@ -128,7 +128,6 @@ if ($save && $onlycontent) {
 
     $added  = array();
     $errors = array();
-
     // Original booked attendees plus those awaiting approval
     if ($session->datetimeknown) {
         $original = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
@@ -145,6 +144,11 @@ if ($save && $onlycontent) {
     }
 
     // Adding new attendees.
+    // Setup language string object for Site Log entry on adding/removing attendees.
+    $a = new stdClass();
+    $a->f2fname = $facetoface->name;
+    $a->sessionid = $session->id;
+    $a->action = get_string('addremoveattendees', 'facetoface');
     // Check if we need to add anyone.
     $attendeestoadd = array_diff_key($attendees, $original);
     if (!empty($attendeestoadd) && has_capability('mod/facetoface:addattendees', $context)) {
@@ -190,6 +194,11 @@ if ($save && $onlycontent) {
         }
     }
 
+    // Log that users were edited.
+    $a->usercount = count($added);
+    $a->errorcount = count($errors);
+    $info = get_string('sitelogseditattendees', 'facetoface', $a);
+    add_to_log($course->id, 'facetoface', $a->action, "editattendees.php?s={$session->id}&attendees={$attendee->id}", $info, $cm->id);
     $_SESSION['f2f-bulk-results'][$session->id] = array($added, $errors);
 
     $result_message = facetoface_generate_bulk_result_notice(array($added, $errors), 'addedit');

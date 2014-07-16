@@ -233,6 +233,11 @@ class user_editadvanced_form extends moodleform {
             $err['idnumber'] = get_string('idnumberexists', 'totara_core');
         }
 
+        // If idnumber is empty, ensure sync is not turned on.
+        if (empty($usernew->idnumber) && !empty($usernew->totarasync)) {
+            $err['totarasync'] = get_string('error:emptyidnumberwithsync', 'totara_core');
+        }
+
         /// Next the customisable profile fields
         $err += profile_validation($usernew, $files);
 

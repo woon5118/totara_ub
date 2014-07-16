@@ -93,6 +93,7 @@ if ($delete && $confirm) {
         print_error('error:notificationdoesnotexist', 'facetoface');
     }
 
+    // Delete the notification and associated sent and history records.
     $notification->delete();
 
     totara_set_notification(get_string('notificationdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));

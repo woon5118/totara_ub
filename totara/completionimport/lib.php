@@ -598,6 +598,7 @@ function import_course($importname, $importtime) {
     $users = array();
     $enrolledusers = array();
     $completions = array();
+    $stats = array();
     $deletedcompletions = array();
     $completion_history = array();
 
@@ -653,6 +654,12 @@ function import_course($importname, $importtime) {
                     // Batch import completions.
                     $DB->insert_records_via_batch('course_completions', $completions);
                     $completions = array();
+                }
+
+                if (!empty($stats)) {
+                    // Batch import block_totara_stats.
+                    $DB->insert_records_via_batch('block_totara_stats', $stats);
+                    $stats = array();
                 }
 
                 if (!empty($completion_history)) {
@@ -732,20 +739,29 @@ function import_course($importname, $importtime) {
             $completion->reaggregate = 0;
             $completion->userid = $course->userid;
             $completion->course = $course->courseid;
+            // Create block_totara_stats records
+            $stat = new stdClass();
+            $stat->userid = $course->userid;
+            $stat->timestamp = time();
+            $stat->eventtype = STATS_EVENT_COURSE_COMPLETE;
+            $stat->data = '';
+            $stat->data2 = $course->courseid;
 
             $priorkey = "{$completion->userid}_{$completion->course}";
             $historyrecord = null;
 
-            // Now that records have been ordered we know everytime we enter here means it's a new completion record.
+            // Now that records have been ordered we know that every time we enter here it's a new completion record.
             if ($course->userid != $currentuser || $course->courseid != $currentcourse) {
                 // User or course has changed or they are empty. Update the current user and course.
                 $currentuser = $course->userid;
                 $currentcourse = $course->courseid;
                 if (empty($course->coursecompletionid)) {
                     $completions[$priorkey] = $completion; // Completion should be the first record
+                    $stats[$priorkey] = $stat;
                 } else if ($completion->timecompleted >= $course->currenttimecompleted && $overridecurrentcompletion) {
                     $deletedcompletions[] = $course->coursecompletionid;
                     $completions[$priorkey] = $completion;
+                    $stats[$priorkey] = $stat;
                 }
             } else {
                 $historyrecord = $completion;
@@ -780,6 +796,12 @@ function import_course($importname, $importtime) {
         // Batch import completions.
         $DB->insert_records_via_batch('course_completions', $completions);
         $completions = array();
+    }
+
+    if (!empty($stats)) {
+        // Batch import block_totara_stats.
+        $DB->insert_records_via_batch('block_totara_stats', $stats);
+        $stats = array();
     }
 
     if (!empty($completion_history)) {

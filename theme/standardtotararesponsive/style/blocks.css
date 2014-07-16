@@ -49,7 +49,6 @@
 .block .header .block_action {
     float: right;
     padding: 5px 10px 0 0;
-    float:right;
 }
 .dir-rtl .block .header .block_action {
     float:left;

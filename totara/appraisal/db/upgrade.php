@@ -91,6 +91,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014061600, 'totara', 'appraisal');
     }
 
+
     if ($oldversion < 2014062300) {
         $table = new xmldb_table('appraisal_user_assignment');
         $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
@@ -153,6 +154,86 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2014062302, 'totara', 'appraisal');
+
+    if ($oldversion < 2014071600) {
+        $users = $DB->get_records('user', array('deleted' => 1));
+        $users = array_keys($users);
+
+        $transaction = $DB->start_delegated_transaction();
+
+        if (!empty($users)) {
+            list($insql, $inparam) = $DB->get_in_or_equal($users);
+            $now = time();
+
+            // First try and complete the stage so the user can continue the appraisal.
+            $sql = "SELECT ara.*, aua.activestageid, aua.appraisalid, aua.userid AS subjectid
+                      FROM {appraisal_role_assignment} ara
+                      JOIN {appraisal_user_assignment} aua
+                        ON ara.appraisaluserassignmentid = aua.id
+                     WHERE ara.userid {$insql}";
+            $roleassignments = $DB->get_records_sql($sql, $inparam);
+
+            $completionsql = "SELECT 1
+                                FROM {appraisal_role_assignment} ara
+                           LEFT JOIN {appraisal_stage_data} asd
+                                  ON asd.appraisalroleassignmentid = ara.id
+                                 AND asd.appraisalstageid = ?
+                               WHERE ara.appraisaluserassignmentid = ?
+                                 AND ara.userid <> 0
+                                 AND asd.timecompleted IS NULL";
+
+            $todb = new stdClass();
+            $todb->timecompleted = $now;
+            foreach ($roleassignments as $role) {
+                $todb->appraisalroleassignmentid = $role->id;
+                $todb->appraisalstageid = $role->activestageid;
+                $DB->insert_record('appraisal_stage_data', $todb);
+
+                // Check if all assigned roles have completed the appraisal.
+                if (!$DB->record_exists_sql($completionsql, array($role->activestageid, $role->appraisaluserassignmentid))) {
+                    $stages = $DB->get_records('appraisal_stage', array('appraisalid' => $role->appraisalid), 'timedue, id');
+
+                    // Find the next stage.
+                    $currentstage = reset($stages);
+                    for ($i = 0; $i < count($stages) - 1; $i++) {
+                        if ($currentstage->id == $role->activestageid) {
+                            $currentstage = next($stages);
+                            $nextstageid = $currentstage->id;
+                            break;
+                        }
+                        $currentstage = next($stages);
+                    }
+
+                    // Move to the next stage or mark the appraisal as complete.
+                    if (!empty($nextstageid)) {
+                        $DB->set_field('appraisal_user_assignment', 'activestageid', $nextstageid,
+                            array('userid' => $role->subjectid, 'appraisalid' => $role->appraisalid));
+                        $nextstageid = 0;
+                    } else {
+                        // Mark the user as complete for this appraisal.
+                        $DB->set_field('appraisal_user_assignment', 'timecompleted', $now, array('id' => $role->appraisaluserassignmentid));
+
+                        // Check if all users are complete.
+                        $unfinished = $DB->count_records('appraisal_user_assignment', array('appraisalid' => $role->appraisalid, 'timecompleted' => null));
+                        if (!$unfinished) {
+                            // Mark this appraisal as complete.
+                            $DB->set_field('appraisal', 'status', appraisal::STATUS_COMPLETED, array('id' => $role->appraisalid));
+                            $DB->set_field('appraisal', 'timefinished', $now, array('id' => $role->appraisalid));
+                        }
+                    }
+                }
+            }
+
+            // Then flag all the role_assignments as empty.
+            $sql = "UPDATE {appraisal_role_assignment}
+                       SET userid = 0
+                       WHERE userid {$insql}";
+            $DB->execute($sql, $inparam);
+        }
+
+        $transaction->allow_commit();
+
+        upgrade_plugin_savepoint(true, 2014071600, 'totara', 'appraisal');
     }
 
     return true;

@@ -924,4 +924,38 @@ class competency extends hierarchy {
         return $message;
     }
 
+    /**
+     * Update an existing hierarchy item
+     *
+     * This can include moving to a new location in the hierarchy or changing some of its data values.
+     * This method will not update an item's custom field data
+     *
+     * @param integer $itemid ID of the item to update
+     * @param object $newitem An object containing details to be updated
+     *                        Only a parentid is required to update the items location, other data such as
+     *                        depthlevel, sortthread, path, etc will be handled internally
+     * @param boolean $usetransaction If true this function will use transactions (optional, default: true)
+     * @param boolean $triggerevent If true, this command will trigger a "{$prefix}_added" event handler.
+     * @param boolean $removedesc If true this sets the description field to null,
+     *                             descriptions should be set by post-update editor operations
+     *
+     * @return object|false The updated item, or false if it could not be updated
+     */
+    function update_hierarchy_item($itemid, $newitem, $usetransaction = true, $triggerevent = true, $removedesc = true) {
+        global $DB;
+
+        $olditem = $DB->get_record('comp', array('id' => $itemid));
+
+        if (isset($newitem->aggregationmethod) && $olditem->aggregationmethod != $newitem->aggregationmethod) {
+            $now = time();
+            $sql = "UPDATE {comp_record} SET reaggregate = ? WHERE competencyid = ?";
+            $params = array($now, $itemid);
+            $DB->execute($sql, $params);
+        }
+
+        $updateditem = parent::update_hierarchy_item($itemid, $newitem, $usetransaction, $triggerevent, $removedesc);
+
+        return $updateditem;
+    }
+
 }  // class

@@ -3612,9 +3612,9 @@ class reportbuilder {
         $row = 0;
         $col = 0;
         $dateformat = $workbook->add_format();
-        $dateformat->set_num_format('dd mmm yyyy');
+        $dateformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATE);
         $datetimeformat = $workbook->add_format();
-        $datetimeformat->set_num_format('dd mmm yyyy h:mm');
+        $datetimeformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
         if (is_array($restrictions) && count($restrictions) > 0) {
             $worksheet[0]->write($row, 0, get_string('reportcontents', 'totara_reportbuilder'));
@@ -5850,9 +5850,9 @@ class admin_setting_configdaymonthpicker extends admin_setting {
         // Default settings.
         $default = $this->get_defaultsetting();
 
-        if (!is_null($default)) {
-            $defaultday = substr($default, 0, 2);
-            $defaultmonth = substr($default, 2, 2);
+        if (is_array($default)) {
+            $defaultday = $default['d'];
+            $defaultmonth = $default['m'];
             $defaultinfo = date('j F', mktime(0, 0, 0, $defaultmonth, $defaultday, 0));
         } else {
             $defaultinfo = null;

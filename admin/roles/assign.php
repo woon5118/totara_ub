@@ -180,7 +180,7 @@ if ($roleid) {
     // Show UI for assigning a particular role to users.
     // Print a warning if we are assigning system roles.
     if ($context->contextlevel == CONTEXT_SYSTEM) {
-        echo $OUTPUT->box(get_string('globalroleswarning', 'core_role'));
+        echo $OUTPUT->notification(get_string('globalroleswarning', 'core_role'));
     }
 
     // Print the form.
@@ -255,7 +255,7 @@ if ($roleid) {
 
     // Print a warning if we are assigning system roles.
     if ($context->contextlevel == CONTEXT_SYSTEM) {
-        echo $OUTPUT->box(get_string('globalroleswarning', 'core_role'));
+        echo $OUTPUT->notification(get_string('globalroleswarning', 'core_role'));
     }
 
     // Print instruction.

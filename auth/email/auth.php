@@ -94,22 +94,13 @@ class auth_plugin_email extends auth_plugin_base {
             $user->calendartype = $CFG->calendartype;
         }
 
-        $user->id = user_create_user($user, false);
+        $user->id = user_create_user($user, false, false);
 
         // Save any custom profile field information.
         profile_save_data($user);
 
-        // Save primary position fields if selected and settings allow it.
-        position_save_data($user);
-
-        $user = $DB->get_record('user', array('id' => $user->id));
-        $event = \core\event\user_created::create(
-            array(
-                'objectid' => $user->id,
-                'context' => context_user::instance($user->id),
-            )
-        );
-        $event->trigger();
+        // Trigger event.
+        \core\event\user_created::create_from_userid($user->id)->trigger();
 
         if (! send_confirmation_email($user)) {
             print_error('auth_emailnoemail','auth_email');
@@ -157,23 +148,7 @@ class auth_plugin_email extends auth_plugin_base {
             } else if ($user->secret == $confirmsecret) {   // They have provided the secret key to get in
                 $DB->set_field("user", "confirmed", 1, array("id"=>$user->id));
                 if ($user->firstaccess == 0) {
-                    $now = time();
-                    $DB->set_field("user", "firstaccess", $now, array("id"=>$user->id));
-
-                    $user->firstaccess = $now;
-
-                    $event = \totara_core\event\user_firstlogin::create(
-                        array(
-                            'objectid' => $user->id,
-                            'context' => context_user::instance($user->id),
-                            'other' => array(
-                                'username' => $user->username,
-                                'firstaccess' => $now,
-                            ),
-                        )
-                    );
-                    $event->add_record_snapshot('user', $user);
-                    $event->trigger();
+                    $DB->set_field("user", "firstaccess", time(), array("id"=>$user->id));
                 }
                 return AUTH_CONFIRM_OK;
             }
@@ -249,17 +224,13 @@ class auth_plugin_email extends auth_plugin_base {
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // Set to defaults if undefined.
+        // set to defaults if undefined
         if (!isset($config->recaptcha)) {
             $config->recaptcha = false;
         }
 
-        // Save settings.
+        // save settings
         set_config('recaptcha', $config->recaptcha, 'auth/email');
-        set_config('allowsignupposition', $config->allowsignupposition, 'totara_hierarchy');
-        set_config('allowsignuporganisation', $config->allowsignuporganisation, 'totara_hierarchy');
-        set_config('allowsignupmanager', $config->allowsignupmanager, 'totara_hierarchy');
-
         return true;
     }
 

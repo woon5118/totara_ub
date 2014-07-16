@@ -855,8 +855,10 @@ function dp_display_plans_menu_required($programs, $extraparams, $progcount=0) {
     global $OUTPUT;
     $list = array();
     foreach ($programs as $p) {
+        $urlparams = $extraparams;
+
         if (count($list) + $progcount >= DP_MAX_PROGS_TO_DISPLAY) {
-            $list[] = $OUTPUT->action_link(new moodle_url('/totara/program/required.php', $extraparams), get_string('viewallrequiredlearning', 'totara_program'));
+            $list[] = $OUTPUT->action_link(new moodle_url('/totara/program/required.php', $urlparams), get_string('viewallrequiredlearning', 'totara_program'));
             break;
         }
         // hide inaccessible programs
@@ -864,8 +866,8 @@ function dp_display_plans_menu_required($programs, $extraparams, $progcount=0) {
         if (!$prog->is_accessible()) {
             continue;
         }
-        $extraparams['id'] = $p->id;
-        $list[] = $OUTPUT->action_link(new moodle_url('/totara/program/required.php', $extraparams), $p->fullname);
+        $urlparams['id'] = $p->id;
+        $list[] = $OUTPUT->action_link(new moodle_url('/totara/program/required.php', $urlparams), $p->fullname);
     }
     return($list);
 }

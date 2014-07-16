@@ -662,18 +662,28 @@ $capabilities = array(
         'totara/hierarchy:viewcompetencyframeworks' => array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
-            'clonepermissionsfrom' => 'totara/hierarchy:editcompetencyframeworks'
+            'archetypes' => array(
+                'manager' => CAP_ALLOW
             ),
+            'clonepermissionsfrom' => 'totara/hierarchy:editcompetencyframeworks'
+        ),
         'totara/hierarchy:viewpositionframeworks' => array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
-            'clonepermissionsfrom' => 'totara/hierarchy:editpositionframeworks'
+            'archetypes' => array(
+                'manager' => CAP_ALLOW
             ),
+            'clonepermissionsfrom' => 'totara/hierarchy:editpositionframeworks'
+        ),
         'totara/hierarchy:vieworganisationframeworks' => array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
-            'clonepermissionsfrom' => 'totara/hierarchy:editorganisationframeworks'
+            'archetypes' => array(
+                'manager' => CAP_ALLOW
             ),
+            'clonepermissionsfrom' => 'totara/hierarchy:editorganisationframeworks'
+        ),
+
         'totara/hierarchy:viewgoalframeworks' => array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
@@ -681,7 +691,7 @@ $capabilities = array(
                 'manager' => CAP_ALLOW,
                 'staffmanager' => CAP_ALLOW,
                 'user' => CAP_ALLOW
-                ),
-            'clonepermissionsfrom' => 'totara/hierarchy:editgoalframeworks'
             ),
-        );
+            'clonepermissionsfrom' => 'totara/hierarchy:editgoalframeworks'
+        ),
+    );

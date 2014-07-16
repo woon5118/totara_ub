@@ -730,8 +730,8 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
         return true;
     }
 
-    $formatDate =& $workbook->add_format();
-    $formatDate->set_num_format(get_string('log_excel_date_format'));
+    $formatDate = $workbook->add_format();
+    $formatDate->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
     $row = FIRSTUSEDEXCELROW;
     $wsnumber = 1;
@@ -843,9 +843,6 @@ function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
         $workbook->close();
         return true;
     }
-
-    $formatDate =& $workbook->add_format();
-    $formatDate->set_num_format(get_string('log_excel_date_format'));
 
     $row = FIRSTUSEDEXCELROW;
     $wsnumber = 1;
@@ -3549,6 +3546,10 @@ function mod_duplicate_activity($course, $cm, $sr = null) {
         $section = $DB->get_record('course_sections', array('id' => $cm->section, 'course' => $cm->course));
         moveto_module($newcm, $section, $cm);
         moveto_module($cm, $section, $newcm);
+
+        // Trigger course module created event. We can trigger the event only if we know the newcmid.
+        $event = \core\event\course_module_created::create_from_cm($newcm);
+        $event->trigger();
     }
     rebuild_course_cache($cm->course);
 

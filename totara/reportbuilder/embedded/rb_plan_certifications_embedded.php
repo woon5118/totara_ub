@@ -175,7 +175,11 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
-        $subjectid = $report->get_param_value('userid');
+        global $USER;
+        // If no user param passed, assume current user only.
+        if (!($subjectid = $report->get_param_value('userid'))) {
+            $subjectid = $USER->id;
+        }
         // Users can only view their own and their staff's pages or if they are an admin.
         return ($reportfor == $subjectid ||
                 totara_is_manager($subjectid, $reportfor) ||

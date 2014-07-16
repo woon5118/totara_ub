@@ -25,7 +25,7 @@ $string['pluginname'] = 'Totara sync';
 
 $string['sync'] = 'Sync';
 $string['totarasync'] = 'Totara sync';
-$string['totarasync_help'] = 'Enabling Totara syncing will cause the element to be updated/deleted (synced) from an external source (if configured).
+$string['totarasync_help'] = 'Enabling Totara syncing will cause the element to be updated/deleted (synced) from an external source (if configured). The idnumber field MUST have a value to enable this field.
 See the Sync settings in the Administration menu.';
 $string['totara_sync:manage'] = 'Manage Totara sync';
 $string['totara_sync:runsync'] = 'Run Totara sync via the web interface';

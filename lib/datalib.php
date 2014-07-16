@@ -419,7 +419,7 @@ function get_users($get=true, $search='', $confirmed=false, array $exceptions=nu
         $select .= ' AND deleted = 0';
     } else {
         // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email
-        $select .= ' AND ' . $DB->sql_like('email', ':nolegacyemail', false);
+        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
         $params['nolegacyemail'] = '%@%';
     }
 
@@ -496,7 +496,7 @@ function get_users_listing($sort='lastaccess', $dir='ASC', $page=0, $recordsperp
         $select .= " AND deleted <> 1";
     } else {
         // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email.
-        $select .= ' AND ' . $DB->sql_like('email', ':nolegacyemail', false);
+        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
         $params['nolegacyemail'] = '%@%';
     }
 
@@ -1716,6 +1716,11 @@ function add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user
     // database so that it doesn't cause a DB error. Log a warning so that
     // developers can avoid doing things which are likely to cause this on a
     // routine basis.
+    if (core_text::strlen($action) > 40) {
+        $action = core_text::substr($action, 0, 37) . '...';
+        debugging('Warning: logged very long action', DEBUG_DEVELOPER);
+    }
+
     if(!empty($info) && core_text::strlen($info)>255) {
         $info = core_text::substr($info,0,252).'...';
         debugging('Warning: logged very long info',DEBUG_DEVELOPER);

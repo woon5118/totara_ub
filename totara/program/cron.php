@@ -571,7 +571,7 @@ function program_cron_programs_due(&$programs) {
             WHERE pc.timecompleted = ?
             AND pc.coursesetid = ?
             AND pm.messagetype = ?
-            AND (pc.timedue - pm.triggertime) < ?
+            AND pc.timedue > 0 AND (pc.timedue - pm.triggertime) < ?
             ORDER BY pc.programid, u.id";
 
     // get the records
@@ -626,7 +626,7 @@ function program_cron_coursesets_due(&$programs) {
             WHERE pc.timecompleted = ?
             AND pc.coursesetid <> ?
             AND pm.messagetype = ?
-            AND (pc.timedue - pm.triggertime) < ?
+            AND pc.timedue > 0 AND (pc.timedue - pm.triggertime) < ?
             ORDER BY pc.programid, u.id";
 
     // get the records
@@ -681,7 +681,7 @@ function program_cron_programs_overdue(&$programs) {
             WHERE pc.timecompleted = ?
             AND pc.coursesetid = ?
             AND pm.messagetype = ?
-            AND (pc.timedue + pm.triggertime) < ?
+            AND pc.timedue > 0 AND (pc.timedue + pm.triggertime) < ?
             ORDER BY pc.programid, u.id";
 
     // get the records
@@ -736,7 +736,7 @@ function program_cron_coursesets_overdue(&$programs) {
             WHERE pc.timecompleted = ?
             AND pc.coursesetid <> ?
             AND pm.messagetype = ?
-            AND (pc.timedue + pm.triggertime) < ?
+            AND pc.timedue > 0 AND (pc.timedue + pm.triggertime) < ?
             ORDER BY pc.programid, u.id";
 
     // get the records

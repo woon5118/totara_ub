@@ -196,7 +196,7 @@ if ($hassiteconfig
     $temp->add(new admin_setting_configselect('tempmanagerrestrictselection',
             new lang_string('tempmanagerrestrictselection', 'totara_core'),
             new lang_string('tempmanagerrestrictselectiondesc', 'totara_core'),
-            1,
+            null,
             array(null => get_string('tempmanagerselectionallusers', 'totara_core'),
                   1 => get_string('tempmanagerselectiononlymanagers', 'totara_core'))));
 

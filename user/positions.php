@@ -205,21 +205,25 @@ else {
             $data->positionid = null;
         }
 
-        // Setup data
-        position_assignment::set_properties($position_assignment, $data);
-
         $data->type = $POSITION_CODES[$type];
         $data->userid = $user->id;
 
-        // Get new manager id
+        // Get new manager id.
         if (isset($data->managerid) && $data->managerid > 0) {
             if ($data->managerid == $data->userid) {
                 print_error('error:userownmanager', 'totara_hierarchy');
             } else {
-                $managerid = $data->managerid;
+                // If there is a manager assigned, check manager is valid.
+                $validmanager = $DB->get_record('user', array('id' => $data->managerid), 'username, deleted');
+                if ($validmanager && $validmanager->deleted != 0) {
+                    $data->managerid = null;
+                    $data->reportstoid = null;
+                    $data->managerpath = null;
+                    $a = new stdClass();
+                    $a->username = $validmanager->username;
+                    totara_set_notification(get_string('error:managerdeleted','totara_hierarchy', $a), null, array('class' => 'notifynotice'));
+                }
             }
-        } else {
-            $managerid = null;
         }
 
         // Get new appraiser id.
@@ -227,17 +231,24 @@ else {
             if ($data->appraiserid == $data->userid) {
                 print_error('error:userownappraiser', 'totara_hierarchy');
             } else {
-                $appraiserid = $data->appraiserid;
+                // If there is a appraiser assigned, check appraiser is valid.
+                $validappraiser = $DB->get_record('user', array('id' => $data->managerid), 'username, deleted');
+                if ($validappraiser && $validappraiser->deleted != 0) {
+                    $data->appraiserid = null;
+                    $a = new stdClass();
+                    $a->username = $validappraiser->username;
+                    totara_set_notification(get_string('error:appraiserdeleted','totara_hierarchy', $a), null, array('class' => 'notifynotice'));
+                }
             }
-        } else {
-            $appraiserid = null;
         }
 
         // If aspiration type, make sure no manager is set
         if ($data->type == POSITION_TYPE_ASPIRATIONAL) {
-            $managerid = null;
+            $data->managerid = null;
         }
 
+        // Setup data
+        position_assignment::set_properties($position_assignment, $data);
         assign_user_position($position_assignment);
 
         // Description editor post-update
@@ -251,8 +262,17 @@ else {
 
         if (!empty($data->tempmanagerid)) {
             // Update temporary manager.
-            totara_update_temporary_manager($user->id, $data->tempmanagerid,
-                totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->tempmanagerexpiry));
+            // If there is a temporary manager assigned, check temporary manager is valid.
+            $validtempmgr = $DB->get_record('user', array('id' => $data->tempmanagerid), 'username, deleted');
+            if ($validtempmgr && $validtempmgr->deleted != 0) {
+                $data->tempmanagerid = null;
+                $a = new stdClass();
+                $a->username = $validtempmgr->username;
+                totara_set_notification(get_string('error:tempmanagerdeleted','totara_hierarchy', $a), null, array('class' => 'notifynotice'));
+            } else {
+                totara_update_temporary_manager($user->id, $data->tempmanagerid,
+                    totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->tempmanagerexpiry));
+            }
         } else if (!empty($CFG->enabletempmanagers)) {
             // Unassign the current temporary manager.
             totara_unassign_temporary_manager($user->id);

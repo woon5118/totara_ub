@@ -3,6 +3,73 @@
 
 Totara LMS Changelog
 
+Release 2.6.5 (16th July 2014):
+==================================================
+
+Security issues:
+    MoodleHQ       http://docs.moodle.org/dev/Moodle_2.6.4_release_notes
+    T-12579        Fixed potential security risk in Totara Sync when using database sources
+
+Improvements:
+    T-12497        Improved internationalisation for the display of audience rules
+    T-12547        Added validity checks to the position assignments form
+    T-12591        Backported MDL-45985 new database schema checking script from Moodle 2.8
+    T-10684        Added checks to prevent downgrades from a higher version of Moodle
+
+Bug Fixes:
+    T-12521        Fixed dynamic audiences not updating if the cohort enrolment plugin is disabled
+    T-12203        Fixed reaggregation of Competencies when the aggregation type is changed
+    T-12672        Fixed Totara Sync deleting users with no idnumber set
+    T-12658        Fixed capabilities of Site Manager to enable them to create hierarchy frameworks
+    T-11447        Fixed error on upgrade from Moodle to Totara
+    T-12691        Fixed the sending of Stage Due messages in the Appraisal cron
+    T-12567        Fixed the starting of new attempts for completed SCORMs which open in a new window
+    T-12676        Fixed Totara Sync database source connections with non-alphanumeric passwords
+    T-12636        Fixed addition of user middle name columns in Reportbuilder sources
+    T-12524        Fixed the default facetoface reminder notifications failing to send
+    T-12674        Fixed error when a user tries to show/hide columns in an embedded report
+    T-12678        Fixed errors when using Totara Sync with database sources when position dates are text fields
+    T-12710        Fixed display of users with no email addresses
+    T-12588        Fixed Excel exports failing on some versions of PHP
+    T-12299        Fixed appearance of docks in RTL languages
+    T-11883        Fixed the multilang filter for goal and competency scales
+    T-12623        Fixed the "view all" link in the record of learning and required learning sidebar
+    T-12324        Fixed the formatting of date fields in Excel exports
+    T-12545        Fixed deletion of associated data when deleting a facetoface notification
+    T-12657        Fixed the padding for the body element in Internet Explorer
+    T-12489        Fixed an issue with expanding a SCORM activity from the navigation block in a course
+
+
+Release 2.6.4 (1st July 2014):
+==================================================
+
+Improvements:
+    T-12605        Added logic to serve older versions of jquery to older versions of IE
+    T-12497        Improved internationalisation for the display of audience rules
+    T-12527        Added username of creator to Facetoface report and improved logging of attendees actions
+
+Database Upgrades:
+    T-12578        Added the ability to continue appraisals with missing roles
+    T-11887        Fixed display of appraisals after a user has been deleted
+
+Bug Fixes:
+    T-12521        Fixed dynamic audiences not updating if the cohort enrolment plugin is disabled
+    T-12538        Fixed category drop down selector not working correctly when creating programs
+    T-12570        Fixed the sending of Program messages when completion is set relative to an action
+    T-12479        Fixed the activate link incorrectly showing while viewing closed feedback360
+    T-12509        Fixed historical course completion records not showing on the my team tab
+    T-12563        Changed the default "temporary manager restrict selection" setting to "all users" for new installs
+    T-12572        Added check to ensure generator columns can not be added to the same report multiple times
+    T-12498        Fixed the display of custom field names for audience rules
+    T-12156        Fixed cancellation message when F2F activity email notifications are turned off
+    T-12571        Fixed the view hidden courses capability in the enhanced catalog
+    T-12488        Fixed dynamic audiences showing on the 'add to audiences' option in bulk user actions
+    T-12465        Fixed duplicate records issue when importing more than 250 course completion records
+    T-12500        Fixed the incorrect use of urldecode function on page parameters
+    T-12372        Fixed learning plan comments linking to the wrong components
+    T-12387        Fixed the page title for program/certification searches
+    T-12531        Fixed the formatting of the heading for facetoface attendance exports
+
 
 Release 2.6.3 (17th June 2014):
 ==================================================
@@ -16,6 +83,7 @@ Improvements:
     T-12385    Added content filter to user reports to allow temporary managers to see their staff
     T-12530    Added room filter to Facetoface session view page
     T-12544    Added admin page to check current role capabilities against the installation defaults
+    T-12494    Added ability to edit/delete evidence items created through course completion upload - Requires role with totara/plan:accessanyplan or totara/plan:editsiteevidence capabilities
 
 Bug Fixes:
     T-12303    Fixed duplicated text on upgrade screen
@@ -36,6 +104,7 @@ Bug Fixes:
     T-12512    Fixed column options in Appraisal Details report
     T-12492    Fixed Record of Learning Evidence report when using "show records based on users" option
     T-12526    Fixed PHP undefined property error in Record of Learning Evidence report
+    T-12242    Fixed file saving on scheduled reports when "Export to filesystem" is disabled at site level
     T-12525    Fixed errors with Facetoface attendance report export to CSV
     T-12320    Fixed Facetoface iCal attachment line breaks in long descriptions
     T-11816    Fixed display of Articulate Storyline SCORMS in iPads - use new display setting of "New Window (simple)"
@@ -57,7 +126,9 @@ Bug Fixes:
     T-12467    Fixed display of SCORM packages on secure HTTPS sites
     T-12463    Fixed critical SCORM error where subsequent attempts after an initial failed attempt are not recorded
     T-12471    Fixed display of grades in Course Completion Report for grades uploaded by completion import tool
+    T-12444    Fixed course completion import report sometimes returning zero records
     T-12469    Fixed sending of notifications when a Facetoface booking date/time is changed
+    T-12277    Fixed Face-to-face reminders still being sent to users who have cancelled from a session
     T-12121    Fixed transaction error when quiz completion triggers sending of messages
     T-12307    Fixed days not being translated in weekly scheduled reports
     T-12327    Fixed issue with dialog boxes being too wide for some screens
@@ -92,6 +163,7 @@ Improvements:
     T-12375    Improved accessibility by combining links under My Reports
     T-12399    Improved look of the events filter on the calendar page
     T-12433    Show participants in appraisal overview page and pdf snapshots
+    T-12201    Improved clarity of Audience Visibility language strings
 
 Bug Fixes:
     T-12307    Fixed days not being translated in weekly scheduled reports
@@ -102,9 +174,11 @@ Bug Fixes:
     T-12234    Fixed highlight effect on Kiwifruit themes
     T-12446    Fixed display issue where save search button was overlaying column headers
     T-12326    Recover activity completion, grade and previous course completion data
+    T-12246    Fixed course completion data reset for all users when a course is used as content in a certification
     T-12314    Fixed unknown column error when creating a program with multi_select custom field
     T-12434    The search and clear button on the find courses now are hidden immediately
     T-12278    Fixed facetoface attendance export not showing data if a users do not have a manager assigned to them
+    T-12254    Fixed sort order of Facetoface attendees and requested users in Feedback360
     T-12248    Fixed SCORM redirect when it is opened in a new window
     T-12318    Fixed issue where custom field menus did not work as expected in responsive themes
     T-12310    Fixed display of custom field images in the enhanced catalog

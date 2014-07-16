@@ -201,6 +201,20 @@ class facetoface_notification extends data_object {
         }
     }
 
+    /**
+    * Delete notification and any associated sent message data.
+    *
+    * @access public
+    * @return bool
+    */
+    public function delete() {
+        global $DB;
+        //Delete message sent and history data.
+        $DB->delete_records('facetoface_notification_sent', array('notificationid' => $this->id));
+        $DB->delete_records('facetoface_notification_hist', array('notificationid' => $this->id));
+        // Call main delete function in parent data_object class.
+        parent::delete();
+    }
 
     /**
      * Get timestamp from schedule data
@@ -373,7 +387,12 @@ class facetoface_notification extends data_object {
 
         $time = time();
         $sent = 0;
+        $sessions = array();
         foreach ($recordset as $session) {
+            // Check if we have already processed and found at least one active signup for this session that needs sending.
+            if (isset($sessions[$session->id])) {
+                continue;
+            }
             // Check if they aren't ready to have their notification sent
             switch ($this->conditiontype) {
                 case MDL_F2F_CONDITION_BEFORE_SESSION:
@@ -398,10 +417,19 @@ class facetoface_notification extends data_object {
             }
 
             $sent++;
-            $this->send_to_users($session->id);
+            if (!isset($sessions[$session->id])) {
+                $sessions[$session->id] = $session->id;
+            }
         }
 
-        echo "Checked scheduled notification for {$sent} session(s)\n";
+        if (count($sessions) > 0) {
+            foreach ($sessions as $sessionid => $session) {
+                $this->send_to_users($sessionid);
+            }
+            echo "Sent scheduled notifications for {$sent} session(s)\n";
+        } else {
+            echo "No scheduled notifications need to be sent at this time\n";
+        }
 
         $recordset->close();
     }

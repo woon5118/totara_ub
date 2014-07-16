@@ -1042,5 +1042,38 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014041500, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2014070800) {
+        // Clean up the pos_assignment table for deleted managers.
+        $countsql = "SELECT COUNT(*)";
+        $usersql = "SELECT u.id, pa.userid, pa.type";
+        $clause = "FROM {pos_assignment} pa
+                   JOIN {user} u
+                     ON u.id = pa.managerid
+                    AND u.deleted = 1";
+        $usercount = $DB->count_records_sql("{$countsql} {$clause}");
+        if ($usercount > 0) {
+            $i = 0;
+            $pbar = new progress_bar('fixdeleteduserassignments', 500, true);
+            $pbar->update($i, $usercount, "Fixing position assignments related to deleted managers - {$i}/{$usercount}.");
+            $users = $DB->get_recordset_sql("{$usersql} {$clause}");
+            foreach ($users as $user) {
+                $position_assignment = new position_assignment(array(
+                                                'userid'    => $user->userid,
+                                                'type'      => $user->type));
+                $data = new stdClass();
+                $data->managerid = null;
+                $data->reportstoid = null;
+                $data->managerpath = null;
+                position_assignment::set_properties($position_assignment, $data);
+                $position_assignment->save(true);
+                $i++;
+                $pbar->update($i, $usercount, "Fixing position assignments related to deleted managers - {$i}/{$usercount}.");
+            }
+        }
+        // Clean up any remaining orphaned reportstoid and managerpath records.
+        $sql = "UPDATE {pos_assignment} SET reportstoid = NULL, managerpath = NULL WHERE managerid IS NULL AND (reportstoid IS NOT NULL OR managerpath IS NOT NULL)";
+        $DB->execute($sql, array());
+        upgrade_plugin_savepoint(true, 2014070800, 'totara', 'hierarchy');
+    }
     return true;
 }
