@@ -155,6 +155,8 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2014062302, 'totara', 'appraisal');
 
+    }
+
     if ($oldversion < 2014071600) {
         $users = $DB->get_records('user', array('deleted' => 1));
         $users = array_keys($users);
