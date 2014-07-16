@@ -3,6 +3,42 @@
 
 Totara LMS Changelog
 
+Release 2.6.5 (16th July 2014):
+==================================================
+
+Security issues:
+    MoodleHQ       http://docs.moodle.org/dev/Moodle_2.6.4_release_notes
+    T-12579        Fixed potential security risk in Totara Sync when using database sources
+
+Improvements:
+    T-12497        Improved internationalisation for the display of audience rules
+    T-12547        Added validity checks to the position assignments form
+    T-12591        Backported MDL-45985 new database schema checking script from Moodle 2.8
+    T-10684        Added checks to prevent downgrades from a higher version of Moodle
+
+Bug Fixes:
+    T-12521        Fixed dynamic audiences not updating if the cohort enrolment plugin is disabled
+    T-12203        Fixed reaggregation of Competencies when the aggregation type is changed
+    T-12672        Fixed Totara Sync deleting users with no idnumber set
+    T-12658        Fixed capabilities of Site Manager to enable them to create hierarchy frameworks
+    T-11447        Fixed error on upgrade from Moodle to Totara
+    T-12691        Fixed the sending of Stage Due messages in the Appraisal cron
+    T-12567        Fixed the starting of new attempts for completed SCORMs which open in a new window
+    T-12676        Fixed Totara Sync database source connections with non-alphanumeric passwords
+    T-12636        Fixed addition of user middle name columns in Reportbuilder sources
+    T-12524        Fixed the default facetoface reminder notifications failing to send
+    T-12674        Fixed error when a user tries to show/hide columns in an embedded report
+    T-12678        Fixed errors when using Totara Sync with database sources when position dates are text fields
+    T-12710        Fixed display of users with no email addresses
+    T-12588        Fixed Excel exports failing on some versions of PHP
+    T-12299        Fixed appearance of docks in RTL languages
+    T-11883        Fixed the multilang filter for goal and competency scales
+    T-12623        Fixed the "view all" link in the record of learning and required learning sidebar
+    T-12324        Fixed the formatting of date fields in Excel exports
+    T-12545        Fixed deletion of associated data when deleting a facetoface notification
+    T-12657        Fixed the padding for the body element in Internet Explorer
+    T-12489        Fixed an issue with expanding a SCORM activity from the navigation block in a course
+
 
 Release 2.6.4 (1st July 2014):
 ==================================================
