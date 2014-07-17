@@ -61,9 +61,9 @@ $PAGE->set_title(get_string('deletescheduledreport', 'totara_reportbuilder'));
 $PAGE->set_heading(' ');
 echo $OUTPUT->header();
 
+echo $OUTPUT->heading(get_string('deletescheduledreport', 'totara_reportbuilder'));
 if (!$confirm) {
-    $strdelete = get_string('deletecheckschedulereport', 'totara_reportbuilder');
-    echo $OUTPUT->confirm($strdelete . str_repeat(html_writer::empty_tag('br'), 2) . format_string($reportname), $deleteurl, $returnurl);
+    echo $OUTPUT->confirm(get_string('deletecheckschedulereport', 'totara_reportbuilder', format_string($reportname)), $deleteurl, $returnurl);
 
     echo $OUTPUT->footer();
     exit;
