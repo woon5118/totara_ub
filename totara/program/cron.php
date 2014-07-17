@@ -315,6 +315,8 @@ function program_cron_switch_recurring_courses() {
                         $messagedata->fullmessage = $stringmanager->get_string('z:incompleterecurringprogrammessage', 'totara_program', null, $user->lang);
                         $messagedata->contexturl = $CFG->wwwroot . '/course/view.php?id=' . $course->id;
                         $messagedata->contexturlname = $stringmanager->get_string('launchcourse', 'totara_program', null, $user->lang);
+                        $messagedata->icon = 'program-update';
+                        $messagedata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
                         $result = tm_alert_send($messagedata);
                     }
                 }
