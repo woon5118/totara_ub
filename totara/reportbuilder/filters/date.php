@@ -198,13 +198,19 @@ class rb_filter_date extends rb_filter_type {
         }
 
         $data = array();
+        // Record what filters we're applying so if we're working with
+        // the epoch (1970-01-01 00:00:00) as a search date we know we
+        // need to apply the filter and not just reply on the integer
+        // value for the date. (The UNIX timstamp of the epoch is 0.)
         if (isset($formdata->$sck)) {
             $data['after'] = $formdata->$sdt;
+            $data['after_applied'] = true;
         } else {
             $data['after'] = 0;
         }
         if (isset($formdata->$eck)) {
             $data['before'] = $formdata->$edt;
+            $data['before_applied'] = true;
         } else {
             $data['before'] = 0;
         }
@@ -220,6 +226,7 @@ class rb_filter_date extends rb_filter_type {
         } else {
             $data['daysbefore'] = 0;
         }
+
         return $data;
     }
 
@@ -236,21 +243,17 @@ class rb_filter_date extends rb_filter_type {
         $datetoday = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
         $query  = $this->get_field();
 
-        if (empty($after) and empty($before) and empty($daysafter) and empty($daysbefore)) {
-            return array('', array());
-        }
-
         $params = array();
         $res = "$query > 0" ;
         $resdaysbefore = "$query <= $datetoday";
         $resdaysafter = "$query >= $datetoday";
 
-        if ($after) {
+        if (isset($after) && isset($data['after_applied'])) {
             $uniqueparam = rb_unique_param('fdafter');
             $res .= " AND {$query} >= :{$uniqueparam}";
             $params[$uniqueparam] = $after;
         }
-        if ($before) {
+        if (isset($before) && isset($data['before_applied'])) {
             $uniqueparam = rb_unique_param('fdbefore');
             $res .= " AND {$query} < :{$uniqueparam}";
             $params[$uniqueparam] = $before;
