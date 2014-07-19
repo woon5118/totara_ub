@@ -3929,11 +3929,13 @@ class appraisal_message {
             $assignedroles = $DB->get_records('appraisal_role_assignment', $params, '', 'appraisalrole, userid');
             foreach ($this->roles as $role) {
                 if (isset($assignedroles[$role])) {
+                    $rcptuserid = $assignedroles[$role]->userid;
                     // Send only if complete/incomplete.
                     if ($this->type == self::EVENT_STAGE_DUE && $this->stageiscompleted != 0) {
                         // Get stage completion.
                         $stage = new appraisal_stage($this->stageid);
-                        $complete = $stage->is_completed($assignedroles[$role]);
+                        $roleassignment = appraisal_role_assignment::get_role($this->appraisalid, $learner->userid, $rcptuserid, $role);
+                        $complete = $stage->is_completed($roleassignment);
                         // Skip completed if set "only to incompleted" and contra versa.
                         if ($this->stageiscompleted == 1 && !$complete ||
                             $this->stageiscompleted == -1 && $complete) {
@@ -3942,7 +3944,6 @@ class appraisal_message {
                     }
 
                     $message = $this->get_message($role);
-                    $rcptuserid = $assignedroles[$role]->userid;
                     $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
 
                     // Create a message.
