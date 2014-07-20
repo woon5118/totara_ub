@@ -158,6 +158,7 @@ $string['error:datenotinfuture'] = 'The date needs to be in the future';
 $string['error:dialognotreeitems'] = 'No items available';
 $string['error:duplicaterecordsdeleted'] = 'Duplicate {$a} record deleted: ';
 $string['error:duplicaterecordsfound'] = '{$a->count} duplicate record(s) found in the {$a->tablename} table...fixing (see error log for details)';
+$string['error:emptyidnumberwithsync'] = 'Totara Sync is enabled but the ID number field is empty. Either disable sync for this user or provide a valid ID number.';
 $string['error:importtimezonesfailed'] = 'Failed to update timezone information.';
 $string['error:managernotselected'] = 'Please select a manager';
 $string['error:morethanxitemsatthislevel'] = 'There are more than {$a} items at this level.';
@@ -318,6 +319,7 @@ $string['tempmanagersupporttext'] = ' Note, only current team managers can be se
 $string['timecompleted'] = 'Time completed';
 $string['toggletotarasync'] = 'Toggle Totara sync';
 $string['toggletotarasyncerror'] = 'Could not enable/disable the totara sync field for user {$a}';
+$string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so totara sync cannot be enabled for these users: {$a}';
 $string['totarabuild'] = 'Totara build number';
 $string['totaracopyright'] = '<p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> is a distribution of Moodle. A "distro" or distribution is a ready-made extended version of the standard product with its own particular focus and vision. Totara is specifically designed for the requirements of corporate, industry and vocational training in contrast to standard Moodle\'s traditional educational setting.</p><p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> extensions are Copyright &copy; 2010 onwards, Totara Learning Solutions Limited.</p>';
 $string['totaracore'] = 'Totara core';

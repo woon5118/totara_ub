@@ -44,30 +44,54 @@ if (empty($SESSION->bulk_users)) {
 }
 
 echo $OUTPUT->header();
+$errornotifications = '';
+$badusernotification = array();
 
 if ($confirm) {
     require_sesskey();
-    $errornotifications = '';
-    $count = count($SESSION->bulk_users);
     $errorcounter = 0;
+    $usercount = 0;
     // Slice the amount of users if there are more than 1000 users (Oracle limitation).
     while ($users = totara_pop_n($SESSION->bulk_users, 1000)) {
+        // Set the keys of users to be the values for ease of removal. get_in_or_equal uses array_values so should cause no issues.
+        $users = array_combine($users, $users);
         list($in, $params) = $DB->get_in_or_equal($users);
-        $rs = $DB->get_recordset_select('user', "id $in", $params);
-        foreach ($rs as $user) {
-            if (!$DB->set_field('user', 'totarasync', $enable, array('id' => $user->id))) {
-                $errornotifications .= $OUTPUT->notification(get_string('toggletotarasyncerror', 'totara_core', fullname($user, true)));
+        // Only enable sync if the user has an idnumber.
+        if ($enable) {
+            $badusers = $DB->get_recordset_select('user', "idnumber = '' AND id $in", $params);
+            foreach ($badusers as $baduser) {
+                $badusernotification[] = fullname($baduser, true);
                 $errorcounter++;
+                unset($users[$baduser->id]);
             }
         }
-        $rs->close();
+        // Recalculate the in_or_equal with the remaining good users (if any).
+        if (!empty($users)) {
+            list($in, $params) = $DB->get_in_or_equal($users);
+            $rs = $DB->get_recordset_select('user', "id $in", $params);
+            foreach ($rs as $user) {
+                if (!$DB->set_field('user', 'totarasync', $enable, array('id' => $user->id))) {
+                    $errornotifications .= $OUTPUT->notification(get_string('toggletotarasyncerror', 'totara_core', fullname($user, true)), 'notifynotice');
+                    $errorcounter++;
+                } else {
+                    $usercount++;
+                }
+            }
+            $rs->close();
+        }
     }
+
+    // Show info on bad users
+    if(!empty($badusernotification)) {
+        echo $OUTPUT->notification(get_string('toggletotarasyncerror:noidnumber', 'totara_core', implode(',', $badusernotification)), 'notifynotice');
+    }
+
     // Show users who could not be updated if any.
     if ($errornotifications) {
         echo $errornotifications;
     }
     // Check if at least one user was updated.
-    if (($count - $errorcounter) > 0) {
+    if (($usercount) > 0) {
         echo $OUTPUT->notification(get_string('changessaved'), 'notifysuccess');
     }
     echo $OUTPUT->continue_button($return);
@@ -75,9 +99,21 @@ if ($confirm) {
     $userlist = array();
     $bulkusers = $SESSION->bulk_users;
     while ($users = totara_pop_n($bulkusers, 1000)) {
+        // Check the selected users have idnumbers.
         list($in, $params) = $DB->get_in_or_equal($users);
+        // Warn if the user has no idnumber - note we may still want to disable sync on users who should not have it turned on.
+        $badusers = $DB->get_recordset_select('user', "idnumber = '' AND id $in", $params);
+        foreach ($badusers as $baduser) {
+            $badusernotification[] = fullname($baduser, true);
+        }
         $userlist += $DB->get_records_select_menu('user', "id $in", $params, 'fullname', 'id,'.$DB->sql_fullname().' AS fullname', 0, MAX_BULK_USERS);
     }
+
+    // Show info on bad users.
+    if(!empty($badusernotification)) {
+        echo $OUTPUT->notification(get_string('toggletotarasyncerror:noidnumber', 'totara_core', implode(',', $badusernotification)), 'notifynotice');
+    }
+
     $usernames = implode(', ', $userlist);
     if (count($SESSION->bulk_users) > MAX_BULK_USERS) {
         $usernames .= ', ...';
