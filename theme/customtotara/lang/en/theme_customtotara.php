@@ -40,3 +40,5 @@ $string['buttoncolor'] = 'Button color';
 $string['buttoncolordesc'] = 'This sets the color for the background of buttons.';
 $string['customcss'] = 'Custom CSS';
 $string['customcssdesc'] = 'Any CSS you enter here will be added to every page allowing your to easily customise this theme.';
+$string['region-side-post'] = 'Right';
+$string['region-side-pre'] = 'Left';
