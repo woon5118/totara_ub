@@ -161,7 +161,7 @@ $string['component'] = 'Source';
 $string['configaudiencevisibility'] = 'Default visibility option when the site-wide audience-based visibility setting is enabled';
 $string['configenableaudiencevisibility'] = 'When enabled, course, program and certification visibility will switch to a more advanced interface which supports assigning "Visible learning" to Audiences at a site-wide level.
 
-Once enabled, the visibility of each individual course, program or certification can be set to "Visible to all users", "Hidden from all users" or "Visible to members of the selected audiences". If "Visible to members of the selected audiences" is selected then the course, program or certification is only visible to members of any of the assigned audiences.
+Once enabled, the visibility of each individual course, program or certification can be set to "Visible to all users", "Visible to enrolled users" or "Visible to enrolled users and members of the selected audiences". If "Visible to enrolled users and members of the selected audiences" is selected then the course, program or certification is only visible to enrolled users and members of any of the assigned audiences.
 
 <strong>Warning:</strong> Enabling this setting will change the visibility of courses, programs and certifications across the whole site - the existing "Visibility" setting and the "viewhiddencourses" capability will no longer apply, so courses, programs and certifications that are currently hidden may become visible.';
 $string['confirmdynamiccohortcreation'] = 'Confirm Dynamic Audience Creation';
@@ -244,7 +244,7 @@ $string['error:mustpickonevalue'] = 'You must specify at least one value';
 $string['error:noeditdynamiccohort'] = 'This is a dynamic audience. You cannot directly edit its members.';
 $string['error:noresponsefromajax'] = 'Error: No response from Ajax';
 $string['error:notdynamiccohort'] = 'This is not a dynamic audience.';
-$string['error:novisibleaudiencesselected'] = 'Audiences must be added when using the option "Visible to members of the selected audiences" is selected';
+$string['error:novisibleaudiencesselected'] = 'Audiences must be added when using the option "Visible to enrolled users and members of the selected audiences" is selected';
 $string['error:rulemissing'] = 'A required parameter (rule) was missing';
 $string['error:rulemissingparams'] = 'This rule is not defined.';
 $string['error:startafterfinish'] = 'Start date must not be later than finish date';
@@ -477,7 +477,7 @@ $string['visibleaudience'] = 'Visible to enrolled users and members of the selec
 $string['visiblelearning'] = 'Visible learning';
 $string['visiblelearning_help'] = 'This setting determines whether the course, program or certification appears in the corresponding list.
 
-If "Visible to members of the selected audiences" is selected then it will be visible to all members of the assigned audiences.
+If "Visible to enrolled users and members of the selected audiences" is selected then it will be visible to all members of the assigned audiences.
 
 Users that are enrolled will be able to see it, not matter what visibility setting is selected.
 
