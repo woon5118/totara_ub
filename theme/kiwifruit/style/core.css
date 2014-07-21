@@ -96,7 +96,10 @@ h2.header,
     text-align: left;
 }
 
-h2.header a {
+h2 a,
+h2 a:visited,
+h2 a:hover,
+h2 a:focus {
     color:#FFFFFF;
 }
 h1.centered,
