@@ -1217,7 +1217,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $participants[] = $rolestring . ": " . fullname($user);
             }
         }
-        $out .= html_writer::tag('div', html_writer::tag('label', 'Participants:') .
+        $out .= html_writer::tag('div', html_writer::tag('label', get_string('participants', 'totara_appraisal')) .
                     html_writer::alist($participants), array('class' => 'appraisal-participants'));
 
         if (!$preview) {

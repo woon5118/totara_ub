@@ -283,6 +283,7 @@ $string['overdue'] = 'Overdue';
 $string['pagename'] = 'Page: {$a}';
 $string['pagedefaultname'] = 'New Page';
 $string['pageupdated'] = 'Page updated';
+$string['participants'] = 'Participants:';
 $string['periodchoose'] = 'How much earlier/later?';
 $string['perioddays'] = 'days';
 $string['periodmonths'] = 'months';
