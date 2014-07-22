@@ -907,14 +907,15 @@ class totara_program_renderer extends plugin_renderer_base {
             $totalcount = coursecat::search_programs_count($searchcriteria, $chelper->get_programs_display_options(), $type);
             $programslist = $this->coursecat_programs($chelper, $programs, $totalcount);
 
+            $content .= $this->heading(get_string('searchresults'));
             if (!$totalcount) {
                 if (!empty($searchcriteria['search'])) {
-                    $content .= $this->heading(get_string('noprogramsfound', 'totara_program', $searchcriteria['search']));
+                    $content .= html_writer::tag('p', get_string('noprogramsfound', 'totara_program', $searchcriteria['search']));
                 } else {
-                    $content .= $this->heading(get_string('novalidprograms', 'totara_program'));
+                    $content .= html_writer::tag('p', get_string('novalidprograms', 'totara_program'));
                 }
             } else {
-                $content .= $this->heading(get_string('searchresults'). ": $totalcount");
+                $content .= html_writer::tag('p', get_string('searchresults'). ": $totalcount");
                 $content .= $programslist;
             }
 
