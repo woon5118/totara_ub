@@ -32,6 +32,7 @@ $errors = array();
 $notifications = array();
 
 if ($data = data_submitted()) {
+    require_sesskey();
 
     foreach ($data as $key => $value) {
         if(substr($key, 0, 8) == 'badzone_') {
@@ -93,6 +94,7 @@ $unknownusercount = $DB->count_records_sql($sql, $inparams);
 if ($unknownusercount > 0) {
     $sql = "SELECT DISTINCT timezone from {user} WHERE timezone $insql";
     $unknownzones = $DB->get_fieldset_sql($sql, $inparams);
+    $a = new stdClass();
     $a->numusers = $unknownusercount;
     $a->badzonelist = implode(", ", $unknownzones);
     echo $OUTPUT->notification(get_string('error:unknownzones', 'tool_totara_timezonefix', $a), 'notifyproblem');
@@ -140,6 +142,7 @@ if ($totalbad > 0) {
         $table->data[] = $row;
     }
     $output = html_writer::start_tag('form', array('method' => 'post', 'action' => $PAGE->url->out()));
+    $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
     $output .= html_writer::table($table);
     $output .= $OUTPUT->single_submit(get_string('updatetimezones', 'tool_totara_timezonefix'));
     $output .= html_writer::end_tag('form');
