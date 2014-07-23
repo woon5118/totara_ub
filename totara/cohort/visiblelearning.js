@@ -69,7 +69,8 @@ M.totara_cohortvisiblelearning = M.totara_cohortvisiblelearning || {
                     data: ({
                         id: learningcontentid,
                         type: learningcontenttype,
-                        value: learningvisibilityvalue
+                        value: learningvisibilityvalue,
+                        sesskey: M.cfg.sesskey
                     })
                 });
             } else {

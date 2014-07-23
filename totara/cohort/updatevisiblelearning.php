@@ -32,6 +32,9 @@ $id = required_param('id', PARAM_INT);
 $type = required_param('type', PARAM_INT);
 $value = required_param('value', PARAM_INT);
 
+require_login();
+require_sesskey();
+
 if (!empty($CFG->audiencevisibility)) {
     if ($type == COHORT_ASSN_ITEMTYPE_COURSE && has_capability('moodle/course:update', context_course::instance($id))) {
 
