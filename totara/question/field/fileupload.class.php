@@ -93,7 +93,7 @@ class question_fileupload extends question_base{
      */
     public function add_field_specific_edit_elements(MoodleQuickForm $form) {
         global $FILEPICKER_OPTIONS;
-        if (isguestuser()) {
+        if (isguestuser() || !isloggedin()) {
             $form->addElement('static', '', '', get_string('unavailableforguest', 'totara_question'));
             return;
         }
@@ -111,7 +111,7 @@ class question_fileupload extends question_base{
         $options['maxfiles'] = $this->param1;
 
         $data = new stdClass();
-        if (!$this->value || isguestuser()) {
+        if (!$this->value || isguestuser() || !isloggedin()) {
             return $data;
         }
 
@@ -134,7 +134,7 @@ class question_fileupload extends question_base{
     }
 
     public function edit_set(stdClass $data, $source) {
-        if (isguestuser()) {
+        if (isguestuser() || !isloggedin()) {
             return;
         }
         if ($source == 'form') {
@@ -148,7 +148,7 @@ class question_fileupload extends question_base{
 
     public function to_html($value) {
         global $FILEPICKER_OPTIONS, $OUTPUT;
-        if (isguestuser()) {
+        if (isguestuser() || !isloggedin()) {
             return get_string('unavailableforguest', 'totara_question');
         }
         $fs = get_file_storage();

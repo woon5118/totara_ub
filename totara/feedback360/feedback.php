@@ -52,11 +52,12 @@ $viewasown = false;
 if ($isexternaluser) {
     // Get the user's email address from the token.
     $email = $DB->get_field('feedback360_email_assignment', 'email', array('token' => $token));
-    if ($USER->id != $CFG->siteguest) {
-        $USER = guest_user();
-    }
     $respassignment = feedback360_responder::by_email($email, $token);
     $returnurl = new moodle_url('/totara/feedback360/feedback.php', array('token' => $token));
+    if ($respassignment) {
+        $respassignment->tokenaccess = true;
+    }
+
 } else if ($preview) {
     $feedback360id = required_param('feedback360id', PARAM_INT);
 
