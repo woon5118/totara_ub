@@ -102,6 +102,7 @@ if ($canupdate) {
 
 // Check if we are performing an action
 if ($data = data_submitted() && $canupdate) {
+    require_sesskey();
 
     if ($action === 'removelinkedcourses' && !$plan->is_complete()) {
         $deletions = array();
@@ -172,8 +173,8 @@ if ($plan->get_component('course')->get_setting('enabled')) {
     echo $OUTPUT->heading(get_string('linkedx', 'totara_plan', $coursename), 3);
 
     $class = 'plan-remove-selected';
-    $currenturl->param('action', 'removelinkedcourses');
-    echo html_writer::start_tag('form', array('id' => 'dp-component-update', 'action' => $currenturl->out(false), 'method' => 'POST'));
+    $url = new moodle_url($currenturl, array('action' => 'removelinkedcourses', 'sesskey' => sesskey()));
+    echo html_writer::start_tag('form', array('id' => 'dp-component-update', 'action' => $url->out(false), 'method' => 'POST'));
     echo $OUTPUT->container_start('', 'dp-objective-courses-container');
 
     if ($linkedcourses = $component->get_linked_components($caid, 'course')) {

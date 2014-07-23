@@ -68,9 +68,10 @@ class dp_evidence_relation {
         $out .= $OUTPUT->heading(get_string('linkedx', 'totara_plan', $evidencename), 3, null, 'dp-component-evidence-header');
 
         if ($canupdate && !$plancompleted) {
-            $currenturl->param('action', 'removelinkedevidence');
+            // Do not alter the $currenturl parameter!
+            $url = new moodle_url($currenturl, array('action' => 'removelinkedevidence', 'sesskey' => sesskey()));
             $out .=  html_writer::start_tag('form', array('id' => 'dp-component-evidence-update',
-                'action' => $currenturl->out(false), 'method' => 'POST'));
+                'action' => $url->out(false), 'method' => 'POST'));
         }
 
         $out .= $OUTPUT->container_start('', 'dp-component-evidence-container');
