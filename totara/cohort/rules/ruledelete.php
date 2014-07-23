@@ -30,6 +30,9 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 
 $ruleid = required_param('ruleid', PARAM_INT);
 
+require_login();
+require_sesskey();
+
 $syscontext = context_system::instance();
 require_capability('totara/cohort:managerules', $syscontext);
 

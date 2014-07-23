@@ -27,6 +27,8 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/cohort/rules/lib.php');
 
+require_login();
+
 $syscontext = context_system::instance();
 require_capability('totara/cohort:managerules', $syscontext);
 $PAGE->set_context($syscontext);
@@ -64,6 +66,7 @@ $sqlhandler = $rule->sqlhandler;
 $update = optional_param('update', false, PARAM_BOOL);
 
 if ($update) {
+    require_sesskey();
 
     if ($ui->validateResponse()) {
 

@@ -120,7 +120,8 @@ M.totara_cohortrules = M.totara_cohortrules || {
                      id: id,
                      type: type,
                      value: opvalue,
-                     cohortid : cohortid
+                     cohortid : cohortid,
+                     sesskey: M.cfg.sesskey
                  }),
                  success: function(o) {
                      // If sucess, update operators description in the client side
@@ -224,7 +225,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
             }
 
             dialog.default_url = url + '?rule=' + select.val() + '&id=' + id + '&type=' + idtype;
-            dialog.saveurl = dialog.default_url + '&update=1';
+            dialog.saveurl = dialog.default_url + '&update=1&sesskey=' + M.cfg.sesskey;
             dialog.open();
 
             // Set the value of the menu back to "Add rule" if they cancel
@@ -255,7 +256,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
 
             // Set the URL
             dialog.default_url = link.attr('href');
-            dialog.saveurl = dialog.default_url + '&update=1';
+            dialog.saveurl = dialog.default_url + '&update=1&sesskey=' + M.cfg.sesskey;
             dialog.open();
         });
     }
