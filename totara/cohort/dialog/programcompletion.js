@@ -103,7 +103,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
                           '&cohortid=' + this.cohortid +
                           '&completiontime=' + completiontime +
                           '&completionevent=' + completionevent +
-                          '&completioninstance=' + completioninstance;
+                          '&completioninstance=' + completioninstance +
+                          '&sesskey=' + M.cfg.sesskey;
 
                 var original = this.completionlink.html();
                 this.completionlink.html('Loading..');
