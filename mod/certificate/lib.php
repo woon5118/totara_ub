@@ -1228,6 +1228,8 @@ function certificate_get_date_completed($certificate, $certrecord, $course, $use
 /**
  * Returns the completed date formated according to the certificate date format and the users language
  *
+ * Note: this function may close active user session
+ *
  * @param object $certificate record
  * @param int $timecompleted time completed
  * @return string formatted date
@@ -1247,6 +1249,8 @@ function certificate_get_date_completed_formatted($certificate, $date, $user) {
 
         $olduser = null;
         if (!is_null($user) && is_object($user)) {
+            // It is forbidden to switch $USER while session is active!!!
+            \core\session\manager::write_close();
             // Temporarily set the global $USER to $user
             $olduser = $USER;
             $USER = $user;
