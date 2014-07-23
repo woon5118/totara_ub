@@ -77,6 +77,7 @@ $overviewurl = $CFG->wwwroot."/totara/program/edit.php?id={$id}&action=view";
 // only READ data from the database and MUST NOT WRITE anything as nothing has
 // been checked or validated yet.
 if ($rawdata = data_submitted()) {
+    require_sesskey();
 
     if (!$programmessagemanager->setup_messages($rawdata)) {
         print_error('error:setupprogrammessages', 'totara_program');
