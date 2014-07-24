@@ -235,9 +235,12 @@ function print_session_list($courseid, $facetoface, $sessions) {
     }
     else {
         $upcomingarray = array_merge($upcomingarray, $upcomingtbdarray);
-        // Include information about reservations when drawing the list of sessions.
-        $reserveinfo = facetoface_can_reserve_or_allocate($facetoface, $sessions, $context);
-        echo html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $facetoface));
+        $reserveinfo = array();
+        if (!empty($facetoface->managerreserve)) {
+            // Include information about reservations when drawing the list of sessions.
+            $reserveinfo = facetoface_can_reserve_or_allocate($facetoface, $sessions, $context);
+            echo html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $facetoface));
+        }
         echo $f2f_renderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo);
     }
 
