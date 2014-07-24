@@ -425,7 +425,7 @@ class columns_test extends reportcache_advanced_testcase {
     );
 
     protected $appraisal_user_assignment = array(
-        'id' => 3, 'userid' => 2, 'appraisalid' => 1, 'activestageid' => 2, 'timecompleted' => null,
+        'id' => 3, 'userid' => 2, 'appraisalid' => 1, 'activestageid' => 2, 'timecompleted' => null, 'status' => 1,
     );
 
     protected $goal = array(
