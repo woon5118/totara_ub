@@ -71,7 +71,8 @@ $('#column-checkboxes input').click(function() {
         url: '<?php print $CFG->wwwroot; ?>/totara/reportbuilder/showhide_save.php',
         data: {'shortname' : shortname,
                'column' : $(this).attr('name'),
-               'value' : value
+               'value' : value,
+               'sesskey' : M.cfg.sesskey
         }
     });
 
