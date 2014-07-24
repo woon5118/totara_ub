@@ -149,7 +149,7 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
                                         if ($syncexists) {
                                             // The sync record exists, so create it.
                                             $syncrecord = new stdClass();
-                                            $syncrecord->syncid = 1000 + $key;
+                                            $syncrecord->timemodified = 0;
                                             $syncrecord->username = 'tsetsyncusername' . $key;
                                             $syncrecord->deleted = $syncdeleted;
                                             if ($syncidnumber) {
@@ -199,15 +199,10 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
 
                                             // Create the sync record.
                                             if ($sourceallrecords) {
-                                                $sql = "INSERT INTO {{$synctable}} (id, idnumber, timemodified, username)
-                                                        VALUES (?, ?, 0, ?)";
-                                                $DB->execute($sql, array($syncrecord->syncid, $syncrecord->idnumber,
-                                                        $syncrecord->username));
+                                                unset($syncrecord->deleted);
+                                                $syncrecord->syncid = $DB->insert_record($synctable, $syncrecord);
                                             } else {
-                                                $sql = "INSERT INTO {{$synctable}} (id, idnumber, timemodified, username, deleted)
-                                                        VALUES (?, ?, 0, ?, ?)";
-                                                $DB->execute($sql, array($syncrecord->syncid, $syncrecord->idnumber,
-                                                        $syncrecord->username, $syncrecord->deleted));
+                                                $syncrecord->syncid = $DB->insert_record($synctable, $syncrecord);
                                             }
                                         } else {
                                             // The sync record doesn't exist.

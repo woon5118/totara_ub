@@ -182,10 +182,10 @@ class totara_sync_element_user extends totara_sync_element {
 
         if (!empty($this->config->allow_create)) {
             // Get accounts that must be created.
-            $sql = "SELECT DISTINCT s.*
+            $sql = "SELECT s.*
                       FROM {{$synctable}} s
            LEFT OUTER JOIN {user} u ON (s.idnumber=u.idnumber)
-                     WHERE (u.idnumber IS NULL)";
+                     WHERE (u.idnumber IS NULL AND s.idnumber IS NOT NULL)";
             $rscreateaccounts = $DB->get_recordset_sql($sql);
 
             // The idea of doing this is to get the accounts that need to be created. Since users are created first and then user assignments,
