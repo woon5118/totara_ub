@@ -441,12 +441,15 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     $limit = !empty($options['limit']) ? $options['limit'] : null;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
-    if ($categoryid != "all" && is_numeric($categoryid)) {
+    if ((int)$categoryid > 0) {
         $certifsql = ($type == 'program') ? " AND p.certifid IS NULL" : " AND p.certifid IS NOT NULL";
         $categoryselect = "WHERE p.category = :category {$certifsql}";
-        $params['category'] = $categoryid;
-    } else {
+        $params['category'] = (int)$categoryid;
+    } else if ($categoryid === "all") {
+        // Returns all programs for Program Overview reportbuilder.
         $categoryselect = "";
+    } else {
+        return array();
     }
 
     if (empty($sort)) {
