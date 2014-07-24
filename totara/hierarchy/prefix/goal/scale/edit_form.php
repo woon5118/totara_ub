@@ -31,7 +31,7 @@ class edit_scale_form extends moodleform {
         // Visible elements.
         $mform->addElement('header', 'general', get_string('scale'));
 
-        $mform->addElement('text', 'name', get_string('name'), 'size="40"');
+        $mform->addElement('text', 'name', get_string('name'), 'size="40" maxlength="255"');
         $mform->addHelpButton('name', 'goalscalescalename', 'totara_hierarchy');
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
         $mform->setType('name', PARAM_TEXT);

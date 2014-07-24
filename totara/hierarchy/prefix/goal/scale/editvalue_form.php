@@ -49,8 +49,7 @@ class goalscalevalue_edit_form extends moodleform {
         $mform->addElement('static', 'scalename', get_string('goalscale', 'totara_hierarchy'));
         $mform->addHelpButton('scalename', 'goalscaleassign', 'totara_hierarchy');
 
-        $mform->addElement('text', 'name', get_string('goalscalevaluename', 'totara_hierarchy'),
-            'maxlength="100" size="20"');
+        $mform->addElement('text', 'name', get_string('goalscalevaluename', 'totara_hierarchy'), 'maxlength="255" size="20"');
         $mform->addHelpButton('name', 'goalscalevaluename', 'totara_hierarchy');
         $mform->addRule('name', get_string('missingscalevaluename', 'totara_hierarchy'), 'required', null, 'client');
         $mform->setType('name', PARAM_MULTILANG);

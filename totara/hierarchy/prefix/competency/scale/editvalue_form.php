@@ -49,7 +49,7 @@ class competencyscalevalue_edit_form extends moodleform {
         $mform->addElement('static', 'scalename', get_string('competencyscale', 'totara_hierarchy'));
         $mform->addHelpButton('scalename', 'competencyscaleassign', 'totara_hierarchy');
 
-        $mform->addElement('text', 'name', get_string('competencyscalevaluename', 'totara_hierarchy'), 'maxlength="100" size="20"');
+        $mform->addElement('text', 'name', get_string('competencyscalevaluename', 'totara_hierarchy'), 'maxlength="255" size="20"');
         $mform->addHelpButton('name', 'competencyscalevaluename', 'totara_hierarchy');
         $mform->addRule('name', get_string('missingscalevaluename', 'totara_hierarchy'), 'required', null, 'client');
         $mform->setType('name', PARAM_MULTILANG);
