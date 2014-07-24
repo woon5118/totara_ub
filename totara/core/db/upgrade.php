@@ -1134,5 +1134,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014082700, 'totara', 'core');
     }
 
+    if ($oldversion < 2014090800) {
+        global $CFG;
+        if (get_config('moodle', 'tempmanagerrestrictselection') !== false) {
+            set_config('tempmanagerrestrictselection', (int) $CFG->tempmanagerrestrictselection);
+        }
+        totara_upgrade_mod_savepoint(true, 2014090800, 'totara_core');
+    }
+
     return true;
 }

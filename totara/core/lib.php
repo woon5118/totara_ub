@@ -400,7 +400,7 @@ function totara_update_temporary_managers() {
         return true;
     }
 
-    if (!empty($CFG->tempmanagerrestrictselection)) {
+    if (!$CFG->tempmanagerrestrictselection) {
         // Ensure only users that are currently managers are assigned as temporary managers.
         // We need this check for scenarios where tempmanagerrestrictselection was previously disabled.
         $sql = "SELECT DISTINCT tm.userid
