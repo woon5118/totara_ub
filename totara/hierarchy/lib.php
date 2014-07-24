@@ -1297,7 +1297,7 @@ class hierarchy {
      *
      * @return string HTML to display action icons
      */
-    function display_hierarchy_item_actions($record, $canedit=true, $candelete=true, $canmove=true, $extraparams='') {
+    function display_hierarchy_item_actions($record, $canedit=true, $candelete=true, $canmove=true, $extraparams=array()) {
         global $OUTPUT;
         $buttons = array();
         $str_edit = get_string('edit');
@@ -1308,29 +1308,29 @@ class hierarchy {
         $str_delete = get_string('delete');
         $str_spacer = $OUTPUT->spacer(array('height' => 11, 'width' => 11));
         $prefix = $this->prefix;
-        $extraparams = !empty($extraparams) ? '&amp;' . $extraparams : '';
+        $params = array_merge(array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'sesskey' => sesskey()), $extraparams);
 
         if ($canedit) {
-            $buttons[] = $OUTPUT->action_icon(new moodle_url('item/edit.php', array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'id' => $record->id . $extraparams, 'sesskey' => sesskey())),
+            $buttons[] = $OUTPUT->action_icon(new moodle_url('item/edit.php', array_merge($params, array('id' => $record->id))),
                     new pix_icon('t/edit', $str_edit));
 
             if ($record->visible) {
-                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'hide' => $record->id . $extraparams, 'sesskey' => sesskey())),
+                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('hide' => $record->id))),
                     new pix_icon('t/hide', $str_hide));
             } else {
-                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'show' => $record->id . $extraparams, 'sesskey' => sesskey())),
+                $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('show' => $record->id))),
                     new pix_icon('t/show', $str_show));
             }
 
             if ($canmove) {
                 if ($this->get_hierarchy_item_adjacent_peer($record, HIERARCHY_ITEM_ABOVE)) {
-                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'moveup' => $record->id, 'frameworkid' => $record->frameworkid . $extraparams, 'sesskey' => sesskey())),
+                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('moveup' => $record->id))),
                             new pix_icon('t/up', $str_moveup));
                 } else {
                     $buttons[] = $str_spacer;
                 }
                 if ($this->get_hierarchy_item_adjacent_peer($record, HIERARCHY_ITEM_BELOW)) {
-                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array('prefix' => $prefix, 'movedown' => $record->id, 'frameworkid' => $record->frameworkid . $extraparams, 'sesskey' => sesskey())),
+                    $buttons[] = $OUTPUT->action_icon(new moodle_url('index.php', array_merge($params, array('movedown' => $record->id))),
                             new pix_icon('t/down', $str_movedown));
                 } else {
                     $buttons[] = $str_spacer;
@@ -1338,7 +1338,7 @@ class hierarchy {
             }
         }
         if ($candelete) {
-            $buttons[] = $OUTPUT->action_icon(new moodle_url('item/delete.php', array('prefix' => $prefix, 'frameworkid' => $record->frameworkid, 'id' => $record->id . $extraparams)),
+            $buttons[] = $OUTPUT->action_icon(new moodle_url('item/delete.php', array_merge($params, array('id' => $record->id))),
                     new pix_icon('t/delete', $str_delete));
         }
         return implode($buttons, '');

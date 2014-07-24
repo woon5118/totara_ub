@@ -266,12 +266,11 @@ if ($matchcount > 0) {
 
         $params = array();
         if ($page) {
-            $params[] = 'page='.$page;
+            $params['page'] = $page;
         }
         if ($searchactive) {
-            $params[] = 'query='.urlencode($search);
+            $params['query'] = urlencode($search);
         }
-        $extraparams = (count($params)) ? implode($params, '&amp;') : '';
 
         // Cache this hierarchies types.
         $types = $hierarchy->get_types();
@@ -293,7 +292,7 @@ if ($matchcount > 0) {
             }
             if ($canupdateitems || $candeleteitems) {
                 $row[] = $hierarchy->display_hierarchy_item_actions($record, $canupdateitems,
-                        $candeleteitems, $canmoveitems, $extraparams);
+                        $candeleteitems, $canmoveitems, $params);
             }
             $table->add_data($row);
             ++$num_on_page;
