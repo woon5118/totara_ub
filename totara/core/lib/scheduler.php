@@ -278,11 +278,14 @@ class scheduler {
      * @param array $data - array with schedule parameters. If not set, default schedule will be applied
      */
     public function from_array(array $data = array()) {
+        global $CFG;
+
         $this->changed = true;
 
         $data['frequency'] = isset($data['frequency']) ? $data['frequency'] : self::DAILY;
         $data['schedule'] = isset($data['schedule']) ? $data['schedule'] : 0;
         $data['initschedule'] = isset($data['initschedule']) ? $data['initschedule'] : false;
+        $data['timezone'] = isset($data['timezone']) ? $data['timezone'] : $CFG->timezone;
         $this->subject->{$this->map['frequency']} = $data['frequency'];
         $this->subject->{$this->map['schedule']} = $data['schedule'];
         // If no need in reinitialize, don't change nextreport value.
