@@ -30,6 +30,9 @@ $system_context = context_system::instance();
 require_login(0, false);
 require_capability('moodle/site:config', $system_context);
 
+// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+send_headers('text/html; charset=utf-8', false);
+
 $PAGE->set_context($system_context);
 
 $id = optional_param('id', 0, PARAM_INT);   // roomid
@@ -44,4 +47,3 @@ echo '<div id="f2froomform">';
 $form->display();
 echo '</div>';
 
-?>

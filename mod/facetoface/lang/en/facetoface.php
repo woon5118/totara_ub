@@ -309,6 +309,7 @@ $string['filterbyroom'] = 'Filter by Room';
 $string['floor'] = 'Floor';
 $string['format'] = 'Format';
 $string['full'] = 'Date is fully occupied';
+$string['generalsettings'] = 'General Settings';
 $string['goback'] = 'Go back';
 $string['guestsno'] = 'Sorry, guests are not allowed to sign up for sessions.';
 $string['icalendarheading'] = 'iCalendar Attachments';

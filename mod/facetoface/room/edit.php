@@ -23,17 +23,16 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/room/room_form.php');
 
 $id = optional_param('id', 0, PARAM_INT);
+$page = optional_param('page', 0, PARAM_INT);
 
-$PAGE->set_url($CFG->wwwroot . '/mod/facetoface/room/edit.php');
+admin_externalpage_setup('modfacetofacerooms');
 $systemcontext = context_system::instance();
-$PAGE->set_context($systemcontext);
 
-require_login();
-
-$roomlisturl = $CFG->wwwroot . '/mod/facetoface/room/manage.php';
+$roomlisturl = new moodle_url('/mod/facetoface/room/manage.php', array('page' => $page));
 
 $editoroptions = array(
     'noclean'  => false,
@@ -44,21 +43,22 @@ $editoroptions = array(
 if ($id == 0) {
     $room = new stdClass();
     $room->id = 0;
+    $room->description = '';
+    $room->status = 1;
 } else {
-    $room = $DB->get_record('facetoface_room', array('id' => $id));
-    $room->descriptionformat = FORMAT_HTML;
-    $room = file_prepare_standard_editor($room, 'description', $editoroptions, $systemcontext, 'facetoface', 'room', $room->id);
+    $room = $DB->get_record('facetoface_room', array('id' => $id, 'custom' => 0), '*', MUST_EXIST);
 }
+$room->descriptionformat = FORMAT_HTML;
+$room->page = $page;
+$room = file_prepare_standard_editor($room, 'description', $editoroptions, $systemcontext, 'facetoface', 'room', $room->id);
 
-$form = new f2f_room_form(null, array('roomid' => $room->id, 'editoroptions' => $editoroptions));
+$form = new mod_facetoface_room_form(null, array('id' => $room->id, 'editoroptions' => $editoroptions));
 $form->set_data($room);
 
 if ($form->is_cancelled()) {
     redirect($roomlisturl);
 } else if ($data = $form->get_data()) {
     if (isset($data->submitbutton)) {
-
-        $now = time();
 
         $todb = new stdClass();
         $todb->name = $data->name;
@@ -67,21 +67,21 @@ if ($form->is_cancelled()) {
         $todb->capacity = $data->capacity;
         $todb->type = $data->type;
         $todb->custom = 0;
-        $todb->timemodified = $now;
+        $todb->timemodified = time();
 
         if ($data->id == 0) {
-            //Create new room
-            $todb->timecreated = $now;
+            // Create new room.
+            $todb->timecreated = $todb->timemodified;
 
             $room->id = $DB->insert_record('facetoface_room', $todb);
 
-            // Update description
+            // Update description.
             $description_data = file_postupdate_standard_editor($data, 'description', $editoroptions, $systemcontext, 'facetoface', 'room', $room->id);
             $DB->set_field('facetoface_room', 'description', $description_data->description, array('id' => $room->id));
 
             totara_set_notification(get_string('roomcreatesuccess', 'facetoface'), $roomlisturl, array('class' => 'notifysuccess'));
         } else {
-            //Update room
+            // Update room.
             $todb->id = $room->id;
 
             $DB->update_record('facetoface_room', $todb);
@@ -102,10 +102,6 @@ if ($id == 0) {
 } else {
     $page_heading = get_string('editroom', 'facetoface');
 }
-
-$PAGE->set_title($page_heading);
-$PAGE->navbar->add(get_string('rooms', 'facetoface'))->add($page_heading);
-navigation_node::override_active_url($url);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($page_heading);

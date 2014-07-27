@@ -35,7 +35,7 @@ class mod_facetoface_signup_form extends moodleform {
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
-        $mform->setType('backtoallsessions', PARAM_TEXT);
+        $mform->setType('backtoallsessions', PARAM_INT);
 
         if ($manageremail === false) {
             $mform->addElement('hidden', 'manageremail', '');

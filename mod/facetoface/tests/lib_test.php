@@ -35,7 +35,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-class facetofacelib_test extends advanced_testcase {
+class facetoface_lib_testcase extends advanced_testcase {
     // Test database data.
     protected $facetoface_data = array(
         array('id',                     'course',           'name',                     'thirdparty',
@@ -86,7 +86,7 @@ class facetofacelib_test extends advanced_testcase {
         array(1,    1,   100,    1,  'dtl1',     1,     4,    '$75',     '$60',     1500,   1600, 2),
         array(2,    2,    50,    0,  'dtl2',     0,     1,    '$90',     '$0',     1400,   1500, 2),
         array(3,    3,    10,    1,  'dtl3',     1,     7,    '$100',    '$80',     1500,   1500, 2),
-        array(4,    4,    1,     0,  'dtl4',     0,     7,    '$10',     '$8',     0500,   1900, 2),
+        array(4,    4,    1,     0,  'dtl4',     0,     7,    '$10',     '$8',      500,   1900, 2),
         );
 
     protected $facetoface_sessions_field_data = array(
@@ -110,7 +110,7 @@ class facetofacelib_test extends advanced_testcase {
         array('id',     'sessionid',    'timestart',    'timefinish'),
         array(1,        1,              1100,           1300),
         array(2,        2,              1900,           2100),
-        array(3,        3,              0900,           1100),
+        array(3,        3,               900,           1100),
         array(4,        3,              1200,           1400),
     );
 
@@ -130,7 +130,7 @@ class facetofacelib_test extends advanced_testcase {
         array(2,        2,              70,             0,              32.5,
             'note2',    'advice2',      '2',      1700),
         array(3,        3,              70,             0,              88,
-            'note3',    'advice3',      '3',      0700),
+            'note3',    'advice3',      '3',       700),
         array(4,        4,              70,             0,              12.5,
             'note4',    'advice4',      '4',      1100),
     );
@@ -246,19 +246,19 @@ class facetofacelib_test extends advanced_testcase {
             'usermodified', 'organisationid', 'userid', 'positionid',
             'reportstoid', 'type', 'managerid'),
         array(1, 'fullname1', 'shortname1', 'idnumber1', 'desc1',
-            0900, 1000, 0800, 1300,
+             900, 1000,  800, 1300,
             1, 1122, 1, 2,
             1, 1, 2),
         array(2, 'fullname2', 'shortname2', 'idnumber2', 'desc2',
-            0900, 2000, 0800, 2300,
+             900, 2000,  800, 2300,
             2, 2222, 2, 2,
             2, 2, 1),
         array(3, 'fullname3', 'shortname3', 'idnumber3', 'desc3',
-            0900, 3000, 0800, 3300,
+             900, 3000,  800, 3300,
             3, 3322, 3, 2,
             3, 3, 1),
         array(4, 'fullname4', 'shortname4', 'idnumber4', 'desc4',
-            0900, 4000, 0800, 4300,
+             900, 4000,  800, 4300,
             4, 4422, 4, 2,
             4, 4, 1),
     );
@@ -979,6 +979,8 @@ class facetofacelib_test extends advanced_testcase {
         $session1 = $this->sessions['sess0'];
         $sess0 = $this->array_to_object($session1);
 
+        $sessiondates1 = new stdClass();
+
         // Test.
         $this->assertEquals(facetoface_add_session($session1, $sessiondates1), 4);
         $this->resetAfterTest(true);
@@ -999,7 +1001,7 @@ class facetofacelib_test extends advanced_testcase {
         $sessiondates->sessionid = 1;
 
         // Test.
-        $this->assertTrue((bool)facetoface_update_session($session, $sessiondates), $this->msgtrue);
+        $this->assertTrue((bool)facetoface_update_session($session1, $sessiondates), $this->msgtrue);
         $this->resetAfterTest(true);
     }
 
@@ -1595,12 +1597,6 @@ class facetofacelib_test extends advanced_testcase {
 
         // Test for invalid case.
         $this->assertFalse((bool)facetoface_manager_needed($f2f2), $this->msgfalse);
-
-        $this->resetAfterTest(true);
-    }
-
-    function test_facetoface_list_of_sitenotices() {
-        $this->assertTrue((bool)facetoface_list_of_sitenotices(), $this->msgtrue);
 
         $this->resetAfterTest(true);
     }

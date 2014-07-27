@@ -21,35 +21,45 @@
  * @subpackage facetoface
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once "$CFG->dirroot/lib/formslib.php";
 require_once "$CFG->dirroot/mod/facetoface/lib.php";
 
 class mod_facetoface_sitenotice_form extends moodleform {
 
-    function definition()
-    {
-        $mform =& $this->_form;
+    public function definition() {
+        $mform = $this->_form;
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('hidden', 'id', $this->_customdata['id']);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'page');
+        $mform->setType('page', PARAM_INT);
 
         $mform->addElement('text', 'name', get_string('name'), 'maxlength="255" size="50"');
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->setType('name', PARAM_MULTILANG);
+        $mform->setType('name', PARAM_TEXT);
 
-        $mform->addElement('editor', 'text', get_string('noticetext', 'facetoface'), array('rows'  => 10, 'cols'  => 64));
-        $mform->setType('text', PARAM_RAW);
-        $mform->addRule('text', null, 'required', null, 'client');
+        $mform->addElement('editor', 'text_editor', get_string('noticetext', 'facetoface'), array('rows'  => 10, 'cols'  => 64), $this->_customdata['editoroptions']);
+        $mform->setType('text_editor', PARAM_RAW);
+        $mform->addRule('text_editor', null, 'required', null, 'client');
 
         $mform->addElement('header', 'conditions', get_string('conditions', 'facetoface'));
         $mform->addElement('html', get_string('conditionsexplanation', 'facetoface'));
 
-        // Show all custom fields
+        // Show all custom fields.
         $customfields = $this->_customdata['customfields'];
         facetoface_add_customfields_to_form($mform, $customfields, true);
 
-        $this->add_action_buttons();
+        if ($this->_customdata['id']) {
+            $label = null;
+        } else {
+            $label = get_string('addnewnoticelink', 'facetoface');
+        }
+
+        $this->add_action_buttons(true, $label);
     }
 }

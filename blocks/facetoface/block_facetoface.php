@@ -25,19 +25,18 @@
  */
 
 class block_facetoface extends block_base {
-    function init() {
+    public function init() {
         $this->title = get_string('formaltitle', 'block_facetoface');
-        $this->version = 2012071900;
     }
 
-    function specialization() {
+    public function specialization() {
     }
 
-    function applicable_formats() {
+    public function applicable_formats() {
         return array('all' => true);
     }
 
-    function get_content() {
+    public function get_content() {
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -45,6 +44,11 @@ class block_facetoface extends block_base {
 
         $this->content = new stdClass;
         $this->content->footer = '';
+
+        if (!isloggedin() or isguestuser()) {
+            // Guests cannot see any bookings.
+            return $this->content;
+        }
 
         $timenow = time();
         $startyear  = strftime('%Y', $timenow);

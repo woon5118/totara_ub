@@ -35,23 +35,14 @@ M.totara_f2f_room = M.totara_f2f_room || {
      * module initialisation method called by php js_init_call()
      *
      * @param object    YUI instance
-     * @param string    args supplied in JSON format
+     * @param object    configuration from PHP script
      */
-    init: function(Y, args){
+    init: function(Y, config){
         var module = this;
 
         // Save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
-
-        // If defined, parse args into this module's config object
-        if (args) {
-            var jargs = Y.JSON.parse(args);
-            for (var a in jargs) {
-                if (Y.Object.owns(jargs, a)) {
-                    this.config[a] = jargs[a];
-                }
-            }
-        }
+        this.config = config;
 
         // Check jQuery dependency is available
         if (typeof $ === 'undefined') {
@@ -74,7 +65,7 @@ M.totara_f2f_room = M.totara_f2f_room || {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('chooseroom', 'facetoface') + M.totara_f2f_room.config.display_selected_item + '</h2>'
                 },
-                url + 'sessionrooms.php?sessionid=' + M.totara_f2f_room.config.sessionid,
+                url + 'sessionrooms.php?sessionid=' + M.totara_f2f_room.config.sessionid + '&facetofaceid=' + M.totara_f2f_room.config.facetofaceid,
                 handler
         );
 
@@ -209,7 +200,7 @@ totaraDialog_handler_addpdroom.prototype._open = function(alternative_url) {
     });
     // Update the url to include the timestamps
     timeslots = JSON.stringify(timeslots);
-    this._dialog.default_url = M.cfg.wwwroot+'/mod/facetoface/room/ajax/sessionrooms.php?sessionid='+M.totara_f2f_room.config.sessionid+'&timeslots='+timeslots;
+    this._dialog.default_url = M.cfg.wwwroot+'/mod/facetoface/room/ajax/sessionrooms.php?sessionid='+M.totara_f2f_room.config.sessionid+'&timeslots='+timeslots+'&facetofaceid='+M.totara_f2f_room.config.facetofaceid;
 }
 
 totaraDialog_handler_addpdroom.prototype.first_load = function() {

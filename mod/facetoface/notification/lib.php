@@ -586,7 +586,7 @@ class facetoface_notification extends data_object {
         $subst = array('subject', 'body', 'managerprefix');
         foreach ($subst as $text) {
             $$text = facetoface_message_substitutions(
-                $$text,
+                $text,
                 $coursename,
                 $this->_facetoface->name,
                 $user,

@@ -25,6 +25,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+// TODO: These includes are VERY wrong, lib.php must include as little as possible! Solution is to create locallib.php and move most of the stuff there.
 
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
@@ -32,9 +33,7 @@ require_once($CFG->dirroot.'/lib/adminlib.php');
 require_once($CFG->dirroot . '/user/selector/lib.php');
 require_once $CFG->dirroot.'/mod/facetoface/messaginglib.php';
 require_once $CFG->dirroot.'/mod/facetoface/notification/lib.php';
-if (file_exists($CFG->libdir.'/completionlib.php')) {
-    require_once($CFG->libdir.'/completionlib.php');
-}
+require_once($CFG->libdir.'/completionlib.php');
 
 /**
  * Definitions for setting notification types
@@ -1195,7 +1194,7 @@ function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
  * @param integer $courseid      ID of the course
  * @param integer $facetofaceid  ID of the Face-to-face activity
  *
- * @returns object String grade and the time that it was graded
+ * @return object String grade and the time that it was graded
  */
 function facetoface_get_grade($userid, $courseid, $facetofaceid) {
 
@@ -1425,8 +1424,7 @@ function facetoface_download_attendance($facetofacename, $facetofaceid, $locatio
  * @param object $context the course context of the facetoface instance
  * @returns integer The index of the next column
  */
-function facetoface_write_worksheet_header(&$worksheet, $context)
-{
+function facetoface_write_worksheet_header(&$worksheet, $context) {
     $pos=0;
     $customfields = facetoface_get_session_customfields();
     foreach ($customfields as $field) {
@@ -1477,8 +1475,7 @@ function facetoface_write_worksheet_header(&$worksheet, $context)
  * @returns integer Index of the last row written
  */
 function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $startingrow, $facetofaceid, $location,
-                                              $coursename, $activityname, $dateformat)
-{
+                                              $coursename, $activityname, $dateformat) {
     global $CFG, $DB;
 
     $trainerroles = facetoface_get_trainer_roles($coursecontext);
@@ -1854,8 +1851,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
  *
  * @param array $fieldstoinclude Limit the fields returned/cached to these ones (optional)
  */
-function facetoface_get_user_customfields($userid, $fieldstoinclude=null)
-{
+function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
     global $CFG, $DB;
 
     // Cache all lookup
@@ -2197,7 +2193,7 @@ function facetoface_check_manageremail($manageremail) {
  *                     the ID of the signup
  */
 function facetoface_take_attendance($data) {
-    global $USER;
+    global $USER, $DB;
 
     $sessionid = $data->s;
 
@@ -2229,6 +2225,12 @@ function facetoface_take_attendance($data) {
         if ($submissionidcheck == 'submissionid_') {
             $submissionid = substr($key, 13);
             $selectedsubmissionids[$submissionid]=$submissionid;
+
+            if (!$DB->record_exists('facetoface_signups', array('id' => $submissionid, 'sessionid' => $session->id))) {
+                // The data is inconsistent, hacker?
+                error_log("F2F: could not mark signup id '$submissionid' because it does not match session id $session->id");
+                continue;
+            }
 
             // Update status
             switch ($value) {
@@ -2467,13 +2469,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     if (!has_capability('mod/facetoface:view', $contextmodule)) {
         return null; // Not allowed to view this activity.
     }
-    $contextcourse = context_course::instance($coursemodule->course);
     // Can view attendees.
-    $viewattendees = has_capability('mod/facetoface:viewattendees', $contextcourse);
+    $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
     // Can see "view all sessions" link even if activity is hidden/currently unavailable.
     $iseditor = has_any_capability(array('mod/facetoface:viewattendees', 'mod/facetoface:editsessions',
                                         'mod/facetoface:addattendees', 'mod/facetoface:addattendees',
-                                        'mod/facetoface:takeattendance'), $contextcourse);
+                                        'mod/facetoface:takeattendance'), $contextmodule);
 
     $table = html_writer::start_tag('table', array('class' => 'table90 inlinetable'));
     $timenow = time();
@@ -3440,29 +3441,6 @@ function facetoface_get_session_customfields() {
     return $customfields;
 }
 
-/**
- * Display the list of custom fields in the site-wide settings page
- */
-function facetoface_list_of_customfields() {
-    global $CFG, $USER, $DB, $OUTPUT;
-
-    if ($fields = $DB->get_records('facetoface_session_field', array(), 'name', 'id, name')) {
-        $table = new html_table();
-        $table->attributes['class'] = 'halfwidthtable';
-        foreach ($fields as $field) {
-            $fieldname = format_string($field->name);
-            $edit_url = new moodle_url('/mod/facetoface/customfield.php', array('id' => $field->id));
-            $editlink = $OUTPUT->action_icon($edit_url, new pix_icon('t/edit', get_string('edit')));
-            $delete_url = new moodle_url('/mod/facetoface/customfield.php', array('id' => $field->id, 'd' => '1', 'sesskey' => $USER->sesskey));
-            $deletelink = $OUTPUT->action_icon($delete_url, new pix_icon('t/delete', get_string('delete')));
-            $table->data[] = array($fieldname, $editlink, $deletelink);
-        }
-        return html_writer::table($table, true);
-    }
-
-    return get_string('nocustomfields', 'facetoface');
-}
-
 function facetoface_update_trainers($facetoface, $session, $form) {
     global $DB;
 
@@ -3548,15 +3526,25 @@ function facetoface_update_trainers($facetoface, $session, $form) {
 
 /**
  * Return array of trainer roles configured for face-to-face
- * @param $coursecontext context of the course
+ * @param $context context of the course or activity
  * @return  array
  */
-function facetoface_get_trainer_roles($coursecontext) {
+function facetoface_get_trainer_roles($context) {
     global $CFG, $DB;
 
     // Check that roles have been selected
     if (empty($CFG->facetoface_session_roles)) {
         return false;
+    }
+
+    if ($context) {
+        $coursecontext = $context->get_course_context(false);
+        if (!$coursecontext) {
+            debugging('Invalid context specified as facetoface_get_trainer_roles() parameter');
+            return array();
+        }
+    } else {
+        $coursecontext = null;
     }
 
     // Parse roles
@@ -3664,37 +3652,10 @@ function facetoface_manager_needed($facetoface){
 }
 
 /**
- * Display the list of site notices in the site-wide settings page
- */
-function facetoface_list_of_sitenotices() {
-    global $CFG, $USER, $DB, $OUTPUT;
-
-    if ($notices = $DB->get_records('facetoface_notice', array(), 'name', 'id, name')) {
-        $table = new html_table();
-        $table->width = '50%';
-        $table->tablealign = 'left';
-        $table->data = array();
-        $table->size = array('100%');
-        foreach ($notices as $notice) {
-            $noticename = format_string($notice->name);
-            $edit_url = new moodle_url('/mod/facetoface/sitenotice.php', array('id' => $notice->id));
-            $editlink = $OUTPUT->action_icon($edit_url, new pix_icon('t/edit', get_string('edit')));
-            $delete_url = new moodle_url('/mod/facetoface/sitenotice.php', array('id' => $notice->id, 'd' => '1', 'sesskey' => $USER->sesskey));
-            $deletelink = $OUTPUT->action_icon($delete_url, new pix_icon('t/delete', get_string('delete')));
-            $table->data[] = array($noticename, $editlink, $deletelink);
-        }
-        return html_writer::table($table, true);
-    }
-
-    return get_string('nositenotices', 'facetoface');
-}
-
-/**
  * Add formslib fields for all custom fields defined site-wide.
  * (used by the session add/edit page and the site notices)
  */
-function facetoface_add_customfields_to_form(&$mform, $customfields, $alloptional=false)
-{
+function facetoface_add_customfields_to_form(&$mform, $customfields, $alloptional=false) {
     foreach ($customfields as $field) {
         $fieldname = "custom_$field->shortname";
 
@@ -4369,7 +4330,8 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     }
 
     // Make sure that the user is enroled in the course
-    $context   = context_course::instance($course->id);
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
     if (!is_enrolled($context, $user)) {
 
         $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
@@ -4996,7 +4958,7 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
         return false;
     }
 
-    require_course_login($course, true, $cm);
+    require_login($course, true, $cm);
 
     if ($filearea !== 'session') {
         return false;
@@ -5020,7 +4982,7 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
     }
 
     // finally send the file
-    send_stored_file($file, 360, 0, $forcedownload, $options);
+    send_stored_file($file, 360, 0, true, $options);
 }
 
 /**
@@ -5699,4 +5661,18 @@ function facetoface_get_rooms($facetofaceid) {
         WHERE s.facetoface = ?";
 
     return $DB->get_records_sql($sql, array($facetofaceid));
+}
+
+/**
+ * Called after each config setting update.
+ */
+function facetoface_displaysessiontimezones_updated() {
+    global $DB;
+
+    $sessions = $DB->get_recordset('facetoface_sessions');
+    foreach ($sessions as $s) {
+        $session = facetoface_get_session($s->id);
+        facetoface_update_calendar_entries($session);
+    }
+    $sessions->close();
 }

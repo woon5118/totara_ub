@@ -22,23 +22,23 @@
  * @subpackage facetoface
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 require_once("{$CFG->dirroot}/lib/formslib.php");
 
-class f2f_room_form extends moodleform {
+class mod_facetoface_room_form extends moodleform {
 
     /**
      * Definition of the room form
      */
-    function definition() {
-        $mform =& $this->_form;
-        $roomid = $this->_customdata['roomid'];
+    public function definition() {
+        $mform = $this->_form;
 
-        $mform->addElement('hidden', 'id', $roomid);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'page');
+        $mform->setType('page', PARAM_INT);
 
         $mform->addElement('text', 'name', get_string('roomname', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
@@ -59,11 +59,16 @@ class f2f_room_form extends moodleform {
 
         $typelist = array('internal' => get_string('internal', 'facetoface'), 'external' => get_string('external', 'facetoface'));
         $mform->addElement('select', 'type', get_string('type', 'facetoface'), $typelist);
-        $mform->setType('type', PARAM_TEXT);
         $mform->addHelpButton('type', 'roomtype', 'facetoface');
 
         $mform->addElement('editor', 'description_editor', get_string('roomdescription', 'facetoface'), null, $this->_customdata['editoroptions']);
 
-        $this->add_action_buttons();
+        if ($this->_customdata['id']) {
+            $label = null;
+        } else {
+            $label = get_string('addroom', 'facetoface');
+        }
+
+        $this->add_action_buttons(true, $label);
     }
 }

@@ -40,8 +40,14 @@ if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetof
 if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
     print_error('error:coursemisconfigured', 'facetoface');
 }
+if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
+}
+$context = context_module::instance($cm->id);
+
 // Cap checks
-require_login($facetoface->course);
+require_login($course, false, $cm);
+require_capability('mod/facetoface:addattendees', $context);
 
 // Get import results
 if (isset($_SESSION['f2f-bulk-results'][$session->id])) {
@@ -50,6 +56,9 @@ if (isset($_SESSION['f2f-bulk-results'][$session->id])) {
     print_error('error:noimportresultsfound', 'facetoface');
 }
 
+// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+send_headers('text/html; charset=utf-8', false);
+
 $added = $results[0];
 $errors = $results[1];
 $bulkaddsource = empty($results[2]) ? 'bulkaddsourceuserid' : $results[2];
@@ -57,6 +66,8 @@ $bulkaddsource = empty($results[2]) ? 'bulkaddsourceuserid' : $results[2];
 // Check capability
 
 if ($data = data_submitted()) {
+    require_sesskey();
+
     if (!empty($data->f2f_conflict)) {
         $errors = array();
         $added = array();

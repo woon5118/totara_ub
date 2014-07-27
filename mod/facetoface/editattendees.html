@@ -62,7 +62,7 @@ if ($error) {
                 if ($usercount > MAX_USERS_PER_PAGE) {
                     $serchcount = new stdClass();
                     $serchcount->count = $usercount;
-                    $serchcount->search = $searchtext;
+                    $serchcount->search = s($searchtext);
                     echo '<optgroup label="'.get_string('toomanyusersmatchsearch', 'moodle', $serchcount).'"><option></option></optgroup>'."\n"
                         .'<optgroup label="'.get_string('pleasesearchmore').'"><option></option></optgroup>'."\n";
                 } else {
@@ -78,7 +78,7 @@ if ($error) {
                             }
                         }
                     } else {
-                        echo '<optgroup label="'.get_string('nomatchingusers', 'moodle', $searchtext).'"><option></option></optgroup>'."\n"
+                        echo '<optgroup label="'.get_string('nomatchingusers', 'moodle', s($searchtext)).'"><option></option></optgroup>'."\n"
                             .'<optgroup label="'.get_string('pleasesearchmore').'"><option></option></optgroup>'."\n";
                     }
                     $availableusers->close();

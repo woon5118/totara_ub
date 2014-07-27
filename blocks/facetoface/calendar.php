@@ -432,7 +432,7 @@ function matches_defaultfield_filters($sessiondata, $event) {
  * Prints calendar view with all session that match current filters and all session that you have created with a grey background
  */
 function show_month_detailed($baseparams, $display, $m, $y, $courses, $groups, $users, $courseid, $activefilters, $waitlistedsessions, $events) {
-    global $USER, $SESSION, $OUTPUT;
+    global $USER, $SESSION, $OUTPUT, $CFG;
     global $timenow;
 
     $calendardays = calendar_get_days();
@@ -934,7 +934,7 @@ function get_notice($activefilters) {
         $whereparams = array($fieldvalue);
         if (CUSTOMFIELD_TYPE_MULTISELECT == $customfields[$fieldid]->type) {
             $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, true);
-            $whereparams = array('%' . $value . '%');
+            $whereparams = array('%' . $fieldvalue . '%');
         }
         $filterwhere .= " OR (d{$filternb}.fieldid = ? AND $whereclause) ";
         $filterparams = array_merge($filterparams, array($fieldid), $whereparams);

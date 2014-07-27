@@ -25,34 +25,38 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
-require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
 class mod_facetoface_notification_template_form extends moodleform {
 
     function definition() {
-        global $CFG;
+        $mform = $this->_form;
 
-        $mform =& $this->_form;
-
-        $editoroptions = $this->_customdata['editoroptions'];
-
-        $mform->addElement('hidden', 'id', $this->_customdata['id']);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'page');
+        $mform->setType('page', PARAM_INT);
 
         $mform->addElement('text', 'title', get_string('title', 'facetoface'), array('size' => 50));
         $mform->addRule('title', null, 'required', null, 'client');
         $mform->setType('title', PARAM_TEXT);
 
-        $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'));
+        $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'), null, $this->_customdata['editoroptions']);
         $mform->setType('body_editor', PARAM_RAW);
 
-        $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
+        $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'), null, $this->_customdata['editoroptions']);
         $mform->setType('managerprefix', PARAM_RAW);
 
         $mform->addElement('advcheckbox', 'status', get_string('status'));
         $mform->setType('status', PARAM_INT);
         $mform->addHelpButton('status', 'notificationtemplatestatus', 'facetoface');
 
-        $this->add_action_buttons(true, get_string('save', 'admin'));
+        if ($this->_customdata['id']) {
+            $label = null;
+        } else {
+            $label = get_string('add');
+        }
+
+        $this->add_action_buttons(true, $label);
     }
 }
