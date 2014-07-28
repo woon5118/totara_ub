@@ -1397,11 +1397,23 @@ select.totara-limited-width {
     position: static;
 }
 /* expand while selecting option (IE only) */
-.ie select.totara-limited-width:hover,
-.ie select.totara-limited-width:focus,
-select.totara-expanded-width {
+.ie select.totara-limited-width:hover option,
+.ie select.totara-limited-width:focus option,
+.ie select.totara-limited-width:active option,
+.ie8 select.totara-limited-width:hover,
+.ie8 select.totara-limited-width:focus,
+.ie8 select.totara-limited-width:active {
     width: auto;
     min-width: 200px;
+}
+.ie select.totara-limited-width-150:hover option,
+.ie select.totara-limited-width-150:focus option,
+.ie select.totara-limited-width-150:active option,
+.ie8 select.totara-limited-width-150:hover,
+.ie8 select.totara-limited-width-150:focus,
+.ie8 select.totara-limited-width-150:active {
+    width: auto;
+    min-width: 150px;
 }
 
 #rb-search-controls .singleselect label {

@@ -153,10 +153,7 @@ class rb_filter_option {
      */
     static function select_width_limiter() {
         return array(
-            'class' => 'totara-limited-width-150',
-            'onMouseDown' => "if (document.all) this.className = 'totara-expanded-width-150';",
-            'onBlur' => "if (document.all) this.className = 'totara-limited-width-150';",
-            'onChange' => "if (document.all) this.className = 'totara-limited-width-150';"
+            'class' => 'totara-limited-width-150'
         );
     }
 

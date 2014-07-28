@@ -129,10 +129,7 @@ function check_string($identifier, $module='', $extralocations=null) {
  */
 function totara_select_width_limiter() {
     return array(
-        'class' => 'totara-limited-width',
-        'onMouseDown'=>"if (document.all) this.className='totara-expanded-width';",
-        'onBlur'=>"if (document.all) this.className='totara-limited-width';",
-        'onChange'=>"if (document.all) this.className='totara-limited-width';"
+        'class' => 'totara-limited-width'
     );
 }
 

@@ -87,9 +87,6 @@ class program_edit_form extends moodleform {
             $displaylist = array();
             $attributes = array();
             $attributes['class'] = 'totara-limited-width';
-            $attributes['onchange'] = 'if (document.all) { this.className=\'totara-limited-width\';}';
-            $attributes['onmousedown'] = 'if (document.all) this.className=\'totara-expanded-width\';';
-            $attributes['onblur'] = 'if (document.all) this.className=\'totara-limited-width\';';
             $displaylist = coursecat::make_categories_list('totara/program:createprogram');
             $mform->addElement('select', 'category', get_string('category', 'totara_program'), $displaylist, $attributes);
             $mform->setType('category', PARAM_INT);

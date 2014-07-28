@@ -52,11 +52,6 @@ class course_edit_form extends moodleform {
         $mform->addElement('hidden', 'returnto', null);
         $mform->setType('returnto', PARAM_ALPHANUM);
         $mform->setConstant('returnto', $returnto);
-        $attributes = array();
-        $attributes['class'] = 'totara-limited-width';
-        $attributes['onchange'] = 'if (document.all) { this.className=\'totara-limited-width\';}';
-        $attributes['onmousedown'] = 'if (document.all) this.className=\'totara-expanded-width\';';
-        $attributes['onblur'] = 'if (document.all) this.className=\'totara-limited-width\';';
 
         $mform->addElement('text','fullname', get_string('fullnamecourse'),'maxlength="254" size="50"');
         $mform->addHelpButton('fullname', 'fullnamecourse');

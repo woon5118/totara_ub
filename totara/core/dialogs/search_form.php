@@ -115,10 +115,7 @@ class dialog_search_form extends moodleform {
                 $frameworkid = 0;
             }
             $attr = array(
-                'class' => 'totara-limited-width-150',
-                'onMouseDown'=>"if(document.all) this.className='totara-expanded-width';",
-                'onBlur'=>"if(document.all) this.className='totara-limited-width-150';",
-                'onChange'=>"if(document.all) this.className='totara-limited-width-150';",
+                'class' => 'totara-limited-width-150'
             );
 
             $item =& $mform->addElement('select', 'frameworkid', '', $options, $attr);
