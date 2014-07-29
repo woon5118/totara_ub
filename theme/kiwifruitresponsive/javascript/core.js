@@ -30,9 +30,11 @@ YUI().use('event', function (Y) {
 
     function dockscroll(e) {
         var dock = Y.one('#dock');
-        dock.removeClass('dock-fixed');
-        if (window.scrollY > dock.get('offsetTop')) {
-            dock.addClass('dock-fixed');
+        if (dock) {
+            dock.removeClass('dock-fixed');
+            if (window.scrollY > dock.get('offsetTop')) {
+                dock.addClass('dock-fixed');
+            }
         }
     }
 });
