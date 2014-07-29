@@ -222,38 +222,46 @@ foreach ($waitingapproval as $waiting) {
     }
 }
 // Handle the POST actions sent to the page
+$error = false;
 if ($frm = data_submitted()) {
     require_sesskey();
     // Add button
     if ($add and !empty($frm->addselect)) {
-        foreach ($frm->addselect as $adduser) {
-            if (!$adduser = clean_param($adduser, PARAM_INT)) {
-                continue; // invalid userid
-            }
-
-            $adduser = $DB->get_record('user', array('id' => $adduser), 'id, lastname, firstname, email');
-            $adduser->statuscode = MDL_F2F_STATUS_BOOKED;
-            if ($adduser) {
-                $attendees[$adduser->id] = $adduser;
-            }
-        }
-        // Remove any attendees from the removed users list
-        $removed = array_diff($removed, array_keys($attendees));
-    } else if ($remove and !empty($frm->removeselect)) { // Remove button
-        foreach ($frm->removeselect as $removeuser) {
-            if (!$removeuser = clean_param($removeuser, PARAM_INT)) {
-                continue; // invalid userid
-            }
-
-            if (isset($attendees[$removeuser])) {
-                // Real cancellation - The user is signed up for this session and has a status code
-                if ($attendees[$removeuser]->statuscode) {
-                    $removed[] = $removeuser;
+        if (has_capability('mod/facetoface:addattendees', $context)) {
+            foreach ($frm->addselect as $adduser) {
+                if (!$adduser = clean_param($adduser, PARAM_INT)) {
+                    continue; // invalid userid
                 }
-                unset($attendees[$removeuser]);
-            }
-        }
 
+                $adduser = $DB->get_record('user', array('id' => $adduser), 'id, lastname, firstname, email');
+                $adduser->statuscode = MDL_F2F_STATUS_BOOKED;
+                if ($adduser) {
+                    $attendees[$adduser->id] = $adduser;
+                }
+            }
+            // Remove any attendees from the removed users list
+            $removed = array_diff($removed, array_keys($attendees));
+        } else {
+            $error = get_string('error:capabilityaddattendees', 'facetoface');
+        }
+    } else if ($remove and !empty($frm->removeselect)) { // Remove button
+        if (has_capability('mod/facetoface:removeattendees', $context)) {
+            foreach ($frm->removeselect as $removeuser) {
+                if (!$removeuser = clean_param($removeuser, PARAM_INT)) {
+                    continue; // invalid userid
+                }
+
+                if (isset($attendees[$removeuser])) {
+                    // Real cancellation - The user is signed up for this session and has a status code
+                    if ($attendees[$removeuser]->statuscode) {
+                        $removed[] = $removeuser;
+                    }
+                    unset($attendees[$removeuser]);
+                }
+            }
+        } else {
+            $error = get_string('error:capabilityremoveattendees', 'facetoface');
+        }
     } else if (!$searchbutton) { // Initialize search if "Show all" button is clicked
         $searchtext = '';
     }
