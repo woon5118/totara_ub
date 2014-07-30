@@ -97,15 +97,17 @@
  * Other styles applied when viewing the program (but not when editing)
  */
 
-fieldset.display-program table .status {
+.display-program table .status {
     width:95px;
 }
-fieldset.display-program table .launchcourse {
+.display-program table .launchcourse {
     width:55px;
 }
 
-fieldset.display-program {
-    padding: 10px 25px;
+.display-program {
+    padding: 0 10px;
+    border: 1px solid #000000;
+    border-radius: 5px;
 }
 
 /*****************************************************************************/

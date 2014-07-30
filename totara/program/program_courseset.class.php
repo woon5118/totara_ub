@@ -792,8 +792,8 @@ class multi_course_set extends course_set {
         }
 
         $out = '';
-        $out .= html_writer::start_tag('fieldset', array('class' => 'surround display-program'));
-        $out .= html_writer::tag('legend', $this->label);
+        $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
+        $out .= $OUTPUT->heading(format_string($this->label), 3);
 
         switch ($this->completiontype) {
             case COMPLETIONTYPE_ALL:
@@ -903,7 +903,7 @@ class multi_course_set extends course_set {
             $out .= html_writer::tag('p', get_string('nocourses', 'totara_program'));
         }
 
-        $out .=  html_writer::end_tag('fieldset');
+        $out .= html_writer::end_tag('div');
 
         if (!isset($this->islastset) || $this->islastset === false) {
             switch ($this->nextsetoperator) {
@@ -1568,8 +1568,8 @@ class competency_course_set extends course_set {
         global $OUTPUT, $DB;
 
         $out = '';
-        $out .= html_writer::start_tag('fieldset', array('class' => 'surround display-program'));
-        $out .= html_writer::tag('legend', $this->label);
+        $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
+        $out .= $OUTPUT->heading(format_string($this->label), 3);
 
         switch ($this->completiontype) {
             case COMPLETIONTYPE_ALL:
@@ -1632,7 +1632,7 @@ class competency_course_set extends course_set {
             $out .= html_writer::tag('p', get_string('nocourses', 'totara_program'));
         }
 
-        $out .= html_writer::end_tag('fieldset');
+        $out .= html_writer::end_tag('div');
 
         if (!isset($this->islastset) || $this->islastset === false) {
             switch($this->nextsetoperator) {
@@ -2132,8 +2132,8 @@ class recurring_course_set extends course_set {
         global $OUTPUT, $DB;
 
         $out = '';
-        $out .= html_writer::start_tag('fieldset', array('class' => 'surround display-program'));
-        $out .= html_writer::tag('legend', format_string($this->label));
+        $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
+        $out .= $OUTPUT->heading(format_string($this->label), 3);
 
         $timeallowance = program_utilities::duration_explode($this->timeallowed);
 
@@ -2186,7 +2186,7 @@ class recurring_course_set extends course_set {
             $out .= html_writer::tag('p', get_string('nocourses', 'totara_program'));
         }
 
-        $out .= html_writer::end_tag('fieldset');
+        $out .= html_writer::end_tag('div');
 
         return $out;
 
