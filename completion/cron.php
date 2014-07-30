@@ -130,6 +130,7 @@ function completion_cron_completions() {
         WHERE
             reaggregate < :timestarted
         AND reaggregate > 0
+        AND timecompleted IS NOT NULL
     ";
 
     $DB->execute($sql, array('timestarted' => $timestarted));
