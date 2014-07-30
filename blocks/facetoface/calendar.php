@@ -31,8 +31,7 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 define('MAX_EVENTS_PER_DAY', 5);
 define('MAX_WAITLISTED_SESSIONS', 7);
 
-$timenow = time();
-
+$timenow    = optional_param('time', time(), PARAM_INT);
 $currenttab = optional_param('tab', 'm', PARAM_ALPHA);
 $day        = optional_param('cal_d', strftime('%d', $timenow), PARAM_INT);
 $month      = optional_param('cal_m', strftime('%m', $timenow), PARAM_INT);
