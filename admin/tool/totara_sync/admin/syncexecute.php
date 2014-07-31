@@ -56,62 +56,69 @@ if ($execute) {
     $msg .= html_writer::empty_tag('br') . get_string('viewsynclog', 'tool_totara_sync', $url->out());
     echo $succeed ? $OUTPUT->notification($msg, 'notifysuccess') : $OUTPUT->notification($msg, 'notifynotice');
 }
-    $configured = true;
-    //sanity checks
-    $fileaccess = get_config('totara_sync', 'fileaccess');
-    if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
+
+// Check enabled sync element objects.
+$elements = totara_sync_get_elements(true);
+if (empty($elements)) {
+    echo $OUTPUT->notification(get_string('noenabledelements', 'tool_totara_sync'), 'notifyproblem');
+    echo $OUTPUT->footer();
+    exit();
+}
+// Display Run Sync table.
+$configured = true;
+$table = new html_table();
+$table->data = array();
+$table->head  = array(get_string('element', 'tool_totara_sync'), get_string('source', 'tool_totara_sync'), get_string('configuresource', 'tool_totara_sync'));
+foreach ($elements as $element) {
+    $cells = array();
+    $elname = $element->get_name();
+    $cells[] = new html_table_cell(get_string('displayname:'.$elname, 'tool_totara_sync'));
+    // Check a source is enabled.
+    if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
         $configured = false;
-        echo $OUTPUT->notification(get_string('nofilesdir', 'tool_totara_sync'), 'notifyproblem');
-    }
-    // Check enabled sync element objects
-    $elements = totara_sync_get_elements(true);
-    if (empty($elements)) {
-        $configured = false;
-        echo $OUTPUT->notification(get_string('noenabledelements', 'tool_totara_sync'), 'notifyproblem');
+        $url = new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', array('element' => $elname));
+        $link = html_writer::link($url, get_string('sourcenotfound', 'tool_totara_sync'));
+        $cells[] = new html_table_cell($link);
+        $cells[] = new html_table_cell('');
     } else {
-        $table = new html_table();
-        $table->data = array();
-        $table->head  = array(get_string('element', 'tool_totara_sync'), get_string('source', 'tool_totara_sync'), get_string('configuresource', 'tool_totara_sync'));
-        foreach ($elements as $element) {
-            $cells = array();
-            $elname = $element->get_name();
-            $cells[] = new html_table_cell(get_string('displayname:'.$elname, 'tool_totara_sync'));
-            //check a source is enabled
-            if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
-                $configured = false;
-                $url = new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', array('element' => $elname));
-                $link = html_writer::link($url, get_string('sourcenotfound', 'tool_totara_sync'));
-                $cells[] = new html_table_cell($link);
-                $cells[] = new html_table_cell('');
-            } else {
-                $source = get_string('displayname:'.$sourceclass, 'tool_totara_sync');
-                $cells[] = new html_table_cell($source);
-            }
-            //check source has configs - note get_config returns an object
-            if ($sourceclass) {
-                $configs = get_config($sourceclass);
-                $props = get_object_vars($configs);
-                if(empty($props)) {
+        $source = get_string('displayname:'.$sourceclass, 'tool_totara_sync');
+        $cells[] = new html_table_cell($source);
+    }
+    // Check source has configs - note get_config returns an object.
+    if ($sourceclass) {
+        $configs = get_config($sourceclass);
+        $props = get_object_vars($configs);
+        if(empty($props)) {
+            $configured = false;
+            $url = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', array('element' => $elname, 'source' => $sourceclass));
+            $link = html_writer::link($url, get_string('nosourceconfig', 'tool_totara_sync'));
+            $cells[] = new html_table_cell($link);
+        } else {
+            if (core_text::strtolower($source) == 'csv') {
+                // Sanity checks.
+                $fileaccess = get_config('totara_sync', 'fileaccess');
+                if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
                     $configured = false;
-                    $url = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', array('element' => $elname, 'source' => $sourceclass));
-                    $link = html_writer::link($url, get_string('nosourceconfig', 'tool_totara_sync'));
+                    $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
+                    $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
                     $cells[] = new html_table_cell($link);
                 } else {
                     $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
                 }
+            } else {
+                $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
             }
-            $row = new html_table_row($cells);
-            $table->data[] = $row;
         }
-        echo html_writer::table($table);
     }
+    $row = new html_table_row($cells);
+    $table->data[] = $row;
+}
+echo html_writer::table($table);
 
-    if ($configured) {
-        echo $OUTPUT->single_button(new moodle_url('/admin/tool/totara_sync/admin/syncexecute.php', array('execute' => 1)), get_string('syncexecute', 'tool_totara_sync'), 'post');
-    } else {
-        //some problem with configuration
-        echo $OUTPUT->notification(get_string('syncnotconfigured', 'tool_totara_sync'), 'notifyproblem');
-    }
+if ($configured) {
+    echo $OUTPUT->single_button(new moodle_url('/admin/tool/totara_sync/admin/syncexecute.php', array('execute' => 1)), get_string('syncexecute', 'tool_totara_sync'), 'post');
+} else {
+    // Some problem with configuration.
+    echo $OUTPUT->notification(get_string('syncnotconfigured', 'tool_totara_sync'), 'notifyproblem');
+}
 echo $OUTPUT->footer();
-
-?>
