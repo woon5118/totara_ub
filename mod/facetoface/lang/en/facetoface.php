@@ -147,6 +147,10 @@ $string['cancellations'] = 'Cancellations';
 $string['cancellationmessage'] = 'Cancellation message';
 $string['cancellationconfirm'] = 'Are you sure you want to cancel your booking to this session?';
 $string['costheading'] = 'Session Cost';
+$string['cutoff'] = 'Cut-off';
+$string['cutoff_help'] = 'The amount of time before the first session that messages about minimum capacity will be sent.
+This must be at least 24 hours before the session.
+The start date of the earliest session must be at least this far in the future.';
 $string['csvtextfile'] = 'Text file';
 $string['csvtextinput'] = 'CSV text input';
 $string['currentallocations'] = 'Current allocations ({$a->allocated} / {$a->max})';
@@ -205,6 +209,7 @@ $string['email:instrmngr'] = 'Notice for manager';
 $string['email:message'] = 'Message';
 $string['email:subject'] = 'Subject';
 $string['emptylocation'] = 'Location was empty';
+$string['enablemincapacity'] = 'Enable minimum capacity';
 $string['enrolled'] = 'enrolled';
 $string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this Face-to-face activity.';
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this Face-to-face activity.';
@@ -244,6 +249,7 @@ $string['error:couldnotupdatenotice'] = 'Could not update site notice.';
 $string['error:couldnotupdatesession'] = 'Could not update session';
 $string['error:coursemisconfigured'] = 'Course is misconfigured';
 $string['error:cronprefix'] = 'Error: facetoface cron:';
+$string['error:cutofftoolate'] = 'The minimum cut off date is 24 hours and the start date of the earliest session must be at least this far in the future.';
 $string['error:emptymanageremail'] = 'Manager email address empty.';
 $string['error:emptylocation'] = 'Location was empty.';
 $string['error:emptyvenue'] = 'Venue was empty.';
@@ -258,6 +264,9 @@ $string['error:incorrectfacetofaceid'] = 'Face-to-face ID was incorrect';
 $string['error:incorrectnotificationtype'] = 'Incorrect notification type supplied';
 $string['error:invaliduserid'] = 'Invalid user ID';
 $string['error:manageremailaddressmissing'] = 'You are currently not assigned to a manager in the system. Please contact the site administrator.';
+$string['error:mincapacitynotnumeric'] = 'Session minimum capacity is not a number';
+$string['error:mincapacitytoolarge'] = 'Session minimum capacity cannot be greater than the capacity';
+$string['error:mincapacityzero'] = 'Session minimum capacity cannot be zero';
 $string['error:mustspecifycoursemodulefacetoface'] = 'Must specify a course module or a facetoface ID';
 $string['error:mustspecifytimezone'] = 'You must set the timezone for each date';
 $string['error:nodatasupplied'] = 'No data supplied';
@@ -376,6 +385,8 @@ $string['messagerecipientgroups'] = 'Recipient Groups';
 $string['messagesenttostaffmember'] = 'The following message has been sent to your staff member {$a}';
 $string['messagesubject'] = 'Subject';
 $string['messageusers'] = 'Message users';
+$string['mincapacity'] = 'Minimum capacity';
+$string['mincapacity_help'] = 'If the minimum capacity has not been reached at the cut off point, then course tutors (those with moodle/course:manageactivities capability) will be automatically notified.';
 $string['modulename'] = 'Face-to-face';
 $string['modulenameplural'] = 'Face-to-face';
 $string['moreinfo'] = 'More info';
@@ -402,6 +413,7 @@ $string['noreservations'] = 'None';
 $string['nosignedupusers'] = 'No users have signed-up for this session.';
 $string['nosignedupusersnumrequests'] = 'No users are fully booked for this session. {$a} users are awaiting approval.';
 $string['nosignedupusersonerequest'] = 'No users are fully booked for this session. 1 user is awaiting approval.';
+$string['nostarttime'] = 'No dates specified';
 $string['note'] = 'Note';
 $string['notefull'] = 'Even if the Session is fully booked you can still register. You will be queued (marked in red). If someone signs out, the first student in the queue will be moved into registeres students and a notification will be sent to him/her by mail.';
 $string['notificationalreadysent'] = 'This notification has already been sent, so can no longer be edited.';
@@ -595,6 +607,13 @@ $string['sessionstartdateshort'] = 'Start date';
 $string['sessionstarttime'] = 'Session start time';
 $string['sessiontimezone'] = 'Timezone';
 $string['sessiontimezoneunknown'] = 'Unknown Timezone';
+$string['sessionundercapacity'] = 'Session under capacity for: {$a}';
+$string['sessionundercapacity_body'] = 'The following session is under capacity:
+
+Name: {$a->name}
+Session start: {$a->starttime}
+Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
+{$a->link}';
 $string['sessionvenue'] = 'Session venue';
 $string['setactive'] = 'Set active';
 $string['setinactive'] = 'Set inactive';

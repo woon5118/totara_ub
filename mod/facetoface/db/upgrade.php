@@ -2206,6 +2206,27 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014090500, 'facetoface');
     }
 
+    // Add new 'mincapacity' and 'cutoff' fields.
+    if ($oldversion < 2014091200) {
+
+        $table = new xmldb_table('facetoface_sessions');
+
+        $field = new xmldb_field('mincapacity', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'usermodified');
+        $field->setComment('The minimum number of people for this session to take place.');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Field defaults to 24 hours (86400 seconds).
+        $field = new xmldb_field('cutoff', XMLDB_TYPE_INTEGER, '10', null, null, null, '86400', 'mincapacity');
+        $field->setComment('The number of seconds before the session start by which the minimum capacity should be reached');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2014091200, 'facetoface');
+    }
+
     return $result;
 }
 

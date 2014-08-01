@@ -161,6 +161,26 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('checkbox', 'allowoverbook', get_string('allowoverbook', 'facetoface'));
         $mform->addHelpButton('allowoverbook', 'allowoverbook', 'facetoface');
 
+        // Show minimum capacity and cut-off (for when this should be reached).
+        $mform->addElement('checkbox', 'enablemincapacity', get_string('enablemincapacity', 'facetoface'));
+        $mform->setDefault('enablemincapacity', 0);
+        $mform->disabledIf('enablemincapacity', 'datetimeknown', 'eq', 0);
+
+        $mform->addElement('text', 'mincapacity', get_string('mincapacity', 'facetoface'), 'size="5"');
+        $mform->disabledIf('mincapacity', 'enablemincapacity', 'notchecked');
+        $mform->disabledIf('mincapacity', 'datetimeknown', 'eq', 0);
+        $mform->setType('mincapacity', PARAM_INT);
+        $mform->setDefault('mincapacity', 0);
+        $mform->addRule('mincapacity', null, 'numeric', null, 'client');
+        $mform->addHelpButton('mincapacity', 'mincapacity', 'facetoface');
+
+        $mform->addElement('duration', 'cutoff', get_string('cutoff', 'facetoface'), array('defaultunit' => HOURSECS, 'optional' => false));
+        $mform->setType('cutoff', PARAM_INT);
+        $mform->setDefault('cutoff', DAYSECS);
+        $mform->disabledIf('cutoff', 'enablemincapacity', 'notchecked');
+        $mform->disabledIf('cutoff', 'datetimeknown', 'eq', 0);
+        $mform->addHelpButton('cutoff', 'cutoff', 'facetoface');
+
         $mform->addElement('text', 'duration', get_string('duration', 'facetoface'), 'size="5"');
         $mform->setType('duration', PARAM_TEXT);
         $mform->addHelpButton('duration', 'duration', 'facetoface');
@@ -387,6 +407,39 @@ class mod_facetoface_session_form extends moodleform {
             $capacity = $data['capacity'];
             if (!(is_numeric($capacity) && (intval($capacity) == $capacity) && $capacity > 0)) {
                 $errors['capacity'] = get_string('error:capacitynotnumeric', 'facetoface');
+            }
+        }
+
+        // Check the minimum capacity and cut-off.
+        if (!empty($data['enablemincapacity'])) {
+            if (empty($data['mincapacity'])) {
+                $errors['mincapacity'] = get_string('error:mincapacityzero', 'facetoface');
+            } else {
+                $mincapacity = $data['mincapacity'];
+                if (!is_numeric($mincapacity) || (intval($mincapacity) != $mincapacity)) {
+                    $errors['mincapacity'] = get_string('error:mincapacitynotnumeric', 'facetoface');
+                } else if ($mincapacity > $data['capacity']) {
+                    $errors['mincapacity'] = get_string('error:mincapacitytoolarge', 'facetoface');
+                }
+            }
+
+            // Check the cut-off is at least the day before the earliest start time.
+            $cutoff = $data['cutoff'];
+            if ($cutoff < DAYSECS) {
+                $errors['cutoff'] = get_string('error:cutofftoolate', 'facetoface');
+            }
+
+            foreach ($dates as $dateid => $date) {
+                // If the date is being deleted then we don't need to test against it.
+                if (!empty($data['datedelete'][$dateid])) {
+                    continue;
+                }
+
+                $cutofftimestamp = $date->timestart - $cutoff;
+                if ($cutofftimestamp < time()) {
+                    $errors['cutoff'] = get_string('error:cutofftoolate', 'facetoface');
+                    break;
+                }
             }
         }
 

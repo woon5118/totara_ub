@@ -213,6 +213,14 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->roomid = 0;
     $todb->selfapproval = $facetoface->approvalreqd ? $fromform->selfapproval : 0;
 
+    // If min capacity is not provided or unset default to 0.
+    if (empty($fromform->enablemincapacity) || $fromform->mincapacity < 0) {
+        $fromform->mincapacity = 0;
+    }
+
+    $todb->mincapacity = $fromform->mincapacity;
+    $todb->cutoff = $fromform->cutoff;
+
     $transaction = $DB->start_delegated_transaction();
 
     $update = false;
@@ -340,6 +348,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
             $toform->croomcapacity = $sroom->capacity;
         }
     }
+
+    if ($session->mincapacity) {
+        $toform->enablemincapacity = true;
+    }
+    $toform->mincapacity = $session->mincapacity;
+    $toform->cutoff = $session->cutoff;
 
     $mform->set_data($toform);
 }

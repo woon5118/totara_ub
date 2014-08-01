@@ -1017,6 +1017,12 @@ function facetoface_cron($testing = false) {
     // Find any reservations that are too close to the start of the session and delete them.
     facetoface_remove_reservations_after_deadline($testing);
 
+    // Notify of sessions that are under capacity.
+    if (!$testing) {
+        mtrace("Checking for sessions below minimum capacity");
+    }
+    facetoface_notify_under_capacity();
+
     return true;
 }
 
@@ -1073,6 +1079,83 @@ function facetoface_remove_reservations_after_deadline($testing) {
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Send out email notifications for all sessions that are under capacity at the cut-off.
+ */
+function facetoface_notify_under_capacity() {
+    global $DB;
+
+    $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'facetoface'));
+    $time = time();
+
+    $params = array(
+        'lastcron' => $lastcron,
+        'now'      => $time
+    );
+
+    $sql = "SELECT s.*, minstart FROM {facetoface_sessions} s
+            INNER JOIN (
+                SELECT s.id as sessid, MIN(timestart) AS minstart
+                FROM {facetoface_sessions} s
+                INNER JOIN {facetoface_sessions_dates} d ON s.id = d.sessionid
+                GROUP BY s.id
+            ) dates ON dates.sessid = s.id
+            WHERE datetimeknown = 1 AND mincapacity > 0 AND (minstart - cutoff) < :now AND (minstart - cutoff) >= :lastcron";
+
+    $tocheck = $DB->get_records_sql($sql, $params);
+
+    foreach ($tocheck as $session) {
+        $booked = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED);
+        if ($booked >= $session->mincapacity) {
+            continue;
+        }
+
+        // We've found a session that has not reached the minimum capacity by the cut-off - time to send out emails.
+        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
+        $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course, false);
+        $url = new moodle_url('/mod/facetoface/view.php', array('id' => $cm->id));
+        $link = $url->out(false);
+
+        // Get the start time of the first date for this session.
+        if (!$session->minstart) {
+            $starttime = get_string('nostarttime', 'facetoface');
+        } else {
+            $starttime = userdate($session->minstart, get_string('strftimedatetime'));
+        }
+
+        $info = (object)array(
+            'name' => format_string($facetoface->name),
+            'starttime' => $starttime,
+            'capacity' => $session->capacity,
+            'mincapacity' => $session->mincapacity,
+            'booked' => $booked,
+            'link' => $link,
+        );
+
+        $eventdata = (object)array(
+            'subject' => get_string('sessionundercapacity', 'facetoface', format_string($facetoface->name)),
+            'fullmessage' => get_string('sessionundercapacity_body', 'facetoface', $info),
+            'msgtype' => TOTARA_MSG_TYPE_FACE2FACE,
+            'msgstatus' => TOTARA_MSG_STATUS_NOTOK,
+            'urgency' => TOTARA_MSG_URGENCY_NORMAL,
+            'sendmail' => TOTARA_MSG_EMAIL_YES,
+        );
+
+        if (CLI_SCRIPT) {
+            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing course editors.");
+        }
+
+        $coursecontext = context_course::instance($facetoface->course);
+        $usernamefields = get_all_user_name_fields(true, 'u');
+        $users = get_users_by_capability($coursecontext, 'moodle/course:manageactivities',
+                                         "u.id, $usernamefields, u.email, u.maildisplay");
+        foreach ($users as $user) {
+            $eventdata->userto = $user;
+            tm_alert_send($eventdata);
         }
     }
 }
