@@ -557,13 +557,15 @@ function copy_certif_completion_to_hist($certificationid, $userid, $unassigned =
 function set_course_renewalstatus($courseids, $userid, $renewalstatus) {
     global $DB;
 
-    list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids);
-    $sql = "UPDATE {course_completions}
-    SET renewalstatus = ?
-    WHERE userid = ? AND course {$coursesql}";
+    if (!empty($courseids)) {
+        list($coursesql, $courseparams) = $DB->get_in_or_equal($courseids);
+        $sql = "UPDATE {course_completions}
+                SET renewalstatus = ?
+                WHERE userid = ? AND course {$coursesql}";
 
-    $params = array_merge(array($renewalstatus, $userid), $courseparams);
-    $DB->execute($sql, $params);
+        $params = array_merge(array($renewalstatus, $userid), $courseparams);
+        $DB->execute($sql, $params);
+    }
 }
 
 /**
