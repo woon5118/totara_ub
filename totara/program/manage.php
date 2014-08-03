@@ -29,6 +29,8 @@ require_once($CFG->libdir . '/coursecatlib.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
+define('MAX_MOVE_CATEGORY', 500);
+
 // Category id.
 $id = optional_param('categoryid', 0, PARAM_INT);
 // Which page to show.
@@ -340,6 +342,9 @@ echo $OUTPUT->header();
 if (!empty($searchcriteria)) {
     echo $OUTPUT->heading(new lang_string('searchresults'));
 } else if (!$coursecat->id) {
+    $catlist = array(0 => get_string('top')) + coursecat::make_categories_list('moodle/category:manage');
+    $catlist = count($catlist) < MAX_MOVE_CATEGORY ? $catlist : false;
+
     // Print out the categories with all the knobs.
     $table = new html_table;
     $table->id = 'coursecategories';
@@ -351,12 +356,16 @@ if (!empty($searchcriteria)) {
         $strcategory = get_string('certifcategories', 'totara_certification');
         $strtype = get_string('certifications', 'totara_certification');
     }
-    $table->head = array(
-                    $strcategory,
-                    $strtype,
-                    get_string('edit'),
-                    get_string('movecategoryto'),
-    );
+
+    $headers = array();
+    $headers[] = $strcategory;
+    $headers[] = $strtype;
+    $headers[] = get_string('edit');
+    if (is_array($catlist)) {
+        $headers[] = get_string('movecategoryto');
+    }
+    $table->head = $headers;
+
     $table->colclasses = array(
                     'leftalign name',
                     'centeralign count',
@@ -365,7 +374,7 @@ if (!empty($searchcriteria)) {
     );
     $table->data = array();
 
-    print_category_edit($table, $coursecat, $viewtype);
+    print_category_edit($table, $coursecat, $catlist, $viewtype);
 
     echo html_writer::table($table);
 } else {
@@ -373,7 +382,7 @@ if (!empty($searchcriteria)) {
     $displaylist = coursecat::make_categories_list();
     $select = new single_select(new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)),
                   'categoryid', $displaylist, $coursecat->id, null, 'switchcategory');
-    $strcategory = ($viewtype == 'program') ? get_string('programcategories', 'totara_program') : 
+    $strcategory = ($viewtype == 'program') ? get_string('programcategories', 'totara_program') :
                                               get_string('certifcategories', 'totara_certification');
     $select->set_label($strcategory . ':');
 
@@ -716,7 +725,7 @@ echo $OUTPUT->footer();
  * @param bool $up True if this category can be moved up.
  * @param bool $down True if this category can be moved down.
  */
-function print_category_edit(html_table $table, coursecat $category, $viewtype = 'program', $depth = -1, $up = false, $down = false) {
+function print_category_edit(html_table $table, coursecat $category, $catlist, $viewtype = 'program', $depth = -1, $up = false, $down = false) {
     global $OUTPUT;
 
     static $str = null;
@@ -737,6 +746,7 @@ function print_category_edit(html_table $table, coursecat $category, $viewtype =
     if ($category->id) {
 
         $categorycontext = context_coursecat::instance($category->id);
+        $canmanage = has_capability('moodle/category:manage', $categorycontext);
 
         $attributes = array();
         $attributes['class'] = $category->visible ? '' : 'dimmed';
@@ -748,7 +758,7 @@ function print_category_edit(html_table $table, coursecat $category, $viewtype =
         $categoryname = $categorypadding . html_writer::link($categoryurl, $categoryname, $attributes);
 
         $icons = array();
-        if (has_capability('moodle/category:manage', $categorycontext)) {
+        if ($canmanage) {
             // Edit category.
             $icons[] = $OUTPUT->action_icon(
                             new moodle_url('/course/editcategory.php', array('id' => $category->id, 'type' => $viewtype)),
@@ -810,26 +820,23 @@ function print_category_edit(html_table $table, coursecat $category, $viewtype =
         }
 
         $actions = '';
-        if (has_capability('moodle/category:manage', $categorycontext)) {
+        if ($canmanage && is_array($catlist)) {
             $popupurl = new moodle_url('/totara/program/manage.php',
                             array('movecat' => $category->id, 'sesskey' => sesskey(), 'viewtype' => $viewtype));
-            $tempdisplaylist = array(0 => get_string('top')) + coursecat::make_categories_list('moodle/category:manage', $category->id);
-            $select = new single_select($popupurl, 'movetocat', $tempdisplaylist, $category->parent, null, "moveform$category->id");
+            $select = new single_select($popupurl, 'movetocat', $catlist, $category->parent, null, "moveform$category->id");
             $select->set_label(get_string('frontpagecategorynames'), array('class' => 'accesshide'));
             $actions = $OUTPUT->render($select);
         }
 
         $count = $viewtype == 'program' ? $category->programcount : $category->certifcount;
-        $table->data[] = new html_table_row(array(
-                        // Category name.
-                        new html_table_cell($categoryname),
-                        // Program count.
-                        new html_table_cell($count),
-                        // Icons.
-                        new html_table_cell(join(' ', $icons)),
-                        // Actions.
-                        new html_table_cell($actions)
-        ));
+        $rowdata = array();
+        $rowdata[] = new html_table_cell($categoryname);
+        $rowdata[] = new html_table_cell($count);
+        $rowdata[] = new html_table_cell(join(' ', $icons));
+        if (is_array($catlist)) {
+            $rowdata[] = new html_table_cell($actions);
+        }
+        $table->data[] = new html_table_row($rowdata);
     }
 
     if ($categories = $category->get_children()) {
@@ -847,7 +854,7 @@ function print_category_edit(html_table $table, coursecat $category, $viewtype =
             $down = $last ? false : true;
             $first = false;
 
-            print_category_edit($table, $cat, $viewtype, $depth+1, $up, $down);
+            print_category_edit($table, $cat, $catlist, $viewtype, $depth+1, $up, $down);
         }
     }
 }
