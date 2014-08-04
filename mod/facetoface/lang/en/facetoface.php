@@ -121,6 +121,7 @@ $string['chooseroom'] = 'Choose a room';
 $string['choosepredefinedroom'] = 'Choose a pre-defined room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
 $string['clearall'] = 'Clear all';
+$string['close'] = 'Close';
 $string['closed'] = 'Closed';
 $string['conditions'] = 'Conditions';
 $string['conditionsexplanation'] = 'All of these criteria must be met for the notice to be shown on the training calendar:';
@@ -530,6 +531,17 @@ $string['selectnoneop'] = 'None';
 $string['selectnotsetop'] = 'Not Set';
 $string['selectoptionbefore'] = ' Please choose an option (All, Set or Not set) before selecting this option';
 $string['selectsetop'] = 'Set';
+$string['selfapproval'] = 'Self Approval';
+$string['selfapproval_help'] = 'This setting allows a user to confirm that they have sought approval to attend the session. Instead of their manager needing to approve their booking the user is presented with a check box when signing up and must confirm they have met the specified terms and conditions.
+This setting will be disabled unless "Requires approval" is enabled in the Face-to-face activity settings.';
+$string['selfapprovalsought'] = 'Self Approval Sought';
+$string['selfapprovalsoughtdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
+$string['selfapprovaltandc'] = 'Self Approval Terms and Conditions';
+$string['selfapprovaltandc_help'] = 'Where an activity has approval required and a session has self approval enabled these are the terms and conditions that will be displayed when a user signs up.';
+$string['selfapprovaltandccontents'] = 'By checking the box you confirm that permission to sign up to this Face to Face activity has been granted by your manager.
+
+Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
+';
 $string['selfbooked'] = 'Self booked';
 $string['sendlater'] = 'Send later';
 $string['sendmessage'] = 'Send message';

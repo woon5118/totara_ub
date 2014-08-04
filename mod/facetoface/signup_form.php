@@ -75,6 +75,20 @@ class mod_facetoface_signup_form extends moodleform {
         }
         $mform->setType('notificationtype', PARAM_INT);
 
+        if ($this->_customdata['hasselfapproval']) {
+            $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $this->_customdata['s']));
+            $tandcurl = html_writer::link($url, get_string('selfapprovaltandc', 'mod_facetoface'), array("class"=>"tsandcs"));
+
+            global $PAGE;
+            $PAGE->requires->strings_for_js(array('selfapprovaltandc', 'close'), 'mod_facetoface');
+            $params = array('selfapprovaltandc' => $this->_customdata['selfapprovaltandc']);
+            $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init', $params);
+
+            $mform->addElement('checkbox', 'selfapprovaltc', get_string('selfapprovalsought', 'mod_facetoface'),
+                               get_string('selfapprovalsoughtdesc', 'mod_facetoface', $tandcurl));
+            $mform->addRule('selfapprovaltc', get_string('required'), 'required', null, 'client', true);
+        }
+
         $this->add_action_buttons(true, get_string('signup', 'facetoface'));
     }
 

@@ -148,7 +148,7 @@ if (isset($session)) {
     $defaulttimezone = totara_get_clean_timezone();
 }
 
-$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'nbdays', 'customfields', 'course', 'editoroptions', 'defaulttimezone'));
+$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'nbdays', 'customfields', 'course', 'editoroptions', 'defaulttimezone', 'facetoface'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -169,6 +169,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
     }
     if (empty($fromform->discountcost)) {
         $fromform->discountcost = 0;
+    }
+    if (empty($fromform->selfapproval)) {
+        $fromform->selfapproval = 0;
     }
 
     //check dates and calculate total duration
@@ -208,6 +211,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->discountcost = $fromform->discountcost;
     $todb->usermodified = $USER->id;
     $todb->roomid = 0;
+    $todb->selfapproval = $facetoface->approvalreqd ? $fromform->selfapproval : 0;
 
     $transaction = $DB->start_delegated_transaction();
 
@@ -296,6 +300,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $toform->duration = $session->duration;
     $toform->normalcost = $session->normalcost;
     $toform->discountcost = $session->discountcost;
+    $toform->selfapproval = $session->selfapproval;
 
     if ($session->sessiondates) {
         $i = 0;

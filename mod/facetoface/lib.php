@@ -1954,8 +1954,8 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
 
     // Work out which status to use
 
-    // If approval not required
-    if (!$facetoface->approvalreqd) {
+    // If approval not required or self approval enabled.
+    if (!$facetoface->approvalreqd || facetoface_session_has_selfapproval($facetoface, $session)) {
         $new_status = $statuscode;
     } else {
         // If approval required
@@ -3665,6 +3665,17 @@ function facetoface_manager_needed($facetoface){
         || (isset($facetoface->confirmationinstrmngr) && !empty($facetoface->confirmationinstrmngr))
         || (isset($facetoface->reminderinstrmngr) && !empty($facetoface->reminderinstrmngr))
         || (isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationinstrmngr));
+}
+
+/**
+ * Determines whether a session has the self-approval option
+ *
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  object $session    A database fieldset object for the facetoface session
+ * @return boolean whether a person needs a manager to sign up for that activity
+ */
+function facetoface_session_has_selfapproval($facetoface, $session) {
+    return $facetoface->approvalreqd && $session->selfapproval;
 }
 
 /**

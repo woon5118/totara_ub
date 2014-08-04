@@ -82,11 +82,15 @@ if (get_config(NULL, 'facetoface_addchangemanageremail') && !empty($manager)) {
 
 $showdiscountcode = ($session->discountcost > 0);
 
-$mform = new mod_facetoface_signup_form(null, compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode'));
+$hasselfapproval = facetoface_session_has_selfapproval($facetoface, $session);
+
+$selfapprovaltandc = format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
+
+$mform = new mod_facetoface_signup_form(null, compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode', 'hasselfapproval', 'selfapprovaltandc'));
+
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
-
 if ($fromform = $mform->get_data()) { // Form submitted
 
     if (empty($fromform->submitbutton)) {
@@ -105,7 +109,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
         print_error('sessionisfull', 'facetoface', $returnurl);
     } else if (facetoface_get_user_submissions($facetoface->id, $USER->id, MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_FULLY_ATTENDED, $multisessionid)) {
         print_error('alreadysignedup', 'facetoface', $returnurl);
-    } else if (facetoface_manager_needed($facetoface) && empty($manager->email)) {
+    } else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$hasselfapproval) {
         print_error('error:manageremailaddressmissing', 'facetoface', $returnurl);
     }
 
@@ -118,7 +122,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if ($result['result'] === true) {
         add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
 
-        if (!empty($facetoface->approvalreqd)) {
+        if (!empty($facetoface->approvalreqd) && !$hasselfapproval) {
             $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
             $cssclass = 'notifymessage';
         } else {
@@ -207,7 +211,7 @@ if ($signedup) {
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 }
 // Don't allow signup to proceed if a manager is required.
-else if (facetoface_manager_needed($facetoface) && empty($manager->email)) {
+else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$hasselfapproval) {
     // Check to see if the user has a managers email set.
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:manageremailaddressmissing', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));

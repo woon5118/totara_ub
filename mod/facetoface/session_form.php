@@ -187,6 +187,12 @@ class mod_facetoface_session_form extends moodleform {
         $mform->setType('details_editor', PARAM_RAW);
         $mform->addHelpButton('details_editor', 'details', 'facetoface');
 
+        $mform->addElement('checkbox', 'selfapproval', get_string('selfapproval', 'facetoface'));
+        $mform->addHelpButton('selfapproval', 'selfapproval', 'facetoface');
+        if (!$this->_customdata['facetoface']->approvalreqd) {
+            $mform->hardFreeze('selfapproval');
+        }
+
         // Choose users for trainer roles
         $context = context_course::instance($this->_customdata['course']->id);
         $roles = facetoface_get_trainer_roles($context);

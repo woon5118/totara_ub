@@ -70,6 +70,11 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'approvalreqd', get_string('approvalreqd', 'facetoface'));
         $mform->addHelpButton('approvalreqd', 'approvalreqd', 'facetoface');
 
+        $mform->addElement('textarea', 'selfapprovaltandc', get_string('selfapprovaltandc', 'facetoface'), array('rows' => 7));
+        $mform->setDefault('selfapprovaltandc', get_string('selfapprovaltandccontents', 'facetoface'));
+        $mform->disabledIf('selfapprovaltandc', 'approvalreqd', 'eq', 0);
+        $mform->addHelpButton('selfapprovaltandc', 'selfapprovaltandc', 'facetoface');
+
         $mform->addElement('advcheckbox', 'multiplesessions', get_string('multiplesessions', 'facetoface'), '',
                 array('group' => 1), array(0, 1));
         $mform->setType('multiplesessions', PARAM_BOOL);

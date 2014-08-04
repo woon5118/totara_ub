@@ -72,7 +72,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'approvalreqd', 'usercalentry',
             'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
-            'reservedays'));
+            'reservedays', 'selfapprovaltandc'));
         $notifications = new backup_nested_element('notifications');
 
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -85,7 +85,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session = new backup_nested_element('session', array('id'), array(
             'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown', 'duration', 'normalcost',
             'discountcost', 'roomid', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
-            'timemodified'));
+            'timemodified', 'selfapproval'));
 
         $signups = new backup_nested_element('signups');
 
@@ -143,7 +143,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->set_source_sql('SELECT s.id, s.facetoface, s.capacity, s.allowoverbook, s.details, s.datetimeknown,
                                          s.duration, s.normalcost, s.discountcost, s.roomid, r.name AS room_name,
                                          r.building AS room_building, r.custom AS room_custom, r.address AS room_address,
-                                         s.timecreated, s.timemodified, s.usermodified
+                                         s.timecreated, s.timemodified, s.usermodified, s.selfapproval
                                         FROM {facetoface_sessions} s
                                         LEFT JOIN {facetoface_room} r ON s.roomid = r.id
                                        WHERE s.facetoface = ?', array(backup::VAR_PARENTID));

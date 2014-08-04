@@ -26,6 +26,7 @@
         <FIELD NAME="maxmanagerreserves" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="How many reservations can each manager make"/>
         <FIELD NAME="reservecanceldays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Number days before the session when all unconfirmed reservations are deleted"/>
         <FIELD NAME="reservedays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="2" SEQUENCE="false" COMMENT="Number days before the session when reservations are closed"/>
+        <FIELD NAME="selfapprovaltandc" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Terms and conditions to display when to users when self approval is enabled"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -60,6 +61,7 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="18" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="selfapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow self approval"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>

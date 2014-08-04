@@ -2129,6 +2129,35 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014082200, 'facetoface');
     }
 
+    // Add new selfapproval and selfapprovaltandc fields.
+    if ($oldversion < 2014090400) {
+
+        // Define field selfapproval to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('selfapproval', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'usermodified');
+        $field->setComment('Allow self approval.');
+
+        // Conditionally launch add field selfapproval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field selfapprovaltandc to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('selfapprovaltandc', XMLDB_TYPE_TEXT, 'big', null, null, null, null, 'reservedays');
+        $field->setComment('Terms and conditions to display when to users when self approval is enabled');
+
+        // Conditionally launch add field selfapprovaltandc and set to default value.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $defaultvalue = get_string('selfapprovaltandccontents', 'facetoface');
+            $DB->execute("UPDATE {facetoface} SET selfapprovaltandc = ?", array($defaultvalue));
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014090400, 'facetoface');
+    }
     return $result;
 }
 
