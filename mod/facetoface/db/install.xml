@@ -27,6 +27,8 @@
         <FIELD NAME="reservecanceldays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Number days before the session when all unconfirmed reservations are deleted"/>
         <FIELD NAME="reservedays" TYPE="int" LENGTH="7" NOTNULL="false" DEFAULT="2" SEQUENCE="false" COMMENT="Number days before the session when reservations are closed"/>
         <FIELD NAME="selfapprovaltandc" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Terms and conditions to display when to users when self approval is enabled"/>
+        <FIELD NAME="declareinterest" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow users to declare interest in the facetoface"/>
+        <FIELD NAME="interestonlyiffull" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"  COMMENT="Only allow users to declare interest if all sessions are full"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -276,6 +278,22 @@
         <KEY NAME="sessiondateid_fk" TYPE="foreign" FIELDS="sessiondateid" REFTABLE="facetoface_sessions_dates" REFFIELDS="id"/>
         <KEY NAME="facenotihist_use_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="facetoface_interest" COMMENT="Users who have declared interest in a facetoface session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="facetoface" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timedeclared" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="facetoface" UNIQUE="false" FIELDS="facetoface"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

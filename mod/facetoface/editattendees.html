@@ -111,6 +111,12 @@ if ($error) {
          <?php if (!empty($searchtext)) { ?>
          <input name="clearsearch" id="clearsearch" type="submit" value="<?php echo $strshowall ?>" onclick="$('form#assignform input[name=searchbutton]').val(0);" />
          <?php } ?>
+         <?php
+            $strinterested = get_string('declareinterestfiltercheckbox', 'mod_facetoface');
+            $attrchecked = $interested ? 'checked="checked"' : '';
+         ?>
+          <br />
+         <input name="interested" id="interested" type="checkbox" value="1" onClick="$('form#assignform').submit();" <?php echo $attrchecked;?>/><?php echo $strinterested; ?>
        </td>
     </tr>
     </table>

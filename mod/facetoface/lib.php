@@ -354,6 +354,12 @@ function facetoface_fix_settings($facetoface) {
     if (!empty($facetoface->shortname)) {
         $facetoface->shortname = textlib::substr($facetoface->shortname, 0, CALENDAR_MAX_NAME_LENGTH);
     }
+    if (empty($facetoface->declareinterest)) {
+        $facetoface->declareinterest = 0;
+    }
+    if (empty($facetoface->interestonlyiffull) || !$facetoface->declareinterest) {
+        $facetoface->interestonlyiffull = 0;
+    }
 }
 
 /**
@@ -572,6 +578,8 @@ function facetoface_delete_instance($id) {
             "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
     $DB->delete_records_select('facetoface_notification_hist',
             "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
+
+    $DB->delete_records('facetoface_interest', array('facetoface' => $facetoface->id));
 
     $DB->delete_records('facetoface_sessions', array('facetoface' => $facetoface->id));
 
@@ -2043,6 +2051,8 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         }
     }
 
+    facetoface_withdraw_interest($facetoface, $userid);
+
     return true;
 }
 
@@ -2483,6 +2493,12 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $sessions_url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
     $htmlviewallsessions = html_writer::link($sessions_url, $strviewallsessions, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strviewallsessions));
 
+    $alreadydeclaredinterest = facetoface_user_declared_interest($facetoface);
+    $declareinterest_enable = $alreadydeclaredinterest || facetoface_activity_can_declare_interest($facetoface);
+    $declareinterest_label = $alreadydeclaredinterest ? get_string('declareinterestwithdraw', 'facetoface') : get_string('declareinterest', 'facetoface');
+    $declareinterest_url = new moodle_url('/mod/facetoface/interest.php', array('f' => $facetoface->id));
+    $declareinterest_link = html_writer::link($declareinterest_url, $declareinterest_label, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $declareinterest_label));
+
     if ($submissions = facetoface_get_user_submissions($facetoface->id, $USER->id)) {
         // User has signedup for the instance.
         if (!$facetoface->multiplesessions) {
@@ -2582,11 +2598,18 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     .html_writer::end_tag('tr');
             }
         }
-        // Add closing "view all sessions" row to table.
+        // Add "view all sessions" row to table.
         $table .= html_writer::start_tag('tr')
             .html_writer::tag('td', $htmlviewallsessions, array('colspan' => '2'))
-            .html_writer::end_tag('tr')
-            .html_writer::end_tag('table');
+            .html_writer::end_tag('tr');
+
+        if ($declareinterest_enable) {
+            $table .= html_writer::start_tag('tr')
+                .html_writer::tag('td', $declareinterest_link, array('colspan' => '2'))
+                .html_writer::end_tag('tr');
+        }
+
+        $table .= html_writer::end_tag('table');
     } else if ($sessions = facetoface_get_sessions($facetoface->id)) {
         if ($facetoface->display > 0) {
             $j=1;
@@ -2697,8 +2720,15 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
 
             $table .= html_writer::start_tag('tr')
                 .html_writer::tag('td', ($iseditor || ($coursemodule->visible && $coursemodule->available)) ? $htmlviewallsessions : $strviewallsessions, array('colspan' => '2'))
-                .html_writer::end_tag('tr')
-                .html_writer::end_tag('table');
+                .html_writer::end_tag('tr');
+
+            if (($iseditor || ($coursemodule->visible && $coursemodule->available)) && $declareinterest_enable) {
+                $table .= html_writer::start_tag('tr')
+                    .html_writer::tag('td', $declareinterest_link, array('colspan' => '2'))
+                    .html_writer::end_tag('tr');
+            }
+
+            $table .= html_writer::end_tag('table');
         } else {
             // Show only name if session display is set to zero.
             $content = html_writer::tag('span', $htmlviewallsessions, array('class' => 'f2fsessionnotice f2factivityname f2fonepointfive'));
@@ -4732,7 +4762,7 @@ function facetoface_eventhandler_role_unassigned_bulk($event) {
  * @param navigation_node $facetofacenode The node to add module settings to
  */
 function facetoface_extend_settings_navigation(settings_navigation $settings, navigation_node $facetofacenode) {
-    global $PAGE;
+    global $PAGE, $DB;
 
     $mode = optional_param('mode', '', PARAM_ALPHA);
     $hook = optional_param('hook', 'ALL', PARAM_CLEAN);
@@ -4740,6 +4770,11 @@ function facetoface_extend_settings_navigation(settings_navigation $settings, na
     $context = context_module::instance($PAGE->cm->id);
     if (has_capability('moodle/course:manageactivities', $context)) {
         $facetofacenode->add(get_string('notifications', 'facetoface'), new moodle_url('/mod/facetoface/notification/index.php', array('update' => $PAGE->cm->id)), navigation_node::TYPE_SETTING);
+    }
+
+    $facetoface = $DB->get_record('facetoface', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
+    if ($facetoface->declareinterest && has_capability('mod/facetoface:viewinterestreport', $context)) {
+        $facetofacenode->add(get_string('declareinterestreport', 'facetoface'), new moodle_url('/mod/facetoface/interestreport.php', array('facetofaceid' => $PAGE->cm->instance)), navigation_node::TYPE_SETTING);
     }
 }
 
@@ -5716,4 +5751,125 @@ function facetoface_get_rooms($facetofaceid) {
         WHERE s.facetoface = ?";
 
     return $DB->get_records_sql($sql, array($facetofaceid));
+}
+
+/**
+ * Determines whether the user has already expressed interest in this activity.
+ *
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  object $userid     Default to current user if null
+ * @return boolean whether a person needs a manager to sign up for that activity
+ */
+function facetoface_user_declared_interest($facetoface, $userid = null) {
+    global $DB, $USER;
+
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+
+    return $DB->record_exists('facetoface_interest', array('facetoface' => $facetoface->id, 'userid' => $userid));
+}
+
+/**
+ * Determines whether the user can declare interest in the activity.
+ *
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  object $userid     Default to current user if null
+ * @return boolean whether a person needs a manager to sign up for that activity
+ */
+function facetoface_activity_can_declare_interest($facetoface, $userid = null) {
+    global $DB, $USER;
+
+    // "Declare interest" must be turned on for the activity.
+    if (!$facetoface->declareinterest) {
+        return false;
+    }
+
+    // If user already declared interest, cannot declare again.
+    if (facetoface_user_declared_interest($facetoface, $userid)) {
+        return false;
+    }
+
+    // Check that the user has no existing signup.
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+    $sql = "
+    SELECT snp.id
+    FROM {facetoface_sessions} ssn
+    JOIN {facetoface_signups} snp ON (snp.sessionid = ssn.id)
+    JOIN {facetoface_signups_status} sst ON (sst.signupid = snp.id AND sst.superceded = :superceded)
+    WHERE ssn.facetoface = :ftfid
+    AND snp.userid = :userid
+    AND sst.statuscode >= :statusrequested
+    AND sst.statuscode <= :statusbooked
+    ";
+    $params = array(
+        'ftfid' => $facetoface->id,
+        'userid' => $userid,
+        'superceded' => 0,
+        'statusrequested' => MDL_F2F_STATUS_REQUESTED,
+        'statusbooked' => MDL_F2F_STATUS_BOOKED,
+    );
+    if ($DB->record_exists_sql($sql, $params)) {
+        return false;
+    }
+
+    // If "only when full" is turned on, allow only when all sessions are fully booked.
+    if ($facetoface->interestonlyiffull) {
+        $sessions = $DB->get_records('facetoface_sessions', array('facetoface' => $facetoface->id));
+        if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id)) {
+            print_error('error:incorrectcoursemodule', 'facetoface');
+        }
+        $contextmodule = context_module::instance($cm->id);
+        foreach ($sessions as $session) {
+            if ($session->allowoverbook || facetoface_session_has_capacity($session, $contextmodule)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Declares interest in a facetoface activity for a user.
+ * Assume we have already checked that no existing decleration exists
+ * And all the necessary permissions
+ *
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  string $reason     Reason provided by user
+ * @param  object $userid     Default to current user if null
+ * @return boolean            Success
+ */
+function facetoface_declare_interest($facetoface, $reason = '', $userid = null) {
+    global $DB, $USER;
+
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+
+    $toinsert = (object)array(
+        'facetoface' => $facetoface->id,
+        'userid' => $userid,
+        'timedeclared' => time(),
+        'reason' => $reason,
+    );
+
+    return $DB->insert_record('facetoface_interest', $toinsert);
+}
+
+/**
+ * Withdraws interest from a facetoface activity for a user.
+ * @param  object $facetoface A database fieldset object for the facetoface activity
+ * @param  int    $userid     Default to current user if null
+ * @return boolean            Success
+ */
+function facetoface_withdraw_interest($facetoface, $userid = null) {
+    global $DB, $USER;
+
+    if (is_null($userid)) {
+        $userid = $USER->id;
+    }
+
+    return $DB->delete_records('facetoface_interest', array('facetoface' => $facetoface->id, 'userid' => $userid));
 }

@@ -215,6 +215,19 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         ),
     ),
+
+    // Can view declare interest report.
+    'mod/facetoface:viewinterestreport' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'staffmanager' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
 );
 
 ?>

@@ -72,7 +72,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'name', 'intro', 'introformat', 'thirdparty', 'thirdpartywaitlist', 'display',
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'approvalreqd', 'usercalentry',
             'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
-            'reservedays', 'selfapprovaltandc'));
+            'reservedays', 'selfapprovaltandc', 'declareinterest', 'interestonlyiffull'));
         $notifications = new backup_nested_element('notifications');
 
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -112,6 +112,10 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $sessions_date = new backup_nested_element('sessions_date', array('id'), array(
             'sessionid', 'sessiontimezone', 'timestart', 'timefinish'));
 
+        $interests = new backup_nested_element('interests');
+
+        $interest = new backup_nested_element('interest', array('id'), array(
+            'facetoface', 'userid', 'timedeclared', 'reason'));
 
         // Build the tree
         $facetoface->add_child($notifications);
@@ -135,6 +139,9 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session->add_child($sessions_dates);
         $sessions_dates->add_child($sessions_date);
 
+        $facetoface->add_child($interests);
+        $interests->add_child($interest);
+
         // Define sources
         $facetoface->set_source_table('facetoface', array('id' => backup::VAR_ACTIVITYID));
 
@@ -156,6 +163,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             $signup_status->set_source_table('facetoface_signups_status', array('signupid' => backup::VAR_PARENTID));
 
             $session_role->set_source_table('facetoface_session_roles', array('sessionid' => backup::VAR_PARENTID));
+
+            $interest->set_source_table('facetoface_interest', array('facetoface' => backup::VAR_PARENTID));
         }
 
         $customfield->set_source_sql('SELECT d.id, f.shortname AS field_name, f.type AS field_type, d.data AS field_data
@@ -171,6 +180,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session_role->annotate_ids('role', 'roleid');
 
         $session_role->annotate_ids('user', 'userid');
+
+        $interest->annotate_ids('user', 'userid');
 
         // Define file annotations
         // None for F2F

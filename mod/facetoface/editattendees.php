@@ -42,6 +42,7 @@ $onlycontent    = optional_param('onlycontent', false, PARAM_BOOL); // return co
 $attendees      = optional_param('attendees', '', PARAM_SEQUENCE);
 $removedusers   = optional_param('removedusers', '', PARAM_SEQUENCE); // Cancellations and removed users list
 $save           = optional_param('save', false, PARAM_BOOL);
+$interested     = optional_param('interested', false, PARAM_BOOL); // Declare interest.
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
@@ -300,6 +301,15 @@ if ($attendees) {
     $params = array_merge($params, $attendee_params);
 }
 
+$joininterest = '';
+if ($interested) {
+    $joininterest = "
+    JOIN {facetoface_interest} fit ON (fit.userid = u.id)
+    JOIN {facetoface_sessions} ssn ON (ssn.facetoface = fit.facetoface AND ssn.id = ?)
+    ";
+    array_unshift($params, $session->id);
+}
+
 $usercountrow = $DB->get_record_sql("SELECT COUNT(u.id) as num
                                                FROM {user} u
                                                LEFT JOIN {facetoface_signups} su
@@ -308,6 +318,7 @@ $usercountrow = $DB->get_record_sql("SELECT COUNT(u.id) as num
                                                LEFT JOIN {facetoface_signups_status} ss
                                                  ON su.id = ss.signupid
                                                 AND ss.superceded != 1
+                                               $joininterest
                                       WHERE {$where} ", $params);
 
 $usercount = $usercountrow->num;
@@ -321,6 +332,7 @@ if ($usercount <= MAX_USERS_PER_PAGE) {
                                         LEFT JOIN {facetoface_signups_status} ss
                                           ON su.id = ss.signupid
                                          AND ss.superceded != 1
+                                       $joininterest
                                        WHERE {$where}
                                        ORDER BY u.lastname ASC, u.firstname ASC", $params);
 }

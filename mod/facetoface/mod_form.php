@@ -82,6 +82,12 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $multiplesessions = get_config(null, 'facetoface_multiplesessions') ? 1 : 0;
         $mform->setDefault('multiplesessions', $multiplesessions);
 
+        $mform->addElement('checkbox', 'declareinterest', get_string('declareinterestenable', 'facetoface'));
+        $mform->addHelpButton('declareinterest', 'declareinterest', 'mod_facetoface');
+        $mform->addElement('checkbox', 'interestonlyiffull', get_string('declareinterestonlyiffull', 'facetoface'));
+        $mform->addHelpButton('interestonlyiffull', 'declareinterestonlyiffull', 'mod_facetoface');
+        $mform->disabledIf('interestonlyiffull', 'declareinterest');
+
         $conf = get_config('facetoface');
 
         $mform->addElement('header', 'managerreserveheader', get_string('managerreserveheader', 'mod_facetoface'));

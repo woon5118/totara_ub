@@ -2158,6 +2158,54 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014090400, 'facetoface');
     }
+
+    if ($oldversion < 2014090500) {
+
+        // Define field declareinterest to be added to facetoface.
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('declareinterest', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'completionstatusrequired');
+        $field->setComment('Allow users to declare interest in the facetoface');
+
+        // Conditionally launch add field declareinterest.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('interestonlyiffull', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'declareinterest');
+        $field->setComment('Only allow users to declare interest if all sessions are full');
+
+        // Conditionally launch add field interestonlyiffull.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table facetoface_interest to be created.
+        $table = new xmldb_table('facetoface_interest');
+        $table->setComment('Users who have declared interest in a facetoface session');
+
+        // Adding fields to table facetoface_interest.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('facetoface', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timedeclared', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('reason', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table facetoface_interest.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table facetoface_interest.
+        $table->add_index('facetoface', XMLDB_INDEX_NOTUNIQUE, array('facetoface'));
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+
+        // Conditionally launch create table for facetoface_interest.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014090500, 'facetoface');
+    }
+
     return $result;
 }
 

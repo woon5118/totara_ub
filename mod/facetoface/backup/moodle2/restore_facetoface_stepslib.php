@@ -39,6 +39,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
             $paths[] = new restore_path_element('facetoface_signup', '/activity/facetoface/sessions/session/signups/signup');
             $paths[] = new restore_path_element('facetoface_signups_status', '/activity/facetoface/sessions/session/signups/signup/signups_status/signup_status');
             $paths[] = new restore_path_element('facetoface_session_roles', '/activity/facetoface/sessions/session/session_roles/session_role');
+            $paths[] = new restore_path_element('facetoface_interest', '/activity/facetoface/interests/interest');
         }
 
         // Return the paths wrapped into standard activity structure
@@ -234,6 +235,20 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_sessions_dates', $data);
+    }
+
+
+    protected function process_facetoface_interest($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->facetoface = $this->get_new_parentid('facetoface');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        // Insert the entry record.
+        $newitemid = $DB->insert_record('facetoface_interest', $data);
     }
 
     protected function after_execute() {

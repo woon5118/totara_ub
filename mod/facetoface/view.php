@@ -148,6 +148,18 @@ if (has_capability('mod/facetoface:viewattendees', $context)) {
 }
 
 echo $OUTPUT->box_end();
+
+$alreadydeclaredinterest = facetoface_user_declared_interest($facetoface);
+if ($alreadydeclaredinterest || facetoface_activity_can_declare_interest($facetoface)) {
+    if ($alreadydeclaredinterest) {
+        $strbutton = get_string('declareinterestwithdraw', 'mod_facetoface');
+    } else {
+        $strbutton = get_string('declareinterest', 'mod_facetoface');
+    }
+    $url = new moodle_url('/mod/facetoface/interest.php', array('f' => $facetoface->id));
+    echo $OUTPUT->single_button($url, $strbutton, 'get');
+}
+
 echo $OUTPUT->footer($course);
 
 function print_session_list($courseid, $facetoface, $sessions) {
