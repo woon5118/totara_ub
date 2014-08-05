@@ -1437,7 +1437,20 @@ function certificate_get_code($certificate, $certrecord) {
  * @param string $text the text to print
  */
 function certificate_print_text($pdf, $x, $y, $align, $font='freeserif', $style, $size=10, $text) {
-    $pdf->setFont($font, $style, $size);
+
+    $language = current_language();
+    if (right_to_left()) {
+        $pdf->setRTL(true);
+    }
+
+    if (in_array($language, array('zh_cn', 'ja'))) {
+        $pdf->setFont('droidsansfallback', $style, $size);
+    } else if ($language == 'th') {
+        $pdf->setFont('cordiaupc', $style, $size);
+    } else {
+        $pdf->setFont($font, $style, $size);
+    }
+
     $pdf->SetXY($x, $y);
     $pdf->writeHTMLCell(0, 0, '', '', $text, 0, 0, 0, true, $align);
 }
