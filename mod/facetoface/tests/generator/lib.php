@@ -106,7 +106,7 @@ class mod_facetoface_generator extends testing_module_generator {
             $sessiondates = $record->sessiondates;
         }
 
-        if (empty($record->datetimeknown)) {
+        if (!isset($record->datetimeknown)) {
             $record->datetimeknown = 1;
         }
         if (!isset($record->capacity)) {
