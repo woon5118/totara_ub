@@ -58,6 +58,7 @@ $string['embeddedanswersfromallheading'] = 'All Roles\' Answers';
 
 // Column category titles.
 $string['type_userappraisal'] = 'User\'s Appraisal';
+$string['type_appraisal'] = 'Appraisal';
 $string['type_rolelearner'] = 'Appraisal Answers';
 $string['type_rolemanager'] = 'Appraisal Answers';
 $string['type_roleteamlead'] = 'Appraisal Answers';

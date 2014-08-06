@@ -36,3 +36,4 @@ $string['evidencelink'] = 'Evidence Link';
 $string['actionlinks'] = 'Actions';
 $string['evidencetype'] = 'Evidence Type';
 $string['evidenceinuse'] = 'In Use?';
+$string['type_evidence'] = 'Evidence';

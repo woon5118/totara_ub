@@ -3956,8 +3956,8 @@ class reportbuilder {
                     // How about in report builder?
                     $section = get_string($langstr, 'totara_reportbuilder');
                 } else {
-                    // Fall back on original approach to cope with dynamic types in feedback sources.
-                    $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $filter->type));
+                    // Display in missing string format to make it obvious.
+                    $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
                 }
 
                 $key = $filter->type . '-' . $filter->value;
@@ -4000,8 +4000,8 @@ class reportbuilder {
                     // How about in report builder?
                     $section = get_string($langstr, 'totara_reportbuilder');
                 } else {
-                    // Fall back on original approach to cope with dynamic types in feedback sources.
-                    $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $columnoption->type));
+                    // Display in missing string format to make it obvious.
+                    $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
                 }
 
                 $key = $columnoption->type . '-' . $columnoption->value;
@@ -4105,8 +4105,8 @@ class reportbuilder {
             } else if (get_string_manager()->string_exists($langstr, 'totara_reportbuilder')) {
                 $section = get_string($langstr, 'totara_reportbuilder');
             } else {
-            // fall back on original approach to cope with dynamic types in feedback sources
-                $section = ucwords(str_replace(array('_', '-'), array(' ', ' '), $column->type));
+                // Display in missing string format to make it obvious.
+                $section = get_string_manager()->get_string($langstr, 'rb_source_' . $sourcename);
             }
 
             $key = $column->type . '-' . $column->value;

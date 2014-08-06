@@ -45,6 +45,7 @@ $string['statusincomplete'] = 'Incomplete';
 $string['statusontarget'] = 'On Target';
 $string['statusoverdue'] = 'Overdue';
 $string['type_userappraisal'] = 'User\'s Appraisal';
+$string['type_appraisal'] = 'Appraisal';
 $string['user'] = 'The user';
 $string['userappraisalactivestagenamecolumn'] = 'User\'s Current Stage';
 $string['userappraisalactivestagenameheading'] = 'Current stage';
