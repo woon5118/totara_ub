@@ -89,10 +89,6 @@ form[id^="toolbarsearch"].mform .fsubmit {
     margin-right: 1em;
 }
 
-.totaratable .toolbar-cell .paging {
-    margin-top: 8px;
-}
-
 /* Sidebar filters */
 .rb-sidebar {
     float: left;

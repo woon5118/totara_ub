@@ -57,11 +57,19 @@
 }
 .totaratable .toolbar-cell {
     border: none;
-    vertical-align: middle;
+    vertical-align: top;
     white-space: nowrap;
     padding: 4px;
     background-color: #f3f3f3;
     display: inline-block;
+}
+.totaratable .toolbar-cell .fitem_fsubmit,
+.totaratable .toolbar-cell input {
+    vertical-align: top;
+    margin: 0;
+}
+.totaratable .toolbar-cell form div {
+    margin: 0;
 }
 
 /* Align the toolbar items, swapping sides in RTL languages */

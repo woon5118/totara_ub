@@ -239,6 +239,12 @@ table.generalbox :last-child .last td:last-child {
     border-bottom-left-radius: 4px;
 }
 
+.paging a,
+.paging span {
+    margin: 3px;
+    display: inline-block;
+}
+
 /* Form elements in totaratables toolbar. */
 .totaratable .toolbar .mform .fitem .fitemtitle,
 .totaratable .toolbar .mform .fitem .felement {
