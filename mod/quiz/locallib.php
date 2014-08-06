@@ -1534,7 +1534,7 @@ function quiz_send_confirmation($recipient, $a) {
     $eventdata->subject           = $strmgr->get_string('emailconfirmsubject', 'quiz', $a, $recipient->lang);
     $eventdata->fullmessage       = $strmgr->get_string('emailconfirmbody', 'quiz', $a, $recipient->lang);
     $eventdata->fullmessageformat = FORMAT_PLAIN;
-    $eventdata->fullmessagehtml   = '';
+    $eventdata->fullmessagehtml   = $eventdata->fullmessage;
 
     $eventdata->smallmessage      = $strmgr->get_string('emailconfirmsmall', 'quiz', $a, $recipient->lang);
     $eventdata->contexturl        = $a->quizurl;
@@ -1571,7 +1571,7 @@ function quiz_send_notification($recipient, $submitter, $a) {
     $eventdata->subject           = $strmgr->get_string('emailnotifysubject', 'quiz', $a, $recipient->lang);
     $eventdata->fullmessage       = $strmgr->get_string('emailnotifybody', 'quiz', $a, $recipient->lang);
     $eventdata->fullmessageformat = FORMAT_PLAIN;
-    $eventdata->fullmessagehtml   = '';
+    $eventdata->fullmessagehtml   = $eventdata->fullmessage;
 
     $eventdata->smallmessage      = $strmgr->get_string('emailnotifysmall', 'quiz', $a, $recipient->lang);
     $eventdata->contexturl        = $a->quizreviewurl;
@@ -1739,7 +1739,7 @@ function quiz_send_overdue_message($course, $quiz, $attempt, $context, $cm) {
     $eventdata->subject           = get_string('emailoverduesubject', 'quiz', $a);
     $eventdata->fullmessage       = get_string('emailoverduebody', 'quiz', $a);
     $eventdata->fullmessageformat = FORMAT_PLAIN;
-    $eventdata->fullmessagehtml   = '';
+    $eventdata->fullmessagehtml   = $eventdata->fullmessage;
 
     $eventdata->smallmessage      = get_string('emailoverduesmall', 'quiz', $a);
     $eventdata->contexturl        = $a->quizurl;
