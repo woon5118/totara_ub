@@ -229,3 +229,11 @@ form[id^="toolbarsearch"].mform .fsubmit {
 .jsenabled #fgroup_id_submitgroupsidebar {
     display: none;
 }
+
+fieldset.felement.fgroup > .rb-filter-button {
+    margin: 0 5px 0 5px;
+}
+
+fieldset.felement.fgroup > .rb-filter-content-list {
+    margin: 10px 5px 10px 5px;
+}

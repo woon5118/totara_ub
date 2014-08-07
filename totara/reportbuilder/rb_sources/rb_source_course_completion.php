@@ -530,7 +530,7 @@ class rb_source_course_completion extends rb_base_source {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
+                'value' => 'path',
                 'advanced' => 1,
             ),
             array(

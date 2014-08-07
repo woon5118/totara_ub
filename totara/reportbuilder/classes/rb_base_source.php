@@ -2569,32 +2569,34 @@ abstract class rb_base_source {
     protected function add_course_category_fields_to_columns(&$columnoptions,
         $catjoin='course_category', $coursejoin='course', $column='coursecount') {
         $columnoptions[] = new rb_column_option(
-                'course_category',
-                'name',
-                get_string('coursecategory', 'totara_reportbuilder'),
-                "$catjoin.name",
-                array('joins' => $catjoin,
-                      'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+            'course_category',
+            'name',
+            get_string('coursecategory', 'totara_reportbuilder'),
+            "$catjoin.name",
+            array('joins' => $catjoin,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
         );
         $columnoptions[] = new rb_column_option(
-                'course_category',
-                'namelink',
-                get_string('coursecategorylinked', 'totara_reportbuilder'),
-                "$catjoin.name",
-                array(
-                    'joins' => $catjoin,
-                    'displayfunc' => 'link_course_category',
-                    'defaultheading' => get_string('category', 'totara_reportbuilder'),
-                    'extrafields' => array('cat_id' => "$catjoin.id", 'cat_visible' => "$catjoin.visible", $column => "{$catjoin}.{$column}")
-                )
+            'course_category',
+            'namelink',
+            get_string('coursecategorylinked', 'totara_reportbuilder'),
+            "$catjoin.name",
+            array(
+                'joins' => $catjoin,
+                'displayfunc' => 'link_course_category',
+                'defaultheading' => get_string('category', 'totara_reportbuilder'),
+                'extrafields' => array('cat_id' => "$catjoin.id",
+                                        'cat_visible' => "$catjoin.visible",
+                                        $column => "{$catjoin}.{$column}")
+            )
         );
         $columnoptions[] = new rb_column_option(
-                'course_category',
-                'id',
-                get_string('coursecategoryid', 'totara_reportbuilder'),
-                "$coursejoin.category",
-                array('joins' => $coursejoin)
+            'course_category',
+            'id',
+            get_string('coursecategoryid', 'totara_reportbuilder'),
+            "$coursejoin.category",
+            array('joins' => $coursejoin)
         );
         return true;
     }
@@ -2618,6 +2620,15 @@ abstract class rb_base_source {
                 'selectfunc' => 'course_categories_list',
                 'attributes' => rb_filter_option::select_width_limiter(),
             )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'course_category',
+            'path',
+            get_string('coursecategorymultichoice', 'totara_reportbuilder'),
+            'category',
+            array(),
+            'course_category.path',
+            'course_category'
         );
         return true;
     }

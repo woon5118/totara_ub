@@ -515,5 +515,50 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014100701, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014102300) {
+
+        // Replace old category filter with the new one.
+        $sql = "UPDATE {report_builder_filters}
+        SET value = :newfiltervalue
+        WHERE type = :filtertype
+          AND value = :filtervalue
+          AND region = :filterregion";
+        $params = array(
+            'newfiltervalue' => 'path',
+            'filtertype' => 'course_category',
+            'filtervalue' => 'id',
+            'filterregion' => rb_filter_type::RB_FILTER_REGION_STANDARD
+        );
+        $DB->execute($sql, $params);
+
+        // Replace old category filter in saved search.
+        $sql = "SELECT rbs.*
+        FROM {report_builder_saved} rbs
+        INNER JOIN {report_builder_filters} rbf ON rbs.reportid = rbf.reportid
+        WHERE rbf.type = :filtertype
+          AND rbf.value = :filtervalue";
+        $params = array('filtertype' => 'course_category', 'filtervalue' => 'path');
+        $searches = $DB->get_records_sql($sql, $params);
+        foreach ($searches as $search) {
+            $todb = new stdClass();
+            $todb->id = $search->id;
+            $currentfilters = unserialize($search->search);
+            $newfilters = array();
+            foreach ($currentfilters as $key => $filter) {
+                if ($key === 'course_category-id') {
+                    // Change key and add recursive param to the filter.
+                    $key = 'course_category-path';
+                    $filter['recursive'] = 0;
+                }
+                $newfilters[$key] = $filter;
+            }
+            $todb->search = serialize($newfilters);
+            $DB->update_record('report_builder_saved', $todb);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014102300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

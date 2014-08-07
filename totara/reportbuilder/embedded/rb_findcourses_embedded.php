@@ -67,7 +67,7 @@ class rb_findcourses_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
+                'value' => 'path',
                 'advanced' => 1,
             ),
             array(

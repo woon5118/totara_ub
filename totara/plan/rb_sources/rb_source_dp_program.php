@@ -478,7 +478,7 @@ class rb_source_dp_program extends rb_base_source {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
+                'value' => 'path',
                 'advanced' => 0,
             ),
         );

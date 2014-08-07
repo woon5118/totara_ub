@@ -1026,14 +1026,14 @@ totaraDialog_handler_treeview_multiselect_rb_filter.prototype = new totaraDialog
  */
 totaraDialog_handler_treeview_multiselect_rb_filter.prototype.first_load = function() {
     var id = this._title;
-    var addLink = $('#show-'+id+'-dialog');
+    var linkcontainer = $('.list-'+id);
     var handler = this;
     // find all the currently selected items (by traversing the DOM on the
     // underlying page), then add them to the 'selected' panel without the
     // 'clickable' class (so they are hidden)
     // This ensures they can't be selected again from the 'choose' panel
     var preselected = '';
-    $('.multiselect-selected-item', addLink.parent('div').prev()).each(function(i, el) {
+    $('.multiselect-selected-item', linkcontainer).each(function(i, el) {
         var item_id = $(this).data('id');
         var item_name = $(this).text();
         preselected += '<div class="treeview-selected-item"><span id="item_'+item_id+'"><a href="#">'+item_name+'</a><span class="deletebutton">'

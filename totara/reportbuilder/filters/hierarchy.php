@@ -92,7 +92,7 @@ class rb_filter_hierarchy extends rb_filter_type {
         $objs[] =& $mform->createElement('static', 'selectorbutton',
             '',
             html_writer::empty_tag('input', array('type' => 'button',
-                'class' => 'rb-filter-choose-' . $type,
+                'class' => 'rb-filter-button rb-filter-choose-' . $type,
                 'value' => get_string('choose' . $type, 'totara_reportbuilder'),
                 'id' => 'show-' . $this->name . '-dialog')));
         $objs[] =& $mform->createElement('checkbox', $this->name . '_rec', '', get_string('includesubcategories', 'filters'));

@@ -78,6 +78,9 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
             case "cohort":
                 this.rb_load_cohort_filters();
                 break;
+            case "category":
+                this.rb_load_category_filters();
+                break;
         }
 
         // Activate the 'delete' option next to any selected items in filters.
@@ -292,6 +295,44 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
                     url + 'save_badge.php?filtername=' + id + '&sesskey=' + M.cfg.sesskey + '&ids='
                 );
             })();
+        });
+    },
+
+    rb_load_category_filters: function() {
+        $(document).on('change', '#id_course_category-path_op', function(event) {
+            event.preventDefault();
+            var name = $(this).attr('name');
+            name = name.substr(0, name.length - 3);// Remove _op.
+
+            if ($(this).val() == 0) {
+                $('input[name='+name+'_rec]').prop('disabled', true);
+                $('#show-'+name+'-dialog').prop('disabled', true);
+            } else {
+                $('input[name='+name+'_rec]').prop('disabled', false);
+                $('#show-'+name+'-dialog').prop('disabled', false);
+            }
+        });
+
+        $('input.rb-filter-choose-category').each(function(i, el) {
+            var id = $(this).attr('id');
+            // Remove 'show-' and '-dialog' from ID.
+            id = id.substr(5, id.length - 12);
+
+            (function() {
+                var url = M.cfg.wwwroot + '/totara/reportbuilder/ajax/filter/category/';
+                totaraMultiSelectDialogRbFilter(
+                    id,
+                    M.util.get_string('choosecatplural', 'totara_reportbuilder'),
+                    url + 'find.php?sesskey=' + M.cfg.sesskey,
+                    url + 'save.php?filtername=' + id + '&sesskey=' + M.cfg.sesskey +'&ids='
+                );
+            })();
+
+            // Disable popup buttons if first pulldown is set to 'any value'.
+            if ($('select[name='+id+'_op]').val() == 0) {
+                $('input[name='+id+'_rec]').prop('disabled',true);
+                $('#show-'+id+'-dialog').prop('disabled',true);
+            }
         });
     }
 }

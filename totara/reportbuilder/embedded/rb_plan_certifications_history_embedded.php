@@ -86,7 +86,7 @@ class rb_plan_certifications_history_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
+                'value' => 'path',
                 'advanced' => 1,
             ),
         );

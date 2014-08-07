@@ -171,9 +171,9 @@ class rb_source_courses extends rb_base_source {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
-                'region' => rb_filter_type::RB_FILTER_REGION_SIDEBAR,
-            ),
+                'value' => 'path',
+                'advanced' => 0,
+            )
         );
 
         return $defaultfilters;

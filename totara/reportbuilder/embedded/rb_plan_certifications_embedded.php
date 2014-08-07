@@ -134,7 +134,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'course_category',
-                'value' => 'id',
+                'value' => 'path',
                 'advanced' => 1,
             ),
             array(

@@ -464,6 +464,25 @@ switch ($searchtype) {
         $search_info->params = $params;
         break;
 
+    /*
+     * Category search.
+     */
+    case 'category':
+        // Generate search SQL.
+        $keywords = totara_search_parse_keywords($query);
+        $fields = array('name');
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+
+        $search_info->fullname = 'c.name';
+        $search_info->sql = "
+            FROM
+                {course_categories} c
+            WHERE
+                {$searchsql}
+        ";
+        $search_info->order = ' ORDER BY name ASC';
+        $search_info->params = $params;
+        break;
 
     case 'this':
         $keywords = totara_search_parse_keywords($query);
