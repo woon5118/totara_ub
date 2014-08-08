@@ -52,6 +52,10 @@ chmod 777 ../moodledata
 echo "Allow creation of config.php"
 chmod 777 .
 
+# Copy vendor folder
+echo "Copy vendor folder"
+cp -r /usr/local/share/vendor26 vendor
+
 echo "Initialize installation"
 
 # Convert to type required by moodle cli install
@@ -75,7 +79,6 @@ then
 else
     LANG='en'
 fi
-
 
 sudo -u www-data php admin/cli/install.php \
     --chmod=755 \
