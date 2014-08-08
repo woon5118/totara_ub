@@ -54,7 +54,8 @@ class behat_cohort extends behat_base {
         $userid = $DB->get_field('user', 'id', array('username' => $username));
 
         $steps = array(
-            new Given('I click on "' . get_string('assign', 'cohort') . '" "link" in the "' . $this->escape($cohortidnumber) . '" "table_row"'),
+            new Given('I click on "' . get_string('edit') . '" "link" in the "' . $this->escape($cohortidnumber) . '" "table_row"'),
+            new Given('I click on "' . get_string('editmembers', 'totara_cohort') . '" "link" in the ".tabtree" "css_element"'),
             new Given('I select "' . $userid . '" from "' . get_string('potusers', 'cohort') . '"'),
             new Given('I press "' . get_string('add') . '"'),
             new Given('I press "' . get_string('backtocohorts', 'cohort') . '"')

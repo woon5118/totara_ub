@@ -12,8 +12,8 @@ Feature: An administrator can filter user accounts by role, cohort and other pro
       | user3 | User | Three | one@asd.com | manual | 1 |
       | user4 | User | Four | one@asd.com | ldap | 0 |
     And the following "cohorts" exists:
-      | name | idnumber |
-      | Cohort 1 | CH1 |
+      | name | idnumber | cohorttype |
+      | Cohort 1 | CH1 | 1 |
     And the following "courses" exists:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
@@ -30,7 +30,7 @@ Feature: An administrator can filter user accounts by role, cohort and other pro
   @javascript
   Scenario: Filter user accounts by role and cohort
     When I fill the moodle form with:
-      | courserole_rl | Student |
+      | courserole_rl | Learner |
       | courserole_ct | any category |
       | courserole | C1 |
     And I press "Add filter"
