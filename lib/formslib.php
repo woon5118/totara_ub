@@ -60,7 +60,7 @@ $TEXTAREA_OPTIONS = array(
         'subdirs' => 0,
         'maxfiles' => EDITOR_UNLIMITED_FILES,
         'maxbytes' => $totara_maxbytes,
-        'trusttext' => true,
+        'trusttext' => false,
         'context' => $totara_context,
         'collapsed' => true
 );
