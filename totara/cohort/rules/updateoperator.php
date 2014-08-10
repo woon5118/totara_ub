@@ -33,6 +33,9 @@ $type = required_param('type', PARAM_ALPHA);
 $value = required_param('value', PARAM_INT);
 $cohortid = required_param('cohortid', PARAM_INT);
 
+require_login();
+require_sesskey();
+
 $syscontext = context_system::instance();
 require_capability('totara/cohort:managerules', $syscontext);
 

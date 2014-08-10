@@ -3,6 +3,46 @@
 
 Totara LMS Changelog
 
+Release 2.6.6 (29th July 2014):
+==================================================
+
+Security issues:
+    T-12619        Improved sesskey checks throughout the system
+    T-12745        Improved capability checks around Reportbuilder scheduled reports
+    T-12634        Fixed an issue with file downloads in Feedback360 and Appraisals
+    T-12633        Fixed an issue with the session data when viewing/downloading a Certificate
+    T-12632        Fixed an issue with token access for external Feedback360 requests
+
+Improvements:
+    T-12677        Improved error messages for Totara Sync
+    T-12693        Improved validation checks around retrieving Programs within a category
+    T-12099        Improved developer debugging in Reportbuilder
+    T-12771        Added a SVG icon for Facetoface activities
+    T-12561        Increased the maximum length of Hierarchy scale names and values for use with the multi-lang filter
+
+Bug Fixes:
+    T-12487        Fixed the type of assignment set when uploading completion records for Certifications
+    T-12780        Fixed the formatting of dates when viewing a Badge
+    T-12761        Fixed an undefined timezone issue in Reportbuilder caching
+    T-12668        Fixed Programs potentially appearing multiple times in a user's Required Learning
+    T-12403        Fixed the empty duration label when creating new events
+    T-12720        Fixed an issue with filtering messages by icon in the Alerts block
+    T-12576        Fixed the handling of epoch date for Reportbuilder date/time filters
+    T-12621        Fixed the creation of file attachments in Facetoface
+    T-11556        Fixed resolving Program exceptions through setting a realistic time
+    T-12730        Fixed missing strings in Customtotara and Customtotararesponsive Themes
+    T-12515        Fixed parameter names for manager rules in Dynamic Audiences
+    T-12445        Fixed URL encoding in Hierarchies
+    T-12283        Fixed docking for the Kiwifruitresponsive Theme
+    T-12284        Fixed docking for the Kiwifruit Theme
+    T-12675        Fixed the ordering of completion criteria for course completion reports
+    T-12742        Fixed the downloading of a Badge image
+    T-12717        Fixed an issue with the My Team report when adding temporary reports
+    T-12731        Fixed the hardcoded 'Participants' string in Appraisals
+    T-12737        Fixed the description for the Enable Audience-based Visibility setting
+    T-12760        Added the default database collation in all tables including temporary tables
+
+
 Release 2.6.5 (16th July 2014):
 ==================================================
 

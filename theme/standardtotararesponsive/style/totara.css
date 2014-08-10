@@ -174,6 +174,11 @@ div.totara-dialog {
                     div.totara-dialog td.select #search-tab fieldset button {
                         font-size: 0.85em;
                     }
+                    @-moz-document url-prefix() {
+                        .mozilla div.totara-dialog td.select #search-tab fieldset select {
+                            padding-top: 5px;
+                        }
+                    }
                     div.totara-dialog td.select #search-tab table#dialog-search-table td.querybox input {
                         width: 95%;
                     }

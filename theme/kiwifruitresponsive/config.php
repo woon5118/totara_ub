@@ -30,6 +30,9 @@ $THEME->sheets = array(
     'fonts', 'core', 'blocks', 'navigation', 'course', 'dock', 'css3', 'ie7', 'custom'
 );
 
-$THEME->enable_dock = false;
+$THEME->enable_dock = true;
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->csspostprocess = 'theme_kiwifruitresponsive_process_css';
+$THEME->javascripts_footer = array(
+    'core'
+);

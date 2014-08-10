@@ -258,8 +258,8 @@ if ($data = $form->get_data()) {
             $transaction = $DB->start_delegated_transaction();
 
             // Set up the certification
-            $newcertifid = $DB->insert_record('certif', $certification_todb);
-            $DB->set_field('prog', 'certifid', $newcertifid , array('id' => $newid));
+            $newcertid = $DB->insert_record('certif', $certification_todb);
+            $DB->set_field('prog', 'certifid', $newcertid , array('id' => $newid));
 
             $transaction->allow_commit();
 

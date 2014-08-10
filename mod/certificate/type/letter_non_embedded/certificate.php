@@ -113,7 +113,7 @@ $pdf->SetTextColor(0, 0, 0);
 certificate_print_text($pdf, $x, $y + 55, 'C', CERT_FONT_SERIF, '', 20, $strmgr->get_string('certify', 'certificate', null, $user->lang));
 certificate_print_text($pdf, $x, $y + 105, 'C', CERT_FONT_SANS, '', 30, fullname($user));
 certificate_print_text($pdf, $x, $y + 155, 'C', CERT_FONT_SANS, '', 20, $strmgr->get_string('statement', 'certificate', null, $user->lang));
-certificate_print_text($pdf, $x, $y + 205, 'C', CERT_FONT_SANS, '', 20, $course->fullname);
+certificate_print_text($pdf, $x, $y + 205, 'C', CERT_FONT_SANS, '', 20, format_string($course->fullname));
 certificate_print_text($pdf, $x, $y + 255, 'C', CERT_FONT_SANS, '', 14, $timecompleted);
 certificate_print_text($pdf, $x, $y + 283, 'C', CERT_FONT_SERIF, '', 10, $grade);
 certificate_print_text($pdf, $x, $y + 311, 'C', CERT_FONT_SERIF, '', 10, $outcome);

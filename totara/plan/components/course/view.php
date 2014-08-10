@@ -80,6 +80,8 @@ $delete_mandatory = $permission >= DP_PERMISSION_ALLOW;
 
 // Check if we are performing an action
 if ($data = data_submitted() && $canupdate) {
+    require_sesskey();
+
     if ($action === 'removelinkedcomps' && !$plan->is_complete()) {
         $deletions = array();
 
@@ -168,15 +170,15 @@ if ($competenciesenabled) {
     echo $OUTPUT->heading(get_string('linkedx', 'totara_plan', $competencyname), 3);
     echo $OUTPUT->container_start(null, "dp-course-competencies-container");
     if ($linkedcomps = $component->get_linked_components($caid, 'competency')) {
-        $currenturl->param('action', 'removelinkedcomps');
-        echo html_writer::start_tag('form', array('id' => "dp-component-update",  'action' => $currenturl->out(false), "method" => "POST"));
+        $url = new moodle_url($currenturl, array('action' => 'removelinkedcomps', 'sesskey' => sesskey()));
+        echo html_writer::start_tag('form', array('id' => "dp-component-update",  'action' => $url->out(false), "method" => "POST"));
         if ($delete_mandatory) {
             echo $plan->get_component('competency')->display_linked_competencies($linkedcomps);
         } else {
             echo $plan->get_component('competency')->display_linked_competencies($linkedcomps, $mandatory_list);
         }
         if ($canupdate) {
-            echo $OUTPUT->single_button($currenturl, get_string('removeselected', 'totara_plan'), 'post', array('class' => 'plan-remove-selected'));
+            echo $OUTPUT->single_button($url, get_string('removeselected', 'totara_plan'), 'post', array('class' => 'plan-remove-selected'));
         }
         echo html_writer::end_tag('form');
     } else {

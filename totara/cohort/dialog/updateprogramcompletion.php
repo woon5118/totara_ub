@@ -42,6 +42,8 @@ $completiontime = optional_param('completiontime', null, PARAM_TEXT);
 $completionevent = optional_param('completionevent', null, PARAM_INT);
 $completioninstance = optional_param('completioninstance', null, PARAM_INT);
 
+require_sesskey();
+
 // Load the data into an array of the form required by prog_assignment_category::update_assignments()
 $data = new stdClass();
 $data->id = $programid;

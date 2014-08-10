@@ -191,8 +191,48 @@ if (empty($completions)) {
     // Save row data.
     $rows = array();
 
+    // Organise activity completions according to the course display order.
+    // Obtain the display order of activity modules.
+    $sections = $DB->get_records('course_sections', array('course' => $course->id), 'section ASC', 'id, sequence');
+    $moduleorder = array();
+    foreach ($sections as $section) {
+        if (!empty($section->sequence)) {
+            $moduleorder = array_merge(array_values($moduleorder), array_values(explode(',', $section->sequence)));
+        }
+    }
+
+    $orderedcompletions = array();
+    $modulecriteria = array();
+    $activitycompletions = array();
+    $nonactivitycompletions = array();
+    foreach($completions as $completion) {
+        $criteria = $completion->get_criteria();
+        if ($criteria->criteriatype == COMPLETION_CRITERIA_TYPE_ACTIVITY) {
+            if (!empty($criteria->moduleinstance)) {
+                $modulecriteria[$criteria->moduleinstance] = $completion;
+            }
+        } else {
+            $nonactivitycompletions[] = $completion;
+        }
+    }
+    // Compare to the course module order to put the activities in the same order as on the course view.
+    foreach($moduleorder as $module) {
+        // Some modules may not have completion criteria and can be ignored.
+        if (isset($modulecriteria[$module])) {
+            $activitycompletions[] = $modulecriteria[$module];
+        }
+    }
+
+    // Put the activity completions at the top.
+    foreach ($activitycompletions as $completion) {
+        $orderedcompletions[] = $completion;
+    }
+    foreach ($nonactivitycompletions as $completion) {
+        $orderedcompletions[] = $completion;
+    }
+
     // Loop through course criteria.
-    foreach ($completions as $completion) {
+    foreach ($orderedcompletions as $completion) {
         $criteria = $completion->get_criteria();
 
         $row = array();

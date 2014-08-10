@@ -36,7 +36,7 @@ $sortby     = optional_param('sort', 'name', PARAM_ALPHA);
 $sorthow    = optional_param('dir', 'ASC', PARAM_ALPHA);
 $confirm    = optional_param('confirm', false, PARAM_BOOL);
 $delete     = optional_param('delete', 0, PARAM_INT);
-$msg        = optional_param('msg', '', PARAM_TEXT);
+$msg        = optional_param('msg', '', PARAM_STRINGID);
 
 if (!in_array($sortby, array('name', 'status'))) {
     $sortby = 'name';
@@ -126,29 +126,8 @@ if ($delete && has_capability('moodle/badges:deletebadge', $PAGE->context)) {
     }
 }
 
-if ($activate && has_capability('moodle/badges:configuredetails', $PAGE->context)) {
-    $badge = new badge($activate);
-
-    if (!$badge->has_criteria()) {
-        $err = get_string('error:cannotact', 'badges', $badge->name) . get_string('nocriteria', 'badges');
-    } else {
-        list($valid, $message) = $badge->validate_criteria();
-        if ($valid) {
-            if ($badge->is_locked()) {
-                $badge->set_status(BADGE_STATUS_ACTIVE_LOCKED);
-                $msg = get_string('activatesuccess', 'badges');
-            } else {
-                require_sesskey();
-                $badge->set_status(BADGE_STATUS_ACTIVE);
-                $msg = get_string('activatesuccess', 'badges');
-            }
-            $returnurl->param('msg', $msg);
-            redirect($returnurl);
-        } else {
-            $err = get_string('error:cannotact', 'badges', $badge->name) . $message;
-        }
-    }
-} else if ($deactivate && has_capability('moodle/badges:configuredetails', $PAGE->context)) {
+if ($deactivate && has_capability('moodle/badges:configuredetails', $PAGE->context)) {
+    require_sesskey();
     $badge = new badge($deactivate);
     if ($badge->is_locked()) {
         $badge->set_status(BADGE_STATUS_INACTIVE_LOCKED);

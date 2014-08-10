@@ -72,7 +72,12 @@ class rb_source_dp_program extends rb_base_source {
             new rb_join(
                 'prog_user_assignment', // table alias
                 'LEFT', // type of join
-                '{prog_user_assignment}',
+                '(SELECT pua2.*
+                  FROM (SELECT MAX(id) as id, programid, userid
+                        FROM {prog_user_assignment}
+                        GROUP BY userid, programid) AS pua
+                  INNER JOIN {prog_user_assignment} AS pua2
+                    ON pua2.id = pua.id)',
                 'program_completion.programid = prog_user_assignment.programid AND program_completion.userid = prog_user_assignment.userid', //how it is joined
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 array('program_completion')

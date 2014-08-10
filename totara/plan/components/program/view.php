@@ -111,6 +111,8 @@ if ($canupdate) {
 
 // Check if we are performing an action
 if ($data = data_submitted() && $canupdate) {
+    require_sesskey();
+
     if ($action === 'removelinkedevidence' && !$plan->is_complete()) {
         $selectedids = optional_param_array('delete_linked_evidence', array(), PARAM_BOOL);
         $evidence->remove_linked_evidence($selectedids, $currenturl);

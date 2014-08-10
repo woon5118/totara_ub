@@ -1228,6 +1228,8 @@ function certificate_get_date_completed($certificate, $certrecord, $course, $use
 /**
  * Returns the completed date formated according to the certificate date format and the users language
  *
+ * Note: this function may close active user session
+ *
  * @param object $certificate record
  * @param int $timecompleted time completed
  * @return string formatted date
@@ -1247,6 +1249,8 @@ function certificate_get_date_completed_formatted($certificate, $date, $user) {
 
         $olduser = null;
         if (!is_null($user) && is_object($user)) {
+            // It is forbidden to switch $USER while session is active!!!
+            \core\session\manager::write_close();
             // Temporarily set the global $USER to $user
             $olduser = $USER;
             $USER = $user;
@@ -1433,7 +1437,20 @@ function certificate_get_code($certificate, $certrecord) {
  * @param string $text the text to print
  */
 function certificate_print_text($pdf, $x, $y, $align, $font='freeserif', $style, $size=10, $text) {
-    $pdf->setFont($font, $style, $size);
+
+    $language = current_language();
+    if (right_to_left()) {
+        $pdf->setRTL(true);
+    }
+
+    if (in_array($language, array('zh_cn', 'ja'))) {
+        $pdf->setFont('droidsansfallback', $style, $size);
+    } else if ($language == 'th') {
+        $pdf->setFont('cordiaupc', $style, $size);
+    } else {
+        $pdf->setFont($font, $style, $size);
+    }
+
     $pdf->SetXY($x, $y);
     $pdf->writeHTMLCell(0, 0, '', '', $text, 0, 0, 0, true, $align);
 }

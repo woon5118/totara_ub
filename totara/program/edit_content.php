@@ -85,6 +85,7 @@ $overviewurl = $CFG->wwwroot."/totara/program/edit.php?id={$id}&action=view";
 // anything as nothing has been checked or validated yet.
 
 if ($rawdata = data_submitted()) {
+    require_sesskey();
 
     // process the submitted elements to create the courseset etc info that is passed on to program_content_edit_form()
     if (!$programcontent->setup_content($rawdata)) {

@@ -41,7 +41,7 @@ class core_badges_renderer extends plugin_renderer_base {
                 $bname = $badge->name;
                 $imageurl = moodle_url::make_pluginfile_url($context->id, 'badges', 'badgeimage', $badge->id, '/', 'f1', false);
             } else {
-                $bname = $badge->assertion->badge->name;
+                $bname = s($badge->assertion->badge->name);
                 $imageurl = $badge->imageUrl;
             }
 
@@ -457,11 +457,11 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('issuerdetails', 'badges'), 3);
         $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
         $output .= html_writer::tag('div', get_string('issuername', 'badges'), array('class' => 'span2'));
-        $output .= html_writer::tag('div', $issuer->name, array('class' => 'span10'));
+        $output .= html_writer::tag('div', s($issuer->name), array('class' => 'span10'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
         $output .= html_writer::tag('div', get_string('issuerurl', 'badges'), array('class' => 'span2'));
-        $output .= html_writer::tag('div', html_writer::tag('a', $issuer->origin, array('href' => $issuer->origin)), array('class' => 'span10'));
+        $output .= html_writer::tag('div', html_writer::tag('a', s($issuer->origin), array('href' => $issuer->origin)), array('class' => 'span10'));
         $output .= html_writer::end_tag('div');
         if (isset($issuer->contact)) {
             $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
@@ -472,41 +472,45 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('badgedetails', 'badges'), 3);
         $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
         $output .= html_writer::tag('div', get_string('name'), array('class' => 'span2'));
-        $output .= html_writer::tag('div', $assertion->badge->name, array('class' => 'span10'));
+        $output .= html_writer::tag('div', s($assertion->badge->name), array('class' => 'span10'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
         $output .= html_writer::tag('div', get_string('description', 'badges'), array('class' => 'span2'));
-        $output .= html_writer::tag('div', $assertion->badge->description, array('class' => 'span10'));
+        $output .= html_writer::tag('div', s($assertion->badge->description), array('class' => 'span10'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
         $output .= html_writer::tag('div', get_string('bcriteria', 'badges'), array('class' => 'span2'));
-        $output .= html_writer::tag('div', html_writer::tag('a', $assertion->badge->criteria, array('href' => $assertion->badge->criteria)), array('class' => 'span10'));
+        $output .= html_writer::tag('div', html_writer::tag('a', s($assertion->badge->criteria), array('href' => $assertion->badge->criteria)), array('class' => 'span10'));
         $output .= html_writer::end_tag('div');
 
         $output .= $this->output->heading(get_string('issuancedetails', 'badges'), 3);
         if (isset($assertion->issued_on)) {
+            $issuedate = !strtotime($assertion->issued_on) ? s($assertion->issued_on) : strtotime($assertion->issued_on);
             $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
             $output .= html_writer::tag('div', get_string('dateawarded', 'badges'), array('class' => 'span2'));
-            $output .= html_writer::tag('div', $assertion->issued_on, array('class' => 'span10'));
+            $output .= html_writer::tag('div', userdate($issuedate), array('class' => 'span10'));
             $output .= html_writer::end_tag('div');
         }
-        if (isset($assertion->badge->expire)) {
+        if (isset($assertion->expires)) {
+            $today_date = date('Y-m-d');
+            $today = strtotime($today_date);
+            $expiration = !strtotime($assertion->expires) ? s($assertion->expires) : strtotime($assertion->expires);
             if ($expiration < $today) {
                 $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
                 $output .= html_writer::tag('div', get_string('expirydate', 'badges'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', $assertion->badge->expire . get_string('warnexpired', 'badges'), array('class' => 'span10 notifyproblem warning'));
+                $output .= html_writer::tag('div', userdate($expiration) . get_string('warnexpired', 'badges'), array('class' => 'span10 notifyproblem warning'));
                 $output .= html_writer::end_tag('div');
             } else {
                 $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
                 $output .= html_writer::tag('div', get_string('expirydate', 'badges'), array('class' => 'span2'));
-                $output .= html_writer::tag('div', $assertion->badge->expire, array('class' => 'span10'));
+                $output .= html_writer::tag('div', userdate($expiration), array('class' => 'span10'));
                 $output .= html_writer::end_tag('div');
             }
         }
         if (isset($assertion->evidence)) {
             $output .= html_writer::start_tag('div', array('class' => 'row-fluid'));
             $output .= html_writer::tag('div', get_string('evidence', 'badges'), array('class' => 'span2'));
-            $output .= html_writer::tag('div', html_writer::tag('a', $assertion->evidence, array('href' => $assertion->evidence)), array('class' => 'span10'));
+            $output .= html_writer::tag('div', html_writer::tag('a', s($assertion->evidence), array('href' => $assertion->evidence)), array('class' => 'span10'));
             $output .= html_writer::end_tag('div');
         }
 

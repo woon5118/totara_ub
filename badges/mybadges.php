@@ -71,17 +71,14 @@ if ($hide) {
     require_sesskey();
     $badge = new badge($download);
     $name = str_replace(' ', '_', $badge->name) . '.png';
-    ob_start();
     $file = badges_bake($hash, $download);
     header('Content-Type: image/png');
     header('Content-Disposition: attachment; filename="'. $name .'"');
     readfile($file);
-    ob_flush();
+    die;
 } else if ($downloadall) {
     require_sesskey();
-    ob_start();
     badges_download($USER->id);
-    ob_flush();
 }
 
 $context = context_user::instance($USER->id);

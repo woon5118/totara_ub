@@ -216,6 +216,37 @@ class reportcache_testing_data_generator extends testing_data_generator {
         $data->completioninstance = array(ASSIGNTYPE_INDIVIDUAL => array());
         return $data;
     }
+
+    /**
+     * Assign users to a program
+     * @todo remove this when program generator is merged in.
+     *
+     * @param int $programid Program id
+     * @param int $assignmenttype Assignment type
+     * @param int $itemid item to be assigned to the program. e.g Audience, position, organization, individual
+     * @param null $record
+     */
+    public function assign_to_program($programid, $assignmenttype, $itemid, $record = null) {
+        // Set completion values.
+        $completiontime = (isset($record['completiontime'])) ? $record['completiontime'] : -1;
+        $completionevent = (isset($record['completionevent'])) ? $record['completionevent'] : 0;
+        $completioninstance = (isset($record['completioninstance'])) ? $record['completioninstance'] : 0;
+
+        // Create data.
+        $data = new stdClass();
+        $data->id = $programid;
+        $data->item = array($assignmenttype => array($itemid => 1));
+        $data->completiontime = array($assignmenttype => array($itemid => $completiontime));
+        $data->completionevent = array($assignmenttype => array($itemid => $completionevent));
+        $data->completioninstance = array($assignmenttype => array($itemid => $completioninstance));
+
+        // Assign item to program.
+        $assignmenttoprog = prog_assignments::factory($assignmenttype);
+        $assignmenttoprog->update_assignments($data, false);
+        $program = new program($programid);
+        $program->update_learner_assignments();
+    }
+
     /**
      * Add mock program to user
      *

@@ -111,6 +111,8 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
         $newevent->fullmessage = $stringmanager->get_string('requestattendsession', 'facetoface', html_writer::link($url, $facetoface->name), $user->lang) . ' ' . $approvedstr;
         $newevent->subject     = $stringmanager->get_string('requestattendsession', 'facetoface', $facetoface->name, $user->lang) . ' ' . $approvedstr;
         $newevent->urgency     = TOTARA_MSG_URGENCY_NORMAL;
+        $newevent->icon        = 'facetoface-regular';
+        $newevent->msgtype     = TOTARA_MSG_TYPE_FACE2FACE;
         return tm_alert_send($newevent);
     }
 }

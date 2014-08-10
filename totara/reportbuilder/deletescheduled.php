@@ -25,6 +25,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/core/lib.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 require_login();
 
@@ -38,6 +39,13 @@ $PAGE->set_totara_menu_selected('myreports');
 
 if (!$report = $DB->get_record('report_builder_schedule', array('id' => $id))) {
     print_error('error:invalidreportscheduleid', 'totara_reportbuilder');
+}
+
+if (!reportbuilder::is_capable($report->reportid)) {
+    print_error('nopermission', 'totara_reportbuilder');
+}
+if ($report->userid != $USER->id) {
+    require_capability('totara/reportbuilder:managereports', context_system::instance());
 }
 
 $reportname = $DB->get_field('report_builder', 'fullname', array('id' => $report->reportid));

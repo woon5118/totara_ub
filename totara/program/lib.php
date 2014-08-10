@@ -441,12 +441,15 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     $limit = !empty($options['limit']) ? $options['limit'] : null;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
-    if ($categoryid != "all" && is_numeric($categoryid)) {
+    if ((int)$categoryid > 0) {
         $certifsql = ($type == 'program') ? " AND p.certifid IS NULL" : " AND p.certifid IS NOT NULL";
         $categoryselect = "WHERE p.category = :category {$certifsql}";
-        $params['category'] = $categoryid;
-    } else {
+        $params['category'] = (int)$categoryid;
+    } else if ($categoryid === "all") {
+        // Returns all programs for Program Overview reportbuilder.
         $categoryselect = "";
+    } else {
+        return array();
     }
 
     if (empty($sort)) {
@@ -1172,6 +1175,8 @@ function prog_process_extensions($extensions, $reasonfordecision = array()) {
                 $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                 $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                 $messagedata->fullmessage      = $stringmanager->get_string('extensiondeniedmessage', 'totara_program', $program->fullname, $userto->lang);
+                $messagedata->icon             = 'program-decline';
+                $messagedata->msgtype          = TOTARA_MSG_TYPE_PROGRAM;
 
                 if (!empty($reasonfordecision[$id])) {
                     // Add reason to the message.
@@ -1234,6 +1239,8 @@ function prog_process_extensions($extensions, $reasonfordecision = array()) {
                     $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                     $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                     $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program', userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), $CFG->timezone), null, $userto->lang);
+                    $messagedata->icon             = 'program-approve';
+                    $messagedata->msgtype          = TOTARA_MSG_TYPE_PROGRAM;
 
                     if (!empty($reasonfordecision[$id])) {
                         // Add reason to the message.

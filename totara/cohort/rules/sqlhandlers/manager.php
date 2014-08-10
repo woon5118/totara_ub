@@ -77,6 +77,7 @@ class cohort_rule_sqlhandler_reportsto extends cohort_rule_sqlhandler {
         } else {
             $sqlhandler->sql .= "and (";
             $needor = 0;
+            $index = 1;
             // We need to get the actual managerpath for each manager for this to work properly.
             $mgrpaths = $DB->get_records_sql_menu("SELECT userid, managerpath FROM {pos_assignment} WHERE userid {$sqlin} AND type=" . POSITION_TYPE_PRIMARY, $params);
             foreach ($this->managerid as $mid) {
@@ -84,9 +85,10 @@ class cohort_rule_sqlhandler_reportsto extends cohort_rule_sqlhandler {
                     $sqlhandler->sql .= ' OR ';
                 }
                 $mgrpath = (!empty($mgrpaths[$mid])) ? $mgrpaths[$mid] : "/{$mid}";
-                $sqlhandler->sql .= $DB->sql_like('pa.managerpath', ':rtm'.$this->ruleid.$needor);
-                $params['rtm'.$this->ruleid.$needor] = $mgrpath . '/%';
+                $sqlhandler->sql .= $DB->sql_like('pa.managerpath', ':rtm'.$this->ruleid.$index);
+                $params['rtm'.$this->ruleid.$index] = $mgrpath . '/%';
                 $needor = true;
+                $index++;
             }
             $sqlhandler->sql .= ")";
         }

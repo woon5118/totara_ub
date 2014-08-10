@@ -36,7 +36,7 @@ class question_longtext extends question_base{
         global $TEXTAREA_OPTIONS;
         parent::__construct($storage, $subjectid, $answerid);
         $this->options = $TEXTAREA_OPTIONS;
-        if (isguestuser()) {
+        if (isguestuser() || !isloggedin()) {
             $this->options['maxfiles'] = 0;
         }
     }

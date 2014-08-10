@@ -89,6 +89,7 @@ abstract class prog_user_assignment {
      * @return string
      */
     function display_date_as_text($mydate) {
+        global $CFG;
 
         if (isset($mydate)) {
             return userdate($mydate, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);

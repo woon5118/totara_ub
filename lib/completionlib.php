@@ -496,8 +496,8 @@ class completion_info {
                 'course'    => $this->course->id
             );
 
-            // Load criteria from database
-            $records = (array)$DB->get_records('course_completion_criteria', $params);
+            // Load criteria from database.
+            $records = (array)$DB->get_records('course_completion_criteria', $params, 'criteriatype ASC');
 
             // Build array of criteria objects
             $this->criteria = array();

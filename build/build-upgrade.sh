@@ -45,7 +45,7 @@ step_time "1"
 
 echo "STEP 3: Run PHPUnit";
 php admin/tool/phpunit/cli/init.php
-phpunit --log-junit build/logs/xml/TEST-suite.xml
+vendor/bin/phpunit --log-junit build/logs/xml/TEST-suite.xml
 step_time "3"
 
 # Can't use the cucumber tests, they assume blank db.

@@ -50,10 +50,18 @@ if ($id == 0) {
     $schedule->frequency = null;
     $schedule->schedule = null;
     $schedule->exporttofilesystem = null;
+    $schedule->userid = $USER->id;
 } else {
     if (!$schedule = $DB->get_record('report_builder_schedule', array('id' => $id))) {
         print_error('error:invalidreportscheduleid', 'totara_reportbuilder');
     }
+}
+
+if (!reportbuilder::is_capable($schedule->reportid)) {
+    print_error('nopermission', 'totara_reportbuilder');
+}
+if ($schedule->userid != $USER->id) {
+    require_capability('totara/reportbuilder:managereports', context_system::instance());
 }
 
 $report = new reportbuilder($schedule->reportid);

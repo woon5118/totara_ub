@@ -262,13 +262,21 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $a->username = fullname($subjectuser);
         $a->userid = $subjectuser->id;
         $a->site = $CFG->wwwroot;
+        $a->profileurl = "{$CFG->wwwroot}/user/profile.php?id={$subjectuser->id}";
 
-        if (isguestuser()) {
-            $titlestr = 'userheaderfeedbackwolinks';
-        } else if ($resp->is_fake() || $subjectuser->id != $USER->id) {
-            $titlestr =  'userheaderfeedback';
+        if ($resp->is_email()) {
+            if (!$resp->tokenaccess and $subjectuser->id == $USER->id) {
+                $titlestr = 'userownheaderfeedback';
+            } else {
+                $a->responder = $resp->get_email();
+                $titlestr = 'userheaderfeedbackbyemail';
+            }
         } else {
-            $titlestr =  'userownheaderfeedback';
+            if ($subjectuser->id == $USER->id) {
+                $titlestr = 'userownheaderfeedback';
+            } else {
+                $titlestr = 'userheaderfeedback';
+            }
         }
 
         $r = new html_table_row(array($this->output->user_picture($subjectuser, array('link' => false)),

@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of Totara LMS
  *
@@ -17,13 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ben Lobo <ben.lobo@kineo.com>
+ * @author Brian Barnes <brian.barnes@totaralms.com>
  * @package totara
- * @subpackage cohort
+ * @subpackage theme
  */
-defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2014072900;  // The (date) version of this module
-$plugin->requires = 2011120501;  // Requires this Moodle version
-$plugin->cron     = 1;
-$plugin->component = 'totara_cohort'; // To check on upgrade, that module sits in correct place
+/**
+ * Causes the dock to be attached to the page and scroll with it, rather than being stuck to the side of the browser.
+ */
+YUI().use('event', function (Y) {
+    var body = Y.one('html');
+    Y.on('scroll', dockscroll);
+
+    function dockscroll(e) {
+        var dock = Y.one('#dock');
+        if (dock) {
+            dock.removeClass('dock-fixed');
+
+            if (window.scrollY > dock.get('offsetTop')) {
+                dock.addClass('dock-fixed');
+            }
+        }
+    }
+});

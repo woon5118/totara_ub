@@ -1,6 +1,9 @@
 /**
  * Totara Navigation
  */
+#navbar ul {
+    margin-left: 10px;
+}
 #login-info {
     width: 100%;
     background-color: #ffffff;

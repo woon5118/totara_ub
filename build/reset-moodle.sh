@@ -62,6 +62,10 @@ echo "Install Moodle ${MOODLEVERSION}"
 git fetch moodle # Update the moodle repo for this job.
 git checkout "v${MOODLEVERSION}"
 
+# Copy vendor folder
+echo "Copy vendor folder"
+cp -r /usr/local/share/vendor26 vendor
+
 sudo -u www-data php admin/cli/install.php \
     --chmod=755 \
     --lang=en_utf8 \

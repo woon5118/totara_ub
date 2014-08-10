@@ -54,11 +54,10 @@ echo $OUTPUT->doctype() ?>
 
 <body <?php echo $OUTPUT->body_attributes('two-column'); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html(); ?>
+<!-- START OF HEADER -->
+<?php echo $OUTPUT->kiwifruit_header(); ?>
 <div id="page">
   <div id="wrapper" class="clearfix">
-
-<!-- START OF HEADER -->
-    <?php echo $OUTPUT->kiwifruit_header(); ?>
 
     <div id="navbar" class="clearfix">
         <div class="breadcrumb"><?php echo $OUTPUT->navbar(); ?></div>

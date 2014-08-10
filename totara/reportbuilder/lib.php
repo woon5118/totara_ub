@@ -2938,7 +2938,7 @@ class reportbuilder {
      * @return integer Record count
      */
     function get_full_count() {
-        global $DB;
+        global $DB, $CFG;
 
         // Don't do the calculation if the results are initially hidden.
         if ($this->is_initially_hidden()) {
@@ -2948,7 +2948,12 @@ class reportbuilder {
         // Use cached value if present.
         if (empty($this->_fullcount)) {
             list($sql, $params) = $this->build_query(true);
-            $this->_fullcount = $DB->count_records_sql($sql, $params);
+            try {
+                $this->_fullcount = $DB->count_records_sql($sql, $params);
+            } catch (dml_read_exception $e) {
+                $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
+                print_error('error:problemobtainingreportdata', 'totara_reportbuilder', '', $debuginfo);
+            }
         }
         return $this->_fullcount;
     }
@@ -2960,7 +2965,7 @@ class reportbuilder {
      * @return integer Filtered record count
      */
     public function get_filtered_count($nocache = false) {
-        global $DB;
+        global $DB, $CFG;
 
         // Don't do the calculation if the results are initially hidden.
         if ($this->is_initially_hidden()) {
@@ -2970,7 +2975,12 @@ class reportbuilder {
         // Use cached value if present.
         if (empty($this->_filteredcount) || $nocache) {
             list($sql, $params) = $this->build_query(true, true);
-            $this->_filteredcount = $DB->count_records_sql($sql, $params);
+            try {
+                $this->_filteredcount = $DB->count_records_sql($sql, $params);
+            } catch (dml_read_exception $e) {
+                $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
+                print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder', '', $debuginfo);
+            }
         }
         return $this->_filteredcount;
     }
@@ -2987,6 +2997,7 @@ class reportbuilder {
         $count = $this->get_filtered_count();
         list($sql, $params, $cache) = $this->build_query(false, true);
         $order = $this->get_report_sort();
+
 
         // array of filters that have been applied
         // for including in report where possible
@@ -3022,7 +3033,7 @@ class reportbuilder {
      * @return No return value but prints the current data table
      */
     function display_table() {
-        global $SESSION, $DB, $OUTPUT, $PAGE;
+        global $SESSION, $DB, $OUTPUT, $PAGE, $CFG;
 
         $initiallyhidden = $this->is_initially_hidden();
 
@@ -3159,9 +3170,11 @@ class reportbuilder {
                 }
             } catch (dml_read_exception $e) {
                 if ($this->is_cached()) {
-                    print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder');
+                    $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
+                    print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder', '', $debuginfo);
                 } else {
-                    print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
+                    $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
+                    print_error('error:problemobtainingreportdata', 'totara_reportbuilder', '', $debuginfo);
                 }
             }
         }

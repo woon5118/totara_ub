@@ -33,7 +33,9 @@ $id = required_param('id', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 $searched = optional_param_array('submitgroup', array(), PARAM_ALPHANUM);
 
-ajax_require_login();
+if ($CFG->forcelogin) {
+    ajax_require_login();
+}
 $PAGE->set_context(context_system::instance());
 
 // New report object.

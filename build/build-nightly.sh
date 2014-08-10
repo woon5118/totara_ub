@@ -44,7 +44,7 @@ sudo -u www-data php build/generate_users.php
 step_time "2"
 
 echo "STEP 3: Run PHPUnit";
-phpunit --log-junit build/logs/xml/TEST-suite.xml
+vendor/bin/phpunit --log-junit build/logs/xml/TEST-suite.xml
 step_time "3"
 
 echo "STEP 4: Run cucumber tests (disabled link checker tests)";

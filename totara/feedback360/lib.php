@@ -1136,6 +1136,11 @@ class feedback360_responder {
     protected $fake = false;
 
     /**
+     * @var bool true when user accessed the response via email token
+     */
+    public $tokenaccess = false;
+
+    /**
      * Constructor
      * @param int $id feedback360_resp_assignment.id
      */
@@ -1161,7 +1166,7 @@ class feedback360_responder {
      *
      * @param string $email
      * @param string $token
-     * @return feedback360_responder
+     * @return feedback360_responder or false if not found
      */
     public static function by_email($email, $token) {
         global $DB;
@@ -1169,10 +1174,24 @@ class feedback360_responder {
         // Get feedback360_resp_assignment.id by email and token record from feedback360_email_assignment.
         $emailparams = array('email' => $email, 'token' => $token);
         $emailid = $DB->get_field('feedback360_email_assignment', 'id', $emailparams);
+        if (!$emailid) {
+            return false;
+        }
 
         // Instantiate and return feedback360_responder.
         $resp = $DB->get_record('feedback360_resp_assignment', array('feedback360emailassignmentid' => $emailid));
+        if (!$resp) {
+            return false;
+        }
         return new feedback360_responder($resp->id);
+    }
+
+    /**
+     * Return responder email if TYPE_EMAIL.
+     * @return string
+     */
+    public function get_email() {
+        return $this->email;
     }
 
     /**
@@ -1633,7 +1652,7 @@ function totara_feedback360_pluginfile($course, $cm, $context, $filearea, $args,
     }
 
     \core\session\manager::write_close();
-    send_stored_file($file, 60*60, 0, $forcedownload, $options);
+    send_stored_file($file, 60*60, 0, true, $options);
 }
 
 

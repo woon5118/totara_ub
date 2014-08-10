@@ -486,9 +486,7 @@ class facetoface_notification extends data_object {
 
     public function delete_ical_attachment() {
         if (!empty($this->_ical_attachment)) {
-            @unlink($this->_ical_attachment->filename);
-            @rmdir($this->_ical_attachment->dir2);
-            @rmdir($this->_ical_attachment->dir1);
+            $this->_ical_attachment->file->delete();
         }
     }
 

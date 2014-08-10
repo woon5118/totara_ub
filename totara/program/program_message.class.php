@@ -643,6 +643,8 @@ abstract class prog_noneventbased_message extends prog_message {
         $studentdata->subject = $this->replacevars($this->studentmessagedata->subject);
         $studentdata->fullmessage = $this->replacevars($this->studentmessagedata->fullmessage);
         $studentdata->contexturl = $this->studentmessagedata->contexturl;
+        $studentdata->icon = 'program-regular';
+        $studentdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
         $result = $result && tm_alert_send($studentdata);
 
         // Send the message to the manager.
@@ -654,6 +656,8 @@ abstract class prog_noneventbased_message extends prog_message {
             $managerdata->subject = $this->replacevars($this->managermessagedata->subject);
             $managerdata->fullmessage = $this->replacevars($this->managermessagedata->fullmessage);
             $managerdata->contexturl = $CFG->wwwroot.'/totara/program/view.php?id='.$this->programid.'&amp;userid='.$recipient->id;
+            $managerdata->icon = 'program-regular';
+            $managerdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
             $result = $result && tm_alert_send($managerdata);
         }
 
@@ -760,6 +764,8 @@ abstract class prog_eventbased_message extends prog_message {
         $studentdata->subject = $this->replacevars($this->studentmessagedata->subject);
         $studentdata->fullmessage = $this->replacevars($this->studentmessagedata->fullmessage);
         $studentdata->contexturl = $this->studentmessagedata->contexturl;
+        $studentdata->icon = 'program-regular';
+        $studentdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
         $result = $result && tm_alert_send($studentdata);
 
         // if the message was sent, add a record to the message log to
@@ -782,6 +788,8 @@ abstract class prog_eventbased_message extends prog_message {
             $managerdata->subject = $this->replacevars($this->managermessagedata->subject);
             $managerdata->fullmessage = $this->replacevars($this->managermessagedata->fullmessage);
             $managerdata->contexturl = $CFG->wwwroot.'/totara/program/view.php?id='.$this->programid.'&amp;userid='.$recipient->id;
+            $managerdata->icon = 'program-regular';
+            $managerdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
             $result = $result && tm_alert_send($managerdata);
         }
 

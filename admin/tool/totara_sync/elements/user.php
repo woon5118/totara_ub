@@ -104,12 +104,28 @@ class totara_sync_element_user extends totara_sync_element {
 
         $this->addlog(get_string('syncstarted', 'tool_totara_sync'), 'info', 'usersync');
 
-        if (!$synctable = $this->get_source_sync_table()) {
-            throw new totara_sync_exception('user', 'usersync', 'couldnotgetsourcetable');
+        try {
+            // This can go wrong in many different ways - catch as a generic exception.
+            $synctable = $this->get_source_sync_table();
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            if (debugging()) {
+                $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
+            }
+            totara_sync_log($this->get_name(), $msg, 'error', 'unknown');
+            return false;
         }
 
-        if (!$synctable_clone = $this->get_source_sync_table_clone($synctable)) {
-            throw new totara_sync_exception('user', 'usersync', 'couldnotcreateclonetable');
+        try {
+            // This can go wrong in many different ways - catch as a generic exception.
+            $synctable_clone = $this->get_source_sync_table_clone($synctable);
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            if (debugging()) {
+                $msg .= !empty($e->debuginfo) ? " - {$e->debuginfo}" : '';
+            }
+            totara_sync_log($this->get_name(), $msg, 'error', 'unknown');
+            return false;
         }
 
         $this->set_customfieldsdb();
@@ -166,10 +182,10 @@ class totara_sync_element_user extends totara_sync_element {
 
         if (!empty($this->config->allow_create)) {
             // Get accounts that must be created.
-            $sql = "SELECT DISTINCT s.*
+            $sql = "SELECT s.*
                       FROM {{$synctable}} s
            LEFT OUTER JOIN {user} u ON (s.idnumber=u.idnumber)
-                     WHERE (u.idnumber IS NULL)";
+                     WHERE (u.idnumber IS NULL AND s.idnumber IS NOT NULL)";
             $rscreateaccounts = $DB->get_recordset_sql($sql);
 
             // The idea of doing this is to get the accounts that need to be created. Since users are created first and then user assignments,

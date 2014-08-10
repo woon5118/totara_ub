@@ -667,7 +667,7 @@ class rb_user_content extends rb_base_content {
         }
 
         // Add in the user's temporary reports if necessary.
-        if (($who & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS) {
+        if (($who & self::USER_TEMP_REPORTS) == self::USER_TEMP_REPORTS && !empty($tempsql)) {
             if (empty($sql)) {
                 $sql = $tempsql;
                 $params = $tempparams;
