@@ -195,10 +195,12 @@ if ($save && $onlycontent) {
     }
 
     // Log that users were edited.
-    $a->usercount = count($added);
-    $a->errorcount = count($errors);
-    $info = get_string('sitelogseditattendees', 'facetoface', $a);
-    add_to_log($course->id, 'facetoface', $a->action, "editattendees.php?s={$session->id}&attendees={$attendee->id}", $info, $cm->id);
+    if (count($added) > 0 || count($errors) > 0) {
+        $a->usercount = count($added);
+        $a->errorcount = count($errors);
+        $info = get_string('sitelogseditattendees', 'facetoface', $a);
+        add_to_log($course->id, 'facetoface', $a->action, "editattendees.php?s={$session->id}&clear=1", $info, $cm->id);
+    }
     $_SESSION['f2f-bulk-results'][$session->id] = array($added, $errors);
 
     $result_message = facetoface_generate_bulk_result_notice(array($added, $errors), 'addedit');
