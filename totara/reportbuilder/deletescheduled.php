@@ -58,8 +58,8 @@ if ($confirm == 1) {
         print_error('confirmsesskeybad', 'error');
     } else {
         $DB->delete_records('report_builder_schedule', array('id' => $report->id));
-        add_to_log(SITEID, 'reportbuilder', 'delete', "scheduled.php?id=$report->id", "$reportname (ID $report->id)");
-
+        $report = new reportbuilder($id);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'scheduled')->trigger();
         totara_set_notification(get_string('deletedscheduledreport', 'totara_reportbuilder', format_string($reportname)),
                                 $returnurl, array('class' => 'notifysuccess'));
     }

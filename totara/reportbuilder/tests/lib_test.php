@@ -33,7 +33,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 
-class reportbuilderlib_test extends advanced_testcase {
+class totara_reportbuilder_lib_testcase extends advanced_testcase {
+    /** @var reportbuilder */
+    public $rb;
 
     protected function setUp() {
         global $DB,$CFG;
@@ -1074,31 +1076,6 @@ class reportbuilderlib_test extends advanced_testcase {
         $after = count($SESSION->flextable['test_report']->sortby);
         // the bad sort key should have been deleted
         $this->assertEquals(1, $before - $after);
-
-        $this->resetAfterTest(true);
-    }
-
-    function test_reportbuilder_strip_tags_r() {
-        $nested = array(
-            array(
-                'test' => array('contents', 'at', 'many', 'depths'),
-                'another' => array('some associative', 'some not'),
-            ),
-            array(
-                '<b>should strip tags</b>',
-                '<a href="#">even here</a>',
-                '<br />',
-            ),
-        );
-        $rb = $this->rb;
-        // should return the array with tags stripped at all depth levels
-        $strip_tags = $rb->strip_tags_r($nested);
-        $end = end($strip_tags);
-        $current_end = current($end);
-        $this->assertEquals('should strip tags', $current_end);
-
-        $next_end = next($end);
-        $this->assertEquals('even here', $next_end);
 
         $this->resetAfterTest(true);
     }

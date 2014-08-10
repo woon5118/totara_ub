@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php');
 
-class rb_team_members_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 17, 'fullname' => 'Team Members', 'shortname' => 'team_members',
                                            'source' => 'user', 'hidden' => 1, 'embedded' => 1, 'contentmode' => 2);
@@ -96,7 +96,7 @@ class rb_team_members_embedded_cache_test extends reportcache_advanced_testcase 
      * - Users0 has three members in team
      * - Users1 has two members in team
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_team_members($usecache) {

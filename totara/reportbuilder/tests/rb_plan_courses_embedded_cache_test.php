@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-class rb_plan_courses_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_plan_courses_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 11, 'fullname' => 'Record of Learning: Courses', 'shortname' => 'plan_courses',
                                            'source' => 'dp_course', 'hidden' => 1, 'embedded' => 1);
@@ -131,7 +131,7 @@ class rb_plan_courses_embedded_cache_test extends reportcache_advanced_testcase 
      * - Check that user2 has three course (2,3,4)
      * - Check that user3 doesn't have any courses
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_plan_courses($usecache) {

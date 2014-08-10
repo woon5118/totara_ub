@@ -257,7 +257,8 @@ from
                 'dp_competency.planstartdate',
                 array(
                     'joins' => 'dp_competency',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -267,7 +268,8 @@ from
                 'dp_competency.planenddate',
                 array(
                     'joins' => 'dp_competency',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -300,7 +302,8 @@ from
                 'template.startdate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -310,7 +313,8 @@ from
                 'template.enddate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -334,7 +338,8 @@ from
                 'dp_competency.duedate',
                 array(
                     'displayfunc' => 'nice_date',
-                    'joins' => 'dp_competency'
+                    'joins' => 'dp_competency',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 

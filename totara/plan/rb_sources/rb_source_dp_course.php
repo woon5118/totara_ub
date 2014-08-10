@@ -261,7 +261,8 @@ from
                 'dp_course.planstartdate',
                 array(
                     'joins' => 'dp_course',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -271,7 +272,8 @@ from
                 'dp_course.planenddate',
                 array(
                     'joins' => 'dp_course',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -292,7 +294,8 @@ from
                 'dp_course.duedate',
                 array(
                     'joins' => 'dp_course',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -326,7 +329,8 @@ from
                 'course_completion.timecompleted',
                 array(
                     'joins' => 'course_completion',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -349,7 +353,8 @@ from
                 'dp_template.startdate',
                 array(
                     'joins' => 'dp_template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -359,7 +364,8 @@ from
                 'dp_template.enddate',
                 array(
                     'joins' => 'dp_template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(

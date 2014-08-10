@@ -26,6 +26,11 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
 
 /**
  * Abstract base class to be extended to create report builder sources
+ *
+ * @property string $base
+ * @property rb_join[] $joinlist
+ * @property rb_column_option[] $columnoptions
+ * @property rb_filter_option[] $filteroptions
  */
 abstract class rb_base_source {
 
@@ -34,6 +39,11 @@ abstract class rb_base_source {
      */
     public $needsredirect, $redirecturl, $redirectmessage;
 
+    /** @var array of component used for lookup of classes */
+    protected $usedcomponents = array();
+
+    /** @var rb_column[] */
+    public $requiredcolumns;
 
 /**
  * Class constructor
@@ -45,7 +55,11 @@ abstract class rb_base_source {
  * to ensure child class has implemented everything necessary to work.
  *
  */
-    function __construct() {
+    public function __construct() {
+        // Extending classes should add own component to this array before calling parent constructor,
+        // this allows us to lookup display classes at more locations.
+        $this->usedcomponents[] = 'totara_reportbuilder';
+
         // check that child classes implement required properties
         $properties = array(
             'base',
@@ -146,7 +160,7 @@ abstract class rb_base_source {
 
         }
 
-        //validate column extrafields don't have alias named 'id'
+        // Validate column extrafields don't have alias named 'id'.
         foreach ($this->columnoptions as $columnoption) {
             if (isset($columnoption->extrafields) && is_array($columnoption->extrafields)) {
                 foreach ($columnoption->extrafields as $extrakey => $extravalue) {
@@ -312,12 +326,13 @@ abstract class rb_base_source {
      *
      * @param string $type The type of the column option to use
      * @param string $value The value of the column option to use
+     * @param int $transform
+     * @param int $aggregate
      * @param string $heading Heading for the new column
      * @param boolean $customheading True if the heading has been customised
-     * @return object A new rb_column object with details copied from this
-     *                rb_column_option
+     * @return rb_column A new rb_column object with details copied from this rb_column_option
      */
-    function new_column_from_option($type, $value, $heading=null, $customheading = true, $hidden=0) {
+    public function new_column_from_option($type, $value, $transform, $aggregate, $heading=null, $customheading = true, $hidden=0) {
         $columnoptions = $this->columnoptions;
         $joinlist = $this->joinlist;
         if ($coloption =
@@ -355,6 +370,8 @@ abstract class rb_base_source {
                     'class' => $coloption->class,
                     'hidden' => $hidden,
                     'customheading' => $customheading,
+                    'transform' => $transform,
+                    'aggregate' => $aggregate,
                 )
             );
         } else {
@@ -373,21 +390,48 @@ abstract class rb_base_source {
     //
     //
 
-
     /**
-     * Reformat a timestamp into a date, showing nothing if invalid or null
+     * Format row record data for display.
      *
-     * @param integer $date Unix timestamp
-     * @param object $row Object containing all other fields for this row
-     *
-     * @return string Date in a nice format
+     * @param stdClass $row
+     * @param string $format
+     * @param reportbuilder $report
+     * @return mixed usually string - may be an array if extra info required such as for Excel/ODS export (type, value, format)
      */
-    function rb_display_nice_date($date, $row) {
-        if ($date && is_numeric($date)) {
-            return userdate($date, get_string('strfdateshortmonth', 'langconfig'));
-        } else {
-            return '';
+    public function process_data_row(stdClass $row, $format, reportbuilder $report) {
+        $isexport = ($format !== 'html');
+
+        $results = array();
+
+        foreach ($report->columns as $column) {
+            if (!$column->display_column($isexport)) {
+                continue;
+            }
+
+            $type = $column->type;
+            $value = $column->value;
+            $field = "{$type}_{$value}";
+
+            if (!property_exists($row, $field)) {
+                $results[] = get_string('unknown', 'totara_reportbuilder');
+                continue;
+            }
+
+            $displayfunc = $column->get_displayfunc();
+            if ($displayfunc) {
+                foreach ($this->usedcomponents as $component) {
+                    $classname = "\\$component\\rb\\display\\$displayfunc";
+                    if (class_exists($classname)) {
+                        $results[] = $classname::display($row->$field, $format, $row, $column, $report);
+                        continue 2;
+                    }
+                }
+            }
+
+            $results[] = \totara_reportbuilder\rb\display\legacy::display($row->$field, $format, $row, $column, $report);
         }
+
+        return $results;
     }
 
     /**
@@ -453,22 +497,6 @@ abstract class rb_base_source {
     }
 
     /**
-     * Reformat a timestamp into a date and time, showing nothing if invalid or null
-     *
-     * @param integer $date Unix timestamp
-     * @param object $row Object containing all other fields for this row
-     *
-     * @return string Date and time in a nice format
-     */
-    function rb_display_nice_datetime($date, $row) {
-        if ($date && is_numeric($date)) {
-            return userdate($date, get_string('strfdateattime', 'langconfig'));
-        } else {
-            return '';
-        }
-    }
-
-    /**
      * Reformat a timestamp into a date and time (including seconds), showing nothing if invalid or null
      *
      * @param integer $date Unix timestamp
@@ -499,19 +527,6 @@ abstract class rb_base_source {
         } else {
             return '';
         }
-    }
-
-
-    /**
-     * Convert first letters of each word to uppercase
-     *
-     * @param string $item A string to convert
-     * @param object $row Object containing all other fields for this row
-     *
-     * @return string The string with words capitialized
-     */
-    function rb_display_ucfirst($item, $row) {
-        return ucfirst($item);
     }
 
     // convert floats to 2 decimal places
@@ -551,223 +566,6 @@ abstract class rb_base_source {
         $userid = $row->user_id;
         $url = new moodle_url('/user/view.php', array('id' => $userid));
         return html_writer::link($url, $user);
-    }
-
-    /**
-     * Properly format tinymce textarea data for display
-     *
-     * @param string $field fieldname from SQL query
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string Textarea contents
-     */
-    public function rb_display_tinymce_textarea($field = '', $data = '', $row = '', $isexport = false) {
-        if (empty($field) || empty($data) || empty($row)) {
-            return '';
-        }
-
-        if (empty($row->context) && empty($row->recordid)) {
-            $context = context_system::instance();
-        } else {
-            $rowcontext = $row->context;
-            if ($rowcontext == 'context_module') {
-                $component = str_replace('mod_', '', $row->component);
-                $cm = get_coursemodule_from_instance($component, $row->recordid);
-                $row->recordid = $cm->id;
-            }
-            $context = $rowcontext::instance($row->recordid);
-        }
-
-        if (!isset($row->fileid)) {
-            $row->fileid = null;
-        }
-
-        $data = file_rewrite_pluginfile_urls($data, 'pluginfile.php', $context->id, $row->component, $row->filearea, $row->fileid);
-
-        if ($isexport) {
-            $displaytext = format_text($data, FORMAT_MOODLE);
-        } else {
-            $displaytext = format_text($data, FORMAT_HTML);
-        }
-
-        return $displaytext;
-    }
-
-    /**
-     * Properly format user customfield textarea data for display
-     *
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string Textarea contents with images etc processed properly
-     */
-    function rb_display_userfield_textarea($data, $row, $isexport = false) {
-        global $CFG;
-        if (empty($data)) {
-            return '';
-        }
-
-        if ($isexport) {
-            $displaytext = format_text($data, FORMAT_MOODLE);
-        } else {
-            $displaytext = format_text($data, FORMAT_HTML);
-        }
-
-        return $displaytext;
-    }
-
-    /**
-     * Properly format totara customfield textarea data for display
-     *
-     * @param string $field fieldname from SQL query
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string Textarea contents with images etc processed properly
-     */
-    function rb_display_customfield_textarea($field, $data, $row, $isexport = false) {
-        global $CFG;
-        if (empty($data)) {
-            return '';
-        }
-
-        if ($isexport) {
-            $displaytext = format_text($data, FORMAT_MOODLE);
-        } else {
-            //hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
-            //extract prefix from field name
-            $pattern = '/(?P<prefix>(.*?))_custom_field_(\d+)$/';
-            $matches = array();
-            preg_match($pattern, $field, $matches);
-            if (!empty($matches)) {
-                $cf_prefix = $matches['prefix'];
-                switch ($cf_prefix) {
-                    case 'org_type':
-                        $prefix = 'organisation';
-                        break;
-                    case 'pos_type':
-                        $prefix = 'position';
-                        break;
-                    case 'comp_type':
-                        $prefix = 'competency';
-                        break;
-                    case 'goal_type':
-                        $prefix = 'goal';
-                        break;
-                    case 'course':
-                        $prefix = 'course';
-                        break;
-                    case 'prog':
-                        $prefix = 'program';
-                        break;
-                    default:
-                        //unknown prefix
-                        return '';
-                }
-            } else {
-                //unknown prefix
-                return '';
-            }
-
-            $itemidfield = "{$field}_itemid";
-            require_once($CFG->dirroot.'/totara/customfield/field/textarea/field.class.php');
-            $extradata = array('prefix' => $prefix, 'itemid' => $row->$itemidfield);
-            $displaytext = call_user_func(array('customfield_textarea', 'display_item_data'), $data, $extradata);
-        }
-
-        return $displaytext;
-    }
-
-    /**
-     * Properly format totara customfield file data for display
-     * @param string $field fieldname from SQL query
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string Filename action link or just the name if $isexport
-     */
-    function rb_display_customfield_file($field, $data, $row, $isexport = false) {
-        global $CFG;
-        if (empty($data)) {
-            return '';
-        }
-        //hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
-        //extract prefix from field name
-        $pattern = '/(?P<prefix>(.*?))_custom_field_(\d?)$/';
-        $matches = array();
-        preg_match($pattern, $field, $matches);
-        if (!empty($matches)) {
-            $cf_prefix = $matches['prefix'];
-            switch ($cf_prefix) {
-                case 'org_type':
-                    $prefix = 'organisation';
-                    break;
-                case 'pos_type':
-                    $prefix = 'position';
-                    break;
-                case 'comp_type':
-                    $prefix = 'competency';
-                    break;
-                case 'goal_type':
-                    $prefix = 'goal';
-                    break;
-                case 'course':
-                    $prefix = 'course';
-                    break;
-                case 'prog':
-                    $prefix = 'prog';
-                    break;
-                default:
-                    //unknown prefix
-                    return '';
-            }
-        } else {
-            //unknown prefix
-            return '';
-        }
-        $itemidfield = "{$field}_itemid";
-        require_once($CFG->dirroot.'/totara/customfield/field/file/field.class.php');
-        $extradata = array('prefix' => $prefix, 'itemid' => $row->$itemidfield, 'isexport' => $isexport);
-        $displaytext = call_user_func(array('customfield_file', 'display_item_data'), $data, $extradata);
-
-        return $displaytext;
-    }
-
-    /**
-     * Properly format totara customfield multi-select data for display as icons
-     * @param string $field fieldname from SQL query
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string icon of selected options
-     */
-    public function rb_display_customfield_multiselect_icon($field, $data, $row, $isexport = false) {
-        global $CFG;
-
-        if ($isexport) {
-            return $this->rb_display_customfield_multiselect_text($field, $data, $row, $isexport);
-        }
-
-        require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
-
-        return customfield_multiselect::display_item_data($row->{$field . '_json'}, array('display' => 'list-icons'));
-    }
-
-    /**
-     * Properly format totara customfield multi-select data for display as text titles
-     * @param string $field fieldname from SQL query
-     * @param integer $data contents of field from database
-     * @param object $row Object containing all other fields for this row
-     * @param boolean $isexport
-     * @return string icon of selected options
-     */
-    public function rb_display_customfield_multiselect_text($field, $data, $row, $isexport = false) {
-        global $CFG;
-
-        require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
-
-        return customfield_multiselect::display_item_data($row->{$field . '_json'}, array('display' => 'list-text'));
     }
 
     function rb_display_link_user_icon($user, $row, $isexport = false) {
@@ -1613,14 +1411,12 @@ abstract class rb_base_source {
                 $settingname = $name . '_content';
                 if (class_exists($classname)) {
                     if ($name == 'completed_org' || $name == 'current_org') {
-                        if (reportbuilder::get_setting($reportid, $settingname,
-                            'enable', $report->is_cached())) {
+                        if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
                             $localset = true;
                         }
                     } else {
-                        if (reportbuilder::get_setting($reportid, $settingname,
-                            'enable', $report->is_cached())) {
-                        $nonlocal = true;
+                        if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
+                            $nonlocal = true;
                         }
                     }
                 }
@@ -1961,6 +1757,7 @@ abstract class rb_base_source {
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1971,6 +1768,7 @@ abstract class rb_base_source {
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
+                'dbdatatype' => 'timestamp',
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2048,7 +1846,8 @@ abstract class rb_base_source {
             "$join.timecreated",
             array(
                 'joins' => $join,
-                'displayfunc' => 'nice_datetime'
+                'displayfunc' => 'nice_datetime',
+                'dbdatatype' => 'timestamp',
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2058,7 +1857,8 @@ abstract class rb_base_source {
             "$join.timemodified",
             array(
                 'joins' => $join,
-                'displayfunc' => 'nice_datetime'
+                'displayfunc' => 'nice_datetime',
+                'dbdatatype' => 'timestamp',
             )
         );
 
@@ -2334,6 +2134,7 @@ abstract class rb_base_source {
             array(
                 'joins' => $join,
                 'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2365,6 +2166,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'tinymce_textarea',
                 'extrafields' => array(
+                    'format' => "$join.summaryformat",
                     'filearea' => '\'summary\'',
                     'component' => '\'course\'',
                     'context' => '\'context_course\'',
@@ -2586,7 +2388,8 @@ abstract class rb_base_source {
             "$join.availablefrom",
             array(
                 'joins' => $join,
-                'displayfunc' => 'nice_date'
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2596,7 +2399,8 @@ abstract class rb_base_source {
             "$join.availableuntil",
             array(
                 'joins' => $join,
-                'displayfunc' => 'nice_date'
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2996,14 +2800,22 @@ abstract class rb_base_source {
             'posstartdate',
             get_string('posstartdate', 'totara_reportbuilder'),
             "$posassign.timevalidfrom",
-            array('joins' => $posassign, 'displayfunc' => 'nice_date')
+            array(
+                'joins' => $posassign,
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
+            )
         );
         $columnoptions[] = new rb_column_option(
             'user',
             'posenddate',
             get_string('posenddate', 'totara_reportbuilder'),
             "$posassign.timevalidto",
-            array('joins' => $posassign, 'displayfunc' => 'nice_date')
+            array(
+                'joins' => $posassign,
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
+            )
         );
         return true;
     }
@@ -3314,6 +3126,9 @@ abstract class rb_base_source {
                     $column_options['extrafields'] = array(
                             "{$cf_prefix}_custom_field_{$id}_itemid" => "{$joinname}.id"
                     );
+                    if ($cf_prefix === 'user') {
+                        $column_options['extrafields']["{$cf_prefix}_custom_field_{$id}_format"] = "{$joinname}.dataformat";
+                    }
                     $column_options['dbdatatype'] = 'text';
                     $column_options['outputformat'] = 'text';
                     break;
@@ -3340,9 +3155,11 @@ abstract class rb_base_source {
                     $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
                     if ($record->param3) {
                         $column_options['displayfunc'] = 'nice_datetime';
+                        $column_options['dbdatatype'] = 'timestamp';
                         $filter_options['includetime'] = true;
                     } else {
                         $column_options['displayfunc'] = 'nice_date';
+                        $column_options['dbdatatype'] = 'timestamp';
                     }
                     break;
 
@@ -4125,16 +3942,29 @@ abstract class rb_base_source {
     }
 
     /**
-     * Called after parameters have been read, allows the source to configure source title, additional tables, etc.
+     * Called after parameters have been read, allows the source to configure itself,
+     * such as source title, additional tables, column definitions, etc.
      *
-     * post_config() can add extra data to the query by adding to joinlist and columnoptions
-     * or by calling the following method on the $report object:
-     * {@link $report->set_post_config_restrictions()}    Extra WHERE clause
+     * If post_params fails it needs to set redirect.
      *
-     * If post_config fails and needs to redirect or execute some other code then return an object.
+     * @param reportbuilder $report
+     */
+    public function post_params(reportbuilder $report) {
+    }
+
+    /**
+     * This method is called at the very end of reportbuilder class constructor
+     * right before marking it ready.
      *
-     * @param array $params
-     * @return object
+     * This method allows sources to add extra restrictions by calling
+     * the following method on the $report object:
+     *  {@link $report->set_post_config_restrictions()}    Extra WHERE clause
+     *
+     * If post_config fails it needs to set redirect.
+     *
+     * NOTE: do NOT modify the list of columns here.
+     *
+     * @param reportbuilder $report
      */
     public function post_config(reportbuilder $report) {
     }
@@ -4146,6 +3976,106 @@ abstract class rb_base_source {
      */
     public function get_required_jss() {
         return array();
+    }
+
+    protected function get_advanced_aggregation_classes($type) {
+        global $CFG;
+
+        $classes = array();
+
+        foreach (scandir("{$CFG->dirroot}/totara/reportbuilder/classes/rb/{$type}") as $filename) {
+            if (substr($filename, -4) !== '.php') {
+                continue;
+            }
+            if ($filename === 'base.php') {
+                continue;
+            }
+            $name = str_replace('.php', '', $filename);
+            $classname = "\\totara_reportbuilder\\rb\\{$type}\\$name";
+            if (!class_exists($classname)) {
+                debugging("Invalid aggregation class $name found", DEBUG_DEVELOPER);
+                continue;
+            }
+            $classes[$name] = $classname;
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Get list of allowed advanced options for each column option.
+     *
+     * @return array of group select column values that are grouped
+     */
+    public function get_allowed_advanced_column_options() {
+        $allowed = array();
+
+        foreach ($this->columnoptions as $option) {
+            $key = $option->type . '-' . $option->value;
+            $allowed[$key] = array('');
+
+            $classes = $this->get_advanced_aggregation_classes('transform');
+            foreach ($classes as $name => $classname) {
+                if ($classname::is_column_option_compatible($option)) {
+                    $allowed[$key][] = 'transform_'.$name;
+                }
+            }
+
+            $classes = $this->get_advanced_aggregation_classes('aggregate');
+            foreach ($classes as $name => $classname) {
+                if ($classname::is_column_option_compatible($option)) {
+                    $allowed[$key][] = 'aggregate_'.$name;
+                }
+            }
+        }
+        return $allowed;
+    }
+
+    /**
+     * Get list of grouped columns.
+     *
+     * @return array of group select column values that are grouped
+     */
+    public function get_grouped_column_options() {
+        $grouped = array();
+        foreach ($this->columnoptions as $option) {
+            if ($option->grouping !== 'none') {
+                $grouped[] = $option->type . '-' . $option->value;
+            }
+        }
+        return $grouped;
+    }
+
+    /**
+     * Returns list of advanced aggregation/transformation options.
+     *
+     * @return array nested array suitable for groupselect forms element
+     */
+    public function get_all_advanced_column_options() {
+        $advoptions = array();
+        $advoptions[get_string('none')][''] = '-';
+
+        foreach (array('transform', 'aggregate') as $type) {
+            $classes = $this->get_advanced_aggregation_classes($type);
+            foreach ($classes as $name => $classname) {
+                $advoptions[$classname::get_typename()][$type . '_' . $name] = get_string("{$type}type{$name}_name",
+                            'totara_reportbuilder');
+            }
+        }
+
+        foreach ($advoptions as $k => $unused) {
+            \core_collator::asort($advoptions[$k]);
+        }
+
+        return $advoptions;
+    }
+
+    /**
+     * Set up necessary $PAGE stuff for columns.php page.
+     */
+    public function columns_page_requires() {
+        \totara_reportbuilder\rb\aggregate\base::require_column_heading_strings();
+        \totara_reportbuilder\rb\transform\base::require_column_heading_strings();
     }
 
     /**
@@ -4184,5 +4114,4 @@ abstract class rb_base_source {
             }
         }
     }
-
 }

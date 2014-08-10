@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/lib.php');
 
-class rb_cohort_members_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_cohort_members_embedded_cache_testcase extends reportcache_advanced_testcase {
     // Testcase data
     protected $report_builder_data = array('id' => 4, 'fullname' => 'Audience members', 'shortname' => 'cohort_members',
                                            'source' => 'cohort_members', 'hidden' => 1, 'embedded' => 1);
@@ -109,7 +109,7 @@ class rb_cohort_members_embedded_cache_test extends reportcache_advanced_testcas
      * - Check that set group has added members
      * - Check that dynamic group has all members
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_cohort_members($usecache) {

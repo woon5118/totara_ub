@@ -260,6 +260,7 @@ class rb_source_dp_certification extends rb_base_source {
                 array(
                     'joins' => array('prog_completion', 'certif_completion'),
                     'displayfunc' => 'timedue_date',
+                    'dbdatatype' => 'timestamp',
                     'extrafields' => array(
                         'timedue' => 'prog_completion.timedue',
                         'status' => 'certif_completion.status',
@@ -345,7 +346,8 @@ class rb_source_dp_certification extends rb_base_source {
                 'certif_completion.timecompleted',
                 array(
                     'joins' => 'certif_completion',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -372,6 +374,7 @@ class rb_source_dp_certification extends rb_base_source {
                 'certif_completion_history.historycount',
                 array(
                     'joins' => 'certif_completion_history',
+                    'dbdatatype' => 'integer'
                 )
         );
         $columnoptions[] = new rb_column_option(

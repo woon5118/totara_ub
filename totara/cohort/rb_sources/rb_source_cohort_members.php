@@ -148,6 +148,7 @@ class rb_source_cohort_members extends rb_base_source {
             'cohort.startdate',
             array(
                 'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
                 'joins' => array('cohort')
             )
         );
@@ -158,6 +159,7 @@ class rb_source_cohort_members extends rb_base_source {
             'cohort.enddate',
             array(
                 'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
                 'joins' => array('cohort')
             )
         );

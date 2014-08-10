@@ -214,7 +214,7 @@ class rb_filter_badge extends rb_filter_type {
         $jsdetails->strings = array(
             'badges' => array('choosebadges')
         );
-        $jsdetails->args = array('args' => '{"filter_to_load":"badge", "reportid":"' . $this->report->id . '"}');
+        $jsdetails->args = array('args' => '{"filter_to_load":"badge", "reportid":"' . $this->report->_id . '"}');
 
         foreach ($jsdetails->strings as $scomponent => $sstrings) {
             $PAGE->requires->strings_for_js($sstrings, $scomponent);

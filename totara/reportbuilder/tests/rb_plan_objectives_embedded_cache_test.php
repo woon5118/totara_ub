@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
 
-class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_plan_objectives_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 12, 'fullname' => 'Record of Learning: Objectives', 'shortname' => 'plan_objectives',
                                            'source' => 'dp_objective', 'hidden' => 1, 'embedded' => 1);
@@ -140,7 +140,7 @@ class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testca
      * - Check that user2 has objectives of plan2 and plan3
      * - Check that user3 has no plans
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_plan_objectives($usecache) {

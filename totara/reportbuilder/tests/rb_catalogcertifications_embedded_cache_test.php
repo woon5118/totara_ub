@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-class rb_catalogcertifications_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_catalogcertifications_embedded_cache_testcase extends reportcache_advanced_testcase {
     // Testcase data.
     protected $report_builder_data = array('id' => 60, 'fullname' => 'Certifications',
                                            'shortname' => 'catalogcertifications',
@@ -96,7 +96,7 @@ class rb_catalogcertifications_embedded_cache_test extends reportcache_advanced_
      * - Enable op<1> cf"1", op[2]-cf[1], op1cf2, op2cf2 for certification3
      * - Certification4 has no enabled customfield options
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_certifications($usecache) {

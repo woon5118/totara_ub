@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
-class rb_cohort_associations_enrolled_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_cohort_associations_enrolled_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 5, 'fullname' => 'Audience: Enrolled Learning', 'shortname' => 'cohort_associations_enrolled',
                                            'source' => 'cohort_associations', 'hidden' => 1, 'embedded' => 1);
@@ -110,7 +110,7 @@ class rb_cohort_associations_enrolled_embedded_cache_test extends reportcache_ad
      * - Add course1 to enrolled cohorts
      * - Check that course appeared in report
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_cohort_associations_enrolled($usecache) {
@@ -176,10 +176,8 @@ class rb_cohort_associations_enrolled_embedded_cache_test extends reportcache_ad
     /**
      * Add mock of particular params to cohort rules
      *
-     * @staticvar int $paramid
-     * @param int $ruleid
-     * @param array $params Params to add
-     * @param array List of values
+     * @param int $cohortid
+     * @param int $courseid
      */
     protected function create_enrol_cohort($cohortid, $courseid) {
         global $DB;

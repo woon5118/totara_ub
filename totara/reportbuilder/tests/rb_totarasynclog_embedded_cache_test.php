@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
 
-class rb_totarasynclog_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_totarasynclog_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 15, 'fullname' => 'Sync log', 'shortname' => 'totarasynclog',
                                            'source' => 'totara_sync_log', 'hidden' => 1, 'embedded' => 1);
@@ -98,7 +98,7 @@ class rb_totarasynclog_embedded_cache_test extends reportcache_advanced_testcase
      * - Find all synclogs
      * - Find synclog entry with word 'level'
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_synclog($usecache) {

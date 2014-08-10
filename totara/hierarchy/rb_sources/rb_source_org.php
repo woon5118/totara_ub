@@ -200,14 +200,14 @@ class rb_source_org extends rb_base_source {
                 'timecreated',
                 get_string('timecreated', 'rb_source_org'),
                 'base.timecreated',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'org',
                 'timemodified',
                 get_string('timemodified', 'rb_source_org'),
                 'base.timemodified',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
         );
 

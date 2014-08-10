@@ -28,34 +28,98 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     // below will override these values
     config: {},
     loadingimg: '<img src="'+M.util.image_url('i/ajaxloader', 'moodle')+'" alt="'+M.util.get_string('saving', 'totara_reportbuilder')+'" class="iconsmall" />',
+    advoptionshtml : '',
 
     /**
      * module initialisation method called by php js_init_call()
      *
      * @param object    YUI instance
-     * @param string    args supplied in JSON format
+     * @param object    configuration data
      */
-    init: function(Y, args){
+    init: function(Y, config){
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
-        // if defined, parse args into this module's config object
-        if (args) {
-            var jargs = Y.JSON.parse(args);
-            for (var a in jargs) {
-                if (Y.Object.owns(jargs, a)) {
-                    this.config[a] = jargs[a];
-                }
-            }
-        }
+        // store config info
+        this.config = config;
+        this.config.user_sesskey = M.cfg.sesskey;
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
             throw new Error('M.totara_reportbuildercolumns.init()-> jQuery dependency required for this module to function.');
         }
 
+        // store all options for adv selector for later
+        this.advoptionshtml = $('select.new_advanced_selector').html();
+
         // do setup
         this.rb_init_col_rows();
+    },
+
+    /**
+     * Tweak row elements.
+     * @param column_selector
+     */
+    rb_update_col_row: function(column_selector) {
+        var module = this;
+
+        var colName = $(column_selector).val();
+        var newHeading = module.config.rb_column_headings[colName];
+
+        var advancedSelector = $('select.advanced_selector', $(column_selector).parents('tr:first'));
+        var headingElement = $('input.column_heading_text', $(column_selector).parents('tr:first'));
+        var customHeadingCheckbox = $('input.column_custom_heading_checkbox', $(column_selector).parents('tr:first'));
+
+        if (colName == '0') {
+            advancedSelector.hide();
+            customHeadingCheckbox.hide();
+            headingElement.hide();
+
+        } else if ($.inArray(colName, module.config.rb_grouped_columns) == -1) {
+            advancedSelector.show();
+            customHeadingCheckbox.show();
+            headingElement.show();
+
+            var advancedSelectorVal = advancedSelector.val();
+            if (advancedSelectorVal != '') {
+                if ($.inArray(advancedSelectorVal, module.config.rb_allowed_advanced[colName]) == -1) {
+                    advancedSelector.val('');
+                    advancedSelectorVal = '';
+                } else {
+                    var strName = advancedSelectorVal.replace('transform_', 'transformtype').replace('aggregate_', 'aggregatetype') + '_heading';
+                    newHeading = M.util.get_string(strName, 'totara_reportbuilder', newHeading);
+                }
+            }
+            // Alter advanced selector to show only possible options.
+            advancedSelector.html(module.advoptionshtml);
+            advancedSelector.val(advancedSelectorVal);
+            advancedSelector.find('option').each(function () {
+                var option = $(this);
+                if ($.inArray(option.val(), module.config.rb_allowed_advanced[colName]) == -1) {
+                    option.remove();
+                }
+            });
+            advancedSelector.children().each(function () {
+                var group = $(this);
+                if (group.children().size() == 0) {
+                    group.remove();
+                }
+            });
+
+        } else {
+            advancedSelector.hide();
+            customHeadingCheckbox.show();
+            headingElement.show();
+
+            advancedSelector.val('');
+        }
+
+        if (customHeadingCheckbox.is(':checked')) {
+            headingElement.prop('disabled', false);
+        } else {
+            headingElement.prop('disabled', true);
+            headingElement.val(newHeading);
+        }
     },
 
     /**
@@ -69,21 +133,19 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         $('#id_newheading').prop('disabled', true);
         $('#id_newcustomheading').prop('disabled', true);
 
-        // disable uncustomised headers on page load
-        $('input.column_custom_heading_checkbox').not(':checked').each(function() {
-            var textElement = $('input.column_heading_text', $(this).parents('tr:first'));
-            textElement.prop('disabled', true);
-        });
-
         // handle changes to the column pulldowns
         $('select.column_selector').unbind('change');
         $('select.column_selector').bind('change', function() {
             window.onbeforeunload = null;
-            var changedSelector = $(this).val();
-            var newContent = module.config.rb_column_headings[changedSelector];
-            var textElement = $('input.column_heading_text', $(this).parents('tr:first'));
+            module.rb_update_col_row(this);
+        });
 
-            textElement.val(newContent);  // insert new content
+        // handle changes to the advanced pulldowns
+        $('select.advanced_selector').unbind('change');
+        $('select.advanced_selector').bind('change', function() {
+            window.onbeforeunload = null;
+            var column_selector = $('select.column_selector', $(this).parents('tr:first'));
+            module.rb_update_col_row(column_selector);
         });
 
         // handle changes to the customise checkbox
@@ -91,20 +153,9 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         $('input.column_custom_heading_checkbox').unbind('click');
         $('input.column_custom_heading_checkbox').bind('click', function() {
             window.onbeforeunload = null;
-            var textElement = $('input.column_heading_text', $(this).parents('tr:first'));
-            if ($(this).is(':checked')) {
-                // enable the textbox when checkbox isn't checked
-                textElement.prop('disabled', false);
-            } else {
-                // disable the textbox when checkbox is checked
-                // and reset text contents back to default
-                var changedSelector = $('select.column_selector', $(this).parents('tr:first')).val();
-                var newContent = module.config.rb_column_headings[changedSelector];
-                textElement.val(newContent);
-                textElement.prop('disabled', true);
-            }
+            var column_selector = $('select.column_selector', $(this).parents('tr:first'));
+            module.rb_update_col_row(column_selector);
         });
-
 
         // special case for the 'Add another column...' selector
         $('select.new_column_selector').bind('change', function() {
@@ -123,6 +174,11 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                 // reenable it (binding above will fill the value)
                 newCheckBox.prop('disabled', false);
             }
+        });
+
+        // init display of advanced column for existing fields
+        $('select.column_selector').each(function() {
+            module.rb_update_col_row(this);
         });
 
         // Set up delete button events
@@ -145,7 +201,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
     rb_init_addbutton: function(colselector){
 
         var module = this;
+        var newAdvancedBox = $('select.advanced_selector', colselector.parents('tr:first'));
+        var newHeadingCheckbox = $('input.column_custom_heading_checkbox', colselector.parents('tr:first'));
         var newHeadingBox = $('input.column_heading_text', colselector.parents('tr:first'));
+
         var optionsbox = $('td:last', newHeadingBox.parents('tr:first'));
         var newcolinput = colselector.closest('tr').clone();  // clone of current 'Add new col...' tr
         var addbutton = optionsbox.find('.addcolbtn');
@@ -160,18 +219,41 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
         optionsbox.prepend(addbutton);
         addbutton.unbind('click');
         addbutton.bind('click', function(e) {
+            var data = {
+                action: 'add',
+                sesskey: module.config.user_sesskey,
+                id: module.config.rb_reportid,
+                col: colselector.val(),
+                heading: newHeadingBox.val(),
+                advanced: newAdvancedBox.val(),
+                customheading : (newHeadingCheckbox.is(':checked') ? 1 : 0)
+            }
+            var oldAddButtonHtml = addbutton.html();
+
             e.preventDefault();
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
                 type: "POST",
-                data: ({action: 'add', sesskey: module.config.user_sesskey, id: module.config.rb_reportid, col: colselector.val(), heading: newHeadingBox.val()}),
+                data: data,
                 beforeSend: function() {
                     addbutton.html(module.loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
+                    if (o.length == 0) {
+                        alert(M.util.get_string('error', 'moodle'));
+                        // Reload the broken page.
+                        location.reload();
+                    } else if (o.error) {
+                        alert(o.error);
+                        if (o.noreload) {
+                            addbutton.html(oldAddButtonHtml);
+                            return;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
                         // Add action buttons to row
-                        var colid = parseInt(o);
+                        var colid = parseInt(o.result);
                         var hidebutton = module.rb_get_btn_hide(module.config.rb_reportid, colid);
                         var deletebutton = module.rb_get_btn_delete(module.config.rb_reportid, colid);
 
@@ -193,6 +275,10 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         columnSelector.attr('name', 'column'+colid);
                         columnSelector.attr('id', 'id_column'+colid);
                         columnbox.find('select optgroup[label=New]').remove();
+
+                        newAdvancedBox.removeClass('new_advanced_selector');
+                        newAdvancedBox.attr('name', 'advanced'+colid);
+                        newAdvancedBox.attr('id', 'id_advanced'+colid);
 
                         newCustomHeading.attr('name', 'customheading'+colid);
                         newCustomHeading.removeAttr('id');
@@ -216,19 +302,12 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         // Add added col to 'default sort column' selector
                         $('select[name=defaultsortcolumn]').append('<option value="'+coltype+'_'+colval+'">'+module.config.rb_column_headings[coltype+'-'+colval]+'</option>');
 
-
-
                         module.rb_init_col_rows();
 
-                    } else {
-                        alert('Error');
-                        // Reload the broken page
-                        location.reload();
                     }
-
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }
@@ -263,15 +342,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                     clickedbtn.replaceWith(module.loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
-                        //o = eval('('+o+')');  // this may become necessary for older browsers :(
-                        o = JSON.parse(o);
-
+                    if (o.success) {
                         var uppersibling = colrow.prev('tr');
                         var lowersibling = colrow.next('tr');
 
                         // Remove column row
                         colrow.remove();
+
+                        var delcol = o.result;
 
                         // Fix sibling buttons
                         if (uppersibling.find('select.column_selector').length > 0) {
@@ -282,7 +360,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         }
 
                         // Add deleted col to new col selector
-                        var nlabel = rb_ucwords(o.optgroup_label);
+                        var nlabel = rb_ucwords(delcol.optgroup_label);
                         var optgroup = $(".new_column_selector optgroup[label='"+nlabel+"']");
                         if (optgroup.length == 0) {
                             // Create optgroup and append to select
@@ -290,24 +368,21 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                             $('.new_column_selector').append(optgroup);
                         }
 
-                        if (optgroup.find('option[value='+o.type+'-'+o.value+']').length == 0) {
-                            optgroup.append('<option value="'+o.type+'-'+o.value+'">'+module.config.rb_column_headings[o.type+'-'+o.value]+'</option>');
+                        if (optgroup.find('option[value='+delcol.type+'-'+delcol.value+']').length == 0) {
+                            optgroup.append('<option value="'+delcol.type+'-'+delcol.value+'">'+module.config.rb_column_headings[delcol.type+'-'+delcol.value]+'</option>');
                         }
 
                         // Remove deleted col from 'default sort column' selector
-                        $('select[name=defaultsortcolumn] option[value='+o.type+'_'+o.value+']').remove();
+                        $('select[name=defaultsortcolumn] option[value='+delcol.type+'_'+delcol.value+']').remove();
 
                         module.rb_init_col_rows();
-
                     } else {
-                        alert('Error');
-                        // Reload the broken page
+                        alert(M.util.get_string('error', 'moodle'));
                         location.reload();
                     }
-
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }
@@ -341,8 +416,8 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                     clickedbtn.find('img').replaceWith(module.loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
-                        var colid = parseInt(o);
+                    if (o.success) {
+                        var colid = colrow.attr('colid');
 
                         var showbtn = module.rb_get_btn_show(module.config.rb_reportid, colid);
                         clickedbtn.replaceWith(showbtn);
@@ -350,14 +425,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         module.rb_init_col_rows();
 
                     } else {
-                        alert('Error');
+                        alert(M.util.get_string('error', 'moodle'));
                         // Reload the broken page
                         location.reload();
                     }
 
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }
@@ -380,13 +455,13 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
                 type: "POST",
-                data: ({action: 'show', sesskey: module.config.user_sesskey, id: rb_reportid, cid: colrow.attr('colid')}),
+                data: ({action: 'show', sesskey: module.config.user_sesskey, id: module.config.rb_reportid, cid: colrow.attr('colid')}),
                 beforeSend: function() {
                     clickedbtn.find('img').replaceWith(module.loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
-                        var colid = parseInt(o);
+                    if (o.success) {
+                        var colid = colrow.attr('colid');
 
                         var showbtn = module.rb_get_btn_hide(module.config.rb_reportid, colid);
                         clickedbtn.replaceWith(showbtn);
@@ -394,14 +469,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         module.rb_init_col_rows();
 
                     } else {
-                        alert('Error');
+                        alert(M.util.get_string('error', 'moodle'));
                         // Reload the broken page
                         location.reload();
                     }
 
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }
@@ -426,12 +501,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+            colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
 
             var lowersibling = colrow.next('tr');
 
             var lowersiblingclone = lowersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             lowersiblingclone.find('select.column_selector option[value='+lowersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+            lowersiblingclone.find('select.advanced_selector option[value='+lowersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
@@ -444,7 +521,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                     lowersiblingclone.find('td *').hide();
                 },
                 success: function(o) {
-                    if (o.length > 0) {
+                    if (o.success) {
                         // Switch!
                         colrow.replaceWith(lowersiblingclone);
                         lowersibling.replaceWith(colrowclone);
@@ -459,14 +536,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         module.rb_init_col_rows();
 
                     } else {
-                        alert('Error');
+                        alert(M.util.get_string('error', 'moodle'));
                         // Reload the broken page
                         location.reload();
                     }
 
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }
@@ -490,12 +567,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+            colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
 
             var uppersibling = colrow.prev('tr');
 
             var uppersiblingclone = uppersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
             uppersiblingclone.find('select.column_selector option[value='+uppersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+            uppersiblingclone.find('select.advanced_selector option[value='+uppersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
@@ -509,7 +588,7 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                     uppersiblingclone.find('td *').hide();
                 },
                 success: function(o) {
-                    if (o.length > 0) {
+                    if (o.success) {
                         // Switch!
                         colrow.replaceWith(uppersiblingclone);
                         uppersibling.replaceWith(colrowclone);
@@ -524,14 +603,14 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
                         module.rb_init_col_rows();
 
                     } else {
-                        alert('Error');
+                        alert(M.util.get_string('error', 'moodle'));
                         // Reload the broken page
                         location.reload();
                     }
 
                 },
                 error: function(h, t, e) {
-                    alert('Error');
+                    alert(M.util.get_string('error', 'moodle'));
                     // Reload the broken page
                     location.reload();
                 }

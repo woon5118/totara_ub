@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot.'/tag/lib.php');
 
-class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 6, 'fullname' => 'Find Courses', 'shortname' => 'findcourses',
                                            'source' => 'courses', 'hidden' => 1, 'embedded' => 1);
@@ -158,7 +158,7 @@ class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
      * - Find all courses
      * - Find courses with name 'Basics'
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_courses($usecache) {
@@ -186,7 +186,7 @@ class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
      * - Find course that has tagc or tagb
      * - Find course with taga and tagb
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_courses_tags($usecache) {
@@ -257,7 +257,7 @@ class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
      * - Create report using all enabled filters
      * - Check that course (and only this course) listed in report
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_all_filters($usecache) {
@@ -323,61 +323,35 @@ class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
      * - Cache report
      * - Add Filter (with and without join)
      * - Add Column (with and without join)
-     * - Enable new content settings
-     * - Check that reports result not affected
+     * - Check that report status changed
      */
     public function test_cache_course_settings() {
         $this->resetAfterTest();
         $this->enable_caching($this->report_builder_data['id']);
+        $this->assertEquals(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['shortname'], array()));
 
         $this->loadDataSet($this->createArrayDataSet(array(
-            'report_builder_columns' => $this->report_builder_columns_additinal_data,
             'report_builder_filters' => $this->report_builder_filters_additional_data)));
-        // Add content settings
-        // Check that result not affected
-        $result = $this->get_report_result($this->report_builder_data['shortname'], array(), true);
+
+        $this->assertEquals(RB_CACHE_FLAG_CHANGED, $this->get_report_cache_status($this->report_builder_data['shortname'],
+                                array()));
+
+        $this->enable_caching($this->report_builder_data['id']);
+        $this->assertEquals(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['shortname'], array()));
+
+        $this->loadDataSet($this->createArrayDataSet(array(
+            'report_builder_columns' => $this->report_builder_columns_additinal_data)));
+
+        $this->assertEquals(RB_CACHE_FLAG_CHANGED, $this->get_report_cache_status($this->report_builder_data['shortname'],
+                                array()));
     }
     /**
      * Attach mock tags into a course
-     * @param int courseid - id of the course
+     * @param int $courseid - id of the course
+     * @param array $tags
      */
     protected function add_tags_info($courseid, $tags) {
        tag_set('course', $courseid, $tags, 'course', context_course::instance($courseid)->id);
-    }
-
-    /**
-     * Simplified enrolment of user to course using default options.
-     *
-     * It is strongly recommended to use only this method for 'manual' and 'self' plugins only!!!
-     *
-     * @param int $userid
-     * @param int $courseid
-     * @param int $roleid optional role id, use only with manual plugin
-     * @param string $enrol name of enrol plugin,
-     *     there must be exactly one instance in course,
-     *     it must support enrol_user() method.
-     * @return bool success
-     */
-    public function enrol_cohort($cohortid, $courseid) {
-        global $DB;
-
-        if (!$plugin = enrol_get_plugin('cohort')) {
-            return false;
-        }
-
-        $instances = $DB->get_records('enrol', array('courseid'=>$courseid, 'enrol'=>'cohort'));
-        if (count($instances) != 1) {
-            return false;
-        }
-        $instance = reset($instances);
-
-        if ($instance->roleid) {
-            $roleid = $instance->roleid;
-        }
-
-        $plugin->enrol_user($instance, $userid, $roleid);
-
-        return true;
     }
 
     /**

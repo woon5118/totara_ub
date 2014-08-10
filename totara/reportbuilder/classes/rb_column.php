@@ -36,16 +36,22 @@
  * describe it.
  */
 class rb_column {
-    /**
-     * Column field mode. Adjust grouping fields to prepare cache data (NOGROUP),
-     * request to cache (CACHE), normal work with cache turned off (REGULAR)
-     * or to return ALIASONLY or FIELDONLY
-     */
+    /** Select columns from normal tables */
     const REGULAR = 0;
+    /** Select from cached tables */
     const CACHE = 1;
+    /** Selection from normal table for insertion into cache table */
     const NOGROUP = 2;
+    /** @deprecated do not use! */
     const ALIASONLY = 3;
+    /** @deprecated do not use! */
     const FIELDONLY = 4;
+    /** GROUP BY for non-aggregated columns from normal tables */
+    const GROUPBYREGULAR = 5;
+    /** GROUP BY for non-aggregated columns from cache tables */
+    const GROUPBYCACHE = 6;
+    /** Select columns from normal tables when GROUP BY present */
+    const REGULARGROUPED = 7;
 
     /**
      * Used with value to define a column. These properties are used
@@ -253,6 +259,25 @@ class rb_column {
     public $customheading;
 
     /**
+     * Column transform function
+     *
+     * @access public
+     * @var string
+     */
+    public $transform;
+
+    /**
+     * Determines if the column is aggregated
+     *
+     * @access public
+     * @var string
+     */
+    public $aggregate;
+
+    /** @var bool is this column already grouped? */
+    public $grouped;
+
+    /**
      * Generate a new column instance
      *
      * Options provided by an associative array, e.g.:
@@ -282,7 +307,9 @@ class rb_column {
             'style' => null,
             'class' => null,
             'hidden' => 0,
-            'customheading' => true
+            'customheading' => true,
+            'transform' => null,
+            'aggregate' => null,
         );
         $options = array_merge($defaults, $options);
 
@@ -295,41 +322,27 @@ class rb_column {
         foreach ($defaults as $property => $unused) {
             $this->$property = $options[$property];
         }
-
     }
 
 
     /**
      * Obtain an array of SQL snippets describing field information for this column
      *
-     * @param object $src Source object containing grouping methods
+     * @param rb_base_source $src Source object containing grouping methods
      * @param int $aliasmode mode of alias handle (@see rb_column::REGULAR)
      * @param bool $returnextrafields whether to return the $extrafields (true) or just the main field (false)
      * @return array Array of field names with aliases used to build a query
      */
-    function get_fields($src = null, $aliasmode = self::REGULAR, $returnextrafields=true) {
+    public function get_fields($src = null, $aliasmode = self::REGULAR, $returnextrafields=true) {
         $field = $this->field;
         $type = $this->type;
         $value = $this->value;
         $fields = array();
-        $extrafields = isset($this->extrafields) ? $this->extrafields : null;
 
-        if ($this->grouping == 'none') {
-            if ($field !== null) {
-                switch ($aliasmode) {
-                    case self::CACHE:
-                    case self::ALIASONLY:
-                        $fields[] = "{$type}_{$value}";
-                        break;
-                    case self::FIELDONLY:
-                        $fields[] = "{$field}";
-                        break;
-                    default:
-                        $fields[] = "{$field} AS {$type}_{$value}";
-                        break;
-                }
-            }
-        } else {
+        if ($field === null) {
+            // Not much to do...
+
+        } else if ($this->grouping !== 'none') {
             // field is grouped
             // if grouping function doesn't exist, exit with error
             $groupfunc = 'rb_group_' . $this->grouping;
@@ -339,45 +352,150 @@ class rb_column {
                     (object)array('groupfunc' => $groupfunc, 'type' => $type, 'value' => $value)));
             }
             // apply grouping function and ignore extrafields
-            if ($field !== null) {
-                switch ($aliasmode) {
-                    case self::ALIASONLY:
-                        // Alias only used in grouping, when no "AS" allowed
-                        $fields[] = "{$type}_{$value}";
-                        break;
-                    case self::NOGROUP:
-                        // grouping disabled in cache preparation when grouping cannot be performed as sensitive data will be removed
-                         $fields[] = $field . " AS {$type}_{$value}";
-                        break;
-                    case self::CACHE:
-                        // Request will be pointed to cache instead of normal database table
-                         $fields[] = $src->$groupfunc("{$type}_{$value}") . " AS {$type}_{$value}";
-                        break;
-                    default:
-                        // cache disabled
-                        $fields[] = $src->$groupfunc($field) . " AS {$type}_{$value}";
-                        break;
-                }
+            switch ($aliasmode) {
+                case self::FIELDONLY:
+                    $fields[] = $src->$groupfunc($field);
+                    break;
+                case self::ALIASONLY:
+                    $fields[] = "{$type}_{$value}";
+                    break;
+                case self::NOGROUP:
+                    // Grouping disabled in cache preparation when grouping cannot be performed as sensitive data will be removed.
+                    $fields[] = $field . " AS {$type}_{$value}";
+                    break;
+                case self::CACHE:
+                    // Request will be pointed to cache instead of normal database table.
+                    $fields[] = $src->$groupfunc("{$type}_{$value}") . " AS {$type}_{$value}";
+                    break;
+                case self::REGULAR:
+                default:
+                    // Cache disabled.
+                    $fields[] = $src->$groupfunc($field) . " AS {$type}_{$value}";
+                    break;
+            }
+
+        } else if ($this->transform) {
+            $classname = "\\totara_reportbuilder\\rb\\transform\\$this->transform";
+            if (class_exists($classname)) {
+                $fields[] = $classname::get_field($this, $src, $aliasmode, $returnextrafields);
+            }
+
+        } else if ($this->aggregate) {
+            $classname = "\\totara_reportbuilder\\rb\\aggregate\\$this->aggregate";
+            if (class_exists($classname)) {
+                $fields[] = $classname::get_field($this, $src, $aliasmode, $returnextrafields);
+            }
+
+        } else { // Grouping is 'none'.
+            switch ($aliasmode) {
+                case self::FIELDONLY:
+                    $fields[] = "{$field}";
+                    break;
+                case self::ALIASONLY:
+                    $fields[] = "{$type}_{$value}";
+                    break;
+                case self::CACHE:
+                case self::GROUPBYCACHE:
+                    $fields[] = "{$type}_{$value}";
+                    break;
+                case self::GROUPBYREGULAR:
+                    if (!self::is_static_field($field)) {
+                        $fields[] = "{$field}";
+                    }
+                    break;
+                case self::REGULARGROUPED:
+                    if (self::is_static_field($field)) {
+                        $fields[] = "MIN({$field}) AS {$type}_{$value}";
+                    } else {
+                        $fields[] = "{$field} AS {$type}_{$value}";
+                    }
+                    break;
+                case self::REGULAR:
+                case self::NOGROUP:
+                default:
+                    $fields[] = "{$field} AS {$type}_{$value}";
+                    break;
             }
         }
 
-        // Add extrafields to the array after the main fields.
-        if ($returnextrafields && $extrafields !== null) {
-            foreach ($extrafields as $extrafieldname => $extrafield) {
-                $alias = reportbuilder_get_extrafield_alias($type, $value, $extrafieldname);
-                switch ($aliasmode) {
-                    case self::ALIASONLY:
-                    case self::CACHE:
-                        $fields[] = $alias;
-                        break;
-                    case self::FIELDONLY:
-                        $fields[] = $extrafield;
-                        break;
-                    default:
-                        $fields[] = "$extrafield AS $alias";
-                }
+        $fields = array_merge($fields, $this->get_extra_fields($aliasmode));
+
+        return $fields;
+    }
+
+    /**
+     * Static fields such as 'grrr' or (10) cannot be in GROUP BY clause in
+     * PostgreSQL and MSSQL - the trick is to apply aggregation function
+     * to them instead of putting them to GROUP BY list.
+     * @param string $field
+     * @return bool True if field is static (all rows have the same value).
+     */
+    protected static function is_static_field($field) {
+        $trimmed = trim($field, '()');
+        if (is_numeric($trimmed)) {
+            return true;
+        }
+        if (substr($field, 0, 1) === "'" and substr($field, -1)) {
+            $trimmed = substr($field, 1, strlen($field) - 2);
+            if (strpos($trimmed, "'") === false) {
+                // This looks like a SQL string constant.
+                return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Obtain an array of SQL snippets describing field information for extra fields of this column
+     *
+     * @param int $aliasmode
+     * @return array SQL fields
+     */
+    public function get_extra_fields($aliasmode) {
+        $fields = array();
+        if (!$this->extrafields) {
+            return $fields;
+        }
+        if ($this->aggregate) {
+            // Aggregated columns do not need any extras because the aggregation is the whole result.
+            return $fields;
+        }
+
+        $type = $this->type;
+        $value = $this->value;
+
+        foreach ($this->extrafields as $extrafieldname => $extrafield) {
+            $alias = reportbuilder_get_extrafield_alias($type, $value, $extrafieldname);
+            switch ($aliasmode) {
+                case self::FIELDONLY:
+                    $fields[] = $extrafield;
+                    break;
+                case self::ALIASONLY:
+                    $fields[] = $alias;
+                    break;
+                case self::GROUPBYREGULAR:
+                    if (!self::is_static_field($extrafield)) {
+                        $fields[] = $extrafield;
+                    }
+                    break;
+                case self::CACHE:
+                case self::GROUPBYCACHE:
+                    $fields[] = $alias;
+                    break;
+                case self::REGULARGROUPED:
+                    if (self::is_static_field($extrafield)) {
+                        $fields[] = "MIN({$extrafield}) AS $alias";
+                    } else {
+                        $fields[] = "$extrafield AS $alias";
+                    }
+                    break;
+                case self::REGULAR:
+                case self::NOGROUP:
+                default:
+                    $fields[] = "$extrafield AS $alias";
+            }
+        }
+
         return $fields;
     }
 
@@ -388,7 +506,8 @@ class rb_column {
      * @return boolean True if the column should be shown, false otherwise
      */
     function display_column($isexport=false) {
-        // don't print the column if heading is blank
+        // Don't print the column if we do not have any heading,
+        // value comes from default heading or user defined heading.
         if ($this->heading == '') {
             return false;
         }
@@ -407,4 +526,23 @@ class rb_column {
         return true;
     }
 
-} // end of rb_column class
+    /**
+     * Get appropriate display function name without prefix,
+     * this uses transformation and aggregation classes if necessary
+     * @return string
+     */
+    public function get_displayfunc() {
+        $displayfunc = null;
+        if ($this->grouping === 'none' and $this->transform) {
+            $classname = '\totara_reportbuilder\rb\transform\\' . $this->transform;
+            $displayfunc = $classname::get_displayfunc($this);
+        } else if ($this->grouping === 'none' and $this->aggregate) {
+            $classname = '\totara_reportbuilder\rb\aggregate\\' . $this->aggregate;
+            $displayfunc = $classname::get_displayfunc($this);
+        } else {
+            $displayfunc = $this->displayfunc;
+        }
+
+        return $displayfunc;
+    }
+}

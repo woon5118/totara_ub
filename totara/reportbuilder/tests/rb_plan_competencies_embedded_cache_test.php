@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 
 
-class rb_plan_competencies_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 10, 'fullname' => 'Record of Learning: Competencies', 'shortname' => 'plan_competencies',
                                            'source' => 'dp_competency', 'hidden' => 1, 'embedded' => 1);
@@ -142,7 +142,7 @@ class rb_plan_competencies_embedded_cache_test extends reportcache_advanced_test
      * - Check that user2 has competencies of plan2 and plan3
      * - Check that user3 has no plans
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_plan_competencies($usecache) {

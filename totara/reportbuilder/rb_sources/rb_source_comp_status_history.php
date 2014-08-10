@@ -134,7 +134,8 @@ class rb_source_comp_status_history extends rb_base_source {
                 get_string('comptimemodifiedcolumn', 'rb_source_comp_status_history'),
                 'base.timemodified',
                 array('defaultheading' => get_string('comptimemodifiedheading', 'rb_source_comp_status_history'),
-                      'displayfunc' => 'nice_datetime')
+                      'displayfunc' => 'nice_datetime',
+                      'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'history',

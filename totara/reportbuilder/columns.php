@@ -45,20 +45,15 @@ $report = new reportbuilder($id, null, false, null, null, true);
 
 // include jquery
 local_js();
-$PAGE->requires->strings_for_js(array('saving', 'confirmcoldelete', 'hide', 'show', 'delete', 'moveup', 'movedown', 'add'), 'totara_reportbuilder');
-$args = array('args' => '{"user_sesskey":"'.$USER->sesskey.'", "rb_reportid":'.$id.', "rb_column_headings":'.json_encode($report->get_default_headings_array()).'}');
-$jsmodule = array(
-    'name' => 'totara_reportbuildercolumns',
-    'fullpath' => '/totara/reportbuilder/columns.js',
-    'requires' => array('json'));
-$PAGE->requires->js_init_call('M.totara_reportbuildercolumns.init', $args, false, $jsmodule);
+
+$allowedadvanced = $report->src->get_allowed_advanced_column_options();
+$grouped = $report->src->get_grouped_column_options();
+$advoptions = $report->src->get_all_advanced_column_options();
 
 // toggle show/hide column
 if ($h !== null && isset($cid)) {
     if ($report->showhide_column($cid, $h)) {
-        $vis = $h ? 'Hide' : 'Show';
-        add_to_log(SITEID, 'reportbuilder', 'update report', 'columns.php?id='. $id,
-            $vis . ' Column: Report ID=' . $id . ', Column ID=' . $cid);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
         totara_set_notification(get_string('column_vis_updated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         totara_set_notification(get_string('error:column_vis_not_updated', 'totara_reportbuilder'), $returnurl);
@@ -66,63 +61,50 @@ if ($h !== null && isset($cid)) {
 }
 
 // delete column
-if ($d and $confirm) {
-    if (!confirm_sesskey()) {
-        totara_set_notification(get_string('error:bad_sesskey', 'totara_reportbuilder'), $returnurl);
-    }
-
-    if (isset($cid)) {
+if ($d and $cid) {
+    if ($confirm and confirm_sesskey()) {
         if ($report->delete_column($cid)) {
-            add_to_log(SITEID, 'reportbuilder', 'update report', 'columns.php?id='. $id,
-                'Deleted Column: Report ID=' . $id . ', Column ID=' . $cid);
+            \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
             totara_set_notification(get_string('column_deleted', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
         } else {
             totara_set_notification(get_string('error:column_not_deleted', 'totara_reportbuilder'), $returnurl);
         }
     }
-}
-
-// confirm deletion column
-if ($d) {
-
     echo $output->header();
 
-    if (isset($cid)) {
-        $confirmurl = new moodle_url('/totara/reportbuilder/columns.php', array('d' => '1', 'id' => $id, 'cid' => $cid, 'confirm' => 'l', 'sesskey' => $USER->sesskey));
-        echo $output->confirm(get_string('confirmcolumndelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
-    }
+    $confirmurl = new moodle_url('/totara/reportbuilder/columns.php', array('d' => '1', 'id' => $id, 'cid' => $cid,
+                                                                            'confirm' => '1', 'sesskey' => $USER->sesskey));
+    echo $output->confirm(get_string('confirmcolumndelete', 'totara_reportbuilder'), $confirmurl, $returnurl);
 
     echo $output->footer();
     die;
 }
 
-// move column
-if ($m && isset($cid)) {
+// Move column.
+if ($m and $cid and confirm_sesskey()) {
     if ($report->move_column($cid, $m)) {
-        add_to_log(SITEID, 'reportbuilder', 'update report', 'columns.php?id='. $id,
-            'Moved Column: Report ID=' . $id . ', Column ID=' . $cid);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
         totara_set_notification(get_string('column_moved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         totara_set_notification(get_string('error:column_not_moved', 'totara_reportbuilder'), $returnurl);
     }
 }
 
-// form definition
-$mform = new report_builder_edit_columns_form(null, compact('id', 'report'));
+// Form definition.
+$mform = new report_builder_edit_columns_form(null, compact('report', 'allowedadvanced', 'grouped', 'advoptions'));
 
-// form results check
+// Form results check.
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 if ($fromform = $mform->get_data()) {
-
     if (empty($fromform->submitbutton)) {
         totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
     }
-    if (build_columns($id, $fromform, $report)) {
+    if (totara_reportbuilder_build_columns($fromform, $report, $allowedadvanced, $grouped)) {
         reportbuilder_set_status($id);
-        add_to_log(SITEID, 'reportbuilder', 'update report', 'columns.php?id='. $id,
-            'Column Settings: Report ID=' . $id);
+        $report = new reportbuilder($id);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'columns')->trigger();
         totara_set_notification(get_string('columns_updated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         totara_set_notification(get_string('error:columns_not_updated', 'totara_reportbuilder'), $returnurl);
@@ -139,71 +121,150 @@ echo $output->container_end();
 
 echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
 
-if (reportbuilder_get_status($id)) {
+if ($report->get_cache_status() > 0) {
     echo $output->cache_pending_notification($id);
 }
 
 $currenttab = 'columns';
-include_once('tabs.php');
+require('tabs.php');
 
-// display the form
+
+$config = new stdClass();
+$config->rb_reportid = $id;
+$config->rb_column_headings = $report->get_default_headings_array();
+$config->rb_grouped_columns = $grouped;
+$config->rb_allowed_advanced = $allowedadvanced;
+$config->rb_advanced_options = $advoptions;
+
+$jsmodule = array(
+    'name' => 'totara_reportbuildercolumns',
+    'fullpath' => '/totara/reportbuilder/columns.js');
+$PAGE->requires->js_init_call('M.totara_reportbuildercolumns.init', array($config), false, $jsmodule);
+
+$PAGE->requires->strings_for_js(array('saving', 'confirmcoldelete', 'hide', 'show', 'delete', 'moveup', 'movedown', 'add'),
+                                'totara_reportbuilder');
+$report->src->columns_page_requires();
+
+// Display the form.
 $mform->display();
 
-// include JS object to define the column headings
-echo html_writer::script(
-    "var rb_reportid = {$id}; var rb_column_headings = " .
-    json_encode($report->get_default_headings_array()) . ';');
-
 echo $output->footer();
-
-
+die;
 
 /**
  * Update the report columns table with data from the submitted form
  *
- * @param integer $id Report ID to update
  * @param object $fromform Moodle form object containing the new column data
- * @param object $report The report object
+ * @param reportbuilder $report The report object
+ * @param array $allowedadvanced
+ * @param array $grouped
  *
  * @return boolean True if the columns could be updated successfully
  */
-function build_columns($id, $fromform, $report) {
+function totara_reportbuilder_build_columns($fromform, reportbuilder $report, $allowedadvanced, $grouped) {
     global $DB;
 
     $transaction = $DB->start_delegated_transaction();
+
+    $id = $report->_id;
 
     $oldcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id));
     // see if existing columns have changed
     foreach ($oldcolumns as $cid => $oldcolumn) {
         $columnname = "column{$cid}";
+        $advancedname = "advanced{$cid}";
         $headingname = "heading{$cid}";
         $customheadingname = "customheading{$cid}";
-        // update db only if column has changed
-        if (isset($fromform->$columnname) &&
-            ($fromform->$columnname != $oldcolumn->type.'-'.$oldcolumn->value ||
-            $fromform->$headingname != $oldcolumn->heading ||
-            $fromform->$customheadingname != $oldcolumn->customheading)) {
-            $heading = isset($fromform->$headingname) ? $fromform->$headingname : '';
+
+        if (!isset($fromform->$columnname)) {
+            // This should have been already deleted by ajax,
+            // but this may happen on concurrent edits.
+            $DB->delete_records('report_builder_columns', array('id' => $cid));
+            continue;
+        }
+
+        $parts = explode('-', $fromform->$columnname);
+        $coltype = $parts[0];
+        $colvalue = $parts[1];
+
+        if ($fromform->$customheadingname) {
+            $heading = $fromform->$headingname;
+        } else {
+            $heading = null;
+        }
+
+        if (in_array($fromform->$columnname, $grouped)) {
+            $fromform->$advancedname = '';
+        } else if (empty($fromform->$advancedname)) {
+            $fromform->$advancedname = '';
+        } else if (!in_array($fromform->$advancedname, $allowedadvanced[$fromform->$columnname], true)) {
+            $fromform->$advancedname = '';
+        }
+
+        $transform = null;
+        $aggregate = null;
+        if (strpos($fromform->$advancedname, 'transform_') === 0) {
+            $transform = str_replace('transform_', '', $fromform->$advancedname);
+            $aggregate = null;
+        } else if (strpos($fromform->$advancedname, 'aggregate_') === 0) {
+            $transform = null;
+            $aggregate = str_replace('aggregate_', '', $fromform->$advancedname);
+        }
+
+        // Update db only if column has changed.
+        if ($coltype !== $oldcolumn->type || $colvalue !== $oldcolumn->value ||
+            $transform !== $oldcolumn->transform ||
+            $aggregate !== $oldcolumn->aggregate ||
+            $heading !== $oldcolumn->heading ||
+            $fromform->$customheadingname != $oldcolumn->customheading) {
+
             $todb = new stdClass();
             $todb->id = $cid;
-            $parts = explode('-', $fromform->$columnname);
-            $todb->type = $parts[0];
-            $todb->value = $parts[1];
+            $todb->type = $coltype;
+            $todb->value = $colvalue;
+            $todb->transform = $transform;
+            $todb->aggregate = $aggregate;
             $todb->heading = $heading;
             $todb->customheading = $fromform->$customheadingname;
             $DB->update_record('report_builder_columns', $todb);
         }
     }
-    // add any new columns
-    if (isset($fromform->newcolumns) && $fromform->newcolumns != '0') {
-        $heading = isset($fromform->newheading) ? $fromform->newheading : '';
+    // Add any new column.
+    if (!empty($fromform->newcolumns)) {
+        $parts = explode('-', $fromform->newcolumns);
+        $coltype = $parts[0];
+        $colvalue = $parts[1];
+
         $todb = new stdClass();
         $todb->reportid = $id;
-        $parts = explode('-', $fromform->newcolumns);
-        $todb->type = $parts[0];
-        $todb->value = $parts[1];
-        $todb->heading = $heading;
+        $todb->type = $coltype;
+        $todb->value = $colvalue;
+
+        if (in_array($fromform->newcolumns, $grouped)) {
+            $fromform->newadvanced = '';
+        } else if (empty($fromform->newadvanced)) {
+            $fromform->newadvanced = '';
+        } else if (!in_array($fromform->newadvanced, $allowedadvanced[$fromform->newcolumns], true)) {
+            $fromform->newadvanced = '';
+        }
+
+        $todb->transform = null;
+        $todb->aggregate = null;
+        if (strpos($fromform->newadvanced, 'transform_') === 0) {
+            $todb->transform = str_replace('transform_', '', $fromform->newadvanced);
+            $todb->aggregate = null;
+        } else if (strpos($fromform->newadvanced, 'aggregate_') === 0) {
+            $todb->transform = null;
+            $todb->aggregate = str_replace('aggregate_', '', $fromform->newadvanced);
+        }
+
         $todb->customheading = $fromform->newcustomheading;
+        if ($fromform->newcustomheading) {
+            $todb->heading = $fromform->newheading;
+        } else {
+            $todb->heading = null;
+        }
+
         $sortorder = $DB->get_field('report_builder_columns', 'MAX(sortorder) + 1', array('reportid' => $id));
         if (!$sortorder) {
             $sortorder = 1;
@@ -219,6 +280,17 @@ function build_columns($id, $fromform, $report) {
         $todb->defaultsortorder = $fromform->defaultsortorder;
         $DB->update_record('report_builder', $todb);
     }
+
+    // Fix sortorders if necessary.
+    $columns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC', 'id, sortorder');
+    $i = 0;
+    foreach ($columns as $column) {
+        $i++;
+        if ($column->sortorder != $i) {
+            $DB->set_field('report_builder_columns', 'sortorder', $i, array('id' => $column->id));
+        }
+    }
+    unset($columns);
 
     $transaction->allow_commit();
 

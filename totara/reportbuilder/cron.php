@@ -229,6 +229,7 @@ function process_scheduled_reports() {
                 mtrace('Failed to send email for report ' . $report->id);
             }
 
+            // TODO: this should be probably replaced by events triggered in reportbuilder_send_scheduled_report()
             add_to_log(SITEID, 'reportbuilder', 'dailyreport', null, "$reportname (ID $report->id)");
 
             // Restore original export setting if we have changed it because file export is disabled.

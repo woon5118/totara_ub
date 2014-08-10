@@ -96,7 +96,7 @@ class rb_source_facetoface_summary extends rb_base_source {
                 'capacity',
                 get_string('sesscapacity', 'rb_source_facetoface_sessions'),
                 'sessions.capacity',
-                array('joins' => 'sessions')
+                array('joins' => 'sessions', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'session',
@@ -105,7 +105,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode >= ' . MDL_F2F_STATUS_APPROVED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -115,7 +116,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode >= ' . MDL_F2F_STATUS_REQUESTED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -125,7 +127,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_REQUESTED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -136,7 +139,9 @@ class rb_source_facetoface_summary extends rb_base_source {
                 array('joins' => array('attendees', 'sessions'),
                     'grouping' => 'count',
                     'displayfunc' => 'session_spaces',
-                    'extrafields' => array('overall_capacity' => 'sessions.capacity'))
+                    'extrafields' => array('overall_capacity' => 'sessions.capacity'),
+                    'dbdatatype' => 'integer'
+                )
             ),
             new rb_column_option(
                 'session',
@@ -145,7 +150,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode IN (' . MDL_F2F_STATUS_USER_CANCELLED . ', ' . MDL_F2F_STATUS_SESSION_CANCELLED . ') THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -155,7 +161,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_FULLY_ATTENDED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -165,7 +172,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_PARTIALLY_ATTENDED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -175,17 +183,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_NO_SHOW . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
-                )
-            ),
-            new rb_column_option(
-                'session',
-                'noshowattendees',
-                get_string('noshowattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_NO_SHOW . ' THEN 1 ELSE NULL END)',
-                array(
-                    'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -195,7 +194,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_DECLINED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
-                    'grouping' => 'count'
+                    'grouping' => 'count',
+                    'dbdatatype' => 'integer'
                 )
             ),
             new rb_column_option(
@@ -237,7 +237,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone'
+                    'displayfunc' => 'nice_date_in_timezone',
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
@@ -248,7 +249,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 array(
                     'extrafields' => array('session_id' => 'sessions.id', 'timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'link_f2f_session'
+                    'displayfunc' => 'link_f2f_session',
+                    'dbdatatype' => 'timestamp'
                 )
             ),
         );

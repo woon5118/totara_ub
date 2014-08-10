@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/lib.php');
 
-class rb_cohort_admin_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_cohort_admin_embedded_cache_testcase extends reportcache_advanced_testcase {
     // Testcase data
     protected $report_builder_data = array('id' => 1, 'fullname' => 'Audience Admin Screen', 'shortname' => 'cohort_admin',
                                            'source' => 'cohort', 'hidden' => 1, 'embedded' => 1);
@@ -126,7 +126,7 @@ class rb_cohort_admin_embedded_cache_test extends reportcache_advanced_testcase 
      * - Check that cohort2 has four memebrs
      * - Check that cohort3 has zero members
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_cohort_admin($usecache) {

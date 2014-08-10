@@ -34,7 +34,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
     public $sourcetitle, $shortname, $cacheable;
 
     /**
-     * Stored during post_config so that it can be used later.
+     * Stored during post_params() so that it can be used later when generating columns.
      *
      * @var int
      */
@@ -180,9 +180,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
      * Set up some extra joins that could not be done in the constructor.
      *
      * @param reportbuilder $report
-     * @return object
      */
-    public function post_config(reportbuilder $report) {
+    public function post_params(reportbuilder $report) {
         $this->appraisalid = $report->get_param_value('appraisalid');
 
         $this->set_redirect(new moodle_url('/totara/appraisal/rb_sources/appraisaldetailselector.php',
@@ -199,7 +198,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             $table = "";
         }
 
-        // Configure the appriasal-specific joins.
+        // Configure the appraisal-specific joins.
         $extendedjoinlist = array(
             new rb_join(
                 'rolelearner',
@@ -256,7 +255,9 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
                     'style' => $columnoption->style,
                     'class' => array('verticaltableheading'),
                     'hidden' => $hidden,
-                    'customheading' => null
+                    'customheading' => 1,
+                    'transform' => $columnoption->transform,
+                    'aggregate' => $columnoption->aggregate,
                 ));
     }
 

@@ -141,21 +141,21 @@ class rb_source_course_completion extends rb_base_source {
                 'completeddate',
                 get_string('completiondate', 'rb_source_course_completion'),
                 'base.timecompleted',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'course_completion',
                 'starteddate',
                 get_string('datestarted', 'rb_source_course_completion'),
                 'base.timestarted',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'course_completion',
                 'enrolleddate',
                 get_string('dateenrolled', 'rb_source_course_completion'),
                 'base.timeenrolled',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'course_completion',

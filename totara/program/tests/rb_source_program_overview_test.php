@@ -25,7 +25,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 //require_once ($CFG->dirroot.'/totara/program/rb_sources/rb_source_program_overview.php');
-class rb_source_program_overview_test extends reportcache_advanced_testcase {
+class totara_program_rb_source_program_overview_testcase extends reportcache_advanced_testcase {
     protected $load = 0;
     protected $report_builder_data = array('id' => 123, 'fullname' => 'Program Overview', 'shortname' => 'report_program_overview',
                                            'source' => 'program_overview', 'hidden' => 0, 'embedded' => 0, 'accessmode' => 1);

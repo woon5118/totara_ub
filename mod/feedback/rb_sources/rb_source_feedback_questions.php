@@ -139,14 +139,14 @@ class rb_source_feedback_questions extends rb_base_source {
                 'number',
                 get_string('numfeedbackresponses', 'rb_source_feedback_questions'),
                 'base.id',
-                array('grouping' => 'count')
+                array('grouping' => 'count', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'responses',
                 'timecompleted',
                 get_string('timecompleted', 'rb_source_feedback_questions'),
                 'base.completedtime',
-                array('displayfunc' => 'nice_datetime')
+                array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'feedback',

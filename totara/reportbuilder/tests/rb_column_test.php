@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_column_option.php');
 
 
-class rb_column_test extends advanced_testcase {
+class totara_reportbuilder_rb_column_testcase extends advanced_testcase {
 
     protected function setUp() {
         parent::setup();

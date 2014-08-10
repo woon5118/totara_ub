@@ -74,7 +74,8 @@ class rb_source_totara_sync_log extends rb_base_source {
                 'time',
                 get_string('datetime', 'tool_totara_sync'),
                 "base.time",
-                array('displayfunc' => 'nice_datetime_seconds')
+                array('displayfunc' => 'nice_datetime_seconds',
+                      'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'totara_sync_log',

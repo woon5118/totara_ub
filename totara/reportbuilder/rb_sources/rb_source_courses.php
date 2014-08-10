@@ -196,6 +196,24 @@ class rb_source_courses extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'category',
+            '',
+            "base.category"
+        );
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'visible',
+            '',
+            "base.visible"
+        );
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'audiencevisible',
+            '',
+            "base.audiencevisible"
+        );
         return $requiredcolumns;
     }
 
@@ -241,30 +259,10 @@ class rb_source_courses extends rb_base_source {
 
     public function post_config(reportbuilder $report) {
         // Don't include the front page (site-level course).
-        $this->requiredcolumns[] = new rb_column(
-            'base',
-            'category',
-            '',
-            "base.category"
-        );
-
         $categorysql = $report->get_field('base', 'category', 'base.category') . " <> :sitelevelcategory";
         $categoryparams = array('sitelevelcategory' => 0);
 
         // Visibility.
-        $this->requiredcolumns[] = new rb_column(
-            'base',
-            'visible',
-            '',
-            "base.visible"
-        );
-        $this->requiredcolumns[] = new rb_column(
-            'base',
-            'audiencevisible',
-            '',
-            "base.audiencevisible"
-        );
-
         $reportfor = $report->reportfor; // ID of the user the report is for.
         $fieldbaseid = $report->get_field('base', 'id', 'base.id');
         $fieldvisible = $report->get_field('base', 'visible', 'base.visible');

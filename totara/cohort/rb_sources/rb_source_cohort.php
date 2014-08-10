@@ -145,7 +145,8 @@ class rb_source_cohort extends rb_base_source {
             get_string('numofmembers', 'totara_cohort'),
             'CASE WHEN membercount.count IS NULL THEN 0 ELSE membercount.count END',
             array(
-                'joins' => array('membercount')
+                'joins' => array('membercount'),
+                'dbdatatype' => 'integer'
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -164,7 +165,8 @@ class rb_source_cohort extends rb_base_source {
             get_string('startdate', 'totara_cohort'),
             'base.startdate',
             array(
-                'displayfunc' => 'nice_date'
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -173,7 +175,8 @@ class rb_source_cohort extends rb_base_source {
             get_string('enddate', 'totara_cohort'),
             'base.enddate',
             array(
-                'displayfunc' => 'nice_date'
+                'displayfunc' => 'nice_date',
+                'dbdatatype' => 'timestamp',
             )
         );
         $columnoptions[] = new rb_column_option(

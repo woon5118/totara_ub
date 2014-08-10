@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 
-$id = required_param('id', PARAM_INT); // report builder id
+$id = required_param('id', PARAM_INT); // Report builder id.
 
 admin_externalpage_setup('rbmanagereports');
 
@@ -41,17 +41,25 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 $returnurl = $CFG->wwwroot . "/totara/reportbuilder/general.php?id=$id";
 
 $report = new reportbuilder($id);
-$report->descriptionformat = FORMAT_HTML;
-$report = file_prepare_standard_editor($report, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-    'totara_reportbuilder', 'report_builder', $id);
 $schedule = array();
 if ($report->cache) {
     $cache = reportbuilder_get_cached($id);
     $scheduler = new scheduler($cache, array('nextevent' => 'nextreport'));
     $schedule = $scheduler->to_array();
 }
-// form definition
-$mform = new report_builder_edit_form(null, array('id' => $id, 'report' => $report));
+
+// Form definition.
+$record = new stdClass();
+$record->id = $report->_id;
+$record->fullname = $report->fullname;
+$record->description = $report->description;
+$record->descriptionformat = FORMAT_HTML;
+$record->hidden = $report->hidden;
+$record->recordsperpage = $report->recordsperpage;
+$record = file_prepare_standard_editor($record, 'description', $TEXTAREA_OPTIONS, context_system::instance(),
+    'totara_reportbuilder', 'report_builder', $record->id);
+
+$mform = new report_builder_edit_form(null, array('report' => $report, 'record' => $record));
 
 // form results check
 if ($mform->is_cancelled()) {
@@ -76,8 +84,8 @@ if ($fromform = $mform->get_data()) {
 
     $DB->update_record('report_builder', $todb);
 
-    add_to_log(SITEID, 'reportbuilder', 'update report', 'general.php?id='. $id,
-        'General Settings: Report ID=' . $id);
+    $report = new reportbuilder($id);
+    \totara_reportbuilder\event\report_updated::create_from_report($report, 'general')->trigger();
     totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 }
 
@@ -90,12 +98,12 @@ echo $output->container_end();
 
 echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
 
-if (reportbuilder_get_status($id)) {
+if ($report->get_cache_status() > 0) {
     echo $output->cache_pending_notification($id);
 }
 
 $currenttab = 'general';
-include_once('tabs.php');
+require('tabs.php');
 
 // display the form
 $mform->display();

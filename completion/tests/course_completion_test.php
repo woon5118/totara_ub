@@ -36,9 +36,9 @@ require_once($CFG->dirroot . '/completion/cron.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 
-define('COURSES_CREATED', 3);
+define('COMPLETION_TEST_COURSES_CREATED', 3);
 
-class course_completion extends reportcache_advanced_testcase {
+class core_completion_course_completion_testcase extends reportcache_advanced_testcase {
 
     /** This setUp will create: three users (user1, user2, user3), three courses (course1, course2, course3),
      *  one certification program with course1 as certification content path and course2 as re-certification path.
@@ -51,6 +51,8 @@ class course_completion extends reportcache_advanced_testcase {
     protected function setUp() {
         global $DB;
         parent::setup();
+
+        $this->preventResetByRollback();
 
         $this->assertEquals(2, $DB->count_records('user')); // Guest + Admin
 
@@ -65,7 +67,7 @@ class course_completion extends reportcache_advanced_testcase {
 
         // Create three courses
         $coursedefaults = array('enablecompletion' => COMPLETION_ENABLED, 'completionstartonenrol' => 1, 'completionprogressonview' => 1);
-        for ($i = 1; $i <= COURSES_CREATED; $i++) {
+        for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $this->{"course".$i} = $this->getDataGenerator()->create_course($coursedefaults, array('createsections' => true));
             $this->{"completioninfo".$i} = new completion_info($this->{"course".$i});
             $this->assertEquals(COMPLETION_ENABLED, $this->{"completioninfo".$i}->is_enabled());
@@ -82,7 +84,7 @@ class course_completion extends reportcache_advanced_testcase {
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionview' => COMPLETION_VIEW_REQUIRED
         );
-        for ($i = 1; $i <= COURSES_CREATED; $i++) {
+        for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $courseid = $this->{"course".$i}->id;
             $this->{"certificate".$i} = $this->getDataGenerator()->create_module(
                 'certificate',
@@ -95,7 +97,7 @@ class course_completion extends reportcache_advanced_testcase {
         $this->assertEquals(3, $DB->count_records('certificate'));
 
         // Create completion based on the certificate activity that each course has.
-        for ($i = 1; $i <= COURSES_CREATED; $i++) {
+        for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $courseid = $this->{"course".$i}->id;
             $activityid = $this->{"certificate".$i}->id;
             $data = new stdClass();
@@ -132,8 +134,10 @@ class course_completion extends reportcache_advanced_testcase {
         $this->getDataGenerator()->add_courseset_program($this->program->id, array($this->course2->id), CERTIFPATH_RECERT);
         $this->assertEquals(2, $DB->count_records('prog_courseset_course'), 'Record count mismatch for coursetsets in certification');
 
+        $sink = $this->redirectMessages();
         // Enrol user1 and user2 to the certification program.
         $this->getDataGenerator()->assign_program($this->program->id, array($this->user1->id, $this->user2->id));
+        $sink->close();
 
         // Enrol user1, user2 and user3 to the course1 ... and user1 and user3 to course3 (via manual).
         $this->getDataGenerator()->enrol_user($this->user1->id, $this->course1->id);
@@ -160,7 +164,7 @@ class course_completion extends reportcache_advanced_testcase {
 
         // Make all users complete courses by viewing the certifications.
         $this->assertEquals(0, $DB->count_records('certificate_issues'));
-        for ($i = 1; $i <= COURSES_CREATED; $i++) {
+        for ($i = 1; $i <= COMPLETION_TEST_COURSES_CREATED; $i++) {
             $courseid = $this->{"course".$i}->id;
             // Verify the course is in the courses group we want to complete.
             if (!in_array($courseid, $this->coursestocomplete)) {
@@ -210,7 +214,9 @@ class course_completion extends reportcache_advanced_testcase {
         $this->assertNotNull($certification->timecompleted, 'Time completed is NULL');
 
         // Run the cron.
+        ob_start();
         certification_cron();
+        ob_end_clean();
 
         /* As the re-certification windows is opened, the completion record for user1-course1 should be deleted
          * because it is part of the certification program and user1 already complete course1.

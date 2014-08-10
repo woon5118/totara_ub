@@ -99,7 +99,8 @@ class rb_source_dp_course_completion_history extends rb_base_source {
                 get_string('timecompleted', 'rb_source_dp_course_completion_history'),
                 'base.timecompleted',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 

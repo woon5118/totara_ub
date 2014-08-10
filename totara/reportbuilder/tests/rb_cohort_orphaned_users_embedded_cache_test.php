@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/lib.php');
 
-class rb_cohort_orphaned_users_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_cohort_orphaned_users_embedded_cache_testcase extends reportcache_advanced_testcase {
     // Testcase data
     protected $report_builder_data = array('id' => 3, 'fullname' => 'Audience Orphaned Users', 'shortname' => 'cohort_orphaned_users',
                                            'source' => 'cohort_orphaned_users', 'hidden' => 1, 'embedded' => 1);
@@ -112,17 +112,12 @@ class rb_cohort_orphaned_users_embedded_cache_test extends reportcache_advanced_
      * - Common part (@see: self::setUp() )
      * - Check that set group has added members
      * - Check that dynamic group has all members
-     *
-     * @param int Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_cohort_members($usecache) {
+    public function test_cohort_members() {
         $this->resetAfterTest();
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
+        // NOTE: this report is not cacheable because it uses current time in SQL query, it should be fast anyway.
         $useridalias = reportbuilder_get_extrafield_alias('user', 'namelinkicon', 'user_id');
-        $result = $this->get_report_result($this->report_builder_data['shortname'],  array(), $usecache);
+        $result = $this->get_report_result($this->report_builder_data['shortname'],  array(), false);
         $this->assertCount(4, $result);
         $was = array();
         foreach($result as $r) {

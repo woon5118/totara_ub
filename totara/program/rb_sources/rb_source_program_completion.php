@@ -105,21 +105,21 @@ class rb_source_program_completion extends rb_base_source {
             'starteddate',
             get_string('starteddate', 'rb_source_program_completion'),
             'base.timestarted',
-            array('displayfunc' => 'prog_date')
+            array('displayfunc' => 'prog_date', 'dbdatatype' => 'timestamp')
         );
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'completeddate',
             get_string('completeddate', 'rb_source_program_completion'),
             'base.timecompleted',
-            array('displayfunc' => 'prog_date')
+            array('displayfunc' => 'prog_date', 'dbdatatype' => 'timestamp')
         );
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'duedate',
             get_string('duedate', 'rb_source_program_completion'),
             'base.timedue',
-            array('displayfunc' => 'prog_date')
+            array('displayfunc' => 'prog_date', 'dbdatatype' => 'timestamp')
         );
 
         $columnoptions[] =new rb_column_option(

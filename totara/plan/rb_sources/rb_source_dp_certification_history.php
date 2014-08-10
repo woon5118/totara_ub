@@ -220,7 +220,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 get_string('timecompleted', 'rb_source_dp_certification'),
                 'base.timecompleted',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -230,7 +231,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 get_string('timeexpires', 'rb_source_dp_certification'),
                 'base.timeexpires',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 

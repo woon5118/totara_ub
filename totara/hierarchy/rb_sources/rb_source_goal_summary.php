@@ -114,7 +114,9 @@ class rb_source_goal_summary extends rb_base_source {
                 get_string('goalnumberofusersassignedcolumn', 'rb_source_goal_summary'),
                 'COALESCE(numberassigned.c, 0)',
                 array('joins' => 'numberassigned',
-                      'defaultheading' => get_string('goalnumberofusersassignedheading', 'rb_source_goal_summary'))
+                      'defaultheading' => get_string('goalnumberofusersassignedheading', 'rb_source_goal_summary'),
+                      'dbdatatype' => 'integer'
+                )
             ),
             new rb_column_option(
                 'goal',
@@ -130,7 +132,7 @@ class rb_source_goal_summary extends rb_base_source {
     }
 
 
-    public function post_config(reportbuilder $report) {
+    public function post_params(reportbuilder $report) {
         global $DB;
 
         $this->goalframeworkid = $report->get_param_value('goalframeworkid');

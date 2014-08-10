@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/message/messagelib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-class rb_alerts_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_alerts_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 2, 'fullname' => 'Alerts', 'shortname' => 'alerts',
                                            'source' => 'totaramessages', 'hidden'=>1, 'embedded' => 1);
@@ -157,7 +157,7 @@ class rb_alerts_embedded_cache_test extends reportcache_advanced_testcase {
      * - Check alerts for second user (3 alerts)
      * - Check alerts for third user (0 alerts)
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_alerts($usecache) {

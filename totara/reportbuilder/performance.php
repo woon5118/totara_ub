@@ -77,8 +77,8 @@ if ($fromform = $mform->get_data()) {
         reportbuilder_purge_cache($id, true);
     }
 
-    add_to_log(SITEID, 'reportbuilder', 'update report', 'performance.php?id='. $id,
-        'Performance Settings: Report ID=' . $id);
+    $report = new reportbuilder($id);
+    \totara_reportbuilder\event\report_updated::create_from_report($report, 'performance')->trigger();
     totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 }
 
@@ -92,7 +92,7 @@ echo $output->container_end();
 echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
 
 $currenttab = 'performance';
-include_once('tabs.php');
+require('tabs.php');
 
 // display the form
 $mform->display();

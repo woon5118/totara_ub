@@ -170,6 +170,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             "base.timecompleted",
             array(
                 'displayfunc' => 'completion_date',
+                'dbdatatype' => 'timestamp',
             )
         );
 
@@ -180,6 +181,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
             "base.timedue",
             array(
                 'displayfunc' => 'completion_date',
+                'dbdatatype' => 'timestamp',
             )
         );
 

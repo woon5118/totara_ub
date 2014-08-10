@@ -197,7 +197,7 @@ class rb_source_dp_evidence extends rb_base_source {
             'datecompleted',
             get_string('datecompleted', 'rb_source_dp_evidence'),
             'base.datecompleted',
-            array('displayfunc'=>'nice_date')
+            array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
         );
 
         $columnoptions[] = new rb_column_option(

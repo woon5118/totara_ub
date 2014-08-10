@@ -192,6 +192,7 @@ class rb_source_dp_program extends rb_base_source {
             array(
                 'joins' => 'program_completion',
                 'displayfunc' => 'timedue_date',
+                'dbdatatype' => 'timestamp',
                 'extrafields' => array(
                     'program_id' => "base.id",
                     'completionstatus' => "program_completion.status"
@@ -275,6 +276,7 @@ class rb_source_dp_program extends rb_base_source {
             'program_completion_history.historycount',
             array(
                 'joins' => 'program_completion_history',
+                'dbdatatype' => 'integer',
             )
         );
 

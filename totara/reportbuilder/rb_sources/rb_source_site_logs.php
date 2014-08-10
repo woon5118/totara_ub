@@ -83,7 +83,7 @@ class rb_source_site_logs extends rb_base_source {
                 'time',
                 get_string('time', 'rb_source_site_logs'),
                 'base.time',
-                array('displayfunc' => 'nice_datetime')
+                array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'log',

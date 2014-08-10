@@ -172,7 +172,9 @@ class rb_source_totaramessages extends rb_base_source {
                 get_string('sent', 'rb_source_totaramessages'),
                 'msg.timecreated',
                 array('joins' => 'msg',
-                      'displayfunc' => 'nice_date')
+                      'displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp'
+                )
             ),
             new rb_column_option(
                 'message_values',

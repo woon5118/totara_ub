@@ -366,12 +366,13 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $notice = '';
         if ($report instanceof reportbuilder) {
             //Check that regeneration is started
-            if ($report->cacheschedule->changed == RB_CACHE_FLAG_FAIL) {
+            $status = $report->get_cache_status();
+            if ($status == RB_CACHE_FLAG_FAIL) {
                 $notice = $this->container(get_string('cachegenfail','totara_reportbuilder'), 'notifyproblem clearfix');
-            } else if ($report->cacheschedule->genstart > 0) {
+            } else if ($status == RB_CACHE_FLAG_GEN) {
                 $time = userdate($report->cacheschedule->genstart);
                 $notice = $this->container(get_string('cachegenstarted','totara_reportbuilder', $time), 'notifynotice clearfix');
-            } else if ($report->cacheschedule->changed) {
+            } else if ($status == RB_CACHE_FLAG_CHANGED) {
                 $context = context_system::instance();
                 if ($report->_id > 0 && has_capability('totara/reportbuilder:managereports', $context)) {
                     $button = html_writer::start_tag('div', array('class' => 'boxalignright rb-genbutton'));

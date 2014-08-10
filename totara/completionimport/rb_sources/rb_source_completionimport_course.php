@@ -102,7 +102,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 'base',
                 'rownumber',
                 get_string('columnbaserownumber', 'rb_source_completionimport_course'),
-                'base.rownumber'
+                'base.rownumber',
+                array('dbdatatype' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -158,7 +159,8 @@ class rb_source_completionimport_course extends rb_base_source {
                 get_string('columnbasetimecreated', 'rb_source_completionimport_course'),
                 'base.timecreated',
                 array(
-                    'displayfunc' => 'nice_datetime'
+                    'displayfunc' => 'nice_datetime',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -194,6 +196,7 @@ class rb_source_completionimport_course extends rb_base_source {
                 'completiondate',
                 get_string('columnbasecompletiondate', 'rb_source_completionimport_course'),
                 'base.completiondate'
+                // NOTE: This is not an integer timestamp in install.xml.
         );
 
         $columnoptions[] = new rb_column_option(

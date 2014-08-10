@@ -130,6 +130,7 @@ class rb_source_appraisal extends rb_base_source {
                 get_string('userappraisaltimecompletedcolumn', 'rb_source_appraisal'),
                 'base.timecompleted',
                 array('displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('userappraisaltimecompletedheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -139,6 +140,7 @@ class rb_source_appraisal extends rb_base_source {
                 'previousstage.timecompleted',
                 array('joins' => array('previousstage'),
                       'displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('userappraisalpreviousstagetimecompletedheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -174,6 +176,7 @@ class rb_source_appraisal extends rb_base_source {
                 'activestage.timedue',
                 array('joins' => 'activestage',
                       'displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('userappraisalactivestagetimedueheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -202,6 +205,7 @@ class rb_source_appraisal extends rb_base_source {
                 'appraisal.timestarted',
                 array('joins' => 'appraisal',
                       'displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('appraisaltimestartedheading', 'rb_source_appraisal'))
             ),
             new rb_column_option(
@@ -211,6 +215,7 @@ class rb_source_appraisal extends rb_base_source {
                 'appraisal.timefinished',
                 array('joins' => 'appraisal',
                       'displayfunc' => 'nice_date',
+                      'dbdatatype' => 'timestamp',
                       'defaultheading' => get_string('appraisaltimefinishedheading', 'rb_source_appraisal'))
             )
         );

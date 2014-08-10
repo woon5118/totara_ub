@@ -448,5 +448,72 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014092400, 'totara', 'reportbuilder');
     }
 
+
+    // This is the Totara 2.7 upgrade line.
+    // All following versions need to be bumped up during merging from 2.6 until we have separate t2-release-27 branch!
+
+    if ($oldversion < 2014100701) {
+
+        // Define field transform to be added to report_builder_columns.
+        $table = new xmldb_table('report_builder_columns');
+        $field = new xmldb_field('transform', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'value');
+
+        // Conditionally launch add field transform.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field aggregate to be added to report_builder_columns.
+        $table = new xmldb_table('report_builder_columns');
+        $field = new xmldb_field('aggregate', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'transform');
+
+        // Conditionally launch add field aggregate.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Invalidate all caches.
+        $DB->set_field('report_builder_cache', 'changed', 1, array('changed' => 0));
+
+        // Drop unused config field.
+        $table = new xmldb_table('report_builder_cache');
+        $field = new xmldb_field('config');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Delete all old cache tables.
+        $rs = $DB->get_recordset_select('report_builder_cache', "cachetable IS NOT NULL AND cachetable <> ''", array(), 'id ASC',
+                                        'id, cachetable');
+        foreach ($rs as $cache) {
+            $table = trim($cache->cachetable, '{}');
+            if (!$table) {
+                continue;
+            }
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table(new xmldb_table($table));
+            }
+        }
+        $rs->close();
+        $DB->set_field('report_builder_cache', 'cachetable', null, array());
+
+        // Add query hash field.
+        $table = new xmldb_table('report_builder_cache');
+        $field = new xmldb_field('queryhash', XMLDB_TYPE_CHAR, '40', null, null, null, null, 'nextreport');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Drop unused config field.
+        $table = new xmldb_table('report_builder_settings');
+        $field = new xmldb_field('cachedvalue');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014100701, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

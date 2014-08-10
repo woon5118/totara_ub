@@ -53,7 +53,7 @@ foreach ($report->src->filteroptions as $option) {
 }
 
 $searchcolumnheadings = array();
-foreach ($report->src->columnoptions as $option) {
+foreach ($report->columnoptions as $option) {
     if ($option->is_searchable()) {
         $key = $option->type . '-' . $option->value;
         $searchcolumnheadings[$key] = format_string($option->name);
@@ -85,8 +85,7 @@ if ($d and $confirm) {
                 totara_set_notification(get_string('initialdisplay_error', 'totara_reportbuilder'), $returnurl);
         } else {
             if ($report->delete_filter($fid)) {
-                add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
-                    'Delete Filter: Report ID=' . $id . ', Filter ID=' . $fid);
+                \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
                 totara_set_notification(get_string('filterdeleted', 'totara_reportbuilder'), $returnurl,
                     array('class' => 'notifysuccess'));
             } else {
@@ -98,8 +97,7 @@ if ($d and $confirm) {
                 totara_set_notification(get_string('initialdisplay_error', 'totara_reportbuilder'), $returnurl);
         } else {
             if ($report->delete_search_column($searchcolumnid)) {
-                add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
-                    'Delete Search Column: Report ID=' . $id . ', Search Column ID=' . $searchcolumnid);
+                \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
                 totara_set_notification(get_string('searchcolumndeleted', 'totara_reportbuilder'), $returnurl,
                     array('class' => 'notifysuccess'));
             } else {
@@ -130,8 +128,7 @@ if ($d) {
 // Move filter.
 if ($m && isset($fid)) {
     if ($report->move_filter($fid, $m)) {
-        add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
-            'Moved Filter: Report ID=' . $id . ', Filter ID=' . $fid);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
         totara_set_notification(get_string('filtermoved', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         totara_set_notification(get_string('error:filter_not_moved', 'totara_reportbuilder'), $returnurl);
@@ -156,8 +153,8 @@ if ($fromform = $mform->get_data()) {
     if (build_filters($id, $fromform)) {
         $DB->set_field('report_builder', 'toolbarsearch', !$fromform->toolbarsearchdisabled, array('id' => $id));
         reportbuilder_set_status($id);
-        add_to_log(SITEID, 'reportbuilder', 'update report', 'filters.php?id='. $id,
-            'Filter Settings: Report ID=' . $id);
+        $report = new reportbuilder($id);
+        \totara_reportbuilder\event\report_updated::create_from_report($report, 'filters')->trigger();
         totara_set_notification(get_string('filters_updated', 'totara_reportbuilder'), $returnurl,
             array('class' => 'notifysuccess'));
     } else {
@@ -175,12 +172,12 @@ echo $output->container_end();
 
 echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
 
-if (reportbuilder_get_status($id)) {
+if ($report->get_cache_status() > 0) {
     echo $output->cache_pending_notification($id);
 }
 
 $currenttab = 'filters';
-require_once('tabs.php');
+require('tabs.php');
 
 // Display the form.
 $mform->display();

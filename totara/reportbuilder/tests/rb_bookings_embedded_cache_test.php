@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcache_advanced_testcase {
     // testcase data
     protected $report_builder_data = array(
         'id' => 8, 'fullname' => 'My Bookings', 'shortname' => 'bookings',
@@ -189,7 +189,7 @@ class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
      * - Check bookings for second user (1)
      * - Check bookings for fourth user (0)
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_bookings($usecache) {

@@ -174,7 +174,7 @@ class rb_filter_type {
     private function get_columnoption($type, $value) {
 
         $sourcename = get_class($this->report->src);
-        $columnoption = reportbuilder::get_single_item($this->report->src->columnoptions, $type, $value);
+        $columnoption = reportbuilder::get_single_item($this->report->columnoptions, $type, $value);
 
         if (!$columnoption) {
             $a = new stdClass();

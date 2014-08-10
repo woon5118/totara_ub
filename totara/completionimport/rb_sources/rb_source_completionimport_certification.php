@@ -102,7 +102,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'base',
                 'rownumber',
                 get_string('columnbaserownumber', 'rb_source_completionimport_certification'),
-                'base.rownumber'
+                'base.rownumber',
+                array('dbdatatype' => 'integer')
         );
 
         $columnoptions[] = new rb_column_option(
@@ -158,7 +159,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 get_string('columnbasetimecreated', 'rb_source_completionimport_certification'),
                 'base.timecreated',
                 array(
-                    'displayfunc' => 'nice_datetime'
+                    'displayfunc' => 'nice_datetime',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -193,7 +195,8 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'base',
                 'completiondate',
                 get_string('columnbasecompletiondate', 'rb_source_completionimport_certification'),
-                'base.completiondate'
+                'base.completiondate',
+                array('dbdatatype' => 'timestamp')
         );
 
         return $columnoptions;

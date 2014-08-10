@@ -156,7 +156,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'dp.startdate',
                 array(
                     'joins' => 'dp',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -166,7 +167,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'dp.enddate',
                 array(
                     'joins' => 'dp',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -199,7 +201,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'template.startdate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -209,7 +212,8 @@ class rb_source_dp_objective extends rb_base_source {
                 'template.enddate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 
@@ -265,7 +269,8 @@ class rb_source_dp_objective extends rb_base_source {
                 get_string('objduedate', 'rb_source_dp_objective'),
                 'base.duedate',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 

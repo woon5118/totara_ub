@@ -74,12 +74,13 @@ foreach ($columns as $column) {
     // Check that column should be included.
     if ($column->display_column(true)) {
         $type = 'STRING';
-        if ($column->displayfunc == 'nice_date') {
+        $displayfunc = $column->get_displayfunc();
+        if ($displayfunc === 'nice_date') {
             $type = 'DATETIME';
-        } else if ($column->displayfunc == 'number') {
+        } else if ($displayfunc == 'number') {
             $type = 'NUMBER';
         }
-        $fields[clean_column_name(strip_tags($column->heading))] = $type;
+        $fields[clean_column_name($report->format_column_heading($column, true))] = $type;
     }
 }
 
@@ -94,21 +95,10 @@ $tables = $oauth->show_tables();
 @set_time_limit(0);
 
 // Process the output.
-$numfields = count($fields);
-
 if ($records = $DB->get_recordset_sql($query, $params)) {
     $rows = array();
     foreach ($records as $record) {
-        $record_data = $report->process_data_row($record, true, true);
-        $row = array();
-        for($j=0; $j < $numfields; $j++) {
-            if (isset($record_data[$j])) {
-                $row[] = htmlspecialchars_decode($record_data[$j]);
-            } else {
-                $row[] = '';
-            }
-        }
-        $rows[]= $row;
+        $rows[] = $report->src->process_data_row($record, 'fusion', $report);
     }
     // Add last rows.
     $errors = array_merge($errors, $oauth->insert_rows($tablename, $rows));

@@ -52,8 +52,9 @@ if ($d && $confirm) {
     if (!confirm_sesskey()) {
         totara_set_notification(get_string('error:bad_sesskey', 'totara_reportbuilder'), $returnurl);
     }
+    $report = new reportbuilder($id);
     if (delete_report($id)) {
-        add_to_log(SITEID, 'reportbuilder', $type . ' report', 'index.php', 'Report ID=' . $id);
+        \totara_reportbuilder\event\report_deleted::create_from_report($report, $em)->trigger();
         totara_set_notification(get_string($type . 'report', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 
     } else {
@@ -116,7 +117,6 @@ if ($fromform = $mform->get_data()) {
         $transaction = $DB->start_delegated_transaction();
 
         $newid = $DB->insert_record('report_builder', $todb);
-        add_to_log(SITEID, 'reportbuilder', 'new report', 'report.php?id=' . $newid, $fromform->fullname . ' (ID=' . $newid . ')');
 
         // by default we'll require a role but not set any, which will restrict report access to
         // the site administrators only
@@ -148,13 +148,15 @@ if ($fromform = $mform->get_data()) {
                     null;
                 $hidden = isset($option['hidden']) ? $option['hidden'] : 0;
                 $column = $src->new_column_from_option($option['type'],
-                    $option['value'], $heading, $hidden);
+                    $option['value'], null, null, $heading, !empty($heading), $hidden);
                 $todb = new stdClass();
                 $todb->reportid = $newid;
                 $todb->type = $column->type;
                 $todb->value = $column->value;
                 $todb->heading = $column->heading;
                 $todb->hidden = $column->hidden;
+                $todb->transform = $column->transform;
+                $todb->aggregate = $column->aggregate;
                 $todb->sortorder = $so;
                 $todb->customheading = 0; // initially no columns are customised
                 $DB->insert_record('report_builder_columns', $todb);
@@ -187,6 +189,8 @@ if ($fromform = $mform->get_data()) {
                 $DB->insert_record('report_builder_search_cols', $todb);
             }
         }
+        $report = new reportbuilder($newid);
+        \totara_reportbuilder\event\report_created::create_from_report($report, false)->trigger();
         $transaction->allow_commit();
         redirect($CFG->wwwroot . '/totara/reportbuilder/general.php?id='.$newid);
     } catch (ReportBuilderException $e) {

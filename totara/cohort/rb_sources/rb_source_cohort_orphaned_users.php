@@ -37,6 +37,9 @@ class rb_source_cohort_orphaned_users extends rb_source_user {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
+    /** @var bool do not cache because current time is used in query */
+    public $cacheable = false;
+
     /**
      * Constructor
      * @global object $CFG

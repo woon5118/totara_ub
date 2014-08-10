@@ -147,7 +147,7 @@ class rb_source_feedback_summary extends rb_base_source {
                 'timecompleted',
                 get_string('timecompleted', 'rb_source_feedback_questions'),
                 'base.timemodified',
-                array('displayfunc' => 'nice_datetime')
+                array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'feedback',

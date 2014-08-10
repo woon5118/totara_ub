@@ -97,7 +97,11 @@ class rb_column_option {
     public $joins;
 
     /**
-     * Function to pass the result through before displaying
+     * Class or function to pass the result through before displaying.
+     *
+     * The classes need to be defined in \xx_yy\rb\display\ namespace,
+     * source classes may define list of other components for lookup
+     * in usedcomponents property.
      *
      * If displayfunc is set to 'name', a method of the source called
      * 'rb_display_name()' will be called if found, with the field passed as
@@ -256,6 +260,9 @@ class rb_column_option {
      * 'unspecified' (default if parameter is not specified)
      * 'char'
      * 'text'
+     * 'integer' - not intended for ids and foreign keys, the value must have some numerical meaning
+     * 'decimal'
+     * 'timestamp'
      * Other formats may be defined in the future.
      */
     public $dbdatatype;
@@ -267,6 +274,22 @@ class rb_column_option {
      * Other formats may be defined in the future.
      */
     public $outputformat;
+
+    /**
+     * Column transform function
+     *
+     * @access public
+     * @var string
+     */
+    public $transform;
+
+    /**
+     * Determines if the column is aggregated
+     *
+     * @access public
+     * @var string
+     */
+    public $aggregate;
 
     /**
      * Generate a new column option instance
@@ -301,7 +324,9 @@ class rb_column_option {
             'selectable' => true,
             'columngenerator' => null,
             'dbdatatype' => 'unspecified',
-            'outputformat' => 'unspecified'
+            'outputformat' => 'unspecified',
+            'transform' => null,
+            'aggregate' => null,
         );
         $options = array_merge($defaults, $options);
 
@@ -325,7 +350,7 @@ class rb_column_option {
     public function is_searchable() {
         return (($this->dbdatatype == 'char' || $this->dbdatatype == 'text') &&
                 $this->outputformat == 'text' &&
-                $this->grouping == 'none');
+                $this->grouping == 'none' && !$this->aggregate);
     }
 
 } // end of rb_column_option class

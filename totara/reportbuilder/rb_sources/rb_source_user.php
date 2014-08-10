@@ -184,6 +184,7 @@ class rb_source_user extends rb_base_source {
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'totara_stats_comp_achieved',
+                            'dbdatatype' => 'integer',
                         )
         );
 
@@ -196,6 +197,7 @@ class rb_source_user extends rb_base_source {
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'totara_stats_courses_started',
+                            'dbdatatype' => 'integer',
                         )
         );
 
@@ -208,6 +210,7 @@ class rb_source_user extends rb_base_source {
                         array(
                             'displayfunc' => 'count',
                             'joins' => 'totara_stats_courses_completed',
+                            'dbdatatype' => 'integer',
                         )
         );
 

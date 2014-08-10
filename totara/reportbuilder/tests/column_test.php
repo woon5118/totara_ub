@@ -1,4 +1,4 @@
-<?php // $Id$
+<?php
 /*
  * This file is part of Totara LMS
  *
@@ -23,7 +23,7 @@
  *
  * Unit tests to check source column definitions
  *
- * vendor/bin/phpunit columns_test totara/reportbuilder/tests/column_test.php
+ * vendor/bin/phpunit totara_reportbuilder_column_testcase
  *
  */
 
@@ -35,7 +35,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 
-class columns_test extends reportcache_advanced_testcase {
+class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase {
     // Warning: Massive amount of test data ahead.
     protected $user_info_field_data = array(
        'id' => 1, 'shortname' => 'datejoined', 'name' => 'Date Joined', 'datatype' => 'text', 'description' => '', 'categoryid' => 1,
@@ -648,7 +648,7 @@ class columns_test extends reportcache_advanced_testcase {
      *
      * @group slowtest
      */
-    function test_columns_and_filters() {
+    public function test_columns_and_filters() {
         global $SESSION, $DB;
 
         $this->resetAfterTest();
@@ -665,6 +665,7 @@ class columns_test extends reportcache_advanced_testcase {
             $sourcecheck = in_array($sourcename, array('dp_certification_history', 'program_completion', 'user'));
             // echo '<h3>Title : [' . $title . '] Sourcename : [' . $sourcename . ']</h3>' . "\n";
             $src = reportbuilder::get_source_object($sourcename);
+            $sortorder = 1;
             foreach ($src->columnoptions as $column) {
                 // Create a report.
                 $report = new stdClass();
@@ -679,8 +680,8 @@ class columns_test extends reportcache_advanced_testcase {
                 $col->reportid = $reportid;
                 $col->type = $column->type;
                 $col->value = $column->value;
-                $col->heading = addslashes($column->defaultheading);
-                $col->sortorder = 1;
+                $col->heading = $column->defaultheading;
+                $col->sortorder = $sortorder++;
                 $colid = $DB->insert_record('report_builder_columns', $col);
 
                 // Create the reportbuilder object.
@@ -725,6 +726,8 @@ class columns_test extends reportcache_advanced_testcase {
                 }
             }
 
+            $sortorder = 1;
+
             foreach ($src->filteroptions as $filter) {
                 // Create a report.
                 $report = new stdClass();
@@ -751,7 +754,7 @@ class columns_test extends reportcache_advanced_testcase {
                 $fil->reportid = $reportid;
                 $fil->type = $filter->type;
                 $fil->value = $filter->value;
-                $fil->sortorder = 1;
+                $fil->sortorder = $sortorder++;
                 $filid = $DB->insert_record('report_builder_filters', $fil);
 
                 // Set session to filter by this column.

@@ -44,7 +44,8 @@ foreach ($report->columns as $column) {
     }
     $ident = "{$column->type}_{$column->value}";
     echo html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => $ident, 'name' => $ident));
-    echo html_writer::tag('label', format_string($column->heading), array('for' => $ident)) . html_writer::empty_tag('br');
+    echo html_writer::tag('label', $report->format_column_heading($column, false), array('for' => $ident));
+    echo html_writer::empty_tag('br');
     $count++;
 }
 echo $OUTPUT->container_end();

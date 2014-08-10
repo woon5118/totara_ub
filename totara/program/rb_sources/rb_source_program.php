@@ -157,6 +157,19 @@ class rb_source_program extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
+        // Visibility.
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'visible',
+            '',
+            "base.visible"
+        );
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'audiencevisible',
+            '',
+            "base.audiencevisible"
+        );
         return $requiredcolumns;
     }
 
@@ -167,20 +180,6 @@ class rb_source_program extends rb_base_source {
     }
 
     public function post_config(reportbuilder $report) {
-        // Visibility.
-        $this->requiredcolumns[] = new rb_column(
-            'base',
-            'visible',
-            '',
-            "base.visible"
-        );
-        $this->requiredcolumns[] = new rb_column(
-            'base',
-            'audiencevisible',
-            '',
-            "base.audiencevisible"
-        );
-
         $reportfor = $report->reportfor; // ID of the user the report is for.
         $fieldbaseid = $report->get_field('base', 'id', 'base.id');
         $fieldvisible = $report->get_field('base', 'visible', 'base.visible');

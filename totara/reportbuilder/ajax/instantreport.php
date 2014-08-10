@@ -52,14 +52,7 @@ if (!empty($report->embeddedurl)) {
 $PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
 
-// Function reportbuilder_get_report_url expects a report record so make the object look like a record.
-$report->id = $report->_id;
-$logurl = reportbuilder_get_report_url($report);
-
-// The module path is readded when the log entry is generated.
-$logurl = str_replace($logurl, $CFG->wwwroot . '/totara/reportbuilder', '');
-
-add_to_log(SITEID, 'reportbuilder', 'view report', $logurl, $report->fullname);
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $override_initial = isset($searched['addfilter']);
 $hide_initial_display = ($report->initialdisplay == RB_INITIAL_DISPLAY_HIDE && !$override_initial);

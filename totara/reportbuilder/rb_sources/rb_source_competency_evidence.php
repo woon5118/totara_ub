@@ -125,7 +125,7 @@ class rb_source_competency_evidence extends rb_base_source {
                 'completeddate',
                 get_string('completiondate', 'rb_source_competency_evidence'),
                 'base.timemodified',
-                array('displayfunc' => 'nice_date')
+                array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'competency_evidence',

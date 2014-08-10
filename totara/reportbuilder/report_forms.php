@@ -77,9 +77,9 @@ class report_builder_edit_form extends moodleform {
     function definition() {
         global $TEXTAREA_OPTIONS;
 
-        $mform =& $this->_form;
+        $mform = $this->_form;
         $report = $this->_customdata['report'];
-        $id = $this->_customdata['id'];
+        $record = $this->_customdata['record'];
 
         $mform->addElement('header', 'general', get_string('reportsettings', 'totara_reportbuilder'));
 
@@ -110,14 +110,12 @@ class report_builder_edit_form extends moodleform {
 
         $mform->addElement('static', 'reporttype', get_string('reporttype', 'totara_reportbuilder'), $reporttype);
 
-        $mform->addElement('hidden', 'id', $id);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'source', $report->source);
-        $mform->setType('source', PARAM_TEXT);
         $this->add_action_buttons();
 
-        // set the defaults
-        $this->set_data($report);
+        // Set the data.
+        $this->set_data($record);
     }
 }
 
@@ -469,11 +467,22 @@ class report_builder_edit_filters_form extends moodleform {
  * Formslib template for edit columns form
  */
 class report_builder_edit_columns_form extends moodleform {
+    /** @var reportbuilder */
+    protected $report;
+    /** @var array */
+    protected $allowedadvanced;
+    /** @var array */
+    protected $grouped;
+
     function definition() {
-        global $CFG, $OUTPUT;
+        global $CFG, $OUTPUT, $DB;
         $mform =& $this->_form;
-        $report = $this->_customdata['report'];
-        $id = $this->_customdata['id'];
+        $this->report = $this->_customdata['report'];
+        $report = $this->report;
+        $this->allowedadvanced = $this->_customdata['allowedadvanced'];
+        $this->grouped = $this->_customdata['grouped'];
+        $advoptions = $this->_customdata['advoptions'];
+        $id = $report->_id;
 
         $strmovedown = get_string('movedown', 'totara_reportbuilder');
         $strmoveup = get_string('moveup', 'totara_reportbuilder');
@@ -495,31 +504,52 @@ class report_builder_edit_columns_form extends moodleform {
 
             $mform->addElement('html', $OUTPUT->container_start('reportbuilderform') . html_writer::start_tag('table') .
                 html_writer::start_tag('tr') . html_writer::tag('th', get_string('column', 'totara_reportbuilder')) .
+                html_writer::tag('th', get_string('advancedcolumnheading', 'totara_reportbuilder')) .
                 html_writer::tag('th', get_string('customiseheading', 'totara_reportbuilder'), array('colspan' => 2)) .
                 html_writer::tag('th', get_string('options', 'totara_reportbuilder') . html_writer::end_tag('tr')));
 
             $columnsselect = $report->get_columns_select();
             $columnoptions = array();
 
-            if (isset($report->columns) && is_array($report->columns) && count($report->columns) > 0) {
-                /* Here we get the ORIGINAL columns from the database, rather than the processed (through any
-                 * available column generators) columns that are normally returned when a report is built.
-                 * Ideally, we wouldn't be calling get_columns for a second time. See bug 10920. */
-                $columns = $report->get_columns(array(), false);
-                $colcount = count($columns);
+            $rawcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC');
+            $badcolumns = array();
+            $goodcolumns = array();
+            foreach ($rawcolumns as $rawcolumn) {
+                $key = $rawcolumn->type . '-' . $rawcolumn->value;
+                if (!isset($report->columnoptions[$key]) or !empty($report->columnoptions[$key]->required)) {
+                    $badcolumns[] = array(
+                        'id' => $rawcolumn->id,
+                        'type' => $rawcolumn->type,
+                        'value' => $rawcolumn->value,
+                        'heading' => $rawcolumn->heading
+                    );
+                    unset($rawcolumns[$rawcolumn->id]);
+                    continue;
+                }
+                $goodcolumns[$rawcolumn->id] = $rawcolumn;
+            }
+
+            if ($goodcolumns) {
+                $colcount = count($goodcolumns);
                 $i = 1;
-                foreach ($columns as $index => $column) {
+                foreach ($goodcolumns as $cid => $column) {
                     $columnoptions["{$column->type}_{$column->value}"] = $column->heading;
                     if (!isset($column->required) || !$column->required) {
-                        $row = array();
-                        $type = $column->type;
-                        $value = $column->value;
                         $field = "{$column->type}-{$column->value}";
-                        $cid = $index;
                         $mform->addElement('html', html_writer::start_tag('tr', array('colid' => $cid)) .
                             html_writer::start_tag('td'));
                         $mform->addElement('selectgroups', "column{$cid}", '', $columnsselect, array('class' => 'column_selector'));
                         $mform->setDefault("column{$cid}", $field);
+                        $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+
+                        $advanced = '';
+                        if ($column->transform) {
+                            $advanced = 'transform_' . $column->transform;
+                        } else if ($column->aggregate) {
+                            $advanced = 'aggregate_' . $column->aggregate;
+                        }
+                        $mform->addElement('selectgroups', 'advanced'.$cid, '', $advoptions, array('class' => 'advanced_selector'));
+                        $mform->setDefault("advanced{$cid}", $advanced);
                         $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
 
                         $mform->addElement('advcheckbox', "customheading{$cid}", '', '', array('class' => 'column_custom_heading_checkbox', 'group' => 0), array(0, 1));
@@ -590,7 +620,6 @@ class report_builder_edit_columns_form extends moodleform {
                 }
             } else {
                 $mform->addElement('html', html_writer::tag('p', get_string('nocolumnsyet', 'totara_reportbuilder')));
-                $columns = array();
             }
 
             $mform->addElement('html', html_writer::start_tag('tr') . html_writer::start_tag('td'));
@@ -604,7 +633,7 @@ class report_builder_edit_columns_form extends moodleform {
             foreach ($newcolumnsselect as $okey => $optgroup) {
                 foreach ($optgroup as $typeval => $heading) {
                     $typevalarr = explode('-', $typeval);
-                    foreach ($columns as $curcol) {
+                    foreach ($goodcolumns as $curcol) {
                         if ($curcol->type == $typevalarr[0] && $curcol->value == $typevalarr[1]) {
                             unset($cleanednewcolselect[$okey][$typeval]);
                         }
@@ -613,25 +642,29 @@ class report_builder_edit_columns_form extends moodleform {
             }
             $newcolumnsselect = $cleanednewcolselect;
             unset($cleanednewcolselect);
-            $mform->addElement('selectgroups', 'newcolumns', '', $newcolumnsselect, array('class' => 'column_selector new_column_selector'));
+            $mform->addElement('selectgroups', 'newcolumns', '', $newcolumnsselect,
+                                    array('class' => 'column_selector new_column_selector'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
-            $mform->addElement('advcheckbox', "newcustomheading", '', '', array('id' => 'id_newcustomheading', 'class' => 'column_custom_heading_checkbox', 'group' => 0), array(0, 1));
+            $mform->addElement('selectgroups', 'newadvanced', '', $advoptions,
+                                    array('class' => 'advanced_selector new_advanced_selector'));
+            $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
+            $mform->addElement('advcheckbox', "newcustomheading", '', '', array('id' => 'id_newcustomheading',
+                                    'class' => 'column_custom_heading_checkbox', 'group' => 0), array(0, 1));
             $mform->setDefault("newcustomheading", 0);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
 
             $mform->addElement('text', 'newheading', '', 'class="column_heading_text"');
             $mform->setType('newheading', PARAM_TEXT);
-            // do manually as disabledIf doesn't play nicely with using JS to update heading values
+            // Do manually as disabledIf doesn't play nicely with using JS to update heading values.
             // $mform->disabledIf('newheading', 'newcolumns', 'eq', 0);
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::start_tag('td'));
             $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
             $mform->addElement('html', html_writer::end_tag('table') . $OUTPUT->container_end());
 
 
-            // if the report is referencing columns that don't exist in the
-            // source, display them here so the user has the option to delete
-            // them
-            if (count($report->badcolumns)) {
+            // If the report is referencing columns that don't exist in the
+            // source, display them here so the user has the option to delete them.
+            if ($badcolumns) {
                 $mform->addElement('header', 'badcols', get_string('badcolumns', 'totara_reportbuilder'));
                 $mform->addElement('html', html_writer::tag('p', get_string('badcolumnsdesc', 'totara_reportbuilder')));
 
@@ -641,7 +674,7 @@ class report_builder_edit_columns_form extends moodleform {
                     html_writer::tag('th', get_string('value', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('heading', 'totara_reportbuilder')) .
                     html_writer::tag('th', get_string('options', 'totara_reportbuilder')) . html_writer::end_tag('tr'));
-                foreach ($report->badcolumns as $bad) {
+                foreach ($badcolumns as $bad) {
                     $deleteurl = new moodle_url('/totara/reportbuilder/columns.php',
                         array('d' => '1', 'id' => $id, 'cid' => $bad['id']));
 
@@ -682,18 +715,24 @@ class report_builder_edit_columns_form extends moodleform {
         $mform->setType('source', PARAM_TEXT);
         $this->add_action_buttons();
 
-        // remove the labels from the form elements
-        $renderer =& $mform->defaultRenderer();
-        $select_elementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fselectgroups'), 'fitem');
-        $check_elementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'fcheckbox'), 'fitem');
-        $text_elementtemplate = $OUTPUT->container($OUTPUT->container('{element}', 'ftext'), 'fitem');
+        // Remove the labels from the form elements.
+        $renderer = $mform->defaultRenderer();
+
+        // Do not mess with $OUTPUT here, we need to get decent quickforms template
+        // which also includes error placeholder here.
+        $select_elementtemplate = '<div class="fitem"><div class="fselectgroups<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div>';
+        $check_elementtemplate ='<div class="fitem"><div class="fcheckbox<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div>';
+        $text_elementtemplate = '<div class="fitem"><div class="ftext<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div>';
+
         $renderer->setElementTemplate($select_elementtemplate, 'newcolumns');
+        $renderer->setElementTemplate($select_elementtemplate, 'newadvanced');
         $renderer->setElementTemplate($check_elementtemplate, 'newcustomheading');
         $renderer->setElementTemplate($text_elementtemplate, 'newheading');
-        foreach ($columns as $index => $unused) {
-            $renderer->setElementTemplate($select_elementtemplate, 'column' . $index);
-            $renderer->setElementTemplate($check_elementtemplate, 'customheading' . $index);
-            $renderer->setElementTemplate($text_elementtemplate, 'heading' . $index);
+        foreach ($goodcolumns as $cid => $unused) {
+            $renderer->setElementTemplate($select_elementtemplate, 'column' . $cid);
+            $renderer->setElementTemplate($select_elementtemplate, 'advanced' . $cid);
+            $renderer->setElementTemplate($check_elementtemplate, 'customheading' . $cid);
+            $renderer->setElementTemplate($text_elementtemplate, 'heading' . $cid);
         }
     }
 
@@ -706,16 +745,51 @@ class report_builder_edit_columns_form extends moodleform {
      * @return array of "element_name"=>"error_description" if there are errors,
      *         or an empty array if everything is OK (true allowed for backwards compatibility too).
      */
-    function validation($data, $files) {
-        $err = array();
-        $err += validate_unique_columns($data);
-        $err += validate_none_empty_heading_columns($data);
-        return $err;
+    public function validation($data, $files) {
+        $errors = array();
+
+        // NOTE: do NOT move the validation to some obscure functions, this needs to be kept in sync with the form!
+
+        $usedcols = array();
+        foreach ($data as $key => $value) {
+            // Validate unique columns including the new column if set.
+            if (preg_match('/^column\d+/', $key) or ($key === 'newcolumns' and $value)) {
+                if (isset($usedcols[$value])) {
+                    $errors[$key] = get_string('norepeatcols', 'totara_reportbuilder');
+                } else {
+                    $usedcols[$value] = true;
+                }
+                continue;
+            }
+            // Validate the heading is not empty if custom heading used.
+            if (preg_match('/^heading(\d+)/', $key, $matches)) {
+                $cid = $matches[1];
+                if ($data['customheading'.$cid]) {
+                    if (trim($value) == '') {
+                        $errors[$key] = get_string('noemptycols', 'totara_reportbuilder');
+                    }
+                }
+                continue;
+            }
+            // Validate the advanced type is compatible with column.
+            if (preg_match('/^advanced(\d+)/', $key, $matches)) {
+                if ($value) {
+                    $cid = $matches[1];
+                    $column = $data['column'.$cid];
+                    if (!in_array($column, $this->grouped)) { // Grouped columns do not have advanced option.
+                        if (!in_array($value, $this->allowedadvanced[$column], true)) {
+                            // This is non-js fallback only, no need to localise this.
+                            $errors[$key] = get_string('error');
+                        }
+                    }
+                }
+                continue;
+            }
+        }
+
+        return $errors;
     }
-
-
 }
-
 
 /**
  * Formslib template for content restrictions form
@@ -911,66 +985,6 @@ function validate_shortname($data) {
     return $errors;
 
 }
-
-/**
- * Method to check each column is only included once
- *
- * Flexible table breaks if not used as headers must be distinct
- *
- * @param array $data Array of data from the form
- *
- * @return array Array of errors to display on failure
- */
-function validate_unique_columns($data) {
-    global $DB;
-    $errors = array();
-
-    $id = $data['id'];
-    $used_cols = array();
-    $currentcols = $DB->get_records('report_builder_columns', array('reportid' => $id));
-    foreach ($currentcols as $col) {
-        $field = "column{$col->id}";
-        if (isset($data[$field])) {
-            if (array_key_exists($data[$field], $used_cols)) {
-                $errors[$field] = get_string('norepeatcols', 'totara_reportbuilder');
-            } else {
-                $used_cols[$data[$field]] = 1;
-            }
-        }
-    }
-
-    // also check new column if set
-    if (isset($data['newcolumns'])) {
-        if (array_key_exists($data['newcolumns'], $used_cols)) {
-            $errors['newcolumns'] = get_string('norepeatcols', 'totara_reportbuilder');
-        }
-    }
-    return $errors;
-}
-
-
-/**
- * Method to check column headings aren't empty (or just whitespace)
- *
- * @param array $data Array of data from the form
- *
- * @return array Array of errors to display on failure
- */
-function validate_none_empty_heading_columns($data) {
-    $errors = array();
-
-    foreach ($data as $key => $value) {
-        // only look at the heading fields
-        if (preg_match('/^heading\d+/', $key)) {
-            if (trim($value) == '') {
-                $errors[$key] = get_string('noemptycols', 'totara_reportbuilder');
-            }
-        }
-    }
-
-    return $errors;
-}
-
 
 /**
  * Method to check each filter is only included once

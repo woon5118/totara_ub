@@ -51,8 +51,8 @@ if ($fromform = $mform->get_data()) {
     }
     update_content($id, $report, $fromform);
     reportbuilder_set_status($id);
-    add_to_log(SITEID, 'reportbuilder', 'update report', 'content.php?id='. $id,
-        'Content Settings: Report ID=' . $id);
+    $report = new reportbuilder($id);
+    \totara_reportbuilder\event\report_updated::create_from_report($report, 'content')->trigger();
     totara_set_notification(get_string('reportupdated', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 
 }
@@ -66,12 +66,12 @@ echo $output->container_end();
 
 echo $output->heading(get_string('editreport', 'totara_reportbuilder', format_string($report->fullname)));
 
-if (reportbuilder_get_status($id)) {
+if ($report->get_cache_status() > 0) {
     echo $output->cache_pending_notification($id);
 }
 
 $currenttab = 'content';
-include_once('tabs.php');
+require('tabs.php');
 
 // display the form
 $mform->display();

@@ -129,7 +129,7 @@ class rb_source_scorm extends rb_base_source {
                 $DB->sql_cast_char2int('sco_starttime.value', true),
                 array(
                     'joins' => 'sco_starttime',
-                    'displayfunc' => 'nice_datetime',
+                    'displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp',
                 )
             ),
             new rb_column_option(
@@ -165,7 +165,7 @@ class rb_source_scorm extends rb_base_source {
                 'sco_status.timemodified',
                 array(
                     'joins' => 'sco_status',
-                    'displayfunc' => 'nice_datetime'
+                    'displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
@@ -186,7 +186,8 @@ class rb_source_scorm extends rb_base_source {
                 'sco',
                 'attempt',
                 get_string('attemptnum', 'rb_source_scorm'),
-                'base.attempt'
+                'base.attempt',
+                array('dbdatatype' => 'integer')
             ),
         );
 

@@ -159,18 +159,18 @@ class rb_source_facetoface_sessions extends rb_base_source {
         global $DB;
         $columnoptions = array(
             new rb_column_option(
-                'session',              // type
-                'capacity',             // value
-                get_string('sesscapacity', 'rb_source_facetoface_sessions'),     // name
-                'sessions.capacity',        // field
-                array('joins' => 'sessions')                 // options array
+                'session',                  // Type.
+                'capacity',                 // Value.
+                get_string('sesscapacity', 'rb_source_facetoface_sessions'),    // Name.
+                'sessions.capacity',        // Field.
+                array('joins' => 'sessions', 'dbdatatype' => 'integer')         // Options array.
             ),
             new rb_column_option(
                 'session',
                 'numattendees',
                 get_string('numattendees', 'rb_source_facetoface_sessions'),
                 'attendees.number',
-                array('joins' => 'attendees')
+                array('joins' => 'attendees', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'session',
@@ -203,6 +203,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                     END',
                 array(
                     'joins' => array('sessiondate','sessions'),
+                    'dbdatatype' => 'decimal',
                     'displayfunc' => 'hours_minutes',
                 )
             ),
@@ -221,7 +222,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'discountcode',
                 get_string('discountcode', 'rb_source_facetoface_sessions'),
                 'base.discountcode',
-                array('dbdatatype' => 'char',
+                array('dbdatatype' => 'text',
                       'outputformat' => 'text')
             ),
              new rb_column_option(
@@ -230,6 +231,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 get_string('usernote', 'rb_source_facetoface_sessions'),
                 'status.note',
                 array(
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
                     'joins' => 'status',
                 )
             ),
@@ -295,7 +298,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' =>'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone'
+                    'displayfunc' => 'nice_date_in_timezone',
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
@@ -307,7 +311,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
                     'joins' => 'sessiondate',
                     'displayfunc' => 'link_f2f_session',
                     'defaultheading' => get_string('sessdate', 'rb_source_facetoface_sessions'),
-                    'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone')
+                    'extrafields' => array('session_id' => 'base.sessionid', 'timezone' => 'sessiondate.sessiontimezone'),
+                    'dbdatatype' => 'timestamp'
                 )
             ),
             new rb_column_option(
@@ -318,28 +323,39 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 array(
                     'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
                     'joins' => 'sessiondate',
-                    'displayfunc' => 'nice_date_in_timezone')
+                    'displayfunc' => 'nice_date_in_timezone',
+                    'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'date',
                 'timestart',
                 get_string('sessstart', 'rb_source_facetoface_sessions'),
                 'sessiondate.timestart',
-                array('extrafields' => array('timezone' => 'sessiondate.sessiontimezone'), 'joins' => 'sessiondate', 'displayfunc' => 'nice_time_in_timezone')
+                array(
+                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'joins' => 'sessiondate',
+                    'displayfunc' => 'nice_time_in_timezone',
+                    'dbdatatype' => 'timestamp'
+                )
             ),
             new rb_column_option(
                 'date',
                 'timefinish',
                 get_string('sessfinish', 'rb_source_facetoface_sessions'),
                 'sessiondate.timefinish',
-                array('extrafields' => array('timezone' => 'sessiondate.sessiontimezone'), 'joins' => 'sessiondate', 'displayfunc' => 'nice_time_in_timezone')
+                array(
+                    'extrafields' => array('timezone' => 'sessiondate.sessiontimezone'),
+                    'joins' => 'sessiondate',
+                    'displayfunc' => 'nice_time_in_timezone',
+                    'dbdatatype' => 'timestamp'
+                )
             ),
             new rb_column_option(
                 'session',
                 'cancellationdate',
                 get_string('cancellationdate', 'rb_source_facetoface_sessions'),
                 'cancellationstatus.timecreated',
-                array('joins' => 'cancellationstatus', 'displayfunc' => 'nice_datetime')
+                array('joins' => 'cancellationstatus', 'displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'session',
@@ -390,7 +406,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'capacity',
                 get_string('roomcapacity', 'rb_source_facetoface_sessions'),
                 'room.capacity',
-                array('joins' => 'room')
+                array('joins' => 'room', 'dbdatatype' => 'integer')
             ),
             new rb_column_option(
                 'room',

@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/rb_bookings_embedded_cache_test.php');
 
-class rb_pastbookings_embedded_cache_test extends rb_bookings_embedded_cache_test {
+class totara_reportbuilder_rb_pastbookings_embedded_cache_testcase extends totara_reportbuilder_rb_bookings_embedded_cache_testcase {
     // testcase data
     protected $report_builder_data = array('id' => 9, 'fullname' => 'My Past Bookings', 'shortname' => 'pastbookings',
                                            'source' => 'facetoface_sessions', 'hidden' => 1, 'embedded' => 1,
@@ -56,7 +56,7 @@ class rb_pastbookings_embedded_cache_test extends rb_bookings_embedded_cache_tes
      * - Check bookings for second user (1)
      * - Check bookings for fourth user (0)
      *
-     * @param int Use cache or not (1/0)
+     * @param int $usecache Use cache or not (1/0)
      * @dataProvider provider_use_cache
      */
     public function test_bookings($usecache) {

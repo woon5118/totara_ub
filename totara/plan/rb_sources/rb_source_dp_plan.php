@@ -139,7 +139,8 @@ class rb_source_dp_plan extends rb_base_source {
                 get_string('planstartdate', 'rb_source_dp_plan'),
                 'base.startdate',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -148,7 +149,8 @@ class rb_source_dp_plan extends rb_base_source {
                 get_string('planenddate', 'rb_source_dp_plan'),
                 'base.enddate',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -157,7 +159,8 @@ class rb_source_dp_plan extends rb_base_source {
                 get_string('timecompleted', 'rb_source_dp_plan'),
                 'base.timecompleted',
                 array(
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -189,7 +192,8 @@ class rb_source_dp_plan extends rb_base_source {
                 'template.startdate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
         $columnoptions[] = new rb_column_option(
@@ -199,7 +203,8 @@ class rb_source_dp_plan extends rb_base_source {
                 'template.enddate',
                 array(
                     'joins' => 'template',
-                    'displayfunc' => 'nice_date'
+                    'displayfunc' => 'nice_date',
+                    'dbdatatype' => 'timestamp'
                 )
         );
 

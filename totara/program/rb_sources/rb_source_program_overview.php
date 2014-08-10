@@ -194,6 +194,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'base',
                 'displayfunc' => 'prog_date',
+                'dbdatatype' => 'timestamp',
             )
         );
 
@@ -205,6 +206,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'base',
                 'displayfunc' => 'prog_date',
+                'dbdatatype' => 'timestamp',
                 'extrafields' => array('prog_id' => 'program.id')
             )
         );
@@ -217,6 +219,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'base',
                 'displayfunc' => 'prog_date',
+                'dbdatatype' => 'timestamp',
             )
         );
 

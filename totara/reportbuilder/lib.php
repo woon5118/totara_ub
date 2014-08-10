@@ -88,9 +88,11 @@ define('RB_INITIAL_DISPLAY_HIDE', 1);
 /**
  * Report cache status flags
  */
-define('RB_CACHE_FLAG_OK', 0);
-define('RB_CACHE_FLAG_CHANGED', 1);
-define('RB_CACHE_FLAG_FAIL', 2);
+define('RB_CACHE_FLAG_NONE', -1);   // Cache not used.
+define('RB_CACHE_FLAG_OK', 0);      // Everything ready.
+define('RB_CACHE_FLAG_CHANGED', 1); // Cache table needs to be rebuilt.
+define('RB_CACHE_FLAG_FAIL', 2);    // Cache table creation failed.
+define('RB_CACHE_FLAG_GEN', 3);     // Cache table is being generated.
 
 global $REPORT_BUILDER_EXPORT_OPTIONS;
 $REPORT_BUILDER_EXPORT_OPTIONS = array(
@@ -145,13 +147,22 @@ class reportbuilder {
     const FILTER = 1;
     const FILTERALL = 2;
 
-    public $fullname, $shortname, $source, $hidden, $searchcolumns, $filters, $filteroptions, $columns, $requiredcolumns;
-    public $columnoptions, $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
+    /** @var rb_base_source */
+    public $src;
+
+    /** @var rb_column_option[] */
+    public $columnoptions;
+
+    /** @var rb_column[] */
+    public $columns;
+
+    public $fullname, $shortname, $source, $hidden, $searchcolumns, $filters, $filteroptions, $requiredcolumns;
+    public $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
     public $_id, $recordsperpage, $defaultsortcolumn, $defaultsortorder;
     private $_joinlist, $_base, $_params, $_sid;
 
     private $_paramoptions, $_embeddedparams, $_fullcount, $_filteredcount, $_isinitiallyhidden;
-    public $src, $grouped, $reportfor, $badcolumns, $embedded, $toolbarsearch;
+    public $grouped, $reportfor, $embedded, $toolbarsearch;
 
     private $_post_config_restrictions;
 
@@ -162,14 +173,17 @@ class reportbuilder {
 
     /**
      *
-     * @var bool $cacheignore If true cahce will be ignored during report preparation
+     * @var bool $cacheignore If true cache will be ignored during report preparation
      */
     public $cacheignore = false;
 
     /**
      * @var stdClass $cacheschedule Record of cache scheduling and readyness
      */
-    public $cacheschedule = null;
+    public $cacheschedule;
+
+    /** @var string|bool name of caching table if used and up-to-date, false if not present */
+    protected $cachetable = null;
 
     /**
      *
@@ -195,7 +209,7 @@ class reportbuilder {
      *
      * @param integer $id ID of the report to generate
      * @param string $shortname Shortname of the report to generate
-     * @param object $embed_deprecated Object containing settings for an embedded report - see note above
+     * @param stdClass|bool $embed_deprecated Object containing settings for an embedded report - see note above
      * @param integer $sid Saved search ID if displaying a saved search
      * @param integer $reportfor User ID of user who is viewing the report
      *                           (or null to use the current user)
@@ -208,6 +222,7 @@ class reportbuilder {
             $nocache = false, $embeddata = array()) {
         global $USER, $DB;
 
+        $report = false;
         if ($id != null) {
             // look for existing report by id
             $report = $DB->get_record('report_builder', array('id' => $id), '*', IGNORE_MISSING);
@@ -254,8 +269,6 @@ class reportbuilder {
         $this->hidden = $report->hidden;
         $this->initialdisplay = $report->initialdisplay;
         $this->toolbarsearch = $report->toolbarsearch;
-        $this->cache = $report->cache;
-        $this->cacheignore = $nocache;
         $this->description = $report->description;
         $this->embedded = $report->embedded;
         $this->contentmode = $report->contentmode;
@@ -270,14 +283,14 @@ class reportbuilder {
         $this->_sid = $sid;
         // Assume no grouping initially.
         $this->grouped = false;
-        $this->badcolumns = array();
 
-        // Load report cache - requires column options.
-        $restored = false;
-        if (!$this->cacheignore && $report->cache) {
-            if ($this->restore_cached_state()) {
-                $restored = true;
-            }
+        $this->cacheignore = $nocache;
+        if ($this->src->cacheable) {
+            $this->cache = $report->cache;
+            $this->cacheschedule = $DB->get_record('report_builder_cache', array('reportid' => $this->_id), '*', IGNORE_MISSING);
+        } else {
+            $this->cache = 0;
+            $this->cacheschedule = false;
         }
 
         // Determine who is viewing or receiving the report.
@@ -292,9 +305,8 @@ class reportbuilder {
             $this->restore_saved_search();
         }
 
-        // Before we pull in the rest of the data, get the parameters and call the post_config method.
-        // This allows the source to configure additional tables and columns based on the parameters.
         $this->_paramoptions = $this->src->paramoptions;
+
         if ($embed) {
             $this->_embeddedparams = $embed->embeddedparams;
         }
@@ -312,28 +324,53 @@ class reportbuilder {
             }
         }
 
-        // Allow the source to configure additional tables and columns based on the parameters.
-        $this->src->post_config($this);
+        // Allow sources to modify itself based on params.
+        $this->src->post_params($this);
 
-        // Pull in the rest of the data for this report from the source.
         $this->_base = $this->src->base . ' base';
-        $this->columnoptions = $this->src->columnoptions;
-        $this->filteroptions = $this->src->filteroptions;
-        $this->contentoptions = $this->src->contentoptions;
-        $this->requiredcolumns = $this->src->requiredcolumns;
-        $this->searchcolumns = isset($this->searchcolumns) ? $this->searchcolumns : array();
-        if ($restored) {
-            $this->columns = $this->get_columns($this->columns);
-            $this->filters = $this->get_filters($this->filters);
-            $this->searchcolumns = $this->get_search_columns($this->searchcolumns);
-        } else {
-            $this->columns = $this->get_columns();
-            $this->filters = $this->get_filters();
-            $this->searchcolumns = $this->get_search_columns();
+
+        $this->requiredcolumns = array();
+        if (!empty($this->src->requiredcolumns)) {
+            foreach ($this->src->requiredcolumns as $column) {
+                $key = $column->type . '-' . $column->value;
+                $this->requiredcolumns[$key] = $column;
+            }
         }
+
+        $this->columnoptions = array();
+        foreach ($this->src->columnoptions as $columnoption) {
+            $key = $columnoption->type . '-' . $columnoption->value;
+            if (isset($this->columnoptions[$key])) {
+                debugging("Duplicate column option $key detected in source " . get_class($this->src), DEBUG_DEVELOPER);
+            }
+            $this->columnoptions[$key] = $columnoption;
+        }
+
+        $this->columns = $this->get_columns();
+
+        // Some sources add joins when generating new columns.
         $this->_joinlist = $this->src->joinlist;
 
+        $this->contentoptions = $this->src->contentoptions;
+
+        $this->filteroptions = $this->src->filteroptions;
+        $this->filters = $this->get_filters();
+
+        $this->searchcolumns = $this->get_search_columns();
+
         $this->process_filters();
+
+        // Allow the source to configure additional restrictions,
+        // note that columns must not be changed any more here
+        // because we may have already decided if cache is used.
+        $colkeys = array_keys($this->columns);
+        $reqkeys = array_keys($this->requiredcolumns);
+        $this->src->post_config($this);
+        if ($colkeys != array_keys($this->columns) or $reqkeys != array_keys($this->requiredcolumns)) {
+            throw new coding_exception('Report source ' . get_class($this->src) .
+                                            '::post_config() must not change report columns!');
+        }
+
         $this->ready = true;
     }
 
@@ -354,7 +391,6 @@ class reportbuilder {
     public function handle_pre_display_actions() {
         $this->src->pre_display_actions();
     }
-
 
     /**
      * Include javascript code needed by report builder
@@ -473,7 +509,7 @@ class reportbuilder {
      *
      * @param string $source The name of the source class to return
      *                       (excluding the rb_source prefix)
-     * @return object An instance of the source. Returns false if
+     * @return rb_base_source An instance of the source. Returns false if
      *                the source can't be found
      */
     static function get_source_object($source) {
@@ -731,16 +767,13 @@ class reportbuilder {
     /**
      * Gets any filters set for the current report from the database
      *
-     * @param array $filters predefined set of filters
      * @return array Array of filters for current report or empty array if none set
      */
-    function get_filters(array $filters = array()) {
+    public function get_filters() {
         global $DB;
 
         $out = array();
-        if (empty($filters)) {
-            $filters = $DB->get_records('report_builder_filters', array('reportid' => $this->_id), 'sortorder');
-        }
+        $filters = $DB->get_records('report_builder_filters', array('reportid' => $this->_id), 'sortorder');
         foreach ($filters as $filter) {
             $type = $filter->type;
             $value = $filter->value;
@@ -780,15 +813,12 @@ class reportbuilder {
     /**
      * Gets any search columns set for the current report from the database
      *
-     * @param array $searchcolumns predefined set of search columns
      * @return array Array of search columns for current report or empty array if none set
      */
-    public function get_search_columns(array $searchcolumns = array()) {
+    public function get_search_columns() {
         global $DB;
 
-        if (empty($searchcolumns)) {
-            $searchcolumns = $DB->get_records('report_builder_search_cols', array('reportid' => $this->_id));
-        }
+        $searchcolumns = $DB->get_records('report_builder_search_cols', array('reportid' => $this->_id));
 
         return $searchcolumns;
     }
@@ -1060,13 +1090,45 @@ class reportbuilder {
     }
 
     /**
+     * Returns user visible column heading name
+     *
+     * @param rb_column $column
+     * @param bool false means return html, true means utf-8 plaintext for exports
+     * @return string
+     */
+    public function format_column_heading(rb_column $column, $plaintext) {
+        if ($column->customheading) {
+            // Use value from database.
+            $heading = format_string($column->heading);
+        } else {
+            // Use default value.
+            $defaultheadings = $this->get_default_headings_array();
+            $heading = isset($defaultheadings[$column->type . '-' . $column->value]) ?
+                $defaultheadings[$column->type . '-' . $column->value] : null;
+
+            if ($column->grouping === 'none') {
+                if ($column->transform) {
+                    $heading = get_string("transformtype{$column->transform}_heading", 'totara_reportbuilder', $heading);
+                } else if ($column->aggregate) {
+                    $heading = get_string("aggregatetype{$column->aggregate}_heading", 'totara_reportbuilder', $heading);
+                }
+            }
+        }
+
+        if ($plaintext) {
+            $heading = strip_tags($heading);
+            $heading = core_text::entities_to_utf8($heading);
+        }
+
+        return $heading;
+    }
+
+    /**
      * Gets any columns set for the current report from the database
      *
-     * @param array $columns predefined set of columns
-     * @params bool $runcolumngenerators false to disable column generators - used to get the original columns
      * @return array Array of columns for current report or empty array if none set
      */
-    public function get_columns(array $columns = array(), $runcolumngenerators = true) {
+    public function get_columns() {
         global $DB;
 
         $out = array();
@@ -1075,69 +1137,72 @@ class reportbuilder {
             return $out;
         }
 
-        if (empty($columns)) {
-            $columns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder');
-        }
+        $columns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC');
+
         foreach ($columns as $column) {
             // Find the column option that matches this column.
-            $columnoption = self::get_single_item($this->columnoptions, $column->type, $column->value);
+            $key = $column->type . '-' . $column->value;
+            if (!isset($this->columnoptions[$key])) {
+                continue;
+            }
+            $columnoption = $this->columnoptions[$key];
 
-            if ($runcolumngenerators && isset($columnoption->columngenerator)) {
+            if (!empty($columnoption->columngenerator)) {
                 /* Rather than putting the column into the list, we call the generator and it
                  * will supply an array of columns (0 or more) that should be included. We pass
                  * all available information to the generator (columnoption and hidden). */
                 $columngenerator = 'rb_cols_generator_' . $columnoption->columngenerator;
                 $results = $this->src->$columngenerator($columnoption, $column->hidden);
-                $out = array_merge($out, $results);
+                foreach ($results as $result) {
+                    $key = $result->type . '-' . $result->value;
+                    if (isset($this->requiredcolumns[$key])) {
+                        debugging("Generated column $key duplicates required column in source " . get_class($this->src),
+                                    DEBUG_DEVELOPER);
+                        continue;
+                    }
+                    if (isset($out[$key])) {
+                        debugging("Generated column $key overrides column in source " . get_class($this->src), DEBUG_DEVELOPER);
+                        continue;
+                    }
+                    $out[$key] = $result;
+                    if ($out[$key]->grouping != 'none' or $out[$key]->aggregate) {
+                        $this->grouped = true;
+                    }
+                }
             } else {
-                /* To properly support multiple languages - only use value
-                 * in database if it's different from the default. If it's the
-                 * same as the default for that column, use the default string
-                 * directly. */
-                if ($column->customheading) {
-                    // Use value from database.
-                    $heading = format_string($column->heading);
-                } else {
-                    // Use default value.
-                    $defaultheadings = $this->get_default_headings_array();
-                    $heading = isset($defaultheadings[$column->type . '-' . $column->value]) ?
-                        $defaultheadings[$column->type . '-' . $column->value] : null;
+                if (isset($this->requiredcolumns[$key])) {
+                    debugging("Column $key duplicates required column in source " . get_class($this->src), DEBUG_DEVELOPER);
+                    continue;
                 }
 
                 try {
-                    $out[$column->id] = $this->src->new_column_from_option(
+                    $out[$key] = $this->src->new_column_from_option(
                         $column->type,
                         $column->value,
-                        $heading,
+                        $column->transform,
+                        $column->aggregate,
+                        $column->heading,
                         $column->customheading,
                         $column->hidden
                     );
                     // Enabled report grouping if any columns are grouped.
-                    if ($out[$column->id]->grouping != 'none') {
+                    if ($out[$key]->grouping !== 'none' or $out[$key]->aggregate) {
                         $this->grouped = true;
                     }
                 } catch (ReportBuilderException $e) {
-                    // Save list of bad columns.
-                    $this->badcolumns[] = array(
-                        'id' => $column->id,
-                        'type' => $column->type,
-                        'value' => $column->value,
-                        'heading' => $column->heading
-                    );
-                    trigger_error($e->getMessage(), E_USER_WARNING);
+                    debugging($e->getMessage(), DEBUG_NORMAL);
                 }
             }
         }
 
-        // now append any required columns
-        if (is_array($this->requiredcolumns)) {
-            foreach ($this->requiredcolumns as $column) {
-                $column->required = true;
-                $out[] = $column;
-                // enabled report grouping if any columns are grouped
-                if ($column->grouping != 'none') {
-                    $this->grouped = true;
-                }
+        // Now append any required columns.
+        foreach ($this->requiredcolumns as $column) {
+            $key = $column->type . '-' . $column->value;
+            $column->required = true;
+            $out[$key] = $column;
+            // Enabled report grouping if any columns are grouped.
+            if ($column->grouping !== 'none' or $column->aggregate) {
+                $this->grouped = true;
             }
         }
 
@@ -1159,12 +1224,12 @@ class reportbuilder {
      *               Key is "{$type}-{$value]", value is the default heading string
      */
     function get_default_headings_array() {
-        if (!isset($this->src->columnoptions) || !is_array($this->src->columnoptions)) {
+        if (!isset($this->columnoptions) || !is_array($this->columnoptions)) {
             return false;
         }
 
         $out = array();
-        foreach ($this->src->columnoptions as $option) {
+        foreach ($this->columnoptions as $option) {
             $key = $option->type . '-' . $option->value;
 
             if ($this->embedobj && $embeddedheading = $this->embedobj->get_embedded_heading($option->type, $option->value)) {
@@ -1667,8 +1732,7 @@ class reportbuilder {
                 if (class_exists($classname)) {
                     $class = new $classname($this->reportfor);
 
-                    if (reportbuilder::get_setting($reportid, $settingname,
-                        'enable', $cache)) {
+                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
                         // this content option is enabled
                         // call function to get SQL snippet
                         list($out[], $contentparams) = $class->sql_restriction($fields, $reportid);
@@ -1712,8 +1776,7 @@ class reportbuilder {
                 $title = $option->title;
                 if (class_exists($classname)) {
                     $class = new $classname($this->reportfor);
-                    if (reportbuilder::get_setting($reportid, $settingname,
-                        'enable')) {
+                    if (reportbuilder::get_setting($reportid, $settingname, 'enable')) {
                         // this content option is enabled
                         // call function to get text string
                         $res[] = $class->text_restriction($title, $reportid);
@@ -1764,7 +1827,7 @@ class reportbuilder {
         $fields = array();
         $src = $this->src;
         foreach ($this->columns as $column) {
-            $fields = array_merge($fields, $column->get_fields($src, $mode));
+            $fields = array_merge($fields, $column->get_fields($src, $mode, true));
         }
         return $fields;
     }
@@ -2442,97 +2505,66 @@ class reportbuilder {
      *
      * @return bool
      */
-    function is_cached() {
-        $enabled = !$this->cacheignore && $this->cache;
-        return $enabled && isset($this->cacheschedule) && $this->cacheschedule->cachetable != '';
-    }
-
-    /**
-     * Load back previously stored configuration
-     *
-     * @param string $sdata Serialized configuration
-     */
-    public function import_config($sdata) {
-        $data = unserialize(base64_decode($sdata));
-        if (!$data) {
-            throw new ReportBuilderException('Cache unserialization failed');
-        }
-        foreach ($data as $property => $value) {
-            $this->{$property} = $value;
-        }
-    }
-    /**
-     * Support of configuration caching
-     *
-     * Number of fields depends on report configuration (filters, contents, columns, etc).
-     * To ensure that cache will work after changes in configuration, current configuration also
-     * should be cached. This function serialize all necessary report configuration to save it in
-     * cache database
-     *
-     * @return array
-     */
-    public function export_config() {
-        // save filters
-        $filters = array();
-        foreach ($this->filters as $filterinfo) {
-            $filter = new stdClass();
-            $filter->type = $filterinfo->type;
-            $filter->value = $filterinfo->value;
-            $filter->advanced = $filterinfo->advanced;
-            $filter->id = $filterinfo->id;
-            $filter->filtername = $filterinfo->filtername;
-            $filter->customname = $filterinfo->customname;
-            $filter->region = $filterinfo->region;
-            $filters[] = $filter;
-        }
-        // save columns
-        $columns = array();
-        foreach ($this->columns as $columnid => $columninfo) {
-            if (!in_array($columninfo, $this->requiredcolumns)) {
-                $column = new stdClass();
-                $column->id = $columnid;
-                $column->heading = $columninfo->heading;
-                $column->customheading = $columninfo->customheading;
-                $column->type = $columninfo->type;
-                $column->value = $columninfo->value;
-                $column->hidden = $columninfo->hidden;
-                $column->grouping = $columninfo->grouping;
-                $columns[] = $column;
-            }
-        }
-        return base64_encode(serialize(array('filters' => $filters, '_params' => $this->_params,
-                     'contentoptions' => $this->contentoptions, 'contentmode' => $this->contentmode,
-                     'columns' => $columns, 'src' => $this->src, 'source' => $this->source,
-                     'requiredcolumns' => $this->requiredcolumns,
-                     '_paramoptions' => $this->_paramoptions, '_id' => $this->_id,
-                     'filteroptions' => $this->filteroptions, 'columnoptions' => $this->columnoptions,
-                     '_joinlist' => $this->_joinlist, '_base' => $this->_base,
-                     'embeddedurl' => $this->embeddedurl, 'defaultsortorder' => $this->defaultsortorder,
-                     'defaultsortcolumn' => $this->defaultsortcolumn, 'embedded' => $this->embedded,
-                     'description' => $this->description, 'hidden' => $this->hidden,
-                     'fullname' => $this->fullname)));
-    }
-
-    /**
-     * Load cached configuration
-     *
-     * @return bool if object was restored from cache
-     */
-    public function restore_cached_state() {
-        global $DB;
-        $this->cacheschedule = $DB->get_record('report_builder_cache',
-                                                array('reportid' => $this->_id), '*',
-                                                IGNORE_MISSING);
-        if ($this->cacheschedule) {
-            $sdata = $this->cacheschedule->config;
-            if ($sdata == '') {
-                return false;
-            }
-            $this->import_config($sdata);
-        } else {
+    public function is_cached() {
+        if ($this->cacheignore or !$this->cache) {
             return false;
         }
-        return true;
+
+        if ($this->get_cache_table()) {
+            return true;
+        }
+    }
+
+    /**
+     * Returns cache status.
+     * @return int constants RB_CACHE_FLAG_*
+     */
+    public function get_cache_status() {
+        global $DB;
+
+        if (!$this->cache) {
+            return RB_CACHE_FLAG_NONE;
+        }
+
+        if (!$this->cacheschedule) {
+            return RB_CACHE_FLAG_CHANGED;
+        }
+
+        if ($this->cacheschedule->genstart) {
+            return RB_CACHE_FLAG_GEN;
+        }
+
+        if ($this->cacheschedule->changed) {
+            return RB_CACHE_FLAG_CHANGED;
+        }
+
+        if (!$this->cacheschedule->cachetable) {
+            return RB_CACHE_FLAG_FAIL;
+        }
+
+        if ($this->cachetable) {
+            // Shortcut.
+            return RB_CACHE_FLAG_OK;
+        }
+
+        list($query, $params) = $this->build_create_cache_query();
+        if (sha1($query.serialize($params)) === $this->cacheschedule->queryhash) {
+            $this->cachetable = $this->cacheschedule->cachetable;
+            return RB_CACHE_FLAG_OK;
+        }
+
+        $this->cachetable = false;
+        $DB->set_field('report_builder_cache', 'changed', RB_CACHE_FLAG_CHANGED, array('id' => $this->cacheschedule->id));
+        $this->cacheschedule->changed = RB_CACHE_FLAG_CHANGED;
+    }
+
+    public function get_cache_table() {
+        $status = $this->get_cache_status();
+        if ($status !== RB_CACHE_FLAG_OK) {
+            return false;
+        }
+
+        return $this->cachetable;
     }
 
     /**
@@ -2579,23 +2611,21 @@ class reportbuilder {
     /**
      * This function builds main cached SQL query to get the data for page
      *
-     * @return array array($sql, $params). If no cache found array('', array()) will be returned
+     * @return array array($sql, $params, $cache). If no cache found array('', array(), array()) will be returned
      */
-    function build_cache_query($countonly = false, $filtered = false) {
-        global $DB;
-
+    public function build_cache_query($countonly = false, $filtered = false) {
         if (!$this->is_cached()) {
-            return array('', array());
+            return array('', array(), array());
         }
-        $cache = $this->cacheschedule;
+        $table = $this->get_cache_table();
         $fields = $this->get_column_fields(rb_column::CACHE);
 
         list($where, $group, $having, $sqlparams, $allgrouped) = $this->collect_restrictions($filtered, true);
 
-        $sql = $this->collect_sql($fields, $cache->cachetable, array(), $where, $group, $having,
+        $sql = $this->collect_sql($fields, $table, array(), $where, $group, $having,
                                   $countonly, $allgrouped);
 
-        return array($sql, $sqlparams, (array)$cache);
+        return array($sql, $sqlparams, (array)$this->cacheschedule);
     }
 
     /**
@@ -2617,7 +2647,11 @@ class reportbuilder {
                 return $cached;
             }
         }
-        $fields = $this->get_column_fields();
+        $mode = rb_column::REGULAR;
+        if ($this->grouped) {
+            $mode = rb_column::REGULARGROUPED;
+        }
+        $fields = $this->get_column_fields($mode);
 
         $filter = ($filtered) ? reportbuilder::FILTER : reportbuilder::FILTERNONE;
         $joins = $this->collect_joins($filter, $countonly);
@@ -2641,6 +2675,16 @@ class reportbuilder {
     public function add_filter_counts($mform) {
         global $DB;
 
+        // The counts do not make much sense if we aggregate rows,
+        // better not show it at all and it also allows us to keep this code as-is,
+        // this prevents performance problems too.
+        $showcountfilters = array();
+        foreach ($this->columns as $column) {
+            if ($column->aggregate) {
+                return;
+            }
+        }
+
         $iscached = $this->is_cached();
         $isgrouped = $this->grouped;
         $filters = $this->get_sidebar_filters();
@@ -2648,7 +2692,6 @@ class reportbuilder {
         $extrajoins = array();
 
         // Find all the showcount filters.
-        $showcountfilters = array();
         foreach ($filters as $filter) {
             $showcountparams = $filter->get_showcount_params();
             if ($showcountparams !== false) {
@@ -2674,7 +2717,7 @@ class reportbuilder {
                             $extrajoins[] = $dependency;
                         }
                     }
-                    if ($isgrouped) {
+                    if ($isgrouped and $filter->joins != 'base') {
                         $extrajoins[] = $this->get_single_join($filter->joins, 'filtercount');
                     }
                 }
@@ -2686,7 +2729,7 @@ class reportbuilder {
 
         // If the base query uses grouping then we need to include all column fields (so that each field can be grouped).
         if ($isgrouped && !$iscached) {
-            $fields = array_unique(array_merge($fields, $this->get_column_fields()));
+            $fields = array_unique(array_merge($fields, $this->get_column_fields(rb_column::REGULARGROUPED)));
         }
 
         // If there are none then return, because we do not want to generate an empty query.
@@ -2704,7 +2747,7 @@ class reportbuilder {
         }
 
         // Get all conditions for active filters (except the ones we deactivated).
-        list($where, $group, $having, $sqlparams, $allgrouped) = $this->collect_restrictions(true);
+        list($where, $group, $having, $sqlparams, $allgrouped) = $this->collect_restrictions(true, $iscached);
 
         // Apply any SQL specified by the source.
         if (!$iscached && !empty($this->src->sourcewhere)) {
@@ -2713,7 +2756,7 @@ class reportbuilder {
 
         // Get the base sql query with all other joins and (active) filters applied.
         if ($iscached) {
-            $base = $this->cacheschedule->cachetable;
+            $base = $this->get_cache_table();
         } else {
             $base = $this->src->base;
         }
@@ -2855,32 +2898,32 @@ class reportbuilder {
 
         if ($this->grouped) {
             $group = array();
-            // We use FIELDONLY for the GROUP BY clause because MSSQL does not allow aliases in grouping.
-            // In the same time pgsql does not allow grouping by text constants which can be fieldnames
-            $mode = rb_column::CACHE;
-            if (!$cache) {
-                $mode = rb_column::ALIASONLY;
-                if ($DB->get_dbfamily() == 'mssql') {
-                    $mode = rb_column::FIELDONLY;
-                }
-            }
+            $groupbymode = ($cache ? rb_column::GROUPBYCACHE : rb_column::GROUPBYREGULAR);
 
             foreach ($this->columns as $column) {
-                if ($column->grouping == 'none') {
-                    $allgrouped = false;
-                    $group = array_merge($group, $column->get_fields($this->src, $mode, true));
-                } else {
+                if ($column->grouping !== 'none') {
                     // We still need to add extrafields to the GROUP BY if there is a displayfunc.
-                    if ($column->extrafields !== null && $column->displayfunc !== null) {
-                        foreach ($column->extrafields as $name => $field) {
-                            $alias = reportbuilder_get_extrafield_alias($column->type, $column->value, $name);
-                            $gp = ($mode == rb_column::CACHE || $mode == rb_column::ALIASONLY) ? $alias : $field;
-                            if (!in_array($gp, $group)) {
-                                $group[] = $gp;
+                    if ($column->extrafields && $column->get_displayfunc()) {
+                        $fields = $column->get_extra_fields($groupbymode);
+                        foreach ($fields as $field) {
+                            if (!in_array($field, $group)) {
+                                $group[] = $field;
                                 $allgrouped = false;
                             }
                         }
                     }
+
+                } else if ($column->transform) {
+                    $allgrouped = false;
+                    $group = array_merge($group, $column->get_fields($this->src, $groupbymode, true));
+
+                } else if ($column->aggregate) {
+                    // No need to add GROUP BY for extra fields
+                    // because the display functions in aggregations do not need extra columns.
+
+                } else { // Column grouping is 'none'.
+                    $allgrouped = false;
+                    $group = array_merge($group, $column->get_fields($this->src, $groupbymode, true));
                 }
             }
         }
@@ -2915,7 +2958,7 @@ class reportbuilder {
         }
         $joinssql = (count($joins) > 0) ? $this->get_join_sql($joins) : '';
 
-        $fromsql = "FROM $base base\n    " . $joinssql;
+        $fromsql = "FROM {$base} base\n    " . $joinssql;
 
         $wheresql = (count($where) > 0) ? "WHERE " . implode("\n    AND ", $where) . "\n" : '';
 
@@ -3065,7 +3108,7 @@ class reportbuilder {
             $value = $column->value;
             if ($column->display_column()) {
                 $tablecolumns[] = "{$type}_{$value}"; // used for sorting
-                $tableheaders[] = format_string($column->heading);
+                $tableheaders[] = $this->format_column_heading($column, false);
             }
         }
 
@@ -3164,15 +3207,19 @@ class reportbuilder {
                     $count = $this->get_filtered_count();
                     $location = 0;
                     foreach ($records as $record) {
-                        $record_data = $this->process_data_row($record);
+                        $record_data = $this->src->process_data_row($record, 'html', $this);
+                        foreach ($record_data as $k => $v) {
+                            if ((string)$v === '') {
+                                // We do not want empty cells in HTML table.
+                                $record_data[$k] = '&nbsp;';
+                            }
+                        }
                         if (++$location == $count % $perpage || $location == $perpage) {
                             $table->add_data($record_data, 'last');
                         } else {
                             $table->add_data($record_data);
                         }
                     }
-                } else if ($data === false) {
-                    print_error('error:problemobtainingreportdata', 'totara_reportbuilder');
                 }
             } catch (dml_read_exception $e) {
                 if ($this->is_cached()) {
@@ -3297,72 +3344,6 @@ class reportbuilder {
         }
         return true;
     }
-
-
-    /**
-     * Given a record, returns an array of data for the record. If display
-     * functions exist for any columns the data is passed to the display
-     * function and the result included instead.
-     *
-     * @param object $record A record returned by a recordset
-     * @param boolean $striptags If true, returns the data with any html tags removed
-     * @param boolean $isexport If true, data is being exported
-     * @param boolean $excel true if processing data for an export_xls
-     * @return array Outer array are table rows, inner array are columns
-     *               False is returned if the SQL query failed entirely
-     */
-    function process_data_row($record, $striptags=false, $isexport=false, $excel=false) {
-        $columns = $this->columns;
-
-        $tabledata = array();
-        foreach ($columns as $column) {
-            // check column should be shown
-            if ($column->display_column($isexport)) {
-                $type = $column->type;
-                $value = $column->value;
-                $field = "{$type}_{$value}";
-                // treat fields different if display function exists
-                if (isset($column->displayfunc)) {
-                    $func = 'rb_display_'.$column->displayfunc;
-                    if (method_exists($this->src, $func)) {
-                        // Get extrafields for column and rename them before passing them to display function.
-                        $extrafields = $this->get_extrafields_row($record, $column);
-                        if (in_array($column->displayfunc, array('customfield_textarea',
-                            'customfield_multiselect_icon', 'customfield_multiselect_text',
-                            'customfield_file', 'tinymce_textarea'))) {
-                            $tabledata[] = $this->src->$func($field, $record->$field, $extrafields, $isexport);
-                        } else if (($column->displayfunc == 'nice_date' || $column->displayfunc == 'nice_datetime') && $excel) {
-                            $tabledata[] = $record->$field;
-                        } else {
-                            $tabledata[] = $this->src->$func(format_text($record->$field, FORMAT_HTML), $extrafields, $isexport);
-                        }
-                    } else {
-                        $tabledata[] = format_text($record->$field, FORMAT_HTML);
-                    }
-                } else {
-                    $tabledata[] = format_text($record->$field, FORMAT_HTML);
-                }
-            }
-        }
-        if ($striptags === true) {
-            return $this->strip_tags_r($tabledata);
-        } else {
-            return $tabledata;
-        }
-    }
-
-
-    /**
-     * Recursive version of strip_tags
-     *
-     * @param array $value A nested array of strings
-     * @return array The same array with HTML stripped from all strings
-     */
-    function strip_tags_r($value) {
-        return is_array($value) ? array_map(array($this, 'strip_tags_r'), $value) :
-            strip_tags($value);
-    }
-
 
     /**
      * Returns a menu that when selected, takes the user to the specified saved search
@@ -3529,7 +3510,7 @@ class reportbuilder {
         }
 
         foreach ($fields as $field) {
-            $worksheet[0]->write($row, $col, strip_tags($field->heading));
+            $worksheet[0]->write($row, $col, $this->format_column_heading($field, true));
             $col++;
         }
         $row++;
@@ -3539,11 +3520,17 @@ class reportbuilder {
         // Use recordset so we can manage very large datasets.
         if ($records = $DB->get_recordset_sql($query, $params)) {
             foreach ($records as $record) {
-                $record_data = $this->process_data_row($record, true, true);
-
-                for($col=0; $col<$numfields; $col++) {
-                    if (isset($record_data[$col])) {
-                        $worksheet[0]->write($row, $col, html_entity_decode($record_data[$col], ENT_COMPAT, 'UTF-8'));
+                $record_data = $this->src->process_data_row($record, 'ods', $this);
+                $col = 0;
+                foreach ($record_data as $value) {
+                    if (is_array($value)) {
+                        if (method_exists($worksheet[0], 'write_' . $value[0])) {
+                            $worksheet[0]->{'write_' . $value[0]}($row, $col++, $value[1], $value[2]);
+                        } else {
+                            $worksheet[0]->write($row, $col++, $value[1]);
+                        }
+                    } else {
+                        $worksheet[0]->write($row, $col++, $value);
                     }
                 }
                 $row++;
@@ -3561,7 +3548,7 @@ class reportbuilder {
     }
 
     /** Download current table in XLS format
-     * @param array $fields Array of column headings
+     * @param rb_column[] $fields Array of column headings
      * @param string $query SQL query to run to get results
      * @param array $params SQL query params
      * @param integer $count Number of filtered records in query
@@ -3594,10 +3581,6 @@ class reportbuilder {
         $worksheet[0] = $workbook->add_worksheet('');
         $row = 0;
         $col = 0;
-        $dateformat = $workbook->add_format();
-        $dateformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATE);
-        $datetimeformat = $workbook->add_format();
-        $datetimeformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
         if (is_array($restrictions) && count($restrictions) > 0) {
             $worksheet[0]->write($row, 0, get_string('reportcontents', 'totara_reportbuilder'));
@@ -3622,26 +3605,25 @@ class reportbuilder {
         }
 
         foreach ($fields as $field) {
-            $worksheet[0]->write($row, $col, strip_tags($field->heading));
+            $worksheet[0]->write($row, $col, $this->format_column_heading($field, true));
             $col++;
         }
         $row++;
 
-        $numfields = count($fields);
-
         // User recordset so we can handle large datasets.
         if ($records = $DB->get_recordset_sql($query, $params)) {
             foreach ($records as $record) {
-                $record_data = $this->process_data_row($record, true, true, true);
-                for ($col=0; $col<$numfields; $col++) {
-                    if (isset($record_data[$col]) && !empty($record_data[$col])) {
-                        if ($fields[$col]->displayfunc == 'nice_date') {
-                            $worksheet[0]->write_date($row, $col, $record_data[$col], $dateformat);
-                        } else if ($fields[$col]->displayfunc == 'nice_datetime') {
-                            $worksheet[0]->write_date($row, $col, $record_data[$col], $datetimeformat);
+                $record_data = $this->src->process_data_row($record, 'excel', $this);
+                $col = 0;
+                foreach ($record_data as $value) {
+                    if (is_array($value)) {
+                        if (method_exists($worksheet[0], 'write_' . $value[0])) {
+                            $worksheet[0]->{'write_' . $value[0]}($row, $col++, $value[1], $value[2]);
                         } else {
-                            $worksheet[0]->write($row, $col, html_entity_decode($record_data[$col], ENT_COMPAT, 'UTF-8'));
+                            $worksheet[0]->write($row, $col++, $value[1]);
                         }
+                    } else {
+                        $worksheet[0]->write($row, $col++, $value);
                     }
                 }
                 $row++;
@@ -3682,23 +3664,14 @@ class reportbuilder {
 
         $row = array();
         foreach ($fields as $field) {
-            $row[] = strip_tags($field->heading);
+            $row[] =  $this->format_column_heading($field, true);
         }
 
         $export->add_data($row);
-        $numfields = count($fields);
 
         if ($records = $DB->get_recordset_sql($query, $params)) {
             foreach ($records as $record) {
-                $record_data = $this->process_data_row($record, true, true);
-                $row = array();
-                for ($j=0; $j<$numfields; $j++) {
-                    if (isset($record_data[$j])) {
-                        $row[] = html_entity_decode($record_data[$j], ENT_COMPAT, 'UTF-8');
-                    } else {
-                        $row[] = '';
-                    }
-                }
+                $row = $this->src->process_data_row($record, 'csv', $this);
                 $export->add_data($row);
             }
             $records->close();
@@ -3799,20 +3772,15 @@ class reportbuilder {
                         <thead>
                             <tr style="background-color: #CCC;">';
         foreach ($fields as $field) {
-            $html .= '<th>' . strip_tags($field->heading) . '</th>';
+            $html .= '<th>' . s($this->format_column_heading($field, true)) . '</th>';
         }
         $html .= '</tr></thead><tbody>';
 
         foreach ($records as $record) {
-            $record_data = $this->process_data_row($record, true, true);
+            $record_data = $this->src->process_data_row($record, 'pdf', $this);
             $html .= '<tr>';
-            for ($j = 0; $j < $numfields; $j++) {
-                if (isset($record_data[$j])) {
-                    $cellcontent = html_entity_decode($record_data[$j], ENT_COMPAT, 'UTF-8');
-                } else {
-                    $cellcontent = '';
-                }
-                $html .= '<td>' . $cellcontent . '</td>';
+            foreach($record_data as $value) {
+                $html .= '<td>' . str_replace("\n", '<br />', s($value)) . '</td>';
             }
             $html .= '</tr>';
 
@@ -4109,6 +4077,8 @@ class reportbuilder {
         $todb->id = $cid;
         $todb->hidden = $hide;
         $DB->update_record('report_builder_columns', $todb);
+
+        $this->columns = $this->get_columns();
         return true;
     }
 
@@ -4290,13 +4260,11 @@ class reportbuilder {
      * @param integer $reportid ID for the report to obtain a setting for
      * @param string $type Identifies the class using the setting
      * @param string $name Identifies the particular setting
-     * @param bool $cache Use cached settings
      * @return mixed The value of the setting $name or null if it doesn't exist
      */
-    static function get_setting($reportid, $type, $name, $cache = false) {
+    public static function get_setting($reportid, $type, $name) {
         global $DB;
-        $field = ($cache) ? 'cachedvalue' : 'value';
-        return $DB->get_field('report_builder_settings', $field, array('reportid' => $reportid, 'type' => $type, 'name' => $name));
+        return $DB->get_field('report_builder_settings', 'value', array('reportid' => $reportid, 'type' => $type, 'name' => $name));
     }
 
     /**
@@ -4304,17 +4272,15 @@ class reportbuilder {
      *
      * @param integer $reportid ID of the report to get settings for
      * @param string $type Identifies the class to get settings from
-     * @param bool $cache Use cached settings
      * @return array Associative array of name|value settings
      */
-    static function get_all_settings($reportid, $type, $cache = false) {
+    static function get_all_settings($reportid, $type) {
         global $DB;
 
         $settings = array();
-        $field = ($cache) ? 'cachedvalue' : 'value';
         $records = $DB->get_records('report_builder_settings', array('reportid' => $reportid, 'type' => $type));
         foreach ($records as $record) {
-            $settings[$record->name] = $record->{$field};
+            $settings[$record->name] = $record->value;
         }
         return $settings;
     }
@@ -4449,47 +4415,17 @@ class reportbuilder {
             }
 
             if (isset($primary_field)) {
-                // print primary heading
-                $primaryname = $primary_field->type . '_' . $primary_field->value;
+                // Print primary heading.
                 $primaryheading = $primary_field->heading;
-
-                // treat fields different if display function exists
-                if (isset($primary_field->displayfunc)) {
-                    $func = 'rb_display_' . $primary_field->displayfunc;
-                    if (method_exists($this->src, $func)) {
-                        // Get extrafields for column and rename them before passing them to display function.
-                        $extrafields = $this->get_extrafields_row($item, $primary_field);
-                        $primaryvalue = $this->src->$func(format_text($item->$primaryname, FORMAT_HTML), $extrafields, false);
-                    } else {
-                        $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) :
-                                get_string('unknown', 'totara_reportbuilder');
-                    }
-                } else {
-                    $primaryvalue = (isset($item->$primaryname)) ? format_text($item->$primaryname, FORMAT_HTML) :
-                            get_string('unknown', 'totara_reportbuilder');
-                }
-
+                $primaryvalue = $this->src->format_column_data($primary_field, 'html', $item, $this);
                 $out .= $OUTPUT->heading($primaryheading . ': ' . $primaryvalue, 2);
             }
 
             if (isset($additional_fields)) {
-                // print secondary details
+                // Print secondary details.
                 foreach ($additional_fields as $additional_field) {
-                    $addname = $additional_field->type . '_' . $additional_field->value;
                     $addheading = $additional_field->heading;
-                    $addvalue = (isset($item->$addname)) ? $item->$addname : get_string('unknown', 'totara_reportbuilder');
-                    // treat fields different if display function exists
-                    if (isset($additional_field->displayfunc)) {
-                        $func = 'rb_display_' . $additional_field->displayfunc;
-                        if (method_exists($this->src, $func)) {
-                            $addvalue = $this->src->$func(format_text($item->$addname, FORMAT_HTML), $item);
-                        } else {
-                            $addvalue = (isset($item->$addname)) ? format_text($item->$addname, FORMAT_HTML) : get_string('unknown', 'totara_reportbuilder');
-                        }
-                    } else {
-                        $addvalue = (isset($item->$addname)) ? format_text($item->$addname, FORMAT_HTML) : get_string('unknown', 'totara_reportbuilder');
-                    }
-
+                    $addvalue = $this->src->format_column_data($additional_field, 'html', $item, $this);
                     $out .= html_writer::tag('strong', $addheading . ': '. $addvalue) . html_writer::empty_tag('br');
                 }
             }
@@ -4666,34 +4602,6 @@ class reportbuilder {
         return $this->_post_config_restrictions;
     }
 
-    /**
-     * Get extrafields for a column from a database record.
-     * This removes the stuff that was added to make the name unique when processed in a query.
-     *
-     * @param object $row record returned from sql query
-     * @param rb_column $column which has a display function with extra fields (else returns empty array)
-     * @return object $extrafieldsrow only the extrafields specified by the column, with unique identifier removed.
-     */
-    private function get_extrafields_row($row, $column) {
-        $extrafieldsrow = new stdClass();
-
-        if (!isset($column->extrafields) || empty($column->extrafields)) {
-            return $extrafieldsrow;
-        }
-
-        $extrafields = $column->extrafields;
-        foreach ($extrafields as $extrafield => $value) {
-            $extrafieldalias = reportbuilder_get_extrafield_alias($column->type, $column->value, $extrafield);
-            if (isset($row->$extrafieldalias)) {
-                $extrafieldsrow->$extrafield = $row->$extrafieldalias;
-            } else {
-                $extrafieldsrow->$extrafield = null;
-            }
-        }
-
-        return $extrafieldsrow;
-    }
-
 } // End of reportbuilder class
 
 class ReportBuilderException extends Exception { }
@@ -4712,11 +4620,13 @@ function totara_reportbuilder_cron() {
 /**
  * Returns the proper SQL to create table based on a query
  * @param string $table
- *
- * @return string SQL to execute
+ * @param string $select SQL select statement
+ * @param array $params SQL params
+ * @return bool success
  */
-function sql_table_from_select($table, $select, array $params = array()) {
+function sql_table_from_select($table, $select, array $params) {
     global $DB;
+    $table = '{' . trim($table, '{}') . '}'; // Make sure this is valid table with correct prefix.
     $hashtablename = substr(md5($table), 0, 15);
     switch ($DB->get_dbfamily()) {
         case 'mysql':
@@ -4768,7 +4678,11 @@ function sql_table_from_select($table, $select, array $params = array()) {
             $result = $DB->execute($sql, $params);
             break;
     }
-    if (!$result) return false;
+    $DB->reset_caches();
+
+    if (!$result) {
+        return false;
+    }
 
     // Create indexes
     $fields = $DB->get_records_sql($columnssql);
@@ -4814,6 +4728,8 @@ function sql_table_from_select($table, $select, array $params = array()) {
         }
         $DB->execute($sql);
     }
+    $DB->reset_caches();
+
     return true;
 }
 
@@ -4899,7 +4815,7 @@ function reportbuilder_fix_schedule($reportid) {
     }
 
     if ($schedule->is_changed()) {
-        $result = $DB->update_record('report_builder_cache', $cache);
+        $DB->update_record('report_builder_cache', $cache);
     }
     return true;
 }
@@ -4934,18 +4850,15 @@ function reportbuilder_purge_cache($cache, $unschedule = false) {
         error_log(get_string('error:cachenotfound', 'totara_reportbuilder'));
         return false;
     }
-    if ($cache->cachetable != '') {
+    if ($cache->cachetable) {
         sql_drop_table_if_exists($cache->cachetable);
     }
     if ($unschedule) {
-        $DB->delete_records_select('report_builder_cache', 'reportid = :reportid', array('reportid' => $cache->reportid));
-        $report = new stdClass();
-        $report->cache = 0;
-        $report->id = $cache->reportid;
-        $DB->update_record('report_builder', $report);
+        $DB->delete_records('report_builder_cache', array('reportid' => $cache->reportid));
+        $DB->set_field('report_builder', 'cache', 0, array('id' => $cache->reportid));
     } else {
-        $cache->cachetable = '';
-        $cache->config = '';
+        $cache->cachetable = null;
+        $cache->queryhash = null;
         $DB->update_record('report_builder_cache', $cache);
     }
 }
@@ -4981,7 +4894,7 @@ function reportbuilder_set_status($reportcache, $flag = RB_CACHE_FLAG_CHANGED) {
     $reportid = 0;
     if (is_object($reportcache)) {
         $reportid = $reportcache->reportid;
-        $reportcache->changed = 1;
+        $reportcache->changed = $flag;
     } else if (is_numeric($reportcache)) {
         $reportid = $reportcache;
     }
@@ -4990,23 +4903,6 @@ function reportbuilder_set_status($reportcache, $flag = RB_CACHE_FLAG_CHANGED) {
     $sql = 'UPDATE {report_builder_cache} SET changed = ? WHERE reportid = ?';
     $result = $DB->execute($sql, array($flag, $reportid));
     return $result;
-}
-
-/**
- * Get reportbuilder cache status flags
- *
- * @param mixed stdClass|int $report Report id or report_builder_cache record object
- * @return int result
- */
-function reportbuilder_get_status($reportcache) {
-    global $DB;
-    if (is_numeric($reportcache)) {
-        $reportcache = reportbuilder_get_cached($reportcache);
-    }
-    if (is_object($reportcache)) {
-        return $reportcache->changed;
-    }
-    return false;
 }
 
 /**
@@ -5019,9 +4915,12 @@ function reportbuilder_generate_cache($reportid) {
     global $DB;
 
     $success = false;
+    $dbman = $DB->get_manager();
+
+    $rawreport = $DB->get_record('report_builder', array('id' => $reportid), '*', MUST_EXIST);
 
     // Prepare record for cache
-    $rbcache = $DB->get_record('report_builder_cache', array('reportid' => $reportid));
+    $rbcache = $DB->get_record('report_builder_cache', array('reportid' => $reportid), '*', IGNORE_MISSING);
     if (!$rbcache) {
         $cache = new stdClass();
         $cache->reportid = $reportid;
@@ -5029,78 +4928,61 @@ function reportbuilder_generate_cache($reportid) {
         $cache->schedule = 0;
         $cache->changed = 0;
         $cache->genstart = 0;
-        $DB->insert_record('report_builder_cache', $cache);
+        $cache->id = $DB->insert_record('report_builder_cache', $cache);
+        $rbcache = $DB->get_record('report_builder_cache', array('reportid' => $reportid), '*', MUST_EXIST);
     }
 
-    // set report generation timestamp
-    $sql = 'UPDATE {report_builder_cache} SET genstart = ? WHERE reportid = ?';
-    $params = array(time(), $reportid);
-    $DB->execute($sql, $params);
+    $date = date("YmdHis");
+    $newtable = "{report_builder_cache_{$reportid}_{$date}}";
 
-    $transaction = $DB->start_delegated_transaction();
-    // Moodle rollback rethrow exception, so have to use nested try..catch blocks
+    // Purge old data and mark as started.
+    $oldtable = $rbcache->cachetable;
+    $rbcache->cachetable = $newtable;
+    $rbcache->genstart = time();
+    $rbcache->queryhash = null;
+    $DB->update_record('report_builder_cache', $rbcache);
+
+    if ($oldtable) {
+        sql_drop_table_if_exists($oldtable);
+    }
+
     try {
-        try {
-            $sql = 'SELECT rbc.id, rbc.cachetable, rb.embedded, rb.shortname  FROM {report_builder} rb
-                    LEFT JOIN {report_builder_cache} rbc ON rb.id = rbc.reportid
-                    WHERE rbc.reportid = ?';
-            $reportcacherecord = $DB->get_record_sql($sql, array($reportid), MUST_EXIST);
+        // Instantiate.
+        if ($rawreport->embedded) {
+            $report = reportbuilder_get_embedded_report($rawreport->shortname, array(), true, 0);
+        } else {
+            $report = new reportbuilder($reportid, null, false, null, null, true);
+        }
 
-            // Instantiate
-            if ($reportcacherecord->embedded) {
-                $shortname = $reportcacherecord->shortname;
-                $report = reportbuilder_get_embedded_report($shortname, array(), true, 0);
-            } else {
-                $report = new reportbuilder($reportid, null, false, null, null, true);
-            }
+        // Get caching query.
+        list($query, $params) = $report->build_create_cache_query();
+        $queryhash = sha1($query.serialize($params));
 
-            // Get caching query
-            list($query, $params) = $report->build_create_cache_query();
+        $result = sql_table_from_select($newtable, $query, $params);
 
-            $date = date("YmdHis");
-            $oldtable = isset($reportcacherecord->cachetable) ? $reportcacherecord->cachetable : '';
-            $newtable = "{report_builder_cache_{$reportid}_{$date}}";
-
-            $result = sql_table_from_select($newtable, $query, $params);
-
-            // Save new table only if success
-            if ($result) {
-                $cache = new stdClass();
-                $cache->id = $reportcacherecord->id;
-                $cache->lastreport = time();
-                $cache->cachetable = $newtable;
-                $cache->config = $report->export_config();
-                $cache->changed = 0;
-                $cache->genstart = 0;
-
-                // Cache settings
-                $settingsql = "UPDATE {report_builder_settings} SET cachedvalue = value WHERE reportid = ?";
-                $DB->execute($settingsql, array($reportid));
-
-                $DB->update_record('report_builder_cache', $cache);
-
-                if ($oldtable != '') {
-                    sql_drop_table_if_exists($oldtable);
-                }
-                $success = true;
-            }
-        } catch (dml_exception $e) {
-            $transaction->rollback($e);
+        if ($result) {
+            $rbcache->lastreport = time();
+            $rbcache->queryhash = $queryhash;
+            $rbcache->changed = 0;
+            $rbcache->genstart = 0;
+            $DB->update_record('report_builder_cache', $rbcache);
+            $success = true;
         }
     } catch (dml_exception $e) {
-        // drop report generation timestamp
-        $sql = 'UPDATE {report_builder_cache} SET genstart = ?, changed = ? WHERE reportid = ?';
-        $params = array(0, RB_CACHE_FLAG_FAIL, $reportid);
-        $DB->execute($sql, $params);
-
-        throw $e;
+        debugging('Problem creating cache table '.$e->getMessage());
     }
 
-    if ($success) {
-        $transaction->allow_commit();
-        return true;
+    if (!$success) {
+        // Clean up.
+        sql_drop_table_if_exists($rbcache->cachetable);
+
+        $rbcache->cachetable = null;
+        $rbcache->genstart = 0;
+        $rbcache->changed = RB_CACHE_FLAG_FAIL;
+        $DB->update_record('report_builder_cache', $rbcache);
     }
-    return false;
+
+    return $success;
 }
 
 /**
@@ -5195,8 +5077,8 @@ function reportbuilder_send_scheduled_report($sched) {
  * Creates an export of a report in specified format (xls, csv or ods)
  * for adding to email as attachment
  *
- * @param record $sched schedule record
- * @param integer userid ID of the user the report is for
+ * @param stdClass $sched schedule record
+ * @param integer $userid ID of the user the report is for
  *
  * @return string Filename of the created attachment
  */
@@ -5641,6 +5523,9 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
                 }
             }
         }
+        $report = new reportbuilder($newid);
+        \totara_reportbuilder\event\report_created::create_from_report($report, true)->trigger();
+
         $transaction->allow_commit();
     } catch (Exception $e) {
         $transaction->rollback($e);
@@ -5865,3 +5750,4 @@ class admin_setting_configdaymonthpicker extends admin_setting {
         return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $defaultinfo, $query);
     }
 }
+

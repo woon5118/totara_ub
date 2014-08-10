@@ -140,7 +140,7 @@ class rb_source_graphical_feedback_questions extends rb_base_source {
                 'timecompleted',
                 get_string('timecompleted', 'rb_source_graphical_feedback_questions'),
                 'base.completedtime',
-                array('displayfunc' => 'nice_datetime')
+                array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'feedback',
@@ -152,7 +152,7 @@ class rb_source_graphical_feedback_questions extends rb_base_source {
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'trainer',
+                'session', // NOTE: this was previously called 'trainer' which was a duplicate.
                 'id',
                 get_string('ftfsessionid', 'rb_source_graphical_feedback_questions'),
                 'base.sessionid'

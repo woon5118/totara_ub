@@ -28,7 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/mock/rb_source_column_extra_id.php');
 
-class rb_base_source_test extends PHPUnit_Framework_TestCase {
+class totara_reportbuilder_rb_base_source_testcase extends PHPUnit_Framework_TestCase {
     /**
      * Test that report builder source doesn't allow 'id' as columns extrafields alias
      */
