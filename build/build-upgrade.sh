@@ -35,7 +35,7 @@ step_time () {
 
 TIME=`date +%s`
 echo "STEP 1: Run php syntax check";
-find . \( -name '*.php' -o -name '*.html' \) -print0 | xargs -0 -n1 -P4 ./build/lint.sh | grep -v "No syntax errors detected"
+find . \( -path ./vendor -prune -o -name '*.php' -o -name '*.html' \) -print0 | xargs -0 -n1 -P4 ./build/lint.sh | grep -v "No syntax errors detected"
 step_time "1"
 
 # Shouldn't be necessary
