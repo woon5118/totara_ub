@@ -80,6 +80,8 @@ switch ($action) {
             if (!empty($fromform->timedue)) {
                 $fromform->timedue = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
                         $fromform->timedue);
+                // Set date to end-of-day.
+                $fromform->timedue += ((int)$fromform->timedue > 0 ? (DAYSECS - 1) : 0);
                 if ($fromform->timedue < time()) {
                     totara_set_notification(get_string('error:completebyinvalid', 'totara_appraisal'));
                     break;
