@@ -814,7 +814,7 @@ class multi_course_set extends course_set {
 
         if (count($this->courses) > 0) {
             $table = new html_table();
-            $table->head = array(get_string('coursename', 'totara_program'), '');
+            $table->head = array(get_string('coursename', 'totara_program'), get_string('actions'));
             $table->colclasses = array('coursename', 'launchcourse');
             $table->attributes['class'] = 'fullwidth generaltable';
             if ($userid) {
