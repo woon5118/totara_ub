@@ -33,5 +33,9 @@ SALT=`grep passwordsaltmain /var/lib/jenkins/jobs/${PREBUILDNAME}/workspace/conf
 # Generate a new config file and replace the old one.
 sed "s/###PASSWORDSALTMAINGOESHERE###/${SALT}/g" ../config-template.php > config.php
 
+# Copy vendor folder
+echo "Copy vendor folder"
+cp -r /usr/local/share/vendor26 vendor
+
 echo "Run the CLI-Upgrade script"
 sudo -u www-data php /var/lib/jenkins/jobs/${JOB_NAME}/workspace/admin/cli/upgrade.php --non-interactive --allow-unstable
