@@ -49,6 +49,10 @@ class rb_filter_date extends rb_filter_type {
         if (!isset($this->options['includetime'])) {
             $this->options['includetime'] = false;
         }
+
+        if (!isset($this->options['includebetween'])) {
+            $this->options['includebetween'] = true;
+        }
     }
 
     /**
@@ -60,6 +64,7 @@ class rb_filter_date extends rb_filter_type {
         $label = format_string($this->label);
         $advanced = $this->advanced;
         $includetime = $this->options['includetime'];
+        $includebetween = $this->options['includebetween'];
 
         $objs = array();
 
@@ -77,22 +82,24 @@ class rb_filter_date extends rb_filter_type {
         } else {
             $objs[] =& $mform->createElement('date_selector', $this->name.'_edt', null);
         }
-        $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
-        $objs[] =& $mform->createElement('checkbox', $this->name.'daysbeforechkbox', null,
-                get_string('dateisbetween', 'totara_reportbuilder'));
-        $objs[] =& $mform->createElement('text', $this->name.'daysbefore', null, 'size="2"');
-        $mform->setType($this->name.'daysbefore', PARAM_INT);
-        $objs[] =& $mform->createElement('static', null, null, get_string('isbeforetoday', 'totara_reportbuilder'));
-        $objs[] =& $mform->createElement('static', null, null,
-                html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
-        $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
-        $objs[] =& $mform->createElement('checkbox', $this->name.'daysafterchkbox', null,
-                get_string('dateisbetween', 'totara_reportbuilder'));
-        $objs[] =& $mform->createElement('text', $this->name.'daysafter', null, 'size="2"');
-        $mform->setType($this->name.'daysafter', PARAM_INT);
-        $objs[] =& $mform->createElement('static', null, null, get_string('isaftertoday', 'totara_reportbuilder'));
-        $objs[] =& $mform->createElement('static', null, null,
-                html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
+        if ($includebetween) {
+            $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
+            $objs[] =& $mform->createElement('checkbox', $this->name.'daysbeforechkbox', null,
+                    get_string('dateisbetween', 'totara_reportbuilder'));
+            $objs[] =& $mform->createElement('text', $this->name.'daysbefore', null, 'size="2"');
+            $mform->setType($this->name.'daysbefore', PARAM_INT);
+            $objs[] =& $mform->createElement('static', null, null, get_string('isbeforetoday', 'totara_reportbuilder'));
+            $objs[] =& $mform->createElement('static', null, null,
+                    html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
+            $objs[] =& $mform->createElement('static', null, null, html_writer::empty_tag('br'));
+            $objs[] =& $mform->createElement('checkbox', $this->name.'daysafterchkbox', null,
+                    get_string('dateisbetween', 'totara_reportbuilder'));
+            $objs[] =& $mform->createElement('text', $this->name.'daysafter', null, 'size="2"');
+            $mform->setType($this->name.'daysafter', PARAM_INT);
+            $objs[] =& $mform->createElement('static', null, null, get_string('isaftertoday', 'totara_reportbuilder'));
+            $objs[] =& $mform->createElement('static', null, null,
+                    html_writer::span(get_string('isrelativetotoday', 'totara_reportbuilder')));
+        }
         $grp =& $mform->addElement('group', $this->name.'_grp', $label, $objs, '', false);
         $mform->addHelpButton($grp->_name, 'filterdate', 'filters');
 
@@ -149,13 +156,15 @@ class rb_filter_date extends rb_filter_type {
             $mform->setDefault($this->name.'_eck', 1);
             $mform->setDefault($this->name.'_edt', $defaults['before']);
         }
-        if (isset($defaults['daysafter']) && $defaults['daysafter'] != 0) {
-            $mform->setDefault($this->name.'daysafterchkbox', 1);
-            $mform->setDefault($this->name.'daysafter', ceil(abs(($defaults['daysafter'] - time()) / 86400)));
-        }
-        if (isset($defaults['daysbefore']) && $defaults['daysbefore'] != 0) {
-            $mform->setDefault($this->name.'daysbeforechkbox', 1);
-            $mform->setDefault($this->name.'daysbefore', floor(abs(($defaults['daysbefore'] - time()) / 86400)));
+        if ($includebetween) {
+            if (isset($defaults['daysafter']) && $defaults['daysafter'] != 0) {
+                $mform->setDefault($this->name.'daysafterchkbox', 1);
+                $mform->setDefault($this->name.'daysafter', ceil(abs(($defaults['daysafter'] - time()) / 86400)));
+            }
+            if (isset($defaults['daysbefore']) && $defaults['daysbefore'] != 0) {
+                $mform->setDefault($this->name.'daysbeforechkbox', 1);
+                $mform->setDefault($this->name.'daysbefore', floor(abs(($defaults['daysbefore'] - time()) / 86400)));
+            }
         }
 
     }
