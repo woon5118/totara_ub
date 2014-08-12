@@ -29,7 +29,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 
 $id = required_param('id', PARAM_INT);
-$type = required_param('type', PARAM_ALPHA);
+$type = required_param('type', PARAM_INT);
 $value = required_param('value', PARAM_INT);
 $cohortid = required_param('cohortid', PARAM_INT);
 
@@ -39,48 +39,12 @@ require_sesskey();
 $syscontext = context_system::instance();
 require_capability('totara/cohort:managerules', $syscontext);
 
-$sql = "SELECT c.idnumber, c.draftcollectionid, crc.rulesetoperator, crc.status
-        FROM {cohort} c
-        INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
-        WHERE c.id = ?";
-
-if ($cohort = $DB->get_record_sql($sql, array($cohortid), '*', MUST_EXIST)) {
-
-    if ($type === 'cohortoperator') {
-        // Update cohort operator
-        if ($value != $cohort->rulesetoperator) {
-            $rulecollection = new stdClass();
-            $rulecollection->id = $cohort->draftcollectionid;
-            $rulecollection->rulesetoperator = $value;
-            $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
-            $rulecollection->timemodified = time();
-            $rulecollection->modifierid = $USER->id;
-            if($DB->update_record('cohort_rule_collections', $rulecollection)) {
-                echo json_encode(array('action' => 'updcohortop', 'ruleid' => $rulecollection->id, 'value' => $value));
-            }
-        }
-    } else {
-        $operator = $DB->get_field('cohort_rulesets', 'operator', array('id' => $id));
-        if ($operator != $value) {
-            // Update resulset operator
-            $ruleset = new stdClass();
-            $ruleset->id = $id;
-            $ruleset->operator = $value;
-            $ruleset->timemodified = time();
-            $ruleset->modifierid = $USER->id;
-            if ($DB->update_record('cohort_rulesets', $ruleset)) {
-                echo json_encode(array('action' => 'updrulesetop', 'ruleid' => $ruleset->id, 'value' => $value));
-            }
-
-            // Update cohort rule collection
-            $rulecollection = new stdClass;
-            $rulecollection->id = $cohort->draftcollectionid;
-            $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
-            $DB->update_record('cohort_rule_collections', $rulecollection);
-        }
-    }
-
-    add_to_log(SITEID, 'cohort', 'edit rule operators', 'cohort/view.php?id='.$cohortid, $cohort->idnumber);
+$result = totara_cohort_update_operator($cohortid, $id, $type, $value);
+if ($type === COHORT_OPERATOR_TYPE_COHORT) {
+    echo json_encode(array('action' => 'updcohortop', 'ruleid' => $id, 'value' => $value, 'result' => $result));
+} else if ($type === COHORT_OPERATOR_TYPE_RULESET) {
+    echo json_encode(array('action' => 'updrulesetop', 'ruleid' => $id, 'value' => $value, 'result' => $result));
 }
+add_to_log(SITEID, 'cohort', 'edit rule operators', 'cohort/view.php?id='.$cohortid);
 
 exit();

@@ -43,37 +43,7 @@ $success = '';
 admin_externalpage_setup('cohorts');
 
 if (($data = data_submitted()) && confirm_sesskey()) {
-    $success = true;
-
-    // Make an array of object to use it later when inserting via batch.
-    $selectedroles = array();
-    foreach ($roles as $key => $value) {
-        $roleobj = new stdClass();
-        $roleobj->roleid = $key;
-        $roleobj->contextid = $value;
-        $selectedroles[$key] = $roleobj;
-    }
-
-    // Get members of the cohort.
-    $memberids = array();
-    if ($members = totara_get_members_cohort($cohort->id)) {
-        $memberids = array_keys($members);
-    }
-
-    // Current roles assigned to this cohort.
-    $currentroles = totara_get_cohort_roles($cohort->id);
-
-    // Unassign roles.
-    if (!empty($currentroles)) {
-        $rolestounassign = array_diff_key($currentroles, $selectedroles);
-        $success = totara_unassign_roles_cohort($rolestounassign, $cohort->id, $memberids);
-    }
-
-    // Assign roles.
-    $rolestoassign = array_diff_key($selectedroles, $currentroles);
-    if (!empty($rolestoassign)) {
-        $success = $success && totara_assign_roles_cohort($rolestoassign, $cohort->id, $memberids);
-    }
+    $success = totara_cohort_process_assigned_roles($cohort->id, $roles);
 }
 
 // Get list of all roles.

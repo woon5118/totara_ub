@@ -83,7 +83,7 @@ abstract class cohort_rule_sqlhandler_completion_list extends cohort_rule_sqlhan
                 break;
             case COHORT_RULE_COMPLETION_OP_NOTALL:
                 $goalnum = count($this->listofids);
-                $operator = '>';
+                $operator = '<';
                 break;
             case COHORT_RULE_COMPLETION_OP_ALL:
                 $goalnum = count($this->listofids);
@@ -108,7 +108,19 @@ class cohort_rule_sqlhandler_completion_list_course extends cohort_rule_sqlhandl
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'clc'.$this->ruleid);
-        $sqlhandler->sql = "{$goalnum} {$operator}
+        if ($goalnum != 0) {
+            $sqlhandler->sql = "
+                  (
+                  SELECT count(*)
+                    FROM {course_completions} cc
+                   WHERE cc.userid = u.id
+                     AND cc.course {$sqlin}
+                     AND cc.timecompleted > 0
+                  GROUP BY userid
+                  ) {$operator} {$goalnum}";
+
+        } else {
+            $sqlhandler->sql = "{$goalnum} {$operator}
                   (
                   SELECT count(*)
                     FROM {course_completions} cc
@@ -116,6 +128,7 @@ class cohort_rule_sqlhandler_completion_list_course extends cohort_rule_sqlhandl
                      AND cc.course {$sqlin}
                      AND cc.timecompleted > 0
                   )";
+        }
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
@@ -129,16 +142,30 @@ class cohort_rule_sqlhandler_completion_list_program extends cohort_rule_sqlhand
         global $DB;
         $sqlhandler = new stdClass();
         list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'clp'.$this->ruleid);
-        $sqlhandler->sql = "{$goalnum} {$operator}
+        if ($goalnum != 0) {
+            $sqlhandler->sql = "
                   (
                   SELECT count(*)
-                    FROM {prog_completion} pc
-                   WHERE pc.userid = u.id
-                     AND pc.programid {$sqlin}
-                     AND pc.coursesetid = 0
-                     AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
-                     AND pc.timecompleted > 0
+                  FROM {prog_completion} pc
+                  WHERE pc.userid = u.id
+                    AND pc.programid {$sqlin}
+                    AND pc.coursesetid = 0
+                    AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
+                    AND pc.timecompleted > 0
+                  GROUP BY userid
+                  ) {$operator} {$goalnum}";
+        } else {
+            $sqlhandler->sql = "{$goalnum} {$operator}
+                  (
+                  SELECT count(*)
+                  FROM {prog_completion} pc
+                  WHERE pc.userid = u.id
+                    AND pc.programid {$sqlin}
+                    AND pc.coursesetid = 0
+                    AND pc.status = " . STATUS_PROGRAM_COMPLETE . "
+                    AND pc.timecompleted > 0
                   )";
+        }
         $sqlhandler->params = $params;
         return $sqlhandler;
     }
@@ -184,7 +211,6 @@ abstract class cohort_rule_sqlhandler_completion_date extends cohort_rule_sqlhan
                 break;
         }
 
-        $date = (int) $this->date;
         $goalnum = count($this->listofids);
 
         return $this->construct_sql_snippet($goalnum, $comparison, $this->listofids);

@@ -48,7 +48,7 @@ class rb_source_program extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program');
-        $this->sourcewhere = '(base.certifid IS NULL)';
+        $this->sourcewhere = $this->define_sourcewhere();
         parent::__construct();
     }
 
@@ -93,7 +93,17 @@ class rb_source_program extends rb_base_source {
     }
 
     protected function define_contentoptions() {
-        $contentoptions = array();
+        $contentoptions = array(
+            new rb_content_option(
+                'prog_availability',
+                get_string('availablecontent', 'rb_source_program'),
+                array(
+                    'base.available',
+                    'base.availablefrom',
+                    'base.availableuntil',
+                )
+            ),
+        );
         return $contentoptions;
     }
 
@@ -148,6 +158,12 @@ class rb_source_program extends rb_base_source {
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
         return $requiredcolumns;
+    }
+
+    protected function define_sourcewhere() {
+        $sourcewhere = '(base.certifid IS NULL)';
+
+        return $sourcewhere;
     }
 
     public function post_config(reportbuilder $report) {

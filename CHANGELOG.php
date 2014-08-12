@@ -3,6 +3,33 @@
 
 Totara LMS Changelog
 
+Release 2.6.7 (12th August 2014):
+==================================================
+
+Improvements:
+    T-12735        Improved scalability for the program management page
+    T-12311        Added checks for Program availability to the Program catalog
+    T-12785        Added capability check to hide facetoface session attendees add/remove dropdown depending on permissions
+    T-12876        Added forced cache purge on every upgrade
+
+Bug Fixes:
+    T-12778        Fixed Face-to-face calendar prev/next month display
+    T-12502        Fixed sidebar filters in enhanced catalog when not logged in
+    T-12224        Fixed alignment of framework dropdown in totara dialogs in the standard reponsive theme
+    T-12464        Added error messages when importing course completion records with different grade on same day, user and course
+    T-12799        Fixed filtering of course name through multilang filter for Certificates
+    T-12694        Stopped reservation info being shown on session list page if reservations are turned off
+    T-12874        Stopped notices being displayed on attendees page if no attendees are selected when add dialog is submitted
+    T-12845        Fixed hardcoded column/filter section headings in Reportbuilder
+    T-12835        Fixed quiz activities sending blank messages
+    T-12786        Fixed course completion not working properly when another course is a prerequisite for completion
+    T-12872        Fixed Appraisal Stages so they can be completed on the final due day
+    T-12775        Disabled incorrect trust text usage
+    T-12768        Fixed incorrect capacity and places totals in the Facetoface Summary report source
+    T-12824        Fixed Certification id being incorrectly set in creation event objects
+    T-12829        Fixed error on cron when a certification does not contain any courses
+
+
 Release 2.6.6 (29th July 2014):
 ==================================================
 

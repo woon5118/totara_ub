@@ -70,5 +70,6 @@ $string['coursedelivery'] = 'Course Delivery';
 $string['type_session'] = 'Session';
 $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
+$string['type_room'] = 'Room';
 $string['type_facetoface'] = 'Face-to-face';
 $string['type_date'] = 'Session Date';

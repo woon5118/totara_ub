@@ -38,7 +38,7 @@ class rb_source_certification extends rb_source_program {
     public function __construct() {
         parent::__construct();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification');
-        $this->sourcewhere = '(base.certifid IS NOT NULL)';
+        $this->sourcewhere = $this->define_sourcewhere();
     }
     protected function define_columnoptions() {
         $columnoptions = array();
@@ -51,6 +51,11 @@ class rb_source_certification extends rb_source_program {
         return $columnoptions;
     }
 
+    protected function define_sourcewhere() {
+        $sourcewhere = '(base.certifid IS NOT NULL)';
+
+        return $sourcewhere;
+    }
 
     protected function define_filteroptions() {
         $filteroptions = array();

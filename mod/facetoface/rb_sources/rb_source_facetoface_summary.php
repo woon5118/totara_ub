@@ -37,6 +37,7 @@ class rb_source_facetoface_summary extends rb_base_source {
         $this->filteroptions = $this->define_filteroptions();
         $this->contentoptions = $this->define_contentoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
+        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_summary');
 
         parent::__construct();
@@ -457,5 +458,23 @@ class rb_source_facetoface_summary extends rb_base_source {
      */
     function rb_display_session_spaces($count, $row) {
         return $row->overall_capacity - $count;
+    }
+
+    /**
+     * Required columns.
+     */
+    protected function define_requiredcolumns() {
+        // Session_id is needed so when grouping we can keep the information grouped by sessions.
+        // This is done to cover the case when we have several sessions which are identical.
+        $requiredcolumns = array(
+            new rb_column(
+                'sessions',
+                'id',
+                '',
+                "sessions.id",
+                array('joins' => 'sessions')
+            )
+        );
+        return $requiredcolumns;
     }
 }

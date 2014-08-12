@@ -37,3 +37,5 @@ $string['columnbaseimportuserfullname'] = 'Imported by';
 $string['columnbaserownumber'] = 'Line number';
 $string['columnbasetimecreated'] = 'Time uploaded';
 $string['columnbaseusername'] = 'Username to import';
+$string['type_base'] = 'Import';
+$string['type_importuser'] = 'Imported By';

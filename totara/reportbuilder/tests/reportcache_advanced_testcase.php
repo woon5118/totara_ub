@@ -322,7 +322,6 @@ class reportcache_testing_data_generator extends testing_data_generator {
         $program = new program($programid);
         $programcontent = $program->get_content();
         $programcontent->setup_content($rawdata);
-        $programcontent->add_set($rawdata->{'contenttype' . $CERTIFPATHSUF[$certifpath]});
         $programcontent->save_content();
     }
 

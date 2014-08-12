@@ -23,11 +23,11 @@
  */
 
 /**
- * Data generator.
- *
- * @package    totara_cohort
- * @category   test
- */
+* Data generator.
+*
+* @package    totara_cohort
+* @category   test
+*/
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -104,17 +104,20 @@ class totara_cohort_generator extends component_generator_base {
     /**
      * Add particular mock params to cohort rules
      *
-     * @param int $ruleid
-     * @param array $params Params to add
-     * @param array $listofvaluesorids List of values
-     * @param string $indexnamelist Current possible values (listofvalues, listofids)
+     * @param int $ruleset Ruleset ID
+     * @param string $ruletype Rule type
+     * @param string $rulename Rule name
+     * @param array $ruleparams Params to add
+     * @param array $rulevalues List of values
+     * @param string $paramname Current possible values (listofvalues, listofids, managerid, cohortids)
      */
-    public function create_cohort_rule_params($ruleid, $params, $listofvaluesorids, $indexnamelist = 'listofvalues') {
+    public function create_cohort_rule_params($ruleset, $ruletype, $rulename, $ruleparams, $rulevalues, $paramname = 'listofvalues') {
         global $DB, $USER;
-        $data = array($params);
-        foreach($listofvaluesorids as $l) {
-            $data[] = array($indexnamelist => $l);
+        $data = array($ruleparams);
+        foreach($rulevalues as $l) {
+            $data[] = array($paramname => $l);
         }
+        $ruleid = cohort_rule_create_rule($ruleset, $ruletype, $rulename);
         foreach($data as $d) {
             foreach ($d as $name => $value) {
                 $todb = new stdClass();

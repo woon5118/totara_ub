@@ -1100,5 +1100,33 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014051200, 'totara_core');
     }
 
+    if ($oldversion < 2014081200) {
+        // Get course that have other courses as criteria for completion.
+        $sqlaffectedusers = "SELECT cc.id
+                             FROM {course_completions} cc
+                             INNER JOIN {course_completion_criteria} ccc
+                               ON ccc.criteriatype = ".COMPLETION_CRITERIA_TYPE_COURSE." AND ccc.courseinstance = cc.course
+                             WHERE ccc.courseinstance IS NOT NULL
+                               AND cc.reaggregate = 0
+                               AND cc.timecompleted IS NULL";
+
+        $completions = $DB->get_fieldset_sql($sqlaffectedusers);
+        if ($completions) {
+            list($insql, $inparams) = $DB->get_in_or_equal($completions);
+
+            // Set reaggregate to 1 for courses that have dependencies or other courses so they can be evaluated again
+            // when the cron for completion runs.
+            $sql = "UPDATE
+                        {course_completions}
+                    SET
+                        reaggregate = 1
+                    WHERE
+                        id $insql";
+            $DB->execute($sql, $inparams);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014081200, 'totara_core');
+    }
+
     return true;
 }

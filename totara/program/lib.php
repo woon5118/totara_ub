@@ -460,15 +460,29 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
 
     $visibleprograms = array();
 
+
+    $system_context = context_system::instance();
+    $now = time();
+    $availabilitysql = '';
+    $canseeunavailable = has_capability('totara/program:viewhiddenprograms', $system_context);
+    $availabilityparams = array();
+    if(!$canseeunavailable) {
+        $availabilitysql = 'AND p.available > 0 AND p.availablefrom < :timefrom
+                            AND (p.availableuntil = 0 OR p.availableuntil > :timeuntil)';
+        $availabilityparams['timefrom'] = $now;
+        $availabilityparams['timeuntil'] = $now;
+    }
+    $params = array_merge($params, $availabilityparams);
+
     $visibilitysql = '';
     $visibilityparams = array();
-    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance());
+    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $system_context);
     if (!empty($CFG->audiencevisibility) && !$canmanagevisibility) {
         list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql('p', 'id', COHORT_ASSN_ITEMTYPE_PROGRAM);
     }
-
     $params = array_merge($params, $visibilityparams);
-    // Pull out all programs matching the categoty.
+
+    // Pull out all programs matching the category.
     $programs = $DB->get_records_sql("SELECT DISTINCT {$fields},
                                     ctx.id AS ctxid, ctx.path AS ctxpath,
                                     ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
@@ -477,6 +491,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
                                       ON (p.id = ctx.instanceid
                                           AND ctx.contextlevel = :contextlevel)
                                     $visibilitysql
+                                    $availabilitysql
                                     $categoryselect
                                     $sortstatement", $params, $offset, $limit);
 

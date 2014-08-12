@@ -771,12 +771,14 @@ if ($show_table) {
         }
     }
 
-    echo $OUTPUT->container_start('actions last');
-    if ($actions) {
-        // Action selector
-        echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('action')));
+    if (has_any_capability(array('mod/facetoface:addattendees', 'mod/facetoface:removeattendees'), $context)) {
+        echo $OUTPUT->container_start('actions last');
+        if ($actions) {
+            // Action selector
+            echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('action')));
+        }
+        echo $OUTPUT->container_end();
     }
-    echo $OUTPUT->container_end();
 }
 
 if ($action == 'messageusers') {

@@ -85,9 +85,10 @@ class totara_hierarchy_generator extends component_generator_base {
      * Create a hierarchy based on the shortprefix and assign it to a framework.
      *
      * @param $frameworkid
-     * @param string $shortprefix use in hierarchy
+     * @param $prefix
      * @param string $fullname
      * @param null $record
+     * @internal param string $shortprefix use in hierarchy
      * @return bool|int herarchy id
      */
     public function create_hierarchy($frameworkid, $prefix, $fullname, $record = null) {
@@ -202,17 +203,17 @@ class totara_hierarchy_generator extends component_generator_base {
     /**
      * Assign primary positions to a user.
      *
-     * @param $user
+     * @param $userid
      * @param $managerid
      * @param $organisationid
      * @param $positionid
      * @param null $record
      * @return void
      */
-    public function assign_primary_position($user, $managerid, $organisationid, $positionid, $record = null) {
+    public function assign_primary_position($userid, $managerid, $organisationid, $positionid, $record = null) {
         $data = new stdClass();
         $data->type = (isset($record['type'])) ? $record['type'] : POSITION_TYPE_PRIMARY;
-        $data->userid = (isset($record['userid'])) ? $record['userid'] : $user;
+        $data->userid = (isset($record['userid'])) ? $record['userid'] : $userid;
         $data->managerid = (isset($record['managerid'])) ? $record['managerid'] : $managerid; // Assign manager to user position.
         $data->organisationid = (isset($record['organisationid'])) ? $record['organisationid'] : $organisationid; // Assign org.
         $data->positionid = (isset($record['positionid'])) ? $record['positionid'] : $positionid; // Assign pos.
@@ -235,5 +236,25 @@ class totara_hierarchy_generator extends component_generator_base {
         );
         $position_assignment::set_properties($position_assignment, $data); // Setup data.
         assign_user_position($position_assignment);
+    }
+
+    function get_subordinates($managerid){
+        global $DB;
+
+        return $DB->get_fieldset_select('pos_assignment', 'userid', 'managerid = :manager', array('manager' => $managerid));
+    }
+
+    function get_manager_hierarchy($parentid) {
+        $tree = Array();
+        if (!empty($parentid)) {
+            $tree = $this->get_subordinates($parentid);
+            if (!empty($tree)) {
+                foreach ($tree as $key => $value) {
+                    $ids = $this->get_manager_hierarchy($value);
+                    $tree = array_merge($tree, $ids);
+                }
+            }
+        }
+        return $tree;
     }
 }

@@ -192,33 +192,35 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             }
 
             // Output links to reserve/allocate spaces.
-            $sessreserveinfo = $reserveinfo;
-            if (!$session->allowoverbook) {
-                $sessreserveinfo = facetoface_limit_reserveinfo_to_capacity_left($session->id, $sessreserveinfo,
-                                                                                max(0, $session->capacity - $signupcount));
-            }
-            $sessreserveinfo = facetoface_limit_reserveinfo_by_session_date($sessreserveinfo, $session);
-            if (!empty($sessreserveinfo['allocate']) && $sessreserveinfo['maxallocate'][$session->id] > 0) {
-                // Able to allocate and not used all allocations for other sessions.
-                $allocateurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'allocate', 's' => $session->id,
-                                                                                  'backtoallsessions' => $session->facetoface));
-                $options .= html_writer::link($allocateurl, get_string('allocate', 'mod_facetoface'));
-                $options .= ' ('.$sessreserveinfo['allocated'][$session->id].'/'.$sessreserveinfo['maxallocate'][$session->id].')';
-                $options .= html_writer::empty_tag('br');
-            }
-            if (!empty($sessreserveinfo['reserve']) && $sessreserveinfo['maxreserve'][$session->id] > 0) {
-                if (empty($sessreserveinfo['reservepastdeadline'])) {
-                    $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
-                                                                                     'backtoallsessions' => $session->facetoface));
-                    $options .= html_writer::link($reserveurl, get_string('reserve', 'mod_facetoface'));
-                    $options .= ' ('.$sessreserveinfo['reserved'][$session->id].'/'.$sessreserveinfo['maxreserve'][$session->id].')';
+            if (!empty($reserveinfo)) {
+                $sessreserveinfo = $reserveinfo;
+                if (!$session->allowoverbook) {
+                    $sessreserveinfo = facetoface_limit_reserveinfo_to_capacity_left($session->id, $sessreserveinfo,
+                                                                                    max(0, $session->capacity - $signupcount));
+                }
+                $sessreserveinfo = facetoface_limit_reserveinfo_by_session_date($sessreserveinfo, $session);
+                if (!empty($sessreserveinfo['allocate']) && $sessreserveinfo['maxallocate'][$session->id] > 0) {
+                    // Able to allocate and not used all allocations for other sessions.
+                    $allocateurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'allocate', 's' => $session->id,
+                                                                                      'backtoallsessions' => $session->facetoface));
+                    $options .= html_writer::link($allocateurl, get_string('allocate', 'mod_facetoface'));
+                    $options .= ' ('.$sessreserveinfo['allocated'][$session->id].'/'.$sessreserveinfo['maxallocate'][$session->id].')';
                     $options .= html_writer::empty_tag('br');
                 }
-            } else if (!empty($sessreserveinfo['reserveother']) && empty($sessreserveinfo['reservepastdeadline'])) {
-                $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
-                                                                                 'backtoallsessions' => $session->facetoface));
-                $options .= html_writer::link($reserveurl, get_string('reserveother', 'mod_facetoface'));
-                $options .= html_writer::empty_tag('br');
+                if (!empty($sessreserveinfo['reserve']) && $sessreserveinfo['maxreserve'][$session->id] > 0) {
+                    if (empty($sessreserveinfo['reservepastdeadline'])) {
+                        $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
+                                                                                         'backtoallsessions' => $session->facetoface));
+                        $options .= html_writer::link($reserveurl, get_string('reserve', 'mod_facetoface'));
+                        $options .= ' ('.$sessreserveinfo['reserved'][$session->id].'/'.$sessreserveinfo['maxreserve'][$session->id].')';
+                        $options .= html_writer::empty_tag('br');
+                    }
+                } else if (!empty($sessreserveinfo['reserveother']) && empty($sessreserveinfo['reservepastdeadline'])) {
+                    $reserveurl = new moodle_url('/mod/facetoface/reserve.php', array('action' => 'reserve', 's' => $session->id,
+                                                                                     'backtoallsessions' => $session->facetoface));
+                    $options .= html_writer::link($reserveurl, get_string('reserveother', 'mod_facetoface'));
+                    $options .= html_writer::empty_tag('br');
+                }
             }
 
             if ($isbookedsession) {

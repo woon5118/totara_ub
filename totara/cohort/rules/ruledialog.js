@@ -101,8 +101,9 @@ M.totara_cohortrules = M.totara_cohortrules || {
 
              if (radioname === 'cohortoperator') {
                  id = cohortid;
+                 type = M.totara_cohortrules.config.operator_type_cohort;
              } else if (radioname.substr(0, 15) === 'rulesetoperator') {
-                 type = 'rulesetoperator';
+                 type = M.totara_cohortrules.config.operator_type_ruleset;
                  // Pattern for ruleset operators. e.g. rulesetoperator[422].
                  var match = radioname.match(/\[(\d+)\]/);
                  if (match) {
@@ -124,19 +125,23 @@ M.totara_cohortrules = M.totara_cohortrules || {
                      sesskey: M.cfg.sesskey
                  }),
                  success: function(o) {
-                     // If sucess, update operators description in the client side
+                     // If success, update operators description in the client side.
                      if (o.length > 0) {
                          o = JSON.parse(o);
                          var operator = null;
+                         if (o.result === false) {
+                             show_notifications(o.action, id, o.result);
+                             return false;
+                         }
                          if (o.action === 'updcohortop') {
                              operator = M.util.get_string('andcohort', 'totara_cohort');
                              if (o.value !== 0) {
                                  operator = M.util.get_string('orcohort', 'totara_cohort');
                              }
-                             // Change cohort operator
+                             // Change cohort operator.
                              $("div .cohort-oplabel").html(operator);
-                             // Enable approve - cancel options and notify success
-                             show_notifications(o.action, id);
+                             // Enable approve - cancel options and notify success.
+                             show_notifications(o.action, id, o.result);
                          } else {
                              operator = M.util.get_string('and', 'totara_cohort');
                              if (o.value !== 0) {
@@ -145,34 +150,41 @@ M.totara_cohortrules = M.totara_cohortrules || {
                              var divid = '#id_cohort-ruleset-header' + id + " td.operator ";
                              $(divid).each(function (index, value) {
                                  if (index !== 0) {
-                                     // Change ruleset operator
+                                      // Change ruleset operator.
                                       $(this).text(operator);
-                                      // Enable approve - cancel options and notify success
-                                      show_notifications(o.action, id);
                                  }
                              });
+                             // Enable approve - cancel options and notify success.
+                             show_notifications(o.action, id, o.result);
                          }
                      }
                  }
              });
          });
 
-        function show_notifications(type, id) {
-            // Show approve - cancel options
-            $('div#cohort_rules_action_box').removeAttr("style");
+        function show_notifications(type, id, success) {
+            var notification_class = 'notifysuccess';
+            var notification_message = M.util.get_string('rulesupdatesuccess', 'totara_cohort');
+            if (success) {
+                // Show approve - cancel options
+                $('div#cohort_rules_action_box').removeAttr("style");
+            } else {
+                notification_class = 'notifyproblem';
+                notification_message = M.util.get_string('rulesupdatefailure', 'totara_cohort');
+            }
 
-            // Notify success
-            var notice = "<div id='notifysuccess"+ id +"' class='notifysuccess'>" +
-                M.util.get_string('rulesupdatesuccess', 'totara_cohort') + "<div>";
+            // Notify result of operation.
+            var notice = "<div id='notify"+ id +"' class="+notification_class+">" +
+                notification_message + "<div>";
 
-            if ($('div#notifysuccess' + id).length === 0) {
+            if ($('div#notify'+ id).length === 0) {
                 if (type === 'updcohortop') {
                     $('#fgroup_id_cohortoperator').prepend(notice);
                 } else {
                     $('#fgroup_id_rulesetoperator_' + id).prepend(notice);
                 }
             }
-            $('div#notifysuccess' + id).fadeOut(600).fadeIn(600);
+            $('div#notify'+ id).fadeOut(600).fadeIn(600);
         }
 
         // Dialog & handler for hierarchy picker

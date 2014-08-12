@@ -66,6 +66,9 @@ class core_component {
     /** @var array list of the files to map. */
     protected static $filestomap = array('lib.php', 'settings.php');
 
+    /** @var string Totara build */
+    protected static $totarabuild = null;
+
     /**
      * Class loader for Frankenstyle named classes in standard locations.
      * Frankenstyle namespaces are supported.
@@ -160,6 +163,8 @@ class core_component {
                 } else if ((float) $cache['version'] !== (float) self::fetch_core_version()) {
                     // Outdated cache. We trigger an error log to track an eventual repetitive failure of float comparison.
                     error_log('Resetting core_component cache after core upgrade to version ' . self::fetch_core_version());
+                } else if (!isset($cache['totarabuild']) or $cache['totarabuild'] !== self::fetch_totarabuild()) {
+                    error_log('Resetting core_component cache after totara upgrade to build ' . self::fetch_totarabuild());
                 } else if ($cache['plugintypes']['mod'] !== "$CFG->dirroot/mod") {
                     // $CFG->dirroot was changed.
                 } else {
@@ -257,6 +262,7 @@ class core_component {
             'classmap'    => self::$classmap,
             'filemap'     => self::$filemap,
             'version'     => self::$version,
+            'totarabuild' => self::$totarabuild,
         );
 
         return '<?php
@@ -280,6 +286,7 @@ $cache = '.var_export($cache, true).';
         self::fill_classmap_cache();
         self::fill_filemap_cache();
         self::fetch_core_version();
+        self::fetch_totarabuild();
     }
 
     /**
@@ -297,6 +304,24 @@ $cache = '.var_export($cache, true).';
             self::$version = $version;
         }
         return self::$version;
+    }
+
+    /**
+     * Get the Totara build.
+     *
+     * In order for this to work properly, opcache should be reset beforehand.
+     *
+     * @return string build number
+     */
+    protected static function fetch_totarabuild() {
+        global $CFG;
+        if (self::$totarabuild === null) {
+
+            $TOTARA = new stdClass(); // Prevent IDE complaints.
+            require($CFG->dirroot . '/version.php');
+            self::$totarabuild = $TOTARA->build;
+        }
+        return self::$totarabuild;
     }
 
     /**
@@ -984,6 +1009,7 @@ $cache = '.var_export($cache, true).';
 
         // Main version first.
         $versions['core'] = self::fetch_core_version();
+        $versions['totarabuild'] = self::fetch_totarabuild();
 
         // The problem here is tha the component cache might be stable,
         // we want this to work also on frontpage without resetting the component cache.

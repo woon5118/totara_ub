@@ -56,7 +56,7 @@ $personalcontext = context_user::instance($user->id);
 $coursecontext = context_course::instance($course->id);
 $PAGE->set_url(new moodle_url('/user/positions.php', array('user' => $user->id, 'type' => $type)));
 $PAGE->set_context($coursecontext);
-$editoroptions = array('subdirs' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => true, 'context' => $personalcontext);
+$editoroptions = array('subdirs' => true, 'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'context' => $personalcontext);
 
 $canview = false;
 if (!empty($USER->id) && ($user->id == $USER->id)) {

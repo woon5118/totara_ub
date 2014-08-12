@@ -431,6 +431,7 @@ $string['rulesetname'] = 'Ruleset #{$a}';
 $string['rulesetoperatorlabel'] = 'Membership setting between each rule in this rule set';
 $string['rulestitle'] = 'Membership criteria';
 $string['rulesupdatesuccess'] = 'Rules updated';
+$string['rulesupdatefailure'] = 'Failure occurs while updating rules. Changes will not apply';
 $string['saveallchanges'] = 'Save all changes';
 $string['savinglearning'] = 'Saving learning...';
 $string['savingrule'] = 'Saving...';

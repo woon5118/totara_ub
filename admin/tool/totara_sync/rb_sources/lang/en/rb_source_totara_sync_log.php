@@ -22,3 +22,4 @@
  */
 
 $string['sourcetitle'] = 'Totara Sync Log';
+$string['type_totara_sync_log'] = 'Totara Sync Log';
