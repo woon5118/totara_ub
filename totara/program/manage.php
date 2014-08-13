@@ -256,20 +256,22 @@ if (!empty($moveto) && ($data = data_submitted()) && confirm_sesskey()) {
 }
 
 if ((!empty($hide) or !empty($show)) && confirm_sesskey()) {
-    // Hide or show a program.
-    if (!empty($hide)) {
-        $program = $DB->get_record('prog', array('id' => $hide), '*', MUST_EXIST);
-        $visible = 0;
-    } else {
-        $program = $DB->get_record('prog', array('id' => $show), '*', MUST_EXIST);
-        $visible = 1;
+    if (empty($CFG->audiencevisibility)) {
+        // Hide or show a program.
+        if (!empty($hide)) {
+            $program = $DB->get_record('prog', array('id' => $hide), '*', MUST_EXIST);
+            $visible = 0;
+        } else {
+            $program = $DB->get_record('prog', array('id' => $show), '*', MUST_EXIST);
+            $visible = 1;
+        }
+        $programcontext = context_program::instance($program->id);
+        require_capability('totara/program:visibility', $programcontext);
+        // Set the visibility of the program.
+        $params = array('id' => $program->id, 'visible' => $visible, 'timemodified' => time());
+        $DB->update_record('prog', $params);
+        add_to_log($program->id, "program", ($visible ? 'show' : 'hide'), "edit.php?id=$program->id", $program->id);
     }
-    $programcontext = context_program::instance($program->id);
-    require_capability('totara/program:visibility', $programcontext);
-    // Set the visibility of the program.
-    $params = array('id' => $program->id, 'visible' => $visible, 'timemodified' => time());
-    $DB->update_record('prog', $params);
-    add_to_log($program->id, "program", ($visible ? 'show' : 'hide'), "edit.php?id=$program->id", $program->id);
 }
 
 if ((!empty($moveup) or !empty($movedown)) && confirm_sesskey()) {
@@ -556,12 +558,7 @@ if (!$programs) {
 
         $programurl = new moodle_url('/totara/program/view.php', array('id' => $aprogram->id, 'viewtype' => $viewtype));
         $attributes = array();
-        if (empty($CFG->audiencevisibility)) {
-            $isdimmed = !$aprogram->visible;
-        } else {
-            $isdimmed = $aprogram->audiencevisible != COHORT_VISIBLE_ALL;
-        }
-        $attributes['class'] = $isdimmed ? 'dimmed' : '';
+        $attributes['class'] = totara_get_style_visibility($aprogram);
         $programname = format_string($aprogram->fullname);
         $programname = html_writer::link($programurl, $programname, $attributes);
 
@@ -592,11 +589,9 @@ if (!$programs) {
         if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
             $url = new moodle_url('/totara/program/edit.php', array('id' => $aprogram->id, 'action' => 'edit'));
             $url->set_anchor('id_visiblecohortshdr');
-            $icon = 'show';
-            if ($aprogram->audiencevisible == COHORT_VISIBLE_ALL) {
-                $icon = 'hide';
-            } else if ($aprogram->audiencevisible == COHORT_VISIBLE_AUDIENCE) {
-                $icon = 'cohort';
+            $icon = 'hide';
+            if ($aprogram->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+                $icon = 'show';
             }
             $icons[] = $OUTPUT->action_icon($url, new pix_icon("t/{$icon}", get_string('manageaudincevisibility', 'totara_cohort')));
         } else {

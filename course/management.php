@@ -192,9 +192,19 @@ if ($action !== false && confirm_sesskey()) {
             \core_course\management\helper::action_category_resort_courses($category, $sort);
             break;
         case 'showcourse' :
+            if (!empty($CFG->audiencevisibility)) {
+                $url = new moodle_url('/course/edit.php', array('id' => $course->id));
+                $url->set_anchor('id_visiblecohortshdr');
+                redirect($url);
+            }
             $redirectback = \core_course\management\helper::action_course_show($course);
             break;
         case 'hidecourse' :
+            if (!empty($CFG->audiencevisibility)) {
+                $url = new moodle_url('/course/edit.php', array('id' => $course->id));
+                $url->set_anchor('id_visiblecohortshdr');
+                redirect($url);
+            }
             $redirectback = \core_course\management\helper::action_course_hide($course);
             break;
         case 'movecourseup' :

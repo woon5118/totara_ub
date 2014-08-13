@@ -39,6 +39,10 @@ if (!$program = new program($id)) {
     print_error('error:programid', 'totara_program');
 }
 
+if (!$program->is_viewable()) {
+    print_error('error:inaccessible', 'totara_program');
+}
+
 // Check if programs or certifications are enabled.
 if ($program->certifid) {
     check_certification_enabled();

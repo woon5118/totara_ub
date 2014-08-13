@@ -56,24 +56,30 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
     // What items are we counting, courses, programs, or certifications?
     switch ($viewtype) {
         case 'course':
-            $itemcap = 'moodle/course:viewhiddencourses';
             $itemtable = "{course}";
             $itemcontext = CONTEXT_COURSE;
             $itemalias = 'c';
+            $fieldbaseid  = 'c.id';
+            $fieldvisible = 'c.visible';
+            $fieldaudvis  = 'c.audiencevisible';
             $extrawhere = '';
             break;
         case 'program':
-            $itemcap = 'totara/program:viewhiddenprograms';
             $itemtable = "{prog}";
             $itemcontext = CONTEXT_PROGRAM;
             $itemalias = 'p';
+            $fieldbaseid  = 'p.id';
+            $fieldvisible = 'p.visible';
+            $fieldaudvis  = 'p.audiencevisible';
             $extrawhere = " AND certifid IS NULL";
             break;
         case 'certification':
-            $itemcap = 'totara/certification:viewhiddencertifications';
             $itemtable = "{prog}";
             $itemcontext = CONTEXT_PROGRAM;
             $itemalias = 'p';
+            $fieldbaseid  = 'p.id';
+            $fieldvisible = 'p.visible';
+            $fieldaudvis  = 'p.audiencevisible';
             $extrawhere = " AND certifid IS NOT NULL";
             break;
         default:
@@ -96,25 +102,24 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
     // But that's okay as we're only interested in the items inside.
     $contextwhere = array(); $contextparams = array();
     foreach ($contextpaths as $path) {
-        $paramalias = 'cxt_' . rand(1, 10000);
-        $contextwhere[] = $DB->sql_like('cx.path', ":{$paramalias}");
+        $paramalias = 'ctx_' . uniqid();
+        $contextwhere[] = $DB->sql_like('ctx.path', ":{$paramalias}");
         $contextparams[$paramalias] = $path . '/%';
     }
 
     // Add audience visibility setting.
-    $visibilitysql = '';
-    $visibilityparams = array();
-    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance());
-    if (!empty($CFG->audiencevisibility) && !$canmanagevisibility) {
-        list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql($itemalias, 'id', $itemcontext);
-    }
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id,
+                                                                        $fieldbaseid,
+                                                                        $fieldvisible,
+                                                                        $fieldaudvis,
+                                                                        $itemalias,
+                                                                        $viewtype);
 
-    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, cx.path
-              FROM {context} cx
+    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path
+              FROM {context} ctx
               JOIN {$itemtable} {$itemalias}
-                ON {$itemalias}.id = cx.instanceid AND contextlevel = :itemcontext
-                {$visibilitysql}
-             WHERE (" . implode(' OR ', $contextwhere) . ")" . $extrawhere;
+                ON {$itemalias}.id = ctx.instanceid AND contextlevel = :itemcontext
+             WHERE (" . implode(' OR ', $contextwhere) . " AND {$visibilitysql})" . $extrawhere;
     $params = array('itemcontext' => $itemcontext);
     $params = array_merge($params, $contextparams);
     $params = array_merge($params, $visibilityparams);
@@ -131,30 +136,6 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
 
     $results = array();
     foreach ($items as $item) {
-        if (empty($CFG->audiencevisibility)) {
-            // Check individual permission.
-            // Get contextobj - use a switch in case this gets even more complicated in future with a third type.
-            switch ($itemcontext) {
-                case CONTEXT_COURSE:
-                    $contextobj = context_course::instance($item->itemid);
-                    break;
-                case CONTEXT_PROGRAM:
-                    $contextobj = context_program::instance($item->itemid);
-                    break;
-            }
-            if (!$item->visible && !has_capability($itemcap, $contextobj)) {
-                continue;
-            }
-        }
-
-        // We need to check if programs are available to students.
-        if ($viewtype == 'program'  && !is_siteadmin($USER->id)) {
-            $program = new program($item->itemid);
-            if (!$program->is_accessible()) {
-                continue;
-            }
-        }
-
         // Now we need to figure out which sub-category each item is a member of.
         foreach ($contextpaths as $categoryid => $contextpath) {
             // It's a member if the beginning of the contextpath's match.
@@ -221,36 +202,40 @@ function totara_course_is_viewable($courseid, $userid = null) {
             return false;
         }
     } else {
-        if ($course->audiencevisible == COHORT_VISIBLE_ALL) {
-            // Course needs to be visible to all.
-            return true;
-        } else if (has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance(), $userid)) {
-            // Or user has 'manageaudiencevisibility' capability.
-            return true;
-        } else if (is_enrolled($coursecontext, $userid)) {
-            // Or user needs to be enrolled.
-            return true;
-        } else {
-            // Or user is in visible audiences.
-            $sql = "SELECT cv.instanceid
-                            FROM {cohort_visibility} cv
-                            JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
-                            JOIN {course} c ON cv.instanceid = c.id AND c.audiencevisible > 0
-                            WHERE cv.instancetype = :instancetype
-                                  AND cm.userid = :userid
-                                  AND c.id = :cid";
-            $params = array('instancetype' => COHORT_ASSN_ITEMTYPE_COURSE,
-                            'userid' => $userid,
-                            'cid' => $courseid);
-
-            if ($DB->record_exists_sql($sql, $params)) {
-                return true;
-            }
-            return false;
-        }
+        return check_access_audience_visibility('course', $course, $userid);
     }
 
     return true;
+}
+
+/**
+ * Returns the style css name for the component's visibility.
+ *
+ * @param stdClass $component Component (Course, Program, Certification) object
+ * @param string $oldvisfield Old visibility field
+ * @param string $audvisfield Audience visibility field
+ * @return string $dimmed Css class name
+ */
+function totara_get_style_visibility($component, $oldvisfield = 'visible', $audvisfield = 'audiencevisible') {
+    global $CFG;
+    $dimmed = '';
+
+    if (!is_object($component)) {
+        return $dimmed;
+    }
+
+    if (empty($CFG->audiencevisibility)) {
+        if (isset($component->{$oldvisfield}) && !$component->{$oldvisfield}) {
+            $dimmed = 'dimmed';
+        }
+    } else {
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+        if (isset($component->{$audvisfield}) && $component->{$audvisfield} == COHORT_VISIBLE_NOUSERS) {
+            $dimmed = 'dimmed';
+        }
+    }
+
+    return $dimmed;
 }
 
 
@@ -262,15 +247,42 @@ function totara_course_is_viewable($courseid, $userid = null) {
  * @param string $fieldbaseid The field in the base sql query which this query can link to.
  * @param string $fieldvisible The field in the base sql query which contains the visible property.
  * @param string $fieldaudvis The field in the base sql query which contains the audiencevisibile property.
- * @param int $instancetype Either COHORT_ASSN_ITEMTYPE_COURSE or COHORT_ASSN_ITEMTYPE_PROGRAM.
+ * @param string $fieldalias The field in the base sql query (This is used mainly for programs and cert which has available field)
+ * @param string $type course, program or certification.
+ * @param bool $iscached True if the fields passed comes from a report which data has been cached.
  * @return array(sqlstring, array(sqlparams))
  */
-function totara_visibility_where($userid = null, $fieldbaseid = 'course.id',
-        $fieldvisible = 'course.visible', $fieldaudvis = 'course.audiencevisible', $instancetype = COHORT_ASSN_ITEMTYPE_COURSE) {
-    global $CFG, $USER, $COHORT_ASSN_ITEMTYPES;
+function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fieldvisible = 'course.visible',
+             $fieldaudvis = 'course.audiencevisible', $fieldalias = 'course', $type = 'course', $iscached = false) {
+    global $CFG, $USER;
+    require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
     if (!$userid) {
         $userid = $USER->id;
+    }
+
+    // Initialize availability variables, needed for programs and certifications.
+    $availabilitysql = '1=1';
+    $availabilityparams = array();
+    $separator = ($iscached) ? '_' : '.'; // When the report is caches its fields comes in type_value form.
+    $systemcontext = context_system::instance();
+
+    // Evaluate capabilities.
+    switch($type) {
+        case 'course':
+            $capability = 'moodle/course:viewhiddencourses';
+            $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
+            break;
+        case 'program':
+            $capability = 'totara/program:viewhiddenprograms';
+            $instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
+            list($availabilitysql, $availabilityparams) = get_programs_availability_sql($fieldalias, $separator, $userid);
+            break;
+        case 'certification':
+            $capability = 'totara/certification:viewhiddencertifications';
+            $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+            list($availabilitysql, $availabilityparams) = get_programs_availability_sql($fieldalias, $separator, $userid);
+            break;
     }
 
     if (is_siteadmin($userid)) {
@@ -278,21 +290,55 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id',
         return array('1=1', array());
 
     } else if (empty($CFG->audiencevisibility)) {
-        if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE && has_capability('moodle/course:viewhiddencourses',
-                context_system::instance(), $userid)) {
-            return array('1=1', array());
-        } else if ($instancetype == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability('totara/program:viewhiddenprograms',
-                context_system::instance(), $userid)) {
-            return array('1=1', array());
-        } else if ($instancetype == COHORT_ASSN_ITEMTYPE_CERTIF && has_capability('totara/certification:viewhiddencertifications',
-                context_system::instance(), $userid)) {
-            return array('1=1', array());
+        if (has_capability($capability, $systemcontext, $userid)) {
+            return array($availabilitysql, $availabilityparams);
         } else {
-            // Normal visibility.
-            $sqlnormalvisible = "{$fieldvisible} = :tcvwnormalvisible";
-            return array($sqlnormalvisible, array('tcvwnormalvisible' => 1));
+            // Normal visibility unless they have the capability to see hidden learning components.
+            $sqlnormalvisible = "
+            (({$fieldvisible} = :tcvwnormalvisible) OR
+             ({$fieldvisible} = :tcvwnormalvisiblenone AND
+                 EXISTS (
+                     SELECT 1
+                     FROM {role_assignments} ra
+                     INNER JOIN {role_capabilities} rc on rc.roleid = ra.roleid
+                     WHERE ra.contextid = ctx{$separator}id
+                       AND ra.userid = :tcvuseridnormalvisibility
+                       AND rc.capability = :hiddencapability
+                       AND rc.permission = 1
+                   )
+             ))";
+            $params = array(
+                'tcvwnormalvisible' => 1,
+                'tcvwnormalvisiblenone' => 0,
+                'hiddencapability' => $capability,
+                'tcvuseridnormalvisibility' => $userid,
+                'hiddencapability' => $capability,
+            );
+
+            // Add availability sql.
+            if ($availabilitysql != '1=1') {
+                $sqlnormalvisible .= " AND {$availabilitysql} ";
+                $params = array_merge($params, $availabilityparams);
+            }
+
+            return array($sqlnormalvisible, $params);
         }
     } else {
+        // Audience visibility No users. Check for capabilities.
+        $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext, $userid);
+        if ($canmanagevisibility || has_capability($capability, $systemcontext, $userid)) {
+            return array($availabilitysql, $availabilityparams);
+        }
+
+        $sqlnousers = "{$fieldaudvis} != :tcvwaudvisnousers";
+        $paramsnousers = array('tcvwaudvisnousers' => COHORT_VISIBLE_NOUSERS);
+
+        // Add availability sql.
+        if ($availabilitysql != '1=1') {
+            $sqlnousers .= " AND {$availabilitysql} ";
+            $paramsnousers = array_merge($paramsnousers, $availabilityparams);
+        }
+
         // Audience visibility all.
         $sqlall = "{$fieldaudvis} = :tcvwaudvisall";
         $paramsall = array('tcvwaudvisall' => COHORT_VISIBLE_ALL);
@@ -304,28 +350,44 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id',
                            JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
                           WHERE cv.instanceid = {$fieldbaseid}
                             AND cv.instancetype = :tcvwinstancetypeselected
-                            AND cm.userid = :tcvwreportforselected))";
+                            AND cm.userid = :tcvwreportforselected)";
+        if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
+            $sqlselected .= " OR EXISTS (SELECT 1
+                                         FROM {user_enrolments} ue
+                                         JOIN {enrol} e ON e.id = ue.enrolid
+                                         WHERE e.courseid = {$fieldbaseid}
+                                           AND ue.userid = :tcvwreportforenrolled))";
+        } else {
+            $sqlselected .= " OR EXISTS (SELECT 1
+                                         FROM {prog_user_assignment} pua
+                                         WHERE pua.programid = {$fieldbaseid}
+                                           AND pua.userid = :tcvwreportforenrolled))";
+        }
+
         $paramsselected = array('tcvwaudvisaud' => COHORT_VISIBLE_AUDIENCE,
                 'tcvwinstancetypeselected' => $instancetype,
-                'tcvwreportforselected' => $userid);
+                'tcvwreportforselected' => $userid,
+                'tcvwreportforenrolled' => $userid);
 
         // Enrolled or assigned user.
         if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
-            $sqlenrolled = "EXISTS (SELECT 1
+            $sqlenrolled = "({$fieldaudvis} = :tcvwaudvisenr AND EXISTS (SELECT 1
                                       FROM {user_enrolments} ue
                                       JOIN {enrol} e ON e.id = ue.enrolid
                                      WHERE e.courseid = {$fieldbaseid}
-                                       AND ue.userid = :tcvwreportforenrolled)";
-            $paramsenrolled = array('tcvwreportforenrolled' => $userid);
+                                       AND ue.userid = :tcvwreportforenrolledonly))";
+            $paramsenrolled = array('tcvwaudvisenr' => COHORT_VISIBLE_ENROLLED,
+                                    'tcvwreportforenrolledonly' => $userid);
         } else {
-            $sqlenrolled = "EXISTS (SELECT 1
+            $sqlenrolled = "({$fieldaudvis} = :tcvwaudvisenr AND EXISTS (SELECT 1
                                       FROM {prog_user_assignment} pua
                                      WHERE pua.programid = {$fieldbaseid}
-                                       AND pua.userid = :tcvwreportforenrolled)";
-            $paramsenrolled = array('tcvwreportforenrolled' => $userid);
+                                       AND pua.userid = :tcvwreportforenrolledonly))";
+            $paramsenrolled = array('tcvwaudvisenr' => COHORT_VISIBLE_ENROLLED,
+                                    'tcvwreportforenrolledonly' => $userid);
         }
 
-        return array("({$sqlall} OR {$sqlselected} OR {$sqlenrolled})",
-                array_merge($paramsall, $paramsselected, $paramsenrolled));
+        return array("{$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled})",
+                array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled));
     }
 }

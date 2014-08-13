@@ -33,7 +33,7 @@ class rb_source_certification extends rb_source_program {
     /**
      * Overwrite instance type value of totara_visibility_where() in rb_source_program->post_config().
      */
-    protected $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+    protected $instancetype = 'certification';
 
     public function __construct() {
         parent::__construct();
@@ -41,7 +41,6 @@ class rb_source_certification extends rb_source_program {
         $this->sourcewhere = $this->define_sourcewhere();
     }
     protected function define_columnoptions() {
-        $columnoptions = array();
 
         // Include some standard columns.
         $this->add_program_fields_to_columns($columnoptions, 'base', 'totara_certification');

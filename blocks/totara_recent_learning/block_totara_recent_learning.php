@@ -48,19 +48,24 @@ class block_totara_recent_learning extends block_base {
 
         $completions = completion_info::get_all_courses($USER->id);
 
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+        $params = array('userid' => $USER->id, 'roleid' => $CFG->learnerroleid);
+        $params = array_merge($params, $visibilityparams);
+
         $sql = "SELECT c.id,c.fullname, MAX(ra.timemodified)
             FROM {role_assignments} ra
-            INNER JOIN {context} cx
-                ON ra.contextid = cx.id
-                AND cx.contextlevel = " . CONTEXT_COURSE . "
+            INNER JOIN {context} ctx
+                ON ra.contextid = ctx.id
+                AND ctx.contextlevel = " . CONTEXT_COURSE . "
             LEFT JOIN {course} c
-                ON cx.instanceid = c.id
-            WHERE ra.userid = ?
-            AND ra.roleid = ?
+                ON ctx.instanceid = c.id
+            WHERE ra.userid = :userid
+            AND ra.roleid = :roleid
+            AND {$visibilitysql}
             GROUP BY c.id, c.fullname
             ORDER BY MAX(ra.timemodified) DESC";
 
-        $courses = $DB->get_records_sql($sql, array($USER->id, $CFG->learnerroleid));
+        $courses = $DB->get_records_sql($sql, $params);
         if (!$courses) {
             $this->content->text = get_string('norecentlearning', 'block_totara_recent_learning');
             return $this->content;

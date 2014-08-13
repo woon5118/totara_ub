@@ -602,13 +602,21 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_listitem(coursecat $category, course_in_list $course, $selectedcourse) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $text = $course->get_formatted_name();
+        $visibility = 1;
+        if (empty($CFG->audiencevisibility)) {
+            $visibility = $course->visible;
+        } else if ($course->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+            $visibility = 0;
+        }
         $attributes = array(
             'class' => 'listitem listitem-course',
             'data-id' => $course->id,
             'data-selected' => ($selectedcourse == $course->id) ? '1' : '0',
-            'data-visible' => $course->visible ? '1' : '0'
+            'data-visible' => $visibility
         );
 
         $bulkcourseinput = array(

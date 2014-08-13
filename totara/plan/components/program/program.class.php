@@ -95,7 +95,8 @@ class dp_program_component extends dp_base_component {
      * @return  array
      */
     public function get_assigned_items($approved = null, $orderby='', $limitfrom='', $limitnum='') {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         // Generate where clause (using named parameters because of how query is built)
         $where = "a.planid = :planid";
@@ -120,6 +121,15 @@ class dp_program_component extends dp_base_component {
             AND pc.userid = :planuserid
             AND pc.coursesetid = 0)";
         $params['planuserid'] = $this->plan->userid;
+
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid,
+                                                                          'p.id',
+                                                                          'p.visible',
+                                                                          'p.audiencevisible',
+                                                                          'p',
+                                                                          'program');
+        $params = array_merge($params, $visibilityparams);
+        $where .= " AND {$visibilitysql} ";
 
         return $DB->get_records_sql(
             "
@@ -146,6 +156,7 @@ class dp_program_component extends dp_base_component {
             INNER JOIN
                 {prog} p
              ON p.id = a.programid
+            INNER JOIN {context} ctx ON p.id = ctx.instanceid AND ctx.contextlevel = " . CONTEXT_PROGRAM . "
             WHERE
                 $where
                 $orderby

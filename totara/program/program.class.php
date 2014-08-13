@@ -1662,44 +1662,26 @@ class program {
             $user = $USER;
         }
 
-        if (empty($CFG->audiencevisibility)) {
-            if ($this->visible) {
-                return true;
-            }
-
-            // If this user is able to view hidden programs, then let it be visible.
-            if (empty($this->certifid)) {
-                $capability = 'totara/program:viewhiddenprograms';
-            } else {
-                $capability = 'totara/certification:viewhiddencertifications';
-            }
-            if (has_capability($capability, program_get_context($this->id), $user->id)) {
-                return true;
-            }
-        } else {
-            if ($this->audiencevisible == COHORT_VISIBLE_ALL) {
-                return true;
-            } else if (has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance())) {
-                return true;
-            } else {
-                $sql = "SELECT cv.instanceid
-                            FROM {cohort_visibility} cv
-                            JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
-                            JOIN {prog} p ON cv.instanceid = p.id AND p.audiencevisible > 0
-                            WHERE cv.instancetype = :instancetype
-                                  AND cm.userid = :userid
-                                  AND p.id = :progid";
-                $params = array('instancetype' => COHORT_ASSN_ITEMTYPE_PROGRAM,
-                                'userid' => $user->id,
-                                'progid' => $this->id);
-
-                if ($DB->record_exists_sql($sql, $params)) {
-                    return true;
-                }
-            }
+        $instancetype =  'program';
+        if (!empty($this->certifid)) {
+            $instancetype = 'certification';
         }
 
-        return false;
+        $params = array('itemcontext' => CONTEXT_PROGRAM, 'instanceid' => $this->id);
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($user->id,
+                                                                            'p.id',
+                                                                            'p.visible',
+                                                                            'p.audiencevisible',
+                                                                            'p',
+                                                                            $instancetype);
+        $params = array_merge($params, $visibilityparams);
+        $sql = "SELECT p.id
+                FROM {prog} p
+                LEFT JOIN {context} ctx ON p.id = ctx.instanceid AND contextlevel = :itemcontext
+                WHERE p.id = :instanceid
+                  AND {$visibilitysql}";
+
+        return $DB->record_exists_sql($sql, $params);
     }
 
     /**
@@ -1712,8 +1694,10 @@ class program {
      * @return boolean
      */
     public function is_accessible($user = null) {
-        // If a user is set check if they area a site admin, if so, let them have access
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
+        // If a user is set check if they area a site admin, if so, let them have access.
         if (!empty($user->id)) {
             if (is_siteadmin($user->id)) {
                 return true;
@@ -1743,6 +1727,20 @@ class program {
             if (!empty($this->availableuntil) && $this->availableuntil < $now) {
                 return false;
             }
+        }
+
+        // Check audience visibility.
+        if ($this->certifid) {
+            $capability = 'totara/certification:viewhiddencertifications';
+        } else {
+            $capability = 'totara/program:viewhiddenprograms';
+        }
+
+        $syscontext = context_system::instance();
+        $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $syscontext) ||
+            has_capability($capability, $syscontext);
+        if (!empty($CFG->audiencevisibility) && !$canmanagevisibility && $this->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+            return false;
         }
 
         return true;

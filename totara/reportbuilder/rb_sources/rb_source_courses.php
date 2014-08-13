@@ -67,6 +67,7 @@ class rb_source_courses extends rb_base_source {
         );
 
         // Include some standard joins.
+        $this->add_context_table_to_joinlist($joinlist, 'base', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_course_category_table_to_joinlist($joinlist,
             'base', 'category');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'base', 'id');
@@ -197,6 +198,13 @@ class rb_source_courses extends rb_base_source {
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
         $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+        $requiredcolumns[] = new rb_column(
             'base',
             'category',
             '',
@@ -262,13 +270,13 @@ class rb_source_courses extends rb_base_source {
         $categorysql = $report->get_field('base', 'category', 'base.category') . " <> :sitelevelcategory";
         $categoryparams = array('sitelevelcategory' => 0);
 
-        // Visibility.
         $reportfor = $report->reportfor; // ID of the user the report is for.
+        $fieldalias = 'base';
         $fieldbaseid = $report->get_field('base', 'id', 'base.id');
         $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
         $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
         list($visiblesql, $visibleparams) = totara_visibility_where($reportfor,
-                $fieldbaseid, $fieldvisible, $fieldaudvis);
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached());
 
         // Combine the results.
         $report->set_post_config_restrictions(array($categorysql . " AND " . $visiblesql,

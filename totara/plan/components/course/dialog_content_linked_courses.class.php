@@ -29,6 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_courses.class.php');
+require_once($CFG->dirroot.'/totara/cohort/lib.php');
 
 class totara_dialog_linked_courses_content_courses extends totara_dialog_content_courses {
 
@@ -60,6 +61,13 @@ class totara_dialog_linked_courses_content_courses extends totara_dialog_content
 
         $planid = (int) $planid;
 
+        list($visibilitysql, $visibilityparams) = totara_visibility_where(null,
+                                                                          'c.id',
+                                                                          'c.visible',
+                                                                          'c.audiencevisible',
+                                                                          'c',
+                                                                          'course');
+
         $sql = "
             SELECT
                 dppca.id AS id,
@@ -70,12 +78,16 @@ class totara_dialog_linked_courses_content_courses extends totara_dialog_content
             INNER JOIN
                 {course} c
              ON c.id = dppca.courseid
+            INNER JOIN {context} ctx
+             ON c.id = ctx.instanceid AND ctx.contextlevel =:contextlevel
             WHERE
-                dppca.planid = ?
+                dppca.planid =:planid
+             AND
+               {$visibilitysql}
             ORDER BY
                 c.fullname
         ";
-        $params = array($planid);
+        $params = array_merge(array('planid'=> $planid, 'contextlevel' => CONTEXT_COURSE), $visibilityparams);
 
         $this->courses = $DB->get_records_sql($sql, $params);
 
@@ -92,6 +104,13 @@ class totara_dialog_linked_courses_content_courses extends totara_dialog_content
 
         $competencyid = (int) $competencyid;
 
+        list($visibilitysql, $visibilityparams) = totara_visibility_where(null,
+            'c.id',
+            'c.visible',
+            'c.audiencevisible',
+            'c',
+            'course');
+
         $sql = "
             SELECT
                 c.id As id,
@@ -99,6 +118,8 @@ class totara_dialog_linked_courses_content_courses extends totara_dialog_content
                 c.sortorder AS sortorder
             FROM
                 {course} c
+            INNER JOIN {context} ctx
+             ON c.id = ctx.instanceid AND ctx.contextlevel =:contextlevel
             INNER JOIN
                 {comp_criteria} cc
              ON c.id = cc.iteminstance
@@ -106,10 +127,15 @@ class totara_dialog_linked_courses_content_courses extends totara_dialog_content
                 {dp_plan_competency_assign} ca
              ON cc.competencyid = ca.competencyid
             WHERE
-                cc.itemtype = ?
-            AND ca.id = ?
+                cc.itemtype =:cctype
+            AND ca.id =:comptid
+            AND {$visibilitysql}
         ";
-        $params = array(COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION, $competencyid);
+        $params = array(
+            'contextlevel' => CONTEXT_COURSE,
+            'cctype'  => COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION,
+            'comptid' => $competencyid);
+        $params = array_merge($params, $visibilityparams);
 
         $this->courses = $DB->get_records_sql($sql, $params);
 

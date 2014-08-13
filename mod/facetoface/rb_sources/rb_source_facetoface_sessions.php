@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 class rb_source_facetoface_sessions extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $sourcetitle;
+    public $defaultfilters, $sourcetitle, $requiredcolumns;
 
     function __construct() {
         global $CFG;
@@ -39,6 +39,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
+        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_sessions');
         parent::__construct();
     }
@@ -149,7 +150,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
         // include some standard joins
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
-        $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
+        $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course', 'INNER');
+        $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         // requires the course join
         $this->add_course_category_table_to_joinlist($joinlist,
             'course', 'category');
@@ -756,6 +758,47 @@ class rb_source_facetoface_sessions extends rb_base_source {
         return $defaultcolumns;
     }
 
+    protected function define_requiredcolumns() {
+        $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'course',
+            'coursevisible',
+            '',
+            "course.visible",
+            array(
+                'joins' => 'course',
+                'required' => 'true',
+                'hidden' => 'true'
+            )
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'course',
+            'courseaudiencevisible',
+            '',
+            "course.audiencevisible",
+            array(
+                'joins' => 'course',
+                'required' => 'true',
+                'hidden' => 'true')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array(
+                'joins' => 'ctx',
+                'required' => 'true',
+                'hidden' => 'true'
+            )
+        );
+
+        return $requiredcolumns;
+    }
+
     protected function define_defaultfilters() {
         $defaultfilters = array(
             array(
@@ -1189,6 +1232,19 @@ class rb_source_facetoface_sessions extends rb_base_source {
         $coursedelivery['Internal'] = 'Internal';
         $coursedelivery['External'] = 'External';
         return $coursedelivery;
+    }
+
+    public function post_config(reportbuilder $report) {
+        $userid = $report->reportfor;
+        if (isset($report->embedobj->embeddedparams['userid'])) {
+            $userid = $report->embedobj->embeddedparams['userid'];
+        }
+        $fieldalias = 'course';
+        $fieldbaseid = $report->get_field('course', 'id', 'course.id');
+        $fieldvisible = $report->get_field('course', 'coursevisible', 'course.visible');
+        $fieldaudvis = $report->get_field('course', 'courseaudiencevisible', 'course.audiencevisible');
+        $report->set_post_config_restrictions(totara_visibility_where($userid,
+            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached()));
     }
 
 } // end of rb_source_facetoface_sessions class

@@ -577,6 +577,11 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['contextlevel'] = CONTEXT_COURSE;
     $wheres = implode(" AND ", $wheres);
 
+    // Get visibility sql for the courses the user can view.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+    $wheres .= " AND {$visibilitysql} ";
+    $params = array_merge($params, $visibilityparams);
+
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
               FROM {course} c
@@ -595,22 +600,6 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['now2']    = $params['now1'];
 
     $courses = $DB->get_records_sql($sql, $params, 0, $limit);
-
-    // preload contexts and check visibility
-    foreach ($courses as $id=>$course) {
-        context_helper::preload_from_record($course);
-        if (!$course->visible) {
-            if (!$context = context_course::instance($id, IGNORE_MISSING)) {
-                unset($courses[$id]);
-                continue;
-            }
-            if (!has_capability('moodle/course:viewhiddencourses', $context)) {
-                unset($courses[$id]);
-                continue;
-            }
-        }
-        $courses[$id] = $course;
-    }
 
     //wow! Is that really all? :-D
 
@@ -687,29 +676,7 @@ function enrol_get_course_description_texts($course) {
  * @return array
  */
 function enrol_get_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
-
-    $courses = enrol_get_all_users_courses($userid, $onlyactive, $fields, $sort);
-
-    // preload contexts and check visibility
-    if ($onlyactive) {
-        foreach ($courses as $id=>$course) {
-            context_helper::preload_from_record($course);
-            if (!$course->visible) {
-                if (!$context = context_course::instance($id)) {
-                    unset($courses[$id]);
-                    continue;
-                }
-                if (!has_capability('moodle/course:viewhiddencourses', $context, $userid)) {
-                    unset($courses[$id]);
-                    continue;
-                }
-            }
-        }
-    }
-
-    return $courses;
-
+    return enrol_get_all_users_courses($userid, $onlyactive, $fields, $sort);
 }
 
 /**
@@ -748,15 +715,9 @@ function enrol_user_sees_own_courses($user = null) {
 
     // Now the slow way.
     $courses = enrol_get_all_users_courses($userid, true);
-    foreach($courses as $course) {
-        if ($course->visible) {
-            return true;
-        }
-        context_helper::preload_from_record($course);
-        $context = context_course::instance($course->id);
-        if (has_capability('moodle/course:viewhiddencourses', $context, $user)) {
-            return true;
-        }
+
+    if (!empty($courses)) {
+        return true;
     }
 
     return false;
@@ -836,6 +797,14 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
+    $visibilitysql = '';
+    $visibilityparams = array();
+    if ($onlyactive) {
+    // Take into account the visibility of the courses.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+        $visibilitysql = "AND {$visibilitysql}";
+    }
+
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
               FROM {course} c
@@ -845,9 +814,10 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
                  $subwhere
                    ) en ON (en.courseid = c.id)
            $ccjoin
-             WHERE c.id <> :siteid
+             WHERE c.id <> :siteid $visibilitysql
           $orderby";
     $params['userid']  = $userid;
+    $params = array_merge($params, $visibilityparams);
 
     $courses = $DB->get_records_sql($sql, $params);
 

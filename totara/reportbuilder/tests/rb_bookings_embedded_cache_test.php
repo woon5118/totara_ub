@@ -49,7 +49,9 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         array('id' => 35, 'reportid' => 8, 'type' => 'date', 'value' => 'timefinish',
               'heading' => 'E', 'sortorder' => 5),
         array('id' => 36, 'reportid' => 8, 'type' => 'status', 'value' => 'statuscode',
-              'heading' => 'F', 'sortorder' => 6)
+              'heading' => 'F', 'sortorder' => 6),
+        array('id' => 37, 'reportid' => 8, 'type' => 'ctx', 'value' => 'id',
+            'heading' => 'G', 'sortorder' => 7)
     );
 
     protected $report_builder_settings_data = array(

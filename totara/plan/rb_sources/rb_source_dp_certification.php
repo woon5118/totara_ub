@@ -36,7 +36,7 @@ class rb_source_dp_certification extends rb_base_source {
 
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
-    public $defaultfilters, $requiredcolumns, $sourcetitle;
+    public $defaultfilters, $requiredcolumns, $sourcetitle, $instancetype;
 
     /**
      * Constructor
@@ -50,7 +50,8 @@ class rb_source_dp_certification extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
-        $this->requiredcolumns = array();
+        $this->instancetype = 'certification';
+        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_certification');
         $this->sourcewhere = '(base.certifid > 0)';
         parent::__construct();
@@ -159,6 +160,7 @@ class rb_source_dp_certification extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 array('prog_completion')
         );
+        $this->add_context_table_to_joinlist($joinlist, 'base', 'id', CONTEXT_PROGRAM, 'INNER');
         $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
         $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
         $this->add_user_table_to_joinlist($joinlist, 'certif_completion', 'userid');
@@ -203,6 +205,8 @@ class rb_source_dp_certification extends rb_base_source {
                     'extrafields' => array(
                         'programid' => 'base.id',
                         'program_icon' => "base.icon",
+                        'program_visible' => 'base.visible',
+                        'program_audiencevisible' => 'base.audiencevisible',
                         'userid' => 'certif_completion.userid'
                     ),
                 )
@@ -623,6 +627,65 @@ class rb_source_dp_certification extends rb_base_source {
             ),
         );
         return $defaultfilters;
+    }
+
+    protected function define_requiredcolumns() {
+        $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'visible',
+            '',
+            "base.visible"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'audiencevisible',
+            '',
+            "base.audiencevisible"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'available',
+            '',
+            "base.available"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'availablefrom',
+            '',
+            "base.availablefrom"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'availableuntil',
+            '',
+            "base.availableuntil"
+        );
+
+        return $requiredcolumns;
+    }
+
+    public function post_config(reportbuilder $report) {
+        $reportfor = $report->reportfor; // ID of the user the report is for.
+        $fieldalias = 'base';
+        $fieldbaseid = $report->get_field('base', 'id', 'base.id');
+        $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
+        $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
+        $report->set_post_config_restrictions(totara_visibility_where($reportfor,
+            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'certification', $report->is_cached()));
     }
 
 

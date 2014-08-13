@@ -1210,17 +1210,7 @@ class core_course_renderer extends plugin_renderer_base {
 
         // course name
         $coursename = $chelper->get_course_formatted_name($course);
-        $dimmed = '';
-        if (empty($CFG->audiencevisibility)) {
-            if (!$course->visible) {
-                $dimmed = 'dimmed';
-            }
-        } else {
-            require_once($CFG->dirroot . '/totara/cohort/lib.php');
-            if ($course->audiencevisible == COHORT_VISIBLE_NONE) {
-                $dimmed = 'dimmed';
-            }
-        }
+        $dimmed = totara_get_style_visibility($course);
         $coursenamelink = html_writer::link(
             new moodle_url('/course/view.php', array('id' => $course->id)),
             $coursename,

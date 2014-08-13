@@ -148,6 +148,12 @@ if ($form->is_cancelled()) {
     redirect($progindexurl);
 }
 
+// Set type.
+$instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
+if ($iscertif) {
+    $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+}
+
 // Handle form submit
 if ($data = $form->get_data()) {
 
@@ -211,21 +217,21 @@ if ($data = $form->get_data()) {
 
         // Visible audiences.
         if (!empty($CFG->audiencevisibility)) {
-            $visiblecohorts = totara_cohort_get_visible_learning($newid, COHORT_ASSN_ITEMTYPE_PROGRAM);
+            $visiblecohorts = totara_cohort_get_visible_learning($newid, $instancetype);
             $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
             $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
             if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
                 // Delete removed cohorts.
                 foreach ($todelete as $cohortid) {
                     totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,
-                                                    COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+                                                     $instancetype, COHORT_ASSN_VALUE_VISIBLE);
                 }
             }
 
             if ($newvisible = array_diff($newvisible, array_keys($visiblecohorts))) {
                 // Add new cohort associations.
                 foreach ($newvisible as $cohortid) {
-                    totara_cohort_add_association($cohortid, $newid, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+                    totara_cohort_add_association($cohortid, $newid, $instancetype, COHORT_ASSN_VALUE_VISIBLE);
                 }
             }
         }

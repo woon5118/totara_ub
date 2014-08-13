@@ -1066,13 +1066,9 @@ class totara_program_renderer extends plugin_renderer_base {
 
         $programname = format_string($program->fullname);
         $programicon = totara_get_icon($program->id, TOTARA_ICON_TYPE_PROGRAM);
-        if (empty($CFG->audiencevisibility)) {
-            $isdimmed = !$program->visible;
-        } else {
-            $isdimmed = $program->audiencevisible != COHORT_VISIBLE_ALL;
-        }
+        $dimmed = totara_get_style_visibility($program);
         $programnamelink = html_writer::link(new moodle_url('/totara/program/view.php', array('id' => $program->id)),
-                        $programname, array('class' => $isdimmed ? 'dimmed' : '' ,
+                        $programname, array('class' => $dimmed,
                         'style' => "background-image:url({$programicon})"));
         $content .= html_writer::tag($nametag, $programnamelink, array('class' => 'name'));
 

@@ -578,23 +578,24 @@ function program_cron_programs_due(&$programs) {
             AND pc.timedue > 0 AND (pc.timedue - pm.triggertime) < ?
             ORDER BY pc.programid, u.id";
 
-    // get the records
+    // Get the records.
     $rs = $DB->get_recordset_sql($sql, array(0, 0, MESSAGETYPE_PROGRAM_DUE, $now));
 
     foreach ($rs as $user) {
-        if (isset($programs[$user->programid])) { // Use the existing program object if it is available
+        if (isset($programs[$user->programid])) { // Use the existing program object if it is available.
             $program = $programs[$user->programid];
-        } else { // Create a new program object and store it if it has not already been instantiated
+        } else { // Create a new program object and store it if it has not already been instantiated.
             $program = new program($user->programid);
             $programs[$user->programid] = $program;
         }
 
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
+        $isviewable = $program->is_viewable($user);
 
-        // send program due notifications to user and (optionally) the user's manager
+        // Send program due notifications to user and (optionally) the user's manager.
         foreach ($messages as $message) {
-            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_PROGRAM_DUE) {
+            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_PROGRAM_DUE && $isviewable) {
                 $message->send_message($user);
             }
         }
@@ -647,10 +648,11 @@ function program_cron_coursesets_due(&$programs) {
 
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
+        $isviewable = $program->is_viewable($user);
 
         // send course set due notifications to user and (optionally) the user's manager
         foreach ($messages as $message) {
-            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_COURSESET_DUE) {
+            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_COURSESET_DUE && $isviewable) {
                 $message->send_message($user, null, array('coursesetid' => $user->coursesetid));
             }
         }
@@ -702,10 +704,11 @@ function program_cron_programs_overdue(&$programs) {
 
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
+        $isviewable = $program->is_viewable($user);
 
         // send program overdue notifications to user and (optionally) the user's manager
         foreach ($messages as $message) {
-            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_PROGRAM_OVERDUE) {
+            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_PROGRAM_OVERDUE && $isviewable) {
                 $message->send_message($user);
             }
         }
@@ -757,10 +760,11 @@ function program_cron_coursesets_overdue(&$programs) {
 
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
+        $isviewable = $program->is_viewable($user);
 
         // send course set overdue notifications to user and (optionally) the user's manager
         foreach ($messages as $message) {
-            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_COURSESET_OVERDUE) {
+            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_COURSESET_OVERDUE && $isviewable) {
                 $message->send_message($user, null, array('coursesetid' => $user->coursesetid));
             }
         }
@@ -811,10 +815,11 @@ function program_cron_learner_followups(&$programs) {
 
         $messagesmanager = $program->get_messagesmanager();
         $messages = $messagesmanager->get_messages();
+        $isviewable = $program->is_viewable($user);
 
         // send course set overdue notifications to user and (optionally) the user's manager
         foreach ($messages as $message) {
-            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_LEARNER_FOLLOWUP) {
+            if ($message->id == $user->messageid && $message->messagetype == MESSAGETYPE_LEARNER_FOLLOWUP && $isviewable) {
                 $message->send_message($user);
             }
         }
@@ -1010,7 +1015,7 @@ function program_cron_recurrence_history() {
  */
 function program_cron_first_login_assignments() {
     global $DB;
-    $pending_user_sql = "SELECT u.*
+    $pending_user_sql = "SELECT u.*, pfa.programid
                         FROM {user} u
                         INNER JOIN {prog_future_user_assignment} pfa
                         ON pfa.userid = u.id
@@ -1018,7 +1023,11 @@ function program_cron_first_login_assignments() {
 
     $pending_users = $DB->get_records_sql($pending_user_sql);
     foreach ($pending_users as $pending_user) {
-        prog_assignments_firstlogin($pending_user);
+        // Skip update if the program is not accesible for the user.
+        $program = new program($pending_user->programid);
+        if ($program->is_viewable($pending_user)) {
+            prog_assignments_firstlogin($pending_user);
+        }
     }
 }
 

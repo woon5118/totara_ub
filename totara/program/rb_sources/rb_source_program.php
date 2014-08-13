@@ -34,7 +34,7 @@ class rb_source_program extends rb_base_source {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
-    protected $instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
+    protected $instancetype = 'program';
 
     function __construct() {
         global $CFG;
@@ -61,7 +61,15 @@ class rb_source_program extends rb_base_source {
     protected function define_joinlist() {
         global $CFG;
 
-        $joinlist = array();
+        $joinlist = array(
+            new rb_join(
+                'ctx',
+                'INNER',
+                '{context}',
+                'ctx.instanceid = base.id AND ctx.contextlevel = ' . CONTEXT_PROGRAM,
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+        );
 
         $this->add_course_category_table_to_joinlist($joinlist, 'base', 'category');
         $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'id');
@@ -70,7 +78,6 @@ class rb_source_program extends rb_base_source {
     }
 
     protected function define_columnoptions() {
-        $columnoptions = array();
 
         // include some standard columns
         $this->add_program_fields_to_columns($columnoptions, 'base');
@@ -157,6 +164,15 @@ class rb_source_program extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+
         // Visibility.
         $requiredcolumns[] = new rb_column(
             'base',
@@ -164,12 +180,35 @@ class rb_source_program extends rb_base_source {
             '',
             "base.visible"
         );
+
         $requiredcolumns[] = new rb_column(
             'base',
             'audiencevisible',
             '',
             "base.audiencevisible"
         );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'available',
+            '',
+            "base.available"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'availablefrom',
+            '',
+            "base.availablefrom"
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'base',
+            'availableuntil',
+            '',
+            "base.availableuntil"
+        );
+
         return $requiredcolumns;
     }
 
@@ -181,11 +220,12 @@ class rb_source_program extends rb_base_source {
 
     public function post_config(reportbuilder $report) {
         $reportfor = $report->reportfor; // ID of the user the report is for.
+        $fieldalias = 'base';
         $fieldbaseid = $report->get_field('base', 'id', 'base.id');
         $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
         $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
         $report->set_post_config_restrictions(totara_visibility_where($reportfor,
-                $fieldbaseid, $fieldvisible, $fieldaudvis, $this->instancetype));
+            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, $this->instancetype, $report->is_cached()));
     }
 
 } // End of rb_source_courses class.

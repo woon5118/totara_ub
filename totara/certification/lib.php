@@ -681,6 +681,56 @@ function find_courses_for_certif($certifid, $fields='c.id, c.fullname') {
 }
 
 /**
+ * Send message defined in program_message.class.php to user
+ * and also to manager if specified in settings
+ *
+ * @param integer $userid
+ * @param integer $progid
+ * @param integer $msgtype
+ */
+function send_certif_message($progid, $userid, $msgtype) {
+    global $DB;
+
+    $user = $DB->get_record('user', array('id' => $userid));
+    $messagesmanager = new prog_messages_manager($progid);
+    $messages = $messagesmanager->get_messages();
+
+    $params = array('contextlevel' => CONTEXT_PROGRAM, 'progid' => $progid, 'userid' => $userid);
+
+    // Take into account the visiblity of the certification before sending messages.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible',
+        'p.audiencevisible', 'p', 'certification');
+    $params = array_merge($params, $visibilityparams);
+
+    $now = time();
+    $certif = $DB->get_record_sql("SELECT cc.*
+                                   FROM {certif_completion} cc
+                                   JOIN {prog} p ON p.certifid = cc.certifid
+                                   JOIN {context} ctx ON p.id = ctx.instanceid AND contextlevel =:contextlevel
+                                   WHERE p.id =:progid AND cc.userid =:userid AND {$visibilitysql}", $params);
+    // If messagetype set up for this program, send notifications to user and the user's manager (if set on message).
+    foreach ($messages as $message) {
+        if ($message->messagetype == $msgtype) {
+            if ($msgtype == MESSAGETYPE_RECERT_WINDOWDUECLOSE) {
+                // ONLY send the ones that are due.
+                if($now > ($certif->timeexpires - $message->triggertime) && $now < $certif->timeexpires) {
+                    $sent = $DB->get_records('prog_messagelog', array('messageid' => $message->id, 'userid' => $userid));
+                    // DON'T send them more than once.
+                    if(empty($sent)) {
+                        $message->send_message($user);
+                    }
+                }
+            } else {
+               $message->send_message($user); // Prog_eventbased_message.send_message() program_message.class.php.
+               // This function checks prog_messagelog for existing record, checking messageid and userid (and coursesetid(=0))
+               // messageid is id of message in prog_message (ie for this prog and message type)
+               // if exists, the message is not sent.
+            }
+        }
+    }
+}
+
+/**
  * Get current certifpath of user for given certification
  *
  * @param integer $certificationid ID of certification to check
@@ -906,15 +956,21 @@ function certif_get_certifications_page($categoryid="all", $sort="sortorder ASC"
     // Pull out all certification-programs matching the category.
     $visiblecertifications = array();
 
+    // Add audience visibility setting.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible',
+        'p.audiencevisible', 'p', 'certification');
+    $params = array_merge($params, $visibilityparams);
+
     $certifselect = "SELECT $fields, 'certification' AS listtype,
                           ctx.id AS ctxid, ctx.path AS ctxpath,
                           ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
-                   FROM {certif} cf
-                   JOIN {prog} p ON (p.certifid = cf.id)
-                   JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)";
+                     FROM {certif} cf
+                     JOIN {prog} p ON (p.certifid = cf.id)
+                     JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)
+                     {$categoryselect} AND {$visibilitysql}
+                     ORDER BY {$sort}";
 
-    $select = $certifselect.$categoryselect.' ORDER BY '.$sort;
-    $rs = $DB->get_recordset_sql($select, $params);
+    $rs = $DB->get_recordset_sql($certifselect, $params);
 
     $totalcount = 0;
 
@@ -924,19 +980,9 @@ function certif_get_certifications_page($categoryid="all", $sort="sortorder ASC"
 
     // Iteration will have to be done inside loop to keep track of the limitfrom and limitnum.
     foreach ($rs as $certification) {
-        if ($certification->visible <= 0) {
-            // For hidden certifications, require visibility check.
-            if (has_capability('totara/certification:viewhiddencertifications', program_get_context($certification->pid))) {
-                $totalcount++;
-                if ($totalcount > $limitfrom && (!$limitnum or count($visiblecertifications) < $limitnum)) {
-                    $visiblecertifications [] = $certification;
-                }
-            }
-        } else {
-            $totalcount++;
-            if ($totalcount > $limitfrom && (!$limitnum or count($visiblecertifications) < $limitnum)) {
-                $visiblecertifications [] = $certification;
-            }
+        $totalcount++;
+        if ($totalcount > $limitfrom && (!$limitnum or count($visiblecertifications) < $limitnum)) {
+            $visiblecertifications [] = $certification;
         }
     }
 
@@ -1006,14 +1052,7 @@ function certif_print_certifications($category) {
 
     if ($certifications) {
         foreach ($certifications as $certification) {
-            $prog = new program($certification->pid);
-            if (!$prog->is_accessible($USER)) {
-                continue;
-            }
-            if ($certification->visible == 1
-                  || has_capability('totara/certification:viewhiddencertifications', program_get_context($prog->id))) {
-                certif_print_certification($certification);
-            }
+            certif_print_certification($certification);
         }
     } else {
         echo $OUTPUT->heading(get_string('nocertifications', 'totara_certification'));
@@ -1074,12 +1113,12 @@ function certif_print_certification($certification, $highlightterms = '') {
  */
 function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", $fields="cf.*") {
 
-    global $USER, $DB;
+    global $DB;
 
-    $params = array(CONTEXT_PROGRAM);
+    $params = array('contextlevel' => CONTEXT_PROGRAM);
     if ($categoryid != "all" && is_numeric($categoryid)) {
-        $categoryselect = "WHERE p.category = ?";
-        $params[] = $categoryid;
+        $categoryselect = "WHERE p.category = :category";
+        $params['category'] = $categoryid;
     } else {
         $categoryselect = "";
     }
@@ -1090,7 +1129,10 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
         $sortstatement = "ORDER BY $sort";
     }
 
-    $visiblecertifications = array();
+    // Add audience visibility setting.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible',
+        'p.audiencevisible', 'p', 'certification');
+    $params = array_merge($params, $visibilityparams);
 
     // Pull out all certifications matching the category
     // the program join effectively removes programs which
@@ -1100,23 +1142,12 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
                         ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
                         FROM {certif} cf
                         JOIN {prog} p ON (p.certifid = cf.id)
-                        JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)
-                        $categoryselect
-                        $sortstatement", $params
+                        JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = :contextlevel)
+                        {$categoryselect} AND {$visibilitysql}
+                        {$sortstatement}", $params
                     );
 
-    foreach ($certifications as $certification) {
-        if (isset($certification->visible) && $certification->visible <= 0) {
-            // For hidden certifications, require visibility check.
-            if (has_capability('totara/certification:viewhiddencertifications', program_get_context($certification->pid))) {
-                $visiblecertifications[] = $certification;
-            }
-        } else {
-            $visiblecertifications[] = $certification;
-        }
-    }
-
-    return $visiblecertifications;
+    return $certifications;
 }
 
 /**

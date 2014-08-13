@@ -347,6 +347,12 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         ),
     );
 
+    protected $context_data = array(
+        array('instanceid' => 1, 'contextlevel' => CONTEXT_PROGRAM),
+        array('instanceid' => 2, 'contextlevel' => CONTEXT_PROGRAM),
+        array('instanceid' => 2, 'contextlevel' => CONTEXT_COURSE),
+    );
+
     protected $prog_courseset_data = array(
         'id' => 1, 'programid' => 1, 'sortorder' => 1, 'competencyid' => 0, 'nextsetoperator' => 0, 'completiontype' => 1,
         'timeallowed' => 3024000, 'recurcreatetime' => 0, 'recurrencetime' => 0, 'contenttype' => 1, 'label' => 'courseset1',
@@ -640,6 +646,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'certif_completion_history' => array($this->certif_completion_history_data),
             'course_completion_history' => array($this->course_completion_history_data),
             'badge_issued' => array($this->badges_issued),
+            'context' => $this->context_data,
         )));
     }
 

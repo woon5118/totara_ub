@@ -1376,11 +1376,9 @@ class rb_prog_availability_content extends rb_base_content {
      * @return array containing SQL snippet to be used in a WHERE clause, as well as array of SQL params
      */
     public function sql_restriction($field, $reportid) {
-        $now = time();
-        $restriction = "
-            (base.available = 1)
-            AND (base.availablefrom = 0 OR base.availablefrom < {$now})
-            AND (base.availableuntil = 0 OR base.availableuntil > {$now})";
+        // The restriction snippet based on the available fields was moved to totara_visibility_where.
+        // So no restriction for programs or certifications.
+        $restriction = " 1=1 ";
 
         return array($restriction, array());
     }

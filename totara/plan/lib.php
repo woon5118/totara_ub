@@ -350,7 +350,8 @@ function dp_add_permissions_table_row(&$form, $name, $label, $requestable) {
  * @return   array              the components that are visible
  */
 function dp_get_rol_tabs_visible($userid) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
     $visible = array();
 
@@ -384,8 +385,23 @@ function dp_get_rol_tabs_visible($userid) {
         $visible[] = 'objectives';
     }
 
-    $sql = 'SELECT COUNT(id) FROM {prog_user_assignment} WHERE userid = :uid AND exceptionstatus != :eid';
-    $assigned_progs = $DB->count_records_sql($sql, array('uid' => $userid, 'eid' => PROGRAM_EXCEPTION_RAISED));
+    $params = array('contextlevel' => CONTEXT_PROGRAM, 'uid' => $userid, 'eid' => PROGRAM_EXCEPTION_RAISED);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
+                                                                      'p.id',
+                                                                      'p.visible',
+                                                                      'p.audiencevisible',
+                                                                      'p',
+                                                                      'program');
+    $params = array_merge($params, $visibilityparams);
+    $sql = "SELECT COUNT(pua.programid)
+            FROM {prog_user_assignment} pua
+            INNER JOIN {prog} p ON p.id = pua.programid
+            INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel =:contextlevel)
+            WHERE pua.userid = :uid
+              AND pua.exceptionstatus != :eid
+              AND p.certifid IS NULL
+              AND {$visibilitysql}";
+    $assigned_progs = $DB->count_records_sql($sql, $params);
     if (($assigned_progs > 0 || $show_program_tab) && totara_feature_visible('programs')) {
         $visible[] = 'programs';
     }

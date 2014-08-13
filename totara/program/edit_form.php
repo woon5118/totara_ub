@@ -197,13 +197,18 @@ class program_edit_form extends moodleform {
                 $mform->setType('visible', PARAM_BOOL);
             }
         } else {
+            // Define instance type.
+            $instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
+            if (!empty($program->certifid)) {
+                $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+            }
             if ($action == 'view') {
                 $mform->addElement('header', 'visiblecohortshdr', get_string('audiencevisibility', 'totara_cohort'));
                 $mform->addElement('static', 'visibledisplay', get_string('audiencevisibility', 'totara_cohort'), $COHORT_VISIBILITY[$program->audiencevisible]);
-                $cohorts = totara_cohort_get_visible_learning($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM);
+                $cohorts = totara_cohort_get_visible_learning($program->id, $instancetype);
                 if (!empty($cohorts)) {
                     $cohortsclass = new totara_cohort_visible_learning_cohorts();
-                    $cohortsclass->build_visible_learning_table($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM, true);
+                    $cohortsclass->build_visible_learning_table($program->id, $instancetype, true);
                     $mform->addElement('html', $cohortsclass->display(true, 'visible'));
                 }
                 $mform->setExpanded('visiblecohortshdr');
@@ -218,7 +223,7 @@ class program_edit_form extends moodleform {
                         $mform->setDefault('audiencevisible', $config->visiblelearning);
                         $cohorts = '';
                     } else {
-                        $cohorts = totara_cohort_get_visible_learning($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM);
+                        $cohorts = totara_cohort_get_visible_learning($program->id, $instancetype);
                         $cohorts = !empty($cohorts) ? implode(',', array_keys($cohorts)) : '';
                     }
 
@@ -226,7 +231,7 @@ class program_edit_form extends moodleform {
                     $mform->setType('cohortsvisible', PARAM_SEQUENCE);
                     $cohortsclass = new totara_cohort_visible_learning_cohorts();
                     $instanceid = !empty($program->id) ? $program->id : 0;
-                    $cohortsclass->build_visible_learning_table($instanceid, COHORT_ASSN_ITEMTYPE_PROGRAM);
+                    $cohortsclass->build_visible_learning_table($instanceid, $instancetype);
                     $mform->addElement('html', $cohortsclass->display(true, 'visible'));
 
                     $mform->addElement('button', 'cohortsaddvisible', get_string('cohortsaddvisible', 'totara_cohort'));

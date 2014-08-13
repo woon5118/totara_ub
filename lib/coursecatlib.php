@@ -911,7 +911,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return array array of stdClass objects
      */
     public static function get_course_records($whereclause, $params, $options, $checkvisibility = false) {
-        global $DB,$CFG;
+        global $DB, $CFG, $USER;
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
         $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
         $fields = array('c.id', 'c.category', 'c.sortorder',
@@ -925,19 +925,14 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         // Add audience visibility setting.
-        $visibilitysql = '';
-        $visibilityparams = array();
-        $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance());
-        if (!empty($CFG->audiencevisibility) && !$canmanagevisibility) {
-            list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql('c', 'id', COHORT_ASSN_ITEMTYPE_COURSE);
-        }
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+        $visibilitysql = "AND {$visibilitysql}";
         $params = array_merge($params, $visibilityparams);
 
         $sql = "SELECT ". join(',', $fields). ", $ctxselect
                 FROM {course} c
                 JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                {$visibilitysql}
-                WHERE ". $whereclause." ORDER BY c.sortorder";
+                WHERE {$whereclause} {$visibilitysql} ORDER BY c.sortorder";
         $list = $DB->get_records_sql($sql,
                 array('contextcourse' => CONTEXT_COURSE) + $params);
 

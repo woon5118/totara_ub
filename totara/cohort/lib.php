@@ -76,13 +76,15 @@ $COHORT_ASSN_VALUES = array(
 );
 
 // Visibility constants.
-define('COHORT_VISIBLE_NONE', 0);
+define('COHORT_VISIBLE_ENROLLED', 0);
 define('COHORT_VISIBLE_AUDIENCE', 1);
 define('COHORT_VISIBLE_ALL', 2);
+define('COHORT_VISIBLE_NOUSERS', 3);
 
 global $COHORT_VISIBILITY;
 $COHORT_VISIBILITY = array(
-    COHORT_VISIBLE_NONE => get_string('visiblenone', 'totara_cohort'),
+    COHORT_VISIBLE_NOUSERS => get_string('visiblenousers', 'totara_cohort'),
+    COHORT_VISIBLE_ENROLLED => get_string('visibleenrolled', 'totara_cohort'),
     COHORT_VISIBLE_AUDIENCE => get_string('visibleaudience', 'totara_cohort'),
     COHORT_VISIBLE_ALL => get_string('visibleall', 'totara_cohort'),
 );
@@ -106,6 +108,45 @@ function totara_cohort_cron() {
     tcohort_cron();
 }
 
+/**
+ * This function updates the audience visibility of a learning component.
+ *
+ * @param int $type Type of the learning component we want to update (course, program, certification)
+ * @param int $instanceid Learning component instance ID
+ * @param int $visiblevalue The audience visibility value
+ * @return bool $result Result of the operation
+ */
+function totara_cohort_update_audience_visibility($type, $instanceid, $visiblevalue) {
+    global $DB, $CFG, $COHORT_VISIBILITY;
+
+    $result = false;
+
+    // Capabilities to update programs or certifications.
+    $progcap = 'totara/program:configuredetails';
+    $certcap = 'totara/certification:configuredetails';
+
+    // Do nothing if audience visibility is off.
+    if (empty($CFG->audiencevisibility)) {
+        return $result;
+    }
+
+    // Check $visiblevalue is in the range.
+    if (!isset($COHORT_VISIBILITY[$visiblevalue])) {
+        return $result;
+    }
+
+    if ($type == COHORT_ASSN_ITEMTYPE_COURSE &&
+        has_capability('moodle/course:update', context_course::instance($instanceid))) {
+        // Update the database record.
+        $result = $DB->update_record('course', array('id' => $instanceid, 'audiencevisible' => $visiblevalue));
+    } else if (($type == COHORT_ASSN_ITEMTYPE_PROGRAM && has_capability($progcap, context_program::instance($instanceid))) ||
+        ($type == COHORT_ASSN_ITEMTYPE_CERTIF  && has_capability($certcap, context_program::instance($instanceid)))) {
+            // Update the database record.
+            $result = $DB->update_record('prog', array('id' => $instanceid, 'audiencevisible' => $visiblevalue));
+    }
+
+    return $result;
+}
 
 /**
  * Add or update a cohort association
@@ -222,6 +263,7 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
             }
             break;
         case COHORT_ASSN_ITEMTYPE_PROGRAM:
+        case COHORT_ASSN_ITEMTYPE_CERTIF:
             if ($progassid = $DB->get_field('prog_assignment', 'id', array('id' => $assid))) {
                 $transaction = $DB->start_delegated_transaction();
 
@@ -1328,65 +1370,6 @@ function totara_cohort_get_visible_learning($instanceid, $instancetype = COHORT_
 }
 
 /**
- * Returns SQL join string to filter course/programs based on user membership in audiences.
- *
- * @param $table string The alias of the table you want to join to.
- *                      MUST be a table alias, not just the table's name.
- * @param $field string The name of the field containing ids in the table you are joining to.
- * @param $instancetype int COHORT_ASSN_ITEMTYPE_COURSE or COHORT_ASSN_ITEMTYPE_PROGRAM
- * @param $userid int ID of a user (defaults to $USER)
- *
- * @return array  An array containing an SQL snippet and parameters.
- */
-function totara_cohort_get_visible_learning_sql($table, $field, $instancetype = COHORT_ASSN_ITEMTYPE_COURSE, $userid = 0) {
-    global $USER, $DB;
-
-    // Generate alias for our join.
-    $valias = 'vis_' . random_string(15);
-    $params = array();
-
-    $userid = $userid ? $userid : $USER->id;
-
-    // Get programs or courses current user is enrolled in.
-    if ($instancetype == COHORT_ASSN_ITEMTYPE_COURSE) {
-        $records = enrol_get_all_users_courses($userid, false, $field);
-        $intable = 'course';
-    } else {
-        $records = prog_get_all_users_programs($userid, $field);
-        $intable = 'prog';
-    }
-    $enrolledsql = '';
-    if (!empty($records)) {
-        $ids = array_keys($records);
-        list($insql, $inparams) = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-        $enrolledsql = "UNION SELECT {$field} AS recordid FROM {{$intable}} WHERE {$field} {$insql}";
-        $params = $inparams;
-    }
-
-    // User should be in the audience and added to course/program through visible learning,
-    // Or course/program audience visibility is set to COHORT_VISIBLE_ALL,
-    // Or user is enrolled in a course/assigned to a program if there are any.
-    $sql = " JOIN (
-                SELECT cv.instanceid AS recordid
-                    FROM {cohort_visibility} cv
-                JOIN {cohort_members} cm ON cv.cohortid = cm.cohortid
-                JOIN {{$intable}} {$table}
-                    ON cv.instanceid = {$table}.{$field} AND {$table}.audiencevisible > 0
-                WHERE cv.instancetype = :instancetype AND cm.userid = :userid
-
-            UNION
-
-                SELECT {$field} AS recordid FROM {{$intable}} WHERE audiencevisible = :visibleall
-
-                {$enrolledsql}
-            ) {$valias} ON {$valias}.recordid = {$table}.{$field} ";
-    $joinparams = array('instancetype' => $instancetype, 'userid' => $userid, 'visibleall' => COHORT_VISIBLE_ALL);
-
-    $params = array_merge($joinparams, $params);
-    return array($sql, $params);
-}
-
-/**
  * Used when running the cohort sync to know which cohort has a broken rule.
  *
  * @param int $courseid one course, empty means all
@@ -1720,6 +1703,71 @@ function totara_cohort_process_assigned_roles($cohortid, $roles) {
     }
 
     return $success;
+}
+
+/** Check if the current user $USER can see the learning component.
+ *
+ * @param string $type course or program
+ * @param mixed $instance Instance object or int ID of the learning component
+ * @param mixed $userid User's ID
+ *
+ * @return bool True if the user can see the learning component based on the audience visibility setting
+ */
+function check_access_audience_visibility($type, $instance, $userid = null) {
+    global $CFG, $DB, $USER;
+
+    if (!$CFG->audiencevisibility) {
+        return true;
+    }
+
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+
+    // Checking type of the learning component.
+    if ($type === 'course') {
+        $table = 'course';
+        $alias = 'c';
+        $fieldid = 'c.id';
+        $fieldvis = 'c.visible';
+        $fieldaudvis = 'c.audiencevisible';
+        $itemcontext = CONTEXT_COURSE;
+    } else {
+        $table = 'prog';
+        $alias = 'p';
+        $fieldid = 'p.id';
+        $fieldvis = 'p.visible';
+        $fieldaudvis = 'p.audiencevisible';
+        $itemcontext = CONTEXT_PROGRAM;
+    }
+
+    // Checking the learning component object or ID.
+    if (is_numeric($instance)) {
+        $object = $DB->get_record($table, array('id' => $instance), MUST_EXIST);
+    } else if (is_object($instance) and isset($instance->id)) {
+        $object = $instance;
+    } else {
+        return false;
+    }
+
+    $params = array('itemcontext' => $itemcontext, 'instanceid' => $object->id);
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
+                                                                      $fieldid,
+                                                                      $fieldvis,
+                                                                      $fieldaudvis,
+                                                                      $alias,
+                                                                      $type);
+    $params = array_merge($params, $visibilityparams);
+
+    $sql = "SELECT {$alias}.id
+            FROM {{$table}} {$alias}
+            LEFT JOIN {context} ctx
+              ON {$alias}.id = ctx.instanceid AND contextlevel = :itemcontext
+            WHERE {$alias}.id = :instanceid
+              AND {$visibilitysql}";
+
+    return $DB->record_exists_sql($sql, $params);
+
 }
 
 class totara_cohort_visible_learning_cohorts extends totara_cohort_course_cohorts {

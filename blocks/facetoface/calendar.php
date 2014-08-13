@@ -292,12 +292,19 @@ function get_sessions($display, $groups, $users, $courses, $activefilters, &$eve
             }
         }
         foreach ($events as $eventid => $event) {
-            if (empty($event->modulename)) {
+            if (empty($event->modulename) || empty($event->instance)) {
                 continue; // Nothing to check.
             }
 
+            $eventcourse = $event->courseid;
+            if (empty($eventcourse)) {
+                // Try to figure out the courseid based on the module and instance properties.
+                $cm = get_coursemodule_from_instance($event->modulename, $event->instance);
+                $eventcourse = $cm->course;
+            }
+
             // Check that the course is viewable.
-            if (!totara_course_is_viewable($event->courseid)) {
+            if (empty($eventcourse) || !totara_course_is_viewable($eventcourse)) {
                 unset($events[$eventid]);
                 continue;
             }
@@ -772,19 +779,26 @@ function get_sessions_by_course($sessionids, $displayinfo, $waitlistedsessions) 
         }
     }
 
-    list($insql, $params) = $DB->get_in_or_equal($sessionids);
+    list($insql, $params) = $DB->get_in_or_equal($sessionids, SQL_PARAMS_NAMED);
 
     // If timestart/timefinish has a date, it uses that date. It uses the current month otherwise.
     $timestart = $hasvalue['timestart'] ? $activefilters['defaultfields']['unixtimestart'] : usertime($displayinfo->tstart);
     $timeend = $hasvalue['timefinish'] ? $activefilters['defaultfields']['unixtimefinish'] : usertime($displayinfo->tend);
-    $params[] = $timestart;
-    $params[] = $timeend;
+    $params['timestart'] = $timestart;
+    $params['timeend'] = $timeend;
+
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
+    $params = array_merge($params, $visibilityparams);
 
     $sessions = $DB->get_records_sql("SELECT d.id, s.id AS sessionid, f.id AS facetofaceid, f.name, s.datetimeknown, d.timestart, d.timefinish, d.sessiontimezone
                                    FROM {facetoface} f
                                    JOIN {facetoface_sessions} s ON f.id = s.facetoface
                                    JOIN {facetoface_sessions_dates} d ON d.sessionid = s.id
-                                  WHERE s.id {$insql} AND ((d.timestart >= ? AND d.timestart <= ?) OR s.datetimeknown = 0)
+                                   JOIN {course} c ON c.id = f.course
+                                   JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                                  WHERE s.id {$insql}
+                                   AND ((d.timestart >= :timestart AND d.timestart <= :timeend) OR s.datetimeknown = 0)
+                                   AND {$visibilitysql}
                                ORDER BY f.name, d.timestart", $params);
 
     return $sessions;

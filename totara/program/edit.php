@@ -65,6 +65,12 @@ if (!has_capability('totara/program:configuredetails', $programcontext)) {
     print_error('error:nopermissions', 'totara_program');
 }
 
+// Set type.
+$instancetype = COHORT_ASSN_ITEMTYPE_PROGRAM;
+if ($iscertif) {
+    $instancetype = COHORT_ASSN_ITEMTYPE_CERTIF;
+}
+
 $PAGE->set_url(new moodle_url('/totara/program/edit.php', array('id' => $id, 'action' => $action)));
 $PAGE->set_title(format_string($program->fullname));
 $PAGE->set_heading(format_string($program->fullname));
@@ -91,7 +97,7 @@ if ($action == 'edit') {
         if (empty($program->id)) {
             $visibleselected = '';
         } else {
-            $visibleselected = totara_cohort_get_visible_learning($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM);
+            $visibleselected = totara_cohort_get_visible_learning($program->id, $instancetype);
             $visibleselected = !empty($visibleselected) ? implode(',', array_keys($visibleselected)) : '';
         }
         $PAGE->requires->strings_for_js(array('programcohortsvisible'), 'totara_cohort');
@@ -204,21 +210,21 @@ if ($data = $detailsform->get_data()) {
 
         // Visible audiences.
         if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext)) {
-            $visiblecohorts = totara_cohort_get_visible_learning($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM);
+            $visiblecohorts = totara_cohort_get_visible_learning($program->id, $instancetype);
             $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
             $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
             if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
                 // Delete removed cohorts.
                 foreach ($todelete as $cohortid) {
                     totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,
-                                                    COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+                                                     $instancetype, COHORT_ASSN_VALUE_VISIBLE);
                 }
             }
 
             if ($newvisible = array_diff($newvisible, array_keys($visiblecohorts))) {
                 // Add new cohort associations.
                 foreach ($newvisible as $cohortid) {
-                    totara_cohort_add_association($cohortid, $program->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_VALUE_VISIBLE);
+                    totara_cohort_add_association($cohortid, $program->id, $instancetype, COHORT_ASSN_VALUE_VISIBLE);
                 }
             }
         }

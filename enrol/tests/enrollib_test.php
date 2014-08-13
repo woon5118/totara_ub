@@ -106,16 +106,16 @@ class core_enrollib_testcase extends advanced_testcase {
         $this->assertEquals(array($course2->id, $course1->id, $course3->id), array_keys($courses));
 
         $courses = enrol_get_all_users_courses($user1->id, true);
-        $this->assertCount(2, $courses);
-        $this->assertEquals(array($course2->id, $course3->id), array_keys($courses));
+        $this->assertCount(1, $courses);
+        $this->assertEquals(array($course2->id), array_keys($courses));
 
         $courses = enrol_get_all_users_courses($user2->id);
         $this->assertCount(3, $courses);
         $this->assertEquals(array($course2->id, $course1->id, $course3->id), array_keys($courses));
 
         $courses = enrol_get_all_users_courses($user2->id, true);
-        $this->assertCount(2, $courses);
-        $this->assertEquals(array($course2->id, $course3->id), array_keys($courses));
+        $this->assertCount(1, $courses);
+        $this->assertEquals(array($course2->id), array_keys($courses));
 
         $courses = enrol_get_all_users_courses($user3->id);
         $this->assertCount(2, $courses);

@@ -1653,6 +1653,10 @@ class completion_info {
     public static function get_all_courses($userid, $limit=0) {
         global $DB;
 
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+        $params = array('userid' => $userid);
+        $params = array_merge($params, $visibilityparams);
+
         $sql = "
             SELECT
                 c.id AS course,
@@ -1667,8 +1671,12 @@ class completion_info {
             LEFT JOIN
                 {course} c
              ON cc.course = c.id
+            LEFT JOIN
+                {context} ctx
+             ON ctx.instanceid = c.id AND ctx.contextlevel = " . CONTEXT_COURSE . "
             WHERE
                 cc.userid = :userid
+            AND {$visibilitysql}
             AND
             (
                 cc.timeenrolled > 0
@@ -1683,7 +1691,7 @@ class completion_info {
 
         $completions = array();
 
-        if ($ccompletions = $DB->get_records_sql($sql, array('userid' => $userid), 0, $limit)) {
+        if ($ccompletions = $DB->get_records_sql($sql, $params, 0, $limit)) {
             foreach ($ccompletions as $course) {
                 // Create completion_completion instance (without reloading from db)
                 $completions[$course->course] = new completion_completion((array) $course, false);

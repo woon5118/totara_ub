@@ -150,6 +150,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
     global $DB;
 
     $params = array();
+    $params['contextlevel'] = CONTEXT_PROGRAM;
     $params['userid'] = $userid;
     $params['comptype'] = CERTIFTYPE_PROGRAM;
 
@@ -161,6 +162,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
     $count = 'SELECT COUNT(*) ';
     $select = 'SELECT p.id, p.fullname, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.status, cfc.timeexpires ';
     $from = "FROM {prog} p
+            INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel =:contextlevel)
             INNER JOIN {prog_completion} pc ON p.id = pc.programid
                     AND pc.coursesetid = 0
                     AND pc.userid = :userid
@@ -175,6 +177,18 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
                             WHERE pua.programid = pc.programid
                             AND pua.userid = pc.userid
                             AND pua.exceptionstatus {$exceptionsql})";
+
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
+                                                                      'p.id',
+                                                                      'p.visible',
+                                                                      'p.audiencevisible',
+                                                                      'p',
+                                                                      'certification');
+
+    $params = array_merge($params, $visibilityparams);
+
+    $where .= " AND {$visibilitysql} ";
+
     if (!$showhidden) {
         $where .= "AND p.visible = :visible ";
         $params['visible'] = 1;
@@ -458,28 +472,13 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
         $sortstatement = "ORDER BY $sort";
     }
 
-    $visibleprograms = array();
-
-
-    $system_context = context_system::instance();
-    $now = time();
-    $availabilitysql = '';
-    $canseeunavailable = has_capability('totara/program:viewhiddenprograms', $system_context);
-    $availabilityparams = array();
-    if(!$canseeunavailable) {
-        $availabilitysql = 'AND p.available > 0 AND p.availablefrom < :timefrom
-                            AND (p.availableuntil = 0 OR p.availableuntil > :timeuntil)';
-        $availabilityparams['timefrom'] = $now;
-        $availabilityparams['timeuntil'] = $now;
-    }
-    $params = array_merge($params, $availabilityparams);
-
-    $visibilitysql = '';
-    $visibilityparams = array();
-    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $system_context);
-    if (!empty($CFG->audiencevisibility) && !$canmanagevisibility) {
-        list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql('p', 'id', COHORT_ASSN_ITEMTYPE_PROGRAM);
-    }
+    // Manage visibility.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id,
+                                                                        'p.id',
+                                                                        'p.visible',
+                                                                        'p.audiencevisible',
+                                                                        'p',
+                                                                        $type);
     $params = array_merge($params, $visibilityparams);
 
     // Pull out all programs matching the category.
@@ -490,29 +489,10 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
                                     JOIN {context} ctx
                                       ON (p.id = ctx.instanceid
                                           AND ctx.contextlevel = :contextlevel)
-                                    $visibilitysql
-                                    $availabilitysql
-                                    $categoryselect
-                                    $sortstatement", $params, $offset, $limit);
+                                    {$categoryselect} AND {$visibilitysql}
+                                    {$sortstatement}", $params, $offset, $limit);
 
-    // If audience visibility is enabled, we just need to return records from DB query.
-    if (!empty($CFG->audiencevisibility)) {
-        return $programs;
-    }
-
-    foreach ($programs as $program) {
-        if (isset($program->visible) && $program->visible <= 0) {
-            // for hidden programs, require visibility check
-            $capability = ($type == 'program') ? 'totara/program:viewhiddenprograms' : 'totara/certification:viewhiddencertifications';
-            if (has_capability($capability, program_get_context($program->id))) {
-                $visibleprograms[] = $program;
-            }
-        } else {
-            $visibleprograms[] = $program;
-        }
-    }
-
-    return $visibleprograms;
+    return $programs;
 }
 
 /**
@@ -572,12 +552,16 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
 
     $typesql = '';
     if ($type == 'program') {
-        $typesql = " p.certifid IS NULL"; // filter out certifications
+        $typesql = " p.certifid IS NULL"; // Filter out certifications.
     } else {
         $typesql = " p.certifid IS NOT NULL";
     }
 
-    // pull out all programs matching the cat
+    // Visibility.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible', 'p.audiencevisible', 'p', $type);
+    $params = array_merge($params, $visibilityparams);
+
+    // Pull out all programs matching the cat.
     $visibleprograms = array();
 
     $progselect = "SELECT $fields, 'program' AS listtype,
@@ -585,7 +569,7 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
                           ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
                    FROM {prog} p
                    JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)
-                   WHERE {$typesql}";
+                   WHERE {$typesql} AND {$visibilitysql}";
 
     $select = $progselect.$categoryselect.' ORDER BY '.$sort;
 
@@ -597,22 +581,11 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
         $limitfrom = 0;
     }
 
-    // iteration will have to be done inside loop to keep track of the limitfrom and limitnum
+    // Iteration will have to be done inside loop to keep track of the limitfrom and limitnum.
     foreach ($rs as $program) {
-        if ($program->visible <= 0) {
-            // For hidden programs, require visibility check.
-            $capability = ($type == 'program') ? 'totara/program:viewhiddenprograms' : 'totara/certification:viewhiddencertifications';
-            if (has_capability($capability, program_get_context($program->id))) {
-                $totalcount++;
-                if ($totalcount > $limitfrom && (!$limitnum or count($visibleprograms) < $limitnum)) {
-                    $visibleprograms [] = $program;
-                }
-            }
-        } else {
-            $totalcount++;
-            if ($totalcount > $limitfrom && (!$limitnum or count($visibleprograms) < $limitnum)) {
-                $visibleprograms [] = $program;
-            }
+        $totalcount++;
+        if ($totalcount > $limitfrom && (!$limitnum or count($visibleprograms) < $limitnum)) {
+            $visibleprograms [] = $program;
         }
     }
 
@@ -936,7 +909,7 @@ function prog_can_enter_course($user, $course) {
  * @return object {@link $COURSE} records
  */
 function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $recordsperpage=50, &$totalcount, $type = 'program') {
-    global $DB, $USER;
+    global $DB;
 
     $REGEXP    = $DB->sql_regex(true);
     $NOTREGEXP = $DB->sql_regex(false);
@@ -979,17 +952,21 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
             $idnumbersearch .= " p.idnumber $NOTREGEXP '(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)' ";
             $shortnamesearch .= " p.shortname $NOTREGEXP '(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)' ";
         } else {
-            $summarysearch .= $DB->sql_like('summary', '?', false, true, false) . ' ';
-            $summarysearchparams[] = '%' . $searchterm . '%';
+            $summaryparam = rb_unique_param('summary');
+            $summarysearch .= $DB->sql_like('summary', ":{$summaryparam}", false, true, false) . ' ';
+            $summarysearchparams[$summaryparam] = '%' . $searchterm . '%';
 
-            $fullnamesearch .= $DB->sql_like('fullname', '?', false, true, false) . ' ';
-            $fullnamesearchparams[] = '%' . $searchterm . '%';
+            $fullnameparam = rb_unique_param('fullname');
+            $fullnamesearch .= $DB->sql_like('fullname', ":{$fullnameparam}", false, true, false) . ' ';
+            $fullnamesearchparams[$fullnameparam] = '%' . $searchterm . '%';
 
-            $idnumbersearch .= $DB->sql_like('idnumber', '?', false, true, false) . ' ';
-            $idnumbersearchparams[] = '%' . $searchterm . '%';
+            $idnumberparam = rb_unique_param('idnumber');
+            $idnumbersearch .= $DB->sql_like('idnumber', ":{$idnumberparam}", false, true, false) . ' ';
+            $idnumbersearchparams[$idnumberparam] = '%' . $searchterm . '%';
 
-            $shortnamesearch .= $DB->sql_like('shortname', '?', false, true, false) . ' ';
-            $shortnamesearchparams[] = '%' . $searchterm . '%';
+            $shortnameparam = rb_unique_param('shortname');
+            $shortnamesearch .= $DB->sql_like('shortname', ":{$shortnameparam}", false, true, false) . ' ';
+            $shortnamesearchparams[$shortnameparam] = '%' . $searchterm . '%';
         }
     }
 
@@ -1006,18 +983,21 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
     }
 
     if ($type == 'program') {
-        $where .= " AND p.certifid IS NULL"; // filter out certifications
+        $where .= " AND p.certifid IS NULL"; // Filter out certifications.
     } else {
         $where .= " AND p.certifid IS NOT NULL";
     }
 
+    // Add visibility query.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible', 'p.audiencevisible', 'p', $type);
+    $params = array_merge($params, $visibilityparams);
     $sql = "SELECT p.*,
                    ctx.id AS ctxid, ctx.path AS ctxpath,
                    ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
             FROM {prog} p
             JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM.")
-            $where
-            ORDER BY " . $sort;
+            {$where} AND {$visibilitysql}
+            ORDER BY {$sort}";
 
     $programs = array();
 
@@ -1028,37 +1008,11 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
     $rs = $DB->get_recordset_sql($sql, $params);
 
     foreach ($rs as $program) {
-        if (!is_siteadmin($USER->id)) {
-            // Check if this program is not available, if it's not then deny access.
-            if ($program->available == 0) {
-                continue;
-            }
-
-            if (isset($USER->timezone)) {
-                $now = usertime(time(),$USER->timezone);
-            } else {
-                $now = usertime(time());
-            }
-
-            // Check if the programme isn't accessible yet.
-            if ($program->availablefrom > 0 && $program->availablefrom > $now) {
-                continue;
-            }
-
-            // Check if the programme isn't accessible anymore.
-            if ($program->availableuntil > 0 && $program->availableuntil < $now) {
-                continue;
-            }
+        // Don't exit this loop till the end we need to count all the visible programs to update $totalcount.
+        if ($c >= $limitfrom && $c < $limitto) {
+            $programs[] = $program;
         }
-
-        $currentprogram = new program($program->id);
-        if ($currentprogram->is_viewable($USER) || $currentprogram->user_is_assigned($USER->id)) {
-            // Don't exit this loop till the end we need to count all the visible programs to update $totalcount.
-            if ($c >= $limitfrom && $c < $limitto) {
-                $programs[] = $program;
-            }
-            $c++;
-        }
+        $c++;
     }
 
     $rs->close();
@@ -1976,4 +1930,30 @@ function check_certification_enabled() {
     if (totara_feature_disabled('certifications')) {
         print_error('certificationsdisabled', 'totara_certification');
     }
+}
+
+/**
+ * Snippet to determine if a program is available based on the available fields.
+ *
+ * @param $fieldalias Alias for the program table used in the query
+ * @param $separator Character separator between the alias and the field name
+ * @param int|null $userid The user ID that wants to see the program
+ * @return array
+ */
+function get_programs_availability_sql($fieldalias, $separator, $userid = null) {
+    global $DB, $USER;
+
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
+
+    $user = $DB->get_record('user', array('id' => $userid));
+    $now = isset($user->timezone) ? usertime(time(), $user->timezone) : usertime(time());
+
+    $availabilitysql = " (({$fieldalias}{$separator}available = :available) AND
+                          ({$fieldalias}{$separator}availablefrom = 0 OR {$fieldalias}{$separator}availablefrom < :timefrom) AND
+                          ({$fieldalias}{$separator}availableuntil = 0 OR {$fieldalias}{$separator}availableuntil > :timeuntil))";
+    $availabilityparams = array('available' => AVAILABILITY_TO_STUDENTS, 'timefrom' => $now, 'timeuntil' => $now);
+
+    return array($availabilitysql, $availabilityparams);
 }

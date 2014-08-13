@@ -84,6 +84,12 @@ class block_course_overview_renderer extends plugin_renderer_base {
             if ($ismovingcourse && ($course->id == $movingcourseid)) {
                 continue;
             }
+
+            // If course is not accesible, then don't show it.
+            if (!totara_course_is_viewable($course->id)) {
+                continue;
+            }
+
             $html .= $this->output->box_start('coursebox', "course-{$course->id}");
             $html .= html_writer::start_tag('div', array('class' => 'course_title'));
             // If user is editing, then add move icons.

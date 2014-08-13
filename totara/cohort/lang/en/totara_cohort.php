@@ -245,6 +245,7 @@ $string['error:mustpickonevalue'] = 'You must specify at least one value';
 $string['error:noeditdynamiccohort'] = 'This is a dynamic audience. You cannot directly edit its members.';
 $string['error:noresponsefromajax'] = 'Error: No response from Ajax';
 $string['error:notdynamiccohort'] = 'This is not a dynamic audience.';
+$string['error:notenoughvisibility'] = 'You are not allowed to view this content.';
 $string['error:novisibleaudiencesselected'] = 'Audiences must be added when using the option "Visible to enrolled users and members of the selected audiences" is selected';
 $string['error:rulemissing'] = 'A required parameter (rule) was missing';
 $string['error:rulemissingparams'] = 'This rule is not defined.';
@@ -475,8 +476,8 @@ $string['usersx'] = 'User\'s "{$a}"';
 $string['values'] = 'Values';
 $string['viewmembers'] = 'Members';
 $string['visibility'] = 'Visibility';
-$string['visibleall'] = 'Visible to all users';
-$string['visibleaudience'] = 'Visible to enrolled users and members of the selected audiences';
+$string['visibleall'] = 'All users';
+$string['visibleaudience'] = 'Enrolled users and members of the selected audiences';
 $string['visiblelearning'] = 'Visible learning';
 $string['visiblelearning_help'] = 'This setting determines whether the course, program or certification appears in the corresponding list.
 
@@ -485,7 +486,8 @@ If "Visible to enrolled users and members of the selected audiences" is selected
 Users that are enrolled will be able to see it, not matter what visibility setting is selected.
 
 Users granted the \'manageaudiencevisibility\' capability (managers by default) can see all courses, programs and certifications.';
-$string['visiblenone'] = 'Visible to enrolled users';
+$string['visibleenrolled'] = 'Enrolled users only';
+$string['visiblenousers'] = 'No users';
 $string['youhaveadded'] = 'You have added {$a->itemnames} to this program<br />
 <br />
 <strong>This will asign {$a->affectedusers} users to the program</strong><br />

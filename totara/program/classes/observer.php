@@ -40,6 +40,9 @@ class totara_program_observer {
 
         try {
             $messagesmanager = new prog_messages_manager($programid);
+            $program = new program($programid);
+            $user = $DB->get_record('user', array('id' => $userid));
+            $isviewable = $program->is_viewable($user);
             $messages = $messagesmanager->get_messages();
             $completion = $DB->get_field('prog_completion', 'status', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
         } catch (exception $e) {
@@ -49,7 +52,7 @@ class totara_program_observer {
         // Send notifications to user and (optionally) the user's manager.
         foreach ($messages as $message) {
             if ($message->messagetype == MESSAGETYPE_ENROLMENT) {
-                if (($user = $DB->get_record('user', array('id' => $userid))) && $completion != STATUS_PROGRAM_COMPLETE) {
+                if ($user && $completion != STATUS_PROGRAM_COMPLETE && $isviewable) {
                     $message->send_message($user);
                 }
             }
@@ -71,6 +74,9 @@ class totara_program_observer {
 
         try {
             $messagesmanager = new prog_messages_manager($programid);
+            $program = new program($programid);
+            $user = $DB->get_record('user', array('id' => $userid));
+            $isviewable = $program->is_viewable($user);
             $messages = $messagesmanager->get_messages();
         } catch (ProgramException $e) {
             return true;
@@ -79,7 +85,7 @@ class totara_program_observer {
         // Send notifications to user and (optionally) the user's manager.
         foreach ($messages as $message) {
             if ($message->messagetype == MESSAGETYPE_UNENROLMENT) {
-                if ($user = $DB->get_record('user', array('id' => $userid))) {
+                if ($user && $isviewable) {
                     $message->send_message($user);
                 }
             }
@@ -103,6 +109,9 @@ class totara_program_observer {
 
         try {
             $messagesmanager = new prog_messages_manager($programid);
+            $program = new program($programid);
+            $user = $DB->get_record('user', array('id' => $userid));
+            $isviewable = $program->is_viewable($user);
             $messages = $messagesmanager->get_messages();
         } catch (ProgramException $e) {
             return true;
@@ -111,7 +120,7 @@ class totara_program_observer {
         // Send notification to user.
         foreach ($messages as $message) {
             if ($message->messagetype == MESSAGETYPE_PROGRAM_COMPLETED) {
-                if ($user = $DB->get_record('user', array('id' => $userid))) {
+                if ($user && $isviewable) {
                     $message->send_message($user);
                 }
             }

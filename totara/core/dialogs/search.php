@@ -199,25 +199,12 @@ switch ($searchtype) {
         $search_info->id = 'c.id';
         $search_info->fullname = 'c.fullname';
 
-        if (empty($CFG->audiencevisibility)) {
-            $search_info->sql = "
-                FROM
-                    {course} c
-            ";
-        } else {
-            $visibilitysql = '';
-            $visibilityparams = array();
-            $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance());
-            if (!$canmanagevisibility) {
-                list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql('c', 'id', COHORT_ASSN_ITEMTYPE_COURSE);
-            }
-            $search_info->sql = "
-                FROM
+        $search_info->sql = "
+            FROM
                 {course} c
-                {$visibilitysql}
-            ";
-            $params = array_merge($params, $visibilityparams);
-        }
+            LEFT JOIN
+                {context} ctx
+              ON c.id = ctx.instanceid AND contextlevel = ". CONTEXT_COURSE . " ";
 
         if ($this->requirecompletioncriteria) {
             $search_info->sql .= "
@@ -228,9 +215,9 @@ switch ($searchtype) {
         }
 
         $search_info->sql .= " WHERE {$searchsql} ";
-        if (empty($CFG->audiencevisibility)) {
-            $search_info->sql .= " AND c.visible = 1 ";
-        }
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+        $search_info->sql .= " AND {$visibilitysql}";
+        $params = array_merge($params, $visibilityparams);
 
         if ($this->requirecompletion || $this->requirecompletioncriteria) {
             $search_info->sql .= "
@@ -257,34 +244,27 @@ switch ($searchtype) {
      */
     case 'program':
         // Generate search SQL
+        $search_info->id = 'p.id';
         $keywords = totara_search_parse_keywords($query);
         $fields = array('p.fullname', 'p.shortname');
         list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields, SQL_PARAMS_NAMED);
-
-        if (empty($CFG->audiencevisibility)) {
-            $search_info->sql = "
-                FROM
-                    {prog} p
-                WHERE
-                    {$searchsql}
-                    AND visible = 1
-            ";
-        } else {
-            $visibilitysql = '';
-            $visibilityparams = array();
-            $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance());
-            if (!$canmanagevisibility) {
-                list($visibilitysql, $visibilityparams) = totara_cohort_get_visible_learning_sql('p', 'id', COHORT_ASSN_ITEMTYPE_PROGRAM);
-            }
-            $search_info->sql = "
-                FROM
-                    {prog} p
-                    {$visibilitysql}
-                WHERE
-                    {$searchsql}
-            ";
-            $params = array_merge($params, $visibilityparams);
-        }
+        list($visibilitysql, $visibilityparams) = totara_visibility_where(null,
+                                                                          'p.id',
+                                                                          'p.visible',
+                                                                          'p.audiencevisible',
+                                                                          'p',
+                                                                          'program');
+        $search_info->sql = "
+            FROM
+                {prog} p
+            LEFT JOIN
+                {context} ctx
+              ON p.id = ctx.instanceid AND contextlevel = " . CONTEXT_PROGRAM . "
+            WHERE
+                  {$searchsql}
+              AND {$visibilitysql}
+        ";
+        $params = array_merge($params, $visibilityparams);
 
         $search_info->order = " ORDER BY p.sortorder ASC";
         $search_info->params = $params;

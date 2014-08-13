@@ -54,7 +54,7 @@ class rb_source_dp_course extends rb_base_source {
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = array();
-        $this->requiredcolumns = array();
+        $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_course');
         parent::__construct();
     }
@@ -69,13 +69,13 @@ class rb_source_dp_course extends rb_base_source {
                         "','",
                         array(
                             sql_cast2char('ra.userid'),
-                            sql_cast2char('cx.instanceid')
+                            sql_cast2char('ctx.instanceid')
                         )
                 ) . " as id, ".
-                "ra.userid as userid, cx.instanceid as courseid ".
+                "ra.userid as userid, ctx.instanceid as courseid ".
                 "from {role_assignments} ra ".
-                "inner join {context} cx ".
-                "on ra.contextid = cx.id and cx.contextlevel = " . CONTEXT_COURSE .
+                "inner join {context} ctx ".
+                "on ra.contextid = ctx.id and ctx.contextlevel = " . CONTEXT_COURSE .
                 " UNION ".
                 "select distinct ".
                 $DB->sql_concat_join(
@@ -119,25 +119,25 @@ class rb_source_dp_course extends rb_base_source {
                 'dp_course',
                 'LEFT',
                 "(select
-  p.id as planid,
-  p.templateid as templateid,
-  p.userid as userid,
-  p.name as planname,
-  p.description as plandescription,
-  p.startdate as planstartdate,
-  p.enddate as planenddate,
-  p.status as planstatus,
-  pc.id as id,
-  pc.courseid as courseid,
-  pc.priority as priority,
-  pc.duedate as duedate,
-  pc.approved as approved,
-  pc.completionstatus as completionstatus,
-  pc.grade as grade
-from
-  {dp_plan} p
-  inner join {dp_plan_course_assign} pc
-  on p.id = pc.planid)",
+                    p.id as planid,
+                    p.templateid as templateid,
+                    p.userid as userid,
+                    p.name as planname,
+                    p.description as plandescription,
+                    p.startdate as planstartdate,
+                    p.enddate as planenddate,
+                    p.status as planstatus,
+                    pc.id as id,
+                    pc.courseid as courseid,
+                    pc.priority as priority,
+                    pc.duedate as duedate,
+                    pc.approved as approved,
+                    pc.completionstatus as completionstatus,
+                    pc.grade as grade
+                  from
+                    {dp_plan} p
+                  inner join {dp_plan_course_assign} pc
+                    on p.id = pc.planid)",
                 'dp_course.userid = base.userid and dp_course.courseid = base.courseid',
                 REPORT_BUILDER_RELATION_ONE_TO_MANY,
                 array('base')
@@ -208,8 +208,8 @@ from
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
 
-
-        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid');
+        $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
+        $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_user_table_to_joinlist($joinlist, 'base','userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
@@ -646,6 +646,46 @@ from
             ),
         );
         return $defaultcolumns;
+    }
+
+    protected function define_requiredcolumns() {
+        $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'course',
+            'coursevisible',
+            '',
+            "course.visible",
+            array('joins' => 'course')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'course',
+            'courseaudiencevisible',
+            '',
+            "course.audiencevisible",
+            array('joins' => 'course')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+
+        return $requiredcolumns;
+    }
+
+    public function post_config(reportbuilder $report) {
+        $reportfor = $report->reportfor; // ID of the user the report is for.
+        $fieldalias = 'course';
+        $fieldbaseid = $report->get_field('base', 'courseid', 'base.courseid');
+        $fieldvisible = $report->get_field('course', 'coursevisible', 'course.visible');
+        $fieldaudvis = $report->get_field('course', 'courseaudiencevisible', 'course.audiencevisible');
+        $report->set_post_config_restrictions(totara_visibility_where($reportfor,
+            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached()));
     }
 
     function rb_display_course_completion_progress($status, $row, $isexport) {

@@ -668,5 +668,26 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014040700, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2014090300) {
+        // Check certifid exists. This is done to avoid errors if upgrading from older versions where the field doesn't exist.
+        $table = new xmldb_table('prog');
+        $field = new xmldb_field('certifid');
+        if ($dbman->field_exists($table, $field)) {
+            // Find and fix all certification type records in cohort_visibility table.
+            $sql = "SELECT cv.id FROM {cohort_visibility} cv
+                    INNER JOIN {prog} p ON cv.instanceid = p.id
+                    WHERE cv.instancetype = ?
+                      AND p.certifid IS NOT NULL";
+            if ($certifications = $DB->get_fieldset_sql($sql, array(COHORT_ASSN_ITEMTYPE_PROGRAM))) {
+                list($insql, $inparams) = $DB->get_in_or_equal($certifications);
+                $update = "UPDATE {cohort_visibility}
+                           SET instancetype = " . COHORT_ASSN_ITEMTYPE_CERTIF ."
+                           WHERE id $insql";
+                $DB->execute($update, $inparams);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2014090300, 'totara', 'cohort');
+    }
+
     return true;
 }

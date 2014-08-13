@@ -133,7 +133,7 @@ class dp_course_component extends dp_base_component {
         global $DB;
 
         // Generate where clause (using named parameters because of how query is built)
-        $where = "c.visible = 1 AND a.planid = :planid";
+        $where = "a.planid = :planid";
         $params = array('planid' => $this->plan->id);
         if ($approved !== null) {
             list($approvedsql, $approvedparams) = $DB->get_in_or_equal($approved, SQL_PARAMS_NAMED, 'approved');
@@ -165,6 +165,15 @@ class dp_course_component extends dp_base_component {
             $params['planuserid'] = $this->plan->userid;
         }
 
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid,
+                                                                          'c.id',
+                                                                          'c.visible',
+                                                                          'c.audiencevisible',
+                                                                          'c',
+                                                                          'course');
+        $params = array_merge($params, $visibilityparams);
+        $where .= " AND {$visibilitysql} ";
+
         return $DB->get_records_sql(
             "
             SELECT
@@ -184,6 +193,9 @@ class dp_course_component extends dp_base_component {
             INNER JOIN
                 {course} c
              ON c.id = a.courseid
+            INNER JOIN
+                {context} ctx
+             ON c.id = ctx.instanceid AND ctx.contextlevel = " . CONTEXT_COURSE . "
             LEFT JOIN
                 (SELECT itemid,
                     COUNT(id) AS count
@@ -488,7 +500,14 @@ class dp_course_component extends dp_base_component {
             $params['userid'] = $this->plan->userid;
         }
 
-        $select = "SELECT ca.*, c.fullname, c.icon, psv.name AS priorityname, $completion_field";
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid,
+                                                                          'c.id',
+                                                                          'c.visible',
+                                                                          'c.audiencevisible',
+                                                                          'c',
+                                                                          'course');
+
+        $select = "SELECT ca.*, c.fullname, c.icon, c.visible, c.audiencevisible, psv.name AS priorityname, $completion_field";
 
         // get courses assigned to this plan
         // and related details
@@ -499,6 +518,9 @@ class dp_course_component extends dp_base_component {
                 {course} c
              ON c.id = ca.courseid
             LEFT JOIN
+                {context} ctx
+             ON c.id = ctx.instanceid AND ctx.contextlevel = " . CONTEXT_COURSE . "
+            LEFT JOIN
                 {dp_priority_scale_value} psv
             ON  (ca.priority = psv.id
             AND psv.priorityscaleid = :pscaleid )
@@ -508,8 +530,9 @@ class dp_course_component extends dp_base_component {
         list($insql, $inparams) = $DB->get_in_or_equal($list, SQL_PARAMS_NAMED);
         $where = " WHERE ca.id $insql
             AND ca.approved = :approved ";
-        $params = array_merge($params, $inparams);
+        $params = array_merge($params, $inparams, $visibilityparams);
         $params['approved'] = DP_APPROVAL_APPROVED;
+        $where .= " AND {$visibilitysql} ";
         $sort = " ORDER BY c.fullname";
 
         $tableheaders = array(

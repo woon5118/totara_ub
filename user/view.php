@@ -320,12 +320,7 @@ if (!isset($hiddenfields['mycourses'])) {
                 $cfullname = $ccontext->get_context_name(false);
                 if ($mycourse->id != $course->id) {
                     $linkattributes = null;
-                    if ($mycourse->visible == 0) {
-                        if (!has_capability('moodle/course:viewhiddencourses', $ccontext)) {
-                            continue;
-                        }
-                        $linkattributes['class'] = 'dimmed';
-                    }
+                    $linkattributes['class'] = totara_get_style_visibility($mycourse);
                     $params = array('id' => $user->id, 'course' => $mycourse->id);
                     if ($showallcourses) {
                         $params['showallcourses'] = 1;

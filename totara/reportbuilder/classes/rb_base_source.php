@@ -234,13 +234,18 @@ abstract class rb_base_source {
         // Serialize the data so that it can be passed as a single value.
         $paramstring = http_build_query($params);
 
+        $class_link = 'rb-display-expand-link ';
+        if (array_key_exists('class', $attributes)) {
+            $class_link .=  $attributes['class'];
+        }
+
         $attributes['class'] = 'rb-display-expand';
         $attributes['data-name'] = $expandname;
         $attributes['data-param'] = $paramstring;
         $attributes['style'] = 'background-image:url(' . $OUTPUT->pix_url('i/info') . ')';
 
         // Create the result.
-        $link = html_writer::link($alternateurl, format_string($columnvalue), array('class' => 'rb-display-expand-link'));
+        $link = html_writer::link($alternateurl, format_string($columnvalue), array('class' => $class_link));
         return html_writer::div($link, 'rb-display-expand', $attributes);
     }
 
@@ -664,7 +669,7 @@ abstract class rb_base_source {
             return format_string($course);
         }
 
-        $attr = (isset($row->course_visible) && $row->course_visible == 0) ? array('class' => 'dimmed') : array();
+        $attr = array('class' => totara_get_style_visibility($row, 'course_visible', 'course_audiencevisible'));
         $alturl = new moodle_url('/course/view.php', array('id' => $row->course_id));
         return $this->create_expand_link($course, 'course_details', array('expandcourseid' => $row->course_id), $alturl, $attr);
     }
@@ -682,8 +687,7 @@ abstract class rb_base_source {
             return format_string($program);
         }
 
-        $attr = (isset($row->prog_visible) && $row->prog_visible == 0) ? array('class' => 'dimmed')
-                : array();
+        $attr = array('class' => totara_get_style_visibility($row, 'prog_visible', 'prog_audiencevisible'));
         $alturl = new moodle_url('/totara/program/view.php', array('id' => $row->prog_id));
         return $this->create_expand_link($program, 'prog_details',
                 array('expandprogid' => $row->prog_id), $alturl, $attr);
@@ -936,12 +940,7 @@ abstract class rb_base_source {
         }
 
         $courseid = $row->course_id;
-        if (empty($CFG->audiencevisibility)) {
-            $attr = (isset($row->course_visible) && $row->course_visible == 0) ? array('class' => 'dimmed') : array();
-        } else {
-            $attr = (isset($row->course_audiencevisible) && $row->course_audiencevisible == COHORT_VISIBLE_NONE) ?
-                    array('class' => 'dimmed') : array();
-        }
+        $attr = array('class' => totara_get_style_visibility($row, 'course_visible', 'course_audiencevisible'));
         $url = new moodle_url('/course/view.php', array('id' => $courseid));
         return html_writer::link($url, $course, $attr);
     }
@@ -958,12 +957,7 @@ abstract class rb_base_source {
 
         $courseid = $row->course_id;
         $courseicon = !empty($row->course_icon) ? $row->course_icon : 'default';
-        if (empty($CFG->audiencevisibility)) {
-            $cssclass = (isset($row->course_visible) && $row->course_visible == 0) ? 'dimmed' : '';
-        } else {
-            $cssclass = (isset($row->course_audiencevisible) && $row->course_audiencevisible == COHORT_VISIBLE_NONE) ?
-                    'dimmed' : '';
-        }
+        $cssclass = totara_get_style_visibility($row, 'course_visible', 'course_audiencevisible');
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($courseid, TOTARA_ICON_TYPE_COURSE),
             'class' => 'course_icon', 'alt' => ''));
         $link = $OUTPUT->action_link(
@@ -1331,11 +1325,13 @@ abstract class rb_base_source {
         global $OUTPUT;
         $programid = $row->program_id;
         $programicon = !empty($row->program_icon) ? $row->program_icon : 'default';
+        $programobj = (object) $row;
+        $class = 'course_icon ' . totara_get_style_visibility($programobj, 'program_visible', 'program_audiencevisible');
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon', 'alt' => ''));
+            'class' => $class, 'alt' => ''));
         $link = $OUTPUT->action_link(
             new moodle_url('/totara/program/view.php', array('id' => $programid)),
-            $icon . $program, null, array('class' => 'course_icon')
+            $icon . $program, null, array('class' => $class)
         );
         return $link;
     }
@@ -2009,15 +2005,41 @@ abstract class rb_base_source {
      * @param string $join Name of the join that provides the
      *                     'course id' field
      * @param string $field Name of course id field to join on
+     * @param string $jointype Type of Join (INNER, LEFT, RIGHT)
      * @return boolean True
      */
-    protected function add_course_table_to_joinlist(&$joinlist, $join, $field) {
+    protected function add_course_table_to_joinlist(&$joinlist, $join, $field, $jointype = 'LEFT') {
 
         $joinlist[] = new rb_join(
             'course',
-            'LEFT',
+            $jointype,
             '{course}',
             "course.id = $join.$field",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
+    }
+
+    /**
+     * Adds the course table to the $joinlist array
+     *
+     * @param array &$joinlist Array of current join options
+     *                         Passed by reference and updated to
+     *                         include new table joins
+     * @param string $join Name of the join that provides the
+     *                     'course id' field
+     * @param string $field Name of course id field to join on
+     * @param int $contextlevel Name of course id field to join on
+     * @param string $jointype Type of join (INNER, LEFT, RIGHT)
+     * @return boolean True
+     */
+    protected function add_context_table_to_joinlist(&$joinlist, $join, $field, $contextlevel, $jointype = 'LEFT') {
+
+        $joinlist[] = new rb_join(
+            'ctx',
+            $jointype,
+            '{context}',
+            "ctx.instanceid = $join.$field AND ctx.contextlevel = $contextlevel",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
@@ -2069,7 +2091,11 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'course_expand',
                 'defaultheading' => get_string('coursename', 'totara_reportbuilder'),
-                'extrafields' => array('course_id' => "$join.id", 'course_visible' => "$join.visible")
+                'extrafields' => array(
+                    'course_id' => "$join.id",
+                    'course_visible' => "$join.visible",
+                    'course_audiencevisible' => "$join.audiencevisible"
+                )
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2437,7 +2463,9 @@ abstract class rb_base_source {
                 'defaultheading' => get_string('programname', $langfile),
                 'extrafields' => array(
                     'program_id' => "$join.id",
-                    'program_icon' => "$join.icon"
+                    'program_icon' => "$join.icon",
+                    'program_visible' => "$join.visible",
+                    'program_audiencevisible' => "$join.audiencevisible",
                 )
             )
         );
@@ -2450,7 +2478,10 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'program_expand',
                 'defaultheading' => get_string('programname', $langfile),
-                'extrafields' => array('prog_id' => "$join.id", 'prog_visible' => "$join.visible",
+                'extrafields' => array(
+                    'prog_id' => "$join.id",
+                    'prog_visible' => "$join.visible",
+                    'prog_audiencevisible' => "$join.audiencevisible",
                     'prog_certifid' => "$join.certifid")
             )
         );

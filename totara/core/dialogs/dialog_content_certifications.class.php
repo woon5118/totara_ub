@@ -163,12 +163,6 @@ class totara_dialog_content_certifications extends totara_dialog_content {
     public function load_certifications() {
         if ($this->categoryid) {
             $certs = certif_get_certifications($this->categoryid, "p.fullname ASC", 'p.id, p.fullname, p.sortorder, p.visible');
-            foreach ($certs as $key => $cert) {
-                $certification = new program($cert->id);
-                if (!$certification->is_accessible()) {
-                    unset($certs[$key]);
-                }
-            }
             $this->certifications = $certs;
         }
     }

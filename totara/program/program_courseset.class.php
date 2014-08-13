@@ -853,7 +853,10 @@ class multi_course_set extends course_set {
 
                 // Site admin can access any course.
                 if (is_siteadmin($USER->id)) {
-                    $coursedetails .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)), $coursename);
+                    // Get visibility class name.
+                    $dimmed = totara_get_style_visibility($course);
+                    $coursedetails .= html_writer::link(new moodle_url('/course/view.php',
+                        array('id' => $course->id)), $coursename, array('class' => $dimmed));
                     $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                     get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
                 } else {
