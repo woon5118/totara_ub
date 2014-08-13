@@ -165,19 +165,20 @@ class totara_sync_config_form extends moodleform {
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
         if (DIRECTORY_SEPARATOR == '\\') {
-            $pattern = '/^[a-z0-9\/\.\-_\\\\\\:]{1,}$/i';
+            $pattern = '/^[a-z0-9 \/\.\-_\\\\\\:]{1,}$/i';
         } else {
             // Character '@' is used in Jenkins workspaces, it might be used on other servers too.
-            $pattern = '/^[a-z0-9@\/\.\-_]{1,}$/i';
+            $pattern = '/^[a-z0-9@ \/\.\-_]{1,}$/i';
         }
 
         if ($data['fileaccess'] == FILE_ACCESS_DIRECTORY && isset($data['filesdir'])) {
-            if (!preg_match($pattern, $data['filesdir'])) {
+            $filesdir = trim($data['filesdir']);
+            if (!preg_match($pattern, $filesdir)) {
                 $errors['filesdir'] = get_string('pathformerror', 'tool_totara_sync');
-            } else if (!is_dir($data['filesdir'])) {
-                $errors['filesdir'] = get_string('notadirerror', 'tool_totara_sync', $data['filesdir']);
-            } else if (!is_writable($data['filesdir'])) {
-                $errors['filesdir'] = get_string('readonlyerror', 'tool_totara_sync', $data['filesdir']);
+            } else if (!is_dir($filesdir)) {
+                $errors['filesdir'] = get_string('notadirerror', 'tool_totara_sync', $filesdir);
+            } else if (!is_writable($filesdir)) {
+                $errors['filesdir'] = get_string('readonlyerror', 'tool_totara_sync', $filesdir);
             }
         }
 
