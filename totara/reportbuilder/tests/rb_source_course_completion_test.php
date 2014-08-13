@@ -29,6 +29,7 @@ class totara_reportbuilder_rb_source_course_completion_testcase extends advanced
     public function test_report() {
         global $CFG, $DB;
 
+        set_config('enablecompletion', 1);
         $this->resetAfterTest();
         $this->setAdminUser();
 

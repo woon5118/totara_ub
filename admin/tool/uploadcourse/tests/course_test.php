@@ -312,8 +312,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         // Enrolment methods.
         $enroldata = array();
         $instances = enrol_get_instances($course->id, false);
-        // 3 in Moodle, 4 in Totara because program plugin enabled by default.
-        $this->assertCount(4, $instances);
+        $this->assertCount(3, $instances);
         foreach ($instances as $instance) {
             $enroldata[$instance->enrol] = $instance;
         }
@@ -400,8 +399,7 @@ class tool_uploadcourse_course_testcase extends advanced_testcase {
         // Enrolment methods.
         $enroldata = array();
         $instances = enrol_get_instances($course->id, false);
-        // 2 in Moodle, 3 in Totara because program plugin enabled by default.
-        $this->assertCount(3, $instances);
+        $this->assertCount(2, $instances);
         foreach ($instances as $instance) {
             $enroldata[$instance->enrol] = $instance;
         }

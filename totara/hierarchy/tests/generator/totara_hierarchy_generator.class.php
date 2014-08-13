@@ -18,48 +18,106 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Maria Torres <maria.torres@totaralms.com>
+ * @author Rob Tyler <rob.tyler@totaralms.com>
  * @package totara_hierarchy
- * @subpackage tests_generator
+ * @subpackage test
  */
-
-/**
-* Data generator.
-*
-* @package    totara_hierarchy
-* @category   test
-*/
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Hierarchy generator
+ *
+ * @package totara_hierarchy
+ * @subpackage test
+ */
 class totara_hierarchy_generator extends component_generator_base {
 
+    // Default names when created a framework.
+    const DEFAULT_NAME_FRAMEWORK_COMPETENCY = 'Test Competency Framework';
+    const DEFAULT_NAME_FRAMEWORK_GOAL = 'Test Goal Framework';
+    const DEFAULT_NAME_FRAMEWORK_ORGANISATION = 'Test Organisation Framework';
+    const DEFAULT_NAME_FRAMEWORK_POSITION = 'Test Position Framework';
+
+    // Default names when created a hierarchy.
+    const DEFAULT_NAME_HIERARCHY_COMPETENCY = 'Test Competency';
+    const DEFAULT_NAME_HIERARCHY_GOAL = 'Test Goal';
+    const DEFAULT_NAME_HIERARCHY_ORGANISATION = 'Test Organisation';
+    const DEFAULT_NAME_HIERARCHY_POSITION = 'Test Position';
+
     /**
-     * Create a framework for the shortprefix.
-     *
-     * @param string $shortprefix Prefix that identify the type of hierarchy (pos, org, etc)
-     * @param string $fullname
-     * @param array $record
-     * @return bool|int hierarchy id
+     * @var array Map of hierarchy type and prefix
      */
-    public function create_framework($shortprefix, $fullname, $record = array()) {
-        global $USER, $DB;
+    private $hierarchy_type_prefix = array('competency' => 'comp',
+                                           'goal'=> 'goal',
+                                           'organisation' => 'org',
+                                           'position' => 'pos');
+    /**
+     * @var array integer Number of items to be assigned.
+     */
+    private $hierarchy_assign_quantities = array(2, 4, 8, 16, 32, 64);
+
+    /**
+     * @var integer Keep track of how many frameworks have been created.
+     */
+    private $frameworkcount = array ('competency' => 0,
+                                     'goal' => 0,
+                                     'organisation' => 0,
+                                     'position' => 0);
+    /**
+     * @var integer Keep track of how many hierarchies have been created.
+     */
+    private $hierarchycount = array ('competency' => 0,
+                                     'goal' => 0,
+                                     'organisation' => 0,
+                                     'position' => 0);
+
+    /**
+     * Create a framework for the given prefix.
+     *
+     * @param string $prefix Prefix that identifies the type of hierarchy (position, organisation, etc)
+     * @param array $record
+     * @return int hierarchy framework id
+     *
+     * @todo Define an array of default values then use
+     *       array_merge($default_values,$record) to
+     *       merge in the optional record data and reduce
+     *       / remove the need for multiple statements
+     *       beginning with: if (!isset($record['...
+     */
+    public function create_framework($prefix, $record = array()) {
+        global $USER, $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
         $record = (array) $record;
+        $shortprefix = hierarchy::get_short_prefix($prefix);
+        // Increment the count for the given framework.
+        $i = ++$this->frameworkcount[$prefix];
 
         if (!isset($record['visible'])) {
             $record['visible'] = 1;
         }
 
-        if (!isset($record['description'])) {
-            $record['description'] = 'created by tool generator';
-        }
-
         if (!isset($record['fullname'])) {
-            $record['fullname'] = $fullname;
+            $defaultnameconst = 'self::DEFAULT_NAME_FRAMEWORK_' . strtoupper($prefix);
+            $record['fullname'] = trim(constant($defaultnameconst)) . ' ' .$i;
         }
 
+        if (!isset($record['idnumber'])) {
+            $record['idnumber'] = totara_generator_util::create_short_name($record['fullname']);
+        }
+
+        if (!isset($record['description'])) {
+            $record['description'] = '<p>' . $record['fullname'] . ' description</p>';
+        }
+
+        // Get the sort order from the database.
         if (!isset($record['sortorder'])) {
             $record['sortorder'] = $DB->get_field($shortprefix.'_framework', 'MAX(sortorder) + 1', array());
+        }
+        // A sort order may not have been found in the database or may have an invalid 0 or NULL value.
+        if (!$record['sortorder']) {
+            $record['sortorder'] = 1;
         }
 
         if (!isset($record['hidecustomfields'])) {
@@ -70,15 +128,27 @@ class totara_hierarchy_generator extends component_generator_base {
         $record['timemodified'] = $record['timecreated'];
         $record['usermodified'] = $USER->id;
 
-        if ($record['sortorder'] == null) {
-            $record['sortorder'] = 1;
+        $framework_id = $DB->insert_record($shortprefix.'_framework', $record);
+        $framework = $DB->get_record($shortprefix.'_framework', array('id' => $framework_id));
+
+        if (!isset($record['scale'])) {
+            $record['scale'] = 1;
         }
 
-        if ($framework = $DB->get_record($shortprefix.'_framework', array('fullname' => $record['fullname']))) {
-            return $framework->id;
+        // If this is an competency or organisation
+        // framework we need to assign a scale to it.
+        if ($prefix == 'competency' || $prefix == 'goal') {
+            // We need to assign a scale to the
+            $scale_assign = new stdClass();
+            $scale_assign->scaleid = $record['scale'];
+            $scale_assign->frameworkid = $framework_id;
+            $scale_assign->timemodified = time();
+            $scale_assign->usermodified = $USER->id;
+
+            $scale_assign_id = $DB->insert_record($shortprefix . '_scale_assignments', $scale_assign);
         }
 
-        return $DB->insert_record($shortprefix.'_framework', $record);
+        return $framework;
     }
 
     /**
@@ -86,22 +156,38 @@ class totara_hierarchy_generator extends component_generator_base {
      *
      * @param $frameworkid
      * @param $prefix
-     * @param string $fullname
      * @param null $record
-     * @internal param string $shortprefix use in hierarchy
-     * @return bool|int herarchy id
+     * @return bool|int hierarchy item id
+     *
+     * @todo Define an array of default values then use
+     *       array_merge($default_values,$record) to
+     *       merge in the optional record data and reduce
+     *       / remove the need for multiple statements
+     *       beginning with: if (!isset($record['...
      */
-    public function create_hierarchy($frameworkid, $prefix, $fullname, $record = null) {
-        global $DB, $USER;
+    public function create_hierarchy($frameworkid, $prefix, $record = null) {
+        global $DB, $USER, $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+
+        if (is_string($record)) {
+            throw new coding_exception('$record parameter must be array or object');
+        }
 
         $record = (array) $record;
+        // Increment the count for the given hierarchy.
+        $i = ++$this->hierarchycount[$prefix];
 
         if (!isset($record['fullname'])) {
-            $record['fullname'] = $fullname;
+            $defaultnameconst = 'self::DEFAULT_NAME_HIERARCHY_' . strtoupper($prefix);
+            $record['fullname'] = trim(constant($defaultnameconst)) . ' ' .$i;
+        }
+
+        if (!isset($record['idnumber'])) {
+            $record['idnumber'] = totara_generator_util::create_short_name($record['fullname']);
         }
 
         if (!isset($record['description'])) {
-            $record['description'] = $record['fullname'];
+            $record['description'] = '<p>' . $record['fullname'] . ' description</p>';
         }
 
         if (!isset($record['visible'])) {
@@ -116,89 +202,71 @@ class totara_hierarchy_generator extends component_generator_base {
             $record['parentid'] = 0;
         }
 
+        if (!isset($record['aggregationmethod'])) {
+            // Get a default value for the agreggation method.
+            // This variable is used to build the select menu
+            // in the hierarchy form.
+            global $COMP_AGGREGATION;
+            $record['aggregationmethod'] = $COMP_AGGREGATION['ALL'];
+        }
+
+        if (!isset($record['proficiencyexpected'])) {
+            // The default value for proficiencyexpected
+            // is hard coded in the hierarchy form.
+            $record['proficiencyexpected'] = 1;
+        }
+
         $record['frameworkid'] = $frameworkid;
         $record['timecreated'] = time();
         $record['timemodified'] = $record['timecreated'];
         $record['usermodified'] = $USER->id;
-
-        $shortprefix = hierarchy::get_short_prefix($prefix);
-        if ($hierarchy = $DB->get_record($shortprefix, array('fullname' => $record['fullname']))) {
-            return $hierarchy->id; // Hierarchy id.
-        }
 
         $record = (object) $record;
         $hierarchy = hierarchy::load_hierarchy($prefix);
         $itemnew = $hierarchy->process_additional_item_form_fields($record);
         $item = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false);
 
-        return $item->id;
+        return $item;
     }
 
     /**
-     * Creates/gets Hierarchies.
+     * Create some hierarchies.
      *
-     * @param int $from
-     * @param int $to
-     * @param string $shortprefix
-     * @param int $frameworkid
+     * @param int $frameworkid The framework to assign the hierachies to.
+     * @param string $prefix The type of hierarchy to create.
+     * @param int $quantity The number of hierarchies to create.
+     * @param string $name The base name of the hierarchy.
+     * @param int $randomise_percent Randomly determine (by percentage) if the hierarchy is created.
      * @return array of hierarchies
      */
-    private function create_hierarchies($from, $to, $prefix, $frameworkid) {
-        for ($i = $from; $i <= $to; $i++) {
-            $fullname = 'tool_generator_' . str_pad($i, 6, '0', STR_PAD_LEFT);
-            if ($hierarchy = $this->create_hierarchy($frameworkid, $prefix, $fullname)) {
-                $hierarchies[$i] = (int) $hierarchy;
-            }
+    public function create_hierarchies($frameworkid, $prefix, $quantity, $name = '', $randomise_percent = 0, $hierarchy_extra_data = array() ) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+
+        // Create the objective name we want to use with by ge3tting
+        // the number off any previous matching records we created.
+        if (!$name) {
+            $name = 'self::DEFAULT_NAME_HIERARCHY_' . strtoupper($prefix);
         }
-
-        return $hierarchies;
-    }
-
-    /**
-     * Creates/gets Hierarchies.
-     *
-     * @param string $shortprefix
-     * @param int $frameworkid
-     * @param int $count
-     * @return array of hierarchies
-     */
-    public function get_hierarchies($prefix, $frameworkid, $count) {
-        global $DB;
-
-        $result = array();
-        $fullname = 'tool_generator_%';
         $shortprefix = hierarchy::get_short_prefix($prefix);
-        $rs = $DB->get_recordset_select($shortprefix, $DB->sql_like('fullname', '?'), array($fullname), 'fullname', 'id, fullname');
-        $nextnumber = 1;
-        foreach ($rs as $record) {
-            $matches = tool_generator_backend::get_number_match($fullname, $record->fullname);
-            if (empty($matches)) {
-                continue;
-            }
+        $number = totara_generator_util::get_next_record_number($shortprefix, 'fullname', $name);
 
-            // Create missing hierarchies in range up to this.
-            $number = (int) $matches[1];
-            if ($number != $nextnumber) {
-                $result += $this->create_hierarchies($nextnumber, min($number - 1, $count), $shortprefix, $frameworkid);
-            } else {
-                $result[$number] = (int)$record->id;
-            }
-
-            // Stop if we've got enough hierarchies.
-            $nextnumber = $number + 1;
-            if ($number >= $count) {
-                break;
+        $hierarchy_data = array ();
+        $hierarchy_ids = array ();
+        // Create the quantity of hierarchies we need.
+        for ($i = 1; $i <= $quantity; $i++) {
+            // Create a hierarchy, or apply randomisation and create if required.
+            if ($randomise_percent == 0 || ($randomise_percent && get_random_act($randomise_percent))) {
+                $hierarchy_data['fullname'] = $name . ' ' . $number++;
+                $create_data = array_merge ($hierarchy_data, $hierarchy_extra_data);
+                $hierarchy = $this->create_hierarchy($frameworkid, $prefix, $create_data);
+                $hierarchy_ids[$i] = $hierarchy->id;
             }
         }
-        $rs->close();
 
-        // Create hierarchies as per required.
-        if ($nextnumber <= $count) {
-            $result += $this->create_hierarchies($nextnumber, $count, $prefix, $frameworkid);
-        }
-
-        return $result;
+        return $hierarchy_ids;
     }
+
 
     /**
      * Assign primary positions to a user.
@@ -211,6 +279,9 @@ class totara_hierarchy_generator extends component_generator_base {
      * @return void
      */
     public function assign_primary_position($userid, $managerid, $organisationid, $positionid, $record = null) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+
         $data = new stdClass();
         $data->type = (isset($record['type'])) ? $record['type'] : POSITION_TYPE_PRIMARY;
         $data->userid = (isset($record['userid'])) ? $record['userid'] : $userid;
@@ -238,14 +309,205 @@ class totara_hierarchy_generator extends component_generator_base {
         assign_user_position($position_assignment);
     }
 
+
+    /**
+     * Assigns random courses to competencies.
+     *
+     * @param $size int number of items to process.
+     */
+    public function assign_competency($size) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
+
+        // Do not assign the site course!
+        $site = get_site();
+        // Track the ones we have already assigned.
+        $assignedhierarchies = array();
+        // Get $size competencies.
+        for ($x=0; $x < $size; $x++) {
+            // Find one we have not already used.
+            $uniquehierarchy = false;
+            while (!$uniquehierarchy) {
+                $hierarchyid = totara_generator_util::get_random_record_id($this->hierarchy_type_prefix['competency']);
+                if (!in_array($hierarchyid, $assignedhierarchies)) {
+                    $assignedhierarchies[] = $hierarchyid;
+                    $uniquehierarchy = true;
+                }
+            }
+            // Load competency
+            if ($competency = $DB->get_record('comp', array('id' => $hierarchyid))) {
+                // Assign random number of courses up to $size.
+                $coursesassigned = 0;
+                $coursestoassign = mt_rand(0, $size);
+                while ($coursesassigned < $coursestoassign) {
+                    // Set up the completion evidence type.
+                    $evidence = competency_evidence_type::factory(array('itemtype' => 'coursecompletion'));
+                    $evidence->iteminstance = totara_generator_util::get_random_record_id('course');
+                    if ($evidence->iteminstance != $site->id && !$DB->record_exists('comp_criteria', array('competencyid' => $hierarchyid, 'itemtype' => 'coursecompletion', 'iteminstance' => $evidence->iteminstance))) {
+                        // Randomise mandatory or optional.
+                        $evidence->linktype = mt_rand(0,1);
+                        // Assign courses to competency.
+                        $newevidenceid = $evidence->add($competency);
+                        $coursesassigned++;
+                    }
+                }
+            }
+        }
+        echo "\n" . get_string('progress_assigncoursecompetencies', 'totara_generator');
+    }
+
+    /**
+     * Assigns random competencies and goals to organisations.
+     *
+     * @param $size int number of items to process.
+     */
+    public function assign_organisation($size) {
+        $this->assign_competency_to_hierarchy('organisation', $size);
+    }
+
+    /**
+     * Assigns random competencies and goals to positions
+     *
+     * @param $size int number of items to process.
+     */
+    public function assign_position($size) {
+        $this->assign_competency_to_hierarchy('position', $size);
+    }
+
+    /**
+     * Assigns random user groups to goals.
+     *
+     * @param $size int number of items to process.
+     */
+    public function assign_goal($size) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/assign/lib.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
+
+        // Track the ones we have already assigned.
+        $assignedhierarchies = array();
+        // Get all goals to assign at least one group.
+        for ($x=0; $x < $size; $x++) {
+            // Find one we have not already used.
+            $uniquehierarchy = false;
+            while (!$uniquehierarchy) {
+                $hierarchyid = totara_generator_util::get_random_record_id($this->hierarchy_type_prefix['goal']);
+                if (!in_array($hierarchyid, $assignedhierarchies)) {
+                    $assignedhierarchies[] = $hierarchyid;
+                    $uniquehierarchy = true;
+                }
+            }
+            // Get the base goal item.
+            $item = $DB->get_record('goal', array('id' => $hierarchyid));
+            $baseclassname = "totara_assign_goal";
+            $baseclass = new $baseclassname('goal', $item);
+            // Assign random pos, org or cohort groups to this goal.
+            $grouptypes = array('pos', 'org', 'cohort');
+            $groupstoassign = mt_rand(1,3);
+            for ($i=0; $i < $groupstoassign; $i++) {
+                $grouptype = $grouptypes[mt_rand(0,2)];
+                $grouptypeobj = $baseclass->load_grouptype($grouptype);
+                // Get a random record from the groups.
+                $groupid = totara_generator_util::get_random_record_id($grouptype);
+                $grouptypeobj->validate_item_selector($groupid);
+                $urlparams = array('module' => 'group',
+                        'grouptype' => $grouptype,
+                        'itemid' => $hierarchyid,
+                        'add' => 1,
+                        'listofvalues' => array($groupid),
+                        'includechildren' => 0
+                );
+                $grouptypeobj->handle_item_selector($urlparams);
+            }
+        }
+        echo "\n" . get_string('progress_assigngoalusergroups', 'totara_generator');
+    }
+
+    /**
+     * Assigns a random number of competencies from 1 to $size to each item in the hierarchy type
+     *
+     * @param $hierarchytype string usually 'position' or 'organisation'
+     * @param $size int number of items to process.
+     */
+    private function assign_competency_to_hierarchy($hierarchytype, $size) {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/' . $hierarchytype . '/lib.php');
+
+        $time = time();
+        // Track the ones we have already assigned.
+        $assignedhierarchies = array();
+        // Assign something to every hierarchy item.
+        for ($x=0; $x < $size; $x++) {
+            // Find one we have not already used.
+            $uniquehierarchy = false;
+            while (!$uniquehierarchy) {
+                $hierarchyid = totara_generator_util::get_random_record_id($this->hierarchy_type_prefix[$hierarchytype]);
+                if (!in_array($hierarchyid, $assignedhierarchies)) {
+                    $assignedhierarchies[] = $hierarchyid;
+                    $uniquehierarchy = true;
+                }
+            }
+            // Setup hierarchy objects
+            $competencies = new competency();
+            $hierarchies = new $hierarchytype();
+            // Load position
+            if (!$hierarchy = $hierarchies->get_item($hierarchyid)) {
+                print_error("{$hierarchytype}notfound", 'totara_hierarchy');
+            }
+            // Currently assigned competencies
+            if (!$currentlyassigned = $hierarchies->get_assigned_competencies($hierarchyid)) {
+                $currentlyassigned = array();
+            }
+            $addcompetencies = 0;
+            $add = array();
+            $competencytoassign = mt_rand(1, $size);
+            while ($addcompetencies < $competencytoassign) {
+                $newcomp = totara_generator_util::get_random_record_id ($this->hierarchy_type_prefix['competency']);
+                if (!in_array($newcomp, $currentlyassigned)) {
+                    $add[] = $newcomp;
+                    // Add it to currently assigned too - on small sites it may try to add the same competency twice.
+                    $currentlyassigned[] = $newcomp;
+                    $addcompetencies++;
+                }
+            }
+            foreach ($add as $addition) {
+                // Add relationship
+                $related = $competencies->get_item($addition);
+                $relationship = new stdClass();
+                $field = "{$hierarchytype}id";
+                $relationship->$field = $hierarchy->id;
+                $relationship->competencyid = $related->id;
+                $relationship->timecreated = $time;
+                $relationship->usermodified = $USER->id;
+                $relationship->linktype = mt_rand(0,1);
+                $relationship->id = $DB->insert_record($this->hierarchy_type_prefix[$hierarchytype] . '_competencies', $relationship);
+            }
+        }
+        echo "\n" . get_string('progress_assigncompetenciestohierarchy', 'totara_generator', get_string($hierarchytype, 'totara_hierarchy'));
+    }
+
+    /**
+     * Get immediate reports for a manager.
+     * @param $managerid id of the manager.
+     * @return array of userids.
+     */
     function get_subordinates($managerid){
         global $DB;
 
         return $DB->get_fieldset_select('pos_assignment', 'userid', 'managerid = :manager', array('manager' => $managerid));
     }
 
+    /**
+     * Get entire list of subordinates at all levels below a given manager.
+     * @param $managerid id of the manager.
+     * @return array of userids.
+     */
     function get_manager_hierarchy($parentid) {
-        $tree = Array();
+        $tree = array();
         if (!empty($parentid)) {
             $tree = $this->get_subordinates($parentid);
             if (!empty($tree)) {

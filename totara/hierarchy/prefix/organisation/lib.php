@@ -241,7 +241,6 @@ class organisation extends hierarchy {
         }
 
         $sql .= " ORDER BY c.fullname";
-
         return $DB->get_records_sql($sql, $params);
     }
 

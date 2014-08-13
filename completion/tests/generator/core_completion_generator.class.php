@@ -18,19 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Maria Torres <maria.torres@totaralms.com>
- * @package completion
- * @subpackage tests_generator
+ * @package core_completion
+ * @subpackage test
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Data generator.
  *
  * @package    core_completion
- * @category   test_genertor
+ * @category   test
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 class core_completion_generator extends component_generator_base {
     /**
      * Set activity completion for the course.

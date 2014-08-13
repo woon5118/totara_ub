@@ -48,6 +48,7 @@ class importcertification_testcase extends reportcache_advanced_testcase {
     public function test_import() {
         global $DB, $CFG;
 
+        set_config('enablecompletion', 1);
         $this->resetAfterTest(true);
 
         $importname = 'certification';
@@ -239,7 +240,9 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         // Assign audience to the certification.
         $this->getDataGenerator()->assign_to_program($program->id, ASSIGNTYPE_COHORT, $cohort->id);
         if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled(null, null, '', 5);
+            $messages = $this->getDebuggingMessages();
+            $this->resetDebugging();
+            $this->assertCount(5, $messages);
         }
 
         // Assign some users as individual to the certification - (users: 6 and 7).

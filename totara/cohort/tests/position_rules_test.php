@@ -28,6 +28,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
+require_once($CFG->libdir . '/testing/generator/lib.php');
 
 /**
  * Test position rules.
@@ -50,7 +51,9 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
     private $userspos2 = array();
     private $userspos3 = array();
     private $userspos4 = array();
+    /** @var totara_cohort_generator $cohort_generator */
     private $cohort_generator = null;
+    /** @var totara_hierarchy_generator $hierarchy_generator */
     private $hierarchy_generator = null;
     private $dateformat = '';
     const TEST_POSITION_COUNT_MEMBERS = 23;
@@ -80,14 +83,17 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         // Set totara_hierarchy generator.
         $this->hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
-        // Create positions and organisation fw.
-        $this->posfw = $this->hierarchy_generator->create_framework('pos', 'posfw');
+        // Create positions and position fw.
+        $name = totara_hierarchy_generator::DEFAULT_NAME_FRAMEWORK_POSITION;
+        $name .= ' ' . totara_generator_util::get_next_record_number('pos_framework', 'fullname', $name);
+        $data = array ('fullname' => $name);
+        $this->posfw = $this->hierarchy_generator->create_framework('position', $data);
 
         // Create positions and organisation hierarchies.
         $this->assertEquals(0, $DB->count_records('pos'));
-        $this->pos1 = $this->hierarchy_generator->create_hierarchy($this->posfw, 'position', 'posname1', array('idnumber' => 'pos1'));
-        $this->pos2 = $this->hierarchy_generator->create_hierarchy($this->posfw, 'position', 'posname2', array('idnumber' => 'pos2'));
-        $this->pos3 = $this->hierarchy_generator->create_hierarchy($this->posfw, 'position', 'posname3', array('idnumber' => 'pos3'));
+        $this->pos1 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position', array('idnumber' => 'pos1', 'fullname' => 'posname1'));
+        $this->pos2 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position', array('idnumber' => 'pos2', 'fullname' => 'posname2'));
+        $this->pos3 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position', array('idnumber' => 'pos3', 'fullname' => 'posname3'));
         $this->assertEquals(3, $DB->count_records('pos'));
 
         // Create some test users and assign them to a position.
@@ -96,17 +102,17 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         for ($i = 1; $i <= self::TEST_POSITION_COUNT_MEMBERS; $i++) {
             $this->{'user'.$i} = $this->getDataGenerator()->create_user();
             if ($i%3 === 0) {
-                $posid = $this->pos1; // 7 users.
+                $posid = $this->pos1->id; // 7 users.
                 $pos = 'pos1';
                 $postimestarted = date($this->dateformat, $now);
                 $postimefinish = date($this->dateformat, $now + (20 * DAYSECS));
             } else if ($i%2 === 0){
-                $posid = $this->pos2; // 8 users.
+                $posid = $this->pos2->id; // 8 users.
                 $pos = 'pos2';
                 $postimestarted = date($this->dateformat, $now - DAYSECS);
                 $postimefinish = date($this->dateformat, $now + (50 * DAYSECS));
             } else {
-                $posid = $this->pos3; // 8 users.
+                $posid = $this->pos3->id; // 8 users.
                 $pos = 'pos3';
                 $postimestarted = date($this->dateformat, $now + (2 * DAYSECS));
                 $postimefinish = date($this->dateformat, $now + (70 * DAYSECS));
@@ -126,9 +132,9 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->assertEquals(self::TEST_POSITION_COUNT_MEMBERS + 2, $DB->count_records('user'));
 
         // Check positions were assigned correctly.
-        $this->assertEquals(7, $DB->count_records('pos_assignment', array('positionid' => $this->pos1)));
-        $this->assertEquals(8, $DB->count_records('pos_assignment', array('positionid' => $this->pos2)));
-        $this->assertEquals(8, $DB->count_records('pos_assignment', array('positionid' => $this->pos3)));
+        $this->assertEquals(7, $DB->count_records('pos_assignment', array('positionid' => $this->pos1->id)));
+        $this->assertEquals(8, $DB->count_records('pos_assignment', array('positionid' => $this->pos2->id)));
+        $this->assertEquals(8, $DB->count_records('pos_assignment', array('positionid' => $this->pos3->id)));
 
         // Creating dynamic cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -248,7 +254,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $this->assertInternalType('int', $postype1);
 
         // Assign the type position to pos1.
-        $this->assertTrue($DB->set_field('pos', 'typeid', $postype1, array('id' => $this->pos1)));
+        $this->assertTrue($DB->set_field('pos', 'typeid', $postype1, array('id' => $this->pos1->id)));
 
         // Create a rule that matches users in the previous created type.
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'pos', 'postype', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($postype1));
@@ -421,14 +427,14 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         // Process positions.
         $listofvalues = array();
         foreach ($positions as $pos) {
-            $listofvalues[] = $this->{$pos};
+            $listofvalues[] = $this->{$pos}->id;
         }
 
         // Create some positions to make a hierarchy.
-        $data = array('idnumber' => 'pos4', 'parentid' => $this->pos1);
-        $this->pos4 = $this->hierarchy_generator->create_hierarchy($this->posfw, 'position', 'pos4', $data);
-        $data = array('idnumber' => 'pos5', 'parentid' => $this->pos2);
-        $this->pos5 = $this->hierarchy_generator->create_hierarchy($this->posfw, 'position', 'pos5', $data);
+        $data = array('idnumber' => 'pos4', 'parentid' => $this->pos1->id, 'fullname' => 'pos4');
+        $this->pos4 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position', $data);
+        $data = array('idnumber' => 'pos5', 'parentid' => $this->pos2->id, 'fullname' => 'pos5');
+        $this->pos5 = $this->hierarchy_generator->create_hierarchy($this->posfw->id, 'position', $data);
 
         // Create some users and assign them to the new positions.
         $newuser1 = $this->getDataGenerator()->create_user(array('username' => 'newuser1'));
@@ -438,15 +444,15 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
         $newuser5 = $this->getDataGenerator()->create_user(array('username' => 'newuser5'));
 
         // Assign positions.
-        $this->hierarchy_generator->assign_primary_position($newuser1->id, null, null, $this->pos4);
-        $this->hierarchy_generator->assign_primary_position($newuser2->id, null, null, $this->pos5);
-        $this->hierarchy_generator->assign_primary_position($newuser3->id, null, null, $this->pos5);
-        $this->hierarchy_generator->assign_primary_position($newuser4->id, null, null, $this->pos4);
-        $this->hierarchy_generator->assign_primary_position($newuser5->id, null, null, $this->pos4);
+        $this->hierarchy_generator->assign_primary_position($newuser1->id, null, null, $this->pos4->id);
+        $this->hierarchy_generator->assign_primary_position($newuser2->id, null, null, $this->pos5->id);
+        $this->hierarchy_generator->assign_primary_position($newuser3->id, null, null, $this->pos5->id);
+        $this->hierarchy_generator->assign_primary_position($newuser4->id, null, null, $this->pos4->id);
+        $this->hierarchy_generator->assign_primary_position($newuser5->id, null, null, $this->pos4->id);
         $this->userspos4 = array_flip(array($newuser1->id, $newuser4->id, $newuser5->id));
 
-        $this->assertEquals(3, $DB->count_records('pos_assignment', array('positionid' => $this->pos4)));
-        $this->assertEquals(2, $DB->count_records('pos_assignment', array('positionid' => $this->pos5)));
+        $this->assertEquals(3, $DB->count_records('pos_assignment', array('positionid' => $this->pos4->id)));
+        $this->assertEquals(2, $DB->count_records('pos_assignment', array('positionid' => $this->pos5->id)));
 
         // Process list of users that should match the data.
         $membersincohort = array();

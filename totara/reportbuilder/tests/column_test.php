@@ -550,6 +550,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     protected function setUp() {
         global $DB;
         parent::setup();
+        set_config('enablecompletion', 1);
 
         $DB->delete_records('upgrade_log', array());
 

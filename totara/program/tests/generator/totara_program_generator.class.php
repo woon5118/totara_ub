@@ -19,94 +19,114 @@
  *
  * @author Maria Torres <maria.torres@totaralms.com>
  * @package totara_program
- * @subpackage tests_generator
+ * @subpackage test
  */
-
-/**
-* Data generator.
-*
-* @package    totara_program
-* @category   test
-*/
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Program generator.
+ *
+ * @package totara_program
+ * @subpackage test
+ */
 class totara_program_generator extends component_generator_base {
     protected $programcount = 0;
+    protected $certificationcount = 0;
+    // Default name for created programs.
+    const DEFAULT_PROGRAM_NAME = 'Test Program';
+    const DEFAULT_CERTIFICATION_NAME = 'Test Certification';
 
     /**
-     * Assign users to a program
+     * Create mock programs.
      *
-     * @param int $programid Program id
-     * @param int $assignmenttype Assignment type
-     * @param int $itemid item to be assigned to the program. e.g Audience, position, organization, individual
-     * @param null $record
+     * @param int $size number of items to create.
      */
-    public function assign_to_program($programid, $assignmenttype, $itemid, $record = null) {
-        // Set completion values. (No sure what to put in here)
-        $completiontime = (isset($record['completiontime'])) ? $record['completiontime'] : -1;
-        $completionevent = (isset($record['completionevent'])) ? $record['completionevent'] : 0;
-        $completioninstance = (isset($record['completioninstance'])) ? $record['completioninstance'] : 0;
+    public function create_programs($size) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
 
-        // Create data.
-        $data = new stdClass();
-        $data->id = $programid;
-        $data->item = array($assignmenttype => array($itemid => 1));
-        $data->completiontime = array($assignmenttype => array($itemid => $completiontime));
-        $data->completionevent = array($assignmenttype => array($itemid => $completionevent));
-        $data->completioninstance = array($assignmenttype => array($itemid => $completioninstance));
+        // Add 1-$size programs
+        // Randomly make some certifications
+        $certstocreate = mt_rand(1, $size-1);
+        for ($p=0; $p < $size; $p++) {
+            $certstocreate = mt_rand(1, $size-1);
+            $default_name = ($this->certificationcount < $certstocreate) ? self::DEFAULT_CERTIFICATION_NAME : self::DEFAULT_PROGRAM_NAME;
+            $id = totara_generator_util::get_next_record_number('prog', 'fullname', $default_name);
+            $fullname = "{$default_name} {$id}";
+            echo "\nCREATE PROGRAM $fullname";
+            $data = array('fullname' => $fullname);
+            $prog = $this->create_program($data);
+            // Add 1-$size coursesets, with 1-$size random courses in each.
+            $coursesets = mt_rand(1, $size);
+            for ($cs=0; $cs < $coursesets; $cs++) {
+                $this->add_courseset_to_program($prog->id, ($cs+1), $size);
+            }
+            // Randomly make some as a certification
+            if ($this->certificationcount < $certstocreate) {
+                list($actperiod, $winperiod, $recerttype) = $this->get_random_certification_setting();
+                // Covert this program to a certification.
+                $this->create_certification_settings($prog->id, $actperiod, $winperiod, $recerttype);
+                // Get a random course and assign as the recert path.
+                $this->add_courseset_to_program($prog->id, ($cs+1), 1, CERTIFPATH_RECERT);
+                $this->certificationcount++;
+            }
+            // Now do some random user assignments.
+            $assigntypes = array(
+                    'org' => ASSIGNTYPE_ORGANISATION,
+                    'pos' => ASSIGNTYPE_POSITION,
+                    'cohort' => ASSIGNTYPE_COHORT,
+                    'manager' => ASSIGNTYPE_MANAGER,
+                    'individual' => ASSIGNTYPE_INDIVIDUAL,
+            );
+            // Add at least 2 assignment types.
+            $numassignments = mt_rand(2, count($assigntypes));
+            $assigns = array_rand($assigntypes, $numassignments);
+            $exceptions = false;
+            foreach ($assigns as $assign) {
+                echo "\nADD PROGRAM ASSIGNMENT $assign";
+                // Get random selection of items for assignment type.
+                $items = $this->get_assignment_items($assigntypes[$assign], $size);
+                // Assign the items.
+                foreach ($items as $item) {
+                    $exception = $this->assign_to_program($prog->id, $assigntypes[$assign], $item);
+                    if ($exception) { $exceptions = true;}
+                }
+            }
+            // Finalise the assignments.
+            $program = new program($prog->id);
+            // reset the assignments property to ensure it only contains the current assignments.
+            $assignments = $program->get_assignments();
+            $assignments->init_assignments($prog->id);
+            // Update the user assignments
+            $program->update_learner_assignments();
+            // Randomly resolve some exceptions and assign program anyway.
+            if ($exceptions && mt_rand(0,1)) {
+                $exceptions_manager = new prog_exceptions_manager($prog->id);
+                $exceptions_manager->set_selections(-1, '');
+                $selected_exceptions = $exceptions_manager->get_selected_exceptions();
+                echo "\nRESOLVING EXCEPTIONS";
+                foreach ($selected_exceptions as $exception_ob) {
+                    $exception = null;
 
-        // Assign item to program.
-        $assignmenttoprog = prog_assignments::factory($assignmenttype);
-        $assignmenttoprog->update_assignments($data, false);
-
-    }
-
-    /**
-     * Add course to program
-     *
-     * @param int $programid id Program id
-     * @param array $courseids of int Course id
-     */
-    public function add_courseset_program($programid, $courseids, $certifpath = CERTIFPATH_CERT) {
-        global $CFG, $CERTIFPATHSUF;
-        require_once($CFG->dirroot . '/totara/certification/lib.php');
-
-        $rawdata = new stdClass();
-        $rawdata->id = $programid;
-        $rawdata->contentchanged = 1;
-        $rawdata->contenttype = 1;
-        $rawdata->setprefixes = '999';
-        $rawdata->{'999courses'} = implode(',', $courseids);
-        $rawdata->{'999contenttype'} = 1;
-        $rawdata->{'999id'} = 0;
-        $rawdata->{'999label'} = '';
-        $rawdata->{'999sortorder'} = 2;
-        $rawdata->{'999contenttype'} = 1;
-        $rawdata->{'999nextsetoperator'} = '';
-        $rawdata->{'999completiontype'} = 1;
-        $rawdata->{'999timeallowedperiod'} = 2;
-        $rawdata->{'999timeallowednum'} = 1;
-
-        if ($certifpath === CERTIFPATH_RECERT) { // Re-certification path.
-            $rawdata->setprefixes_rc = 999;
-            $rawdata->certifpath_rc = CERTIFPATH_RECERT;
-            $rawdata->iscertif = 1;
-            $rawdata->contenttype_rc = 1;
-            $rawdata->{'999certifpath'} = 2;
-            $rawdata->contenttype_rc = 1;
-        } else { // Certification path.
-            $rawdata->setprefixes_ce = 999;
-            $rawdata->certifpath_ce = CERTIFPATH_CERT;
-            $rawdata->iscertif = 0;
-            $rawdata->{'999certifpath'} = 1;
-            $rawdata->contenttype_ce = 1;
+                    // Get an instance of the correct exception class
+                    if (isset($exceptions_manager->exceptiontype_classnames[$exception_ob->exceptiontype])) {
+                        // Create an instance
+                        $exception = new $exceptions_manager->exceptiontype_classnames[$exception_ob->exceptiontype]($exception_ob->programid, $exception_ob);
+                    } else {
+                        // Else do nothing..
+                        continue;
+                    }
+                    echo ".";
+                    // Handle the exception. This will delete the exception if it is successfully
+                    // handled and return true. If this exception does not have a handler for
+                    // the specified action it will also return true.  Otherwise it will return false.
+                    $success = $exception->handle(2);
+                }
+            }
         }
-
-        $program = new program($programid);
-        $programcontent = $program->get_content();
-        $programcontent->setup_content($rawdata);
-        $programcontent->save_content();
+        $this->fix_program_sortorder();
+        echo "\n" . get_string('progress_createprograms', 'totara_generator', $size);
     }
 
     /**
@@ -117,20 +137,20 @@ class totara_program_generator extends component_generator_base {
      */
     public function create_program($data = array()) {
         global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
         require_once($CFG->dirroot . '/totara/program/program_messages.class.php');
 
         $this->programcount++;
         $now = time();
         $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
         $default = array(
-            'fullname' => 'Program ' . $this->programcount,
+            'fullname' => $data['fullname'],
             'availablefrom' => 0,
             'availableuntil' => 0,
             'timecreated' => $now,
             'timemodified' => $now,
             'usermodified' => 2,
-            'category' => 1,
-            'shortname' => '',
+            'shortname' => preg_replace('/[^A-Z0-9]/', '', $data['fullname']),
             'idnumber' => '',
             'available' => 1,
             'sortorder' => !empty($sortorder) ? $sortorder : 0,
@@ -155,6 +175,178 @@ class totara_program_generator extends component_generator_base {
         return $program;
     }
 
+    /**
+     * Get user assignment items
+     *
+     * @param int $assigntype Type of item - individual, cohort, position etc
+     * @param int $size return random 1 to $size items of this type
+     * @return array of item ids
+     */
+    public function get_assignment_items($assigntype, $size) {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
+
+        $numitems = mt_rand(1, $size);
+        $items = array();
+        switch ($assigntype) {
+            case ASSIGNTYPE_ORGANISATION:
+                $table = 'org';
+                break;
+            case ASSIGNTYPE_POSITION:
+                $table = 'pos';
+                break;
+            case ASSIGNTYPE_COHORT:
+                $table = 'cohort';
+                break;
+            case ASSIGNTYPE_MANAGER:
+                $table = 'user';
+                $like = $DB->sql_like('username', '?');
+                $managers = $DB->get_fieldset_select('user', 'id', $like, array(totara_generator_site_backend::MANAGER_TOOL_GENERATOR . '%'));
+                $keys = array_rand($managers, $numitems);
+                if (!is_array($keys)) { $keys = array($keys);}
+                foreach ($keys as $key) {
+                    if (isset($managers[$key])) {
+                        $items[] = $managers[$key];
+                    }
+                }
+                return $items;
+                break;
+            case ASSIGNTYPE_INDIVIDUAL:
+                $table = 'user';
+                break;
+        }
+        $circuitbreaker =0;
+        for ($x=0; $x< $numitems; $x++) {
+            // Find one we have not already used...there may not be enough of desired item though.
+            $unique = false;
+            while (!$unique) {
+                if ($circuitbreaker > 1000) {
+                    break;
+                }
+                $itemid = totara_generator_util::get_random_record_id($table);
+                if (!in_array($itemid, $items)) {
+                    $items[] = $itemid;
+                    $unique = true;
+                } else {
+                    $circuitbreaker++;
+                }
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * Add courseset to program
+     *
+     * @param int $programid id Program id
+     * @param int $coursesetnum number of courseset
+     * @param int $numcourses add random number of courses between 1 and $numcourses
+     */
+    public function add_courseset_to_program($programid, $coursesetnum, $numcourses, $certifpath = CERTIFPATH_CERT) {
+        global $CFG, $DB, $CERTIFPATHSUF;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
+        require_once($CFG->dirroot . '/totara/certification/lib.php');
+
+        // Do not assign the site course!
+        $site = get_site();
+        // Get all courses assigned in coursesets so we do not assign a course twice in different coursesets.
+        $sql = "SELECT pcc.id, pcc.courseid
+                FROM {prog_courseset_course} pcc
+                INNER JOIN {prog_courseset} pc on pcc.coursesetid = pc.id
+                INNER JOIN {prog} p on pc.programid = p.id
+                WHERE pc.programid = p.id
+                AND pc.contenttype = 1
+                AND p.id = ?";
+        $existingcourses = $DB->get_records_sql_menu($sql, array($programid));
+        $existingcourses = array_values($existingcourses);
+        $numcoursestoassign = mt_rand(1, $numcourses);
+        $courseids = array();
+        $coursesassigned = 0;
+        while ($coursesassigned < $numcoursestoassign) {
+            $courseid = totara_generator_util::get_random_record_id('course');
+            if ($courseid != $site->id && !in_array($courseid, $existingcourses)) {
+                $courseids[] = $courseid;
+                $coursesassigned++;
+            }
+        }
+        $rawdata = new stdClass();
+        $rawdata->id = $programid;
+        $rawdata->contentchanged = 1;
+        $rawdata->contenttype = 1;
+        $rawdata->setprefixes = '999';
+        $rawdata->{'999courses'} = implode(',', $courseids);
+        $rawdata->{'999contenttype'} = 1;
+        $rawdata->{'999id'} = 0;
+        $rawdata->{'999label'} = "Course Set {$coursesetnum}";
+        $rawdata->{'999sortorder'} = 2;
+        $rawdata->{'999contenttype'} = 1;
+        $rawdata->{'999nextsetoperator'} = '';
+        $rawdata->{'999completiontype'} = 1;
+        $rawdata->{'999timeallowedperiod'} = 2;
+        $rawdata->{'999timeallowednum'} = 1;
+        if ($certifpath === CERTIFPATH_RECERT) { // Re-certification path.
+            $rawdata->setprefixes_rc = 999;
+            $rawdata->certifpath_rc = CERTIFPATH_RECERT;
+            $rawdata->iscertif = 1;
+            $rawdata->contenttype_rc = 1;
+            $rawdata->{'999certifpath'} = 2;
+            $rawdata->contenttype_rc = 1;
+        } else {
+            // Certification path.
+            $rawdata->setprefixes_rc = 999;
+            $rawdata->certifpath_rc = CERTIFPATH_CERT;
+            $rawdata->iscertif = 0;
+            $rawdata->contenttype_rc = 1;
+            $rawdata->{'999certifpath'} = 1;
+            $rawdata->contenttype_rc = 1;
+        }
+        $program = new program($programid);
+        $programcontent = $program->get_content();
+        $programcontent->setup_content($rawdata);
+        $programcontent->save_content();
+    }
+
+    /**
+     * Assign users to a program
+     *
+     * @param int $programid Program id
+     * @param int $assignmenttype Assignment type
+     * @param int $itemid item to be assigned to the program. e.g Audience, position, organization, individual
+     * @param null $record
+     * @return bool whether this assignment will generate exceptions.
+     */
+    public function assign_to_program($programid, $assignmenttype, $itemid, $record = null) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
+
+        // Set completion values.
+        $now = time();
+        $past = date('d/m/Y', $now - (DAYSECS * 14));
+        $future = date('d/m/Y', $now + (DAYSECS * 14));
+        // We can add other completion options here in future. For now a past date, future date and relative to first login.
+        $completionsettings = array(
+            array($past,     0,   null, true),
+            array($future,   0,   null, false),
+            array('3 2', COMPLETION_EVENT_FIRST_LOGIN, null, false),
+        );
+        $randomcompletion = rand(0, count($completionsettings) - 1);
+        list($completiontime, $completionevent, $completioninstance, $exceptions) = $completionsettings[$randomcompletion];
+
+        // Create data.
+        $data = new stdClass();
+        $data->id = $programid;
+        $data->item = array($assignmenttype => array($itemid => 1));
+        $data->completiontime = array($assignmenttype => array($itemid => $completiontime));
+        $data->completionevent = array($assignmenttype => array($itemid => $completionevent));
+        $data->completioninstance = array($assignmenttype => array($itemid => $completioninstance));
+        $data->includechildren = array ($assignmenttype => array($itemid => 0));
+
+        // Assign item to program.
+        $assignmenttoprog = prog_assignments::factory($assignmenttype);
+        $assignmenttoprog->update_assignments($data, false);
+        return $exceptions;
+    }
+
     public function fix_program_sortorder($categoryid = 0) {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/program/lib.php');
@@ -169,19 +361,6 @@ class totara_program_generator extends component_generator_base {
     }
 
     /**
-     * Assign users to a program by method.
-     *
-     * @param int $programid Program id
-     * @param string $method method to  id to be added to the audience of last user
-     * @param $items
-     */
-    public function assign_users_by_method($programid, $method, $items) {
-        foreach ($items as $item) {
-            $this->assign_to_program($programid, $method, $item);
-        }
-    }
-
-    /**
      * Create certification settings.
      *
      * @param int $programid Program id
@@ -190,7 +369,8 @@ class totara_program_generator extends component_generator_base {
      * @param int $recertifydatetype
      */
     public function create_certification_settings($programid, $activeperiod, $windowperiod, $recertifydatetype) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/totara/program/lib.php');
 
         $certification_todb = new stdClass;
         $certification_todb->learningcomptype = CERTIFTYPE_PROGRAM;

@@ -1956,9 +1956,6 @@ class core_moodlelib_testcase extends advanced_testcase {
      */
     public function test_date_format_string() {
         global $CFG;
-        if ($CFG->ostype == 'WINDOWS' && get_string('localewincharset', 'langconfig') == '') {
-            $this->markTestSkipped('This test requires \'localewincharset\' to be configured in \'langconfig\' file on Windows environment');
-        }
 
         // Forcing locale and timezone.
         $oldlocale = setlocale(LC_TIME, '0');

@@ -1174,7 +1174,7 @@ class core_plugin_manager {
             'totara' => array(
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
-                'certification', 'completionimport', 'mssql'
+                'certification', 'completionimport', 'mssql', 'generator',
             ),
 
             'webservice' => array(

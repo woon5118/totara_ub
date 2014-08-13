@@ -28,6 +28,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
+require_once($CFG->libdir . '/testing/generator/lib.php');
 
 /**
  * Test system access rules.
@@ -41,7 +42,9 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
     private $pos1 = null;
     private $pos2 = null;
     private $cohort = null;
+    /** @var totara_cohort_generator $cohort_generator */
     private $cohort_generator = null;
+    /** @var totara_hierarchy_generator $hierarchy_generator */
     private $hierarchy_generator = null;
 
     public function setUp() {
@@ -63,17 +66,20 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
         $user3 = $this->getDataGenerator()->create_user(array('username' => 'user3'));
 
         // Create 2 positions
-        $posfw = $this->hierarchy_generator->create_framework('pos', 'posfw');
-        $this->pos1 = $this->hierarchy_generator->create_hierarchy($posfw, 'position', 'pos1');
-        $this->pos2 = $this->hierarchy_generator->create_hierarchy($posfw, 'position', 'pos2');
+        $name = totara_hierarchy_generator::DEFAULT_NAME_FRAMEWORK_POSITION;
+        $name .= ' ' . totara_generator_util::get_next_record_number('pos_framework', 'fullname', $name);
+        $data = array ('fullname' => $name);
+        $posfw = $this->hierarchy_generator->create_framework('position', $data);
+        $this->pos1 = $this->hierarchy_generator->create_hierarchy($posfw->id, 'position', array('fullname' => 'pos1'));
+        $this->pos2 = $this->hierarchy_generator->create_hierarchy($posfw->id, 'position', array('fullname' => 'pos2'));
 
         // Assign position to users.
-        $this->hierarchy_generator->assign_primary_position($user1->id, null, null, $this->pos1);
-        $this->hierarchy_generator->assign_primary_position($user2->id, null, null, $this->pos1);
-        $this->hierarchy_generator->assign_primary_position($user3->id, null, null, $this->pos2);
+        $this->hierarchy_generator->assign_primary_position($user1->id, null, null, $this->pos1->id);
+        $this->hierarchy_generator->assign_primary_position($user2->id, null, null, $this->pos1->id);
+        $this->hierarchy_generator->assign_primary_position($user3->id, null, null, $this->pos2->id);
 
-        $this->assertEquals(2, $DB->count_records('pos_assignment', array('positionid' => $this->pos1)));
-        $this->assertEquals(1, $DB->count_records('pos_assignment', array('positionid' => $this->pos2)));
+        $this->assertEquals(2, $DB->count_records('pos_assignment', array('positionid' => $this->pos1->id)));
+        $this->assertEquals(1, $DB->count_records('pos_assignment', array('positionid' => $this->pos2->id)));
 
         // Create a dynamic cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -86,7 +92,7 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
             'equal' => 1,
             'includechildren' => 0
         );
-        $listofvalues = array($this->pos1, $this->pos2);
+        $listofvalues = array($this->pos1->id, $this->pos2->id);
         $this->cohort_generator->create_cohort_rule_params($ruleset, 'pos', 'id', $params, $listofvalues, 'listofvalues');
         cohort_rules_approve_changes($this->cohort);
         $this->assertEquals(3, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
@@ -103,7 +109,7 @@ class totara_cohort_delete_items_testcase extends advanced_testcase {
         $ruleid = reset($ruleids);
 
         // Get the pos1 rule param.
-        $params = array('ruleid' => $ruleid, 'name' => 'listofvalues', 'value' => $this->pos1);
+        $params = array('ruleid' => $ruleid, 'name' => 'listofvalues', 'value' => $this->pos1->id);
         $ruleparam = $DB->get_record('cohort_rule_params', $params);
 
         // The dynamic cohort has pos1 and pos2 as item of the rule. Delete pos1 from the list of params.

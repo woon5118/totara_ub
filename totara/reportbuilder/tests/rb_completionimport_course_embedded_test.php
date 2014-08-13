@@ -35,6 +35,7 @@ class totara_reportbuilder_rb_completionimport_course_embedded_testcase extends 
      */
     protected function setUp() {
         parent::setup();
+        set_config('enablecompletion', 1);
         $this->setAdminUser();
         $this->resetAfterTest(true);
         $this->preventResetByRollback();

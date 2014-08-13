@@ -121,18 +121,6 @@ abstract class tool_generator_backend {
     }
 
     /**
-     * Extract number from the value.
-     * @param $field
-     * @param $value
-     * @return array $matches
-     */
-    public static function get_number_match($field, $value) {
-        $matches = array();
-        preg_match('~^' . $field . '([0-9]{6})$~', $value, $matches);
-        return $matches;
-    }
-
-    /**
      * Displays information as part of progress.
      * @param string $langstring Part of langstring (after progress_)
      * @param mixed $a Optional lang string parameters
@@ -147,7 +135,17 @@ abstract class tool_generator_backend {
         } else {
             echo html_writer::start_tag('li');
         }
-        echo get_string('progress_' . $langstring, 'tool_generator', $a);
+        if (get_string_manager()->string_exists('progress_' . $langstring, 'tool_generator')) {
+            // Is there a type string in the base generator file?
+            $string = get_string('progress_' . $langstring, 'tool_generator', $a);
+        } else if (get_string_manager()->string_exists('progress_' . $langstring, 'totara_generator')) {
+            // How about in totara_generator?
+            $string = get_string('progress_' . $langstring, 'totara_generator', $a);
+        } else {
+            // Make it obvious this string is missing
+            $string = get_string('progress_' . $langstring, 'totara_generator', $a);
+        }
+        echo $string;
         if (!$leaveopen) {
             if (CLI_SCRIPT) {
                 echo "\n";

@@ -77,38 +77,6 @@ class tool_generator_course_backend extends tool_generator_backend {
      * @var array Number of forum posts per discussion
      */
     private static $paramforumposts = array(2, 2, 5, 10, 10, 10);
-    /**
-     * @var array Number of programs to be created
-     */
-    private static $paramprogramscount = array(1, 2, 5, 10, 10, 10);
-    /**
-     * @var array Number of certifications to be created
-     */
-    private static $paramcertificationscount = array(1, 2, 5, 10, 10, 10);
-    /**
-     * @var array Number of activities to be created based on the course size
-     */
-    private static $paramactivitiescount = array(2, 3, 4, 5, 6, 7);
-    /**
-     * @var array kind of activities to generate.
-     */
-    private static $activities = array('certificate', 'feedback', 'quiz', 'scorm', 'choice', 'facetoface', 'book');
-    /**
-     * @var array Number of positions to be used.
-     */
-    private static $parampositionscount = array(1, 2, 2, 2, 2, 2);
-    /**
-     * @var array Number of organisations to be used.
-     */
-    private static $paramorganisationscount = array(1, 2, 2, 2, 2, 2);
-    /**
-     * @var array Number of manager accounts to be used.
-     */
-    private static $parammanagersaccount = array(1, 2, 5, 10, 10, 10);
-    /**
-     * @var array Number of audience to be used/created.
-     */
-    private static $paramaudience = array(1, 2, 2, 2, 4, 4);
 
     /**
      * @var string Course shortname
@@ -121,21 +89,6 @@ class tool_generator_course_backend extends tool_generator_backend {
     protected $generator;
 
     /**
-     * @var cohort_generator Data generator for hierarchy
-     */
-    protected $cohort_generator;
-
-    /**
-     * @var hierarchy_generator Data generator for hierarchy
-     */
-    protected $hierarchy_generator;
-
-    /**
-     * @var program_generator Data generator for program
-     */
-    protected $program_generator;
-
-    /**
      * @var stdClass Course object
      */
     private $course;
@@ -144,51 +97,6 @@ class tool_generator_course_backend extends tool_generator_backend {
      * @var array Array from test user number (1...N) to userid in database
      */
     private $userids;
-
-    /**
-     * @var array Array of programs id
-     */
-    private $programids = array();
-
-    /**
-     * @var array Array of programs id
-     */
-    private $certificationids = array();
-
-    /**
-     * @var array Array of managers id
-     */
-    private $managerids = array();
-
-    /**
-     * @var array Array of organisations id
-     */
-    private $organisationids = array();
-
-    /**
-     * @var array Array of positions id
-     */
-    private $positionids = array();
-
-    /**
-     * @var array Array of audiences id
-     */
-    private $audienceids = array();
-
-    /**
-     * @var array Array of activities created.
-     */
-    private $activitiescreated = array();
-
-    /**
-     * @const string To identify manager account
-     */
-    const MANAGER_TOOL_GENERATOR = 'manager';
-
-    /**
-     * @const string To identify student account
-     */
-    const USER_TOOL_GENERATOR = 'user';
 
     /**
      * Constructs object ready to create course.
@@ -274,14 +182,7 @@ class tool_generator_course_backend extends tool_generator_backend {
 
         // Make course.
         $this->course = $this->create_course();
-
-        // Create students accounts.
-        $this->create_users(self::USER_TOOL_GENERATOR, self::$paramusers[$this->size]);
-
-        $this->create_totara_objects();
-
-        // Create pages, small and big files, and forum.
-        core_php_time_limit::raise(0);
+        $this->create_users();
         $this->create_assignments();
         $this->create_pages();
         $this->create_small_files();
@@ -298,63 +199,6 @@ class tool_generator_course_backend extends tool_generator_backend {
         // Commit transaction and finish.
         $transaction->allow_commit();
         return $this->course->id;
-    }
-
-    /**
-     * Set custom data generators
-     *
-     */
-    protected function set_customs_generators() {
-        $this->hierarchy_generator = $this->generator->get_plugin_generator('totara_hierarchy');
-        $this->cohort_generator = $this->generator->get_plugin_generator('totara_cohort');
-        $this->program_generator = $this->generator->get_plugin_generator('totara_program');
-        $this->completion_generator = $this->generator->get_plugin_generator('core_completion');
-    }
-
-    /**
-     * Create Totara objects, such as: audiences, positions, organisations, managers,
-     * assign primary position to students, create programs, etc.
-     *
-     */
-    protected function create_totara_objects() {
-        // Set custom data generators.
-        $this->set_customs_generators();
-        // Enable completion tracking.
-        $this->completion_generator->enable_completion_tracking($this->course);
-        // Create some activities.
-        $this->create_activities();
-        // Set completion for the activities created.
-        $this->completion_generator->set_activity_completion($this->course->id, $this->activitiescreated, COMPLETION_AGGREGATION_ALL);
-        // Create manager accounts.
-        $this->create_users(self::MANAGER_TOOL_GENERATOR, self::$parammanagersaccount[$this->size]);
-        // Create position framework.
-        $posframework = $this->hierarchy_generator->create_framework('pos', 'pos_framework_tool_generator');
-        // Create organisation framework.
-        $orgframework = $this->hierarchy_generator->create_framework('org', 'org_framework_tool_generator');
-        // Create/get organisations.
-        $this->organisationids = $this->hierarchy_generator->get_hierarchies('organisation', $orgframework, self::$paramorganisationscount[$this->size]);
-        // Create/get positions.
-        $this->positionids = $this->hierarchy_generator->get_hierarchies('position', $posframework, self::$parampositionscount[$this->size]);
-        // Create primary position for all students.
-        $this->create_primary_position($this->userids, $this->managerids, $this->positionids, $this->organisationids);
-        // Create audiences.
-        $this->audienceids = $this->cohort_generator->create_audiences(self::$paramaudience[$this->size], $this->userids);
-        // Create programs.
-        if (totara_feature_visible('programs')) {
-            // Create programs.
-            $this->create_programs();
-            // Assign users to program via cohort method.
-            $this->assign_users_to_programs(ASSIGNTYPE_COHORT, $this->programids);
-        }
-
-        if (totara_feature_visible('certifications')) {
-            // Create certifications
-            $this->create_certifications();
-            // Assign users to program via cohort method.
-            $this->assign_users_to_programs(ASSIGNTYPE_COHORT, $this->certificationids);
-        }
-
-        $this->program_generator->fix_program_sortorder();
     }
 
     /**
@@ -375,33 +219,32 @@ class tool_generator_course_backend extends tool_generator_backend {
      * Creates a number of user accounts and enrols them on the course.
      * Note: Existing user accounts that were created by this system are
      * reused if available.
-     *
-     * @param string $usertype Type of user (user, manager, teacher, etc)
-     * @param int $count Number of user account to create
      */
-    private function create_users($usertype, $count) {
+    private function create_users() {
         global $DB;
 
-        $username = $usertype . '_tool_generator_';
+        // Work out total number of users.
+        $count = self::$paramusers[$this->size];
 
         // Get existing users in order. We will 'fill up holes' in this up to
         // the required number.
         $this->log('checkaccounts', $count);
         $nextnumber = 1;
-        $rs = $DB->get_recordset_select('user', $DB->sql_like('username', '?'), array($username . '%'), 'username', 'id, username');
-        foreach ($rs as $record) {
+        $rs = $DB->get_recordset_select('user', $DB->sql_like('username', '?'),
+                array('tool_generator_%'), 'username', 'id, username');
+        foreach ($rs as $rec) {
             // Extract number from username.
-            $matches = tool_generator_backend::get_number_match($username, $record->username);
-            if (empty($matches)) {
+            $matches = array();
+            if (!preg_match('~^tool_generator_([0-9]{6})$~', $rec->username, $matches)) {
                 continue;
             }
+            $number = (int)$matches[1];
 
             // Create missing users in range up to this.
-            $number = (int) $matches[1];
             if ($number != $nextnumber) {
-                $this->create_user_accounts($nextnumber, min($number - 1, $count), $usertype);
+                $this->create_user_accounts($nextnumber, min($number - 1, $count));
             } else {
-                $this->{$usertype .'ids'}[$number] = (int) $record->id;
+                $this->userids[$number] = (int)$rec->id;
             }
 
             // Stop if we've got enough users.
@@ -414,32 +257,32 @@ class tool_generator_course_backend extends tool_generator_backend {
 
         // Create users from end of existing range.
         if ($nextnumber <= $count) {
-            $this->create_user_accounts($nextnumber, $count, $usertype);
+            $this->create_user_accounts($nextnumber, $count);
         }
 
-        if ($usertype === self::USER_TOOL_GENERATOR) { // Enrol users.
-            $this->log('enrol', $count, true);
-            $enrolplugin = enrol_get_plugin('manual');
-            $instances = enrol_get_instances($this->course->id, true);
-            foreach ($instances as $instance) {
-                if ($instance->enrol === 'manual') {
-                    break;
-                }
-            }
-            if ($instance->enrol !== 'manual') {
-                throw new coding_exception('No manual enrol plugin in course');
-            }
-            $role = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
+        // Assign all users to course.
+        $this->log('enrol', $count, true);
 
-            for ($number = 1; $number <= $count; $number++) {
-                // Enrol user.
-                $enrolplugin->enrol_user($instance, $this->{$usertype . 'ids'}[$number], $role->id);
-                $this->dot($number, $count);
+        $enrolplugin = enrol_get_plugin('manual');
+        $instances = enrol_get_instances($this->course->id, true);
+        foreach ($instances as $instance) {
+            if ($instance->enrol === 'manual') {
+                break;
             }
+        }
+        if ($instance->enrol !== 'manual') {
+            throw new coding_exception('No manual enrol plugin in course');
+        }
+        $role = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
+
+        for ($number = 1; $number <= $count; $number++) {
+            // Enrol user.
+            $enrolplugin->enrol_user($instance, $this->userids[$number], $role->id);
+            $this->dot($number, $count);
         }
 
         // Sets the pointer at the beginning to be aware of the users we use.
-        reset($this->{$usertype . 'ids'});
+        reset($this->userids);
 
         $this->end_log();
     }
@@ -449,18 +292,20 @@ class tool_generator_course_backend extends tool_generator_backend {
      *
      * @param int $first Number of first user
      * @param int $last Number of last user
-     * @param int $usertype Type of user: common user or manager
      */
-    private function create_user_accounts($first, $last, $usertype) {
+    private function create_user_accounts($first, $last) {
         global $CFG;
 
         $this->log('createaccounts', (object)array('from' => $first, 'to' => $last), true);
         $count = $last - $first + 1;
         $done = 0;
         for ($number = $first; $number <= $last; $number++, $done++) {
-
-            $username = $usertype . '_tool_generator_';
-            $username = $username . str_pad($number, 6, '0', STR_PAD_LEFT);
+            // Work out username with 6-digit number.
+            $textnumber = (string)$number;
+            while (strlen($textnumber) < 6) {
+                $textnumber = '0' . $textnumber;
+            }
+            $username = 'tool_generator_' . $textnumber;
 
             // Create user account.
             $record = array('firstname' => get_string('firstname', 'tool_generator'),
@@ -472,7 +317,7 @@ class tool_generator_course_backend extends tool_generator_backend {
             }
 
             $user = $this->generator->create_user($record);
-            $this->{$usertype . 'ids'}[$number] = (int) $user->id;
+            $this->userids[$number] = (int)$user->id;
             $this->dot($done, $count);
         }
         $this->end_log();
@@ -495,44 +340,6 @@ class tool_generator_course_backend extends tool_generator_backend {
             $this->dot($i, $number);
         }
 
-        $this->end_log();
-    }
-
-    /**
-     * Assign users to programs.
-     *
-     * @param string $method type of assignment (position, organisation, individuals, cohort)
-     */
-    private function assign_users_to_programs($method, $programids) {
-        $this->log('assignusers');
-        $programscount = count($programids);
-
-        switch ($method) {
-            case ASSIGNTYPE_COHORT:
-                $item = $this->audienceids;
-            break;
-            case ASSIGNTYPE_POSITION:
-                $item = $this->positionids;
-            break;
-            case ASSIGNTYPE_ORGANISATION:
-                $item = $this->organisationids;
-            break;
-            case ASSIGNTYPE_INDIVIDUAL:
-                $item = $this->userids;
-            break;
-        }
-
-        if (count($item) > $programscount) {
-            $size = floor(count($item) / $programscount);
-            $items = array_chunk($item, $size);
-        } else {
-            $items = array_chunk($item, 1);
-        }
-
-        $itemscount = count($items);
-        foreach ($programids as $programid) {
-            $this->program_generator->assign_users_by_method($programid, $method, $items[rand(0, $itemscount-1)]);
-        }
         $this->end_log();
     }
 
@@ -586,124 +393,6 @@ class tool_generator_course_backend extends tool_generator_backend {
             $this->dot($i, $count);
         }
 
-        $this->end_log();
-    }
-
-    /**
-     * Creates programs for the course.
-     *
-     * @return nothing but saving the programs id created.
-     */
-    private function create_programs() {
-        $count = self::$paramprogramscount[$this->size];
-        $done = 0;
-        $this->log('createprograms', $count, true);
-        // Create programs.
-        for ($i = 1; $i <= $count; $i++, $done++) {
-            $programname = 'program_toolgenerator_' . $this->course->id . str_pad($i, 6, '0', STR_PAD_LEFT);
-            $data = array('fullname' => $programname, 'shortname' => $programname);
-            if ($newprogram = $this->program_generator->create_program($data)) {
-                $this->programids[] = $newprogram->id;
-                $this->dot($done, $count);
-            }
-        }
-
-        // Assign this course to the programs created.
-        foreach ($this->programids as $programid) {
-            $this->program_generator->add_courseset_program($programid, array($this->course->id));
-        }
-
-        $this->end_log();
-    }
-
-    /**
-     * Creates programs for the course.
-     *
-     * @return nothing but saving the programs id created.
-     */
-    private function create_certifications() {
-        $count = self::$paramcertificationscount[$this->size];
-        $done = 0;
-        $this->log('createcertifications', $count, true);
-        // Create programs.
-        for ($i = 1; $i <= $count; $i++, $done++) {
-            $programname = 'certification_toolgenerator_' . $this->course->id . str_pad($i, 6, '0', STR_PAD_LEFT);
-            $data = array('fullname' => $programname, 'shortname' => $programname);
-            if ($newprogram = $this->program_generator->create_program($data)) {
-                // Get random activeperiod, windowperiod and recertifydatetype.
-                list($actperiod, $winperiod, $recerttype) = $this->program_generator->get_random_certification_setting();
-                // Covert this program in a certification.
-                $this->program_generator->create_certification_settings($newprogram->id, $actperiod, $winperiod, $recerttype);
-                $this->certificationids[] = $newprogram->id;
-                $this->dot($done, $count);
-            }
-        }
-
-        // Assign this course to the certifications created.
-        // Make this course the certification and recertification path.
-        foreach ($this->certificationids as $certificationid) {
-            $this->program_generator->add_courseset_program($certificationid, array($this->course->id));
-            $this->program_generator->add_courseset_program($certificationid, array($this->course->id), CERTIFPATH_RECERT);
-        }
-
-        $this->end_log();
-    }
-
-    /**
-     * Creates activities for this course.
-     *
-     */
-    protected function create_activities() {
-        // Set up generator.
-        $activitiescount = count(self::$activities) - 1;
-        $number = self::$paramactivitiescount[$this->size];
-        $this->log('createactivities', $number, true);
-        for ($i = 1; $i <= $number; $i++) {
-            $mod = 'mod_' . self::$activities[rand(0, $activitiescount)];
-            $modgenerator = $this->generator->get_plugin_generator($mod);
-            $record = array('course' => $this->course->id);
-            $options = array(
-                'section' => 0,
-                'completion' => COMPLETION_TRACKING_AUTOMATIC,
-                'completionview' => COMPLETION_VIEW_REQUIRED
-            );
-            if ($activity = $modgenerator->create_instance($record, $options)) {
-                // Some activities has content. Check if the current activity has the create_content method implemented.
-                $ref = new ReflectionClass($modgenerator);
-                $method = $ref->getMethod('create_content');
-                if ($method->class === get_class($modgenerator)) {
-                    $modgenerator->create_content($activity);
-                }
-                $this->activitiescreated[] = $activity;
-            }
-            $this->dot($i, $number);
-        }
-        $this->end_log();
-    }
-
-    /**
-     * Creates primary position for the given users.
-     *
-     * @param array $users Array of userids
-     * @param array $managerids Array of managerids
-     * @param array $positionids Array of positionids
-     * @param array $organisationids Array of organisationids
-     */
-    private function create_primary_position($users, $managerids, $positionids, $organisationids) {
-        $done = 0;
-        $count = count($users);
-        $this->log('assignhierarchy', $count);
-        $managerscount = count($managerids);
-        $positionscount = count($positionids);
-        $organisationscount = count($organisationids);
-        foreach ($users as $user) {
-            $done++;
-            $managerid = $managerids[rand(1, $managerscount)];
-            $positionid = $positionids[rand(1, $positionscount)];
-            $organisationid = $organisationids[rand(1, $organisationscount)];
-            $this->hierarchy_generator->assign_primary_position($user, $managerid, $positionid, $organisationid);
-            $this->dot($done, $count);
-        }
         $this->end_log();
     }
 

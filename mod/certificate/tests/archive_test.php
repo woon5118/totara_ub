@@ -53,6 +53,8 @@ class mod_certificate_archive_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
+        set_config('enablecompletion', 1);
+
         // Create a course
         $this->assertEquals(1, $DB->count_records('course')); // Site course
         $coursedefaults = array('enablecompletion' => COMPLETION_ENABLED);

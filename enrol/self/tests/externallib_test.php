@@ -66,8 +66,7 @@ class enrol_self_external_testcase extends externallib_advanced_testcase {
                                                                 'password' => 'test'));
 
         $enrolmentmethods = $DB->get_records('enrol', array('courseid' => $course->id, 'status' => ENROL_INSTANCE_ENABLED));
-        // 3 in Moodle, 4 in Totara because program plugin enabled by default.
-        $this->assertCount(4, $enrolmentmethods);
+        $this->assertCount(3, $enrolmentmethods);
 
         $instanceinfo1 = enrol_self_external::get_instance_info($instanceid1);
 

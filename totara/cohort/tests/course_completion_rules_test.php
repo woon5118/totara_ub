@@ -67,6 +67,7 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
         global $DB;
 
         parent::setup();
+        set_config('enablecompletion', 1);
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $this->preventResetByRollback();

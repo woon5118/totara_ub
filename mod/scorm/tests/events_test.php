@@ -55,10 +55,6 @@ class mod_scorm_event_testcase extends advanced_testcase {
         $record->course = $this->eventcourse->id;
         $this->eventscorm = $this->getDataGenerator()->create_module('scorm', $record);
         $this->eventcm = get_coursemodule_from_instance('scorm', $this->eventscorm->id);
-
-        $this->resetAfterTest();
-        // Ehm, completion is enabled in Totara by default.
-        set_config('enablecompletion', 0);
     }
 
     /** Tests for attempt deleted event */

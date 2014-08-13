@@ -262,8 +262,18 @@ abstract class testing_module_generator extends component_generator_base {
         // Add the module to the course.
         $moduleinfo = add_moduleinfo($record, $course, $mform = null);
 
+        // TODO: upstream to Moodle
+        $modcontext = context_module::instance($moduleinfo->coursemodule);
+        // Trigger event.
+        $eventdata = clone $moduleinfo;
+        $eventdata->modname = $eventdata->modulename;
+        $eventdata->id = $eventdata->coursemodule;
+        $event = \core\event\course_module_created::create_from_cm($eventdata, $modcontext);
+        $event->trigger();
+        $moduleinfo = edit_module_post_actions($moduleinfo, $course);
         // Prepare object to return with additional field cmid.
         $instance = $DB->get_record($this->get_modulename(), array('id' => $moduleinfo->instance), '*', MUST_EXIST);
+
         $instance->cmid = $moduleinfo->coursemodule;
         return $instance;
     }

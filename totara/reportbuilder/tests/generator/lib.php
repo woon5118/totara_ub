@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
+ * @category test
  *
- * Reportbuilder generators.
+ * Reportbuilder generator.
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,6 +31,8 @@ require_once($CFG->libdir  . '/testing/generator/data_generator.php');
 /**
  * This class intended to generate different mock entities
  *
+ * @package totara_reportbuilder
+ * @category test
  */
 class totara_reportbuilder_cache_generator extends testing_data_generator {
     protected static $ind = 0;

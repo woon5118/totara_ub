@@ -147,11 +147,7 @@ class core_outputcomponents_testcase extends advanced_testcase {
         $this->assertNotEquals('user3@example.com', $user3->email);
         $this->assertFalse($context3);
 
-        $storeforceloggin = $CFG->forcelogin;
-        $storeforceloginforprofileimage = $CFG->forceloginforprofileimage;
-        $CFG->forcelogin = $CFG->forceloginforprofileimage = 0;
-
-        // try legacy picture == 1
+        // Try legacy picture == 1.
         $user1->picture = 1;
         $up1 = new user_picture($user1);
         $this->assertSame($CFG->wwwroot.'/pluginfile.php/'.$context1->id.'/user/icon/standardtotararesponsive/f2?rev=1', $up1->get_url($page, $renderer)->out(false));
@@ -280,9 +276,6 @@ class core_outputcomponents_testcase extends advanced_testcase {
 
         $up3 = new user_picture($user3);
         $this->assertSame($CFG->wwwroot.'/theme/image.php?theme=standardtotararesponsive&component=core&rev=1&image=u%2Ff2', $up3->get_url($page, $renderer)->out(false));
-
-        $CFG->forcelogin = $storeforceloggin;
-        $CFG->forceloginforprofileimage = $storeforceloginforprofileimage;
     }
 
     public function test_empty_menu() {
