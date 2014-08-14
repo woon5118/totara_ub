@@ -1269,47 +1269,124 @@ class facetofacelib_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    // Test sending an adhoc notice using message substitution to the users signed for a session.
     function test_facetoface_send_notice() {
-        // Test. method - returns string
-        $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
 
-        // Test variables.
-        $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
-        $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
+            'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
 
-        //TODO where is sessiondata coming from in here? check table references
+        $usernamefields = get_all_user_name_fields();
+        $fields = array_merge($fields, array_values($usernamefields));
 
-        $postsubject1 = 'postsubject1';
-        $posttext1 = 'posttext1';
-        $posttextmgrheading1 = 'posttextmgrheading1';
-        $notificationtype1 = 'notificationtype1';
+        $noticebody = '';
+        foreach ($fields as $field) {
+            $noticebody .= get_string('placeholder:'.$field, 'mod_facetoface') . ' ';
+        }
 
-        $userid1 = 1;
+        $noticebody .= get_string('placeholder:fullname', 'mod_facetoface') . ' ';
 
-        // Test for valid case.
-        //$this->assertEquals(facetoface_send_notice($postsubject1, $posttext1, $posttextmgrheading1, $notificationtype1, $facetoface1, $session1, $userid1), '');
-        $this->resetAfterTest(true);
+        $userdata = array();
+        foreach ($fields as $field) {
+            $userdata[$field] = 'display_' . $field;
+        }
+
+        // Set up three users, one learner, a primary mgr and a secondary mgr.
+        $user1 = $this->getDataGenerator()->create_user($userdata);
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course1->id, 'multiplesessions' => 1));
+        $facetofaces[$facetoface->id] = $facetoface;
+
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (YEARSECS * 2);
+        $sessiondate->timefinish = time() + (YEARSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        facetoface_user_signup($session, $facetoface, $this->course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, false);
+
+        $notification = new facetoface_notification();
+        $notification->booked = 0;
+        $notification->courseid = $course1->id;
+        $notification->facetofaceid = $facetoface->id;
+        $notification->ccmanager = 0;
+        $notification->status = 1;
+        $notification->title = 'hello';
+        $notification->body = $noticebody;
+        $notification->managerprefix = '';
+        $notification->type = MDL_F2F_NOTIFICATION_MANUAL;
+        $notification->save();
+
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        $notification->send_to_users($sessionid);
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Check the expected number of messages got sent.
+        $this->assertCount(1, $messages);
+        $this->assertEquals($user1->id, $messages[0]->useridto);
+
+        foreach ($fields as $field) {
+            $uservalue = 'display_' . $field;
+            $this->assertTrue(strpos($messages[0]->fullmessage, $uservalue) !== false, $uservalue);
+        }
+
+        $this->assertTrue(strpos($messages[0]->fullmessage, fullname($user1)) !== false, fullname($user1));
     }
 
     function test_facetoface_send_confirmation_notice() {
-        // Test variables.
-        $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
-        $facetoface1 = $this->facetoface[0];
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
 
-        $session1 = $this->session[0];
-        //TODO where is sessiondata coming from in here? check table references
+        // Set up three users, one learner, a primary mgr and a secondary mgr.
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
 
-        $postsubject1 = 'postsubject1';
-        $posttext1 = 'posttext1';
-        $posttextmgrheading1 = 'posttextmgrheading1';
-        $notificationtype1 = 'notificationtype1';
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course1->id, 'multiplesessions' => 1));
+        $facetofaces[$facetoface->id] = $facetoface;
 
-        $userid1 = 1;
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (YEARSECS * 2);
+        $sessiondate->timefinish = time() + (YEARSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
 
-        // Test for valid case.
-        $this->resetAfterTest(true);
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        facetoface_user_signup($session, $facetoface, $this->course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true);
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Check the expected number of messages got sent.
+        $this->assertCount(1, $messages);
+        $this->assertEquals($user1->id, $messages[0]->useridto);
     }
 
     function test_facetoface_send_cancellation_notice() {

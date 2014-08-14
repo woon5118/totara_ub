@@ -469,7 +469,9 @@ class facetoface_notification extends data_object {
                 $this->send_to_thirdparty($recipient, $recipient->sessionid);
                 $this->delete_ical_attachment();
             }
-            echo get_string('sentxnotifications', 'facetoface', $count) . "\n";
+            if (!CLI_SCRIPT) {
+                echo get_string('sentxnotifications', 'facetoface', $count) . "\n";
+            }
 
             $recipients->close();
         }
@@ -1243,7 +1245,149 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $msg = str_replace($placeholder, $value, $msg);
     }
 
+    $msg = facetoface_message_substitutions_userfields($msg, $user);
+
     return $msg;
+}
+
+/**
+ * Substitute placeholders for user fields in message templates for the actual data
+ *
+ * @param   string  $msg            Email message
+ * @param   obj     $user           The subject of the message
+ * @return  string                  Message with substitutions applied
+ */
+function facetoface_message_substitutions_userfields($msg, $user) {
+    global $DB;
+    static $customfields = null;
+
+    $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
+        'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
+
+    $usernamefields = get_all_user_name_fields();
+    $fields = array_merge($fields, array_values($usernamefields));
+
+    // Process basic user fields.
+    foreach ($fields as $field) {
+        $msg = str_replace(get_string('placeholder:'.$field, 'mod_facetoface'), $user->$field, $msg);
+    }
+
+    $fullname = fullname($user);
+    $msg = str_replace(get_string('placeholder:fullname', 'mod_facetoface'), $fullname, $msg);
+
+    $langvalue = output_language_code($user->lang);
+    $msg = str_replace(get_string('placeholder:lang', 'mod_facetoface'), $langvalue, $msg);
+
+    $countryvalue = output_country_code($user->country);
+    $msg = str_replace(get_string('placeholder:country', 'mod_facetoface'), $countryvalue, $msg);
+
+    $timezone = usertimezone($user->timezone);
+    $msg = str_replace(get_string('placeholder:timezone', 'mod_facetoface'), $timezone, $msg);
+
+    // Check to see if we need to load and process custom profile fields.
+    if (strpos($msg, '[user:') !== false) {
+        // If static fields variable isn't already populated with custom profile fields then grab them.
+        if ($customfields === null) {
+            $customfields = $DB->get_records('user_info_field');
+        }
+
+        $sql = "SELECT f.shortname,d.*
+                      FROM {user_info_data} d
+                      JOIN {user_info_field} f ON d.fieldid = f.id
+                     WHERE d.userid = :userid";
+
+        $customfielddata = $DB->get_records_sql($sql, array('userid' => $user->id));
+
+        // Iterate through custom profile fields.
+        foreach ($customfields as $field) {
+            if (array_key_exists($field->shortname, $customfielddata)) {
+                $value = $customfielddata[$field->shortname]->data;
+            } else {
+                $value = $field->defaultdata;
+            }
+
+            // Use output functions for checkbox/datatime.
+            switch ($field->datatype){
+                case 'checkbox':
+                    $value = output_checkbox($value);
+                    break;
+                case 'datetime':
+                    $value = output_datetime($field, $value);
+                    break;
+            }
+
+            $msg = str_replace('[user:'.$field->shortname.']', $value, $msg);
+        }
+    }
+
+    return $msg;
+}
+
+/**
+ * Write plain text yes or no for checkboxes.
+ *
+ * @param boolean $value
+ * @return string
+ */
+function output_checkbox($value) {
+    if ($value) {
+        return get_string('yes');
+    } else {
+        return get_string('no');
+    }
+}
+
+/**
+ * Get plain text date for timestamps.
+ *
+ * @param int $value    Timestamp
+ * @return string
+ */
+function output_datetime($field, $value) {
+    // Variable param3 indicates wether or not to display time.
+    if ($field->param3 && is_numeric($value)) {
+        return userdate($value, get_string('strfdateattime', 'langconfig'));
+    } else if (is_numeric($value) && $value > 0) {
+        return userdate($value, get_string('strfdateshortmonth', 'langconfig'));
+    } else {
+        return '';
+    }
+}
+
+/**
+ * Get country name for country codes.
+ *
+ * @param string $code  Country code
+ * @return string
+ */
+function output_country_code($code) {
+    global $CFG;
+    require_once($CFG->dirroot.'/lib/moodlelib.php');
+
+    $countries = get_string_manager()->get_list_of_countries();
+
+    if (isset($countries[$code])) {
+        return $countries[$code];
+    }
+    return $code;
+}
+
+/**
+ * Get language name for language codes
+ *
+ * @param string $code  Language code
+ * @return string
+ */
+function output_language_code($code) {
+    global $CFG;
+    require_once($CFG->dirroot.'/lib/moodlelib.php');
+
+    $languages = get_string_manager()->get_list_of_languages();
+
+    if (isset($languages[$code])) {
+        return $languages[$code];
+    }
+    return $code;
 }
 
 
