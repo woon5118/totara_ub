@@ -167,7 +167,8 @@ class totara_sync_config_form extends moodleform {
         if (DIRECTORY_SEPARATOR == '\\') {
             $pattern = '/^[a-z0-9\/\.\-_\\\\\\:]{1,}$/i';
         } else {
-            $pattern = '/^[a-z0-9\/\.\-_]{1,}$/i';
+            // Character '@' is used in Jenkins workspaces, it might be used on other servers too.
+            $pattern = '/^[a-z0-9@\/\.\-_]{1,}$/i';
         }
 
         if ($data['fileaccess'] == FILE_ACCESS_DIRECTORY && isset($data['filesdir'])) {

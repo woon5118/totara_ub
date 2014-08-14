@@ -67,7 +67,7 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
             $valid = empty($valid);
 
             $this->assertEquals($expected[0], $source->get_canonical_filesdir($suffix));
-            $this->assertEquals($expected[1], $valid, null);
+            $this->assertEquals($expected[1], $valid, "unexpected result for path: $path");
         }
     }
 
