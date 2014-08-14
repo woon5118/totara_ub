@@ -3936,23 +3936,6 @@ function facetoface_get_requests($sessionid) {
     return facetoface_get_users_by_status($sessionid, MDL_F2F_STATUS_REQUESTED, $select);
 }
 
-
-/**
- * Get session declined requests
- *
- * @access  public
- * @param   integer $sessionid
- * @return  array|false
- */
-function facetoface_get_declines($sessionid) {
-    $usernamefields = get_all_user_name_fields(true, 'u');
-    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
-        ss.statuscode, ss.timecreated AS timerequested";
-
-    return facetoface_get_users_by_status($sessionid, MDL_F2F_STATUS_DECLINED, $select);
-}
-
-
 /**
  * Get session attendees by status
  *

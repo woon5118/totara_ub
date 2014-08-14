@@ -192,17 +192,6 @@ if (($facetoface->approvalreqd && $staff = totara_get_staff()) ||
             $available_actions[] = 'cancellations';
         }
     }
-
-    // Check if any staff have declined
-    $get_declines = facetoface_get_declines($session->id);
-    if ($get_declines) {
-        $declines = array_intersect_key($get_declines, array_flip($staff));
-
-        if ($declines) {
-            $allowed_actions[] = 'approvalrequired';
-            $available_actions[] = 'approvalrequired';
-        }
-    }
 }
 
 $can_view_session = !empty($allowed_actions);
