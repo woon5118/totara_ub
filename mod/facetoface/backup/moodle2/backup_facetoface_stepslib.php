@@ -84,7 +84,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
 
         $session = new backup_nested_element('session', array('id'), array(
             'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown', 'duration', 'normalcost',
-            'discountcost', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
+            'discountcost', 'roomid', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
             'timemodified'));
 
         $signups = new backup_nested_element('signups');
@@ -141,11 +141,11 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $notification->set_source_table('facetoface_notification', array('facetofaceid' => backup::VAR_PARENTID));
 
         $session->set_source_sql('SELECT s.id, s.facetoface, s.capacity, s.allowoverbook, s.details, s.datetimeknown,
-                                         s.duration, s.normalcost, s.discountcost, r.name AS room_name,
+                                         s.duration, s.normalcost, s.discountcost, s.roomid, r.name AS room_name,
                                          r.building AS room_building, r.custom AS room_custom, r.address AS room_address,
                                          s.timecreated, s.timemodified, s.usermodified
-                                        FROM {facetoface_room} r
-                                        JOIN {facetoface_sessions} s ON s.roomid = r.id
+                                        FROM {facetoface_sessions} s
+                                        LEFT JOIN {facetoface_room} r ON s.roomid = r.id
                                        WHERE s.facetoface = ?', array(backup::VAR_PARENTID));
 
         $sessions_date->set_source_table('facetoface_sessions_dates', array('sessionid' => backup::VAR_PARENTID));
