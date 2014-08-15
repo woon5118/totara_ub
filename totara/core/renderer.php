@@ -148,12 +148,19 @@ class totara_core_renderer extends plugin_renderer_base {
     * @return html_writer::table
     */
     public function print_report_manager($reports, $canedit) {
+        $output = '';
+
         if (count($reports) == 0) {
-            return '';
+            return $output;
         }
 
-        $output = html_writer::start_tag('ul', array('class' => 'reportmanager'));
         foreach ($reports as $report) {
+            if ($report->embedded) {
+                $url = $report->embeddedurl;
+            } else {
+                $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $report->id));
+            }
+
             // show reports user has permission to view, that are not hidden
             $output .= html_writer::start_tag('li');
             $cells = array();
@@ -163,7 +170,7 @@ class totara_core_renderer extends plugin_renderer_base {
                     array('src' => $this->output->pix_url('report_icon', 'totara_reportbuilder'),
                     'alt'=> $text)
             );
-            $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $report->id));
+
             $attributes = array('href' => $url);
             $output .= html_writer::tag('a', $icon . $text, $attributes);
             // if admin with edit mode on show settings button too
@@ -179,7 +186,11 @@ class totara_core_renderer extends plugin_renderer_base {
             $output .= html_writer::end_tag('li');
         }
 
-        $output .= html_writer::end_tag('ul');
+        // If we've generated a list of report links, wrap it.
+        if ($output) {
+            $output = html_writer::start_tag('ul', array('class' => 'reportmanager')) . $output . html_writer::end_tag('ul');
+        }
+
         return $output;
     }
     /**

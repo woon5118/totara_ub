@@ -189,6 +189,10 @@ class reportbuilder {
      * $embed_deprecated parameter. Now, this constructor will create the embedded object. The data required by the embedded
      * object should be passed in the $embeddata parameter.
      *
+     * Note: If a report is embedded and it implements is_capable (all embedded reports SHOULD implement this, but are
+     * not required to) then is_capable will be called: If the user does not have access then an exception is thrown. If
+     * the function is not implemented then a debug warning is generated and an exception will NOT be thrown.
+     *
      * @param integer $id ID of the report to generate
      * @param string $shortname Shortname of the report to generate
      * @param object $embed_deprecated Object containing settings for an embedded report - see note above
@@ -1510,7 +1514,7 @@ class reportbuilder {
     }
 
     /**
-     * Returns an array of reportbuilder objects that the user can view
+     * Returns an array of reportbuilder records that the user can view
      *
      * @param int $userid The user to check which reports they have access to
      * @param boolean $showhidden If true, reports which are hidden
@@ -1538,6 +1542,20 @@ class reportbuilder {
         //we now have all the information we need
         if ($reports) {
             foreach ($reports as $report) {
+                if ($report->embedded) {
+                    try {
+                        // Get hold of the report builder object for the embedded url.
+                        $reportobj = new reportbuilder($report->id);
+                        if ($reportobj->embeddedurl) {
+                            $report->embeddedurl = $reportobj->embeddedurl;
+                        } else {
+                            continue;
+                        }
+                    } catch (Exception $ex) {
+                        continue;
+                    }
+                }
+
                 if ($report->accessmode == REPORT_BUILDER_ACCESS_MODE_NONE) {
                     $permitted_reports[$report->id] = $report;
                     continue;
@@ -1553,7 +1571,7 @@ class reportbuilder {
                         }
                         continue;
                     } else {
-                        // bad data - set to "any plugin passing", but no plugins actually have settings to check for this report
+                        // Bad data - set to "any plugin passing", but no plugins actually have settings to check for this report.
                         continue;
                     }
                 }
@@ -5235,7 +5253,7 @@ function reportbuilder_create_attachment($sched, $userid) {
     $sid = $sched->savedsearchid;
     $scheduleid = $sched->id;
 
-    $report = new reportbuilder($reportid, null, false, $sid, $userid);
+    $report = new reportbuilder($reportid, null, false, $sid, $userid, false, array('userid' => $userid));
     $columns = $report->columns;
     $count = $report->get_filtered_count();
     list($sql, $params) = $report->build_query(false, true);
