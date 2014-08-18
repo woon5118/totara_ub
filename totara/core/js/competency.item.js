@@ -158,10 +158,10 @@
                 $('.noitems-'+this._title).remove();
 
                 //Split response into table and div
-                var new_table = $(response).find('table.list-evidence');
+                var new_table = $(response).find('#list-evidence');
 
                 // Grab table
-                var table = $('table.list-evidence');
+                var table = $('#list-evidence');
 
                 // If table found
                 if (table.size()) {
