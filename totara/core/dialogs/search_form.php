@@ -95,7 +95,7 @@ class dialog_search_form extends moodleform {
 
         // Query box
         $query = $this->_customdata['query'];
-        $searcharray[] =& $mform->createElement('text', 'query', get_string('search', 'totara_core'), 'maxlength="254"');
+        $searcharray[] =& $mform->addElement('text', 'query', get_string('search', 'totara_core'), 'maxlength="254"');
         $mform->setType('query', PARAM_TEXT);
         $mform->setDefault('query', $query);
 
@@ -118,18 +118,18 @@ class dialog_search_form extends moodleform {
                 'class' => 'totara-limited-width-150',
                 'onMouseDown'=>"if(document.all) this.className='totara-expanded-width';",
                 'onBlur'=>"if(document.all) this.className='totara-limited-width-150';",
-                'onChange'=>"if(document.all) this.className='totara-limited-width-150';"
+                'onChange'=>"if(document.all) this.className='totara-limited-width-150';",
             );
 
-            $searcharray[] =& $mform->createElement('select', 'frameworkid', get_string('framework', 'totara_core'), $options, $attr);
+            $item =& $mform->addElement('select', 'frameworkid', '', $options, $attr);
+            $item->setHiddenLabel(get_string('framework', 'totara_core'));
             $mform->setDefault('frameworkid', $frameworkid);
         }
 
         // Show search button and close markup
         // Pad search string to make it look nicer
-        $strsearch = '    '.get_string('search').'    ';
-        $searcharray[] =& $mform->createElement('submit', 'dialogsearchsubmitbutton', $strsearch);
-        $mform->addGroup($searcharray, 'searchgroup', '', array(' '), false);
+        $strsearch = get_string('search');
+        $searcharray[] =& $mform->addElement('submit', 'dialogsearchsubmitbutton', $strsearch);
 
     }
 }

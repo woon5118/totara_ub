@@ -188,6 +188,13 @@ div.ui-dialog .totara-msgs-action-right {
     vertical-align:top;
 }
 
+.totara-dialog #fitem_id_query {
+    padding-top: 2px;
+}
+.totara-dialog #fitem_id_dialogsearchsubmitbutton {
+    padding: 2px 3px;
+}
+
 /* Make none JS links look more like buttons */
 a.noscript-button {
     padding: 5px;

@@ -83,6 +83,53 @@ div.totara-dialog .selected div.treeview-selected-item {
     display: none;
 }
 
+.totara-dialog #fitem_id_query,
+.totara-dialog #fitem_id_frameworkid,
+.totara-dialog #fitem_id_dialogsearchsubmitbutton {
+    float: left;
+    display: inline-block;
+    width: auto;
+}
+.totara-dialog #fitem_id_query .felement,
+.totara-dialog #fitem_id_frameworkid .felement,
+.totara-dialog #fitem_id_dialogsearchsubmitbutton .felement {
+    width: auto;
+    float: left;
+}
+
+.totara-dialog #fitem_id_query label,
+.totara-dialog #fitem_id_frameworkid label,
+.totara-dialog #fitem_id_dialogsearchsubmitbutton label {
+    display: inline;
+}
+
+.totara-dialog #fitem_id_query .fitemtitle,
+.totara-dialog #fitem_id_frameworkid .fitemtitle,
+.totara-dialog #fitem_id_dialogsearchsubmitbutton .fitemtitle {
+    float: left;
+    width: auto;
+}
+.dir-rtl .totara-dialog #fitem_id_query,
+.dir-rtl .totara-dialog #fitem_id_frameworkid,
+.dir-rtl .totara-dialog #fitem_id_dialogsearchsubmitbutton,
+.dir-rtl .totara-dialog #fitem_id_query .felement,
+.dir-rtl .totara-dialog #fitem_id_frameworkid .felement,
+.dir-rtl .totara-dialog #fitem_id_dialogsearchsubmitbutton .felement,
+.dir-rtl .totara-dialog #fitem_id_query .fitemtitle,
+.dir-rtl .totara-dialog #fitem_id_frameworkid .fitemtitle,
+.dir-rtl .totara-dialog #fitem_id_dialogsearchsubmitbutton .fitemtitle {
+    float: right;
+    clear: left;
+}
+
+.totara-dialog #fitem_id_query .fitemtitle {
+    padding-top: 5px;
+}
+
+.totara-dialog #id_dialogsearchsubmitbutton {
+    margin: 0;
+}
+
 #dialog-tabs{
     margin-bottom: 0;
     padding-bottom: 0;
