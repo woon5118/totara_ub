@@ -1133,7 +1133,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         if (get_config('tempmanagerrestrictselection') !== false) {
             set_config('tempmanagerrestrictselection', (int) $CFG->tempmanagerrestrictselection);
         }
-        totara_upgrade_mod_savepoint(true, 2014080600, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014081400, 'totara_core');
     }
 
     return true;
