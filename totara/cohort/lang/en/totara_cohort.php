@@ -236,6 +236,7 @@ $string['error:badduration'] = 'Please specify a valid number of days';
 $string['error:badresponsefromajax'] = 'Error: erroneous response from Ajax';
 $string['error:badrule'] = 'No rule definition found for {$a}';
 $string['error:badruleonupgrade'] = 'Dynamic Audience "{$a}" contains criteria based on a user profile customfield of type textarea. This type of criteria is no longer supported in Totara 2.2 Audiences. You should check the rules for the "{$a}" Audience after the upgrade and make any necessary changes.';
+$string['error:capabilitycohortview'] = 'You do not have the necessary permissions to view audiences';
 $string['error:couldnotapprovechanges'] = 'Error while approving changes';
 $string['error:couldnotcancelchanges'] = 'Error while cancelling changes';
 $string['error:couldnotupdateglobalsettings'] = 'There was an error while updating the global settings';
