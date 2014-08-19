@@ -471,7 +471,8 @@ class rb_source_facetoface_summary extends rb_base_source {
                 'sessions',
                 'id',
                 '',
-                "sessions.id"
+                "sessions.id",
+                array('joins' => 'sessions')
             )
         );
         return $requiredcolumns;
