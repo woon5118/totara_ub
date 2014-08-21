@@ -392,5 +392,26 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         // Report builder savepoint reached.
         totara_upgrade_mod_savepoint(true, 2014031400, 'totara_reportbuilder');
     }
+
+    if ($oldversion < 2014082200) {
+
+        // Changing the default of field cachedvalue on table report_builder_settings to drop it.
+        $table = new xmldb_table('report_builder_settings');
+        $field = new xmldb_field('cachedvalue', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'value');
+
+        // Launch change of default for field cachedvalue.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field exporttofilesystem on table report_builder_schedule to drop it.
+        $table = new xmldb_table('report_builder_schedule');
+        $field = new xmldb_field('exporttofilesystem', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'frequency');
+
+        // Launch change of default for field exporttofilesystem.
+        $dbman->change_field_default($table, $field);
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014082200, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

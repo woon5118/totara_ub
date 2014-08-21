@@ -2085,6 +2085,50 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014061600, 'facetoface');
     }
 
+    if ($oldversion < 2014082200) {
+
+        // Changing the default of field waitlisted on table facetoface_notification to 0.
+        $table = new xmldb_table('facetoface_notification');
+        $field = new xmldb_field('waitlisted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'booked');
+        $dbman->change_field_default($table, $field);
+
+        // Define key userid (foreign) to be dropped form facetoface_notification_sent.
+        $table = new xmldb_table('facetoface_notification_sent');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $dbman->drop_key($table, $key); // We cannot check for key existence, just drop and recreate later.
+
+        // Changing the default of field userid on table facetoface_notification_sent to 0.
+        $table = new xmldb_table('facetoface_notification_sent');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'sessionid');
+        $dbman->change_field_default($table, $field);
+
+        // Define key userid (foreign) to be readded to facetoface_notification_sent.
+        $table = new xmldb_table('facetoface_notification_sent');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $dbman->add_key($table, $key);
+
+        // Define key facesess_use_fk (foreign) to be dropped form facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $key = new xmldb_key('facesess_use_fk', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
+        $dbman->drop_key($table, $key); // We cannot check for key existence, just drop and recreate later.
+
+        // Make sure there are no nulls before changing to not null.
+        $DB->execute("UPDATE {facetoface_sessions} SET usermodified = 0 WHERE usermodified IS NULL");
+
+        // Changing nullability of field usermodified on table facetoface_sessions to not null.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null, 'timemodified');
+        $dbman->change_field_notnull($table, $field);
+
+        // Define key facesess_use_fk (foreign) to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $key = new xmldb_key('facesess_use_fk', XMLDB_KEY_FOREIGN, array('usermodified'), 'user', array('id'));
+        $dbman->add_key($table, $key);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014082200, 'facetoface');
+    }
+
     return $result;
 }
 
