@@ -28,8 +28,8 @@ Feature: Students can edit or delete their forum posts within a set time limit
       | Forum type | Standard forum for general use |
       | Description | Test forum description |
     And I log out
-    And I follow "Course 1"
     And I log in as "student1"
+    And I follow "Course 1"
     And I add a new discussion to "Test forum name" forum with:
       | Subject | Forum post subject |
       | Message | This is the body |
