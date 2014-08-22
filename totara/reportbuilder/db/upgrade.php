@@ -413,5 +413,18 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014082200, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014082201) {
+
+        // Changing precision of field cache on table report_builder to (4).
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('cache', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'hidden');
+
+        // Launch change of precision for field cache.
+        $dbman->change_field_precision($table, $field);
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014082201, 'totara', 'reportbuilder');
+    }
+
     return true;
 }
