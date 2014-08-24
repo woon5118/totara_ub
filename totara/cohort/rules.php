@@ -34,7 +34,10 @@ require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 $id = required_param('id', PARAM_INT);
 $debug = optional_param('debug', false, PARAM_BOOL);
 
-$url = new moodle_url('/totara/cohort/rules.php', array('id' => $id, 'debug' => $debug));
+$url = new moodle_url('/totara/cohort/rules.php', array('id' => $id));
+if ($debug) {
+    $url->param('debug', $debug);
+}
 admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
 
 $context = context_system::instance();
@@ -215,19 +218,18 @@ if (!empty($cohortbrokenrules)) {
     totara_display_broken_rules_box();
 }
 
-display_approval_action_box($cohort->id,
+display_approval_action_box($cohort->id, $debug,
     $style=$cohort->status == COHORT_COL_STATUS_DRAFT_CHANGED ? null : 'display:none;');
 
 echo '<div id="reportarea"></div>';
 
 // Print the generated query
 if ($debug) {
-    print '<div style="border: 1px solid black; background-color: #ffc; padding: 10px;">';
-    print '<h3>'.get_string('querydebugheader', 'totara_cohort').'</h3>';
-    print '<pre>';
-    print_r("select count(*) from {user} u where " . totara_cohort_get_dynamic_cohort_whereclause($id)->sql);
-    print '</pre>';
-    print '</div>';
+    $whereclause = totara_cohort_get_dynamic_cohort_whereclause($id);
+    echo $OUTPUT->heading(get_string('querydebugheader', 'totara_cohort'), 3);
+    echo html_writer::tag('pre', "select count(*) from {user} u where " . $whereclause->sql, array('class' => 'notifymessage'));
+    echo $OUTPUT->heading(get_string('querydebugparams', 'totara_cohort'), 3);
+    echo html_writer::tag('pre', s(print_r($whereclause->params, true)), array('class' => 'notifymessage'));
 }
 
 print '<div id="cohort-rules">';
@@ -235,13 +237,16 @@ $mform->display();
 print '</div>';
 echo $OUTPUT->footer();
 
-function display_approval_action_box($cohortid, $style='display:block') {
+function display_approval_action_box($cohortid, $debug=false, $style='display:block') {
     $attrs = array('class' => 'notifynotice clearfix', 'id' => 'cohort_rules_action_box', 'style' => $style);
     echo html_writer::start_tag('div', $attrs);
     $attrs = array('action' => new moodle_url("/totara/cohort/rules.php"), 'method' => 'POST', 'class' => 'approvalform');
     echo html_writer::start_tag('form', $attrs);
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $cohortid));
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+    if ($debug) {
+        echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'debug', 'value' => 1));
+    }
     echo html_writer::start_tag('span');
 
     echo get_string('cohortruleschanged', 'totara_cohort');
