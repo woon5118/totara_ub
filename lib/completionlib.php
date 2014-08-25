@@ -899,13 +899,29 @@ class completion_info {
         if ($countrpl == false) {
             $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
         }
-        $params = array($this->course_id);
 
-        // Limit data to a single user if an ID is supplied
-        if ($user_id) {
-            $sql .= ' AND userid = ?';
-            $params[] = $user_id;
+        // When deleting course completion data(delete_course_completion_data) we are ignoring records marked via RPL.
+        // We need to do the same here. This function is evaluated to determine if the completion information should be locked,
+        // or not.
+        $insql = '';
+        $inparams = array();
+        if (empty($user_id)) {
+            if ($countrpl == false) {
+                // Find all RPL completions for this course.
+                $sqlcomp = "SELECT userid FROM {course_completions}
+                        WHERE course = ? AND status = ?";
+                if ($rpl = $DB->get_fieldset_sql($sqlcomp, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
+                    $insql = ' AND userid ' . $insql;
+                }
+            }
+        } else { // Limit data to a single user if an ID is supplied.
+            $insql = ' AND userid = ?';
+            $inparams = array($user_id);
         }
+
+        $sql .= " {$insql} ";
+        $params = array_merge(array($this->course_id), $inparams);
 
         return $DB->get_field_sql($sql, $params);
     }
