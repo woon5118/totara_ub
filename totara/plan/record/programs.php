@@ -123,7 +123,16 @@ $report->include_js();
 ///
 /// Display the page
 ///
-$PAGE->navbar->add(get_string('mylearning', 'totara_core'), new moodle_url('/my/'));
+$ownplan = $USER->id == $userid;
+$usertype = ($ownplan) ? 'learner' : 'manager';
+if ($usertype == 'manager') {
+    $menuitem = 'myteam';
+    $url = new moodle_url('/my/teammembers.php');
+} else {
+    $menuitem = 'mylearning';
+    $url = new moodle_url('/my/');
+}
+$PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
 
@@ -131,9 +140,6 @@ $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading($strheading);
 
-$ownplan = $USER->id == $userid;
-
-$usertype = ($ownplan) ? 'learner' : 'manager';
 $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
