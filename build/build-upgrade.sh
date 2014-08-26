@@ -43,10 +43,11 @@ step_time "1"
 #sudo -u www-data php build/generate_users.php
 #step_time "2"
 
-echo "STEP 3: Run PHPUnit";
-php admin/tool/phpunit/cli/init.php
-vendor/bin/phpunit --log-junit build/logs/xml/TEST-suite.xml
-step_time "3"
+# No need to run phpunit because it is the same as in build-nightly.sh
+#echo "STEP 3: Run PHPUnit";
+#php admin/tool/phpunit/cli/init.php
+#vendor/bin/phpunit --log-junit build/logs/xml/TEST-suite.xml
+#step_time "3"
 
 # Can't use the cucumber tests, they assume blank db.
 #echo "STEP 4: Run cucumber tests (disabled link checker tests)";
