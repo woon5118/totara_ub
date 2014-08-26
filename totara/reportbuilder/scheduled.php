@@ -44,6 +44,8 @@ $returnurl = $CFG->wwwroot . '/totara/reportbuilder/scheduled.php';
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($id == 0) {
+    // Try to create report object to catch invalid data.
+    $report = new reportbuilder($reportid);
     $schedule = new stdClass();
     $schedule->id = 0;
     $schedule->reportid = $reportid;
@@ -55,6 +57,8 @@ if ($id == 0) {
     if (!$schedule = $DB->get_record('report_builder_schedule', array('id' => $id))) {
         print_error('error:invalidreportscheduleid', 'totara_reportbuilder');
     }
+
+    $report = new reportbuilder($schedule->reportid);
 }
 
 if (!reportbuilder::is_capable($schedule->reportid)) {
@@ -63,8 +67,6 @@ if (!reportbuilder::is_capable($schedule->reportid)) {
 if ($schedule->userid != $USER->id) {
     require_capability('totara/reportbuilder:managereports', context_system::instance());
 }
-
-$report = new reportbuilder($schedule->reportid);
 
 $savedsearches = $report->get_saved_searches($schedule->reportid, $USER->id);
 if (!isset($report->src->redirecturl)) {

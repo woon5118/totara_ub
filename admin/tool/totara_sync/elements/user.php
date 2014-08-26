@@ -44,10 +44,16 @@ class totara_sync_element_user extends totara_sync_element {
     function set_customfieldsdb() {
         global $DB;
 
-        $rs = $DB->get_recordset('user_info_field', array('datatype' => 'menu'), '', 'shortname, param1');
+        $rs = $DB->get_recordset('user_info_field', array(), '', 'id,shortname,datatype,required,locked,forceunique,param1');
         if ($rs->valid()) {
             foreach ($rs as $r) {
-                $this->customfieldsdb['customfield_'.$r->shortname] = array_map('strtolower', explode("\n", $r->param1));
+                $this->customfieldsdb['customfield_'.$r->shortname]['id'] = $r->id;
+                $this->customfieldsdb['customfield_'.$r->shortname]['required'] = $r->required;
+                $this->customfieldsdb['customfield_'.$r->shortname]['forceunique'] = $r->forceunique;
+
+                if ($r->datatype == 'menu') {
+                    $this->customfieldsdb['customfield_'.$r->shortname]['menu_options'] = array_map('strtolower', explode("\n", $r->param1));
+                }
             }
         }
         $rs->close();
@@ -275,21 +281,10 @@ class totara_sync_element_user extends totara_sync_element {
                     unset($userauth);
                 }
 
-                // Unpack custom field data
-                $suser->customfields = json_decode($suser->customfields);
-
                 // Update user assignment data.
                 $this->sync_user_assignments($user->id, $suser);
-
                 // Update custom field data.
-                if ($suser->customfields) {
-                    require_once($CFG->dirroot.'/user/profile/lib.php');
-                    foreach ($suser->customfields as $name => $value) {
-                        $profile = str_replace('customfield_', 'profile_field_', $name);
-                        $user->{$profile} = (isset($this->customfieldsdb[$name])) ? array_search(strtolower($value), $this->customfieldsdb[$name]) : $value;
-                    }
-                    profile_save_data($user);
-                }
+                $user = $this->put_custom_field_data($user, $suser);
 
                 $this->addlog(get_string('updateduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
 
@@ -373,16 +368,8 @@ class totara_sync_element_user extends totara_sync_element {
             }
         }
         unset($userauth);
-
-        // Add custom field data.
-        if ($customfields = json_decode($suser->customfields)) {
-            require_once($CFG->dirroot.'/user/profile/lib.php');
-            foreach ($customfields as $name => $value) {
-                $profile = str_replace('customfield_', 'profile_field_', $name);
-                $user->{$profile} = (isset($this->customfieldsdb[$name])) ? array_search(strtolower($value), $this->customfieldsdb[$name]) : $value;
-            }
-            profile_save_data($user);
-        }
+        // Update custom field data.
+        $user = $this->put_custom_field_data($user, $suser);
 
         $transaction->allow_commit();
 
@@ -395,6 +382,29 @@ class totara_sync_element_user extends totara_sync_element {
         $event->trigger();
 
         return true;
+    }
+
+    /**
+     * Store the custom field data for the given user.
+     *
+     * @param stdClass $suser escaped sync user object
+     */
+    public function put_custom_field_data($user, $suser) {
+        global $CFG;
+
+        $customfields = json_decode($suser->customfields);
+
+        if ($customfields) {
+            require_once($CFG->dirroot.'/user/profile/lib.php');
+            foreach ($customfields as $name => $value) {
+                $profile = str_replace('customfield_', 'profile_field_', $name);
+                // If the custom field is a menu, we need to use the option index rather than the value.
+                $user->{$profile} = (isset($this->customfieldsdb[$name]['menu_options'])) ? array_search(strtolower($value), $this->customfieldsdb[$name]['menu_options']) : $value;
+            }
+            profile_save_data($user);
+        }
+
+        return $user;
     }
 
     /**
@@ -597,7 +607,7 @@ class totara_sync_element_user extends totara_sync_element {
 
         // Get invalid options (in case of menu of choices).
         if ($syncfields->customfields != '[]') {
-            $badids = $this->validate_menu_of_choices($synctable);
+            $badids = $this->validate_custom_fields($synctable);
             $invalidids = array_merge($invalidids, $badids);
         }
 
@@ -762,34 +772,95 @@ class totara_sync_element_user extends totara_sync_element {
      *
      * @return array with invalid ids from synctable for options that do not exist in the database
      */
-    function validate_menu_of_choices($synctable) {
+    public function validate_custom_fields($synctable) {
         global $DB;
 
         $params = empty($this->config->sourceallrecords) ? array('deleted' => 0) : array();
         $invalidids = array();
         $rs = $DB->get_recordset($synctable, $params, '', 'id, idnumber, customfields');
+
+        // Keep track of the fields that need to be tested for having unique values.
+        $unique_fields = array ();
+
         foreach ($rs as $r) {
             $customfields = json_decode($r->customfields, true);
             if (!empty($customfields)) {
                 foreach ($customfields as $name => $value) {
-                    if (!isset($this->customfieldsdb[$name])) {
-                        // Not a menu of choices.
-                        continue;
-                    }
-                    if (trim($value) == '') {
-                        // No value provided, this is okay.
-                        continue;
-                    }
-                    // Check menu value matches one of the available options.
-                    if (!in_array(strtolower($value), $this->customfieldsdb[$name])) {
-                        $this->addlog(get_string('optionxnotexist', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'option' => $value, 'fieldname' => $name)), 'error', 'checksanity');
-                        $invalidids[] = $r->id;
+                    // Check each of the fields that have attributes that may affect
+                    // whether the sync data will be accepted or not.
+                    if ($this->customfieldsdb[$name]['required'] && trim($value) == '') {
+                        $this->addlog(get_string('fieldrequired', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'fieldname' => $name)), 'error', 'checksanity');
+                        $invalidids[] = intval($r->id);
                         break;
+                    } else if (isset($this->customfieldsdb[$name]['menu_options'])) {
+                        // Check menu value matches one of the available options.
+                        if (!in_array(strtolower($value), $this->customfieldsdb[$name]['menu_options'])) {
+                            $this->addlog(get_string('optionxnotexist', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'option' => $value, 'fieldname' => $name)), 'error', 'checksanity');
+                            $invalidids[] = intval($r->id);
+                            break;
+                        }
+                    } else if ($this->customfieldsdb[$name]['forceunique']) {
+
+                        $sql = "SELECT uid.data
+                                  FROM {user} usr
+                                  JOIN {user_info_data} uid ON usr.id = uid.userid
+                                 WHERE usr.idnumber != :idnumber
+                                   AND uid.fieldid = :fieldid
+                                   AND uid.data = :data";
+                        // Check that the sync value does not exist in the user info data.
+                        $params = array ('idnumber' => $r->idnumber, 'fieldid' => $this->customfieldsdb[$name]['id'], 'data' => $value);
+                        $cfdata = $DB->get_records_sql($sql, $params);
+                        // If the value already exists in the database then flag an error. If not, record
+                        // it in unique_fields to later verify that it's not duplicated in the sync data.
+                        if ($cfdata) {
+                            $this->addlog(get_string('fieldduplicated', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'fieldname' => $name, 'value' => $value)), 'error', 'checksanity');
+                            $invalidids[] = intval($r->id);
+                            break;
+                        } else {
+                            $unique_fields[$name][intval($r->id)] = array ( 'idnumber' => $r->idnumber, 'value' => $value);
+                        }
                     }
                 }
             }
         }
         $rs->close();
+
+        // Process any data that must have unique values.
+        foreach ($unique_fields as $fieldname => $fielddata) {
+
+            // We need to get all the field values into
+            // an array so we can extract the duplicate values.
+            $field_values = array ();
+            foreach ($fielddata as $id => $values) {
+                $field_values[$id] = $values['value'];
+            }
+
+            // Build up an array from the field values
+            // where there are duplicates.
+            $error_ids = array ();
+            foreach ($field_values as $id => $value) {
+                // Get a list of elements that match the current value.
+                $matches = array_keys($field_values, $value);
+                // If we've got more than one then we've got duplicates.
+                if (count($matches) >  1) {
+                    $error_ids = array_merge($error_ids, $matches);
+                }
+            }
+
+            // The above process will create multiple occurences
+            // for each problem value so remove the duplicates.
+            $error_ids = array_unique ($error_ids);
+            natsort($error_ids);
+
+            // Loop through the error ids and produce a sync log entry.
+            foreach ($error_ids as $id) {
+                $log_data = (object) array('idnumber' => $fielddata[$id]['idnumber'], 'fieldname' => $fieldname, 'value' => $fielddata[$id]['value']);
+                $this->addlog(get_string('fieldmustbeunique', 'tool_totara_sync', $log_data), 'error', 'checksanity');
+            }
+            $invalidids = array_merge ($invalidids, $error_ids);
+        }
+
+        $invalidids = array_unique($invalidids);
 
         return $invalidids;
     }

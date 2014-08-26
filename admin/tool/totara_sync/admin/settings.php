@@ -38,7 +38,7 @@ if ($data = $form->get_data()) {
         set_config('fileaccess', $data->fileaccess, 'totara_sync');
     }
     if (isset($data->filesdir)) {
-        set_config('filesdir', $data->filesdir, 'totara_sync');
+        set_config('filesdir', trim($data->filesdir), 'totara_sync');
     }
 
     // Notifications.

@@ -47,7 +47,8 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $out .= $this->output->heading(get_string('evidenceitems', 'totara_hierarchy'));
 
         $table = new html_table();
-        $table->attributes = array('id' => 'list-evidence', 'class' => 'generaltable boxaligncenter');
+        $table->id = 'list-evidence';
+        $table->attributes = array('class' => 'generaltable boxaligncenter');
         // Set up table header.
         $table->head = array();
         $table->head[] = get_string('name');

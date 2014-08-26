@@ -719,6 +719,18 @@ td.submit input[disabled] {
     color: #333333;
     background-color: inherit;
 }
+input#id_submitbutton2:active,
+input#id_submitbutton2:focus,
+input#id_submitbutton2:hover {
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#006498),to(#003298));
+    background-image: -webkit-linear-gradient(top,#006498,#003298);
+    background-image: -o-linear-gradient(top,#006498,#003298);
+    background-image: linear-gradient(to bottom,#006498,#003298);
+    background-position: 0;
+    color: #ffffff;
+    background-color: #005aa8;
+}
+
 input[type="checkbox"] {
     margin: 0 5px 0 0;
 }

@@ -166,12 +166,15 @@ $PAGE->navbar->add($appraisal->name);
 
 local_js();
 
+$PAGE->requires->string_for_js('cancel', 'moodle');
 $PAGE->requires->string_for_js('ok', 'moodle');
 $PAGE->requires->string_for_js('yes', 'moodle');
 $PAGE->requires->string_for_js('no', 'moodle');
+$PAGE->requires->string_for_js('savechanges', 'moodle');
 $PAGE->requires->string_for_js('confirmdeleteitem', 'totara_appraisal');
 $PAGE->requires->string_for_js('confirmdeleteitemwithredisplay', 'totara_appraisal');
 $PAGE->requires->string_for_js('error:cannotdelete', 'totara_appraisal');
+$PAGE->requires->string_for_js('addpage', 'totara_appraisal');
 $jsmodule = array(
     'name' => 'totara_appraisal_stage',
     'fullpath' => '/totara/appraisal/js/stage.js',

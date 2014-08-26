@@ -181,15 +181,13 @@ class program {
         // or the users won't be properly unassigned
         $result = $result && $DB->delete_records('dp_plan_program_assign', array('programid' => $this->id));
 
-        // Get all users who are automatically assigned, as we want to unassign them all
-        // $users_to_unassign = get_records_select('role_assignments', 'roleid = '. $this->studentroleid .' AND contextid = '. $this->context->id, '', 'userid as id');
-        $users_to_unassign = $DB->get_records('prog_user_assignment', array('programid' => $this->id), '', 'userid as id');
+        // Get all users who are automatically assigned, as we want to unassign them all.
+        $users_to_unassign = $DB->get_fieldset_sql("SELECT DISTINCT userid FROM {prog_user_assignment} WHERE programid = ?", array($this->id));
 
         $transaction = $DB->start_delegated_transaction();
 
-        // unassign the users
-        if ($users_to_unassign != false) {
-            $users_to_unassign = array_keys($users_to_unassign);
+        // Unassign the users.
+        if (!empty($users_to_unassign)) {
             $this->unassign_learners($users_to_unassign);
         }
 

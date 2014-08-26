@@ -365,5 +365,23 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014030600, 'totara', 'plan');
     }
 
+    if ($oldversion < 2014082200) {
+        // Make sure there are no nulls before preventing nulls.
+        $DB->set_field_select('dp_plan_evidence', 'name', '', "name IS NULL");
+
+        // Fix nulls before setting to nul null.
+        $DB->execute("UPDATE {dp_plan_evidence} SET name = '' WHERE name IS NULL");
+
+        // Changing nullability of field name on table dp_plan_evidence to not null.
+        $table = new xmldb_table('dp_plan_evidence');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Launch change of nullability for field name.
+        $dbman->change_field_notnull($table, $field);
+
+        // Plan savepoint reached.
+        upgrade_plugin_savepoint(true, 2014082200, 'totara', 'plan');
+    }
+
     return true;
 }

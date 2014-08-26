@@ -3820,7 +3820,8 @@ function facetoface_get_requests($sessionid) {
  * @return  array|false
  */
 function facetoface_get_declines($sessionid) {
-    $select = "u.id, su.id AS signupid, u.firstname, u.lastname, u.email,
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
         ss.statuscode, ss.timecreated AS timerequested";
 
     return facetoface_get_users_by_status($sessionid, MDL_F2F_STATUS_DECLINED, $select);

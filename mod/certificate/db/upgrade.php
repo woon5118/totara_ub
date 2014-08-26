@@ -518,5 +518,29 @@ function xmldb_certificate_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2013021201, 'certificate');
     }
 
+    if ($oldversion < 2013021203) {
+        // Fix previous upgrades.
+
+        $table = new xmldb_table('certificate');
+
+        $field = new xmldb_field('borderstyle', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, 0, '0');
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('printwmark', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, 0, '0');
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('printhours', XMLDB_TYPE_CHAR, '255', null, false, 0, null);
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('printsignature', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, 0, '0');
+        $dbman->change_field_default($table, $field);
+
+        $field = new xmldb_field('printseal', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, 0, '0');
+        $dbman->change_field_default($table, $field);
+
+        // Certificate savepoint reached.
+        upgrade_mod_savepoint(true, 2013021203, 'certificate');
+    }
+
     return true;
 }

@@ -4782,7 +4782,8 @@ function sql_table_from_select($table, $select, array $params = array()) {
                 if ($field->field_type == 'image' || $field->field_type == 'binary') { // image
                     continue;
                 }
-                if ($field->field_type == 'text' || $field->field_type == 'ntext') {
+                if ($field->field_type == 'text' || $field->field_type == 'ntext'
+                        || ($field->field_type == 'nvarchar' && ($field->max_length == -1 || $field->max_length > 450))) {
                     $altersql = "ALTER TABLE {$table} ALTER COLUMN {$field->name} NVARCHAR(450)"; //Maximum index size = 900 bytes or 450 unicode chars
                     try {
                         // Attempt to convert field to indexable

@@ -244,7 +244,9 @@ class rb_filter_date extends rb_filter_type {
         $query  = $this->get_field();
 
         $params = array();
-        $res = "$query > 0" ;
+        $uniqueparam = rb_unique_param('fdnotnull');
+        $res = "{$query} != :{$uniqueparam}";
+        $params[$uniqueparam] = 0;
         $resdaysbefore = "$query <= $datetoday";
         $resdaysafter = "$query >= $datetoday";
 

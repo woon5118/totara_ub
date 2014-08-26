@@ -978,7 +978,7 @@ class appraisal {
                     ON asp.appraisalstageid = ast.id
                   LEFT JOIN {appraisal_quest_field} aqf
                     ON aqf.appraisalstagepageid = asp.id
-                  LEFT JOIN {appraisal_quest_field_role} aqfr
+                 INNER JOIN {appraisal_quest_field_role} aqfr
                     ON aqfr.appraisalquestfieldid = aqf.id AND aqfr.rights > 0
                  WHERE ast.appraisalid = ? {$sqlrights}
                  ORDER BY aqfr.appraisalrole";

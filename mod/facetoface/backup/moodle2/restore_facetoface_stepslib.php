@@ -86,30 +86,31 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->usermodified = isset($USER->id) ? $USER->id : get_admin()->id;
-
-        $rooms = $DB->get_records('facetoface_room', array('name' => $data->room_name,
-            'building' => $data->room_building, 'address' => $data->room_address, 'custom' => 0), '', 'id');
-        $rooms_found = count($rooms);
-        if (!$rooms_found || $data->room_custom) {
-            if (!$data->room_custom) {
-                debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] ".
-                    "in face to face session does not exist - creating as custom room");
+        // Check if the session has any predefined or custom room.
+        if ((int)$data->roomid > 0) {
+            // If it is a custom room, create a new record.
+            if ((int)$data->room_custom == 1) {
+                $data->roomid = $this->create_facetoface_room($data);
+            } else {
+                // Check if a predefined room exists.
+                $rooms = $DB->get_records('facetoface_room', array('name' => $data->room_name,
+                    'building' => $data->room_building, 'address' => $data->room_address, 'custom' => 0), '', 'id');
+                if (count($rooms) > 0) {
+                    if (count($rooms) > 1) {
+                        debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] matches more ".
+                            "than one predefined room and we can't identify which - arbitrarily selecting one of them");
+                    }
+                    $data->roomid = reset($rooms)->id;
+                } else {
+                    // Create a new predefined room record.
+                    debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] ".
+                        "in face to face session does not exist - creating as predefined room");
+                    $data->roomid = $this->create_facetoface_room($data);
+                }
             }
-            $customroom = new stdClass();
-            $customroom->name = $data->room_name;
-            $customroom->building = $data->room_building;
-            $customroom->address = $data->room_address;
-            $customroom->capacity = $data->capacity;
-            $customroom->custom = 1;
-            $customroom->timecreated = $data->timecreated;
-            $customroom->timemodified = $data->timemodified;
-            $data->roomid = $DB->insert_record('facetoface_room', $customroom);
         } else {
-            if ($rooms_found > 1) {
-                debugging("Room [{$data->room_name}, {$data->room_building}, {$data->room_address}] matches more ".
-                    "than one predefined room and we can't identify which - arbitrarily selecting one of them");
-            }
-            $data->roomid = reset($rooms)->id;
+            // F2F session has no room.
+            $data->roomid = 0;
         }
 
         // insert the entry record
@@ -117,6 +118,19 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $this->set_mapping('facetoface_session', $oldid, $newitemid, true); // childs and files by itemname
     }
 
+    private function create_facetoface_room($data) {
+        global $DB;
+        $customroom = new stdClass();
+        $customroom->name = $data->room_name;
+        $customroom->building = $data->room_building;
+        $customroom->address = $data->room_address;
+        $customroom->capacity = $data->capacity;
+        $customroom->custom = (int)$data->room_custom;
+        $customroom->timecreated = $data->timecreated;
+        $customroom->timemodified = $data->timemodified;
+        $roomid = $DB->insert_record('facetoface_room', $customroom);
+        return $roomid;
+    }
 
     protected function process_facetoface_signup($data) {
         global $DB;
