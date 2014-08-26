@@ -814,6 +814,10 @@ input[type="checkbox"] {
   background: none;
   border: none;
 }
+.mform .fdate_selector img.smallicon,
+.mform .fdate_time_selector img.smallicon {
+    vertical-align: middle;
+}
 
 @media screen and (max-width: 979px) {
     .mform .fitem div.fitemtitle,

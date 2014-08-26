@@ -192,14 +192,6 @@ else {
         redirect("{$CFG->wwwroot}/user/positions.php?user={$user->id}&amp;course={$course->id}&amp;&type=$type");
     }
     elseif ($data = $form->get_data()) {
-        // Fix dates
-        if (isset($data->timevalidfrom) && $data->timevalidfrom) {
-            $data->timevalidfrom = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->timevalidfrom);
-        }
-
-        if (isset($data->timevalidto) && $data->timevalidto) {
-            $data->timevalidto = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->timevalidto);
-        }
 
         if (isset($data->positionid) && $data->positionid == 0) {
             $data->positionid = null;
@@ -270,8 +262,7 @@ else {
                 $a->username = $validtempmgr->username;
                 totara_set_notification(get_string('error:tempmanagerdeleted','totara_hierarchy', $a), null, array('class' => 'notifynotice'));
             } else {
-                totara_update_temporary_manager($user->id, $data->tempmanagerid,
-                    totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->tempmanagerexpiry));
+                totara_update_temporary_manager($user->id, $data->tempmanagerid, $data->tempmanagerexpiry);
             }
         } else if (!empty($CFG->enabletempmanagers)) {
             // Unassign the current temporary manager.

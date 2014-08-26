@@ -307,7 +307,7 @@ $string['tempmanagerassignmsgstaff'] = '{$a->tempmanager} has been assigned as t
 $string['tempmanagerassignmsgstaffsubject'] = '{$a->tempmanager} is now your temporary manager';
 $string['tempmanagerassignmsgtmpmgr'] = 'You have been assigned as temporary manager to {$a->staffmember}.<br>Temporary manager expiry: {$a->expirytime}.<br>View details <a href="{$a->url}">here</a>.';
 $string['tempmanagerassignmsgtmpmgrsubject'] = 'You are now {$a->staffmember}\'s temporary manager';
-$string['tempmanagerexpiry'] = 'Temporary manager expiry date (dd/mm/yyyy)';
+$string['tempmanagerexpiry'] = 'Temporary manager expiry date';
 $string['tempmanagerexpiry_help'] = 'Click the calendar icon to select the date the temporary manager will expire.';
 $string['tempmanagerexpirydays'] = 'Temporary manager expiry days';
 $string['tempmanagerexpirydaysdesc'] = 'Set a default temporary manager expiry period (in days).';
