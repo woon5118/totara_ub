@@ -1128,5 +1128,11 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014081200, 'totara_core');
     }
 
+    if ($oldversion < 2014082600) {
+        require_once(dirname(__FILE__) . '/upgradelib.php');
+        totara_core_fix_old_upgraded_mssql();
+        upgrade_plugin_savepoint(true, 2014082600, 'totara', 'core');
+    }
+
     return true;
 }
