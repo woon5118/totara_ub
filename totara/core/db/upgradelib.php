@@ -41,10 +41,19 @@ function totara_core_fix_old_upgraded_mssql() {
 
     // All these text columns should be NOT NULL.
     $candidates = array(
+        'appraisal_event_message' => array('content'),
+        'assign' => array('intro'),
+        'badge' => array('message', 'messagesubject'),
+        'badge_issued' => array('message', 'uniquehash'),
+        'facetoface_notification' => array('body'),
+        'facetoface_notification_tpl' => array('body'),
+        'feedback_value_history' => array('value'),
+        'goal_scale_values' => array('name'),
+        'qtype_randomsamatch_options' => array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'),
         'config' => array('value'),
         'config_plugins' => array('value'),
         'course_request' => array('summary', 'reason'),
-        'event' => array('description'),
+        'event' => array('description', 'name'),
         'cache_filters' => array('rawtext'),
         'cache_text' => array('formattedtext'),
         'log_queries' => array('sqltext'),
