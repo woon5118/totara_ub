@@ -210,11 +210,22 @@ class profile_field_base {
     }
 
     /**
-     * Loads a user object with data for this field ready for the edit profile
-     * form
-     * @param   object   a user object
+     * Loads a user object with data for this field ready for the edit profile form.
+     *
+     * @param object a user object
      */
     function edit_load_user_data($user) {
+        if ($this->data !== NULL) {
+            $user->{$this->inputname} = $this->data;
+        }
+    }
+
+    /**
+     * Loads a user object with data for this field ready for the export, such as a spreadsheet.
+     *
+     * @param object a user object
+     */
+    function export_load_user_data($user) {
         if ($this->data !== NULL) {
             $user->{$this->inputname} = $this->data;
         }
@@ -347,7 +358,7 @@ class profile_field_base {
 
 /***** General purpose functions for customisable user profiles *****/
 
-function profile_load_data($user) {
+function profile_load_data($user, $export = false) {
     global $CFG, $DB;
 
     if ($fields = $DB->get_records('user_info_field')) {
@@ -355,7 +366,11 @@ function profile_load_data($user) {
             require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
             $newfield = 'profile_field_'.$field->datatype;
             $formfield = new $newfield($field->id, $user->id);
-            $formfield->edit_load_user_data($user);
+            if ($export) {
+                $formfield->export_load_user_data($user);
+            } else {
+                $formfield->edit_load_user_data($user);
+            }
         }
     }
 }

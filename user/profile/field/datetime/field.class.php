@@ -125,4 +125,25 @@ class profile_field_datetime extends profile_field_base {
 
         parent::edit_save_data($usernew);
     }
+
+    /**
+     * Loads a user object with data for this field ready for the export, such as a spreadsheet.
+     *
+     * @param   object   a user object
+     */
+    function export_load_user_data($user) {
+        // Check if time was specified.
+        if (!empty($this->field->param3)) {
+            $format = get_string('strftimedaydatetime', 'langconfig');
+        } else {
+            $format = get_string('strftimedate', 'langconfig');
+        }
+
+        // Check if a date has been specified.
+        if (empty($this->data)) {
+            $user->{$this->inputname} = get_string('notset', 'profilefield_datetime');
+        } else {
+            $user->{$this->inputname} = userdate($this->data, $format);
+        }
+    }
 }
