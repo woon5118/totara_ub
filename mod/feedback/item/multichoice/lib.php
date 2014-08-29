@@ -232,7 +232,7 @@ class feedback_item_multichoice extends feedback_item_base {
         if ($analysed_item) {
             $itemname = $analysed_item[1];
             echo '<tr><th align="' . $align . '" colspan="2">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$itemname;
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($itemname);
             echo '</th></tr>';
 
             $analysed_vals = $analysed_item[2];
@@ -269,7 +269,7 @@ class feedback_item_multichoice extends feedback_item_base {
         $data = $analysed_item[2];
 
         //frage schreiben
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
         $worksheet->write_string($row_offset, 1, $analysed_item[1], $xls_formats->head2);
         if (is_array($data)) {
             $sizeofdata = count($data);
@@ -321,12 +321,12 @@ class feedback_item_multichoice extends feedback_item_base {
         if ($info->subtype == 'd') {
             echo '<label for="'. $item->typ . '_' . $item->id .'">';
         }
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -537,7 +537,7 @@ class feedback_item_multichoice extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 

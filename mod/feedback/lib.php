@@ -1503,7 +1503,7 @@ function feedback_create_item($data) {
     $item->name = ($itemname ? $data->itemname : get_string('no_itemname', 'feedback'));
 
     if (!empty($data->itemlabel)) {
-        $item->label = trim($data->itemlabel);
+        $item->label = trim(format_string($data->itemlabel));
     } else {
         $item->label = get_string('no_itemlabel', 'feedback');
     }
