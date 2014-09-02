@@ -3,6 +3,38 @@
 
 Totara LMS Changelog
 
+Release 2.6.8 (26th August 2014):
+==================================================
+
+Improvements:
+    T-12943        Improved debugging on Audience rules tab
+
+Database Upgrades:
+    T-12581        Fixed database differences when upgrading from Totara 2.2 to 2.6
+
+Bug Fixes:
+    T-12910        Fixed required parameter checks on the edit scheduled reports page
+    T-12950        Fixed Report builder caching so it doesn't break on MSSQL
+    T-12917        Fixed wording of breadcrumbs when viewing learner details as a manager
+    T-12767        Fixed backup and restore of Facetoface sessions without rooms
+    T-12912        Fixed display of linked courses after adding a course to a competency
+    T-12635        Fixed installation recovery if installation of Totara MSSQL module fails
+    T-12776        Fixed incorrect error message being shown in Totara sync when an invalid source is selected
+    T-12880        Fixed database error when deleting Programs
+    T-12163        Fixed hover state on some form buttons in responsive themes
+    T-12725        Fixed filtering by dates before January 1970 in Reportbuilder
+    T-12511        Fixed get_roles_involved sql query when previewing an appraisal
+    T-12895        Fixed missing username fields when viewing pending face-to-face session approvals
+    T-12890        Fixed Totara Sync to allow spaces in directory paths
+    T-12202        Fixed incorrect modal behaviour in dialogs when help icons are selected
+    T-12938        Fixed Reportbuilder upgrade error when using MySQL
+    T-12391        Fixed focus order of controls in the Calendar
+    T-12904        Fixed Totara Sync to allow @ in directory paths
+
+API Changes:
+    T-12713        Enforce unique property if set when importing user custom profile fields with Sync
+
+
 Release 2.6.7 (12th August 2014):
 ==================================================
 
