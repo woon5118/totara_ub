@@ -3252,8 +3252,7 @@ abstract class rb_base_source {
 
                 case 'checkbox':
                     $default = $record->defaultdata;
-                    $columnsql = $DB->sql_cast_char2int($columnsql, true);
-                    $columnsql = "CASE WHEN {$columnsql} IS NULL THEN {$default} ELSE {$columnsql} END";
+                    $columnsql = "CASE WHEN ( {$columnsql} IS NULL OR {$columnsql} = '' ) THEN {$default} ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
                     $filtertype = 'select';
                     $filter_options['selectchoices'] = array(0 => get_string('no'), 1 => get_string('yes'));
                     $filter_options['simplemode'] = true;
@@ -3262,7 +3261,7 @@ abstract class rb_base_source {
 
                 case 'datetime':
                     $filtertype = 'date';
-                    $columnsql = $DB->sql_cast_char2int($columnsql, true);
+                    $columnsql = "CASE WHEN {$columnsql} = '' THEN NULL ELSE " . $DB->sql_cast_char2int($columnsql, true) . " END";
                     if ($record->param3) {
                         $column_options['displayfunc'] = 'nice_datetime';
                         $filter_options['includetime'] = true;
