@@ -88,14 +88,14 @@ if ($action == 'edit') {
             'requires' => array('json'));
     $PAGE->requires->js_init_call('M.totara_programedit.init',$args, false, $jsmodule);
 
-    // attach a date picker to the available until/from fields
+    // Attach a date picker to the available until/from fields.
     build_datepicker_js(
         'input[name="availablefromselector"], input[name="availableuntilselector"]'
     );
 
     // Visible audiences.
     if (!empty($CFG->audiencevisibility)) {
-        if(empty($program->id)) {
+        if (empty($program->id)) {
             $visibleselected = '';
         } else {
             $visibleselected = totara_cohort_get_visible_learning($program->id, COHORT_ASSN_ITEMTYPE_PROGRAM);
@@ -169,21 +169,31 @@ if ($data = $detailsform->get_data()) {
     if (isset($data->edit)) {
         redirect($editurl);
     } else if (isset($data->savechanges)) {
-
-        // Preprocess to convert string dates e.g. '23/11/2012' to a unix timestamp
-        $data->availablefrom = ($data->availablefromselector) ? totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->availablefromselector) : 0;
-        $data->availableuntil = ($data->availableuntilselector) ? totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->availableuntilselector) : 0;
-
         $data->timemodified = time();
         $data->usermodified = $USER->id;
 
-        // Program has moved categories
+        // Preprocess to convert string dates e.g. '23/11/2012' to a unix timestamp.
+        $dateformat = get_string('datepickerlongyearparseformat', 'totara_core');
+        $data->availablefrom = ($data->availablefromselector) ?
+            totara_date_parse_from_format($dateformat, $data->availablefromselector) : 0;
+        $data->availableuntil = ($data->availableuntilselector) ?
+            totara_date_parse_from_format($dateformat, $data->availableuntilselector) + (DAYSECS - 1) : 0;
+
+        $data->available = prog_check_availability($data->availablefrom, $data->availableuntil);
+
+        // Program has moved categories.
         if ($data->category != $program->category) {
             prog_move_programs(array($program->id), $data->category);
         }
 
-        // Save program data
+        // Save program data.
         $DB->update_record('prog', $data);
+
+        // Program availability has changed to unavailable, we need to update the enrolments as well.
+        if ($program->available == AVAILABILITY_TO_STUDENTS && $data->available == AVAILABILITY_NOT_TO_STUDENTS) {
+            $program_plugin = enrol_get_plugin('totara_program');
+            prog_update_available_enrolments($program_plugin, $program->id);
+        }
 
         $data->id = $program->id;
         customfield_save_data($data, 'program', 'prog');
@@ -239,16 +249,14 @@ if ($data = $detailsform->get_data()) {
         totara_set_notification(get_string('programdetailssaved', 'totara_program'), $nexturl, array('class' => 'notifysuccess'));
     }
 
-    // Reload program to reflect any changes
+    // Reload program to reflect any changes.
     $program = new program($id);
 }
 
-// log this request
+// Log this request.
 add_to_log(SITEID, 'program', 'view', "edit.php?id={$program->id}&amp;iscertif={$iscertif}", $program->fullname);
 
-///
-/// Display
-///
+// Display.
 
 $programpagelinks = '';
 $pageid = 'program-overview';
@@ -272,39 +280,39 @@ echo $program->display_current_status();
 $exceptions = $program->get_exception_count();
 require('tabs.php');
 
-// Program details
+// Program details.
 $program->availablefromselector = $program->availablefrom > 0 ? userdate($program->availablefrom, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false) : '';
 $program->availableuntilselector = $program->availableuntil > 0 ? userdate($program->availableuntil, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false) : '';
 
 $detailsform->set_data($program);
 $detailsform->display();
 
-// display content, assignments and messages if in view mode
+// Display content, assignments and messages if in view mode.
 if ($action == 'view') {
 
-    // display the content form
+    // Display the content form.
     $contentform = new program_content_nonedit_form($editcontenturl, array('program' => $program), 'get');
     $contentform->set_data($program);
     $contentform->display();
 
-    // display the assignments form
+    // Display the assignments form.
     $assignmentform = new program_assignments_nonedit_form($editassignmentsurl, array('program' => $program), 'get');
     $assignmentform->set_data($program);
     $assignmentform->display();
 
-    // display the messages form
+    // Display the messages form.
     $messagesform = new program_messages_nonedit_form($editmessagesurl, array('program' => $program), 'get');
     $messagesform->set_data($program);
     $messagesform->display();
 
     if ($iscertif) {
-        // display the certifications form
+        // Display the certifications form.
         $certificationsform = new program_certifications_nonedit_form($editcertificationsurl, array('program' => $program), 'get');
         $certificationsform->set_data($program);
         $certificationsform->display();
     }
 
-    // display the delete button form
+    // Display the delete button form.
     if (has_capability('totara/program:deleteprogram', $program->get_context())) {
         $deleteform = new program_delete_form($currenturl, array('program' => $program));
         $deleteform->set_data($program);

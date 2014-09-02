@@ -147,19 +147,6 @@ class program_edit_form extends moodleform {
             $mform->addHelpButton('idnumber', 'programidnumber', 'totara_program');
         }
 
-        $availabilityoptions = array(
-            AVAILABILITY_TO_STUDENTS => get_string('availabletostudents', 'totara_program'),
-            AVAILABILITY_NOT_TO_STUDENTS => get_string('availabletostudentsnot', 'totara_program'),
-        );
-        $mform->addElement('select', 'available', get_string('availability', 'totara_program'), $availabilityoptions);
-        if ($action == 'view') {
-            $mform->hardFreeze('available');
-        } else {
-            $mform->addHelpButton('available', 'programavailability', 'totara_program');
-            $mform->setDefault('available', AVAILABILITY_TO_STUDENTS);
-            $mform->setType('available', PARAM_INT);
-        }
-
         $mform->addElement('text', 'availablefromselector', get_string('availablefrom', 'totara_program'), array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
         $mform->setType('availablefromselector', PARAM_TEXT);
         if ($action == 'view') {

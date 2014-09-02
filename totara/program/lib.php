@@ -858,10 +858,12 @@ function prog_can_enter_course($user, $course) {
 
     // Get programs containing this course that this user is assigned to, either via learning plans or required learning
     $get_programs = "
-        SELECT p.id
+        SELECT p.id, p.fullname, p.available
           FROM {prog} p
-         WHERE p.id IN
-             (
+          WHERE p.available = ?
+          AND (
+              p.id IN
+              (
                 SELECT DISTINCT pc.programid
                   FROM {dp_plan_program_assign} pc
             INNER JOIN {dp_plan} pln ON pln.id = pc.planid
@@ -883,9 +885,9 @@ function prog_can_enter_course($user, $course) {
                    AND pc.coursesetid = ?
                    AND (pc.timedue = ?
                         OR pc.status <> ? )
-             )
+             ))
     ";
-    $params = array($course->id, DP_APPROVAL_APPROVED, $user->id, DP_PLAN_STATUS_APPROVED, $course->id, $user->id, 0, COMPLETION_TIME_NOT_SET, STATUS_PROGRAM_COMPLETE);
+    $params = array(AVAILABILITY_TO_STUDENTS, $course->id, DP_APPROVAL_APPROVED, $user->id, DP_PLAN_STATUS_APPROVED, $course->id, $user->id, 0, COMPLETION_TIME_NOT_SET, STATUS_PROGRAM_COMPLETE);
     $program_records = $DB->get_records_sql($get_programs, $params);
 
     if (!empty($program_records)) {
@@ -1869,6 +1871,85 @@ function prog_get_all_users_programs($userid, $fields = NULL, $sort = 'visible D
 
     $programs = $DB->get_records_sql($sql, $params);
     return $programs;
+}
+
+/**
+ * updates the course enrolments for a program enrolment plugin, unenrolling students if the program is unavailable.
+ *
+ * @param enrol_totara_program_plugin $program_plugin
+ * @param int $programid
+ * @param boolean debugging
+ */
+function prog_update_available_enrolments(enrol_totara_program_plugin $program_plugin, $programid, $debugging = false) {
+    global $DB;
+
+    // Get all the courses in all the coursesets of the program.
+    $coursesql = "SELECT c.*
+                    FROM {course} c
+                   WHERE c.id IN (SELECT DISTINCT(pcc.courseid)
+                                    FROM {prog_courseset_course} pcc
+                                    JOIN {prog_courseset} pc
+                                      ON pcc.coursesetid = pc.id
+                                   WHERE pc.programid = :pid
+                                 )";
+    $courseparams = array('pid' => $programid);
+    $courses = $DB->get_records_sql($coursesql, $courseparams);
+
+    foreach ($courses as $course) {
+        if (CLI_SCRIPT && $debugging) {
+            mtrace("Checking enrolments for Course-{$course->id}...");
+        }
+
+        // Get all the users enrolled in the course through the program enrolment plugin.
+        $enrolsql = "SELECT ue.*
+                      FROM {user_enrolments} ue
+                      JOIN {enrol} e
+                        ON ue.enrolid = e.id
+                     WHERE e.courseid = :cid
+                       AND e.enrol = 'totara_program'";
+        $enrolparams = array('cid' => $course->id);
+        $enrolments = $DB->get_records_sql($enrolsql, $enrolparams);
+        $instance = $program_plugin->get_instance_for_course($course->id);
+
+        foreach ($enrolments as $enrolment) {
+            // Check to see if they user should still be able to access the course.
+            if (CLI_SCRIPT && $debugging) {
+                mtrace("Checking enrolment-{$enrolment->id}");
+            }
+
+            $user = $DB->get_record('user', array('id' => $enrolment->userid));
+            $access = prog_can_enter_course($user, $course);
+            if (!$access->enroled) {
+                // If they can't, then remove the enrolment.
+                if (CLI_SCRIPT && $debugging) {
+                    mtrace("unenrolling user-{$enrolment->userid}");
+                }
+                $program_plugin->unenrol_user($instance, $enrolment->userid);
+            } else if (CLI_SCRIPT && $debugging) {
+                mtrace("user-{$enrolment->userid} can still access the course");
+            }
+        }
+    }
+}
+
+/**
+ * Checks the programs availability based off the available from/untill dates.
+ *
+ * @param int $availablefrom    - A time stamp of the time a program becomes available
+ * @param int $availableuntil   - A time stamp of the time a program becomes unavailable
+ * @return int                  - Either AVAILABILITY_NOT_TO_STUDENTS or AVAILABILITY_TO_STUDENTS
+ */
+function prog_check_availability($availablefrom, $availableuntil) {
+    $now = time();
+
+    if (!empty($availablefrom) && $availablefrom > $now) {
+        return AVAILABILITY_NOT_TO_STUDENTS;
+    }
+    if (!empty($availableuntil) && $availableuntil < $now) {
+        return AVAILABILITY_NOT_TO_STUDENTS;
+    }
+
+    return AVAILABILITY_TO_STUDENTS;
 }
 
 /**

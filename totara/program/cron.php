@@ -81,6 +81,8 @@ function program_hourly_cron() {
 
     program_cron_first_login_assignments();
 
+    program_cron_availability_checks();
+
     return true;
 }
 
@@ -1017,5 +1019,64 @@ function program_cron_first_login_assignments() {
     $pending_users = $DB->get_records_sql($pending_user_sql);
     foreach ($pending_users as $pending_user) {
         prog_assignments_firstlogin($pending_user);
+    }
+}
+
+/**
+ * Checks whether programs are available or not
+ * if they are switched to unavailable checks course enrolments
+ */
+function program_cron_availability_checks() {
+    global $PAGE, $DB;
+
+    if (CLI_SCRIPT) {
+        mtrace('Checking programs availability');
+    }
+
+    $now = time();
+    $debugging = debugging();
+    $unavailable = $DB->get_records('prog', array('available' => AVAILABILITY_NOT_TO_STUDENTS));
+    $available = $DB->get_records('prog', array('available' => AVAILABILITY_TO_STUDENTS));
+    $program_plugin = enrol_get_plugin('totara_program');
+
+    // Check unavailable programs haven't become available.
+    foreach ($unavailable as $program) {
+        if (CLI_SCRIPT && $debugging) {
+            mtrace("Checking if Program-{$program->id} is still unavailable...");
+        }
+
+        if ((!empty($program->availablefrom) && $program->availablefrom <= $now) &&
+            (!empty($program->availableuntil) && $program->availableuntil >= $now)) {
+
+            if (CLI_SCRIPT && $debugging) {
+                mtrace("Marking Program-{$program->id} as available.");
+            }
+
+            // Mark program as available.
+            $program->available = AVAILABILITY_TO_STUDENTS;
+            $DB->update_record('prog', $program);
+        }
+    }
+
+    // Check available programs haven't become unavailable.
+    foreach ($available as $program) {
+        if (CLI_SCRIPT && $debugging) {
+            mtrace("Checking if Program-{$program->id} is still available...");
+        }
+
+        if ((!empty($program->availablefrom) && $program->availablefrom >= $now) ||
+            (!empty($program->availableuntil) && $program->availableuntil <= $now)) {
+
+                if (CLI_SCRIPT && $debugging) {
+                    mtrace("Marking Program-{$program->id} as unavailable...");
+                }
+
+                // Mark program as unavailable.
+                $program->available = AVAILABILITY_NOT_TO_STUDENTS;
+                $DB->update_record('prog', $program);
+
+                // Update course enrolments for the program.
+                prog_update_available_enrolments($program_plugin, $program->id, $debugging);
+        }
     }
 }
