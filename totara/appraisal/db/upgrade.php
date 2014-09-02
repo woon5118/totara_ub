@@ -179,7 +179,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
 
     if ($oldversion < 2014081101) {
         $table = new xmldb_table('appraisal_user_assignment');
-        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
         if (!$dbman->field_exists($table, $field)) {
             $transaction = $DB->start_delegated_transaction();
@@ -214,9 +214,9 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         // Adding fields to table appraisal_role_changes.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('userassignmentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('originaluserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('originaluserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('newuserid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('role', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('role', XMLDB_TYPE_INTEGER, '3', null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
 
         // Adding keys to table appraisal_role_changes.
@@ -233,7 +233,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
     if ($oldversion < 2014081103) {
         // Adding a timecreated field to appraisals role assignments.
         $table = new xmldb_table('appraisal_role_assignment');
-        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, 0);
 
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
