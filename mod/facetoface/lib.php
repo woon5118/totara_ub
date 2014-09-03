@@ -1929,6 +1929,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         $usersignup->userid = $userid;
     }
 
+    $usersignup->bookedby = $userid == $USER->id ? 0 : $USER->id;
     $usersignup->mailedreminder = 0;
     $usersignup->notificationtype = $notificationtype;
 
