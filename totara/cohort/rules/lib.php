@@ -426,11 +426,13 @@ function cohort_rules_clone_collection($collid, $status=null, $usetrans=true, $c
                 $newruleparam = new stdClass();
                 $newruleparam->ruleid =      $newrule->id;
                 $newruleparam->name =        $ruleparam->name;
-                $newruleparam->value =       $ruleparam->value;
+                $newruleparam->value =       trim($ruleparam->value);
                 $newruleparam->timecreated = $newruleparam->timemodified = time();
                 $newruleparam->modifierid =  $USER->id;
 
-                $newruleparam->id = $DB->insert_record('cohort_rule_params', $newruleparam);
+                if (!($newruleparam->value == '')) {
+                    $newruleparam->id = $DB->insert_record('cohort_rule_params', $newruleparam);
+                }
 
             }
             unset($ruleparams);
