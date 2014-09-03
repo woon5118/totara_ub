@@ -170,5 +170,21 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062000, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2014090100) {
+        $transaction = $DB->start_delegated_transaction();
+        $records = $DB->get_recordset_select('appraisal_stage', ' timedue > ?', array(0), ' id ASC', 'id, timedue');
+        foreach ($records as $record) {
+            $timestring = date('H:i:s', $record->timedue);
+            if ($timestring !== '23:59:59') {
+                $datestring = date('Y-m-d', $record->timedue);
+                $datestring .= " 23:59:59";
+                if ($newtimestamp = totara_date_parse_from_format('Y-m-d H:i:s', $datestring)) {
+                    $DB->set_field('appraisal_stage', 'timedue', $newtimestamp, array('id' => $record->id));
+                }
+            }
+        }
+        $transaction->allow_commit();
+        upgrade_plugin_savepoint(true, 2014090100, 'totara', 'appraisal');
+    }
     return true;
 }
