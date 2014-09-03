@@ -217,6 +217,7 @@ class completion_criteria_activity extends completion_criteria {
         $info = new completion_info($course);
 
         $module = $DB->get_record('course_modules', array('id' => $this->moduleinstance));
+        $moduletype = get_string('modulename', "mod_{$this->module}");
         $data = $info->get_data($module, false, $completion->userid);
 
         $activity = $DB->get_record($this->module, array('id' => $module->instance));
@@ -232,7 +233,7 @@ class completion_criteria_activity extends completion_criteria {
             $details['requirement'][] = get_string('markingyourselfcomplete', 'completion');
         } elseif ($module->completion == 2) {
             if ($module->completionview) {
-                $details['requirement'][] = get_string('viewingactivity', 'completion', $this->module);
+                $details['requirement'][] = get_string('viewingactivity', 'completion', $moduletype);
             }
 
             if (!is_null($module->completiongradeitemnumber)) {
@@ -260,7 +261,7 @@ class completion_criteria_activity extends completion_criteria {
         } else {
             if ($module->completion == 2) {
                 if ($module->completionview) {
-                    $details['status'][] = get_string('viewedactivity', 'completion', $this->module);
+                    $details['status'][] = get_string('viewedactivity', 'completion', $moduletype);
                 }
 
                 if (!is_null($module->completiongradeitemnumber)) {
