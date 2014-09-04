@@ -63,8 +63,8 @@ class rb_plan_programs_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'program_completion_history',
-                'value' => 'program_completion_history_link',
-                'heading' => get_string('program_completion_history_link', 'rb_source_dp_program'),
+                'value' => 'program_previous_completion',
+                'heading' => get_string('program_previous_completion', 'rb_source_dp_program'),
             ),
             array(
                 'type' => 'program_completion',

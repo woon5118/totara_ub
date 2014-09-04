@@ -241,13 +241,13 @@ class rb_source_dp_program extends rb_base_source {
         );
         $columnoptions[] = new rb_column_option(
             'program_completion_history',
-            'program_completion_history_link',
-            get_string('program_completion_history_link', 'rb_source_dp_program'),
+            'program_previous_completion',
+            get_string('program_previous_completion', 'rb_source_dp_program'),
             'program_completion_history.historycount',
             array(
                 'joins' => 'program_completion_history',
-                'defaultheading' => get_string('program_completion_history_link', 'rb_source_dp_program'),
-                'displayfunc' => 'program_completion_history_link',
+                'defaultheading' => get_string('program_previous_completion', 'rb_source_dp_program'),
+                'displayfunc' => 'program_previous_completion',
                 'extrafields' => array(
                     'program_id' => "base.id",
                     'userid' => "program_completion.userid"
@@ -318,7 +318,7 @@ class rb_source_dp_program extends rb_base_source {
         return $program->display_link_program_icon($programname, $row->program_id, $row->program_icon, $row->userid);
     }
 
-    public function rb_display_program_completion_history_link($name, $row) {
+    public function rb_display_program_previous_completion($name, $row) {
         global $OUTPUT;
         return $OUTPUT->action_link(new moodle_url('/totara/plan/record/programs.php',
                 array('program_id' => $row->program_id, 'userid' => $row->userid, 'history' => 1)), $name);

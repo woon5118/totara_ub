@@ -50,6 +50,8 @@ $string['elearning'] = 'E-Learning';
 $string['blended'] = 'Blended';
 $string['facetoface'] = 'Face-to-Face';
 // Completion history
+$string['course_completion_previous_completion'] = 'Previous Completions';
+// AMOS does not like strings containing _link but we must leave it here to avoid breaking older sites.
 $string['course_completion_history_link'] = 'Previous Completions';
 $string['course_completion_history_count'] = 'Previous Completion count';
 
