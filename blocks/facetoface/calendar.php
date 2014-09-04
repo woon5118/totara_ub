@@ -296,6 +296,12 @@ function get_sessions($display, $groups, $users, $courses, $activefilters, &$eve
                 continue; // Nothing to check.
             }
 
+            // Check that the course is viewable.
+            if (!totara_course_is_viewable($event->courseid)) {
+                unset($events[$eventid]);
+                continue;
+            }
+
             // Check that facetoface events match all filters.
             $sessionid = (int)$event->uuid;
             if ('facetoface' == $event->modulename and $sessionid > 0) {
@@ -1039,18 +1045,25 @@ function print_waitlisted_content($waitlistedsessions) {
 
     // Show the selected sessions
     foreach ($waitlistedsessions as $session) {
-        $html .= html_writer::empty_tag('hr');
+        // Getting only the fields we need in order to save some memory.
+        $f2f = $DB->get_record('facetoface', array('id' => $session->facetoface), 'id, course, intro');
 
-        $html .= $OUTPUT->container_start();
-        $sessionurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-        $html .= html_writer::link($sessionurl, format_string($session->name));
-        $html .= $OUTPUT->container_end();
+        $visible = totara_course_is_viewable($f2f->course);
 
-        // Getting only the description of the sessions to display in order to save some memory
-        $description = $DB->get_field('facetoface', 'intro', array('id' => $session->facetoface));
-        if (!empty($description)) {
-            $description = format_text($description, FORMAT_HTML);
-            $html .= $OUTPUT->container($description);
+        // If the course isn't viewable then don't show it.
+        if ($visible) {
+            $html .= html_writer::empty_tag('hr');
+
+            $html .= $OUTPUT->container_start();
+            $sessionurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
+            $html .= html_writer::link($sessionurl, format_string($session->name));
+            $html .= $OUTPUT->container_end();
+
+            $description = $f2f->intro;
+            if (!empty($description)) {
+                $description = format_text($description, FORMAT_HTML);
+                $html .= $OUTPUT->container($description);
+            }
         }
     }
 
