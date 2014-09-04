@@ -230,13 +230,6 @@ M.totara_message = M.totara_message || {
         }
         $('#totara_message_selects #all').click(function() {jqCheckAll(true); return false;});
         $('#totara_message_selects #none').click(function() {jqCheckAll(false); return false;});
-    },
-
-    /**
-     *
-     */
-    message_dismiss: function(Y, selector){
-        $(selector).css('display','block');
     }
 };
 

@@ -383,39 +383,17 @@ class rb_source_totaramessages extends rb_base_source {
 
     // generate dismiss message link
     function rb_display_dismiss_link($id, $row) {
-        global $PAGE;
+        $out = totara_message_dismiss_action($id);
+        $out .= html_writer::checkbox('totara_message_' . $id, $id, false, '', array('id' => 'totara_msgcbox_'.$id, 'class' => "selectbox"));
 
-        $table = new html_table();
-        $table->attributes['class'] = 'totara_messages_actions';
-        $table->attributes['border'] = 0;
-        $cells = array();
-        $cells[] = new html_table_cell(totara_message_dismiss_action($id));
-
-        $PAGE->requires->js_init_call('M.totara_message.message_dismiss', array('selector' => '#totara_msgcbox_'.$id));
-
-        $content = html_writer::checkbox('totara_message_' . $id, $id, false, '', array('id' => 'totara_msgcbox_'.$id, 'class' => "selectbox"));
-        $cells[] = new html_table_cell($content);
-        $table->data[] = new html_table_row($cells);
-        $out = html_writer::tag('div', html_writer::table($table), array('class' => 'totara_alerts_actions'));
         return $out;
     }
 
     // generate task message links
     function rb_display_task_links($id, $row) {
+        $out = totara_message_accept_reject_action($id);
+        $out .= totara_message_dismiss_action($id);
 
-        $table = new html_table();
-        $table->attributes['class'] = 'totara_messages_actions';
-        $table->attributes['border'] = 0;
-        $cells = array();
-        $cells[] = new html_table_cell(totara_message_accept_reject_action($id));
-        $cells[] = new html_table_cell(totara_message_dismiss_action($id));
-
-        $PAGE->requires->js_init_call('M.totara_message.message_dismiss', array('selector' => '#totara_msgcbox_'.$id));
-
-        $content .= html_writer::checkbox('totara_message_' . $id, $id, false, '', array('id' => 'totara_msgcbox_'.$id, 'class' => "selectbox"));
-        $cells[] = new html_table_cell($content);
-        $table->data[] = new html_table_row($cells);
-        $out = html_writer::tag('div', html_writer::table($table), array('class' => 'totara_tasks_actions'));
         return $out;
     }
 

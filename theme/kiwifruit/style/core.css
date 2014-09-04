@@ -230,10 +230,6 @@ table#hierarchy-bulk-action td.action-column div.fitem div.fitemtitle {
 #page-mod-forum-view .forumheaderlist td {
     border:none;
 }
-.totara_alerts_actions .totara_messages_actions,
-.totara_alerts_actions .totara_messages_actions input {
-    margin:0;
-}
 .logtable td,
 .path-mod-forum .forumheaderlist .discussion .lastpost {
     font-size: 0.9em;
