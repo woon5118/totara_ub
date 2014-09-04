@@ -136,7 +136,8 @@ class totara_sync_element_user extends totara_sync_element {
 
         $this->set_customfieldsdb();
 
-        $issane = $this->check_sanity($synctable, $synctable_clone);
+        $invalidids = $this->check_sanity($synctable, $synctable_clone);
+        $issane = (empty($invalidids) ? true : false);
 
         // Delete obsolete users.
         if (!empty($this->config->allow_delete)) {
@@ -153,13 +154,15 @@ class totara_sync_element_user extends totara_sync_element {
                LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
                          WHERE u.totarasync=1 AND s.idnumber IS NULL AND u.deleted=0";
             }
-
             if ($rs = $DB->get_recordset_sql($sql)) {
                 foreach ($rs as $user) {
                     // Remove user.
                     try {
-                        delete_user($DB->get_record('user', array('id' => $user->id)));
-                        $this->addlog(get_string('deleteduserx', 'tool_totara_sync', $user->idnumber), 'info', 'deleteuser');
+                        // Do not delete the records which have invalid values(e.g. spelling mistake).
+                        if (array_search($user->idnumber, $invalidids) === false) {
+                            delete_user($DB->get_record('user', array('id' => $user->id)));
+                            $this->addlog(get_string('deleteduserx', 'tool_totara_sync', $user->idnumber), 'info', 'deleteuser');
+                        }
                     } catch (Exception $e) {
                         throw new totara_sync_exception('user', 'deleteuser', 'cannotdeleteuserx', $user->idnumber, $e->getMessage());
                     }
@@ -568,7 +571,7 @@ class totara_sync_element_user extends totara_sync_element {
             return; // Nothing to check.
         }
 
-        $issane = true;
+        $issane = array();
         $invalidids = array();
         // Get duplicated idnumbers.
         $badids = $this->get_duplicated_values($synctable, $synctable_clone, 'idnumber', 'duplicateuserswithidnumberx');
@@ -645,9 +648,13 @@ class totara_sync_element_user extends totara_sync_element {
 
             if (count($invalidids)) {
                 list($badids, $params) = $DB->get_in_or_equal($invalidids);
+                // Collect idnumber for records which are invalid.
+                $rs = $DB->get_records_sql("SELECT id, idnumber FROM {{$synctable}} WHERE id $badids", $params);
+                foreach ($rs as $id => $record) {
+                    $issane[] = $record->idnumber;
+                }
                 $DB->delete_records_select($synctable, "id $badids", $params);
                 $DB->delete_records_select($synctable_clone, "id $badids", $params);
-                $issane = false;
                 $invalidids = array();
             } else {
                 break;
