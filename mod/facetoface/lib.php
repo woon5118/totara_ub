@@ -1496,7 +1496,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
 
     // Fast version of "facetoface_get_attendees()" for all sessions
     $sessionsignups = array();
-    $signups = $DB->get_records_sql("
+    $signupsql = "
         SELECT
             su.id AS submissionid,
             s.id AS sessionid,
@@ -1558,8 +1558,9 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         AND ss.superceded != 1
         AND ss.statuscode >= ?
         ORDER BY
-            s.id, u.firstname, u.lastname
-    ", array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, $facetofaceid, POSITION_TYPE_PRIMARY, MDL_F2F_STATUS_APPROVED));
+            s.id, u.firstname, u.lastname";
+    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY, $facetofaceid, MDL_F2F_STATUS_APPROVED);
+    $signups = $DB->get_records_sql($signupsql, $signupparams);
 
     if ($signups) {
         // Get all grades at once
