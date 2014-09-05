@@ -80,12 +80,10 @@ $string['body_help'] = 'This is the body of the notification to be sent.
 
 In the notification there are a number of placeholders that can be used, these placeholders will be replaced with the appropriate values when the message is sent.
 
-Available placholders:
+Available Face to Face placholders:
 
 * [coursename] - Name of course
 * [facetofacename] - Name of Face to face activity
-* [firstname] - First name of learner
-* [lastname] - Last name of learner
 * [cost] - Cost of session
 * [alldates] - All session dates for the Face to face
 * [reminderperiod] - Amount of time before the session that the reminder message is sent
@@ -102,6 +100,37 @@ Available placholders:
 * [session:room] - Room the session is being held in
 
 There are also placeholders available for session custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Face to face custom field.
+
+Available user placeholders:
+
+* [firstname] - User\'s first name
+* [lastname] - User\'s last name
+* [middlename] - User\'s middle name
+* [firstnamephonetic] - Phonetic spelling of the User\'s first name
+* [lastnamephonetic] - Phonetic spelling of the User\'s last name
+* [alternatename] - Alternate name the user is known by
+* [fullname] - User\'s full name
+* [username] - User\'s username
+* [idnumber] - User\'s ID Number
+* [email] - User\'s email address
+* [address] - User\'s address
+* [city] - User\'s city
+* [country] - User\'s country
+* [department] - User\'s department
+* [description] - User\'s description
+* [institution] - User\'s institution
+* [lang] - User\'s language
+* [icq] - User\'s ICQ number
+* [aim] - User\'s AIM ID
+* [msn] - Users\'s MSN ID
+* [yahoo] - User\'s Yahoo ID
+* [skype] - User\'s Skype ID
+* [phone1] - User\'s phone number
+* [phone2] - User\'s mobile phone number
+* [timezone] - User\'s timezone
+* [url] - User\'s URL
+
+There are also placeholders available for user custom profile fields and they follow the format [user:shortname]. Where "shortname" is the shortname of the User custom profile field.
 ';
 $string['booked'] = 'Booked';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
