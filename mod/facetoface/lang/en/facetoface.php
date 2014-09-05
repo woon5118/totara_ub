@@ -72,6 +72,33 @@ $string['attendeestablesummary'] = 'People planning on or having attended this s
 $string['requeststablesummary'] = 'People requesting to attended this session.';
 $string['beforestartofsession'] = 'before start of session';
 $string['body'] = 'Body';
+$string['body_help'] = 'This is the body of the notification to be sent.
+
+In the notification there are a number of placeholders that can be used, these placeholders will be replaced with the appropriate values when the message is sent.
+
+Available placholders:
+
+* [coursename] - Name of course
+* [facetofacename] - Name of Face to face activity
+* [firstname] - First name of learner
+* [lastname] - Last name of learner
+* [cost] - Cost of session
+* [alldates] - All session dates for the Face to face
+* [reminderperiod] - Amount of time before the session that the reminder message is sent
+* [sessiondate] - Date of the session the learner is booked on
+* [startdate] - Date at the start of the session. If there are multiple session dates it will use the first one.
+* [finishdate] - Date at the end of the session. If there are multiple session dates it will use the first one.
+* [starttime] - Start time of the session. If there are multiple session dates it will use the first one.
+* [finishtime] - Finish time of the session. If there are multiple session dates it will use the first one.
+* [duration] - Length of the session
+* [details] - Details about the session
+* [attendeeslink] - Link to the attendees page for the session
+* [session:location] - Location of the session
+* [session:venue] - Venue the session is being held in
+* [session:room] - Room the session is being held in
+
+There are also placeholders available for session custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Face to face custom field.
+';
 $string['booked'] = 'Booked';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
 $string['bookingcompleted'] = 'Your booking has been completed.';

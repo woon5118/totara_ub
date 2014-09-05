@@ -41,7 +41,8 @@ class mod_facetoface_notification_template_form extends moodleform {
         $mform->addRule('title', null, 'required', null, 'client');
         $mform->setType('title', PARAM_TEXT);
 
-        $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'), null, $this->_customdata['editoroptions']);
+        $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'));
+        $mform->addHelpButton('body_editor', 'body', 'facetoface');
         $mform->setType('body_editor', PARAM_RAW);
 
         $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'), null, $this->_customdata['editoroptions']);
