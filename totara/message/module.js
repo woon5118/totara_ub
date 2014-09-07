@@ -115,7 +115,6 @@ M.totara_message = M.totara_message || {
     create_action_dialog: function( Y, action, action_str, clean_fullme, sesskey ){
         // dismiss dialog
         (function() {
-            $('#totara-'+action).css('display','block');
             var url = M.cfg.wwwroot+'/totara/message/';
             var handler = new totaraDialog_handler_confirm();
             var name = action+'msg';

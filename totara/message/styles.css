@@ -19,3 +19,10 @@
 #totara-msgs-dismiss label {
     padding-top: 10px;
 }
+
+#totara_message_actions input[type=submit] {
+    display: none;
+}
+.jsenabled #totara_message_actions input[type=submit] {
+    display: inline-block;
+}

@@ -129,17 +129,10 @@ if ($countfiltered > 0) {
 
     $out = $output->box_start('generalbox', 'totara_message_actions');
     $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'returnto', 'value' => $FULLME));
-    $out .= html_writer::start_tag('center');
-    $tab = new html_table();
-    $tab->align = array('left', 'left');
-    $tab->size = array('50%', '50%');
-    $tab->attributes = array('class', 'fullwidth');
-    $dismisslink = html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'dismiss', 'id' => 'totara-dismiss',
-            'disabled' => 'true', 'value' => get_string('dismiss', 'totara_message'), 'style' => 'display:none;')) .
-            html_writer::tag('noscript', get_string('noscript', 'totara_message'));
-    $tab->data[]  = new html_table_row(array(get_string('withselected', 'totara_message'), $dismisslink));
-    $out .= html_writer::table($tab);
-    $out .= html_writer::end_tag('center');
+    $out .= get_string('withselected', 'totara_message');
+    $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'dismiss', 'id' => 'totara-dismiss',
+            'disabled' => 'true', 'value' => get_string('dismiss', 'totara_message')));
+    $out .= html_writer::tag('noscript', get_string('noscript', 'totara_message'));
     $out .= $output->box_end();
     print $out;
     print totara_message_checkbox_all_none();
