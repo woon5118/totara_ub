@@ -67,7 +67,7 @@ class mod_facetoface_attendees_message_form extends moodleform {
 
             $title = facetoface_get_status($status);
 
-            $mform->addElement('checkbox', 'recipient_group['.$status.']', get_string('status_'.$title, 'facetoface') . ' - ' . get_string('xusers', 'facetoface', $count));
+            $mform->addElement('checkbox', 'recipient_group['.$status.']', get_string('status_'.$title, 'facetoface') . ' - ' . get_string('xusers', 'facetoface', $count), null, array('id' => 'id_recipient_group_'.$status));
         }
 
         // Display individual recipient selectors
