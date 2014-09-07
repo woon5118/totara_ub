@@ -5553,12 +5553,14 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
                     FROM {facetoface_signups} xsu
                     JOIN {facetoface_signups_status} sus ON sus.signupid = xsu.id AND sus.superceded = 0
                     JOIN {facetoface_sessions} s ON s.id = xsu.sessionid
-                   WHERE s.facetoface = :facetofaceid AND sus.statuscode > :statuscancelled
+                   WHERE s.facetoface = :facetofaceid AND sus.statuscode > :status
               ) su ON su.userid = u.id
               LEFT JOIN {user} b ON b.id = su.bookedby
              WHERE u.id $usql";
+
     $params['facetofaceid'] = $facetoface->id;
-    $params['statuscancelled'] = MDL_F2F_STATUS_USER_CANCELLED;
+    // Statuses greater than declined to handle cases where people change their mind.
+    $params['status'] = MDL_F2F_STATUS_DECLINED;
     $users = $DB->get_records_sql($sql, $params);
 
     foreach ($users as $user) {

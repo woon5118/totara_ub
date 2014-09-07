@@ -43,7 +43,8 @@ $THEME->sheets = array(
     'totara_jquery_datatables',
     'totara_jquery_ui_dialog',
     'totara',
-    'css3'      // Sets up CSS 3 + browser specific styles.
+    'css3',     // Sets up CSS 3 + browser specific styles.
+    'badges'    // Remove in t2-integration as not needed.
 );
 
 $THEME->layouts = array(

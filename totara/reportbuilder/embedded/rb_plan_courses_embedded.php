@@ -61,8 +61,8 @@ class rb_plan_courses_embedded extends rb_base_embedded {
             ),
             array(
                 'type' => 'course_completion_history',
-                'value' => 'course_completion_history_link',
-                'heading' => get_string('course_completion_history_link', 'rb_source_dp_course'),
+                'value' => 'course_completion_previous_completion',
+                'heading' => get_string('course_completion_previous_completion', 'rb_source_dp_course'),
             ),
             array(
                 'type' => 'course_completion',

@@ -172,12 +172,29 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014062000, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2014090100) {
+        $transaction = $DB->start_delegated_transaction();
+        $records = $DB->get_recordset_select('appraisal_stage', ' timedue > ?', array(0), ' id ASC', 'id, timedue');
+        foreach ($records as $record) {
+            $timestring = date('H:i:s', $record->timedue);
+            if ($timestring !== '23:59:59') {
+                $datestring = date('Y-m-d', $record->timedue);
+                $datestring .= " 23:59:59";
+                if ($newtimestamp = totara_date_parse_from_format('Y-m-d H:i:s', $datestring)) {
+                    $DB->set_field('appraisal_stage', 'timedue', $newtimestamp, array('id' => $record->id));
+                }
+            }
+        }
+        $transaction->allow_commit();
+        upgrade_plugin_savepoint(true, 2014090100, 'totara', 'appraisal');
+    }
 
+    
     // This is the Totara 2.7 upgrade line.
     // All following versions need to be bumped up during merging from 2.6 until we have separate t2-release-27 branch!
 
 
-    if ($oldversion < 2014081101) {
+    if ($oldversion < 2014090801) {
         $table = new xmldb_table('appraisal_user_assignment');
         $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
@@ -203,10 +220,10 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
             $transaction->allow_commit();
         }
 
-        upgrade_plugin_savepoint(true, 2014081101, 'totara', 'appraisal');
+        upgrade_plugin_savepoint(true, 2014090801, 'totara', 'appraisal');
     }
 
-    if ($oldversion < 2014081102) {
+    if ($oldversion < 2014090802) {
 
         // Define table appraisal_role_changes to be created.
         $table = new xmldb_table('appraisal_role_changes');
@@ -227,10 +244,10 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2014081102, 'totara', 'appraisal');
+        upgrade_plugin_savepoint(true, 2014090802, 'totara', 'appraisal');
     }
 
-    if ($oldversion < 2014081103) {
+    if ($oldversion < 2014090803) {
         // Adding a timecreated field to appraisals role assignments.
         $table = new xmldb_table('appraisal_role_assignment');
         $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, 0);
@@ -239,7 +256,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2014081103, 'totara', 'appraisal');
+        upgrade_plugin_savepoint(true, 2014090803, 'totara', 'appraisal');
     }
 
     return true;

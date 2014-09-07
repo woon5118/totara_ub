@@ -432,13 +432,13 @@ from
             );
         $columnoptions[] = new rb_column_option(
                 'course_completion_history',
-                'course_completion_history_link',
-                get_string('course_completion_history_link', 'rb_source_dp_course'),
+                'course_completion_previous_completion',
+                get_string('course_completion_previous_completion', 'rb_source_dp_course'),
                 'course_completion_history.historycount',
                 array(
                     'joins' => 'course_completion_history',
-                    'defaultheading' => get_string('course_completion_history_link', 'rb_source_dp_course'),
-                    'displayfunc' => 'course_completion_history_link',
+                    'defaultheading' => get_string('course_completion_previous_completion', 'rb_source_dp_course'),
+                    'displayfunc' => 'course_completion_previous_completion',
                     'extrafields' => array(
                         'courseid' => 'base.courseid',
                         'userid' => 'base.userid',
@@ -666,7 +666,7 @@ from
         return $content;
     }
 
-    public function rb_display_course_completion_history_link($name, $row) {
+    public function rb_display_course_completion_previous_completion($name, $row) {
         global $OUTPUT;
         return $OUTPUT->action_link(new moodle_url('/totara/plan/record/courses.php',
                 array('courseid' => $row->courseid, 'userid' => $row->userid, 'history' => 1)), $name);
