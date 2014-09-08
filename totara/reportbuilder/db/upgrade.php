@@ -426,5 +426,17 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014082201, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014090900) {
+        // Fix renamed columns in existing reports.
+        $DB->set_field_select('report_builder_columns', 'value', 'program_previous_completion',
+                'type = ? AND value= ?',
+                array('program_completion_history', 'program_completion_history_link'));
+
+         $DB->set_field_select('report_builder_columns', 'value', 'course_completion_previous_completion',
+                'type = ? AND value= ?',
+                array('course_completion_history', 'course_completion_history_link'));
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014090900, 'totara', 'reportbuilder');
+    }
     return true;
 }
