@@ -79,6 +79,10 @@ $layouts = array(
         'name' => 'Report',
         'description' => 'This is the layout used when displaying moodle reports.',
     ),
+    'secure' => array(
+        'name' => 'Secure',
+        'description' => 'This is the layout used when in a secure environment.'
+    )
 );
 
 if (!array_key_exists($layout, $layouts)) {
