@@ -243,7 +243,7 @@ class totara_sync_element_user extends totara_sync_element {
                         $user->deleted = 0;
 
                         // Tag the revived user for new password generation (if applicable).
-                        $userauth = get_auth_plugin($user->auth);
+                        $userauth = get_auth_plugin(strtolower($user->auth));
                         if ($userauth->can_change_password()) {
                             set_user_preference('auth_forcepasswordchange', 1, $user->id);
                             set_user_preference('create_password',          1, $user->id);
@@ -273,7 +273,7 @@ class totara_sync_element_user extends totara_sync_element {
 
                 // Update user password.
                 if (empty($this->config->ignoreexistingpass) && isset($suser->password) && trim($suser->password) !== '') {
-                    $userauth = get_auth_plugin($user->auth);
+                    $userauth = get_auth_plugin(strtolower($user->auth));
                     if ($userauth->can_change_password()) {
                         if (!$userauth->user_update_password($user, $suser->password)) {
                             $this->addlog(get_string('cannotsetuserpassword', 'tool_totara_sync', $user->idnumber), 'warn', 'updateusers');
@@ -355,7 +355,7 @@ class totara_sync_element_user extends totara_sync_element {
             throw new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $user->idnumber);
         }
 
-        $userauth = get_auth_plugin($user->auth);
+        $userauth = get_auth_plugin(strtolower($user->auth));
         if ($userauth->can_change_password()) {
             if (!isset($suser->password) || trim($suser->password) === '') {
                 // Tag for password generation.
@@ -550,7 +550,7 @@ class totara_sync_element_user extends totara_sync_element {
             }
         }
 
-        $user->auth = isset($suser->auth) ? $suser->auth : 'manual';
+        $user->auth = isset($suser->auth) ? strtolower($suser->auth) : 'manual';
 
         $user->suspended = empty($suser->suspended) ? 0 : $suser->suspended;
     }
