@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>lib/SVGGraph</location>
+        <name>SVGGraph</name>
+        <license>LGPL</license>
+        <version>2.16</version>
+        <licenseversion>3+</licenseversion>
+    </library>
+</libraries>
