@@ -227,17 +227,13 @@ abstract class totara_sync_source {
      */
     function check_length_limit(&$datarows, $columnsinfo, $fieldmappings, $source) {
         foreach ($datarows as $i => $datarow) {
-            $isexceeded = false;
             foreach ($datarow as $name => $value) {
-                if ((($columnsinfo[$name]->type == 'varchar') && strlen($value)) && (strlen($value) > $columnsinfo[$name]->max_length)) {
+                if ((($columnsinfo[$name]->type == 'varchar' ||
+                      $columnsinfo[$name]->type == 'nvarchar') && strlen($value)) && (strlen($value) > $columnsinfo[$name]->max_length)) {
                     $field = in_array($name, $fieldmappings) ? array_search($name, $fieldmappings) : $name;
                     $this->addlog(get_string('lengthlimitexceeded', 'tool_totara_sync', (object)array('idnumber' => $datarow['idnumber'], 'field' => $field,
                         'value' => $value, 'length' => $columnsinfo[$name]->max_length, 'source' => $source)), 'error', 'populatesynctablecsv');
-                    $isexceeded = true;
                 }
-            }
-            if ($isexceeded) {
-                unset($datarows[$i]);
             }
         }
     }

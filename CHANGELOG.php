@@ -3,6 +3,32 @@
 
 Totara LMS Changelog
 
+Release 2.6.9 (9th September 2014):
+==================================================
+
+Improvements:
+    T-13001        Improved multilingual support for View Activity completion criteria
+
+Bug Fixes:
+    T-12872        Fixed appraisal stages so they can be completed on the final due day
+    T-12978        Fixed label field in Feedback items to accept non-English characters
+    T-12975        Fixed MSSQL error when viewing courses with linked evidence in a Learning Plan
+    T-12669        Fixed ability of manager to add a previously-declined user to a Facetoface session
+    T-13024        Fixed reportbuilder strings to meet AMOS requirements
+    T-12985        Fixed setting of default user for course badge creators when restoring a course backup
+    T-13010        Fixed the user join in Facetoface attendance exports
+    T-12940        Fixed behaviour of Recipient Groups and Recipients when sending messages to users on a Facetoface session
+    T-12988        Fixed Totara Sync incorrectly deleting existing users when the CSV source has invalid values
+    T-12906        Fixed links to embedded reports in My Reports
+    T-13014        Fixed missing type strings for translation in Facetoface session summary report source
+    T-12893        Fixed the TinyMCE Editor fullscreen mode on IE8
+    T-12989        Fixed reportbuilder caching for reports containing columns with incorrectly formatted date/time data
+    T-12888        Fixed display of dates for Facetoface sessions on the Upcoming Events block
+    T-12976        Fixed position of labels in right to left languages
+    T-12946        Fixed the "Unlock and delete existing completion data" button to ensure criteria are unlocked
+    T-12965        Fixed schema differences on upgrade from 2.5 to 2.6 with MSSQL
+
+
 Release 2.6.8 (26th August 2014):
 ==================================================
 

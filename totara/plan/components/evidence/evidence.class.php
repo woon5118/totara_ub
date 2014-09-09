@@ -176,20 +176,21 @@ class dp_evidence_relation {
     public function list_linked_evidence($canremove) {
         global $DB;
 
-        $sql = "
-            SELECT er.id AS id, e.name AS fullname
+        $selectsql = "SELECT er.id AS id, e.name AS fullname";
+        $countsql = "SELECT COUNT('x')";
+        $wheresql = "
             FROM {dp_plan_evidence_relation} er
             JOIN {dp_plan_evidence} e ON e.id = er.evidenceid
             WHERE er.planid = ?
             AND er.component = ?
-            AND er.itemid = ?
-            ORDER BY e.name";
+            AND er.itemid = ?";
+        $ordersql = " ORDER BY e.name";
 
         $params = array($this->planid, $this->componentname, $this->itemid);
-        if (!$items = $DB->get_recordset_sql($sql, $params)) {
+        if (!$items = $DB->get_recordset_sql($selectsql . $wheresql . $ordersql, $params)) {
             return false;
         }
-        $numberrows = $DB->count_records_sql('SELECT COUNT(*) FROM (' . $sql . ') t', $params);
+        $numberrows = $DB->count_records_sql($countsql . $wheresql, $params);
         $rownumber = 0;
 
         $tableheaders = array(get_string('evidencename', 'totara_plan'));

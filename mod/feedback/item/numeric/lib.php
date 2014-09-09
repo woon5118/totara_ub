@@ -174,7 +174,7 @@ class feedback_item_numeric extends feedback_item_base {
 
         if (isset($values->data) AND is_array($values->data)) {
             echo '<tr><th colspan="2" align="' . $align . '">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$item->name;
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($item->name);
             echo '</th></tr>';
 
             foreach ($values->data as $value) {
@@ -200,8 +200,8 @@ class feedback_item_numeric extends feedback_item_base {
 
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, $item->name, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
 
@@ -257,13 +257,13 @@ class feedback_item_numeric extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<label for="'. $inputname .'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, true, false, false);
         if ($item->dependitem) {
             $params = array('id'=>$item->dependitem);
             if ($dependitem = $DB->get_record('feedback_item', $params)) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -412,7 +412,7 @@ class feedback_item_numeric extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, true, false, false);
         switch(true) {
             case ($range_from === '-' AND is_numeric($range_to)):

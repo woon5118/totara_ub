@@ -2042,13 +2042,19 @@ class restore_badges_structure_step extends restore_structure_step {
     }
 
     public function process_badge($data) {
-        global $DB, $CFG;
+        global $DB, $CFG, $USER;
 
         require_once($CFG->libdir . '/badgeslib.php');
 
         $data = (object)$data;
         $data->usercreated = $this->get_mappingid('user', $data->usercreated);
+        if (empty($data->usercreated)) {
+            $data->usercreated = $USER->id;
+        }
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
+        if (empty($data->usermodified)) {
+            $data->usermodified = $USER->id;
+        }
 
         // We'll restore the badge image.
         $restorefiles = true;

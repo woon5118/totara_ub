@@ -74,7 +74,7 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
                 {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('editmessagerecipientsindividually', 'facetoface') + '</h2>',
-                    height: 500
+                    height: 600
                 },
                 default_url,
                 handler
@@ -82,39 +82,47 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
         })();
 
         // Logic for messaging tab
-        $('fieldset#recipientsheader').hide();
+        $('fieldset#id_recipientsheader').hide();
 
         var f2f_update_message_recipients_from_group = function() {
 
-            var recipients = $('fieldset#recipientsheader select');
+            var recipients = $("select[name=recipients]");
             recipients.html('');
+            var recipients_hidden = $('input[name=recipients_selected]');
+            recipients_hidden.val('');
 
             // Get selected
-            $('fieldset#recipientgroupsheader input:checked').each(function() {
+            $("fieldset#id_recipientgroupsheader input:checked").each(function() {
                 // Get status code
                 var status = $(this).attr('id').substring(('id_recipient_group_').length);
                 for (user in recipient_groups[status]) {
                     user = recipient_groups[status][user];
-                    recipients.append('<option value="'+user.id+'">'+user.firstname+' '+user.lastname+', '+user.email+'</select>');
+                    recipients.append('<option value="'+user.id+'">'+user.firstname+' '+user.lastname+', '+user.email+'</option>');
+                    recipients_hidden.val(recipients_hidden.val()+','+user.id);
                 }
             });
 
-            if ($('option', recipients).length) {
-                $('fieldset#recipientsheader').show();
+            if ($("select[name=recipients] option").length) {
+                $('fieldset#id_recipientsheader').show();
+                $("input[name=submitbutton]").removeAttr('disabled');
             } else {
-                $('fieldset#recipientsheader').hide();
+                $('fieldset#id_recipientsheader').hide();
+                $("input[name=submitbutton]").attr('disabled','disabled');
             }
         };
 
         // Update recipients list on update groups and on page load
-        $('fieldset#recipientgroupsheader input').change(f2f_update_message_recipients_from_group);
+        $("fieldset#id_recipientgroupsheader input").on("change", function() {
+            f2f_update_message_recipients_from_group();
+        });
+
         f2f_update_message_recipients_from_group();
 
         $('input#id_recipient_custom').click(function() {
 
             // Update default url to reflect currently selected users
             var selected = '';
-            $('fieldset#recipientsheader select option').each(function() {
+            $("select[name=recipients] option").each(function() {
                 selected += $(this).val()+',';
             });
 
@@ -123,7 +131,10 @@ M.totara_f2f_attendees_messaging = M.totara_f2f_attendees_messaging || {
         });
 
         // Make recipient checkbox unclickable
-        $('fieldset#recipientsheader select').change(function() { $(this).blur(); $(this).children().attr('selected', false); });
+        $("select[name=recipients]").on("change", function() {
+            $(this).blur();
+            $(this).children().attr('selected', false);
+        });
     }
 }
 
@@ -139,13 +150,13 @@ totaraDialog_handler_editrecipients.prototype = new totaraDialog_handler();
  */
 totaraDialog_handler_editrecipients.prototype.update_recipients = function() {
     // Reset recipients on list in background
-    var recipients = $('fieldset#recipientsheader select');
+    var recipients = $("select[name=recipients]");
     var recipients_hidden = $('input[name=recipients_selected]');
     recipients.html('');
     recipients_hidden.val('');
 
     // Reset recipient groups
-    $('fieldset#recipientgroupsheader input').removeAttr('checked');
+    $("fieldset#id_recipientgroupsheader input").removeAttr('checked');
 
     $('select#removeselect option', this._container).each(function() {
         var value = $(this).val();
@@ -160,12 +171,14 @@ totaraDialog_handler_editrecipients.prototype.update_recipients = function() {
     });
 
     // Check if anything selected
-    if ($('option', recipients).length) {
-        $('fieldset#recipientgroupsheader').hide();
-        $('fieldset#recipientsheader').show();
+    if ($("select[name=recipients] option").length) {
+        $('fieldset#id_recipientgroupsheader').hide();
+        $('fieldset#id_recipientsheader').show();
+        $("input[name=submitbutton]").removeAttr('disabled');
     } else {
-        $('fieldset#recipientgroupsheader').show();
-        $('fieldset#recipientsheader').hide();
+        $('fieldset#id_recipientgroupsheader').show();
+        $('fieldset#id_recipientsheader').hide();
+        $("input[name=submitbutton]").attr('disabled','disabled');
     }
 
     this._cancel();

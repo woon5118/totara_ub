@@ -207,8 +207,8 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
                                         } else {
                                             // The sync record doesn't exist.
                                             if ($sourceallrecords && $usersync) {
-                                                // So the user record should be deleted.
-                                                $expectedresult->deleted = true;
+                                                // So the user record should be not deleted.
+                                                $expectedresult->deleted = false;
                                             }
                                         }
                                         // Add to the expected results array if we expect a result.
@@ -293,7 +293,7 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
                             "Unexpected result for firstname\n{$settings}");
                 }
                 if (!empty($expectedresult->deleted)) {
-                    $this->assertEquals($expectedresult->deleted, $finalresult->deleted,
+                    $this->assertEquals((bool)$expectedresult->deleted, (bool)$finalresult->deleted,
                             "Unexpected result for deleted\n{$settings}");
                 }
                 if (!empty($expectedresult->totarasync)) {
