@@ -512,5 +512,12 @@ echo $renderer->grid_end();
 
 // End of the management form.
 echo $renderer->management_form_end();
-echo $renderer->management_buttons($categoryid);
+
+if ($search === '') {
+    // Show the Totara management icons only when not searching because we need current category.
+    echo $renderer->management_buttons($categoryid);
+}
+
+echo $renderer->course_search_form($search);
+
 echo $renderer->footer();

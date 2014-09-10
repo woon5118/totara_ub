@@ -544,6 +544,7 @@ function get_users_listing($sort='lastaccess', $dir='ASC', $page=0, $recordsperp
                                    FROM {user}
                                   WHERE $select
                                   $sort", $params, $page, $recordsperpage);
+
 }
 
 
@@ -844,6 +845,7 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
     $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
+
     $sql = "SELECT c.* $ccselect
               FROM {course} c
            $ccjoin
@@ -1345,11 +1347,10 @@ function get_coursemodule_from_id($modulename, $cmid, $courseid=0, $sectionnum=f
                                                 WHERE cm.id = :cmid", $params, $strictness)) {
             return false;
         }
-    }
-
-    // Ensure $modulename matches syntax for a valid table name.
-    if (!preg_match('/^[a-z][a-z0-9_]*$/', $modulename)) {
-        return false;
+    } else {
+        if (!core_component::is_valid_plugin_name('mod', $modulename)) {
+            throw new coding_exception('Invalid modulename parameter');
+        }
     }
 
     $params['modulename'] = $modulename;
@@ -1395,9 +1396,8 @@ function get_coursemodule_from_id($modulename, $cmid, $courseid=0, $sectionnum=f
 function get_coursemodule_from_instance($modulename, $instance, $courseid=0, $sectionnum=false, $strictness=IGNORE_MISSING) {
     global $DB;
 
-    // Ensure $modulename matches syntax for a valid table name.
-    if (!preg_match('/^[a-z][a-z0-9_]*$/', $modulename)) {
-        return false;
+    if (!core_component::is_valid_plugin_name('mod', $modulename)) {
+        throw new coding_exception('Invalid modulename parameter');
     }
 
     $params = array('instance'=>$instance, 'modulename'=>$modulename);
@@ -1438,6 +1438,10 @@ function get_coursemodule_from_instance($modulename, $instance, $courseid=0, $se
 function get_coursemodules_in_course($modulename, $courseid, $extrafields='') {
     global $DB;
 
+    if (!core_component::is_valid_plugin_name('mod', $modulename)) {
+        throw new coding_exception('Invalid modulename parameter');
+    }
+
     if (!empty($extrafields)) {
         $extrafields = ", $extrafields";
     }
@@ -1475,6 +1479,10 @@ function get_coursemodules_in_course($modulename, $courseid, $extrafields='') {
  */
 function get_all_instances_in_courses($modulename, $courses, $userid=NULL, $includeinvisible=false) {
     global $CFG, $DB;
+
+    if (!core_component::is_valid_plugin_name('mod', $modulename)) {
+        throw new coding_exception('Invalid modulename parameter');
+    }
 
     $outputarray = array();
 
