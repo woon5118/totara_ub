@@ -396,12 +396,11 @@ abstract class rb_base_source {
      * @param stdClass $row
      * @param string $format
      * @param reportbuilder $report
-     * @return mixed usually string - may be an array if extra info required such as for Excel/ODS export (type, value, format)
+     * @return array of strings usually, values may be arrays for Excel format for example.
      */
     public function process_data_row(stdClass $row, $format, reportbuilder $report) {
-        $isexport = ($format !== 'html');
-
         $results = array();
+        $isexport = ($format !== 'html');
 
         foreach ($report->columns as $column) {
             if (!$column->display_column($isexport)) {

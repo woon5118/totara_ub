@@ -560,5 +560,65 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014102300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014110400) {
+
+        // Define field timemodified to be added to report_builder.
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'toolbarsearch');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014110400, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2014110401) {
+
+        // Define field timemodified to be added to report_builder_saved.
+        $table = new xmldb_table('report_builder_saved');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'ispublic');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014110401, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2014110402) {
+
+        // Define table report_builder_graph to be created.
+        $table = new xmldb_table('report_builder_graph');
+
+        // Adding fields to table report_builder_graph.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('stacked', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('maxrecords', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '500');
+        $table->add_field('category', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('legend', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('series', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table report_builder_graph.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('repobuilcolu_rep_fk', XMLDB_KEY_FOREIGN, array('reportid'), 'report_builder', array('id'));
+
+        // Conditionally launch create table for report_builder_graph.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014110402, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

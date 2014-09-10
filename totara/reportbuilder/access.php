@@ -97,6 +97,7 @@ function update_access($reportid, $fromform) {
     $todb = new stdClass();
     $todb->id = $reportid;
     $todb->accessmode = $accessenabled;
+    $todb->timemodified = time();
     $DB->update_record('report_builder', $todb);
 
     // loop round classes, only considering classes that extend rb_base_access

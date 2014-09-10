@@ -23,6 +23,7 @@
  */
 
 define('AJAX_SCRIPT', true);
+define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');

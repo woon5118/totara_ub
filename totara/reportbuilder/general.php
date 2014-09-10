@@ -73,6 +73,7 @@ if ($fromform = $mform->get_data()) {
 
     $todb = new stdClass();
     $todb->id = $id;
+    $todb->timemodified = time();
     $todb->fullname = $fromform->fullname;
     $todb->hidden = $fromform->hidden;
     $todb->description_editor = $fromform->description_editor;

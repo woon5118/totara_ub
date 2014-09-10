@@ -26,6 +26,8 @@
  * Page containing list of available reports and new report form
  */
 
+define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
@@ -112,6 +114,7 @@ if ($fromform = $mform->get_data()) {
     $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
     $todb->accessmode = REPORT_BUILDER_ACCESS_MODE_ANY; // default to limited access
     $todb->embedded = 0;
+    $todb->timemodified = time();
 
     try {
         $transaction = $DB->start_delegated_transaction();

@@ -66,6 +66,7 @@ if ($fromform = $mform->get_data()) {
     $todb->id = $id;
     $todb->initialdisplay = isset($fromform->initialdisplay) ? $fromform->initialdisplay : 0;
     $todb->cache = isset($fromform->cache) ? $fromform->cache : 0;
+    $todb->timemodified = time();
     $DB->update_record('report_builder', $todb);
 
     if ($fromform->cache) {

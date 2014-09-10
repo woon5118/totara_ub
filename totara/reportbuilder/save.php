@@ -32,20 +32,27 @@ require_once('report_forms.php');
 
 require_login();
 
-$id = optional_param('id', null, PARAM_INT); // id for report to save
+$id = required_param('id', PARAM_INT); // Id for report to save.
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/reportbuilder/save.php', array('id' => $id));
 $PAGE->set_totara_menu_selected('myreports');
 
 $report = new reportbuilder($id);
-if (!$report->is_capable($id)) {
+if (isguestuser() or !$report->is_capable($id)) {
+    // No saving for guests, sorry.
     print_error('nopermission', 'totara_reportbuilder');
 }
 
 $returnurl = $report->report_url();
 
-$mform = new report_builder_save_form(null, compact('id', 'report'));
+$data = new stdClass();
+$data->id = $id;
+$data->sid = 0;
+$data->ispublic = 0;
+$data->action = 'edit';
+
+$mform = new report_builder_save_form(null, array('report' => $report, 'data' => $data));
 
 // form results check
 if ($mform->is_cancelled()) {
@@ -55,14 +62,18 @@ if ($fromform = $mform->get_data()) {
     if (empty($fromform->submitbutton)) {
         print_error('error:unknownbuttonclicked', 'totara_reportbuilder', $returnurl);
     }
+
+    $searchsettings = (isset($SESSION->reportbuilder[$id])) ? serialize($SESSION->reportbuilder[$id]) : null;
+
     // handle form submission
     $todb = new stdClass();
     $todb->reportid = $fromform->id;
-    $todb->userid = $fromform->creatoruserid;
-    $todb->search = $fromform->search;
+    $todb->userid = $USER->id;
+    $todb->search = $searchsettings;
     $todb->name = $fromform->name;
     $todb->ispublic = $fromform->ispublic;
-    $DB->insert_record('report_builder_saved', $todb);
+    $todb->timemodified = time();
+    $todb->id = $DB->insert_record('report_builder_saved', $todb);
 
     redirect($returnurl);
 }

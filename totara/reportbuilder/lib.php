@@ -1330,13 +1330,22 @@ class reportbuilder {
 
         $clearfiltersparam = optional_param('clearfilters', 0, PARAM_INT);
 
+        // This hack is necessary because the report instance may be constructed
+        // on pages with colliding GET or POST page parameters.
+        $ignorepageparams = false;
+        if (defined('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS')) {
+            $ignorepageparams = REPORT_BUILDER_IGNORE_PAGE_PARAMETERS;
+        }
+
         $out = array();
         if (empty($this->_paramoptions)) {
             return $out;
         }
         foreach ($this->_paramoptions as $param) {
             $name = $param->name;
-            if ($param->type == 'string') {
+            if ($ignorepageparams) {
+                $var = null;
+            } else if ($param->type == 'string') {
                 $var = optional_param($name, null, PARAM_TEXT);
             } else {
                 $var = optional_param($name, null, PARAM_INT);
@@ -3084,7 +3093,7 @@ class reportbuilder {
     /**
      * Display the results table
      *
-     * @return No return value but prints the current data table
+     * @return void No return value but prints the current data table
      */
     function display_table() {
         global $SESSION, $DB, $OUTPUT, $PAGE, $CFG;
@@ -3101,7 +3110,14 @@ class reportbuilder {
 
         if (count($columns) == 0) {
             echo html_writer::tag('p', get_string('error:nocolumnsdefined', 'totara_reportbuilder'));
-            return false;
+            return;
+        }
+
+        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->_id));
+        if (!empty($graphrecord->type)) {
+            $graph = new \totara_reportbuilder\local\graph($graphrecord, $this, false);
+        } else {
+            $graph = null;
         }
 
         list($sql, $params, $cache) = $this->build_query(false, true);
@@ -3111,11 +3127,14 @@ class reportbuilder {
         foreach ($columns as $column) {
             $type = $column->type;
             $value = $column->value;
-            if ($column->display_column()) {
+            if ($column->display_column(false)) {
                 $tablecolumns[] = "{$type}_{$value}"; // used for sorting
                 $tableheaders[] = $this->format_column_heading($column, false);
             }
         }
+
+        // Arrgh, the crazy table outputs each row immediately...
+        ob_start();
 
         // Prevent notifications boxes inside the table.
         echo $OUTPUT->container_start('nobox rb-display-table-container no-overflow', $this->_id);
@@ -3208,7 +3227,8 @@ class reportbuilder {
             // Get the ORDER BY SQL fragment from table.
             $order = $this->get_report_sort($table);
             try {
-                if ($records = $DB->get_recordset_sql($sql.$order, $params, $table->get_page_start(), $perpage)) {
+                $pagestart = $table->get_page_start();
+                if ($records = $DB->get_recordset_sql($sql.$order, $params, $pagestart, $perpage)) {
                     $count = $this->get_filtered_count();
                     $location = 0;
                     foreach ($records as $record) {
@@ -3224,9 +3244,23 @@ class reportbuilder {
                         } else {
                             $table->add_data($record_data);
                         }
+
+                        if ($graph and $pagestart == 0) {
+                            $graph->add_record($record);
+                        }
+                    }
+                }
+                if ($graph and ($pagestart != 0 or $perpage == $graph->count_records())) {
+                    $graph->reset_records();
+                    if ($records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records())) {
+                        foreach ($records as $record) {
+                            $graph->add_record($record);
+                        }
                     }
                 }
             } catch (dml_read_exception $e) {
+                ob_end_flush();
+
                 if ($this->is_cached()) {
                     $debuginfo = $CFG->debugdeveloper ? $e->debuginfo : '';
                     print_error('error:problemobtainingcachedreportdata', 'totara_reportbuilder', '', $debuginfo);
@@ -3237,8 +3271,32 @@ class reportbuilder {
             }
         }
 
-        // display the table
-        $table->print_html();
+        // The rows are already displayed.
+        $table->finish_html();
+
+        // end of .nobox div
+        echo $OUTPUT->container_end();
+
+        $tablehmtml = ob_get_clean();
+
+        if ($graph and $graphdata = $graph->fetch_svg()) {
+            if (core_useragent::check_browser_version('MSIE', '6.0') and !core_useragent::check_browser_version('MSIE', '9.0')) {
+                // See http://partners.adobe.com/public/developer/en/acrobat/PDFOpenParameters.pdf
+                $svgurl = new moodle_url('/totara/reportbuilder/ajax/graph.php', array('id' => $this->_id, 'sid' => $this->_sid));
+                $svgurl = $svgurl . '#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&viewrect=20,20,400,300';
+                $nopdf = get_string('error:nopdf', 'totara_reportbuilder');
+                echo "<div class=\"rb-report-pdfgraph\"><object type=\"application/pdf\" data=\"$svgurl\" width=\"100%\" height=\"400\">$nopdf</object>";
+
+            } else {
+                // The SVGGraph supports only one SVG per page when embedding directly,
+                // it should be fine here because there are no blocks on this page.
+                echo '<div class="rb-report-svggraph">';
+                echo $graphdata;
+                echo '</div>';
+            }
+        }
+
+        echo $tablehmtml;
 
         local_js();
         $jsmodule = array(
@@ -3247,8 +3305,6 @@ class reportbuilder {
             'requires' => array('json'));
         $PAGE->requires->js_init_call('M.totara_reportbuilder_expand.init', array(), true, $jsmodule);
 
-        // end of .nobox div
-        echo $OUTPUT->container_end();
     }
 
     /**
@@ -3407,6 +3463,12 @@ class reportbuilder {
      */
     public function display_saved_search_options() {
         global $PAGE;
+
+        if (!isloggedin() or isguestuser()) {
+            // No saving for guests, sorry.
+            return '';
+        }
+
         $output = $PAGE->get_renderer('totara_reportbuilder');
 
         $savedbutton = $output->save_button($this);
@@ -3726,6 +3788,13 @@ class reportbuilder {
             return false;
         }
 
+        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->_id));
+        if (!empty($graphrecord->type)) {
+            $graph = new \totara_reportbuilder\local\graph($graphrecord, $this, false);
+        } else {
+            $graph = null;
+        }
+
         // Layout options.
         if ($portrait) {
             $pdf = new PDF('P', 'mm', 'A4', true, 'UTF-8');
@@ -3782,6 +3851,10 @@ class reportbuilder {
         $html .= '</tr></thead><tbody>';
 
         foreach ($records as $record) {
+            if ($graph) {
+                $graph->add_record($record);
+            }
+
             $record_data = $this->src->process_data_row($record, 'pdf', $this);
             $html .= '<tr>';
             foreach($record_data as $value) {
@@ -3799,6 +3872,16 @@ class reportbuilder {
             }
         }
         $html .= '</tbody></table>';
+
+        $svgdata = $graph->fetch_pdf_svg($portrait);
+        if ($svgdata) {
+            if ($portrait) {
+                $pdf->ImageSVG('@'.$svgdata, 5, 30, 196, 100);
+            } else {
+                $pdf->ImageSVG('@'.$svgdata, 5, 30, 282, 100);
+            }
+            $pdf->SetY(130);
+        }
 
         // Closing the pdf.
         $pdf->WriteHTML($html, true, false, false, false, '');
@@ -4319,6 +4402,7 @@ class reportbuilder {
             $todb->value = $value;
             $DB->insert_record('report_builder_settings', $todb);
         }
+        $DB->set_field('report_builder', 'timemodified', time(), array('id' => $reportid));
         return true;
     }
 

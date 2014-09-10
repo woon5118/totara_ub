@@ -981,7 +981,7 @@ class core_plugin_manager {
                 // Totara
                 ,'totara_addtoplan', 'totara_alerts',
                 'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
-                'totara_recent_learning', 'totara_report_manager', 'totara_stats',
+                'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
                 'totara_tasks', 'facetoface', 'totara_certifications', 'gaccess',
             ),
 

@@ -792,6 +792,130 @@ class report_builder_edit_columns_form extends moodleform {
 }
 
 /**
+ * Formslib template for graph form
+ */
+class report_builder_edit_graph_form extends moodleform {
+    public function definition() {
+        global $CFG, $OUTPUT;
+
+        $mform = $this->_form;
+
+        /* @var reportbuilder $report */
+        $report = $this->_customdata['report'];
+        $graph = $this->_customdata['graph'];
+
+        // Graph types.
+        $types = array(
+            '' => get_string('none'),
+            'column' => get_string('graphtypecolumn', 'totara_reportbuilder'),
+            'line' => get_string('graphtypeline', 'totara_reportbuilder'),
+            'bar' => get_string('graphtypebar', 'totara_reportbuilder'),
+            'pie' => get_string('graphtypepie', 'totara_reportbuilder'),
+            'scatter' => get_string('graphtypescatter', 'totara_reportbuilder'),
+            'area' => get_string('graphtypearea', 'totara_reportbuilder'),
+        );
+        $mform->addElement('select', 'type', get_string('graphtype', 'totara_reportbuilder'), $types);
+
+        $optionoptions = array(
+            'C' => get_string('graphorientationcolumn', 'totara_reportbuilder'),
+            'R' => get_string('graphorientationrow', 'totara_reportbuilder'),
+        );
+        $mform->addElement('select', 'orientation', get_string('graphorientation', 'totara_reportbuilder'), $optionoptions);
+        $mform->addHelpButton('orientation', 'graphorientation', 'totara_reportbuilder');
+
+        $mform->addElement('header', 'serieshdr', 'Data');
+
+        $catoptions = array('none' => get_string('graphnocategory', 'totara_reportbuilder'));
+        $legendoptions = array();
+        foreach ($report->columns as $key => $column) {
+            if (!$column->display_column(true)) {
+                continue;
+            }
+            $catoptions[$key] = $report->format_column_heading($column, true);
+            $legendoptions[$key] = $catoptions[$key];
+        }
+
+        $mform->addElement('select', 'category', get_string('graphcategory', 'totara_reportbuilder'), $catoptions);
+        $mform->disabledIf('category', 'type', 'eq', '');
+        $mform->disabledIf('category', 'orientation', 'noteq', 'C');
+
+        $mform->addElement('select', 'legend', get_string('graphlegend', 'totara_reportbuilder'), $legendoptions);
+        $mform->disabledIf('legend', 'type', 'eq', '');
+        $mform->disabledIf('legend', 'orientation', 'noteq', 'R');
+
+        $series = array();
+        foreach ($catoptions as $key => $colheading) {
+            if ($key === 'none') {
+                continue;
+            }
+            $series[$key] = $colheading;
+        }
+        $mform->addElement('select', 'series', get_string('graphseries', 'totara_reportbuilder'), $series, array('multiple' => true));
+        $mform->disabledIf('series', 'type', 'eq', '');
+
+        $mform->addElement('advcheckbox', 'stacked', get_string('graphstacked', 'totara_reportbuilder'));
+        $mform->disabledIf('stacked', 'type', 'eq', '');
+        $mform->disabledIf('stacked', 'type', 'eq', 'pie');
+        $mform->disabledIf('stacked', 'type', 'eq', 'scatter');
+
+        $mform->addElement('header', 'advancedhdr', 'Advanced options');
+
+        $mform->addElement('text', 'maxrecords', get_string('graphmaxrecords', 'totara_reportbuilder'));
+        $mform->setType('maxrecords', PARAM_INT);
+        $mform->disabledIf('maxrecords', 'type', 'eq', '');
+
+        $mform->addElement('textarea', 'settings', get_string('graphsettings', 'totara_reportbuilder'), array('rows' => 10));
+        $mform->addHelpButton('settings', 'graphsettings', 'totara_reportbuilder');
+        $mform->setType('settings', PARAM_RAW);
+        $mform->disabledIf('settings', 'type', 'eq', '');
+
+        // No need for param 'id' here.
+        $mform->addElement('hidden', 'reportid');
+        $mform->setType('reportid', PARAM_INT);
+
+        $this->add_action_buttons();
+
+        $this->set_data($graph);
+    }
+
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if ($data['type']) {
+            if ($data['orientation'] == 'C') {
+                if (!empty($data['series'])) {
+                    $key = array_search($data['category'], $data['series']);
+                    if ($key !== false) {
+                        unset($data['series'][$key]);
+                    }
+                }
+            } else {
+                if (!empty($data['series'])) {
+                    $key = array_search($data['legend'], $data['series']);
+                    if ($key !== false) {
+                        unset($data['series'][$key]);
+                    }
+                }
+            }
+            if (empty($data['series'])) {
+                $errors['series'] = get_string('required');
+            }
+        }
+
+        if (trim($data['settings'])) {
+            // Unfortunately it is not easy to get meaningful errors from this parser.
+            $test = @parse_ini_string($data['settings'], false);
+            if ($test === false) {
+                $errors['settings'] = get_string('error');
+            }
+        }
+
+        return $errors;
+    }
+}
+
+
+/**
  * Formslib template for content restrictions form
  */
 class report_builder_edit_content_form extends moodleform {
@@ -1026,18 +1150,14 @@ function validate_unique_filters($data) {
  */
 class report_builder_save_form extends moodleform {
     function definition() {
-        global $USER, $SESSION;
-        $mform =& $this->_form;
+        $mform = $this->_form;
         $report = $this->_customdata['report'];
-        $id = $this->_customdata['id'];
-        $sid = isset($this->_customdata['sid']) ? $this->_customdata['sid'] : '';
+        $data = $this->_customdata['data'];
+
         $filterparams = $report->get_restriction_descriptions('filter');
-        $shortname = $report->shortname;
-        $filtername = 'filtering_'.$shortname;
-        $searchsettings = (isset($SESSION->reportbuilder[$id])) ? serialize($SESSION->reportbuilder[$id]) : null;
         $params = implode(html_writer::empty_tag('br'), $filterparams);
 
-        if (isset($this->_customdata['sid'])) {
+        if ($data->sid) {
             $mform->addElement('header', 'savesearch', get_string('editingsavedsearch', 'totara_reportbuilder'));
         } else {
             $mform->addElement('header', 'savesearch', get_string('createasavedsearch', 'totara_reportbuilder'));
@@ -1048,18 +1168,15 @@ class report_builder_save_form extends moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('missingsearchname', 'totara_reportbuilder'), 'required', null, 'server');
         $mform->addElement('advcheckbox', 'ispublic', get_string('publicallyavailable', 'totara_reportbuilder'), '', null, array(0, 1));
-        $mform->addElement('hidden', 'id', $id);
+        $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'sid', $sid);
+        $mform->addElement('hidden', 'sid');
         $mform->setType('sid', PARAM_INT);
-        $mform->addElement('hidden', 'search', $searchsettings);
-        $mform->setType('search', PARAM_TEXT);
-        $mform->addElement('hidden', 'creatoruserid', $USER->id);
-        $mform->setType('creatoruserid', PARAM_INT);
-        $mform->addElement('hidden', 'action', 'edit');
+        $mform->addElement('hidden', 'action');
         $mform->setType('action', PARAM_ALPHANUMEXT);
 
         $this->add_action_buttons();
+        $this->set_data($data);
     }
 }
 

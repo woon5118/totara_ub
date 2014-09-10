@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', true); // We are setting up report here, do not accept source params.
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
@@ -272,14 +274,17 @@ function totara_reportbuilder_build_columns($fromform, reportbuilder $report, $a
         $todb->sortorder = $sortorder;
         $DB->insert_record('report_builder_columns', $todb);
     }
-    // update default column settings
+
+    // Mark report as modified after any column change.
+    $todb = new stdClass();
+    $todb->id = $id;
     if (isset($fromform->defaultsortcolumn)) {
-        $todb = new stdClass();
-        $todb->id = $id;
+        // Update default column settings.
         $todb->defaultsortcolumn = $fromform->defaultsortcolumn;
         $todb->defaultsortorder = $fromform->defaultsortorder;
-        $DB->update_record('report_builder', $todb);
     }
+    $todb->timemodified = time();
+    $DB->update_record('report_builder', $todb);
 
     // Fix sortorders if necessary.
     $columns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC', 'id, sortorder');

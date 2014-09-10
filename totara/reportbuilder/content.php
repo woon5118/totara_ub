@@ -99,6 +99,7 @@ function update_content($id, $report, $fromform) {
     $todb = new stdClass();
     $todb->id = $id;
     $todb->contentmode = $contentenabled;
+    $todb->timemodified = time();
     $DB->update_record('report_builder', $todb);
 
     $contentoptions = isset($report->contentoptions) ?
