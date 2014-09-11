@@ -74,6 +74,7 @@ $string['progress_checkaccounts'] = 'Checking user accounts ({$a})';
 $string['progress_coursecompleted'] = 'Course completed ({$a}s)';
 $string['progress_createaccounts'] = 'Creating user accounts ({$a->from} - {$a->to})';
 $string['progress_createactivities'] = 'Creating activities ({$a})';
+$string['progress_createassignments'] = 'Creating assignments ({$a})';
 $string['progress_createaudience'] = 'Creating Audiences ({$a})';
 $string['progress_createbigfiles'] = 'Creating big files ({$a})';
 $string['progress_createcertifications'] = 'Creating certifications ({$a})';
