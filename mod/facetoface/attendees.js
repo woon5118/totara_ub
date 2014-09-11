@@ -119,6 +119,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             $('div.f2f-attendees-table').empty();
             $('div.f2f-attendees-table').append(newtable);
 
+            M.totara_f2f_attendees.attachCustomClickEvents();
+
             // Close dialog
             this._dialog.hide();
         };
@@ -184,6 +186,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             // Replace any items on the main page with their content (if IDs match)
             $('div.f2f-attendees-table').empty();
             $('div.f2f-attendees-table').append(newtable);
+
+            M.totara_f2f_attendees.attachCustomClickEvents();
 
             // Close dialog
             this._dialog.hide();
@@ -413,7 +417,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         /**
         *  Attaches mouse events to the loaded content.
         */
-        function attachEvents() {
+        this.attachCustomClickEvents = function() {
             // Add new page button.
             $('a.attendee-add-note').on('click', function(){
                 $.get($(this).attr('href'), function(href){
@@ -422,7 +426,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 return false;
             });
         }
-        attachEvents();
+        this.attachCustomClickEvents();
 
         /**
         * Modal popup for generic single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
