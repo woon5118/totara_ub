@@ -23,11 +23,12 @@
  */
 
 function tcohort_cron() {
-    global $CFG;
+    global $CFG, $DB;
+    require_once($CFG->dirroot . "/totara/cohort/rules/lib.php");
 
-    // Check if we need to sync audience memberships.
+    // Check if we need to run hourly tasks for cleanup and membership sync.
     $trace = new text_progress_trace();
-    $syncmembers = true;
+    $runhourlycron = true;
     $timenow = time();
     $hourlycron = 60 * 60; // one hour.
     $lasthourlycron = get_config('totara_cohort', 'lasthourlycron');
@@ -37,10 +38,20 @@ function tcohort_cron() {
         if (isset($CFG->debugcron) && $CFG->debugcron) {
             $trace->output("DEBUG - run cohort member syncing anyway");
         } else {
-            $syncmembers = false;
+            $runhourlycron = false;
         }
     }
-    if ($syncmembers) {
+
+    if ($runhourlycron) {
+        // Clean up obsolete rule collections.
+        $obsoleted = $DB->get_fieldset_select('cohort_rule_collections', 'id', 'status = ?', array(COHORT_COL_STATUS_OBSOLETE));
+        if (!empty($obsoleted)) {
+            $trace->output(date("H:i:s", $timenow).' Cleaning up obsolete rule collections...');
+            foreach ($obsoleted as $obsolete) {
+                cohort_rules_delete_collection($obsolete);
+            }
+        }
+        // Sync dynamic audience members.
         $trace->output(date("H:i:s", time()).' Syncing dynamic audience members');
         totara_cohort_check_and_update_dynamic_cohort_members(null, $trace);
     }

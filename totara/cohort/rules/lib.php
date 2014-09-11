@@ -283,6 +283,8 @@ function cohort_rules_approve_changes($cohort) {
     $todb->timemodified = $now;
     $todb->modifierid = $USER->id;
     $DB->update_record('cohort', $todb);
+    // Delete the now-obsolete previous collection.
+    cohort_rules_delete_collection($cohort->activecollectionid);
 
     $transaction->allow_commit();
 
