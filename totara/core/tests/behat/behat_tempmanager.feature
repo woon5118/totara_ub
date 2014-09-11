@@ -27,6 +27,7 @@ Feature: Test temporary managers
         And I navigate to "Primary position" node in "Profile settings for user 1 > Positions"
         And I click on "Choose temporary manager" "button"
         And I should see "user 2"
+        And I should see "temp manager"
 
     Scenario: Only assign temporary manager
         And I set the following administration settings values:
