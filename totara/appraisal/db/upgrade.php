@@ -189,14 +189,14 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014090100, 'totara', 'appraisal');
     }
 
-    
+
     // This is the Totara 2.7 upgrade line.
     // All following versions need to be bumped up during merging from 2.6 until we have separate t2-release-27 branch!
 
 
     if ($oldversion < 2014090801) {
         $table = new xmldb_table('appraisal_user_assignment');
-        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecompleted');
 
         if (!$dbman->field_exists($table, $field)) {
             $transaction = $DB->start_delegated_transaction();
