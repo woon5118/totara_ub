@@ -129,16 +129,6 @@ if ($editform->is_cancelled()) {
 
 } else if ($data = $editform->get_data()) {
 
-    // Fix dates
-    if (isset($data->startdate) && $data->startdate) {
-        $data->startdate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->startdate);
-    }
-
-    if (isset($data->enddate) && $data->enddate) {
-        $data->enddate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->enddate);
-    }
-
-
     if ($data->id) {
         cohort_update_cohort($data);
         if ($usetags) {
@@ -189,13 +179,5 @@ else {
     echo $OUTPUT->heading($strheading);
 }
 echo $editform->display();
-
-//Javascript include
-local_js(array(
-    TOTARA_JS_DATEPICKER
-));
-
-// Set up js calendars
-build_datepicker_js('#id_startdate, #id_enddate');
 
 echo $OUTPUT->footer();
