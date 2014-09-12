@@ -65,10 +65,9 @@ class plan_reactivate_form extends moodleform {
 
             $mform->addElement('static', 'instructions', null, 'This plan was completed because the end date elapsed, please enter a new end date.');
 
-            $mform->addElement('text', 'enddate', get_string('completiondate', 'totara_plan'));
+            $mform->addElement('date_selector', 'enddate', get_string('completiondate', 'totara_plan'));
             $mform->setType('enddate', PARAM_TEXT);
             $mform->addRule('enddate', get_string('err_required', 'form'), 'required', '', 'client', false, false);
-            $mform->setDefault('enddate', userdate(time(), get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false));
         }
 
         $this->add_action_buttons(true, get_string('reactivate', 'totara_plan'));
@@ -91,12 +90,7 @@ class plan_reactivate_form extends moodleform {
             $datenow = time();
             $enddate = isset($data['enddate']) ? $data['enddate'] : '';
 
-            $datepattern = get_string('datepickerlongyearregexphp', 'totara_core');
-            if (preg_match($datepattern, $enddate, $matches) == 0) {
-                $errstr = get_string('error:dateformat', 'totara_plan', get_string('datepickerlongyearplaceholder', 'totara_core'));
-                $result['enddate'] = $errstr;
-                unset($errstr);
-            } else if ($datenow > totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $enddate) && $enddate !== false) {
+            if ($datenow > $enddate && $enddate !== false) {
                 // Enforce start date before finish date
                 $errstr = get_string('error:reactivatedatebeforenow', 'totara_plan');
                 $result['enddate'] = $errstr;

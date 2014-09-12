@@ -52,12 +52,6 @@ if ($deleteno == null) {
     $deleteno = true;
 }
 
-//Javascript include
-local_js(array(
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
-));
-
 ///
 /// Load data
 ///
@@ -243,7 +237,5 @@ switch($action) {
 }
 
 echo $OUTPUT->container_end();
-
-echo build_datepicker_js('input[name="duedate"]');
 
 echo $OUTPUT->footer();

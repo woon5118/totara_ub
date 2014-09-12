@@ -38,7 +38,6 @@ require_login();
 $id = required_param('id', PARAM_INT); // Plan id.
 $submitted = optional_param('submitbutton', null, PARAM_TEXT); // Form submitted.
 
-
 ///
 /// Load data
 ///
@@ -120,11 +119,6 @@ $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fulln
 dp_get_plan_base_navlinks($plan->userid);
 $PAGE->navbar->add($fullname, new moodle_url('/totara/plan/view.php', array('id' => $id)));
 $PAGE->navbar->add(get_string('pendingitems', 'totara_plan'));
-///
-/// Javascript stuff
-///
-local_js(array(TOTARA_JS_DATEPICKER, TOTARA_JS_PLACEHOLDER));
-
 
 ///
 /// Display page

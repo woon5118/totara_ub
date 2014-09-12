@@ -44,12 +44,6 @@ if (!in_array($rolstatus, array('active','completed','all'))) {
     $rolstatus = 'all';
 }
 
-//Javascript include
-local_js(array(
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
-));
-
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('noblocks');

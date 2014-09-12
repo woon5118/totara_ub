@@ -57,13 +57,6 @@ if ($is_component) {
     $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fullname);
 }
 
-//Javascript include
-local_js(array(
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
-));
-
-
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($pagetitle);
 echo $OUTPUT->header();

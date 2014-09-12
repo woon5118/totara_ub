@@ -41,12 +41,6 @@ $action = optional_param('action', 'view', PARAM_TEXT);
 
 if ($action == 'edit') {
     require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
-
-    //Javascript include
-    local_js(array(
-        TOTARA_JS_DATEPICKER,
-        TOTARA_JS_PLACEHOLDER
-    ));
 }
 
 $componentname = 'plan';
@@ -129,8 +123,6 @@ if ($data = $form->get_data()) {
             print_error('error:nopermissions', 'totara_plan');
         }
         // Save plan data
-        $data->startdate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->startdate);
-        $data->enddate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->enddate);
         $data = file_postupdate_standard_editor($data, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_plan', 'dp_plan', $data->id);
         $DB->update_record('dp_plan', $data);
         totara_set_notification(get_string('planupdatesuccess', 'totara_plan'), $viewurl, array('class' => 'notifysuccess'));
@@ -151,10 +143,7 @@ add_to_log(SITEID, 'plan', 'view', "view.php?id={$plan->id}", $plan->name);
 
 // Plan details
 if ($plan->timecompleted) {
-    $plan->enddate = userdate($plan->timecompleted, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
-} else {
-    $plan->startdate = userdate($plan->startdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
-    $plan->enddate = userdate($plan->enddate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+    $plan->enddate = $plan->timecompleted;
 }
 $form->set_data($plan);
 $form->display();
@@ -176,10 +165,5 @@ if ($action == 'view') {
 }
 
 echo $OUTPUT->container_end();
-
-if ($action == 'edit') {
-    echo build_datepicker_js('input[name="startdate"]');
-    echo build_datepicker_js('input[name="enddate"]');
-}
 
 echo $OUTPUT->footer();

@@ -197,7 +197,6 @@ if (!empty($approvalrequest)) {
     }
 }
 
-
 ///
 /// Delete
 ///
@@ -285,11 +284,6 @@ if (!empty($reactivate)) {
     require_once($CFG->dirroot . '/totara/plan/reactivate_form.php');
     require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-    local_js(array(
-        TOTARA_JS_DATEPICKER,
-        TOTARA_JS_PLACEHOLDER
-    ));
-
     if ($plan->get_setting('completereactivate') >= DP_PERMISSION_ALLOW) {
         $form = new plan_reactivate_form(null, compact('id','referer'));
 
@@ -299,7 +293,7 @@ if (!empty($reactivate)) {
 
         if ($data = $form->get_data()) {
 
-            $new_date = (isset($data->enddate)) ? totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->enddate) : null;
+            $new_date = $data->enddate;
 
             $referer = $data->referer;
 

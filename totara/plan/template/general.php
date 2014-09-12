@@ -42,9 +42,7 @@ admin_externalpage_setup('managetemplates');
 
 //Javascript include
 local_js(array(
-    TOTARA_JS_DIALOG,
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
+    TOTARA_JS_DIALOG
 ));
 
 $returnurl = new moodle_url('/totara/plan/template/general.php', array('id' => $id));
@@ -88,8 +86,6 @@ require('tabs.php');
 
 $mform->display();
 
-echo build_datepicker_js('#id_startdate, #id_enddate');
-
 echo $OUTPUT->footer();
 
 
@@ -99,7 +95,7 @@ function update_general_settings($id, $fromform) {
     $todb = new stdClass();
     $todb->id = $id;
     $todb->fullname = $fromform->templatename;
-    $todb->enddate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $fromform->enddate);
+    $todb->enddate = $fromform->enddate;
 
     $transaction = $DB->start_delegated_transaction();
 

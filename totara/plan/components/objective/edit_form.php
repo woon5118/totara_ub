@@ -104,10 +104,8 @@ class plan_objective_edit_form extends moodleform {
 
         // Due dates
         if ($duedateallow && ($duedatemode == DP_DUEDATES_OPTIONAL || $duedatemode == DP_DUEDATES_REQUIRED)) {
-            $mform->addElement('text', 'duedate', get_string('duedate', 'totara_plan'), array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
+            $mform->addElement('date_selector', 'duedate', get_string('duedate', 'totara_plan'));
             $mform->setType('duedate', PARAM_TEXT);
-
-            $mform->addRule('duedate', get_string('error:dateformat', 'totara_plan', get_string('datepickerlongyearplaceholder', 'totara_core')), 'regex', get_string('datepickerlongyearregexphp', 'totara_core'));
 
             // Whether to make the field optional
             if ($duedatemode == DP_DUEDATES_REQUIRED) {
@@ -138,18 +136,5 @@ class plan_objective_edit_form extends moodleform {
 
         $this->add_action_buttons(true, empty($this->_customdata['objectiveid']) ?
             get_string('addobjective', 'totara_plan') : get_string('updateobjective', 'totara_plan'));
-    }
-
-    /**
-     * Carries out validation of submitted form values
-     *
-     * @param array $data array of ("fieldname"=>value) of submitted data
-     * @param array $files array of uploaded files "element_name"=>tmp_file_path
-     * @return array of "element_name"=>"error_description" if there are errors,
-     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
-     */
-    function validation($data, $files) {
-        $errors = array();
-        return $errors;
     }
 }

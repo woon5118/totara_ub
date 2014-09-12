@@ -49,9 +49,7 @@ admin_externalpage_setup('managetemplates');
 
 // Javascript include
 local_js(array(
-    TOTARA_JS_DIALOG,
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
+    TOTARA_JS_DIALOG
 ));
 
 $returnurl = new moodle_url('/totara/plan/template/index.php');
@@ -317,7 +315,5 @@ else {
 }
 
 $mform->display();
-
-echo build_datepicker_js('#id_enddate');
 
 echo $OUTPUT->footer();
