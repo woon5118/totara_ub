@@ -62,10 +62,6 @@ switch ($action) {
         $defaults->descriptionformat = FORMAT_HTML;
         $defaults = file_prepare_standard_editor($defaults, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
             'totara_appraisal', 'appraisal_stage', $id);
-        if ($defaults->timedue) {
-            $defaults->timedue = userdate($defaults->timedue, get_string('datepickerlongyearphpuserdate', 'totara_core'),
-                    $CFG->timezone, false);
-        }
         $mform = new appraisal_stage_edit_form(null, array('action'=>$action, 'stage' => $defaults, 'readonly' => !$isdraft));
         if ($mform->is_cancelled()) {
             redirect($returnurl);
@@ -78,8 +74,6 @@ switch ($action) {
                 totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_appraisal'), $returnurl);
             }
             if (!empty($fromform->timedue)) {
-                $fromform->timedue = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
-                        $fromform->timedue);
                 // Set date to end-of-day.
                 $fromform->timedue += ((int)$fromform->timedue > 0 ? (DAYSECS - 1) : 0);
                 if ($fromform->timedue < time()) {
@@ -203,8 +197,6 @@ switch ($action) {
         echo $output->confirm_delete_stage($stage->id);
         break;
     case 'edit':
-        local_js(array(TOTARA_JS_DATEPICKER));
-        build_datepicker_js('#id_timedue');
         echo $mform->display();
         break;
     default:
