@@ -131,31 +131,33 @@ class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
      * @param bool $timeinverse Invert future time to past
      */
     protected function create_booking($initiator, $attender, $course, $timeinverse = false) {
+        global $DB;
+
         self::$ind++;
 
         // Create activity
         $facetoface = new stdClass();
-        $facetoface->id = self::$ind;
         $facetoface->course = $course->id;
         $facetoface->name = 'Name '.self::$ind;
         $facetoface->display = 6;
         $facetoface->reminderperiod = 2;
         $facetoface->timecreated = time();
         $facetoface->showoncal = 1;
-        facetoface_add_instance($facetoface);
+
+        $f2fgenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface1 = $f2fgenerator->create_instance($facetoface);
 
         // Add session
-        $session = new stdClass();
-        $session->id = self::$ind;
-        $session->facetoface = $facetoface->id;
-        $session->datetimeknown = 1;
-        $session->capacity = 10;
-        $session->allowoverbook = 0;
-        $session->duration = 1;
-        $session->normalcost = 0;
-        $session->discountcost = 0;
-        $session->roomid = 1;
-        $session->usermodified = 2;
+        $sessiondata = new stdClass();
+        $sessiondata->facetoface = $facetoface1->id;
+        $sessiondata->datetimeknown = 1;
+        $sessiondata->capacity = 10;
+        $sessiondata->allowoverbook = 0;
+        $sessiondata->duration = 1;
+        $sessiondata->normalcost = 0;
+        $sessiondata->discountcost = 0;
+        $sessiondata->roomid = 1;
+        $sessiondata->usermodified = 2;
 
         $delta = ($timeinverse) ? -1 * $this->delta : $this->delta;
         $dates = new stdClass();
@@ -164,16 +166,18 @@ class rb_bookings_embedded_cache_test extends reportcache_advanced_testcase {
         $dates->timefinish = time() + $delta + abs($delta) * 0.5;
         $dates->sessiontimezone = 'Europe/London';
         $sessiondates = array($dates);
-        facetoface_add_session($session, $sessiondates);
+        $sessiondata->sessiondates = $sessiondates;
 
-        $session->sessiondates = $sessiondates;
-        facetoface_update_calendar_entries($session, $facetoface);
+        $sessionid = $f2fgenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         // Signup for session
         $usernote = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-        facetoface_user_signup($session, $facetoface, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
+        facetoface_user_signup($session, $facetoface1, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
             $initiator->id, false, $usernote);
-        facetoface_user_signup($session, $facetoface, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
+        facetoface_user_signup($session, $facetoface1, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
             $attender->id, false, $usernote);
     }
 

@@ -30,20 +30,35 @@ M.mod_facetoface.signupform = {
         TSANDCS:             '.tsandcs'
     },
 
-    tsandcs: null,
+    opts: {},
 
-    init: function(opts) {
+    init: function() {
         var body = Y.one('body');
+        M.mod_facetoface.signupform.opts = arguments;
         // Can't attach handler to body as we need to stop default action.
-        Y.one(this.SELECTORS.TSANDCS).on("click", this.showTsandCs);
+        Y.all(M.mod_facetoface.signupform.SELECTORS.TSANDCS).each(function(node) {
+            node.on("click", M.mod_facetoface.signupform.showTsandCs);
+        });
+    },
+
+    showTsandCs : function(e) {
+        e.preventDefault();
+        var content;
+
+        if (typeof(M.mod_facetoface.signupform.opts[0]) == 'string') {
+            content = M.mod_facetoface.signupform.opts[0];
+        } else {
+            facetofaceid = e.target.getAttribute('facetofaceid');
+            content = M.mod_facetoface.signupform.opts[0]['selfapprovaltandc_' + facetofaceid];
+        }
 
         // Set Default options
         var params = {
-                bodyContent : opts,
-                headerContent : M.util.get_string('selfapprovaltandc', 'mod_facetoface'),
-                visible : false, // Hide by default
-                lightbox : true // This dialogue should be modal
-            };
+            bodyContent : content,
+            headerContent : M.util.get_string('selfapprovaltandc', 'mod_facetoface'),
+            visible : true,
+            lightbox : true // This dialogue should be modal
+        };
 
         // Create the panel
         tsandcsdlg = new M.core.dialogue(params);
@@ -52,17 +67,10 @@ M.mod_facetoface.signupform = {
             label: M.util.get_string('close', 'mod_facetoface'),
             action: function(e) {
                 e.preventDefault();
-                tsandcsdlg.hide();
+                tsandcsdlg.destroy();
             },
             section: Y.WidgetStdMod.FOOTER
         });
-
-        this.tsandcs = tsandcsdlg;
-    },
-
-    showTsandCs : function(e) {
-        e.preventDefault();
-        M.mod_facetoface.signupform.tsandcs.show();
     }
 };
 

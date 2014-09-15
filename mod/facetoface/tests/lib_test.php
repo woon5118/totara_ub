@@ -1171,27 +1171,54 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_user_signup() {
-        // Test variables.
-        $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
-        $sess0->sessiondates = array(0 => new stdClass());
-        $sess0->sessiondates[0]->timestart = time() - 100;
-        $sess0->sessiondates[0]->timefinish = time() + 100;
+        global $DB;
 
-        $facetoface1 = $this->facetoface['f2f0'];
-        $f2f = $this->array_to_object($facetoface1);
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface1 = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        // This session should trigger a mincapacity warning now as cutoff is 24:01 hrs before start time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
 
         $discountcode1 = 'disc1';
         $notificationtype1 = 1;
         $statuscode1 = 1;
-        $userid1 = 1;
-
-        $notifyuser1 = TRUE;
-        $displayerrors = TRUE;
 
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_user_signup($sess0, $f2f, $this->course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
-        //TODO invalid case?
+        $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+
         $this->resetAfterTest(true);
     }
 
@@ -1220,22 +1247,59 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_update_signup_status() {
-        // Test variables.
-        $signupid1 = 1;
+
+        global $DB;
+
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface1 = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        // This session should trigger a mincapacity warning now as cutoff is 24:01 hrs before start time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+        $session->sessiondates = facetoface_get_session_dates($session->id);
+
+        $discountcode1 = 'disc1';
+        $notificationtype1 = 1;
         $statuscode1 = 1;
-        $createdby1 = 1;
-        $note1 = 'note1';
-        $grade1 = 85;
-
-        $signupid2 = 42;
-        $statuscode2 = 7;
-        $createdby2 = 40;
-        $note2 = '';
-        $grade1 = 0;
-
 
         // Test for valid case.
-        $this->assertEquals(facetoface_update_signup_status($signupid1, $statuscode1, $createdby1, $note1), 5);
+        facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1, $student1->id);
+
+        $params = array('sessionid' => $sessionid, 'userid' => $student1->id);
+        $signup = $DB->get_record('facetoface_signups', $params);
+        // Test for valid case.
+        $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id, 'testnote'), 6);
 
         // Test for invalid case.
         // TODO invlaid case - how to cause sql error from here?

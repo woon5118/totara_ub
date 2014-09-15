@@ -73,9 +73,7 @@ class mod_facetoface_generator extends testing_module_generator {
             }
         }
 
-        $record->coursemodule = $this->precreate_course_module($record->course, $options);
-        $id = facetoface_add_instance($record);
-        return $this->post_add_instance($id, $record->coursemodule);
+        return parent::create_instance($record, $options);
     }
 
     /**
