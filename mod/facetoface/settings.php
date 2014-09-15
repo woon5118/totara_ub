@@ -54,6 +54,14 @@ if ($ADMIN->fulltree) { // Improve performance.
         )
     );
 
+    $settings->add(new admin_setting_configcheckbox('facetoface_allowwaitlisteveryone',
+        new lang_string('setting:allowwaitlisteveryone_caption', 'facetoface'),
+        new lang_string('setting:allowwaitlisteveryone', 'facetoface'), 0));
+
+    $settings->add( new admin_setting_configcheckbox('facetoface_lotteryenabled',
+        new lang_string('setting:lotteryenabled_caption', 'facetoface'),
+        new lang_string('setting:lotteryenabled', 'facetoface'), 0));
+
     $settings->add(new admin_setting_heading('facetoface_multiplesessions_header', get_string('multiplesessionsheading', 'facetoface'), ''));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));

@@ -57,6 +57,7 @@
         <FIELD NAME="facetoface" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of the facetoface activity this session is for"/>
         <FIELD NAME="capacity" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of students who can enroll in this session. A value of 0 means unlimited."/>
         <FIELD NAME="allowoverbook" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag to turn on waitlisting of signups over capacity."/>
+        <FIELD NAME="waitlisteveryone" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Will everyone be added to the waiting list"/>
         <FIELD NAME="details" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Extra information about this session"/>
         <FIELD NAME="datetimeknown" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A value of 0 means that the date and time are unknown whereas a value of 1 means that both are known."/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Total duration (in minutes) of the session.  A session may be split across multiple dates, this is the total."/>

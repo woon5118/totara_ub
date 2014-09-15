@@ -2340,6 +2340,17 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014100902, 'facetoface');
     }
 
+    if ($oldversion < 2014102100) {
+
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('waitlisteveryone', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'allowoverbook');
+        $field->setComment('Will everyone be added to the waiting list');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2014102100, 'facetoface');
+    }
+
     return $result;
 }
-

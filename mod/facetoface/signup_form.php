@@ -90,6 +90,15 @@ class mod_facetoface_signup_form extends moodleform {
 
         self::add_position_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
 
+        if ($this->_customdata['waitlisteveryone']) {
+            $mform->addElement(
+                'static',
+                'youwillbeaddedtothewaitinglist',
+                get_string('youwillbeaddedtothewaitinglist', 'facetoface'),
+                ''
+            );
+        }
+
         $this->add_action_buttons(true, get_string('signup', 'facetoface'));
     }
 

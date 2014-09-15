@@ -163,7 +163,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if (empty($fromform->allowoverbook)) {
         $fromform->allowoverbook = 0;
     }
-
+    if (empty($fromform->waitlisteveryone)) {
+        $fromform->waitlisteveryone = 0;
+    }
     if (empty($fromform->normalcost)) {
         $fromform->normalcost = 0;
     }
@@ -206,6 +208,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->datetimeknown = $fromform->datetimeknown;
     $todb->capacity = $fromform->capacity;
     $todb->allowoverbook = $fromform->allowoverbook;
+    $todb->waitlisteveryone = $fromform->waitlisteveryone;
     $todb->duration = $fromform->duration;
     $todb->normalcost = $fromform->normalcost;
     $todb->discountcost = $fromform->discountcost;
@@ -309,6 +312,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $toform->datetimeknown = (1 == $session->datetimeknown);
     $toform->capacity = $session->capacity;
     $toform->allowoverbook = $session->allowoverbook;
+    $toform->waitlisteveryone = $session->waitlisteveryone;
     $toform->duration = $session->duration;
     $toform->normalcost = $session->normalcost;
     $toform->discountcost = $session->discountcost;

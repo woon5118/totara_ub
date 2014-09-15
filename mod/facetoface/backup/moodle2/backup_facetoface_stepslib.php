@@ -86,7 +86,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session = new backup_nested_element('session', array('id'), array(
             'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown', 'duration', 'normalcost',
             'discountcost', 'roomid', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
-            'timemodified', 'selfapproval', 'mincapacity', 'cutoff'));
+            'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone'));
 
         $signups = new backup_nested_element('signups');
 

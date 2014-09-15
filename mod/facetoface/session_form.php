@@ -168,6 +168,12 @@ class mod_facetoface_session_form extends moodleform {
             $mform->addHelpButton('allowcancellations', 'allowcancellations', 'facetoface');
         }
 
+        $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+        if ($facetoface_allowwaitlisteveryone) {
+            $mform->addElement('checkbox', 'waitlisteveryone', get_string('waitlisteveryone', 'facetoface'));
+            $mform->addHelpButton('waitlisteveryone', 'waitlisteveryone', 'facetoface');
+            $mform->disabledIf('waitlisteveryone', 'allowoverbook');
+        }
 
         // Show minimum capacity and cut-off (for when this should be reached).
         $mform->addElement('checkbox', 'enablemincapacity', get_string('enablemincapacity', 'facetoface'));

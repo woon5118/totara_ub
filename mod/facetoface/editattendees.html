@@ -1,5 +1,11 @@
+<?php
+$facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+if ($session->waitlisteveryone && !empty($facetoface_allowwaitlisteveryone)) { ?>
+<span><strong><?php print_string('addremoveattendeeswaitlisted', 'facetoface'); ?></strong></span>
+<?php } ?>
 <form id="assignform" method="post" action="<?php echo "{$CFG->wwwroot}/mod/facetoface/editattendees.php?s={$s}"; ?>">
 <div>
+<input type="hidden" name="waitlisteveryone" value="<?php echo $session->waitlisteveryone; ?>">
 <input type="hidden" name="searchbutton" value="<?php p($searchbutton) ?>" />
 <input type="hidden" name="sesskey" value="<?php p(sesskey()) ?>" />
 <input type="hidden" name="add" value="" />

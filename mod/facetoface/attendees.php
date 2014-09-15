@@ -255,6 +255,14 @@ if ($action == 'waitlist') {
         array('user', 'email'),
     );
 
+    $lotteryenabled = get_config(null, 'facetoface_lotteryenabled');
+
+    $actions['confirmattendees'] = get_string('confirm');
+    $actions['cancelattendees'] = get_string('cancel');
+    if ($lotteryenabled) {
+        $actions['playlottery'] = get_string('playlottery', 'facetoface');
+    }
+
     $show_table = true;
 }
 
@@ -422,10 +430,14 @@ if (!$onlycontent) {
 
     $PAGE->requires->string_for_js('save', 'admin');
     $PAGE->requires->string_for_js('cancel', 'moodle');
-    $PAGE->requires->strings_for_js(array('uploadfile', 'addremoveattendees', 'approvalreqd','bulkaddattendeesfrominput',
-        'submitcsvtext', 'bulkaddattendeesresults', 'bulkaddattendeesfromfile', 'bulkaddattendeesresults', 'wait-list',
-        'cancellations', 'approvalreqd', 'takeattendance', 'updateattendeessuccessful', 'updateattendeesunsuccessful'),
-        'facetoface');
+    $PAGE->requires->strings_for_js(
+        array('uploadfile', 'addremoveattendees', 'approvalreqd', 'areyousureconfirmwaitlist',
+            'bulkaddattendeesfrominput', 'submitcsvtext', 'bulkaddattendeesresults', 'bulkaddattendeesfromfile',
+            'bulkaddattendeesresults', 'wait-list', 'cancellations', 'approvalreqd', 'takeattendance',
+            'updateattendeessuccessful', 'updateattendeesunsuccessful', 'waitlistselectoneormoreusers',
+            'confirmlotteryheader', 'confirmlotterybody', 'updatewaitlist', 'close'),
+        'facetoface'
+    );
 
     $json_action = json_encode($action);
     $args = array('args' => '{"sessionid":'.$session->id.','.
@@ -556,6 +568,7 @@ if ($show_table) {
                 echo $OUTPUT->notification($overbookedmessage, 'notifynotice');
             }
         }
+
         //output the section heading
         echo $OUTPUT->heading($heading);
     }
@@ -593,7 +606,7 @@ if ($show_table) {
             $baseurl->param('action', $action);
         }
         $table->define_baseurl($baseurl);
-        $table->set_attribute('class', 'generalbox mod-facetoface-attendees');
+        $table->set_attribute('class', 'generalbox mod-facetoface-attendees '.$action);
 
         $exportfilename = isset($action) ? $action : 'attendees';
 
@@ -642,6 +655,13 @@ if ($show_table) {
             $columns[] = 'attendance';
             $headers[] = get_string('attendeenote', 'facetoface');
             $columns[] = 'usernote';
+
+            if ($action == 'waitlist' && !$download) {
+                $headers[] = html_writer::tag('a', get_string('all'), array('href' => '#', 'class' => 'selectall'))
+                            . '/'
+                            . html_writer::tag('a', get_string('none'), array('href' => '#', 'class' => 'selectnone'));
+                $columns[] = 'actions';
+            }
         }
         if (!$download) {
             $table->define_columns($columns);
@@ -765,6 +785,12 @@ if ($show_table) {
                 $note = html_writer::span($attendee->usernote, 'note'.$attendee->id, array('id' => 'usernote'.$attendee->id));
                 $data[] = $icon . $note;
             }
+
+            if ($action == 'waitlist' && !$download) {
+                $d = html_writer::empty_tag('input', array('type' => 'checkbox', 'value' => $attendee->id, 'name' => 'userid'));
+                $data[] = $d;
+            }
+
             if (!$download) {
                 $table->add_data($data);
             } else {
@@ -793,6 +819,9 @@ if ($show_table) {
         if ($actions) {
             // Action selector
             echo html_writer::select($actions, 'f2f-actions', '', array('' => get_string('action')));
+            if ($action == 'waitlist') {
+                echo $OUTPUT->help_icon('f2f-waitlist-actions', 'mod_facetoface');
+            }
         }
         echo $OUTPUT->container_end();
     }

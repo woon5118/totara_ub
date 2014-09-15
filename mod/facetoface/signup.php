@@ -91,12 +91,14 @@ $hasselfapproval = facetoface_session_has_selfapproval($facetoface, $session);
 
 $selfapprovaltandc = format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
 
+$facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+$waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
+
 $f2fid = $session->facetoface;
 
-$mform = new mod_facetoface_signup_form(
-    null,
-    compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode', 'hasselfapproval', 'selfapprovaltandc', 'f2fid')
-);
+$params = compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode',
+    'hasselfapproval', 'selfapprovaltandc', 'f2fid', 'waitlisteveryone');
+$mform = new mod_facetoface_signup_form(null, $params);
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);

@@ -811,7 +811,8 @@ function facetoface_update_attendees($session) {
             }
 
             // If booked less than capacity, book some new users
-            if ($booked < $capacity) {
+            $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+            if ($booked < $capacity && (!$session->waitlisteveryone || empty($facetoface_allowwaitlisteveryone))) {
                 foreach ($users as $user) {
                     if ($booked >= $capacity) {
                         break;
@@ -4538,7 +4539,10 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         return $result;
     }
 
-    if (!facetoface_session_has_capacity($session, $context)) {
+    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+    if ($session->waitlisteveryone && !empty($facetoface_allowwaitlisteveryone)) {
+        $status = MDL_F2F_STATUS_WAITLISTED;
+    } else if (!facetoface_session_has_capacity($session, $context)) {
         if ($session->allowoverbook) {
             $status = MDL_F2F_STATUS_WAITLISTED;
         } else {
@@ -6011,4 +6015,63 @@ function facetoface_displaysessiontimezones_updated() {
         facetoface_update_calendar_entries($session);
     }
     $sessions->close();
+}
+
+/**
+ * Cancels waitlisted users from an array as booked on a session
+ * @param int    $sessionid  ID of the session to use
+ * @param array  $userids    Array of user ids to confirm
+ */
+function facetoface_confirm_attendees($sessionid, $userids) {
+    global $DB, $USER;
+
+    $session = facetoface_get_session($sessionid);
+    $facetoface = $DB->get_record('facetoface', array('id'=>$session->facetoface));
+
+    foreach ($userids as $userid) {
+        $conditions = array('sessionid' => $sessionid, 'userid' => $userid);
+        $existingsignup = $DB->get_record('facetoface_signups', $conditions, '*', MUST_EXIST);
+        facetoface_update_signup_status($existingsignup->id, MDL_F2F_STATUS_BOOKED, $USER->id);
+        facetoface_send_confirmation_notice($facetoface, $session, $userid, $existingsignup->notificationtype, false);
+    }
+}
+
+/**
+ * Cancels waitlisted users from an array on a session
+ * @param int    $sessionid  ID of the session to use
+ * @param array  $userids    Array of user ids to cancel
+ */
+function facetoface_cancel_attendees($sessionid, $userids) {
+    global $DB, $USER;
+
+    foreach ($userids as $userid) {
+        $params = array('sessionid' => $sessionid, 'userid' => $userid);
+        $existingsignup = $DB->get_record('facetoface_signups', $params, '*', MUST_EXIST);
+        facetoface_update_signup_status($existingsignup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id);
+    }
+}
+
+/**
+ * Randomly books waitlisted users on to a session
+ * @param int $sessionid  ID of the session to use
+ */
+function facetoface_waitlist_randomly_confirm_users($sessionid, $userids) {
+    $session = facetoface_get_session($sessionid);
+    $signupcount = facetoface_get_num_attendees($sessionid);
+
+    $numtoconfirm = $session->capacity - $signupcount;
+
+    if (count($userids) <= $session->capacity) {
+        $winners = $userids;
+    } else {
+        $winners = array_rand(array_flip($userids), $numtoconfirm);
+
+        if ($numtoconfirm == 1) {
+            $winners = array($winners);
+        }
+    }
+
+    facetoface_confirm_attendees($sessionid, $winners);
+
+    return $winners;
 }

@@ -43,6 +43,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         // save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
+        $('.selectall').click(function(){
+            $('[name="userid"]').prop("checked", true);
+        });
+
+        $('.selectnone').click(function(){
+            $('[name="userid"]').prop("checked", false);
+        });
+
         // if defined, parse args into this module's config object
         if (args) {
             var jargs = Y.JSON.parse(args);
@@ -137,7 +145,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
             // Activate or deactivate waitlist tab
             if (waitlisttab.length > 0) {
-                if ($('input[name=waitlist]').val() == 1 && $('input[name=attendees]').val()) {
+                if (($('input[name=waitlist]').val() == 1 && $('input[name=attendees]').val()) || $('input[name=waitlisteveryone]').val() == 1) {
                     waitlisttab.parent('a').removeClass('nolink');
                     waitlisttab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' +
                         M.totara_f2f_attendees.config.sessionid + '&action=waitlist');
@@ -536,6 +544,48 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             if (current == "addremove" || current == "bulkaddfile" || current == "bulkaddinput") {
                 totaraDialogs[current].open();
             }
+            // Process confirm/cancel attendees.
+            if (current == "confirmattendees" || current == "cancelattendees" || current == "playlottery") {
+
+                var users = Y.all('table.mod-facetoface-attendees.waitlist tr');
+                var updateusers = [];
+                var i = 0;
+                users.each(function(node) {
+                    if (checkbox = node.one('input[type=checkbox]')) {
+                        if (checkbox._node.checked) {
+                            userid = checkbox.get('value');
+                            updateusers[i] = userid;
+                            i++;
+                        }
+                    }
+                });
+
+                if (updateusers.length == 0) {
+                    Y.use('panel', function (Y) {
+                        var config = {
+                            headerContent: M.util.get_string('updatewaitlist', 'facetoface'),
+                            bodyContent: M.util.get_string('waitlistselectoneormoreusers','facetoface'),
+                            draggable: true,
+                            modal: true
+                        };
+                        dialog = new M.core.dialogue(config);
+
+                        dialog.addButton({
+                            label: M.util.get_string('close', 'facetoface'),
+                            section: Y.WidgetStdMod.FOOTER,
+                            action: function() {
+                                dialog.destroy(true);
+                                return false;
+                            }
+                        });
+
+                        dialog.show();
+                    });
+                } else {
+                    updateusers = updateusers.join();
+                    update_waitlist(current, updateusers, false);
+                }
+            }
 
             // If exporting, redirect to that url
             if (current.substr(0, 6) == "export") {
@@ -554,6 +604,108 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 $('form.f2f-takeattendance-form').submit();
             }
         });
+
+        function update_waitlist(action, updateusers, checked) {
+            var nextaction = null;
+            if (checked == false && action == 'confirmattendees') {
+                nextaction = action;
+                action = 'checkcapacity';
+            }
+
+            function do_post() {
+                Y.io(M.cfg.wwwroot + '/mod/facetoface/updatewaitlist.php', {
+                    data: {
+                        courseid: M.totara_f2f_attendees.config.courseid,
+                        sessionid: M.totara_f2f_attendees.config.sessionid,
+                        context: this,
+                        action: action,
+                        datasubmission: updateusers,
+                        sesskey: M.totara_f2f_attendees.config.sesskey
+                    },
+                    on: {
+                        success: function (x, o) {
+                            var parsedResponse;
+                            // protected against malformed JSON response
+                            try {
+                                parsedResponse = Y.JSON.parse(o.responseText);
+                            }
+                            catch (e) {
+                                alert("JSON Parse failed!");
+                            }
+
+                            if (parsedResponse.result == 'overcapacity') {
+                                Y.use('moodle-core-notification-confirm', function () {
+                                    var confirm = new M.core.confirm({
+                                        title: M.util.get_string('confirm', 'moodle'),
+                                        question: M.util.get_string('areyousureconfirmwaitlist', 'facetoface'),
+                                        yesLabel: M.util.get_string('yes', 'moodle'),
+                                        noLabel: M.util.get_string('cancel', 'moodle')
+                                    });
+                                    confirm.on('complete-yes', function () {
+                                        confirm.hide();
+                                        confirm.destroy();
+                                        update_waitlist(nextaction, updateusers, true);
+                                    }, self);
+                                    confirm.show();
+
+                                });
+                            }
+                            if (parsedResponse.result == 'undercapacity') {
+                                update_waitlist(nextaction, updateusers, true);
+                            }
+                            if (parsedResponse.result == 'success') {
+                                var attendees = parsedResponse.attendees;
+
+                                $('input[name=userid]').each(function (index, elem) {
+                                    var userid = parseInt(elem.value);
+                                    if (attendees.indexOf(userid) > -1) {
+                                        $('input[name=userid][value=' + userid + ']').parents('tr').remove();
+                                    }
+                                });
+
+                                print_notice(true);
+                            }
+                        },
+                        failure: function () {
+                            print_notice(false);
+                        }
+                    }
+                });
+            }
+
+            if (action == 'playlottery') {
+                Y.use('panel', function (Y) {
+                    var config = {
+                        headerContent: M.util.get_string('confirmlotteryheader', 'facetoface'),
+                        bodyContent: M.util.get_string('confirmlotterybody','facetoface'),
+                        draggable: true,
+                        modal: true,
+                    };
+                    dialogue = new M.core.dialogue(config);
+                    dialogue.addButton({
+                        label: M.util.get_string('ok', 'moodle'),
+                        section: Y.WidgetStdMod.FOOTER,
+                        action: function() {
+                            do_post.call(this);
+                            dialogue.destroy(true);
+                            return false;
+                        }
+                    });
+                    dialogue.addButton({
+                        label: M.util.get_string('cancel', 'moodle'),
+                        section: Y.WidgetStdMod.FOOTER,
+                        action: function() {
+                            dialogue.destroy(true);
+                            return false;
+                        }
+                    });
+
+                    dialogue.show();
+                });
+            } else {
+                do_post.call(this);
+            }
+        }
 
         function removeselect_onfocus() {
             $('form#assignform input[name=add]').attr('disabled', 'disabled');
