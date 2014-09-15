@@ -28,25 +28,24 @@ require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
-$searchterms = optional_param('notification-title', '', PARAM_TEXT);
 $update = required_param('update', PARAM_INT);
 $display = optional_param('display', '', PARAM_ALPHANUM);
 $deactivate = optional_param('deactivate', 0, PARAM_INT);
 $activate = optional_param('activate', 0, PARAM_INT);
 $delete = optional_param('delete', 0, PARAM_INT);
-$confirm = optional_param('confirm', 0, PARAM_TEXT);
+$confirm = optional_param('confirm', 0, PARAM_BOOL);
 
 
-if (!$cm = $DB->get_record('course_modules', array('id' => $update))) {
-    error('This course module doesn\'t exist');
+if (!$cm = get_coursemodule_from_id('facetoface', $update)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
 }
 
 if (!$course = $DB->get_record("course", array('id' => $cm->course))) {
-    error('This course doesn\'t exist');
+    print_error('error:coursemisconfigured', 'facetoface');
 }
 
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $cm->instance))) {
-    error('This facetoface doesn\'t exist');
+    print_error('error:incorrectcoursemodule', 'facetoface');
 }
 
 $url = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));

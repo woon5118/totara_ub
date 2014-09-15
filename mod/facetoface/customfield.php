@@ -21,49 +21,28 @@
  * @subpackage facetoface
  */
 
-global $DB;
 require_once '../../config.php';
 require_once 'customfield_form.php';
 
-$id      = required_param('id', PARAM_INT); // ID in facetoface_session_field
-$d       = optional_param('d', false, PARAM_BOOL); // set to true to delete the given field
-$confirm = optional_param('confirm', false, PARAM_BOOL); // delete confirmationx
+$id      = required_param('id', PARAM_INT); // ID in facetoface_session_field.
+$delete  = optional_param('d', 0, PARAM_BOOL); // Set to true to delete the given field.
+$confirm = optional_param('confirm', 0, PARAM_BOOL); // Delete confirmationx.
+$page    = optional_param('page', 0, PARAM_INT );
 
-$field = null;
-if ($id > 0) {
-    if (!$field = $DB->get_record('facetoface_session_field', array('id' => $id))) {
-        print_error('error:fieldidincorrect', 'facetoface', '', $id);
-    }
-}
-
-$PAGE->set_url('/mod/facetoface/customfield.php', array('id' => $id, 'd' => $d, 'confirm' => $confirm));
-
-admin_externalpage_setup('managemodules'); // this is hacky, tehre should be a special hidden page for it
+$page = optional_param('page', 0, PARAM_INT);
 
 $contextsystem = context_system::instance();
+admin_externalpage_setup('modfacetofacecustomfields');
 
-require_capability('moodle/site:config', $contextsystem);
-
-$returnurl = "$CFG->wwwroot/admin/settings.php?section=modsettingfacetoface";
-
-// Header
-
-$title = get_string('addnewfield', 'facetoface');
-if ($field != null) {
-    $title = $field->name;
-}
-
-$PAGE->set_title($title);
+$returnurl = new moodle_url('/mod/facetoface/customfields.php', array('page' => $page));
 
 // Handle deletions
-if (!empty($d)) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
+if ($delete and $id) {
+    $field = $DB->get_record('facetoface_session_field', array('id' => $id), '*', MUST_EXIST);
 
-    if (!$confirm) {
+    if (!$confirm or !confirm_sesskey()) {
         echo $OUTPUT->header();
-        echo $OUTPUT->heading($title);
+
         $optionsyes = array('id' => $id, 'sesskey' => $USER->sesskey, 'd' => 1, 'confirm' => 1);
         echo $OUTPUT->confirm(get_string('fielddeleteconfirm', 'facetoface', format_string($field->name)),
             new moodle_url("customfield.php", $optionsyes),
@@ -71,49 +50,41 @@ if (!empty($d)) {
         echo $OUTPUT->footer();
         exit;
     }
-    else {
-        $transaction = $DB->start_delegated_transaction();
 
-        try {
-            if (!$DB->delete_records('facetoface_session_field', array('id' => $id))) {
-                throw new Exception(get_string('error:couldnotdeletefield', 'facetoface'));
-            }
-
-            if (!$DB->delete_records('facetoface_session_data', array('fieldid' => $id))) {
-                throw new Exception(get_string('error:couldnotdeletefield', 'facetoface'));
-            }
-
-            $transaction->allow_commit();
-        } catch (Exception $e) {
-            $transaction->rollback($e);
-        }
-
-        redirect($returnurl);
-    }
+    $transaction = $DB->start_delegated_transaction();
+    $DB->delete_records('facetoface_session_field', array('id' => $id));
+    $DB->delete_records('facetoface_session_data', array('fieldid' => $id));
+    $transaction->allow_commit();
+    redirect($returnurl);
 }
 
+if ($id == 0) {
+    $field = new stdClass();
+    $field->id = 0;
+    $field->name = '';
+    $field->shortname = '';
+    $field->type = (string)CUSTOMFIELD_TYPE_TEXT;
+    $field->required = '0';
+    $field->showinsummary = '1';
+
+} else {
+    $field = $DB->get_record('facetoface_session_field', array('id' => $id), '*', MUST_EXIST);
+    $field->possiblevalues = implode(PHP_EOL, explode(CUSTOMFIELD_DELIMITER, $field->possiblevalues));
+}
+$field->page = $page;
+
 $mform = new mod_facetoface_customfield_form(null, compact('id'));
+$mform->set_data($field);
+
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($fromform = $mform->get_data()) { // Form submitted
+if ($fromform = $mform->get_data()) {
 
-    if (empty($fromform->submitbutton)) {
-        print_error('error:unknownbuttonclicked', 'facetoface', $returnurl);
-    }
-
-    // Post-process the input
-    if (empty($fromform->required)) {
-        $fromform->required = 0;
-    }
-    if (empty($fromform->showinsummary)) {
-        $fromform->showinsummary = 0;
-    }
-    if (empty($fromform->type)) {
+    if (!isset($fromform->possiblevalues)) {
         $fromform->possiblevalues = '';
     }
-
     $values_list = explode("\n", trim($fromform->possiblevalues));
     $pos_vals = array();
     foreach ($values_list as $val) {
@@ -132,42 +103,18 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->required = $fromform->required;
     $todb->showinsummary = $fromform->showinsummary;
 
-    if ($field != null) {
+    if ($field->id) {
         $todb->id = $field->id;
-        if (!$DB->update_record('facetoface_session_field', $todb)) {
-            print_error('error:couldnotupdatefield', 'facetoface', $returnurl);
-        }
-    }
-    else {
-        if (!$DB->insert_record('facetoface_session_field', $todb)) {
-            print_error('error:couldnotaddfield', 'facetoface', $returnurl);
-        }
+        $DB->update_record('facetoface_session_field', $todb);
+    } else {
+        $DB->insert_record('facetoface_session_field', $todb);
     }
 
     redirect($returnurl);
 }
-elseif ($field != null) { // Edit mode
-    // Set values for the form
-    $toform = new stdClass();
-    $toform->name = $field->name;
-    $toform->shortname = $field->shortname;
-    $toform->type = $field->type;
-    $toform->defaultvalue = $field->defaultvalue;
-    $value_array = explode(CUSTOMFIELD_DELIMITER, $field->possiblevalues);
-    $possible_values = implode(PHP_EOL, $value_array);
-    $toform->possiblevalues = $possible_values;
-    $toform->required = ($field->required == 1);
-    $toform->showinsummary = ($field->showinsummary == 1);
-
-    $mform->set_data($toform);
-}
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->box_start();
-echo $OUTPUT->heading($title);
-
 $mform->display();
 
-echo $OUTPUT->box_end();
 echo $OUTPUT->footer();

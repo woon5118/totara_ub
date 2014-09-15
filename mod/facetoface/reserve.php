@@ -26,7 +26,6 @@
  */
 
 require_once(dirname(__FILE__).'/../../config.php');
-global $DB, $CFG, $PAGE, $USER;
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
 $sid = required_param('s', PARAM_INT);

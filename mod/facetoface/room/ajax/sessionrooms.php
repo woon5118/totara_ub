@@ -27,16 +27,47 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content.class.php');
 
-$sessionid = required_param('sessionid', PARAM_INT);
-$timeslots = required_param('timeslots', PARAM_TEXT);
+$facetofaceid = required_param('facetofaceid', PARAM_INT); // Necessary when creating new sessions.
+$sessionid = required_param('sessionid', PARAM_INT);       // Empty when adding new session.
+$timeslots = required_param('timeslots', PARAM_RAW);
 $timeslotsarray = json_decode($timeslots);
+// Cleanup the json encoded data.
+foreach ($timeslotsarray as $k => $v) {
+    $timeslotsarray[$k] = array(clean_param($v[0], PARAM_INT), clean_param($v[1], PARAM_INT));
+}
 
-require_login();
-$PAGE->set_context(context_system::instance());
+if (!$facetoface = $DB->get_record('facetoface',array('id' => $facetofaceid))) {
+    print_error('error:incorrectfacetofaceid', 'facetoface');
+}
+if (!$course = $DB->get_record('course', array('id'=> $facetoface->course))) {
+    print_error('error:coursemisconfigured', 'facetoface');
+}
+if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
+}
+if ($sessionid) {
+    if (!$session = facetoface_get_session($sessionid)) {
+        print_error('error:incorrectcoursemodulesession', 'facetoface');
+    }
+    if ($session->facetoface != $facetoface->id) {
+        print_error('error:incorrectcoursemodulesession', 'facetoface');
+    }
+}
+
+$context = context_module::instance($cm->id);
+
+require_login($course, false, $cm);
+require_capability('mod/facetoface:editsessions', $context);
+
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/facetoface/room/ajax/sessionrooms.php', array('sessionid' => $sessionid, 'timeslots' => $timeslots));
 
 if (empty($timeslotsarray)) {
     print_error('notimeslotsspecified', 'facetoface');
 }
+
+// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+send_headers('text/html; charset=utf-8', false);
 
 // Setup / loading data
 // Get all rooms

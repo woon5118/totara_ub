@@ -56,11 +56,11 @@ if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
 if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
     print_error('error:incorrectcoursemodule', 'facetoface');
 }
+$context = context_module::instance($cm->id);
 
 
 // Check essential permissions
-require_course_login($course);
-$context = context_course::instance($course->id);
+require_login($course, false, $cm);
 require_capability('mod/facetoface:viewattendees', $context);
 
 // Get some language strings

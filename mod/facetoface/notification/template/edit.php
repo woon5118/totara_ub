@@ -30,80 +30,60 @@ require_once($CFG->dirroot . '/mod/facetoface/notification/template/edit_form.ph
 
 // Parameters
 $id = optional_param('id', 0, PARAM_INT);
+$page = optional_param('page', 0, PARAM_INT);
 
-// Setup page and check permissions
 $contextsystem = context_system::instance();
-$PAGE->set_url($CFG->wwwroot . '/mod/facetoface/notification/template/edit.php');
-$PAGE->set_context($contextsystem);
 
-require_login(0, false);
-require_capability('moodle/site:config', $contextsystem);
+// Check permissions.
+admin_externalpage_setup('modfacetofacetemplates');
 
-$redirectto = "{$CFG->wwwroot}/mod/facetoface/notification/template/index.php";
+$redirectto = new moodle_url('/mod/facetoface/notification/template/index.php', array('page' => $page));
 
-if ($id) {
-    $notification = $DB->get_record('facetoface_notification_tpl', array('id' => $id));
-}
-
-// Setup editors
+// Setup editors.
 $editoroptions = array(
     'noclean'  => false,
-    'maxfiles' => EDITOR_UNLIMITED_FILES,
-    'maxbytes' => $CFG->maxbytes,
+    'maxfiles' => 0, // Files were never working here.
     'context'  => $contextsystem,
 );
 
-$body = new stdClass();
-$body->id = isset($notification) ? $notification->id : 0;
-$body->body = isset($notification->body) ? $notification->body : '';
-$body->bodyformat = FORMAT_HTML;
-$body = file_prepare_standard_editor($body, 'body', $editoroptions, $contextsystem, 'mod_facetoface', 'notification_template', $id);
+if ($id == 0) {
+    $template = new stdClass();
+    $template->id = 0;
+    $template->body = '';
+    $template->managerprefix = '';
+    $template->status = '1';
 
-$managerprefix = new stdClass();
-$managerprefix->id = isset($notification) ? $notification->id : 0;
-$managerprefix->managerprefix = isset($notification->managerprefix) ? $notification->managerprefix : '';
-$managerprefix->managerprefixformat = FORMAT_HTML;
-$managerprefix = file_prepare_standard_editor($managerprefix, 'managerprefix', $editoroptions, $contextsystem, 'mod_facetoface', 'notification_template', $id);
-
-// Load data
-$form = new mod_facetoface_notification_template_form(null, compact('id', 'editoroptions'));
-
-if ($id) {
+} else {
     $template = $DB->get_record('facetoface_notification_tpl', array('id' => $id));
     if (!$template) {
         print_error('error:notificationtemplatecouldnotbefound', 'facetoface');
     }
-
-    // Format for the text editors
-    $template->managerprefixformat = FORMAT_HTML;
-    $template->bodyformat = FORMAT_HTML;
-
-    $template = file_prepare_standard_editor($template, 'body', $editoroptions, $contextsystem, 'mod_facetoface', 'notification', $id);
-    $template = file_prepare_standard_editor($template, 'managerprefix', $editoroptions, $contextsystem, 'mod_facetoface', 'notification', $id);
-
-    $form->set_data($template);
 }
+$template->bodyformat = FORMAT_HTML;
+$template->managerprefixformat = FORMAT_HTML;
+$template->page = $page;
+$template = file_prepare_standard_editor($template, 'body', $editoroptions, $contextsystem, null, null, $id);
+$template = file_prepare_standard_editor($template, 'managerprefix', $editoroptions, $contextsystem, null, null, $id);
 
-// Process data
+// Load data.
+$form = new mod_facetoface_notification_template_form(null, compact('id', 'editoroptions'));
+$form->set_data($template);
+
+// Process data.
 if ($form->is_cancelled()) {
     redirect($redirectto);
 
 } else if ($data = $form->get_data()) {
+    unset($data->page);
 
-    $data->body = '';
-    $data->managerprefix = '';
+    $data = file_postupdate_standard_editor($data, 'body', $editoroptions, $contextsystem, 'mod_facetoface', null, null);
+    $data = file_postupdate_standard_editor($data, 'managerprefix', $editoroptions, $contextsystem, 'mod_facetoface', null, null);
 
     if ($data->id) {
         $DB->update_record('facetoface_notification_tpl', $data);
     } else {
         $data->id = $DB->insert_record('facetoface_notification_tpl', $data);
     }
-
-    $data = file_postupdate_standard_editor($data, 'body', $editoroptions, $contextsystem, 'mod_facetoface', 'session', $data->id);
-    $DB->set_field('facetoface_notification_tpl', 'body', $data->body, array('id' => $data->id));
-
-    $data = file_postupdate_standard_editor($data, 'managerprefix', $editoroptions, $contextsystem, 'mod_facetoface', 'session', $data->id);
-    $DB->set_field('facetoface_notification_tpl', 'managerprefix', $data->managerprefix, array('id' => $data->id));
 
     totara_set_notification(get_string('notificationtemplatesaved', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
@@ -116,14 +96,7 @@ if ($id) {
     $heading = get_string('addnotificationtemplate', 'facetoface');
 }
 
-$PAGE->set_title(get_string('notificationtemplates', 'facetoface'));
-$PAGE->set_heading('');
-$PAGE->set_focuscontrol('');
-$PAGE->set_cacheable(true);
-$PAGE->navbar->add(get_string('notificationtemplates', 'facetoface'))->add($heading);
-navigation_node::override_active_url($url);
 echo $OUTPUT->header();
-
 echo $OUTPUT->heading($heading);
 
 $form->display();

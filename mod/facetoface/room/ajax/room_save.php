@@ -31,6 +31,9 @@ require_once($CFG->dirroot.'/mod/facetoface/room/room_form.php');
 require_login(0, false);
 require_capability('moodle/site:config', context_system::instance());
 
+// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+send_headers('text/html; charset=utf-8', false);
+
 $form = new f2f_room_form(null, null, 'post', '', null, true, 'ajaxmform');
 
 // Process form data
@@ -63,4 +66,3 @@ if ($data = $form->get_data()) {
 
 $form->display();
 
-?>

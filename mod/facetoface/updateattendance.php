@@ -21,30 +21,45 @@
  * @package totara
  * @subpackage cohort/rules
  */
+
 /**
- * This class is an ajax back-end for updating attendance
+ * This file is an ajax back-end for updating attendance
  */
 define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot.'/mod/facetoface/lib.php');
 
-$courseid = required_param('courseid', PARAM_INT);
-$facetofaceid = required_param('facetofaceid', PARAM_INT);
 $data = required_param_array('datasubmission', PARAM_ALPHANUMEXT);
 
-$context = context_course::instance($courseid);
-require_capability('mod/facetoface:takeattendance', $context);
+require_sesskey();
 
-// Cast to object.
-$data = (object) $data;
-$modinfo = get_fast_modinfo($courseid);
-$cm = $modinfo->instances['facetoface'][$facetofaceid];
+$data = (object)$data;
+if (empty($data->s)) {
+    print_error('error:incorrectcoursemodulesession', 'facetoface');
+}
+if (!$session = facetoface_get_session((int)$data->s)) {
+    print_error('error:incorrectcoursemodulesession', 'facetoface');
+}
+if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface))) {
+    print_error('error:incorrectfacetofaceid', 'facetoface');
+}
+if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
+    print_error('error:coursemisconfigured', 'facetoface');
+}
+if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemodule', 'facetoface');
+}
+$context = context_module::instance($cm->id);
+
+require_login($course, false, $cm);
+require_capability('mod/facetoface:takeattendance', $context);
 
 if (facetoface_take_attendance($data)) {
     echo json_encode(array('result' => 'success'));
-    add_to_log($courseid, 'facetoface', 'take attendance', "view.php?id=$cm->id", $facetofaceid, $cm->id);
+    add_to_log($course->id, 'facetoface', 'take attendance', "view.php?id=$cm->id", $facetoface->id, $cm->id);
 } else {
-    add_to_log($courseid, 'facetoface', 'take attendance (FAILED)', "view.php?id=$cm->id", $facetofaceid, $cm->id);
+    add_to_log($course->id, 'facetoface', 'take attendance (FAILED)', "view.php?id=$cm->id", $facetoface->id, $cm->id);
 }
 
 exit();

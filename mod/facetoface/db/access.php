@@ -63,7 +63,6 @@ $capabilities = array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -71,12 +70,11 @@ $capabilities = array(
     // Ability to signup for a session
     'mod/facetoface:signup' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -87,7 +85,6 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -95,11 +92,10 @@ $capabilities = array(
     // Ability to see how many people have signed up for a session
     'mod/facetoface:viewattendees' => array(
         'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -107,11 +103,10 @@ $capabilities = array(
     // Ability to take attendance
     'mod/facetoface:takeattendance' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -119,11 +114,10 @@ $capabilities = array(
     // Ability to add attendees to a session
     'mod/facetoface:addattendees' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -131,11 +125,10 @@ $capabilities = array(
     // Ability to remove attendees from a session
     'mod/facetoface:removeattendees' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -143,11 +136,10 @@ $capabilities = array(
     // Ability to add, edit, copy and delete a session
     'mod/facetoface:editsessions' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     ),
@@ -155,11 +147,10 @@ $capabilities = array(
     // View session cancellations
     'mod/facetoface:viewcancellations' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
     ),
@@ -168,11 +159,10 @@ $capabilities = array(
     // Users with mod/facetoface:addattendees can also overbook
     'mod/facetoface:overbook' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
     ),
@@ -182,7 +172,7 @@ $capabilities = array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
         'captype' => 'write',
-        'contextlevel' => CONTEXT_BLOCK,
+        'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
@@ -230,4 +220,3 @@ $capabilities = array(
     ),
 );
 
-?>

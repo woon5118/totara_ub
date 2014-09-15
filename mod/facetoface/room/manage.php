@@ -26,44 +26,35 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$searchterms = optional_param('room-name', '', PARAM_TEXT);
 $delete = optional_param('delete', 0, PARAM_INT);
-$confirm = optional_param('confirm', 0, PARAM_TEXT);
-$format = optional_param('format', '', PARAM_TEXT);
+$confirm = optional_param('confirm', 0, PARAM_BOOL);
 $page = optional_param('page', 0, PARAM_INT);
 
-if ($format != '') {
-    add_to_log(SITEID, 'reportbuilder', 'export embedded report', '', $report->fullname);
-    $report->export_data($format);
-    die;
-}
-
-// Check permissions
-$PAGE->set_url($CFG->wwwroot . '/mod/facetoface/room/manage.php');
-$PAGE->set_context(context_system::instance());
-require_login(0, false);
-require_capability('moodle/site:config', context_system::instance());
+// Check permissions.
+admin_externalpage_setup('modfacetofacerooms');
 
 $returnurl = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
 $redirectto = new moodle_url('/mod/facetoface/room/manage.php');
 
-// Handle actions
-if ($delete && $confirm) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
-
+// Handle actions.
+if ($delete) {
     if (!$room = $DB->get_record('facetoface_room', array('id' => $delete))) {
         print_error('error:roomdoesnotexist', 'facetoface');
     }
 
     $room_in_use = $DB->count_records_select('facetoface_sessions', "roomid = :id", array('id'=>$delete));
-
     if ($room_in_use) {
         print_error('error:roomisinuse', 'facetoface');
+    }
+
+    if (!$confirm or !confirm_sesskey()) {
+        echo $OUTPUT->header();
+        $confirmurl = new moodle_url($redirectto, array('delete' => $delete, 'confirm' => 1, 'sesskey' => sesskey()));
+        echo $OUTPUT->confirm(get_string('deleteroomconfirm', 'facetoface', format_string($room->name)), $confirmurl, $redirectto);
+        echo $OUTPUT->footer();
+        die;
     }
 
     $DB->delete_records('facetoface_room', array('id' => $delete));
@@ -73,7 +64,6 @@ if ($delete && $confirm) {
 
 // Check for form submission
 if (($data = data_submitted()) && !empty($data->bulk_update)) {
-    // Check sesskey
     if (!confirm_sesskey()) {
         print_error('confirmsesskeybad', 'error');
     }
@@ -94,34 +84,13 @@ if (($data = data_submitted()) && !empty($data->bulk_update)) {
     redirect($redirectto);
 }
 
-// Display
 local_js(array(
     TOTARA_JS_DIALOG,
     )
 );
 
-$PAGE->set_title(get_string('rooms', 'facetoface'));
-$PAGE->set_heading('');
-$PAGE->set_focuscontrol('');
-$PAGE->set_cacheable(true);
-$PAGE->navbar->add(get_string('rooms', 'facetoface'));
-navigation_node::override_active_url($returnurl);
 echo $OUTPUT->header();
-
-// Print delete confirmation page
-if ($delete) {
-    if (!$room = $DB->get_record('facetoface_room', array('id' => $delete))) {
-        print_error('error:roomdoesnotexist', 'facetoface');
-    }
-
-    echo $OUTPUT->confirm(get_string('deleteroomconfirm', 'facetoface', format_string($room->name)), "{$redirectto}?delete={$delete}&amp;sesskey=".sesskey()."&amp;confirm=1", $redirectto);
-    echo $OUTPUT->footer();
-    die();
-}
-
-$heading = get_string('rooms', 'facetoface');
-
-echo $OUTPUT->heading($heading);
+echo $OUTPUT->heading(get_string('managerooms', 'facetoface'));
 
 $str_edit = get_string('edit', 'moodle');
 $str_remove = get_string('delete', 'moodle');
@@ -179,7 +148,7 @@ foreach ($rooms as $room) {
     $editbutton = '';
     $deletebutton = '';
 
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/room/edit.php', array('id' => $room->id)), new pix_icon('t/edit', $str_edit));
+    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/room/edit.php', array('id' => $room->id, 'page' => $page)), new pix_icon('t/edit', $str_edit));
 
     if (in_array($room->id, $rooms_in_use)) {
         $buttons[] = $OUTPUT->pix_icon('t/delete_gray', $str_remove_inuse, null, array('class' => 'disabled_action_icon'));
@@ -194,12 +163,11 @@ foreach ($rooms as $room) {
 
 $table->finish_html();
 
-// Action buttons
+// Action buttons.
 $addurl = new moodle_url('/mod/facetoface/room/edit.php');
-$backurl = new moodle_url("/{$CFG->admin}/settings.php", array('section' => 'modsettingfacetoface'));
 
-$addbutton = $OUTPUT->single_button($addurl, get_string('add'), 'get', array('class' => 'f2f-button'));
-$backbutton = $OUTPUT->single_button($backurl, get_string('back'), 'get', array('class' => 'f2f-button'));
+echo $OUTPUT->container_start('buttons');
+echo $OUTPUT->single_button($addurl, get_string('addroom', 'facetoface'), 'get');
+echo $OUTPUT->container_end();
 
-echo $OUTPUT->container($addbutton . $backbutton, 'continuebutton');
 echo $OUTPUT->footer();

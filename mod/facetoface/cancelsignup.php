@@ -41,9 +41,9 @@ if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
 if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id)) {
     print_error('error:incorrectcoursemoduleid', 'facetoface');
 }
+$context = context_module::instance($cm->id);
 
-require_course_login($course);
-$context = context_course::instance($course->id);
+require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
 $returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";

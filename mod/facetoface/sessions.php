@@ -42,7 +42,7 @@ define('SECONDS_IN_AN_HOUR', 60 * 60);
 
 $session = null;
 if ($id && !$s) {
-    if (!$cm = $DB->get_record('course_modules', array('id' => $id))) {
+    if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
     }
     if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
@@ -80,12 +80,12 @@ if ($id && !$s) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
     }
 }
+$context = context_module::instance($cm->id);
 
-require_course_login($course);
-$errorstr = '';
-$context = context_course::instance($course->id);
-$module_context = context_module::instance($cm->id);
+require_login($course, false, $cm);
 require_capability('mod/facetoface:editsessions', $context);
+
+$errorstr = '';
 
 
 local_js(array(
@@ -98,15 +98,13 @@ $PAGE->requires->string_for_js('error:addpdroom-dialognotselected', 'totara_core
 $PAGE->requires->strings_for_js(array('cancel', 'ok'), 'moodle');
 $PAGE->requires->strings_for_js(array('chooseroom', 'pdroomcapacityexceeded'), 'facetoface');
 
-$display_selected = json_encode(dialog_display_currently_selected(get_string('selected', 'facetoface'), 'addpdroom-dialog'));
-$args = array('args' => '{"sessionid":'.$s.','.
-                         '"display_selected_item":'.$display_selected.'}');
-
+$display_selected = dialog_display_currently_selected(get_string('selected', 'facetoface'), 'addpdroom-dialog');
+$jsconfig = array('sessionid' => $s, 'display_selected_item' => $display_selected, 'facetofaceid' => $facetoface->id);
 $jsmodule = array(
     'name' => 'totara_f2f_room',
     'fullpath' => '/mod/facetoface/sessions.js',
     'requires' => array('json', 'totara_core'));
-$PAGE->requires->js_init_call('M.totara_f2f_room.init', $args, false, $jsmodule);
+$PAGE->requires->js_init_call('M.totara_f2f_room.init', array($jsconfig), false, $jsmodule);
 
 $returnurl = "view.php?f=$facetoface->id";
 
@@ -114,7 +112,7 @@ $editoroptions = array(
     'noclean'  => false,
     'maxfiles' => EDITOR_UNLIMITED_FILES,
     'maxbytes' => $course->maxbytes,
-    'context'  => $module_context,
+    'context'  => $context,
 );
 
 // Handle deletions
@@ -141,7 +139,7 @@ $details = new stdClass();
 $details->id = $sessionid;
 $details->details = isset($session->details) ? $session->details : '';
 $details->detailsformat = FORMAT_HTML;
-$details = file_prepare_standard_editor($details, 'details', $editoroptions, $module_context, 'mod_facetoface', 'session', $sessionid);
+$details = file_prepare_standard_editor($details, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $sessionid);
 if (isset($session)) {
     $defaulttimezone = empty($session->sessiondates[0]->sessiontimezone) ? get_string('sessiontimezoneunknown', 'facetoface') : $session->sessiondates[0]->sessiontimezone;
 } else {
@@ -293,14 +291,14 @@ if ($fromform = $mform->get_data()) { // Form submitted
         add_to_log($course->id, 'facetoface', 'added session', 'sessions.php?f='.$facetoface->id, $facetoface->id, $cm->id);
     }
 
-    $data = file_postupdate_standard_editor($fromform, 'details', $editoroptions, $module_context, 'mod_facetoface', 'session', $session->id);
+    $data = file_postupdate_standard_editor($fromform, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $session->id);
     $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $session->id));
 
     redirect($returnurl);
 } else if ($session != null) { // Edit mode
     // Set values for the form
     $toform = new stdClass();
-    $toform = file_prepare_standard_editor($details, 'details', $editoroptions, $module_context, 'mod_facetoface', 'session', $session->id);
+    $toform = file_prepare_standard_editor($details, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $session->id);
 
     $toform->datetimeknown = (1 == $session->datetimeknown);
     $toform->capacity = $session->capacity;

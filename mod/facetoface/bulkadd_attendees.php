@@ -47,8 +47,17 @@ if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetof
 if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
     print_error('error:coursemisconfigured', 'facetoface');
 }
+if (!$cm = get_coursemodule_from_instance("facetoface", $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
+}
+$context = context_module::instance($cm->id);
+
 // Check capability
-require_login($facetoface->course);
+require_login($course, false, $cm);
+require_capability('mod/facetoface:addattendees', $context);
+
+// Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+send_headers('text/html; charset=utf-8', false);
 
 // Generate url
 $url = new moodle_url('/mod/facetoface/bulkadd_attendees.php', array('s' => $s, 'type' => $type, 'action' => 'attendees'));

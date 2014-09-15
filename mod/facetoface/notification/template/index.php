@@ -28,20 +28,16 @@ require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$searchterms = optional_param('template-title', '', PARAM_TEXT);
 $deactivate = optional_param('deactivate', 0, PARAM_INT);
 $activate = optional_param('activate', 0, PARAM_INT);
 $delete = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_TEXT);
 $page = optional_param('page', 0, PARAM_INT);
 
-// Setup page and check permissions
 $contextsystem = context_system::instance();
-$PAGE->set_url($CFG->wwwroot . '/mod/facetoface/notification/template/index.php');
-$PAGE->set_context($contextsystem);
 
-require_login(0, false);
-require_capability('moodle/site:config', $contextsystem);
+// Check permissions.
+admin_externalpage_setup('modfacetofacetemplates');
 
 $redirectto = new moodle_url('/mod/facetoface/notification/template/');
 
@@ -57,13 +53,13 @@ if ($deactivate || $activate) {
         print_error('error:notificationtemplatedoesnotexist', 'facetoface');
     }
 
-    $notification->status = $deactivate ? 0 : 1;
+    $notification->status = ($notification->id == $deactivate) ? 0 : 1;
     $DB->update_record('facetoface_notification_tpl', $notification);
 
     redirect($redirectto->out());
 }
 
-if ($delete && $confirm) {
+if ($delete) {
     if (!confirm_sesskey()) {
         print_error('confirmsesskeybad', 'error');
     }
@@ -73,9 +69,17 @@ if ($delete && $confirm) {
         print_error('error:notificationtemplatedoesnotexist', 'facetoface');
     }
 
+    if (!$confirm or !confirm_sesskey()) {
+        echo $OUTPUT->header();
+        $confirmurl = new moodle_url($redirectto, array('delete' => $delete, 'confirm' => 1, 'sesskey' => sesskey()));
+        echo $OUTPUT->confirm(get_string('deletenotificationtemplateconfirm', 'facetoface', format_string($notification->title)), $confirmurl->out(), $redirectto);
+        echo $OUTPUT->footer();
+        die;
+    }
+
     $DB->delete_records('facetoface_notification_tpl', array('id' => $delete));
 
-    totara_set_notification(get_string('notificationtemplatedeleted', 'facetoface'), $redirectto->out(), array('class' => 'notifysuccess'));
+    totara_set_notification(get_string('notificationtemplatedeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
 // Check for form submission
@@ -123,37 +127,8 @@ $str_deactivate = get_string('deactivate', 'facetoface');
 
 $url = new moodle_url('/admin/settings.php', array('section' => 'modsettingfacetoface'));
 
-$PAGE->set_title(get_string('notificationtemplates', 'facetoface'));
-$PAGE->set_heading('');
-$PAGE->set_focuscontrol('');
-$PAGE->set_cacheable(true);
-$PAGE->navbar->add(get_string('notificationtemplates', 'facetoface'));
-navigation_node::override_active_url($url);
 echo $OUTPUT->header();
-
-// Print delete confirmation page
-if ($delete) {
-    $notification = $DB->get_record('facetoface_notification_tpl', array('id' => $delete));
-    if (!$notification) {
-        print_error('error:notificationtemplatedoesnotexist', 'facetoface');
-    }
-
-    $confirmurl = clone($redirectto);
-    $confirmurl->param('delete', $delete);
-    $confirmurl->param('sesskey', sesskey());
-    $confirmurl->param('confirm', '1');
-    echo $OUTPUT->confirm(get_string('deletenotificationtemplateconfirm', 'facetoface', format_string($notification->title)), $confirmurl->out(), $redirectto);
-    echo $OUTPUT->footer();
-    die();
-}
-
-
-$heading = get_string('notificationtemplates', 'facetoface');
-$report_data = array();
-
-echo $OUTPUT->heading($heading);
-
-$notification_templates = $DB->get_records('facetoface_notification_tpl', array(), 'id');
+echo $OUTPUT->heading(get_string('managenotificationtemplates', 'facetoface'));
 
 $columns = array();
 $headers = array();
@@ -193,6 +168,7 @@ $notification_templates = $DB->get_records_sql($sql.$sort, array(), $table->get_
 foreach ($notification_templates as $note_templ) {
     $row = array();
     $buttons = array();
+    $rowclass = '';
 
     $row[] = $note_templ->title;
 
@@ -203,10 +179,11 @@ foreach ($notification_templates as $note_templ) {
     }
     $row[] = $status;
 
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/edit.php', array('id' => $note_templ->id)), new pix_icon('t/edit', $str_edit));
+    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/edit.php', array('id' => $note_templ->id, 'page' => $page)), new pix_icon('t/edit', $str_edit));
 
     if ($note_templ->status == 0) {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/index.php', array('activate' => $note_templ->id, 'sesskey' => sesskey())), new pix_icon('t/show', $str_activate));
+        $rowclass = 'dimmed_text';
     } else {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/index.php', array('deactivate' => $note_templ->id, 'sesskey' => sesskey())), new pix_icon('t/hide', $str_deactivate));
     }
@@ -215,17 +192,16 @@ foreach ($notification_templates as $note_templ) {
 
     $row[] = implode($buttons, '');
 
-    $table->add_data($row);
+    $table->add_data($row, $rowclass);
 }
 
 $table->finish_html();
 
 // Action buttons
 $addurl = new moodle_url('/mod/facetoface/notification/template/edit.php');
-$backurl = new moodle_url('/' . $CFG->admin . '/settings.php', array('section' => 'modsettingfacetoface'));
 
-$addbutton = $OUTPUT->single_button($addurl, get_string('add'), 'get', array('class' => 'f2f-button'));
-$backbutton = $OUTPUT->single_button($backurl, get_string('back'), 'get', array('class' => 'f2f-button'));
+echo $OUTPUT->container_start('buttons');
+echo $OUTPUT->single_button($addurl, get_string('add'), 'get');
+echo $OUTPUT->container_end();
 
-echo $OUTPUT->container($addbutton . $backbutton, 'continuebutton');
 echo $OUTPUT->footer();

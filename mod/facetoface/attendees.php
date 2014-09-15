@@ -30,8 +30,6 @@ require_once($CFG->dirroot.'/mod/facetoface/attendees_message_form.php');
 require_once($CFG->libdir.'/totaratablelib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-global $DB;
-
 /**
  * Load and validate base data
  */
@@ -59,6 +57,9 @@ if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
 if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
     print_error('error:incorrectcoursemodule', 'facetoface');
 }
+$context = context_module::instance($cm->id);
+
+require_login($course, false, $cm);
 
 // Setup urls
 $baseurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id));
@@ -89,26 +90,7 @@ $allowed_actions = array();
 // Available actions are actions that have a point. e.g. view the cancellations page whhen there are no cancellations is not an "available" action, but it maybe be an "allowed" action
 $available_actions = array();
 
-$context = context_course::instance($course->id);
-$contextmodule = context_module::instance($cm->id);
-if (!$onlycontent) { // Need to check this for security issues
-
-    $coursecheck = null;
-    $modulecheck = null;
-    $guestaccess = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'guest'));
-    if (!empty($guestaccess) && $guestaccess->status === '0') {
-        // Guest access is enabled, we need to check login against the course.
-        $coursecheck = $course;
-        if (!$cm->visible && !has_capability('moodle/course:viewhiddenactivities', $context)) {
-            // The module is hidden, we need to check the users ability to view it.
-            $modulecheck = $cm;
-        }
-    }
-
-    require_login($coursecheck, true, $modulecheck);
-}
-
-$PAGE->set_context($contextmodule);
+$PAGE->set_context($context);
 
 // Actions the user can perform
 $has_attendees = facetoface_get_num_attendees($s);
@@ -497,6 +479,10 @@ if (!$onlycontent && !$download) {
     echo $OUTPUT->container_start('f2f-attendees-table');
 }
 
+if ($onlycontent && !$download) {
+    // Legacy Totara HTML ajax, this should be converted to json + AJAX_SCRIPT.
+    send_headers('text/html; charset=utf-8', false);
+}
 
 /**
  * Print attendees (if user able to view)
@@ -794,7 +780,7 @@ if ($action == 'approvalrequired') {
     $numwaiting = count($requests);
     $availablespaces = $session->capacity - $numattendees;
     $allowoverbook = $session->allowoverbook;
-    $canoverbook = has_capability('mod/facetoface:overbook', $contextmodule);
+    $canoverbook = has_capability('mod/facetoface:overbook', $context);
     // Are there more users waiting than spaces available?
     // Note this does not apply to people with overbook capability (see facetoface_session_has_capacity).
     if (!$canoverbook && ($numwaiting > $availablespaces)) {

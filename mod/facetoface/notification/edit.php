@@ -36,17 +36,14 @@ $id = optional_param('id', 0, PARAM_INT);
 $duplicate = optional_param('duplicate', 0, PARAM_INT);
 
 if (!$facetoface = $DB->get_record('facetoface', array('id' => $f))) {
-    error("This facetoface doesn't exist");
+    print_error('error:incorrectfacetofaceid', 'facetoface');
 }
 
 if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
-    error("This course doesn't exist");
+    print_error('error:coursemisconfigured', 'facetoface');
 }
-
-$module = $DB->get_record('modules', array('name' => 'facetoface'));
-
-if (!$cm = $DB->get_record('course_modules', array('instance' => $f, 'module' => $module->id))) {
-    error("This course module doesn't exist");
+if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
 }
 
 // Setup page and check permissions

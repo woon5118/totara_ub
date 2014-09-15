@@ -180,7 +180,7 @@ function export_spreadsheet($dates, $format, $includebookings) {
 function get_users_search($search) {
     global $CFG, $DB;
 
-    $searchvalues = split(' ',trim($search));
+    $searchvalues = explode(' ', trim($search));
     $sort = 'firstname, lastname, username, email ASC';
     $searchfields = array('firstname', 'lastname', 'username', 'email');
 

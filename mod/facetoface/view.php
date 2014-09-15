@@ -25,8 +25,6 @@ require_once '../../config.php';
 require_once 'lib.php';
 require_once 'renderer.php';
 
-global $DB, $OUTPUT;
-
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID
 $f = optional_param('f', 0, PARAM_INT); // facetoface ID
 $location = optional_param('location', '', PARAM_TEXT); // location
@@ -34,7 +32,7 @@ $roomid = optional_param('roomid', 0, PARAM_INT);
 $download = optional_param('download', '', PARAM_ALPHA); // download attendance
 
 if ($id) {
-    if (!$cm = $DB->get_record('course_modules', array('id' => $id))) {
+    if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
         print_error('error:incorrectcoursemoduleid', 'facetoface');
     }
     if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
@@ -71,7 +69,7 @@ if (!empty($download)) {
     exit();
 }
 
-require_course_login($course, true, $cm);
+require_login($course, true, $cm);
 require_capability('mod/facetoface:view', $context);
 
 add_to_log($course->id, 'facetoface', 'view', "view.php?id=$cm->id", $facetoface->id, $cm->id);
@@ -169,7 +167,8 @@ function print_session_list($courseid, $facetoface, $sessions) {
 
     $timenow = time();
 
-    $context = context_course::instance($courseid);
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid, false, MUST_EXIST);
+    $context = context_module::instance($cm->id);
     $f2f_renderer->setcontext($context);
     $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
     $editsessions = has_capability('mod/facetoface:editsessions', $context);

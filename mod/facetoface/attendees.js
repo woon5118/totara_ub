@@ -396,8 +396,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 type: "POST",
                 url: M.cfg.wwwroot + '/mod/facetoface/updateattendance.php',
                 data: ({
-                    courseid:  M.totara_f2f_attendees.config.courseid,
-                    facetofaceid:  M.totara_f2f_attendees.config.facetofaceid,
+                    sesskey:  M.cfg.sesskey,
                     datasubmission: data
                 }),
                 success: function(o) {

@@ -337,6 +337,7 @@ $string['filterbyroom'] = 'Filter by Room';
 $string['floor'] = 'Floor';
 $string['format'] = 'Format';
 $string['full'] = 'Date is fully occupied';
+$string['generalsettings'] = 'General Settings';
 $string['gettointerestreport'] = 'To view the declare interest report go to the facetoface activity and follow the \'Declared interest report\' link in the module admin menu.';
 $string['goback'] = 'Go back';
 $string['guestsno'] = 'Sorry, guests are not allowed to sign up for sessions.';

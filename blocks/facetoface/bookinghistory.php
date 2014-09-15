@@ -29,8 +29,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('lib.php');
 
-$PAGE->set_context(context_system::instance());
-require_login();
+require_login(null, false);
 
 $sid        = required_param('session', PARAM_INT);
 $userid     = optional_param('userid', $USER->id, PARAM_INT);
@@ -48,13 +47,21 @@ if (!$facetoface = $DB->get_record('facetoface', array('id' => $session->facetof
 if (!$course = $DB->get_record('course', array('id' => $facetoface->course))) {
     print_error('error:invalidcourseid', 'block_facetoface');
 }
+if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+    print_error('error:incorrectcoursemoduleid', 'facetoface');
+}
+$contextmodule = context_module::instance($cm->id);
 
 if ($userid != $USER->id) {
     $contextuser = context_user::instance($userid);
-    if (!has_capability('block/facetoface:viewbookings', $contextuser)) {
-        $contextcourse = context_course::instance($course->id);
-        require_capability('mod/facetoface:viewattendees', $contextcourse);
+    if (has_capability('block/facetoface:viewbookings', $contextuser)) {
+        $PAGE->set_context($contextmodule);
+    } else {
+        require_login($course, false, $cm);
+        require_capability('mod/facetoface:viewattendees', $contextmodule);
     }
+} else {
+    require_login($course, false, $cm);
 }
 
 $pagetitle = format_string(get_string('bookinghistory', 'block_facetoface'));
@@ -96,8 +103,6 @@ if ($user->id != $USER->id) {
 echo $OUTPUT->heading(get_string('sessiondetails', 'block_facetoface'));
 
 // print the session information
-$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id);
-$contextmodule = context_module::instance($cm->id);
 $viewattendees = has_capability('mod/facetoface:viewattendees', $contextmodule);
 echo facetoface_print_session($session, $viewattendees, false, false, true);
 
