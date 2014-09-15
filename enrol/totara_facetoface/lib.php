@@ -410,6 +410,47 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
     }
 
     /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param $form
+     * @return MoodleQuickForm Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_enrol_hook($form, $instance) {
+        global $DB;
+
+        $course = $DB->get_record('course', array('id'=>$instance->courseid), '*', MUST_EXIST);
+
+        if ($data = $form->get_data()) {
+            if ($this->enrol_totara_facetoface($instance, $data, $course, null)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param stdClass $instance
+     * @return moodleform Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_get_form_hook($instance) {
+        global $CFG;
+
+        require_once("$CFG->dirroot/enrol/totara_facetoface/signup_form.php");
+
+        $enrolstatus = $this->can_self_enrol($instance);
+
+        // Don't show enrolment instance form, if user can't enrol using it.
+        if ($enrolstatus === true) {
+            return new enrol_totara_facetoface_signup_form(null, $instance);
+        }
+        return $enrolstatus;
+    }
+
+    /**
      * Checks if user can self enrol.
      *
      * @param stdClass $instance enrolment instance

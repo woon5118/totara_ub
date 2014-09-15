@@ -21,8 +21,11 @@
  * @subpackage facetoface
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once('../../config.php');
-require_once('lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+require_once($CFG->dirroot . '/mod/facetoface/signup_tsandcs_form.php');
 
 $s = required_param('s', PARAM_INT); // Facetoface session ID.
 $backtoallsessions = optional_param('backtoallsessions', 0, PARAM_INT);
@@ -46,28 +49,5 @@ require_capability('mod/facetoface:view', $context);
 
 $pagetitle = format_string($facetoface->name);
 
-$PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/signup_tsandcs.php', array('s' => $s));
-
-$PAGE->set_title($pagetitle);
-$PAGE->set_heading($course->fullname);
-
-echo $OUTPUT->header();
-
-$heading = get_string('selfapprovaltandc', 'mod_facetoface');
-
-echo $OUTPUT->box_start();
-echo $OUTPUT->heading($heading);
-
-echo format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
-
-echo html_writer::start_div('box generalbox');
-$url = new moodle_url('/mod/facetoface/signup.php', array('s' => $s));
-echo html_writer::end_div();
-
-echo html_writer::start_div('box generalbox');
-echo html_writer::link($url, get_string('goback', 'mod_facetoface'));
-echo html_writer::end_div();
-
-echo $OUTPUT->box_end();
-echo $OUTPUT->footer($course);
+$mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->selfapprovaltandc, 's' => $s));
+$mform->display();

@@ -26,8 +26,14 @@
  */
 
 M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
+    /** Selectors. */
+    SELECTORS: {
+        ENROLMENTBUTTONS:     '.expandenrol'
+    },
+
     init: function(Y, args) {
         $('body').on('click', '.rb-display-expand', M.totara_reportbuilder_expand.displayExpand);
+        $('body').on('click', this.SELECTORS.ENROLMENTBUTTONS, M.totara_reportbuilder_expand.clickEnrol);
     },
 
     /*
@@ -55,10 +61,52 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
             // Insert the content in the following row. We calculate colspan using the clicked row.
             var content = $(data).find('.rb-expand-row');
             var colspan = $(that).closest('tr').find('td').length;
-            content.find('td').attr({ colspan: colspan});
+            content.find('td.rb-expand-cell').attr({ colspan: colspan});
             content.insertAfter($(that).closest('tr'));
             // Mark the link as clicked.
             $(that).attr({clicked: true});
+        });
+    },
+
+    /*
+     * When clicking an enrol button in a course expander
+     * Post the form values with expand data, render the result, redirect if told to do so.
+     */
+    clickEnrol: function(event) {
+        var button=$(event.target);
+
+        var courseid = $('input[type="hidden"][name="courseid"]').attr('value');
+        var id = $('.rb-display-table-container').attr('id');
+        var url = M.cfg.wwwroot + '/totara/reportbuilder/ajax/expand.php';
+
+        var form = $(button).parents('form')[0];
+        var formdata = $(form).serialize();
+
+        formdata += '&expandname=course_details';
+        formdata += '&expandcourseid=' + courseid;
+        formdata += '&id=' + id;
+        formdata += '&instancesubmitted=' + button.attr('name');
+
+        var that = $('[data-param="expandcourseid=' + courseid + '"]');
+
+        $.post(url, formdata).done(function(data) {
+            var redirect = $(data).find('input[type="hidden"][name="redirect"]');
+            if (redirect.length) {
+                window.location = redirect.attr('value');
+                return;
+            }
+
+            // Remove any existing expanded contents.
+            $('.rb-expand-row').remove();
+            // Unmark any links as clicked.
+            $('.rb-display-table-container div').attr({clicked: null});
+            // Insert the content in the following row. We calculate colspan using the clicked row.
+            var content = $(data).find('.rb-expand-row');
+            var colspan = $(that).closest('tr').find('td').length;
+            content.find('td.rb-expand-cell').attr({ colspan: colspan});
+            content.insertAfter($(that).closest('tr'));
+            // Mark the link as clicked.
+            that.attr({clicked: true});
         });
     }
 };

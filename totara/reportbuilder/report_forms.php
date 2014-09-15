@@ -1159,14 +1159,19 @@ class report_builder_toolbar_search_form extends moodleform {
 
 class report_builder_course_expand_form extends moodleform {
     public function definition() {
+        global $PAGE, $CFG;
+
         $mform =& $this->_form;
 
         $summary = $this->_customdata['summary'];
         $status = $this->_customdata['status'];
+        $inlineenrolmentelements = isset($this->_customdata['inlineenrolmentelements'])
+            ? $this->_customdata['inlineenrolmentelements'] : '';
         $enroltype = isset($this->_customdata['enroltype']) ? $this->_customdata['enroltype'] : '';
         $progress = isset($this->_customdata['progress']) ? $this->_customdata['progress'] : '';
         $enddate = isset($this->_customdata['enddate']) ? $this->_customdata['enddate'] : '';
         $grade = isset($this->_customdata['grade']) ? $this->_customdata['grade'] : '';
+        $courseid = $this->_customdata['courseid'];
         $action = $this->_customdata['action'];
         $url = $this->_customdata['url'];
 
@@ -1188,11 +1193,27 @@ class report_builder_course_expand_form extends moodleform {
         if ($grade != '') {
             $mform->addElement('static', 'grade', get_string('grade'), $grade);
         }
+
+        $mform->addElement('hidden', 'courseid', $courseid);
+
+        if (count($inlineenrolmentelements) > 0) {
+            // If we haven't enrolled there may be notifications with errors in so display them now.
+            $totararenderer = $PAGE->get_renderer('totara_core', null);
+            $notifications = $totararenderer->print_totara_notifications();
+            $mform->addElement('static', 'notifications', $notifications);
+        }
+
+        foreach ($inlineenrolmentelements as $inlineenrolmentelement) {
+            $mform->addElement($inlineenrolmentelement);
+
+            if ($inlineenrolmentelement->_type == 'header') { // Headers are collapsed by default and we want them open.
+                $mform->setExpanded($inlineenrolmentelement->getName());
+            }
+        }
+
         if ($url != '') {
             $mform->addElement('static', 'enrol', '', html_writer::link($url, $action,
-                    array('class' => 'link-as-button')));
-        } else {
-            $mform->addElement('static', 'enrol', '', $action);
+                array('class' => 'link-as-button')));
         }
     }
 }
@@ -1221,6 +1242,6 @@ class report_builder_program_expand_form extends moodleform {
 
         $url = new moodle_url('/totara/program/view.php', array('id' => $prog['id']));
         $mform->addElement('static', 'view', '', html_writer::link($url, get_string('view' . $type, 'totara_' . $type),
-                array('class' => 'link-as-button')));
+            array('class' => 'link-as-button')));
     }
 }

@@ -879,6 +879,7 @@ abstract class rb_base_source {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
         require_once($CFG->dirroot . '/course/renderer.php');
+        require_once($CFG->dirroot . '/lib/coursecatlib.php');
 
         $formdata = array();
 
@@ -943,6 +944,7 @@ abstract class rb_base_source {
 
             $cansignup = false;
             $enrolmethodlist = array();
+            $inlineenrolments = array();
             foreach ($instances as $instance) {
                 if (!isset($plugins[$instance->enrol])) {
                     continue;
@@ -950,15 +952,19 @@ abstract class rb_base_source {
                 $plugin = $plugins[$instance->enrol];
                 if (enrol_is_enabled($instance->enrol)) {
                     $enrolmethodlist[] = $plugin->get_instance_name($instance);
-                    if (in_array($instance->enrol, array('self', 'guest'))) {
-                        if ($plugin->show_enrolme_link($instance)) {
-                            $cansignup = true;
-                        }
+                    // If the enrolment plugin has a course_expand_hook then add to a list to process.
+                    if (method_exists($plugin, 'course_expand_get_form_hook')
+                        && method_exists($plugin, 'course_expand_enrol_hook')) {
+                        $inlineenrolments[$instance->id] = (object) ['plugin' => $plugin, 'instance' => $instance];
                     }
                 }
             }
             $enrolmethodstr = implode(', ', $enrolmethodlist);
             $realuser = \core\session\manager::get_realuser();
+
+            $inlineenrolmentelements = $this->get_inline_enrolment_elements($inlineenrolments);
+            $formdata['inlineenrolmentelements'] = $inlineenrolmentelements;
+            $formdata['courseid'] = $course->id;
 
             // Enrolling methods.
 
@@ -979,7 +985,67 @@ abstract class rb_base_source {
 
         $mform = new report_builder_course_expand_form(null, $formdata);
 
+        $this->process_enrolments($mform, $inlineenrolments);
+
         return $mform->render();
+    }
+
+    /**
+     * @param $inlineenrolments array of objects containing matching instance/plugin pairs
+     * @return array of form elements
+     */
+    private function get_inline_enrolment_elements(array $inlineenrolments) {
+        global $CFG;
+
+        require_once($CFG->dirroot . '/lib/pear/HTML/QuickForm/button.php');
+
+        $retval = array();
+        foreach ($inlineenrolments as $inlineenrolment) {
+            $instance = $inlineenrolment->instance;
+            $plugin = $inlineenrolment->plugin;
+            $enrolform = $plugin->course_expand_get_form_hook($instance);
+
+            $nameprefix = 'instanceid_' . $instance->id . '_';
+
+            if (is_string($enrolform)) {
+                $retval[] = new HTML_QuickForm_static(null, null, $enrolform);
+                continue;
+            }
+
+            if ($enrolform instanceof moodleform) {
+                foreach ($enrolform->_form->_elements as $element) {
+                    if ($element->_type == 'button' || $element->_type == 'submit') {
+                        continue;
+                    } else if ($element->_type == 'group') {
+                        $newelements = array();
+                        foreach ($element->getElements() as $subelement) {
+                            if ($subelement->_type == 'button' || $subelement->_type == 'submit') {
+                                continue;
+                            }
+                            $subelement->setName($nameprefix . $element->getName());
+                            $newelements[] = $subelement;
+                        }
+                        if (count($newelements)>0) {
+                            $element->setElements($newelements);
+                            $retval[] = $element;
+                        }
+                    } else {
+                        $element->setName($nameprefix . $element->getName());
+                        $retval[] = $element;
+                    }
+                }
+            }
+
+            if (count($inlineenrolments) > 1) {
+                $enrollabel = get_string('enrolusing', 'totara_reportbuilder', $plugin->get_instance_name($instance->id));
+            } else {
+                $enrollabel = get_string('enrol', 'totara_reportbuilder');
+            }
+            $name = $instance->id;
+
+            $retval[] = new HTML_QuickForm_button($name, $enrollabel, array('class' => 'expandenrol'));
+        }
+        return $retval;
     }
 
     /**
@@ -4082,4 +4148,41 @@ abstract class rb_base_source {
         return array();
     }
 
-} // end of rb_base_source class
+    /**
+     * @param $mform
+     * @param $inlineenrolments
+     */
+    private function process_enrolments($mform, $inlineenrolments) {
+        global $CFG;
+
+        if ($formdata = $mform->get_data()) {
+            $submittedinstance = required_param('instancesubmitted', PARAM_INT);
+            $inlineenrolment = $inlineenrolments[$submittedinstance];
+            $instance = $inlineenrolment->instance;
+            $plugin = $inlineenrolment->plugin;
+            $nameprefix = 'instanceid_' . $instance->id . '_';
+            $nameprefixlength = strlen($nameprefix);
+
+            $valuesforenrolform = array();
+            foreach ($formdata as $name => $value) {
+                if (substr($name, 0, $nameprefixlength) === $nameprefix) {
+                    $name = substr($name, $nameprefixlength);
+                    $valuesforenrolform[$name] = $value;
+                }
+            }
+            $enrolform = $plugin->course_expand_get_form_hook($instance);
+
+            $enrolform->_form->updateSubmission($valuesforenrolform, null);
+
+            $enrolled = $plugin->course_expand_enrol_hook($enrolform, $instance);
+            if ($enrolled) {
+                $mform->_form->addElement('hidden', 'redirect', $CFG->wwwroot . '/course/view.php?id=' . $instance->courseid);
+            }
+
+            foreach ($enrolform->_form->_errors as $errorname => $error) {
+                $mform->_form->_errors[$nameprefix . $errorname] = $error;
+            }
+        }
+    }
+
+}

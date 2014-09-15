@@ -23,51 +23,53 @@
 
 M.mod_facetoface = M.mod_facetoface || {};
 M.mod_facetoface.signupform = {
-    /** Selectors. */
-    SELECTORS: {
-        TSANDCS:             '.tsandcs'
-    },
 
-    opts: {},
+    /**
+     * module initialisation method called by php js_init_call()
+     *
+     * @param object    YUI instance
+     * @param string    args supplied in JSON format
+     */
+    init: function(){
 
-    init: function() {
-        var body = Y.one('body');
-        M.mod_facetoface.signupform.opts = arguments;
-        // Can't attach handler to body as we need to stop default action.
-        Y.all(M.mod_facetoface.signupform.SELECTORS.TSANDCS).each(function(node) {
-            node.on("click", M.mod_facetoface.signupform.showTsandCs);
-        });
-    },
-
-    showTsandCs : function(e) {
-        e.preventDefault();
-        var content;
-
-        if (typeof(M.mod_facetoface.signupform.opts[0]) == 'string') {
-            content = M.mod_facetoface.signupform.opts[0];
-        } else {
-            facetofaceid = e.target.getAttribute('facetofaceid');
-            content = M.mod_facetoface.signupform.opts[0]['selfapprovaltandc_' + facetofaceid];
-        }
-
-        // Set Default options
-        var params = {
-            bodyContent : content,
-            headerContent : M.util.get_string('selfapprovaltandc', 'mod_facetoface'),
-            visible : true,
-            lightbox : true // This dialogue should be modal
+        /**
+         *  Attaches mouse events to the loaded content.
+         */
+        this.attachCustomClickEvents = function() {
+            // Add handler to edit position button.
+            Y.all('a.ajax-action').each(function(node) {
+                var href = node.getAttribute('href');
+                node.on('click', function(e){
+                    Y.io(node.getAttribute('href'), {
+                        on: {success: M.mod_facetoface.signupform.loadConfirmForm}
+                    });
+                    e.preventDefault();
+                });
+            });
         };
 
-        // Create the panel
-        tsandcsdlg = new M.core.dialogue(params);
+        this.attachCustomClickEvents();
 
-        tsandcsdlg.addButton({
-            label: M.util.get_string('close', 'mod_facetoface'),
-            action: function(e) {
+        /**
+         * Modal popup for confirmation form. Requires the existence of standard mform with a button #id_confirm
+         * @param href The desired contents of the panel
+         */
+        this.loadConfirmForm = function(id, o) {
+            bodyContent = o.responseText;
+            var config = {
+                headerContent : null,
+                bodyContent : bodyContent,
+                draggable : true,
+                modal : true,
+                closeButton : false,
+                width : '600px'
+            };
+            dialog = new M.core.dialogue(config);
+            Y.one('#' + dialog.get('id')).one('#id_confirm').on('click', function(e) {
+                dialog.destroy(true);
                 e.preventDefault();
-                tsandcsdlg.destroy();
-            },
-            section: Y.WidgetStdMod.FOOTER
-        });
+            });
+            dialog.show();
+        };
     }
 };

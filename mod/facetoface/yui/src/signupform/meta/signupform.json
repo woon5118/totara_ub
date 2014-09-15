@@ -3,6 +3,7 @@
         "requires": [
             "base",
             "node",
+            "io-base",
             "moodle-core-notification-dialogue",
             "moodle-core-notification-alert"
         ]

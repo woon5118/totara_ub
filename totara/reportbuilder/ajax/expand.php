@@ -25,6 +25,7 @@
 /**
  * Page for returning a block of html which will be inserted below the row that was clicked.
  */
+define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');

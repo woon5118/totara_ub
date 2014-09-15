@@ -218,6 +218,8 @@ class enrol_self_plugin extends enrol_plugin {
         if ($instance->customint4) {
             $this->email_welcome_message($instance, $USER);
         }
+
+        return true;
     }
 
     /**
@@ -250,6 +252,54 @@ class enrol_self_plugin extends enrol_plugin {
             return $OUTPUT->box($output);
         }
     }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param $form
+     * @return MoodleQuickForm Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_enrol_hook($form, $instance) {
+        global $CFG, $OUTPUT, $USER;
+
+        require_once("$CFG->dirroot/enrol/self/locallib.php");
+
+        $enrolstatus = $this->can_self_enrol($instance);
+
+        // Don't show enrolment instance form, if user can't enrol using it.
+        if ($enrolstatus === true) {
+            if ($data = $form->get_data()) {
+                $this->enrol_self($instance, $data);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param stdClass $instance
+     * @return Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_get_form_hook($instance) {
+        global $CFG, $OUTPUT, $USER;
+
+        require_once("$CFG->dirroot/enrol/self/locallib.php");
+
+        $enrolstatus = $this->can_self_enrol($instance);
+
+        // Don't show enrolment instance form, if user can't enrol using it.
+        if ($enrolstatus === true) {
+            return new enrol_self_enrol_form(null, $instance);
+        }
+
+        return false;
+    }
+
 
     /**
      * Checks if user can self enrol.

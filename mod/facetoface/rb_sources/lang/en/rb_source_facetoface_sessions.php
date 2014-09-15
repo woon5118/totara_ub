@@ -40,6 +40,7 @@ $string['endtime'] = 'End Time';
 $string['facilitator'] = 'Facilitator';
 $string['ftfname'] = 'Face to Face Name';
 $string['ftfnamelink'] = 'Face to Face Name (linked to session page)';
+$string['room'] = 'Room';
 $string['roomdescription'] = 'Room description';
 $string['roomname'] = 'Room name';
 $string['sessdate'] = 'Session Start Date';

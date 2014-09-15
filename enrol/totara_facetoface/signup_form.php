@@ -211,7 +211,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                     $selfapprovaljsparams[$elementname] = $facetofaces[$session->facetoface]->selfapprovaltandc;
 
                     $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
-                    $attributes = array("class" => "tsandcs", 'facetofaceid' => $facetoface->id);
+                    $attributes = array("class" => "tsandcs ajax-action");
                     $tandcurl = html_writer::link($url, get_string('selfapprovalsoughtbrief', 'mod_facetoface'), $attributes);
                     $elementid = 'selfapprovaltc' . $session->id;
                     $mform->addElement('checkbox', $elementid, $tandcurl);
@@ -227,13 +227,18 @@ class enrol_totara_facetoface_signup_form extends moodleform {
         }
         $mform->addElement('html', html_writer::end_div());
 
-        global $PAGE;
-        $PAGE->requires->strings_for_js(array('selfapprovaltandc', 'close'), 'mod_facetoface');
-        $PAGE->requires->yui_module(
-            'moodle-mod_facetoface-signupform',
-            'M.mod_facetoface.signupform.init',
-            array('tsandcs' => $selfapprovaljsparams)
-        );
+        if (defined('AJAX_SCRIPT') && AJAX_SCRIPT) {
+            global $CFG;
+            $url = $CFG->wwwroot . '/theme/yui_combo.php?m/-1/mod_facetoface/signupform/signupform.js';
+            $mform->addElement('hidden', 'eventhandlers', $url);
+
+            $url = $CFG->wwwroot . '/mod/facetoface/signup_tsandcs_ajax.js';
+            $mform->addElement('html', '<script src=' . $url . '></script>');
+        } else {
+            global $PAGE;
+            $PAGE->requires->strings_for_js(array('selfapprovaltandc', 'close'), 'mod_facetoface');
+            $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
+        }
 
         $mform->addRule('sid', null, 'required', null, 'client');
     }

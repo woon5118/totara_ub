@@ -5,14 +5,14 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
   I need to auto enrol me in courses
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | student1 | Student | 1 | student1@asd.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
 
@@ -65,3 +65,18 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     Given I log in as "student1"
     When I follow "Course 1"
     Then I should see "You can not enrol yourself in this course"
+
+  @javascript
+  Scenario: Enrol through course catalogue
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    When I add "Face-to-face direct enrolment" enrolment method with:
+      | Custom instance name | Test student enrolment |
+    And I log out
+    And I log in as "student1"
+    And I should see "Courses" in the "Navigation" "block"
+    And I click on "Courses" "link_or_button" in the "Navigation" "block"
+    And I click on ".rb-display-expand" "css_element"
+    And I click on "[name$='_sid']" "css_element" in the "1 January 2020" "table_row"
+    And I press "Enrol"
+    Then I should see "Topic 1"

@@ -177,6 +177,7 @@ $string['cancellation'] = 'Cancellation';
 $string['cancellations'] = 'Cancellations';
 $string['cancellationmessage'] = 'Cancellation message';
 $string['cancellationconfirm'] = 'Are you sure you want to cancel your booking to this session?';
+$string['close'] = 'Close';
 $string['costheading'] = 'Session Cost';
 $string['cutoff'] = 'Cut-off';
 $string['cutoff_help'] = 'The amount of time before the first session that messages about minimum capacity will be sent.
