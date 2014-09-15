@@ -74,9 +74,7 @@ if ($action == 'edit') {
     local_js(array(
         TOTARA_JS_DIALOG,
         TOTARA_JS_UI,
-        TOTARA_JS_DATEPICKER,
         TOTARA_JS_ICON_PREVIEW,
-        TOTARA_JS_PLACEHOLDER,
         TOTARA_JS_TREEVIEW
     ));
 
@@ -87,11 +85,6 @@ if ($action == 'edit') {
             'fullpath' => '/totara/program/program_edit.js',
             'requires' => array('json'));
     $PAGE->requires->js_init_call('M.totara_programedit.init',$args, false, $jsmodule);
-
-    // Attach a date picker to the available until/from fields.
-    build_datepicker_js(
-        'input[name="availablefromselector"], input[name="availableuntilselector"]'
-    );
 
     // Visible audiences.
     if (!empty($CFG->audiencevisibility)) {
@@ -172,12 +165,8 @@ if ($data = $detailsform->get_data()) {
         $data->timemodified = time();
         $data->usermodified = $USER->id;
 
-        // Preprocess to convert string dates e.g. '23/11/2012' to a unix timestamp.
-        $dateformat = get_string('datepickerlongyearparseformat', 'totara_core');
-        $data->availablefrom = ($data->availablefromselector) ?
-            totara_date_parse_from_format($dateformat, $data->availablefromselector) : 0;
-        $data->availableuntil = ($data->availableuntilselector) ?
-            totara_date_parse_from_format($dateformat, $data->availableuntilselector) + (DAYSECS - 1) : 0;
+        $data->availablefrom = ($data->availablefrom) ? $data->availablefrom : 0;
+        $data->availableuntil = ($data->availableuntil) ? $data->availableuntil + (DAYSECS - 1) : 0;
 
         $data->available = prog_check_availability($data->availablefrom, $data->availableuntil);
 
@@ -279,10 +268,6 @@ $renderer = $PAGE->get_renderer('totara_program');
 echo $program->display_current_status();
 $exceptions = $program->get_exception_count();
 require('tabs.php');
-
-// Program details.
-$program->availablefromselector = $program->availablefrom > 0 ? userdate($program->availablefrom, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false) : '';
-$program->availableuntilselector = $program->availableuntil > 0 ? userdate($program->availableuntil, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false) : '';
 
 $detailsform->set_data($program);
 $detailsform->display();

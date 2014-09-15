@@ -77,8 +77,6 @@ if ($iscertif) {
 local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_UI,
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER,
     TOTARA_JS_ICON_PREVIEW,
     TOTARA_JS_TREEVIEW
 ));
@@ -157,13 +155,9 @@ if ($data = $form->get_data()) {
 
         $program_todb = new stdClass;
 
-        $dateformat = get_string('datepickerlongyearparseformat', 'totara_core');
-        $availablefrom = ($data->availablefromselector) ?
-            totara_date_parse_from_format($dateformat, $data->availablefromselector) : 0;
-        $availableuntil = ($data->availableuntilselector) ?
-            totara_date_parse_from_format($dateformat, $data->availableuntilselector) + (DAYSECS - 1) : 0;
-
-        $available = prog_check_availability($availablefrom, $availableuntil);
+        $program_todb->availablefrom = ($data->availablefrom) ? $data->availablefrom : 0;
+        $program_todb->availableuntil = ($data->availableuntil) ? $data->availableuntil : 0;
+        $available = prog_check_availability($program_todb->availablefrom, $program_todb->availableuntil);
 
         //Calcuate sortorder
         $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
@@ -328,9 +322,5 @@ require('tabs.php');
 $form->display();
 
 echo $OUTPUT->container_end();
-
-echo build_datepicker_js(
-    'input[name="availablefromselector"], input[name="availableuntilselector"]'
-);
 
 echo $OUTPUT->footer();

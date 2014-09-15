@@ -144,28 +144,22 @@ class program_edit_form extends moodleform {
             $mform->addHelpButton('idnumber', 'programidnumber', 'totara_program');
         }
 
-        $mform->addElement('text', 'availablefromselector', get_string('availablefrom', 'totara_program'), array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $mform->setType('availablefromselector', PARAM_TEXT);
-        if ($action == 'view') {
-            $mform->hardFreeze('availablefromselector');
-        } else {
-            $mform->addHelpButton('availablefromselector', 'programavailability', 'totara_program');
-        }
-
-        $mform->addElement('hidden', 'availablefrom');
+        $mform->addElement('date_selector', 'availablefrom', get_string('availablefrom', 'totara_program'), array('optional' => true));
         $mform->setType('availablefrom', PARAM_INT);
-
-        $mform->addElement('text', 'availableuntilselector', get_string('availableuntil', 'totara_program'), array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $mform->setType('availableuntilselector', PARAM_TEXT);
         if ($action == 'view') {
-            $mform->hardFreeze('availableuntilselector');
+            $mform->hardFreeze('availablefrom');
         } else {
-            $mform->addHelpButton('availableuntilselector', 'programavailability', 'totara_program');
-
+            $mform->addHelpButton('availablefrom', 'programavailability', 'totara_program');
         }
 
-        $mform->addElement('hidden', 'availableuntil');
+        $mform->addElement('date_selector', 'availableuntil', get_string('availableuntil', 'totara_program'), array('optional' => true));
         $mform->setType('availableuntil', PARAM_INT);
+        if ($action == 'view') {
+            $mform->hardFreeze('availableuntil');
+        } else {
+            $mform->addHelpButton('availableuntil', 'programavailability', 'totara_program');
+
+        }
 
         $mform->addElement('editor', 'summary_editor', get_string('description', 'totara_program'), null, $editoroptions);
         if ($action == 'view') {
@@ -287,24 +281,10 @@ class program_edit_form extends moodleform {
 
         $mform = $this->_form;
         $errors = array();
-        $dateparseformat = get_string('datepickerlongyearparseformat', 'totara_core');
-        if (!empty($data['availablefromselector'])) {
-            $availablefrom = $data['availablefromselector'];
-            if (!empty($availablefrom) && !totara_date_parse_from_format($dateparseformat, $availablefrom)) {
-                $errors['availablefromselector'] = get_string('error:invaliddate', 'totara_program');
-            }
-        }
 
-        if (!empty($data['availableuntilselector'])) {
-            $availableuntil = $data['availableuntilselector'];
-            if (!empty($availableuntil) &&  !totara_date_parse_from_format($dateparseformat, $availableuntil)) {
-                $errors['availableuntilselector'] = get_string('error:invaliddate', 'totara_program');
-            }
-        }
-
-        if (!empty($availablefrom) && !empty($availableuntil)) {
-            if (totara_date_parse_from_format($dateparseformat, $availablefrom) > totara_date_parse_from_format($dateparseformat, $availableuntil)) {
-                $errors['availableuntilselector'] = get_string('error:availibileuntilearlierthanfrom', 'totara_program');
+        if ($data['availablefrom'] != 0 && $data['availableuntil'] != 0) {
+            if ($data['availablefrom'] > $data['availableuntil']) {
+                $errors['availableuntil'] = get_string('error:availibileuntilearlierthanfrom', 'totara_program');
             }
         }
 
