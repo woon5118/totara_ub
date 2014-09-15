@@ -563,7 +563,8 @@ class facetoface_notification extends data_object {
                 FROM {facetoface} f2f
                 INNER JOIN {course} c ON c.id = f2f.course
                 WHERE f2f.id = ?", array($this->facetofaceid));
-        } else if (!isset($this->_facetoface->coursename)) {
+        }
+        if (!isset($this->_facetoface->coursename)) {
             $course = $DB->get_record('course', array('id' => $this->_facetoface->course), 'fullname');
             $this->_facetoface->coursename = $course->fullname;
         }
@@ -577,23 +578,34 @@ class facetoface_notification extends data_object {
             $this->_sessions[$sessionid]->sessiondates = array($sessiondate);
         }
 
-        $subject = $this->title;
-        $body = $this->body;
-        $managerprefix = $this->managerprefix;
         $options = array('context' => context_course::instance($this->_facetoface->course));
         $coursename = format_string($this->_facetoface->coursename, true, $options);
 
-        $subst = array('subject', 'body', 'managerprefix');
-        foreach ($subst as $text) {
-            $$text = facetoface_message_substitutions(
-                $text,
-                $coursename,
-                $this->_facetoface->name,
-                $user,
-                $this->_sessions[$sessionid],
-                $sessionid
-            );
-        }
+        // Note: $$text was failing randomly in PHP 5.6.0 me with undefined variable for some weird reason...
+        $subject = facetoface_message_substitutions(
+            $this->title,
+            $coursename,
+            $this->_facetoface->name,
+            $user,
+            $this->_sessions[$sessionid],
+            $sessionid
+        );
+        $body = facetoface_message_substitutions(
+            $this->body,
+            $coursename,
+            $this->_facetoface->name,
+            $user,
+            $this->_sessions[$sessionid],
+            $sessionid
+        );
+        $managerprefix = facetoface_message_substitutions(
+            $this->managerprefix,
+            $coursename,
+            $this->_facetoface->name,
+            $user,
+            $this->_sessions[$sessionid],
+            $sessionid
+        );
         $plaintext = format_text_email($body, FORMAT_HTML);
 
         $this->_event = new stdClass();

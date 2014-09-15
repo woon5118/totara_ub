@@ -91,6 +91,7 @@ $allowed_actions = array();
 $available_actions = array();
 
 $PAGE->set_context($context);
+$PAGE->set_url('/mod/facetoface/atendees.php', array('s' => $s));
 
 // Actions the user can perform
 $has_attendees = facetoface_get_num_attendees($s);
