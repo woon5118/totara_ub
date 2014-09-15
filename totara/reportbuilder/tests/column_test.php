@@ -230,6 +230,10 @@ class columns_test extends reportcache_advanced_testcase {
         'id' => 1, 'sessionid' => 1, 'roleid' => 1, 'userid' => 2,
     );
 
+    protected $f2f_interest_data = array(
+        'id' => 1, 'facetoface' => 1, 'userid' => 2, 'timedeclared' => 114051960, 'reason' => 'A good reason.'
+    );
+
     protected $scorm_data = array(
         'id' => 1, 'course' => 1, 'name' => 'Scorm', 'intro' => 'Hi there, this is a scorm.',
     );
@@ -547,6 +551,7 @@ class columns_test extends reportcache_advanced_testcase {
             'facetoface_signups' => array($this->f2f_signups_data),
             'facetoface_signups_status' => array($this->f2f_signup_status_data),
             'facetoface_session_roles' => array($this->f2f_session_roles_data),
+            'facetoface_interest' => array($this->f2f_interest_data),
             'scorm_scoes' => array($this->scorm_scoes_data),
             'scorm_scoes_track' => $this->scorm_scoes_track_data,
             'feedback' => array($this->feedback_data),
