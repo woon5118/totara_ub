@@ -1,5 +1,0 @@
-/* This file should be removed when merged in to t2-integration as there is a
-    better fix there that is more in line with Moodle */
-.dir-rtl.path-badges .span2 {
-    float: right;
-}
