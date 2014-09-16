@@ -129,6 +129,7 @@ class mod_facetoface_notification_form extends moodleform {
         $mform->setType('title', PARAM_TEXT);
 
         $mform->addElement('editor', 'body_editor', get_string('body', 'facetoface'));
+        $mform->addHelpButton('body_editor', 'body', 'facetoface');
         $mform->setType('body', PARAM_RAW);
 
         if (!$isfrozen) {
