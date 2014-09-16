@@ -1409,3 +1409,8 @@ select.totara-expanded-width {
 #rb-search-controls .singleselect {
     margin-bottom: 10px;
 }
+
+.ie8 .helptooltip {
+    display: block;
+    float: right;
+}
