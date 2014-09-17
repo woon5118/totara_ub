@@ -2129,6 +2129,41 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014082200, 'facetoface');
     }
 
+    if ($oldversion < 2014091700) {
+        // Fix the default settings on the standard scheduled notifications.
+        $bookedconditions = array(MDL_F2F_CONDITION_BEFORE_SESSION,
+                                MDL_F2F_CONDITION_AFTER_SESSION,
+                                MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE,
+                                );
+        list($statussql, $statusparams) = $DB->get_in_or_equal($bookedconditions);
+        $params = array_merge(array(1, MDL_F2F_NOTIFICATION_AUTO), $statusparams);
+        $sql = "UPDATE {facetoface_notification}
+                SET booked = ?
+                WHERE type = ?
+                AND conditiontype $statussql";
+        $DB->execute($sql, $params);
+
+        // Now fix the three standard cancellation messages.
+        $cancelconditions = array(MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION,
+                                MDL_F2F_CONDITION_RESERVATION_CANCELLED,
+                                MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED);
+        list($statussql, $statusparams) = $DB->get_in_or_equal($cancelconditions);
+        $params = array_merge(array(1, MDL_F2F_NOTIFICATION_AUTO), $statusparams);
+        $sql = "UPDATE {facetoface_notification}
+                SET cancelled = ?
+                WHERE type = ?
+                AND conditiontype $statussql";
+        $DB->execute($sql, $params);
+
+        // Inform waitlisted learners of session datetime changes.
+        $sql = "UPDATE {facetoface_notification}
+                SET waitlisted = ?
+                WHERE type = ?
+                AND conditiontype = ?";
+        $DB->execute($sql, array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE));
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014091700, 'facetoface');
+    }
     return $result;
 }
 
