@@ -151,13 +151,13 @@ class totara_sync_element_user extends totara_sync_element {
         if (!empty($this->config->allow_delete)) {
             if (empty($this->config->sourceallrecords)) {
                 // Get records with "deleted" flag set.
-                $sql = "SELECT u.id, u.idnumber, u.auth
+                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
                          FROM {{$synctable}} s
                    INNER JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
                         WHERE u.totarasync=1 AND u.deleted = 0 AND s.deleted = 1";
             } else {
                 // All records provided by source - get missing user records.
-                $sql = "SELECT u.id, u.idnumber, u.auth
+                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
                           FROM {user} u
                LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
                          WHERE u.totarasync=1 AND s.idnumber IS NULL AND u.deleted=0";
