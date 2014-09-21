@@ -1915,27 +1915,27 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2014050400) {
-        $del_users = $DB->get_records('user', array('deleted' => 1));
-        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
+        $del_users = $DB->get_fieldset_select('user', 'id', 'deleted = ?', array(1));
+        $sus_users = $DB->get_fieldset_select('user', 'id', 'deleted = ? AND suspended = ?', array(0, 1));
 
         foreach ($del_users as $user) {
             // Cancel already deleted users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
                 foreach ($signups as $signup) {
                     $session = facetoface_get_session($signup->sessionid);
                     // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
+                    facetoface_user_cancel($session, $user, false, $null, get_string('userdeletedcancel', 'facetoface'));
                 }
             }
         }
 
         foreach ($sus_users as $user) {
             // Cancel already suspended users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
                 foreach ($signups as $signup) {
                     $session = facetoface_get_session($signup->sessionid);
                     // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+                    facetoface_user_cancel($session, $user, false, $null, get_string('usersuspendedcancel', 'facetoface'));
                 }
             }
         }
