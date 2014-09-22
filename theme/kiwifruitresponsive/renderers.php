@@ -27,7 +27,7 @@
  */
 class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararesponsive_core_renderer {
     public function kiwifruit_header() {
-        global $OUTPUT, $PAGE, $CFG;
+        global $OUTPUT, $PAGE, $CFG, $SITE;
         $output = '';
         $output .= html_writer::tag('div', $OUTPUT->login_info(), array('id' => 'login-info'));
 
@@ -38,15 +38,22 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
 
         // Find the logo.
         if (!empty($PAGE->theme->settings->frontpagelogo)) {
-            $logourl = $PAGE->theme->settings->frontpagelogo;
+            $logourl = $PAGE->theme->setting_file_url('frontpagelogo', 'frontpagelogo');
+            $logoalt = get_string('logoalt', 'theme_kiwifruitresponsive', $SITE->fullname);
         } else if (!empty($PAGE->theme->settings->logo)) {
-            $logourl = $PAGE->theme->settings->logo;
+            $logourl = $PAGE->theme->setting_file_url('logo', 'logo');
+            $logoalt = get_string('logoalt', 'theme_kiwifruitresponsive', $SITE->fullname);
         } else {
             $logourl = $OUTPUT->pix_url('logo', 'theme');
+            $logoalt = get_string('totaralogo', 'theme_standardtotararesponsive');
+        }
+
+        if (!empty($PAGE->theme->settings->alttext)) {
+            $logoalt = format_string($PAGE->theme->settings->alttext);
         }
 
         if ($logourl) {
-            $logo = html_writer::empty_tag('img', array('src' => $logourl, 'alt' => get_string('logo', 'theme_kiwifruitresponsive')));
+            $logo = html_writer::empty_tag('img', array('src' => $logourl, 'alt' => $logoalt));
             $output .= html_writer::tag('a', $logo, array('href' => $CFG->wwwroot, 'class' => 'logo'));
         }
 

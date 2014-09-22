@@ -22,6 +22,8 @@
  * @subpackage customtotararesponsive
  */
 
+$string['alttext'] = 'Logo alternative text';
+$string['alttextdesc'] = 'The text that is displayed when an image can\'t be. This text is also read by a screen reader.';
 $string['buttoncolor'] = 'Button color';
 $string['buttoncolordesc'] = 'This sets the color for the background of buttons.';
 $string['choosereadme'] = 'This is a highly customisable totara theme, suitable for creating a branded look via the theme settings page.';

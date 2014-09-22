@@ -25,8 +25,14 @@
 
 if (!empty($PAGE->theme->settings->logo)) {
     $logourl = $PAGE->theme->setting_file_url('logo', 'logo');
+    $logoalt = get_string('logo', 'theme_standardtotararesponsive', $SITE->fullname);
 } else {
     $logourl = $OUTPUT->pix_url('logo', 'theme');
+    $logoalt = get_string('totaralogo', 'theme_standardtotararesponsive');
+}
+
+if (!empty($PAGE->theme->settings->alttext)) {
+    $logoalt = format_string($PAGE->theme->settings->alttext);
 }
 
 if (!empty($PAGE->theme->settings->favicon)) {
@@ -67,9 +73,13 @@ echo $OUTPUT->doctype() ?>
     <nav role="navigation" class="navbar-inner">
         <div class="container-fluid">
             <?php if ($logourl == NULL) { ?>
-            <div id="logo"><a href="<?php echo $CFG->wwwroot; ?>">&nbsp;</a></div>
+                <div id="logo"><a href="<?php echo $CFG->wwwroot; ?>">&nbsp;</a></div>
             <?php } else { ?>
-            <div id="logo" class="custom"><a href="<?php echo $CFG->wwwroot; ?>"><img class="logo" src="<?php echo $logourl;?>" alt="Logo" /></a></div>
+                <div id="logo" class="custom">
+                    <a href="<?php echo $CFG->wwwroot; ?>">
+                        <img class="logo" src="<?php echo $logourl;?>" alt="<?php echo $logoalt ?>" />
+                    </a>
+                </div>
             <?php } ?>
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>

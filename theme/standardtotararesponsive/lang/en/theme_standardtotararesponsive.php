@@ -23,7 +23,9 @@
  * @package   theme_standardtotararesponsive
  * @author Mark Webster <mark.webster@catalyst-eu.net>
  */
+$string['choosereadme'] = 'This theme is a simple but clean responsive totara theme, suitable for use as a base when building new responsive themes.';
+$string['logo'] = '{$a} logo';
 $string['pluginname'] = 'Standard Totara Responsive';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
-$string['choosereadme'] = 'This theme is a simple but clean responsive totara theme, suitable for use as a base when building new responsive themes.';
+$string['totaralogo'] = 'Totara Logo';

@@ -38,6 +38,14 @@ if ($ADMIN->fulltree) {
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);
 
+    // Logo alt text.
+    $name = 'theme_customtotararesponsive/alttext';
+    $title = new lang_string('alttext', 'theme_customtotararesponsive');
+    $description = new lang_string('alttextdesc', 'theme_customtotararesponsive');
+    $setting = new admin_setting_configtext($name, $title, $description, '');
+    $setting->set_updatedcallback('theme_reset_all_caches');
+    $settings->add($setting);
+
     // Favicon file setting.
     $name = 'theme_customtotararesponsive/favicon';
     $title = new lang_string('favicon', 'theme_customtotararesponsive');
