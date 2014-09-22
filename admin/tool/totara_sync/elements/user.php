@@ -69,6 +69,7 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('static', 'emailsettingsdesc', '', get_string('emailsettingsdesc', 'tool_totara_sync'));
         $mform->setType('defaultsyncemail', PARAM_TEXT);
         $mform->disabledIf('defaultsyncemail', 'allowduplicatedemails', 'eq', 0);
+        $mform->setDefault('defaultsyncemail', '');
 
 
         // User password settings.
