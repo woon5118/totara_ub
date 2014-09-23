@@ -3,6 +3,39 @@
 
 Totara LMS Changelog
 
+Release 2.6.10 (23rd September 2014):
+==================================================
+
+Security issues:
+    T-12620        Fixed Facetoface access control issues
+
+Improvements:
+    T-13017        Added help button to body field in Facetoface notifications to explain placeholders
+    T-12475        Improved Program enrolment message for Single Activity format course
+    T-12606        Added a default user email address setting to Totara Sync
+
+Bug Fixes:
+    T-12140        Fixed undefined offset errors on the SCORM Interaction report
+    T-12748        Fixed temporary manager restriction default value
+    T-12848        Fixed course availability through programs after program expires
+    T-12977        Fixed Facetoface notification emails when there are scheduling conflicts
+    T-12980        Fixed allowing upper case values in auth field in Totara Sync
+    T-12973        Fixed alignment of the user table in right-to-left languages
+    T-12481        Fixed format for custom user profile fields in bulk user actions download
+    T-13155        Fixed launch of SCORMs using simple popup display mode in certain languages
+    T-13107        Fixed sending of Facetoface notification emails to cancelled users
+    T-13148        Fixed scalability of appraisals and Facetoface upgrade script for large numbers of deleted users
+    T-13128        Fixed multilang support when menu and multiselect course custom fields are used as reportbuilder filters
+    T-13054        Fixed incorrect overdue status being displayed on completed programs and certifications
+    T-13007        Fixed creation of dynamic audience rules with empty parameters
+    T-13085        Fixed formatting of course details section when managing courses and categories in older browsers
+    T-13082        Fixed formatting help icons in middle of text for older browsers
+    T-13005        Fixed recording which user has booked other users to a Facetoface session
+    T-13130        Fixed exception when updating course categories with an empty ID Number
+    T-13063        Removed excess obsolete entries from cohort rule table
+    T-13081        Fixed Totara Sync failure when deleting users if duplicate ID Numbers exist
+
+
 Release 2.6.9 (9th September 2014):
 ==================================================
 

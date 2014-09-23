@@ -157,10 +157,13 @@ if ($data = $form->get_data()) {
 
         $program_todb = new stdClass;
 
-        $program_todb->availablefrom = ($data->availablefromselector) ?
-            totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->availablefromselector) : 0;
-        $program_todb->availableuntil = ($data->availableuntilselector) ?
-            totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),$data->availableuntilselector) : 0;
+        $dateformat = get_string('datepickerlongyearparseformat', 'totara_core');
+        $availablefrom = ($data->availablefromselector) ?
+            totara_date_parse_from_format($dateformat, $data->availablefromselector) : 0;
+        $availableuntil = ($data->availableuntilselector) ?
+            totara_date_parse_from_format($dateformat, $data->availableuntilselector) + (DAYSECS - 1) : 0;
+
+        $available = prog_check_availability($availablefrom, $availableuntil);
 
         //Calcuate sortorder
         $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
@@ -173,10 +176,12 @@ if ($data = $form->get_data()) {
         $program_todb->shortname = $data->shortname;
         $program_todb->fullname = $data->fullname;
         $program_todb->idnumber = $data->idnumber;
-        $program_todb->available = $data->available;
         $program_todb->sortorder = !empty($sortorder) ? $sortorder : 0;
         $program_todb->icon = $data->icon;
         $program_todb->exceptionssent = 0;
+        $program_todb->availablefrom = $availablefrom;
+        $program_todb->availableuntil = $availableuntil;
+        $program_todb->available = $available;
         if (isset($data->visible)) {
             $program_todb->visible = $data->visible;
         }

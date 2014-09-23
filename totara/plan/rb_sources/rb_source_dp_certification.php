@@ -256,6 +256,7 @@ class rb_source_dp_certification extends rb_base_source {
                         'programid' => 'base.id',
                         'certifpath' => 'certif_completion.certifpath',
                         'timeexpires' => 'certif_completion.timeexpires',
+                        'userid' => 'prog_completion.userid',
                     )
                 )
         );
@@ -619,13 +620,13 @@ class rb_source_dp_certification extends rb_base_source {
                 return get_string('duedatenotset', 'totara_program');
             } else if ($row->prog_completion_timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
                 // User is still in the first stage of certification, not overdue yet.
-                return $program->display_duedate($row->prog_completion_timedue, $row->certifpath, $row->status);
+                return $program->display_duedate($row->prog_completion_timedue, $row->userid, $row->certifpath, $row->status);
             } else {
                 // Looks like the certification has expired, overdue!
                 return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
             }
         } else {
-            return $program->display_duedate($row->timeexpires, $row->certifpath, $row->status);
+            return $program->display_duedate($row->timeexpires, $row->userid, $row->certifpath, $row->status);
         }
 
         return '';

@@ -417,6 +417,7 @@ function facetoface_add_instance($facetoface) {
     $cancellation->managerprefix = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
     $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
     $cancellation->ccmanager = 1;
+    $cancellation->cancelled = 1;
     $cancellation->save();
 
     $decline = new facetoface_notification($defaults, false);
@@ -437,6 +438,7 @@ function facetoface_add_instance($facetoface) {
     $reminder->scheduleamount = 2;
     $reminder->ccmanager = 1;
     $reminder->status = 0;
+    $reminder->booked = 1;
     $reminder->save();
 
     $request = new facetoface_notification($defaults, false);
@@ -451,6 +453,8 @@ function facetoface_add_instance($facetoface) {
     $session_change->title = get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface');
     $session_change->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
     $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
+    $reminder->booked = 1;
+    $reminder->waitlisted = 1;
     $session_change->save();
 
     $trainer_confirmation = new facetoface_notification($defaults, false);
@@ -475,12 +479,14 @@ function facetoface_add_instance($facetoface) {
     $cancelreservation->title = get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface');
     $cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
     $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
+    $cancelreservation->cancelled = 1;
     $cancelreservation->save();
 
     $cancelallreservations = new facetoface_notification($defaults, false);
     $cancelallreservations->title = get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface');
     $cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
     $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
+    $cancelallreservations->cancelled = 1;
     $cancelallreservations->save();
 
     return $facetoface->id;
@@ -2019,6 +2025,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         $usersignup->userid = $userid;
     }
 
+    $usersignup->bookedby = $userid == $USER->id ? 0 : $USER->id;
     $usersignup->mailedreminder = 0;
     $usersignup->notificationtype = $notificationtype;
 

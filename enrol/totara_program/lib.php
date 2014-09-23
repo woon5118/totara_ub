@@ -124,7 +124,15 @@ class enrol_totara_program_plugin extends enrol_plugin {
                     $a = new stdClass();
                     $a->course = $course->fullname;
                     $a->program = $result->program;
-                    totara_set_notification($OUTPUT->container(get_string('nowenrolled', 'enrol_totara_program', $a), 'plan_box'), null, array('class' => 'notifysuccess'));
+                    require_once($CFG->dirroot . '/course/lib.php');
+                    $courseformat = course_get_format($course);
+                    if ($courseformat->get_format() == 'singleactivity') {
+                        $viewurl =  new moodle_url('/course/view.php', array('id' => $course->id));
+                        $a->url = $viewurl->out();
+                        totara_set_notification($OUTPUT->container(get_string('nowenrolledcontinue', 'enrol_totara_program', $a), 'plan_box'), null, array('class' => 'notifysuccess'));
+                    } else {
+                        totara_set_notification($OUTPUT->container(get_string('nowenrolled', 'enrol_totara_program', $a), 'plan_box'), null, array('class' => 'notifysuccess'));
+                    }
                 }
                 //return 0 sets enrolment with no time limit
                 return 0;

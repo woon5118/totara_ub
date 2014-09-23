@@ -212,7 +212,7 @@ $fields = customfield_get_defined_fields($tableprefix, $where);
 $fieldcount = count($fields);
 
 foreach ($fields as $field) {
-    $row = array($field->fullname, get_string('customfieldtype'.$field->datatype, 'totara_customfield'));
+    $row = array(format_string($field->fullname), get_string('customfieldtype'.$field->datatype, 'totara_customfield'));
     if ($can_edit || $can_delete) {
         $row[] = customfield_edit_icons($field, $fieldcount, $typeid, $prefix, $can_edit, $can_delete);
     }

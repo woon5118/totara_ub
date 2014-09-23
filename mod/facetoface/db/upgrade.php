@@ -1915,27 +1915,27 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2014050400) {
-        $del_users = $DB->get_records('user', array('deleted' => 1));
-        $sus_users = $DB->get_records('user', array('deleted' => 0, 'suspended' => 1));
+        $del_users = $DB->get_fieldset_select('user', 'id', 'deleted = ?', array(1));
+        $sus_users = $DB->get_fieldset_select('user', 'id', 'deleted = ? AND suspended = ?', array(0, 1));
 
         foreach ($del_users as $user) {
             // Cancel already deleted users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
                 foreach ($signups as $signup) {
                     $session = facetoface_get_session($signup->sessionid);
                     // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user->id, false, $null, get_string('userdeletedcancel', 'facetoface'));
+                    facetoface_user_cancel($session, $user, false, $null, get_string('userdeletedcancel', 'facetoface'));
                 }
             }
         }
 
         foreach ($sus_users as $user) {
             // Cancel already suspended users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user->id))) {
+            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
                 foreach ($signups as $signup) {
                     $session = facetoface_get_session($signup->sessionid);
                     // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user->id, false, $null, get_string('usersuspendedcancel', 'facetoface'));
+                    facetoface_user_cancel($session, $user, false, $null, get_string('usersuspendedcancel', 'facetoface'));
                 }
             }
         }
@@ -2129,8 +2129,46 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014082200, 'facetoface');
     }
 
+    if ($oldversion < 2014091700) {
+        // Fix the default settings on the standard scheduled notifications.
+        $bookedconditions = array(MDL_F2F_CONDITION_BEFORE_SESSION,
+                                MDL_F2F_CONDITION_AFTER_SESSION,
+                                MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE,
+                                );
+        list($statussql, $statusparams) = $DB->get_in_or_equal($bookedconditions);
+        $params = array_merge(array(1, MDL_F2F_NOTIFICATION_AUTO), $statusparams);
+        $sql = "UPDATE {facetoface_notification}
+                SET booked = ?
+                WHERE type = ?
+                AND conditiontype $statussql";
+        $DB->execute($sql, $params);
+
+        // Now fix the three standard cancellation messages.
+        $cancelconditions = array(MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION,
+                                MDL_F2F_CONDITION_RESERVATION_CANCELLED,
+                                MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED);
+        list($statussql, $statusparams) = $DB->get_in_or_equal($cancelconditions);
+        $params = array_merge(array(1, MDL_F2F_NOTIFICATION_AUTO), $statusparams);
+        $sql = "UPDATE {facetoface_notification}
+                SET cancelled = ?
+                WHERE type = ?
+                AND conditiontype $statussql";
+        $DB->execute($sql, $params);
+
+        // Inform waitlisted learners of session datetime changes.
+        $sql = "UPDATE {facetoface_notification}
+                SET waitlisted = ?
+                WHERE type = ?
+                AND conditiontype = ?";
+        $DB->execute($sql, array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE));
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014091700, 'facetoface');
+    }
+    
+    // Totara 2.6.x upgrade line - bump all version numbers below after merge from t2-release-26 if necessary.
+    
     // Add new selfapproval and selfapprovaltandc fields.
-    if ($oldversion < 2014090400) {
+    if ($oldversion < 2014092300) {
 
         // Define field selfapproval to be added to facetoface_sessions.
         $table = new xmldb_table('facetoface_sessions');
@@ -2156,10 +2194,10 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
 
         // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014090400, 'facetoface');
+        upgrade_mod_savepoint(true, 2014092300, 'facetoface');
     }
 
-    if ($oldversion < 2014090500) {
+    if ($oldversion < 2014092301) {
 
         // Define field declareinterest to be added to facetoface.
         $table = new xmldb_table('facetoface');
@@ -2203,11 +2241,11 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         }
 
         // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014090500, 'facetoface');
+        upgrade_mod_savepoint(true, 2014092301, 'facetoface');
     }
 
     // Add new 'mincapacity' and 'cutoff' fields.
-    if ($oldversion < 2014091200) {
+    if ($oldversion < 2014092302) {
 
         $table = new xmldb_table('facetoface_sessions');
 
@@ -2224,7 +2262,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2014091200, 'facetoface');
+        upgrade_mod_savepoint(true, 2014092302, 'facetoface');
     }
 
     return $result;

@@ -194,7 +194,7 @@ class rb_filter_select extends rb_filter_type {
      */
     function get_label($data) {
         $value     = $data['value'];
-        $label = $this->label;
+        $label = format_string($this->label);
         $options = $this->options['selectchoices'][$value];
         $simplemode = $this->options['simplemode'];
 

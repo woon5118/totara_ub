@@ -74,7 +74,7 @@ if ($data = data_submitted()) {
 
         // Prepare params
         $params = array();
-        $params['suppressemail']   = true;
+        $params['suppressemail']   = false;
         $params['ignoreconflicts'] = true;
         $params['bulkaddsource']   = $bulkaddsource;
         // Do not need the approval, change the status

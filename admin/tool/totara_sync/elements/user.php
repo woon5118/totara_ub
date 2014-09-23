@@ -62,8 +62,15 @@ class totara_sync_element_user extends totara_sync_element {
     function config_form(&$mform) {
         $mform->addElement('selectyesno', 'sourceallrecords', get_string('sourceallrecords', 'tool_totara_sync'));
         $mform->addElement('static', 'sourceallrecordsdesc', '', get_string('sourceallrecordsdesc', 'tool_totara_sync'));
+
+        // User email settings.
         $mform->addElement('selectyesno', 'allowduplicatedemails', get_string('allowduplicatedemails', 'tool_totara_sync'));
-        $mform->addElement('static', 'allowduplicatedemailsdesc', '', get_string('allowduplicatedemailsdesc', 'tool_totara_sync'));
+        $mform->addElement('text', 'defaultsyncemail', get_string('defaultemailaddress', 'tool_totara_sync'), array('size' => 50));
+        $mform->addElement('static', 'emailsettingsdesc', '', get_string('emailsettingsdesc', 'tool_totara_sync'));
+        $mform->setType('defaultsyncemail', PARAM_TEXT);
+        $mform->disabledIf('defaultsyncemail', 'allowduplicatedemails', 'eq', 0);
+        $mform->setDefault('defaultsyncemail', '');
+
 
         // User password settings.
         $mform->addElement('selectyesno', 'ignoreexistingpass', get_string('ignoreexistingpass', 'tool_totara_sync'));
@@ -84,6 +91,7 @@ class totara_sync_element_user extends totara_sync_element {
     function config_save($data) {
         $this->set_config('sourceallrecords', $data->sourceallrecords);
         $this->set_config('allowduplicatedemails', $data->allowduplicatedemails);
+        $this->set_config('defaultsyncemail', $data->defaultsyncemail);
         $this->set_config('ignoreexistingpass', $data->ignoreexistingpass);
         $this->set_config('forcepwchange', $data->forcepwchange);
         $this->set_config('allow_create', !empty($data->allow_create));
@@ -143,13 +151,13 @@ class totara_sync_element_user extends totara_sync_element {
         if (!empty($this->config->allow_delete)) {
             if (empty($this->config->sourceallrecords)) {
                 // Get records with "deleted" flag set.
-                $sql = "SELECT u.id, u.idnumber, u.auth
+                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
                          FROM {{$synctable}} s
                    INNER JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
                         WHERE u.totarasync=1 AND u.deleted = 0 AND s.deleted = 1";
             } else {
                 // All records provided by source - get missing user records.
-                $sql = "SELECT u.id, u.idnumber, u.auth
+                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
                           FROM {user} u
                LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
                          WHERE u.totarasync=1 AND s.idnumber IS NULL AND u.deleted=0";
@@ -551,6 +559,12 @@ class totara_sync_element_user extends totara_sync_element {
         }
 
         $user->auth = isset($suser->auth) ? strtolower($suser->auth) : 'manual';
+
+        // If there is no email, check the default email.
+        $usedefaultemail = !empty($this->config->allowduplicatedemails) && !empty($this->config->defaultsyncemail);
+        if (empty($suser->email) && empty($user->email) && $usedefaultemail) {
+            $user->email = $this->config->defaultsyncemail;
+        }
 
         $user->suspended = empty($suser->suspended) ? 0 : $suser->suspended;
     }

@@ -252,16 +252,16 @@ $LMS_api = (scorm_version_check($scorm->version, SCORM_12) || empty($scorm->vers
         }
         function monitorContentWindow() {
             if (cWin != null) cWin.focus();
-            document.body.innerHTML = "<?php echo get_string('popup_simple_notice', 'scorm'); ?>"
-            window.top.onbeforeunload = function() { if (cWin != null && !cWin.closed) return "<?php echo get_string('popup_simple_closenotice', 'scorm'); ?>" };
+            document.body.innerHTML = "<?php echo addslashes_js(get_string('popup_simple_notice', 'scorm')); ?>"
+            window.top.onbeforeunload = function() { if (cWin != null && !cWin.closed) return '<?php echo addslashes_js(get_string('popup_simple_closenotice', 'scorm')); ?>' };
             window.top.onunload = function() { if (cWin != null && !cWin.closed) cWin.close(); };
             setTimeout(checkContentWindowOpen,500);
         }
         function checkContentWindowOpen() {
             if (cWin == null) {
-                document.body.innerHTML = '<?php echo get_string('popup_simple_popupblockednotice', 'scorm'); ?><p><a href="javascript:openContentWindow();" onclick="openContentWindow();"><?php echo get_string('popup_simple_popupmanuallaunch', 'scorm'); ?></a></p>';
+                document.body.innerHTML = '<?php echo addslashes_js(get_string('popup_simple_popupblockednotice', 'scorm')); ?><p><a href="javascript:openContentWindow();" onclick="openContentWindow();"><?php echo addslashes_js(get_string('popup_simple_popupmanuallaunch', 'scorm')); ?></a></p>';
             } else if (cWin.closed) {
-                document.body.innerHTML = "<?php echo get_string('popup_simple_redirectingnotice', 'scorm'); ?>&nbsp;<img src='<?php echo $OUTPUT->pix_url('wait', 'scorm') ?>'></p>";
+                document.body.innerHTML = "<?php echo addslashes_js(get_string('popup_simple_redirectingnotice', 'scorm')); ?>&nbsp;<img src='<?php echo $OUTPUT->pix_url('wait', 'scorm') ?>'></p>";
                 setTimeout((function(){window.top.location = "<?php echo $CFG->wwwroot.'/course/view.php?id='.$scorm->course; ?>";}),2000);
             } else {
                 setTimeout(checkContentWindowOpen,2000);

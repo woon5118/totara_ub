@@ -3041,9 +3041,14 @@ abstract class rb_base_source {
      */
     function list_to_array($list, $sep) {
         $result = array();
-        $base = explode($sep, $list);
-        if (!empty($base)) {
-            $result = array_combine($base, $base);
+        $unfilteredbase = explode($sep, $list);
+        $filteredbase = array();
+        if (!empty($unfilteredbase)) {
+            foreach ($unfilteredbase as $base) {
+                // Run through format_string in case the options are using multilang filter.
+                $filteredbase[] = format_string($base);
+            }
+            $result = array_combine($filteredbase, $filteredbase);
         }
         return $result;
     }
@@ -3171,7 +3176,7 @@ abstract class rb_base_source {
 
                 $selectchoices = array();
                 foreach ($record->multiselectitem as $selectchoice) {
-                    $selectchoices[md5($selectchoice['option'])] = $selectchoice['option'];
+                    $selectchoices[md5($selectchoice['option'])] = format_string($selectchoice['option']);
                 }
                 $filter_options['selectchoices'] = $selectchoices;
                 $filter_options['showcounts'] = array(
@@ -3196,7 +3201,7 @@ abstract class rb_base_source {
                 $iconselectchoices = array();
                 foreach ($record->multiselectitem as $selectchoice) {
                     $iconselectchoices[md5($selectchoice['option'])] =
-                            customfield_multiselect::get_item_string($selectchoice['option'], $selectchoice['icon'], 'list-icon');
+                            customfield_multiselect::get_item_string(format_string($selectchoice['option']), $selectchoice['icon'], 'list-icon');
                 }
                 $filter_options['selectchoices'] = $iconselectchoices;
                 $filter_options['showcounts'] = array(

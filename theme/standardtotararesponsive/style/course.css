@@ -86,3 +86,7 @@
 #course-category-listings {margin-bottom:20px;}
 
 #id_criteria_course_value {max-width:500px}
+
+.ie8 .course-detail .row {
+    margin-left: 0;
+}

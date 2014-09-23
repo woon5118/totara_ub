@@ -1028,6 +1028,16 @@ class program {
      */
     public function can_enter_course($userid, $courseid) {
 
+        $now = time();
+        $available = !isset($this->available) || $this->available == AVAILABILITY_NOT_TO_STUDENTS;
+        $from = !empty($this->availablefrom) && $this->availablefrom > $now;
+        $until = !empty($this->availableuntil) && $this->availableuntil < $now;
+
+        // Don't allow access to courses through unavailable programs.
+        if ($available || $from || $until) {
+            return false;
+        }
+
         $certifpath = get_certification_path_user($this->certifid, $userid);
         $certifpath == CERTIFPATH_UNSET && $certifpath = CERTIFPATH_CERT;
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
@@ -1035,6 +1045,7 @@ class program {
         $courseset_group_completed = false;
         $maxcompletedgroup = -1;
         $coursegroup = -1;
+
         // Find the last completed groupset, and which groupset the course is in.
         foreach ($courseset_groups as $groupkey => $courseset_group) {
             $thisgroupcomplete = false;
@@ -1043,7 +1054,8 @@ class program {
                     $thisgroupcomplete = true;
                     $maxcompletedgroup = $groupkey;
                 }
-                if ($courseset->contains_course($courseid)) {
+                if ($coursegroup == -1 && $courseset->contains_course($courseid)) {
+                    // Get the first occurance of the course.
                     $coursegroup = $groupkey;
                 }
                 if ($thisgroupcomplete && $courseset->contains_course($courseid)) {
@@ -1052,11 +1064,11 @@ class program {
                 }
             }
         }
+
         // Allow access if the course is in the first group...
-        if ($maxcompletedgroup == -1 && $coursegroup == 0) {
+        if ($coursegroup == 0) {
             return true;
-        }
-        if ($maxcompletedgroup >= 0 && $coursegroup >= 0) {
+        } else if ($maxcompletedgroup >= 0 && $coursegroup > 0) {
             // Or an already completed group...
             if ($coursegroup <= $maxcompletedgroup) {
                 return true;
@@ -1066,6 +1078,7 @@ class program {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1196,9 +1209,9 @@ class program {
                                 ? $this->display_date_as_text($prog_completion->timestarted)
                                 : get_string('nostartdate', 'totara_program'));
                 if ($iscertif) {
-                    $duedatestr = $this->display_duedate($timedue, $certifcompletion->certifpath, $certifcompletion->status);
+                    $duedatestr = $this->display_duedate($timedue, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
                 } else {
-                    $duedatestr = $this->display_duedate($timedue);
+                    $duedatestr = $this->display_duedate($timedue, $prog_completion->userid);
                 }
                 $duedatestr .= html_writer::empty_tag('br');
                 $duedatestr .= $request;
@@ -1361,11 +1374,12 @@ class program {
      * Display the due date for a program
      *
      * @param int $duedate
+     * @param int $userid
      * @param int $certifpath   Optional param telling us the path of the certification
      * @param int $certstatus   Optional param telling us the status of the certification
      * @return string
      */
-    function display_duedate($duedate, $certifpath = null, $certstatus = null) {
+    function display_duedate($duedate, $userid, $certifpath = null, $certstatus = null) {
         global $OUTPUT;
 
         if (empty($duedate) || $duedate == COMPLETION_TIME_NOT_SET) {
@@ -1389,8 +1403,11 @@ class program {
 
         $out = '';
         $out .= $this->display_date_as_text($duedate);
-        // highlight dates that are overdue or due soon
-        $out .= $this->display_duedate_highlight_info($duedate);
+
+        // Highlight dates that are overdue or due soon if program is not complete.
+        if (!$this->is_program_complete($userid)) {
+            $out .= $this->display_duedate_highlight_info($duedate, $userid);
+        }
 
         return $out;
     }

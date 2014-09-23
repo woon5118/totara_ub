@@ -494,8 +494,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             if (core_text::strlen($data->idnumber) > 100) {
                 throw new moodle_exception('idnumbertoolong');
             }
-            if ($DB->record_exists('course_categories', array('idnumber' => $data->idnumber))) {
-                throw new moodle_exception('categoryidnumbertaken');
+            if ($data->idnumber) {
+                if ($DB->record_exists('course_categories', array('idnumber' => $data->idnumber))) {
+                    throw new moodle_exception('categoryidnumbertaken');
+                }
             }
             $newcategory->idnumber = $data->idnumber;
         }

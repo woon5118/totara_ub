@@ -92,13 +92,12 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014062000) {
-        $users = $DB->get_records('user', array('deleted' => 1));
-        $users = array_keys($users);
+        $users = $DB->get_fieldset_select('user', 'id', 'deleted = ? ', array(1));
 
         $transaction = $DB->start_delegated_transaction();
 
         if (!empty($users)) {
-            list($insql, $inparam) = $DB->get_in_or_equal($users);
+
             $now = time();
 
             // First try and complete the stage so the user can continue the appraisal.
@@ -106,8 +105,10 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
                       FROM {appraisal_role_assignment} ara
                       JOIN {appraisal_user_assignment} aua
                         ON ara.appraisaluserassignmentid = aua.id
-                     WHERE ara.userid {$insql}";
-            $roleassignments = $DB->get_records_sql($sql, $inparam);
+                      JOIN {user} u
+                        ON ara.userid = u.id
+                       AND u.deleted = ?";
+            $roleassignments = $DB->get_records_sql($sql, array(1));
 
             $completionsql = "SELECT 1
                                 FROM {appraisal_role_assignment} ara
@@ -160,11 +161,21 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
                 }
             }
 
-            // Then flag all the role_assignments as empty.
-            $sql = "UPDATE {appraisal_role_assignment}
+            // Then flag all the role_assignments as empty. Chunk the data in case there are more than 65535 deleted users.
+            $length = 1000;
+            $chunked_datarows = array_chunk($users, $length);
+            unset($users);
+            foreach ($chunked_datarows as $key => $chunk) {
+                list($insql, $inparam) = $DB->get_in_or_equal($chunk);
+                $sql = "UPDATE {appraisal_role_assignment}
                        SET userid = 0
                        WHERE userid {$insql}";
-            $DB->execute($sql, $inparam);
+                $DB->execute($sql, $inparam);
+                unset($chunked_datarows[$key]);
+                unset($chunk);
+                unset($sql);
+            }
+            unset($chunked_datarows);
         }
 
         $transaction->allow_commit();

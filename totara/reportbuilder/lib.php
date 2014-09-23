@@ -3943,7 +3943,7 @@ class reportbuilder {
                 }
 
                 $key = $filter->type . '-' . $filter->value;
-                $ret[$section][$key] = $filter->label;
+                $ret[$section][$key] = format_string($filter->label);
             }
         }
         return $ret;

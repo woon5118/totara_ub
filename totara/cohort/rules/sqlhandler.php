@@ -224,10 +224,13 @@ abstract class cohort_rule_sqlhandler {
                         $todb = new stdClass();
                         $todb->ruleid = $ruleinstanceid;
                         $todb->name = $name;
-                        $todb->value = $val;
+                        $todb->value = trim($val);
                         $todb->timecreated = $todb->timemodified = time();
                         $todb->modifierid = $USER->id;
-                        $DB->insert_record('cohort_rule_params', $todb);
+
+                        if (!($todb->value == '')) {
+                            $DB->insert_record('cohort_rule_params', $todb);
+                        }
                     }
 
                     foreach ($todelete as $val) {
@@ -240,10 +243,13 @@ abstract class cohort_rule_sqlhandler {
                         $todb = new stdClass();
                         $todb->ruleid = $ruleinstanceid;
                         $todb->name = $name;
-                        $todb->value = $val;
+                        $todb->value = trim($val);
                         $todb->timecreated = $todb->timemodified = time();
                         $todb->modifierid = $USER->id;
-                        $DB->insert_record('cohort_rule_params', $todb);
+
+                        if (!($todb->value == '')) {
+                            $DB->insert_record('cohort_rule_params', $todb);
+                        }
                     }
                 }
 
