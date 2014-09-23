@@ -243,7 +243,7 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $columnoptions[] = new rb_column_option(
-                'prog_completion',
+                'certif_completion',
                 'timedue',
                 get_string('certificationduedate', 'totara_program'),
                 'prog_completion.timedue',
@@ -427,7 +427,7 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
-                'prog_completion',
+                'certif_completion',
                 'timedue',
                 get_string('certificationduedate', 'totara_program'),
                 'date'
