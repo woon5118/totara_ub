@@ -208,8 +208,6 @@ if ($mform->is_cancelled()) {
             redirect(new moodle_url($findurl, $findparams));
         }
 
-        $duedate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $data->duedateselector);
-
         $newsystem = array();
         if (!empty($data->systemnew)) {
             $newsystem = explode(',', $data->systemnew);
@@ -254,7 +252,7 @@ if ($mform->is_cancelled()) {
         $newduedate = !empty($data->duedate) ? $data->duedate : 0;
 
         if (!empty($newsystem) || !empty($cancelsystem) || !empty($newemail) || !empty($cancelemail) ||
-                $duedate != $data->oldduedate) {
+                $data->duedate != $data->oldduedate) {
             $params = array('userid' => $data->userid,
                 'action' => 'confirm',
                 'formid' => $data->formid,
@@ -264,7 +262,7 @@ if ($mform->is_cancelled()) {
                 'emailnew' => implode(',', $newemail),
                 'emailkeep' => implode(',', $keepemail),
                 'emailcancel' => implode(',', $cancelemail),
-                'duedate' => $duedate,
+                'duedate' => $data->duedate,
                 'oldduedate' => $data->oldduedate,
             );
 

@@ -386,16 +386,6 @@ class request_select_users extends moodleform {
 
         $mform =& $this->_form;
 
-        // Javascript include.
-        local_js(array(
-            TOTARA_JS_DATEPICKER,
-        ));
-
-        // Attach a date picker to date fields.
-        build_datepicker_js(
-            'input[name="duedateselector"]'
-        );
-
         // Header - Manage users requested.
         $mform->addElement('header', 'manageuserrequests', get_string('manageuserrequests', 'totara_feedback360'));
 
@@ -447,10 +437,9 @@ class request_select_users extends moodleform {
         $mform->addElement('static', 'existing_external', '', '');
 
         // Target date.
-        $mform->addElement('text', 'duedateselector', get_string('duedate', 'totara_feedback360'),
-                 array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $mform->addHelpButton('duedateselector', 'duedate', 'totara_feedback360');
-        $mform->setType('duedateselector', PARAM_MULTILANG);
+        $mform->addElement('date_selector', 'duedate', get_string('duedate', 'totara_feedback360'), array('optional' => true));
+        $mform->addHelpButton('duedate', 'duedate', 'totara_feedback360');
+        $mform->setType('duedate', PARAM_INT);
 
     }
 
@@ -546,8 +535,7 @@ class request_select_users extends moodleform {
 
         if (!empty($data['duedate'])) {
             $mform->getElement('oldduedate')->setValue($data['duedate']);
-            $due = userdate($data['duedate'], get_string('datepickerlongyearphpuserdate', 'totara_core'));
-            $mform->getElement('duedateselector')->setValue($due);
+            $mform->getElement('duedate')->setValue($data['duedate']);
         }
 
         if (!empty($data['update'])) {
@@ -612,27 +600,21 @@ class request_select_users extends moodleform {
         }
 
         // Validate the due date field.
-        $dateparseformat = get_string('datepickerlongyearparseformat', 'totara_core');
-        if (!empty($data['duedateselector'])) {
+        if (!empty($data['duedate'])) {
             // If they have set a due date check that it is in the future.
-            $targetdate = $data['duedateselector'];
-
-            if (empty($targetdate)) {
+            if (empty($data['duedate'])) {
                 // Carry on, the due date can be empty.
-            } else if ($date = totara_date_parse_from_format($dateparseformat, $targetdate)) {
-                if ($date < time()) {
-                    $errors['duedateselector'] = get_string('error:duedatepast', 'totara_feedback360');
+            } else {
+                if ($data['duedate'] < time()) {
+                    $errors['duedate'] = get_string('error:duedatepast', 'totara_feedback360');
                 }
                 // If we are updating an existing request, check that the due date is the same or further in the future.
                 if (!empty($data['oldduedate'])) {
                     $olddue = $data['oldduedate'];
-                    if ($olddue > $date) {
-                        $errors['duedateselector'] = get_string('error:newduedatebeforeold', 'totara_feedback360');
+                    if ($olddue > $data['duedate']) {
+                        $errors['duedate'] = get_string('error:newduedatebeforeold', 'totara_feedback360');
                     }
                 }
-            } else {
-                // Due date is not in a parseable format.
-                $errors['duedateselector'] = get_string('error:duedateformat', 'totara_feedback360');
             }
         }
 
