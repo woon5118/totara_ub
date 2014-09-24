@@ -126,9 +126,7 @@ if ($course->id != SITEID && has_capability('moodle/course:viewparticipants', $c
 // Setup custom javascript
 local_js(array(
     TOTARA_JS_DIALOG,
-    TOTARA_JS_TREEVIEW,
-    TOTARA_JS_DATEPICKER,
-    TOTARA_JS_PLACEHOLDER
+    TOTARA_JS_TREEVIEW
 ));
 $PAGE->requires->strings_for_js(array('chooseposition', 'chooseappraiser', 'choosemanager',
     'chooseorganisation', 'currentlyselected'), 'totara_hierarchy');
@@ -281,9 +279,5 @@ else {
     echo $OUTPUT->header();
 
     $form->display();
-
-    // Setup calendar
-    build_datepicker_js('#id_timevalidfrom:not([readonly]), #id_timevalidto:not([readonly]), ' .
-            '#id_tempmanagerexpiry:not([readonly])');
 }
 echo $OUTPUT->footer();
