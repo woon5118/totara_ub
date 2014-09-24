@@ -5710,10 +5710,10 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
 function rb_unique_param($name) {
     static $UNIQUE_PARAMS = array();
 
-    $param = $name . rand(1, 30777);
+    $param = $name . uniqid();
 
     while (in_array($param, $UNIQUE_PARAMS)) {
-        $param = $name . rand(1, 30777);
+        $param = $name . uniqid();
     }
 
     $UNIQUE_PARAMS[] = $param;

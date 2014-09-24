@@ -136,7 +136,7 @@ function search_get_keyword_where_clause_options($field, $keywords, $negate=fals
     }
 
     foreach ($keywords as $keyword) {
-        $uniqueparam = "{$operator}_{$count}_" . rand(1, 30777);
+        $uniqueparam = "{$operator}_{$count}_" . uniqid();
         $queries[] = $DB->sql_like($field, ":{$uniqueparam}", false, true, $not);
         $params[$uniqueparam] = $presign . $DB->sql_like_escape($keyword) . $postsign;
         ++$count;
