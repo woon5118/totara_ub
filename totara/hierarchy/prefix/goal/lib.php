@@ -296,15 +296,8 @@ class goal extends hierarchy {
         local_js(array(
             TOTARA_JS_DIALOG,
             TOTARA_JS_UI,
-            TOTARA_JS_DATEPICKER,
-            TOTARA_JS_ICON_PREVIEW,
-            TOTARA_JS_PLACEHOLDER
+            TOTARA_JS_ICON_PREVIEW
         ));
-
-        // Attach a date picker to the available until/from fields.
-        build_datepicker_js(
-            'input[name="targetdateselector"]'
-        );
 
         $frameworkid = $this->frameworkid;
 
@@ -324,81 +317,14 @@ class goal extends hierarchy {
         $mform->addElement('static', 'scalename', get_string('scale'), ($scaledesc) ? format_string($scaledesc) : get_string('none'));
         $mform->addHelpButton('scalename', 'goalscale', 'totara_hierarchy');
 
-        $mform->addElement('text', 'targetdateselector', get_string('goaltargetdate', 'totara_hierarchy'),
-            array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $mform->addHelpButton('targetdateselector', 'goaltargetdate', 'totara_hierarchy');
-        $mform->setType('targetdateselector', PARAM_MULTILANG);
-
-        $mform->addElement('hidden', 'targetdate');
+        $mform->addElement('date_selector', 'targetdate', get_string('goaltargetdate', 'totara_hierarchy'), array('optional' => true));
+        $mform->addHelpButton('targetdate', 'goaltargetdate', 'totara_hierarchy');
         $mform->setType('targetdate', PARAM_INT);
 
         $mform->addElement('hidden', 'proficiencyexpected', 1);
         $mform->setType('proficiencyexpected', PARAM_INT);
         $mform->addElement('hidden', 'evidencecount', 0);
         $mform->setType('evidencecount', PARAM_INT);
-    }
-
-    /**
-     * Set goal specific fields in the add/edit form, e.g. targetdate.
-     *
-     * @param $data object      Database record of the hierarchy item
-     */
-    public function set_additional_item_form_fields($data) {
-        global $CFG;
-
-        // Fix up the format of the goal target date.
-        if (!empty($data->targetdate)) {
-            $data->targetdateselector = userdate($data->targetdate,
-                get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
-        }
-    }
-
-    /**
-     * Override this function in prefix lib.php to add validation for
-     * type specific fields when submitting an edit/add form. e.g. targetdate
-     *
-     * @param $data object      The forms returned dataobject
-     * @return array            An array containing any errors
-     */
-    public function validate_additional_item_form_fields($data) {
-        $errors = array();
-
-        if (!empty($data->targetdateselector)) {
-            $targetdate = $data->targetdateselector;
-            $dateparseformat = get_string('datepickerlongyearparseformat', 'totara_core');
-            $datepattern = get_string('datepickerlongyearregexphp', 'totara_core');
-
-            if (preg_match($datepattern, $targetdate) == 0) {
-                // The date doesn't match the expected format.
-                $errors['targetdateselector'] = get_string('error:invaliddate', 'totara_program');
-            } else if (!empty($targetdate) && !totara_date_parse_from_format($dateparseformat, $targetdate)) {
-                // The date can not be parsed.
-                $errors['targetdateselector'] = get_string('error:invaliddate', 'totara_program');
-            }
-        }
-
-        return $errors;
-    }
-
-    /**
-     * Format additional fields shown in the goals add/edit forms, namely the target date.
-     *
-     * @param $item object      The form data object to be formatted
-     * @return object           The same object after formatting
-     */
-    public function process_additional_item_form_fields($item) {
-
-        // Format the goal's target date.
-        if (!empty($item->targetdateselector)) {
-            // Set up formatting the date for goals.
-            $dateformat = get_string('datepickerlongyearparseformat', 'totara_core');
-            $targetdate = totara_date_parse_from_format($dateformat, $item->targetdateselector);
-
-            $item->targetdate = $targetdate;
-            unset($item->targetdateselector);
-        }
-
-        return $item;
     }
 
     /**

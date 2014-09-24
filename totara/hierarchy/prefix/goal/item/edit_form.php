@@ -65,15 +65,8 @@ class goal_edit_personal_form extends moodleform {
         local_js(array(
             TOTARA_JS_DIALOG,
             TOTARA_JS_UI,
-            TOTARA_JS_DATEPICKER,
-            TOTARA_JS_ICON_PREVIEW,
-            TOTARA_JS_PLACEHOLDER
+            TOTARA_JS_ICON_PREVIEW
         ));
-
-        // Attach a date picker to date fields.
-        build_datepicker_js(
-            'input[name="targetdateselector"]'
-        );
 
         $mform =& $this->_form;
 
@@ -82,8 +75,6 @@ class goal_edit_personal_form extends moodleform {
         $mform->setType('goalpersonalid', PARAM_INT);
         $mform->addElement('hidden', 'userid');
         $mform->setType('userid', PARAM_INT);
-        $mform->addElement('hidden', 'targetdate');
-        $mform->setType('targetdate', PARAM_INT);
 
         // Name.
         $mform->addElement('text', 'name', get_string('name'), 'maxlength="1024" size="50"');
@@ -106,10 +97,9 @@ class goal_edit_personal_form extends moodleform {
         $mform->addHelpButton('scaleid', 'goalscale', 'totara_hierarchy');
 
         // Target date.
-        $mform->addElement('text', 'targetdateselector', get_string('goaltargetdate', 'totara_hierarchy'),
-                 array('placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core')));
-        $mform->addHelpButton('targetdateselector', 'goaltargetdate', 'totara_hierarchy');
-        $mform->setType('targetdateselector', PARAM_MULTILANG);
+        $mform->addElement('date_selector', 'targetdate', get_string('goaltargetdate', 'totara_hierarchy'), array('optional' => true));
+        $mform->addHelpButton('targetdate', 'goaltargetdate', 'totara_hierarchy');
+        $mform->setType('targetdate', PARAM_INT);
 
         $this->add_action_buttons();
     }
@@ -118,12 +108,6 @@ class goal_edit_personal_form extends moodleform {
         global $TEXTAREA_OPTIONS, $CFG;
 
         $options = $TEXTAREA_OPTIONS;
-
-        if (!empty($data->targetdate)) {
-            // Format and name the data correctly for the date selector.
-            $data->targetdateselector = userdate($data->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'),
-                    $CFG->timezone, false);
-        }
 
         if (!empty($data->description)) {
             // Same again for the description.
@@ -152,19 +136,8 @@ class goal_edit_personal_form extends moodleform {
         }
 
         // Check target date is in the future.
-        $dateparseformat = get_string('datepickerlongyearparseformat', 'totara_core');
-        if (!empty($fromform->targetdateselector)) {
-            $targetdate = $fromform->targetdateselector;
-            if (!empty($targetdate)) {
-                if ($date = totara_date_parse_from_format($dateparseformat, $targetdate)) {
-                    if ($date < time()) {
-                        $errors['targetdateselector'] = get_string('error:invaliddatepast', 'totara_hierarchy');
-                    }
-                } else {
-                    $errors['targetdateselector'] = get_string('error:invaliddateformat', 'totara_hierarchy',
-                            get_string('datepickerlongyearplaceholder', 'totara_core'));
-                }
-            }
+        if (!empty($fromform->targetdate) && $fromform->targetdate < time()) {
+            $errors['targetdate'] = get_string('error:invaliddatepast', 'totara_hierarchy');
         }
 
         return $errors;

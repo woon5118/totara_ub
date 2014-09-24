@@ -92,14 +92,12 @@ if ($mform->is_cancelled()) {
     $todb->name = $fromform->name;
     $todb->usermodified = $USER->id;
     $todb->timemodified = time();
-    if (isset($fromform->targetdateselector)) {
-        if (empty($fromform->targetdateselector)) {
+    if (isset($fromform->targetdate)) {
+        if (empty($fromform->targetdate)) {
             $todb->targetdate = 0;
         } else {
-            $todb->targetdate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
-                    $fromform->targetdateselector);
+            $todb->targetdate = $fromform->targetdate;
         }
-        unset($fromform->targetdateselector);
     }
 
     $existingrecord = null;
