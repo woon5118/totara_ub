@@ -3113,7 +3113,7 @@ abstract class rb_base_source {
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
             if ($cf_prefix == 'user' && $record->visible != PROFILE_VISIBLE_ALL) {
-                $column_options['capability'] = 'moodle/user:update';
+                $column_options['capability'] = 'moodle/user:viewalldetails';
             }
             $filtertype = 'text'; // default filter type
             $filter_options = array();
