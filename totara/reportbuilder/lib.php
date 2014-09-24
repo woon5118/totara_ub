@@ -3901,7 +3901,11 @@ class reportbuilder {
         } else if ($language == 'th') {
             return 'cordiaupc';
         } else {
-            return 'dejavusans';
+            // NOTE: previously used 'dejavusans' is not compatible with iOS 7 and older devices,
+            //       'freesans' on the other hand does not support all languages.
+            //       Ideally this should be admin configurable so that multilingual sites
+            //       may decide to use Arial Unicode here.
+            return 'freeserif';
         }
     }
 
