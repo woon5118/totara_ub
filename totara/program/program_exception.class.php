@@ -126,25 +126,27 @@ abstract class prog_exception {
         global $DB;
         $program = new program($this->programid);
 
-        $user_assign = $DB->get_record('prog_user_assignment', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
-        $learner_assign_todb = new stdClass();
-        $learner_assign_todb->id = $user_assign->id;
-        $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
+        $assignid = $DB->get_field('prog_user_assignment', 'id', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
 
-        if (!$DB->update_record('prog_user_assignment', $learner_assign_todb)) {
-            return false;
+        if (!empty($assignid)) {
+            $learner_assign_todb = new stdClass();
+            $learner_assign_todb->id = $assignid;
+            $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
+
+            if (!$DB->update_record('prog_user_assignment', $learner_assign_todb)) {
+                return false;
+            }
+
+            // Event trigger to send notification when exception is resolved.
+            $event = \totara_program\event\program_assigned::create(
+                array(
+                    'objectid' => $this->programid,
+                    'context' => context_program::instance($this->programid),
+                    'userid' => $this->userid,
+                )
+            );
+            $event->trigger();
         }
-
-        //Event trigger to send notification when
-        //exception is resolved
-        $event = \totara_program\event\program_assigned::create(
-            array(
-                'objectid' => $this->programid,
-                'context' => context_program::instance($this->programid),
-                'userid' => $this->userid,
-            )
-        );
-        $event->trigger();
 
         return prog_exception::delete_exception($this->id);
     }
@@ -165,37 +167,40 @@ abstract class prog_exception {
             return false;
         }
 
-        // Get the total time allowed for the content in the program
+        // Get the total time allowed for the content in the program.
         require_once($CFG->dirroot . '/totara/certification/lib.php');
         $certifpath = get_certification_path_user($program->certifid, $this->userid);
         $certifpath == CERTIFPATH_UNSET && $certifpath = CERTIFPATH_CERT;
         $total_time_allowed = $program->content->get_total_time_allowance($certifpath);
 
-        // Give the user this much time plus one week (from now!)
+        // Give the user this much time plus one week.
         $timedue = time() + $total_time_allowed + 604800;
 
-        // Update prog_completion
+        // Update prog_completion.
         $assignment = new user_assignment($this->userid, $this->assignmentid, $this->programid);
         if (!$assignment->update($timedue)) {
             return false;
         }
 
-        // Update user_assignment
-        $user_assign = $DB->get_record('prog_user_assignment', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
-        $learner_assign_todb = new stdClass();
-        $learner_assign_todb->id = $user_assign->id;
-        $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
+        // Update user_assignment.
+        $assignid = $DB->get_field('prog_user_assignment', 'id', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
 
-        $DB->update_record('prog_user_assignment', $learner_assign_todb);
+        if (!empty($assignid)) {
+            $learner_assign_todb = new stdClass();
+            $learner_assign_todb->id = $assignid;
+            $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_RESOLVED;
 
-        $event = \totara_program\event\program_assigned::create(
-            array(
-                'objectid' => $this->programid,
-                'context' => context_program::instance($this->programid),
-                'userid' => $this->userid,
-            )
-        );
-        $event->trigger();
+            $DB->update_record('prog_user_assignment', $learner_assign_todb);
+
+            $event = \totara_program\event\program_assigned::create(
+                array(
+                    'objectid' => $this->programid,
+                    'context' => context_program::instance($this->programid),
+                    'userid' => $this->userid,
+                )
+            );
+            $event->trigger();
+        }
 
         return prog_exception::delete_exception($this->id);
     }
@@ -209,12 +214,16 @@ abstract class prog_exception {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/program/program.class.php');
 
-        $user_assign = $DB->get_record('prog_user_assignment', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
-        $learner_assign_todb = new stdClass();
-        $learner_assign_todb->id = $user_assign->id;
-        $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_DISMISSED;
-        if (!$DB->update_record('prog_user_assignment', $learner_assign_todb)) {
-            return false;
+        // Update user_assignment.
+        $assignid = $DB->get_field('prog_user_assignment', 'id', array('assignmentid' => $this->assignmentid, 'userid' => $this->userid));
+
+        if (!empty($assignid)) {
+            $learner_assign_todb = new stdClass();
+            $learner_assign_todb->id = $assignid;
+            $learner_assign_todb->exceptionstatus = PROGRAM_EXCEPTION_DISMISSED;
+            if (!$DB->update_record('prog_user_assignment', $learner_assign_todb)) {
+                return false;
+            }
         }
 
         return prog_exception::delete_exception($this->id);
