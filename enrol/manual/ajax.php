@@ -121,7 +121,12 @@ switch ($action) {
         if ($duration <= 0) {
             $timeend = 0;
         } else {
-            $timeend = $timestart + ($duration*24*60*60);
+            // Use DateTime to properly account for DST changes.
+            $dateobj = new DateTime();
+            $dateobj->setTimestamp($timestart);
+            $dateobj->add(new DateInterval("P{$duration}D"));
+            $dateobj->sub(new DateInterval('PT1S'));
+            $timeend = $dateobj->getTimestamp();
         }
 
         $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
