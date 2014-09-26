@@ -1337,7 +1337,7 @@ class question_bank_view {
         $formatoptions->noclean = true;
         $formatoptions->overflowdiv = true;
         echo '<div class="boxaligncenter">';
-        echo format_text($category->info, $category->infoformat, $formatoptions, $this->course->id);
+        echo format_text(get_string('defaultinfofor', 'question', $category->info), $category->infoformat, $formatoptions, $this->course->id);
         echo "</div>\n";
     }
 

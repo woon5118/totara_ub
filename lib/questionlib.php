@@ -1089,8 +1089,8 @@ function question_make_default_categories($contexts) {
             // Otherwise, we need to make one
             $category = new stdClass();
             $contextname = $context->get_context_name(false, true);
-            $category->name = get_string('defaultfor', 'question', $contextname);
-            $category->info = get_string('defaultinfofor', 'question', $contextname);
+            $category->name = $contextname;
+            $category->info = $contextname;
             $category->contextid = $context->id;
             $category->parent = 0;
             // By default, all categories get this number, and are sorted alphabetically.
@@ -1166,8 +1166,9 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
                 if ($currentcat != $cid || $currentcat == 0) {
                     $countstring = !empty($category->questioncount) ?
                             " ($category->questioncount)" : '';
+                    $defaultstring = get_string('defaultfor', 'question', $category->indentedname);
                     $categoriesarray[$contextstring][$cid] =
-                            format_string($category->indentedname, true,
+                            format_string($defaultstring, true,
                                 array('context' => $context)) . $countstring;
                 }
             }

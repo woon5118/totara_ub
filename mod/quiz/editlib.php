@@ -1237,7 +1237,7 @@ class quiz_question_bank_view extends question_bank_view {
         echo shorten_text(strip_tags(format_string($category->name)), 60);
         echo '</span></div><div class="categoryinfofieldcontainer">' .
                 '<span class="categoryinfofield">';
-        echo shorten_text(strip_tags(format_text($category->info, $category->infoformat,
+        echo shorten_text(strip_tags(format_text(get_string('defaultinfofor', 'question', $category->info), $category->infoformat,
                 $formatoptions, $this->course->id)), 200);
         echo '</span></div></div>';
     }

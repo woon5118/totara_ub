@@ -1232,5 +1232,25 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014101401, 'totara_core');
     }
 
+    if ($oldversion < 2014101402) {
+        // Remove the hardcoded defaultfor and defaultinfofor strings in question_categories
+        $categories = $DB->get_recordset_select('question_categories', '', array());
+        $todelete = array();
+        foreach ($categories as $category) {
+            if ($context = context::instance_by_id($category->contextid, IGNORE_MISSING)) {
+                $name = $context->get_context_name(false);
+                $category->name = $name;
+                $category->info = $name;
+                $DB->update_record('question_categories', $category);
+            } else {
+                // This can happen because when a quiz is deleted, it does not check and clean up entries in question_categories.
+                $todelete[] = $category->id;
+            }
+        }
+        if (!empty($todelete)) {
+            $DB->delete_records_list('question_categories', 'id', $todelete);
+        }
+        totara_upgrade_mod_savepoint(true, 2014101402, 'totara_core');
+    }
     return true;
 }
