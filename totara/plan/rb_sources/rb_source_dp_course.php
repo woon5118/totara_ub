@@ -405,7 +405,11 @@ from
                 'grade_grades.finalgrade',
                 array(
                     'joins' => 'grade_grades',
-                    'displayfunc' => 'percent',
+                    'displayfunc' => 'course_grade_percent',
+                    'extrafields' => array(
+                        'rplgrade' => 'course_completion.rplgrade',
+                        'course_completion_status' => 'course_completion.status'
+                    ),
                 )
             );
         $columnoptions[] = new rb_column_option(
@@ -426,7 +430,11 @@ from
                 array(
                     'joins' => array('criteria', 'grade_grades'),
                     'displayfunc' => 'grade_string',
-                    'extrafields' => array('gradepass' => 'criteria.gradepass'),
+                    'extrafields' => array(
+                        'gradepass' => 'criteria.gradepass',
+                        'rplgrade' => 'course_completion.rplgrade',
+                        'course_completion_status' => 'course_completion.status'
+                    ),
                     'defaultheading' => get_string('grade', 'rb_source_course_completion'),
                 )
             );
