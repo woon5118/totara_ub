@@ -129,7 +129,8 @@ class columns_test extends reportcache_advanced_testcase {
     );
 
     protected $grade_items_data = array(
-        'id' => 1, 'courseid' => 2, 'itemtype' => 'course', 'gradepass' => 2, 'itemmodule' => 'assignment', 'iteminstance' => 1, 'scaleid' => 1,
+        array('id' => 1, 'courseid' => 2, 'itemtype' => 'course', 'gradepass' => 2, 'itemmodule' => 'assignment', 'iteminstance' => 1, 'scaleid' => 1),
+        array('id' => 2, 'courseid' => 2, 'itemtype' => 'mod', 'gradepass' => 0, 'itemmodule' => 'assign', 'iteminstance' => 1, 'scaleid' => 1),
     );
 
     protected $grade_grades_data = array(
@@ -399,6 +400,41 @@ class columns_test extends reportcache_advanced_testcase {
         'param1' => 'text', 'param2' => 'text', 'param3' => 'text', 'param4' => 'text', 'param5' => 'text',
     );
 
+    protected $assignment_data = array(
+        'id' => 1, 'course' => 2, 'name' => 'Assignment 001', 'description' => 'Assignment description 001', 'format' => 0, 'assignmenttype' => 'uploadsingle',
+        'resubmit' => 0, 'preventlate' => 0, 'emailteachers' => 0, 'var1' => 0, 'var2' => 0, 'var3' => 0, 'var4' => 0, 'var5' => 0, 'maxbytes' => 1048576,
+        'timedue' => 1332758400, 'timeavailable' => 1332153600, 'grade' => 2, 'timemodified' => 1332153673, 'intro' => 'introduction',
+    );
+
+    protected $assignment_submissions_data = array(
+        'id' => 1, 'assignment' => 1, 'userid' => 2, 'timecreated' => 0, 'timemodified' => 1332166933, 'numfiles' => 1, 'data1' => '', 'data2' => '',
+        'grade' => 2, 'submissioncomment' => 'well done', 'format' => 0, 'teacher' => 0, 'timemarked' => 0, 'mailed' => 1,
+    );
+
+    protected $assign_data = array(
+        'id' => 1, 'course' => 2, 'name' => 'Assign 001', 'intro' => 'Assign description 001', 'introformat' => 1, 'alwaysshowdescription' => 0,
+        'completionsubmit' => 1, 'sendnotifications' => 0, 'sendlatenotifications' => 0, 'allowsubmissionsfromdate' => 1332153600, 'duedate' => 1332758400,
+        'maxattempts' => -1,
+    );
+
+    protected $assign_submission_data = array(
+        'id' => 1, 'assignment' => 1, 'userid' => 2, 'timecreated' => 0, 'timemodified' => 1332166933, 'status' => 'submitted',
+        'groupid' => 0, 'attemptnumber' => 0,
+    );
+
+    protected $assign_onlinetext_data = array(
+        'id' => 1, 'assignment' => 1, 'submission' => 1, 'onlinetext' => '<p>qweqwe</p>', 'onlineformat' => 1,
+    );
+
+    protected $assign_grades_data = array(
+        'id' => 1, 'assignment' => 1, 'userid' => 2, 'timecreated' => 0, 'timemodified' => 1332166933, 'grader' => 2,
+        'grade' => 100.00000, 'attemptnumber' => 0,
+    );
+
+    protected $assign_feedback_data = array(
+        'id' => 1, 'assignment' => 1, 'grade' => 1, 'commenttext' => 'qweqwe', 'commentformat' => 1,
+    );
+
     protected $scale_data = array(
         array(
             'id' => 1, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 001', 'scale' => 'Bad,Average,Good', 'description' => '', 'timemodified' => 1332243112,
@@ -519,7 +555,7 @@ class columns_test extends reportcache_advanced_testcase {
             'course_completions' => array($this->course_completions_data),
             'log' => array($this->log_data),
             'course' => array($this->course_data),
-            'grade_items' => array($this->grade_items_data),
+            'grade_items' => $this->grade_items_data,
             'grade_grades' => array($this->grade_grades_data),
             'comp_framework' => $this->framework_data,
             'comp_type' => $this->type_data,
@@ -583,6 +619,16 @@ class columns_test extends reportcache_advanced_testcase {
             'org_type_info_field' => array($this->org_type_info_field_data),
             'pos_type_info_data' => array($this->pos_type_info_data_data),
             'org_type_info_data' => array($this->org_type_info_data_data),
+<<<<<<< HEAD
+=======
+            'assignment' => array($this->assignment_data),
+            'assignment_submissions' => array($this->assignment_submissions_data),
+            'assign' => array($this->assign_data),
+            'assign_submission' => array($this->assign_submission_data),
+            'assignsubmission_onlinetext' => array($this->assign_onlinetext_data),
+            'assign_grades' => array($this->assign_grades_data),
+            'assignfeedback_comments' => array($this->assign_feedback_data),
+>>>>>>> 2352285... T-10554 tests: Fix column tests for new assign reports
             'scale' => $this->scale_data,
             'files' => array($this->files_data),
             'enrol' => array($this->filler_data),
