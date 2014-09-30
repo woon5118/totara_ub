@@ -175,8 +175,11 @@ class prog_assignments {
     public function count_user_assignment_exceptions() {
         global $DB;
 
-        $sql = "SELECT COUNT(DISTINCT userid) FROM {prog_exception} WHERE programid = ?";
-        return $DB->count_records_sql($sql, array($this->programid));
+        $sql = "SELECT COUNT(DISTINCT ex.userid)
+                FROM {prog_exception} ex
+                INNER JOIN {user} us ON us.id = ex.userid
+                WHERE ex.programid = ? AND us.deleted = ?";
+        return $DB->count_records_sql($sql, array($this->programid, 0));
     }
 
     /**

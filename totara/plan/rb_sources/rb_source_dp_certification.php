@@ -530,7 +530,17 @@ class rb_source_dp_certification extends rb_base_source {
             )
         );
         // Include the rb_user_content content options for this report
-        $contentoptions[] = new rb_content_option('user', get_string('users'), 'certif_completion.userid', 'certif_completion');
+        $contentoptions[] = new rb_content_option(
+            'user',
+            get_string('users'),
+            array(
+                'userid' => 'certif_completion.userid',
+                'managerid' => 'position_assignment.managerid',
+                'managerpath' => 'position_assignment.managerpath',
+                'postype' => 'position_assignment.type',
+            ),
+            'position_assignment'
+        );
         return $contentoptions;
     }
 
