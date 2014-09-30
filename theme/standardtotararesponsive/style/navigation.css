@@ -63,6 +63,16 @@ div#custommenu ul ul {
     margin: 0 0 0 1px;
 }
 
+.ie8 div#totaramenu ul ul,
+.ie8 div#custommenu ul ul {
+    border: 1px solid #ddd;
+}
+
+.ie div#totaramenu ul ul,
+.ie div#custommenu ul ul {
+    border-left: 1px solid #ddd;
+}
+
 div#totaramenu ul ul li,
 div#custommenu ul ul li {
     font-size:0.8em;
