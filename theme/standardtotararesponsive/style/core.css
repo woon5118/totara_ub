@@ -1434,3 +1434,12 @@ select.totara-limited-width {
 .ie8 .row {
     margin-left: 0;
 }
+
+.ie8 .mform select {
+    max-width: 500px;
+}
+
+.ie8 .mform select:focus {
+    width: auto;
+    position: relative;
+}
