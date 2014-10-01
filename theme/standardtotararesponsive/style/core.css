@@ -1416,3 +1416,7 @@ select.totara-expanded-width {
     display: block;
     float: right;
 }
+
+.ie8 .row {
+    margin-left: 0;
+}
