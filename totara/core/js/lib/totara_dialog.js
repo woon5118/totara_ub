@@ -683,8 +683,8 @@ totaraDialog_handler_treeview.prototype.setup_tabs = function(e, ui) {
     $('div#search-tab .treeview-wrapper', this._container).height(containerheight - $('#search-tab .mform', selcontainer).outerHeight() - $('div.search-paging', this._container).outerHeight() - 24);
 
     // If showing search tab, focus search box
-    if (ui && ui.index == 1) {
-        $('div#search-tab #dialog-search-table #id_query', this._container).focus();
+    if (ui && $(ui.newTab).attr('aria-controls') === 'search-tab') {
+        $('#id_query', this._container).focus();
     }
 }
 
@@ -707,7 +707,8 @@ totaraDialog_handler_treeview.prototype.first_load = function() {
     $('#dialog-tabs').tabs(
         {
             selected: 0,
-            show: handler.setup_tabs
+            show: handler.setup_tabs,
+            activate: handler.setup_tabs
         }
     );
 
