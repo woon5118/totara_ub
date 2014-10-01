@@ -840,8 +840,9 @@ function cron_delete_from_temp() {
     global $CFG;
 
     $tmpdir = $CFG->tempdir;
-    // Default to last weeks time.
-    $time = strtotime('-1 week');
+    // Default to last weeks time. Use DateTime class to account for DST.
+    $lastweektime = new DateTime('now', new DateTimeZone('Pacific/Auckland'));
+    $lastweektime = $lastweektime->sub(new DateInterval('P1W'))->getTimestamp();
 
     try {
         $dir = new RecursiveDirectoryIterator($tmpdir);
@@ -854,7 +855,7 @@ function cron_delete_from_temp() {
                 continue;
             }
             // Check if file or directory is older than the given time.
-            if ($iter->getMTime() < $time) {
+            if ($iter->getMTime() < $lastweektime) {
                 if ($iter->isDir() && !$iter->isDot()) {
                     // Don't attempt to delete the directory if it isn't empty.
                     if (!glob($node. DIRECTORY_SEPARATOR . '*')) {

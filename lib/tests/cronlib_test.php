@@ -41,33 +41,37 @@ class cronlib_testcase extends basic_testcase {
         $tmpdir = realpath($CFG->tempdir);
         // This is a relative time.
         $time = 0;
-
+        $now = time();
         // Relative time stamps. Did you know data providers get executed during phpunit init?
-        $lastweekstime = -(7 * 24 * 60 * 60);
-        $beforelastweekstime = $lastweekstime - 60;
-        $afterlastweekstime = $lastweekstime + 60;
+        // Use DateTime classes to account for DST.
+        $lastweektime = new DateTime('now', new DateTimeZone('Pacific/Auckland'));
+        $lastweektime = $lastweektime->sub(new DateInterval('P1W'))->getTimestamp() - $now;
+        $lastmonthtime = new DateTime('now', new DateTimeZone('Pacific/Auckland'));
+        $lastmonthtime = $lastmonthtime->sub(new DateInterval('P1M'))->getTimestamp() - $now;
+        $lastyeartime = new DateTime('now', new DateTimeZone('Pacific/Auckland'));
+        $lastyeartime = $lastyeartime->sub(new DateInterval('P1Y'))->getTimestamp() - $now;
 
         $nodes = array();
         // Really old directory to remove.
-        $nodes[] = $this->generate_test_path('/dir1/dir1_1/dir1_1_1/dir1_1_1_1/', true, $lastweekstime * 52, false);
+        $nodes[] = $this->generate_test_path('/dir1/dir1_1/dir1_1_1/dir1_1_1_1/', true, $lastyeartime, false);
 
         // New Directory to keep.
         $nodes[] = $this->generate_test_path('/dir1/dir1_2/', true, $time, true);
 
         // Directory exactly 1 week old, keep.
-        $nodes[] = $this->generate_test_path('/dir2/', true, $lastweekstime, true);
+        $nodes[] = $this->generate_test_path('/dir2/', true, $lastweektime, true);
 
         // Directory older than 1 week old, remove.
-        $nodes[] = $this->generate_test_path('/dir3/', true, $beforelastweekstime, false);
+        $nodes[] = $this->generate_test_path('/dir3/', true, $lastmonthtime, false);
 
         // File older than 1 week old, remove.
-        $nodes[] = $this->generate_test_path('/dir1/dir1_1/dir1_1_1/file1_1_1_1', false, $beforelastweekstime, false);
+        $nodes[] = $this->generate_test_path('/dir1/dir1_1/dir1_1_1/file1_1_1_1', false, $lastmonthtime, false);
 
         // New File to keep.
         $nodes[] = $this->generate_test_path('/dir1/dir1_1/dir1_1_1/file1_1_1_2', false, $time, true);
 
         // File older than 1 week old, remove.
-        $nodes[] = $this->generate_test_path('/dir1/dir1_2/file1_1_2_1', false, $beforelastweekstime, false);
+        $nodes[] = $this->generate_test_path('/dir1/dir1_2/file1_1_2_1', false, $lastmonthtime, false);
 
         // New file to keep.
         $nodes[] = $this->generate_test_path('/dir1/dir1_2/file1_1_2_2', false, $time, true);
@@ -76,18 +80,18 @@ class cronlib_testcase extends basic_testcase {
         $nodes[] = $this->generate_test_path('/file1', false, $time, true);
 
         // File older than 1 week, keep.
-        $nodes[] = $this->generate_test_path('/file2', false, $beforelastweekstime, false);
+        $nodes[] = $this->generate_test_path('/file2', false, $lastmonthtime, false);
 
         // Directory older than 1 week to keep.
         // Note: Since this directory contains a directory that contains a file that is also older than a week
         // the directory won't be deleted since it's mtime will be updated when the file is deleted.
 
-        $nodes[] = $this->generate_test_path('/dir4/dir4_1', true, $beforelastweekstime, true);
+        $nodes[] = $this->generate_test_path('/dir4/dir4_1', true, $lastmonthtime, true);
 
-        $nodes[] = $this->generate_test_path('/dir4/dir4_1/dir4_1_1/', true, $beforelastweekstime, true);
+        $nodes[] = $this->generate_test_path('/dir4/dir4_1/dir4_1_1/', true, $lastmonthtime, true);
 
         // File older than 1 week to remove.
-        $nodes[] = $this->generate_test_path('/dir4/dir4_1/dir4_1_1/file4_1_1_1', false, $beforelastweekstime, false);
+        $nodes[] = $this->generate_test_path('/dir4/dir4_1/dir4_1_1/file4_1_1_1', false, $lastmonthtime, false);
 
         $expectednodes = array();
         foreach ($nodes as $node) {
