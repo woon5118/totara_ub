@@ -130,6 +130,20 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 REPORT_BUILDER_RELATION_MANY_TO_ONE,
                 'status'
             ),
+            new rb_join(
+                'pos',
+                'LEFT',
+                '{pos}',
+                'pos.id = base.positionid',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE
+            ),
+            new rb_join(
+                'pos_assignment',
+                'LEFT',
+                '{pos_assignment}',
+                'pos_assignment.id = base.positionassignmentid',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE
+            ),
         );
 
 
@@ -417,6 +431,33 @@ class rb_source_facetoface_sessions extends rb_base_source {
                       'dbdatatype' => 'text',
                       'outputformat' => 'text')
             ),
+            new rb_column_option(
+                'session',
+                'positionname',
+                get_string('selectedposition', 'mod_facetoface'),
+                'pos.fullname',
+                array('joins' => 'pos',
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text')
+            ),
+            new rb_column_option(
+                'session',
+                'positionassignmentname',
+                get_string('selectedpositionassignment', 'mod_facetoface'),
+                'pos_assignment.fullname',
+                array('joins' => 'pos_assignment',
+                'dbdatatype' => 'text',
+                'outputformat' => 'text')
+            ),
+            new rb_column_option(
+                'session',
+                'positiontype',
+                get_string('selectedpositiontype', 'mod_facetoface'),
+                'base.positiontype',
+                array('dbdatatype' => 'text',
+                      'outputformat' => 'text',
+                      'displayfunc' => 'position_type')
+            ),
         );
 
         // include some standard columns
@@ -578,6 +619,38 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 get_string('createdby', 'rb_source_facetoface_sessions'),
                 'text'
             ),
+            new rb_filter_option(
+                'session',
+                'positionname',
+                get_string('selectedpositionname', 'mod_facetoface'),
+                'select',
+                array(
+                    'selectfunc' => 'positions_list',
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                ),
+                'pos.id',
+                'pos'
+            ),
+            new rb_filter_option(
+                'session',
+                'positionassignment',
+                get_string('selectedpositionassignment', 'mod_facetoface'),
+                'text',
+                array(),
+                'pos_assignment.fullname',
+                'pos_assignment'
+            ),
+            new rb_filter_option(
+                'session',
+                'positiontype',
+                get_string('selectedpositiontype', 'mod_facetoface'),
+                'select',
+                array(
+                    'selectfunc' => 'position_types_list',
+                    'attributes' => rb_filter_option::select_width_limiter(),
+                ),
+                'base.positiontype'
+            ),
         );
 
         // include some standard filters
@@ -599,6 +672,13 @@ class rb_source_facetoface_sessions extends rb_base_source {
         return $filteroptions;
     }
 
+    public function rb_filter_position_types_list() {
+        global $CFG, $POSITION_TYPES;
+
+        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
+
+        return $POSITION_TYPES;
+    }
 
     protected function define_contentoptions() {
         $contentoptions = array(
@@ -995,6 +1075,14 @@ class rb_source_facetoface_sessions extends rb_base_source {
     // Face-to-face specific display functions
     //
     //
+
+    public function rb_display_position_type($position, $row) {
+        global $CFG, $POSITION_TYPES;
+
+        include_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
+
+        return get_string('type'.$POSITION_TYPES[$position], 'totara_hierarchy');
+    }
 
     // convert a f2f status code to a text string
     function rb_display_facetoface_status($status, $row) {

@@ -24,7 +24,6 @@
 require_once "$CFG->dirroot/lib/formslib.php";
 
 class mod_facetoface_signup_form extends moodleform {
-
     function definition() {
         global $CFG;
 
@@ -86,9 +85,44 @@ class mod_facetoface_signup_form extends moodleform {
             $mform->addElement('checkbox', 'selfapprovaltc', get_string('selfapprovalsought', 'mod_facetoface'),
                                get_string('selfapprovalsoughtdesc', 'mod_facetoface', $tandcurl));
             $mform->addRule('selfapprovaltc', get_string('required'), 'required', null, 'client', true);
+
         }
 
+        self::add_position_selection_formelem($mform, $this->_customdata['f2fid'], $this->_customdata['s']);
+
         $this->add_action_buttons(true, get_string('signup', 'facetoface'));
+    }
+
+    public static function add_position_selection_formelem ($mform, $f2fid, $sessionid) {
+        global $DB;
+
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if (empty($selectpositiononsignupglobal)) {
+            return;
+        }
+
+        $facetoface = $DB->get_record('facetoface', array('id' => $f2fid));
+        $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+
+        if (empty($facetoface->selectpositiononsignup)) {
+            return;
+        }
+
+        $controlname = 'selectedposition_'.$f2fid;
+
+        $managerrequired = $facetoface->approvalreqd && !$session->selfapproval;
+        $applicablepositions = get_position_assignments($managerrequired);
+
+        if (count($applicablepositions) > 1) {
+            $posselectelement = $mform->addElement('select', $controlname, get_string('selectposition', 'mod_facetoface'));
+            $mform->addHelpButton($controlname, 'selectedposition', 'mod_facetoface');
+            $mform->setType($controlname, PARAM_INT);
+
+            foreach ($applicablepositions as $posassignment) {
+                $label = position::position_label($posassignment);
+                $posselectelement->addOption($label, $posassignment->id);
+            }
+        }
     }
 
     function validation($data, $files)

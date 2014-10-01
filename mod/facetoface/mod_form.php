@@ -94,6 +94,12 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addHelpButton('interestonlyiffull', 'declareinterestonlyiffull', 'mod_facetoface');
         $mform->disabledIf('interestonlyiffull', 'declareinterest');
 
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if (!empty($selectpositiononsignupglobal)) {
+            $mform->addElement('checkbox', 'selectpositiononsignup', get_string('selectpositiononsignup', 'facetoface'));
+            $mform->addElement('checkbox', 'forceselectposition', get_string('forceselectposition', 'facetoface'));
+        }
+
         $conf = get_config('facetoface');
 
         $mform->addElement('header', 'managerreserveheader', get_string('managerreserveheader', 'mod_facetoface'));

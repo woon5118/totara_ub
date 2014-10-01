@@ -73,7 +73,14 @@ if (isguestuser()) {
 }
 
 $manageremail = false;
-$manager = totara_get_manager($USER->id);
+
+$selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+if ($selectpositiononsignupglobal) {
+    $manager = totara_get_most_primary_manager($USER->id);
+} else {
+    $manager = totara_get_manager($USER->id);
+}
+
 if (get_config(NULL, 'facetoface_addchangemanageremail') && !empty($manager)) {
     $manageremail = $manager->email;
 }
@@ -84,7 +91,12 @@ $hasselfapproval = facetoface_session_has_selfapproval($facetoface, $session);
 
 $selfapprovaltandc = format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
 
-$mform = new mod_facetoface_signup_form(null, compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode', 'hasselfapproval', 'selfapprovaltandc'));
+$f2fid = $session->facetoface;
+
+$mform = new mod_facetoface_signup_form(
+    null,
+    compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode', 'hasselfapproval', 'selfapprovaltandc', 'f2fid')
+);
 
 if ($mform->is_cancelled()) {
     redirect($returnurl);
@@ -116,6 +128,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $params['notificationtype'] = $fromform->notificationtype;
     $params['usernote']         = $fromform->usernote;
 
+    $f2fselectedpositionelemid = 'selectedposition_' . $session->facetoface;
+
+    if (property_exists($fromform, $f2fselectedpositionelemid)) {
+        $params['positionassignment'] = $fromform->$f2fselectedpositionelemid;
+    }
+
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
         add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
@@ -142,7 +160,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
         totara_set_notification($message, $returnurl, array('class' => $cssclass));
     } else {
-        if (isset($result['conflict']) && $result['conflict']) {
+        if ((isset($result['conflict']) && $result['conflict']) || isset($result['nogoodpos'])) {
             totara_set_notification($result['result'], $returnurl);
         } else {
             add_to_log($course->id, 'facetoface', 'signup (FAILED)', "signup.php?s=$session->id", $session->id, $cm->id);
@@ -216,6 +234,9 @@ else if (facetoface_manager_needed($facetoface) && empty($manager->email) && !$h
 
 } else if (!has_capability('mod/facetoface:signup', $context)) {
     echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopermissiontosignup', 'facetoface')));
+    echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
+} else if ($facetoface->forceselectposition && !get_position_assignments($facetoface->approvalreqd)) {
+    echo html_writer::tag('p', html_writer::tag('strong', get_string('error:nopositionselectedactivity', 'facetoface')));
     echo html_writer::empty_tag('br') . html_writer::link($returnurl, get_string('goback', 'facetoface'), array('title' => get_string('goback', 'facetoface')));
 } else {
     // Signup form.

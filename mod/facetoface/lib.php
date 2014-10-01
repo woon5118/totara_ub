@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/user/selector/lib.php');
 require_once $CFG->dirroot.'/mod/facetoface/messaginglib.php';
 require_once $CFG->dirroot.'/mod/facetoface/notification/lib.php';
 require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 
 /**
  * Definitions for setting notification types
@@ -358,6 +359,12 @@ function facetoface_fix_settings($facetoface) {
     }
     if (empty($facetoface->interestonlyiffull) || !$facetoface->declareinterest) {
         $facetoface->interestonlyiffull = 0;
+    }
+    if (empty($facetoface->selectpositiononsignup) || !$facetoface->selectpositiononsignup) {
+        $facetoface->selectpositiononsignup = 0;
+    }
+    if (empty($facetoface->forceselectposition) || !$facetoface->forceselectposition) {
+        $facetoface->forceselectposition = 0;
     }
 }
 
@@ -1351,7 +1358,10 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
                 FROM {facetoface_signups_status} ss2
                 WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
             ) as timesignedup,
-            ss.timecreated
+            ss.timecreated,
+            p.fullname as positionname,
+            pa.type as positiontype,
+            pa.fullname as positionassignmentname
         FROM
             {facetoface} f
         JOIN
@@ -1363,6 +1373,12 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
         JOIN
             {facetoface_signups_status} ss
          ON su.id = ss.signupid
+   LEFT JOIN
+            {pos} p
+         ON p.id = su.positionid
+   LEFT JOIN
+            {pos_assignment} pa
+         ON pa.id = su.positionassignmentid
        {$userjoin}
             {user} u
          ON u.id = su.userid
@@ -1547,6 +1563,11 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
         $worksheet->write_string(0, $pos++, $fullname);
     }
 
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    if (!empty($selectpositiononsignupglobal)) {
+        $worksheet->write_string(0, $pos++, get_string('selectedposition', 'mod_facetoface'));
+    }
+
     $worksheet->write_string(0, $pos++, get_string('attendance', 'facetoface'));
     $worksheet->write_string(0, $pos++, get_string('datesignedup', 'facetoface'));
 
@@ -1597,7 +1618,10 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             f.course AS courseid,
             ss.grade,
             sign.timecreated,
-            manager.email AS managersemail
+            COALESCE (mu1.email, mu2.email) AS managersemail,
+            p.fullname as positionname,
+            pa.type as positiontype,
+            pa.fullname as positionassignmentname
         FROM
             {facetoface} f
         JOIN
@@ -1633,19 +1657,20 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             {user} u
             ON u.id = su.userid
         LEFT JOIN
-            (
-            SELECT
-                pa.userid AS userid,
-                u2.email AS email
-            FROM
-                {pos_assignment} pa
-            INNER JOIN
-                {user} u2
-                ON u2.id = pa.managerid
-            WHERE
-                pa.type = ?
-            ) manager
-         ON u.id = manager.userid
+            {pos} p
+         ON p.id = su.positionid
+        LEFT JOIN
+            {pos_assignment} pa
+         ON pa.id = su.positionassignmentid
+        LEFT JOIN
+            {user} mu1
+            ON mu1.id = pa.managerid
+        LEFT JOIN
+            {pos_assignment} pa2
+         ON pa2.userid = u.id AND pa2.type = ?
+        LEFT JOIN
+            {user} mu2
+            ON mu2.id = pa2.managerid
         WHERE
             f.id = ?
         AND ss.superceded != 1
@@ -1836,6 +1861,12 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
                         $worksheet->write_string($i,$j++,$value);
                     }
                 }
+
+                $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+                if (!empty($selectpositiononsignupglobal)) {
+                    $label = position::position_label($attendee);
+                    $worksheet->write_string($i, $j++, $label);
+                }
                 $worksheet->write_string($i,$j++,$attendee->grade);
 
                 if (method_exists($worksheet,'write_date')) {
@@ -1999,11 +2030,12 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
  * @param integer $statuscode Status code to set
  * @param integer $userid user to signup
  * @param bool $notifyuser whether or not to send an email confirmation
- * @param bool $displayerrors whether or not to return an error page on errors
+ * @param string $usernote
+ * @param class $positionassignment object containing information on selected position (positionid, type, assignmnetid)
  */
 function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
-                                $notifyuser = true, $usernote = '') {
+                                $notifyuser = true, $usernote = '', $positionassignment = null) {
 
     global $DB, $OUTPUT, $USER;
 
@@ -2028,6 +2060,32 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
     $usersignup->bookedby = $userid == $USER->id ? 0 : $USER->id;
     $usersignup->mailedreminder = 0;
     $usersignup->notificationtype = $notificationtype;
+
+    // If the selected position information hasn't been supplied then we need to try to default it
+    // we won't throw errors if it's not present as all we can do is throw exceptions that won't be handled and may break cron
+    // in theory the only routes here that don't go through facetoface_user_import handle reservations which handled by a manager
+    // or come from a wait list and so a position assignment should always be available.
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    $positionrequired = !empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup);
+
+    if ($positionrequired) {
+        if ($positionassignment === null) {
+            $positionassignment = pos_get_most_primary_position_assignment($userid);
+        }
+
+        if (!empty($positionassignment)) {
+            $usersignup->positionid = $positionassignment->positionid;
+            $usersignup->positiontype = $positionassignment->positiontype;
+            $usersignup->positionassignmentid = $positionassignment->id;
+        }
+    }
+
+    // If no position is wanted by the face to face or none is provided then record all info as null.
+    if (!$positionrequired || empty($positionassignment)) {
+        $usersignup->positionid = null;
+        $usersignup->positiontype = null;
+        $usersignup->positionassignmentid = null;
+    }
 
     $usersignup->discountcode = trim(strtoupper($discountcode));
     if (empty($usersignup->discountcode)) {
@@ -2141,7 +2199,6 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
 
     return true;
 }
-
 
 /**
  * Update the signup status of a particular signup
@@ -3844,6 +3901,9 @@ function facetoface_get_cancellations($sessionid) {
                 u.id,
                 su.id AS signupid,
                 {$usernamefields},
+                p.fullname as positionname,
+                pa.fullname as positionassignmentname,
+                pa.type as positiontype,
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
                 " . $DB->sql_compare_text('c.note', 255) . " AS cancelreason
@@ -3861,7 +3921,13 @@ function facetoface_get_cancellations($sessionid) {
                 {facetoface_signups_status} ss
              ON su.id = ss.signupid
              AND ss.statuscode $insql
-            AND ss.superceded = 1
+             AND ss.superceded = 1
+           LEFT JOIN
+             {pos} p
+             ON p.id = su.positionid
+           LEFT JOIN
+             {pos_assignment} pa
+             ON pa.id = su.positionassignmentid
             WHERE
                 su.sessionid = ?
             GROUP BY
@@ -3869,7 +3935,9 @@ function facetoface_get_cancellations($sessionid) {
                 u.id,
                 {$usernamefields},
                 c.timecreated,
-                " . $DB->sql_compare_text('c.note', 255) . "
+                " . $DB->sql_compare_text('c.note', 255) . ",
+                p.fullname,
+                pa.fullname
             ORDER BY
                 " . $DB->sql_fullname('u.firstname', 'u.lastname') . ",
                 c.timecreated
@@ -4497,6 +4565,33 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $status = MDL_F2F_STATUS_WAITLISTED;
     }
 
+    $positionassignment = null;
+
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
+
+        // Get the position assignment record while checking that it is applicable for this activity/session.
+        if (!empty($params['positionassignment'])) {
+            $positionassignmentid = $params['positionassignment'];
+            $applicablepositionassignments = get_position_assignments(false, $userid);
+            if (!empty($applicablepositionassignments[$positionassignmentid])) {
+                $positionassignment = $applicablepositionassignments[$positionassignmentid];
+            }
+        }
+
+        // If that didn't work or no positionassignmentid provided try defaulting.
+        if (!$positionassignment) {
+            $positionassignment = pos_get_most_primary_position_assignment($userid);
+        }
+
+        // If we still don't have a position and it's mandated then error.
+        if (!$positionassignment && !empty($facetoface->forceselectposition)) {
+            $result['result'] = get_string('error:nopositionselected', 'facetoface');
+            $result['nogoodpos'] = true;
+            return $result;
+        }
+    }
+
     // Finally attempt to enrol
     if (!facetoface_user_signup(
         $session,
@@ -4507,7 +4602,8 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $status,
         $user->id,
         !$suppressemail,
-        $usernote)) {
+        $usernote,
+        $positionassignment)) {
             $result['result'] = get_string('error:addattendee', 'facetoface', fullname($user));
             return $result;
     }
@@ -4515,7 +4611,6 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     $result['result'] = true;
     return $result;
 }
-
 
 /**
  * Return message describing bulk import results
@@ -5682,11 +5777,9 @@ function facetoface_get_manager_list() {
     $sql = "SELECT u.id, u.firstname, u.lastname
               FROM {pos_assignment} pa
               JOIN {user} u ON u.id = pa.managerid
-             WHERE pa.type = ?
              GROUP BY u.id, u.firstname, u.lastname
              ORDER BY u.lastname, u.firstname";
-    $params = array(POSITION_TYPE_PRIMARY);
-    $managers = $DB->get_records_sql($sql, $params);
+    $managers = $DB->get_records_sql($sql);
     foreach ($managers as $manager) {
         $ret[$manager->id] = fullname($manager);
     }
@@ -5828,13 +5921,13 @@ function facetoface_activity_can_declare_interest($facetoface, $userid = null) {
     FROM {facetoface_sessions} ssn
     JOIN {facetoface_signups} snp ON (snp.sessionid = ssn.id)
     JOIN {facetoface_signups_status} sst ON (sst.signupid = snp.id AND sst.superceded = :superceded)
-    WHERE ssn.facetoface = :ftfid
+    WHERE ssn.facetoface = :f2fid
     AND snp.userid = :userid
     AND sst.statuscode >= :statusrequested
     AND sst.statuscode <= :statusbooked
     ";
     $params = array(
-        'ftfid' => $facetoface->id,
+        'f2fid' => $facetoface->id,
         'userid' => $userid,
         'superceded' => 0,
         'statusrequested' => MDL_F2F_STATUS_REQUESTED,

@@ -132,12 +132,32 @@ $attendees = array();
 $cancellations = array();
 $requests = array();
 
-// Check if the user is manager with staff
-if (($facetoface->approvalreqd && $staff = totara_get_staff()) ||
-        ($facetoface->approvalreqd && is_siteadmin())) {
-    // Lets check to see what state their staff are in
+$staff = null;
+if ($facetoface->approvalreqd) {
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    if (!empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup)) {
+        // Check if the user is manager of a position selected by staff signed up to this session.
+        $requestssql = "SELECT fs.userid FROM {facetoface_signups} fs
+                      JOIN {pos_assignment} pa ON fs.positionassignmentid = pa.id
+                     WHERE sessionid = :sessionid AND managerid = :managerid";
+        $params = array('sessionid' => $session->id, 'managerid' => $USER->id);
+        $staff = $DB->get_fieldset_sql($requestssql, $params);
 
-    // Check if any staff have requests awaiting approval
+        // Get temporary staff.
+        if (!empty($CFG->enabletempmanagers)) {
+            $tempstaff = $DB->get_fieldset_select('temporary_manager', 'userid', 'tempmanagerid = ? AND expirytime > ?',
+                array($USER->id, time()));
+
+            $staff = array_unique(array_merge($staff, $tempstaff));
+        }
+    } else {
+        // Get the staff the user is primary manager of.
+        $staff = totara_get_staff();
+    }
+}
+
+if (!empty($staff)) {
+    // Check if any staff have requests awaiting approval.
     $get_requests = facetoface_get_requests($session->id);
     if ($get_requests) {
         $requests = (is_siteadmin() ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
@@ -322,8 +342,7 @@ if ($form = data_submitted()) {
                     if (!$value) {
                         continue;
                     }
-
-                    $recipients = $recipients + facetoface_get_users_by_status($s, $key, 'u.id, u.*');
+                    $recipients = $recipients + facetoface_get_users_by_status($s, $key, 'u.id, u.*, su.positiontype');
                 }
             }
 
@@ -351,8 +370,8 @@ if ($form = data_submitted()) {
                 if (email_to_user($recipient, $facetofaceuser, $data->subject, $bodyplain, $body) === true) {
                     $emailcount += 1;
 
-                    // Check if we are sending to managers and if user has a manager assigned.
-                    if (empty($data->cc_managers) || !$manager = totara_get_manager($recipient->id)) {
+                    // Are sending to managers and does user have a manager assigned for the position type they signedup with.
+                    if (empty($data->cc_managers) || !$manager = totara_get_manager($recipient->id, $recipient->positiontype)) {
                         continue;
                     }
 
@@ -589,6 +608,13 @@ if ($show_table) {
 
         $hidecost = get_config(null, 'facetoface_hidecost');
         $hidediscount = get_config(NULL, 'facetoface_hidediscount');
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+
+        $showpositions = !empty($selectpositiononsignupglobal) && !empty($facetoface->selectpositiononsignup);
+        if ($showpositions) {
+            $headers[] = get_string('selectedposition', 'mod_facetoface');
+            $columns[] = 'position';
+        }
 
         if ($action == 'takeattendance' && !$download) {
             $chooseoption = get_string('select','facetoface');
@@ -626,6 +652,7 @@ if ($show_table) {
             }
         }
         $cancancelreservations = has_capability('mod/facetoface:reserveother', $context);
+        $canchangesignedupjobposition = has_capability('mod/facetoface:changesignedupjobposition', $context);
 
         foreach ($rows as $attendee) {
             $data = array();
@@ -680,6 +707,20 @@ if ($show_table) {
 
             // Strip the comma if we are exporting to CSV
             $data[] = $download == 'csv' ? str_replace(',', '', $timesignedup) : $timesignedup;
+
+            if ($showpositions) {
+                $label = position::position_label($attendee);
+
+                $url = new moodle_url('/mod/facetoface/attendee_position.php', array('s' => $session->id, 'id' => $attendee->id));
+                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-edit-position pull-right'));
+                $position = html_writer::span($label, 'position'.$attendee->id, array('id' => 'position'.$attendee->id));
+
+                if ($canchangesignedupjobposition) {
+                    $data[] = $icon . $position;
+                } else {
+                    $data[] = $position;
+                }
+            }
 
             if ($action == 'takeattendance') {
                 $optionid = 'submissionid_' . $attendee->submissionid;

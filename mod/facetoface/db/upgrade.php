@@ -2292,6 +2292,54 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014100901, 'facetoface');
     }
 
+    if ($oldversion < 2014100902) {
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('selectpositiononsignup', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'interestonlyiffull');
+        $field->setComment('Users with multiple positions will select one on signup');
+
+        // Conditionally launch add field selectpositiononsignup.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('forceselectposition', XMLDB_TYPE_INTEGER, '1', null,
+            XMLDB_NOTNULL, null, '0', 'selectpositiononsignup');
+        $field->setComment('Error if no suitable position is available when signing up');
+
+        // Conditionally launch add field forceselectposition.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('facetoface_signups');
+        $field = new xmldb_field('positionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'bookedby');
+        $field->setComment('If required, the position the user is doing the training for');
+
+        // Conditionally launch add field positionid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('positiontype', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'positionid');
+        $field->setComment('If required, the position type (prim, sec, asp) the user is doing the training for');
+
+        // Conditionally launch add field positiontype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('positionassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'positiontype');
+        $field->setComment('If required, the position assignment the user is doing the training for');
+
+        // Conditionally launch add field positiontype.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014100902, 'facetoface');
+    }
+
     return $result;
 }
 

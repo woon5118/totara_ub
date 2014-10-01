@@ -229,5 +229,16 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
+
+    // Ability to edit the position a learner has used to sign up to a session.
+    'mod/facetoface:changesignedupjobposition' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
 );
 

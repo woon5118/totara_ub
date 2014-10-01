@@ -1081,6 +1081,42 @@ function totara_get_manager($userid, $postype=null, $skiptemp=false, $skipreal=f
 }
 
 /**
+ * Find the manager of the user's 'most primary' position.
+ *
+ * @param int $userid Id of the user whose manager we want
+ * @return mixed False if no manager. Manager user object from mdl_user if the user has a manager.
+ */
+function totara_get_most_primary_manager($userid = false) {
+    global $DB, $USER;
+
+    if ($userid === false) {
+        $userid = $USER->id;
+    }
+
+    $enabletempmanagers = get_config(null, 'enabletempmanagers');
+    if (!empty($enabletempmanagers)) {
+        if ($tempmanager = totara_get_manager($userid, null, false, true)) {
+            $mostprimarymanagers[$userid] = $tempmanager;
+            return $tempmanager;
+        }
+    }
+
+    $sql = "SELECT u.*
+                  FROM {pos_assignment} pa
+                  JOIN {user} u ON u.id = pa.managerid
+                 WHERE pa.userid = :userid
+                    AND (pa.timevalidfrom is null OR pa.timevalidfrom <= :from)
+                    AND (pa.timevalidto is null OR pa.timevalidto >= :to)
+              ORDER BY pa.type ASC";
+
+    if ($manager = $DB->get_record_sql($sql, array('userid' => $userid, 'from' => time(), 'to' => time()), IGNORE_MULTIPLE)) {
+        return $manager;
+    }
+
+    return false;
+}
+
+/**
  * Update/set a temp manager for the specified user
  *
  * @param int $userid Id of user to set temp manager for

@@ -470,6 +470,28 @@ class position extends hierarchy {
 
         return $message;
     }
+
+    /**
+     * @param $posassignment
+     * @param $POSITION_TYPES
+     * @return string
+     * @throws coding_exception
+     */
+    public static function position_label($posassignment) {
+        global $POSITION_TYPES;
+
+        $label = '';
+        if ($posassignment->positionassignmentname) {
+            $label .= $posassignment->positionname;
+        } else {
+            $label .= get_string('type' . $POSITION_TYPES[$posassignment->positiontype], 'totara_hierarchy');
+        }
+        if ($posassignment->positionname) {
+            $label .= "($posassignment->positionname)";
+            return $label;
+        }
+        return $label;
+    }
 }  // class
 
 
@@ -773,4 +795,78 @@ function pos_get_current_position_data($userid = false, $type = POSITION_TYPE_PR
 
     return array('positionid' => $positionid, 'organisationid' => $organisationid);
 
+}
+
+/**
+ * Return the specified user's most primary position assignment
+ *
+ * @param integer $userid ID of the user to get the data for (defaults to current user)
+ *
+ * @return mixed position assignment object or false if none are available
+ */
+function pos_get_most_primary_position_assignment($userid = false) {
+    global $USER;
+    if ($userid === false) {
+        $userid = $USER->id;
+    }
+
+    $positionassignments = get_position_assignments(false, $userid);
+
+    if (is_array($positionassignments) && count($positionassignments) > 0) {
+        $mostprimary = null;
+
+        foreach ($positionassignments as $positionassignment) {
+            if ($mostprimary === null || $positionassignment->positiontype < $mostprimary->positiontype) {
+                $mostprimary = $positionassignment;
+            }
+        }
+        return $mostprimary;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * Return all of a user's position assignments
+ *
+ * @param bool $managerreqd If true then filter out any positions with no manager
+ * @param integer $userid ID of the user to get the data for (defaults to current user)
+ *
+ * @return array array of position assignment objects (potentially empty)
+ */
+function get_position_assignments($managerreqd = false, $userid = false) {
+    global $DB, $USER;
+
+    if ($userid === false) {
+        $userid = $USER->id;
+    }
+
+    $now = time();
+    $sql = "SELECT pa.id as id, p.id as positionid, pa.fullname as positionassignmentname,
+                       p.fullname as positionname, pa.managerid, pa.type as positiontype
+                FROM {pos_assignment} pa
+                LEFT JOIN {pos} p ON p.id = pa.positionid
+                WHERE pa.userid = :userid
+                  AND (pa.timevalidfrom is null OR pa.timevalidfrom <= :from)
+                  AND (pa.timevalidto is null OR pa.timevalidto >= :to)
+                ORDER BY pa.type ASC";
+
+    $userposassignments = $DB->get_records_sql($sql, array('userid' => $userid, 'from' => $now, 'to' => $now));
+
+    if (!$userposassignments) {
+        return $userposassignments;
+    }
+
+    $validpossitionassignments = array();
+    // Get any temporary manager.
+    $tempmanager = totara_get_manager($userid, null, false, true);
+
+    foreach ($userposassignments as $positionassignment) {
+        // Return the position if a manager is not required, a manager is set for the position or a temp manager exists.
+        if (!$managerreqd || $positionassignment->managerid !== null || $tempmanager) {
+            $validpossitionassignments[$positionassignment->id] = $positionassignment;
+        }
+    }
+
+    return $validpossitionassignments;
 }

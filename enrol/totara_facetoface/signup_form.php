@@ -23,6 +23,7 @@
  */
 
 require_once($CFG->dirroot . '/lib/formslib.php');
+require_once($CFG->dirroot . '/mod/facetoface/signup_form.php');
 
 class enrol_totara_facetoface_signup_form extends moodleform {
     protected $instance;
@@ -58,9 +59,11 @@ class enrol_totara_facetoface_signup_form extends moodleform {
         $mform->addElement('hidden', 'id', $this->_customdata->courseid);
         $mform->setType('id', PARAM_INT);
 
-        self::add_signup_elements($mform, $this->_customdata, $plugin);
+        $sessionsadded = self::add_signup_elements($mform, $this->_customdata, $plugin);
 
-        $this->add_action_buttons(true, get_string('signup', 'facetoface'));
+        if ($sessionsadded) {
+            $this->add_action_buttons(true, get_string('signup', 'facetoface'));
+        }
     }
 
     /**
@@ -71,7 +74,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
      * @throws dml_exception
      */
     private function add_signup_elements($mform, $instance, $totara_facetoface) {
-        global $DB, $CFG;
+        global $DB, $CFG, $OUTPUT;
 
         $courseid = $instance->courseid;
 
@@ -92,7 +95,9 @@ class enrol_totara_facetoface_signup_form extends moodleform {
         list($idin, $params) = $DB->get_in_or_equal($f2fids);
         $facetofaces = $DB->get_records_select('facetoface', "ID $idin", $params);
 
-        if (empty($instance->$settingautosignup)) { // If autosignup then we don't need user to select a session.
+        if (!empty($instance->$settingautosignup)) {
+            $sessionsavailable = true;
+        } else {// If autosignup then we don't need user to select a session.
             if ($totara_facetoface->sessions_require_manager()) {
                 $mform->addElement('static', 'managermissing', get_string('managermissingsomesessions', 'enrol_totara_facetoface'));
             }
@@ -107,125 +112,48 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 }
                 $sessrows[$session->facetoface][] = $session;
             }
+            $mform->addElement('html', html_writer::start_div('', array('id' => 'f2fdirect-list')));
 
-            $this->enrol_totara_facetoface_addsessrows($mform, $sessrows, $facetofaces);
-        }
+            $sessionsavailable = false;
 
-        if (empty($CFG->facetoface_notificationdisable)) {
-            $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
-                MDL_F2F_TEXT => get_string('notificationemail', 'facetoface'),
-                MDL_F2F_NONE => get_string('notificationnone', 'facetoface'),
-            );
-            $mform->addElement('select', 'notificationtype', get_string('notificationtype', 'facetoface'), $options);
-            $mform->addHelpButton('notificationtype', 'notificationtype', 'facetoface');
-            $mform->addRule('notificationtype', null, 'required', null, 'client');
-            $mform->setDefault('notificationtype', MDL_F2F_BOTH);
-        } else {
-            $mform->addElement('hidden', 'notificationtype', MDL_F2F_NONE);
-        }
-        $mform->setType('notificationtype', PARAM_INT);
-    }
+            foreach ($sessrows as $facetofaceid => $sessions) {
+                $facetoface = $facetofaces[$facetofaceid];
 
-    /*
-     * Add session rows to signup form
-     * @param moodleform $mform
-     * @param array $sessrows
-     * @param array $facetofaces
-     */
-    private function enrol_totara_facetoface_addsessrows($mform, $sessrows, $facetofaces) {
-        global $OUTPUT;
-        $selfapprovaljsparams = array();
+                $mform->addElement('html', html_writer::start_div('f2factivity', array('id' => 'f2factivity' . $facetofaceid)));
+                $mform->addElement('html', $OUTPUT->heading($facetoface->name, 3));
 
-        $mform->addElement('html', html_writer::start_div('', array('id' => 'ftfdirect-list')));
-        foreach ($sessrows as $facetofaceid => $sessions) {
-            $facetoface = $facetofaces[$facetofaceid];
-            $mform->addElement('html', html_writer::start_div('f2factivity', array('id' => 'f2factivity' . $facetofaceid)));
-            $mform->addElement('html', $OUTPUT->heading($facetoface->name, 3));
-
-            $mform->addElement('html', html_writer::start_tag('table'));
-            $mform->addElement('html', html_writer::start_tag('thead'));
-            $mform->addElement('html', html_writer::start_tag('tr'));
-            $mform->addElement('html', html_writer::tag('th', get_string('selectsession', 'enrol_totara_facetoface'))); // No title for radio button col.
-            $mform->addElement('html', html_writer::tag('th', get_string('sessiondatetime', 'facetoface')));
-            $mform->addElement('html', html_writer::tag('th', get_string('room', 'facetoface')));
-            $mform->addElement('html', html_writer::tag('th', get_string('additionalinformation', 'enrol_totara_facetoface')));
-            $mform->addElement('html', html_writer::end_tag('tr'));
-            $mform->addElement('html', html_writer::end_tag('thead'));
-            $mform->addElement('html', html_writer::start_tag('tbody'));
-
-            foreach ($sessions as $session) {
-                $sid = $session->id;
-
-                $mform->addElement('html', html_writer::start_tag('tr'));
-
-                $mform->addElement('html', html_writer::start_tag('td'));
-                $mform->addElement('radio', 'sid', '', '', $sid);
-                $mform->addElement('html', html_writer::end_tag('td'));
-
-                // Dates/times.
-                if ($session->datetimeknown) {
-                    $allsessiondates = html_writer::start_tag('ul', array('class' => 'unlist'));
-                    foreach ($session->sessiondates as $date) {
-                        $allsessiondates .= html_writer::start_tag('li');
-
-                        $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
-                        if ($sessionobj->startdate == $sessionobj->enddate) {
-                            $allsessiondates .= $sessionobj->startdate;
-                        } else {
-                            $allsessiondates .= $sessionobj->startdate . ' - ' . $sessionobj->enddate;
-                        }
-                        $allsessiondates .= ', ' . $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
-
-                        $allsessiondates .= html_writer::end_tag('li');
-                    }
-
-                    $allsessiondates .= html_writer::end_tag('ul');
+                if ($facetoface->forceselectposition && !get_position_assignments($facetoface->approvalreqd)) {
+                    $msg = get_string('error:nopositionselectedactivity', 'facetoface');
+                    $mform->addElement('html', html_writer::tag('div', $msg));
                 } else {
-                    $allsessiondates = get_string('wait-listed', 'facetoface');
+                    $this->enrol_totara_facetoface_addsessrows($mform, $sessions, $facetoface);
+                    $sessionsavailable = true;
                 }
-                $mform->addElement('html', html_writer::tag('td', $allsessiondates));
-
-                // Room.
-                $roomhtml = '';
-                if (isset($session->room)) {
-                    $roomhtml .= isset($session->room->name) ? html_writer::span(format_string($session->room->name), 'room room_name') : '';
-                    $roomhtml .= isset($session->room->building) ? html_writer::span(format_string($session->room->building), 'room room_building') : '';
-                    $roomhtml .= isset($session->room->address) ? html_writer::span(format_string($session->room->address), 'room room_address') : '';
-                }
-                $mform->addElement('html', html_writer::tag('td', $roomhtml));
-
-                // Signup information.
-                $mform->addElement('html', html_writer::start_tag('td'));
-
-                $elementid = 'discountcode' . $session->id;
-                if ($session->discountcost > 0) {
-                    $mform->addElement('text', $elementid, get_string('discountcode', 'facetoface'), 'size="6"');
-                    $mform->addHelpButton($elementid, 'discountcodelearner', 'facetoface');
-                } else {
-                    $mform->addElement('hidden', $elementid, '');
-                }
-                $mform->setType($elementid, PARAM_TEXT);
-
-                if (facetoface_session_has_selfapproval($facetoface, $session)) {
-                    $elementname = 'selfapprovaltandc_' . $facetoface->id;
-                    $selfapprovaljsparams[$elementname] = $facetofaces[$session->facetoface]->selfapprovaltandc;
-
-                    $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
-                    $attributes = array("class" => "tsandcs ajax-action");
-                    $tandcurl = html_writer::link($url, get_string('selfapprovalsoughtbrief', 'mod_facetoface'), $attributes);
-                    $elementid = 'selfapprovaltc' . $session->id;
-                    $mform->addElement('checkbox', $elementid, $tandcurl);
-                }
-
-                $mform->addElement('html', html_writer::end_tag('td'));
-
-                $mform->addElement('html', html_writer::end_tag('tr'));
+                $mform->addElement('html', html_writer::end_div());
             }
-            $mform->addElement('html', html_writer::end_tag('tbody'));
-            $mform->addElement('html', html_writer::end_tag('table'));
             $mform->addElement('html', html_writer::end_div());
+
+            if ($sessionsavailable) {
+                $mform->addRule('sid', null, 'required', null, 'client');
+            }
         }
-        $mform->addElement('html', html_writer::end_div());
+
+        if ($sessionsavailable) {
+            $notificationdisabled = get_config(null, 'facetoface_notificationdisable');
+            if (empty($notificationdisabled)) {
+                $options = array(MDL_F2F_BOTH => get_string('notificationboth', 'facetoface'),
+                    MDL_F2F_TEXT => get_string('notificationemail', 'facetoface'),
+                    MDL_F2F_NONE => get_string('notificationnone', 'facetoface'),
+                );
+                $mform->addElement('select', 'notificationtype', get_string('notificationtype', 'facetoface'), $options);
+                $mform->addHelpButton('notificationtype', 'notificationtype', 'facetoface');
+                $mform->addRule('notificationtype', null, 'required', null, 'client');
+                $mform->setDefault('notificationtype', MDL_F2F_BOTH);
+            } else {
+                $mform->addElement('hidden', 'notificationtype', MDL_F2F_NONE);
+            }
+            $mform->setType('notificationtype', PARAM_INT);
+        }
 
         if (defined('AJAX_SCRIPT') && AJAX_SCRIPT) {
             global $CFG;
@@ -240,7 +168,99 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $PAGE->requires->yui_module('moodle-mod_facetoface-signupform', 'M.mod_facetoface.signupform.init');
         }
 
-        $mform->addRule('sid', null, 'required', null, 'client');
+        return $sessionsavailable;
+    }
+
+    /*
+     * Add session rows to signup form
+     * @param moodleform $mform
+     * @param array $sessrows
+     * @param array $facetofaces
+     */
+    private function enrol_totara_facetoface_addsessrows($mform, $sessions, $facetoface) {
+        $mform->addElement('html', html_writer::start_tag('table'));
+        $mform->addElement('html', html_writer::start_tag('thead'));
+        $mform->addElement('html', html_writer::start_tag('tr'));
+        $mform->addElement('html', html_writer::tag('th', get_string('selectsession', 'enrol_totara_facetoface'))); // No title for radio button col.
+        $mform->addElement('html', html_writer::tag('th', get_string('sessiondatetime', 'facetoface')));
+        $mform->addElement('html', html_writer::tag('th', get_string('room', 'facetoface')));
+        $mform->addElement('html', html_writer::tag('th', get_string('additionalinformation', 'enrol_totara_facetoface')));
+        $mform->addElement('html', html_writer::end_tag('tr'));
+        $mform->addElement('html', html_writer::end_tag('thead'));
+        $mform->addElement('html', html_writer::start_tag('tbody'));
+
+        foreach ($sessions as $session) {
+            $sid = $session->id;
+
+            $mform->addElement('html', html_writer::start_tag('tr'));
+
+            $mform->addElement('html', html_writer::start_tag('td'));
+            $mform->addElement('radio', 'sid', '', '', $sid);
+            $mform->addElement('html', html_writer::end_tag('td'));
+
+            // Dates/times.
+            if ($session->datetimeknown) {
+                $allsessiondates = html_writer::start_tag('ul', array('class' => 'unlist'));
+                foreach ($session->sessiondates as $date) {
+                    $allsessiondates .= html_writer::start_tag('li');
+
+                    $sessionobj = facetoface_format_session_times($date->timestart, $date->timefinish, $date->sessiontimezone);
+                    if ($sessionobj->startdate == $sessionobj->enddate) {
+                        $allsessiondates .= $sessionobj->startdate;
+                    } else {
+                        $allsessiondates .= $sessionobj->startdate . ' - ' . $sessionobj->enddate;
+                    }
+                    $allsessiondates .= ', ' . $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone;
+
+                    $allsessiondates .= html_writer::end_tag('li');
+                }
+
+                $allsessiondates .= html_writer::end_tag('ul');
+            } else {
+                $allsessiondates = get_string('wait-listed', 'facetoface');
+            }
+            $mform->addElement('html', html_writer::tag('td', $allsessiondates));
+
+            // Room.
+            $roomhtml = '';
+            if (isset($session->room)) {
+                $roomhtml .= isset($session->room->name) ? html_writer::span(format_string($session->room->name), 'room room_name') : '';
+                $roomhtml .= isset($session->room->building) ? html_writer::span(format_string($session->room->building), 'room room_building') : '';
+                $roomhtml .= isset($session->room->address) ? html_writer::span(format_string($session->room->address), 'room room_address') : '';
+            }
+            $mform->addElement('html', html_writer::tag('td', $roomhtml));
+
+            // Signup information.
+            $mform->addElement('html', html_writer::start_tag('td'));
+
+            $elementid = 'discountcode' . $session->id;
+            if ($session->discountcost > 0) {
+                $mform->addElement('text', $elementid, get_string('discountcode', 'facetoface'), 'size="6"');
+                $mform->addHelpButton($elementid, 'discountcodelearner', 'facetoface');
+            } else {
+                $mform->addElement('hidden', $elementid, '');
+            }
+            $mform->setType($elementid, PARAM_TEXT);
+
+            if (facetoface_session_has_selfapproval($facetoface, $session)) {
+                $elementname = 'selfapprovaltandc_' . $facetoface->id;
+                $selfapprovaljsparams[$elementname] = $facetoface->selfapprovaltandc;
+
+                $url = new moodle_url('/mod/facetoface/signup_tsandcs.php', array('s' => $session->id));
+                $attributes = array("class" => "tsandcs ajax-action");
+                $tandcurl = html_writer::link($url, get_string('selfapprovalsoughtbrief', 'mod_facetoface'), $attributes);
+                $elementid = 'selfapprovaltc' . $session->id;
+                $mform->addElement('checkbox', $elementid, $tandcurl);
+            }
+
+            mod_facetoface_signup_form::add_position_selection_formelem($mform, $facetoface->id, $session->id);
+
+            $mform->addElement('html', html_writer::end_tag('td'));
+
+            $mform->addElement('html', html_writer::end_tag('tr'));
+        }
+        $mform->addElement('html', html_writer::end_tag('tbody'));
+        $mform->addElement('html', html_writer::end_tag('table'));
     }
 
     public function validation($data, $files) {

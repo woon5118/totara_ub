@@ -45,6 +45,15 @@ if ($ADMIN->fulltree) { // Improve performance.
     $setting->set_updatedcallback('facetoface_displaysessiontimezones_updated');
     $settings->add($setting);
 
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'facetoface_selectpositiononsignupglobal',
+            new lang_string('setting:selectpositiononsignupglobal', 'facetoface'),
+            new lang_string('setting:selectpositiononsignupglobal_caption', 'facetoface'),
+            0
+        )
+    );
+
     $settings->add(new admin_setting_heading('facetoface_multiplesessions_header', get_string('multiplesessionsheading', 'facetoface'), ''));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_multiplesessions', get_string('setting:multiplesessions_caption', 'facetoface'), get_string('setting:multiplesessions', 'facetoface'), 0));

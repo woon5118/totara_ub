@@ -26,6 +26,7 @@
  * Face-to-Face Direct enrolment plugin.
  */
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
 
 class enrol_totara_facetoface_plugin extends enrol_plugin {
 
@@ -204,7 +205,13 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         list($idin, $params) = $DB->get_in_or_equal($f2fids);
         $facetofaces = $DB->get_records_select('facetoface', "ID $idin", $params);
 
-        $manager = totara_get_manager($USER->id);
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if ($selectpositiononsignupglobal) {
+            $manager = totara_get_most_primary_manager($USER->id);
+        } else {
+            $manager = totara_get_manager($USER->id);
+        }
+
 
         if (get_config(null, 'facetoface_addchangemanageremail') && !empty($manager)) {
             $manageremail = $manager->email;
@@ -257,6 +264,11 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 $enrolled = true;
             }
         } else {
+            $f2fselectedpositionelemid = 'selectedposition_' . $session->facetoface;
+            if (property_exists($fromform, $f2fselectedpositionelemid)) {
+                $signupparams['positionassignment'] = $fromform->$f2fselectedpositionelemid;
+            }
+
             $session = $sessions[$sid];
             $facetoface = $facetofaces[$session->facetoface];
             $cm = get_coursemodule_from_instance('facetoface', $facetoface->id);
@@ -939,7 +951,12 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $sessions[$sessiondate->sessionid]->sessiondates[] = $sessiondate;
         }
 
-        $manager = totara_get_manager($USER->id);
+        $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+        if ($selectpositiononsignupglobal) {
+            $manager = totara_get_most_primary_manager($USER->id);
+        } else {
+            $manager = totara_get_manager($USER->id);
+        }
 
         foreach ($sessions as $session) {
             if ($session->roomid) {

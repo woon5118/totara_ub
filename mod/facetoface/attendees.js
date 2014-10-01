@@ -424,6 +424,13 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 });
                 return false;
             });
+            // Add handler to edit position button.
+            $('a.attendee-edit-position').on('click', function(){
+                $.get($(this).attr('href'), function(href){
+                    editPositionModalForm(href);
+                });
+                return false;
+            });
         }
         this.attachCustomClickEvents();
 
@@ -456,6 +463,47 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                             panel.destroy(true);
                         } else {
                             $("#attendee_note_err").text(obj.error);
+                        }
+                    });
+                    return false;
+                });
+                $content.find('#id_cancel').on('click', function() {
+                    panel.destroy(true);
+                    return false;
+                });
+                panel.show();
+            });
+        }
+
+        /**
+         * Modal popup for edit position single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
+         * @param href The desired contents of the panel
+         */
+        function editPositionModalForm(href) {
+            this.Y.use('panel', function(Y) {
+                var panel = new Y.Panel({
+                    headerContent: null,
+                    bodyContent  : href,
+                    width        : 600,
+                    zIndex       : 5,
+                    centered     : true,
+                    modal        : true,
+                    render       : true
+                });
+                var $content = $('#' + panel.get('id'));
+                $content.find('input[type="text"]').eq(0).focus();
+                $content.find('#id_submitbutton').on('click', function() {
+                    var $theFrm = $content.find('form.mform');
+                    var apprObj = $theFrm.serialize();
+                    apprObj += ('&submitbutton=' + $(this).attr('value'));
+                    $.post($theFrm.attr('action'), apprObj).done(function(data){
+                        var obj = $.parseJSON(data);
+                        if (obj.result == 'success') {
+                            var span = "#position"+obj.id;
+                            $(span).html(obj.positiondisplayname);
+                            panel.destroy(true);
+                        } else {
+                            $("#attendee_position_err").text(obj.error);
                         }
                     });
                     return false;

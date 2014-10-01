@@ -677,12 +677,10 @@ class facetoface_notification extends data_object {
     public function send_to_manager($user, $sessionid) {
         global $CFG, $DB;
 
-        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
-            return true;
-        }
+        $params = array('userid'=>$user->id, 'sessionid'=>$sessionid);
+        $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
 
-        // Check if notification is to be cc'd to manager.
-        if ($this->ccmanager && $manager = totara_get_manager($user->id)) {
+        if ($this->ccmanager && $manager = totara_get_manager($user->id, $positiontype)) {
 
             $event = clone $this->_event;
 
@@ -1093,9 +1091,17 @@ function facetoface_send_trainer_session_unassignment_notice($facetoface, $sessi
  * @return  string  Error string, empty on success
  */
 function facetoface_send_request_notice($facetoface, $session, $userid) {
-    global $DB;
+    global $DB, $USER;
 
-    $manager = totara_get_manager($userid);
+    $positiontype = $DB->get_field('facetoface_signups', 'positiontype', array('userid' => $userid, 'sessionid' => $session->id));
+
+    $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
+    if ($selectpositiononsignupglobal && empty($positiontype)) {
+        $manager = totara_get_most_primary_manager($USER->id);
+    } else {
+        $manager = totara_get_manager($userid, $positiontype);
+    }
+
     if (empty($manager->email)) {
         return 'error:nomanagersemailset';
     }

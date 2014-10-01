@@ -1222,6 +1222,97 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    public function test_facetoface_user_signup_select_manager_message_manager() {
+        global $DB, $CFG;
+
+        set_config('facetoface_selectpositiononsignupglobal', true);
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        // Set up three users, one learner, a primary mgr and a secondary mgr.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $assignmentprim = new position_assignment(
+            array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY, 'managerid' => $user2->id)
+        );
+        $assignmentsec = new position_assignment(
+            array('userid' => $user1->id, 'type' => POSITION_TYPE_SECONDARY, 'managerid' => $user3->id)
+        );
+        assign_user_position($assignmentprim, true);
+        assign_user_position($assignmentsec, true);
+
+        // Get position assignment records.
+        $posassprim = $DB->get_record('pos_assignment', array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY));
+        $posassprim->positiontype = $posassprim->type;
+        $posasssec = $DB->get_record('pos_assignment', array('userid' => $user1->id, 'type' => POSITION_TYPE_SECONDARY));
+        $posasssec->positiontype = $posasssec->type;
+
+        // Set up a face to face session that requires you to get manager approval and select a position.
+        $facetofacedata = array(
+            'course' => $this->course1->id,
+            'multiplesessions' => 1,
+            'selectpositiononsignup' => 1,
+            'approvalreqd' => 1
+        );
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance($facetofacedata);
+        $facetofaces[$facetoface->id] = $facetoface;
+
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (DAYSECS * 365 * 2);
+        $sessiondate->timefinish = time() + (DAYSECS * 365 * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        // Sign the user up to the session with the secondary position.
+        facetoface_user_signup(
+            $session,
+            $facetoface,
+            $this->course1,
+            'discountcode1',
+            MDL_F2F_INVITE,
+            MDL_F2F_STATUS_REQUESTED,
+            $user1->id,
+            true,
+            '',
+            $posasssec
+        );
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Check the expected number of messages got sent.
+        $this->assertCount(2, $messages);
+
+        $foundstudent = false;
+        $foundmanager = false;
+
+        // Look for user1 and user 3 email addresses.
+        foreach ($messages as $message) {
+            if ($message->useridto == $user1->id) {
+                $foundstudent = true;
+            } else if ($message->useridto == $user3->id) {
+                $foundmanager = true;
+            }
+        }
+        $this->assertTrue($foundstudent);
+        $this->assertTrue($foundmanager);
+    }
+
     function test_facetoface_send_request_notice() {
         // Set managerroleid to make sure that it
         // matches the role id defined in the unit test
