@@ -1406,7 +1406,7 @@ class program {
 
         // Highlight dates that are overdue or due soon if program is not complete.
         if (!$this->is_program_complete($userid)) {
-            $out .= $this->display_duedate_highlight_info($duedate, $userid);
+            $out .= $this->display_duedate_highlight_info($duedate);
         }
 
         return $out;
