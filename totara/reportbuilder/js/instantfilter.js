@@ -67,9 +67,23 @@ M.totara_reportbuilder_instantfilter = M.totara_reportbuilder_instantfilter || {
                         '" class="iconsmall instantfilterwait" />';
                 $(loadingimg).insertAfter($(event.target).parent().children().last());
             }
-            // Make the ajax call.
-            xhr = $.post(M.cfg.wwwroot + '/totara/reportbuilder/ajax/instantreport.php', $('.rb-sidebar').serialize()
-            ).done(function(data) {
+            xhr = M.totara_reportbuilder_instantfilter.refresh_results();
+        });
+    },
+
+    /**
+     * refresh results panel, used by change handler on sidebar search
+     * as well as callbacks from reportbuilder sources that change
+     * report entries
+     *
+     * @param callback    function to run once data is refreshed
+     */
+    refresh_results: function (callback) {
+        // Make the ajax call.
+        return $.post(
+            M.cfg.wwwroot + '/totara/reportbuilder/ajax/instantreport.php',
+            $('.rb-sidebar').serialize()
+        ).done( function (data) {
                 // Clear all waiting icons.
                 $('.instantfilterwait').remove();
                 // Replace contents.
@@ -82,8 +96,9 @@ M.totara_reportbuilder_instantfilter = M.totara_reportbuilder_instantfilter || {
                         $('label[for="'+$elem.attr('for')+'"]').html($elem.html());
                     }
                 });
+                if (callback) {
+                    callback();
+                }
             });
-        });
     }
-
 };

@@ -1126,10 +1126,10 @@ class report_builder_sidebar_search_form extends moodleform {
             $submitgroup[] =& $mform->createElement('submit', 'clearsidebarfilters',
                     get_string('clearform', 'totara_reportbuilder'));
             $mform->addGroup($submitgroup, 'submitgroupsidebar', '&nbsp;', ' &nbsp; ');
-
-            $mform->addElement('hidden', 'id', $id);
-            $mform->setType('id', PARAM_INT);
         }
+
+        $mform->addElement('hidden', 'id', $id);
+        $mform->setType('id', PARAM_INT);
     }
 
     public function definition_after_data() {
