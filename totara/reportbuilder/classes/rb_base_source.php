@@ -497,6 +497,30 @@ abstract class rb_base_source {
     }
 
     /**
+     * Reformat a timestamp and timezone into a datetime, showing nothing if invalid or null
+     *
+     * @param integer $date Unix timestamp
+     * @param object $row Object containing all other fields for this row (which should include a timezone field)
+     *
+     * @return string Date and time in a nice format
+     */
+    function rb_display_nice_datetime_in_timezone($date, $row) {
+        if ($date && is_numeric($date)) {
+            if (empty($row->timezone)) {
+                $targetTZ = totara_get_clean_timezone();
+                $tzstring = get_string('nice_time_unknown_timezone', 'totara_reportbuilder');
+            } else {
+                $targetTZ = $row->timezone;
+                $tzstring = get_string(strtolower($targetTZ), 'timezones');
+            }
+            $date = userdate($date, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ';
+            return $date . $tzstring;
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * Reformat a timestamp into a date and time (including seconds), showing nothing if invalid or null
      *
      * @param integer $date Unix timestamp
