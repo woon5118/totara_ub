@@ -268,7 +268,7 @@ class program {
 
         // Get user assignments only if there assignments for this program
         if ($prog_assignments) {
-            $user_assignments = $DB->get_records('prog_user_assignment', array('programid' => $this->id));
+            $user_assignments = $DB->get_records('prog_user_assignment', array('programid' => $this->id), 'timeassigned DESC, userid');
         }
 
         $assigned_user_ids = array();
@@ -1120,7 +1120,7 @@ class program {
         $userassigned = $this->user_is_assigned($userid);
         $timedue = null;
 
-        // display the reason why this user has been assigned to the program (if it is mandatory for the user)
+        // Display the reason why this user has been assigned to the program (if it is mandatory for the user).
         if ($userassigned) {
             $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
             $user_assignments = $DB->get_records_select('prog_user_assignment', "programid = ? AND userid = ?", array($this->id, $userid));
@@ -1143,7 +1143,7 @@ class program {
             }
         }
 
-        // show message box if there are any messages
+        // Show message box if there are any messages.
         if (!empty($message)) {
             $out .= html_writer::tag('div', $message, array('class' => 'notifymessage'));
         }
@@ -1163,9 +1163,15 @@ class program {
                                 WHERE userid = :uid
                                 AND certifid = :cid';
                         $params = array('uid' => $userid, 'cid' => $this->certifid);
-                        $timedue = $DB->get_field_sql($sql, $params);
+                        $pasttimedue = $DB->get_field_sql($sql, $params);
 
-                        $out .= get_string('certexpired', 'totara_certification');
+                        // Prog_completion timedue changes when setting completion for the assignment (Set completion link).
+                        // If the certification for this user has expired and a new completion is set,
+                        // we should take the new completion date as the due date. Following discussion in Zoho ticket #598.
+                        if ($timedue < $pasttimedue) {
+                            $timedue = $pasttimedue;
+                            $out .= get_string('certexpired', 'totara_certification');
+                        }
                     } else {
                         $out .= get_string('certinprogress', 'totara_certification');
                     }
