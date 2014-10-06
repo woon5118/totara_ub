@@ -832,11 +832,6 @@ input[type="checkbox"] {
         text-align: right;
     }
 
-    .visibleto {
-        position: static;
-        display: block;
-    }
-
     /* this definition is required to fix the menu expand and collapse on the iPhone
      * have upstreamed this (MDL-43989)
      */
@@ -846,6 +841,13 @@ input[type="checkbox"] {
     .nav-collapse.collapse {
         height: auto;
         display: none;
+    }
+}
+@media screen and (max-width: 1199px) {
+    .visibleto,
+    .visibleto-review {
+        position: static;
+        display: block;
     }
 }
 /**
@@ -1415,4 +1417,8 @@ select.totara-expanded-width {
 .ie8 .helptooltip {
     display: block;
     float: right;
+}
+
+.ie8 .row {
+    margin-left: 0;
 }

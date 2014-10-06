@@ -244,7 +244,11 @@ class rb_source_course_completion extends rb_base_source {
                 array(
                     'joins' => array('criteria', 'grade_grades'),
                     'displayfunc' => 'grade_string',
-                    'extrafields' => array('gradepass' => 'criteria.gradepass'),
+                    'extrafields' => array(
+                        'gradepass' => 'criteria.gradepass',
+                        'rplgrade'  => 'base.rplgrade',
+                        'course_completion_status' => 'base.status'
+                    ),
                     'defaultheading' => get_string('grade', 'rb_source_course_completion'),
                 )
             ),

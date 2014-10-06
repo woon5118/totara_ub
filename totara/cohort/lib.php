@@ -597,7 +597,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
 
     /// update necessary nested cohorts first (if any)
     if ($updatenested) {
-        $nestedcohorts = totara_cohort_get_nested_dynamic_cohorts($cohortid);
+        $nestedcohorts = totara_cohort_get_nested_dynamic_cohorts($cohortid, array(), true);
         foreach ($nestedcohorts as $ncohortid) {
             totara_cohort_update_dynamic_cohort_members($ncohortid, $userid, $delaymessages, false);
         }
@@ -738,10 +738,11 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
 /**
  * Get all nested cohorts for the specified parent cohort
  *
- * @param int $cohortid the parent cohortid
- * @param array $current the current list of found nested cohortids (used by recursion)
+ * @param int   $cohortid   The parent cohortid
+ * @param array $current    The current list of found nested cohortids (used by recursion)
+ * @param bool  $exclude    A flag to exclude expired audiences
  */
-function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current=array()) {
+function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current = array(), $exclude = false) {
     global $DB;
 
     if (empty($current)) {
@@ -764,13 +765,23 @@ function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current=array()) {
         WHERE crc.cohortid = ?
         AND c.id {$notinsql}
         AND c.cohorttype = " . cohort::TYPE_DYNAMIC;
+
+    if ($exclude) {
+        $now = time();
+        $sql .= "
+            AND (c.startdate IS NULL OR c.startdate = 0 OR c.startdate > ?)
+            AND (c.enddate IS NULL OR c.enddate = 0 OR c.enddate < ?)";
+        $sqlparams[] = $now;
+        $sqlparams[] = $now;
+    }
+
     $cohorts = $DB->get_records_sql($sql, $sqlparams);
     $cohorts = array_keys($cohorts);
 
     $current = array_unique(array_merge($current, $cohorts));
 
     foreach ($cohorts as $ncohortid) {
-        $current = array_merge($current, totara_cohort_get_nested_dynamic_cohorts($ncohortid, $current));
+        $current = array_merge($current, totara_cohort_get_nested_dynamic_cohorts($ncohortid, $current, $exclude));
     }
     $current = array_unique($current);
 

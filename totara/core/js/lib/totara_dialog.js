@@ -687,7 +687,7 @@ totaraDialog_handler_treeview.prototype.setup_tabs = function(e, ui) {
     var selcontainer = $('.select', this._container);
 
     // If showing search tab, focus search box
-    if (ui && ui.index == 1) {
+    if (ui && $(ui.newTab).attr('aria-controls') === 'search-tab') {
         $('#id_query', this._container).focus();
     }
 }
@@ -711,7 +711,8 @@ totaraDialog_handler_treeview.prototype.first_load = function() {
     $('#dialog-tabs').tabs(
         {
             selected: 0,
-            show: handler.setup_tabs
+            show: handler.setup_tabs,
+            activate: handler.setup_tabs
         }
     );
 

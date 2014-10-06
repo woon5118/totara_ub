@@ -354,6 +354,7 @@ class totara_sync_element_user extends totara_sync_element {
         $user->mnethostid = $CFG->mnet_localhost_id;
         $user->lang = $CFG->lang;
         $user->timecreated = time();
+        $user->auth = isset($suser->auth) ? core_text::strtolower($suser->auth) : 'manual';
         $this->set_sync_user_fields($user, $suser);
 
         try {
@@ -516,7 +517,7 @@ class totara_sync_element_user extends totara_sync_element {
         $fields = array('address', 'city', 'country', 'department', 'description',
             'email', 'firstname', 'institution', 'lang', 'lastname', 'firstnamephonetic',
             'lastnamephonetic', 'middlename', 'alternatename', 'phone1', 'phone2',
-            'timemodified', 'timezone', 'url', 'username', 'suspended', 'emailstop');
+            'timemodified', 'timezone', 'url', 'username', 'suspended', 'emailstop', 'auth');
 
         $requiredfields = array('username', 'firstname', 'lastname', 'email');
 
@@ -557,8 +558,6 @@ class totara_sync_element_user extends totara_sync_element {
                 }
             }
         }
-
-        $user->auth = isset($suser->auth) ? strtolower($suser->auth) : 'manual';
 
         // If there is no email, check the default email.
         $usedefaultemail = !empty($this->config->allowduplicatedemails) && !empty($this->config->defaultsyncemail);

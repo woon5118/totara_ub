@@ -318,8 +318,10 @@ class mod_facetoface_session_form extends moodleform {
             //check this date does not overlap with any previous dates - time overlap logic from a Stack Overflow post
             if (!empty($dates)) {
                 foreach ($dates as $existing) {
-                    if (($endtime > $existing->timestart) && ($existing->timefinish > $starttime)) {
-                        //this date clashes with an existing date
+                    if (($endtime > $existing->timestart) && ($existing->timefinish > $starttime) ||
+                        ($endtime == $existing->timefinish) || ($starttime == $existing->timestart)) {
+                        // This date clashes with an existing date - either they overlap or
+                        // one of them is zero minutes and they start at the same time or end at the same time.
                         $errors['timestart['.$i.']'] = get_string('error:sessiondatesconflict', 'facetoface');
                     }
                 }

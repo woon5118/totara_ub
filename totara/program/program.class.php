@@ -1406,7 +1406,7 @@ class program {
 
         // Highlight dates that are overdue or due soon if program is not complete.
         if (!$this->is_program_complete($userid)) {
-            $out .= $this->display_duedate_highlight_info($duedate, $userid);
+            $out .= $this->display_duedate_highlight_info($duedate);
         }
 
         return $out;
@@ -1526,9 +1526,14 @@ class program {
         $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
             'class' => 'course_icon', 'alt' => ''));
 
-        if ($program->is_accessible()) {
+        if ($program->is_required_learning($userid) && $program->is_accessible()) {
             $html = $OUTPUT->action_link(
                 new moodle_url('/totara/program/required.php', array('id' => $programid, 'userid' => $userid)),
+                $icon . $programname
+            );
+        } else if ($program->is_accessible()) {
+            $html = $OUTPUT->action_link(
+                new moodle_url('/totara/program/view.php', array('id' => $programid)),
                 $icon . $programname
             );
         } else {
@@ -1770,7 +1775,7 @@ class program {
                 programid = ?
             AND
                 userid = ?";
-        if ($DB->count_records_sql($sql, $params) > 0) {
+        if ($DB->count_records_sql($sql, $params) > 0 && !$this->is_program_complete($userid)) {
             return true;
         }
 

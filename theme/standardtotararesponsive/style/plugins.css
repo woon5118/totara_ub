@@ -66,6 +66,10 @@
     top: 35px;
 }
 
+.visibleto-review {
+    top: 88px;
+}
+
 /** Learning Plans **/
 @media screen and (max-width: 979px) {
     #recordoflearning-menu,

@@ -1696,9 +1696,9 @@ function calendar_format_event_time($event, $now, $linkparams = null, $usecommon
                   FROM {facetoface_sessions_dates} fsd
             INNER JOIN {facetoface_sessions} fs
                     ON fsd.sessionid = fs.id
-                   AND fs.facetoface = ?
+                   AND fs.id = ?
                  WHERE fsd.timestart = ?";
-        if ($sessiondata = $DB->get_record_sql($sql, array($event->instance, $event->timestart))) {
+        if ($sessiondata = $DB->get_record_sql($sql, array($event->uuid, $event->timestart))) {
             $sessionobj = facetoface_format_session_times($event->timestart,
                                                           $event->timestart + $event->timeduration,
                                                           $sessiondata->sessiontimezone);

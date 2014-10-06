@@ -224,7 +224,7 @@ function totara_course_is_viewable($courseid, $userid = null) {
         if ($course->audiencevisible == COHORT_VISIBLE_ALL) {
             // Course needs to be visible to all.
             return true;
-        } else if (has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance())) {
+        } else if (has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance(), $userid)) {
             // Or user has 'manageaudiencevisibility' capability.
             return true;
         } else if (is_enrolled($coursecontext, $userid)) {

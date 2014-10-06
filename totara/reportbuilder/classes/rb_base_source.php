@@ -1456,6 +1456,11 @@ abstract class rb_base_source {
 
     // display grade along with passing grade if it is known
     function rb_display_grade_string($item, $row) {
+        // Taking into account rpl grade.
+        if (empty($item) && $row->course_completion_status == COMPLETION_STATUS_COMPLETEVIARPL && !empty($row->rplgrade)) {
+            $item = $row->rplgrade;
+        }
+
         $passgrade = isset($row->gradepass) ? sprintf('%d', $row->gradepass) : null;
         $usergrade = sprintf('%d', $item);
 
@@ -3113,7 +3118,7 @@ abstract class rb_base_source {
             $column_options = array('joins' => $joinname);
             // If profile field isn't available to everyone require a capability to display the column.
             if ($cf_prefix == 'user' && $record->visible != PROFILE_VISIBLE_ALL) {
-                $column_options['capability'] = 'moodle/user:update';
+                $column_options['capability'] = 'moodle/user:viewalldetails';
             }
             $filtertype = 'text'; // default filter type
             $filter_options = array();

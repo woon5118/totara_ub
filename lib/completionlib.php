@@ -1083,9 +1083,10 @@ class completion_info {
         }
 
         if ($acriteria) {
-            // Delete all criteria completions relating to this activity
-            $DB->delete_records('course_completion_crit_compl', array('course' => $this->course_id, 'criteriaid' => $acriteria->id));
-            $DB->delete_records('course_completions', array('course' => $this->course_id));
+            // Delete all criteria completions relating to this activity, but skip any RPL records.
+            $where = "course = ? AND criteriaid = ? AND (rpl = '' OR rpl IS NULL)";
+            $DB->delete_records_select('course_completion_crit_compl', $where, array($this->course_id, $acriteria->id));
+            $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($this->course_id));
         }
     }
 

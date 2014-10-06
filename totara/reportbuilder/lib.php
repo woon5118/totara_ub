@@ -3865,7 +3865,11 @@ class reportbuilder {
         } else if ($language == 'th') {
             return 'cordiaupc';
         } else {
-            return 'dejavusans';
+            // NOTE: previously used 'dejavusans' is not compatible with iOS 7 and older devices,
+            //       'freesans' on the other hand does not support all languages.
+            //       Ideally this should be admin configurable so that multilingual sites
+            //       may decide to use Arial Unicode here.
+            return 'freeserif';
         }
     }
 
@@ -5670,10 +5674,10 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
 function rb_unique_param($name) {
     static $UNIQUE_PARAMS = array();
 
-    $param = $name . rand(1, 30777);
+    $param = $name . uniqid();
 
     while (in_array($param, $UNIQUE_PARAMS)) {
-        $param = $name . rand(1, 30777);
+        $param = $name . uniqid();
     }
 
     $UNIQUE_PARAMS[] = $param;
