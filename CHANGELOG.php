@@ -3,6 +3,38 @@
 
 Totara LMS Changelog
 
+Release 2.6.11 (7th October 2014):
+==================================================
+
+Database Upgrades:
+    T-13169        Fixed incorrect column type string in Record Of Learning Certifications report
+
+Bug Fixes:
+    T-13199        Fixed the handling of program exceptions missing the linked user assignment
+    T-12878        Fixed course enrolment checks to take audience visiblity into account
+    T-13278        Fixed nested audiences being updated even when they are unavailable
+    T-13054        Fixed overdue warning incorrectly appearing on completed programs and certifications
+    T-12660        Fixed capability checks for Audience dialog on course settings page
+    T-13102        Fixed border on totara/custom menu drop downs on older browsers
+    T-13282        Fixed managing courses and categories page on older browsers
+    T-13229        Fixed RPL course completion records being deleted when an activities settings are updated
+    T-12942        Fixed display issue in appraisals where visible to overlaps entry field
+    T-13137        Fixed capability checks in course visibility for current user
+    T-12987        Fixed overwriting a users existing 'Auth' field with totara sync
+    T-13118        Removed the docking block functionality on older browsers
+    T-13056        Fixed the ordering of html tags on the user profile page when a field is empty
+    T-13046        Fixed bulleted and numbered lists in TinyMCE editors for RTL languages
+    T-13197        Fixed certification link in ROL pointing to required learning
+    T-13178        Fixed column grade not showing in courses report when uploading course completion records
+    T-13289        Prevent errors in calendar from Facetoface with sessions with the same start time
+    T-12486        Fixed the focus for text boxes in modal dialogs
+    T-13196        Changed reportbuilder capability check to use the user:viewalldetails capability
+    T-13174        Fixed fatal error on Record Of Learning : Certifications report source when user content restrictions are enabled
+    T-13194        Fixed uniqueness of param keys for audience rules
+    T-12682        Fixed reportbuilder export to PDF compatibility with IOS devices.
+    T-13205        Fixed Program exceptions count methods incorrectly including deleted users
+
+
 Release 2.6.10 (23rd September 2014):
 ==================================================
 
