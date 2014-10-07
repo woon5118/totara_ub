@@ -1193,7 +1193,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace(get_string('placeholder:finishdate', 'facetoface'), $finishdate, $msg);
     $msg = str_replace(get_string('placeholder:starttime', 'facetoface'), $starttime, $msg);
     $msg = str_replace(get_string('placeholder:finishtime', 'facetoface'), $finishtime, $msg);
-    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_duration($data->duration), $msg);
+    $msg = str_replace(get_string('placeholder:duration', 'facetoface'), format_time($data->duration), $msg);
 
     // add placeholders that somehow have been forgetten since moodle
     $roomnull = 'N/A';  // Displayed if empty.

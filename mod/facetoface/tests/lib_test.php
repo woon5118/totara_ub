@@ -83,10 +83,10 @@ class facetoface_lib_testcase extends advanced_testcase {
     protected $facetoface_sessions_data = array(
         array('id', 'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown',
               'duration', 'normalcost', 'discountcost', 'timecreated', 'timemodified', 'usermodified'),
-        array(1,    1,   100,    1,  'dtl1',     1,     4,    '$75',     '$60',     1500,   1600, 2),
-        array(2,    2,    50,    0,  'dtl2',     0,     1,    '$90',     '$0',     1400,   1500, 2),
-        array(3,    3,    10,    1,  'dtl3',     1,     7,    '$100',    '$80',     1500,   1500, 2),
-        array(4,    4,    1,     0,  'dtl4',     0,     7,    '$10',     '$8',      500,   1900, 2),
+        array(1,    1,   100,    1,  'dtl1',     1,     14400,    '$75',     '$60',     1500,   1600, 2),
+        array(2,    2,    50,    0,  'dtl2',     0,     3600,    '$90',     '$0',     1400,   1500, 2),
+        array(3,    3,    10,    1,  'dtl3',     1,     25200,    '$100',    '$80',     1500,   1500, 2),
+        array(4,    4,    1,     0,  'dtl4',     0,     25200,    '$10',     '$8',      500,   1900, 2),
         );
 
     protected $facetoface_sessions_field_data = array(
@@ -661,7 +661,7 @@ class facetoface_lib_testcase extends advanced_testcase {
                 'timestart' => 0,
                 'timefinish' => 0,
             ),
-            'duration' => 3,
+            'duration' => 10800,
             'normalcost' => '$100',
             'discountcost' => '$75',
             'timecreated' => 1300,
@@ -679,7 +679,7 @@ class facetoface_lib_testcase extends advanced_testcase {
                 'timestart' => 0,
                 'timefinish' => 0,
             ),
-            'duration' => 6,
+            'duration' => 21600,
             'normalcost' => '$100',
             'discountcost' => '$75',
             'timecreated' => 1300,
@@ -810,100 +810,6 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    function test_format_duration() {
-        /* ISSUES:
-         * expects a space after hour/s but not minute/s
-         * minutes > 59 are not being converted to hour values
-         * negative values are not interpreted correctly
-         */
-
-        // Test - for positive single hour value.
-        $this->assertEquals(format_duration('1:00'), '1 hour ');
-        $this->assertEquals(format_duration('1.00'), '1 hour ');
-
-        // Test - for positive multiple hours value.
-        $this->assertEquals(format_duration('3:00'), '3 hour(s) ');
-        $this->assertEquals(format_duration('3.00'), '3 hour(s) ');
-
-        // Test - for positive single minute value.
-        $this->assertEquals(format_duration('0:01'), '1 minute');
-        $this->assertEquals(format_duration('0.1'), '6 minute(s)');
-
-        // Test - for positive minutes value.
-        $this->assertEquals(format_duration('0:30'), '30 minute(s)');
-        $this->assertEquals(format_duration('0.50'), '30 minute(s)');
-
-        // Test - for out of range minutes value.
-        $this->assertEquals(format_duration('9:70'), '');
-
-        // Test - for zero value.
-        $this->assertEquals(format_duration('0:00'), '');
-        $this->assertEquals(format_duration('0.00'), '');
-
-        // Test - for negative hour value.
-        $this->assertEquals(format_duration('-1:00'), '');
-        $this->assertEquals(format_duration('-1.00'), '');
-
-        // Test - for negative multiple hours value.
-        $this->assertEquals(format_duration('-7:00'), '');
-        $this->assertEquals(format_duration('-7.00'), '');
-
-        // Test - for negative single minute value.
-        $this->assertEquals(format_duration('-0:01'), '');
-        $this->assertEquals(format_duration('-0.01'), '');
-
-        // Test - for negative multiple minutes value.
-        $this->assertEquals(format_duration('-0:33'), '');
-        $this->assertEquals(format_duration('-0.33'), '');
-
-        // Test - for negative hours & minutes value.
-        $this->assertEquals(format_duration('-5:42'), '');
-        $this->assertEquals(format_duration('-5.42'), '');
-
-        // Test - for invalid characters value.
-        $this->assertEquals(format_duration('invalid_string'), '');
-
-        $this->resetAfterTest(true);
-    }
-
-    function test_facetoface_minutes_to_hours() {
-        // Test - for positive minutes value.
-        $this->assertEquals(facetoface_minutes_to_hours('11'), '0:11');
-
-        // Test - for positive hours & minutes value.
-        $this->assertEquals(facetoface_minutes_to_hours('67'), '1:7');
-
-        // Test - for negative minutes value.
-        $this->assertEquals(facetoface_minutes_to_hours('-42'), '-42');
-
-        // Test - for negative hours and minutes value.
-        $this->assertEquals(facetoface_minutes_to_hours('-7:19'), '-7:19');
-
-        // Test - for invalid characters value.
-        $this->assertEquals(facetoface_minutes_to_hours('invalid_string'), '0');
-
-        $this->resetAfterTest(true);
-    }
-
-    function test_facetoface_hours_to_minutes() {
-        // Test - for positive hours value.
-        $this->assertEquals(facetoface_hours_to_minutes('10'), '600');
-
-        // Test - for positive minutes and hours value.
-        $this->assertEquals(facetoface_hours_to_minutes('11:17'), '677');
-
-        // Test - for negative hours value.
-        $this->assertEquals(facetoface_hours_to_minutes('-3'), '-180');
-
-        // Test - for negative hours & minutes value.
-        $this->assertEquals(facetoface_hours_to_minutes('-2:1'), '-119');
-
-        // Test - for invalid characters value.
-        $this->assertEquals(facetoface_hours_to_minutes('invalid_string'), 0.0);
-
-        $this->resetAfterTest(true);
-    }
-
     function test_facetoface_fix_settings() {
         // test for facetoface object
         $facetoface1 = $this->facetoface['f2f0'];
@@ -950,7 +856,7 @@ class facetoface_lib_testcase extends advanced_testcase {
         //define session object for test
         //valid values
         $sessionValid = new stdClass();
-        $sessionValid->duration = '1.5';
+        $sessionValid->duration = '5400';
         $sessionValid->capacity = '250';
         $sessionValid->normalcost = '70';
         $sessionValid->discountcost = '50';

@@ -2379,5 +2379,19 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014102200, 'facetoface');
     }
 
+    if ($oldversion < 2014102201) {
+        // Change the f2f session duration fields from minutes to seconds.
+        $sessions = $DB->get_recordset('facetoface_sessions', null, 'id', 'id, duration');
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($sessions as $session) {
+            $session->duration = $session->duration * MINSECS;
+            $DB->set_field('facetoface_sessions', 'duration', $session->duration, array('id' => $session->id));
+        }
+        $transaction->allow_commit();
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014102201, 'facetoface');
+    }
+
     return $result;
 }

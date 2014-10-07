@@ -1239,14 +1239,8 @@ $string['discountcodelearner_help'] = 'If you know the discount code enter it he
 $string['discountcost_help'] = 'Discount cost is the amount charged to staff members who have a membership id.';
 
 $string['duration_help'] = '**Duration** is the total length of the training in hours.
-For example:
-
-* "2 hours" is enters as **2** or **2:00**
-* "1 hour and 30 minutes" is entered as **1:30**
-* "45 minutes" is entered as **0:45**
-* "20 minutes" is entered as **0:20**.
-
-If the training occurs over two or more time periods, the duration is the combined total.';
+If the training occurs over two or more time periods, the duration is the combined total.
+If the start and end dates are known, this field is unavailable.';
 
 $string['emailmanagercancellation'] = '# Send notice to manager';
 $string['emailmanagercancellation_help'] = 'When "Send notice to manager" is checked, an email will be sent to the learner\'s manager advising them that the face-to-face booking has been cancelled.';
