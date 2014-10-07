@@ -22,6 +22,7 @@ echo './build*
 ./TAGS
 *.swp
 *~
+*/.idea
 ./.settings*
 ./.buildpath
 ./.project
