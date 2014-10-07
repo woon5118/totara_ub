@@ -45,7 +45,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
                 'heading' => get_string('certificationname', 'totara_program'),
             ),
             array(
-                'type' => 'prog_completion',
+                'type' => 'certif_completion',
                 'value' => 'timedue',
                 'heading' => get_string('certificationduedate', 'totara_program'),
             ),
@@ -98,7 +98,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
                 'advanced' => 0,
             ),
             array(
-                'type' => 'prog_completion',
+                'type' => 'certif_completion',
                 'value' => 'timedue',
                 'advanced' => 1,
             ),

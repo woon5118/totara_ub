@@ -53,6 +53,9 @@ M.totara_coursecohort = M.totara_coursecohort || {
                 }
             }
         }
+        this.config['sesskey'] = $('input:hidden[name="sesskey"]').val();
+        this.config['courseid'] = $('input:hidden[name="id"]').val();
+        this.config['categoryid'] = $('select[name="category"] option:selected').val();
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
@@ -83,7 +86,10 @@ M.totara_coursecohort = M.totara_coursecohort || {
                 buttons: dbuttons,
                 title: '<h2>' + M.util.get_string('coursecohortsenrolled', 'totara_cohort') + '</h2>'
             },
-            url+'cohort.php?selected=' + this.config.enrolledselected,
+            url+'cohort.php?selected=' + this.config.enrolledselected
+                    + '&categoryid=' + this.config.categoryid
+                    + '&courseid=' + this.config.courseid
+                    + '&sesskey=' + this.config.sesskey,
             ehandler
         );
     }  // init_dialogs
@@ -117,8 +123,9 @@ totaraDialog_handler_coursecohorts.prototype._update = function(response) {
     var self = this;
     var elements = $('.selected > div > span', this._container);
     var selected_str = this._get_ids(elements).join(',');
-    var url = this._dialog.default_url;
-    this._dialog.default_url = url.split("?")[0] + '?selected=' + selected_str;
+    var url = this._dialog.default_url.split("selected=");
+    var params = url[1].slice(url[1].indexOf('&'));
+    this._dialog.default_url = url[0] + 'selected=' + selected_str + params;
 
     var newids = new Array();
 
@@ -139,17 +146,20 @@ totaraDialog_handler_coursecohorts.prototype._update = function(response) {
     if (newids.length > 0) {
         this._dialog.showLoading();
 
-        var ajax_url = M.cfg.wwwroot + '/totara/cohort/dialog/cohort_item.php?itemid=' + newids.join(',');
+        var ajax_url = M.cfg.wwwroot + '/totara/cohort/dialog/cohort_item.php?itemid=' + newids.join(',') + params;
         $.getJSON(ajax_url, function(data) {
-
+            if (data.error) {
+                self._dialog.hide();
+                alert(data.error);
+                return;
+            }
             $.each(data['rows'], function(index, html) {
                 self.create_item(html);
             });
 
             self._dialog.hide();
         })
-    }
-    else {
+    } else {
         this._dialog.hide();
     }
 }
@@ -223,7 +233,7 @@ totaraDialog_handler_coursecohorts.prototype.remove_cohort_item = function(item)
 
     $('input:hidden[name="cohortsenrolled"]').val(this.cohort_items.join(','));
 
-    var url = this._dialog.default_url;
-    this._dialog.default_url = url.split("?")[0] + '?selected=' + this.cohort_items.join(',');
-
+    var url = this._dialog.default_url.split("selected=");
+    var params = url[1].slice(url[1].indexOf('&'));
+    this._dialog.default_url = url[0] + 'selected=' + this.cohort_items.join(',') + params;
 }

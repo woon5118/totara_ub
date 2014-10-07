@@ -438,5 +438,15 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2014090900, 'totara', 'reportbuilder');
     }
+
+    if ($oldversion < 2014092400) {
+        // Fix the column type.
+        reportbuilder_rename_data('columns', 'dp_certification', 'prog_completion', 'timedue', 'certif_completion', 'timedue');
+        // Fix the filter type.
+        reportbuilder_rename_data('filters', 'dp_certification', 'prog_completion', 'timedue', 'certif_completion', 'timedue');
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014092400, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

@@ -22,16 +22,39 @@
  * @subpackage course
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
 
 require_login();
-$context = context_system::instance();
-require_capability('moodle/cohort:manage', $context);
-$PAGE->set_context($context);
+try {
+    require_sesskey();
+} catch (moodle_exception $e) {
+    $error = array('error' => $e->getMessage());
+    die(json_encode($error));
+}
 
+$categoryid = optional_param('categoryid', 0, PARAM_INT);
+$courseid   = optional_param('courseid', 0, PARAM_INT);
 $itemids = required_param('itemid', PARAM_SEQUENCE);
 $itemids = explode(',', $itemids);
+
+// Check user capabilities.
+$contextsystem = context_system::instance();
+if ((int)$courseid > 0) {
+    $context = context_course::instance((int)$courseid);
+} else if ((int)$categoryid > 0) {
+    $context = context_coursecat::instance((int)$categoryid);
+} else {
+    $context = $contextsystem;
+}
+if (false == (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $contextsystem))) {
+    print_error('error:capabilitycohortview', 'totara_cohort');
+}
+
+$PAGE->set_context($context);
+$PAGE->set_url('/totara/cohort/dialog/cohort_item.php');
 
 $ccohort = new totara_cohort_course_cohorts();
 

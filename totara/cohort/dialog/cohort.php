@@ -23,18 +23,42 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
-require_once($CFG->dirroot .'/totara/core/dialogs/dialog_content.class.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
 
+$selected   = optional_param('selected', array(), PARAM_SEQUENCE);
+$categoryid = optional_param('categoryid', 0, PARAM_INT);
+$courseid   = optional_param('courseid', 0, PARAM_INT);
+
 require_login();
-$context = context_system::instance();
-// Get program id and check capabilities
-require_capability('moodle/cohort:manage', $context);
+try {
+    require_sesskey();
+} catch (moodle_exception $e) {
+    echo html_writer::tag('div', $e->getMessage(), array('class' => 'notifyproblem'));
+    die();
+}
+
+// Check user capabilities.
+$contextsystem = context_system::instance();
+if ((int)$courseid > 0) {
+    $context = context_course::instance((int)$courseid);
+} else if ((int)$categoryid > 0) {
+    $context = context_coursecat::instance((int)$categoryid);
+} else {
+    $context = $contextsystem;
+}
+$capable = false;
+if (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $contextsystem)) {
+    $capable = true;
+}
 
 $PAGE->set_context($context);
+$PAGE->set_url('/totara/cohort/dialog/cohort.php');
 
-// Already selected items
-$selected = optional_param('selected', array(), PARAM_SEQUENCE);
+if (!$capable) {
+    echo html_writer::tag('div', get_string('error:capabilitycohortview', 'totara_cohort'), array('class' => 'notifyproblem'));
+    die();
+}
+
 if (!empty($selected)) {
     $selected = $DB->get_records_select('cohort', "id IN ({$selected})", array(), '', 'id, name as fullname');
 }
@@ -61,6 +85,9 @@ $dialog->selected_title = 'itemstoadd';
 
 // Setup search
 $dialog->searchtype = 'cohort';
+
+$dialog->customdata['courseid'] = (int)$courseid;
+$dialog->customdata['categoryid'] = (int)$categoryid;
 
 // Display
 echo $dialog->generate_markup();
