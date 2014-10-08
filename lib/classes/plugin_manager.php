@@ -911,7 +911,10 @@ class core_plugin_manager {
             'tool' => array('bloglevelupgrade', 'qeupgradehelper'),
             'theme' => array('mymobile', 'afterburner', 'anomaly', 'arialist', 'binarius', 'boxxie', 'brick', 'formal_white',
                 'formfactor', 'fusion', 'leatherbound', 'magazine', 'nimble', 'nonzero', 'overlay', 'serenity', 'sky_high',
-                'splash', 'standard', 'standardold'),
+                'splash', 'standard', 'standardold'
+                // Totara uninstalled themes.
+                , 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara',
+            ),
         );
 
         if (!isset($plugins[$type])) {

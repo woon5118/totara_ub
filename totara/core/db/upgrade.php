@@ -1134,7 +1134,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014082700, 'totara', 'core');
     }
 
-    // This is 2.6.x upgrade line - rewrite all version in t2-integration on each merge from 2.6 release until we merge Moodle 2.7
+    // This is Totara 2.7 upgrade line.
 
     if ($oldversion < 2014091100) {
         global $CFG;
@@ -1159,10 +1159,41 @@ function xmldb_totara_core_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014100800) {
-        if (get_config('filter_tex', 'pathmimetex')) {
+        if (!get_config('filter_tex', 'pathmimetex')) {
             set_config('pathmimetex', '',  'filter_tex');
         }
         totara_upgrade_mod_savepoint(true, 2014100800, 'totara_core');
+    }
+
+    if ($oldversion < 2014100900) {
+        // Removing the themes from core and old Totara.
+        $themes = array('clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara');
+
+        foreach ($themes as $theme) {
+            if (file_exists("{$CFG->dirroot}/theme/{$theme}/config.php")) {
+                // Do not alter reintroduced themes.
+                continue;
+            }
+
+            $replacement = 'standardtotararesponsive';
+            if (file_exists("{$CFG->dirroot}/theme/{$theme}responsive/config.php")) {
+                $replacement = "{$theme}responsive";
+            }
+
+            // Replace the theme configs.
+            $types = array('theme', 'thememobile', 'themelegacy', 'themetablet');
+            foreach ($types as $type) {
+                if (get_config('core', $type) === $theme) {
+                    set_config($type, $replacement);
+                    // TODO: there should be some attempt to migrate theme settings, it is tricky because all themes may be already configured.
+                }
+            }
+
+            // Hacky emulation of plugin uninstallation.
+            unset_all_config_for_plugin('theme_'.$theme);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014100900, 'totara_core');
     }
 
     return true;
