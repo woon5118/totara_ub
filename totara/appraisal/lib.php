@@ -267,7 +267,6 @@ class appraisal {
                 )
             )
         );
-        $event->add_record_snapshot('appraisal', $this);
         $event->trigger();
     }
 

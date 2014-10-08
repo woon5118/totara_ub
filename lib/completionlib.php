@@ -1246,6 +1246,7 @@ class completion_info {
                 $data->completionstate = 0;
                 $data->viewed          = 0;
                 $data->timemodified    = 0;
+                $data->timecompleted   = null;
             }
 
             // Put in cache

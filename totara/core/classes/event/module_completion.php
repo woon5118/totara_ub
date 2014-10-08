@@ -41,7 +41,7 @@ class module_completion extends \core\event\base {
         $this->context = \context_system::instance();
         $this->data['objecttable'] = 'course_modules_completion';
         $this->data['crud'] = 'u';
-        $this->data['level'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**

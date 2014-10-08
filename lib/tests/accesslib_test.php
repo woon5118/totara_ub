@@ -36,6 +36,9 @@ class core_accesslib_testcase extends advanced_testcase {
      * Verify comparison of context instances in phpunit asserts.
      */
     public function test_context_comparisons() {
+
+        $this->resetAfterTest(); // There is some bloody timezone hack somewhere messing up execution of the first test, why???
+
         $frontpagecontext1 = context_course::instance(SITEID);
         context_helper::reset_caches();
         $frontpagecontext2 = context_course::instance(SITEID);

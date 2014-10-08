@@ -212,6 +212,8 @@ class rb_plan_competencies_embedded_cache_test extends reportcache_advanced_test
         $plan = new development_plan($planid);
         $component = $plan->get_component('competency');
         $component->assign_new_item($competencyid, false, true);
+        // TODO: kill add_to_log()
+        $this->resetDebugging();
     }
 
     public function test_is_capable() {

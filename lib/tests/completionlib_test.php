@@ -40,6 +40,10 @@ class core_completionlib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // NOTE: this mocking is totally idiotic and explodes like crazy!
+        $CFG->loglifetime = -1; // No legacy events.
+        $CFG->rolesactive = 0; // No normal events.
+
         $dbman = $DB->get_manager();
         $DB = $this->getMock(get_class($DB));
         $DB->expects($this->any())
@@ -431,7 +435,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $result=$c->get_data($cm, true, 123);
         $this->assertEquals((object)array(
             'id'=>'0', 'coursemoduleid'=>13, 'userid'=>123, 'completionstate'=>0,
-            'viewed'=>0, 'timemodified'=>0), $result);
+            'viewed'=>0, 'timemodified'=>0, 'timecompleted'=>null), $result);
         $this->assertFalse(isset($SESSION->completioncache));
 
         // 3. Current user, single record, not from cache.
@@ -538,6 +542,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $data->completionstate = COMPLETION_COMPLETE;
         $data->timemodified = time();
         $data->viewed = COMPLETION_NOT_VIEWED;
+        $data->timecompleted = null;
 
         $c->internal_set_data($cm, $data);
         $d1 = $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id));
@@ -557,6 +562,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $d2->completionstate = COMPLETION_COMPLETE;
         $d2->timemodified = time();
         $d2->viewed = COMPLETION_NOT_VIEWED;
+        $d2->timecompleted = null;
         $c->internal_set_data($cm2, $d2);
         $this->assertFalse(isset($SESSION->completioncache));
 
@@ -845,6 +851,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $current = $c->get_data($activities[$forum->cmid], false, $this->user->id);
         $current->completionstate = COMPLETION_COMPLETE;
         $current->timemodified = time();
+        $current->timecompleted = null;
         $sink = $this->redirectEvents();
         $c->internal_set_data($activities[$forum->cmid], $current);
         $events = $sink->get_events();

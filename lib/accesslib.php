@@ -1862,6 +1862,7 @@ function role_assign_bulk($roleid, $userids, $contextid, $component = '', $itemi
 
     reload_all_capabilities();
 
+    // TODO: migrate to new events.
     $ra = new stdClass;
     $ra->userids = $userids;
     $ra->roleid = $roleid;
@@ -1869,7 +1870,7 @@ function role_assign_bulk($roleid, $userids, $contextid, $component = '', $itemi
     $ra->component = $component;
     $ra->itemid = $itemid;
     $ra->timemodified = $timemodified;
-    events_trigger('role_assigned_bulk', $ra);
+    events_trigger_legacy('role_assigned_bulk', $ra);
 
     return true;
 }
@@ -2068,7 +2069,8 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
             // this is a bit expensive but necessary
             $context->mark_dirty();
         }
-        events_trigger('role_unassigned_bulk', $ras);
+        // TODO: migrate to new events.
+        events_trigger_legacy('role_unassigned_bulk', $ras);
         unset($ras);
     }
 
@@ -2091,7 +2093,8 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
                     $DB->delete_records_select('role_assignments', "id {$sqlin}", $sqlparams);
                     // this is a bit expensive but necessary
                     $context->mark_dirty();
-                    events_trigger('role_unassigned_bulk', $ras);
+                    // TODO: migrate to new events.
+                    events_trigger_legacy('role_unassigned_bulk', $ras);
                 }
             }
             unset($sparams);

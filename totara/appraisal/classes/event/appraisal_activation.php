@@ -34,7 +34,7 @@ class appraisal_activation extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'appraisal';
         $this->data['crud'] = 'u';
-        $this->data['level'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**

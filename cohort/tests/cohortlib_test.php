@@ -97,6 +97,16 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $sink->close();
 
+        $cohort->cohorttype = '0';
+        $cohort->visibility = '0';
+        $cohort->alertmembers = '0';
+        $cohort->startdate = null;
+        $cohort->enddate = null;
+        $cohort->calculationstatus = '1';
+        $cohort->activecollectionid = 1;
+        $cohort->draftcollectionid = 2;
+        $cohort->broken = '0';
+
         // Validate the event.
         $this->assertCount(1, $events);
         $event = $events[0];
@@ -168,6 +178,16 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
 
         $events = $sink->get_events();
         $sink->close();
+
+        $cohort->cohorttype = '0';
+        $cohort->visibility = '0';
+        $cohort->alertmembers = '0';
+        $cohort->startdate = null;
+        $cohort->enddate = null;
+        $cohort->calculationstatus = '1';
+        $cohort->activecollectionid = 1;
+        $cohort->draftcollectionid = 2;
+        $cohort->broken = '0';
 
         // Validate the event.
         $this->assertCount(1, $events);

@@ -34,7 +34,7 @@ class program_unassigned extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'prog_assignment';
         $this->data['crud'] = 'd';
-        $this->data['level'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**

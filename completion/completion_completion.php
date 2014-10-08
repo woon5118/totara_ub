@@ -65,7 +65,7 @@ class completion_completion extends data_object {
 
     /* @var array $required_fields Array of required table fields, must start with 'id'. */
     public $required_fields = array('id', 'userid', 'course', 'organisationid', 'positionid',
-        'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status', 'rpl', 'rplgrade');
+        'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status', 'rpl', 'rplgrade', 'renewalstatus', 'invalidatecache');
 
     /* @var array $optional_fields Array of optional table fields */
     public $optional_fields = array('name' => '');

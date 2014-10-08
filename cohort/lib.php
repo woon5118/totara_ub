@@ -61,6 +61,7 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     $cohort->modifierid = $USER->id;
 
     $cohort->id = $DB->insert_record('cohort', $cohort);
+    $cohort = $DB->get_record('cohort', array('id' => $cohort->id));
 
     totara_cohort_increment_automatic_id($cohort->idnumber);
 

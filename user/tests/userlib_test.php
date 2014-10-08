@@ -159,6 +159,7 @@ class core_userliblib_testcase extends advanced_testcase {
      */
     public function test_user_count_login_failures() {
         $this->resetAfterTest();
+        set_config('lockoutthreshold', 0); // Totara has 20 by default.
         $user = $this->getDataGenerator()->create_user();
         $this->assertEquals(0, get_user_preferences('login_failed_count_since_success', 0, $user));
         for ($i = 0; $i < 10; $i++) {

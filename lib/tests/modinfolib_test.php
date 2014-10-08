@@ -536,6 +536,7 @@ class core_modinfolib_testcase extends advanced_testcase {
 
         // If conditional availability is disabled the activity will always be unrestricted.
         $CFG->enableavailability = false;
+        $this->setUser($teacher); // uservisible is for current user
         $cm = get_fast_modinfo($course)->instances['assign'][$assign1->id];
         $this->assertTrue($cm->uservisible);
 

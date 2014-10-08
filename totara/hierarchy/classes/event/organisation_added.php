@@ -34,7 +34,7 @@ class organisation_added extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'org';
         $this->data['crud'] = 'c';
-        $this->data['level'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**

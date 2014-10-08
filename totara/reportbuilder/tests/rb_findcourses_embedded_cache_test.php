@@ -342,7 +342,7 @@ class rb_findcourses_embedded_cache_test extends reportcache_advanced_testcase {
      * @param int courseid - id of the course
      */
     protected function add_tags_info($courseid, $tags) {
-       tag_set('course', $courseid, $tags);
+       tag_set('course', $courseid, $tags, 'course', context_course::instance($courseid)->id);
     }
 
     /**

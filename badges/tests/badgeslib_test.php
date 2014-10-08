@@ -245,6 +245,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $current = $c->get_data($activities[$this->module->cmid], false, $this->user->id);
         $current->completionstate = COMPLETION_COMPLETE;
         $current->timemodified = time();
+        $current->timecompleted = null;
         $sink = $this->redirectEmails();
         $c->internal_set_data($activities[$this->module->cmid], $current);
         $this->assertCount(1, $sink->get_messages());

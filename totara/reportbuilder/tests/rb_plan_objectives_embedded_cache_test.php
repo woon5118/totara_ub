@@ -105,6 +105,9 @@ class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testca
         $this->objectives[] = $this->create_objective($this->plan3->id);
         $this->objectives[] = $this->create_objective($this->plan3->id);
 
+        // TODO: kill add_to_log() calls
+        $this->resetDebugging();
+
         $syscontext = context_system::instance();
 
         // Assign user2 to be user1's manager and remove viewallmessages from manager role.

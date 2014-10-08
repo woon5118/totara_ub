@@ -623,11 +623,12 @@ function groups_delete_group_members_bulk($courseid, $userids, $showfeedback=fal
     $groupssql = "SELECT id FROM {groups} g WHERE g.courseid = :courseid";
     $DB->delete_records_select('groups_members', "groupid IN ($groupssql) $usersql", $params);
 
-    //trigger groups events
+    // TODO: migrate to new events.
+    // Trigger groups events.
     $eventdata = new stdClass();
     $eventdata->courseid = $courseid;
     $eventdata->userids  = $userids;
-    events_trigger('groups_members_removed_bulk', $eventdata);
+    events_trigger_legacy('groups_members_removed_bulk', $eventdata);
 
     if ($showfeedback) {
         echo $OUTPUT->notification(get_string('deleted').' - '.get_string('groupmembers', 'group'), 'notifysuccess');

@@ -34,7 +34,7 @@ class position_deleted extends \core\event\base {
     protected function init() {
         $this->data['objecttable'] = 'pos';
         $this->data['crud'] = 'd';
-        $this->data['level'] = self::LEVEL_OTHER;
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**

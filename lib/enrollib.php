@@ -1424,12 +1424,13 @@ abstract class enrol_plugin {
         $inserted = $DB->insert_records_via_batch('user_enrolments', $newenrolments);
         unset($newenrolments);
         if ($inserted) {
+            // TODO: migrate to new events.
             // add extra info and trigger event
             $ue = new stdClass;
             $ue->courseid = $courseid;
             $ue->enrol    = $name;
             $ue->userids  = $userids;
-            events_trigger('user_enrolled_bulk', $ue);
+            events_trigger_legacy('user_enrolled_bulk', $ue);
             completion_start_user_bulk($courseid);
         }
 
@@ -1653,13 +1654,14 @@ abstract class enrol_plugin {
                   AND ue.userid {$sqlin}";
         $uenotlast = $DB->get_records_sql($sql, array_merge(array($courseid), $sqlinparams));
         if (!empty($uenotlast)) {
+            // TODO: migrate to new events.
             // user still has some enrolments in the course, no big cleanup needed
             $eventdata = new stdClass;
             $eventdata->ue = $ue;
             $eventdata->courseid = $courseid;
             $eventdata->enrol = $name;
             $eventdata->lastenrol = false;
-            events_trigger('user_unenrolled_bulk', $eventdata);
+            events_trigger_legacy('user_unenrolled_bulk', $eventdata);
         } else {
             // users' last enrolment intance in course - do big cleanup
 
@@ -1680,12 +1682,13 @@ abstract class enrol_plugin {
             list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
             $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}", array_merge(array($courseid), $sqlinparams));
 
+            // TODO: migrate to new events.
             $eventdata = new stdClass;
             $eventdata->ue = $ue;
             $eventdata->courseid = $courseid;
             $eventdata->enrol = $name;
             $eventdata->lastenrol = true; // means users not enrolled any more
-            events_trigger('user_unenrolled_bulk', $eventdata);
+            events_trigger_legacy('user_unenrolled_bulk', $eventdata);
         }
 
         // reset all enrol caches

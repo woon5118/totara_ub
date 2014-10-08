@@ -399,17 +399,6 @@ class columns_test extends reportcache_advanced_testcase {
         'param1' => 'text', 'param2' => 'text', 'param3' => 'text', 'param4' => 'text', 'param5' => 'text',
     );
 
-    protected $assignment_data = array(
-        'id' => 1, 'course' => 2, 'name' => 'Assignment 001', 'description' => 'Assignment description 001', 'format' => 0, 'assignmenttype' => 'uploadsingle',
-        'resubmit' => 0, 'preventlate' => 0, 'emailteachers' => 0, 'var1' => 0, 'var2' => 0, 'var3' => 0, 'var4' => 0, 'var5' => 0, 'maxbytes' => 1048576,
-        'timedue' => 1332758400, 'timeavailable' => 1332153600, 'grade' => 2, 'timemodified' => 1332153673, 'intro' => 'introduction',
-    );
-
-    protected $assignment_submissions_data = array(
-        'id' => 1, 'assignment' => 1, 'userid' => 2, 'timecreated' => 0, 'timemodified' => 1332166933, 'numfiles' => 1, 'data1' => '', 'data2' => '',
-        'grade' => 2, 'submissioncomment' => 'well done', 'format' => 0, 'teacher' => 0, 'timemarked' => 0, 'mailed' => 1,
-    );
-
     protected $scale_data = array(
         array(
             'id' => 1, 'courseid' => 0, 'userid' => 2, 'name' => 'Scale 001', 'scale' => 'Bad,Average,Good', 'description' => '', 'timemodified' => 1332243112,
@@ -588,8 +577,6 @@ class columns_test extends reportcache_advanced_testcase {
             'org_type_info_field' => array($this->org_type_info_field_data),
             'pos_type_info_data' => array($this->pos_type_info_data_data),
             'org_type_info_data' => array($this->org_type_info_data_data),
-            'assignment' => array($this->assignment_data),
-            'assignment_submissions' => array($this->assignment_submissions_data),
             'scale' => $this->scale_data,
             'files' => array($this->files_data),
             'enrol' => array($this->filler_data),
