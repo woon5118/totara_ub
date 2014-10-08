@@ -620,6 +620,7 @@ $string['selfapproval'] = 'Self Approval';
 $string['selfapproval_help'] = 'This setting allows a user to confirm that they have sought approval to attend the session. Instead of their manager needing to approve their booking the user is presented with a check box when signing up and must confirm they have met the specified terms and conditions.
 This setting will be disabled unless "Requires approval" is enabled in the Face-to-face activity settings.';
 $string['selfapprovalsought'] = 'Self Approval Sought';
+$string['selfapprovalsoughtbrief'] = 'I accept the terms and conditions.';
 $string['selfapprovalsoughtdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
 $string['selfapprovaltandc'] = 'Self Approval Terms and Conditions';
 $string['selfapprovaltandc_help'] = 'Where an activity has approval required and a session has self approval enabled these are the terms and conditions that will be displayed when a user signs up.';

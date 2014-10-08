@@ -2182,8 +2182,23 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
                     LEFT JOIN {facetoface_sessions} f2fses ON (f2fses.id = f2fs.sessionid)
                     LEFT JOIN {facetoface} f2f ON (f2f.id = f2fses.facetoface)
                 WHERE f2fs.id = ?";
+
         $status = $DB->get_record_sql($sql, array($signupid));
         facetoface_set_completion($status, $status->userid, COMPLETION_UNKNOWN);
+        $signup = $DB->get_record('facetoface_signups', array('id' => $signupid), '*', MUST_EXIST);
+        $session = $DB->get_record('facetoface_sessions', array('id' => $signup->sessionid), '*', MUST_EXIST);
+        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
+        $moduleid = $DB->get_field('modules', 'id', array('name' => 'facetoface'), MUST_EXIST);
+        $cm = $DB->get_record('course_modules', array('module' => $moduleid, 'instance' => $facetoface->id), '*', MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        $signupstatus->id = $statusid;
+
+        $event = \mod_facetoface\event\signupstatus_updated::create(array(
+            'context' => $context,
+            'objectid' => $signupstatus->id,
+        ));
+        $event->add_record_snapshot('facetoface_signups_status', $signupstatus);
+        $event->trigger();
 
         return $statusid;
     } else {
@@ -4373,12 +4388,13 @@ function facetoface_get_session_involvement($user, $info) {
  * @param   object  $facetoface         Record from the facetoface table
  * @param   object  $session            Session to signup user to
  * @param   mixed   $userid             User to signup (normally int)
- * @param   array   $params             Optional suppressemail, ignoreconflicts, bulkaddsource, discountcode, notificationtype
+ * @param   array   $params             Optional suppressemail, ignoreconflicts, bulkaddsource, discountcode, notificationtype, autoenrol
  *          boolean $suppressemail      Suppress notifications flag
  *          boolean $ignoreconflicts    Ignore booking conflicts flag
  *          string  $bulkaddsource      Flag to indicate if $userid is actually another field
  *          string  $discountcode       Optional A user may specify a discount code
  *          integer $notificationtype   Optional A user may choose the type of notifications they will receive
+ *          boolean $autoenrol          Optional If user not enrolled on the course then enrols them manually (default true)
  * @return  array
  */
 function facetoface_user_import($course, $facetoface, $session, $userid, $params = array()) {
@@ -4393,6 +4409,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     $discountcode     = (isset($params['discountcode'])     ? $params['discountcode']     : '');
     $notificationtype = (isset($params['notificationtype']) ? $params['notificationtype'] : MDL_F2F_BOTH);
     $usernote         = (isset($params['usernote'])         ? $params['usernote']         : '');
+    $autoenrol        = (isset($params['autoenrol'])        ? $params['autoenrol']        : true);
 
     if (isset($params['approvalreqd'])) {
         // Overwrite default behaviour as bulkadd_* is requested
@@ -4451,7 +4468,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     // Make sure that the user is enroled in the course
     $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
     $context = context_module::instance($cm->id);
-    if (!is_enrolled($context, $user)) {
+    if (!is_enrolled($context, $user) && $autoenrol) {
 
         $defaultlearnerrole = $DB->get_record('role', array('id' => $CFG->learnerroleid));
 
