@@ -86,15 +86,8 @@ class totara_program_renderer extends plugin_renderer_base {
     */
     public function render_current_status($data) {
 
-        $programstatusclass = 'notifymessage';
-        if (!empty($data->statusstr)) {
-            $programstatusstring = get_string($data->statusstr, 'totara_program');
-        } else if ($data->visible) {
-            $programstatusstring = get_string('programlive', 'totara_program');
-            $programstatusclass = 'notifynotice';
-        } else {
-            $programstatusstring = get_string('programnotlive', 'totara_program');
-        }
+        $programstatusclass = $data->statusclass;
+        $programstatusstring = get_string($data->statusstr, 'totara_program');
 
         $learnerinfo = html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'assignmentcount'));
         if ($data->exceptions > 0) {

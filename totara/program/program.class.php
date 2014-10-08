@@ -1585,22 +1585,47 @@ class program {
      * @return string
      */
     public function display_current_status() {
-        global $PAGE, $CFG;
+        global $PAGE, $CFG, $DB;
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $data = new stdClass();
         $data->assignments = $this->assignments->count_active_user_assignments();
         $data->exceptions = $this->assignments->count_user_assignment_exceptions();
         $data->total = $this->assignments->count_total_user_assignments();
-        $data->statusstr = '';
-        $data->visible = $this->visible;
         $data->audiencevisibilitywarning = false;
 
-        // Notify if there are courses in this program which don't have audience visibility to all.
         if (!empty($CFG->audiencevisibility)) {
             $coursesnovisible = $this->content->get_visibility_coursesets(TOTARA_SEARCH_OP_NOT_EQUAL, COHORT_VISIBLE_ALL);
             if (!empty($coursesnovisible)) {
+                // Notify if there are courses in this program which don't have audience visibility to all.
                 $data->audiencevisibilitywarning = true;
+            }
+
+            $audiencesql = "SELECT cm.id
+                      FROM {cohort_visibility} cv
+                      JOIN {cohort_members} cm
+                        ON cv.cohortid = cm.cohortid
+                       AND cv.instanceid = ?
+                       AND cv.instancetype IN (?, ?)";
+            $audienceparams = array($this->id, COHORT_ASSN_ITEMTYPE_PROGRAM, COHORT_ASSN_ITEMTYPE_CERTIF);
+            if ($this->audiencevisible == COHORT_VISIBLE_ALL ||
+                $data->assignments > 0 ||
+                $this->audiencevisible == COHORT_VISIBLE_AUDIENCE && $DB->record_exists_sql($audiencesql, $audienceparams)) {
+                $data->statusstr = 'programlive';
+                $data->statusclass = 'notifynotice';
+            } else {
+                $data->statusstr = 'programnotlive';
+                $data->statusclass = 'notifymessage';
+            }
+
+        } else {
+            if ($this->visible ||
+                $data->assignments > 0) {
+                $data->statusstr = 'programlive';
+                $data->statusclass = 'notifynotice';
+            } else {
+                $data->statusstr = 'programnotlive';
+                $data->statusclass = 'notifymessage';
             }
         }
 
