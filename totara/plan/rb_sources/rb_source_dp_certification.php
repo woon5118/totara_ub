@@ -242,16 +242,26 @@ class rb_source_dp_certification extends rb_base_source {
                 )
         );
 
+        // The date to use for sorting when there is no due date. Sufficiently far in the future.
+        $neverduedate = 100000000000;
+
         $columnoptions[] = new rb_column_option(
                 'certif_completion',
                 'timedue',
                 get_string('certificationduedate', 'totara_program'),
-                'prog_completion.timedue',
+                'CASE WHEN certif_completion.timeexpires > 0
+                           THEN certif_completion.timeexpires
+                      WHEN prog_completion.timedue IS NULL OR prog_completion.timedue = 0
+                           OR prog_completion.timedue = ' . COMPLETION_TIME_NOT_SET . '
+                           THEN ' . $neverduedate . '
+                      WHEN prog_completion.timedue > ' . time() . ' AND certif_completion.certifpath = ' . CERTIFPATH_CERT . '
+                           THEN prog_completion.timedue
+                      ELSE 0 END',
                 array(
                     'joins' => array('prog_completion', 'certif_completion'),
                     'displayfunc' => 'timedue_date',
                     'extrafields' => array(
-                        'prog_completion_timedue' => 'prog_completion.timedue',
+                        'timedue' => 'prog_completion.timedue',
                         'status' => 'certif_completion.status',
                         'programid' => 'base.id',
                         'certifpath' => 'certif_completion.certifpath',
@@ -625,12 +635,12 @@ class rb_source_dp_certification extends rb_base_source {
         $program = new program($row->programid);
 
         if (empty($row->timeexpires)) {
-            if (empty($row->prog_completion_timedue) || $row->prog_completion_timedue == COMPLETION_TIME_NOT_SET) {
+            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
                 // There is no time due set.
                 return get_string('duedatenotset', 'totara_program');
-            } else if ($row->prog_completion_timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
                 // User is still in the first stage of certification, not overdue yet.
-                return $program->display_duedate($row->prog_completion_timedue, $row->userid, $row->certifpath, $row->status);
+                return $program->display_duedate($row->timedue, $row->userid, $row->certifpath, $row->status);
             } else {
                 // Looks like the certification has expired, overdue!
                 return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
