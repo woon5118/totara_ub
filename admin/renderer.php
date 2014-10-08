@@ -488,10 +488,11 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->header();
 
         // Print the component download link
+        /* No env updates in Totara yet
         $output .= html_writer::tag('div', html_writer::link(
                     new moodle_url('/admin/environment.php', array('action' => 'updatecomponent', 'sesskey' => sesskey())),
                     get_string('updatecomponent', 'admin')),
-                array('class' => 'reportlink'));
+                array('class' => 'reportlink'));*/
 
         // Heading.
         $output .= $this->heading(get_string('environment', 'admin'));

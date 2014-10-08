@@ -1196,5 +1196,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014100900, 'totara_core');
     }
 
+    if ($oldversion < 2014100901) {
+        if (file_exists($CFG->dataroot.'/environment/environment.xml')) {
+            // Totara cannot use Moodle environment files and there is no update mechanism.
+            unlink($CFG->dataroot.'/environment/environment.xml');
+        }
+        totara_upgrade_mod_savepoint(true, 2014100901, 'totara_core');
+    }
+
     return true;
 }

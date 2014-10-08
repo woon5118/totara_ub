@@ -492,10 +492,7 @@
           <ON_ERROR message="iconvrequired" />
         </FEEDBACK>
       </PHP_EXTENSION>
-      <PHP_EXTENSION name="mbstring" level="optional">
-        <FEEDBACK>
-          <ON_CHECK message="mbstringrecommended" />
-        </FEEDBACK>
+      <PHP_EXTENSION name="mbstring" level="required">
       </PHP_EXTENSION>
       <PHP_EXTENSION name="curl" level="required">
         <FEEDBACK>
@@ -587,7 +584,6 @@
           <ON_ERROR message="quizattemptsupgradedmessage" />
         </FEEDBACK>
       </CUSTOM_CHECK>
-      <CUSTOM_CHECK level="required" file="/totara/mssql/db/install.php" function="totara_mssql_environment_check"/>
     </CUSTOM_CHECKS>
   </MOODLE>
 </COMPATIBILITY_MATRIX>

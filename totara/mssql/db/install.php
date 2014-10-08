@@ -66,8 +66,9 @@ function xmldb_totara_mssql_install_recovery() {
 }
 
 /**
- * Check that database user has enought permission for database upgrade
- * @param  $result
+ * Check that database user has enough permission for database upgrade
+ * @param environment_results $result
+ * @return environment_results
  */
 function totara_mssql_environment_check(environment_results $result) {
     global $DB;

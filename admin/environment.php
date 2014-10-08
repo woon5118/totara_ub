@@ -44,6 +44,7 @@ admin_externalpage_setup('environment', '', $extraurlparams);
 
 // Handle the 'updatecomponent' action
 if ($action == 'updatecomponent' && confirm_sesskey()) {
+    die(); // No updates for Totara, sorry.
     // Create component installer and execute it
     if ($cd = new component_installer('http://download.moodle.org',
                                       'environment',
