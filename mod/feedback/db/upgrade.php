@@ -54,7 +54,17 @@ function xmldb_feedback_upgrade($oldversion) {
     // Moodle v2.5.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2013050101) {
+    // Moodle v2.6.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    // Moodle v2.7.0 release upgrade line.
+    // Put any upgrade step following this.
+
+
+    // Totara upgrade line - all Totara hacks must be done after all other Moodle upgrades!
+    // NOTE: use .01 version bumps because upstream does not use them (no risk of collision).
+
+    if ($oldversion < 2014051200.01) {
 
         // Define table feedback_completed_history to be created
         $table = new xmldb_table('feedback_completed_history');
@@ -102,14 +112,6 @@ function xmldb_feedback_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // feedback savepoint reached
-        upgrade_mod_savepoint(true, 2013050101, 'feedback');
-    }
-
-    // Moodle v2.6.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    if ($oldversion < 2013110501) {
         /// Undo Totara grade support in feedback from T-9604, not used any more.
         $table = new xmldb_table('feedback');
         $field = new xmldb_field('grade');
@@ -118,11 +120,9 @@ function xmldb_feedback_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2013110501, 'feedback');
+        // feedback savepoint reached
+        upgrade_mod_savepoint(true, 2014051200.01, 'feedback');
     }
-
-    // Moodle v2.7.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

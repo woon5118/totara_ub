@@ -1165,7 +1165,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014100800, 'totara_core');
     }
 
-    if ($oldversion < 2014100900) {
+    if ($oldversion < 2014100902) {
         // Removing the themes from core and old Totara.
         $themes = array('standard', 'standardold', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara');
 
@@ -1193,15 +1193,15 @@ function xmldb_totara_core_upgrade($oldversion) {
             unset_all_config_for_plugin('theme_'.$theme);
         }
 
-        totara_upgrade_mod_savepoint(true, 2014100900, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014100902, 'totara_core');
     }
 
-    if ($oldversion < 2014100901) {
+    if ($oldversion < 2014100903) {
         if (file_exists($CFG->dataroot.'/environment/environment.xml')) {
             // Totara cannot use Moodle environment files and there is no update mechanism.
             unlink($CFG->dataroot.'/environment/environment.xml');
         }
-        totara_upgrade_mod_savepoint(true, 2014100901, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014100903, 'totara_core');
     }
 
     return true;
