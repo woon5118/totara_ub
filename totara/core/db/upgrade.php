@@ -1167,7 +1167,7 @@ function xmldb_totara_core_upgrade($oldversion) {
 
     if ($oldversion < 2014100900) {
         // Removing the themes from core and old Totara.
-        $themes = array('clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara');
+        $themes = array('standard', 'standardold', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara');
 
         foreach ($themes as $theme) {
             if (file_exists("{$CFG->dirroot}/theme/{$theme}/config.php")) {
