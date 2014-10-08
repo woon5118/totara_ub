@@ -213,6 +213,8 @@ class rb_plan_competencies_embedded_cache_test extends reportcache_advanced_test
         $component = $plan->get_component('competency');
         $component->assign_new_item($competencyid, false, true);
         // TODO: kill add_to_log()
+        $debugs = $this->getDebuggingMessages();
+        $this->assertGreaterThan(0, $debugs);
         $this->resetDebugging();
     }
 

@@ -106,6 +106,8 @@ class rb_plan_objectives_embedded_cache_test extends reportcache_advanced_testca
         $this->objectives[] = $this->create_objective($this->plan3->id);
 
         // TODO: kill add_to_log() calls
+        $debugs = $this->getDebuggingMessages();
+        $this->assertCount(3, $debugs);
         $this->resetDebugging();
 
         $syscontext = context_system::instance();
