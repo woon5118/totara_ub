@@ -54,9 +54,72 @@ function xmldb_feedback_upgrade($oldversion) {
     // Moodle v2.5.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2013050101) {
+
+        // Define table feedback_completed_history to be created
+        $table = new xmldb_table('feedback_completed_history');
+
+        // Adding fields to table feedback_completed_history
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('feedback', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('random_response', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('anonymous_response', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timearchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('idarchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table feedback_completed_history
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('feedback', XMLDB_KEY_FOREIGN, array('feedback'), 'feedback', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('user'));
+
+        // Conditionally launch create table for feedback_completed_history
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table feedback_value_history to be created
+        $table = new xmldb_table('feedback_value_history');
+
+        // Adding fields to table feedback_value_history
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('item', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('completed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('tmp_completed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timearchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('idarchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table feedback_value_history
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('item', XMLDB_KEY_FOREIGN, array('item'), 'feedback_item', array('id'));
+        $table->add_key('completed', XMLDB_KEY_FOREIGN, array('completed'), 'feedback_completed_history', array('id'));
+
+        // Conditionally launch create table for feedback_value_history
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // feedback savepoint reached
+        upgrade_mod_savepoint(true, 2013050101, 'feedback');
+    }
 
     // Moodle v2.6.0 release upgrade line.
     // Put any upgrade step following this.
+
+    if ($oldversion < 2013110501) {
+        /// Undo Totara grade support in feedback from T-9604, not used any more.
+        $table = new xmldb_table('feedback');
+        $field = new xmldb_field('grade');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2013110501, 'feedback');
+    }
 
     // Moodle v2.7.0 release upgrade line.
     // Put any upgrade step following this.

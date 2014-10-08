@@ -39,11 +39,24 @@ class message_output_email extends message_output {
     function send_message($eventdata) {
         global $CFG;
 
-        // Ignore $CFG->noemailever here because we want to test this code,
-        // the message sending fails later in email_to_user().
+        if (!empty($CFG->noemailever)) {
+            // hidden setting for development sites, set in config.php if needed
+            //turn off display of errors if we have arrived here from an AJAX script
+            if (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') {
+                debugging('$CFG->noemailever active, no email message sent.', DEBUG_MINIMAL);
+            }
+            return true;
+        }
 
         // skip any messaging suspended and deleted users
         if ($eventdata->userto->auth === 'nologin' or $eventdata->userto->suspended or $eventdata->userto->deleted) {
+            return true;
+        }
+
+        // totara specific extension to allow system to send alert/task but prevent email
+        // even when users have it enabled
+        require_once($CFG->dirroot.'/totara/message/messagelib.php');
+        if (isset($eventdata->sendemail) && $eventdata->sendemail !== TOTARA_MSG_EMAIL_YES) {
             return true;
         }
 
@@ -63,6 +76,10 @@ class message_output_email extends message_output {
         } else {
             $recipient = $eventdata->userto;
         }
+        // append a footer to the emails in the recipient language explaining how to change email preferences
+        $strmgr = get_string_manager();
+        $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+        $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
 
         // Check if we have attachments to send.
         $attachment = '';
@@ -84,8 +101,8 @@ class message_output_email extends message_output {
             }
         }
 
-        $result = email_to_user($recipient, $eventdata->userfrom, $eventdata->subject, $eventdata->fullmessage,
-                                $eventdata->fullmessagehtml, $attachment, $attachname);
+        $result = email_to_user($recipient, $eventdata->userfrom, $eventdata->subject, $eventdata->fullmessage . "\n" . $footerplain,
+                                $eventdata->fullmessagehtml . $footerhtml, $attachment, $attachname);
 
         // Remove an attachment file if any.
         @unlink($attachment);

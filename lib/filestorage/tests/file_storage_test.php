@@ -327,7 +327,7 @@ class core_files_file_storage_testcase extends advanced_testcase {
         $repositorypluginname = 'user';
         // Override repository permission.
         $capability = 'repository/' . $repositorypluginname . ':view';
-        $allroles = $DB->get_records_menu('role', array(), 'id', 'archetype, id');
+        $allroles = $DB->get_records_select_menu('role', "archetype <> ''", array(), 'id', 'archetype, id');
         assign_capability($capability, CAP_ALLOW, $allroles['guest'], $syscontext->id, true);
 
         $args = array();

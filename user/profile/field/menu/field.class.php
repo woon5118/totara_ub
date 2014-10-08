@@ -62,9 +62,14 @@ class profile_field_menu extends profile_field_base {
             $this->options[$key] = format_string($option); // Multilang formatting.
         }
 
-        // Set the data key.
-        if ($this->data !== null) {
-            $this->datakey = (int)array_search($this->data, $this->options);
+        /// Set the data key.
+        if ($this->data !== NULL) {
+            // Returns false if no match found, so we can't just
+            // cast to an integer.
+            $match = array_search($this->data, $this->options);
+            if ($match !== false) {
+                $this->datakey = (int)$match;
+            }
         }
     }
 

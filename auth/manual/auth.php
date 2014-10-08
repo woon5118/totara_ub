@@ -231,7 +231,22 @@ class auth_plugin_manual extends auth_plugin_base {
             } else {
                 $DB->set_field("user", "confirmed", 1, array("id"=>$user->id));
                 if ($user->firstaccess == 0) {
-                    $DB->set_field("user", "firstaccess", time(), array("id"=>$user->id));
+                    $now = time();
+                    $DB->set_field("user", "firstaccess", $now, array("id"=>$user->id));
+
+                    $user->firstaccess = $now;
+                    $event = \totara_core\event\user_firstlogin::create(
+                        array(
+                            'objectid' => $user->id,
+                            'context' => context_user::instance($user->id),
+                            'other' => array(
+                                'username' => $user->username,
+                                'firstaccess' => $now,
+                            ),
+                        )
+                    );
+                    $event->add_record_snapshot('user', $user);
+                    $event->trigger();
                 }
                 return AUTH_CONFIRM_OK;
             }

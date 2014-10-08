@@ -33,6 +33,8 @@ $sectionreturn = optional_param('sr', 0, PARAM_INT);
 
 $PAGE->set_url('/course/editsection.php', array('id'=>$id, 'sr'=> $sectionreturn));
 
+$PAGE->set_pagelayout('standard');
+
 $section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $section->course), '*', MUST_EXIST);
 $sectionnum = $section->section;
@@ -44,7 +46,7 @@ require_capability('moodle/course:update', $context);
 // Get section_info object with all availability options.
 $sectioninfo = get_fast_modinfo($course)->get_section_info($sectionnum);
 
-$editoroptions = array('context'=>$context ,'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes, 'trusttext'=>false, 'noclean'=>true);
+$editoroptions = array('context'=>$context ,'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>(int)$CFG->maxbytes, 'trusttext'=>0, 'noclean'=>true);
 $mform = course_get_format($course->id)->editsection_form($PAGE->url,
         array('cs' => $sectioninfo, 'editoroptions' => $editoroptions));
 // set current value, make an editable copy of section_info object
@@ -105,9 +107,12 @@ $strsummaryof = get_string('summaryof', '', " $sectionname");
 $PAGE->set_title($stredit);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($stredit);
-echo $OUTPUT->header();
 
+echo $OUTPUT->header();
+echo $OUTPUT->box_start();
 echo $OUTPUT->heading($strsummaryof);
 
 $mform->display();
+
+echo $OUTPUT->box_end();
 echo $OUTPUT->footer();

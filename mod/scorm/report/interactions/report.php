@@ -117,7 +117,8 @@ class scorm_interactions_report extends scorm_default_report {
             // Now check if asked download of data
             $coursecontext = context_course::instance($course->id);
             if ($download) {
-                $filename = clean_filename("$course->shortname ".format_string($scorm->name, true,$formattextoptions));
+                $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
+                        format_string(strip_tags($course->shortname . ' ' . $scorm->name), true, $formattextoptions)));
             }
 
             // Define table columns
@@ -148,10 +149,33 @@ class scorm_interactions_report extends scorm_default_report {
             $columns[] = 'score';
             $headers[] = get_string('score', 'scorm');
             $scoes = $DB->get_records('scorm_scoes', array("scorm" => $scorm->id), 'sortorder, id');
+
+            $questioncount = get_scorm_sco_question_count($scorm->id);
+
+            // Create the headers and columns for each sco and it's questions.
             foreach ($scoes as $sco) {
                 if ($sco->launch != '') {
                     $columns[] = 'scograde'.$sco->id;
                     $headers[] = format_string($sco->title,'',$formattextoptions);
+
+                    // Create header and column for the sco. Add the sco id to make
+                    // the column unique, otheriwse the table creation will fail.
+                    if (isset($questioncount[$sco->id])) {
+                        for ($id = 0; $id < $questioncount[$sco->id]; $id++) {
+                            if ($displayoptions['qtext']) {
+                                $columns[] = 'question_' . $sco->id . '_' . $id;
+                                $headers[] = get_string('questionx', 'scormreport_interactions', $id);
+                            }
+                            if ($displayoptions['resp']) {
+                                $columns[] = 'response_' . $sco->id . '_' . $id;
+                                $headers[] = get_string('responsex', 'scormreport_interactions', $id);
+                            }
+                            if ($displayoptions['right']) {
+                                $columns[] = 'right_' . $sco->id . '_' . $id;
+                                $headers[] = get_string('rightanswerx', 'scormreport_interactions', $id);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -185,22 +209,6 @@ class scorm_interactions_report extends scorm_default_report {
             $countsql .= 'COUNT(DISTINCT('.$DB->sql_concat('u.id', '\'#\'', 'st.attempt').')) AS nbattempts, ';
             $countsql .= 'COUNT(DISTINCT(u.id)) AS nbusers ';
             $countsql .= $from.$where;
-            $questioncount = get_scorm_question_count($scorm->id);
-            $nbmaincolumns = count($columns);
-            for($id = 0; $id < $questioncount; $id++) {
-                if ($displayoptions['qtext']) {
-                    $columns[] = 'question' . $id;
-                    $headers[] = get_string('questionx', 'scormreport_interactions', $id);
-                }
-                if ($displayoptions['resp']) {
-                    $columns[] = 'response' . $id;
-                    $headers[] = get_string('responsex', 'scormreport_interactions', $id);
-                }
-                if ($displayoptions['right']) {
-                    $columns[] = 'right' . $id;
-                    $headers[] = get_string('rightanswerx', 'scormreport_interactions', $id);
-                }
-            }
 
             if (!$download) {
                 $table = new flexible_table('mod-scorm-report');
@@ -213,31 +221,35 @@ class scorm_interactions_report extends scorm_default_report {
                 $table->collapsible(true);
 
                 // This is done to prevent redundant data, when a user has multiple attempts
-                $table->column_suppress('picture');
+                // Make sure data is shown on all rows see T-10294 for details
+                /*$table->column_suppress('picture');
                 $table->column_suppress('fullname');
                 foreach ($extrafields as $field) {
                     $table->column_suppress($field);
-                }
+                }*/
 
                 $table->no_sorting('start');
                 $table->no_sorting('finish');
                 $table->no_sorting('score');
 
-                for($id = 0; $id < $questioncount; $id++) {
-                    if ($displayoptions['qtext']) {
-                        $table->no_sorting('question'.$id);
-                    }
-                    if ($displayoptions['resp']) {
-                        $table->no_sorting('response'.$id);
-                    }
-                    if ($displayoptions['right']) {
-                        $table->no_sorting('right'.$id);
-                    }
-                }
-
+                // Process each sco and it's questions, applying no_sorting.
                 foreach ($scoes as $sco) {
                     if ($sco->launch != '') {
                         $table->no_sorting('scograde'.$sco->id);
+
+                        if (isset($questioncount[$sco->id])) {
+                            for ($id = 0; $id < $questioncount[$sco->id]; $id++) {
+                                if ($displayoptions['qtext']) {
+                                    $table->no_sorting('question_' . $sco->id . '_' . $id);
+                                }
+                                if ($displayoptions['resp']) {
+                                    $table->no_sorting('response_' . $sco->id . '_' . $id);
+                                }
+                                if ($displayoptions['right']) {
+                                    $table->no_sorting('right_' . $sco->id . '_' . $id);
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -478,44 +490,45 @@ class scorm_interactions_report extends scorm_default_report {
                                 } else {
                                     $row[] = $score;
                                 }
-                                // interaction data
-                                for ($i=0; $i < $questioncount; $i++) {
-                                    if ($displayoptions['qtext']) {
-                                        $element='cmi.interactions_'.$i.'.id';
-                                        if (isset($trackdata->$element)) {
-                                            $row[] = s($trackdata->$element);
-                                        } else {
-                                            $row[] = '&nbsp;';
-                                        }
-                                    }
-                                    if ($displayoptions['resp']) {
-                                        $element='cmi.interactions_'.$i.'.student_response';
-                                        if (isset($trackdata->$element)) {
-                                            $row[] = s($trackdata->$element);
-                                        } else {
-                                            $row[] = '&nbsp;';
-                                        }
-                                    }
-                                    if ($displayoptions['right']) {
-                                        $j=0;
-                                        $element = 'cmi.interactions_'.$i.'.correct_responses_'.$j.'.pattern';
-                                        $rightans = '';
-                                        if (isset($trackdata->$element)) {
-                                            while(isset($trackdata->$element)) {
-                                                if($j>0) {
-                                                    $rightans .= ',';
-                                                }
-                                                $rightans .= s($trackdata->$element);
-                                                $j++;
-                                                $element = 'cmi.interactions_'.$i.'.correct_responses_'.$j.'.pattern';
+                                // Process the sco's question / interactions data.
+                                if (isset($questioncount[$sco->id])) {
+                                    for ($i=0; $i < $questioncount[$sco->id]; $i++) {
+                                        if ($displayoptions['qtext']) {
+                                            $element='cmi.interactions_'.$i.'.id';
+                                            if (isset($trackdata->$element)) {
+                                                $row[] = s($trackdata->$element);
+                                            } else {
+                                                $row[] = '&nbsp;';
                                             }
-                                            $row[] = $rightans;
-                                        } else {
-                                            $row[] = '&nbsp;';
+                                        }
+                                        if ($displayoptions['resp']) {
+                                            $element='cmi.interactions_'.$i.'.student_response';
+                                            if (isset($trackdata->$element)) {
+                                                $row[] = s($trackdata->$element);
+                                            } else {
+                                                $row[] = '&nbsp;';
+                                            }
+                                        }
+                                        if ($displayoptions['right']) {
+                                            $j=0;
+                                            $element = 'cmi.interactions_'.$i.'.correct_responses_'.$j.'.pattern';
+                                            $rightans = '';
+                                            if (isset($trackdata->$element)) {
+                                                while (isset($trackdata->$element)) {
+                                                    if ($j>0) {
+                                                        $rightans .= ',';
+                                                    }
+                                                    $rightans .= s($trackdata->$element);
+                                                    $j++;
+                                                    $element = 'cmi.interactions_'.$i.'.correct_responses_'.$j.'.pattern';
+                                                }
+                                                $row[] = $rightans;
+                                            } else {
+                                                $row[] = '&nbsp;';
+                                            }
                                         }
                                     }
                                 }
-                            //---end of interaction data*/
                             } else {
                                 // if we don't have track data, we haven't attempted yet
                                 $strstatus = get_string('notattempted', 'scorm');
@@ -524,9 +537,11 @@ class scorm_interactions_report extends scorm_default_report {
                                 } else {
                                     $row[] = $strstatus;
                                 }
-                                // complete the empty cells
-                                for ($i=0; $i < count($columns) - $nbmaincolumns; $i++) {
-                                    $row[] = '&nbsp;';
+                                // Add the empty cells for the incomplete sco and question.
+                                if (isset($questioncount[$sco->id])) {
+                                    for ($i=0; $i < $questioncount[$sco->id]; $i++) {
+                                        $row[] = '&nbsp;';
+                                    }
                                 }
                             }
                         }

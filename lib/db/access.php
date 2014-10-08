@@ -487,6 +487,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
             'guest' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
@@ -730,6 +731,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
@@ -1219,6 +1221,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
+            'assessor' => CAP_ALLOW,
             'guest' => CAP_PROHIBIT,
             'user' => CAP_ALLOW,
             'manager' => CAP_ALLOW
@@ -1269,6 +1272,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
         )
     ),
 
@@ -1764,6 +1768,7 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
             'frontpage' => CAP_ALLOW,
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
@@ -1779,6 +1784,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
             'user' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
@@ -1792,6 +1798,7 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'staffmanager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )

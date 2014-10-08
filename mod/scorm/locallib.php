@@ -154,7 +154,8 @@ function scorm_get_updatefreq_array() {
  */
 function scorm_get_popup_display_array() {
     return array(0 => get_string('currentwindow', 'scorm'),
-                 1 => get_string('popup', 'scorm'));
+                 1 => get_string('popup', 'scorm'),
+                 2 => get_string('popup_simple', 'scorm'));
 }
 
 /**
@@ -806,10 +807,11 @@ function scorm_get_last_completed_attempt($scormid, $userid) {
     global $DB;
 
     /// Find the last completed attempt number for the given user id and scorm id
+    $value_sql = $DB->sql_compare_text('value');
     $sql = "SELECT MAX(attempt)
               FROM {scorm_scoes_track}
              WHERE userid = ? AND scormid = ?
-               AND (value='completed' OR value='passed')";
+               AND ({$value_sql}='completed' OR {$value_sql}='passed')";
     $lastattempt = $DB->get_field_sql($sql, array($userid, $scormid));
     if (empty($lastattempt)) {
         return '1';

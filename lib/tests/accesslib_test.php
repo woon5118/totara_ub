@@ -720,8 +720,9 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $allroles = get_all_roles();
+
         $this->assertInternalType('array', $allroles);
-        $this->assertCount(8, $allroles); // There are 8 roles is standard install.
+        $this->assertCount(12, $allroles); // there are 12 roles in standard totara install
 
         $role = reset($allroles);
         $role = (array)$role;
@@ -744,7 +745,7 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $allroles = get_all_roles($coursecontext);
         $this->assertInternalType('array', $allroles);
-        $this->assertCount(9, $allroles);
+        $this->assertCount(13, $allroles);
         $role = reset($allroles);
         $role = (array)$role;
 
@@ -765,8 +766,8 @@ class core_accesslib_testcase extends advanced_testcase {
      */
     public function test_get_role_archetypes() {
         $archetypes = get_role_archetypes();
-        $this->assertCount(8, $archetypes); // There are 8 archetypes in standard install.
-        foreach ($archetypes as $k => $v) {
+        $this->assertCount(10, $archetypes); // there are 9+1 archetypes in standard totara install
+        foreach ($archetypes as $k=>$v) {
             $this->assertSame($k, $v);
         }
     }
@@ -1765,7 +1766,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $testcourses = array();
         $testpages = array();
         $testblocks = array();
-        $allroles = $DB->get_records_menu('role', array(), 'id', 'archetype, id');
+        $allroles = $DB->get_records_select_menu('role', "archetype <> ''", array(), 'id', 'archetype, id');
 
         $systemcontext = context_system::instance();
         $frontpagecontext = context_course::instance(SITEID);
@@ -1853,6 +1854,7 @@ class core_accesslib_testcase extends advanced_testcase {
         $count += $DB->count_records('user', array('deleted'=>0));
         $count += $DB->count_records('course_categories');
         $count += $DB->count_records('course');
+        $count += $DB->count_records('prog');
         $count += $DB->count_records('course_modules');
         $count += $DB->count_records('block_instances');
         $this->assertEquals($count, $DB->count_records('context'));
@@ -2185,7 +2187,8 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $this->assertFalse(has_capability('moodle/block:view', $frontpageblockcontext, 0));
         $this->assertFalse(has_capability('mod/page:view', $frontpagepagecontext, 0));
-        $this->assertTrue(has_capability('mod/page:view', $frontpagecontext, 0));
+        // Frontpage is inaccessible for non-loggedin users
+        $this->assertFalse(has_capability('mod/page:view', $frontpagecontext, 0));
         $this->assertFalse(has_capability('mod/page:view', $systemcontext, 0));
 
         $this->assertFalse(has_capability('moodle/course:create', $systemcontext, $testusers[11]));
@@ -2562,7 +2565,7 @@ class core_accesslib_testcase extends advanced_testcase {
         // Test basic test of legacy functions.
         // Note: watch out, the fake site might be pretty borked already.
 
-        $this->assertEquals(get_system_context(), context_system::instance());
+        $this->assertEquals(context_system::instance(), context_system::instance());
 
         foreach ($DB->get_records('context') as $contextid => $record) {
             $context = context::instance_by_id($contextid);

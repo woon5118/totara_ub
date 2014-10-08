@@ -61,7 +61,7 @@ require_capability('mod/wiki:managefiles', $context);
 
 if (empty($returnurl)) {
     if (!empty($_SERVER["HTTP_REFERER"])) {
-        $returnurl = $_SERVER["HTTP_REFERER"];
+        $returnurl = clean_param($_SERVER["HTTP_REFERER"], PARAM_LOCALURL);
     } else {
         $returnurl = new moodle_url('/mod/wiki/files.php', array('subwiki'=>$subwiki->id));
     }

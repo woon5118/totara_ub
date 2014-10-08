@@ -192,6 +192,9 @@ function scorm_update_instance($scorm, $mform=null) {
     if (empty($scorm->timeclose)) {
         $scorm->timeclose = 0;
     }
+    if (empty($scorm->completionstatusrequired)) {
+        $scorm->completionstatusrequired = null;
+    }
 
     $cmid       = $scorm->coursemodule;
     $cmidnumber = $scorm->cmidnumber;
@@ -697,6 +700,7 @@ function scorm_grade_item_update($scorm, $grades=null) {
     return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, $grades, $params);
 }
 
+
 /**
  * Delete grade item for given scorm
  *
@@ -995,7 +999,7 @@ function scorm_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
     $fs = get_file_storage();
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
         if ($filearea === 'content') { //return file not found straight away to improve performance.
-            send_header_404();
+            header('HTTP/1.0 404 not found');
             die;
         }
         return false;
@@ -1029,6 +1033,8 @@ function scorm_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:          return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return true;
+        case FEATURE_ARCHIVE_COMPLETION:      return true;
 
         default: return null;
     }
@@ -1189,6 +1195,118 @@ function scorm_version_check($scormversion, $version='') {
 }
 
 /**
+ * Obtains the specific requirements for completion.
+ *
+ * @param object $cm Course-module
+ * @return array Requirements for completion of this scorm
+ */
+function scorm_get_completion_requirements($cm) {
+    global $DB;
+
+    $scorm = $DB->get_record('scorm', array('id' => $cm->instance));
+    $statuses = scorm_status_options();
+
+    $result = array();
+
+    if ($scorm->completionstatusrequired) {
+        foreach ($statuses as $nstatus => $status) {
+            if ($scorm->completionstatusrequired & $nstatus) {
+                $result[] = get_string($status, 'scorm');
+            }
+        }
+    }
+
+    if ($scorm->completionscorerequired) {
+        $result[] = get_string('scorerequired', 'scorm', $scorm->completionscorerequired);
+    }
+
+    return $result;
+}
+
+/**
+ * Obtains the completion progress.
+ *
+ * @param object $cm      Course-module
+ * @param int    $userid  User ID
+ * @return string The current status of completion for the user
+ */
+function scorm_get_completion_progress($cm, $userid) {
+    global $DB;
+
+    // Get scorm details.
+    if (!$scorm = $DB->get_record('scorm', array('id' => $cm->instance))) {
+        print_error('cannotfindscorm', 'scorm');
+    }
+
+    $result = array();
+
+    if ($scorm->completionstatusrequired !== null ||
+        $scorm->completionscorerequired !== null) {
+        // Get user's tracks data.
+        $tracks = $DB->get_records_sql(
+            "SELECT id, element, value
+                FROM {scorm_scoes_track}
+                WHERE scormid = ?
+                AND userid = ?
+                AND element IN
+                (
+                    'cmi.core.lesson_status',
+                    'cmi.completion_status',
+                    'cmi.core.score.raw',
+                    'cmi.score.raw'
+                )", array($scorm->id, $userid)
+        );
+
+        if (!$tracks) {
+            return $result;
+        }
+    }
+
+    // Check for status.
+    if ($scorm->completionstatusrequired !== null) {
+
+        // Get status.
+        $statuses = array_flip(scorm_status_options());
+        $totalstatus = 0;
+
+        foreach ($tracks as $track) {
+            if (!in_array($track->element, array('cmi.core.lesson_status', 'cmi.completion_status'))) {
+                continue;
+            }
+            if (array_key_exists($track->value, $statuses)) {
+                $totalstatus |= $statuses[$track->value];
+            }
+        }
+
+        foreach ($statuses as $status => $nstatus) {
+            if ($nstatus & $totalstatus) {
+                $result[] = get_string($status, 'scorm');
+            }
+        }
+    }
+
+    // Check for score.
+    if ($scorm->completionscorerequired !== null) {
+        $maxscore = -1;
+
+        foreach ($tracks as $track) {
+            if (!in_array($track->element, array('cmi.core.score.raw', 'cmi.score.raw'))) {
+                continue;
+            }
+            if (strlen($track->value) && floatval($track->value) >= $maxscore) {
+                $maxscore = floatval($track->value);
+            }
+        }
+
+        if ($maxscore > -1) {
+            $result[] = get_string('scoreachieved', 'scorm', $maxscore);
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Obtains the automatic completion state for this scorm based on any conditions
  * in scorm settings.
  *
@@ -1259,7 +1377,7 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
         }
 
         if ($scorm->completionstatusrequired & $nstatus) {
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else {
             return completion_info::aggregate_completion_states($type, $result, false);
         }
@@ -1281,7 +1399,7 @@ function scorm_get_completion_state($course, $cm, $userid, $type) {
         }
 
         if ($scorm->completionscorerequired <= $maxscore) {
-            return completion_info::aggregate_completion_states($type, $result, true);
+            $result &= completion_info::aggregate_completion_states($type, $result, true);
         } else {
             return completion_info::aggregate_completion_states($type, $result, false);
         }
@@ -1366,6 +1484,41 @@ function scorm_set_completion($scorm, $userid, $completionstate = COMPLETION_COM
 }
 
 /**
+ * Deletion archive completion records
+ *
+ * @global object $DB
+ * @param int $userid
+ * @param int $courseid
+ */
+function scorm_archive_completion($userid, $courseid) {
+    global $DB, $CFG;
+
+    require_once($CFG->libdir . '/completionlib.php');
+
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $completion = new completion_info($course);
+
+    $sql = 'SELECT s.*
+            FROM {scorm} s
+            WHERE s.course = :courseid
+            AND EXISTS (SELECT t.id
+                        FROM {scorm_scoes_track} t
+                        WHERE t.scormid = s.id
+                        AND t.userid = :userid)';
+    $scorms = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid));
+    foreach ($scorms as $scorm) {
+        $DB->delete_records('scorm_scoes_track', array('userid' => $userid, 'scormid' => $scorm->id));
+        // Resets the grades and completion to incomplete
+        scorm_update_grades($scorm, $userid, true);
+
+        // Reset viewed
+        $course_module = get_coursemodule_from_instance('scorm', $scorm->id, $courseid);
+        $completion->set_module_viewed_reset($course_module, $userid);
+    }
+    $completion->invalidatecache($courseid, $userid, true);
+}
+
+/*
  * Check that a Zip file contains a valid SCORM package
  *
  * @param $file stored_file a Zip file.

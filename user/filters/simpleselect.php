@@ -62,7 +62,7 @@ class user_filter_simpleselect extends user_filter_type {
      */
     public function setupForm(&$mform) {
         $choices = array('' => get_string('anyvalue', 'filters')) + $this->_options;
-        $mform->addElement('select', $this->_name, $this->_label, $choices);
+        $mform->addElement('select', $this->_name, format_string($this->_label), $choices);
         if ($this->_advanced) {
             $mform->setAdvanced($this->_name);
         }
@@ -89,14 +89,12 @@ class user_filter_simpleselect extends user_filter_type {
      * @return array sql string and $params
      */
     public function get_sql_filter($data) {
-        static $counter = 0;
-        $name = 'ex_simpleselect'.$counter++;
-
+        $name = user_filter_type::filter_unique_param('ex_simpleselect');
         $value = $data['value'];
         $params = array();
         $field = $this->_field;
         if ($value == '') {
-            return '';
+            return array('', $params);
         }
         return array("$field=:$name", array($name => $value));
     }

@@ -262,8 +262,8 @@ if ($type == "xls") {
         }
     }
 
-//      $date = $workbook->addformat();
-//      $date->set_num_format('mmmm-d-yyyy h:mm:ss AM/PM'); // ?? adjust the settings to reflect the PHP format below
+    $datetimeformat = $workbook->add_format();
+    $datetimeformat->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
     $row = 0;
     foreach ($results as $user => $rest) {
@@ -284,8 +284,7 @@ if ($type == "xls") {
         $myxls->write_string($row,$col++,$u->lastname);
         $myxls->write_string($row,$col++,$u->email);
         $myxls->write_string($row,$col++,$u->idnumber);
-        $myxls->write_string($row,$col++, userdate($results[$user]["time"], "%d-%b-%Y %I:%M:%S %p") );
-//          $myxls->write_number($row,$col++,$results[$user]["time"],$date);
+        $myxls->write_date($row,$col++,$results[$user]["time"], $datetimeformat);
         $myxls->write_string($row,$col++,$notes);
 
         foreach ($nestedorder as $key => $nestedquestions) {

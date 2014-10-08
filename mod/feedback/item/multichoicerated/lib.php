@@ -193,6 +193,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
         global $OUTPUT;
+        $align = right_to_left() ? "right" : "left";
         $sep_dec = get_string('separator_decimal', 'feedback');
         if (substr($sep_dec, 0, 2) == '[[') {
             $sep_dec = FEEDBACK_DECIMAL;
@@ -205,8 +206,8 @@ class feedback_item_multichoicerated extends feedback_item_base {
 
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
-            echo '<tr><th colspan="2" align="left">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$analysed_item[1];
+            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($analysed_item[1]);
             echo '</th></tr>';
             $analysed_vals = $analysed_item[2];
             $pixnr = 0;
@@ -220,9 +221,9 @@ class feedback_item_multichoicerated extends feedback_item_base {
                 $avg += $val->avg;
                 $quotient = number_format(($val->quotient * 100), 2, $sep_dec, $sep_thous);
                 echo '<tr>';
-                echo '<td align="left" valign="top">';
+                echo '<td align="' . $align . '" valign="top">';
                 echo '-&nbsp;&nbsp;'.trim($val->answertext).' ('.$val->value.'):</td>';
-                echo '<td align="left" style="width: '.FEEDBACK_MAX_PIX_LENGTH.'">';
+                echo '<td align="' . $align . '" style="width: '.FEEDBACK_MAX_PIX_LENGTH.'">';
                 echo '<img class="feedback_bar_image" alt="'.$intvalue.'" src="'.$pix.'" height="5" width="'.$pixwidth.'" />';
                 echo $val->answercount;
                 if ($val->quotient > 0) {
@@ -233,7 +234,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
                 echo '</td></tr>';
             }
             $avg = number_format(($avg), 2, $sep_dec, $sep_thous);
-            echo '<tr><td align="left" colspan="2"><b>';
+            echo '<tr><td align="' . $align . '" colspan="2"><b>';
             echo get_string('average', 'feedback').': '.$avg.'</b>';
             echo '</td></tr>';
         }
@@ -248,7 +249,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
         $data = $analysed_item[2];
 
         //write the item
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
         $worksheet->write_string($row_offset, 1, $analysed_item[1], $xls_formats->head2);
         if (is_array($data)) {
             $avg = 0.0;
@@ -305,12 +306,12 @@ class feedback_item_multichoicerated extends feedback_item_base {
         if ($info->subtype == 'd') {
             echo '<label for="'. $item->typ . '_' . $item->id .'">';
         }
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -403,7 +404,7 @@ class feedback_item_multichoicerated extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.$item->label.') ';
+            echo '('.format_string($item->label).') ';
             echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 

@@ -24,6 +24,7 @@
 
 require('../config.php');
 require_once("$CFG->libdir/formslib.php");
+require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -41,7 +42,7 @@ if ($course->id == SITEID) {
     redirect("$CFG->wwwroot/");
 }
 
-if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
+if (!totara_course_is_viewable($course->id)) {
     print_error('coursehidden');
 }
 
@@ -99,7 +100,8 @@ if (!$forms) {
     if (isguestuser()) {
         notice(get_string('noguestaccess', 'enrol'), get_login_url());
     } else {
-        notice(get_string('notenrollable', 'enrol'), "$CFG->wwwroot/index.php");
+        $destination = new moodle_url("/course/index.php");
+        notice(get_string('notenrollable', 'enrol'), $destination->out());
     }
 }
 

@@ -955,6 +955,8 @@ class core_plugin_manager {
                 'cas', 'db', 'email', 'fc', 'imap', 'ldap', 'manual', 'mnet',
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'radius',
                 'shibboleth', 'webservice'
+                // Totara
+                , 'gauth'
             ),
 
             'availability' => array(
@@ -973,6 +975,11 @@ class core_plugin_manager {
                 'rss_client', 'search_forums', 'section_links',
                 'selfcompletion', 'settings', 'site_main_menu',
                 'social_activities', 'tag_flickr', 'tag_youtube', 'tags'
+                // Totara
+                ,'totara_addtoplan', 'totara_alerts',
+                'totara_my_learning_nav', 'totara_my_team_nav', 'totara_quicklinks',
+                'totara_recent_learning', 'totara_report_manager', 'totara_stats',
+                'totara_tasks', 'facetoface', 'totara_certifications', 'gaccess',
             ),
 
             'booktool' => array(
@@ -1012,6 +1019,8 @@ class core_plugin_manager {
                 'category', 'cohort', 'database', 'flatfile',
                 'guest', 'imsenterprise', 'ldap', 'manual', 'meta', 'mnet',
                 'paypal', 'self'
+                // Totara
+                , 'totara_learningplan', 'totara_program'
             ),
 
             'filter' => array(
@@ -1022,10 +1031,14 @@ class core_plugin_manager {
 
             'format' => array(
                 'singleactivity', 'social', 'topics', 'weeks'
+                // Totara
+                , 'demo'
             ),
 
             'gradeexport' => array(
                 'ods', 'txt', 'xls', 'xml'
+                // Totara:
+                , 'fusion'
             ),
 
             'gradeimport' => array(
@@ -1040,6 +1053,11 @@ class core_plugin_manager {
                 'rubric', 'guide'
             ),
 
+            // Totara
+            'hierarchy' => array(
+                'competency', 'goal', 'organisation', 'position'
+            ),
+
             'local' => array(
             ),
 
@@ -1049,6 +1067,8 @@ class core_plugin_manager {
 
             'message' => array(
                 'airnotifier', 'email', 'jabber', 'popup'
+                // Totara
+                , 'totara_alert', 'totara_task'
             ),
 
             'mnetservice' => array(
@@ -1059,6 +1079,8 @@ class core_plugin_manager {
                 'assign', 'assignment', 'book', 'chat', 'choice', 'data', 'feedback', 'folder',
                 'forum', 'glossary', 'imscp', 'label', 'lesson', 'lti', 'page',
                 'quiz', 'resource', 'scorm', 'survey', 'url', 'wiki', 'workshop'
+                // Totara
+                , 'certificate', 'facetoface'
             ),
 
             'plagiarism' => array(
@@ -1126,7 +1148,9 @@ class core_plugin_manager {
             ),
 
             'theme' => array(
-                'base', 'bootstrapbase', 'canvas', 'clean', 'more'
+                'base', 'bootstrapbase'
+                // Totara:
+                , 'kiwifruitresponsive', 'standardtotararesponsive', 'customtotararesponsive'
             ),
 
             'tool' => array(
@@ -1135,6 +1159,15 @@ class core_plugin_manager {
                 'langimport', 'log', 'multilangupgrade', 'phpunit', 'profiling',
                 'replace', 'spamcleaner', 'task', 'timezoneimport',
                 'unittest', 'uploadcourse', 'uploaduser', 'unsuproles', 'xmldb'
+                // Totara:
+                , 'totara_sync', 'totara_timezonefix'
+            ),
+
+            // Totara:
+            'totara' => array(
+                'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360',
+                'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
+                'certification', 'completionimport', 'mssql'
             ),
 
             'webservice' => array(

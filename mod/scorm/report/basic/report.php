@@ -105,8 +105,8 @@ class scorm_basic_report extends scorm_default_report {
             // Now check if asked download of data
             $coursecontext = context_course::instance($course->id);
             if ($download) {
-                $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                $filename = clean_filename("$shortname ".format_string($scorm->name, true));
+                $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
+                        format_string(strip_tags($course->shortname . ' ' . $scorm->name), true, array('context' => $coursecontext))));
             }
 
             // Define table columns
@@ -158,11 +158,12 @@ class scorm_basic_report extends scorm_default_report {
                 $table->collapsible(true);
 
                 // This is done to prevent redundant data, when a user has multiple attempts
-                $table->column_suppress('picture');
+                // Make sure data is shown on all rows see T-10294 for details
+                /*$table->column_suppress('picture');
                 $table->column_suppress('fullname');
                 foreach ($extrafields as $field) {
                     $table->column_suppress($field);
-                }
+                }*/
 
                 $table->no_sorting('start');
                 $table->no_sorting('finish');

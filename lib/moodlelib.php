@@ -433,6 +433,11 @@ define('FEATURE_BACKUP_MOODLE2', 'backup_moodle2');
 /** True if module can show description on course main page */
 define('FEATURE_SHOW_DESCRIPTION', 'showdescription');
 
+/** True if module supports archiving of completion data
+ * Chose FEATURE_ARCHIVE rather than FEATURE_RESET to avoid confusion with existing function reset_course_userdata()
+ **/
+define('FEATURE_ARCHIVE_COMPLETION', 'archive_completion');
+
 /** True if module uses the question bank */
 define('FEATURE_USES_QUESTIONS', 'usesquestions');
 
@@ -1605,7 +1610,11 @@ function purge_all_caches() {
     $DB->reset_caches();
     cache_helper::purge_all();
 
-    // Purge all other caches: rss, simplepie, etc.
+    // Report Builder
+    require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+    reportbuilder_purge_all_cache();
+
+    // purge all other caches: rss, simplepie, etc.
     remove_dir($CFG->cachedir.'', true);
 
     // Make sure cache dir is writable, throws exception if not.
@@ -3007,9 +3016,13 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         if (is_role_switched($course->id)) {
             // When switching roles ignore the hidden flag - user had to be in course to do the switch.
         } else {
-            if (!$course->visible and !has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
-                // Originally there was also test of parent category visibility, BUT is was very slow in complex queries
-                // involving "my courses" now it is also possible to simply hide all courses user is not enrolled in :-).
+
+            require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+            // Check audience visibility setting and user permissions.
+            if (!totara_course_is_viewable($course->id)) {
+                // originally there was also test of parent category visibility,
+                // BUT is was very slow in complex queries involving "my courses"
+                // now it is also possible to simply hide all courses user is not enrolled in :-)
                 if ($preventredirect) {
                     throw new require_login_exception('Course is hidden');
                 }
@@ -3147,7 +3160,26 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
         redirect($url, get_string('activityiscurrentlyhidden'));
     }
 
-    // Finally access granted, update lastaccess times.
+    // If completion is enabled and mark as started on first view is on
+    if ($course->id !== $SITE->id) {
+        require_once("{$CFG->libdir}/completionlib.php");
+        $completion = new completion_info($course);
+        if ($completion->is_enabled() && !empty($course->completionprogressonview)) {
+            if ($completion->is_tracked_user($USER->id)) {
+                $params = array(
+                    'userid' => $USER->id,
+                    'course' => $course->id
+                );
+
+                $ccompletion = new completion_completion($params);
+                if (empty($ccompletion->id) || empty($ccompletion->timestarted)) {
+                    $ccompletion->mark_inprogress();
+                }
+            }
+        }
+    }
+
+    // Finally access granted, update lastaccess times
     user_accesstime_log($course->id);
 }
 
@@ -4279,10 +4311,6 @@ function delete_user(stdClass $user) {
     $updateuser = new stdClass();
     $updateuser->id           = $user->id;
     $updateuser->deleted      = 1;
-    $updateuser->username     = $delname;            // Remember it just in case.
-    $updateuser->email        = md5($user->username);// Store hash of username, useful importing/restoring users.
-    $updateuser->idnumber     = '';                  // Clear this field to free it up.
-    $updateuser->picture      = 0;
     $updateuser->timemodified = time();
 
     // Don't trigger update event, as user is being deleted.
@@ -4322,7 +4350,42 @@ function delete_user(stdClass $user) {
 }
 
 /**
- * Retrieve the guest user object.
+ * Removes user deleted flag in internal user database and notifies the auth plugin.
+ * @param object $user       Userobject before undelete    (without system magic quotes)
+ * @return boolean success
+ */
+function undelete_user($user) {
+    global $DB;
+
+    $updateuser = new object();
+    $updateuser->id           = $user->id;
+    $updateuser->deleted      = 0;
+    $updateuser->timemodified = time();
+
+    // Call get_context_insance to create context if it doesn't exist.
+    context_user::instance($user->id, IGNORE_MISSING);
+
+    if ($DB->update_record('user', $updateuser)) {
+        $event = \totara_core\event\user_undeleted::create(
+            array(
+                'objectid' => $user->id,
+                'context' => context_user::instance($user->id),
+                'other' => array(
+                    'username' => $user->username,
+                )
+            )
+        );
+        $event->add_record_snapshot('user', $user);
+        $event->trigger();
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * Retrieve the guest user object
  *
  * @return stdClass A {@link $USER} object
  */
@@ -4478,6 +4541,24 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                 // For some reason auth isn't set yet.
                 $DB->set_field('user', 'auth', $auth, array('id' => $user->id));
                 $user->auth = $auth;
+            }
+            if (empty($user->firstaccess)) { //prevent firstaccess from remaining 0 for manual account that never required confirmation
+                $now = time();
+                $DB->set_field('user','firstaccess', $now, array('id' => $user->id));
+                $user->firstaccess = $now;
+
+                $event = \totara_core\event\user_firstlogin::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                        'other' => array(
+                            'username' => $user->username,
+                            'firstaccess' => $now,
+                        ),
+                    )
+                );
+                $event->add_record_snapshot('user', $user);
+                $event->trigger();
             }
 
             // If the existing hash is using an out-of-date algorithm (or the legacy md5 algorithm), then we should update to
@@ -5083,6 +5164,7 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
                     if ($cm) {
                         // Delete cm and its context - orphaned contexts are purged in cron in case of any race condition.
                         context_helper::delete_instance(CONTEXT_MODULE, $cm->id);
+                        $DB->delete_records('course_modules_completion', array('coursemoduleid' => $cm->id));
                         $DB->delete_records('course_modules', array('id' => $cm->id));
                     }
                 }
@@ -5126,8 +5208,8 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
         echo $OUTPUT->notification($strdeleted.get_string('type_mod_plural', 'plugin'), 'notifysuccess');
     }
 
-    // Cleanup the rest of plugins.
-    $cleanuplugintypes = array('report', 'coursereport', 'format');
+    // Cleanup the rest of plugins
+    $cleanuplugintypes = array('report', 'coursereport', 'format', 'totara');
     foreach ($cleanuplugintypes as $type) {
         $plugins = get_plugin_list_with_function($type, 'delete_course', 'lib.php');
         foreach ($plugins as $plugin => $pluginfunction) {
@@ -5723,8 +5805,17 @@ function get_mailer($action='get') {
  */
 function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', $attachment = '', $attachname = '',
                        $usetrueaddress = true, $replyto = '', $replytoname = '', $wordwrapwidth = 79) {
+    global $CFG, $FULLME;
 
-    global $CFG;
+    // TODO: use ical library instead
+    if (strpos($attachname, ".ics") !== false) {
+        $is_this_an_ical_request = TRUE;
+    } else {
+        $is_this_an_ical_request = FALSE;
+        if ($messagehtml && right_to_left()) {
+            $messagehtml = '<div style="text-align:right;" dir="rtl">'.$messagehtml.'</div>';
+        }
+    }
 
     if (empty($user) or empty($user->id)) {
         debugging('Can not send email to null user', DEBUG_DEVELOPER);
@@ -5925,7 +6016,16 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         $mail->addReplyTo($values[0], $values[1]);
     }
 
+    if ($is_this_an_ical_request) {
+        $mail->ContentType = "text/calendar; name={$attachname}; method=REQUEST; charset=UTF-8";
+        $mail->Encoding = '8bit';
+        $mail->LE = "\r\n";
+        $mail->AddCustomHeader("Content-class: urn:content-classes:calendarmessage\r\n");
+        $mail->AddCustomHeader("Content-Transfer-Encoding: 8bit\r\n");
+    }
+
     if ($mail->send()) {
+
         set_send_count($user);
         if (!empty($mail->SMTPDebug)) {
             echo '</pre>';
@@ -6048,9 +6148,10 @@ function reset_password_and_mail($user) {
     $a->link        = $CFG->httpswwwroot .'/login/change_password.php';
     $a->signoff     = generate_email_signoff();
 
-    $message = get_string('newpasswordtext', '', $a);
+    $strmgr = get_string_manager();
+    $message = $strmgr->get_string('newpasswordtext', 'moodle', $a, $user->lang);
 
-    $subject  = format_string($site->fullname) .': '. get_string('changedpassword');
+    $subject  = format_string($site->fullname) .': '. $strmgr->get_string('changedpassword', 'moodle', null, $user->lang);
 
     unset_user_preference('create_password', $user); // Prevent cron from generating the password.
 
@@ -6075,13 +6176,14 @@ function send_confirmation_email($user) {
     $data->sitename  = format_string($site->fullname);
     $data->admin     = generate_email_signoff();
 
-    $subject = get_string('emailconfirmationsubject', '', format_string($site->fullname));
+    $strmgr = get_string_manager();
+    $subject = $strmgr->get_string('emailconfirmationsubject', 'moodle', format_string($site->fullname), $user->lang);
 
     $username = urlencode($user->username);
     $username = str_replace('.', '%2E', $username); // Prevent problems with trailing dots.
     $data->link  = $CFG->wwwroot .'/login/confirm.php?data='. $user->secret .'/'. $username;
-    $message     = get_string('emailconfirmation', '', $data);
-    $messagehtml = text_to_html(get_string('emailconfirmation', '', $data), false, false, true);
+    $message     = $strmgr->get_string('emailconfirmation', 'moodle', $data, $user->lang);
+    $messagehtml = text_to_html($strmgr->get_string('emailconfirmation', 'moodle', $data, $user->lang), false, false, true);
 
     $user->mailformat = 1;  // Always send HTML version as well.
 
@@ -6101,6 +6203,7 @@ function send_password_change_confirmation_email($user, $resetrecord) {
 
     $site = get_site();
     $supportuser = core_user::get_support_user();
+    $strmgr = get_string_manager();
     $pwresetmins = isset($CFG->pwresettime) ? floor($CFG->pwresettime / MINSECS) : 30;
 
     $data = new stdClass();
@@ -6112,8 +6215,8 @@ function send_password_change_confirmation_email($user, $resetrecord) {
     $data->admin     = generate_email_signoff();
     $data->resetminutes = $pwresetmins;
 
-    $message = get_string('emailresetconfirmation', '', $data);
-    $subject = get_string('emailresetconfirmationsubject', '', format_string($site->fullname));
+    $message = $strmgr->get_string('emailpasswordconfirmation', 'moodle', $data, $user->lang);
+    $subject = $strmgr->get_string('emailpasswordconfirmationsubject', 'moodle', format_string($site->fullname), $user->lang);
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
     return email_to_user($user, $supportuser, $subject, $message);
@@ -6133,6 +6236,7 @@ function send_password_change_info($user) {
     $supportuser = core_user::get_support_user();
     $systemcontext = context_system::instance();
 
+    $strmgr = get_string_manager();
     $data = new stdClass();
     $data->firstname = $user->firstname;
     $data->lastname  = $user->lastname;
@@ -6142,9 +6246,9 @@ function send_password_change_info($user) {
     $userauth = get_auth_plugin($user->auth);
 
     if (!is_enabled_auth($user->auth) or $user->auth == 'nologin') {
-        $message = get_string('emailpasswordchangeinfodisabled', '', $data);
-        $subject = get_string('emailpasswordchangeinfosubject', '', format_string($site->fullname));
-        // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
+        $message = $strmgr->get_string('emailpasswordchangeinfodisabled', 'moodle', $data, $user->lang);
+        $subject = $strmgr->get_string('emailpasswordchangeinfosubject', 'moodle', format_string($site->fullname), $user->lang);
+        //directly email rather than using the messaging system to ensure its not routed to a popup or jabber
         return email_to_user($user, $supportuser, $subject, $message);
     }
 
@@ -6158,11 +6262,11 @@ function send_password_change_info($user) {
     }
 
     if (!empty($data->link) and has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
-        $message = get_string('emailpasswordchangeinfo', '', $data);
-        $subject = get_string('emailpasswordchangeinfosubject', '', format_string($site->fullname));
+        $message = $strmgr->get_string('emailpasswordchangeinfo', 'moodle', $data, $user->lang);
+        $subject = $strmgr->get_string('emailpasswordchangeinfosubject', 'moodle', format_string($site->fullname), $user->lang);
     } else {
-        $message = get_string('emailpasswordchangeinfofail', '', $data);
-        $subject = get_string('emailpasswordchangeinfosubject', '', format_string($site->fullname));
+        $message = $strmgr->get_string('emailpasswordchangeinfofail', 'moodle', $data, $user->lang);
+        $subject = $strmgr->get_string('emailpasswordchangeinfosubject', 'moodle', format_string($site->fullname), $user->lang);
     }
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
@@ -7013,10 +7117,11 @@ function get_list_of_themes() {
 /**
  * Returns a list of timezones in the current language
  *
+ * @param string|float $extrazone - a deprecated timezone still set in the database in CFG or user profiles, to be added to the approved timezone list in dropdowns
  * @return array
  */
-function get_list_of_timezones() {
-    global $DB;
+function get_list_of_timezones($extrazone=null) {
+    global $CFG, $DB;
 
     static $timezones;
 
@@ -7024,37 +7129,32 @@ function get_list_of_timezones() {
         return $timezones;
     }
 
-    $timezones = array();
+    $goodzones = totara_get_clean_timezone_list(true);
 
-    if ($rawtimezones = $DB->get_records_sql("SELECT MAX(id), name FROM {timezone} GROUP BY name")) {
-        foreach ($rawtimezones as $timezone) {
-            if (!empty($timezone->name)) {
-                if (get_string_manager()->string_exists(strtolower($timezone->name), 'timezones')) {
-                    $timezones[$timezone->name] = get_string(strtolower($timezone->name), 'timezones');
-                } else {
-                    $timezones[$timezone->name] = $timezone->name;
-                }
-                if (substr($timezones[$timezone->name], 0, 1) == '[') {  // No translation found.
-                    $timezones[$timezone->name] = $timezone->name;
-                }
+    foreach($goodzones as $tzkey => $tzval) {
+        if (get_string_manager()->string_exists(strtolower($tzkey), 'timezones')) {
+            $goodzones[$tzkey] = get_string(strtolower($tzkey), 'timezones');
+        }
+        if (substr($goodzones[$tzkey], 0, 1) == '[') {  // No translation found
+            $goodzones[$tzkey] = $tzval;
+        }
+    }
+    asort($goodzones);
+    //add the extra timezone if set to a deprecated or unknown zone
+    if (!empty($extrazone) && $extrazone != 99) {
+        if (!in_array($extrazone, $goodzones)) {
+            if (is_numeric($extrazone)) {
+                //UTC offset
+                $modifier = ($extrazone > 0) ? '+' : '';
+                $goodzones[$extrazone] = 'UTC' . $modifier . number_format($extrazone, 1);
+            } else {
+                //some string we don't recognise
+                $goodzones[$extrazone] = $extrazone;
             }
         }
     }
 
-    asort($timezones);
-
-    for ($i = -13; $i <= 13; $i += .5) {
-        $tzstring = 'UTC';
-        if ($i < 0) {
-            $timezones[sprintf("%.1f", $i)] = $tzstring . $i;
-        } else if ($i > 0) {
-            $timezones[sprintf("%.1f", $i)] = $tzstring . '+' . $i;
-        } else {
-            $timezones[sprintf("%.1f", $i)] = $tzstring;
-        }
-    }
-
-    return $timezones;
+    return $goodzones;
 }
 
 /**
@@ -7295,7 +7395,7 @@ function endecrypt ($pwd, $data, $case) {
     return $cipher;
 }
 
-// ENVIRONMENT CHECKING.
+/// ENVIRONMENT CHECKING  ////////////////////////////////////////////////////////////
 
 /**
  * This method validates a plug name. It is much faster than calling clean_param.
@@ -9040,6 +9140,7 @@ function apd_get_profiling() {
  * @return bool success, true also if dir does not exist
  */
 function remove_dir($dir, $contentonly=false) {
+    global $CFG;
     if (!file_exists($dir)) {
         // Nothing to do.
         return true;
@@ -9052,8 +9153,13 @@ function remove_dir($dir, $contentonly=false) {
         if ($item != '.' && $item != '..') {
             if (is_dir($dir.'/'.$item)) {
                 $result = remove_dir($dir.'/'.$item) && $result;
-            } else {
-                $result = unlink($dir.'/'.$item) && $result;
+            }else{
+                if ($CFG->ostype == 'WINDOWS') {
+                    // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
+                    $result = @unlink($dir.'/'.$item) && $result;
+                } else {
+                    $result = unlink($dir.'/'.$item) && $result;
+                }
             }
         }
     }
@@ -9062,8 +9168,14 @@ function remove_dir($dir, $contentonly=false) {
         clearstatcache(); // Make sure file stat cache is properly invalidated.
         return $result;
     }
-    $result = rmdir($dir); // If anything left the result will be false, no need for && $result.
-    clearstatcache(); // Make sure file stat cache is properly invalidated.
+
+    if ($CFG->ostype == 'WINDOWS') {
+        // WINDOWS specific bug when META-INF folder locked by javaw process and cannot be deleted
+        $result = @rmdir($dir);
+    } else {
+        $result = rmdir($dir); // if anything left the result will be false, no need for && $result
+    }
+    clearstatcache(); // make sure file stat cache is properly invalidated
     return $result;
 }
 
@@ -9521,6 +9633,24 @@ function get_home_page() {
         }
     }
     return HOMEPAGE_SITE;
+}
+
+/**
+ * Given a function name or array syntax (same as first arg of call_user_func)
+ * returns true if the function or method exists
+ *
+ * @param callback $function Function name or array defining the method
+ * @return boolean true if function or method exists
+ */
+function function_or_method_exists($function) {
+    // see if it's a function
+    if (is_string($function) && function_exists($function)) {
+        return true;
+    }
+    if (is_array($function) && method_exists($function[0], $function[1])) {
+        return true;
+    }
+    return false;
 }
 
 /**

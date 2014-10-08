@@ -1868,10 +1868,11 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertTrue($result);
         $deluser = $DB->get_record('user', array('id'=>$user->id), '*', MUST_EXIST);
         $this->assertEquals(1, $deluser->deleted);
-        $this->assertEquals(0, $deluser->picture);
-        $this->assertSame('', $deluser->idnumber);
-        $this->assertSame(md5($user->username), $deluser->email);
-        $this->assertRegExp('/^'.preg_quote($user->email, '/').'\.\d*$/', $deluser->username);
+        // in totara we just mark them as deleted
+        $this->assertEquals($user->picture, $deluser->picture);
+        $this->assertSame($user->idnumber, $deluser->idnumber);
+        $this->assertSame($user->username, $deluser->username);
+        $this->assertSame($user->email, $deluser->email);
 
         $this->assertEquals(1, $DB->count_records('user', array('deleted'=>1)));
 
@@ -1952,6 +1953,9 @@ class core_moodlelib_testcase extends advanced_testcase {
      */
     public function test_date_format_string() {
         global $CFG;
+        if ($CFG->ostype == 'WINDOWS' && get_string('localewincharset', 'langconfig') == '') {
+            $this->markTestSkipped('This test requires \'localewincharset\' to be configured in \'langconfig\' file on Windows environment');
+        }
 
         // Forcing locale and timezone.
         $oldlocale = setlocale(LC_TIME, '0');

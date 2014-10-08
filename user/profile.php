@@ -366,6 +366,9 @@ if ($user->msn && !isset($hiddenfields['msnid'])) {
 // Print the Custom User Fields.
 profile_display_fields($user->id);
 
+// Display totara user information.
+$totararenderer = $PAGE->get_renderer('totara_core', null);
+$totararenderer->print_totara_user_profile($user->id);
 
 if (!isset($hiddenfields['mycourses'])) {
     if ($mycourses = enrol_get_all_users_courses($user->id, true, null, 'visible DESC, sortorder ASC')) {

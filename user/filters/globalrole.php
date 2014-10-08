@@ -57,7 +57,7 @@ class user_filter_globalrole extends user_filter_type {
      * @param object $mform a MoodleForm object to setup
      */
     public function setupForm(&$mform) {
-        $obj =& $mform->addElement('select', $this->_name, $this->_label, $this->get_roles());
+        $obj =& $mform->addElement('select', $this->_name, format_string($this->_label), $this->get_roles());
         $mform->setDefault($this->_name, 0);
         if ($this->_advanced) {
             $mform->setAdvanced($this->_name);
@@ -86,13 +86,16 @@ class user_filter_globalrole extends user_filter_type {
     public function get_sql_filter($data) {
         global $CFG;
         $value = (int)$data['value'];
-
         $timenow = round(time(), 100);
-
+        $params = array();
+        $namecontext = user_filter_type::filter_unique_param('ex_globalrole');
+        $namerole = user_filter_type::filter_unique_param('ex_globalrole');
         $sql = "id IN (SELECT userid
                          FROM {role_assignments} a
-                        WHERE a.contextid=".SYSCONTEXTID." AND a.roleid=$value)";
-        return array($sql, array());
+                        WHERE a.contextid = :{$namecontext} AND a.roleid = :{$namerole})";
+        $params[$namecontext] = SYSCONTEXTID;
+        $params[$namerole] = $value;
+        return array($sql, $params);
     }
 
     /**

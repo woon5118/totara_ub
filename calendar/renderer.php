@@ -256,10 +256,10 @@ class core_calendar_renderer extends plugin_renderer_base {
         $events = calendar_get_upcoming($calendar->courses, $calendar->groups, $calendar->users, 1, 100, $calendar->timestamp_today());
 
         $output  = html_writer::start_tag('div', array('class'=>'header'));
+        $output .= $this->course_filter_selector($returnurl, get_string('dayviewfor', 'calendar'));
         if (calendar_user_can_add_event($calendar->course)) {
             $output .= $this->add_event_button($calendar->course->id, 0, 0, 0, $calendar->time);
         }
-        $output .= $this->course_filter_selector($returnurl, get_string('dayviewfor', 'calendar'));
         $output .= html_writer::end_tag('div');
         // Controls
         $output .= html_writer::tag('div', calendar_top_controls('day', array('id' => $calendar->courseid, 'time' => $calendar->time)), array('class'=>'controls'));
@@ -459,15 +459,20 @@ class core_calendar_renderer extends plugin_renderer_base {
                 }
             }
         }
+        // Apply any relevant module filters
+        calendar_apply_mod_filters($events);
 
         // Extract information: events vs. time
         calendar_events_by_day($events, $date['mon'], $date['year'], $eventsbyday, $durationbyday, $typesbyday, $calendar->courses);
 
         $output  = html_writer::start_tag('div', array('class'=>'header'));
+        $output .= $this->course_filter_selector($returnurl, get_string('detailedmonthviewfor', 'calendar'));
         if (calendar_user_can_add_event($calendar->course)) {
             $output .= $this->add_event_button($calendar->course->id, 0, 0, 0, $calendar->time);
         }
-        $output .= $this->course_filter_selector($returnurl, get_string('detailedmonthviewfor', 'calendar'));
+        $output .= html_writer::start_tag('div', array('class'=>'calendar-mod-filters'));
+        $output .= $this->mod_filter_controls();
+        $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div', array('class'=>'header'));
         // Controls
         $output .= html_writer::tag('div', calendar_top_controls('month', array('id' => $calendar->courseid, 'time' => $calendar->time)), array('class' => 'controls'));
@@ -577,8 +582,9 @@ class core_calendar_renderer extends plugin_renderer_base {
             }
             if (isset($durationbyday[$day])) {
                 $cell->text .= html_writer::start_tag('ul', array('class'=>'events-underway'));
-                foreach($durationbyday[$day] as $eventindex) {
-                    $cell->text .= html_writer::tag('li', '['.format_string($events[$eventindex]->name,true).']', array('class'=>'events-underway'));
+                foreach($durationbyday[$calendar->day] as $eventindex) {
+                    $link = html_writer::link($dayhref, format_string($events[$eventindex]->name, true) . ' (' . get_string('continue'). ')');
+                    $cell->text .= html_writer::tag('li', $link, array('class'=>'events-underway'));
                 }
                 $cell->text .= html_writer::end_tag('ul');
             }
@@ -614,10 +620,10 @@ class core_calendar_renderer extends plugin_renderer_base {
         $events = calendar_get_upcoming($calendar->courses, $calendar->groups, $calendar->users, $futuredays, $maxevents);
 
         $output  = html_writer::start_tag('div', array('class'=>'header'));
+        $output .= $this->course_filter_selector($returnurl, get_string('upcomingeventsfor', 'calendar'));
         if (calendar_user_can_add_event($calendar->course)) {
             $output .= $this->add_event_button($calendar->course->id);
         }
-        $output .= $this->course_filter_selector($returnurl, get_string('upcomingeventsfor', 'calendar'));
         $output .= html_writer::end_tag('div');
 
         if ($events) {
@@ -783,4 +789,42 @@ class core_calendar_renderer extends plugin_renderer_base {
         $html .= html_writer::end_tag('form');
         return $html;
     }
+
+    /**
+     * Displays modules' calendar filter input.
+     * This is done by calling a hook in the module's renderer class.
+     *
+     * @return string html
+     */
+    protected function mod_filter_controls() {
+         global $CFG, $DB;
+
+        $output = '';
+        $mods = $DB->get_records('modules', array('visible' => '1'));
+        foreach ($mods as $mod) {
+            $rendererfile = "{$CFG->dirroot}/mod/{$mod->name}/renderer.php";
+            if (!file_exists($rendererfile)) {
+                continue;
+            }
+            $functionname = "calendar_filter_controls";
+            $modrenderer = $this->page->get_renderer($mod->name);
+            if (!method_exists($modrenderer, $functionname)) {
+                continue;
+            }
+            if (!$filtercontrols = $modrenderer->$functionname()) {
+                continue;
+            }
+            $output .= html_writer::start_tag('fieldset');
+            $output .= html_writer::tag('legend', get_string('pluginname', $mod->name));
+            $output .= html_writer::start_tag('form', array('action' => new moodle_url(qualified_me()), 'method' => 'post', 'id' => 'module_filter_' . $mod->name));
+            // call renderer function to render module filter controls
+            $output .= $filtercontrols;
+            $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => "apply{$mod->name}filter", 'value' => get_string('applyfilter', 'facetoface')));
+            $output .= html_writer::end_tag('form');
+            $output .= html_writer::end_tag('fieldset');
+        }
+
+        return $output;
+    }
+
 }

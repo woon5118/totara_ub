@@ -31,6 +31,7 @@ $scoid = required_param('scoid', PARAM_INT);     // sco ID.
 $mode = optional_param('mode', '', PARAM_ALPHA); // navigation mode.
 $currentorg = optional_param('currentorg', '', PARAM_RAW); // Selected organization.
 $attempt = required_param('attempt', PARAM_INT); // new attempt.
+$currentorg = optional_param('currentorg', '', PARAM_RAW); // selected organization
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('scorm', $id, 0, false, MUST_EXIST);

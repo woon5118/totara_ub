@@ -67,7 +67,7 @@ class user_filter_text extends user_filter_type {
         $objs = array();
         $objs[] = $mform->createElement('select', $this->_name.'_op', null, $this->getOperators());
         $objs[] = $mform->createElement('text', $this->_name, null);
-        $grp =& $mform->addElement('group', $this->_name.'_grp', $this->_label, $objs, '', false);
+        $grp =& $mform->addElement('group', $this->_name.'_grp', format_string($this->_label), $objs, '', false);
         $mform->setType($this->_name, PARAM_RAW);
         $mform->disabledIf($this->_name, $this->_name.'_op', 'eq', 5);
         if ($this->_advanced) {
@@ -107,9 +107,8 @@ class user_filter_text extends user_filter_type {
      */
     public function get_sql_filter($data) {
         global $DB;
-        static $counter = 0;
-        $name = 'ex_text'.$counter++;
 
+        $name = user_filter_type::filter_unique_param('ex_text');
         $operator = $data['operator'];
         $value    = $data['value'];
         $field    = $this->_field;
@@ -117,7 +116,7 @@ class user_filter_text extends user_filter_type {
         $params = array();
 
         if ($operator != 5 and $value === '') {
-            return '';
+            return array('', $params);
         }
 
         switch($operator) {
@@ -146,7 +145,7 @@ class user_filter_text extends user_filter_type {
                 $params[$name] = '';
                 break;
             default:
-                return '';
+                return array('', $params);
         }
         return array($res, $params);
     }

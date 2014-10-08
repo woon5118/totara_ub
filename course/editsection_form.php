@@ -48,8 +48,6 @@ class editsection_form extends moodleform {
         if (!empty($formatoptions)) {
             $elements = $courseformat->create_edit_form_elements($mform, true);
         }
-
-        $mform->_registerCancelButton('cancel');
     }
 
     public function definition_after_data() {

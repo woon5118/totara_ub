@@ -85,6 +85,7 @@ M.core_comment = {
                             if (linktext) {
                                 linktext.set('innerHTML', M.str.moodle.comments + ' ('+obj.count+')');
                             }
+                            /* Not used by Totara
                             for(var i in ids) {
                                 var attributes = {
                                     color: { to: '#06e' },
@@ -93,6 +94,7 @@ M.core_comment = {
                                 var anim = new Y.YUI2.util.ColorAnim(ids[i], attributes);
                                 anim.animate();
                             }
+                            */
                             scope.register_pagination();
                             scope.register_delete_buttons();
                         }
@@ -183,7 +185,7 @@ M.core_comment = {
                     val = val.replace('___time___', list[i].time);
                     val = val.replace('___picture___', list[i].avatar);
                     val = val.replace('___content___', list[i].content);
-                    val = '<li id="'+htmlid+'">'+val+'</li>';
+                    val = '<li id="'+htmlid+'" class="comment-own-post">'+val+'</li>';
                     ret.ids.push(htmlid);
                     html = (val+html);
                 }

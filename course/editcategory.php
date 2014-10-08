@@ -33,6 +33,8 @@ require_once($CFG->libdir.'/coursecatlib.php');
 require_login();
 
 $id = optional_param('id', 0, PARAM_INT);
+$type = optional_param('type', 'course', PARAM_TEXT); // Type of the page to know where we need to return to.
+$itemid = 0; //initalise itemid, as all files in category description has item id 0
 
 $url = new moodle_url('/course/editcategory.php');
 if ($id) {
@@ -78,7 +80,8 @@ $mform = new core_course_editcategory_form(null, array(
     'categoryid' => $id,
     'parent' => $category->parent,
     'context' => $context,
-    'itemid' => $itemid
+    'itemid' => $itemid,
+    'type' => $type
 ));
 $mform->set_data(file_prepare_standard_editor(
     $category,
@@ -92,6 +95,11 @@ $mform->set_data(file_prepare_standard_editor(
 
 $manageurl = new moodle_url('/course/management.php');
 if ($mform->is_cancelled()) {
+    if ($type != 'course') {
+        $manageurl = new moodle_url('/totara/program/manage.php');
+        $manageurl->param('viewtype', $type);
+    }
+
     if ($id) {
         $manageurl->param('categoryid', $id);
     } else if ($parent) {
@@ -107,8 +115,22 @@ if ($mform->is_cancelled()) {
     } else {
         $category = coursecat::create($data, $mform->get_description_editor_options());
     }
-    $manageurl->param('categoryid', $category->id);
-    redirect($manageurl);
+
+    if ($type == 'course') {
+        $manageurl->param('categoryid', $category->id);
+        redirect($manageurl);
+    } else {
+        redirect(new moodle_url('/totara/program/manage.php',
+                 array('categoryid' => $category->id, 'viewtype' => $type)));
+    }
+}
+
+// Page "Add new category" (with "Top" as a parent) does not exist in navigation.
+// We pretend we are on course management page.
+if (empty($id) && empty($parent) && $type == 'course') {
+    navigation_node::override_active_url($manageurl);
+} else if (empty($id) && empty($parent)) {
+    navigation_node::override_active_url(new moodle_url('/totara/program/manage.php', array('viewtype' => $type)));
 }
 
 echo $OUTPUT->header();

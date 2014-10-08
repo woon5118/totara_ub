@@ -74,8 +74,9 @@ if ($action == 'updatecomponent' && confirm_sesskey()) {
     }
 }
 
-// Get current Moodle version
-$current_version = $CFG->release;
+// Get current Totara version
+require($CFG->dirroot.'/version.php');
+$current_version = $TOTARA->release;
 
 // Calculate list of versions
 $versions = array();

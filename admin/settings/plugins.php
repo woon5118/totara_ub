@@ -83,12 +83,17 @@ if ($hassiteconfig) {
                                             new lang_string('forgottenpassword', 'auth'), ''));
     $temp->add(new admin_setting_confightmleditor('auth_instructions', new lang_string('instructions', 'auth'),
                                                 new lang_string('authinstructions', 'auth'), ''));
+    // TODO SCANMSG: re-add once force change feature integrated
+    //$temp->add(new admin_setting_confightmleditor('auth_forcedchangeinstructions', new lang_string('forcedchangeinstructions', 'auth'),
+    //                                        new lang_string('authforcedchangeinstructions', 'auth'), ''));
     $temp->add(new admin_setting_configtext('allowemailaddresses', new lang_string('allowemailaddresses', 'admin'), new lang_string('configallowemailaddresses', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configtext('denyemailaddresses', new lang_string('denyemailaddresses', 'admin'), new lang_string('configdenyemailaddresses', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configcheckbox('verifychangedemail', new lang_string('verifychangedemail', 'admin'), new lang_string('configverifychangedemail', 'admin'), 1));
 
     $temp->add(new admin_setting_configtext('recaptchapublickey', new lang_string('recaptchapublickey', 'admin'), new lang_string('configrecaptchapublickey', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configtext('recaptchaprivatekey', new lang_string('recaptchaprivatekey', 'admin'), new lang_string('configrecaptchaprivatekey', 'admin'), '', PARAM_NOTAGS));
+    $temp->add(new admin_setting_configcheckbox('recaptchaloginform', new lang_string('recaptchaloginform', 'admin'), new lang_string('configrecaptchaloginform', 'admin'), 0));
+    $temp->add(new admin_setting_configcheckbox('recaptchaforgotform', new lang_string('recaptchaforgotform', 'admin'), new lang_string('configrecaptchaforgotform', 'admin'), 0));
     $ADMIN->add('authsettings', $temp);
 
     $temp = new admin_externalpage('authtestsettings', get_string('testsettings', 'core_auth'), new moodle_url("/auth/test_settings.php"), 'moodle/site:config', true);
@@ -465,6 +470,15 @@ if ($hassiteconfig) {
             include($settingspath);
             $ADMIN->add('cachestores', $settings);
         }
+    }
+}
+
+// Add any settings from totara modules.
+foreach (get_plugin_list('totara') as $plugin => $plugindir) {
+    $settings_path = "$plugindir/settings.php";
+    if (file_exists($settings_path)) {
+        include($settings_path);
+        continue;
     }
 }
 

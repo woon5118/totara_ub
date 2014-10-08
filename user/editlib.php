@@ -297,7 +297,7 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
         $mform->setDefault('country', $CFG->country);
     }
 
-    $choices = get_list_of_timezones();
+    $choices = get_list_of_timezones($user->timezone);
     $choices['99'] = get_string('serverlocaltime');
     if ($CFG->forcetimezone != 99) {
         $mform->addElement('static', 'forcedtimezone', get_string('timezone'), $choices[$CFG->forcetimezone]);
@@ -392,6 +392,9 @@ function useredit_shared_definition(&$mform, $editoroptions = null, $filemanager
 
     $mform->addElement('text', 'idnumber', get_string('idnumber'), 'maxlength="255" size="25"');
     $mform->setType('idnumber', PARAM_NOTAGS);
+    if (!has_capability('totara/core:updateuseridnumber', context_system::instance())) {
+        $mform->freeze('idnumber');
+    }
 
     $mform->addElement('text', 'institution', get_string('institution'), 'maxlength="255" size="25"');
     $mform->setType('institution', PARAM_TEXT);

@@ -1262,7 +1262,7 @@ function upgrade_log($type, $plugin, $info, $details=null, $backtrace=null) {
  * @global object
  */
 function upgrade_started($preinstall=false) {
-    global $CFG, $DB, $PAGE, $OUTPUT;
+    global $CFG, $DB, $PAGE, $OUTPUT, $TOTARA;
 
     static $started = false;
 
@@ -1278,7 +1278,7 @@ function upgrade_started($preinstall=false) {
             $strupgrade  = get_string('upgradingversion', 'admin');
             $PAGE->set_pagelayout('maintenance');
             upgrade_init_javascript();
-            $PAGE->set_title($strupgrade.' - Moodle '.$CFG->target_release);
+            $PAGE->set_title($strupgrade.' - Totara '.$TOTARA->release);
             $PAGE->set_heading($strupgrade);
             $PAGE->navbar->add($strupgrade);
             $PAGE->set_cacheable(false);
@@ -1511,7 +1511,8 @@ function install_core($version, $verbose) {
         events_update_definition('moodle');
         \core\task\manager::reset_scheduled_tasks_for_component('moodle');
         message_update_providers('moodle');
-
+        // Populate the timezone table.
+        totara_import_timezonelist();
         // Write default settings unconditionally
         admin_apply_default_settings(NULL, true);
 
@@ -1532,7 +1533,7 @@ function install_core($version, $verbose) {
  * @return void, may throw exception
  */
 function upgrade_core($version, $verbose) {
-    global $CFG, $SITE, $DB, $COURSE;
+    global $CFG, $SITE, $DB, $COURSE, $TOTARA;
 
     raise_memory_limit(MEMORY_EXTRA);
 
@@ -1603,7 +1604,13 @@ function upgrade_noncore($verbose) {
     global $CFG;
 
     raise_memory_limit(MEMORY_EXTRA);
-
+    // Upgrade internationalisation first.
+    print_upgrade_part_start('Totara', false, $verbose);
+    // Upgrade all language packs if we can.
+    totara_upgrade_installed_languages();
+    // Ensure timezones are updated.
+    totara_import_timezonelist();
+    print_upgrade_part_end('Totara', false, $verbose);
     // upgrade all plugins types
     try {
         // Reset caches before any output.

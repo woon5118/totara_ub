@@ -30,6 +30,9 @@ if (isloggedin()) {
 $temp->add(new admin_setting_configtext('supportname', new lang_string('supportname', 'admin'), new lang_string('configsupportname', 'admin'), $primaryadminname, PARAM_NOTAGS));
 $temp->add(new admin_setting_configtext('supportemail', new lang_string('supportemail', 'admin'), new lang_string('configsupportemail', 'admin'), $primaryadminemail, PARAM_NOTAGS));
 $temp->add(new admin_setting_configtext('supportpage', new lang_string('supportpage', 'admin'), new lang_string('configsupportpage', 'admin'), '', PARAM_URL));
+$temp->add(new admin_setting_configtext('orgname', new lang_string('orgname', 'admin'), new lang_string('orgnamehelp', 'admin'), '', PARAM_NOTAGS));
+$temp->add(new admin_setting_configtext('techsupportemail', new lang_string('techsupportemail', 'admin'), new lang_string('techsupportemailhelp', 'admin'), '', PARAM_NOTAGS));
+$temp->add(new admin_setting_configtext('techsupportphone', new lang_string('techsupportphone', 'admin'), new lang_string('techsupportphonehelp', 'admin'), '', PARAM_NOTAGS));
 $ADMIN->add('server', $temp);
 
 
@@ -193,7 +196,7 @@ $temp->add(new admin_setting_configtext('curltimeoutkbitrate', new lang_string('
 $ADMIN->add('server', $temp);
 
 
-$ADMIN->add('server', new admin_externalpage('adminregistration', new lang_string('hubs', 'admin'),
+$ADMIN->add('server', new admin_externalpage('registrationhubs', new lang_string('hubs', 'admin'),
     "$CFG->wwwroot/$CFG->admin/registration/index.php"));
 
 // "update notifications" settingpage
@@ -217,5 +220,8 @@ if (empty($CFG->disableupdatenotifications)) {
                                                 new lang_string('updatenotifybuilds_desc', 'core_admin'), 0));
     $ADMIN->add('server', $temp);
 }
+
+//New cron administrative page
+$ADMIN->add('server', new admin_externalpage('cron_settings', new lang_string('cron_settings', 'admin'), "$CFG->wwwroot/$CFG->admin/cronsettings.php"));
 
 } // end of speedup

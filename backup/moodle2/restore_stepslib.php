@@ -487,8 +487,6 @@ class restore_rebuild_course_cache extends restore_execution_step {
 
         // Rebuild cache now that all sections are in place
         rebuild_course_cache($this->get_courseid());
-        cache_helper::purge_by_event('changesincourse');
-        cache_helper::purge_by_event('changesincoursecat');
     }
 }
 
@@ -890,8 +888,6 @@ class restore_groups_structure_step extends restore_structure_step {
         }
         // Save the id mapping
         $this->set_mapping('group', $oldid, $newitemid, $restorefiles);
-        // Invalidate the course group data cache just in case.
-        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($data->courseid));
     }
 
     public function process_grouping($data) {
@@ -935,8 +931,6 @@ class restore_groups_structure_step extends restore_structure_step {
         }
         // Save the id mapping
         $this->set_mapping('grouping', $oldid, $newitemid, $restorefiles);
-        // Invalidate the course group data cache just in case.
-        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($data->courseid));
     }
 
     public function process_grouping_group($data) {
@@ -954,8 +948,6 @@ class restore_groups_structure_step extends restore_structure_step {
         $this->add_related_files('group', 'description', 'group');
         // Add grouping related files, matching with "grouping" mappings
         $this->add_related_files('grouping', 'description', 'grouping');
-        // Invalidate the course group data.
-        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($this->get_courseid()));
     }
 
 }
@@ -1426,7 +1418,7 @@ class restore_course_structure_step extends restore_structure_step {
         $course = new restore_path_element('course', '/course');
         $category = new restore_path_element('category', '/course/category');
         $tag = new restore_path_element('tag', '/course/tags/tag');
-        $allowed_module = new restore_path_element('allowed_module', '/course/allowed_modules/module');
+        $custom_field = new restore_path_element('custom_field', '/course/custom_fields/custom_field');
 
         // Apply for 'format' plugins optional paths at course level
         $this->add_plugin_structure('format', $course);
@@ -1446,7 +1438,8 @@ class restore_course_structure_step extends restore_structure_step {
         // Apply for local plugins optional paths at course level
         $this->add_plugin_structure('local', $course);
 
-        return array($course, $category, $tag, $allowed_module);
+        return array($course, $category, $tag, $custom_field);
+
     }
 
     /**
@@ -1499,6 +1492,7 @@ class restore_course_structure_step extends restore_structure_step {
         if (empty($CFG->enablecompletion)) {
             $data->enablecompletion = 0;
             $data->completionstartonenrol = 0;
+            $data->completionprogressonview = 0;
             $data->completionnotify = 0;
         }
         $languages = get_string_manager()->get_list_of_translations(); // Get languages for quick search
@@ -1510,6 +1504,11 @@ class restore_course_structure_step extends restore_structure_step {
         if (!array_key_exists($data->theme, $themes) || empty($CFG->allowcoursethemes)) {
             $data->theme = '';
         }
+
+        // This is for when restoring from a moodle version 1 backup
+        $data->icon = str_replace(' ', '-', $data->icon);
+        $data->icon = str_replace('.png', '', $data->icon);
+        $data->icon = str_replace('.gif', '', $data->icon);
 
         // Check if this is an old SCORM course format.
         if ($data->format == 'scorm') {
@@ -1563,12 +1562,38 @@ class restore_course_structure_step extends restore_structure_step {
         }
     }
 
+    public function process_custom_field($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        if ($data->field_data) {
+            if (!$field = $DB->get_record('course_info_field', array('shortname' => $data->field_name))) {
+                debugging("Custom field [{$data->field_name}] cannot be restored because it doesn't exist in the target database");
+            } else if ($field->datatype != $data->field_type) {
+                debugging("Custom field [{$data->field_name}] cannot be restored because there is a data type mismatch" .
+                        " - target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
+            } else {
+                if ($customfield = $DB->get_record('course_info_data', array('fieldid' => $field->id, 'courseid' => $this->get_courseid()))) {
+                    $customfield->data = $data->field_data;
+                    $DB->update_record('course_info_data', $customfield);
+                } else {
+                    $customfield = new stdClass();
+                    $customfield->id = 0;
+                    $customfield->courseid = $this->get_courseid();
+                    $customfield->fieldid = $field->id;
+                    $customfield->data    = $data->field_data;
+                    $DB->insert_record('course_info_data', $customfield);
+                }
+            }
+        }
+    }
+
     protected function after_execute() {
         global $DB;
 
         // Add course related files, without itemid to match
         $this->add_related_files('course', 'summary', null);
-        $this->add_related_files('course', 'overviewfiles', null);
 
         // Deal with legacy allowed modules.
         if ($this->legacyrestrictmodules) {
@@ -1973,14 +1998,6 @@ class restore_filters_structure_step extends restore_structure_step {
 
         $data = (object)$data;
 
-        if (strpos($data->filter, 'filter/') === 0) {
-            $data->filter = substr($data->filter, 7);
-
-        } else if (strpos($data->filter, '/') !== false) {
-            // Unsupported old filter.
-            return;
-        }
-
         if (!filter_is_enabled($data->filter)) { // Not installed or not enabled, nothing to do
             return;
         }
@@ -1990,14 +2007,6 @@ class restore_filters_structure_step extends restore_structure_step {
     public function process_config($data) {
 
         $data = (object)$data;
-
-        if (strpos($data->filter, 'filter/') === 0) {
-            $data->filter = substr($data->filter, 7);
-
-        } else if (strpos($data->filter, '/') !== false) {
-            // Unsupported old filter.
-            return;
-        }
 
         if (!filter_is_enabled($data->filter)) { // Not installed or not enabled, nothing to do
             return;
@@ -2051,7 +2060,7 @@ class restore_comments_structure_step extends restore_structure_step {
 }
 
 /**
- * This structure steps restores the badges and their configs
+ * This structure steps restores the badges and their configs.
  */
 class restore_badges_structure_step extends restore_structure_step {
 
@@ -2108,13 +2117,19 @@ class restore_badges_structure_step extends restore_structure_step {
     }
 
     public function process_badge($data) {
-        global $DB, $CFG;
+        global $DB, $CFG, $USER;
 
         require_once($CFG->libdir . '/badgeslib.php');
 
         $data = (object)$data;
         $data->usercreated = $this->get_mappingid('user', $data->usercreated);
+        if (empty($data->usercreated)) {
+            $data->usercreated = $USER->id;
+        }
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
+        if (empty($data->usermodified)) {
+            $data->usermodified = $USER->id;
+        }
 
         // We'll restore the badge image.
         $restorefiles = true;
@@ -2139,7 +2154,7 @@ class restore_badges_structure_step extends restore_structure_step {
                 'messagesubject' => $data->messagesubject,
                 'attachment'     => $data->attachment,
                 'notification'   => $data->notification,
-                'status'         => BADGE_STATUS_INACTIVE,
+                'status'         => $data->status != BADGE_STATUS_ARCHIVED ? BADGE_STATUS_INACTIVE : BADGE_STATUS_ARCHIVED,
                 'nextcron'       => $this->apply_date_offset($data->nextcron)
         );
 
@@ -2153,9 +2168,9 @@ class restore_badges_structure_step extends restore_structure_step {
         $data = (object)$data;
 
         $params = array(
-                'badgeid'      => $this->get_new_parentid('badge'),
-                'criteriatype' => $data->criteriatype,
-                'method'       => $data->method
+            'badgeid'      => $this->get_new_parentid('badge'),
+            'criteriatype' => $data->criteriatype,
+            'method'       => $data->method
         );
         $newid = $DB->insert_record('badge_criteria', $params);
         $this->set_mapping('criterion', $data->id, $newid);
@@ -2495,6 +2510,8 @@ class restore_course_completion_structure_step extends restore_structure_step {
         $data->course = $this->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
+        // If course is set to start completion on enrol, then users may be already enrolled and completion records may exist already at this point.
+        $startonenrol = $DB->get_field('course', 'completionstartonenrol', array('id' => $data->course));
         if (!empty($data->userid)) {
             $params = array(
                 'userid' => $data->userid,
@@ -2504,7 +2521,15 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'timecompleted' => $this->apply_date_offset($data->timecompleted),
                 'reaggregate' => $data->reaggregate
             );
-            $DB->insert_record('course_completions', $params);
+            // Check if completion records actually exist (course_completions has unique index on userid|course).
+            if ($startonenrol && ($ccid = $DB->get_field('course_completions', 'id', array('userid' => $params['userid'], 'course' => $params['course'])))) {
+                // We can add the returned course_completions record id to the array and update the db.
+                $params['id'] = $ccid;
+                $DB->update_record('course_completions', $params);
+            } else {
+                // Insert new completion record.
+                $DB->insert_record('course_completions', $params);
+            }
         }
     }
 
@@ -3310,6 +3335,7 @@ class restore_userscompletion_structure_step extends restore_structure_step {
         $data->coursemoduleid = $this->task->get_moduleid();
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        $data->timecompleted = $this->apply_date_offset($data->timecompleted);
 
         // Find the existing record
         $existing = $DB->get_record('course_modules_completion', array(

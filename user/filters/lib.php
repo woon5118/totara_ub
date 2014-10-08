@@ -66,7 +66,12 @@ class user_filtering {
             $fieldnames = array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'email' => 1, 'city' => 1, 'country' => 1,
                                 'confirmed' => 1, 'suspended' => 1, 'profile' => 1, 'courserole' => 1, 'systemrole' => 1,
                                 'cohort' => 1, 'firstaccess' => 1, 'lastaccess' => 1, 'neveraccessed' => 1, 'timemodified' => 1,
-                                'nevermodified' => 1, 'username' => 1, 'auth' => 1, 'mnethostid' => 1);
+                                'nevermodified' => 1, 'username' => 1, 'auth' => 1, 'mnethostid' => 1, 'totarasync'=>1);
+        }
+
+        $systemcontext = context_system::instance();
+        if (has_capability('totara/core:seedeletedusers', $systemcontext)) {
+            $fieldnames['deleted'] = 1;
         }
 
         $this->_fields  = array();
@@ -149,6 +154,8 @@ class user_filtering {
             case 'timemodified': return new user_filter_date('timemodified', get_string('lastmodified'), $advanced, 'timemodified');
             case 'nevermodified': return new user_filter_checkbox('nevermodified', get_string('nevermodified', 'filters'), $advanced, array('timemodified', 'timecreated'), array('timemodified_sck', 'timemodified_eck'));
             case 'cohort':      return new user_filter_cohort($advanced);
+            case 'deleted':   return new user_filter_yesno('deleted', get_string('deleted', 'totara_core'), $advanced, 'deleted');
+            case 'totarasync':  return new user_filter_yesno('totarasync', get_string('totarasync', 'tool_totara_sync'), $advanced, 'totarasync');
             case 'auth':
                 $plugins = core_component::get_plugin_list('auth');
                 $choices = array();
@@ -281,9 +288,23 @@ class user_filter_type {
     }
 
     /**
+     * Attempt to ensure an SQL named param is unique by incrementing a counter global across filter classes
+     *
+     * @param string $name the param name to make unique
+     * @return string the unique string
+     */
+    static function filter_unique_param($name) {
+
+        static $counter = 0;
+        $param = $name . $counter++;
+
+        return $param;
+    }
+
+    /**
      * Returns the condition to be used with SQL where
      * @param array $data filter settings
-     * @return string the filtering condition or null if the filter is disabled
+     * @return array(string $sql, array $parameters)
      */
     public function get_sql_filter($data) {
         print_error('mustbeoveride', 'debug', '', 'get_sql_filter');

@@ -40,6 +40,7 @@ class login_forgot_password_form extends moodleform {
      * Define the forgot password form.
      */
     function definition() {
+        global $CFG;
         $mform    = $this->_form;
         $mform->setDisableShortforms(true);
 
@@ -55,6 +56,11 @@ class login_forgot_password_form extends moodleform {
 
         $mform->addElement('text', 'email', get_string('email'));
         $mform->setType('email', PARAM_RAW);
+
+        if ($this->captcha_enabled()) {
+            $mform->addElement('recaptcha', 'recaptcha_element', get_string('recaptcha', 'auth'), array('https' => $CFG->loginhttps));
+            $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
+        }
 
         $submitlabel = get_string('search');
         $mform->addElement('submit', 'submitbuttonemail', $submitlabel);
@@ -104,7 +110,33 @@ class login_forgot_password_form extends moodleform {
             }
         }
 
+        if ($this->captcha_enabled()) {
+            $recaptcha_element = $this->_form->getElement('recaptcha_element');
+            if (!empty($this->_form->_submitValues['recaptcha_challenge_field'])) {
+                $challenge_field = $this->_form->_submitValues['recaptcha_challenge_field'];
+                $response_field = $this->_form->_submitValues['recaptcha_response_field'];
+                if (true !== ($result = $recaptcha_element->verify($challenge_field, $response_field))) {
+                    if ($result == 'incorrect-captcha-sol') {
+                        $errors['recaptcha_element'] = get_string('incorrectpleasetryagain', 'auth');
+                    } else {
+                        $errors['recaptcha_element'] = $result;
+                    }
+                }
+            } else {
+                $errors['recaptcha_element'] = get_string('missingrecaptchachallengefield');
+            }
+        }
+
         return $errors;
+    }
+
+    /**
+     * Returns whether or not the captcha element is enabled, and the admin settings fulfil its requirements.
+     * @return bool
+     */
+    function captcha_enabled() {
+        global $CFG;
+        return !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) && !empty($CFG->recaptchaforgotform);
     }
 
 }

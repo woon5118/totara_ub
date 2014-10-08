@@ -324,6 +324,14 @@ class backup_controller extends base_controller {
         return $this->plan->get_results();
     }
 
+    public function log($message, $level, $a = null, $depth = null, $display = false) {
+        backup_helper::log($message, $level, $a, $depth, $display, $this->logger);
+    }
+
+    public function update_plan_setting($name, $value) {
+        $this->plan->set_setting($name, $value);
+    }
+
     /**
      * Save controller information
      *

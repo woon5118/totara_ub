@@ -70,7 +70,7 @@ class user_filter_courserole extends user_filter_type {
         $objs[] = $mform->createElement('select', $this->_name .'_rl', null, $this->get_roles());
         $objs[] = $mform->createElement('select', $this->_name .'_ct', null, $this->get_course_categories());
         $objs[] = $mform->createElement('text', $this->_name, null);
-        $grp =& $mform->addElement('group', $this->_name.'_grp', $this->_label, $objs, '', false);
+        $grp =& $mform->addElement('group', $this->_name.'_grp', format_string($this->_label), $objs, '', false);
         $mform->setType($this->_name, PARAM_TEXT);
         if ($this->_advanced) {
             $mform->setAdvanced($this->_name.'_grp');
@@ -106,8 +106,8 @@ class user_filter_courserole extends user_filter_type {
      */
     public function get_sql_filter($data) {
         global $CFG, $DB;
-        static $counter = 0;
-        $pref = 'ex_courserole'.($counter++).'_';
+
+        $pref = user_filter_type::filter_unique_param('ex_courserole') . '_';
 
         $value      = $data['value'];
         $roleid     = $data['roleid'];

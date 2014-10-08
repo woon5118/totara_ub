@@ -40,7 +40,11 @@ class core_completionlib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        $dbman = $DB->get_manager();
         $DB = $this->getMock(get_class($DB));
+        $DB->expects($this->any())
+            ->method('get_manager')
+            ->will($this->returnValue($dbman));
         $CFG->enablecompletion = COMPLETION_ENABLED;
         $USER = (object)array('id' =>314159);
     }
@@ -133,6 +137,7 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_update_state() {
+        global $DB;
         $this->mock_setup();
 
         $c = $this->getMock('completion_info', array('is_enabled', 'get_data', 'internal_get_state', 'internal_set_data'), array((object)array('id'=>42)));
@@ -200,8 +205,8 @@ class core_completionlib_testcase extends advanced_testcase {
             ->with($cm, $changed);
         $c->update_state($cm, COMPLETION_INCOMPLETE);
 
-        // Auto, change state.
-        $cm = (object)array('id'=>13, 'course'=>42, 'completion'=>COMPLETION_TRACKING_AUTOMATIC);
+        // Auto, change state
+        $cm = (object)array('id' => 13, 'course' => 42, 'module' => 1, 'completion' => COMPLETION_TRACKING_AUTOMATIC);
         $current = (object)array('completionstate'=>COMPLETION_COMPLETE);
         $c->expects($this->at(0))
             ->method('is_enabled')
@@ -220,6 +225,10 @@ class core_completionlib_testcase extends advanced_testcase {
         $c->expects($this->at(3))
             ->method('internal_set_data')
             ->with($cm, $changed);
+        $DB->expects($this->once())
+            ->method('get_field')
+            ->with('course_modules_completion', 'id', $this->anything())
+            ->will($this->returnValue('1'));
         $c->update_state($cm, COMPLETION_COMPLETE_PASS);
     }
 
@@ -427,6 +436,10 @@ class core_completionlib_testcase extends advanced_testcase {
 
         // 3. Current user, single record, not from cache.
         $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(1))
             ->method('get_record')
             ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>314159))
             ->will($this->returnValue($sillyrecord));
@@ -436,7 +449,11 @@ class core_completionlib_testcase extends advanced_testcase {
         // When checking time(), allow for second overlaps.
         $this->assertTrue(time()-$SESSION->completioncache[42]['updated']<2);
 
-        // 4. Current user, 'whole course', but from cache.
+        // 4. Current user, 'whole course', but from cache
+        $DB->expects($this->at(0))
+            ->method('record_exists')
+            ->with('course_completions', array('course' => 42, 'userid' => 314159, 'invalidatecache' => 0))
+            ->will($this->returnValue(true));
         $result = $c->get_data($cm, true);
         $this->assertEquals($sillyrecord, $result);
 
@@ -446,6 +463,22 @@ class core_completionlib_testcase extends advanced_testcase {
         $SESSION->completioncache[17]['updated']=$now;
         $SESSION->completioncache[39]['updated']=72; // Also a long time ago.
         $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(1))
+            ->method('record_exists')
+            ->with('course_completions', array('course' => 17, 'userid' => 314159, 'invalidatecache' => 0))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(2))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 39, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(3))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(4))
             ->method('get_record')
             ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>314159))
             ->will($this->returnValue($sillyrecord));
@@ -461,9 +494,13 @@ class core_completionlib_testcase extends advanced_testcase {
         // 6. Current user, 'whole course' and record not in cache.
         unset($SESSION->completioncache);
 
-        // Scenario: Completion data exists for one CMid.
-        $basicrecord = (object)array('coursemoduleid'=>13);
+        // Scenario: Completion data exists for one CMid
         $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $basicrecord = (object)array('coursemoduleid'=>13);
+        $DB->expects($this->at(1))
             ->method('get_records_sql')
             ->will($this->returnValue(array('1'=>$basicrecord)));
 

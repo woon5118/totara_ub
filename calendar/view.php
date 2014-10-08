@@ -92,6 +92,7 @@ if ($courseid != SITEID && !empty($courseid)) {
 require_course_login($course);
 
 $calendar = new calendar_information(0, 0, 0, $time);
+
 $calendar->prepare_for_view($course, $courses);
 
 $pagetitle = '';
@@ -104,6 +105,7 @@ switch($view) {
         $pagetitle = get_string('dayviewtitle', 'calendar', userdate($time, get_string('strftimedaydate')));
     break;
     case 'month':
+        calendar_set_mod_filters();
         $PAGE->navbar->add(userdate($time, get_string('strftimemonthyear')));
         $pagetitle = get_string('detailedmonthviewtitle', 'calendar', userdate($time, get_string('strftimemonthyear')));
     break;
@@ -117,6 +119,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title("$course->shortname: $strcalendar: $pagetitle");
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->set_button(calendar_preferences_button($course));
+$PAGE->set_totara_menu_selected('calendar');
 
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer, true, $view);

@@ -616,7 +616,22 @@ class auth_plugin_ldap extends auth_plugin_base {
                 }
                 $user->confirmed = 1;
                 if ($user->firstaccess == 0) {
-                    $user->firstaccess = time();
+                    $now = time();
+                    $DB->set_field('user', 'firstaccess', $now, array('id'=>$user->id));
+                    $user->firstaccess = $now;
+
+                    $event = \totara_core\event\user_firstlogin::create(
+                        array(
+                            'objectid' => $user->id,
+                            'context' => context_user::instance($user->id),
+                            'other' => array(
+                                'username' => $user->username,
+                                'firstaccess' => $now,
+                            ),
+                        )
+                    );
+                    $event->add_record_snapshot('user', $user);
+                    $event->trigger();
                 }
                 user_update_user($user, false);
                 return AUTH_CONFIRM_OK;

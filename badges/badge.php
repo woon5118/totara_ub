@@ -37,12 +37,11 @@ $badge = new issued_badge($id);
 
 if ($bake && ($badge->recipient->id == $USER->id)) {
     $name = str_replace(' ', '_', $badge->badgeclass['name']) . '.png';
-    ob_start();
     $file = badges_bake($id, $badge->badgeid);
     header('Content-Type: image/png');
     header('Content-Disposition: attachment; filename="'. $name .'"');
     readfile($file);
-    ob_flush();
+    die;
 }
 
 $PAGE->set_url('/badges/badge.php', array('hash' => $id));

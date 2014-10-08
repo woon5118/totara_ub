@@ -42,7 +42,7 @@ class core_statslib_testcase extends advanced_testcase {
     const DAY = 1272672000;
 
     /** The timezone to use for testing **/
-    const TIMEZONE = 0;
+    const TIMEZONE = 'Pacific/Auckland';
 
     /** @var array The list of temporary tables created for the statistic calculations **/
     protected $tables = array('temp_log1', 'temp_log2', 'temp_stats_daily', 'temp_stats_user_daily');
@@ -95,14 +95,9 @@ class core_statslib_testcase extends advanced_testcase {
         $CFG->statslastdaily          = 0;
         $CFG->statslastexecution      = 0;
 
-        // Figure out the broken day start so I can figure out when to the start time should be.
-        $time   = time();
-        $offset = get_timezone_offset($CFG->timezone);
-        $stime  = $time + $offset;
-        $stime  = intval($stime / (60*60*24)) * 60*60*24;
-        $stime -= $offset;
-
-        $shour  = intval(($time - $stime) / (60*60));
+        // Get the current hour.
+        $time  = new DateTime('now', new DateTimeZone(self::TIMEZONE));
+        $shour = intval($time->format('H'));
 
         $CFG->statsruntimestarthour   = $shour;
         $CFG->statsruntimestartminute = 0;

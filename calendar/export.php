@@ -99,6 +99,7 @@ if ($course !== NULL) {
     $url->param('course', $course->id);
 }
 $PAGE->set_url($url);
+$PAGE->set_totara_menu_selected('calendar');
 
 $calendar = new calendar_information(0, 0, 0, $time);
 $calendar->prepare_for_view($course, $courses);

@@ -97,7 +97,7 @@ function feedback_get_xml_data($feedbackid) {
         $data .= $space.$space.$space.'<ITEMTEXT>'."\n";
         //start of CDATA
         $data .= $space.$space.$space.$space.'<![CDATA[';
-        $data .= $item->name;
+        $data .= format_string($item->name);
         //end of CDATA
         $data .= ']]>'."\n";
         //end of itemtext
@@ -107,7 +107,7 @@ function feedback_get_xml_data($feedbackid) {
         $data .= $space.$space.$space.'<ITEMLABEL>'."\n";
         //start of CDATA
         $data .= $space.$space.$space.$space.'<![CDATA[';
-        $data .= $item->label;
+        $data .= format_string($item->label);
         //end of CDATA
         $data .= ']]>'."\n";
         //end of itemtext
@@ -147,7 +147,7 @@ function feedback_get_xml_data($feedbackid) {
         $data .= $space.$space.$space.'<DEPENDVALUE>'."\n";
         //start of CDATA
         $data .= $space.$space.$space.$space.'<![CDATA[';
-        $data .= $item->dependvalue;
+        $data .= format_string($item->dependvalue);
         //end of CDATA
         $data .= ']]>'."\n";
         //end of dependvalue

@@ -17,8 +17,7 @@ Feature: Authentication
     Given the following "users" exist:
       | username | password | firstname | lastname | email |
       | testuser | testuser | Test | User | moodle@moodlemoodle.com |
-    And I am on homepage
-    When I follow "Log in"
+    And I am on loginpage
     And I set the field "Username" to "testuser"
     And I set the field "Password" to "testuser"
     And I press "Log in"
@@ -28,8 +27,7 @@ Feature: Authentication
     Given the following "users" exist:
       | username | password | firstname | lastname | email |
       | testuser | testuser | Test | User | moodle@moodlemoodle.com |
-    And I am on homepage
-    When I follow "Log in"
+    And I am on loginpage
     And I set the field "Username" to "testuser"
     And I set the field "Password" to "unexisting"
     And I press "Log in"

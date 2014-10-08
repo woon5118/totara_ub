@@ -1210,9 +1210,24 @@ class core_course_renderer extends plugin_renderer_base {
 
         // course name
         $coursename = $chelper->get_course_formatted_name($course);
-        $coursenamelink = html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
-                                            $coursename, array('class' => $course->visible ? '' : 'dimmed'));
+        $dimmed = '';
+        if (empty($CFG->audiencevisibility)) {
+            if (!$course->visible) {
+                $dimmed = 'dimmed';
+            }
+        } else {
+            require_once($CFG->dirroot . '/totara/cohort/lib.php');
+            if ($course->audiencevisible == COHORT_VISIBLE_NONE) {
+                $dimmed = 'dimmed';
+            }
+        }
+        $coursenamelink = html_writer::link(
+            new moodle_url('/course/view.php', array('id' => $course->id)),
+            $coursename,
+            array('class' => $dimmed, 'style' => 'background-image:url(' . totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE) . ')')
+        );
         $content .= html_writer::tag($nametag, $coursenamelink, array('class' => 'coursename'));
+
         // If we display course in collapsed form but the course has summary or course contacts, display the link to the info page.
         $content .= html_writer::start_tag('div', array('class' => 'moreinfo'));
         if ($chelper->get_show_courses() < self::COURSECAT_SHOW_COURSES_EXPANDED) {
@@ -1562,6 +1577,8 @@ class core_course_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function coursecat_category(coursecat_helper $chelper, $coursecat, $depth) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
         // open category tag
         $classes = array('category');
         if (empty($coursecat->visible)) {
@@ -1596,16 +1613,22 @@ class core_course_renderer extends plugin_renderer_base {
             'data-type' => self::COURSECAT_TYPE_CATEGORY,
         ));
 
-        // category name
+        // Category name.
         $categoryname = $coursecat->get_formatted_name();
+        $categorycount = totara_get_category_item_count($coursecat->id, 'course');
+        // Don't show category if there is nothing to show and the user is not a site admin
+        // or a user with capabilities to add course to this category.
+        $categorycontext = context_coursecat::instance($coursecat->id);
+        $capabilities = array('moodle/course:create', 'moodle/category:viewhiddencategories', 'moodle/category:manage');
+        $nohascapabilities = !is_siteadmin() && !has_any_capability($capabilities, $categorycontext);
+        if (!empty($CFG->audiencevisibility) && $categorycount == 0 && $nohascapabilities) {
+            return '';
+        }
         $categoryname = html_writer::link(new moodle_url('/course/index.php',
                 array('categoryid' => $coursecat->id)),
                 $categoryname);
-        if ($chelper->get_show_courses() == self::COURSECAT_SHOW_COURSES_COUNT
-                && ($coursescount = $coursecat->get_courses_count())) {
-            $categoryname .= html_writer::tag('span', ' ('. $coursescount.')',
-                    array('title' => get_string('numberofcourses'), 'class' => 'numberofcourse'));
-        }
+        $categoryname .= html_writer::tag('span', ' (' . $categorycount . ')',
+                        array('title' => get_string('numberofcourses')));
         $content .= html_writer::start_tag('div', array('class' => 'info'));
 
         $content .= html_writer::tag(($depth > 1) ? 'h4' : 'h3', $categoryname, array('class' => 'categoryname'));

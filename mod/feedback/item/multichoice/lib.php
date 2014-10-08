@@ -217,6 +217,7 @@ class feedback_item_multichoice extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
         global $OUTPUT;
+        $align = right_to_left() ? 'right' : 'left';
         $sep_dec = get_string('separator_decimal', 'feedback');
         if (substr($sep_dec, 0, 2) == '[[') {
             $sep_dec = FEEDBACK_DECIMAL;
@@ -230,8 +231,8 @@ class feedback_item_multichoice extends feedback_item_base {
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
         if ($analysed_item) {
             $itemname = $analysed_item[1];
-            echo '<tr><th colspan="2" align="left">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$itemname;
+            echo '<tr><th align="' . $align . '" colspan="2">';
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($itemname);
             echo '</th></tr>';
 
             $analysed_vals = $analysed_item[2];
@@ -247,10 +248,10 @@ class feedback_item_multichoice extends feedback_item_base {
                     $str_quotient = '&nbsp;('. $quotient . '&nbsp;%)';
                 }
                 echo '<tr>';
-                echo '<td align="left" valign="top">
+                echo '<td align="' . $align . '" valign="top">
                             -&nbsp;&nbsp;'.trim($val->answertext).':
                       </td>
-                      <td align="left" style="width:'.FEEDBACK_MAX_PIX_LENGTH.';">
+                      <td align="' . $align . '" style="width:'.FEEDBACK_MAX_PIX_LENGTH.';">
                         <img class="feedback_bar_image" alt="'.$intvalue.'" src="'.$pix.'" height="5" width="'.$pixwidth.'" />
                         &nbsp;'.$val->answercount.$str_quotient.'
                       </td>';
@@ -268,7 +269,7 @@ class feedback_item_multichoice extends feedback_item_base {
         $data = $analysed_item[2];
 
         //frage schreiben
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
         $worksheet->write_string($row_offset, 1, $analysed_item[1], $xls_formats->head2);
         if (is_array($data)) {
             $sizeofdata = count($data);
@@ -320,12 +321,12 @@ class feedback_item_multichoice extends feedback_item_base {
         if ($info->subtype == 'd') {
             echo '<label for="'. $item->typ . '_' . $item->id .'">';
         }
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -536,7 +537,7 @@ class feedback_item_multichoice extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, FORMAT_HTML, array('noclean' => true, 'para' => false));
         echo '</div>';
 

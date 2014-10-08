@@ -169,15 +169,16 @@ class feedback_item_numeric extends feedback_item_base {
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
 
+        $align = right_to_left() ? 'right' : 'left';
         $values = $this->get_analysed($item, $groupid, $courseid);
 
         if (isset($values->data) AND is_array($values->data)) {
-            echo '<tr><th colspan="2" align="left">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$item->name;
+            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($item->name);
             echo '</th></tr>';
 
             foreach ($values->data as $value) {
-                echo '<tr><td colspan="2" valign="top" align="left">';
+                echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
                 echo '-&nbsp;&nbsp;'.number_format($value, 2, $this->sep_dec, $this->sep_thous);
                 echo '</td></tr>';
             }
@@ -187,7 +188,7 @@ class feedback_item_numeric extends feedback_item_base {
             } else {
                 $avg = number_format(0, 2, $this->sep_dec, $this->sep_thous);
             }
-            echo '<tr><td align="left" colspan="2"><b>';
+            echo '<tr><td align="' . $align . '" colspan="2"><b>';
             echo get_string('average', 'feedback').': '.$avg;
             echo '</b></td></tr>';
         }
@@ -199,8 +200,8 @@ class feedback_item_numeric extends feedback_item_base {
 
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, $item->name, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
 
@@ -256,13 +257,13 @@ class feedback_item_numeric extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<label for="'. $inputname .'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, true, false, false);
         if ($item->dependitem) {
             $params = array('id'=>$item->dependitem);
             if ($dependitem = $DB->get_record('feedback_item', $params)) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -411,7 +412,7 @@ class feedback_item_numeric extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name . $requiredmark, true, false, false);
         switch(true) {
             case ($range_from === '-' AND is_numeric($range_to)):

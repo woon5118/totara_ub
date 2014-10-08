@@ -96,12 +96,12 @@ if (isguestuser($user->id)) { // The real guest user can not be edited.
     print_error('guestnoeditprofileother');
 }
 
-if ($user->deleted) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('userdeleted'));
-    echo $OUTPUT->footer();
-    die;
-}
+    if ($user->deleted) {
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading(get_string('userdeleted'));
+        echo $OUTPUT->footer();
+        die;
+    }
 
 // Load user preferences.
 useredit_load_preferences($user);
@@ -216,6 +216,18 @@ if ($usernew = $userform->get_data()) {
         // Force logout if user just suspended.
         if (isset($usernew->suspended) and $usernew->suspended and !$user->suspended) {
             \core\session\manager::kill_user_sessions($user->id);
+
+            // And trigger a user suspended event.
+            $event = \totara_core\event\user_suspended::create(
+                array(
+                    'objectid' => $user->id,
+                    'context' => context_user::instance($user->id),
+                    'other' => array(
+                        'username' => $user->username,
+                    )
+                )
+            );
+            $event->trigger();
         }
     }
 

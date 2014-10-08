@@ -7,6 +7,7 @@
     require_once($CFG->dirroot.'/user/lib.php');
 
     $delete       = optional_param('delete', 0, PARAM_INT);
+    $undelete     = optional_param('undelete', 0, PARAM_INT);
     $confirm      = optional_param('confirm', '', PARAM_ALPHANUM);   //md5 confirmation hash
     $confirmuser  = optional_param('confirmuser', 0, PARAM_INT);
     $sort         = optional_param('sort', 'name', PARAM_ALPHANUM);
@@ -31,12 +32,14 @@
 
     $stredit   = get_string('edit');
     $strdelete = get_string('delete');
+    $strundelete = get_string('undelete', 'totara_core');
     $strdeletecheck = get_string('deletecheck');
     $strshowallusers = get_string('showallusers');
     $strsuspend = get_string('suspenduser', 'admin');
     $strunsuspend = get_string('unsuspenduser', 'admin');
     $strunlock = get_string('unlockaccount', 'admin');
     $strconfirm = get_string('confirm');
+    $preg_emailhash = '/^[0-9a-f]{32}$/i';
 
     if (empty($CFG->loginhttps)) {
         $securewwwroot = $CFG->wwwroot;
@@ -45,6 +48,13 @@
     }
 
     $returnurl = new moodle_url('/admin/user.php', array('sort' => $sort, 'dir' => $dir, 'perpage' => $perpage, 'page'=>$page));
+
+    // force exclude deleted to true if user not permitted to see deleted users
+    if (has_capability('totara/core:seedeletedusers', $sitecontext)) {
+        $excludedeleted = false;
+    } else {
+        $excludedeleted = true;
+    }
 
     if ($confirmuser and confirm_sesskey()) {
         require_capability('moodle/user:update', $sitecontext);
@@ -90,6 +100,35 @@
                 echo $OUTPUT->notification($returnurl, get_string('deletednot', '', fullname($user, true)));
             }
         }
+    } else if ($undelete && confirm_sesskey()) {              // Delete a selected user, after confirmation
+
+        if (!has_capability('totara/core:undeleteuser', $sitecontext)) {
+            print_error('undeleteusernoperm', 'totara_core');
+        }
+        if (!$user = $DB->get_record('user', array('id' => $undelete))) {
+            print_error('userdoesnotexist', 'totara_core');
+        }
+        if (preg_match($preg_emailhash, $user->email)) {
+            // ensure we're not trying to undelete a legacy-deleted (hash in email) user
+            print_error('cannotundeleteuser', 'totara_core');
+        }
+
+        if ($confirm != md5($undelete)) {
+            echo $OUTPUT->header();
+            $fullname = fullname($user, true);
+            echo $OUTPUT->heading(get_string('undeleteuser', 'totara_core'));
+            $optionsyes = array('undelete' => $undelete, 'confirm' => md5($undelete), 'sesskey' => sesskey());
+            echo $OUTPUT->confirm(get_string('undeletecheckfull', 'totara_core', "'$fullname'"), new moodle_url($returnurl, $optionsyes), $returnurl);
+            echo $OUTPUT->footer();
+            die;
+        } else if (data_submitted() && $user->deleted) {
+            if (undelete_user($user)) {
+                add_to_log($site->id, 'user', 'undelete', "view.php?id={$user->id}", $user->firstname . ' ' . $user->lastname);
+                totara_set_notification(get_string('undeletedx', 'totara_core', fullname($user, true)), $returnurl, array('class' => 'notifysuccess'));
+            } else {
+                totara_set_notification(get_string('undeletednotx', 'totara_core', fullname($user, true)), $returnurl);
+            }
+        }
     } else if ($acl and confirm_sesskey()) {
         if (!has_capability('moodle/user:update', $sitecontext)) {
             print_error('nopermissions', 'error', '', 'modify the NMET access control list');
@@ -124,9 +163,30 @@
         if ($user = $DB->get_record('user', array('id'=>$suspend, 'mnethostid'=>$CFG->mnet_localhost_id, 'deleted'=>0))) {
             if (!is_siteadmin($user) and $USER->id != $user->id and $user->suspended != 1) {
                 $user->suspended = 1;
+                $user->timemodified = time();
+
                 // Force logout.
                 \core\session\manager::kill_user_sessions($user->id);
                 user_update_user($user, false);
+
+                $event = \core\event\user_updated::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                    )
+                );
+                $event->trigger();
+
+                $event = \totara_core\event\user_suspended::create(
+                    array(
+                        'objectid' => $user->id,
+                        'context' => context_user::instance($user->id),
+                        'other' => array(
+                            'username' => $user->username,
+                        )
+                    )
+                );
+                $event->trigger();
             }
         }
         redirect($returnurl);
@@ -203,9 +263,9 @@
 
     list($extrasql, $params) = $ufiltering->get_sql_filter();
     $users = get_users_listing($sort, $dir, $page*$perpage, $perpage, '', '', '',
-            $extrasql, $params, $context);
-    $usercount = get_users(false);
-    $usersearchcount = get_users(false, '', false, null, "", '', '', '', '', '*', $extrasql, $params);
+            $extrasql, $params, $context, $excludedeleted);
+    $usercount = get_users(false, '', false, null, 'firstname ASC', '', '', '', '', '*', '', null, $excludedeleted);
+    $usersearchcount = get_users(false, '', false, null, "", '', '', '', '', '*', $extrasql, $params, $excludedeleted);
 
     if ($extrasql !== '') {
         echo $OUTPUT->heading("$usersearchcount / $usercount ".get_string('users'));
@@ -256,17 +316,12 @@
         $table->colclasses = array();
         $table->head[] = $fullnamedisplay;
         $table->attributes['class'] = 'admintable generaltable';
-        $table->colclasses[] = 'leftalign';
         foreach ($extracolumns as $field) {
             $table->head[] = ${$field};
-            $table->colclasses[] = 'leftalign';
         }
         $table->head[] = $city;
-        $table->colclasses[] = 'leftalign';
         $table->head[] = $country;
-        $table->colclasses[] = 'leftalign';
         $table->head[] = $lastaccess;
-        $table->colclasses[] = 'leftalign';
         $table->head[] = get_string('edit');
         $table->colclasses[] = 'centeralign';
         $table->head[] = "";
@@ -339,6 +394,15 @@
                 }
             }
 
+            // Don't show any buttons, except undelete for deleted users
+            if ($user->deleted) {
+                $buttons = array();
+                $buttons[] = html_writer::link(new moodle_url($returnurl, array('undelete' => $user->id, 'sesskey' => sesskey())),
+                    html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/recycle'), 'alt' => $strundelete, 'class' => 'iconsmall')),
+                    array('title' => $strundelete));
+                $lastcolumn = '';
+            }
+
             if ($user->lastaccess) {
                 $strlastaccess = format_time(time() - $user->lastaccess);
             } else {
@@ -354,7 +418,7 @@
             $row[] = $user->city;
             $row[] = $user->country;
             $row[] = $strlastaccess;
-            if ($user->suspended) {
+            if ($user->suspended || $user->deleted) {
                 foreach ($row as $k=>$v) {
                     $row[$k] = html_writer::tag('span', $v, array('class'=>'usersuspended'));
                 }
@@ -369,20 +433,15 @@
     $ufiltering->display_add();
     $ufiltering->display_active();
 
-    if (has_capability('moodle/user:create', $sitecontext)) {
-        echo $OUTPUT->heading('<a href="'.$securewwwroot.'/user/editadvanced.php?id=-1">'.get_string('addnewuser').'</a>');
-    }
     if (!empty($table)) {
         echo html_writer::start_tag('div', array('class'=>'no-overflow'));
         echo html_writer::table($table);
         echo html_writer::end_tag('div');
         echo $OUTPUT->paging_bar($usercount, $page, $perpage, $baseurl);
-        if (has_capability('moodle/user:create', $sitecontext)) {
-            echo $OUTPUT->heading('<a href="'.$securewwwroot.'/user/editadvanced.php?id=-1">'.get_string('addnewuser').'</a>');
-        }
+    }
+    if (has_capability('moodle/user:create', $sitecontext)) {
+        $url = new moodle_url($securewwwroot . '/user/editadvanced.php', array('id' => -1));
+        echo $OUTPUT->single_button($url, get_string('addnewuser'), 'get');
     }
 
     echo $OUTPUT->footer();
-
-
-

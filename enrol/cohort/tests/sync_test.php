@@ -258,6 +258,7 @@ class enrol_cohort_testcase extends advanced_testcase {
 
     public function test_sync_course() {
         global $DB;
+
         $this->resetAfterTest();
 
         $trace = new null_progress_trace();

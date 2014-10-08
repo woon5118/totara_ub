@@ -162,9 +162,11 @@ if (!empty($groupinforow)) {
           </p>
           <?php $potentialmembersselector->display(); ?>
       </td>
-      <td>
-        <p><?php echo($strusergroupmembership) ?></p>
-        <div id="group-usersummary"></div>
+    </tr>
+    <tr>
+      <td colspan="3">
+          <p><?php echo($strusergroupmembership) ?></p>
+          <div id="group-usersummary"></div>
       </td>
     </tr>
     <tr><td colspan="3" id='backcell'>

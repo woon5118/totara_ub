@@ -116,6 +116,29 @@ if ($user !== false or $frm !== false or $errormsg !== '') {
     $frm = data_submitted();
 }
 
+if ($frm && !empty($CFG->recaptchapublickey) && !empty($CFG->recaptchaprivatekey) && !empty($CFG->recaptchaloginform)) {
+    if (!empty($frm->recaptcha_response_field)) {
+        require_once($CFG->libdir . '/recaptchalib.php');
+        $captcha = recaptcha_check_answer($CFG->recaptchaprivatekey,
+                                           getremoteaddr(),
+                                           $frm->recaptcha_challenge_field,
+                                           $frm->recaptcha_response_field);
+        if (!$captcha->is_valid) {
+            if ($captcha->error == 'incorrect-captcha-sol') {
+                $errormsg = get_string('incorrectpleasetryagain', 'auth');
+            } else {
+                $errormsg = $captcha->error;
+            }
+            $errorcode = 5;
+            $user = null;
+        }
+    } else {
+        $errormsg = get_string("missingrecaptchachallengefield");
+        $errorcode = 5;
+        $user = null;
+    }
+}
+
 /// Check if the user has actually submitted login data to us
 
 if ($frm and isset($frm->username)) {                             // Login WITH cookies
@@ -178,6 +201,14 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
         }
 
     /// Let's get them all set up.
+        add_to_log(SITEID, 'user', 'login', "view.php?id=$USER->id&course=".SITEID,
+                   $user->id, 0, $user->id);
+
+        // if multiple logins not permitted, clear out any existing sessions for this user
+        if (!empty($CFG->preventmultiplelogins)) {
+            \core\session\manager::kill_user_sessions($user->id);
+        }
+
         complete_user_login($user);
 
         // sets the username cookie

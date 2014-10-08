@@ -326,7 +326,7 @@ class HTML_QuickForm_select extends HTML_QuickForm_element {
     function loadArray($arr, $values=null)
     {
         if (!is_array($arr)) {
-            return self::raiseError('Argument 1 of HTML_Select::loadArray is not a valid array');
+            return PEAR::raiseError('Argument 1 of HTML_Select::loadArray is not a valid array');
         }
         if (isset($values)) {
             $this->setSelected($values);
@@ -358,7 +358,7 @@ class HTML_QuickForm_select extends HTML_QuickForm_element {
     function loadDbResult(&$result, $textCol=null, $valueCol=null, $values=null)
     {
         if (!is_object($result) || !is_a($result, 'db_result')) {
-            return self::raiseError('Argument 1 of HTML_Select::loadDbResult is not a valid DB_result');
+            return PEAR::raiseError('Argument 1 of HTML_Select::loadDbResult is not a valid DB_result');
         }
         if (isset($values)) {
             $this->setValue($values);
@@ -401,7 +401,7 @@ class HTML_QuickForm_select extends HTML_QuickForm_element {
         } elseif (is_subclass_of($conn, "db_common")) {
             $dbConn = &$conn;
         } else {
-            return self::raiseError('Argument 1 of HTML_Select::loadQuery is not a valid type');
+            return PEAR::raiseError('Argument 1 of HTML_Select::loadQuery is not a valid type');
         }
         $result = $dbConn->query($sql);
         if (DB::isError($result)) {
@@ -485,8 +485,28 @@ class HTML_QuickForm_select extends HTML_QuickForm_element {
             $strHtml .= $tabs . '<select' . $attrString . ">\n";
 
             foreach ($this->_options as $option) {
-                if (is_array($this->_values) && in_array((string)$option['attr']['value'], $this->_values)) {
-                    $this->_updateAttrArray($option['attr'], array('selected' => 'selected'));
+                if (is_array($this->_values)) {
+                    // We can't use in_array() because non-strict matching considers 0 and '' the same
+                    // but strict matching checks the types too. There are places in the code that rely on:
+                    //    (int)1 == (string)1
+                    // and others that rely on
+                    //    (float)1 == (float)1.0
+                    // so non-strict matching with a special case check seems to be the only way.
+                    $match = false;
+                    foreach ($this->_values as $possiblevalue) {
+                        // need to prevent 0 and '' being considered the same
+                        if ($possiblevalue === '' && $option['attr']['value'] === 0) {
+                            continue;
+                        }
+                        // don't use strict matching as some places rely on (int)1 == (string)1
+                        // or (float)1 = (float)1.0
+                        if ($possiblevalue == $option['attr']['value']) {
+                            $match = true;
+                        }
+                    }
+                    if ($match) {
+                        $this->_updateAttrArray($option['attr'], array('selected' => 'selected'));
+                    }
                 }
                 $strHtml .= $tabs . "\t<option" . $this->_getAttrString($option['attr']) . '>' .
                             $option['text'] . "</option>\n";

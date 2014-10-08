@@ -84,6 +84,8 @@ define('COMPLETION_COMPLETE_PASS', 2);
  * This is a completion state value (course_modules_completion/completionstate)
  */
 define('COMPLETION_COMPLETE_FAIL', 3);
+/** A record of prior learning has been added for a user in this activity */
+define('COMPLETION_COMPLETE_RPL', 4);
 
 /**
  * The effect of this change to completion status is unknown.
@@ -199,7 +201,7 @@ function completion_can_view_data($userid, $course = null) {
         return true;
     }
 
-    if ($course->id) {
+    if (isset($course->id)) {
         $coursecontext = context_course::instance($course->id);
     } else {
         $coursecontext = context_system::instance();
@@ -210,6 +212,76 @@ function completion_can_view_data($userid, $course = null) {
     }
 
     return false;
+}
+
+
+/**
+ * Utility function for checking if the logged in user has permissions
+ * to unlock completion data for a course
+ *
+ * @access  public
+ * @param   int         $courseid   Course ID
+ * @return  boolean
+ */
+function completion_can_unlock_data($courseid) {
+    if (!isloggedin()) {
+        return false;
+    }
+
+    // Check if this is the site course.
+    if (!$courseid || $courseid == SITEID) {
+        return false;
+    }
+
+    // Check capabilities.
+    $coursecontext = context_course::instance($courseid);
+    return has_capability('moodle/course:unlockcompletion', $coursecontext);
+}
+
+
+/**
+ * Check if a module type has RPL enabled for it
+ *
+ * RPLs for modules are enabled/disabled via $CFG->enablemodulerpl, which can
+ * be set on the Site Administration settings page "Grades -> General settings"
+ *
+ * @access  public
+ * @param   mixed   $module     Can either be the (string) name of the module,
+ *                              or the module type id (int).
+ * @return  bool
+ */
+function completion_module_rpl_enabled($module) {
+    global $CFG, $DB;
+
+    // If supplied module id, this is easy
+    if (is_integer($module)) {
+        // Check if RPL is enabled for this module
+        return in_array($module, explode(',', $CFG->enablemodulerpl));
+    }
+
+    // If supplied the module string name
+    if (is_string($module)) {
+
+        // Cache modules list
+        static $modules;
+        if ($modules == null) {
+            $modules = $DB->get_records('modules', array(), '', 'name, id');
+            if (!$modules) {
+                $modules = array();
+            }
+        }
+
+        // Check if module exists in DB
+        if (!array_key_exists($module, $modules)) {
+            return false;
+        }
+
+        // Check if RPL is enabled for this module
+        return in_array($modules[$module]->id, explode(',', $CFG->enablemodulerpl));
+    }
+
+    // Incorrect input
+    throw new coding_exception(get_string('error:incorrectdatatypesupplied', 'completion'));
 }
 
 
@@ -267,7 +339,7 @@ class completion_info {
      */
     public static function is_enabled_for_site() {
         global $CFG;
-        return !empty($CFG->enablecompletion);
+        return !(!isset($CFG->enablecompletion) || $CFG->enablecompletion == COMPLETION_DISABLED);
     }
 
     /**
@@ -284,7 +356,7 @@ class completion_info {
         global $CFG, $DB;
 
         // First check global completion
-        if (!isset($CFG->enablecompletion) || $CFG->enablecompletion == COMPLETION_DISABLED) {
+        if (!completion_info::is_enabled_for_site()) {
             return COMPLETION_DISABLED;
         }
 
@@ -424,8 +496,8 @@ class completion_info {
                 'course'    => $this->course->id
             );
 
-            // Load criteria from database
-            $records = (array)$DB->get_records('course_completion_criteria', $params);
+            // Load criteria from database.
+            $records = (array)$DB->get_records('course_completion_criteria', $params, 'criteriatype ASC');
 
             // Build array of criteria objects
             $this->criteria = array();
@@ -535,6 +607,14 @@ class completion_info {
      * calling the involved module via modulename_get_completion_state() to check
      * module-specific conditions.
      *
+     * @global object
+     * @global object
+     * @uses COMPLETION_UNKNOWN
+     * @uses COMPLETION_COMPLETE
+     * @uses COMPLETION_INCOMPLETE
+     * @uses COMPLETION_COMPLETE_PASS
+     * @uses COMPLETION_COMPLETE_FAIL
+     * @uses COMPLETION_TRACKING_MANUAL
      * @param stdClass|cm_info $cm Course-module
      * @param int $possibleresult Expected completion result. If the event that
      *   has just occurred (e.g. add post) can only result in making the activity
@@ -550,7 +630,7 @@ class completion_info {
      * @return void
      */
     public function update_state($cm, $possibleresult=COMPLETION_UNKNOWN, $userid=0) {
-        global $USER, $SESSION;
+        global $USER, $SESSION, $DB;
 
         // Do nothing if completion is not enabled for that activity
         if (!$this->is_enabled($cm)) {
@@ -575,6 +655,10 @@ class completion_info {
                 case COMPLETION_INCOMPLETE:
                     $newstate = $possibleresult;
                     break;
+                case COMPLETION_UNKNOWN:
+                    // We cannot determine the state, so just use the current one :P
+                    $newstate = $current->completionstate;
+                    break;
                 default:
                     $this->internal_systemerror("Unexpected manual completion state for {$cm->id}: $possibleresult");
             }
@@ -588,7 +672,28 @@ class completion_info {
         if ($newstate != $current->completionstate) {
             $current->completionstate = $newstate;
             $current->timemodified    = time();
+            // If module_get_completion_state set time of completion then use it.
+            if (isset($cm->timecompleted)) {
+                $current->timecompleted = ($newstate == COMPLETION_INCOMPLETE) ? null : $cm->timecompleted;
+            }
             $this->internal_set_data($cm, $current);
+        }
+
+        // Notify course completion.
+        if (in_array($newstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
+            $userid = $userid ? $userid : $USER->id;
+            $event = \totara_core\event\module_completion::create(
+                array(
+                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id, 'userid' => $userid)),
+                    'other' => array(
+                            'moduleinstance' => $cm->id,
+                            'userid' => $userid,
+                            'course' => $this->course->id,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY,
+                            ),
+                )
+            );
+            $event->trigger();
         }
     }
 
@@ -709,6 +814,46 @@ class completion_info {
     }
 
     /**
+     * Resets a module as not viewed
+     *
+     * Should be called whenever a module is 'viewed' (it is up to the module how to
+     * determine that). Has no effect if viewing is not set as a completion condition.
+     *
+     * Note that this function must be called before you print the page header because
+     * it is possible that the navigation block may depend on it. If you call it after
+     * printing the header, it shows a developer debug warning.
+     *
+     * @param stdClass|cm_info $cm Activity
+     * @param int $userid User ID or 0 (default) for current user
+     * @return void
+     */
+    public function set_module_viewed_reset($cm, $userid=0) {
+        global $PAGE;
+        if ($PAGE->headerprinted) {
+            debugging('set_module_viewed must be called before header is printed',
+                    DEBUG_DEVELOPER);
+        }
+
+        // Don't do anything if view condition is not turned on
+        if ($cm->completionview == COMPLETION_VIEW_NOT_REQUIRED || !$this->is_enabled($cm)) {
+            return;
+        }
+
+        // Get current completion state
+        $data = $this->get_data($cm, false, $userid);
+
+        // If we haven't already viewed it, don't do anything
+        if ($data->viewed == COMPLETION_NOT_VIEWED) {
+            return;
+        }
+
+        // OK, change state, save it, and update completion
+        $data->viewed = COMPLETION_NOT_VIEWED;
+        $this->internal_set_data($cm, $data);
+        $this->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+    }
+
+    /**
      * Determines how much completion data exists for an activity. This is used when
      * deciding whether completion information should be 'locked' in the module
      * editing form.
@@ -730,15 +875,16 @@ class completion_info {
     }
 
     /**
-     * Determines how much course completion data exists for a course. This is used when
-     * deciding whether completion information should be 'locked' in the completion
+     * Determines how much course completion criteria data exists for a course. This is used
+     * to help decide whether completion information should be 'locked' in the completion
      * settings form and activity completion settings.
      *
      * @param int $user_id Optionally only get course completion data for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
      * @return int The number of users who have completion data stored for this
      *     course, 0 if none
      */
-    public function count_course_user_data($user_id = null) {
+    public function count_course_user_data($user_id = null, $countrpl = true) {
         global $DB;
 
         $sql = '
@@ -750,6 +896,61 @@ class completion_info {
         course = ?
         ';
 
+        if ($countrpl == false) {
+            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
+        }
+
+        // When deleting course completion data(delete_course_completion_data) we are ignoring records marked via RPL.
+        // We need to do the same here. This function is evaluated to determine if the completion information should be locked,
+        // or not.
+        $insql = '';
+        $inparams = array();
+        if (empty($user_id)) {
+            if ($countrpl == false) {
+                // Find all RPL completions for this course.
+                $sqlcomp = "SELECT userid FROM {course_completions}
+                        WHERE course = ? AND status = ?";
+                if ($rpl = $DB->get_fieldset_sql($sqlcomp, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
+                    $insql = ' AND userid ' . $insql;
+                }
+            }
+        } else { // Limit data to a single user if an ID is supplied.
+            $insql = ' AND userid = ?';
+            $inparams = array($user_id);
+        }
+
+        $sql .= " {$insql} ";
+        $params = array_merge(array($this->course_id), $inparams);
+
+        return $DB->get_field_sql($sql, $params);
+    }
+
+    /**
+     * Determines how many course completion records exist for a course. This is used
+     * to help decide whether completion information should be 'locked' in the completion
+     * settings form and activity completion settings.
+     *
+     * @param int $user_id Optionally only get course completion records for a single user
+     * @param bool $countrpl Optionally whether to count records completed via RPL
+     * @return int The number of users who have completion records stored for this
+     *     course, 0 if none
+     */
+    public function count_course_completions_data($user_id = null, $countrpl = true) {
+        global $DB;
+
+        $sql = '
+    SELECT
+        COUNT(1)
+    FROM
+        {course_completions}
+    WHERE
+        course = ?
+        ';
+
+        if ($countrpl == false) {
+            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
+        }
         $params = array($this->course_id);
 
         // Limit data to a single user if an ID is supplied
@@ -761,13 +962,19 @@ class completion_info {
         return $DB->get_field_sql($sql, $params);
     }
 
+
     /**
      * Check if this course's completion criteria should be locked
      *
+     * If there is existing criteria completion data *or* any
+     * course completion records then it should be locked as they
+     * will be deleted when an unlocked form is saved.
+     *
+     * @param bool $countrpl count records completed via RPL
      * @return boolean
      */
-    public function is_course_locked() {
-        return (bool) $this->count_course_user_data();
+    public function is_course_locked($countrpl = true) {
+        return (bool) $this->count_course_user_data(null, $countrpl);
     }
 
     /**
@@ -775,11 +982,48 @@ class completion_info {
      *
      * Intended to be used when unlocking completion criteria settings.
      */
-    public function delete_course_completion_data() {
-        global $DB;
+    public function delete_course_completion_data($userid = null) {
+        global $DB, $CFG;
+        require_once("{$CFG->dirroot}/blocks/totara_stats/locallib.php");
 
-        $DB->delete_records('course_completions', array('course' => $this->course_id));
-        $DB->delete_records('course_completion_crit_compl', array('course' => $this->course_id));
+        $transaction = $DB->start_delegated_transaction();
+
+        if (empty($userid)) {
+            // Find all RPL completions for this course.
+            $sql = "SELECT userid FROM {course_completions}
+                     WHERE course = ? AND status = ?";
+            if ($rpl = $DB->get_fieldset_sql($sql, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
+                list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
+                $insql = ' AND userid ' . $insql;
+            } else {
+                $insql = '';
+                $inparams = array();
+            }
+        } else {
+            $insql = ' AND userid = ?';
+            $inparams = array($userid);
+        }
+
+        $params = array_merge(array($this->course_id), $inparams);
+        $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
+        // Do not remove RPL activity completion records.
+        $DB->delete_records_select('course_completion_crit_compl', "course = ? AND (rpl = '' OR rpl IS NULL) {$insql}", $params);
+
+        // Remove stats data.
+        $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);
+        $DB->delete_records_select(
+            'block_totara_stats',
+            "eventtype = ? AND data2 = ? {$insql}",
+            $statparams
+        );
+
+        $statparams = array_merge(array(STATS_EVENT_COURSE_COMPLETE), $params);
+        $DB->delete_records_select(
+            'block_totara_stats',
+            "eventtype = ? AND data2 = ? {$insql}",
+            $statparams
+        );
+        $transaction->allow_commit();
     }
 
     /**
@@ -839,9 +1083,10 @@ class completion_info {
         }
 
         if ($acriteria) {
-            // Delete all criteria completions relating to this activity
-            $DB->delete_records('course_completion_crit_compl', array('course' => $this->course_id, 'criteriaid' => $acriteria->id));
-            $DB->delete_records('course_completions', array('course' => $this->course_id));
+            // Delete all criteria completions relating to this activity, but skip any RPL records.
+            $where = "course = ? AND criteriaid = ? AND (rpl = '' OR rpl IS NULL)";
+            $DB->delete_records_select('course_completion_crit_compl', $where, array($this->course_id, $acriteria->id));
+            $DB->delete_records_select('course_completions', "course = ? AND (rpl = '' OR rpl IS NULL)", array($this->course_id));
         }
     }
 
@@ -924,8 +1169,10 @@ class completion_info {
             }
             // Expire any old data from cache
             foreach ($SESSION->completioncache as $courseid=>$activities) {
-                if (empty($activities['updated']) || $activities['updated'] < time()-COMPLETION_CACHE_EXPIRY) {
+                if (empty($activities['updated']) || $activities['updated'] < time()-COMPLETION_CACHE_EXPIRY ||
+                        !$DB->record_exists('course_completions', array('userid' => $USER->id, 'course' => $courseid, 'invalidatecache' => 0))) {
                     unset($SESSION->completioncache[$courseid]);
+                    $this->invalidatecache($courseid, $USER->id, false);
                 }
             }
             // See if requested data is present, if so use cache to get it
@@ -934,6 +1181,11 @@ class completion_info {
                 array_key_exists($cm->id, $SESSION->completioncache[$this->course->id])) {
                 return $SESSION->completioncache[$this->course->id][$cm->id];
             }
+        }
+
+        if ($currentuser) {
+            // Rebuilding the cache so set invalidate to false.
+            $this->invalidatecache($this->course->id, $USER->id, false);
         }
 
         // Not there, get via SQL
@@ -1010,6 +1262,26 @@ class completion_info {
     }
 
     /**
+     * Sets invalidatecache - if true, the completion cache will be reset in the the user's session
+     *
+     * @param int $courseid
+     * @param int $userid
+     * @param bool $value true = reset the cache in the session for this course
+     */
+    public function invalidatecache($courseid = null, $userid = null, $value = false) {
+        global $DB, $USER;
+        if (empty($courseid)) {
+            $courseid = $this->course->id;
+        }
+        if (empty($userid)) {
+            $userid = $USER->id;
+        }
+        if (!empty($courseid) && !empty($userid)) {
+            $DB->set_field('course_completions', 'invalidatecache', $value, array('userid' => $userid, 'course' => $courseid));
+        }
+    }
+
+    /**
      * Updates completion data for a particular coursemodule and user (user is
      * determined from $data).
      *
@@ -1077,23 +1349,45 @@ class completion_info {
      * Obtains a list of activities for which completion is enabled on the
      * course. The list is ordered by the section order of those activities.
      *
-     * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
+     * @param array $modinfo For unit testing only, supply the value
+     *   here. Otherwise the method calls get_fast_modinfo
+     * @return array Array from $cmid => $cm of all activities with completion enabled,
      *   empty array if none
      */
-    public function get_activities() {
-        $modinfo = get_fast_modinfo($this->course);
+    public function get_activities($modinfo = null) {
+        global $DB;
+
+        // Obtain those activities which have completion turned on.
+        $withcompletion = $DB->get_records_select('course_modules', 'course='.$this->course->id.
+          ' AND completion<>'.COMPLETION_TRACKING_NONE);
+        if (!$withcompletion) {
+            return array();
+        }
+
+        // Use modinfo to get section order and also add in names.
+        if (empty($modinfo)) {
+            $modinfo = get_fast_modinfo($this->course);
+        }
         $result = array();
-        foreach ($modinfo->get_cms() as $cm) {
-            if ($cm->completion != COMPLETION_TRACKING_NONE) {
-                $result[$cm->id] = $cm;
+        foreach ($modinfo->sections as $sectioncms) {
+            foreach ($sectioncms as $cmid) {
+                if (array_key_exists($cmid, $withcompletion)) {
+                    $result[$cmid] = $withcompletion[$cmid];
+                    $result[$cmid]->modname = $modinfo->cms[$cmid]->modname;
+                    $result[$cmid]->name    = $modinfo->cms[$cmid]->name;
+                }
             }
         }
+
         return $result;
     }
 
     /**
-     * Checks to see if the userid supplied has a tracked role in
-     * this course
+     * Checks to see if the userid has a completion_completions record
+     * or a tracked role in this course.
+     *
+     * We do this because some users could have received a RPL via
+     * a Learning Plan without being enrolled in the course at all.
      *
      * @param int $userid User id
      * @return bool
@@ -1346,5 +1640,55 @@ class completion_info {
         global $SESSION;
         unset($SESSION->completioncache);
         unset($SESSION->completioncacheuserid);
+    }
+
+    /**
+     * Get all completions a user has across the site
+     * @access  public
+     * @param   $userid     int     User id
+     * @param   $limit      int     Limit number of records returned (optional)
+     * @return  array
+     */
+    public static function get_all_courses($userid, $limit=0) {
+        global $DB;
+
+        $sql = "
+            SELECT
+                c.id AS course,
+                c.fullname AS name,
+                cc.timeenrolled,
+                cc.timestarted,
+                cc.timecompleted,
+                cc.status,
+                cc.rpl
+            FROM
+                {course_completions} cc
+            LEFT JOIN
+                {course} c
+             ON cc.course = c.id
+            WHERE
+                cc.userid = :userid
+            AND
+            (
+                cc.timeenrolled > 0
+             OR cc.timestarted > 0
+             OR cc.timecompleted > 0
+            )
+            ORDER BY
+                cc.timeenrolled DESC,
+                cc.timestarted DESC,
+                cc.timecompleted DESC
+        ";
+
+        $completions = array();
+
+        if ($ccompletions = $DB->get_records_sql($sql, array('userid' => $userid), 0, $limit)) {
+            foreach ($ccompletions as $course) {
+                // Create completion_completion instance (without reloading from db)
+                $completions[$course->course] = new completion_completion((array) $course, false);
+            }
+        }
+
+        return $completions;
     }
 }

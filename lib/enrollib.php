@@ -482,27 +482,23 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
                 $plugin = $plugins[$instance->enrol];
                 if ($unenrollink = $plugin->get_unenrolself_link($instance)) {
                     $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                    $coursenode->add(get_string('unenrolme', 'core_enrol', $shortname), $unenrollink, navigation_node::TYPE_SETTING, null, 'unenrolself', new pix_icon('i/user', ''));
+                    $coursenode->add(get_string('unenrolme', 'core_enrol', $shortname), $unenrollink, navigation_node::TYPE_SETTING, null, 'unenrolself', new pix_icon('i/userdel', ''));
                     break;
                     //TODO. deal with multiple unenrol links - not likely case, but still...
                 }
             }
         } else {
             // enrol link if possible
-            if (is_viewing($coursecontext)) {
-                // better not show any enrol link, this is intended for managers and inspectors
-            } else {
-                foreach ($instances as $instance) {
-                    if (!isset($plugins[$instance->enrol])) {
-                        continue;
-                    }
-                    $plugin = $plugins[$instance->enrol];
-                    if ($plugin->show_enrolme_link($instance)) {
-                        $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
-                        $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                        $coursenode->add(get_string('enrolme', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/user', ''));
-                        break;
-                    }
+            foreach ($instances as $instance) {
+                if (!isset($plugins[$instance->enrol])) {
+                    continue;
+                }
+                $plugin = $plugins[$instance->enrol];
+                if ($plugin->show_enrolme_link($instance)) {
+                    $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
+                    $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
+                    $coursenode->add(get_string('enrolmentoptions', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/useradd', ''));
+                    break;
                 }
             }
         }
@@ -1319,7 +1315,7 @@ abstract class enrol_plugin {
         }
 
         if ($inserted) {
-            // Trigger event.
+            // Trigger events.
             $event = \core\event\user_enrolment_created::create(
                     array(
                         'objectid' => $ue->id,
@@ -1330,6 +1326,19 @@ abstract class enrol_plugin {
                         )
                     );
             $event->trigger();
+            // Totara "completion starts on enrol" event.
+            $completionevent = \totara_core\event\user_enrolment::create(
+                    array(
+                        'objectid'  => $ue->id,
+                        'context'   => $context,
+                        'other' => array(
+                                   'courseid'  => $courseid,
+                                    'userid'    => $ue->userid,
+                                    'timestart' => $ue->timestart
+                                   )
+                        )
+                    );
+            $completionevent->trigger();
         }
 
         if ($roleid) {
@@ -1356,6 +1365,90 @@ abstract class enrol_plugin {
                 unset($USER->enrol['tempguest'][$courseid]);
                 remove_temp_course_roles($context);
             }
+        }
+    }
+
+
+    /**
+     * Bulk enrol users into a course
+     *
+     * @param stdClass $instance an enrol instance to use
+     * @param array $userids containing objects of userids
+     * @param int $roleid optional role id
+     * @param int $timestart 0 means unknown
+     * @param int $timeend 0 means forever
+     * @param int $status default to ENROL_USER_ACTIVE for new enrolments, no change by default in updates
+     * @return void
+     */
+    public function enrol_user_bulk(stdClass $instance, $userids, $roleid = NULL, $timestart = 0, $timeend = 0, $status = NULL) {
+        global $DB, $USER, $CFG; // CFG necessary!!!
+
+        if ($instance->courseid == SITEID) {
+            throw new coding_exception('invalid attempt to enrol into frontpage course!');
+        }
+
+        $name = $this->get_name();
+        $courseid = $instance->courseid;
+
+        if ($instance->enrol !== $name) {
+            throw new coding_exception('invalid enrol instance!');
+        }
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
+
+        // Remove duplicates
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal(array_map(function($item) { return $item->userid; },
+            $userids));
+        $sql = "SELECT u.id AS userid
+            FROM {user} u
+            LEFT JOIN {user_enrolments} ue ON u.id = ue.userid AND ue.enrolid = {$instance->id}
+            WHERE u.id {$sqlin}
+            AND ue.id IS NULL";
+        $userids = $DB->get_records_sql($sql, $sqlinparams);
+
+        $timenow = time();
+        $newenrolments = array();
+        foreach ($userids as $u) {
+            $enrolobj = new stdClass;
+            $enrolobj->userid           = $u->userid;
+            $enrolobj->enrolid          = $instance->id;
+            $enrolobj->status       = is_null($status) ? ENROL_USER_ACTIVE : $status;
+            $enrolobj->timestart    = $timestart;
+            $enrolobj->timeend      = $timeend;
+            $enrolobj->modifierid   = $USER->id;
+            $enrolobj->timecreated  = $timenow;
+            $enrolobj->timemodified = $timenow;
+
+            $newenrolments[] = $enrolobj;
+        }
+
+        $inserted = $DB->insert_records_via_batch('user_enrolments', $newenrolments);
+        unset($newenrolments);
+        if ($inserted) {
+            // add extra info and trigger event
+            $ue = new stdClass;
+            $ue->courseid = $courseid;
+            $ue->enrol    = $name;
+            $ue->userids  = $userids;
+            events_trigger('user_enrolled_bulk', $ue);
+            completion_start_user_bulk($courseid);
+        }
+
+        if ($roleid) {
+            // this must be done after the enrolment event so that the role_assigned event is triggered afterwards
+            if ($this->roles_protected()) {
+                role_assign_bulk($roleid, $userids, $context->id, 'enrol_'.$name, $instance->id);
+            } else {
+                role_assign_bulk($roleid, $userids, $context->id);
+            }
+        }
+
+        // reset current user enrolment caching
+        if (isset($USER->enrol['enrolled'][$courseid])) {
+            unset($USER->enrol['enrolled'][$courseid]);
+        }
+        if (isset($USER->enrol['tempguest'][$courseid])) {
+            unset($USER->enrol['tempguest'][$courseid]);
+            remove_temp_course_roles($context);
         }
     }
 
@@ -1512,6 +1605,93 @@ abstract class enrol_plugin {
             }
         }
     }
+
+
+    /**
+     * Unenrol users from course in a bulk way,
+     * the last unenrolment removes all remaining roles.
+     *
+     * @param stdClass $instance enrol instance
+     * @param array $userids
+     * @return void
+     */
+    public function unenrol_user_bulk(stdClass $instance, $userids) {
+        global $CFG, $USER, $DB;
+
+        $name = $this->get_name();
+        $courseid = $instance->courseid;
+
+        if ($instance->enrol !== $name) {
+            throw new coding_exception('invalid enrol instance!');
+        }
+        if (empty($userids)) {
+            return;
+        }
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
+
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+        $sql = "SELECT *
+            FROM {user_enrolments}
+            WHERE enrolid = {$instance->id}
+            AND userid {$sqlin}";
+
+        $ue = $DB->get_records_sql($sql, $sqlinparams);
+        if (empty($ue)) {
+            // weird, users not enrolled
+            return;
+        }
+
+        // TODO perform in batches of 1000
+        role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id,
+            'component' => 'enrol_' . $name, 'itemid' => $instance->id));
+        $DB->delete_records_list('user_enrolments', 'id', array_keys($ue));
+
+        $sql = "SELECT ue.*
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON (e.id = ue.enrolid)
+                  WHERE e.courseid = ?
+                  AND ue.userid {$sqlin}";
+        $uenotlast = $DB->get_records_sql($sql, array_merge(array($courseid), $sqlinparams));
+        if (!empty($uenotlast)) {
+            // user still has some enrolments in the course, no big cleanup needed
+            $eventdata = new stdClass;
+            $eventdata->ue = $ue;
+            $eventdata->courseid = $courseid;
+            $eventdata->enrol = $name;
+            $eventdata->lastenrol = false;
+            events_trigger('user_unenrolled_bulk', $eventdata);
+        } else {
+            // users' last enrolment intance in course - do big cleanup
+
+            require_once("$CFG->dirroot/group/lib.php");
+            require_once("$CFG->libdir/gradelib.php");
+
+            // remove all remaining roles
+            role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id), true, false);
+
+            //clean up ALL invisible user data from course if this is the last enrolment - groups, grades, etc.
+            groups_delete_group_members_bulk($courseid, $userids);
+
+            foreach ($userids as $userid) {
+                // TODO create bulk function for moar speed at some point
+                grade_user_unenrol($courseid, $userid);
+            }
+
+            list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+            $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}", array_merge(array($courseid), $sqlinparams));
+
+            $eventdata = new stdClass;
+            $eventdata->ue = $ue;
+            $eventdata->courseid = $courseid;
+            $eventdata->enrol = $name;
+            $eventdata->lastenrol = true; // means users not enrolled any more
+            events_trigger('user_unenrolled_bulk', $eventdata);
+        }
+
+        // reset all enrol caches
+        $context->mark_dirty();
+    }
+
 
     /**
      * Forces synchronisation of user enrolments.
@@ -1722,11 +1902,25 @@ abstract class enrol_plugin {
             throw new coding_exception('invalid enrol instance!');
         }
 
-        //first unenrol all users
+        //unenrol all users in batches of BATCH_INSERT_MAX_ROW_COUNT
         $participants = $DB->get_recordset('user_enrolments', array('enrolid'=>$instance->id));
+        $pcount = 0;
+        $puids = array();
         foreach ($participants as $participant) {
-            $this->unenrol_user($instance, $participant->userid);
+            $puids[] = $participant->userid;
+            $pcount++;
+            if ($pcount == BATCH_INSERT_MAX_ROW_COUNT) {
+                $this->unenrol_user_bulk($instance, $puids);
+                // reset
+                $pcount = 0;
+                $puids = array();
+            }
         }
+        //handle any remainder
+        if (!empty($puids)) {
+            $this->unenrol_user_bulk($instance, $puids);
+        }
+        unset($pcount, $puids);
         $participants->close();
 
         // now clean up all remainders that were not removed correctly

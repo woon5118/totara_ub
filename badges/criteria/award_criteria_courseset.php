@@ -90,10 +90,11 @@ class award_criteria_courseset extends award_criteria {
                 $select[$c->id] = $list[$c->category] . ' / ' . format_string($c->fullname, true, array('context' => context_course::instance($c->id)));
             }
 
+            asort($select);
             if ($this->id !== 0) {
                 $selected = array_keys($this->params);
             }
-            $settings = array('multiple' => 'multiple', 'size' => 20, 'style' => 'width:300px');
+            $settings = array('multiple' => 'multiple', 'size' => 20, 'class' => 'selectcourse');
             $mform->addElement('select', 'courses', get_string('addcourse', 'badges'), $select, $settings);
             $mform->addRule('courses', get_string('requiredcourse', 'badges'), 'required');
             $mform->addHelpButton('courses', 'addcourse', 'badges');
@@ -209,10 +210,20 @@ class award_criteria_courseset extends award_criteria {
      * @return bool Whether criteria is complete
      */
     public function review($userid, $filtered = false) {
+        global $DB;
+        
         foreach ($this->params as $param) {
-            $course =  new stdClass();
-            $course->id = $param['course'];
+            $course = $DB->get_record('course', array('id' => $param['course']));
 
+            // Extra check in case a course was deleted while badge is still active.
+            if (!$course) {
+                if ($this->method == BADGE_CRITERIA_AGGREGATION_ALL) {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+            
             $info = new completion_info($course);
             $check_grade = true;
             $check_date = true;
@@ -286,5 +297,27 @@ class award_criteria_courseset extends award_criteria {
             }
             return array($join, $where, $params);
         }
+    }
+
+    /**
+     * Checks criteria for any major problems.
+     *
+     * @return array A list containing status and an error message (if any).
+     */
+    public function validate() {
+        global $DB;
+        $params = array_keys($this->params);
+        $method = ($this->method == BADGE_CRITERIA_AGGREGATION_ALL);
+        $singleparam = (count($params) == 1);
+
+        foreach ($params as $param) {
+            // Perform check if there only one parameter with any type of aggregation,
+            // Or there are more than one parameter with aggregation ALL.
+            if (($singleparam || $method) && !$DB->record_exists('course', array('id' => $param))) {
+                return array(false, get_string('error:invalidparamcourse', 'badges'));
+            }
+        }
+
+        return array(true, '');
     }
 }

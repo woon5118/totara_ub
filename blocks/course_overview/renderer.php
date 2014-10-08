@@ -206,11 +206,20 @@ class block_course_overview_renderer extends plugin_renderer_base {
      * @param int $total count of hidden courses
      * @return string html
      */
-    public function hidden_courses($total) {
-        if ($total <= 0) {
+    public function hidden_courses($total, $showing) {
+        if ($total <= $showing) {
             return;
         }
+
+        $vars = new stdClass();
+        $vars->showing = $showing;
+        $vars->total = $total;
+        $url = new moodle_url('/totara/plan/record/courses.php', array('status' => 'all'));
+        $vars->url = $url->out();
+
         $output = $this->output->box_start('notice');
+        $output .= get_string('showingxofycourses', 'block_course_overview', $vars);
+
         $plural = $total > 1 ? 'plural' : '';
         $config = get_config('block_course_overview');
         // Show view all course link to user if forcedefaultmaxcourses is not empty.

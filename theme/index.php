@@ -59,8 +59,8 @@ if ($reset and confirm_sesskey()) {
     $confirmpage->set_url($PAGE->url);
     $confirmpage->set_pagelayout($PAGE->pagelayout);
     $confirmpage->set_pagetype($PAGE->pagetype);
-    $confirmpage->set_title($PAGE->title);
-    $confirmpage->set_heading($PAGE->heading);
+    $confirmpage->set_title($OUTPUT->page_title());
+    $confirmpage->set_heading($OUTPUT->page_heading());
 
     // Get the core renderer for the new theme.
     $output = $confirmpage->get_renderer('core');
@@ -168,6 +168,16 @@ if (!empty($CFG->enabledevicedetection) && empty($device)) {
         }
         if ($themename !== $theme->name) {
             // Obsoleted or broken theme, just skip for now.
+            continue;
+        }
+        //Hide the standard moodle theme from users, they should be using standardTotara.
+        //Do Not! remove the code though, the totara themes require it.
+        if ($themename == 'standard') {
+            continue;
+        }
+        //Hide the standard mymobile theme from users, they should be using mymobiletotara.
+        //Do Not! remove the code though, the totara themes require it.
+        if ($themename == 'mymobile') {
             continue;
         }
         if (empty($CFG->themedesignermode) && $theme->hidefromselector) {

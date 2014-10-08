@@ -317,18 +317,18 @@ foreach($activities as $activity) {
     }
 
     // Some names (labels) come URL-encoded and can be very long, so shorten them
-    $displayname = shorten_text($activity->name);
+    $activity->name = !$csv ? shorten_text($activity->name) : $activity->name;
 
     if ($csv) {
-        print $sep.csv_quote(strip_tags($displayname)).$sep.csv_quote($datetext);
+        print $sep.csv_quote(strip_tags($activity->name)).$sep.csv_quote($datetext);
     } else {
-        $formattedactivityname = format_string($displayname, true, array('context' => $activity->context));
-        print '<th scope="col" class="'.$datepassedclass.'">'.
-            '<a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
+        $formattedactivityname = format_string($activity->name, true, array('context' => $context));
+        print '<th scope="col" class="ie-vertical '.$datepassedclass.'">'.
+            '<div class="ie-vertical"><a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
             '/view.php?id='.$activity->id.'" title="' . $formattedactivityname . '">'.
-            '<img src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
+            '<img class="ie-size" src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
             get_string('modulename',$activity->modname).'" /> <span class="completion-activityname">'.
-            $formattedactivityname.'</span></a>';
+            $formattedactivityname.'</span></a></div>';
         if ($activity->completionexpected) {
             print '<div class="completion-expected"><span>'.$datetext.'</span></div>';
         }
@@ -336,7 +336,7 @@ foreach($activities as $activity) {
     }
     $formattedactivities[$activity->id] = (object)array(
         'datepassedclass' => $datepassedclass,
-        'displayname' => $displayname,
+        'displayname' => $formattedactivityname,
     );
 }
 
@@ -364,12 +364,17 @@ foreach($progress as $user) {
 
     // Progress for each activity
     foreach($activities as $activity) {
-
         // Get progress information and state
         if (array_key_exists($activity->id,$user->progress)) {
             $thisprogress=$user->progress[$activity->id];
             $state=$thisprogress->completionstate;
-            $date=userdate($thisprogress->timemodified);
+            if (!empty($thisprogress->timecompleted)) {
+                $date = userdate($thisprogress->timecompleted);
+            } else if (!empty($thisprogress->timemodified)) {
+                $date = userdate($thisprogress->timemodified);
+            } else {
+                $date = '';
+            }
         } else {
             $state=COMPLETION_INCOMPLETE;
             $date='';
@@ -387,12 +392,13 @@ foreach($progress as $user) {
             ($activity->completion==COMPLETION_TRACKING_AUTOMATIC ? 'auto' : 'manual').
             '-'.$completiontype;
 
+        $modcontext = context_module::instance($activity->id);
         $describe = get_string('completion-' . $completiontype, 'completion');
         $a=new StdClass;
         $a->state=$describe;
         $a->date=$date;
         $a->user=fullname($user);
-        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $activity->context));
+        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $modcontext));
         $fulldescribe=get_string('progress-title','completion',$a);
 
         if ($csv) {

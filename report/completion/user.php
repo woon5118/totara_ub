@@ -36,16 +36,9 @@ $course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
 $coursecontext   = context_course::instance($course->id);
 $personalcontext = context_user::instance($user->id);
 
-if ($USER->id != $user->id and has_capability('moodle/user:viewuseractivitiesreport', $personalcontext)
-        and !is_enrolled($coursecontext, $USER) and is_enrolled($coursecontext, $user)) {
-    //TODO: do not require parents to be enrolled in courses - this is a hack!
-    require_login();
-    $PAGE->set_course($course);
-} else {
-    require_login($course);
-}
+$PAGE->set_course($course);
 
-if (!report_completion_can_access_user_report($user, $course, true)) {
+if (!completion_can_view_data($user->id, $course->id)) {
     // this should never happen
     error('Can not access user completion report');
 }
@@ -62,91 +55,69 @@ echo $OUTPUT->header();
 
 
 // Display course completion user report
+// Categorize courses by their status
 
 // Grab all courses the user is enrolled in and their completion status
-$sql = "
-    SELECT DISTINCT
-        c.id AS id
-    FROM
-        {course} c
-    INNER JOIN
-        {context} con
-     ON con.instanceid = c.id
-    INNER JOIN
-        {role_assignments} ra
-     ON ra.contextid = con.id
-    INNER JOIN
-        {enrol} e
-     ON c.id = e.courseid
-    INNER JOIN
-        {user_enrolments} ue
-     ON e.id = ue.enrolid AND ra.userid = ue.userid
-    AND ra.userid = {$user->id}
-";
-
-// Get roles that are tracked by course completion
-if ($roles = $CFG->gradebookroles) {
-    $sql .= '
-        AND ra.roleid IN ('.$roles.')
-    ';
+if ($course->id == SITEID) {
+    $course_completions = completion_info::get_all_courses($user->id);
 }
+else {
+    $ccompletion = new completion_completion(
+        array(
+            'userid'    => $user->id,
+            'course'    => $course->id
+        )
+    );
 
-$sql .= '
-    WHERE
-        con.contextlevel = '.CONTEXT_COURSE.'
-    AND c.enablecompletion = 1
-';
-
-
-// If we are looking at a specific course
-if ($course->id != 1) {
-    $sql .= '
-        AND c.id = '.(int)$course->id.'
-    ';
-}
-
-// Check if result is empty
-$rs = $DB->get_recordset_sql($sql);
-if (!$rs->valid()) {
-
-    if ($course->id != 1) {
-        $error = get_string('nocompletions', 'report_completion'); // TODO: missing string
-    } else {
-        $error = get_string('nocompletioncoursesenroled', 'report_completion'); // TODO: missing string
-    }
-
-    echo $OUTPUT->notification($error);
-    $rs->close(); // not going to loop (but break), close rs
-    echo $OUTPUT->footer();
-    die();
+    $course_completions = array($ccompletion);
 }
 
 // Categorize courses by their status
 $courses = array(
     'inprogress'    => array(),
     'complete'      => array(),
-    'unstarted'     => array()
+    'notyetstarted' => array()
 );
 
 // Sort courses by the user's status in each
-foreach ($rs as $course_completion) {
-    $c_info = new completion_info((object)$course_completion);
+$num_completions = 0;
+foreach ($course_completions as $course_completion) {
 
-    // Is course complete?
-    $coursecomplete = $c_info->is_course_complete($user->id);
+    // Get status
+    $status = completion_completion::get_status($course_completion);
 
-    // Has this user completed any criteria?
-    $criteriacomplete = $c_info->count_course_user_data($user->id);
+    // Combine complete and completeviarpl
+    if ($status == 'completeviarpl') {
+        $status = 'complete';
+    }
 
-    if ($coursecomplete) {
-        $courses['complete'][] = $c_info;
-    } else if ($criteriacomplete) {
-        $courses['inprogress'][] = $c_info;
-    } else {
-        $courses['unstarted'][] = $c_info;
+    // If the user's status in the course hasn't been aggregated yet,
+    // it probably means the user has been enrolled in the course
+    // but the cron job hasn't run yet.
+    if ($status == ''){
+        $status = 'notyetstarted';
+    }
+
+    $c = (object) array('id' => $course_completion->course);
+    $cinfo = new completion_info($c);
+    if ($cinfo->has_criteria()) {
+        $courses[$status][] = $cinfo;
+        ++$num_completions;
     }
 }
-$rs->close(); // after loop, close rs
+
+// Check if results were empty
+if (!$num_completions) {
+    if ($course->id != SITEID) {
+        $error = get_string('nocompletions', 'report_completion');
+    } else {
+        $error = get_string('nocompletioncoursesenroled', 'report_completion');
+    }
+
+    echo $OUTPUT->notification($error);
+    echo $OUTPUT->footer();
+    die();
+}
 
 // Loop through course status groups
 foreach ($courses as $type => $infos) {
@@ -154,8 +125,14 @@ foreach ($courses as $type => $infos) {
     // If there are courses with this status
     if (!empty($infos)) {
 
-        echo '<h1 align="center">'.get_string($type, 'report_completion').'</h1>';
-        echo '<table class="generaltable boxaligncenter">';
+        // If showing all courses
+        if ($course->id == SITEID) {
+            echo '<h2>'.get_string($type, 'report_completion').'</h2>';
+        } else {
+            echo '<h2>'.format_string($course->fullname).': '.get_string($type, 'completion').'</h2>';
+        }
+
+        echo '<table class="generalbox logtable boxaligncenter course-completion-table" width="100%">';
         echo '<tr class="ccheader">';
         echo '<th class="c0 header" scope="col">'.get_string('course').'</th>';
         echo '<th class="c1 header" scope="col">'.get_string('requiredcriteria', 'completion').'</th>';
@@ -167,6 +144,7 @@ foreach ($courses as $type => $infos) {
         }
 
         echo '</tr>';
+        $oddeven = 0;
 
         // For each course
         foreach ($infos as $c_info) {
@@ -186,9 +164,9 @@ foreach ($courses as $type => $infos) {
             $activities = array();
             $activities_complete = 0;
 
-            // For aggregating prerequisites
-            $prerequisites = array();
-            $prerequisites_complete = 0;
+            // For aggregating dependencies
+            $dependencies = array();
+            $dependencies_complete = 0;
 
             // Loop through course criteria
             foreach ($completions as $completion) {
@@ -206,12 +184,12 @@ foreach ($courses as $type => $infos) {
                     continue;
                 }
 
-                // Prerequisites are also a special case, so cache them and leave them till last
+                // Dependencies are also a special case, so cache them and leave them till last
                 if ($criteria->criteriatype == COMPLETION_CRITERIA_TYPE_COURSE) {
-                    $prerequisites[$criteria->courseinstance] = $complete;
+                    $dependencies[$criteria->courseinstance] = $complete;
 
                     if ($complete) {
-                        $prerequisites_complete++;
+                        $dependencies_complete++;
                     }
 
                     continue;
@@ -225,19 +203,25 @@ foreach ($courses as $type => $infos) {
 
             // Aggregate activities
             if (!empty($activities)) {
+                $activities_stats = new stdClass();
+                $activities_stats->completed = $activities_complete;
+                $activities_stats->total = count($activities);
 
                 $row = array();
                 $row['title'] = get_string('activitiescomplete', 'report_completion');
-                $row['status'] = $activities_complete.' of '.count($activities);
+                $row['status'] = get_string('xofy', 'report_completion', $activities_stats);
                 $rows[] = $row;
             }
 
-            // Aggregate prerequisites
-            if (!empty($prerequisites)) {
+            // Aggregate dependencies
+            if (!empty($dependencies)) {
+                $dependencies_stats = new stdClass();
+                $dependencies_stats->completed = $dependencies_complete;
+                $dependencies_stats->total = count($dependencies);
 
                 $row = array();
-                $row['title'] = get_string('prerequisitescompleted', 'completion');
-                $row['status'] = $prerequisites_complete.' of '.count($prerequisites);
+                $row['title'] = get_string('dependenciescompleted', 'completion');
+                $row['status'] = get_string('xofy', 'report_completion', $dependencies_stats);
                 array_splice($rows, 0, 0, array($row));
             }
 
@@ -246,23 +230,27 @@ foreach ($courses as $type => $infos) {
             // Print table
             foreach ($rows as $row) {
 
+                $oddeven = $oddeven % 2;
+
                 // Display course name on first row
                 if ($first_row) {
-                    echo '<tr><td class="c0"><a href="'.$CFG->wwwroot.'/course/view.php?id='.$c_course->id.'">'.$course_name.'</a></td>';
+                    echo '<tr class="r' . $oddeven .'"><td class="cell c0"><a href="'.$CFG->wwwroot.'/course/view.php?id='.$c_course->id.'">'.format_string($course_name).'</a></td>';
                 } else {
-                    echo '<tr><td class="c0"></td>';
+                    echo '<tr class="r' . $oddeven .'"><td class="cell c0"></td>';
                 }
 
-                echo '<td class="c1">';
+                ++$oddeven;
+
+                echo '<td class="cell c1">';
                 echo $row['title'];
-                echo '</td><td class="c2">';
+                echo '</td><td class="cell c2">';
 
                 switch ($row['status']) {
-                    case 'Yes':
+                    case get_string('yes'):
                         echo get_string('complete');
                         break;
 
-                    case 'No':
+                    case get_string('no'):
                         echo get_string('incomplete', 'report_completion');
                         break;
 
@@ -271,7 +259,7 @@ foreach ($courses as $type => $infos) {
                 }
 
                 // Display link on first row
-                echo '</td><td class="c3">';
+                echo '</td><td class="cell c3">';
                 if ($first_row) {
                     echo '<a href="'.$CFG->wwwroot.'/blocks/completionstatus/details.php?course='.$c_course->id.'&user='.$user->id.'">'.get_string('detailedview', 'report_completion').'</a>';
                 }
@@ -285,7 +273,7 @@ foreach ($courses as $type => $infos) {
                     );
 
                     $ccompletion = new completion_completion($params);
-                    echo '<td class="c4">'.userdate($ccompletion->timecompleted, '%e %B %G').'</td>';
+                    echo '<td class="cell c4">'.userdate($ccompletion->timecompleted, get_string('strftimedate', 'langconfig')).'</td>';
                 }
 
                 $first_row = false;
@@ -295,8 +283,8 @@ foreach ($courses as $type => $infos) {
 
         echo '</table>';
     }
-}
 
+}
 
 echo $OUTPUT->footer();
 // Trigger a user report viewed event.

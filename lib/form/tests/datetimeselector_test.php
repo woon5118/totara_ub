@@ -160,7 +160,14 @@ class core_form_datetimeselector_testcase extends basic_testcase {
             $el->_createElements();
             $submitvalues = array('dateselector' => $vals);
 
-            $this->assertSame(array('dateselector' => $vals['timestamp']), $el->exportValue($submitvalues),
+            //Totara added the _raw field for the date in ISO format
+            $rawvalue = $vals['year'] . '-' . str_pad($vals['month'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($vals['day'], 2, '0', STR_PAD_LEFT);
+            $rawvalue .= ' ' . str_pad($vals['hour'], 2, '0', STR_PAD_LEFT)  . ':' . str_pad($vals['minute'], 2, '0', STR_PAD_LEFT)  . ':00';
+            $exportvalues = $el->exportValue($submitvalues);
+            ksort($exportvalues);
+            $expectedvalues = array('dateselector' => $vals['timestamp'], 'dateselector_raw' => $rawvalue);
+            ksort($expectedvalues);
+            $this->assertSame($exportvalues, $expectedvalues,
                     "Please check if timezones are updated (Site adminstration -> location -> update timezone)");
         }
 

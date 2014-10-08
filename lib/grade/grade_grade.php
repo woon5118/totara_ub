@@ -52,6 +52,12 @@ class grade_grade extends grade_object {
                                  'locktime', 'exported', 'overridden', 'excluded', 'timecreated', 'timemodified');
 
     /**
+     * Array of text table fields.
+     * @var array $text_fields
+     */
+    public $text_fields = array('feedback', 'information');
+
+    /**
      * Array of optional fields with default values (these should match db defaults)
      * @var array $optional_fields
      */
@@ -790,7 +796,7 @@ class grade_grade extends grade_object {
      * @param bool $deleted True if grade was actually deleted
      */
     protected function notify_changed($deleted) {
-        global $CFG;
+        global $CFG, $DB;
 
         // Condition code may cache the grades for conditional availability of
         // modules or sections. (This code should use a hook for communication
@@ -817,8 +823,26 @@ class grade_grade extends grade_object {
         // Load information about grade item
         $this->load_grade_item();
 
-        // Only course-modules have completion data
-        if ($this->grade_item->itemtype!='mod') {
+        // If course grade, notify course completion.
+        if ($this->grade_item->itemtype == 'course') {
+            $event = \totara_core\event\module_completion::create(
+                array(
+                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $this->grade_item->iteminstance, 'userid' => $this->userid)),
+                    'other' => array(
+                            'moduleinstance' => $this->grade_item->iteminstance,
+                            'userid' => $this->userid,
+                            'course' => $this->grade_item->courseid,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE,
+                            ),
+                )
+            );
+            $event->trigger();
+
+            return;
+        }
+
+        // If module grade, notify activityi completion.
+        if ($this->grade_item->itemtype != 'mod') {
             return;
         }
 

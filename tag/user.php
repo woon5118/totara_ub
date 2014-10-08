@@ -23,6 +23,11 @@ if (!confirm_sesskey()) {
 
 $usercontext = context_user::instance($USER->id);
 
+// Either tag or tagid is required.
+if (empty($tag) && !$id) {
+    print_error('invaliddata');
+}
+
 switch ($action) {
     case 'addinterest':
         if (empty($tag) && $id) { // for backward-compatibility (people saving bookmarks, mostly..)
