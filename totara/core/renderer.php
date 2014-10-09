@@ -434,6 +434,12 @@ class totara_core_renderer extends plugin_renderer_base {
      */
     public function print_totara_menu($menudata, $parent=null, $selected_items=array()) {
         global $PAGE;
+        $PAGE->requires->jquery();
+        static $menuinited = false;
+        if (!$menuinited) {
+            $PAGE->requires->yui_module('moodle-totara_core-totaramenu', 'M.coremenu.setfocus.init');
+            $menuinited = true;
+        }
 
         $output = '';
 
