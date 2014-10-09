@@ -50,6 +50,10 @@
 }
 
 /** Daily event list **/
+.path-calendar .maincalendar .eventlist .event {
+    width: 99.9%;
+    padding: 20px 0;
+}
 .path-calendar .maincalendar .eventlist .event .course {
     font-size: 0.8em;
 }
