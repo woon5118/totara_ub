@@ -1373,8 +1373,8 @@ function prog_update_completion($userid, program $program = null) {
             //Get the completion date of the last courseset to use in program completion
             $sql = "SELECT MAX(timecompleted) as timecompleted
                     FROM {prog_completion}
-                    WHERE coursesetid != 0 AND programid = ?";
-            $params = array($program->id);
+                    WHERE coursesetid != 0 AND programid = ? AND userid = ?";
+            $params = array($program->id, $userid);
             $coursesetcompletion = $DB->get_record_sql($sql, $params);
 
             $completionsettings = array(

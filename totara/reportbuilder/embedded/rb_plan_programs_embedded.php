@@ -71,6 +71,16 @@ class rb_plan_programs_embedded extends rb_base_embedded {
                 'value' => 'status',
                 'heading' => get_string('progress', 'totara_program'),
             ),
+            array(
+                'type' => 'program_completion',
+                'value' => 'starteddate',
+                'heading' => get_string('starteddate', 'rb_source_program_completion'),
+            ),
+            array(
+                'type' => 'program_completion',
+                'value' => 'completeddate',
+                'heading' => get_string('completeddate', 'rb_source_program_completion'),
+            ),
         );
 
         $this->filters = array(

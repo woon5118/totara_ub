@@ -240,6 +240,20 @@ class rb_source_dp_program extends rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
+            'program_completion',
+            'starteddate',
+            get_string('starteddate', 'rb_source_program_completion'),
+            'program_completion.timestarted',
+            array('joins' => array('program_completion'), 'displayfunc' => 'prog_date')
+        );
+        $columnoptions[] = new rb_column_option(
+            'program_completion',
+            'completeddate',
+            get_string('completeddate', 'rb_source_program_completion'),
+            'program_completion.timecompleted',
+            array('joins' => array('program_completion'), 'displayfunc' => 'prog_date')
+        );
+        $columnoptions[] = new rb_column_option(
             'program_completion_history',
             'program_previous_completion',
             get_string('program_previous_completion', 'rb_source_dp_program'),
@@ -278,6 +292,24 @@ class rb_source_dp_program extends rb_base_source {
     function rb_display_program_completion_progress($status,$row) {
         $program = new program($row->programid);
         return $program->display_progress($row->userid);
+    }
+
+    /**
+     * Reformat a timestamp into a date, handling -1 which is used by program code for no date.
+     *
+     * If not -1 just call the regular date display function.
+     *
+     * @param integer $date Unix timestamp
+     * @param object $row Object containing all other fields for this row
+     *
+     * @return string Date in a nice format
+     */
+    public function rb_display_prog_date($date, $row) {
+        if ($date == -1) {
+            return '';
+        } else {
+            return $this->rb_display_nice_date($date, $row);
+        }
     }
 
     function rb_display_timedue_date($time,$row) {
