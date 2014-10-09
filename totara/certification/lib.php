@@ -294,8 +294,7 @@ function recertify_window_opens_stage() {
     global $DB, $CFG;
 
     // Find any users who have reached this point.
-    $uniqueid = $DB->sql_concat('cfc.certifid', 'cfc.userid', 'p.id');
-    $sql = "SELECT {$uniqueid} as uniqueid, cfc.certifid, cfc.userid, p.id as pid
+    $sql = "SELECT cfc.id as uniqueid, u.*, cf.id as certifid, cfc.userid, p.id as progid
             FROM {certif_completion} cfc
             JOIN {certif} cf on cf.id = cfc.certifid
             JOIN {prog} p on p.certifid = cf.id
@@ -305,29 +304,45 @@ function recertify_window_opens_stage() {
                   AND cfc.renewalstatus = ?
                   AND u.deleted = 0";
 
-    $certificationcompletions = $DB->get_records_sql($sql, array(time(), CERTIFSTATUS_COMPLETED, CERTIFRENEWALSTATUS_NOTDUE));
+    $results = $DB->get_records_sql($sql, array(time(), CERTIFSTATUS_COMPLETED, CERTIFRENEWALSTATUS_NOTDUE));
 
     require_once($CFG->dirroot.'/course/lib.php'); // Archive_course_activities().
 
     // For each certification & user.
-    foreach ($certificationcompletions as $completionrecord) {
+    foreach ($results as $user) {
         // Archive completion.
-        copy_certif_completion_to_hist($completionrecord->certifid, $completionrecord->userid);
+        copy_certif_completion_to_hist($user->certifid, $user->id);
 
-        $courses = find_courses_for_certif($completionrecord->certifid, 'c.id, c.fullname');
+        $courses = find_courses_for_certif($user->certifid, 'c.id, c.fullname');
 
         // Reset course_completions, course_module_completions, program_completion records.
-        reset_certifcomponent_completions($completionrecord, $courses);
+        reset_certifcomponent_completions($user, $courses);
 
         // Set the renewal status of the certification/program to due for renewal.
         $DB->set_field('certif_completion', 'renewalstatus', CERTIFRENEWALSTATUS_DUE,
-                        array('certifid' => $completionrecord->certifid, 'userid' => $completionrecord->userid));
+                        array('certifid' => $user->certifid, 'userid' => $user->id));
 
-        // Send messages after everything else is done.
-        send_certif_message($completionrecord->pid, $completionrecord->userid, MESSAGETYPE_RECERT_WINDOWOPEN);
+        // Sort out the messages manager.
+        if (isset($messagesmanagers[$user->progid])) {
+            // Use the existing messages manager object if it is available.
+            $messagesmanager = $messagesmanagers[$user->progid];
+        } else {
+            // Create a new messages manager object and store it if it has not already been instantiated.
+            $messagesmanager = new prog_messages_manager($user->progid);
+            $messagesmanagers[$user->progid] = $messagesmanager;
+        }
+
+        $messages = $messagesmanager->get_messages();
+
+        foreach ($messages as $message) {
+            if ($message->messagetype == MESSAGETYPE_RECERT_WINDOWOPEN) {
+                // This function checks prog_messagelog for existing record. If it exists, the message is not sent.
+                $message->send_message($user);
+            }
+        }
     }
 
-    return count($certificationcompletions);
+    return count($results);
 }
 
 /**
@@ -350,7 +365,8 @@ function recertify_window_abouttoclose_stage() {
 
     list($statussql, $statusparams) = $DB->get_in_or_equal(array(CERTIFSTATUS_COMPLETED, CERTIFSTATUS_INPROGRESS));
 
-    $sql = "SELECT cfc.certifid, cfc.userid, p.id as pid
+    $uniqueid = $DB->sql_concat('cfc.id', "'_'", 'pm.id');
+    $sql = "SELECT {$uniqueid} as uniqueid, u.*, p.id as progid, pm.id as pmid
             FROM {certif_completion} cfc
             JOIN {certif} cf on cf.id = cfc.certifid
             JOIN {prog} p ON p.certifid = cf.id
@@ -365,15 +381,30 @@ function recertify_window_abouttoclose_stage() {
 
     $now = time();
     $params = array_merge($statusparams, array(CERTIFRENEWALSTATUS_DUE, $now, $now, MESSAGETYPE_RECERT_WINDOWDUECLOSE));
-    $certificationcompletions = $DB->get_records_sql($sql, $params);
+    $results = $DB->get_records_sql($sql, $params);
 
-    // Send function checks for message already sent and will skip if so. reset_certifcomponent_completion()
-    // will remove entry from prog_messagelog if not already cleared down.
-    foreach ($certificationcompletions as $completion) {
-        send_certif_message($completion->pid, $completion->userid, MESSAGETYPE_RECERT_WINDOWDUECLOSE);
+    foreach ($results as $user) {
+        // Sort out the messages manager.
+        if (isset($messagesmanagers[$user->progid])) {
+            // Use the existing messages manager object if it is available.
+            $messagesmanager = $messagesmanagers[$user->progid];
+        } else {
+            // Create a new messages manager object and store it if it has not already been instantiated.
+            $messagesmanager = new prog_messages_manager($user->progid);
+            $messagesmanagers[$user->progid] = $messagesmanager;
+        }
+
+        $messages = $messagesmanager->get_messages();
+
+        foreach ($messages as $message) {
+            if ($message->id == $user->pmid) {
+                // This function checks prog_messagelog for existing record. If it exists, the message is not sent.
+                $message->send_message($user);
+            }
+        }
     }
 
-    return count($certificationcompletions);
+    return count($results);
 }
 
 /**
@@ -386,7 +417,7 @@ function recertify_expires_stage() {
 
     // Find any users who have reached this point.
     list($statussql, $statusparams) = $DB->get_in_or_equal(array(CERTIFSTATUS_COMPLETED, CERTIFSTATUS_INPROGRESS));
-    $sql = "SELECT cfc.id, cfc.certifid, cfc.userid, cf.id as cfid, p.id as pid
+    $sql = "SELECT cfc.id as uniqueid, u.*, cf.id as certifid, p.id as progid
             FROM {certif_completion} cfc
             JOIN {certif} cf ON cf.id = cfc.certifid
             JOIN {prog} p ON p.certifid = cf.id
@@ -397,30 +428,44 @@ function recertify_expires_stage() {
                 AND cfc.status {$statussql}";
 
     $params = array_merge(array(time(), CERTIFRENEWALSTATUS_DUE), $statusparams);
-    $certificationcompletions = $DB->get_records_sql($sql, $params);
+    $results = $DB->get_records_sql($sql, $params);
 
-    foreach ($certificationcompletions as $completion) {
+    foreach ($results as $user) {
         // Set the renewal status of the certification to Expired.
         // Assign the user back to the original certification path. This means the content of their certification
         // will change to show the original set of courses.
-        write_certif_completion($completion->certifid, $completion->userid, CERTIFPATH_CERT, CERTIFRENEWALSTATUS_EXPIRED);
+        write_certif_completion($user->certifid, $user->id, CERTIFPATH_CERT, CERTIFRENEWALSTATUS_EXPIRED);
 
         // For each course in the certification, set the renewal status to Expired.
         $courseids = array();
-        $courses = find_courses_for_certif($completion->certifid, 'c.id, c.fullname');
+        $courses = find_courses_for_certif($user->certifid, 'c.id, c.fullname');
         foreach ($courses as $course) {
             $courseids[] = $course->id;
         }
 
-        $status = CERTIFRENEWALSTATUS_EXPIRED;
+        set_course_renewalstatus($courseids, $user->id, CERTIFRENEWALSTATUS_EXPIRED);
 
-        set_course_renewalstatus($courseids, $completion->userid, $status);
+        // Sort out the messages manager.
+        if (isset($messagesmanagers[$user->progid])) {
+            // Use the existing messages manager object if it is available.
+            $messagesmanager = $messagesmanagers[$user->progid];
+        } else {
+            // Create a new messages manager object and store it if it has not already been instantiated.
+            $messagesmanager = new prog_messages_manager($user->progid);
+            $messagesmanagers[$user->progid] = $messagesmanager;
+        }
 
-        // Generate a message for the learner's manager alerting them that they have failed to recertify.
-        send_certif_message($completion->pid, $completion->userid, MESSAGETYPE_RECERT_FAILRECERT);
+        $messages = $messagesmanager->get_messages();
+
+        foreach ($messages as $message) {
+            if ($message->messagetype == MESSAGETYPE_RECERT_FAILRECERT) {
+                // This function checks prog_messagelog for existing record. If it exists, the message is not sent.
+                $message->send_message($user);
+            }
+        }
     }
 
-    return count($certificationcompletions);
+    return count($results);
 }
 
 /**
@@ -552,7 +597,7 @@ function copy_certif_completion_to_hist($certificationid, $userid, $unassigned =
  *
  * @param array $courseids
  * @param integer $userid
- * @param enum $renewalstatus
+ * @param integer $renewalstatus
  */
 function set_course_renewalstatus($courseids, $userid, $renewalstatus) {
     global $DB;
@@ -633,48 +678,6 @@ function find_courses_for_certif($certifid, $fields='c.id, c.fullname') {
     $certificationrecords = $DB->get_records_sql($sql, array($certifid));
 
     return $certificationrecords;
-}
-
-/**
- * Send message defined in program_message.class.php to user
- * and also to manager if specified in settings
- *
- * @param integer $userid
- * @param integer $progid
- * @param integer $msgtype
- */
-function send_certif_message($progid, $userid, $msgtype) {
-    global $DB;
-
-    $user = $DB->get_record('user', array('id' => $userid));
-    $messagesmanager = new prog_messages_manager($progid);
-    $messages = $messagesmanager->get_messages();
-
-    $now = time();
-    $certif = $DB->get_record_sql("SELECT cc.*
-                                     FROM {certif_completion} cc
-                                     JOIN {prog} p ON p.certifid = cc.certifid
-                                    WHERE p.id = ? AND cc.userid = ?", array($progid, $userid));
-    // If messagetype set up for this program, send notifications to user and the user's manager (if set on message).
-    foreach ($messages as $message) {
-        if ($message->messagetype == $msgtype) {
-            if ($msgtype == MESSAGETYPE_RECERT_WINDOWDUECLOSE) {
-                // ONLY send the ones that are due.
-                if($now > ($certif->timeexpires - $message->triggertime) && $now < $certif->timeexpires) {
-                    $sent = $DB->get_records('prog_messagelog', array('messageid' => $message->id, 'userid' => $userid));
-                    // DON'T send them more than once.
-                    if(empty($sent)) {
-                        $message->send_message($user);
-                    }
-                }
-            } else {
-               $message->send_message($user); // Prog_eventbased_message.send_message() program_message.class.php.
-               // This function checks prog_messagelog for existing record, checking messageid and userid (and coursesetid(=0))
-               // messageid is id of message in prog_message (ie for this prog and message type)
-               // if exists, the message is not sent.
-            }
-        }
-    }
 }
 
 /**
