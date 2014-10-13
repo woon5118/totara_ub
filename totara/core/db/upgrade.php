@@ -1205,5 +1205,23 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014100903, 'totara_core');
     }
 
+    if ($oldversion < 2014101400) {
+        // Make sure the lockout is enabled before removing this setting.
+        if (!empty($CFG->recaptchaloginform)) {
+            if (empty($CFG->lockoutthreshold) or $CFG->lockoutthreshold < 20) {
+                set_config('lockoutthreshold', 20);
+            }
+        }
+        // Make sure password reset does not show any hints if recaptcha previously enabled.
+        if (!empty($CFG->recaptchaforgotform)) {
+            set_config('protectusernames', 1);
+        }
+
+        unset_config('recaptchaloginform');
+        unset_config('recaptchaforgotform');
+
+        totara_upgrade_mod_savepoint(true, 2014101400, 'totara_core');
+    }
+
     return true;
 }

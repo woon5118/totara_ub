@@ -92,8 +92,6 @@ if ($hassiteconfig) {
 
     $temp->add(new admin_setting_configtext('recaptchapublickey', new lang_string('recaptchapublickey', 'admin'), new lang_string('configrecaptchapublickey', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configtext('recaptchaprivatekey', new lang_string('recaptchaprivatekey', 'admin'), new lang_string('configrecaptchaprivatekey', 'admin'), '', PARAM_NOTAGS));
-    $temp->add(new admin_setting_configcheckbox('recaptchaloginform', new lang_string('recaptchaloginform', 'admin'), new lang_string('configrecaptchaloginform', 'admin'), 0));
-    $temp->add(new admin_setting_configcheckbox('recaptchaforgotform', new lang_string('recaptchaforgotform', 'admin'), new lang_string('configrecaptchaforgotform', 'admin'), 0));
     $ADMIN->add('authsettings', $temp);
 
     $temp = new admin_externalpage('authtestsettings', get_string('testsettings', 'core_auth'), new moodle_url("/auth/test_settings.php"), 'moodle/site:config', true);
