@@ -120,10 +120,8 @@ if ($d and $confirm) {
     }
 
     if (facetoface_delete_session($session)) {
-        add_to_log($course->id, 'facetoface', 'delete session', 'sessions.php?s='.$session->id, $facetoface->id, $cm->id);
-    }
-    else {
-        add_to_log($course->id, 'facetoface', 'delete session (FAILED)', 'sessions.php?s='.$session->id, $facetoface->id, $cm->id);
+        \mod_facetoface\event\session_deleted::create_from_session($session, $context)->trigger();
+    } else {
         print_error('error:couldnotdeletesession', 'facetoface', $returnurl);
     }
     redirect($returnurl);
@@ -240,19 +238,16 @@ if ($fromform = $mform->get_data()) { // Form submitted
         $sessionid = $session->id;
         $olddates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $session->id), 'timestart');
         if (!facetoface_update_session($todb, $sessiondates)) {
-            add_to_log($course->id, 'facetoface', 'update session (FAILED)', "sessions.php?s=$session->id", $facetoface->id, $cm->id);
             print_error('error:couldnotupdatesession', 'facetoface', $returnurl);
         }
     } else {
         if (!$sessionid = facetoface_add_session($todb, $sessiondates)) {
-            add_to_log($course->id, 'facetoface', 'add session (FAILED)', 'sessions.php?f='.$facetoface->id, $facetoface->id, $cm->id);
             print_error('error:couldnotaddsession', 'facetoface', $returnurl);
         }
     }
 
     // Save session room info.
     if (!facetoface_save_session_room($sessionid, $fromform)) {
-        add_to_log($course->id, 'facetoface', 'save room (FAILED)', 'room/manage.php', $facetoface->id, $cm->id);
         print_error('error:couldnotsaveroom', 'facetoface');
     }
 
@@ -298,9 +293,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
     facetoface_update_calendar_entries($session, $facetoface);
 
     if ($update) {
-        add_to_log($course->id, 'facetoface', 'updated session', "sessions.php?s=$session->id", $facetoface->id, $cm->id);
+        \mod_facetoface\event\session_updated::create_from_session($session, $context)->trigger();
     } else {
-        add_to_log($course->id, 'facetoface', 'added session', 'sessions.php?f='.$facetoface->id, $facetoface->id, $cm->id);
+        \mod_facetoface\event\session_created::create_from_session($session, $context)->trigger();
     }
 
     $data = file_postupdate_standard_editor($fromform, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $session->id);

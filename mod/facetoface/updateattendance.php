@@ -57,9 +57,10 @@ require_capability('mod/facetoface:takeattendance', $context);
 
 if (facetoface_take_attendance($data)) {
     echo json_encode(array('result' => 'success'));
-    add_to_log($course->id, 'facetoface', 'take attendance', "view.php?id=$cm->id", $facetoface->id, $cm->id);
+    // Trigger take attendance update event.
+    \mod_facetoface\event\attendance_updated::create_from_session($session, $context)->trigger();
 } else {
-    add_to_log($course->id, 'facetoface', 'take attendance (FAILED)', "view.php?id=$cm->id", $facetoface->id, $cm->id);
+    print_error('error:takeattendance', 'facetoface');
 }
 
 exit();

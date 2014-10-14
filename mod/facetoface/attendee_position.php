@@ -97,14 +97,17 @@ if ($fromform = $mform->get_data()) {
         die();
     }
 
-    add_to_log(
-        $course->id,
-        'facetoface',
-        'update attendee position',
-        "attendee_position.php?id={$userid}&s={$sessionid}",
-        $sessionid,
-        $cm->id
+    $event = \mod_facetoface\event\attendee_position_updated::create(
+        array(
+            'objectid' => $user->signupid,
+            'context' => $context,
+            'other' => array(
+                'sessionid'  => $session->id,
+                'attendeeid' => $user->id,
+            )
+        )
     );
+    $event->trigger();
 
     $label = position::position_label($positionassignment);
 

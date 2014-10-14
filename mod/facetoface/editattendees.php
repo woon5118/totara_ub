@@ -149,11 +149,6 @@ if ($save && $onlycontent) {
     }
 
     // Adding new attendees.
-    // Setup language string object for Site Log entry on adding/removing attendees.
-    $a = new stdClass();
-    $a->f2fname = $facetoface->name;
-    $a->sessionid = $session->id;
-    $a->action = get_string('addremoveattendees', 'facetoface');
     // Check if we need to add anyone.
     $attendeestoadd = array_diff_key($attendees, $original);
     if (!empty($attendeestoadd) && has_capability('mod/facetoface:addattendees', $context)) {
@@ -207,10 +202,7 @@ if ($save && $onlycontent) {
 
     // Log that users were edited.
     if (count($added) > 0 || count($errors) > 0) {
-        $a->usercount = count($added);
-        $a->errorcount = count($errors);
-        $info = get_string('sitelogseditattendees', 'facetoface', $a);
-        add_to_log($course->id, 'facetoface', $a->action, "editattendees.php?s={$session->id}&clear=1", $info, $cm->id);
+        \mod_facetoface\event\attendees_updated::create_from_session($session, $context)->trigger();
     }
     $_SESSION['f2f-bulk-results'][$session->id] = array($added, $errors);
 

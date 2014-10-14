@@ -101,6 +101,7 @@ class attendee_note {
      */
     public function get() {
         $obj = new stdClass();
+        $obj->id = $this->id;
         $obj->userid = $this->userid;
         $obj->sessionid = $this->sessionid;
         $obj->usernote = $this->usernote;

@@ -53,8 +53,6 @@ $PAGE->set_cm($cm);
 require_login($course, true, $cm);
 require_capability('mod/facetoface:view', $context);
 
-add_to_log($course->id, 'facetoface', 'view', "interest.php?id=$cm->id", $facetoface->id, $cm->id);
-
 $title = $course->shortname . ': ' . format_string($facetoface->name);
 
 $PAGE->set_title($title);
@@ -68,9 +66,15 @@ if ($mform->is_cancelled()) {
 } else if ($data = $mform->get_data()) {
     if ($declare) {
         $reason = isset($data->reason) ? $data->reason : '';
-        facetoface_declare_interest($facetoface, $reason);
+        if ($interestid = facetoface_declare_interest($facetoface, $reason)) {
+            $interestobj = $DB->get_record('facetoface_interest', array('id' => $interestid));
+            \mod_facetoface\event\interest_declared::create_from_instance($interestobj, $context)->trigger();
+        }
     } else {
-        facetoface_withdraw_interest($facetoface);
+        $interestobj = $DB->get_record('facetoface_interest', array('facetoface' => $facetoface->id, 'userid' => $USER->id));
+        if (facetoface_withdraw_interest($facetoface)) {
+            \mod_facetoface\event\interest_withdrawn::create_from_instance($interestobj, $context)->trigger();
+        }
     }
     redirect($redirecturl);
 }

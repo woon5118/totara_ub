@@ -46,9 +46,7 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
         $form->requests = array($userid => 2);  // 2 = approve, 1 = decline
 
         // Approve requests
-        if (facetoface_approve_requests($form)) {
-            add_to_log($course->id, 'facetoface', 'approve requests', "view.php?id=$cm->id", $facetoface->id, $cm->id);
-        }
+        facetoface_approve_requests($form);
 
         // issue notification that registration has been accepted
         return $this->acceptreject_notification($userid, $facetoface, $session, 'status_approved');
@@ -82,9 +80,7 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
         $form->requests = array($userid => 1);  // 2 = approve, 1 = decline
         error_log(var_export($form, true));
         // Decline requests
-        if (facetoface_approve_requests($form)) {
-            add_to_log($course->id, 'facetoface', 'approve requests', "view.php?id=$cm->id", $facetoface->id, $cm->id);
-        }
+        facetoface_approve_requests($form);
 
         // issue notification that registration has been declined
         return $this->acceptreject_notification($userid, $facetoface, $session, 'status_declined');
