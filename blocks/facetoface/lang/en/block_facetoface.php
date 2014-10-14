@@ -70,7 +70,6 @@ $string['sessions'] = 'Sessions';
 $string['sessiondatesviewattendees'] = 'You can view attendees in the following sessions:';
 $string['sessiondatesview'] = 'You are involved in the following sessions';
 $string['sessiondatesviewattendeeszero'] = 'You cannot view the attendees of any session in the given date range.';
-$string['sessiondatestable'] = 'List of session details along with number of bookings';
 $string['sessiondetails'] = 'Session details';
 $string['sessionlist'] = 'Session list';
 $string['showingallwaitlistedsessions'] = '<p><i>Displaying all wait-listed courses matching the current criteria.</i></p>';

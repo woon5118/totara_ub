@@ -34,105 +34,92 @@ class block_facetoface_renderer extends plugin_renderer_base {
     public function print_dates($dates, $includebookings, $includegrades=false, $includestatus=false, $includecourseid=false, $includetrainers=false, $showlocation=true) {
         global $CFG, $USER;
 
-        $output = '';
-
         $courselink = $CFG->wwwroot.'/course/view.php?id=';
         $facetofacelink = $CFG->wwwroot.'/mod/facetoface/view.php?f=';
         $attendeelink = $CFG->wwwroot.'/mod/facetoface/attendees.php?s=';
         $bookinghistoryurl = new moodle_url('/blocks/facetoface/bookinghistory.php');
 
-        $output .= html_writer::start_tag('table', array('border' => "1", 'cellpadding' => "5", 'summary' => get_string('sessiondatestable', 'block_facetoface'))) . html_writer::start_tag('tr');
+        $bookings = new html_table();
 
         // include the course id in the display
         if ($includecourseid) {
-            $output .= html_writer::tag('th', get_string('idnumbercourse'));
+            $bookings->head[] = get_string('idnumbercourse');
         }
 
-        $output .= html_writer::tag('th', get_string('course'));
-        $output .= html_writer::tag('th', get_string('name'));
+        $bookings->head[] = get_string('course');
+        $bookings->head[] = get_string('name');
         if ($showlocation) {
-            $output .= html_writer::tag('th', get_string('location'));
+            $bookings->head[] = get_string('location');
         }
-        $output .= html_writer::tag('th', get_string('date','block_facetoface'));
-        $output .= html_writer::tag('th', get_string('time', 'block_facetoface'));
+        $bookings->head[] = get_string('date','block_facetoface');
+        $bookings->head[] = get_string('time', 'block_facetoface');
 
         if ($includebookings) {
-            $output .= html_writer::tag('th', get_string('nbbookings', 'block_facetoface'));
+            $bookings->head[] = get_string('nbbookings', 'block_facetoface');
         }
 
         // include the grades/status in the display
         if ($includegrades || $includestatus) {
-            $output .= html_writer::tag('th', get_string('status'));
+            $bookings->head[] = get_string('status');
         }
 
-        $output .= html_writer::end_tag('tr');
-        $even = false; // used to colour rows
         foreach ($dates as $date) {
-
+            $daterow = new html_table_row();
             // include the grades in the display
             if ($includegrades) {
                 $grade = facetoface_get_grade($date->userid, $date->courseid, $date->facetofaceid);
             }
 
-            if ($even) {
-                $output .= html_writer::start_tag('tr', array('style' => 'background-color: #CCCCCC', 'valign' => 'top'));
-            }
-            else {
-                $output .= html_writer::start_tag('tr', array('valign' => 'top'));
-            }
-            $even = !$even;
             if ($includecourseid) {
-                $output .= html_writer::tag('td', $date->cidnumber);
+                $daterow->cells[] = $date->cidnumber;
             }
-            $output .= html_writer::tag('td', html_writer::link($courselink.$date->courseid, format_string($date->coursename)));
+            $daterow->cells[] = html_writer::link($courselink.$date->courseid, format_string($date->coursename));
 
-            $output .= html_writer::tag('td', html_writer::link($facetofacelink.$date->facetofaceid, format_string($date->name)));
+            $daterow->cells[] = html_writer::link($facetofacelink.$date->facetofaceid, format_string($date->name));
             if ($showlocation) {
                 $location = isset($date->location) ? $date->location : '';
-                $output .= html_writer::tag('td', format_string($location));
+                $daterow->cells[] = format_string($location);
             }
 
-            $output .= html_writer::start_tag('td');
             if ($date->datetimeknown) {
                 $sessiondates = $date->alldates;
+                $datestrings = '';
                 foreach ($sessiondates as $sessiondate) {
                     $sessionobj = facetoface_format_session_times($sessiondate->timestart, $sessiondate->timefinish, $sessiondate->sessiontimezone);
                     if ($sessionobj->startdate == $sessionobj->enddate) {
-                        $output .= $sessionobj->startdate . html_writer::empty_tag('br');
+                        $datestrings .= $sessionobj->startdate . html_writer::empty_tag('br');
                     } else {
-                        $output .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . html_writer::empty_tag('br');
+                        $datestrings .= $sessionobj->startdate . ' - ' . $sessionobj->enddate . html_writer::empty_tag('br');
                     }
                 }
-                $output .= html_writer::end_tag('td');
-                $output .= html_writer::start_tag('td');
+                $daterow->cells[] = $datestrings;
+                $sessionstrings = '';
                 foreach ($sessiondates as $sessiondate) {
                     $sessionobj = facetoface_format_session_times($sessiondate->timestart, $sessiondate->timefinish, $sessiondate->sessiontimezone);
-                    $output .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone . html_writer::empty_tag('br');
+                    $sessionstrings .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessionobj->timezone . html_writer::empty_tag('br');
                 }
+                $daterow->cells[] = $sessionstrings;
             } else {
-                $output .= get_string('datenotset', 'block_facetoface');
-                $output .= html_writer::end_tag('td');
-                $output .= html_writer::start_tag('td');
+                $daterow->cells[] = get_string('datenotset', 'block_facetoface');
+                $daterow->cells[] = '';
             }
-            $output .= html_writer::end_tag('td');
 
             if ($includebookings) {
-                $output .= html_writer::tag('td', html_writer::link($attendeelink.$date->sessionid, (isset($date->nbbookings)? format_string($date->nbbookings) : 0)));
+                $daterow->cells[] = html_writer::link($attendeelink.$date->sessionid, (isset($date->nbbookings)? format_string($date->nbbookings) : 0));
             }
 
             // include the grades/status in the display
             foreach (array($includegrades, $includestatus) as $col) {
                 if ($col) {
                     $bookinghistoryurl->params(array('session' => $date->sessionid, 'userid' => $date->userid));
-                    $output .= html_writer::tag('td', html_writer::link($bookinghistoryurl, get_string('status:' . facetoface_get_status($date->status), 'block_facetoface')));
+                    $daterow->cells[] = html_writer::link($bookinghistoryurl, get_string('status:' . facetoface_get_status($date->status), 'block_facetoface'));
                 }
             }
 
-            $output .= html_writer::end_tag('tr');
+            $bookings->data[] = $daterow;
         }
-        $output .= html_writer::end_tag('table');
 
-        return $output;
+        return html_writer::table($bookings);
     }
 }
 
