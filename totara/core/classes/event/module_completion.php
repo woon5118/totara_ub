@@ -59,7 +59,7 @@ class module_completion extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return 'User ' . $this->other['username'] . ' completed activity in course ' . $this->other['course'];
+        return 'User with id ' . $this->other['userid'] . ' completed activity in course ' . $this->other['course'];
     }
 
     /**
