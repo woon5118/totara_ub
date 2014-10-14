@@ -221,7 +221,4 @@ if (empty($CFG->disableupdatenotifications)) {
     $ADMIN->add('server', $temp);
 }
 
-//New cron administrative page
-$ADMIN->add('server', new admin_externalpage('cron_settings', new lang_string('cron_settings', 'admin'), "$CFG->wwwroot/$CFG->admin/cronsettings.php"));
-
 } // end of speedup

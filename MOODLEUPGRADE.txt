@@ -67,6 +67,3 @@ NOTE: Additional plugins, custom themes or customised Moodle code are likely to
 17. Disable server maintenance mode.
 
 18. Congratulations, your site is now running Totara.
-
-19. Optional: Set up a cron task to run admin/cron_watcher.php every five minutes
-

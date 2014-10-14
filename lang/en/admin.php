@@ -1194,35 +1194,3 @@ $string['activeusercount'] = 'Number of active users';
 $string['webserversoftware'] = 'Web server software identifier';
 $string['wwwroot'] = 'Site www root';
 $string['configpasswordreuselimit'] = 'Number of times a user must change their password before they are allowed to reuse a password';
-
-$string['cron_settings'] = 'Cron';
-$string['cron_max_time'] = 'Maximum execution time';
-$string['cron_max_time_info'] = 'Specifies maximum execution time allowed for cron expressed in hours. Default is 0 which means no time limit.';
-$string['cron_max_time_mail_notify'] = 'Notify Admin';
-$string['cron_max_time_mail_notify_info'] = 'If checked system will notify the administrator by sending an email should the cron ever execute over maximum set time. For this to work you must setup cron watcher.';
-$string['cron_execution_status'] = 'Status';
-$string['cron_terminate'] = 'Terminate';
-$string['cron_execute'] = 'Execute';
-$string['cron_refresh'] = 'Refresh status';
-$string['cron_execution_watch'] = 'Cron Execution';
-$string['cron_execution_running'] = 'Cron is running';
-$string['cron_execution_stopped'] = 'Cron is stopped';
-$string['cron_execution_crashed'] = 'Cron crashed';
-$string['cron_max_time_kill'] = 'Terminate cron automatically';
-$string['cron_max_time_kill_info'] = 'If checked watching process will terminate cron if it is overdue in configured execution. For this to work you must setup cron watcher.';
-$string['cron_max_time_mail_notify_title'] = 'Warning: Cron execution overdue!';
-$string['cron_max_time_mail_notify_msg'] = 'The cron execution is taking more time than specified! Please check your server settings.';
-$string['cron_kill_mail_notify_title'] = 'Warning: Cron execution was automatically terminated!';
-$string['cron_kill_mail_notify_msg'] = 'The cron execution took longer than maximum execution time and was terminated! Please check your server settings.';
-$string['cron_kill_mail_fail_notify_title'] = 'Warning: Cron execution failed to be automatically terminated!';
-$string['cron_kill_mail_fail_notify_msg'] = 'The cron execution took longer than maximum execution time and automatic termination failed! Please check your server settings.';
-$string['cron_watcher_info'] = 'Cron Watcher';
-$string['cron_status_info'] = 'Cron Execution Status';
-$string['cron_watcher_info_help'] = '# Cron Watcher
-
-Cron Watcher is a script located in
-<pre>&lt;SITEURL&gt;/admin/cron_watcher.php</pre> To activate it you need to add it to the list of cron jobs on Linux or create a new scheduled task on Windows.
-
-We recommend you set the script to run every 5 minutes.
-
-See also <a href="http://docs.moodle.org/25/en/Cron" title="Cron help" target="_blank">Cron (at Moodle Wiki)</a>, <a href="http://en.wikipedia.org/wiki/Cron" title="Cron" target="_blank">Cron (at Wikipedia)</a>';

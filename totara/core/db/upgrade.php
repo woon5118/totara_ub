@@ -1223,5 +1223,14 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014101400, 'totara_core');
     }
 
+    if ($oldversion < 2014101401) {
+        // Remove settings for cron watcher superseded by new cron tasks from upstream Moodle.
+        unset_config('cron_max_time');
+        unset_config('cron_max_time_mail_notify');
+        unset_config('cron_max_time_kill');
+
+        totara_upgrade_mod_savepoint(true, 2014101401, 'totara_core');
+    }
+
     return true;
 }
