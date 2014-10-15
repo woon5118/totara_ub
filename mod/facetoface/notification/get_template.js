@@ -63,7 +63,7 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
         $(function() {
 
             // Attach event to drop down
-            $('select#id_template').change(function() {
+            $('select#id_templateid').change(function() {
                 var select = $(this);
 
                 // Get current value

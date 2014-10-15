@@ -160,6 +160,7 @@ if ($form->is_cancelled()) {
     $notification->facetofaceid = $facetoface->id;
     $notification->ccmanager = (isset($data->ccmanager) ? 1 : 0);
     $notification->status = (isset($data->status) ? 1 : 0);
+    $notification->templateid = $data->templateid;
 
     $notification->save();
 
@@ -169,6 +170,13 @@ if ($form->is_cancelled()) {
     $data = file_postupdate_standard_editor($data, 'managerprefix', $editoroptions, $context, 'mod_facetoface', 'notification', $notification->id);
     $DB->set_field('facetoface_notification', 'managerprefix', $data->managerprefix, array('id' => $notification->id));
 
+    if ($data->templateid != 0) {
+        // Double-check that the content is the same as the template - if customised then set template to 0.
+        $default = $templates[$data->templateid];
+        if ($data->title != $default->title || $data->body != $default->body || $data->managerprefix != $default->managerprefix ) {
+            $DB->set_field('facetoface_notification', 'templateid', 0, array('id' => $notification->id));
+        }
+    }
     totara_set_notification(get_string('notificationsaved', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 

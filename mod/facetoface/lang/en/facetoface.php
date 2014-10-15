@@ -378,6 +378,7 @@ $string['error:nopredefinedrooms'] = 'No pre-defined rooms';
 $string['error:norecipientsselected'] = 'You must choose which learners will receive this notification';
 $string['error:noticeidincorrect'] = 'Notice ID is incorrect: {$a}';
 $string['error:notificationtitletoolong'] = 'The title you have used is too long. The title is typically used as an email subject and should be no more than 78 characters long. Longer titles may be truncated by the users email client.';
+$string['error:notificationtemplatemissing'] = 'The following notification templates are missing (notifications could not be created for them):';
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the session.';
 $string['error:sessionstartafterend'] = 'Session start date/time is after end.';
@@ -1001,18 +1002,6 @@ $string['setting:defaultremindersubject_caption'] = 'Reminder subject';
 $string['setting:defaultremindersubjectdefault'] = 'Face-to-face booking reminder: [facetofacename], [starttime]-[finishtime], [sessiondate]';
 $string['setting:defaultrequestinstrmngrdefault'] = 'This is to advise that [firstname] [lastname] has requested to be booked into the following course, and you are listed as their Team Leader / Manager.
 
-Course:   [coursename]
-Face-to-face:   [facetofacename]
-Cost:   [cost]
-
-Duration:   [duration]
-Date(s):
-[alldates]
-
-Location:   [session:location]
-Venue:   [session:venue]
-Room:   [session:room]
-
 Please follow the link below to approve the request:
 [attendeeslink]
 
@@ -1208,6 +1197,18 @@ $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} a
 $string['summary'] = 'Summary';
 $string['takeattendance'] = 'Take attendance';
 $string['template'] = 'Template';
+$string['templateallreservationcancel'] = 'All reservations cancelled';
+$string['templatecancellation'] = 'Cancellation';
+$string['templateconfirmation'] = 'Booking request confirmation';
+$string['templatedecline'] = 'Booking request declined';
+$string['templatereminder'] = 'Reminder';
+$string['templaterequest'] = 'Booking request';
+$string['templatereservationcancel'] = 'Reservation cancelled';
+$string['templatetimechange'] = 'Time changed';
+$string['templatetrainercancel'] = 'Trainer cancelled';
+$string['templatetrainerconfirm'] = 'Trainer confirmed';
+$string['templatetrainerunassign'] = 'Trainer unassigned learner';
+$string['templatewaitlist'] = 'Waitlisted';
 $string['thissession'] = 'This session';
 $string['time'] = 'Time';
 $string['timeandtimezone'] = 'Time and Time Zone';
@@ -1228,6 +1229,9 @@ $string['unknowndate'] = '(unknown date)';
 $string['unknowntime'] = '(unknown time)';
 $string['upcomingsessions'] = 'Upcoming sessions';
 $string['upcomingsessionslist'] = 'List of all upcoming sessions for this Face-to-face activity';
+$string['updateactivities'] = 'Update all activities';
+$string['updateactivities_help'] = 'When checked, saving and updating the template will update all activities that have notifications based on this template.';
+$string['updateactivitieswarning'] = '<b>Warning:</b> If you choose to update all activies then all facetoface activities that have notifications based off this template will be updated with the changes that have been made.';
 $string['updateattendeessuccessful'] = 'Successfully updated attendance';
 $string['updateattendeesunsuccessful'] = 'An error has occurred, attendance could not be updated';
 $string['updateposition'] = 'Update position';

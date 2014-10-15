@@ -188,7 +188,10 @@ foreach ($notification_templates as $note_templ) {
         $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/index.php', array('deactivate' => $note_templ->id, 'sesskey' => sesskey())), new pix_icon('t/hide', $str_deactivate));
     }
 
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/index.php', array('delete' => $note_templ->id, 'sesskey' => sesskey())), new pix_icon('t/delete', $str_remove));
+    // Hide the delete button for system templates.
+    if (empty($note_templ->reference)) {
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/template/index.php', array('delete' => $note_templ->id, 'sesskey' => sesskey())), new pix_icon('t/delete', $str_remove));
+    }
 
     $row[] = implode($buttons, '');
 

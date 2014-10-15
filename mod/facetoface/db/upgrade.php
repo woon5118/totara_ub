@@ -2344,7 +2344,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $field = new xmldb_field('positionassignmentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'positiontype');
         $field->setComment('If required, the position assignment the user is doing the training for');
 
-        // Conditionally launch add field positiontype.
+        // Conditionally launch add field positionassignmentid.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -2938,6 +2938,235 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $DB->execute($sql);
 
         upgrade_mod_savepoint(true, 2015061700, 'facetoface');
+    }
+
+    if ($oldversion < 2015091000) {
+        // We need to validate the content of these language strings to make sure that they are not too long for the database field
+        // they are about to be written to.
+        $titles = array(
+            'setting:defaultconfirmationsubjectdefault' => get_string('setting:defaultconfirmationsubjectdefault', 'facetoface'),
+            'setting:defaultwaitlistedsubjectdefault' => get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface'),
+            'setting:defaultcancellationsubjectdefault' => get_string('setting:defaultcancellationsubjectdefault', 'facetoface'),
+            'setting:defaultdeclinesubjectdefault' => get_string('setting:defaultdeclinesubjectdefault', 'facetoface'),
+            'setting:defaultremindersubjectdefault' => get_string('setting:defaultremindersubjectdefault', 'facetoface'),
+            'setting:defaultrequestsubjectdefault' => get_string('setting:defaultrequestsubjectdefault', 'facetoface'),
+            'setting:defaultdatetimechangesubjectdefault' => get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface'),
+            'setting:defaulttrainerconfirmationsubjectdefault' => get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface'),
+            'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
+            'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
+            'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
+            'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface')
+        );
+        foreach ($titles as $key => $title) {
+            if (core_text::strlen($title) > 255) {
+                // We choose to truncate here. If we throw an exception like we should then the user won't be able to add face to face
+                // sessions and the user may not be able to edit the language pack to fix it. Thus we truncate and debug.
+                $titles[$key] = core_text::substr($title, 0, 255);
+                debugging('A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
+            }
+        }
+
+        // Define field reference to be added to facetoface_notification_tpl.
+        $table = new xmldb_table('facetoface_notification_tpl');
+        $field = new xmldb_field('reference', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'status');
+
+        // Conditionally launch add field reference.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $currenttemplates = $DB->get_records('facetoface_notification_tpl');
+
+            $defaulttemplates = array();
+
+            $tpl_confirmation = new stdClass();
+            $tpl_confirmation->reference = 'confirmation';
+            $tpl_confirmation->title = $titles['setting:defaultconfirmationsubjectdefault'];
+            $tpl_confirmation->body = text_to_html(get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
+            $tpl_confirmation->managerprefix = text_to_html(get_string('setting:defaultconfirmationinstrmngrdefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_confirmation;
+
+            $tpl_cancellation = new stdClass();
+            $tpl_cancellation->reference = 'cancellation';
+            $tpl_cancellation->title = $titles['setting:defaultcancellationsubjectdefault'];
+            $tpl_cancellation->body = text_to_html(get_string('setting:defaultcancellationmessagedefault', 'facetoface'));
+            $tpl_cancellation->managerprefix = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_cancellation;
+
+            $tpl_waitlist = new stdClass();
+            $tpl_waitlist->reference = 'waitlist';
+            $tpl_waitlist->title = $titles['setting:defaultwaitlistedsubjectdefault'];
+            $tpl_waitlist->body = text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_waitlist;
+
+            $tpl_reminder = new stdClass();
+            $tpl_reminder->reference = 'reminder';
+            $tpl_reminder->title = $titles['setting:defaultremindersubjectdefault'];
+            $tpl_reminder->body = text_to_html(get_string('setting:defaultremindermessagedefault', 'facetoface'));
+            $tpl_reminder->managerprefix = text_to_html(get_string('setting:defaultreminderinstrmngrdefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_reminder;
+
+            $tpl_request = new stdClass();
+            $tpl_request->reference = 'request';
+            $tpl_request->title = $titles['setting:defaultrequestsubjectdefault'];
+            $tpl_request->body = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
+            $tpl_request->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_request;
+
+            $tpl_decline = new stdClass();
+            $tpl_decline->reference = 'decline';
+            $tpl_decline->title = $titles['setting:defaultdeclinesubjectdefault'];
+            $tpl_decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+            $tpl_decline->managerprefix = text_to_html(get_string('setting:defaultdeclineinstrmngrdefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_decline;
+
+            $tpl_timechanged = new stdClass();
+            $tpl_timechanged->reference = 'timechange';
+            $tpl_timechanged->title = $titles['setting:defaultdatetimechangesubjectdefault'];
+            $tpl_timechanged->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_timechanged;
+
+            $tpl_trainercancel = new stdClass();
+            $tpl_trainercancel->reference = 'trainercancel';
+            $tpl_trainercancel->title = $titles['setting:defaulttrainersessioncancellationsubjectdefault'];
+            $tpl_trainercancel->body = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_trainercancel;
+
+            $tpl_trainerunassign = new stdClass();
+            $tpl_trainerunassign->reference = 'trainerunassign';
+            $tpl_trainerunassign->title = $titles['setting:defaulttrainersessionunassignedsubjectdefault'];
+            $tpl_trainerunassign->body = text_to_html(get_string('setting:defaulttrainersessionunassignedmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_trainerunassign;
+
+            $tpl_trainerconfirm = new stdClass();
+            $tpl_trainerconfirm->reference = 'trainerconfirm';
+            $tpl_trainerconfirm->title = $titles['setting:defaulttrainerconfirmationsubjectdefault'];
+            $tpl_trainerconfirm->body = text_to_html(get_string('setting:defaulttrainerconfirmationmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_trainerconfirm;
+
+            $tpl_allreservationcancel = new stdClass();
+            $tpl_allreservationcancel->reference = 'allreservationcancel';
+            $tpl_allreservationcancel->title = $titles['setting:defaultcancelallreservationssubjectdefault'];
+            $tpl_allreservationcancel->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_allreservationcancel;
+
+            $tpl_reservationcancelation = new stdClass();
+            $tpl_reservationcancelation->reference = 'reservationcancel';
+            $tpl_reservationcancelation->title = $titles['setting:defaultcancelreservationsubjectdefault'];
+            $tpl_reservationcancelation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
+            $defaulttemplates[] = $tpl_reservationcancelation;
+
+            foreach ($defaulttemplates as $default) {
+                foreach ($currenttemplates as $template) {
+                    if ($template->title === $default->title) {
+                        $update = new stdClass();
+                        $update->id = $template->id;
+                        $update->reference = $default->reference;
+
+                        // Add reference to template.
+                        $DB->update_record('facetoface_notification_tpl', $update);
+
+                        continue 2;
+                    }
+                }
+
+                // If we haven't found a record for this template then we will need to create it.
+                $todb = clone $default;
+                $todb->status = 1;
+
+                $DB->insert_record('facetoface_notification_tpl', $todb);
+            }
+        }
+
+        // Define field id to be added to facetoface_notification.
+        $table = new xmldb_table('facetoface_notification');
+        $field = new xmldb_field('templateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'facetofaceid');
+
+        // Conditionally launch add field templateid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Get all notifications (there could be lots of these).
+            $notifications = $DB->get_records('facetoface_notification', array('templateid' => 0));
+
+            // Now get all the existing F2F notifications that match the updated templates and assign the appropriate templateid.
+            $currenttemplates = $DB->get_records('facetoface_notification_tpl');
+            foreach ($currenttemplates as $template) {
+                $updates = array();
+
+                foreach ($notifications as $notification) {
+                    $notificationbody = $notification->body;
+                    $notificationbody = strip_tags($notificationbody);
+                    $notificationbody = preg_replace("/\s*/", '', $notificationbody);
+
+                    $templatebody = $template->body;
+                    $templatebody = strip_tags($templatebody);
+                    $templatebody = preg_replace("/\s*/", '', $templatebody);
+
+                    $notificationtitle = $notification->title;
+                    $notificationtitle = strip_tags($notificationtitle);
+                    $notificationtitle = preg_replace("/\s*/", '', $notificationtitle);
+
+                    $templatetitle = $template->title;
+                    $templatetitle = strip_tags($templatetitle);
+                    $templatetitle = preg_replace("/\s*/", '', $templatetitle);
+
+                    $hasmgrprefix = (empty($default->managerprefix)) ? false : true;
+                    if ($hasmgrprefix) {
+                        $notificationmanagerprefix = $notification->managerprefix;
+                        $notificationmanagerprefix = strip_tags($notificationmanagerprefix);
+                        $notificationmanagerprefix = preg_replace("/\s*/", '', $notificationmanagerprefix);
+
+                        $templatemanagerprefix = $template->managerprefix;
+                        $templatemanagerprefix = strip_tags($templatemanagerprefix);
+                        $templatemanagerprefix = preg_replace("/\s*/", '', $templatemanagerprefix);
+
+                        $managerprefixmatch = $notificationmanagerprefix == $templatemanagerprefix ? true : false;
+                    }
+
+                    $bodymatch = $notificationbody == $templatebody ? true : false;
+                    $titlematch = $notificationtitle == $templatetitle ? true : false;
+
+                    if ($titlematch && $bodymatch) {
+                        if (!$hasmgrprefix || ($hasmgrprefix && $managerprefixmatch)) {
+                            $updates[] = $notification->id;
+
+                            unset($notifications[$notification->id]);
+                        }
+                    }
+
+                    // There could be a lot of results so do it in batches to avoid IN calls
+                    // with too many parameters.
+                    if (count($updates) >= 1000) {
+                        list($insql, $inparams) = $DB->get_in_or_equal($updates);
+
+                        // Do update query.
+                        $sql = "UPDATE {facetoface_notification} SET templateid = ? WHERE id {$insql}";
+                        $params = array($template->id);
+                        $params = array_merge($params, $inparams);
+
+                        $DB->execute($sql, $params);
+
+                        // Reset updates array.
+                        $updates = array();
+                    }
+                }
+
+                // Update all remaining records.
+                if (count($updates) > 0) {
+                    list($insql, $inparams) = $DB->get_in_or_equal($updates);
+
+                    // Do update query.
+                    $sql = "UPDATE {facetoface_notification} SET templateid = ? WHERE id {$insql}";
+                    $params = array($template->id);
+                    $params = array_merge($params, $inparams);
+
+                    $DB->execute($sql, $params);
+                }
+            }
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2015091000, 'facetoface');
     }
 
     return $result;

@@ -330,11 +330,24 @@ function facetoface_add_instance($facetoface) {
         }
     }
 
-    $defaultnotifications = facetoface_get_default_notifications($facetoface->id);
+
+    list($defaultnotifications, $missingtemplates) = facetoface_get_default_notifications($facetoface->id);
 
     // Create default notifications for activity.
     foreach ($defaultnotifications as $notification) {
         $notification->save();
+    }
+
+    if (!empty($missingtemplates)) {
+        $message = get_string('error:notificationtemplatemissing', 'facetoface') . html_writer::empty_tag('br');
+
+        // Loop through error items and create a message to send.
+        foreach ($missingtemplates as $template) {
+            $missingtemplate = get_string('template'.$template, 'facetoface');
+            $message .= $missingtemplate . html_writer::empty_tag('br');
+        }
+
+        totara_set_notification($message);
     }
 
     return $facetoface->id;

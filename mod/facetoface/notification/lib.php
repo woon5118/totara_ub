@@ -112,7 +112,8 @@ class facetoface_notification extends data_object {
         'waitlisted' => 0,
         'cancelled' => 0,
         'status' => 0,
-        'issent' => 0
+        'issent' => 0,
+        'templateid' => 0
     );
 
     public $type;
@@ -142,6 +143,8 @@ class facetoface_notification extends data_object {
     public $courseid;
 
     public $facetofaceid;
+
+    public $templateid;
 
     public $status;
 
@@ -189,6 +192,9 @@ class facetoface_notification extends data_object {
         if ($this->scheduleunit) {
             $this->scheduletime = $this->_get_timestamp();
         }
+
+        // Handle optional templateid as it cannot be null.
+        $this->templateid = isset($this->templateid) ? $this->templateid : 0;
 
         // Set up modification data
         $this->usermodified = $USER->id;
@@ -1588,8 +1594,9 @@ function facetoface_is_notification_frozen($id) {
 
 
 /**
- * Returns an array of default notifications for a face-to-face
- * activity
+ * Returns an array of all the default notifications for a
+ * face-to-face activity any new notifications used by core f2f
+ * functionality need to be added here.
  *
  * @param int $facetofaceid
  * @return array Array of facetoface_notification objects
@@ -1597,7 +1604,25 @@ function facetoface_is_notification_frozen($id) {
 function facetoface_get_default_notifications($facetofaceid) {
     global $DB;
 
+    // Get templates.
+    $templaterecords = $DB->get_records('facetoface_notification_tpl');
+
+    $templates = array();
+
+    foreach ($templaterecords as $rec) {
+        if (!empty($rec->reference)) {
+            $template = new stdClass();
+            $template->id = $rec->id;
+            $template->title = $rec->title;
+            $template->body = $rec->body;
+            $template->managerprefix = $rec->managerprefix;
+
+            $templates[$rec->reference] = $template;
+        }
+    }
+
     $notifications = array();
+    $missingtemplates = array();
 
     $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
 
@@ -1613,122 +1638,171 @@ function facetoface_get_default_notifications($facetofaceid) {
     $defaults['status'] = 1;
     $defaults['ccmanager'] = 0;
 
-    // We need to validate the content of these language strings to make sure that they are not too long for the database field
-    // they are about to be written to.
-    $titles = array(
-        'setting:defaultconfirmationsubjectdefault' => get_string('setting:defaultconfirmationsubjectdefault', 'facetoface'),
-        'setting:defaultwaitlistedsubjectdefault' => get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface'),
-        'setting:defaultcancellationsubjectdefault' => get_string('setting:defaultcancellationsubjectdefault', 'facetoface'),
-        'setting:defaultdeclinesubjectdefault' => get_string('setting:defaultdeclinesubjectdefault', 'facetoface'),
-        'setting:defaultremindersubjectdefault' => get_string('setting:defaultremindersubjectdefault', 'facetoface'),
-        'setting:defaultrequestsubjectdefault' => get_string('setting:defaultrequestsubjectdefault', 'facetoface'),
-        'setting:defaultdatetimechangesubjectdefault' => get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface'),
-        'setting:defaulttrainerconfirmationsubjectdefault' => get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface'),
-        'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
-        'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
-        'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
-        'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface')
-    );
+    // The titles are fetched from the templates which have already been truncated to the 255
+    // character limit before so there is no need to truncate them again here.
 
-    foreach ($titles as $key => $title) {
-        if (core_text::strlen($title) > 255) {
-            // We choose to truncate here. If we throw an exception like we should then the user won't be able to add face to face
-            // sessions and the user may not be able to edit the language pack to fix it. Thus we truncate and debug.
-            $titles[$key] = core_text::substr($title, 0, 255);
-            debugging('A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
-        }
+    if (isset($templates['confirmation'])) {
+        $template = $templates['confirmation'];
+        $confirmation = new facetoface_notification($defaults, false);
+        $confirmation->title = $template->title;
+        $confirmation->body = $template->body;
+        $confirmation->managerprefix = $template->managerprefix;
+        $confirmation->conditiontype = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
+        $confirmation->ccmanager = 1;
+        $confirmation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BOOKING_CONFIRMATION] = $confirmation;
+    } else {
+        $missingtemplates[] = 'confirmation';
     }
 
-    $confirmation = new facetoface_notification($defaults, false);
-    $confirmation->title = $titles['setting:defaultconfirmationsubjectdefault'];
-    $confirmation->body = text_to_html(get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
-    $confirmation->managerprefix = text_to_html(get_string('setting:defaultconfirmationinstrmngrdefault', 'facetoface'));
-    $confirmation->conditiontype = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
-    $confirmation->ccmanager = 1;
-    $notifications[MDL_F2F_CONDITION_BOOKING_CONFIRMATION] = $confirmation;
+    if (isset($templates['waitlist'])) {
+        $template = $templates['waitlist'];
+        $waitlist = new facetoface_notification($defaults, false);
+        $waitlist->title = $template->title;
+        $waitlist->body = $template->body;
+        $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
+        $waitlist->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION] = $waitlist;
+    } else {
+        $missingtemplates[]  = 'waitlist';
+    }
 
-    $waitlist = new facetoface_notification($defaults, false);
-    $waitlist->title = $titles['setting:defaultwaitlistedsubjectdefault'];
-    $waitlist->body = text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'));
-    $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
-    $notifications[MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION] = $waitlist;
+    if (isset($templates['cancellation'])) {
+        $template = $templates['cancellation'];
+        $cancellation = new facetoface_notification($defaults, false);
+        $cancellation->title = $template->title;
+        $cancellation->body = $template->body;
+        $cancellation->managerprefix = $template->managerprefix;
+        $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
+        $cancellation->ccmanager = 1;
+        $cancellation->cancelled = 1;
+        $cancellation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION] = $cancellation;
+    } else {
+        $missingtemplates[] = 'cancellation';
+    }
 
-    $cancellation = new facetoface_notification($defaults, false);
-    $cancellation->title = $titles['setting:defaultcancellationsubjectdefault'];
-    $cancellation->body = text_to_html(get_string('setting:defaultcancellationmessagedefault', 'facetoface'));
-    $cancellation->managerprefix = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
-    $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
-    $cancellation->ccmanager = 1;
-    $cancellation->cancelled = 1;
-    $notifications[MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION] = $cancellation;
+    if (isset($templates['decline'])) {
+        $template = $templates['decline'];
+        $decline = new facetoface_notification($defaults, false);
+        $decline->title = $template->title;
+        $decline->body = $template->body;
+        $decline->managerprefix = $template->managerprefix;
+        $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
+        $decline->ccmanager = 0;
+        $decline->status = $facetoface->approvalreqd ? 1 : 0;
+        $decline->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_DECLINE_CONFIRMATION] = $decline;
+    } else {
+        $missingtemplates[] = 'decline';
+    }
 
-    $decline = new facetoface_notification($defaults, false);
-    $decline->title = $titles['setting:defaultdeclinesubjectdefault'];
-    $decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
-    $decline->managerprefix = text_to_html(get_string('setting:defaultdeclineinstrmngrdefault', 'facetoface'));
-    $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
-    $decline->ccmanager = 0;
-    $decline->status = $facetoface->approvalreqd ? 1 : 0;
-    $notifications[MDL_F2F_CONDITION_DECLINE_CONFIRMATION] = $decline;
+    if (isset($templates['reminder'])) {
+        $template = $templates['reminder'];
+        $reminder = new facetoface_notification($defaults, false);
+        $reminder->title = $template->title;
+        $reminder->body = $template->body;
+        $reminder->managerprefix = $template->managerprefix;
+        $reminder->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
+        $reminder->scheduleunit = MDL_F2F_SCHEDULE_UNIT_DAY;
+        $reminder->scheduleamount = 2;
+        $reminder->ccmanager = 1;
+        $reminder->booked = 1;
+        $reminder->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BEFORE_SESSION] = $reminder;
+    } else {
+        $missingtemplates[] = 'reminder';
+    }
 
-    $reminder = new facetoface_notification($defaults, false);
-    $reminder->title = $titles['setting:defaultremindersubjectdefault'];
-    $reminder->body = text_to_html(get_string('setting:defaultremindermessagedefault', 'facetoface'));
-    $reminder->managerprefix = text_to_html(get_string('setting:defaultreminderinstrmngrdefault', 'facetoface'));
-    $reminder->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
-    $reminder->scheduleunit = MDL_F2F_SCHEDULE_UNIT_DAY;
-    $reminder->scheduleamount = 2;
-    $reminder->ccmanager = 1;
-    $reminder->booked = 1;
-    $notifications[MDL_F2F_CONDITION_BEFORE_SESSION] = $reminder;
+    if (isset($templates['request'])) {
+        $template = $templates['request'];
+        $request = new facetoface_notification($defaults, false);
+        $request->title = $template->title;
+        $request->body = $template->body;
+        $request->managerprefix = $template->managerprefix;
+        $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+        $request->ccmanager = 1;
+        $request->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST] = $request;
+    } else {
+        $missingtemplates[] = 'request';
+    }
 
-    $request = new facetoface_notification($defaults, false);
-    $request->title = $titles['setting:defaultrequestsubjectdefault'];
-    $request->body = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
-    $request->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
-    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
-    $request->ccmanager = 1;
-    $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST] = $request;
+    if (isset($templates['timechange'])) {
+        $template = $templates['timechange'];
+        $session_change = new facetoface_notification($defaults, false);
+        $session_change->title = $template->title;
+        $session_change->body = $template->body;
+        $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
+        $session_change->booked = 1;
+        $session_change->waitlisted = 1;
+        $session_change->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE] = $session_change;
+    } else {
+        $missingtemplates[] = 'timechange';
+    }
 
-    $session_change = new facetoface_notification($defaults, false);
-    $session_change->title = $titles['setting:defaultdatetimechangesubjectdefault'];
-    $session_change->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
-    $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
-    $session_change->booked = 1;
-    $session_change->waitlisted = 1;
-    $notifications[MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE] = $session_change;
+    if (isset($templates['trainerconfirm'])) {
+        $template = $templates['trainerconfirm'];
+        $trainer_confirmation = new facetoface_notification($defaults, false);
+        $trainer_confirmation->title = $template->title;
+        $trainer_confirmation->body = $template->body;
+        $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
+        $trainer_confirmation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_TRAINER_CONFIRMATION] = $trainer_confirmation;
+    } else {
+        $missingtemplates[] = 'trainerconfirm';
+    }
 
-    $trainer_confirmation = new facetoface_notification($defaults, false);
-    $trainer_confirmation->title = $titles['setting:defaulttrainerconfirmationsubjectdefault'];
-    $trainer_confirmation->body = text_to_html(get_string('setting:defaulttrainerconfirmationmessagedefault', 'facetoface'));
-    $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
-    $notifications[MDL_F2F_CONDITION_TRAINER_CONFIRMATION] = $trainer_confirmation;
+    if (isset($templates['trainercancel'])) {
+        $template = $templates['trainercancel'];
+        $trainer_cancellation = new facetoface_notification($defaults, false);
+        $trainer_cancellation->title = $template->title;
+        $trainer_cancellation->body = $template->body;
+        $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
+        $trainer_cancellation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION] = $trainer_cancellation;
+    } else {
+        $missingtemplates[] = 'trainercancel';
+    }
 
-    $trainer_cancellation = new facetoface_notification($defaults, false);
-    $trainer_cancellation->title = $titles['setting:defaulttrainersessioncancellationsubjectdefault'];
-    $trainer_cancellation->body = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault', 'facetoface'));
-    $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
-    $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION] = $trainer_cancellation;
+    if (isset($templates['trainerunassign'])) {
+        $template = $templates['trainerunassign'];
+        $trainer_unassigned = new facetoface_notification($defaults, false);
+        $trainer_unassigned->title = $template->title;
+        $trainer_unassigned->body = $template->body;
+        $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
+        $trainer_unassigned->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT] = $trainer_unassigned;
+    } else {
+        $missingtemplates[] = 'trainerunassign';
+    }
 
-    $trainer_unassigned = new facetoface_notification($defaults, false);
-    $trainer_unassigned->title = $titles['setting:defaulttrainersessionunassignedsubjectdefault'];
-    $trainer_unassigned->body = text_to_html(get_string('setting:defaulttrainersessionunassignedmessagedefault', 'facetoface'));
-    $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
-    $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT] = $trainer_unassigned;
+    if (isset($templates['reservationcancel'])) {
+        $template = $templates['reservationcancel'];
+        $cancelreservation = new facetoface_notification($defaults, false);
+        $cancelreservation->title = $template->title;
+        $cancelreservation->body = $template->body;
+        $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
+        $cancelreservation->cancelled = 1;
+        $cancelreservation->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_RESERVATION_CANCELLED] = $cancelreservation;
+    } else {
+        $missingtemplates[] = 'reservationcancel';
+    }
 
-    $cancelreservation = new facetoface_notification($defaults, false);
-    $cancelreservation->title = $titles['setting:defaultcancelreservationsubjectdefault'];
-    $cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
-    $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
-    $cancelreservation->cancelled = 1;
-    $notifications[MDL_F2F_CONDITION_RESERVATION_CANCELLED] = $cancelreservation;
+    if (isset($templates['allreservationcancel'])) {
+        $template = $templates['allreservationcancel'];
+        $cancelallreservations = new facetoface_notification($defaults, false);
+        $cancelallreservations->title = $template->title;
+        $cancelallreservations->body = $template->body;
+        $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
+        $cancelallreservations->cancelled = 1;
+        $cancelallreservations->templateid = $template->id;
+        $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $cancelallreservations;
+    } else {
+        $missingtemplates[] = 'allreservationcancel';
+    }
 
-    $cancelallreservations = new facetoface_notification($defaults, false);
-    $cancelallreservations->title = $titles['setting:defaultcancelallreservationssubjectdefault'];
-    $cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
-    $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
-    $cancelallreservations->cancelled = 1;
-    $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $cancelallreservations;
-
-    return $notifications;
+    return array($notifications, $missingtemplates);
 }

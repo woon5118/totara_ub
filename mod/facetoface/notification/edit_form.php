@@ -121,7 +121,7 @@ class mod_facetoface_notification_form extends moodleform {
                 $tpls[$tpl->id] = $tpl->title;
             }
 
-            $mform->addElement('select', 'template', get_string('template', 'facetoface'), $tpls);
+            $mform->addElement('select', 'templateid', get_string('template', 'facetoface'), $tpls);
         }
 
         // Display message content settings.

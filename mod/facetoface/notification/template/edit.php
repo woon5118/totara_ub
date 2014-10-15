@@ -81,6 +81,14 @@ if ($form->is_cancelled()) {
 
     if ($data->id) {
         $DB->update_record('facetoface_notification_tpl', $data);
+
+        // Update all activities with notifications base off this template.
+        if ($data->updateactivities) {
+            $sql = "UPDATE {facetoface_notification} SET title = ?, body = ?, managerprefix = ? WHERE templateid = ?";
+            $params = array($data->title, $data->body, $data->managerprefix, $data->id);
+
+            $DB->execute($sql, $params);
+        }
     } else {
         $data->id = $DB->insert_record('facetoface_notification_tpl', $data);
     }

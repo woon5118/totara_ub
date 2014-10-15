@@ -108,7 +108,7 @@ if ($restoredefaults && $confirm) {
     $currentnotifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id));
 
     // Recreate all default notifications.
-    $defaultnotifications = facetoface_get_default_notifications($facetoface->id);
+    $defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
 
     // Remove all defaults that exist already.
     foreach ($currentnotifications as $current) {
@@ -216,7 +216,7 @@ $notifications = $DB->get_records('facetoface_notification', array('facetofaceid
 echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
 
 // Detect missing default notifications.
-$defaultnotifications = facetoface_get_default_notifications($facetoface->id);
+$defaultnotifications = facetoface_get_default_notifications($facetoface->id)[0];
 
 foreach ($notifications as $note) {
     unset($defaultnotifications[$note->conditiontype]);
