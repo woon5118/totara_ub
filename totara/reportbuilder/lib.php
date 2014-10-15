@@ -1506,19 +1506,7 @@ class reportbuilder {
         //we now have all the information we need
         if ($reports) {
             foreach ($reports as $report) {
-                if ($report->embedded) {
-                    try {
-                        // Get hold of the report builder object for the embedded url.
-                        $reportobj = new reportbuilder($report->id);
-                        if ($reportobj->embeddedurl) {
-                            $report->embeddedurl = $reportobj->embeddedurl;
-                        } else {
-                            continue;
-                        }
-                    } catch (Exception $ex) {
-                        continue;
-                    }
-                }
+                $report->url = reportbuilder_get_report_url($report);
 
                 if ($report->accessmode == REPORT_BUILDER_ACCESS_MODE_NONE) {
                     $permitted_reports[$report->id] = $report;

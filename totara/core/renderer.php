@@ -155,13 +155,7 @@ class totara_core_renderer extends plugin_renderer_base {
         }
 
         foreach ($reports as $report) {
-            if ($report->embedded) {
-                $url = $report->embeddedurl;
-            } else {
-                $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $report->id));
-            }
-
-            // show reports user has permission to view, that are not hidden
+            // Show reports user has permission to view, that are not hidden.
             $output .= html_writer::start_tag('li');
             $cells = array();
             $text = format_string($report->fullname);
@@ -171,7 +165,7 @@ class totara_core_renderer extends plugin_renderer_base {
                     'alt'=> $text)
             );
 
-            $attributes = array('href' => $url);
+            $attributes = array('href' => $report->url);
             $output .= html_writer::tag('a', $icon . $text, $attributes);
             // if admin with edit mode on show settings button too
             if ($canedit) {
