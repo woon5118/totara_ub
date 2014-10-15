@@ -2194,7 +2194,7 @@ function totara_theme_generate_autocolors($css, $theme, $substitutions) {
  */
 function encrypt_data($plaintext, $key = '') {
     global $CFG;
-    require_once($CFG->libdir.'/phpseclib/Crypt/RSA.php');
+    require_once($CFG->dirroot.'/totara/core/lib/phpseclib/Crypt/RSA.php');
 
     $rsa = new Crypt_RSA();
     if ($key == '') {

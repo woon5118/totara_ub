@@ -18,60 +18,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage phpseclib
+ * @package totara_core
  *
- * Unit tests for totara/reportbuilder/lib.php
+ * Unit tests for phpseclib
  */
-if (!defined('MOODLE_INTERNAL') && (PHP_SAPI != 'cli')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
 
-// Separate process reinitialization
-if (!defined('PHPUNIT_TEST')) {
-    define('CLI_SCRIPT', 1);
-    require_once(dirname(dirname(dirname(__DIR__))) . '/config.php');
-}
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/core/totara.php');
-require_once($CFG->libdir . '/phpseclib/Crypt/RSA.php');
 
 /**
  * Test phpseclib for encryption-decryption
  */
-class phpseclib_rsa_test extends PHPUnit_Framework_TestCase {
-    protected $public = '';
-    protected $private = '';
+class totara_core_phpseclib_testcase extends advanced_testcase {
+    /**
+     * Test totara encryption.
+     */
+    public function test_encrypt_data() {
+        // NOTE: do not include the RSA directly here!
 
-    public function setUp() {
-        $rsa = new Crypt_RSA();
-        $keys = $rsa->createKey();
-        $this->private = $keys['privatekey'];
-        $this->public = $keys['publickey'];
+        // Encrypt using public Totara key.
+        $ciphertext = encrypt_data('secret');
+
+        // Pretty much any result is ok, we need to detect notices and errors here,
+        // the actual encryption is tested next.
+        $this->assertSame(128, strlen($ciphertext));
     }
 
     /**
      * Test key creation, encryption and decryption
      */
     public function test_rsa() {
-        // This test requires process isolation, Otherwise it leads to segmentation fault during
-        // all tests suite execution.
-        // Possible workaraounds related to @runInSeparateProcess and @preserveGlobalState disabled
-        // lead to process kill in jenkins.
-        // Further investigation required.
-        $this->markTestSkipped('Skip this test untill --process-isolation is enabled in build system');
+        global $CFG;
+
+        // Delay this include so that we test we have the include in encrypt_data() working.
+        require_once($CFG->dirroot . '/totara/core/lib/phpseclib/Crypt/RSA.php');
+
+        $rsa = new Crypt_RSA();
+        $keys = $rsa->createKey();
+        $privatekey = $keys['privatekey'];
+        $publickey = $keys['publickey'];
+
         $data = array('site' => 'Super site', 'data' => 'my data', 3 => 5, '6' => '9', 'test');
         $sdata = json_encode($data);
         $format_private = '/-----BEGIN RSA PRIVATE KEY-----[A-Z0-9\\n\\r-\\/+=]+-----END RSA PRIVATE KEY-----/im';
         $format_public = '/-----BEGIN PUBLIC KEY-----[A-Z0-9\\n\\r-\\/+=]+-----END PUBLIC KEY-----/im';
 
-        $this->assertEquals(1, preg_match($format_private, $this->private));
-        $this->assertEquals(1, preg_match($format_public, $this->public));
+        $this->assertEquals(1, preg_match($format_private, $privatekey));
+        $this->assertEquals(1, preg_match($format_public, $publickey));
 
-        $ciphertext = encrypt_data($sdata, $this->public);
+        $ciphertext = encrypt_data($sdata, $publickey);
         $this->assertNotEmpty($ciphertext);
-        $newsdata = $this->decrypt_data($ciphertext);
+        $newsdata = self::decrypt_data($ciphertext, $privatekey);
         $newdata = json_decode($newsdata, true);
         $this->assertNotEmpty($newdata);
         $this->assertEquals($data, $newdata);
@@ -81,11 +80,12 @@ class phpseclib_rsa_test extends PHPUnit_Framework_TestCase {
      * Decrypt previously encrypted text
      *
      * @param string $ciphertext
+     * @param string $privatekey
      * @return string
      */
-    protected function decrypt_data($ciphertext) {
+    protected static function decrypt_data($ciphertext, $privatekey) {
         $rsa = new Crypt_RSA();
-        $rsa->loadKey($this->private);
+        $rsa->loadKey($privatekey);
         $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
         $plaintext = $rsa->decrypt($ciphertext);
         return $plaintext;
