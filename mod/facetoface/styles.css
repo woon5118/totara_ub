@@ -1,31 +1,40 @@
-body.path-mod-facetoface table.f2fsession td.c0 {
-    font-weight: bold;
-    width: 12%;
+.f2fsessiongroup {
+    padding-bottom: 10px;
 }
-body.path-mod-facetoface table.f2fsession {
+.f2fsession {
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+}
+.f2fsession:last-child {
+    border-bottom: none;
+}
+.f2fsessiontime {
+    width: 80%;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 5px;
+}
+.f2finprogress .f2fsessiontime {
     width: 100%;
 }
-table.table90 {
-    width: 90%;
+.f2foptions {
+    width: 20%;
+    display: inline-block;
+    min-width: 60px;
 }
-table.table50 {
-    width: 50%;
-    text-align: left;
-}
-table.inlinetable {
-    display: inline-table;
-    border: 0;
-}
-tr.highlight td.cell {
-    background-color: #AAFFAA;
-}
-a.f2fsessionlinks, td.f2fsessionnotice, span.f2fsessionnotice {
+.f2fsessionlinks,
+.f2fsessionnotice {
     font-size: 11px;
     font-weight: bold;
     line-height: 14px;
+    display: block;
+    padding: 3px;
 }
-span.f2fonepointfive {
+.f2factivityname {
     line-height:1.5;
+}
+.facetoface .mod-indent-outer {
+    display: block;
 }
 span.errorstring {
     font-size: 12px;
@@ -65,9 +74,7 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .dir-rtl div.mod-indent form.togglecompletion input[type="image"] {
     right: -5px;
 }
-td.f2fwidth {
-    width: 83%;
-}
+
 /* modal dialogs */
 .path-admin-mod-facetoface.yui3-skin-sam .yui3-panel-content,
 .path-mod-facetoface.yui3-skin-sam .yui3-panel-content {
