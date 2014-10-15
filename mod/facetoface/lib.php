@@ -3300,13 +3300,7 @@ function facetoface_session_has_capacity($session, $context = false, $status = M
 function facetoface_print_session($session, $showcapacity, $calendaroutput=false, $return=false, $hidesignup=false) {
     global $CFG, $DB;
 
-    $table = new html_table();
-    $table->summary = get_string('sessionsdetailstablesummary', 'facetoface');
-    $table->attributes['class'] = 'generaltable f2fsession';
-    $table->align = array('right', 'left');
-    if ($calendaroutput) {
-        $table->tablealign = 'left';
-    }
+    $output = html_writer::start_tag('dl', array('class' => 'f2f'));
 
     $customfields = facetoface_get_session_customfields();
     $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->id), '', 'fieldid, data');
@@ -3321,7 +3315,8 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
                 $data = format_string($customdata[$field->id]->data);
             }
         }
-        $table->data[] = array(str_replace(' ', '&nbsp;', format_string($field->name)), $data);
+        $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($field->name)));
+        $output .= html_writer::tag('dd', $data);
     }
 
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
@@ -3343,9 +3338,11 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             $sessiontimezonestr = !empty($displaytimezones) ? $sessionobj->timezone : '';
             $html .= $sessionobj->starttime . ' - ' . $sessionobj->endtime . ' ' . $sessiontimezonestr;
         }
-        $table->data[] = array($strdatetime, $html);
+        $output .= html_writer::tag('dt', $strdatetime);
+        $output .= html_writer::tag('dd', $html);
     } else {
-        $table->data[] = array($strdatetime, html_writer::tag('i', get_string('wait-listed', 'facetoface')));
+        $output .= html_writer::tag('dt', $strdatetime);
+        $output .= html_writer::tag('dd', html_writer::tag('em', get_string('wait-listed', 'facetoface')));
     }
 
     $signupcount = facetoface_get_num_attendees($session->id);
@@ -3353,29 +3350,33 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
     if ($showcapacity) {
         if ($session->allowoverbook) {
-            $table->data[] = array(get_string('capacity', 'facetoface'), get_string('capacityallowoverbook', 'facetoface', $session->capacity));
+            $output .= html_writer::tag('dt', get_string('capacity', 'facetoface'));
+            $output .= html_writer::tag('dd', get_string('capacityallowoverbook', 'facetoface', $session->capacity));
         } else {
-            $table->data[] = array(get_string('capacity', 'facetoface'), $session->capacity);
+            $output .= html_writer::tag('dt', get_string('capacity', 'facetoface'));
+            $output .= html_writer::tag('dd', $session->capacity);
         }
     }
     elseif (!$calendaroutput) {
-        $table->data[] = array(get_string('seatsavailable', 'facetoface'), max(0, $placesleft));
+        $output .= html_writer::tag('dt', get_string('seatsavailable', 'facetoface'));
+        $output .= html_writer::tag('dd', max(0, $placesleft));
     }
 
     // Display requires approval notification
     $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
 
     if ($facetoface->approvalreqd) {
-        $table->data[] = array('', get_string('sessionrequiresmanagerapproval', 'facetoface'));
+        $output .= html_writer::tag('dd', get_string('sessionrequiresmanagerapproval', 'facetoface'));
     }
 
     // Display waitlist notification
     if (!$hidesignup && $session->allowoverbook && $placesleft < 1) {
-        $table->data[] = array('', get_string('userwillbewaitlisted', 'facetoface'));
+        $output .= html_writer::tag('dd', get_string('userwillbewaitlisted', 'facetoface'));
     }
 
     if (!empty($session->duration)) {
-        $table->data[] = array(get_string('duration', 'facetoface'), format_duration($session->duration));
+        $output .= html_writer::tag('dt', get_string('duration', 'facetoface'));
+        $output .= html_writer::tag('dd', format_duration($session->duration));
     }
 
     // Display room information
@@ -3398,17 +3399,21 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
         $roomstring .= $session->room->description_editor['text'];
 
-        $table->data[] = array(get_string('room', 'facetoface'), $roomstring);
+        $output .= html_writer::tag('dt', get_string('room', 'facetoface'));
+        $output .= html_writer::tag('dd', $roomstring);
     }
 
     if (!empty($session->normalcost)) {
-        $table->data[] = array(get_string('normalcost', 'facetoface'), format_string($session->normalcost));
+        $output .= html_writer::tag('dt', get_string('normalcost', 'facetoface'));
+        $output .= html_writer::tag('dd', format_string($session->normalcost));
     }
     if (!empty($session->discountcost)) {
-        $table->data[] = array(get_string('discountcost', 'facetoface'), format_string($session->discountcost));
+        $output .= html_writer::tag('dt', get_string('discountcost', 'facetoface'));
+        $output .= html_writer::tag('dd', format_string($session->discountcost));
     }
     if (!empty($session->usernote)) {
-        $table->data[] = array(get_string('usernote', 'facetoface'), $session->usernote);
+        $output .= html_writer::tag('dt', get_string('usernote', 'facetoface'));
+        $output .= html_writer::tag('dd', format_string($session->usernote));
     }
 
     // Display trainers.
@@ -3421,7 +3426,8 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
             $session->details = file_rewrite_pluginfile_urls($session->details, 'pluginfile.php', $context->id, 'mod_facetoface', 'session', $session->id);
         }
         $details = format_text($session->details, FORMAT_HTML);
-        $table->data[] = array(get_string('details', 'facetoface'), $details);
+        $output .= html_writer::tag('dt', get_string('details', 'facetoface'));
+        $output .= html_writer::tag('dd', $details);
     }
 
     $trainerroles = facetoface_get_trainer_roles($coursecontext);
@@ -3442,12 +3448,13 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
                 $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
                 $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
             }
-
-            $table->data[] = array($rolename, implode(', ', $trainer_names));
+            $output .= html_writer::tag('dt', $rolename);
+            $output .= html_writer::tag('dd', implode(', ', $trainer_names));
         }
     }
+    $output .= html_writer::end_tag('dl');
 
-    return html_writer::table($table, $return);
+    return $output;
 }
 
 /**

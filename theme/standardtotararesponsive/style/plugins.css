@@ -90,3 +90,17 @@
         width: auto;
     }
 }
+
+@media screen and (min-width: 500px) {
+    .f2f dt {
+        clear: left;
+        float: left;
+        text-align: right;
+        width: 23%;
+    }
+
+    .f2f dd {
+        margin-left: 23%;
+        padding-left: 5px;
+    }
+}
