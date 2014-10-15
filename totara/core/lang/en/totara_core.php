@@ -207,7 +207,6 @@ $string['learningrecords'] = 'Learning Records';
 $string['localpostinstfailed'] = 'There was a problem setting up local modifications to this installation.';
 $string['managecertifications'] = 'Manage certifications';
 $string['managecustomicons'] = 'Manage custom icons';
-$string['manager(s)'] = 'Manager(s)';
 $string['managers'] = 'Manager\'s ';
 $string['modulearchive'] = 'Activity archives';
 $string['moodlecore'] = 'Moodle core';
