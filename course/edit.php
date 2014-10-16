@@ -215,7 +215,7 @@ if ($editform->is_cancelled()) {
             // Deal with course creators - enrol them internally with default role.
             enrol_try_internal_enrol($course->id, $USER->id, $CFG->creatornewroleid);
         }
-        if (!is_enrolled($context)) {
+        if (false && !is_enrolled($context)) { // T-13383 Disable redirect to enrolments page in Totara.
             // Redirect to manual enrolment page if possible.
             $instances = enrol_get_instances($course->id, true);
             foreach($instances as $instance) {
