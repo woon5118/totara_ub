@@ -17,7 +17,7 @@ Feature: Add blocks to my home page
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "student1"
-    And I follow "My home"
+    And I follow "My learning"
 
   Scenario: Add blocks to page
     When I press "Customise this page"
