@@ -297,17 +297,17 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         label: M.util.get_string('savechanges', 'moodle'),
         section: Y.WidgetStdMod.FOOTER,
         action: function() {
-          if (tinymce.activeEditor) {
-            tinymce.activeEditor.save();
-          }
           var $theFrm = $content.find('form.mform');
 
-          // Save all tinyMCE editors.
+          // Save all tinyMCE editors if any.
           // TODO: T-11236 Find way for event propagation.
-          if (tinyMCE) {
-            for (edId in tinyMCE.editors) {
-              tinyMCE.editors[edId].save();
-            }
+          if (typeof tinyMCE != 'undefined') {
+              if (tinymce.activeEditor) {
+                  tinymce.activeEditor.save();
+              }
+              for (edId in tinyMCE.editors) {
+                  tinyMCE.editors[edId].save();
+              }
           }
           var apprObj = $theFrm.serialize();
           apprObj += ('&submitbutton=' + $(this).attr('value'));

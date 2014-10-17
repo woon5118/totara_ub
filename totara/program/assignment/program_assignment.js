@@ -502,7 +502,10 @@ M.totara_programassignment = M.totara_programassignment || {
         // Check if textareas have been changed
         $('textarea', form).each(function() {
             // See if there's a tiny MCE instance for this text area
-            var instance = tinyMCE.getInstanceById($(this).attr('id'));
+            var instance = undefined;
+            if (typeof(tinyMCE) != 'undefined') {
+                instance = tinyMCE.getInstanceById($(this).attr('id'));
+            }
             if (instance !== undefined && typeof instance.isDirty == 'function') {
                 if (instance.isDirty()) {
                     isModified = true;

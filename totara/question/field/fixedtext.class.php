@@ -54,12 +54,6 @@ class question_fixedtext extends question_base{
             $toform = new stdClass();
         }
 
-        // This class only accessible if text editor was added.
-        if (class_exists('tinymce_texteditor')) {
-            $editor = new tinymce_texteditor();
-            $editor->use_editor('fixedtext_editor');
-        }
-
         $toform->fixedtextformat = FORMAT_HTML;
         $toform->fixedtext = $this->param1;
         $toform = file_prepare_standard_editor($toform, 'fixedtext', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
