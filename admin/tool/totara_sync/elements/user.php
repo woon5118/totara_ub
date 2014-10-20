@@ -117,6 +117,9 @@ class totara_sync_element_user extends totara_sync_element {
         global $DB, $CFG;
 
         $this->addlog(get_string('syncstarted', 'tool_totara_sync'), 'info', 'usersync');
+        // Array to store the users we create or update that
+        // will need to have their assignments synced.
+        $assign_sync_users = array();
 
         try {
             // This can go wrong in many different ways - catch as a generic exception.
@@ -223,21 +226,17 @@ class totara_sync_element_user extends totara_sync_element {
                         $this->addlog(get_string('cannotcreateuserx', 'tool_totara_sync', $suser->idnumber), 'error', 'createuser');
                     }
                 }
-                $rscreateaccounts->close(); // Free mem.
+                $rscreateaccounts->close(); // Free memory.
 
-                // Create user assignments.
+                // Get data for user assignments for assignment sync later.
                 $sql = "SELECT sc.*, u.id as uid
                           FROM {{$synctable_clone}} sc
                     INNER JOIN {user} u ON (sc.idnumber = u.idnumber AND u.idnumber != '')";
                 $rscreateassignments = $DB->get_recordset_sql($sql);
                 foreach ($rscreateassignments as $suser) {
-                    try {
-                        $this->sync_user_assignments($suser->uid, $suser);
-                    } catch (Exception $e) {
-                        throw new totara_sync_exception('user', 'syncuserassignments', 'cannotcreateuserassignments', $suser->idnumber, $e->getMessage());
-                    }
+                    $assign_sync_users[] = $suser;
                 }
-                $rscreateassignments->close(); // Free mem.
+                $rscreateassignments->close(); // Free memory.
             }
         }
 
@@ -292,8 +291,8 @@ class totara_sync_element_user extends totara_sync_element {
                     unset($userauth);
                 }
 
-                // Update user assignment data.
-                $this->sync_user_assignments($user->id, $suser);
+                // Store user data for assignment sync later.
+                $assign_sync_users[] = $suser;
                 // Update custom field data.
                 $user = $this->put_custom_field_data($user, $suser);
 
@@ -325,6 +324,18 @@ class totara_sync_element_user extends totara_sync_element {
             $rsupdateaccounts->close();
             unset($user, $pos_assignment, $posdata); // Free memory.
         }
+
+        // Process the assignments after all the user records have been
+        // created and updated so we know they're in the right state.
+        foreach ($assign_sync_users as $suser) {
+            try {
+                $this->sync_user_assignments($suser->uid, $suser);
+            } catch (Exception $e) {
+                throw new totara_sync_exception('user', 'syncuserassignments', 'cannotcreateuserassignments', $suser->idnumber, $e->getMessage());
+            }
+        }
+        // Free memory used by user assignment array.
+        unset($assign_sync_users);
 
         $this->get_source()->drop_table();
         $this->addlog(get_string('syncfinished', 'tool_totara_sync'), 'info', 'usersync');
