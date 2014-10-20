@@ -469,6 +469,7 @@ class reportbuilder {
             return false;
         }
         list($sql, $params) = $this->build_query(false, true);
+        $sql .= $this->get_report_sort();
         echo $OUTPUT->heading('Query', 3);
         echo html_writer::tag('pre', $sql, array('class' => 'notifymessage'));
         echo $OUTPUT->heading('Query params', 3);
