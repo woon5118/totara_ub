@@ -619,8 +619,6 @@ class columns_test extends reportcache_advanced_testcase {
             'org_type_info_field' => array($this->org_type_info_field_data),
             'pos_type_info_data' => array($this->pos_type_info_data_data),
             'org_type_info_data' => array($this->org_type_info_data_data),
-<<<<<<< HEAD
-=======
             'assignment' => array($this->assignment_data),
             'assignment_submissions' => array($this->assignment_submissions_data),
             'assign' => array($this->assign_data),
@@ -628,7 +626,6 @@ class columns_test extends reportcache_advanced_testcase {
             'assignsubmission_onlinetext' => array($this->assign_onlinetext_data),
             'assign_grades' => array($this->assign_grades_data),
             'assignfeedback_comments' => array($this->assign_feedback_data),
->>>>>>> 2352285... T-10554 tests: Fix column tests for new assign reports
             'scale' => $this->scale_data,
             'files' => array($this->files_data),
             'enrol' => array($this->filler_data),
