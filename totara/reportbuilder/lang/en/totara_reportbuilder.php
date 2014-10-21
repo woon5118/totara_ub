@@ -248,6 +248,7 @@ $string['error:problemobtainingreportdata'] = 'There was a problem obtaining the
 $string['error:processfile'] = 'Unable to create process file. Please, try later.';
 $string['error:propertyxmustbesetiny'] = 'Property "{$a->property}" must be set in class "{$a->class}"';
 $string['error:reportcacheinitialize'] = 'Cache is disabled for this report';
+$string['error:reporturlnotset'] = 'The url property for report {$a} is missing, please ask your developers to check your code';
 $string['error:savedsearchnotdeleted'] = 'Saved search could not be deleted';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
 $string['error:updatescheduledreport'] = 'Error updating Scheduled Report';

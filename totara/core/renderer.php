@@ -155,6 +155,11 @@ class totara_core_renderer extends plugin_renderer_base {
         }
 
         foreach ($reports as $report) {
+            // Check url property is set.
+            if (!isset($report->url)) {
+                debugging(get_string('error:reporturlnotset', 'totara_reportbuilder', $report->fullname), DEBUG_DEVELOPER);
+                continue;
+            }
             // Show reports user has permission to view, that are not hidden.
             $output .= html_writer::start_tag('li');
             $cells = array();
