@@ -3059,6 +3059,10 @@ class reportbuilder {
                 $headings[] = $column;
             }
         }
+
+        // Log export event.
+        \totara_reportbuilder\event\report_exported::create_from_report($this, $format)->trigger();
+
         switch($format) {
             case REPORT_BUILDER_EXPORT_ODS:
                 $this->download_ods($headings, $sql . $order, $params, $count, $restrictions, null, $cache);

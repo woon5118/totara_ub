@@ -55,7 +55,6 @@ if ($report->embedded) {
 }
 
 if ($format != '') {
-    \totara_reportbuilder\event\report_exported::create_from_report($report, $format)->trigger();
     $report->export_data($format);
     die;
 }

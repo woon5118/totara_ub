@@ -62,13 +62,11 @@ $report->defaultsortorder = 3;
 
 $logurl = $PAGE->url->out_as_local_url();
 if ($format!='') {
-    add_to_log(SITEID, 'rbembedded', 'export report', $logurl, $report->fullname);
-
     $report->export_data($format);
     die;
 }
 
-add_to_log(SITEID, 'rbembedded', 'view report', $logurl, $report->fullname);
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $report->include_js();
 $PAGE->requires->js_init_call('M.totara_message.init');

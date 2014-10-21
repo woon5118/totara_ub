@@ -56,10 +56,11 @@ $report = reportbuilder_get_embedded_report('cohort_associations_enrolled', arra
 
 // Handle a request for export
 if ($format != '') {
-    // add_to_log(SITEID, 'plan', 'record export', $log_url, $report->fullname);
     $report->export_data($format);
     die;
 }
+
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 

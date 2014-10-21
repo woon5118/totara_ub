@@ -48,7 +48,7 @@ if (!$report = reportbuilder_get_embedded_report($shortname, null, false, 0)) {
 
 $logurl = $PAGE->url->out_as_local_url();
 
-add_to_log(SITEID, 'rbembedded', 'view report', $logurl, $report->fullname);
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $report->include_js();
 

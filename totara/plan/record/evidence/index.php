@@ -69,12 +69,11 @@ $report = reportbuilder_get_embedded_report('plan_evidence', $reportfilters, fal
 
 $logurl = $PAGE->url->out_as_local_url();
 if ($format != '') {
-    add_to_log(SITEID, 'rbembedded', 'record export', $logurl, $report->fullname);
     $report->export_data($format);
     die;
 }
 
-add_to_log(SITEID, 'rbembedded', 'record view', $logurl, $report->fullname);
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $report->include_js();
 

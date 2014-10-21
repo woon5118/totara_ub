@@ -40,13 +40,14 @@ $PAGE->set_context($context);
 $report = reportbuilder_get_embedded_report('cohort_orphaned_users', null, false, $sid);
 // Handle a request for export
 if($format!='') {
-//    add_to_log(SITEID, 'plan', 'record export', $log_url, $report->fullname);
     $report->export_data($format);
     die;
 }
 
 $url = new moodle_url('/totara/cohort/orphanreport.php', array('format' => $format, 'debug' => $debug));
 admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
+
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
 $strcohorts = get_string('cohorts', 'totara_cohort');
 echo $OUTPUT->header();
