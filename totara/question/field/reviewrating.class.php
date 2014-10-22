@@ -86,4 +86,16 @@ abstract class reviewrating extends review {
         }
         parent::add_item_specific_edit_elements($form, $item);
     }
+
+    /**
+     * Add a rating selector to the form.
+     *
+     * The select element you define must include classes "rating_selector rating_item_<item-identifier>"
+     * so that the ratings of all of the same items on the same page will automatically be updated to keep
+     * them in sync. See goals for an example.
+     *
+     * @param MoodleQuickForm $form
+     * @param object $item
+     */
+    protected abstract function add_rating_selector(MoodleQuickForm $form, $item);
 }

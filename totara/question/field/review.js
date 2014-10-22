@@ -117,6 +117,13 @@ M.totara_review = M.totara_review || {
         );
 
         M.totara_review.addActions(this.config.formprefix + '_' + this.config.prefix + '_review');
+
+        // Set up handler to keep all review statuses of the same items in sync.
+        $(document).on('change', '.rating_selector', function() {
+            var identifier = $(this).attr("class").match(/rating_item[\w-]*\b/);
+            var newvalue = $(this).val();
+            $("." + identifier).val(newvalue);
+        });
     },
 
     /**

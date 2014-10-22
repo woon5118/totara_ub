@@ -203,10 +203,14 @@ class question_goals extends reviewrating {
     /**
      * Add a rating selector to the form.
      *
+     * The select element you define must include classes "rating_selector rating_item_<item-identifier>"
+     * so that the ratings of all of the same items on the same page will automatically be updated to keep
+     * them in sync. See goals for an example.
+     *
      * @param MoodleQuickForm $form
      * @param object $item
      */
-    public function add_rating_selector(MoodleQuickForm $form, $item) {
+    protected function add_rating_selector(MoodleQuickForm $form, $item) {
         global $DB;
 
         $goalitem = goal::get_goal_item(array('id' => $item->itemid), $item->scope);
@@ -250,7 +254,8 @@ class question_goals extends reviewrating {
                     $options[$scalevalue->id] = format_string($scalevalue->name);
                 }
                 $name = $this->get_prefix_form() . '_scalevalueid_' . $item->itemid . '_' . $item->scope;
-                $form->addElement('select', $name, get_string('goalstatus', 'totara_question'), $options);
+                $form->addElement('select', $name, get_string('goalstatus', 'totara_question'), $options,
+                        array('class' => 'rating_selector rating_item_goal_' . $item->itemid . '_' . $item->scope));
                 $form->setDefault($name, $scalevalueid);
             } else {
                 $form->addElement('static', '', get_string('goalstatus', 'totara_question'), format_string($scalevalue->name));
