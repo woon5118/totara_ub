@@ -32,6 +32,7 @@
         <FIELD NAME="allowcancellationsdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="selectpositiononsignup" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Users with multiple positions will select one on signup"/>
         <FIELD NAME="forceselectposition" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Error if no suitable position is available when signing up"/>
+        <FIELD NAME="allowsignupnotedefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Allow 'User sign-up note' default"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for facetoface"/>
@@ -71,6 +72,7 @@
         <FIELD NAME="selfapproval" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow self approval"/>
         <FIELD NAME="mincapacity" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The minimum number of people for this session to take place."/>
         <FIELD NAME="cutoff" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="86400" SEQUENCE="false" COMMENT="The number of seconds before the session start by which the minimum capacity should be reached"/>
+        <FIELD NAME="availablesignupnote" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User sign-up note"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the table, please edit me"/>

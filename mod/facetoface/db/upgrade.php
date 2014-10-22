@@ -2345,11 +2345,38 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         $table = new xmldb_table('facetoface_sessions');
         $field = new xmldb_field('waitlisteveryone', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'allowoverbook');
         $field->setComment('Will everyone be added to the waiting list');
+
+        // Conditionally launch add field waitlisteveryone.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         upgrade_mod_savepoint(true, 2014102100, 'facetoface');
+    }
+
+    if ($oldversion < 2014102200) {
+
+        $table = new xmldb_table('facetoface');
+        $field = new xmldb_field('allowsignupnotedefault', XMLDB_TYPE_INTEGER, 1, null, XMLDB_NOTNULL, null, 1);
+        $field->setComment("Allow 'User sign-up note' default");
+
+        // Just double check the field doesn't somehow exist.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field selfapproval to be added to facetoface_sessions.
+        $table = new xmldb_table('facetoface_sessions');
+        $field = new xmldb_field('availablesignupnote', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $field->setComment('User sign-up note');
+
+        // Conditionally launch add field selfapproval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014102200, 'facetoface');
     }
 
     return $result;

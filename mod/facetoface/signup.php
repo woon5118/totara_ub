@@ -93,11 +93,12 @@ $selfapprovaltandc = format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
 
 $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
 $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
+$enableattendeenote = $session->availablesignupnote;
 
 $f2fid = $session->facetoface;
 
 $params = compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode',
-    'hasselfapproval', 'selfapprovaltandc', 'f2fid', 'waitlisteveryone');
+    'hasselfapproval', 'selfapprovaltandc', 'f2fid', 'waitlisteveryone', 'enableattendeenote');
 $mform = new mod_facetoface_signup_form(null, $params);
 
 if ($mform->is_cancelled()) {
@@ -128,7 +129,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $params = array();
     $params['discountcode']     = $fromform->discountcode;
     $params['notificationtype'] = $fromform->notificationtype;
-    $params['usernote']         = $fromform->usernote;
+    $params['usernote']         = ($enableattendeenote ? $fromform->usernote : '');
 
     $f2fselectedpositionelemid = 'selectedposition_' . $session->facetoface;
 

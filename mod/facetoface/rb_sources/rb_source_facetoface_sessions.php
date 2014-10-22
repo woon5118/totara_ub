@@ -248,6 +248,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
                     'dbdatatype' => 'text',
                     'outputformat' => 'text',
                     'joins' => 'status',
+                    'capability' => 'mod/facetoface:viewattendeesnote',
                 )
             ),
             new rb_column_option(

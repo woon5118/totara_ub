@@ -92,7 +92,7 @@ local_js(array(
     TOTARA_JS_DIALOG,
     TOTARA_JS_TREEVIEW
 ));
-
+$PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f));
 $PAGE->requires->string_for_js('save', 'totara_core');
 $PAGE->requires->string_for_js('error:addpdroom-dialognotselected', 'totara_core');
 $PAGE->requires->strings_for_js(array('cancel', 'ok'), 'moodle');
@@ -175,6 +175,9 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if (empty($fromform->selfapproval)) {
         $fromform->selfapproval = 0;
     }
+    if (empty($fromform->availablesignupnote)) {
+        $fromform->availablesignupnote = 0;
+    }
 
     //check dates and calculate total duration
     $sessiondates = array();
@@ -215,6 +218,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $todb->usermodified = $USER->id;
     $todb->roomid = 0;
     $todb->selfapproval = $facetoface->approvalreqd ? $fromform->selfapproval : 0;
+    $todb->availablesignupnote = $fromform->availablesignupnote;
 
     // If min capacity is not provided or unset default to 0.
     if (empty($fromform->enablemincapacity) || $fromform->mincapacity < 0) {
@@ -317,6 +321,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $toform->normalcost = $session->normalcost;
     $toform->discountcost = $session->discountcost;
     $toform->selfapproval = $session->selfapproval;
+    $toform->availablesignupnote = $session->availablesignupnote;
 
     if ($canconfigurecancellation) {
         $toform->allowcancellations = $session->allowcancellations;
@@ -386,7 +391,6 @@ else {
 $pagetitle = format_string($facetoface->name);
 
 $PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/sessions.php', array('f' => $f));
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 

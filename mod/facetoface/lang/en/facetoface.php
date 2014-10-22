@@ -48,7 +48,7 @@ $string['allocationfull_noreserve'] = 'Without replacing your current reservatio
 $string['allocationfull_reserve'] = 'You can only allocate {$a} space(s) for this session';
 $string['allowcancellations'] = 'Allow booking cancellations';
 $string['allowcancellationsdefault'] = 'Allow booking cancellations default';
-$string['allowcancellationsdefault_help'] = 'Whether this facetofaces sessions will allow booking cancellations by default, can be overridden in the session settings';
+$string['allowcancellationsdefault_help'] = 'Whether sessions in this activity will allow booking cancellations by default, can be overridden in the session settings';
 $string['allowcancellations_help'] = 'Whether session attendees will be able to cancel their bookings';
 $string['allowconflicts'] = 'Allow conflicts';
 $string['allowconflicts_help'] = 'This will allow scheduling conflicts to exist';
@@ -56,6 +56,8 @@ $string['allowoverbook'] = 'Allow overbooking';
 $string['allowschedulingconflicts'] = 'Override user conflicts';
 $string['allowschedulingconflicts_help'] = 'If trainers or users are already assigned or booked onto another Facetoface session at the same time as this session then the administrator will be warned, but can override such warnings and proceed anyway by selecting "Yes" from the drop-down menu';
 $string['allowselectedschedulingconflicts'] = 'Allow selected scheduling conflicts';
+$string['allowsignupnotedefault'] = 'Allow "User sign-up note" default';
+$string['allowsignupnotedefault_help'] = 'Whether sessions in this activity will allow a sign-up note by default, can be overridden in the session settings';
 $string['allsessionsin'] = 'All sessions in {$a}';
 $string['alreadysignedup'] = 'You have already signed-up for this Face-to-face activity.';
 $string['answer'] = 'Sign in';
@@ -68,6 +70,7 @@ $string['assessmentyour'] = 'Your assessment';
 $string['attendance'] = 'Attendance';
 $string['attendanceinstructions'] = 'Select users who attended the session:';
 $string['attendedsession'] = 'Attended session';
+$string['attendeenote'] = 'Attendee\'s note';
 $string['attendees'] = 'Attendees';
 $string['approvalnocapacity'] = 'There are {$a->waiting} learners awaiting approval but no spaces available, you cannot approve any more learners at this time.';
 $string['approvalnocapacitywaitlist'] = 'There are {$a->waiting} learners awaiting approval but no spaces available - any approvals will be added to the waitlist instead.';
@@ -75,6 +78,7 @@ $string['approvalovercapacity'] = 'There are {$a->waiting} learners awaiting app
 $string['approvalovercapacitywaitlist'] = 'There are {$a->waiting} learners awaiting approval but only {$a->available} spaces available.<br /> Only the first {$a->available} learners you approve will be added to the session - additional approvals will be added to the waitlist.';
 $string['potentialattendees'] = 'Potential Attendees';
 $string['attendeestablesummary'] = 'People planning on or having attended this session.';
+$string['availablesignupnote'] = 'User sign-up note';
 $string['requeststablesummary'] = 'People requesting to attended this session.';
 $string['beforestartofsession'] = 'before start of session';
 $string['body'] = 'Body';
@@ -387,6 +391,7 @@ $string['facetoface:addinstance'] = 'Add a new facetoface';
 $string['facetoface:configurecancellation'] = 'Allow the configuration of booking cancellations, upon adding/editing a face-to-face activity.';
 $string['facetoface:changesignedupjobposition'] = 'Change signed up job position';
 $string['facetoface:editsessions'] = 'Add, edit, copy and delete face-to-face sessions';
+$string['facetoface:manageattendeesnote'] = 'Manage session attendee\'s notes';
 $string['facetoface:overbook'] = 'Sign-up to full sessions.';
 $string['facetoface:removeattendees'] = 'Remove attendees from a face-to-face session';
 $string['facetoface:reserveother'] = 'Reserve on behalf of other managers';
@@ -395,6 +400,7 @@ $string['facetoface:signup'] = 'Sign-up for a session';
 $string['facetoface:takeattendance'] = 'Take attendance';
 $string['facetoface:view'] = 'View face-to-face activities and sessions';
 $string['facetoface:viewattendees'] = 'View attendance list and attendees';
+$string['facetoface:viewattendeesnote'] = 'View session attendee\'s notes';
 $string['facetoface:viewcancellations'] = 'View cancellations';
 $string['facetoface:viewemptyactivities'] = 'View empty face-to-face activities';
 $string['facetoface:viewinterestreport'] = 'View face-to-face declared interest report';
@@ -1157,7 +1163,6 @@ $string['usersuspendedcancel'] = 'User has been suspended';
 $string['usernotsignedup'] = 'Status: not signed up';
 $string['usernote'] = 'Sign-up note';
 $string['userpositionheading'] = '{$a} - update selected position';
-$string['attendeenote'] = 'Attendee\'s note';
 $string['usernoteupdated'] = 'Attendee\'s note updated';
 $string['usernoteheading'] = '{$a} - update note';
 $string['usersignedup'] = 'Status: signed up';
@@ -1196,6 +1201,11 @@ $string['allowoverbook_help'] = 'When "Allow overbooking" is checked, learners w
 When a learner signs up for a session that is already full, they will receive an email advising that they have been waitlisted for the session and will be notified when a booking becomes available.';
 
 $string['approvalreqd_help'] = 'When "Approval required" is checked, a learner will need approval from their manager to be permitted to attend a face-to-face session.';
+
+$string['availablesignupnote_help'] = 'When "User sign-up note" is checked, learners will be able to enter any specific requirements that the session organiser might need to know about:
+
+* Dietary requirements
+* Disabilities';
 
 $string['cancellationinstrmngr'] = '# Notice for manager';
 $string['cancellationinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for manager** field is sent to a learner\'s manager advising that they have cancelled a face-to-face booking.';

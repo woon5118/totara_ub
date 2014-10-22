@@ -426,9 +426,9 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         */
         this.attachCustomClickEvents = function() {
             // Add new page button.
-            $('a.attendee-add-note').on('click', function(){
-                $.get($(this).attr('href'), function(href){
-                    modalForm(href);
+            $('a.attendee-add-note').on('click', function() {
+                $.get($(this).attr('href'), function(data) {
+                    modalForm(data);
                 });
                 return false;
             });
@@ -446,41 +446,50 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
         * Modal popup for generic single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel
         * @param content The desired contents of the panel
         */
-        function modalForm(href) {
-            this.Y.use('panel', function(Y) {
-                var panel = new Y.Panel({
-                    headerContent: null,
-                    bodyContent  : href,
-                    width        : 500,
-                    zIndex       : 5,
-                    centered     : true,
-                    modal        : true,
-                    render       : true,
-                });
-                var $content = $('#' + panel.get('id'));
-                $content.find('input[type="text"]').eq(0).focus();
-                $content.find('#id_submitbutton').on('click', function() {
-                    var $theFrm = $content.find('form.mform');
-                    var apprObj = $theFrm.serialize();
+        function modalForm(data) {
+            var bodyContent = '';
+            if (typeof data.error === 'undefined') {
+                bodyContent = data;
+            }
+            var dialog = new M.core.dialogue ({
+                headerContent: null,
+                bodyContent  : bodyContent,
+                width        : 500,
+                zIndex       : 5,
+                centered     : true,
+                modal        : true,
+                render       : true,
+            });
+            var content = $('#' + dialog.get('id'));
+            if (typeof data.error !== 'undefined') {
+                // Get widget div header.
+                var div = content.find('div').eq(1);
+                div.after('<div class="notifyproblem" style="margin:2px">' + data.error + '</div>');
+            } else {
+                content.find('fieldset.hidden').removeClass('hidden');
+                content.find('#id_usernote').focus();
+                content.find('#id_submitbutton').on('click', function() {
+                    var form = content.find('form');
+                    var apprObj = form.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
-                    $.post($theFrm.attr('action'), apprObj).done(function(data){
+                    $.post(form.attr('action'), apprObj).done(function(data) {
                         var obj = $.parseJSON(data);
                         if (obj.result == 'success') {
                             var span = "#usernote"+obj.id;
                             $(span).html(obj.usernote);
-                            panel.destroy(true);
+                            dialog.destroy(true);
                         } else {
                             $("#attendee_note_err").text(obj.error);
                         }
                     });
                     return false;
                 });
-                $content.find('#id_cancel').on('click', function() {
-                    panel.destroy(true);
+                content.find('#id_cancel').on('click', function() {
+                    dialog.destroy(true);
                     return false;
                 });
-                panel.show();
-            });
+            }
+            dialog.show();
         }
 
         /**

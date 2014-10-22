@@ -333,6 +333,12 @@ function facetoface_hours_to_minutes($hours) {
  */
 function facetoface_fix_settings($facetoface) {
 
+    if (empty($facetoface->completionstatusrequired)) {
+        $facetoface->completionstatusrequired = null;
+    }
+    if (empty($facetoface->reservecancel)) {
+        $facetoface->reservecanceldays = 0;
+    }
     if (empty($facetoface->emailmanagerconfirmation)) {
         $facetoface->confirmationinstrmngr = null;
     }
@@ -366,6 +372,9 @@ function facetoface_fix_settings($facetoface) {
     if (empty($facetoface->forceselectposition) || !$facetoface->forceselectposition) {
         $facetoface->forceselectposition = 0;
     }
+    if (empty($facetoface->allowsignupnotedefault) || !$facetoface->allowsignupnotedefault) {
+        $facetoface->allowsignupnotedefault = 0;
+    }
 }
 
 /**
@@ -377,9 +386,6 @@ function facetoface_add_instance($facetoface) {
     global $DB;
     $facetoface->timemodified = time();
 
-    if (empty($facetoface->reservecancel)) {
-        $facetoface->reservecanceldays = 0;
-    }
     facetoface_fix_settings($facetoface);
     if ($facetoface->id = $DB->insert_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
@@ -509,12 +515,6 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
 
     if ($instanceflag) {
         $facetoface->id = $facetoface->instance;
-    }
-    if (empty($facetoface->completionstatusrequired)) {
-        $facetoface->completionstatusrequired = null;
-    }
-    if (empty($facetoface->reservecancel)) {
-        $facetoface->reservecanceldays = 0;
     }
 
    facetoface_fix_settings($facetoface);

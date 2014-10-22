@@ -653,8 +653,14 @@ if ($show_table) {
 
             $headers[] = get_string('attendance', 'facetoface');
             $columns[] = 'attendance';
-            $headers[] = get_string('attendeenote', 'facetoface');
-            $columns[] = 'usernote';
+
+            if ($session->availablesignupnote) {
+                if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+
+                    $headers[] = get_string('attendeenote', 'facetoface');
+                    $columns[] = 'usernote';
+                }
+            }
 
             if ($action == 'waitlist' && !$download) {
                 $headers[] = html_writer::tag('a', get_string('all'), array('href' => '#', 'class' => 'selectall'))
@@ -662,6 +668,7 @@ if ($show_table) {
                             . html_writer::tag('a', get_string('none'), array('href' => '#', 'class' => 'selectnone'));
                 $columns[] = 'actions';
             }
+
         }
         if (!$download) {
             $table->define_columns($columns);
@@ -779,11 +786,17 @@ if ($show_table) {
                 }
 
                 $data[] = str_replace(' ', '&nbsp;', get_string('status_'.facetoface_get_status($attendee->statuscode), 'facetoface'));
-
-                $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id));
-                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
-                $note = html_writer::span($attendee->usernote, 'note'.$attendee->id, array('id' => 'usernote'.$attendee->id));
-                $data[] = $icon . $note;
+                if ($session->availablesignupnote) {
+                    $icon = '';
+                    if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+                        $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id, 'sesskey' => sesskey()));
+                        $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+                    }
+                    if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+                        $note = html_writer::span($attendee->usernote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                        $data[] = $icon . $note;
+                    }
+                }
             }
 
             if ($action == 'waitlist' && !$download) {
@@ -886,11 +899,17 @@ if ($action == 'approvalrequired') {
         $data[] = html_writer::link($attendee_link, format_string(fullname($attendee)));
         $data[] = userdate($attendee->timerequested, get_string('strftimedatetime'));
 
-        $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id));
-        $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
-        $note = html_writer::span($attendee->usernote, 'note'.$attendee->id, array('id' => 'usernote'.$attendee->id));
-        $data[] = $icon . $note;
-
+        if ($session->availablesignupnote) {
+            $icon = '';
+            if (has_capability('mod/facetoface:manageattendeesnote', $context)) {
+                $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'id' => $attendee->id, 'sesskey' => sesskey()));
+                $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
+            }
+            if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+                $note = html_writer::span($attendee->usernote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                $data[] = $icon . $note;
+            }
+        }
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
         $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '2')));

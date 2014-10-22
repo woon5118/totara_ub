@@ -31,6 +31,8 @@ require_once($CFG->dirroot . '/mod/facetoface/attendee_note_form.php');
 $userid    = required_param('id', PARAM_INT); // Facetoface signup user ID.
 $sessionid = required_param('s', PARAM_INT); // Facetoface session ID.
 
+require_sesskey();
+
 if (!$session = facetoface_get_session($sessionid)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
 }
@@ -46,8 +48,10 @@ if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course
 
 // Check essential permissions.
 require_course_login($course, true, $cm);
-$context = context_course::instance($course->id);
-require_capability('mod/facetoface:view', $context);
+$context = context_module::instance($cm->id);
+if (!has_capability('mod/facetoface:manageattendeesnote', $context) || (bool)$session->availablesignupnote == false) {
+    print_error('nopermissions', 'error', '', 'Update attendee note');
+}
 
 $PAGE->get_renderer('mod_facetoface');
 
@@ -62,10 +66,6 @@ $mform = new attendee_note_form(null, array('attendee' => $defaults));
 
 if ($fromform = $mform->get_data()) {
 
-    if (!confirm_sesskey()) {
-        echo json_encode(array('result' => 'error', 'error' => get_string('confirmsesskeybad', 'error')));
-        die();
-    }
     if (empty($fromform->submitbutton)) {
         echo json_encode(array('result' => 'error', 'error' => get_string('error:unknownbuttonclicked', 'totara_core')));
         die();

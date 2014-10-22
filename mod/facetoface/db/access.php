@@ -53,8 +53,8 @@
 
 $capabilities = array(
 
-    // Ability to see that the activity exists, and the basic information
-    // about its sessions
+    // Ability to see that the activity exists, and the basic information.
+    // about its sessions.
     'mod/facetoface:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -67,7 +67,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to signup for a session
+    // Ability to signup for a session.
     'mod/facetoface:signup' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -79,7 +79,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to see activities for which no sessions have been added
+    // Ability to see activities for which no sessions have been added.
     'mod/facetoface:viewemptyactivities' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -89,7 +89,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to see how many people have signed up for a session
+    // Ability to see how many people have signed up for a session.
     'mod/facetoface:viewattendees' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -100,7 +100,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to take attendance
+    // Ability to take attendance.
     'mod/facetoface:takeattendance' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -111,7 +111,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to add attendees to a session
+    // Ability to add attendees to a session.
     'mod/facetoface:addattendees' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -122,7 +122,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to remove attendees from a session
+    // Ability to remove attendees from a session.
     'mod/facetoface:removeattendees' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -133,7 +133,7 @@ $capabilities = array(
         )
     ),
 
-    // Ability to add, edit, copy and delete a session
+    // Ability to add, edit, copy and delete a session.
     'mod/facetoface:editsessions' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -144,7 +144,7 @@ $capabilities = array(
         )
     ),
 
-    // View session cancellations
+    // View session cancellations.
     'mod/facetoface:viewcancellations' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -166,8 +166,8 @@ $capabilities = array(
         ),
     ),
 
-    // Ability to overbook a session by signing up for it
-    // Users with mod/facetoface:addattendees can also overbook
+    // Ability to overbook a session by signing up for it.
+    // Users with mod/facetoface:addattendees can also overbook.
     'mod/facetoface:overbook' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -178,7 +178,7 @@ $capabilities = array(
         ),
     ),
 
-    // Ability to create a f2f instance
+    // Ability to create a f2f instance.
     'mod/facetoface:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
@@ -240,5 +240,25 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-);
 
+    // View session attendees note.
+    'mod/facetoface:viewattendeesnote' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+    ),
+
+    // Add/update/delete session attendees note.
+    'mod/facetoface:manageattendeesnote' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+    ),
+);

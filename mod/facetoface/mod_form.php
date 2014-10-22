@@ -100,6 +100,10 @@ class mod_facetoface_mod_form extends moodleform_mod {
             $mform->addElement('checkbox', 'forceselectposition', get_string('forceselectposition', 'facetoface'));
         }
 
+        $mform->addElement('checkbox', 'allowsignupnotedefault', get_string('allowsignupnotedefault', 'facetoface'));
+        $mform->addHelpButton('allowsignupnotedefault', 'allowsignupnotedefault', 'facetoface');
+        $mform->setDefault('allowsignupnotedefault', 1);
+
         $conf = get_config('facetoface');
 
         $mform->addElement('header', 'managerreserveheader', get_string('managerreserveheader', 'mod_facetoface'));
