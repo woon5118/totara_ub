@@ -239,7 +239,7 @@ function core_login_process_password_set($token) {
         if (!$userauth->user_update_password($user, $data->password)) {
             print_error('errorpasswordupdate', 'auth');
         }
-        if (!empty($CFG->pwchangelogout)) {
+        if (!empty($CFG->passwordchangelogout)) {
             \core\session\manager::kill_user_sessions($user->id, session_id());
         }
         // Reset login lockout (if present) before a new password is set.

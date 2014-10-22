@@ -1364,5 +1364,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014120401, 'totara_core');
     }
 
+    if ($oldversion < 2014120500) {
+        // Upgrade forced logout after password change setting after MDL-47800 got upstreamed.
+        if (isset($CFG->pwchangelogout)) {
+            set_config('passwordchangelogout', $CFG->pwchangelogout);
+            unset_config('pwchangelogout');
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014120500, 'totara_core');
+    }
+
     return true;
 }
