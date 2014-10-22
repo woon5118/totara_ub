@@ -54,7 +54,7 @@ if (!$DB->record_exists('dp_plan_competency_assign', array('planid' => $plan->id
 
 $PAGE->set_context($systemcontext);
 $PAGE->set_url('/totara/plan/components/competency/view.php', array('id' => $id, 'itemid' => $caid));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_totara_menu_selected('learningplans');
 
 $plancompleted = $plan->status == DP_PLAN_STATUS_COMPLETE;

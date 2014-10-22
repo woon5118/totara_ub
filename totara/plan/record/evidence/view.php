@@ -50,7 +50,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/view.php', array('id' => $evidenceid));
 
 if ($USER->id != $userid && !totara_is_manager($userid) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
@@ -80,9 +80,8 @@ $PAGE->navbar->add(get_string('allevidence', 'totara_plan'));
 
 $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
+dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 echo $OUTPUT->header();
-
-echo dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 

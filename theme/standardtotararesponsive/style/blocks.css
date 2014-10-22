@@ -42,6 +42,8 @@
 }
 .block .content h3 {
     padding-left: 0;
+    text-transform: none;
+    color: #444;
 }
 .dir-rtl .block .content h3 {
     padding-right: 0;

@@ -671,7 +671,6 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     $table->define_columns($tablecols);
     $table->define_baseurl($baseurl);
     $table->set_attribute('class', 'logtable generalbox');
-    $table->set_attribute('width', '100%');
     $table->set_control_variables(array(
         TABLE_VAR_SORT    => 'tsort',
     ));
@@ -738,7 +737,7 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
  * @return string $out              the form to display
  */
 function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage='courses', $rolstatus='none', $showrol=true, $selectedprogid=0, $showrequired=true) {
-    global $OUTPUT, $DB, $CFG;
+    global $OUTPUT, $DB, $CFG, $PAGE;
     $list = array();
     $attr = array();
     $enableplans = totara_feature_visible('learningplans');
@@ -864,7 +863,10 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
 
     $out .= $OUTPUT->container_end();
 
-    return $out;
+    $fake_block = new block_contents();
+    $fake_block->title = get_string('learningplans', 'totara_plan');;
+    $fake_block->content = $out;
+    $PAGE->blocks->add_fake_block($fake_block, '');
 }
 
 function dp_display_plans_menu_required($programs, $extraparams, $progcount=0) {

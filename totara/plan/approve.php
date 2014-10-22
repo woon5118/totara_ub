@@ -44,7 +44,7 @@ $submitted = optional_param('submitbutton', null, PARAM_TEXT); // Form submitted
 $currenturl = qualified_me();
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url($currenturl);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $planurl = "{$CFG->wwwroot}/totara/plan/view.php?id={$id}";
 $plan = new development_plan($id);
 
@@ -129,10 +129,9 @@ $PAGE->set_heading(format_string($SITE->fullname));
 
 $output = $PAGE->get_renderer('totara_plan');
 
+// Plan menu
+dp_display_plans_menu($plan->userid, $plan->id, $plan->role);
 echo $output->header();
-
-// Plan menu.
-echo dp_display_plans_menu($plan->userid, $plan->id, $plan->role);
 
 // Plan page content.
 echo $output->container_start('', 'dp-plan-content');

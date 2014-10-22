@@ -44,7 +44,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/index.php', array('userid' => $userid, 'format' => $format, 'status' => $rolstatus));
 
 if ($USER->id == $userid) {
@@ -86,10 +86,9 @@ $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_button($report->edit_button());
 $PAGE->set_totara_menu_selected($menuitem);
+dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->header();
-
-echo dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 

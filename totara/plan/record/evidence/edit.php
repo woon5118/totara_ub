@@ -46,7 +46,7 @@ if (!in_array($rolstatus, array('active','completed','all'))) {
 
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/edit.php',
         array('id' => $evidenceid, 'userid' => $userid, 'status' => $rolstatus));
 
@@ -208,10 +208,10 @@ $PAGE->navbar->add(get_string('allevidence', 'totara_plan'), new moodle_url('/to
 $PAGE->navbar->add(get_string($action . 'evidence', 'totara_plan'));
 $PAGE->set_title($strheading);
 $PAGE->set_heading(format_string($SITE->fullname));
+dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->header();
 
-echo dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 

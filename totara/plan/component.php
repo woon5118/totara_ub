@@ -47,7 +47,7 @@ require_login();
 //
 $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $plan = new development_plan($id);
 $ownplan = ($USER->id == $plan->userid);
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';

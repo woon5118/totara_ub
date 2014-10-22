@@ -49,7 +49,7 @@ if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_
 
 $PAGE->set_context($systemcontext);
 $PAGE->set_url('/totara/plan/components/evidence/view.php', array('id' => $id));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_totara_menu_selected('learningplans');
 
 dp_get_plan_base_navlinks($plan->userid);

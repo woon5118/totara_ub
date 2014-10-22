@@ -57,7 +57,7 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/record/competencies.php',
     array('userid' => $userid, 'status' => $rolstatus, 'format' => $format)));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
@@ -111,14 +111,13 @@ $ownplan = $USER->id == $userid;
 $usertype = ($ownplan) ? 'learner' : 'manager';
 $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
+dp_display_plans_menu($userid, 0, $usertype, 'competencies', $rolstatus);
 
 echo $OUTPUT->header();
 
 if ($debug) {
     $report->debug($debug);
 }
-
-echo dp_display_plans_menu($userid, 0, $usertype, 'competencies', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 

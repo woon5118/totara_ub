@@ -74,7 +74,7 @@ if (has_capability('totara/plan:canselectplantemplate', context_system::instance
 //
 $PAGE->set_url('/totara/plan/index.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 
 if ($role == 'manager') {
     $PAGE->set_totara_menu_selected('myteam');
@@ -87,15 +87,12 @@ $pagetitle = get_string('learningplans', 'totara_plan');
 
 dp_get_plan_base_navlinks($planuser);
 
+// Plan menu
+dp_display_plans_menu($planuser,0,$role);
+
 $PAGE->set_title($heading);
 $PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
-
-// Plan menu
-echo dp_display_plans_menu($planuser,0,$role);
-
-// Plan page content
-echo $OUTPUT->container_start('', 'dp-plan-content');
 
 if ($planuser != $USER->id) {
     echo dp_display_user_message_box($planuser);
@@ -104,6 +101,7 @@ if ($planuser != $USER->id) {
 echo $OUTPUT->heading($heading);
 
 echo $OUTPUT->container_start('', 'dp-plans-description');
+
 if ($planuser == $USER->id) {
     $planinstructions = get_string('planinstructions', 'totara_plan') . ' ';
     add_to_log(SITEID, 'plan', 'view all', "index.php?userid={$planuser}");
@@ -117,13 +115,13 @@ if ($canaddplan) {
     $planinstructions .= get_string('planinstructions_add', 'totara_plan');
 }
 
-echo $OUTPUT->container($planinstructions, 'instructional_text');;
+
+echo html_writer::tag('p', $planinstructions, array('class' => 'instructional_text'));
 
 if ($canaddplan) {
     $renderer = $PAGE->get_renderer('totara_plan');
     echo $renderer->print_add_plan_button($planuser);
 }
-echo $OUTPUT->container('', 'clearfix');
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start('', 'dp-plans-list-active-plans');
@@ -137,8 +135,6 @@ echo $OUTPUT->container_end();
 
 echo $OUTPUT->container_start('', 'dp-plans-list-completed-plans');
 echo dp_display_plans($planuser, DP_PLAN_STATUS_COMPLETE, array('completed'), get_string('completedplans', 'totara_plan'));
-echo $OUTPUT->container_end();
-
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->footer();

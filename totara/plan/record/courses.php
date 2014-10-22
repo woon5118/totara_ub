@@ -68,7 +68,7 @@ $context = context_system::instance();
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/record/courses.php', $pageparams));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 
 $renderer =  $PAGE->get_renderer('totara_reportbuilder');
 
@@ -132,14 +132,13 @@ $PAGE->set_heading(format_string($SITE->fullname));
 
 $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
+dp_display_plans_menu($userid, 0, $usertype, 'courses', $rolstatus);
 
 echo $OUTPUT->header();
 
 if ($debug) {
     $report->debug($debug);
 }
-
-echo dp_display_plans_menu($userid, 0, $usertype, 'courses', $rolstatus);
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
 

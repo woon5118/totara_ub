@@ -57,7 +57,7 @@ if (!$DB->record_exists('dp_plan_program_assign', array('planid' => $plan->id, '
 
 $PAGE->set_context($systemcontext);
 $PAGE->set_url('/totara/plan/components/program/view.php', array('id' => $id, 'itemid' => $progassid));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_totara_menu_selected('learningplans');
 
 //Javascript include
