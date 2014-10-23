@@ -42,6 +42,8 @@ if ($showmenu && !$hascustommenu) {
     $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
 }
 
+$kiwifruitheading = $OUTPUT->kiwifruit_header();
+
 $left = (!right_to_left());  // To know if to add 'pull-right' and 'desktop-first-column' classes in the layout for LTR.
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
@@ -55,7 +57,7 @@ echo $OUTPUT->doctype() ?>
 <body <?php echo $OUTPUT->body_attributes('two-column'); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html(); ?>
 <!-- START OF HEADER -->
-<?php echo $OUTPUT->kiwifruit_header(); ?>
+<?php echo $kiwifruitheading ?>
 <div id="page">
   <div id="wrapper" class="clearfix">
 

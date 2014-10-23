@@ -42,6 +42,8 @@ if ($showmenu && !$hascustommenu) {
     $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
 }
 
+$kiwifruitheading = $OUTPUT->kiwifruit_header();
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -56,7 +58,7 @@ echo $OUTPUT->doctype() ?>
 
 <!-- START OF HEADER -->
 
-    <?php echo $OUTPUT->kiwifruit_header(); ?>
+    <?php echo $kiwifruitheading ?>
 
     <div id="navbar" class="clearfix">
         <div class="breadcrumb"><?php echo $OUTPUT->navbar(); ?></div>

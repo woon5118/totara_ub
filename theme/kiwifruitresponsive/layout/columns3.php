@@ -65,6 +65,8 @@ if ($showsidepre && !$showsidepost) {
     $bodyclasses[] = 'content-only';
 }
 
+$kiwifruitheading = $OUTPUT->kiwifruit_header();
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -79,7 +81,7 @@ echo $OUTPUT->doctype() ?>
 <body <?php echo $OUTPUT->body_attributes($bodyclasses); ?>>
 <?php echo $OUTPUT->standard_top_of_body_html(); ?>
 
-<?php echo $OUTPUT->kiwifruit_header(); ?>
+<?php echo $kiwifruitheading ?>
 <div id="page">
   <div id="wrapper" class="clearfix">
 
