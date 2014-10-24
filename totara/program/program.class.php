@@ -313,7 +313,12 @@ class program {
                 // Get user assignments for current assignment.
                 foreach ($affected_users as $user) {
                     $assigned_user_ids[] = $user->id;
-                    $timedue = $this->make_timedue($user->id, $assign);
+
+                    // Get the timedue from program completion as it may contain an extension date,
+                    // when that extension date is set (approved by the manager), then due date should be that one.
+                    $params = array ('programid' => $this->id, 'userid' => $user->id);
+                    $timedue = $DB->get_field('prog_completion', 'timedue', $params);
+                    $timedue = $this->make_timedue($user->id, $assign, $timedue);
 
                     $user_exists = false;
                     $user_assign_data = null;
@@ -704,14 +709,17 @@ class program {
      * @global array $COMPLETION_EVENTS_CLASSNAMES
      * @param int $userid
      * @param object $assignment_record
+     * @param int $timedue Timestamp possibly containing an extended due date
      * @return int A timestamp
      */
-    public function make_timedue($userid, $assignment_record) {
+    public function make_timedue($userid, $assignment_record, $timedue) {
 
         if ($assignment_record->completionevent == COMPLETION_EVENT_NONE) {
             // Fixed time or Not Set?
             if ($assignment_record->completiontime == COMPLETION_TIME_UNKNOWN) {
                 return COMPLETION_TIME_NOT_SET;
+            } else if ($timedue > $assignment_record->completiontime) {
+                return $timedue;
             } else {
                 return $assignment_record->completiontime;
             }
