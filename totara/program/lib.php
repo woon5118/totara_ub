@@ -1867,7 +1867,7 @@ function prog_get_all_users_programs($userid, $fields = NULL, $sort = 'visible D
         $orderby = "ORDER BY $sort";
     }
 
-    $progfields = 'p.' . join(',p.', $fields);
+    $progfields = 'pua.id AS pgaupuniqueid, p.' . join(',p.', $fields);
     $sql = "SELECT $progfields
                 FROM {prog} p
             JOIN {prog_user_assignment} pua ON p.id = pua.programid
