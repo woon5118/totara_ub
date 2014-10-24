@@ -738,11 +738,11 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
 /**
  * Get all nested cohorts for the specified parent cohort
  *
- * @param int   $cohortid   The parent cohortid
- * @param array $current    The current list of found nested cohortids (used by recursion)
- * @param bool  $exclude    A flag to exclude expired audiences
+ * @param int   $cohortid       The parent cohortid
+ * @param array $current        The current list of found nested cohortids (used by recursion)
+ * @param bool  $activeonly     A flag to exclude any audiences that either haven't started or have expired
  */
-function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current = array(), $exclude = false) {
+function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current = array(), $activeonly = false) {
     global $DB;
 
     if (empty($current)) {
@@ -766,11 +766,11 @@ function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current = array(),
         AND c.id {$notinsql}
         AND c.cohorttype = " . cohort::TYPE_DYNAMIC;
 
-    if ($exclude) {
+    if ($activeonly) {
         $now = time();
         $sql .= "
-            AND (c.startdate IS NULL OR c.startdate = 0 OR c.startdate > ?)
-            AND (c.enddate IS NULL OR c.enddate = 0 OR c.enddate < ?)";
+            AND (c.startdate IS NULL OR c.startdate = 0 OR c.startdate < ?)
+            AND (c.enddate IS NULL OR c.enddate = 0 OR c.enddate > ?)";
         $sqlparams[] = $now;
         $sqlparams[] = $now;
     }
@@ -781,7 +781,7 @@ function totara_cohort_get_nested_dynamic_cohorts($cohortid, $current = array(),
     $current = array_unique(array_merge($current, $cohorts));
 
     foreach ($cohorts as $ncohortid) {
-        $current = array_merge($current, totara_cohort_get_nested_dynamic_cohorts($ncohortid, $current, $exclude));
+        $current = array_merge($current, totara_cohort_get_nested_dynamic_cohorts($ncohortid, $current, $activeonly));
     }
     $current = array_unique($current);
 
