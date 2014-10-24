@@ -3700,7 +3700,7 @@ function facetoface_update_trainers($facetoface, $session, $form) {
 
 /**
  * Return array of trainer roles configured for face-to-face
- * @param $context context of the course or activity
+ * @param $context context of the facetoface activity
  * @return  array
  */
 function facetoface_get_trainer_roles($context) {
@@ -3709,16 +3709,6 @@ function facetoface_get_trainer_roles($context) {
     // Check that roles have been selected
     if (empty($CFG->facetoface_session_roles)) {
         return false;
-    }
-
-    if ($context) {
-        $coursecontext = $context->get_course_context(false);
-        if (!$coursecontext) {
-            debugging('Invalid context specified as facetoface_get_trainer_roles() parameter');
-            return array();
-        }
-    } else {
-        $coursecontext = null;
     }
 
     // Parse roles
@@ -3742,7 +3732,7 @@ function facetoface_get_trainer_roles($context) {
         return array();
     }
 
-    $rolenames = role_fix_names($rolenames, $coursecontext);
+    $rolenames = role_fix_names($rolenames, $context);
 
     return $rolenames;
 }
