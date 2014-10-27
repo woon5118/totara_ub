@@ -1023,7 +1023,7 @@ class core_plugin_manager {
                 'guest', 'imsenterprise', 'ldap', 'manual', 'meta', 'mnet',
                 'paypal', 'self'
                 // Totara
-                , 'totara_learningplan', 'totara_program'
+                , 'totara_learningplan', 'totara_program', 'totara_facetoface',
             ),
 
             'filter' => array(
