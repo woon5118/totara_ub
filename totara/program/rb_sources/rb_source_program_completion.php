@@ -60,6 +60,14 @@ class rb_source_program_completion extends rb_base_source {
 
         $joinlist = array(
             new rb_join(
+                'program',
+                'INNER',
+                '{prog}',
+                "program.id = base.programid",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'base'
+            ),
+            new rb_join(
                 'completion_organisation',
                 'LEFT',
                 '{org}',
@@ -80,7 +88,6 @@ class rb_source_program_completion extends rb_base_source {
         // requires the position_assignment join
         $this->add_manager_tables_to_joinlist($joinlist,
             'position_assignment', 'reportstoid');
-        $this->add_program_table_to_joinlist($joinlist, 'base', 'programid');
         $this->add_course_category_table_to_joinlist($joinlist, 'program', 'category');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_cohort_program_tables_to_joinlist($joinlist, 'base', 'programid');
