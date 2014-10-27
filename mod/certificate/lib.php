@@ -1475,30 +1475,59 @@ function certificate_draw_frame($pdf, $certificate) {
         if ($certificate->bordercolor == 4) {
             $color = array(0, 180, 0); // green
         }
-        switch ($certificate->orientation) {
-            case 'L':
-                // create outer line border in selected color
-                $pdf->SetLineStyle(array('width' => 1.5, 'color' => $color));
-                $pdf->Rect(28, 28, 736, 556);
-                // create middle line border in selected color
-                $pdf->SetLineStyle(array('width' => 0.2, 'color' => $color));
-                $pdf->Rect(37, 37, 718, 538);
-                // create inner line border in selected color
-                $pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
-                $pdf->Rect(46, 46, 700, 520);
-                break;
-            case 'P':
-                // create outer line border in selected color
-                $pdf->SetLineStyle(array('width' => 1.5, 'color' => $color));
-                $pdf->Rect(25, 20, 561, 751);
-                // create middle line border in selected color
-                $pdf->SetLineStyle(array('width' => 0.2, 'color' => $color));
-                $pdf->Rect(40, 35, 531, 721);
-                // create inner line border in selected color
-                $pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
-                $pdf->Rect(51, 46, 509, 699);
-                break;
+
+        if ($certificate->certificatetype == 'letter_embedded' || $certificate->certificatetype == 'letter_non_embedded') {
+            switch ($certificate->orientation) {
+                case 'L':
+                    // create outer line border in selected color
+                    $pdf->SetLineStyle(array('width' => 1.5, 'color' => $color));
+                    $pdf->Rect(28, 28, 736, 556);
+                    // create middle line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.2, 'color' => $color));
+                    $pdf->Rect(37, 37, 718, 538);
+                    // create inner line border in selected color
+                    $pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
+                    $pdf->Rect(46, 46, 700, 520);
+                    break;
+                case 'P':
+                    // create outer line border in selected color
+                    $pdf->SetLineStyle(array('width' => 1.5, 'color' => $color));
+                    $pdf->Rect(25, 20, 561, 751);
+                    // create middle line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.2, 'color' => $color));
+                    $pdf->Rect(40, 35, 531, 721);
+                    // create inner line border in selected color
+                    $pdf->SetLineStyle(array('width' => 1.0, 'color' => $color));
+                    $pdf->Rect(51, 46, 509, 699);
+                    break;
+            }
+        } else if ($certificate->certificatetype == 'A4_embedded' || $certificate->certificatetype == 'A4_non_embedded') {
+            switch ($certificate->orientation) {
+                case 'L':
+                    // create outer line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.75, 'color' => $color));
+                    $pdf->Rect(10, 10, 277, 190);
+                    // create middle line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.1, 'color' => $color));
+                    $pdf->Rect(13, 13, 271, 184);
+                    // create inner line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.5, 'color' => $color));
+                    $pdf->Rect(16, 16, 265, 178);
+                    break;
+                case 'P':
+                    // create outer line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.75, 'color' => $color));
+                    $pdf->Rect(12, 10, 188, 277);
+                    // create middle line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.1, 'color' => $color));
+                    $pdf->Rect(15, 13, 182, 271);
+                    // create inner line border in selected color
+                    $pdf->SetLineStyle(array('width' => 0.5, 'color' => $color));
+                    $pdf->Rect(18, 16, 176, 265);
+                    break;
+            }
         }
+
     }
 }
 
