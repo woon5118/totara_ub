@@ -426,6 +426,7 @@ $string['guestsno'] = 'Sorry, guests are not allowed to sign up for sessions.';
 $string['icalendarheading'] = 'iCalendar Attachments';
 $string['id'] = 'Id';
 $string['icaldescription'] = 'This calendar event is for the "{$a->name}" face-to-face session you have been booked on to.';
+$string['ignoreapprovalwhenaddingattendees'] = 'Ignore manager approval when adding attendees';
 $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';

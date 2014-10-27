@@ -37,6 +37,7 @@ $remove         = optional_param('remove', 0, PARAM_BOOL);
 $searchtext     = optional_param('searchtext', '', PARAM_CLEAN); // search string
 $searchbutton   = optional_param('searchbutton', 0, PARAM_BOOL);
 $suppressemail  = optional_param('suppressemail', false, PARAM_BOOL); // send email notifications
+$ignoreapproval = optional_param('ignoreapproval', false, PARAM_BOOL); // Adhere to manager approval.
 $clear          = optional_param('clear', false, PARAM_BOOL); // new add/edit session, clear previous results
 $onlycontent    = optional_param('onlycontent', false, PARAM_BOOL); // return content of attendees page
 $attendees      = optional_param('attendees', '', PARAM_SEQUENCE);
@@ -59,7 +60,6 @@ if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course
 }
 $context = context_module::instance($cm->id);
 
-
 // Check essential permissions
 require_login($course, false, $cm);
 require_capability('mod/facetoface:viewattendees', $context);
@@ -76,6 +76,9 @@ $waitlist = $session->datetimeknown ? 0 : 1;
 
 // Set removed users
 $removed = $removedusers ? explode(',', $removedusers) : array();
+
+// Set value for approval requirement.
+$approvalrequired = $ignoreapproval ? 0 : $facetoface->approvalreqd;
 
 // Get facetoface cancellations and add them to the removed attendees list
 if (!$removed) {
@@ -157,10 +160,15 @@ if ($save && $onlycontent) {
         // Prepare params
         $params = array();
         $params['suppressemail'] = $suppressemail;
-        // Do not need the approval, change the status
-        $params['approvalreqd'] = 0;
-        // Set value for manager copy notification.
-        $params['ccmanager'] = !$suppressccmanager;
+        // If we selected ignore approval then change the status.
+        $params['approvalreqd'] = $approvalrequired;
+        // If approval is required then we need to send a request to their manager.
+        if ($approvalrequired) {
+            $params['ccmanager'] = 1;
+        } else {
+            $params['ccmanager'] = !$suppressccmanager;
+        }
+
         foreach ($attendeestoadd as $attendee) {
             $result = facetoface_user_import($course, $facetoface, $session, $attendee->id, $params);
             if ($result['result'] !== true) {
@@ -237,7 +245,13 @@ if ($frm = data_submitted()) {
                 }
 
                 $adduser = $DB->get_record('user', array('id' => $adduser), 'id, lastname, firstname, email');
-                $adduser->statuscode = MDL_F2F_STATUS_BOOKED;
+
+                if ($approvalrequired) {
+                    $adduser->statuscode = MDL_F2F_STATUS_REQUESTED;
+                } else {
+                    $adduser->statuscode = MDL_F2F_STATUS_BOOKED;
+                }
+
                 if ($adduser) {
                     $attendees[$adduser->id] = $adduser;
                 }
@@ -275,7 +289,6 @@ if ($frm = data_submitted()) {
 
     // Set approval required for the new users
     $requireapproval = (totara_search_for_value($attendees, 'statuscode', TOTARA_SEARCH_OP_EQUAL, MDL_F2F_STATUS_REQUESTED)) ? 1 : 0;
-
 }
 
 // Main page

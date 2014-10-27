@@ -99,6 +99,11 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 url += '&suppressccmanager=1';
             }
 
+            // Grab ignoreapproval value
+            if ($('input#ignoreapproval:checked', handler._container).length) {
+                url += '&ignoreapproval=1';
+            }
+
             this._dialog._request(
                     url,
                     {
@@ -184,16 +189,33 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 }
             }
 
-            // Activate or deactivate approval required tab
-            if (approvalrequiredtab.length > 0) {
-                if (M.totara_f2f_attendees.config.approvalreqd == "1" && $('input[name=requireapproval]').val() == 1) {
+            // Activate, deactivate or create approval required tab.
+            if (M.totara_f2f_attendees.config.approvalreqd == "1" && $('input[name=requireapproval]').val() == 1) {
+                if (approvalrequiredtab.length > 0) {
                     approvalrequiredtab.parent('a').removeClass('nolink');
                     approvalrequiredtab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' +
                         M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
                 } else {
-                    approvalrequiredtab.parent('a').addClass('nolink');
-                    approvalrequiredtab.parent('a').removeAttr("href");
+                    var newtab = document.createElement('li');
+                    var tablink = document.createElement('a');
+                    tablink.setAttribute('href', M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' +
+                        M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
+                    var tabspan = document.createElement('span');
+                    tabspan.innerHTML = M.util.get_string('approvalreqd','facetoface');
+                    newtab.appendChild(tablink);
+                    tablink.appendChild(tabspan);
+
+                    if (takeattendancetab.length > 0) {
+                        takeattendancetab.parent().parent('li').after(newtab);
+                    } else if (cancellationtab.length > 0) {
+                        cancellationtab.parent().parent('li').after(newtab);
+                    } else if (waitlisttab.length > 0) {
+                        waitlisttab.parent().parent('li').after(newtab);
+                    }
                 }
+            } else {
+                approvalrequiredtab.parent('a').addClass('nolink');
+                approvalrequiredtab.parent('a').removeAttr("href");
             }
 
             // Replace any items on the main page with their content (if IDs match)
