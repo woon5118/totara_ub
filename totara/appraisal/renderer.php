@@ -1470,7 +1470,12 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $info .= format_text($description, FORMAT_MOODLE);
         // Involved users statuses.
         if ($preview) {
-            $rolescompletion = $stage->get_roles_involved(appraisal::ACCESS_CANANSWER);
+            $rolesinvolvedrecords = $stage->get_roles_involved(appraisal::ACCESS_CANANSWER);
+            // Reformat the results so that they are the same as those returned by get_mandatory_completion.
+            $rolescompletion = array();
+            foreach ($rolesinvolvedrecords as $roleinvolvedrecord) {
+                $rolescompletion[] = (object) array('appraisalrole' => $roleinvolvedrecord);
+            }
         } else {
             $rolescompletion = $stage->get_mandatory_completion($userassignment->userid);
         }

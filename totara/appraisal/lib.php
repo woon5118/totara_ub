@@ -991,11 +991,11 @@ class appraisal {
     }
 
     /**
-     * Return array of roles involved in current appraisal linking to assigned users.
-     * array(appraisalrole => userid)
+     * Get array of roles involved in the current appraisal for the given user, linking to the users assigned in each role.
      *
-     * @param subjectid the userid in the userassignment
-     * @return array
+     * @param appraisal::ACCESS_XXX $rights only roles that have the given rights
+     * @param int $subjectid the userid in the userassignment
+     * @return array(appraisalrole => userid)
      */
     public function get_user_roles_involved($rights, $subjectid) {
         global $DB;
@@ -1004,8 +1004,7 @@ class appraisal {
         if (empty($roles)) {
             return array();
         }
-
-        list($insql, $inparam) = $DB->get_in_or_equal(array_keys($roles));
+        list($insql, $inparam) = $DB->get_in_or_equal($roles);
         $missingsql = "SELECT ara.appraisalrole, ara.userid
                          FROM {appraisal_role_assignment} ara
                          JOIN {appraisal_user_assignment} aua
@@ -2467,28 +2466,29 @@ class appraisal_stage {
     }
 
     /**
-     * Much the same as get_roles_involved() but linking to the appropriate userid
+     * Get array of roles involved in the current stage for the given user, linking to the users assigned in each role.
      *
-     * @param subjectid the userid in the userassignment
-     * @return array
+     * @param appraisal::ACCESS_XXX $rights only roles that have the given rights
+     * @param int $subjectid the userid in the userassignment
+     * @return array(appraisalrole => userid)
      */
     public function get_user_roles_involved($rights, $subjectid) {
         global $DB;
 
         $roles = $this->get_roles_involved($rights);
-        if (!empty($roles)) {
-            list($insql, $inparam) = $DB->get_in_or_equal($roles);
-            $missingsql = "SELECT ara.appraisalrole, ara.userid
-                             FROM {appraisal_role_assignment} ara
-                             JOIN {appraisal_user_assignment} aua
-                               ON ara.appraisaluserassignmentid = aua.id
-                            WHERE aua.userid = ?
-                              AND aua.appraisalid = ?
-                              AND appraisalrole {$insql}";
-            $missingparams = array_merge(array($subjectid, $this->appraisalid), $inparam);
-            return $DB->get_records_sql($missingsql, $missingparams);
+        if (empty($roles)) {
+            return array();
         }
-        return array();
+        list($insql, $inparam) = $DB->get_in_or_equal($roles);
+        $missingsql = "SELECT ara.appraisalrole, ara.userid
+                         FROM {appraisal_role_assignment} ara
+                         JOIN {appraisal_user_assignment} aua
+                           ON ara.appraisaluserassignmentid = aua.id
+                        WHERE aua.userid = ?
+                          AND aua.appraisalid = ?
+                          AND appraisalrole {$insql}";
+        $missingparams = array_merge(array($subjectid, $this->appraisalid), $inparam);
+        return $DB->get_records_sql($missingsql, $missingparams);
     }
 
     public function get_mandatory_completion($subjectid) {
@@ -5035,14 +5035,8 @@ class appraisal_role_assignment {
         global $DB;
 
         if ($this->preview) {
-            $userassignment = new appraisal_role_assignment();
-            $userassignment->id = 0;
-            $userassignment->userid = $this->subjectid;
-            $userassignment->appraisalid = $this->previewappraisalid;
+            $userassignment = appraisal_user_assignment::get_user($this->previewappraisalid, $this->subjectid, $this->preview);
             $userassignment->activestageid = $this->previewstageid;
-            $userassignment->timecompleted = 0;
-            $userassignment->preview = true;
-            $userassignment->user = $DB->get_record('user', array('id' => $userassignment->userid));
             return $userassignment;
         } else {
             // Do not cache, as in some places there more than one instances can be changed.
