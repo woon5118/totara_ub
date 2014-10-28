@@ -122,8 +122,7 @@ function send_registration_data_email($data) {
     $message = get_string('siteregistrationemailbody', 'totara_core', $data['sitefullname']);
     $fromaddress = $CFG->noreplyaddress;
 
-    $touser = new stdClass();
-    $touser->email = SITE_REGISTRATION_EMAIL;
+    $touser = \totara_core\totara_user::get_external_user(SITE_REGISTRATION_EMAIL);
     $emailed = email_to_user($touser, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
 
     if (!unlink($attachmentpath)) {
