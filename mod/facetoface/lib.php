@@ -5774,7 +5774,9 @@ function facetoface_get_manager_list() {
 
     $ret = array();
 
-    $sql = "SELECT u.id, u.firstname, u.lastname
+
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT u.id, {$usernamefields}
               FROM {pos_assignment} pa
               JOIN {user} u ON u.id = pa.managerid
              GROUP BY u.id, u.firstname, u.lastname
@@ -5785,7 +5787,7 @@ function facetoface_get_manager_list() {
     }
 
     if (!empty($CFG->enabletempmanagers)) {
-        $sql = "SELECT u.id, u.firstname, u.lastname
+        $sql = "SELECT u.id, {$usernamefields}
                   FROM {temporary_manager} tm
                   JOIN {user} u ON u.id = tm.tempmanagerid
                  WHERE tm.expirytime > ?
