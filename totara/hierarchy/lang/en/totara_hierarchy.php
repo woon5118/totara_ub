@@ -682,6 +682,7 @@ $string['goalscalescalevalues_help'] = 'Enter values for the goal scale (one per
   * *Complete*
   * *In progress*
   * *Started*';
+$string['goalscalesetdefault'] = 'Set {$a} as the default value';
 $string['goalscalesgeneral'] = 'Goal Scale';
 $string['goalscalesgeneral_help'] = '**Goal scales** enable you to define the criteria by which a goal can be measured. For example, a scale might have three values \'Complete, In Progress, Started\'.
 

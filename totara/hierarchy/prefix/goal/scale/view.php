@@ -249,7 +249,8 @@ if ($values) {
 
         if ($canupdatescales || $candeletescales) {
             $buttons = array();
-            $attributes = array('type' => 'radio', 'name' => 'default', 'value' => $value->id);
+            $attributes = array('type' => 'radio', 'name' => 'default', 'value' => $value->id, 'id' => 'scaledefault' . $value->id);
+
             // There is only one value or they can't update.
             if ($numvalues == 1 || !$canupdatescales) {
                 $attributes['disabled'] = 'disabled';
@@ -259,7 +260,10 @@ if ($values) {
                 $attributes['checked'] = 'checked';
             }
 
-            $row[] = html_writer::empty_tag('input', $attributes);
+            $labelattrs = array('for' => 'scaledefault' . $value->id, 'class' => 'accesshide');
+            $label = html_writer::tag('label', get_string('goalscalesetdefault', 'totara_hierarchy', $value->name), $labelattrs);
+            $row[] = html_writer::empty_tag('input', $attributes) . $label;
+
 
             // It is the proficient value.
             if ($value->proficient) {
