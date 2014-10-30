@@ -18,8 +18,7 @@
 /**
  * Language strings for the certificate module
  *
- * @package    mod
- * @subpackage certificate
+ * @package    mod_certificate
  * @copyright  Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -74,9 +73,6 @@ the role of teacher, do not select Print Teacher or any signature image except f
 $string['date'] = 'On';
 $string['datefmt'] = 'Date Format';
 $string['datefmt_help'] = 'Choose a date format to print the date on the certificate. Or, choose the last option to have the date printed in the format of the user\'s chosen language.';
-//date format strings - note format 2 is date() format, the others are srtftime() format
-$string['dateformat1'] = '%B %d, %Y';
-$string['dateformat2'] = 'F jS, Y';
 $string['datehelp'] = 'Date';
 $string['deletissuedcertificates'] = 'Delete issued certificates';
 $string['delivery'] = 'Delivery';
@@ -87,7 +83,7 @@ Email Certificate: Choosing this option sends the certificate to the student as 
 After a user receives their certificate, if they click on the certificate link from the course homepage, they will see the date they received their certificate and will be able to review their received certificate.';
 $string['designoptions'] = 'Design Options';
 $string['download'] = 'Force download';
-$string['emailcertificate'] = 'Email (Must also choose save!)';
+$string['emailcertificate'] = 'Email';
 $string['emailothers'] = 'Email Others';
 $string['emailothers_help'] = 'Enter the email addresses here, separated by a comma, of those who should be alerted with an email whenever students receive a certificate.';
 $string['emailstudenttext'] = 'Attached is your certificate for {$a->course}.';
@@ -108,6 +104,10 @@ You can review it here:
 
     <a href="{$a->url}">Certificate Report</a>.';
 $string['entercode'] = 'Enter certificate code to verify:';
+$string['fontsans'] = 'Sans-serif font family';
+$string['fontsans_desc'] = 'Sans-serif font family for certificates with embedded fonts';
+$string['fontserif'] = 'Serif font family';
+$string['fontserif_desc'] = 'Serif font family for certificates with embedded fonts';
 $string['getcertificate'] = 'Get your certificate';
 $string['grade'] = 'Grade';
 $string['gradedate'] = 'Grade Date';
@@ -121,7 +121,7 @@ $string['gradeletter'] = 'Letter Grade';
 $string['gradepercent'] = 'Percentage Grade';
 $string['gradepoints'] = 'Points Grade';
 $string['imagetype'] = 'Image Type';
-$string['incompletemessage'] = 'In order to download your certificate, you must first complete all required '.'activities. Please return to the course to complete your coursework.';
+$string['incompletemessage'] = 'In order to download your certificate, you must first complete all required activities. Please return to the course to complete your coursework.';
 $string['intro'] = 'Introduction';
 $string['issueoptions'] = 'Issue Options';
 $string['issued'] = 'Issued';
@@ -198,10 +198,6 @@ $string['typeletter_non_embedded'] = 'Letter Non-Embedded';
 $string['unsupportedfiletype'] = 'File must be a jpeg or png file';
 $string['uploadimage'] = 'Upload image';
 $string['uploadimagedesc'] = 'This button will take you to a new screen where you will be able to upload images.';
-$string['uplborderdesc'] = 'Upload Certificate Border Files';
-$string['uplwatermarkdesc'] = 'Upload Certificate Watermark Files';
-$string['uplsealdesc'] = 'Upload Certificate Seal Files';
-$string['uplsignaturedesc'] = 'Upload Certificate Signature Files';
 $string['userdateformat'] = 'User\'s Language Date Format';
 $string['validate'] = 'Verify';
 $string['verifycertificate'] = 'Verify Certificate';
@@ -209,6 +205,18 @@ $string['viewcertificateviews'] = 'View {$a} issued certificates';
 $string['viewed'] = 'You received this certificate on:';
 $string['viewtranscript'] = 'View Certificates';
 $string['watermark'] = 'Watermark';
+
+// Totara strings.
+
+// Date format strings - note format 2 is date() format, the others are srtftime() format
+$string['dateformat1'] = '%B %d, %Y';
+$string['dateformat2'] = 'F jS, Y';
+
+// Upload stuff.
+$string['uplborderdesc'] = 'Upload Certificate Border Files';
+$string['uplwatermarkdesc'] = 'Upload Certificate Watermark Files';
+$string['uplsealdesc'] = 'Upload Certificate Seal Files';
+$string['uplsignaturedesc'] = 'Upload Certificate Signature Files';
 
 // Archive strings
 $string['error:certissuenotfound'] = 'Missing certificate issue history record for id : {$a}';

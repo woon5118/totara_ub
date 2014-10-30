@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot . '/mod/certificate/lib.php');
+require_once($CFG->dirroot . '/mod/certificate/locallib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
 class mod_certificate_archive_testcase extends advanced_testcase {

@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
 
-class view_archive_form extends moodleform {
+class mod_certificate_view_archive_form extends moodleform {
 
     public function definition() {
         $mform =& $this->_form;

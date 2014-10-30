@@ -18,8 +18,7 @@
 /**
  * This file keeps track of upgrades to the certificate module
  *
- * @package    mod
- * @subpackage certificate
+ * @package    mod_certificate
  * @copyright  Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -93,16 +92,6 @@ function xmldb_certificate_upgrade($oldversion=0) {
 
         // Certificate savepoint reached
         upgrade_mod_savepoint(true, 2007061301, 'certificate');
-    }
-
-    if ($oldversion < 2007061302) {
-        $table = new xmldb_table('certificate_linked_modules');
-        $field = new xmldb_field('linkid');
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'certificate_id');
-        $dbman->change_field_unsigned($table, $field);
-
-        // Certificate savepoint reached
-        upgrade_mod_savepoint(true, 2007061302, 'certificate');
     }
 
     if ($oldversion < 2007102800) {
@@ -486,39 +475,7 @@ function xmldb_certificate_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2012090901, 'certificate');
     }
 
-    if ($oldversion < 2013021201) {
-        // Table for archiving completions
-
-        // Define table certificate_issues_history to be created
-        $table = new xmldb_table('certificate_issues_history');
-
-        // Adding fields to table certificate_issues_history
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('certificateid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('code', XMLDB_TYPE_CHAR, '40', null, null, null, null);
-        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('grade', XMLDB_TYPE_CHAR, '300', null, null, null, null);
-        $table->add_field('outcome', XMLDB_TYPE_CHAR, '300', null, null, null, null);
-        $table->add_field('timearchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('idarchived', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-
-        // Adding keys to table certificate_issues_history
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('certificateid', XMLDB_KEY_FOREIGN, array('certificateid'), 'certificate', array('id'));
-        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
-
-        // Conditionally launch create table for certificate_issues_history
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // certificate savepoint reached
-        upgrade_mod_savepoint(true, 2013021201, 'certificate');
-    }
-
-    if ($oldversion < 2013021203) {
+    if ($oldversion < 2014081901) {
         // Fix previous upgrades.
 
         $table = new xmldb_table('certificate');
@@ -539,8 +496,17 @@ function xmldb_certificate_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Certificate savepoint reached.
-        upgrade_mod_savepoint(true, 2013021203, 'certificate');
+        upgrade_mod_savepoint(true, 2014081901, 'certificate');
     }
+
+
+    // Do not put Totara upgrade code in this file - put it in
+    // totaraupgradelib.php instead and it will be called on every
+    // upgrade.
+    // Always keep this at the end of upgrade and bump up the main
+    // version by .01 after merging upstream changes!
+    require_once(__DIR__ . '/totaraupgradelib.php');
+    mod_certificate_totara_upgrade($oldversion);
 
     return true;
 }

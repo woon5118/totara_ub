@@ -18,8 +18,7 @@
 /**
  * Certificate module capability definition
  *
- * @package    mod
- * @subpackage certificate
+ * @package    mod_certificate
  * @copyright  Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -71,7 +70,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/certificate:viewarchive' => array(
+    'mod/certificate:viewarchive' => array( // Totara feature.
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,

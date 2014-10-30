@@ -18,8 +18,7 @@
 /**
 * Instance add/edit form
 *
-* @package    mod
-* @subpackage certificate
+* @package    mod_certificate
 * @copyright  Mark Nelson <markn@moodle.com>
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
@@ -29,7 +28,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/certificate/lib.php');
+require_once($CFG->dirroot.'/mod/certificate/locallib.php');
 
 class mod_certificate_mod_form extends moodleform_mod {
 
@@ -61,10 +60,7 @@ class mod_certificate_mod_form extends moodleform_mod {
         $mform->setType('emailothers', PARAM_TEXT);
         $mform->addHelpButton('emailothers', 'emailothers', 'certificate');
 
-        $deliveryoptions = array(0 => get_string('openbrowser', 'certificate'),
-                                 1 => get_string('download', 'certificate'),
-                                 2 => get_string('emailcertificate', 'certificate')
-                            );
+        $deliveryoptions = array( 0 => get_string('openbrowser', 'certificate'), 1 => get_string('download', 'certificate'), 2 => get_string('emailcertificate', 'certificate'));
         $mform->addElement('select', 'delivery', get_string('delivery', 'certificate'), $deliveryoptions);
         $mform->setDefault('delivery', 0);
         $mform->addHelpButton('delivery', 'delivery', 'certificate');
@@ -94,11 +90,13 @@ class mod_certificate_mod_form extends moodleform_mod {
         $mform->addHelpButton('printdate', 'printdate', 'certificate');
 
         $curtime = time();
-        $dateformatoptions = array(1 => strftime(get_string('dateformat1', 'certificate'), $curtime),
-                                   2 => date(get_string('dateformat2', 'certificate'), $curtime) . ' (English only)',
-                                   3 => strftime(get_string('strftimedate', 'langconfig'), $curtime),
-                                   4 => strftime(get_string('strftimemonthyear', 'langconfig'), $curtime)
-                            );
+        $dateformatoptions = array(
+            1 => strftime(get_string('dateformat1', 'certificate'), $curtime),
+            2 => date(get_string('dateformat2', 'certificate'), $curtime) . ' (English only)',
+            3 => strftime(get_string('strftimedate', 'langconfig'), $curtime),
+            4 => strftime(get_string('strftimemonthyear', 'langconfig'), $curtime),
+            5 => get_string('userdateformat', 'certificate'),
+        );
         $mform->addElement('select', 'datefmt', get_string('datefmt', 'certificate'), $dateformatoptions);
         $mform->setDefault('datefmt', 0);
         $mform->addHelpButton('datefmt', 'datefmt', 'certificate');

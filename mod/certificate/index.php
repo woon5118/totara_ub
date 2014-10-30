@@ -18,14 +18,13 @@
 /**
  * This page lists all the instances of certificate in a particular course
  *
- * @package    mod
- * @subpackage certificate
+ * @package    mod_certificate
  * @copyright  Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
-require_once('lib.php');
+require_once('locallib.php');
 
 $id = required_param('id', PARAM_INT);           // Course Module ID
 
@@ -35,7 +34,7 @@ if (!$course = $DB->get_record('course', array('id'=> $id))) {
 }
 
 // Requires a login
-require_course_login($course);
+require_login($course);
 
 // Declare variables
 $currentsection = "";
@@ -56,7 +55,11 @@ $PAGE->set_title($strcertificates);
 $PAGE->set_heading($course->fullname);
 
 // Add the page view to the Moodle log
-add_to_log($course->id, 'certificate', 'view all', 'index.php?id='.$course->id, '');
+$event = \mod_certificate\event\course_module_instance_list_viewed::create(array(
+    'context' => context_course::instance($course->id)
+));
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 // Get the certificates, if there are none display a notice
 if (!$certificates = get_all_instances_in_course('certificate', $course)) {
@@ -66,10 +69,7 @@ if (!$certificates = get_all_instances_in_course('certificate', $course)) {
     exit();
 }
 
-if ($usesections = course_format_uses_sections($course->format)) {
-    $modinfo = get_fast_modinfo($course->id);
-    $sections = $modinfo->get_section_info_all();
-}
+$usesections = course_format_uses_sections($course->format);
 
 $table = new html_table();
 
@@ -89,23 +89,27 @@ foreach ($certificates as $certificate) {
         $link = html_writer::tag('a', $certificate->name, array('class' => 'dimmed',
             'href' => $CFG->wwwroot . '/mod/certificate/view.php?id=' . $certificate->coursemodule));
     }
-    if ($certificate->section !== $currentsection) {
+
+    $strsection = '';
+    if ($certificate->section != $currentsection) {
         if ($certificate->section) {
-            $printsection = $certificate->section;
+            $strsection = get_section_name($course, $certificate->section);
         }
-        if ($currentsection !== "") {
+        if ($currentsection !== '') {
             $table->data[] = 'hr';
         }
         $currentsection = $certificate->section;
     }
+
     // Get the latest certificate issue
     if ($certrecord = $DB->get_record('certificate_issues', array('userid' => $USER->id, 'certificateid' => $certificate->id))) {
         $issued = userdate($certrecord->timecreated);
     } else {
         $issued = get_string('notreceived', 'certificate');
     }
-    if (($course->format == 'weeks') || ($course->format == 'topics')) {
-        $table->data[] = array ($certificate->section, $link, $issued);
+
+    if ($usesections) {
+        $table->data[] = array ($strsection, $link, $issued);
     } else {
         $table->data[] = array ($link, $issued);
     }

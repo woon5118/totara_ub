@@ -26,11 +26,12 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->dirroot . '/mod/certificate/lib.php');
+require_once($CFG->dirroot . '/mod/certificate/locallib.php');
 require_once($CFG->libdir . '/pdflib.php');
 require_once($CFG->dirroot . '/mod/certificate/viewarchive_form.php');
 require_once($CFG->dirroot . '/course/lib.php');
 
+$filters = array();
 $filters['certid'] = required_param('certid', PARAM_INT); // Certificate ID
 $filters['page'] = optional_param('page', 0, PARAM_INT);
 $filters['perpage'] = optional_param('perpage', 20, PARAM_INT);
@@ -57,7 +58,7 @@ require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 
-if (!empty($filters['historyid']) && (!$DB->record_exists('certificate_issues_history', array('id' => $filters['historyid'])))) {
+if (!empty($filters['historyid']) && (!$DB->record_exists('certificate_issues_history', array('id' => $filters['historyid'] , 'certificateid' => $certificate->id)))) {
     print_error(get_string('error:certissuenotfound', 'certificate', $filters['historyid']));
 }
 
@@ -70,22 +71,24 @@ $PAGE->set_title(format_string($heading));
 $PAGE->set_url('/mod/certificate/viewarchive.php', $filters);
 
 if (!empty($filters['historyid'])) {
-    // Display certificate - we are in a popup
+    // No debugging here, sorry.
+    $CFG->debugdisplay = 0;
+    @ini_set('display_errors', '0');
+    @ini_set('log_errors', '1');
 
-    // Create a directory that is writeable so that TCPDF can create temp images.
-    // In 2.2 onwards the function make_cache_directory was introduced, use that,
-    // otherwise we will use make_upload_directory.
-    if ($CFG->version >= '2011120500') {
-        make_cache_directory('tcpdf');
-    } else {
-        make_upload_directory('cache/tcpdf');
-    }
+    $filename = certificate_get_certificate_filename($certificate, $cm, $course) . '.pdf';
 
     $pdf = certificate_print_archive_pdf($filters['historyid']);
-    $certfilename = $course->shortname . '_' . $certificate->name;
-    $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
-                    format_string(strip_tags($certfilename), true))) . '.pdf';
-    $pdf->Output($filename, $filters['output']);
+    $filecontents = $pdf->Output('', 'S');
+
+    if ($filters['output'] == 'I') {
+        // Display certificate - we are in a popup.
+        send_file($filecontents, $filename, 0, 0, true, false, 'application/pdf');
+    } else {
+        // Force download.
+        send_file($filecontents, $filename, 0, 0, true, true, 'application/pdf');
+    }
+
     exit;
 }
 
@@ -94,7 +97,7 @@ if (!empty($filters['historyid'])) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
 
-$mform = new view_archive_form();
+$mform = new mod_certificate_view_archive_form();
 
 if ($formdata = $mform->get_data()) {
     // New filters so reset the page number
@@ -118,6 +121,6 @@ $totalcount = 0;
 $archives = certificate_archive_get_list($filters, $totalcount);
 $filters['totalcount'] = $totalcount;
 
-echo certificate_archive_display_list($archives, $filters);
+certificate_archive_display_list($archives, $filters);
 
 echo $OUTPUT->footer();

@@ -1,28 +1,26 @@
 <?php
-/*
- * This file is part of Totara LMS
- *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Certificate module data generator.
  *
  * @package    mod_certificate
- * @subpackage phpunit
+ * @category   test
  * @author     Russell England <russell.england@catalyst-eu.net>
  * @copyright  Catalyst IT Ltd 2013 <http://catalyst-eu.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
- *
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,9 +29,12 @@ class mod_certificate_generator extends testing_module_generator {
 
     /**
      * Create new certificate module instance
-     * @param array|stdClass $record
-     * @param array $options
-     * @return stdClass activity record with extra cmid field
+     * @param array|stdClass $record data for module being generated. Requires 'course' key
+     *     (an id or the full object). Also can have any fields from add module form.
+     * @param null|array $options general options for course module. Since 2.6 it is
+     *     possible to omit this argument by merging options into $record
+     * @return stdClass record from module-defined table with additional field
+     *     cmid (corresponding id in course_modules table)
      */
     public function create_instance($record = null, array $options = null) {
         global $CFG;
@@ -84,8 +85,7 @@ class mod_certificate_generator extends testing_module_generator {
             $record->cmidnumber = '';
         }
 
-        $record->coursemodule = $this->precreate_course_module($record->course, $options);
-        $id = certificate_add_instance($record, null);
-        return $this->post_add_instance($id, $record->coursemodule);
+        // Do work to actually add the instance.
+        return parent::create_instance($record, (array)$options);
     }
 }

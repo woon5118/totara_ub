@@ -18,14 +18,13 @@
 /**
  * Handles viewing the report
  *
- * @package    mod
- * @subpackage certificate
+ * @package    mod_certificate
  * @copyright  Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
-require_once('lib.php');
+require_once('locallib.php');
 
 $id   = required_param('id', PARAM_INT); // Course module ID
 $sort = optional_param('sort', '', PARAM_RAW);
@@ -67,7 +66,7 @@ if (!$certificate = $DB->get_record('certificate', array('id'=> $cm->instance)))
 }
 
 // Requires a course login
-require_course_login($course->id, false, $cm);
+require_login($course, false, $cm);
 
 // Check capabilities
 $context = context_module::instance($cm->id);
@@ -96,13 +95,11 @@ if (!$download) {
     $page = $perpage = 0;
 }
 
-add_to_log($course->id, 'certificate', 'view', "report.php?id=$cm->id", '$certificate->id', $cm->id);
-
 // Ensure there are issues to display, if not display notice
 if (!$users = certificate_get_issues($certificate->id, $DB->sql_fullname(), $groupmode, $cm, $page, $perpage)) {
     echo $OUTPUT->header();
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/certificate/report.php?id='.$id);
-    notify(get_string('nocertificatesissued', 'certificate'));
+    echo $OUTPUT->notification(get_string('nocertificatesissued', 'certificate'));
     echo $OUTPUT->footer($course);
     exit();
 }
@@ -111,10 +108,7 @@ if ($download == "ods") {
     require_once("$CFG->libdir/odslib.class.php");
 
     // Calculate file name
-    // Replace Ampersands with and, need both incase allowhtmlinheading is on
-    $certname = rtrim($certificate->name, '.');
-    $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
-            format_string(strip_tags($course->shortname . '_' . $certname), true))) . '.ods';
+    $filename = certificate_get_certificate_filename($certificate, $cm, $course) . '.ods';
     // Creating a workbook
     $workbook = new MoodleODSWorkbook("-");
     // Send HTTP headers
@@ -163,10 +157,7 @@ if ($download == "xls") {
     require_once("$CFG->libdir/excellib.class.php");
 
     // Calculate file name
-    // Replace Ampersands with and, need both incase allowhtmlinheading is on
-    $certname = rtrim($certificate->name, '.');
-    $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
-            format_string(strip_tags($course->shortname . '_' . $certname), true))) . '.xls';
+    $filename = certificate_get_certificate_filename($certificate, $cm, $course) . '.xls';
     // Creating a workbook
     $workbook = new MoodleExcelWorkbook("-");
     // Send HTTP headers
@@ -212,10 +203,7 @@ if ($download == "xls") {
 }
 
 if ($download == "txt") {
-    // Replace Ampersands with and, need both incase allowhtmlinheading is on
-    $certname = rtrim($certificate->name, '.');
-    $filename = clean_filename(str_replace(array('&amp;', '&'), get_string('ampersand', 'totara_core'),
-            format_string(strip_tags($course->shortname . '_' . $certname), true))) . '.txt';
+    $filename = certificate_get_certificate_filename($certificate, $cm, $course) . '.txt';
 
     header("Content-Type: application/download\n");
     header("Content-Disposition: attachment; filename=\"$filename\"");
