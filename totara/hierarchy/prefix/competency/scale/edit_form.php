@@ -44,8 +44,10 @@ class edit_scale_form extends moodleform {
             $mform->addRule('scalevalues', get_string('required'), 'required', null, 'server');
             $mform->setType('scalevalues', PARAM_TEXT);
         } else {
+            $linkurl = new moodle_url('view.php', array('id' => clean_param($this->_customdata['scaleid'], PARAM_INT), 'prefix' => 'competency'));
+            $link = html_writer::link($linkurl, get_string('linktoscalevalues', 'totara_hierarchy'));
             $html = html_writer::start_tag('div', array('class' => 'fitem')) . html_writer::tag('div', '&nbsp;', array('class' => 'fitemtitle'));
-            $html .= html_writer::tag('div', get_string('linktoscalevalues','totara_hierarchy',clean_param($this->_customdata['scaleid'], PARAM_INT)), array('class' => 'felement'));
+            $html .= html_writer::tag('div', $link, array('class' => 'felement'));
             $html .= html_writer::end_tag('div');
             $mform->addElement('html', $html);
         }

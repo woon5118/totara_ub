@@ -44,9 +44,11 @@ class edit_priority_form extends moodleform {
             $mform->addHelpButton('priorityvalues', 'priorityscalevalues', 'totara_plan');
             $mform->setType('priorityvalues', PARAM_TEXT);
         } else {
-            $mform->addELement('html', $OUTPUT->container(
+            $linkurl = new moodle_url('view.php', array('id' => clean_param($this->_customdata['priorityid'], PARAM_INT)));
+            $link = html_writer::link($linkurl, get_string('linktopriorityvalues', 'totara_plan'));
+            $mform->addElement('html', $OUTPUT->container(
                 $OUTPUT->container('&nbsp;', "fitemtitle") .
-                $OUTPUT->container(get_string('linktopriorityvalues', 'totara_plan', clean_param($this->_customdata['priorityid'], PARAM_INT)), "felement"),
+                $OUTPUT->container($link, "felement"),
                 "fitem") . html_writer::empty_tag('br'));
         }
         $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);

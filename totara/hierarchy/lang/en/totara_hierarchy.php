@@ -854,8 +854,8 @@ $string['invalidscalenumericalvalue'] = 'Numerical value is outside the allowed 
 $string['invalidtargetdate'] = 'The target date you have set is in the past';
 $string['itemstoadd'] = 'Items to add';
 $string['linkcourses'] = 'Link courses';
-$string['linktoscalevalues'] = '<a href="view.php?id={$a}&amp;prefix=competency">Click here</a> to view/edit the scale values for this competency scale.';
-$string['linktoscalevaluesgoal'] = '<a href="view.php?id={$a}&amp;prefix=goal">Click here</a> to view/edit the scale values for this goal scale.';
+$string['linktoscalevalues'] = 'View/edit the scale values for this competency scale.';
+$string['linktoscalevaluesgoal'] = 'View/edit the scale values for this goal scale.';
 $string['locatecompetency'] = 'Locate competency';
 $string['locatecompetencytemplate'] = 'Locate competency template';
 $string['locategoal'] = 'Locate goal';
