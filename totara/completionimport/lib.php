@@ -637,7 +637,7 @@ function import_course($importname, $importtime) {
     $courses = $DB->get_recordset_sql($sql, $params);
     if ($courses->valid()) {
         $plugin = enrol_get_plugin('manual');
-        $timestart = mktime(date('Y', $importtime), date('m', $importtime), date('d', $importtime), 0, 0, 0);
+        $timestart = $importtime;
         $timeend = 0;
         $enrolcount = 1;
         $enrolid = 0;
