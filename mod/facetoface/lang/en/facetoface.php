@@ -286,6 +286,7 @@ $string['error:addattendee'] = 'Could not add {$a} to the session.';
 $string['error:cancellationsnotallowed'] = 'You are not allowed to cancel this booking.';
 $string['error:cancelbooking'] = 'There was a problem cancelling your booking';
 $string['error:cannotdeclareinterest'] = 'Cannot declare interest in this face-to-face activity.';
+$string['error:cannotapprovefull'] = 'One or more users were not assigned because the session is fully booked and over booking is not allowed';
 $string['error:cannotemailmanager'] = 'Sent reminder mail for submission id {$a->submissionid} to user {$a->userid}, but could not send the message for the user\'s manager email address ({$a->manageremail}).';
 $string['error:cannotemailuser'] = 'Could not send out mail for submission id {$a->submissionid} to user {$a->userid} ({$a->useremail}).';
 $string['error:cannotsendconfirmationmanager'] = 'A confirmation message was sent to your email account, but there was a problem sending the confirmation messsage to your manager\'s email address.';
@@ -1158,6 +1159,9 @@ $string['updateattendeesunsuccessful'] = 'An error has occurred, attendance coul
 $string['updateposition'] = 'Update position';
 $string['updaterequests'] = 'Update requests';
 $string['updatewaitlist'] = 'Update waitlist';
+$string['upgradefixstatusapprovedlimbousersdescription'] = 'Students with an invalid Face-to-Face signup status were detected.
+The following students were removed from sessions:<br>{$a}';
+$string['upgradefixstatusapprovedlimbousersdetail'] = '{$a->user} was removed from Face-to-Face {$a->f2f}';
 $string['upgradeprocessinggrades'] = 'Processing Face-to-face grades, this may take a while if there are many sessions...';
 $string['usercancelledon'] = 'User cancelled on {$a}';
 $string['userdoesnotexist'] = 'User with {$a->fieldname} "{$a->value}" does not exist';

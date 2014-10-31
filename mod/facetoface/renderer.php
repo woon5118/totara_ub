@@ -129,7 +129,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if ($session->datetimeknown) {
                 $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED);
             } else {
-                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED);
+                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_WAITLISTED);
             }
             if ($viewattendees) {
                 if ($session->datetimeknown) {
@@ -138,7 +138,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     if ($signupcount > $session->capacity) {
                         $stats .= get_string('capacityoverbooked', 'facetoface');
                     }
-                    $waitlisted = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED) - $signupcount;
+                    $waitlisted = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_WAITLISTED) - $signupcount;
                     if ($waitlisted > 0) {
                         $stats .= " (" . $waitlisted . " " . get_string('status_waitlisted', 'facetoface') . ")";
                     }

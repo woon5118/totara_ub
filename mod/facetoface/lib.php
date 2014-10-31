@@ -1534,7 +1534,8 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         AND ss.statuscode >= ?
         ORDER BY
             s.id, u.firstname, u.lastname";
-    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY, $facetofaceid, MDL_F2F_STATUS_APPROVED);
+    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY,
+                           $facetofaceid, MDL_F2F_STATUS_WAITLISTED);
     $signups = $DB->get_records_sql($signupsql, $signupparams);
 
     if ($signups) {
@@ -2370,12 +2371,6 @@ function facetoface_approve_requests($data) {
 
             // Approve
             case 2:
-                facetoface_update_signup_status(
-                        $attendee->submissionid,
-                        MDL_F2F_STATUS_APPROVED,
-                        $USER->id
-                );
-
                 if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
                     print_error('error:incorrectcoursemodule', 'facetoface');
                 }
@@ -2388,8 +2383,18 @@ function facetoface_approve_requests($data) {
                 } else {
                     if ($session->allowoverbook) {
                         $status = MDL_F2F_STATUS_WAITLISTED;
+                    } else {
+                        $url = new moodle_url('/mod/facetoface/attendees.php',
+                            array('s' => $sessionid, 'action' => 'approvalrequired'));
+                        totara_set_notification(get_string('error:cannotapprovefull', 'facetoface'), $url);
                     }
                 }
+
+                facetoface_update_signup_status(
+                    $attendee->submissionid,
+                    MDL_F2F_STATUS_APPROVED,
+                    $USER->id
+                );
 
                 // Signup user
                 if (!facetoface_user_signup(

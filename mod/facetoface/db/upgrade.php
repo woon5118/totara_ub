@@ -2379,6 +2379,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014102200, 'facetoface');
     }
 
+
     if ($oldversion < 2014102201) {
         // Change the f2f session duration fields from minutes to seconds.
         $sessions = $DB->get_recordset('facetoface_sessions', null, 'id', 'id, duration');
@@ -2391,6 +2392,69 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014102201, 'facetoface');
+    }
+
+    /* T-13006: It should not be possible for a signup status record to have a statuscode of
+     * MDL_F2F_STATUS_APPROVED unless there has been an error (failed to sign up to full
+     *  session due to someone filling the last spot). This upgrade cancels all signups with
+     * statuscode MDL_F2F_STATUS_APPROVED and displays the list of affected users during upgrade.
+     */
+    if ($oldversion < 2014110701) {
+        // Find signup status records with statuscode MDL_F2F_STATUS_APPROVED.
+        $sql = "SELECT fss.id AS signupstatusid,
+                       f.id AS facetofaceid,
+                       fs.sessionid,
+                       s.datetimeknown,
+                       c.id AS courseid,
+                       f.name AS facetofacename,
+                       u.id AS userid,
+                       u.*
+                  FROM {facetoface_signups_status} fss
+                  JOIN {facetoface_signups} fs ON fs.id = fss.signupid
+                  JOIN {facetoface_sessions} s ON s.id = fs.sessionid
+                  JOIN {facetoface} f ON f.id = s.facetoface
+                  JOIN {user} u ON u.id = fs.userid
+                  JOIN {course} c ON c.id = f.course
+                 WHERE fss.statuscode = ?
+                   AND fss.superceded = 0
+                 ORDER BY fss.timecreated DESC";
+        $affectedusersignups = $DB->get_records_sql($sql, array(MDL_F2F_STATUS_APPROVED));
+
+        $affected = "";
+        $timenow = time();
+        foreach ($affectedusersignups as $usersignup) {
+            $cm = get_coursemodule_from_instance("facetoface", $usersignup->facetofaceid, $usersignup->courseid);
+
+            // Update the record.
+            $DB->set_field('facetoface_signups_status', 'statuscode', MDL_F2F_STATUS_DECLINED,
+                    array('id' => $usersignup->signupstatusid));
+
+            // Add a log message.
+            upgrade_log(UPGRADE_LOG_NOTICE, 'mod_facetoface', 'Invalid user signup cancelled: userid ' .
+                    $usersignup->userid . ', facetofaceid ' . $usersignup->facetofaceid);
+
+            // Calculate strings for upgrade output.
+            $userurl = new moodle_url('/user/view.php', array('id' => $usersignup->userid));
+            $f2furl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $usersignup->sessionid));
+            $userstring = html_writer::link($userurl, format_string(fullname($usersignup)));
+            $f2fstring = html_writer::link($f2furl, format_string($usersignup->facetofacename));
+
+            // Add the string to the set of results.
+            if ($affected) {
+                $affected .= "<br>";
+            }
+            $affected .= get_string('upgradefixstatusapprovedlimbousersdetail', 'facetoface',
+                    array('user' => $userstring, 'f2f' => $f2fstring));
+        }
+
+        if ($affected) {
+            // Display a message indicating that invalid records were found and fixed.
+            $message = get_string('upgradefixstatusapprovedlimbousersdescription', 'facetoface', $affected);
+            echo $OUTPUT->notification($message, 'notifynotice');
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014110701, 'facetoface');
     }
 
     return $result;

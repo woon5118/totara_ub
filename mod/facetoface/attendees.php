@@ -153,13 +153,17 @@ if ($facetoface->approvalreqd) {
     } else {
         // Get the staff the user is primary manager of.
         $staff = totara_get_staff();
+        if (!$staff) {
+            $staff = array();
+        }
     }
 }
 
-if (!empty($staff)) {
+if (is_siteadmin() || !empty($staff)) {
     // Check if any staff have requests awaiting approval.
     $get_requests = facetoface_get_requests($session->id);
     if ($get_requests) {
+        // Calculate which requesting users are relevant to the viewer.
         $requests = (is_siteadmin() ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
 
         if ($requests) {
@@ -177,7 +181,8 @@ if (!empty($staff)) {
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
     }
     if ($get_attendees && !in_array('attendees', $allowed_actions)) {
-        $attendees = array_intersect_key($get_attendees, array_flip($staff));
+        // Calculate which attendees are relevant to the viewer.
+        $attendees = (is_siteadmin() ? $get_attendees : array_intersect_key($get_attendees, array_flip($staff)));
 
         if ($attendees) {
             $allowed_actions[] = 'attendees';
@@ -188,7 +193,8 @@ if (!empty($staff)) {
     // Check if any staff have cancelled
     $get_cancellations = facetoface_get_cancellations($session->id);
     if ($get_cancellations && !in_array('cancellations', $allowed_actions)) {
-        $cancellations = array_intersect_key($get_cancellations, array_flip($staff));
+        // Calculate which cancelled users are relevant to the viewer.
+        $attendees = (is_siteadmin() ? $get_cancellations : array_intersect_key($get_cancellations, array_flip($staff)));
 
         if ($cancellations) {
             $allowed_actions[] = 'cancellations';
