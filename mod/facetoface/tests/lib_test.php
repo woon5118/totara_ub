@@ -1912,4 +1912,112 @@ class facetoface_lib_testcase extends advanced_testcase {
         // Check they got the right message.
         $this->assertEquals(get_string('sessionundercapacity', 'facetoface', format_string($facetoface1->name)), $messages[0]->subject);
     }
+
+    public function test_facetoface_waitlist() {
+        $this->resetAfterTest();
+
+        // Set two users.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        // Set up a face to face session with a capacity of 1 and overbook enabled.
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $this->course1->id));
+
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (YEARSECS * 2);
+        $sessiondate->timefinish = time() + (YEARSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 1,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        $sink = $this->redirectMessages();
+        // Sign the user up user 2.
+        facetoface_user_signup(
+            $session,
+            $facetoface,
+            $this->course1,
+            'discountcode1',
+            MDL_F2F_INVITE,
+            MDL_F2F_STATUS_BOOKED,
+            $user1->id,
+            true,
+            ''
+        );
+
+        // Sign the user up user 1.
+        facetoface_user_signup(
+            $session,
+            $facetoface,
+            $this->course1,
+            'discountcode1',
+            MDL_F2F_INVITE,
+            MDL_F2F_STATUS_WAITLISTED,
+            $user2->id,
+            true,
+            ''
+        );
+        $messages = $sink->get_messages();
+        // User 1 and 2 should have received confirmation messages.
+        $this->assertCount(2, $messages);
+
+        $founduser1 = false;
+        $founduser2 = false;
+
+        // Look for user1 and user 2 email addresses.
+        foreach ($messages as $message) {
+            if ($message->useridto == $user1->id) {
+                $founduser1 = true;
+            } else if ($message->useridto == $user2->id) {
+                $founduser2 = true;
+            }
+        }
+        $this->assertTrue($founduser1);
+        $this->assertTrue($founduser2);
+
+        $sink->clear();
+
+        // User 1 should be booked, user 2 waitlisted.
+        $booked = facetoface_get_attendees($session->id, MDL_F2F_STATUS_BOOKED);
+        $waitlisted = facetoface_get_attendees($session->id, MDL_F2F_STATUS_WAITLISTED);
+        $this->assertCount(1, $booked);
+        $this->assertCount(1, $waitlisted);
+        $booked = reset($booked);
+        $waitlisted = reset($waitlisted);
+        $this->assertEquals($user1->id, $booked->id);
+        $this->assertEquals($user2->id, $waitlisted->id);
+
+        $sink->clear();
+
+        // Cancel user1's booking.
+        facetoface_user_cancel($session, $user1->id);
+
+        $cancelled = facetoface_get_attendees($session->id, MDL_F2F_STATUS_USER_CANCELLED);
+        $booked = facetoface_get_attendees($session->id, MDL_F2F_STATUS_BOOKED);
+        $waitlisted = facetoface_get_attendees($session->id, MDL_F2F_STATUS_WAITLISTED);
+
+        // User 1 should be cancelled, user 2 should be booked.
+        $this->assertCount(1, $cancelled);
+        $this->assertCount(1, $booked);
+        $this->assertCount(0, $waitlisted);
+        $cancelled = reset($cancelled);
+        $booked = reset($booked);
+        $this->assertEquals($user1->id, $cancelled->id);
+        $this->assertEquals($user2->id, $booked->id);
+
+        // User 2 should have had a message from admin.
+        $messages = $sink->get_messages();
+        $this->assertCount(1, $messages);
+        $message = reset($messages);
+        $this->assertEquals($user2->id, $message->useridto);
+        $this->assertEquals(0, $message->useridfrom);
+    }
 }
