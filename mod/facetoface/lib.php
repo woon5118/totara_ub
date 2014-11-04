@@ -3937,6 +3937,7 @@ function facetoface_get_cancellations($sessionid) {
                 c.timecreated,
                 " . $DB->sql_compare_text('c.note', 255) . ",
                 p.fullname,
+                pa.type,
                 pa.fullname
             ORDER BY
                 " . $DB->sql_fullname('u.firstname', 'u.lastname') . ",
