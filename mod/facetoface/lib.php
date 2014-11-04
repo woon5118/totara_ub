@@ -5783,10 +5783,9 @@ function facetoface_get_manager_list() {
 
 
     $usernamefields = get_all_user_name_fields(true, 'u');
-    $sql = "SELECT u.id, {$usernamefields}
+    $sql = "SELECT DISTINCT u.id, {$usernamefields}
               FROM {pos_assignment} pa
               JOIN {user} u ON u.id = pa.managerid
-             GROUP BY u.id, u.firstname, u.lastname
              ORDER BY u.lastname, u.firstname";
     $managers = $DB->get_records_sql($sql);
     foreach ($managers as $manager) {
@@ -5794,11 +5793,10 @@ function facetoface_get_manager_list() {
     }
 
     if (!empty($CFG->enabletempmanagers)) {
-        $sql = "SELECT u.id, {$usernamefields}
+        $sql = "SELECT DISTINCT u.id, {$usernamefields}
                   FROM {temporary_manager} tm
                   JOIN {user} u ON u.id = tm.tempmanagerid
                  WHERE tm.expirytime > ?
-                 GROUP BY u.id, u.firstname, u.lastname
                  ORDER BY u.lastname, u.firstname";
         $params = array(time());
         $tempmanagers = $DB->get_records_sql($sql, $params);
