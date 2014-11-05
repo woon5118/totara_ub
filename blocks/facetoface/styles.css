@@ -50,18 +50,37 @@ body.path-blocks-facetoface table th {
     text-align: left;
 }
 
-div.monthlycalendar {
+.path-blocks-facetoface .monthlycalendar {
     float: left;
     clear: left;
     margin: 0;
     width: 70%;
     margin-bottom: 15px;
+    min-width: 500px;
 }
-div.calendarsidebar {
+.path-blocks-facetoface .calendarsidebar {
+    float: left;
+    margin: 0;
+    margin-left: 2%;
+    width: 27%;
+}
+.dir-rtl.path-blocks-facetoface .monthlycalendar {
     float: right;
     clear: right;
-    margin: 0;
-    width: 25%;
+
+}
+.dir-rtl.path-blocks-facetoface .calendarsidebar {
+    float: right;
+    margin-left: 0;
+    margin-right: 2%;
+}
+@media screen and (max-width: 767px) {
+    .path-blocks-facetoface .monthlycalendar {
+        width: 100%;
+    }
+    .path-blocks-facetoface .calendarsidebar {
+        width: 100%;
+    }
 }
 
 div#calendarcontainer table.calendarmonth ul {
