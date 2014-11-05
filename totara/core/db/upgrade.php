@@ -1233,6 +1233,9 @@ function xmldb_totara_core_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014101402) {
+        // Disable filters temporarily.
+        $filterall = (!empty($CFG->filterall)) ? $CFG->filterall : 0;
+        $CFG->filterall = 0;
         // Remove the hardcoded defaultfor and defaultinfofor strings in question_categories
         $categories = $DB->get_recordset_select('question_categories', '', array());
         $todelete = array();
@@ -1250,6 +1253,8 @@ function xmldb_totara_core_upgrade($oldversion) {
         if (!empty($todelete)) {
             $DB->delete_records_list('question_categories', 'id', $todelete);
         }
+        // Re-enable filters if necessary.
+        $CFG->filterall = $filterall;
         totara_upgrade_mod_savepoint(true, 2014101402, 'totara_core');
     }
 
