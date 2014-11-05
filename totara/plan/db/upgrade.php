@@ -383,5 +383,44 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014082200, 'totara', 'plan');
     }
 
+    if ($oldversion < 2014120400) {
+        // Fix Totara 1.x upgrade.
+
+        // Changing nullability of field component on table dp_component_settings to null.
+        $table = new xmldb_table('dp_component_settings');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'templateid');
+
+        // Conditionally launch drop index templateid-component.
+        $index = new xmldb_index('templateid-component', XMLDB_INDEX_UNIQUE, array('templateid', 'component'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Launch change of nullability for field component.
+        $dbman->change_field_notnull($table, $field);
+
+        // Readd index.
+        $dbman->add_index($table, $index);
+
+        // Changing the default of field reason on table dp_plan_history to drop it.
+        $table = new xmldb_table('dp_plan_history');
+        $field = new xmldb_field('reason', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null, 'status');
+
+        // Launch change of default for field reason.
+        $dbman->change_field_default($table, $field);
+
+        // Define field completionstatus to be dropped from dp_plan_program_assign.
+        $table = new xmldb_table('dp_plan_program_assign');
+        $field = new xmldb_field('completionstatus');
+
+        // Conditionally launch drop field completionstatus.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Plan savepoint reached.
+        upgrade_plugin_savepoint(true, 2014120400, 'totara', 'plan');
+    }
+
     return true;
 }

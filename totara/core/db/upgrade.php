@@ -28,6 +28,7 @@
  */
 
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
+require_once($CFG->dirroot.'/totara/core/db/upgradelib.php');
 
 
 /**
@@ -1292,6 +1293,17 @@ function xmldb_totara_core_upgrade($oldversion) {
     if ($oldversion < 2014120400) {
         set_config('totara_plan_cron', null);
         totara_upgrade_mod_savepoint(true, 2014120400, 'totara_core');
+    }
+
+    if ($oldversion < 2014120401) {
+        $columns = $DB->get_columns('course', false);
+        if ($columns['icon']->not_null) {
+            // There should be no need to run this on sites that
+            // were not upgrade from 1.x, the icon column NOT NULL
+            // property should be fine to find out old upgraded sites.
+            totara_core_fix_upgraded_1x();
+        }
+        totara_upgrade_mod_savepoint(true, 2014120401, 'totara_core');
     }
 
     return true;
