@@ -1792,7 +1792,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'lang',
             get_string('userlang', 'totara_reportbuilder'),
             "$join.lang",
@@ -1829,7 +1829,7 @@ abstract class rb_base_source {
             );
         }
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'id',
             get_string('userid', 'totara_reportbuilder'),
             "$join.id",

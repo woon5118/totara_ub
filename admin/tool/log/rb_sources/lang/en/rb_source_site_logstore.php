@@ -17,26 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
 
-// lang file for totara/reportbuilder/rb_sources/rb_source_site_logs.php
-$string['sourcetitle'] = 'Legacy Site Logs';
-// columns
-$string['time'] = 'Time';
-$string['ip'] = 'IP address';
-$string['module'] = 'Module';
-$string['cmid'] = 'CMID';
+$string['sourcetitle'] = 'Site Logs';
+
+// Columns.
 $string['action'] = 'Action';
-$string['actionlink'] = 'Action (linked to url)';
-$string['url'] = 'URL';
-$string['info'] = 'Info';
-// content
-$string['currentorg'] = 'The user\'s current organisation';
-$string['currentpos'] = 'The user\'s current position';
-$string['user'] = 'The user';
+$string['component'] = 'Component';
+$string['eventclass'] = 'Event Class Name';
+$string['name'] = 'Event Name';
+$string['ip'] = 'IP address';
+$string['origin'] = 'Origin';
+$string['other'] = 'Other info';
+$string['target'] = 'Target';
+$string['targetaction'] = 'Target & action';
+$string['time'] = 'Time';
+$string['objecttable'] = 'Object table';
+$string['objectid'] = 'Object id';
+$string['crud'] = 'CRUD';
+$string['crud_c'] = 'Create';
+$string['crud_r'] = 'Read';
+$string['crud_u'] = 'Update';
+$string['crud_d'] = 'Delete';
+$string['unrecognized'] = 'Unrecognized: {$a}';
+
+// Content.
 $string['date'] = 'The date';
 
-// column types for this source, as strings
-$string['type_log'] = 'Log';
+// Column types for this source, as strings.
+$string['type_logstore_standard_log'] = 'Log';
+$string['type_relateduser'] = 'Related user';
