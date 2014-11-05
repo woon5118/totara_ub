@@ -451,6 +451,10 @@ form.print-stages-form .fitem .fitemtitle {
         font-family: "DejaVu Sans";
     }
 
+    .stagetitle h3 {
+        margin: 10px 0 5px 0;
+    }
+
     .visibleto {
         display: none;
     }
@@ -472,22 +476,35 @@ form.print-stages-form .fitem .fitemtitle {
         color: #087BB1;
     }
 
-    .mform fieldset div.fcontainer {
+    .mform fieldset .fcontainer {
         padding: 10px 0px;
     }
 
-    .mform fieldset div.fcontainer h3 {
+    .mform fieldset .fcontainer h3 {
         font-size: 16px;
     }
 
-   .mform .fitem div.fitemtitle {
+   .mform .fitem .fitemtitle {
         float: left;
         width: 180px;
     }
 
-    .mform div.fitem div.felement {
+    .mform .fitem .felement {
         padding: 0 185px;
     }
+
+    .path-totara-appraisal .plan_box .cell {
+        background-color: #fff;
+    }
+
+    .path-totara-appraisal .plan_box .cell img {
+        margin: 10px 0;
+    }
+}
+
+.appraisal-stage {
+    margin: 10px 0;
+    page-break-inside:avoid;
 }
 
 .redisplay-notification-nomargin .notifyproblem {

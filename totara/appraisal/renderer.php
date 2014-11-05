@@ -33,6 +33,51 @@ require_once('lib.php');
  */
 class totara_appraisal_renderer extends plugin_renderer_base {
     /**
+     * Page header that is aware of dompdf limitations.
+     * @return string
+     */
+    public function snapshot_header() {
+        global $CFG;
+        $this->page->set_state(moodle_page::STATE_PRINTING_HEADER);
+        $output = '';
+        $output .=  $this->doctype();
+        $output .=  html_writer::start_tag('html');
+
+        $headhtml = html_writer::tag('title', $this->page_title());
+        $headhtml .= html_writer::empty_tag('meta', array('http-equiv' => "Content-Type",
+            'content' => "text/html; charset=utf-8"));
+        $headhtml .= html_writer::empty_tag('meta', array('name' => 'viewport',
+            'content' => 'width=device-width, initial-scale=1.'));
+
+        $styles = file_get_contents($CFG->dirroot . '/totara/appraisal/styles.css');
+        $headhtml .= html_writer::tag('style', $styles);
+
+        $headhtml .= $this->page->requires->get_head_code($this->page, $this->output);
+
+        $output .= html_writer::tag('head', $headhtml);
+        $output .= html_writer::start_tag('body', array('id' => $this->body_id(),
+            'class' => $this->body_css_classes(array('bodynoheader'))));
+
+        $this->page->set_state(moodle_page::STATE_IN_BODY);
+        return $output;
+    }
+
+    /**
+     * Page footer that is aware of pdf renderer limitations.
+     * @return string
+     */
+    public function snapshot_footer() {
+        $output = '';
+        $output .= $this->page->requires->get_end_code();
+        $output .= html_writer::end_tag('body');
+        $output .= html_writer::end_tag('html');
+        $output .= $this->container_end_all(false);
+
+        $this->page->set_state(moodle_page::STATE_DONE);
+        return $output;
+    }
+
+    /**
      * Renders a table containing appraisals list for manager
      *
      * @param array $appraisals array of appraisal object
