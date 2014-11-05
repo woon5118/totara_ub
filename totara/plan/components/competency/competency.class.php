@@ -1536,7 +1536,11 @@ class dp_competency_component extends dp_base_component {
      */
     public function can_update_competency_evidence($item) {
         if (!empty($item->approved)) {
-            // Get permissions
+            // If the user doesn't have a role then they can't update evidence.
+            if (empty($this->plan->role)) {
+                return false;
+            }
+            // Get permissions.
             $cansetproficiency = !$this->plan->is_complete() && $this->get_setting('setproficiency') >= DP_PERMISSION_ALLOW;
             $approved = $this->is_item_approved($item->approved);
             return $cansetproficiency && $approved;

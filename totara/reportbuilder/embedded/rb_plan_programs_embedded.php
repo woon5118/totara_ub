@@ -158,6 +158,6 @@ class rb_plan_programs_embedded extends rb_base_embedded {
         return ($reportfor == $subjectid ||
                 totara_is_manager($subjectid, $reportfor) ||
                 has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor) ||
-                has_capability('totara/core:viewrecordoflearning', context_user::instance($reportfor), $reportfor));
+                has_capability('totara/core:viewrecordoflearning', context_user::instance($subjectid), $reportfor));
     }
 }
