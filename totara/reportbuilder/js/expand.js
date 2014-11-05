@@ -34,6 +34,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
     init: function(Y, args) {
         $('body').on('click', '.rb-display-expand', M.totara_reportbuilder_expand.displayExpand);
         $('body').on('click', this.SELECTORS.ENROLMENTBUTTONS, M.totara_reportbuilder_expand.clickEnrol);
+        $('body').on('click', '.rb-display-expand-link', function(event) { event.stopPropagation(); });
     },
 
     /*
