@@ -144,26 +144,21 @@ if (in_array('timestart', $defaultfields) || in_array('timefinish', $defaultfiel
 }
 
 // Default field filters.
-$tablecells = array();
+$filters = '';
 foreach ($defaultfields as $fieldname) {
-    $tablecells[] = defaultfield_chooser($fieldname);
+    $filters .= html_writer::tag('div', defaultfield_chooser($fieldname), array('class' => 'f2fcalendarfilter'));
 }
 
 // Custom field filters.
 foreach ($customfields as $field) {
     if ($html = customfield_chooser($field)) {
-        $tablecells[] = $html;
+        $filters .= html_writer::tag('div', $html, array('class' => 'f2fcalendarfilter'));
     }
 }
 
-if (!empty($tablecells)) {
+if (!empty($filters)) {
     $label = get_string('apply', 'block_facetoface');
-    $tablecells[] = html_writer::empty_tag('input', array('type' => 'submit', 'value' => $label, 'name' => 'submit'));
-
-    $table = new html_table();
-    $table->data[] = $tablecells;
-    $table->tablealign = 'left';
-    $table->summary = get_string('filters:tablesummary', 'block_facetoface');
+    $filters .= html_writer::tag('div', html_writer::empty_tag('input', array('type' => 'submit', 'value' => $label, 'name' => 'submit')), array('class' => 'f2fcalendarfilter'));
 
     echo html_writer::start_tag('form', array('method' => 'get', 'action' => 'calendar.php'));
     echo $OUTPUT->box_start('generalbox calendarfilters');
@@ -171,7 +166,7 @@ if (!empty($tablecells)) {
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cal_d', 'value' => $day));
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cal_m', 'value' => $month));
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cal_y', 'value' => $year));
-    echo html_writer::table($table);
+    echo html_writer::tag('div', $filters, array('class' => 'f2fcalendarfilters'));
     echo $OUTPUT->box_end();
     echo html_writer::end_tag('form');
 }
@@ -635,30 +630,30 @@ function defaultfield_chooser($fieldname) {
     }
     switch($fieldname) {
         case 'timestart':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'id' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'id' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             build_datepicker_js("#$fieldname", get_string('datepickerlongyeardisplayformat', 'totara_core'));
             $fieldname = 'startdateafter';
             break;
         case 'timefinish':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'id' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'id' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             build_datepicker_js("#$fieldname", get_string('datepickerlongyeardisplayformat', 'totara_core'));
             $fieldname = 'finishdatebefore';
             break;
         case 'room':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             break;
         case 'building':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             break;
         case 'address':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             break;
         case 'capacity':
-            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 1, 'name' => $fieldname, 'value' => $value));
+            $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 1, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
             break;
     }
 
-    return get_string($fieldname, 'facetoface') . ': ' . $label;
+    return html_writer::tag('label', get_string($fieldname, 'facetoface') . ':', array('for' => 'id_' . $fieldname)) . $label;
 }
 
 function customfield_chooser($field) {
@@ -702,9 +697,9 @@ function customfield_chooser($field) {
         $currentvalue = $activefilters['customfields'][$field->id];
     }
 
-    $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing));
+    $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing, 'id' => 'id_customfields'));
 
-    return format_string($field->name) . ': ' . $dropdown;
+    return html_writer::tag('label', format_string($field->name) . ':', array('for' => 'id_customfields')) . $dropdown;
 }
 
 /**

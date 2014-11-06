@@ -47,7 +47,6 @@ $string['facetoface:addinstance'] = 'Add new facetoface block';
 $string['facetoface:myaddinstance'] = 'Add new facetoface block to the My Moodle page';
 $string['facetoface:viewbookings'] = 'View users facetoface bookings';
 $string['filters'] = 'Filters';
-$string['filters:tablesummary'] = 'List of filters controlling the events displayed in the monthly calendar view below.';
 $string['finishdate'] = 'Finish date';
 $string['finishtime'] = 'Finish time';
 $string['fixdates'] = 'Fix session dates';
