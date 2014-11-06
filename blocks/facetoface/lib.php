@@ -171,23 +171,42 @@ function export_spreadsheet($dates, $format, $includebookings) {
 }
 
 /**
- *  Return a list of users who match the given search
+ *  Return a list of users who match the given search and that the viewer can access.
  *  Fields searched are:
  *  - username,
  *  - firstname, lastname as fullname,
  *  - email
  */
-function get_users_search($search) {
-    global $CFG, $DB;
+function get_f2f_bookings_users_search($search) {
+    global $DB, $USER;
 
     $searchvalues = explode(' ', trim($search));
     $sort = 'firstname, lastname, username, email ASC';
     $searchfields = array('firstname', 'lastname', 'username', 'email');
 
-    list($where, $searchparams) = facetoface_search_get_keyword_where_clause($searchvalues, $searchfields);
-    $sql = "SELECT u.* FROM {user} u WHERE {$where} ORDER BY {$sort}";
+    list($where, $params) = facetoface_search_get_keyword_where_clause($searchvalues, $searchfields);
 
-    $records = $DB->get_records_sql($sql, $searchparams);
+    if (is_siteadmin($USER)) {
+        $sql = "SELECT u.* FROM {user} u WHERE {$where} ORDER BY {$sort}";
+    } else {
+        // The access control in this query accounts for role assignments but NOT role overrides in the user context
+        // (because performing the capability check in each user's context would be too expensive). That means that if
+        // there is a role override in a user's context set to prevent/prohibit, this query could include users whose
+        // bookings are not accessible to $USER. Since there is a further capability check before displaying the actual
+        // bookings, the worse case scenario is that a user sees a user in the search results but gets an error when
+        // they click to view their booking. In practice user context overrides are rare, so this shouldn't pose a
+        // significant issue.
+        $sql = "SELECT u.*
+              FROM {role_capabilities} rolecaps
+              JOIN {role} role ON rolecaps.roleid = role.id AND rolecaps.capability = ? AND rolecaps.permission = 1
+              JOIN {role_assignments} roleassign ON role.id = roleassign.roleid AND roleassign.userid = ?
+              JOIN {context} context ON context.id = roleassign.contextid
+              JOIN {user} u ON u.id = context.instanceid
+             WHERE {$where} ORDER BY {$sort}";
+        $params = array_merge(array('block/facetoface:viewbookings', $USER->id), $params);
+    }
+
+    $records = $DB->get_records_sql($sql, $params);
 
     return $records;
 }

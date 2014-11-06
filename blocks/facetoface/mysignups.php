@@ -56,7 +56,14 @@ if ($userid != $USER->id) {
     require_capability('block/facetoface:viewbookings', $contextuser);
 }
 
-$search = optional_param('search', '', PARAM_TEXT); // search string
+// Check if the user has the capability to search.
+$sql = "SELECT rolecaps.id
+          FROM {role_capabilities} rolecaps
+          JOIN {role} role ON rolecaps.roleid = role.id AND rolecaps.capability = ? AND rolecaps.permission = 1
+          JOIN {role_assignments} roleassign ON role.id = roleassign.roleid AND roleassign.userid = ?";
+$cansearch = is_siteadmin() || $DB->record_exists_sql($sql, array('block/facetoface:viewbookings', $USER->id));
+
+$search = $cansearch ? optional_param('search', '', PARAM_TEXT) : ''; // Search string.
 
 $startdate = make_timestamp($startyear, $startmonth, $startday);
 $enddate = make_timestamp($endyear, $endmonth, $endday);
@@ -74,7 +81,7 @@ $signups = '';
 $users = '';
 
 if ($search) {
-    $users = get_users_search($search);
+    $users = get_f2f_bookings_users_search($search);
 } else {
     // Get all Face-to-face signups from the DB
     $signups = $DB->get_records_sql("SELECT d.id, c.id as courseid, c.fullname AS coursename, f.name,
@@ -177,20 +184,21 @@ if (empty($users)) {
     }
 }
 
-echo $OUTPUT->heading(get_string('searchusers', 'block_facetoface'));
-
-echo html_writer::start_tag('form', array('class' => 'learnersearch', 'id' => 'searchquery', 'method' => 'post', 'action' => $CFG->wwwroot.'/blocks/facetoface/mysignups.php'));
-echo $OUTPUT->container_start('usersearch');
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startyear', 'value' => $startyear));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startmonth', 'value' => $startmonth));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startday', 'value' => $startday));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endyear', 'value' => $endyear));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endmonth', 'value' => $endmonth));
-echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endday', 'value' => $endday));
-echo html_writer::empty_tag('input', array('class' => 'searchform', 'type' => 'text', 'name' => 'search', 'size' => '35', 'maxlength' => '255', 'value' => $search));
-echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Search'));
-echo $OUTPUT->container_end();
-echo html_writer::end_tag('form');
+if ($cansearch) {
+    echo $OUTPUT->heading(get_string('searchusers', 'block_facetoface'));
+    echo html_writer::start_tag('form', array('class' => 'learnersearch', 'id' => 'searchquery', 'method' => 'post', 'action' => $CFG->wwwroot.'/blocks/facetoface/mysignups.php'));
+    echo $OUTPUT->container_start('usersearch');
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startyear', 'value' => $startyear));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startmonth', 'value' => $startmonth));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startday', 'value' => $startday));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endyear', 'value' => $endyear));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endmonth', 'value' => $endmonth));
+    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endday', 'value' => $endday));
+    echo html_writer::empty_tag('input', array('class' => 'searchform', 'type' => 'text', 'name' => 'search', 'size' => '35', 'maxlength' => '255', 'value' => $search));
+    echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Search'));
+    echo $OUTPUT->container_end();
+    echo html_writer::end_tag('form');
+}
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
