@@ -40,7 +40,7 @@ class certifications extends \totara_core\totara\menu\item {
         if (!empty($CFG->enhancedcatalog)) {
             return '/totara/coursecatalog/certifications.php';
         } else {
-            return '/totara/program/index.php?viewtype=certifications';
+            return '/totara/program/index.php?viewtype=certification';
         }
     }
 
