@@ -605,12 +605,10 @@ function top_controls($month, $year) {
     $prevdate = make_timestamp($prevyear, $prevmonth, 1);
     $nextdate = make_timestamp($nextyear, $nextmonth, 1);
     $content .= $OUTPUT->container_start('calendar-controls');
-    $content .= html_writer::start_tag('table', array('summary' => '')) . html_writer::start_tag('tr') . html_writer::start_tag('td');
-    $content .= calendar_get_link_previous(userdate($prevdate, get_string('strftimemonthyear')), "calendar.php?tab=$currenttab&amp;", 1, $prevmonth, $prevyear);
-    $content .= html_writer::end_tag('td') . html_writer::tag('td', html_writer::tag('span', '|', array('class' => 'hide')) . html_writer::tag('span', userdate($time, get_string('strftimemonthyear')), array('class' => 'current')), array('align' => 'center'));
-    $content .= html_writer::tag('td', html_writer::tag('span', '|', array('class' => 'hide')) . calendar_get_link_next(userdate($nextdate, get_string('strftimemonthyear')), "calendar.php?tab=$currenttab&amp;", 1, $nextmonth, $nextyear) . html_writer::tag('span', '<!-- -->', array('class' => 'clearer')), array('align' => 'right'));
-    $content .= html_writer::end_tag('tr') . html_writer::end_tag('table');
-    $content .= $OUTPUT->container_end() . "\n";
+    $content .= html_writer::tag('div', calendar_get_link_previous(userdate($prevdate, get_string('strftimemonthyear')), "calendar.php?tab=$currenttab&amp;", 1, $prevmonth, $prevyear));
+    $content .= html_writer::tag('div', html_writer::tag('span', userdate($time, get_string('strftimemonthyear'))), array('class' => 'current'));
+    $content .= html_writer::tag('div', calendar_get_link_next(userdate($nextdate, get_string('strftimemonthyear')), "calendar.php?tab=$currenttab&amp;", 1, $nextmonth, $nextyear));
+    $content .= $OUTPUT->container_end();
     return $content;
 }
 

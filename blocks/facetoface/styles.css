@@ -8,22 +8,26 @@ body.path-block-facetoface h2.main, body.blocks-facetoface h3.main {
     text-align: left;
 }
 
-div#calendarcontainer div.monthlycalendar div.calendar-controls {
+#calendarcontainer .calendar-controls {
     line-height: 3.5em;
 }
 
-div#calendarcontainer div.monthlycalendar div.calendar-controls a {
+#calendarcontainer .calendar-controls a {
     font-size: 1.5em;
     width: 100%;
 }
 
-div#calendarcontainer div.monthlycalendar div.calendar-controls table {
-    width: 100%;
+#calendarcontainer .calendar-controls > div {
+    width: 30%;
+    float: left;
 }
-
-div#calendarcontainer div.monthlycalendar div.calendar-controls span.current {
+#calendarcontainer .calendar-controls .current {
+    width: 40%;
+    text-align: center;
     font-size: 2.5em;
-    width: 100%;
+}
+#calendarcontainer .calendar-controls > div:last-child {
+    text-align: right;
 }
 
 div#calendarcontainer div.monthlycalendar table.calendarmonth {
