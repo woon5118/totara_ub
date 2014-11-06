@@ -646,6 +646,17 @@ class menu implements \renderable, \IteratorAggregate {
     }
 
     /**
+     * Resets the menu to the default state as determined by the code.
+     */
+    public static function reset_menu() {
+        global $DB;
+        // Truncate the menu table.
+        $DB->delete_records('totara_navigation');
+        // Then recreate the defaults.
+        totara_upgrade_menu();
+    }
+
+    /**
      * Load new node class if exists. For custom items this will be
      * the class \totara_core\totara\menu\item, for other items it is
      * the item classname.

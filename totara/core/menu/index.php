@@ -34,6 +34,8 @@ $moveup   = optional_param('moveup',   0, PARAM_INT);
 $movedown = optional_param('movedown', 0, PARAM_INT);
 $hideid   = optional_param('hideid',   0, PARAM_INT);
 $showid   = optional_param('showid',   0, PARAM_INT);
+$reset    = optional_param('reset',    0, PARAM_INT);
+$confirm  = optional_param('confirm',  0, PARAM_BOOL);
 
 admin_externalpage_setup('totaranavigation');
 
@@ -60,6 +62,23 @@ if (!empty($showid)) {
     require_sesskey();
     menu::change_visibility($showid, false);
     totara_set_notification(get_string('menuitem:updatesuccess', 'totara_core'), $url, array('class' => 'notifysuccess'));
+}
+
+if (!empty($reset)) {
+    if (empty($confirm)) {
+        $message  = get_string('menuitem:resettodefaultconfirm', 'totara_core');
+        $options  = array('confirm' => 1, 'reset' => 1, 'sesskey' => sesskey());
+        $continue = new moodle_url('/totara/core/menu/index.php', $options);
+        $cancel   = $url;
+        echo $OUTPUT->header();
+        echo $OUTPUT->confirm($message, $continue, $cancel);
+        echo $OUTPUT->footer();
+        exit;
+    } else {
+        require_sesskey();
+        menu::reset_menu();
+        totara_set_notification(get_string('menuitem:resettodefaultcomplete', 'totara_core'), $url, array('class' => 'notifysuccess'));
+    }
 }
 
 $event = \totara_core\event\menuadmin_viewed::create(array('context' => \context_system::instance()));
@@ -95,4 +114,8 @@ totara_menu_table_load($table, $node);
 echo html_writer::table($table);
 
 echo $OUTPUT->single_button($editurl, get_string('menuitem:addnew', 'totara_core'), 'get');
+// Reset button.
+$url = new moodle_url('/totara/core/menu/index.php', array('reset' => 1));
+echo $OUTPUT->single_button($url, get_string('menuitem:resettodefault', 'totara_core'), 'get');
+
 echo $OUTPUT->footer();
