@@ -65,33 +65,6 @@ class menuadmin_viewed extends \core\event\base {
     }
 
     /**
-     * Return name of the legacy event, which is replaced by this event.
-     *
-     * @return string legacy event name
-     */
-    public static function get_legacy_eventname() {
-        return 'menuadmin_viewed';
-    }
-
-    /**
-     * Return menuadmin_viewed legacy event data.
-     *
-     * @return \stdClass.
-     */
-    protected function get_legacy_eventdata() {
-        return new \stdClass();
-    }
-
-    /**
-     * Returns array of parameters to be passed to legacy add_to_log() function.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return array(SITEID, 'totara_core', 'main menu viewed', 'index.php');
-    }
-
-    /**
      * Returns relevant URL.
      *
      * @return \moodle_url
