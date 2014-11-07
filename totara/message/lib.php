@@ -312,25 +312,3 @@ function totara_message_accept_reject_action($id) {
     }
     return $out;
 }
-
-/**
- * Installation function
- */
-function totara_message_install() {
-    global $CFG;
-
-    // hack to get cron working via admin/cron.php
-    // at some point we should create a local_modules table
-    // based on data in version.php
-    set_config('totara_message_cron', 60);
-    return true;
-}
-
-/**
- * Execute cron functions related to messages
- */
-function totara_message_cron() {
-    global $CFG;
-    require_once($CFG->dirroot.'/totara/message/cron.php');
-    message_cron();
-}

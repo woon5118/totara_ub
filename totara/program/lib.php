@@ -1398,15 +1398,6 @@ function prog_assignments_firstlogin($user) {
 }
 
 /**
- * Run the program cron
- */
-function totara_program_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/program/cron.php');
-    program_cron();
-}
-
-/**
  * Returns an array of course objects for all the courses which
  * are part of any program.
  *

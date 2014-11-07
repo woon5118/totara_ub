@@ -17,30 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author David Curry <david.curry@totaralms.com>
- * @package totara
- * @subpackage totara_hierarchy
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_core
  */
-
-require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
 /**
- * Cron job for updating goal assignments.
+ * Update temporary mangers
  */
-function goal_cron() {
-    global $DB;
+namespace totara_core\task;
 
-    $goallib = new goal();
+/**
+ * Sync Totara elements with external sources
+ */
+class tool_totara_sync_task extends \core\task\scheduled_task {
 
-    // Update assignments.
-    mtrace("Updating goal assignments:");
-
-    $goals = $DB->get_records('goal', array());
-
-    foreach ($goals as $goal) {
-        $goallib->update_goal_user_assignments($goal->id);
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('tooltotarasynctask', 'totara_core');
     }
 
-    mtrace(" Done!\n");
+    /**
+     * Sync Totara elements with external sources
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
 
+        tool_totara_sync_cron(true);
+    }
 }

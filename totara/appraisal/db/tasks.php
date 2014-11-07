@@ -17,26 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_appraisal
  */
 
-/**
- * Page to execute report builder cron on a particular activity group and display results
- */
+defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
+/* List of handlers */
 
-require_capability('totara/reportbuilder:managereports', context_system::instance());
-
-$group = optional_param('group', 0, PARAM_INT);
-if (!confirm_sesskey()) {
-    print_error('confirmsesskeybad', 'error');
-}
-print '<pre>';
-print "Starting cron...\n";
-reportbuilder_cron($group);
-print "\n...cron complete.\n";
-print '</pre>';
+$tasks = array(
+    array(
+        'classname' => 'totara_appraisal\task\update_learner_assignments_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

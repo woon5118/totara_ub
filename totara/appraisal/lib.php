@@ -5193,12 +5193,3 @@ class appraisal_user_assignment {
         return $this->status == appraisal::STATUS_CLOSED;
     }
 }
-
-/**
- * Run the appraisal cron
- */
-function totara_appraisal_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/appraisal/cron.php');
-    appraisal_cron();
-}

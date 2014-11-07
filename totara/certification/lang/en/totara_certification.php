@@ -158,6 +158,7 @@ $string['type_course'] = 'Course';
 $string['type_program'] = 'Program';
 $string['type_unset'] = 'Unset';
 $string['unset'] = 'Unset';
+$string['updatecertificationstask'] = 'Update certifications';
 $string['viewallcertifications'] = 'View all certifications';
 $string['viewcertification'] = 'View certification';
 $string['weeks'] = 'Week(s)';

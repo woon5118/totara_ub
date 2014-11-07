@@ -461,6 +461,7 @@ $string['type_help'] = '<p>The audience type can be \'set\' or \'dynamic\'.</p>
 <p>Dynamic audiences are determined by a rule or set of rules, and the users included in the audience will dynamically update to include users who match those rules (and remove users who no longer match).</p>
 <p>The members of a set audience can be changed at any time, and the rules that define a dynamic audience can also be changed, leading to the audience membership being updated.</p>';
 $string['typeunknown'] = '{$a}';
+$string['updatecohortstask'] = 'Sync and clean audiences';
 $string['updateoperatorsbutton'] = 'Update "and/or" operators in current draft';
 $string['updateroles'] = 'Assign selected role(s) to this audience';
 $string['updatedrolesuccessful'] = 'Roles have been updated';

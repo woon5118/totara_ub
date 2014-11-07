@@ -55,13 +55,6 @@ function xmldb_totara_program_install() {
         $DB->update_record('course_categories', $cat, true);
     }
 
-    // Set a config value to ensure that the program cron tasks are included
-    // in the cron schedule
-    if (!isset($CFG->totara_program_cron)) {
-        // hack to get cron working via admin/cron.php
-        set_config('totara_program_cron', 60);
-    }
-
     //enable program enrolment plugin
     $enabledplugins = explode(',', $CFG->enrol_plugins_enabled);
     $enabledplugins[] = 'totara_program';

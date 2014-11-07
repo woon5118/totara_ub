@@ -49,8 +49,6 @@ function latest_runid() {
 /**
  * Run the cron for syncing Totara elements with external sources
  *
- * This can be run separately from the main cron via run_cron.php
- *
  * @param boolean $forcerun force sync to run, ignoring configured schedule
  * @access public
  * @return void

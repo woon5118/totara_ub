@@ -28,7 +28,6 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
 require_once($CFG->dirroot . '/totara/customfield/definelib.php');
 require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class.php');

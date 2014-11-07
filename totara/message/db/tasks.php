@@ -18,24 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage totara_appraisal
+ * @package totara_message
  */
 
-/**
- * Page to execute report builder cron on a particular activity group and display results
- */
+defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->dirroot . '/totara/appraisal/cron.php');
+/* List of handlers */
 
-require_capability('totara/appraisal:managenotifications', context_system::instance());
-
-if (!confirm_sesskey()) {
-    print_error('confirmsesskeybad', 'error');
-}
-print '<pre>';
-print "Starting cron...\n";
-appraisal_cron();
-print "\n...cron complete.\n";
-print '</pre>';
+$tasks = array(
+    array(
+        'classname' => 'totara_message\task\update_messages_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

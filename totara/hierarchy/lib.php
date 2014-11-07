@@ -87,21 +87,6 @@ function totara_hierarchy_pluginfile($course, $cm, $context, $filearea, $args, $
 }
 
 /**
- * Execute cron functions related to hierarchies. This naming convention is required for it to run
- */
-function totara_hierarchy_cron() {
-    global $CFG;
-
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/cron.php');
-    require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/cron.php');
-
-    competency_cron();
-    if (!totara_feature_disabled('goals')) {
-        goal_cron();
-    }
-}
-
-/**
  * Execute the SQL to create a default competency scale
  *
  * @returns true

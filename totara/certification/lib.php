@@ -157,15 +157,6 @@ class certification_event_handler {
     }
 }
 
-/**
- * Run the certification cron
- */
-function totara_certification_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/certification/cron.php');
-    certification_cron();
-}
-
 // Stages functions.
 
 /**

@@ -72,6 +72,7 @@ $string['survey'] = 'Survey';
 $string['task_description'] = 'Listed below are all the tasks you\'ve received. You can click links in the task title to view more detail or dismiss an task by clicking the dismiss icon to the right of the list. You may also choose to filter which tasks are shown in the list by making use of the "Search by" functionality.';
 $string['tasks'] = 'Tasks';
 $string['unknown'] = 'Unknown';
+$string['updatemessagestask'] = 'Process messages and alerts';
 $string['urgencynormal'] = 'Normal';
 $string['urgencyurgent'] = 'Urgent';
 $string['viewdetailshere'] = 'More details can be found at:<br /><br /><a href="{$a}">{$a}</a>';

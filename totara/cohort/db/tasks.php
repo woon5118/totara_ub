@@ -17,24 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara
- * @subpackage totara_sync
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_cohort
  */
 
-// Ensure command-line-only execution
-if (!empty($_SERVER['GATEWAY_INTERFACE'])){
-    error_log("sync cron execution should not be called from apache!");
-    exit;
-}
+defined('MOODLE_INTERNAL') || die();
 
-define('CLI_SCRIPT', 1);
+/* List of handlers */
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
-
-echo get_string('runsynccronstart', 'tool_totara_sync');
-
-tool_totara_sync_cron(true);
-
-echo get_string('runsynccronend', 'tool_totara_sync').PHP_EOL;
+$tasks = array(
+    array(
+        'classname' => 'totara_cohort\task\update_cohort_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

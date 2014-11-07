@@ -28,7 +28,6 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
-require_once($CFG->dirroot . '/totara/program/cron.php');
 
 /**
  * Test program completion rules.

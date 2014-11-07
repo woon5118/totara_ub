@@ -696,6 +696,7 @@ Falsely claiming that approval has been granted can result in non-admittance and
 $string['selfbooked'] = 'Self booked';
 $string['sendlater'] = 'Send later';
 $string['sendmessage'] = 'Send message';
+$string['sendnotificationstask'] = 'Send facetoface notifications';
 $string['sendnow'] = 'Send now';
 $string['sentxnotifications'] = 'Send {$a} notifications';
 $string['sentremindermanager'] = 'Sent reminder email to user manager';

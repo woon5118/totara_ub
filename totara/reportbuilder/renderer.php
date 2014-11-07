@@ -187,14 +187,6 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $deleteattr = array('title' => $strdelete);
             $delete = $this->output->action_icon($deleteurl, new pix_icon('t/delete', $strdelete), null, $deleteattr);
 
-            $cronurl = new moodle_url('/totara/reportbuilder/runcron.php', array('group' => $group->id, 'sesskey' => $USER->sesskey));
-            $options['height'] = 500;
-            $options['width'] = 750;
-            $cron = $this->output->action_link($cronurl,
-                '<img src="'.$this->output->pix_url('/t/reload').'" alt="'.$strcron.'">',
-                new popup_action('click', $cronurl, 'runcron', $options),
-                array('title' => $strcron));
-
             $url = new moodle_url('/totara/reportbuilder/groupsettings.php', array('id' => $group->id));
             $row[] = html_writer::link($url, $group->name);
             //$row[] = $group->preproc;
@@ -204,7 +196,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $row[] = html_writer::link($url, $group->feedbackname);
             $row[] = ($group->numitems === null) ? 0 : $group->numitems;
             $row[] = ($group->numreports === null) ? 0 : $group->numreports;
-            $row[] = "$settings &nbsp; $delete &nbsp; $cron";
+            $row[] = "$settings &nbsp; $delete";
             $data[] = $row;
         }
 

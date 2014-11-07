@@ -18,45 +18,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara
- * @subpackage cohort
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_cohort
  */
 
-function tcohort_cron() {
-    global $CFG, $DB;
-    require_once($CFG->dirroot . "/totara/cohort/rules/lib.php");
+namespace totara_cohort\task;
 
-    // Check if we need to run hourly tasks for cleanup and membership sync.
-    $trace = new text_progress_trace();
-    $runhourlycron = true;
-    $timenow = time();
-    $hourlycron = 60 * 60; // one hour.
-    $lasthourlycron = get_config('totara_cohort', 'lasthourlycron');
-    if ($lasthourlycron && ($timenow - $lasthourlycron <= $hourlycron)) {
-        // Not enough time has elapsed to rerun hourly cron.
-        $trace->output("No need to run cohort member hourly sync - has already been run recently.");
-        if (isset($CFG->debugcron) && $CFG->debugcron) {
-            $trace->output("DEBUG - run cohort member syncing anyway");
-        } else {
-            $runhourlycron = false;
-        }
+/**
+ * Update learner assignments for active appraisals.
+ */
+class update_cohort_task extends \core\task\scheduled_task {
+
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('updatecohortstask', 'totara_cohort');
     }
 
-    if ($runhourlycron) {
+    /**
+     * Do the job.
+     * Throw exceptions on errors (the job will be retried).
+     */
+    public function execute() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . "/totara/cohort/rules/lib.php");
+
+        $trace = new \text_progress_trace();
+
         // Clean up obsolete rule collections.
         $obsoleted = $DB->get_fieldset_select('cohort_rule_collections', 'id', 'status = ?', array(COHORT_COL_STATUS_OBSOLETE));
         if (!empty($obsoleted)) {
-            $trace->output(date("H:i:s", $timenow).' Cleaning up obsolete rule collections...');
+            $trace->output(date("H:i:s", time()).' Cleaning up obsolete rule collections...');
             foreach ($obsoleted as $obsolete) {
                 cohort_rules_delete_collection($obsolete);
             }
         }
+
         // Sync dynamic audience members.
         $trace->output(date("H:i:s", time()).' Syncing dynamic audience members');
         totara_cohort_check_and_update_dynamic_cohort_members(null, $trace);
-    }
 
-    $trace->output(date("H:i:s", time()).' Sending queued cohort notifications...');
-    totara_cohort_send_queued_notifications();
-    $trace->output(date("H:i:s", time()). ' Finished sending queued cohort notifications...');
+        $trace->output(date("H:i:s", time()).' Sending queued cohort notifications...');
+        totara_cohort_send_queued_notifications();
+        $trace->output(date("H:i:s", time()). ' Finished sending queued cohort notifications...');
+    }
 }
+

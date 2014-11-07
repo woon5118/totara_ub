@@ -18,32 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage totara_appraisal
+ * @package totara_core
  */
-
-require_once($CFG->dirroot.'/totara/appraisal/lib.php');
 
 /**
- * Run cron for appraisal
+ * Update temporary mangers
  */
-function appraisal_cron($time = 0) {
-    global $DB;
+namespace totara_core\task;
 
-    // Execute the cron if Appraisals are not disabled.
-    if (!totara_feature_disabled('appraisals')) {
+class update_temporary_managers_task extends \core\task\scheduled_task {
 
-        // Update learner assignments for active appraisals.
-        $appraisals = $DB->get_records('appraisal', array('status' => appraisal::STATUS_ACTIVE));
-        foreach ($appraisals as $app) {
-            $appraisal = new appraisal($app->id);
-            $appraisal->check_assignment_changes();
-        }
+    /**
+     * Get a descriptive name for this task (shown to admins).
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('updatetemporarymanagerstask', 'totara_core');
+    }
 
-        // Send scheduled appraisals messages.
-        if (!$time) {
-            $time = time();
-        }
-        totara_appraisal_observer::send_scheduled($time);
+    /**
+     * Update temporary mangers
+     */
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot.'/totara/core/lib.php');
+
+        totara_update_temporary_managers();
     }
 }

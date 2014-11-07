@@ -379,14 +379,6 @@ function totara_site_version_tracking() {
 
 }
 
-function totara_core_cron() {
-
-    // Temporary manager tasks.
-    totara_update_temporary_managers();
-
-    return true;
-}
-
 function totara_update_temporary_managers() {
     global $CFG, $DB;
 

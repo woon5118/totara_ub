@@ -17,11 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package modules
- * @subpackage facetoface
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package block_totara_stats
  */
 
-require_once '../../config.php';
-require_once 'lib.php';
+defined('MOODLE_INTERNAL') || die();
 
-facetoface_cron();
+/* List of handlers */
+
+$tasks = array(
+    array(
+        'classname' => 'block_totara_stats\task\update_totara_stats_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

@@ -1289,6 +1289,10 @@ function xmldb_totara_core_upgrade($oldversion) {
 
         totara_upgrade_mod_savepoint(true, 2014102000, 'totara_core');
     }
+    if ($oldversion < 2014120400) {
+        set_config('totara_plan_cron', null);
+        totara_upgrade_mod_savepoint(true, 2014120400, 'totara_core');
+    }
 
     return true;
 }

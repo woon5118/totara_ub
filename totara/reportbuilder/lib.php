@@ -4695,17 +4695,6 @@ class reportbuilder {
 
 class ReportBuilderException extends Exception { }
 
-
-
-/**
- * Run the reportbuilder cron
- */
-function totara_reportbuilder_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
-    reportbuilder_cron();
-}
-
 /**
  * Returns the proper SQL to create table based on a query
  * @param string $table

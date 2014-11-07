@@ -18,3 +18,4 @@ $string['minutesbetweensessiondesc'] = 'Used by stats generation to define when 
 $string['executeathelp'] = 'Time to run the cron based stats processing';
 $string['totara_stats:addinstance'] = 'Add a new stats block';
 $string['totara_stats:myaddinstance'] = 'Add a new stats block to the My Moodle page';
+$string['updatetotarastatstask'] = 'Update Totara statistics block';

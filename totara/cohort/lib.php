@@ -100,15 +100,6 @@ function totara_cohort_install() {
 }
 
 /**
- * Run the totara_cohort cron
- */
-function totara_cohort_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/cohort/cron.php');
-    tcohort_cron();
-}
-
-/**
  * This function updates the audience visibility of a learning component.
  *
  * @param int $type Type of the learning component we want to update (course, program, certification)
