@@ -42,6 +42,8 @@ $userid = optional_param('userid', $USER->id, PARAM_INT); // Which user to show.
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format','', PARAM_TEXT); // Export format.
 $rolstatus = optional_param('status', 'all', PARAM_ALPHANUM);
+$debug  = optional_param('debug', 0, PARAM_INT);
+
 if (!in_array($rolstatus, array('active','completed','all'))) {
     $rolstatus = 'all';
 }
@@ -132,6 +134,10 @@ $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
 echo $OUTPUT->header();
+
+if ($debug) {
+    $report->debug($debug);
+}
 
 echo dp_display_plans_menu($userid, 0, $usertype, 'courses', $rolstatus);
 
