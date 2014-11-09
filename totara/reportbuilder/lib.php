@@ -1569,6 +1569,9 @@ class reportbuilder {
     /**
      * Returns an array of reportbuilder records that the user can view
      *
+     * Note: We don't want to do is_capable checks on embedded reports in this function
+     * as it needs to be optimised for speed.
+     *
      * @param int $userid The user to check which reports they have access to
      * @param boolean $showhidden If true, reports which are hidden
      *                            will also be included
