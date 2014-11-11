@@ -1026,7 +1026,8 @@ function certif_print_certifications($category) {
     // Category is 0 (for all certifications) or an object.
     global $OUTPUT, $USER;
 
-    $fields = "cf.id,cf.learningcomptype,p.sortorder,p.shortname,p.fullname,p.summary,p.visible,p.icon,p.certifid,p.id as pid";
+    $fields = "cf.id,cf.learningcomptype,p.sortorder,p.shortname,p.fullname,p.summary,p.visible,
+               p.available,p.availablefrom,p.availableuntil,p.icon,p.certifid,p.id as pid";
 
     if (!is_object($category) && $category==0) {
         $categories = get_child_categories(0);  // Parent = 0  ie top-level categories only.
@@ -1068,9 +1069,8 @@ function certif_print_certifications($category) {
 function certif_print_certification($certification, $highlightterms = '') {
     global $PAGE, $CERTIFTYPE;
 
-    $prog = new program($certification->pid);
     $accessible = false;
-    if ($prog->is_accessible()) {
+    if (prog_is_accessible($certification)) {
         $accessible = true;
     }
 
@@ -1102,7 +1102,7 @@ function certif_print_certification($certification, $highlightterms = '') {
  * Returns list of certifications, for whole site, or category
  * (This is the counterpart to get_courses in /lib/datalib.php)
  */
-function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", $fields="cf.*") {
+function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", $fields="cf.*, p.available, p.availablefrom, p.availableuntil") {
 
     global $DB;
 

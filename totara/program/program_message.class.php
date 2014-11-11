@@ -617,7 +617,7 @@ abstract class prog_noneventbased_message extends prog_message {
      * @return bool Success
      */
     public function send_message($recipient, $sender=null, $options=array()) {
-        global $CFG, $USER;
+        global $DB, $CFG, $USER;
 
         $result = true;
 
@@ -646,7 +646,17 @@ abstract class prog_noneventbased_message extends prog_message {
         $studentdata->msgtype = TOTARA_MSG_TYPE_PROGRAM;
         $result = $result && tm_alert_send($studentdata);
 
-        // Send the message to the manager.
+        // If the message was sent, add a record to the message log.
+        if ($result) {
+            $ob = new stdClass();
+            $ob->messageid = $this->id;
+            $ob->userid = $recipient->id;
+            $ob->coursesetid = isset($options['coursesetid']) ? $options['coursesetid'] : 0;
+            $ob->timeissued = time();
+            $DB->insert_record('prog_messagelog', $ob);
+        }
+
+        // send the message to the manager
         if ($result && $this->notifymanager && $manager) {
             $managerdata = new stdClass();
             $managerdata->userto = $manager;

@@ -309,7 +309,7 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
         $visible = false;
 
         $program = new program($program->id);
-        $access = $program->is_viewable($user) && $program->is_accessible($user);
+        $access = $program->is_viewable($user) && prog_is_accessible($program, $user);
 
         if ($CFG->enhancedcatalog) { // New catalog.
             $search = array();

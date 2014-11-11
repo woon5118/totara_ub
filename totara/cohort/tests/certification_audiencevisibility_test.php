@@ -311,7 +311,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
         $visible = false;
 
         $program = new program($certification->id);
-        $access = $program->is_viewable($user) && $program->is_accessible($user);
+        $access = $program->is_viewable($user) && prog_is_accessible($certification, $user);
 
         if ($CFG->enhancedcatalog) { // New catalog.
             $search = array();

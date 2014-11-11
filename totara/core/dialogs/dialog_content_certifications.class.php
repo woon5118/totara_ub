@@ -190,7 +190,9 @@ class totara_dialog_content_certifications extends totara_dialog_content {
      * @return  boolean
      */
     public function search_can_display_result($certifid) {
-        $cert = new program($certifid);
-        return $cert->is_accessible();
+        global $DB;
+
+        $cert = $DB->get_record('prog', array('id' => $certifid));
+        return prog_is_accessible($cert);
     }
 }

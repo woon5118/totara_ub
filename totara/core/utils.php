@@ -139,25 +139,27 @@ function totara_select_width_limiter() {
  * Returns and associative array where the keys are unique values of the grouped
  * field and the values are arrays of objects that contain the grouped key
  *
- * @param object $rs A recordset as returned by get_recordset() or similar functions
- * @param string $field Name of the field to group by. Must be a field in $rs
+ * @param object $rs        A recordset as returned by get_recordset() or similar functions
+ * @param string $field     Name of the field to group by. Must be a field in $rs
+ * @param string $property   Name of the field to fill the array with. Must be a field in $rs or null for entire record.
  *
  * @return array|false Associative array of results or false if none found or $field invalid
  */
-function totara_group_records($rs, $field) {
+function totara_group_records($rs, $field, $property = null) {
     if (!$rs) {
         return false;
     }
     $out = array();
     foreach ($rs as $row) {
-        // $field must exist in recordset
-        if (!isset($row->$field)) {
+        // Variable $field (and optionally $property) must exist in recordset.
+        if (!isset($row->$field) || (isset($property) && !isset($row->$property))) {
             return false;
         }
+
         if (array_key_exists($row->$field, $out)) {
-            $out[$row->$field][] = $row;
+            $out[$row->$field][] = isset($property) ? $row->$property : $row;
         } else {
-            $out[$row->$field] = array($row);
+            $out[$row->$field] = isset($property) ? array($row->$property) : array($row);
         }
     }
     return $out;

@@ -87,7 +87,7 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
 
     // Construct sql query.
     $count = 'SELECT COUNT(*) ';
-    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate ';
+    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
     list($insql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED),
             SQL_PARAMS_QM, 'param', false);
     $from = "FROM {prog} p
@@ -160,7 +160,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
 
     // Construct sql query
     $count = 'SELECT COUNT(*) ';
-    $select = 'SELECT p.id, p.fullname, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.status, cfc.timeexpires ';
+    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.status, cfc.timeexpires ';
     $from = "FROM {prog} p
             INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel =:contextlevel)
             INNER JOIN {prog_completion} pc ON p.id = pc.programid
@@ -262,14 +262,13 @@ function prog_display_required_programs($userid) {
     }
     $rowcount = 0;
     foreach ($programs as $p) {
-        $program = new program($p->id);
-        if (!$program->is_accessible()) {
+        if (!prog_is_accessible($p)) {
             continue;
         }
         $row = array();
-        $row[] = $program->display_summary_widget($userid);
-        $row[] = $program->display_duedate($p->duedate, $userid);
-        $row[] = $program->display_progress($userid);
+        $row[] = prog_display_summary_widget($p, $userid);
+        $row[] = prog_display_duedate($p->duedate, $p->id, $userid);
+        $row[] = prog_display_progress($p->id, $userid);
         $table->add_data($row);
         $rowcount++;
     }
@@ -340,18 +339,17 @@ function prog_display_certification_programs($userid) {
 
     $rowcount = 0;
     foreach ($cprograms as $cp) {
-        $program = new program($cp->id);
-        if (!$program->is_accessible()) {
+        if (!prog_is_accessible($cp)) {
             continue;
         }
         $row = array();
-        $row[] = $program->display_summary_widget($userid);
+        $row[] = prog_display_summary_widget($cp, $userid);
         if (!empty($cp->timeexpires)) {
-            $row[] = $program->display_duedate($cp->timeexpires, $userid, $cp->certifpath, $cp->status);
+            $row[] = prog_display_duedate($cp->timeexpires, $cp->id, $userid, $cp->certifpath, $cp->status);
         } else {
-            $row[] = $program->display_duedate($cp->duedate, $userid, $cp->certifpath, $cp->status);
+            $row[] = prog_display_duedate($cp->duedate, $cp->id, $userid, $cp->certifpath, $cp->status);
         }
-        $row[] = $program->display_progress($userid);
+        $row[] = prog_display_progress($cp->id, $userid, $cp->certifpath);
         $table->add_data($row);
         $rowcount++;
     }
@@ -831,7 +829,7 @@ function prog_can_enter_course($user, $course) {
 
     // Get programs containing this course that this user is assigned to, either via learning plans or required learning
     $get_programs = "
-        SELECT p.id, p.fullname, p.available
+        SELECT p.*
           FROM {prog} p
           WHERE p.available = ?
           AND (
@@ -868,7 +866,7 @@ function prog_can_enter_course($user, $course) {
         $program_plugin = enrol_get_plugin('totara_program');
         foreach ($program_records as $program_record) {
             $program = new program($program_record->id);
-            if ($program->is_accessible() && $program->can_enter_course($user->id, $course->id)) {
+            if (prog_is_accessible($program_record) && $program->can_enter_course($user->id, $course->id)) {
                 //check if program enrolment plugin is enabled on this course
                 //should be added when coursesets are created but just in case we'll double-check
                 $instance = $program_plugin->get_instance_for_course($course->id);
@@ -1085,8 +1083,7 @@ function prog_get_tab_link($userid) {
                 $program = prog_get_certification_programs($userid, '', '', '', false, true, true);
             }
             $program = reset($program); // resets array pointer and returns value of first element
-            $prog = new program($program->id);
-            if (!$prog->is_accessible()) {
+            if (!prog_is_accessible($program)) {
                 return false;
             }
             return $CFG->wwwroot . '/totara/program/required.php?id=' . $program->id;
@@ -1277,7 +1274,7 @@ function prog_update_completion($userid, program $program = null) {
         }
 
         // First check if the program is already marked as complete for this user and do nothing if it is.
-        if ($program->is_program_complete($userid)) {
+        if (prog_is_complete($program->id, $userid)) {
             continue;
         }
 
@@ -1824,26 +1821,6 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
 }
 
 /**
- * Checks the programs availability based off the available from/untill dates.
- *
- * @param int $availablefrom    - A time stamp of the time a program becomes available
- * @param int $availableuntil   - A time stamp of the time a program becomes unavailable
- * @return int                  - Either AVAILABILITY_NOT_TO_STUDENTS or AVAILABILITY_TO_STUDENTS
- */
-function prog_check_availability($availablefrom, $availableuntil) {
-    $now = time();
-
-    if (!empty($availablefrom) && $availablefrom > $now) {
-        return AVAILABILITY_NOT_TO_STUDENTS;
-    }
-    if (!empty($availableuntil) && $availableuntil < $now) {
-        return AVAILABILITY_NOT_TO_STUDENTS;
-    }
-
-    return AVAILABILITY_TO_STUDENTS;
-}
-
-/**
  * Prints an error if Program is not enabled
  *
  */
@@ -1861,6 +1838,322 @@ function check_certification_enabled() {
     if (totara_feature_disabled('certifications')) {
         print_error('certificationsdisabled', 'totara_certification');
     }
+}
+
+/*
+ * Checks the programs availability based off the available from/untill dates.
+ *
+ * @param int $availablefrom    - A time stamp of the time a program becomes available
+ * @param int $availableuntil   - A time stamp of the time a program becomes unavailable
+ * @return int                  - Either AVAILABILITY_NOT_TO_STUDENTS or AVAILABILITY_TO_STUDENTS
+ */
+function prog_check_availability($availablefrom, $availableuntil, $timezone = null) {
+
+    if (isset($timezone)) {
+        $now = usertime(time(), $timezone);
+    } else {
+        $now = time();
+    }
+
+    if (!empty($availablefrom) && $availablefrom > $now) {
+        return AVAILABILITY_NOT_TO_STUDENTS;
+    }
+    if (!empty($availableuntil) && $availableuntil < $now) {
+        return AVAILABILITY_NOT_TO_STUDENTS;
+    }
+
+    return AVAILABILITY_TO_STUDENTS;
+}
+
+/**
+ * Checks if a given program is required for a given user
+ *
+ * @param int $progid - The id of a program
+ * @param int $userid - The id of a user
+ * @return boolean
+ */
+function prog_required_for_user($progid, $userid) {
+    global $DB;
+
+    $countsql = "SELECT COUNT(*)
+                   FROM {prog_user_assignment}
+                  WHERE exceptionstatus <> :ex1
+                    AND exceptionstatus <> :ex2
+                    AND programid = :pid
+                    AND userid = :uid";
+    $countparams = array('ex1' => PROGRAM_EXCEPTION_RAISED, 'ex2' => PROGRAM_EXCEPTION_DISMISSED,
+                         'pid' => $progid, 'uid' => $userid);
+
+    if ($DB->count_records_sql($countsql, $countparams) > 0) {
+        $params = array('programid' => $progid, 'userid' => $userid, 'coursesetid' => 0);
+        $completion = $DB->get_field('prog_completion', 'status', $params);
+        if ($completion == STATUS_PROGRAM_COMPLETE) {
+            // Not required if the program is complete.
+            return false;
+        }
+
+        // Required if the program is assigned but not complete.
+        return true;
+    }
+
+    // Not required if there are no active assignments.
+    return false;
+}
+
+/**
+ * Generates the HTML to display a program icon that links to a page to view the program
+ *
+ * @param int $progid               The id of a program
+ * @param int $userid   optional    The id of a user, defaults to $USER if not set
+ * @return html
+ */
+function prog_display_link_icon($progid, $userid = null) {
+    global $OUTPUT, $USER, $DB;
+
+    $prog = $DB->get_record('prog', array('id' => $progid));
+    $user = isset($userid) ? $DB->get_record('user', array('id' => $userid)) : $USER;
+
+    $accessibility = prog_check_availability($prog->availablefrom, $prog->availableuntil, $user->timezone);
+    $accessible = $accessibility == AVAILABILITY_TO_STUDENTS;
+    $required = prog_required_for_user($prog->id, $user->id);
+
+    $progicon = totara_get_icon($prog->id, TOTARA_ICON_TYPE_PROGRAM);
+    $icon = html_writer::empty_tag('img', array('src' => $progicon, 'class' => 'course_icon', 'alt' => ''));
+
+    if ($required && $accessible) {
+        $url = new moodle_url('/totara/program/required.php', array('id' => $prog->id, 'userid' => $user->id));
+        $html = $OUTPUT->action_link($url, $icon . $prog->fullname);
+    } else if ($accessible) {
+        $url = new moodle_url('/totara/program/view.php', array('id' => $prog->id));
+        $html = $OUTPUT->action_link($url, $icon . $prog->fullname);
+    } else {
+        $html = $icon . $prog->fullname;
+    }
+
+    return $html;
+}
+
+/**
+ * Display widget containing a program summary
+ *
+ * @param stdClass  $program    A program database record.
+ * @param int       $userid     The userid of the record of learning.
+ * @return string $out
+ */
+function prog_display_summary_widget($program, $userid = null) {
+    global $USER;
+
+    $params = array();
+    if (($userid != null) && ($userid != $USER->id)) {
+        $params['userid'] = $userid;
+    }
+
+    $params['id'] = $program->id;
+    $url = new moodle_url("/totara/program/required.php", $params);
+    $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php',
+            context_program::instance($program->id)->id, 'totara_program', 'summary', 0);
+
+    $out = '';
+    $out .= html_writer::start_tag('div', array('class' => 'cell'));
+    $out .= html_writer::link($url, $program->fullname);
+    $out .= html_writer::end_tag('div');
+    $out .= html_writer::start_tag('div', array('class' => 'dp-summary-widget-description'));
+    $out .= $summary . html_writer::end_tag('div');
+
+    return $out;
+}
+
+/**
+ * Display the due date for a program
+ *
+ * @param int $duedate
+ * @param int $progid
+ * @param int $userid
+ * @param int $certifpath   Optional param telling us the path of the certification
+ * @param int $certstatus   Optional param telling us the status of the certification
+ * @param int $compstatus Whether the user has completed the program.
+ * @return string
+ */
+function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $certstatus = null, $compstatus = null) {
+    global $CFG, $PAGE;
+
+    $renderer = $PAGE->get_renderer('totara_program');
+
+    if (empty($duedate) || $duedate == COMPLETION_TIME_NOT_SET) {
+        if ($certifpath == null && $certstatus == null) {
+            // This is a program, display no due date set.
+            return get_string('duedatenotset', 'totara_program');
+        } else if ($certifpath == CERTIFPATH_CERT) {
+            if ($certstatus == CERTIFSTATUS_EXPIRED) {
+                // This certification has expired.
+                return $renderer->error_text(get_string('overdue', 'totara_program'));
+            } else {
+                // This is the first run through of the certification and no due date was set.
+                return get_string('duedatenotset', 'totara_program');
+            }
+        }
+    }
+
+    $out = '';
+    if (!empty($duedate)) {
+        $out .= userdate($duedate, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
+    }
+
+    $completed = isset($completion) ? $completion == STATUS_PROGRAM_COMPLETE : prog_is_complete($progid, $userid);
+    if (!$completed) {
+        $out .= $renderer->display_duedate_highlight_info($duedate);
+    }
+
+    return $out;
+}
+
+
+/**
+ * Determines and displays the progress of this program for a specified user.
+ *
+ * Progress is determined by course set completion statuses.
+ *
+ * @access  public
+ * @param int $programid
+ * @param int $userid
+ * @param int $certifpath (defaults to cert for programs)
+ * @return  string
+ */
+function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CERT) {
+    global $DB, $PAGE;
+
+    $prog_completion = $DB->get_record('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
+
+    if (!$prog_completion) {
+        $out = get_string('notassigned', 'totara_program');
+        return $out;
+    } else if ($prog_completion->status == STATUS_PROGRAM_COMPLETE) {
+        $overall_progress = 100;
+    } else {
+        $content = new prog_content($programid);
+        $csgroups = $content->get_courseset_groups($certifpath);
+        $csgroup_count = count($csgroups);
+        $csgroup_complete_count = 0;
+
+        foreach ($csgroups as $csgroup) {
+            foreach ($csgroup as $courseset) {
+                if ($courseset->is_courseset_complete($userid)) {
+                    $csgroup_complete_count++;
+                    continue(2);
+                }
+            }
+        }
+
+        $overall_progress = 0;
+        if ($csgroup_count > 0) {
+            $overall_progress = (float)($csgroup_complete_count / $csgroup_count) * 100;
+        }
+    }
+
+    $tooltipstr = 'DEFAULTTOOLTIP';
+
+    // Get relevant progress bar and return for display.
+    $renderer = $PAGE->get_renderer('totara_core');
+    return $renderer->print_totara_progressbar($overall_progress, 'medium', false, $tooltipstr);
+}
+
+/**
+ * Checks accessiblity of the program for user if the user parameter is
+ * passed to the function otherwise checks if the program is generally
+ * accessible.
+ *
+ * @param stdClass  $program    A program database record
+ * @param object    $user       If this parameter is included check availibilty to this user
+ * @return boolean
+ */
+function prog_is_accessible($program, $user = null) {
+    global $CFG;
+    require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
+    // If a user is set check if they area a site admin, if so, let them have access.
+    if (!empty($user->id)) {
+        if (is_siteadmin($user->id)) {
+            return true;
+        }
+    }
+
+    // Check if this program is not available, if it's not then deny access.
+    if ($program->available == AVAILABILITY_NOT_TO_STUDENTS) {
+        return false;
+    }
+
+    // Check if this program has from and until dates set, if so, enforce them.
+    if (!empty($program->availablefrom) || !empty($program->availableuntil)) {
+
+        if (isset($user->timezone)) {
+            $now = usertime(time(), $user->timezone);
+        } else {
+            $now = usertime(time());
+        }
+
+        // Check if the program isn't accessible yet.
+        if (!empty($program->availablefrom) && $program->availablefrom > $now) {
+            return false;
+        }
+
+        // Check if the program isn't accessible anymore.
+        if (!empty($program->availableuntil) && $program->availableuntil < $now) {
+            return false;
+        }
+    }
+
+    // Check audience visibility.
+    if ($program->certifid) {
+        $capability = 'totara/certification:viewhiddencertifications';
+    } else {
+        $capability = 'totara/program:viewhiddenprograms';
+    }
+
+    $syscontext = context_system::instance();
+    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $syscontext) || has_capability($capability, $syscontext);
+    if (!empty($CFG->audiencevisibility) && !$canmanagevisibility && $program->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Return true or false depending on whether or not the specified user has
+ * completed a specified program
+ *
+ * @param int $progid   The id of a program
+ * @param int $userid   The id of a user
+ * @return bool
+ */
+function prog_is_complete($progid, $userid) {
+    global $DB;
+
+    if ($prog_completion_status = $DB->get_record('prog_completion', array('programid' => $progid, 'userid' => $userid, 'coursesetid' => 0))) {
+        if ($prog_completion_status->status == STATUS_PROGRAM_COMPLETE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Return true if the specified user has started but not completed the specified program,
+ * otherwise return false.
+ *
+ * @param int $progid   The id of a program
+ * @param int $userid   The id of a user
+ * @return bool
+ */
+function prog_is_inprogress($progid, $userid) {
+    global $DB;
+
+    if ($prog_completion_status = $DB->get_record('prog_completion', array('programid' => $progid, 'userid' => $userid, 'coursesetid' => 0))) {
+        if ($prog_completion_status->status == STATUS_PROGRAM_INCOMPLETE && $prog_completion_status->timestarted > 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
