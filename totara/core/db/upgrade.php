@@ -1136,15 +1136,15 @@ function xmldb_totara_core_upgrade($oldversion) {
 
     // This is Totara 2.7 upgrade line.
 
-    if ($oldversion < 2014091100) {
+    if ($oldversion < 2014100700) {
         global $CFG;
         if (get_config('moodle', 'tempmanagerrestrictselection') !== false) {
             set_config('tempmanagerrestrictselection', (int) $CFG->tempmanagerrestrictselection);
         }
-        totara_upgrade_mod_savepoint(true, 2014091100, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014100700, 'totara_core');
     }
 
-    if ($oldversion < 2014091101) {
+    if ($oldversion < 2014100701) {
         // Define field categoryid to be dropped from course_info_field.
         $table = new xmldb_table('course_info_field');
         $field = new xmldb_field('categoryid');
@@ -1155,7 +1155,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         }
 
         // Core savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2014091101, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2014100701, 'totara_core');
     }
 
     if ($oldversion < 2014100800) {
