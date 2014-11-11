@@ -47,12 +47,6 @@ abstract class grade_object {
     public $required_fields = array('id', 'timecreated', 'timemodified', 'hidden');
 
     /**
-     * Array of text table fields.
-     * @var array $text_fields
-     */
-    public $text_fields = array();
-
-    /**
      * Array of optional fields with default values - usually long text information that is not always needed.
      * If you want to create an instance without optional fields use: new grade_object($only_required_fields, false);
      * @var array $optional_fields
@@ -183,7 +177,8 @@ abstract class grade_object {
      * @return array|bool Array of object instances or false if not found
      */
     public static function fetch_all_helper($table, $classname, $params) {
-        global $DB;
+        global $DB; // Need to introspect DB here.
+
         $instance = new $classname();
 
         $classvars = (array)$instance;
@@ -192,17 +187,25 @@ abstract class grade_object {
         $wheresql = array();
         $newparams = array();
 
+        $columns = $DB->get_columns($table); // Cached, no worries.
+
         foreach ($params as $var=>$value) {
             if (!in_array($var, $instance->required_fields) and !array_key_exists($var, $instance->optional_fields)) {
                 continue;
             }
+            if (!array_key_exists($var, $columns)) {
+                continue;
+            }
             if (is_null($value)) {
                 $wheresql[] = " $var IS NULL ";
-            } else if (in_array($var, $instance->text_fields)) {
-                $wheresql[] = " ".$DB->sql_order_by_text($var, 255)." = ? ";
-                $newparams[] = $value;
             } else {
-                $wheresql[] = " $var = ? ";
+                if ($columns[$var]->meta_type === 'X') {
+                    // We have a text/clob column, use the cross-db method for its comparison.
+                    $wheresql[] = ' ' . $DB->sql_compare_text($var, 255) . ' = ' . $DB->sql_compare_text('?', 255) . ' ';
+                } else {
+                    // Other columns (varchar, integers...).
+                    $wheresql[] = " $var = ? ";
+                }
                 $newparams[] = $value;
             }
         }

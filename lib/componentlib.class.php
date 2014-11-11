@@ -676,6 +676,7 @@ class lang_installer {
      * @return string URL
      */
     public function lang_pack_url($langcode = '') {
+
         if (empty($langcode)) {
             return DOWNLOAD_BASE . '/'.$this->version.'/';
         } else {
@@ -783,6 +784,7 @@ class lang_installer {
         // initialise new component installer to process this language
         $installer = new component_installer(DOWNLOAD_BASE, '/' . $this->version,
             $langcode . '.zip', 'languages.md5', 'lang');
+
         if (!$installer->requisitesok) {
             echo $OUTPUT->notification(get_string($installer->get_error(), 'error'), 'notifyproblem');
             return self::RESULT_DOWNLOADERROR;

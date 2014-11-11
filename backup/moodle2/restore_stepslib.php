@@ -487,6 +487,8 @@ class restore_rebuild_course_cache extends restore_execution_step {
 
         // Rebuild cache now that all sections are in place
         rebuild_course_cache($this->get_courseid());
+        cache_helper::purge_by_event('changesincourse');
+        cache_helper::purge_by_event('changesincoursecat');
     }
 }
 
@@ -562,6 +564,9 @@ class restore_update_availability extends restore_execution_step {
         rebuild_course_cache($this->get_courseid(), true);
         $modinfo = get_fast_modinfo($this->get_courseid());
 
+        // Get the date offset for this restore.
+        $dateoffset = $this->apply_date_offset(1) - 1;
+
         // Update all sections that were restored.
         $params = array('backupid' => $this->get_restoreid(), 'itemname' => 'course_section');
         $rs = $DB->get_recordset('backup_ids_temp', $params, '', 'newitemid');
@@ -584,7 +589,7 @@ class restore_update_availability extends restore_execution_step {
             if (!is_null($section->availability)) {
                 $info = new \core_availability\info_section($section);
                 $info->update_after_restore($this->get_restoreid(),
-                        $this->get_courseid(), $this->get_logger());
+                        $this->get_courseid(), $this->get_logger(), $dateoffset);
             }
         }
         $rs->close();
@@ -604,7 +609,7 @@ class restore_update_availability extends restore_execution_step {
             if (!is_null($cm->availability)) {
                 $info = new \core_availability\info_module($cm);
                 $info->update_after_restore($this->get_restoreid(),
-                        $this->get_courseid(), $this->get_logger());
+                        $this->get_courseid(), $this->get_logger(), $dateoffset);
             }
         }
         $rs->close();
@@ -888,6 +893,8 @@ class restore_groups_structure_step extends restore_structure_step {
         }
         // Save the id mapping
         $this->set_mapping('group', $oldid, $newitemid, $restorefiles);
+        // Invalidate the course group data cache just in case.
+        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($data->courseid));
     }
 
     public function process_grouping($data) {
@@ -931,6 +938,8 @@ class restore_groups_structure_step extends restore_structure_step {
         }
         // Save the id mapping
         $this->set_mapping('grouping', $oldid, $newitemid, $restorefiles);
+        // Invalidate the course group data cache just in case.
+        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($data->courseid));
     }
 
     public function process_grouping_group($data) {
@@ -948,6 +957,8 @@ class restore_groups_structure_step extends restore_structure_step {
         $this->add_related_files('group', 'description', 'group');
         // Add grouping related files, matching with "grouping" mappings
         $this->add_related_files('grouping', 'description', 'grouping');
+        // Invalidate the course group data.
+        cache_helper::invalidate_by_definition('core', 'groupdata', array(), array($this->get_courseid()));
     }
 
 }
@@ -1598,6 +1609,7 @@ class restore_course_structure_step extends restore_structure_step {
 
         // Add course related files, without itemid to match
         $this->add_related_files('course', 'summary', null);
+        $this->add_related_files('course', 'overviewfiles', null);
 
         // Deal with legacy allowed modules.
         if ($this->legacyrestrictmodules) {
@@ -2002,6 +2014,14 @@ class restore_filters_structure_step extends restore_structure_step {
 
         $data = (object)$data;
 
+        if (strpos($data->filter, 'filter/') === 0) {
+            $data->filter = substr($data->filter, 7);
+
+        } else if (strpos($data->filter, '/') !== false) {
+            // Unsupported old filter.
+            return;
+        }
+
         if (!filter_is_enabled($data->filter)) { // Not installed or not enabled, nothing to do
             return;
         }
@@ -2011,6 +2031,14 @@ class restore_filters_structure_step extends restore_structure_step {
     public function process_config($data) {
 
         $data = (object)$data;
+
+        if (strpos($data->filter, 'filter/') === 0) {
+            $data->filter = substr($data->filter, 7);
+
+        } else if (strpos($data->filter, '/') !== false) {
+            // Unsupported old filter.
+            return;
+        }
 
         if (!filter_is_enabled($data->filter)) { // Not installed or not enabled, nothing to do
             return;
@@ -2121,18 +2149,18 @@ class restore_badges_structure_step extends restore_structure_step {
     }
 
     public function process_badge($data) {
-        global $DB, $CFG, $USER;
+        global $DB, $CFG;
 
         require_once($CFG->libdir . '/badgeslib.php');
 
         $data = (object)$data;
         $data->usercreated = $this->get_mappingid('user', $data->usercreated);
         if (empty($data->usercreated)) {
-            $data->usercreated = $USER->id;
+            $data->usercreated = $this->task->get_userid();
         }
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         if (empty($data->usermodified)) {
-            $data->usermodified = $USER->id;
+            $data->usermodified = $this->task->get_userid();
         }
 
         // We'll restore the badge image.
@@ -2230,6 +2258,12 @@ class restore_badges_structure_step extends restore_structure_step {
                 'issuerrole'  => $role,
                 'datemet'     => $this->apply_date_offset($data->datemet)
             );
+
+            // Skip the manual award if recipient or issuer can not be mapped to.
+            if (empty($award['recipientid']) || empty($award['issuerid'])) {
+                return;
+            }
+
             $DB->insert_record('badge_manual_award', $award);
         }
     }

@@ -157,11 +157,35 @@ function xmldb_forum_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014051201, 'forum');
     }
 
+    if ($oldversion < 2014051203) {
+        // Find records with multiple userid/postid combinations and find the lowest ID.
+        // Later we will remove all those which don't match this ID.
+        $sql = "
+            SELECT MIN(id) as lowid, userid, postid
+            FROM {forum_read}
+            GROUP BY userid, postid
+            HAVING COUNT(id) > 1";
+
+        if ($duplicatedrows = $DB->get_recordset_sql($sql)) {
+            foreach ($duplicatedrows as $row) {
+                $DB->delete_records_select('forum_read', 'userid = ? AND postid = ? AND id <> ?', array(
+                    $row->userid,
+                    $row->postid,
+                    $row->lowid,
+                ));
+            }
+        }
+        $duplicatedrows->close();
+
+        // Forum savepoint reached.
+        upgrade_mod_savepoint(true, 2014051203, 'forum');
+    }
+
 
     // Totara upgrade line - all Totara hacks must be done after all other Moodle upgrades!
     // NOTE: use .01 version bumps because upstream does not use them (no risk of collision).
 
-    if ($oldversion < 2014051202.01) {
+    if ($oldversion < 2014051203.01) {
 
         $table = new xmldb_table('forum_discussions');
         $field = new xmldb_field('archived', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timeend');
@@ -175,7 +199,7 @@ function xmldb_forum_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2014051202.01, 'forum');
+        upgrade_mod_savepoint(true, 2014051203.01, 'forum');
     }
 
     return true;
