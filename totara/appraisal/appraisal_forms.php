@@ -439,6 +439,8 @@ class appraisal_quest_edit_form extends question_base_form {
                     $this->add_clone_roles();
                 }
                 $this->add_role_matrix();
+            } else if ($element->inherits_permissions()) {
+                $this->add_role_inherits_matrix();
             } else {
                 $this->add_role_viewers();
             }
@@ -496,6 +498,51 @@ class appraisal_quest_edit_form extends question_base_form {
     }
 
     /**
+     * Add role inherits redisplay matrix to question field definition form
+     */
+    protected function add_role_inherits_matrix() {
+        global $OUTPUT;
+
+        $mform = & $this->_form;
+        $headcolumns = html_writer::tag('th', get_string('role', 'totara_appraisal'), array('class' => 'header')) .
+            html_writer::tag('th', get_string('redisplay', 'totara_appraisal') .
+                $OUTPUT->help_icon('redisplay', 'totara_appraisal', null), array('class' => 'header')) .
+            html_writer::tag('th', get_string('overrideviewother', 'totara_appraisal') .
+                $OUTPUT->help_icon('overrideviewother', 'totara_appraisal', null), array('class' => 'header'));
+        $header = html_writer::tag('thead', html_writer::tag('tr', $headcolumns));
+        $mform->addElement('html', html_writer::start_tag('table', array('class' => 'role_matrix')) . $header .
+            html_writer::start_tag('tbody'));
+
+        $permission_cananswer = appraisal::ACCESS_CANANSWER; // Used to determine if the question should be redisplayed for role.
+        $permission_viewother = appraisal::ACCESS_CANVIEWOTHER; // If set, overrides base question.
+
+        $roles = appraisal::get_roles();
+        $odd = false;
+        foreach ($roles as $roleid => $name) {
+            $odd = !$odd;
+            $rowclass = ($odd) ? 'r0' : 'r1';
+            $strrolename = html_writer::start_tag('tr', array('class' => $rowclass)) .
+                html_writer::tag('td', get_string($name, 'totara_appraisal')) .
+                html_writer::start_tag('td', array('class' => 'cell'));
+            $strnextcell = html_writer::end_tag('td') . html_writer::start_tag('td', array('class' => 'cell'));
+            $strclosingrow = html_writer::end_tag('td') . html_writer::end_tag('tr');
+            $mform->addElement('html', $strrolename);
+            $mform->addElement('advcheckbox', "roles[{$roleid}][{$permission_cananswer}]", '', '');
+            $mform->addElement('html', $strnextcell);
+            $mform->addElement('advcheckbox', "roles[{$roleid}][$permission_viewother]", '', '');
+            $mform->disabledIf("roles[{$roleid}][{$permission_viewother}]", "roles[{$roleid}][$permission_cananswer]");
+            $mform->addElement('html', $strclosingrow);
+        }
+        $mform->addElement('html', html_writer::start_tag('tr') .
+            html_writer::start_tag('td', array('class' => 'cell', 'colspan' => '4')));
+        $mform->addElement('static', 'roleserr', '');
+        $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+
+        $mform->addElement('html', html_writer::end_tag('tbody') . html_writer::end_tag('table'));
+        $mform->addElement('html', get_string('roleaccessnotice', 'totara_appraisal'));
+    }
+
+    /**
      * Add role viewers list to question field definition form (who can see this element, equivalent to viewother)
      */
     protected function add_role_viewers() {
@@ -541,6 +588,10 @@ class appraisal_quest_edit_form extends question_base_form {
             if ($element->is_answerable()) {
                 $accesskey = appraisal::ACCESS_CANANSWER;
                 $strerr = get_string('error:writerequired', 'totara_appraisal');
+            }
+            if ($element->inherits_permissions()) {
+                $accesskey = appraisal::ACCESS_CANANSWER;
+                $strerr = get_string('error:redisplayrequired', 'totara_appraisal');
             }
             if (!isset($data['cloneprevroles']) || !$data['cloneprevroles']) {
                 if (!$data['roles'][appraisal::ROLE_LEARNER][$accesskey] &&

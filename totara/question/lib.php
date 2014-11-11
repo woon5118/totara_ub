@@ -841,6 +841,16 @@ abstract class question_base {
 
 
     /**
+     * If this element inherits permissions from another question.
+     *
+     * @return bool
+     */
+    public function inherits_permissions() {
+        return false;
+    }
+
+
+    /**
      * Allows the question to perform any actions that are required when it is about to go into active use.
      */
     public function activate() {

@@ -149,7 +149,7 @@ class question_redisplay extends question_base{
      * @return bool
      */
     public function requires_permissions() {
-        return false;
+        return true;
     }
 
 
@@ -198,7 +198,11 @@ class question_redisplay extends question_base{
     }
 
     public function is_answerable() {
-        print_error('error:invalidfunctioncalledinredisplay', 'totara_question');
+        return false;
+    }
+
+    public function inherits_permissions() {
+        return true;
     }
 
 }
