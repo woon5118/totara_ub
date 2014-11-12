@@ -1111,6 +1111,7 @@ $string['subject'] = 'Change in booking in the course {$a->coursename} ({$a->due
 $string['submissions'] = 'Submissions';
 $string['submitted'] = 'Submitted';
 $string['submit'] = 'Submit';
+$string['suppressccmanager'] = 'Suppress notifications to manager about added and removed attendees';
 $string['suppressemail'] = 'Suppress email notification';
 $string['suppressemailforattendees'] = 'Suppress the confirmation and calendar invite emails for newly added attendees and the cancellation emails for removed attendees';
 $string['status'] = 'Status';

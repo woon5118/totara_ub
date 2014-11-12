@@ -89,9 +89,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 url += '&clear=true';
             } // end if - attendee field does not exist
 
-            // Grab suppressemail value
-            if ($('input#suppressemail:checked', handler._container).length) {
+            // Grab suppressemail value.
+            if ($('#suppressemail:checked', handler._container).length) {
                 url += '&suppressemail=1';
+            }
+
+            // Grab suppressccmanager value.
+            if ($('#suppressccmanager:checked', handler._container).length) {
+                url += '&suppressccmanager=1';
             }
 
             this._dialog._request(
@@ -216,7 +221,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('addremoveattendees', 'facetoface') + '</h2>',
-                    height: 600
+                    height: 705
                 },
                 M.cfg.wwwroot + '/mod/facetoface/editattendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&clear=1',
                 handler

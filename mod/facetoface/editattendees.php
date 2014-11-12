@@ -43,6 +43,7 @@ $attendees      = optional_param('attendees', '', PARAM_SEQUENCE);
 $removedusers   = optional_param('removedusers', '', PARAM_SEQUENCE); // Cancellations and removed users list
 $save           = optional_param('save', false, PARAM_BOOL);
 $interested     = optional_param('interested', false, PARAM_BOOL); // Declare interest.
+$suppressccmanager  = optional_param('suppressccmanager', false, PARAM_BOOL); // Send copy manager notifications.
 
 if (!$session = facetoface_get_session($s)) {
     print_error('error:incorrectcoursemodulesession', 'facetoface');
@@ -158,8 +159,8 @@ if ($save && $onlycontent) {
         $params['suppressemail'] = $suppressemail;
         // Do not need the approval, change the status
         $params['approvalreqd'] = 0;
-        // If it is a list of user, do not need to notify manager
-        $params['ccmanager'] = 0;
+        // Set value for manager copy notification.
+        $params['ccmanager'] = !$suppressccmanager;
         foreach ($attendeestoadd as $attendee) {
             $result = facetoface_user_import($course, $facetoface, $session, $attendee->id, $params);
             if ($result['result'] !== true) {
@@ -184,6 +185,7 @@ if ($save && $onlycontent) {
                 // Notify the user of the cancellation if the session hasn't started yet
                 $timenow = time();
                 if (!$suppressemail and !facetoface_has_session_started($session, $timenow)) {
+                    $facetoface->ccmanager = !$suppressccmanager;
                     facetoface_send_cancellation_notice($facetoface, $session, $attendee->id);
                 }
                 $result['result'] = get_string('removedsuccessfully', 'facetoface');
