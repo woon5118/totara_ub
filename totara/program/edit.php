@@ -148,12 +148,15 @@ $program = file_prepare_standard_editor($program, 'summary', $editoroptions, $ed
 $program = file_prepare_standard_editor($program, 'endnote', $editoroptions, $editoroptions['context'],
     'totara_program', 'endnote', 0);
 
+$programinlist = new program_in_list($DB->get_record('prog', array('id' => $program->id)));
+$overviewfiles = $programinlist->get_program_overviewfiles();
+
 $overviewfilesoptions = prog_program_overviewfiles_options($program);
 if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($program, 'overviewfiles', $overviewfilesoptions, $programcontext, 'totara_program', 'overviewfiles', 0);
 }
 $detailsform = new program_edit_form($currenturl,
-                array('program' => $program, 'action' => $action, 'category' => $progcategory,
+                array('program' => $program, 'overviewfiles' => $overviewfiles, 'action' => $action, 'category' => $progcategory,
                         'editoroptions' => $TEXTAREA_OPTIONS, 'nojs' => $nojs, 'iscertif' =>  $iscertif),
                         'post', '', array('name'=>'form_prog_details'));
 
@@ -277,6 +280,11 @@ require('tabs.php');
 
 $detailsform->set_data($program);
 $detailsform->display();
+
+if ($action == 'view' && $program && has_capability('totara/program:configuredetails', $program->get_context())) {
+    $editbuttonform = new program_edit_details_button_form($editurl, array('program' => $program), 'get');
+    $editbuttonform->display();
+}
 
 // Display content, assignments and messages if in view mode.
 if ($action == 'view') {

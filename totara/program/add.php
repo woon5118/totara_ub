@@ -139,8 +139,6 @@ $overviewfilesoptions = prog_program_overviewfiles_options($item);
 if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($item, 'overviewfiles', $overviewfilesoptions, $systemcontext, 'totara_program', 'overviewfiles', 0);
 }
-$form = new program_edit_form($currenturl, array('action' => 'add', 'category' => $category, 'editoroptions' => $TEXTAREA_OPTIONS));
-
 $form = new program_edit_form($currenturl, array('action' => 'add', 'category' => $category,
                 'editoroptions' => $TEXTAREA_OPTIONS, 'iscertif' =>  $iscertif));
 

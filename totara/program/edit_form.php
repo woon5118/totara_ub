@@ -33,13 +33,14 @@ if (!defined('MOODLE_INTERNAL')) {
 class program_edit_form extends moodleform {
 
     function definition() {
-        global $CFG, $USER, $OUTPUT, $COHORT_VISIBILITY;
+        global $CFG, $OUTPUT, $COHORT_VISIBILITY;
 
         $mform =& $this->_form;
         $action = $this->_customdata['action'];
         $category = $this->_customdata['category'];
         $editoroptions = $this->_customdata['editoroptions'];
         $program = (isset($this->_customdata['program'])) ? $this->_customdata['program'] : false;
+        $overviewfiles = (isset($this->_customdata['overviewfiles'])) ? $this->_customdata['overviewfiles'] : false;
         $nojs = (isset($this->_customdata['nojs'])) ? $this->_customdata['nojs'] : 0 ;
         $iscertif = (isset($this->_customdata['iscertif'])) ? $this->_customdata['iscertif'] : 0;
 
@@ -158,30 +159,64 @@ class program_edit_form extends moodleform {
             $mform->hardFreeze('availableuntil');
         } else {
             $mform->addHelpButton('availableuntil', 'programavailability', 'totara_program');
-
         }
 
-        $mform->addElement('editor', 'summary_editor', get_string('description', 'totara_program'), null, $editoroptions);
         if ($action == 'view') {
-            $mform->hardFreeze('summary_editor');
+            if ($program) {
+                $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php',
+                    $programcontext->id, 'totara_program', 'summary', 0);
+                if (!empty($summary)) {
+                    $mform->addElement('static', null, get_string('description', 'totara_program'), $summary);
+                }
+            }
         } else {
+            $mform->addElement('editor', 'summary_editor', get_string('description', 'totara_program'), null, $editoroptions);
             $mform->addHelpButton('summary_editor', 'summary', 'totara_program');
             $mform->setType('summary_editor', PARAM_RAW);
         }
 
         if ($overviewfilesoptions = prog_program_overviewfiles_options($program)) {
-            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('programoverviewfiles', 'totara_program'), null, $overviewfilesoptions);
             if ($action == 'view') {
-                $mform->hardFreeze('overviewfiles_filemanager');
+                if (!empty($overviewfiles)) {
+                    $contentfiles = '';
+                    foreach ($overviewfiles as $file) {
+                        $isimage = $file->is_valid_image();
+                        $url = moodle_url::make_pluginfile_url($file->get_contextid(), 'totara_program',
+                            $file->get_filearea(), 0, $file->get_filepath(), $file->get_filename(), !$isimage);
+                        if ($isimage) {
+                            $contentfiles = html_writer::tag('div',
+                                html_writer::empty_tag('img', array('src' => $url)),
+                                array('class' => 'courseimage'));
+                        } else {
+                            $image = $OUTPUT->pix_icon(file_file_icon($file, 24), $file->get_filename(), 'moodle');
+                            $filename = html_writer::tag('span', $image, array('class' => 'fp-icon')).
+                                html_writer::tag('span', $file->get_filename(), array('class' => 'fp-filename'));
+                            $contentfiles .= html_writer::tag('span',
+                                html_writer::link($url, $filename),
+                                array('class' => 'coursefile fp-filename-icon'));
+                        }
+                    }
+                    if (!empty($contentfiles)) {
+                        $mform->addElement('static', null, get_string('programoverviewfiles', 'totara_program'), $contentfiles);
+                    }
+                }
             } else {
+                $mform->addElement('filemanager', 'overviewfiles_filemanager',
+                    get_string('programoverviewfiles', 'totara_program'), null, $overviewfilesoptions);
                 $mform->addHelpButton('overviewfiles_filemanager', 'programoverviewfiles', 'totara_program');
             }
         }
 
-        $mform->addElement('editor', 'endnote_editor', get_string('endnote', 'totara_program'), null, $editoroptions);
         if ($action == 'view') {
-            $mform->hardFreeze('endnote_editor');
+            if ($program) {
+                $endnote = file_rewrite_pluginfile_urls($program->endnote, 'pluginfile.php',
+                    $programcontext->id, 'totara_program', 'endnote', 0);
+                if (!empty($endnote)) {
+                    $mform->addElement('static', null, get_string('endnote', 'totara_program'), $endnote);
+                }
+            }
         } else {
+            $mform->addElement('editor', 'endnote_editor', get_string('endnote', 'totara_program'), null, $editoroptions);
             $mform->addHelpButton('endnote_editor', 'endnote', 'totara_program');
             $mform->setType('endnote_editor', PARAM_RAW);
         }
@@ -255,11 +290,13 @@ class program_edit_form extends moodleform {
             customfield_definition($mform, $program, 'program', 0, 'prog');
         } else {
             $customfields = customfield_get_fields($program, 'prog', 'program');
-            $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
-            foreach ($customfields as $cftitle => $cfvalue) {
-                $mform->addElement('static', null, $cftitle, $cfvalue);
+            if (!empty($customfields)) {
+                $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
+                foreach ($customfields as $cftitle => $cfvalue) {
+                    $mform->addElement('static', null, $cftitle, $cfvalue);
+                }
+                $mform->setExpanded('customfields');
             }
-            $mform->setExpanded('customfields');
         }
 
         if ($action == 'add') {
@@ -273,12 +310,6 @@ class program_edit_form extends moodleform {
             $buttonarray[] = $mform->createElement('submit', 'savechanges', get_string('savechanges'), 'class="savechanges-overview program-savechanges"');
             $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
             $mform->closeHeaderBefore('buttonar');
-        }
-
-        if ($action == 'view' && $program && has_capability('totara/program:configuredetails', $program->get_context())) {
-            $button = $OUTPUT->single_button(new moodle_url('/totara/program/edit.php',
-                array('id' => $program->id, 'action' => 'edit')), get_string('editprogramdetails', 'totara_program'), 'get');
-            $mform->addElement('static', 'progdetailsbutton', '', $button);
         }
     }
 
@@ -316,6 +347,21 @@ class program_edit_form extends moodleform {
         }
     }
 
+}
+
+// Define a form for the edit program details button.
+class program_edit_details_button_form extends moodleform {
+
+    function definition() {
+        global $OUTPUT;
+
+        $mform =& $this->_form;
+        $program = $this->_customdata['program'];
+
+        $button = $OUTPUT->single_button(new moodle_url($this->_form->getAttribute('action')),
+            get_string('editprogramdetails', 'totara_program'), 'get');
+        $mform->addElement('static', 'progdetailsbutton', '', $button);
+    }
 }
 
 // Define a form class to display the program content in a non-editable form
