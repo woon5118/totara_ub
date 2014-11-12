@@ -55,7 +55,7 @@ if ($d && $confirm) {
         totara_set_notification(get_string('error:bad_sesskey', 'totara_reportbuilder'), $returnurl);
     }
     $report = new reportbuilder($id);
-    if (delete_report($id)) {
+    if (reportbuilder_delete_report($id)) {
         \totara_reportbuilder\event\report_deleted::create_from_report($report, $em)->trigger();
         totara_set_notification(get_string($type . 'report', 'totara_reportbuilder'), $returnurl, array('class' => 'notifysuccess'));
 
@@ -238,42 +238,3 @@ echo $output->embedded_reports_table($embeds);
 $mform->display();
 
 echo $output->footer();
-
-
-// page specific functions
-
-/**
- * Deletes a report and any associated data
- *
- * @param integer $id ID of the report to delete
- *
- * @return boolean True if report was successfully deleted
- */
-function delete_report($id) {
-    global $DB;
-
-    if (!$id) {
-        return false;
-    }
-
-    $transaction = $DB->start_delegated_transaction();
-
-    // delete the report
-    $DB->delete_records('report_builder', array('id' => $id));
-    // delete any columns
-    $DB->delete_records('report_builder_columns', array('reportid' => $id));
-    // delete any filters
-    $DB->delete_records('report_builder_filters', array('reportid' => $id));
-    // delete any content and access settings
-    $DB->delete_records('report_builder_settings', array('reportid' => $id));
-    // delete any saved searches
-    $DB->delete_records('report_builder_saved', array('reportid' => $id));
-
-    reportbuilder_purge_cache($id, true);
-
-    // all okay commit changes
-    $transaction->allow_commit();
-
-    return true;
-}
-

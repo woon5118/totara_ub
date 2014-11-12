@@ -620,5 +620,35 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014110402, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014111300) {
+        foreach(array('assignment', 'assignmentsummary') as $source) {
+            // Get mod_assign reports.
+            $reports = $DB->get_records('report_builder', array('source' => $source));
+
+            // Delete them.
+            // Do not use events because events require report source.
+            foreach ($reports as $reportrec) {
+                $id = $reportrec->id;
+                $transaction = $DB->start_delegated_transaction();
+
+                // Remove cached reports.
+                reportbuilder_purge_cache($id, true);
+
+                // Delete all records related to this report according current db scheme.
+                $DB->delete_records('report_builder_schedule', array('reportid' => $id));
+                $DB->delete_records('report_builder_columns', array('reportid' => $id));
+                $DB->delete_records('report_builder_filters', array('reportid' => $id));
+                $DB->delete_records('report_builder_settings', array('reportid' => $id));
+                $DB->delete_records('report_builder_saved', array('reportid' => $id));
+                $DB->delete_records('report_builder', array('id' => $id));
+
+                $transaction->allow_commit();
+            }
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014111300, 'totara', 'reportbuilder');
+    }
+
     return true;
 }
