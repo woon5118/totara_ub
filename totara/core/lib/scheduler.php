@@ -288,11 +288,11 @@ class scheduler {
         $data['timezone'] = isset($data['timezone']) ? $data['timezone'] : $CFG->timezone;
         $this->subject->{$this->map['frequency']} = $data['frequency'];
         $this->subject->{$this->map['schedule']} = $data['schedule'];
+        $this->subject->{$this->map['timezone']} = $data['timezone'];
         // If no need in reinitialize, don't change nextreport value.
         if ($data['initschedule']) {
             $this->subject->{$this->map['nextevent']} = $this->time - 1;
         } else {
-            $this->subject->{$this->map['timezone']} = $data['timezone'];
             $this->next();
         }
     }
@@ -305,6 +305,7 @@ class scheduler {
         $result = array(
                         'frequency' => $this->subject->{$this->map['frequency']},
                         'schedule' => $this->subject->{$this->map['schedule']},
+                        'timezone' => $this->subject->{$this->map['timezone']},
                         'nextevent' => $this->subject->{$this->map['nextevent']},
                         'initschedule' => ($this->subject->{$this->map['nextevent']} <= $this->time)
         );
@@ -327,6 +328,7 @@ class scheduler {
         $obj->{$this->map['nextevent']} = $this->subject->{$this->map['nextevent']};
         $obj->{$this->map['frequency']} = $this->subject->{$this->map['frequency']};
         $obj->{$this->map['schedule']} = $this->subject->{$this->map['schedule']};
+        $obj->{$this->map['timezone']} = $this->subject->{$this->map['timezone']};
         foreach ($extrafields as $field) {
             if (isset($this->subject->$field)) {
                 $obj->$field = $this->subject->$field;
