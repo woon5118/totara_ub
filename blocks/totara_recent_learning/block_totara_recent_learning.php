@@ -22,6 +22,7 @@
  * @subpackage totara_recent_learning
  */
 
+require_once("{$CFG->libdir}/completionlib.php");
 /**
  * Recent learning block
  *
