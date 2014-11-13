@@ -408,14 +408,14 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     datasubmission: data
                 }),
                 success: function(o) {
-                    // If success, update operators description in the client side.
-                    if (o.length > 0) {
-                        print_notice(true);
-                    } else {
-                        print_notice(false);
-                    }
+                    // Success, display positive message for user.
+                    // We don't need to test the result in 'o' because we only
+                    // arrive here when we receive an encoded JSON response,
+                    // which is only sent on success.
+                    print_notice(true);
                 },
                 error: function() {
+                    // Fail, display error message for user.
                     print_notice(false)
                 }
             });
