@@ -68,6 +68,10 @@
     margin-bottom: 5px;
 }
 
+.course-content .activity input[type="image"] {
+    margin: 0
+}
+
 /* Remove collapsible style images from everywhere except for index page */
 /* This overrides Moodle course core style */
 #page-site-index .course_category_tree .category>.info .name {background-image:url(/theme/image.php?theme=standardtotara&component=core&image=t%2Fcollapsed_empty);background-repeat: no-repeat;background-position:center left;padding:2px 18px;}
