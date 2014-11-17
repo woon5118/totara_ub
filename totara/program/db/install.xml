@@ -79,6 +79,7 @@
         <INDEX NAME="progcomp_pro_ix" UNIQUE="false" FIELDS="programid"/>
         <INDEX NAME="progcomp_use_ix" UNIQUE="false" FIELDS="userid"/>
         <INDEX NAME="progcomp_cou_ix" UNIQUE="false" FIELDS="coursesetid"/>
+        <INDEX NAME="progcomp_prouscou_uix" UNIQUE="true" FIELDS="programid, userid, coursesetid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="prog_completion_history" COMMENT="Stores details of user's program and course set completions history">
@@ -343,6 +344,7 @@
         <INDEX NAME="proguserassi_use_ix" UNIQUE="false" FIELDS="userid"/>
         <INDEX NAME="proguserassi_ass_ix" UNIQUE="false" FIELDS="assignmentid"/>
         <INDEX NAME="proguserassi_exc_ix" UNIQUE="false" FIELDS="exceptionstatus"/>
+        <INDEX NAME="proguserassi_prous_uix" UNIQUE="true" FIELDS="programid, userid, assignmentid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

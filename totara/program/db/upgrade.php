@@ -356,5 +356,47 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014061600, 'totara_program');
     }
 
+    if ($oldversion < 2014110703) {
+        // Remove duplicate records in prog_completion table and create an index to avoid future duplications.
+        // Define index progcomp_prouscou_uix (unique) to be added to prog_completion.
+        $table = new xmldb_table('prog_completion');
+        $index = new xmldb_index('progcomp_prouscou_uix', XMLDB_INDEX_UNIQUE, array('programid', 'userid', 'coursesetid'));
+
+        // This could take a while.
+        raise_memory_limit(MEMORY_HUGE);
+
+        // Conditionally launch add index progcomp_prouscou_uix.
+        if (!$dbman->index_exists($table, $index)) {
+            // Clean up all instances of duplicate records.
+            totara_upgrade_delete_duplicate_records(
+                'prog_completion',
+                array('programid', 'userid', 'coursesetid'),
+                'status DESC, timedue DESC',
+                'totara_prog_completion_to_history'
+            );
+
+            // Add indexes to prevent new duplicates.
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index proguserassi_prous_uix (unique) to be added to prog_completion.
+        $table = new xmldb_table('prog_user_assignment');
+        $index = new xmldb_index('proguserassi_prous_uix', XMLDB_INDEX_UNIQUE, array('programid', 'userid', 'assignmentid'));
+
+        // Conditionally launch add index proguserassi_prous_uix.
+        if (!$dbman->index_exists($table, $index)) {
+            // Clean up all instances of duplicate records.
+            totara_upgrade_delete_duplicate_records(
+                'prog_user_assignment',
+                array('programid', 'userid', 'assignmentid'),
+                'timeassigned DESC'
+            );
+
+            // Add indexes to prevent new duplicates.
+            $dbman->add_index($table, $index);
+        }
+        totara_upgrade_mod_savepoint(true, 2014110703, 'totara_program');
+    }
+
     return true;
 }

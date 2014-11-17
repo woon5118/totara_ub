@@ -1888,3 +1888,15 @@ function get_programs_availability_sql($fieldalias, $separator, $userid = null) 
 
     return array($availabilitysql, $availabilityparams);
 }
+
+/**
+ * Move prog_completion record to history.
+ *
+ * @param $record prog_completion record
+ * @return bool|int Result of the insertion.
+ */
+function totara_prog_completion_to_history($record) {
+    global $DB;
+
+    return $DB->insert_record('prog_completion_history', $record);
+}

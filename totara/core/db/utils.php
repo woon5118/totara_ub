@@ -481,3 +481,77 @@ function totara_postupgrade($totarainfo) {
 
     print_upgrade_part_end('totara_core', false, true);
 }
+
+/**
+ * Function to remove duplicates records.
+ * Use ONLY in upgrades.
+ *
+ * @param string $table Table where the duplicate records exist
+ * @param array $uniques Array of fields that need to be unique
+ * @param string $sql_order (Optional) Sort order for the query to determine the record to keep
+ * @param string $callback (Optional) Function that will manage what to do with the duplicate records
+ */
+function totara_upgrade_delete_duplicate_records($table, array $uniques, $sql_order = '', $callback = '') {
+    global $DB;
+
+    // Check that the uniques array is not empty.
+    if (empty($uniques)) {
+        return;
+    }
+
+    // Find duplicates.
+    $sql_cols  = implode(', ', $uniques);
+
+    $select = "SELECT {$sql_cols}";
+    $conditions = "FROM {{$table}} GROUP BY {$sql_cols} HAVING (count(id) > 1)";
+    $duplicates = $DB->get_recordset_sql("{$select} {$conditions}", array());
+
+    // Get total of duplicates.
+    $total = $DB->get_field_sql("SELECT COALESCE(SUM(dup.total), 0) FROM (SELECT COUNT(*) -1 AS total {$conditions}) dup");
+
+    // There are not duplicates.
+    if ($total == 0) {
+        return;
+    }
+
+    // Create progress bar to notify users.
+    $pbar = new progress_bar('Deleting duplicate records in table' . $table, 500, true);
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Loop through duplicates.
+    $i = 0;
+    foreach ($duplicates as $duplicate) {
+        $pointer = 0;
+        // Generate SQL for finding records with these duplicate uniques.
+        $sql_select = implode(' = ? AND ', $uniques) . ' = ?'; // Builds "fieldname = ? AND fieldname = ?".
+        $uniq_values = array();
+        foreach ($uniques as $u) {
+            $uniq_values[] = $duplicate->$u;
+        }
+
+        // Get records with these duplicate unique values.
+        $records = $DB->get_records_select(
+            $table,
+            $sql_select,
+            $uniq_values,
+            $sql_order
+        );
+
+        // Loop through every duplicate record.
+        foreach ($records as $record) {
+            $pointer++;
+            if ($pointer !== 1) { // We keep 1st record but delete all others.
+                $i++;
+                // If there is a callback, then call function.
+                if (!empty($callback)) {
+                    call_user_func($callback, $record);
+                }
+                $DB->delete_records($table, array('id' => $record->id));
+                $pbar->update($i, $total, "Deleting duplicate records in table $table - $i/$total.");
+            }
+        }
+    }
+    $pbar->update($total, $total, "Deleting duplicate records in table $table - done!");
+    $transaction->allow_commit();
+}
