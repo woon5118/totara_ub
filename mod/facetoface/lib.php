@@ -2808,9 +2808,21 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 $locationstring = '';
                 $roomdata = $DB->get_record('facetoface_room', array('id' => $session->roomid));
                 if (!empty($roomdata)) {
-                    $locationstring  = isset($roomdata->name)     ? format_string($roomdata->name)    .', '.html_writer::empty_tag('br') : '';
-                    $locationstring .= isset($roomdata->building) ? format_string($roomdata->building).', '.html_writer::empty_tag('br') : '';
-                    $locationstring .= isset($roomdata->address)  ? format_string($roomdata->address) .', '.html_writer::empty_tag('br') : '';
+                    $location = array ();
+
+                    if (!empty($roomdata->name)) {
+                        $location[] = format_string($roomdata->name);
+                    }
+                    if (!empty($roomdata->building)) {
+                        $location[] = format_string($roomdata->building);
+                    }
+                    if (!empty($roomdata->address)) {
+                        $location[] = format_string($roomdata->address);
+                    }
+
+                    if ($location) {
+                        $locationstring = implode ($location, ',' . html_writer::empty_tag('br')) . html_writer::empty_tag('br');
+                    }
                 }
 
                 $sessionobject = new stdClass();
