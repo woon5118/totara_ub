@@ -684,12 +684,12 @@ class completion_info {
             $userid = $userid ? $userid : $USER->id;
             $event = \totara_core\event\module_completion::create(
                 array(
-                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id, 'userid' => $userid)),
                     'other' => array(
                             'moduleinstance' => $cm->id,
                             'userid' => $userid,
                             'course' => $this->course->id,
                             'criteriatype' => COMPLETION_CRITERIA_TYPE_ACTIVITY,
+                            'module' => $DB->get_field('modules', 'name', array('id' => $cm->module)),
                             ),
                 )
             );

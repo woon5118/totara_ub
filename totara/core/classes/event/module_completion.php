@@ -39,7 +39,6 @@ class module_completion extends \core\event\base {
      */
     protected function init() {
         $this->context = \context_system::instance();
-        $this->data['objecttable'] = 'course_modules_completion';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
@@ -77,8 +76,7 @@ class module_completion extends \core\event\base {
      * @return \stdClass user data.
      */
     protected function get_legacy_eventdata() {
-        $user = $this->get_record_snapshot('course_modules_completion', $this->data['objectid']);
-        return $user;
+        return $this->data['other'];
     }
 
     /**
@@ -100,11 +98,12 @@ class module_completion extends \core\event\base {
         global $CFG;
         if ($CFG->debugdeveloper) {
             parent::validate_data();
-            if (!isset($this->data['other']['moduleinstance'])) {
-                throw new \coding_exception('moduleinstance must be set in $event.');
-            }
             if (!isset($this->data['other']['criteriatype'])) {
                 throw new \coding_exception('criteriatype must be set in $event.');
+            }
+            if ($this->data['other']['criteriatype'] != COMPLETION_CRITERIA_TYPE_GRADE &&
+                !isset($this->data['other']['moduleinstance'])) {
+                throw new \coding_exception('moduleinstance must be set in $event.');
             }
             if (!isset($this->data['other']['userid'])) {
                 throw new \coding_exception('userid must be set in $event.');

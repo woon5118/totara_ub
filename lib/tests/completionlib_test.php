@@ -231,8 +231,8 @@ class core_completionlib_testcase extends advanced_testcase {
             ->with($cm, $changed);
         $DB->expects($this->once())
             ->method('get_field')
-            ->with('course_modules_completion', 'id', $this->anything())
-            ->will($this->returnValue('1'));
+            ->with('modules', 'name', $this->anything())
+            ->will($this->returnValue('assign'));
         $c->update_state($cm, COMPLETION_COMPLETE_PASS);
     }
 

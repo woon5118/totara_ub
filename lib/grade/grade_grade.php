@@ -897,9 +897,7 @@ class grade_grade extends grade_object {
         if ($this->grade_item->itemtype == 'course') {
             $event = \totara_core\event\module_completion::create(
                 array(
-                    'objectid' => $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $this->grade_item->iteminstance, 'userid' => $this->userid)),
                     'other' => array(
-                            'moduleinstance' => $this->grade_item->iteminstance,
                             'userid' => $this->userid,
                             'course' => $this->grade_item->courseid,
                             'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE,
