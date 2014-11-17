@@ -584,6 +584,7 @@ $string['linkedx'] = 'Linked {$a}';
 $string['linktoobjectivevalues'] = 'View/edit the scale values for this objective scale.';
 $string['linktopriorityvalues'] = 'View/edit the scale values for this priority scale.';
 $string['linktype'] = 'Link type';
+$string['manageplans'] = 'Manage plans';
 $string['manager'] = 'Manager';
 $string['managerdrivenworkflowdesc'] = 'The manager assigns content to their staff\'s learning plan. The user can request content be added but manager approval is required.';
 $string['managerdrivenworkflowname'] = 'Manager driven workflow';
