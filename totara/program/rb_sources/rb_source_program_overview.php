@@ -25,10 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 class rb_source_program_overview extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
+
+    protected $instancetype = 'program';
 
     function __construct() {
         global $CFG;
@@ -42,12 +46,25 @@ class rb_source_program_overview extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_overview');
+        $this->sourcewhere = $this->define_sourcewhere();
+
         parent::__construct();
     }
 
     //
     // Methods for defining contents of source.
     //
+
+    protected function define_sourcewhere() {
+        // Only consider whole programs - not courseset completion.
+        $sourcewhere = 'base.coursesetid = 0';
+
+        // Exclude certifications (they have their own source).
+        $sourcewhere .= ' AND program.certifid IS NULL';
+
+        return $sourcewhere;
+    }
+
     protected function define_joinlist() {
         global $CFG;
 
@@ -59,14 +76,17 @@ class rb_source_program_overview extends rb_base_source {
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
 
-        $joinlist[] = new rb_join(
-            'prog_courseset',
-            'INNER',
-            '{prog_courseset}',
-            "prog_courseset.programid = base.programid AND base.coursesetid = 0",
-            REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'base'
-        );
+        if ($this->instancetype == 'program') {
+            // Overridden in certifications overview to limit coursesets to certifpaths.
+            $joinlist[] = new rb_join(
+                'prog_courseset',
+                'INNER',
+                '{prog_courseset}',
+                "prog_courseset.programid = base.programid AND base.coursesetid = 0",
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'base'
+            );
+        }
 
         $joinlist[] = new rb_join(
             'prog_completion',
@@ -180,7 +200,7 @@ class rb_source_program_overview extends rb_base_source {
         $columnoptions = array();
 
         // Include some standard columns.
-        $this->add_program_fields_to_columns($columnoptions, 'program');
+        $this->add_program_fields_to_columns($columnoptions, 'program', "totara_{$this->instancetype}");
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_position_fields_to_columns($columnoptions);
         $this->add_manager_fields_to_columns($columnoptions);
@@ -223,28 +243,31 @@ class rb_source_program_overview extends rb_base_source {
             )
         );
 
-        $columnoptions[] = new rb_column_option(
-            'program_completion',
-            'status',
-            get_string('programcompletionstatus','rb_source_program_overview'),
-            "base.status",
-            array(
-                'joins' => 'base',
-                'displayfunc' => 'program_completion_status'
-            )
-        );
+        // Only add this to a program report, the certification one needs to be different.
+        if ($this->instancetype == 'program') {
+            $columnoptions[] = new rb_column_option(
+                'program_completion',
+                'status',
+                get_string('programcompletionstatus', 'rb_source_program_overview'),
+                "base.status",
+                array(
+                    'joins' => 'base',
+                    'displayfunc' => 'program_completion_status'
+                )
+            );
 
-        $columnoptions[] = new rb_column_option(
-            'program_completion',
-            'progress',
-            get_string('programcompletionprogress','rb_source_program_overview'),
-            $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
-            array(
-                'displayfunc' => 'program_completion_progress',
-                'grouping' => 'comma_list',
-                'joins' => 'prog_completion',
-            )
-        );
+            $columnoptions[] = new rb_column_option(
+                'program_completion',
+                'progress',
+                get_string('programcompletionprogress', 'rb_source_program_overview'),
+                $DB->sql_concat_join("'|'", array(sql_cast2char('prog_courseset.id'), sql_cast2char("prog_completion.status"))),
+                array(
+                    'displayfunc' => 'program_completion_progress',
+                    'grouping' => 'comma_list',
+                    'joins' => 'prog_completion',
+                )
+            );
+        }
 
         // Organisation Cols.
         $columnoptions[] = new rb_column_option(
@@ -325,33 +348,35 @@ class rb_source_program_overview extends rb_base_source {
         );
 
         // Course completion cols.
-        $columnoptions[] = new rb_column_option(
-            'course',
-            'shortname',
-            get_string('courseshortname', 'rb_source_program_overview'),
-            'COALESCE('.$DB->sql_concat_join("'|'", array('course.shortname', sql_cast2char('course.id'))).', \'-\')',
-            array(
-                'joins' => 'course',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline_coursename',
-                'style' => array('white-space' => 'pre'),
-            )
+        if ($this->instancetype == 'program') {
+            $columnoptions[] = new rb_column_option(
+                'course',
+                'shortname',
+                get_string('courseshortname', 'rb_source_program_overview'),
+                'COALESCE('.$DB->sql_concat_join("'|'", array('course.shortname', sql_cast2char('course.id'))).', \'-\')',
+                array(
+                    'joins' => 'course',
+                    'grouping' => 'comma_list',
+                    'displayfunc' => 'list_to_newline_coursename',
+                    'style' => array('white-space' => 'pre'),
+                )
 
-        );
+            );
 
-        $columnoptions[] = new rb_column_option(
-            'course',
-            'status',
-            get_string('coursecompletionstatus', 'rb_source_program_overview'),
-            sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
-            array(
-                'joins' => 'course_completions',
-                'grouping' => 'comma_list',
-                'displayfunc' => 'course_completion_status',
-                'style' => array('white-space' => 'pre'),
-            )
+            $columnoptions[] = new rb_column_option(
+                'course',
+                'status',
+                get_string('coursecompletionstatus', 'rb_source_program_overview'),
+                sql_cast2char('COALESCE(course_completions.status, '.COMPLETION_STATUS_NOTYETSTARTED.')'),
+                array(
+                    'joins' => 'course_completions',
+                    'grouping' => 'comma_list',
+                    'displayfunc' => 'course_completion_status',
+                    'style' => array('white-space' => 'pre'),
+                )
 
-        );
+            );
+        }
 
         $columnoptions[] = new rb_column_option(
             'course',
@@ -470,17 +495,16 @@ class rb_source_program_overview extends rb_base_source {
         return $columnoptions;
     }
 
-
     protected function define_filteroptions() {
         $filteroptions = array();
 
         $this->add_user_fields_to_filters($filteroptions);
-        $this->add_program_fields_to_filters($filteroptions);
+        $this->add_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
 
         $filteroptions[] = new rb_filter_option(
             'prog',
             'id',
-            get_string('programnameselect', 'rb_source_program_overview'),
+            get_string('programnameselect', "rb_source_{$this->instancetype}_overview"),
             'select',
             array(
                 'selectfunc' => 'program_list',
@@ -549,19 +573,21 @@ class rb_source_program_overview extends rb_base_source {
     }
 
     protected function define_defaultcolumns() {
-        $defaultcolumns = array(
-            array('type' => 'prog', 'value' => 'shortname'),
-            array('type' => 'user', 'value' => 'organisation'),
-            array('type' => 'user', 'value' => 'position'),
-            array('type' => 'user', 'value' => 'namelink'),
-            array('type' => 'program_completion', 'value' => 'status'),
-            array('type' => 'program_completion', 'value' => 'timedue'),
-            array('type' => 'program_completion', 'value' => 'progress'),
-            array('type' => 'course', 'value' => 'shortname'),
-            array('type' => 'course', 'value' => 'status'),
-            array('type' => 'course', 'value' => 'finalgrade'),
-        );
-        return $defaultcolumns;
+        $defaultcolumns = array();
+        $defaultcolumns[] = array('type' => 'prog', 'value' => 'shortname');
+        $defaultcolumns[] = array('type' => 'user', 'value' => 'organisation');
+        $defaultcolumns[] = array('type' => 'user', 'value' => 'position');
+        $defaultcolumns[] = array('type' => 'user', 'value' => 'namelink');
+        $defaultcolumns[] = array('type' => 'program_completion', 'value' => 'timedue');
+        if ($this->instancetype == 'program') {
+            $defaultcolumns[] = array('type' => 'program_completion', 'value' => 'status');
+            $defaultcolumns[] = array('type' => 'program_completion', 'value' => 'progress');
+        }
+        $defaultcolumns[] = array('type' => 'course', 'value' => 'shortname');
+        $defaultcolumns[] = array('type' => 'course', 'value' => 'status');
+        $defaultcolumns[] = array('type' => 'course', 'value' => 'finalgrade');
+
+         return $defaultcolumns;
     }
 
     protected function define_defaultfilters() {
@@ -618,11 +644,6 @@ class rb_source_program_overview extends rb_base_source {
         return implode($items, "\n");
     }
 
-    function rb_display_list_to_newline($status, $row) {
-        $items = explode(', ', $status);
-        return implode($items, "\n");
-    }
-
     function rb_display_list_to_newline_coursename($date, $row) {
          $items = explode(', ', $date);
          foreach ($items as $key => $item) {
@@ -639,7 +660,8 @@ class rb_source_program_overview extends rb_base_source {
 
         $completions = array();
         $tempcompletions = explode(', ', $status);
-        foreach($tempcompletions as $completion) {
+
+        foreach ($tempcompletions as $completion) {
             $coursesetstatus = explode("|", $completion);
             if (isset($coursesetstatus[1])) {
                 $completions[$coursesetstatus[0]] = $coursesetstatus[1];
@@ -675,7 +697,7 @@ class rb_source_program_overview extends rb_base_source {
 
         $list = array();
 
-        if ($progs = prog_get_programs('all', 'p.fullname', 'p.id, p.fullname', 'program')) {
+        if ($progs = prog_get_programs('all', 'p.fullname', 'p.id, p.fullname', $this->instancetype)) {
             foreach ($progs as $prog) {
                 $list[$prog->id] = format_string($prog->fullname);
             }

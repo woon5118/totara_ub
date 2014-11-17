@@ -644,6 +644,7 @@ $string['program:configuremessages'] = 'Configure program messages';
 $string['program:configureprogram'] = 'Configure programs';
 $string['program:createprogram'] = 'Create programs';
 $string['program:deleteprogram'] = 'Delete programs';
+$string['programenrolledincohort'] = 'Program is enrolled in by audience';
 $string['program:handleexceptions'] = 'Handle program exceptions';
 $string['program:manageextensions'] = 'Manage extensions';
 $string['program:markstaffcoursecomplete'] = 'Mark staff course as complete';

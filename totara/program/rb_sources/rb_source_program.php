@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/totara/program/lib.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 class rb_source_program extends rb_base_source {
@@ -94,7 +95,7 @@ class rb_source_program extends rb_base_source {
         // include some standard filters
         $this->add_program_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions, 'base', 'category');
-        $this->add_cohort_program_fields_to_filters($filteroptions);
+        $this->add_cohort_program_fields_to_filters($filteroptions, 'totara_program');
 
         return $filteroptions;
     }

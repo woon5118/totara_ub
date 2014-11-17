@@ -765,15 +765,13 @@ class rb_source_dp_certification extends rb_base_source {
                 array('certifid' => $row->certifid, 'userid' => $row->userid, 'history' => 1)), $name);
     }
 
-
-    function rb_display_certif_certifpath($certifpath, $row) {
-        global $CERTIFPATH;
-        if ($certifpath && isset($CERTIFPATH[$certifpath])) {
-            return get_string($CERTIFPATH[$certifpath], 'totara_certification');
-        }
-    }
-
-
+    /**
+     * Certification display the certification status as string.
+     *
+     * @param string $status    CERTIFSTATUS_X constant to describe the status of the certification.
+     * @param array $row        The record used to generate the table row
+     * @return string
+     */
     function rb_display_certif_status($status, $row) {
         global $CERTIFSTATUS;
         if ($status && isset($CERTIFSTATUS[$status])) {
@@ -785,14 +783,6 @@ class rb_source_dp_certification extends rb_base_source {
         }
     }
 
-    function rb_display_certif_renewalstatus($renewalstatus, $row) {
-        global $CERTIFRENEWALSTATUS;
-        if ($renewalstatus && isset($CERTIFRENEWALSTATUS[$renewalstatus])) {
-            return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
-        } else {
-            return get_string($CERTIFRENEWALSTATUS[CERTIFRENEWALSTATUS_NOTDUE], 'totara_certification');
-        }
-    }
 
     function rb_display_progress($status, $row) {
         return prog_display_progress($row->programid, $row->userid, $row->certifpath);

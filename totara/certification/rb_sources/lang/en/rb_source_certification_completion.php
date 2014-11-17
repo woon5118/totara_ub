@@ -17,10 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara
  * @subpackage certification
  */
 
-$string['sourcetitle'] = 'Certifications';
-$string['type_prog'] = 'Certification';
+$string['sourcetitle'] = 'Certification Completion';
 $string['type_certif'] = 'Certification';
+$string['type_certif_completion'] = 'Certification Completion';
+$string['type_prog'] = 'Certification';
+$string['type_progcompletion'] = 'Certification Completion';

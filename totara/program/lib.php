@@ -454,15 +454,11 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     $userid = !empty($options['userid']) ? $options['userid'] : $USER->id;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
+    $selectsql = ($type == 'program') ? " WHERE p.certifid IS NULL" : " WHERE p.certifid IS NOT NULL";
+
     if ((int)$categoryid > 0) {
-        $certifsql = ($type == 'program') ? " AND p.certifid IS NULL" : " AND p.certifid IS NOT NULL";
-        $categoryselect = "WHERE p.category = :category {$certifsql}";
+        $selectsql .= " AND p.category = :category";
         $params['category'] = (int)$categoryid;
-    } else if ($categoryid === "all") {
-        // Returns all programs for Program Overview reportbuilder.
-        $categoryselect = "";
-    } else {
-        return array();
     }
 
     if (empty($sort)) {
@@ -488,7 +484,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
                                     JOIN {context} ctx
                                       ON (p.id = ctx.instanceid
                                           AND ctx.contextlevel = :contextlevel)
-                                    {$categoryselect} AND {$visibilitysql}
+                                    {$selectsql} AND {$visibilitysql}
                                     {$sortstatement}", $params, $offset, $limit);
 
     return $programs;
