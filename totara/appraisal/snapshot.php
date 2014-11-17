@@ -107,7 +107,7 @@ $nouserpic = false;
 if ($action == 'snapshot') {
     $nouserpic = true;
     require_once($CFG->libdir . '/dompdf/lib.php');
-    set_time_limit('300');
+    core_php_time_limit::raise('300');
 }
 
 $out = "";

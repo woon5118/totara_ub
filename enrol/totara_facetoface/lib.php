@@ -698,7 +698,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         }
 
         // Unfortunately this may take a long time, execution can be interrupted safely here.
-        @set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $trace->output('Verifying totara_facetoface-enrolments...');

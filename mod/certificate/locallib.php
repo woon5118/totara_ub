@@ -534,7 +534,7 @@ function certificate_print_attempts($course, $certificate, $attempts) {
 function certificate_get_course_time($courseid) {
     global $CFG, $USER;
 
-    set_time_limit(0);
+    core_php_time_limit::raise(0);
 
     $totaltime = 0;
     $sql = "l.course = :courseid AND l.userid = :userid";

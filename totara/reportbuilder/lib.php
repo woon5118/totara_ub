@@ -3530,7 +3530,7 @@ class reportbuilder {
         require_once("$CFG->libdir/odslib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3631,7 +3631,7 @@ class reportbuilder {
         require_once("$CFG->libdir/excellib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3720,7 +3720,7 @@ class reportbuilder {
         require_once("{$CFG->libdir}/csvlib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3775,7 +3775,7 @@ class reportbuilder {
         require_once $CFG->libdir . '/pdflib.php';
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
         $filename = clean_filename($fullname . '_report.pdf');

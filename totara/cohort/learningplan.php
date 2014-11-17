@@ -37,7 +37,7 @@ require_capability('moodle/cohort:view', $context);
 require_capability('totara/plan:cancreateplancohort', $context);
 
 // Raise timelimit as this could take a while for big cohorts
-set_time_limit(0);
+core_php_time_limit::raise(0);
 raise_memory_limit(MEMORY_HUGE);
 
 define('COHORT_HISTORY_PER_PAGE', 50);

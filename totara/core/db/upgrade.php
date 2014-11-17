@@ -387,7 +387,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         require_once($CFG->libdir.'/filelib.php');
         require_once($CFG->libdir.'/componentlib.class.php');
 
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         $notice_ok = array();
         $notice_error = array();
         $installedlangs = array();
@@ -1052,7 +1052,7 @@ function xmldb_totara_core_upgrade($oldversion) {
             // is set in all affected versions.
             if ($previousversionknown && ($affected25site || $affected26site)) {
                 // Set time to unlimited as this could take a while.
-                set_time_limit(0);
+                core_php_time_limit::raise(0);
 
                 $countsql = 'SELECT COUNT(crc.id) ';
                 $selectsql = 'SELECT crc.* ';

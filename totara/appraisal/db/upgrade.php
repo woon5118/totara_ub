@@ -62,7 +62,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         $usercount = $DB->count_records('user', array('deleted' => 1));
         if ($usercount > 0) {
             // This could take some time and use a lot of resources.
-            set_time_limit(0);
+            core_php_time_limit::raise(0);
             raise_memory_limit(MEMORY_EXTRA);
             $i = 0;
             $deletedusers = $DB->get_recordset('user', array('deleted' => 1), null, 'id, username, firstname, lastname, email, idnumber, picture, mnethostid');

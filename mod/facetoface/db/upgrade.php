@@ -1954,7 +1954,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         // Only run the upgrade if the userid field doesn't exist.
         if (!$dbman->field_exists($table, $field)) {
             // Set time to unlimited as this could take a while.
-            set_time_limit(0);
+            core_php_time_limit::raise(0);
 
             // Wrap this in a transaction so we can't possibly wipe old records without adding the new.
             $transaction = $DB->start_delegated_transaction();

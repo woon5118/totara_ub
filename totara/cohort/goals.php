@@ -39,7 +39,7 @@ $can_edit = has_capability('totara/hierarchy:managegoalassignments', $context)
     && has_capability('moodle/cohort:manage', $context);
 
 // Raise timelimit as this could take a while for big cohorts.
-set_time_limit(0);
+core_php_time_limit::raise(0);
 raise_memory_limit(MEMORY_HUGE);
 
 define('COHORT_HISTORY_PER_PAGE', 50);
