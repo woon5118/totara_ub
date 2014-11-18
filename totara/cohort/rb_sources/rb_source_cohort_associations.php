@@ -54,7 +54,13 @@ class rb_source_cohort_associations extends rb_base_source {
                 p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_PROGRAM . " AS instancetype
             FROM {prog_assignment} pa
             JOIN {prog} p ON pa.programid = p.id
-            WHERE pa.assignmenttype = " . ASSIGNTYPE_COHORT . ")";
+            WHERE pa.assignmenttype = " . ASSIGNTYPE_COHORT . " AND p.certifid IS NULL
+            UNION ALL
+            SELECT pa.id, pa.assignmenttypeid AS cohortid, p.id AS instanceid,
+                p.fullname AS name, p.icon, " . COHORT_ASSN_ITEMTYPE_CERTIF . " AS instancetype
+            FROM {prog_assignment} pa
+            JOIN {prog} p ON pa.programid = p.id
+            WHERE pa.assignmenttype = " . ASSIGNTYPE_COHORT . " AND p.certifid IS NOT NULL)";
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -210,6 +216,7 @@ class rb_source_cohort_associations extends rb_base_source {
                 'selectchoices' => array(
                     COHORT_ASSN_ITEMTYPE_COURSE => get_string('associationcoursesonly', 'totara_cohort'),
                     COHORT_ASSN_ITEMTYPE_PROGRAM  => get_string('associationprogramsonly', 'totara_cohort'),
+                    COHORT_ASSN_ITEMTYPE_CERTIF  => get_string('associationcertificationsonly', 'totara_cohort'),
                 ),
                 'simplemode' => true,
             )
@@ -295,6 +302,9 @@ class rb_source_cohort_associations extends rb_base_source {
             case COHORT_ASSN_ITEMTYPE_PROGRAM:
                 $ret = get_string('program', 'totara_program');
                 break;
+            case COHORT_ASSN_ITEMTYPE_CERTIF:
+                $ret = get_string('certification', 'totara_program');
+                break;
             default:
                 $ret = '';
         }
@@ -363,7 +373,7 @@ class rb_source_cohort_associations extends rb_base_source {
             $canedit = has_capability('moodle/cohort:manage', context_system::instance());
         }
 
-        if ($canedit && $row->type == COHORT_ASSN_ITEMTYPE_PROGRAM) {
+        if ($canedit && ($row->type == COHORT_ASSN_ITEMTYPE_PROGRAM || $row->type == COHORT_ASSN_ITEMTYPE_CERTIF)) {
             return totara_cohort_program_completion_link($row->cohortid, $instanceid);
         }
         return get_string('na', 'totara_cohort');

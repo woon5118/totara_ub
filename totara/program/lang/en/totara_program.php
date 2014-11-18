@@ -115,6 +115,7 @@ $string['cancelprogrammanagement'] = 'Clear unsaved changes';
 $string['category'] = 'Category';
 $string['certificationduedate'] = 'Certification due date';
 $string['certificationname'] = 'Certification name';
+$string['certification'] = 'Certification';
 $string['certifications'] = 'Certifications';
 $string['certnamelinkedicon'] = 'Certification name and linked icon';
 $string['changecourse'] = 'Change course';

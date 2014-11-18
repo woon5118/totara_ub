@@ -240,9 +240,10 @@ switch ($searchtype) {
 
 
     /**
-     * Program search
+     * Program or certification search.
      */
     case 'program':
+    case 'certification':
         // Generate search SQL
         $search_info->id = 'p.id';
         $keywords = totara_search_parse_keywords($query);
@@ -253,7 +254,7 @@ switch ($searchtype) {
                                                                           'p.visible',
                                                                           'p.audiencevisible',
                                                                           'p',
-                                                                          'program');
+                                                                          $searchtype);
         $search_info->sql = "
             FROM
                 {prog} p
@@ -265,6 +266,9 @@ switch ($searchtype) {
               AND {$visibilitysql}
         ";
         $params = array_merge($params, $visibilityparams);
+
+        // Adjust the SQL for programs or certifications.
+        $search_info->sql .= " AND certifid IS " . ($searchtype == 'program' ? 'NULL' : 'NOT NULL');
 
         $search_info->order = " ORDER BY p.sortorder ASC";
         $search_info->params = $params;

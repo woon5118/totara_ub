@@ -47,7 +47,7 @@ class totara_dialog_content_certifications extends totara_dialog_content {
      * @access  public
      * @var     string
      */
-    public $searchtype = 'program';
+    public $searchtype = 'certification';
 
     /**
      * Current category (e.g., show children of this category)

@@ -1726,7 +1726,7 @@ class program {
      * @return boolean
      */
     public function is_accessible($user = null) {
-        global $CFG;
+        global $CFG, $USER;
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         // If a user is set check if they area a site admin, if so, let them have access.
@@ -1734,6 +1734,8 @@ class program {
             if (is_siteadmin($user->id)) {
                 return true;
             }
+        } else if (is_siteadmin($USER->id)) {
+            return true;
         }
 
         // Check if this program is not available, if it's not then deny access
