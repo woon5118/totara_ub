@@ -89,7 +89,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $mform->addRule('database_dbuser', get_string('err_required', 'form'), 'required');
         $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
         $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
-        $mform->setType('database_dbpass', PARAM_TEXT);
+        $mform->setType('database_dbpass', PARAM_RAW);
 
         // Table name
         $mform->addElement('text', 'database_dbtable', get_string('dbtable', 'tool_totara_sync'));
