@@ -50,7 +50,7 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_cm($cm);
 
-require_login($course);
+require_login($course, true, $cm);
 require_capability('mod/facetoface:view', $context);
 
 add_to_log($course->id, 'facetoface', 'view', "interest.php?id=$cm->id", $facetoface->id, $cm->id);

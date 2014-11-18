@@ -148,7 +148,7 @@ if (isset($session)) {
     $defaulttimezone = totara_get_clean_timezone();
 }
 
-$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'nbdays', 'customfields', 'course', 'editoroptions', 'defaulttimezone', 'facetoface'));
+$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'nbdays', 'customfields', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }

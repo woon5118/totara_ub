@@ -1455,8 +1455,11 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
     private function load_data() {
         global $DB;
         $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
-        $this->timestamps = $DB->get_records_select('prog_pos_assignment', 'type = ?', array(POSITION_TYPE_PRIMARY), '',
-            'id, ' . $DB->sql_concat('userid', "'-'", 'positionid') . ' as hash, timeassigned');
+        $sql = "SELECT " . $DB->sql_concat('ppa.userid', "'-'", "ppa.positionid") . " AS hash, ppa.timeassigned
+                  FROM {prog_pos_assignment} ppa
+                  JOIN {pos_assignment} pa ON ppa.userid = pa.userid AND ppa.positionid = pa.positionid
+                 WHERE ppa.type = ? AND pa.type = ? AND ppa.positionid IS NOT NULL";
+        $this->timestamps = $DB->get_records_sql($sql, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_PRIMARY));
     }
     public function get_item_name($instanceid) {
         // Lazy load data when required.

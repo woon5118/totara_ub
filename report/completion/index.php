@@ -26,6 +26,7 @@
 
 require_once(dirname(__FILE__).'/../../config.php');
 require_once("{$CFG->libdir}/completionlib.php");
+require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
 /**
  * Configuration

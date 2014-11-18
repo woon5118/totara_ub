@@ -1025,15 +1025,11 @@ function prog_get_programs_search($searchterms, $sort='fullname ASC', $page=0, $
 function prog_store_position_assignment($assignment) {
     global $DB;
 
-    // Do not save prog_pos_assignment if we don't really select any position.
-    if (!isset($assignment->positionid) || empty($assignment->positionid)) {
-        return;
-    }
-
     // Need to check this since this is not necessarily set now.
-    $currentpositionid = $assignment->positionid;
+    $currentpositionid = isset($assignment->positionid) ? $assignment->positionid : null;
 
     $position_assignment_history = $DB->get_record('prog_pos_assignment', array('userid' => $assignment->userid, 'type' => $assignment->type));
+
     if (!$position_assignment_history) {
         $position_assignment_history = new stdClass();
         $position_assignment_history->userid = $assignment->userid;

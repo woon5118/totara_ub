@@ -31,12 +31,15 @@ require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
 
 
 class mod_facetoface_session_form extends moodleform {
+    /** @var context_module */
+    protected $context;
 
     function definition() {
         global $CFG, $DB;
 
         $mform =& $this->_form;
-        $context = context_course::instance($this->_customdata['course']->id);
+
+        $this->context = context_module::instance($this->_customdata['cm']->id);
 
         $mform->addElement('hidden', 'id', $this->_customdata['id']);
         $mform->addElement('hidden', 'f', $this->_customdata['f']);
@@ -162,7 +165,7 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('checkbox', 'allowoverbook', get_string('allowoverbook', 'facetoface'));
         $mform->addHelpButton('allowoverbook', 'allowoverbook', 'facetoface');
 
-        if (has_capability('mod/facetoface:configurecancellation', $context)) {
+        if (has_capability('mod/facetoface:configurecancellation', $this->context)) {
             $mform->addElement('advcheckbox', 'allowcancellations', get_string('allowcancellations', 'facetoface'));
             $mform->setDefault('allowcancellations', $this->_customdata['facetoface']->allowcancellationsdefault);
             $mform->addHelpButton('allowcancellations', 'allowcancellations', 'facetoface');
@@ -232,21 +235,21 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addHelpButton('details_editor', 'details', 'facetoface');
 
         // Choose users for trainer roles
-        $roles = facetoface_get_trainer_roles($context);
+        $roles = facetoface_get_trainer_roles($this->context);
 
         if ($roles) {
             // Get current trainers
             $current_trainers = facetoface_get_trainers($this->_customdata['s']);
             // Get course context and roles
-            $rolenames = role_get_names($context);
+            $rolenames = role_get_names($this->context);
             // Loop through all selected roles
             $header_shown = false;
             foreach ($roles as $role) {
-                $rolename = format_string($rolenames[$role->id]->localname);
+                $rolename = $rolenames[$role->id]->localname;
 
                 // Attempt to load users with this role in this context.
                 $usernamefields = get_all_user_name_fields(true, 'u');
-                $rs = get_role_users($role->id, $context, true, "u.id, {$usernamefields}", 'u.id ASC');
+                $rs = get_role_users($role->id, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
 
                 if (!$rs) {
                     continue;
@@ -378,10 +381,9 @@ class mod_facetoface_session_form extends moodleform {
 
             // Loop through roles
             $hasconflicts = 0;
-            $context = context_course::instance($this->_customdata['course']->id);
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
-                $trainerlist = get_role_users($roleid, $context, true, 'u.id, u.firstname, u.lastname', 'u.id ASC');
+                $trainerlist = get_role_users($roleid, $this->context, true, 'u.id, u.firstname, u.lastname', 'u.id ASC');
                 // Initialize error variable.
                 $trainererrors = '';
                 // Loop through trainers in this role.
