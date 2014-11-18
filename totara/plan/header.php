@@ -94,12 +94,12 @@ if ($printinstructions) {
     // If this a component
     if ($is_component) {
         $instructions .= get_string($currenttab.'_instructions_detail', 'totara_plan') . ' ';
-
-        if (!$this->is_active() || $component->get_setting('update'.$currenttab) > DP_PERMISSION_REQUEST) {
-            $instructions .= get_string($currenttab.'_instructions_add11', 'totara_plan') . ' ';
-        }
-        if ($this->is_active() && $component->get_setting('update'.$currenttab) == DP_PERMISSION_REQUEST) {
-            $instructions .= get_string($currenttab.'_instructions_request', 'totara_plan') . ' ';
+        if ($component->get_setting('update'.$currenttab) > DP_PERMISSION_DENY) {
+            if (!$this->is_active()) {
+                $instructions .= get_string($currenttab . '_instructions_add11', 'totara_plan') . ' ';
+            } else {
+                $instructions .= get_string($currenttab . '_instructions_request', 'totara_plan') . ' ';
+            }
         }
     }
 

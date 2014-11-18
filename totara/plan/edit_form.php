@@ -58,7 +58,6 @@ class plan_edit_form extends moodleform {
         if ($action == 'add') {
             if ($canselectplan) {
                 $template_options = array();
-                $template_default = 0;
                 $default_template_id = 0;
 
                 $allowed_templates = dp_template_has_permission('plan', 'create', $role, DP_PERMISSION_ALLOW);
@@ -164,9 +163,11 @@ class plan_edit_form extends moodleform {
             if ($plan->get_setting('completereactivate') >= DP_PERMISSION_ALLOW && $plan->status == DP_PLAN_STATUS_APPROVED) {
                 $buttonarray[] = $mform->createElement('submit', 'complete', get_string('plancomplete', 'totara_plan'));
             }
-
-            $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-            $mform->closeHeaderBefore('buttonar');
+            // The $buttonarray may be empty when learner views the form.
+            if (!empty($buttonarray)) {
+                $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+                $mform->closeHeaderBefore('buttonar');
+            }
         } else {
             switch ($action) {
             case 'add':
