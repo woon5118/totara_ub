@@ -18,15 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralms.com>
- * @package totara
- * @subpackage totara_core
+ * @package totara_core
  */
 
 namespace totara_core\event;
 defined('MOODLE_INTERNAL') || die();
 
-// Event when a user is suspended.
+/**
+ * User suspended event.
+ *
+ * Note: this event is triggered right after
+ *
+ * @property-read array $other {
+ *      Extra information about the event.
+ *
+ *      - string username: username of the user.
+ * }
+ *
+ * @since   Totara 2.6
+ * @package totara_core
+ * @author  David Curry <david.curry@totaralms.com>
+ */
 class user_suspended extends \core\event\base {
+    /**
+     * Create instance of event.
+     *
+     * @param \stdClass $user
+     * @return user_suspended
+     */
+    public static function create_from_user(\stdClass $user) {
+        $data = array(
+            'objectid' => $user->id,
+            'context' => \context_user::instance($user->id),
+            'other' => array(
+                'username' => $user->username,
+            )
+        );
+        $event = self::create($data);
+        $event->add_record_snapshot('user', $user);
+        return $event;
+    }
 
     /**
      * Initialise required event data properties.
@@ -52,8 +83,7 @@ class user_suspended extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $user = $this->get_record_snapshot('user', $this->data['objectid']);
-        return 'User ' . $user->username . ' suspended';
+        return 'User ' . $this->other['username'] . ' suspended';
     }
 
     /**
@@ -92,13 +122,9 @@ class user_suspended extends \core\event\base {
      * @return void
      */
     protected function validate_data() {
-        global $CFG;
-
-        if ($CFG->debugdeveloper) {
-            parent::validate_data();
-            if (!isset($this->other['username'])) {
-                throw new \coding_exception('username must be set in $other.');
-            }
+        parent::validate_data();
+        if (!isset($this->other['username'])) {
+            throw new \coding_exception('username must be set in $other.');
         }
     }
 }

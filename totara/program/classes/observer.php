@@ -212,11 +212,17 @@ class totara_program_observer {
      * with completion deadlines 'from first login' where the
      * user had not yet logged in.
      *
-     * @param \totara_core\event\user_firstlogin $event
+     * @param \core\event\user_loggedin $event
      * @return boolean True if all the update_learner_assignments() succeeded or there was nothing to do
      */
-    public static function assignments_firstlogin(\totara_core\event\user_firstlogin $event) {
-        global $CFG, $DB;
+    public static function assignments_firstlogin(\core\event\user_loggedin $event) {
+        global $CFG, $DB, $USER;
+
+        if ($USER->firstaccess != $USER->currentlogin) {
+            // This is not the first login.
+            return true;
+        }
+
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
         prog_assignments_firstlogin($DB->get_record('user', array('id' => $event->objectid)));

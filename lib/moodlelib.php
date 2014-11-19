@@ -4352,37 +4352,47 @@ function delete_user(stdClass $user) {
 
 /**
  * Removes user deleted flag in internal user database and notifies the auth plugin.
- * @param object $user       Userobject before undelete    (without system magic quotes)
+ *
+ * NOTE: this is a Totara feature, it does not work with accounts deleted from Moodle,
+ *       because they do not keep original email and username!
+ *
+ * @param stdClass $user Userobject before undelete
  * @return boolean success
  */
 function undelete_user($user) {
     global $DB;
 
-    $updateuser = new object();
+    if (!$user->deleted) {
+        // User is not deleted, cannot undelete!
+        return false;
+    }
+
+    if ($user->email !== '' and strpos($user->email, '@') === false) {
+        // This account was deleted in Moodle most likely.
+        return false;
+    }
+
+    $updateuser = new stdClass();
     $updateuser->id           = $user->id;
     $updateuser->deleted      = 0;
     $updateuser->timemodified = time();
+    $DB->update_record('user', $updateuser);
 
-    // Call get_context_insance to create context if it doesn't exist.
-    context_user::instance($user->id, IGNORE_MISSING);
-
-    if ($DB->update_record('user', $updateuser)) {
-        $event = \totara_core\event\user_undeleted::create(
-            array(
-                'objectid' => $user->id,
-                'context' => context_user::instance($user->id),
-                'other' => array(
-                    'username' => $user->username,
-                )
-            )
-        );
-        $event->add_record_snapshot('user', $user);
-        $event->trigger();
-
-        return true;
-    } else {
+    $newuser = $DB->get_record('user', array('id' => $user->id));
+    if (!$newuser) {
         return false;
     }
+
+    // Update the $user parameter to match the database.
+    $user->deleted = 0;
+    $user->timemodified = $updateuser->timemodified;
+
+    // Create context record.
+    context_user::instance($user->id);
+
+    \totara_core\event\user_undeleted::create_from_user($newuser)->trigger();
+
+    return true;
 }
 
 /**
@@ -4542,24 +4552,6 @@ function authenticate_user_login($username, $password, $ignorelockout=false, &$f
                 // For some reason auth isn't set yet.
                 $DB->set_field('user', 'auth', $auth, array('id' => $user->id));
                 $user->auth = $auth;
-            }
-            if (empty($user->firstaccess)) { //prevent firstaccess from remaining 0 for manual account that never required confirmation
-                $now = time();
-                $DB->set_field('user','firstaccess', $now, array('id' => $user->id));
-                $user->firstaccess = $now;
-
-                $event = \totara_core\event\user_firstlogin::create(
-                    array(
-                        'objectid' => $user->id,
-                        'context' => context_user::instance($user->id),
-                        'other' => array(
-                            'username' => $user->username,
-                            'firstaccess' => $now,
-                        ),
-                    )
-                );
-                $event->add_record_snapshot('user', $user);
-                $event->trigger();
             }
 
             // If the existing hash is using an out-of-date algorithm (or the legacy md5 algorithm), then we should update to

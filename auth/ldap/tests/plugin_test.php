@@ -268,17 +268,8 @@ class auth_ldap_plugin_testcase extends advanced_testcase {
         $sink->close();
 
         // Check that the event is valid.
-        $this->assertCount(2, $events); // There should be a firstlogin event and a loggedin event.
-
-        $event = $events[0];
-        $this->assertInstanceOf('\totara_core\event\user_firstlogin', $event);
-        $this->assertEquals('user', $event->objecttable);
-        $this->assertEquals('2', $event->objectid);
-        $this->assertEquals(context_user::instance(2)->id, $event->contextid);
-        $expectedlog = array(SITEID, 'user', 'firstaccess', "view.php?id=".$user->id, $user->username);
-        $this->assertEventLegacyLogData($expectedlog, $event);
-
-        $event = $events[1];
+        $this->assertCount(1, $events);
+        $event = reset($events);
         $this->assertInstanceOf('\core\event\user_loggedin', $event);
         $this->assertEquals('user', $event->objecttable);
         $this->assertEquals('2', $event->objectid);

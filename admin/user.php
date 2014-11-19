@@ -123,7 +123,6 @@
             die;
         } else if (data_submitted() && $user->deleted) {
             if (undelete_user($user)) {
-                add_to_log($site->id, 'user', 'undelete', "view.php?id={$user->id}", $user->firstname . ' ' . $user->lastname);
                 totara_set_notification(get_string('undeletedx', 'totara_core', fullname($user, true)), $returnurl, array('class' => 'notifysuccess'));
             } else {
                 totara_set_notification(get_string('undeletednotx', 'totara_core', fullname($user, true)), $returnurl);
@@ -163,30 +162,11 @@
         if ($user = $DB->get_record('user', array('id'=>$suspend, 'mnethostid'=>$CFG->mnet_localhost_id, 'deleted'=>0))) {
             if (!is_siteadmin($user) and $USER->id != $user->id and $user->suspended != 1) {
                 $user->suspended = 1;
-                $user->timemodified = time();
-
                 // Force logout.
                 \core\session\manager::kill_user_sessions($user->id);
                 user_update_user($user, false);
 
-                $event = \core\event\user_updated::create(
-                    array(
-                        'objectid' => $user->id,
-                        'context' => context_user::instance($user->id),
-                    )
-                );
-                $event->trigger();
-
-                $event = \totara_core\event\user_suspended::create(
-                    array(
-                        'objectid' => $user->id,
-                        'context' => context_user::instance($user->id),
-                        'other' => array(
-                            'username' => $user->username,
-                        )
-                    )
-                );
-                $event->trigger();
+                \totara_core\event\user_suspended::create_from_user($user)->trigger();
             }
         }
         redirect($returnurl);

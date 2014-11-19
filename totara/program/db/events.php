@@ -48,7 +48,7 @@ $observers = array(
         'callback' => 'totara_program_observer::courseset_completed',
     ),
     array(
-        'eventname' => '\totara_core\event\user_firstlogin',
+        'eventname' => '\core\event\user_loggedin',
         'callback' => 'totara_program_observer::assignments_firstlogin',
     ),
     array(
