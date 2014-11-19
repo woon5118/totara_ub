@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Rob Tyler <rob.tyler@totaralms.com>
  * @package totara_reportbuilder
  */
 
@@ -26,28 +26,30 @@ namespace totara_reportbuilder\rb\display;
 /**
  * Class describing column display formatting.
  *
- * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @author Rob Tyler <rob.tyler@totaralms.com>
  * @package totara_reportbuilder
  */
-class nice_date extends base {
+class nice_date_list extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-
-        if (!is_numeric($value) || $value == 0 || $value == -1) {
+        if (!$value) {
             return '';
         }
 
-        if ($format === 'excel') {
-            $dateformat = new \MoodleExcelFormat();
-            $dateformat->set_num_format(14);
-            return array('date', $value, $dateformat);
+        $items = explode(', ', $value);
+
+        foreach ($items as $key => $item) {
+            if (!is_numeric($item) || $item == 0 || $item == -1) {
+                $items[$key] = '';
+            } else {
+                $items[$key] = userdate($item, get_string('strfdateshortmonth', 'langconfig'));
+            }
         }
 
-        if ($format === 'ods') {
-            $dateformat = new \MoodleOdsFormat();
-            $dateformat->set_num_format(14);
-            return array('date', $value, $dateformat);
-        }
-
-        return userdate($value, get_string('strfdateshortmonth', 'langconfig'));
+        // Use a line-break to separate the dates so they're handled consistently with
+        // the other multi-line cells in the HTML report table and spreadsheet exports.
+        // Note that because this function handles multiple dates in a single cell,
+        // the content should not be converted for Excel oor Open Office - it should be
+        // handled as plain text.
+        return implode($items, "\n");
     }
 }
