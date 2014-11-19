@@ -780,7 +780,8 @@ abstract class rb_base_source {
                     // If the enrolment plugin has a course_expand_hook then add to a list to process.
                     if (method_exists($plugin, 'course_expand_get_form_hook')
                         && method_exists($plugin, 'course_expand_enrol_hook')) {
-                        $inlineenrolments[$instance->id] = (object) ['plugin' => $plugin, 'instance' => $instance];
+                        $enrolment = array ('plugin' => $plugin, 'instance' => $instance);
+                        $inlineenrolments[$instance->id] = (object) $enrolment;
                     }
                 }
             }
