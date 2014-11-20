@@ -74,7 +74,7 @@ if ($usertype == 'manager') {
     $url = new moodle_url('/my/');
 }
 $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
-$indexurl = new moodle_url('/totara/plan/record/index.php', array('userid' => $userid));
+$indexurl = new moodle_url('/totara/plan/record/evidence/index.php', array('userid' => $userid));
 $PAGE->navbar->add($strheading, $indexurl);
 $PAGE->navbar->add(get_string('allevidence', 'totara_plan'));
 

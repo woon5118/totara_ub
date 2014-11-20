@@ -64,7 +64,7 @@ class plan_evidence_edit_form extends moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('err_required', 'form'), 'required', '', 'client', false, false);
 
-        $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);
+        $mform->addElement('editor', 'description_editor', get_string('evidencedescription', 'totara_plan'), null, $TEXTAREA_OPTIONS);
         $mform->setType('description_editor', PARAM_RAW);
 
         // Evidence type
