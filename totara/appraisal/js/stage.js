@@ -165,8 +165,15 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         modal        : true,
         render       : true
       });
+
+      var label = M.util.get_string('addpage', 'totara_appraisal');
+
+      if ($('input[name=id]').val() > 0) {
+          label = M.util.get_string('savechanges', 'moodle');
+      }
+
       dialogue.addButton({
-        label: M.util.get_string('addpage', 'totara_appraisal'),
+        label: label,
         section: Y.WidgetStdMod.FOOTER,
         action: function() {
           var $theFrm = $content.find('form.mform');
@@ -198,6 +205,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
       $('.moodle-dialogue-ft button').removeClass('yui3-button');
       var $content = $('#' + dialogue.get('id'));
       $content.find('input[type="text"]').eq(0).focus();
+      dialogue.show();
     }
 
     /**

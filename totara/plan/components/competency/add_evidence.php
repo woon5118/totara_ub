@@ -51,9 +51,8 @@ $nojs = optional_param('nojs', 0, PARAM_INT);
 
 require_login();
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagelayout('noblocks');
 $PAGE->set_url(qualified_me());
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $plan = new development_plan($id);
 $componentname = 'competency';
 $component = $plan->get_component($componentname);
@@ -143,10 +142,8 @@ $PAGE->navbar->add($fullname, new moodle_url('/totara/plan/view.php', array('id'
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
-echo $OUTPUT->header();
 
-// Plan menu
-echo dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
+echo $OUTPUT->header();
 
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');

@@ -687,10 +687,6 @@ img.smallicon {
 /**
  * Record of Learning
  */
-#dp-plans-menu,
-#recordoflearning-menu {
-    width:17%;
-}
 #dp-plans-menu ul,
 #recordoflearning-menu ul {
     list-style:none;

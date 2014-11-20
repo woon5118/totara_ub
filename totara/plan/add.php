@@ -42,7 +42,7 @@ $userid = required_param('userid', PARAM_INT); // user id
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/plan/add.php', array('userid' => $userid));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $ownplan = ($userid == $USER->id);
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
@@ -165,12 +165,12 @@ $args = array('args' => '{"templates":' . $json_templates . '}');
 
 $PAGE->requires->js_init_call('M.totara_plan_template.init', $args, false, $jsmodule);
 
+// Plan menu
+dp_display_plans_menu($userid);
+
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
-
-// Plan menu
-echo dp_display_plans_menu($userid);
 
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');

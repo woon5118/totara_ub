@@ -45,7 +45,7 @@ if ($filter == 'program') {
 }
 
 $PAGE->set_url('/totara/program/required.php');
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 
 //
 /// Permission checks
@@ -101,9 +101,8 @@ if ($programid) {
 
         $PAGE->set_title($pagetitle);
         $PAGE->set_heading('');
+        dp_display_plans_menu($userid, 0 , $role, 'courses', 'none', true, $program->id, true);
         echo $OUTPUT->header();
-
-        echo dp_display_plans_menu($userid, 0 , $role, 'courses', 'none', true, $program->id, true);
 
         // Program page content
         echo $OUTPUT->container_start('', 'program-content');
@@ -148,10 +147,8 @@ if ($programid) {
 
     $PAGE->set_title($heading);
     $PAGE->set_heading($pagetitle);
+    dp_display_plans_menu($userid, 0, $role, 'courses', 'none');
     echo $OUTPUT->header();
-
-    // Plan menu
-    echo dp_display_plans_menu($userid, 0, $role, 'courses', 'none');
 
     // Required learning page content
     echo $OUTPUT->container_start('', 'required-learning');

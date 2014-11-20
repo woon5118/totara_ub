@@ -134,10 +134,8 @@ $PAGE->navbar->add(get_string($component->component, 'totara_plan'));
 /// Display page
 ///
 $PAGE->set_title($pagetitle);
+dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
 echo $OUTPUT->header();
-
-// Plan menu
-echo dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
 
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');

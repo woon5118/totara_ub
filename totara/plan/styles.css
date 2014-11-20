@@ -68,25 +68,20 @@ img.disabled_action_icon {
  * My Learning > LP and RoL layouts
  **/
 
-#recordoflearning-menu,
-#dp-plans-menu {
+#recordoflearning-menu {
     float:left;
-    width:28%;
 }
-.dir-rtl #recordoflearning-menu,
-.dir-rtl #dp-plans-menu {
+.dir-rtl #recordoflearning-menu {
     float:right;
 }
 
 #recordoflearning-menu h3,
-#dp-plans-menu h3,
 #recordoflearning-menu h4,
 #dp-plans-menu h4 {
     margin: 5px 0;
     padding: 4px;
 }
 
-#dp-plan-content,
 #program-content,
 #required-learning{
     float:right;
@@ -104,37 +99,51 @@ div.plan_box {
     padding: 10px;
 }
 
-#dp-plan-content #dp-plans-description .instructional_text {
+#dp-plans-description .instructional_text {
     float: left;
     width: 73%;
     padding: 10px 0;
 }
 
-#dp-plan-content .notifynotice input[type="submit"] {
+.plan_box.notifynotice input[type="submit"] {
     margin: 0;
     margin-left: 5px;
 }
 
-.dir-rtl #dp-plan-content #dp-plans-description .instructional_text {
+.dir-rtl #dp-plans-description .instructional_text {
     float: right;
 }
 
-#dp-plan-content #dp-plans-description .dp-add-plan-link {
+#dp-plans-description .dp-add-plan-link {
     float: right;
     text-align: right;
-    width: 25%;
+    width: 26%;
+    min-width: 180px;
     padding-top: 10px;
 }
 
-.dir-rtl #dp-plan-content #dp-plans-description .dp-add-plan-link {
+.dir-rtl #dp-plans-description .dp-add-plan-link {
     float: left;
     text-align: left;
 }
 
-#dp-plan-content #dp-plans-list-active-plans table td.c0,
-#dp-plan-content #dp-plans-list-unapproved-plans table td.c0,
-#dp-plan-content #dp-plans-list-completed-plans table td.c0 {
+#dp-plans-list-active-plans,
+#dp-plans-list-unapproved-plans,
+#dp-plans-list-completed-plans {
+    clear: both;
+}
+
+#dp-plans-list-active-plans table td.c0,
+#dp-plans-list-unapproved-plans table td.c0,
+#dp-plans-list-completed-plans table td.c0 {
     padding-left: 40px;
+}
+
+.dir-rtl #dp-plans-list-active-plans table td.c0,
+.dir-rtl #dp-plans-list-unapproved-plans table td.c0,
+.dir-rtl #dp-plans-list-completed-plans table td.c0 {
+    padding-right: 40px;
+    padding-left: auto;
 }
 
 table.dp-templates {

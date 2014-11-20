@@ -1341,13 +1341,16 @@ function prog_update_completion($userid, program $program = null) {
  * with completion deadlines 'from first login' where the
  * user had not yet logged in.
  *
- * Used by program_hourly_cron and user_firstlogin events
+ * Used by program_hourly_cron and observer for first user login event.
  *
  * @param int $user User object to check first firstlogin for
  * @return boolean True if all the update_learner_assignments() succeeded or there was nothing to do
  */
 function prog_assignments_firstlogin($user) {
     global $DB;
+
+    // NOTE: in theory this might get called multiple times at the same time,
+    //       please make sure it would not result in fatal errors.
 
     $status = true;
 

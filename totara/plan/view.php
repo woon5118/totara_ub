@@ -56,7 +56,7 @@ $plan = new development_plan($id);
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/view.php', array('id' => $id)));
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 
 $ownplan = $USER->id == $plan->userid;
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';

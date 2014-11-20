@@ -139,9 +139,7 @@ class core_authlib_testcase extends advanced_testcase {
         $result = authenticate_user_login('username1', 'password1');
         $events = $sink->get_events();
         $sink->close();
-        //$this->assertEmpty($events);
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf('totara_core\event\user_firstlogin', reset($events));
+        $this->assertEmpty($events);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertEquals($user1->id, $result->id);
 

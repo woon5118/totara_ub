@@ -57,7 +57,7 @@ if ($deleteno == null) {
 ///
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url(new moodle_url('/totara/plan/components/objective/edit.php', array('id' => $planid)));
 $plan = new development_plan($planid);
 
@@ -200,10 +200,9 @@ $PAGE->navbar->add($fullname, new moodle_url('/totara/plan/view.php', array('id'
 $PAGE->navbar->add(get_string($component->component, 'totara_plan'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
-echo $OUTPUT->header();
+dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
 
-// Plan menu
-echo dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
+echo $OUTPUT->header();
 
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');

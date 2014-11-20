@@ -63,7 +63,7 @@ $currenturl = new moodle_url('/totara/plan/components/objective/view.php', array
 $canupdate = $component->can_update_items();
 
 $PAGE->set_context($systemcontext);
-$PAGE->set_pagelayout('noblocks');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url($currenturl);
 $ownplan = ($USER->id == $plan->userid);
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';

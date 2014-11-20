@@ -307,11 +307,6 @@ function auth_gauth_authenticate_user_login($username, $password) {
                 $DB->set_field('user', 'auth', $auth, array('username' => $username));
                 $user->auth = $auth;
             }
-            if (empty($user->firstaccess)) { //prevent firstaccess from remaining 0 for manual account that never required confirmation
-
-                $DB->set_field('user','firstaccess', $user->timemodified, array('id' => $user->id));
-                $user->firstaccess = $user->timemodified;
-            }
 
             // we don't want to upset the existing authentication schema for the user
             if ($authplugin->is_synchronised_with_external()) { // update user record from external DB

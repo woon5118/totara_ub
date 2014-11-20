@@ -59,16 +59,16 @@ if ($is_component) {
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
+
+// Plan menu
+dp_display_plans_menu($this->userid, $this->id, $this->role);
+
 echo $OUTPUT->header();
 
 // Run post header hook (if this is a component)
 if ($is_component) {
     $component->post_header_hook();
 }
-
-
-// Plan menu
-echo dp_display_plans_menu($this->userid, $this->id, $this->role);
 
 // Plan page content
 echo $OUTPUT->container_start('', 'dp-plan-content');

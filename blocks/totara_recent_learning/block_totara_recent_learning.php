@@ -77,7 +77,7 @@ class block_totara_recent_learning extends block_base {
 
             foreach ($courses as $course) {
                 $id = $course->id;
-                $name = $course->fullname;
+                $name = format_string($course->fullname);
                 $status = array_key_exists($id, $completions) ? $completions[$id]->status : null;
                 $completion = totara_display_course_progress_icon($USER->id, $course->id, $status);
                 $link = html_writer::link(new moodle_url('/course/view.php', array('id' => $id)), $name, array('title' => $name));

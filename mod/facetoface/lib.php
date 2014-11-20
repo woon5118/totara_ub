@@ -2808,9 +2808,21 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 $locationstring = '';
                 $roomdata = $DB->get_record('facetoface_room', array('id' => $session->roomid));
                 if (!empty($roomdata)) {
-                    $locationstring  = isset($roomdata->name)     ? format_string($roomdata->name)    .', '.html_writer::empty_tag('br') : '';
-                    $locationstring .= isset($roomdata->building) ? format_string($roomdata->building).', '.html_writer::empty_tag('br') : '';
-                    $locationstring .= isset($roomdata->address)  ? format_string($roomdata->address) .', '.html_writer::empty_tag('br') : '';
+                    $location = array ();
+
+                    if (!empty($roomdata->name)) {
+                        $location[] = format_string($roomdata->name);
+                    }
+                    if (!empty($roomdata->building)) {
+                        $location[] = format_string($roomdata->building);
+                    }
+                    if (!empty($roomdata->address)) {
+                        $location[] = format_string($roomdata->address);
+                    }
+
+                    if ($location) {
+                        $locationstring = implode ($location, ',' . html_writer::empty_tag('br')) . html_writer::empty_tag('br');
+                    }
                 }
 
                 $sessionobject = new stdClass();
@@ -5771,10 +5783,9 @@ function facetoface_get_manager_list() {
 
 
     $usernamefields = get_all_user_name_fields(true, 'u');
-    $sql = "SELECT u.id, {$usernamefields}
+    $sql = "SELECT DISTINCT u.id, {$usernamefields}
               FROM {pos_assignment} pa
               JOIN {user} u ON u.id = pa.managerid
-             GROUP BY u.id, u.firstname, u.lastname
              ORDER BY u.lastname, u.firstname";
     $managers = $DB->get_records_sql($sql);
     foreach ($managers as $manager) {
@@ -5782,11 +5793,10 @@ function facetoface_get_manager_list() {
     }
 
     if (!empty($CFG->enabletempmanagers)) {
-        $sql = "SELECT u.id, {$usernamefields}
+        $sql = "SELECT DISTINCT u.id, {$usernamefields}
                   FROM {temporary_manager} tm
                   JOIN {user} u ON u.id = tm.tempmanagerid
                  WHERE tm.expirytime > ?
-                 GROUP BY u.id, u.firstname, u.lastname
                  ORDER BY u.lastname, u.firstname";
         $params = array(time());
         $tempmanagers = $DB->get_records_sql($sql, $params);
