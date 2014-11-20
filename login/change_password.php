@@ -25,6 +25,7 @@
  */
 
 require('../config.php');
+require_once($CFG->dirroot.'/user/lib.php');
 require_once('change_password_form.php');
 require_once($CFG->libdir.'/authlib.php');
 
@@ -111,12 +112,11 @@ if ($mform->is_cancelled()) {
     redirect($CFG->wwwroot.'/user/view.php?id='.$USER->id.'&amp;course='.$course->id);
 } else if ($data = $mform->get_data()) {
 
-    $userrecord = $DB->get_record('user', array('id' => $USER->id));
-    $oldpasswordhash = $userrecord->password;
-
     if (!$userauth->user_update_password($USER, $data->newpassword1)) {
         print_error('errorpasswordupdate', 'auth');
     }
+
+    user_add_password_history($USER->id, $data->newpassword1);
 
     if (!empty($CFG->passwordchangelogout)) {
         \core\session\manager::kill_user_sessions($USER->id, session_id());
@@ -124,12 +124,6 @@ if ($mform->is_cancelled()) {
 
     // Reset login lockout - we want to prevent any accidental confusion here.
     login_unlock_account($USER);
-
-    // store old password
-    $todb = new stdClass();
-    $todb->uid = $USER->id;
-    $todb->hash = $oldpasswordhash;
-    $DB->insert_record('oldpassword', $todb);
 
     // register success changing password
     unset_user_preference('auth_forcepasswordchange', $USER);

@@ -940,18 +940,6 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2013102900, 'totara_core');
     }
 
-    if ($oldversion < 2013120300) {
-        // Add timecompleted for module completion.
-        $table = new xmldb_table('oldpassword');
-        $field = new xmldb_field('hash', XMLDB_TYPE_CHAR, '255');
-
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->change_field_precision($table, $field);
-        }
-
-        totara_upgrade_mod_savepoint(true, 2013120300, 'totara_core');
-    }
-
     if ($oldversion < 2014010700) {
         set_config('enablegoals', '1');
         set_config('enableappraisals', '1');
@@ -1438,6 +1426,38 @@ function xmldb_totara_core_upgrade($oldversion) {
 
         // Main savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015021001, 'totara_core');
+    }
+
+    if ($oldversion < 2015021100) {
+        // Backport MDL-47830 from Moodle 2.9dev.
+
+        // Define table user_password_history to be created.
+        $table = new xmldb_table('user_password_history');
+
+        // Adding fields to table user_password_history.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hash', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table user_password_history.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        // Conditionally launch create table for user_password_history.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Drop unused oldpassword table.
+        $table = new xmldb_table('oldpassword');
+
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015021100, 'totara_core');
     }
 
     return true;

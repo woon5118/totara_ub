@@ -41,8 +41,15 @@ class login_change_password_form extends moodleform {
         // visible elements
         $mform->addElement('static', 'username', get_string('username'), $USER->username);
 
-        if (!empty($CFG->passwordpolicy)){
-            $mform->addElement('static', 'passwordpolicyinfo', '', print_password_policy());
+        $policies = array();
+        if (!empty($CFG->passwordpolicy)) {
+            $policies[] = print_password_policy();
+        }
+        if (!empty($CFG->passwordreuselimit) and $CFG->passwordreuselimit > 0) {
+            $policies[] = get_string('informminpasswordreuselimit', 'auth', $CFG->passwordreuselimit);
+        }
+        if ($policies) {
+            $mform->addElement('static', 'passwordpolicyinfo', '', implode('<br />', $policies));
         }
         $mform->addElement('password', 'password', get_string('oldpassword'));
         $mform->addRule('password', get_string('required'), 'required', null, 'client');
@@ -75,7 +82,7 @@ class login_change_password_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         // ignore submitted username
-        if (!$user = authenticate_user_login(addslashes($USER->username), $data['password'], true)) {
+        if (!$user = authenticate_user_login($USER->username, $data['password'], true)) {
             $errors['password'] = get_string('invalidlogin');
             return $errors;
         }
@@ -86,15 +93,15 @@ class login_change_password_form extends moodleform {
             return $errors;
         }
 
-        if ($this->old_password_reused($data['newpassword1'])) {
-            $errors['newpassword1'] = get_string('passwordreused');
-            $errors['newpassword2'] = get_string('passwordreused');
-        }
-
         if ($data['password'] == $data['newpassword1']){
             $errors['newpassword1'] = get_string('mustchangepassword');
             $errors['newpassword2'] = get_string('mustchangepassword');
             return $errors;
+        }
+
+        if (user_is_previously_used_password($USER->id, $data['newpassword1'])) {
+            $errors['newpassword1'] = get_string('errorpasswordreused', 'core_auth');
+            $errors['newpassword2'] = get_string('errorpasswordreused', 'core_auth');
         }
 
         $errmsg = '';//prevents eclipse warnings
@@ -106,51 +113,4 @@ class login_change_password_form extends moodleform {
 
         return $errors;
     }
-
-    // Check if a specified password has been previously used by this user;
-    function old_password_reused($password) {
-        global $CFG, $USER, $DB;
-        $limit = empty($CFG->passwordreuselimit) ? 0: $CFG->passwordreuselimit;
-        if (empty($limit)) {
-            //Checking against zero old passwords - non-match by definition
-            return false;
-        }
-        $oldpasswordssql = 'SELECT * FROM {oldpassword} WHERE uid = ? ORDER BY id desc';
-        $oldpasswords = $DB->get_records_sql($oldpasswordssql, array($USER->id), 0, $limit);
-        foreach ($oldpasswords as $oldpassword) {
-            // Match against new bcrypt style password.
-            if (password_verify($password, $oldpassword->hash)) {
-                return true;
-            }
-
-            // Now check for legacy password algorithm.
-
-            if (md5($password . $CFG->passwordsaltmain) == $oldpassword->hash) {
-                // User tried to use a password they had previously set with the current salt
-                return true;
-            }
-            if (md5($password) == $oldpassword->hash) {
-                // User tried to use a password they had previously set when there was no salt
-                return true;
-            }
-            $altcount = 0;
-            while(1) {
-                //Check at least 20 alt password salts
-                $altcount++;
-                $varname = 'passwordsaltalt' . $altcount;
-                if ($altcount > 20 && empty($CFG->{$varname})) {
-                    break;
-                }
-                if (empty($CFG->{$varname})) {
-                    continue;
-                }
-                if (md5($password . $CFG->{$varname}) == $oldpassword->hash) {
-                    // User tried to use a password they had used on a previous salt;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 }
