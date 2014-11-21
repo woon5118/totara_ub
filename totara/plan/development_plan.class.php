@@ -932,7 +932,7 @@ class development_plan {
      * @return  string
      */
     public function display_plan_message_box() {
-        global $OUTPUT;
+        global $OUTPUT, $USER;
         $unapproved = ($this->status == DP_PLAN_STATUS_UNAPPROVED || $this->status == DP_PLAN_STATUS_PENDING);
         $completed = ($this->status == DP_PLAN_STATUS_COMPLETE);
         $viewingasmanager = $this->role == 'manager';
@@ -973,9 +973,14 @@ class development_plan {
                     } else {
                         $message .= $this->display_pending_items($pending);
                     }
+                } else {
+                    if ($canapproveplan && $USER->id == $this->userid) {
+                        $message .= $this->display_inactive_plan_message();
+                    } else {
+                        $message .= $this->display_unapproved_plan_message();
+                    }
                 }
 
-                $message .= $this->display_unapproved_plan_message();
             } else {
                 if ($haspendingitems) {
                     $message .= $this->display_pending_items($pending);
@@ -1062,6 +1067,26 @@ class development_plan {
         }
 
         $out .= html_writer::end_tag('form');
+        return $out;
+    }
+
+
+    /**
+     * Display message prompting the learner to activate their plan.
+     *
+     * @return string
+     */
+    function display_inactive_plan_message() {
+        global $OUTPUT;
+
+        $out = '';
+        $out .= html_writer::start_tag('form', array('action' => new moodle_url('/totara/plan/action.php'), 'method' => 'post', 'class' => 'approvalform'));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $this->id));
+        $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $out .= get_string('plannotactivated', 'totara_plan');
+        $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'activate', 'value' => get_string('activateplan', 'totara_plan')));
+        $out .= html_writer::end_tag('form');
+
         return $out;
     }
 
@@ -1570,6 +1595,33 @@ class development_plan {
             $event->fullmessage .= html_writer::empty_tag('br') . html_writer::empty_tag('br');
             $event->fullmessage .= $stringmanager->get_string('reasondeclinedplanrequest', 'totara_plan', $reasonfordecision, $userto->lang);
         }
+
+        tm_alert_send($event);
+    }
+
+
+    /**
+     * Send activated alert.
+     *
+     * @global $USER
+     * @global $CFG
+     * @return void
+     */
+    function send_activated_alert() {
+        global $USER, $CFG, $DB;
+        require_once($CFG->dirroot.'/totara/message/messagelib.php');
+
+        $userto = $DB->get_record('user', array('id' => $this->userid));
+        $userfrom = $DB->get_record('user', array('id' => $USER->id));
+        $stringmanager = get_string_manager();
+
+        $event = new stdClass;
+        $event->userfrom = $userfrom;
+        $event->userto = $userto;
+        $event->icon = 'learningplan-approve';
+        $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
+        $event->subject = format_string($stringmanager->get_string('planactivated', 'totara_plan', $this->name, $userto->lang));
+        $event->fullmessage = $event->subject;
 
         tm_alert_send($event);
     }
