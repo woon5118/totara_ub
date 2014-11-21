@@ -1182,6 +1182,64 @@ function xmldb_totara_core_upgrade($oldversion) {
                 $replacement = "{$theme}responsive";
             }
 
+            // Migrate configs for kiwifruit and customtotara to responsive analogs.
+            if (in_array($theme, array('customtotara', 'kiwifruit'))) {
+                $oldcomp = "theme_{$theme}";
+                $newcomp = "theme_{$theme}responsive";
+
+                $noconflict = true;
+                // We only care about settings conflict if theme is not used as site default.
+                // Check site theme used by default.
+                if ($CFG->theme != $theme) {
+                    $defaults['theme_customtotararesponsive'] = array(
+                        'logo' => '',
+                        'favicon' => '',
+                        'linkcolor' => '#087BB1',
+                        'linkvisitedcolor' => '#087BB1',
+                        'headerbgc' => '#F5F5F5',
+                        'buttoncolor' => '#E6E6E6',
+                        'customcss' => '',
+                    );
+                    $defaults['theme_kiwifruitresponsive'] = array(
+                        'logo' => '',
+                        'favicon' => '',
+                        'customcss' => '',
+                    );
+
+
+                    $respsettings = (array)get_config($newcomp);
+                    // Compare default values with current.
+                    foreach ($defaults[$newcomp] as $defaultsetting => $defaultvalue) {
+                        if (isset($respsettings[$defaultsetting]) && $respsettings[$defaultsetting] != $defaultvalue) {
+                            $noconflict = false;
+                        }
+                    }
+                }
+                $config = (array)get_config($oldcomp);
+                if ($noconflict && !empty($config)) {
+                    // Copy all configuration values.
+                    foreach ($config as $confname => $confvalue) {
+                        set_config($confname, $confvalue, $newcomp);
+                    }
+                    // Copy logo and favicon files.
+                    $fs = get_file_storage();
+                    $confcontext = context_system::instance();
+                    foreach (array('logo', 'favicon') as $area) {
+                        // Delete old.
+                        $fs->delete_area_files($confcontext->id, $newcomp, $area);
+
+                        // Copy new.
+                        $files = $fs->get_area_files($confcontext->id, $oldcomp, $area);
+                        if (is_array($files)) {
+                            foreach ($files as $file) {
+                                // Add new.
+                                $fs->create_file_from_storedfile(array('component' => $newcomp, 'filearea' => $area), $file);
+                            }
+                        }
+                    }
+                }
+            }
+
             // Replace the theme configs.
             $types = array('theme', 'thememobile', 'themelegacy', 'themetablet');
             foreach ($types as $type) {
