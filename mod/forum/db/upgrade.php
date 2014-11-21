@@ -181,26 +181,5 @@ function xmldb_forum_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014051203, 'forum');
     }
 
-
-    // Totara upgrade line - all Totara hacks must be done after all other Moodle upgrades!
-    // NOTE: use .01 version bumps because upstream does not use them (no risk of collision).
-
-    if ($oldversion < 2014051203.01) {
-
-        $table = new xmldb_table('forum_discussions');
-        $field = new xmldb_field('archived', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timeend');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $table = new xmldb_table('forum_posts');
-        $field = new xmldb_field('archived', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'mailnow');
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_mod_savepoint(true, 2014051203.01, 'forum');
-    }
-
     return true;
 }

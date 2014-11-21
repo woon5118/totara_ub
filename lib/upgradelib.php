@@ -537,6 +537,12 @@ function upgrade_plugins($type, $startcallback, $endcallback, $verbose) {
                 $result = true;
             }
 
+            if (is_readable($fullplug.'/db/totara_postupgrade.php')) {
+                require_once($fullplug.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_'.$plugin->fullname.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
+            }
+
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
             if ($installedversion < $plugin->version) {
                 // store version if not already there
@@ -697,6 +703,12 @@ function upgrade_plugins_modules($startcallback, $endcallback, $verbose) {
                 $result = $newupgrade_function($installedversion, $module);
             } else {
                 $result = true;
+            }
+
+            if (is_readable($fullmod.'/db/totara_postupgrade.php')) {
+                require_once($fullmod.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_'.$module->name.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
             }
 
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
@@ -889,6 +901,12 @@ function upgrade_plugins_blocks($startcallback, $endcallback, $verbose) {
                 $result = $newupgrade_function($installedversion, $block);
             } else {
                 $result = true;
+            }
+
+            if (is_readable($fullblock.'/db/totara_postupgrade.php')) {
+                require_once($fullblock.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_block_'.$blockname.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
             }
 
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
