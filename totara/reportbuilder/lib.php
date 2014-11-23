@@ -635,7 +635,8 @@ class reportbuilder {
             'tool',
             'totara',
             'local',
-            'enrol'
+            'enrol',
+            'repository',
         );
 
         // Search for rb_sources directories for each plugin type.
