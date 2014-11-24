@@ -26,6 +26,10 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a user is unassigned from a program.
+ *
+ */
 class program_unassigned extends \core\event\base {
 
     /**

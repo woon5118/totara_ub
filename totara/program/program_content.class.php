@@ -404,17 +404,8 @@ class prog_content {
             }
         }
 
-        $event = \totara_program\event\program_contentupdated::create(
-            array(
-                'objectid' => $this->programid,
-                'context' => context_program::instance($this->programid),
-                'userid' => $USER->id,
-                'other' => array(
-                    'coursesets' => $coursesetids,
-                ),
-            )
-        );
-        $event->trigger();
+        $dataevent = array('id' => $this->programid, 'other' => array('coursesets' => $coursesetids));
+        $event = \totara_program\event\program_contentupdated::create_from_data($dataevent)->trigger();
 
         return true;
     }

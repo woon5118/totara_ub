@@ -26,6 +26,16 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a program is deleted.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - certifid The Certif ID field of the program
+ * }
+ *
+ */
 class program_deleted extends \core\event\base {
 
     /**
@@ -43,7 +53,7 @@ class program_deleted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventdeletion', 'totara_program');
+        return get_string('eventdeleted', 'totara_program');
     }
 
     /**
@@ -53,15 +63,6 @@ class program_deleted extends \core\event\base {
      */
     public function get_description() {
         return "This program {$this->objectid} was deleted by user {$this->userid}";
-    }
-
-    /**
-     * Returns relevant URL.
-     *
-     * @return \moodle_url
-     */
-    public function get_url() {
-        return new \moodle_url('/totara/program/edit.php', array('id' => $this->objectid));
     }
 
     /**

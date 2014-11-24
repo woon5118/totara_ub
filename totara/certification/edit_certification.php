@@ -92,16 +92,15 @@ if ($data = $form->get_data()) {
         $certification->recertifydatetype = $data->recertifydatetype;
         $DB->update_record('certif', $certification);
 
+        // Trigger event.
+        $event = \totara_certification\event\certification_updated::create_from_instance($program)->trigger();
+
         totara_set_notification(get_string('certificationdetailssaved', 'totara_certification'),
                 new moodle_url('/totara/certification/edit_certification.php', array('id' => $program->id)),
                 array('class' => 'notifysuccess'));
     }
 
 }
-
-// Log this request.
-add_to_log(SITEID, 'certification', 'edit', "edit_certification.php?id={$program->id}", $program->fullname);
-
 
 // Display.
 

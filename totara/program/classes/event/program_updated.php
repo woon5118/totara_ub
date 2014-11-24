@@ -26,7 +26,44 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a program is updated.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - certifid The Certif ID field of the program.
+ * - action (optional) The Action executed in the update
+ * }
+ *
+ */
 class program_updated extends \core\event\base {
+
+    /**
+     * Flag for prevention of direct create() call.
+     * @var bool
+     */
+    protected static $preventcreatecall = true;
+
+    /**
+     * Create event from data.
+     *
+     * @param   array $dataevent Array with the data needed to create the event.
+     * @return  event
+     */
+    public static function create_from_data(array $dataevent) {
+        $data = array(
+            'objectid' => $dataevent['id'],
+            'context' => \context_program::instance($dataevent['id']),
+            'other' => $dataevent['other']
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Initialise the event data.
@@ -52,7 +89,24 @@ class program_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "This program {$this->objectid} was updated by user {$this->userid}";
+        $actionexecuted = '';
+        if (isset($this->other['action'])) {
+            $actionexecuted = ' Action executed: ';
+            $action = $this->other['action'];
+            switch ($action) {
+                case "show":
+                case "hide":
+                    $actionexecuted .= 'Change visibility to ' . $action;
+                    break;
+                case "move":
+                    $actionexecuted .= 'Change Position = ' . $action;
+                    break;
+                default:
+                    $actionexecuted .= $action;
+                    break;
+            }
+        }
+        return "This program {$this->objectid} was updated by user {$this->userid}. $actionexecuted";
     }
 
     /**

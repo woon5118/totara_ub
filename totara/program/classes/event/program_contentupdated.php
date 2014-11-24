@@ -26,7 +26,43 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when the content of a program is updated.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - coursesets The coursesets that are present in the program content
+ * }
+ *
+ */
 class program_contentupdated extends \core\event\base {
+
+    /**
+     * Flag for prevention of direct create() call.
+     * @var bool
+     */
+    protected static $preventcreatecall = true;
+
+    /**
+     * Create event from data.
+     *
+     * @param   array $dataevent Array with the data needed to create the event.
+     * @return  event
+     */
+    public static function create_from_data(array $dataevent) {
+        $data = array(
+            'objectid' => $dataevent['id'],
+            'context' => \context_program::instance($dataevent['id']),
+            'other' => $dataevent['other']
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Initialise the event data.

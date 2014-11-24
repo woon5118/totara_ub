@@ -104,6 +104,10 @@ if ($programid) {
         dp_display_plans_menu($userid, 0 , $role, 'courses', 'none', true, $program->id, true);
         echo $OUTPUT->header();
 
+        // Trigger event.
+        $dataevent = array('id' => $programid, 'userid' => $userid, 'other' => array('section' => 'required'));
+        $event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
+
         // Program page content
         echo $OUTPUT->container_start('', 'program-content');
 
@@ -163,12 +167,10 @@ if ($programid) {
 
     if ($userid == $USER->id) {
         $requiredlearninginstructions = html_writer::start_tag('div', array('class' => 'instructional_text')) . get_string('requiredlearninginstructions', 'totara_program') . html_writer::end_tag('div');
-        add_to_log(SITEID, 'program', 'view required', "required.php?userid={$userid}");
     } else {
         $user = $DB->get_record('user', array('id' => $userid));
         $userfullname = fullname($user);
         $requiredlearninginstructions = html_writer::start_tag('div', array('class' => 'instructional_text')) . get_string('requiredlearninginstructionsuser', 'totara_program', $userfullname) . html_writer::end_tag('div');
-        add_to_log(SITEID, 'program', 'view required', "required.php?userid={$userid}", $userfullname);
     }
 
     echo $requiredlearninginstructions;

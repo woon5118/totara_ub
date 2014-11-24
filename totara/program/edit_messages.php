@@ -130,8 +130,8 @@ if ($data = $messageseditform->get_data()) {
             print_error('error:setupprogrammessages', 'totara_program');
         }
 
-        // log this request
-        add_to_log(SITEID, 'program', 'update messages', "edit_messages.php?id={$program->id}", $program->fullname);
+        // Trigger event
+        \totara_program\event\update_messages::create_from_instance($program)->trigger();
 
         $prog_update = new stdClass();
         $prog_update->id = $id;
@@ -149,8 +149,9 @@ if ($data = $messageseditform->get_data()) {
 
 }
 
-// log this request
-add_to_log(SITEID, 'program', 'view messages', "edit_messages.php?id={$program->id}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'messages'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 $heading = format_string($program->fullname);

@@ -182,8 +182,15 @@ if ($data = $contenteditform->get_data()) {
         if (!$programcontent->save_content()) {
             totara_set_notification(get_string('programupdatefail', 'totara_program'), $currenturl);
         } else {
-            // log this request
-            add_to_log(SITEID, 'program', 'update content', "edit_content.php?id={$program->id}", $program->fullname);
+            $coursesetids = array();
+            $coursesets = $programcontent->get_course_sets();
+            foreach ($coursesets as $courseset) {
+                $coursesetids[] = $courseset->id;
+            }
+
+            // Trigger event.
+            $dataevent = array('id' => $program->id, 'other' => array('coursesets' => $coursesetids));
+            $event = \totara_program\event\program_contentupdated::create_from_data($dataevent)->trigger();
 
             $prog_update = new stdClass();
             $prog_update->id = $id;
@@ -199,8 +206,9 @@ if ($data = $contenteditform->get_data()) {
     }
 }
 
-// log this request
-add_to_log(SITEID, 'program', 'view content', "edit_content.php?id={$program->id}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'content'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 $heading = format_string($program->fullname);

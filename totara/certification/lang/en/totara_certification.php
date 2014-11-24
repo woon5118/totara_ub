@@ -101,6 +101,7 @@ $string['error:mustbepositive'] = 'Number must be positive';
 $string['error:nullactiveperiod'] = 'Recertification active period is not set';
 $string['error:nullwindowperiod'] = 'Recertification window period is not set';
 $string['error:useralreadyassigned'] = 'user already assigned for certifid={$a->certifid} userid={$a->userid}';
+$string['eventupdated'] = 'Certification\'s setting updated';
 $string['findcertifications'] = 'Find certifications';
 $string['learningcomptype'] = 'Learning component';
 $string['legend:recertfailrecertmessage'] = 'FAILURE TO RECERTIFY MESSAGE';

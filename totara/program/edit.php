@@ -232,17 +232,9 @@ if ($data = $detailsform->get_data()) {
             }
         }
 
-        $event = \totara_program\event\program_updated::create(
-            array(
-                'objectid' => $program->id,
-                'context' => context_program::instance($program->id),
-                'userid' => $USER->id,
-                'other' => array(
-                    'certifid' => empty($program->certifid) ? 0 : $program->certifid,
-                ),
-            )
-        );
-        $event->trigger();
+        $other = array('certifid' => empty($program->certifid) ? 0 : $program->certifid);
+        $dataevent = array('id' => $program->id, 'other' => $other);
+        $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();
 
         totara_set_notification(get_string('programdetailssaved', 'totara_program'), $nexturl, array('class' => 'notifysuccess'));
     }
@@ -251,8 +243,9 @@ if ($data = $detailsform->get_data()) {
     $program = new program($id);
 }
 
-// Log this request.
-add_to_log(SITEID, 'program', 'view', "edit.php?id={$program->id}&amp;iscertif={$iscertif}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'general'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 

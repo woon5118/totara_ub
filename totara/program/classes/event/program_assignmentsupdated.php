@@ -26,6 +26,16 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a program has its assignments updated.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - assignments The assignments associated to the program
+ * }
+ *
+ */
 class program_assignmentsupdated extends \core\event\base {
 
     /**
