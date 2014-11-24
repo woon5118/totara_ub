@@ -125,7 +125,7 @@ class profile_field_datetime extends profile_field_base {
         $fieldname = $this->inputname;
 
         // If a datetime is disabled then remove any existing data
-        if (empty($usernew->$fieldname)) {
+        if (isset($usernew->$fieldname) && empty($usernew->$fieldname)) {
             $DB->delete_records('user_info_data', array('userid' => $usernew->id, 'fieldid' => $this->field->id));
             return;
         }

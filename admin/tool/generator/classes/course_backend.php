@@ -281,7 +281,7 @@ class tool_generator_course_backend extends tool_generator_backend {
         $this->create_totara_objects();
 
         // Create pages, small and big files, and forum.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         $this->create_assignments();
         $this->create_pages();
         $this->create_small_files();

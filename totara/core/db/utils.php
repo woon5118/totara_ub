@@ -442,14 +442,14 @@ function totara_preupgrade($totarainfo) {
     // Check for existence of the three upgrade scripts as necessary - first the any upgrade script.
     $upgradefile = "{$CFG->dirroot}/totara/core/db/pre_any_upgrade.php";
     if (file_exists($upgradefile)) {
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         require($upgradefile);
     }
     // Is this a Moodle upgrade?
     if ($version > $CFG->version) {
         $upgradefile = "{$CFG->dirroot}/totara/core/db/pre_moodle_upgrade.php";
         if (file_exists($upgradefile)) {
-            set_time_limit(0);
+            core_php_time_limit::raise(0);
             require($upgradefile);
         }
     }
@@ -460,7 +460,7 @@ function totara_preupgrade($totarainfo) {
     if (version_compare($newversion, $oldversion, '>')) {
         $upgradefile = "{$CFG->dirroot}/totara/core/db/pre_totara_upgrade.php";
         if (file_exists($upgradefile)) {
-            set_time_limit(0);
+            core_php_time_limit::raise(0);
             require($upgradefile);
         }
     }

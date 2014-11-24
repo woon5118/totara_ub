@@ -448,7 +448,7 @@ function totara_upgrade_installed_languages() {
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/filelib.php');
     require_once($CFG->libdir.'/componentlib.class.php');
-    set_time_limit(0);
+    core_php_time_limit::raise(0);
     $notice_ok = array();
     $notice_error = array();
     $installer = new lang_installer();

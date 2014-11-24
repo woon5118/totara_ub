@@ -124,7 +124,7 @@ function display_evidence_detail($evidenceid, $delete = false) {
 
     if (!empty($item->description)) {
         $item->description = file_rewrite_pluginfile_urls($item->description, 'pluginfile.php', context_system::instance()->id, 'totara_plan', 'dp_plan_evidence', $item->id);
-        $out .= html_writer::tag('p', get_string('description') . ' : ' . format_text($item->description, FORMAT_HTML));
+        $out .= html_writer::tag('p', get_string('evidencedescription', 'totara_plan') . ' : ' . format_text($item->description, FORMAT_HTML));
     }
     if (!empty($item->evidencetypename)) {
         $out .=  html_writer::tag('p', get_string('evidencetype', 'totara_plan') . ' : ' . $item->evidencetypename);

@@ -115,7 +115,7 @@ $report = new reportbuilder($reportid);
 $success = false;
 $message = '';
 
-set_time_limit(REPORT_CACHING_TIMEOUT);
+core_php_time_limit::raise(REPORT_CACHING_TIMEOUT);
 raise_memory_limit(MEMORY_EXTRA);
 
 if ($report->cache) {

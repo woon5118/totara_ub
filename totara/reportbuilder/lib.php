@@ -3530,7 +3530,7 @@ class reportbuilder {
         require_once("$CFG->libdir/odslib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3631,7 +3631,7 @@ class reportbuilder {
         require_once("$CFG->libdir/excellib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3720,7 +3720,7 @@ class reportbuilder {
         require_once("{$CFG->libdir}/csvlib.class.php");
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
         raise_memory_limit(MEMORY_HUGE);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
@@ -3775,7 +3775,7 @@ class reportbuilder {
         require_once $CFG->libdir . '/pdflib.php';
 
         // Increasing the execution time to no limit.
-        set_time_limit(0);
+        core_php_time_limit::raise(0);
 
         $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
         $filename = clean_filename($fullname . '_report.pdf');
@@ -4926,6 +4926,8 @@ function reportbuilder_get_reports($showhidden=false) {
 
 /**
  * Purge cache to force report update during next load
+ * Caution: this function is used in db/upgrade.php, so on any scheme old behaviour for that upgrade must be
+ * maintained.
  *
  * @param int|object $cache either data from rb cache table or report id
  * @param bool $unschedule If true drops scheduling as well
@@ -5753,6 +5755,43 @@ function reportbuilder_get_extrafield_alias($type, $value, $name) {
     $extrafieldalias = "ef_{$hashtypevalue}_{$name}";
 
     return $extrafieldalias;
+}
+
+/**
+ * Deletes a report and any associated data
+ *
+ * @param integer $id ID of the report to delete
+ *
+ * @return boolean True if report was successfully deleted
+ */
+function reportbuilder_delete_report($id) {
+    global $DB;
+
+    if (!$id) {
+        return false;
+    }
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Delete report source cache.
+    reportbuilder_purge_cache($id, true);
+
+    // Delete any columns.
+    $DB->delete_records('report_builder_columns', array('reportid' => $id));
+    // Delete any filters.
+    $DB->delete_records('report_builder_filters', array('reportid' => $id));
+    // Delete any content and access settings.
+    $DB->delete_records('report_builder_settings', array('reportid' => $id));
+    // Delete any saved searches.
+    $DB->delete_records('report_builder_saved', array('reportid' => $id));
+
+    // Delete the report.
+    $DB->delete_records('report_builder', array('id' => $id));
+
+    // all okay commit changes
+    $transaction->allow_commit();
+
+    return true;
 }
 
 /**

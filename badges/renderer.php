@@ -138,7 +138,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $display .= $this->heading(get_string('badgedetails', 'badges'), 3);
         $dl = array();
         $dl[get_string('name')] = $badge->name;
-        $dl[get_string('description', 'badges')] = $badge->description;
+        $dl[get_string('description', 'badges')] = nl2br($badge->description);
         $dl[get_string('createdon', 'search')] = $badge->timecreated;
         $dl[get_string('badgeimage', 'badges')] = print_badge_image($badge, $context, 'large');
         $display .= $this->definition_list($dl);
@@ -310,7 +310,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $output .= $this->output->heading(get_string('badgedetails', 'badges'), 3);
         $dl = array();
         $dl[get_string('name')] = $badge->name;
-        $dl[get_string('description', 'badges')] = $badge->description;
+        $dl[get_string('description', 'badges')] = nl2br($badge->description);
 
         if ($badge->type == BADGE_TYPE_COURSE && isset($badge->courseid)) {
             $coursename = $DB->get_field('course', 'fullname', array('id' => $badge->courseid));

@@ -1439,7 +1439,7 @@ function import_completions($tempfilename, $importname, $importtime, $quiet = fa
     raise_memory_limit(MEMORY_EXTRA);
 
     // Stop time outs, this might take a while.
-    set_time_limit(0);
+    core_php_time_limit::raise(0);
 
     if ($errors = check_fields_exist($tempfilename, $importname)) {
         // Source file header doesn't have the required fields.

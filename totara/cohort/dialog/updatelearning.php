@@ -30,7 +30,7 @@ require_once($CFG->dirroot .'/cohort/lib.php');
 global $COHORT_ASSN_VALUES;
 
 // this could take a while
-set_time_limit(0);
+core_php_time_limit::raise(0);
 
 $context = context_system::instance();
 require_capability('moodle/cohort:manage', $context);

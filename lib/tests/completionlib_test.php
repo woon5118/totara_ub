@@ -519,9 +519,9 @@ class core_completionlib_testcase extends advanced_testcase {
         // Check the cache contents.
         $this->assertTrue(time()-$SESSION->completioncache[42]['updated']<2);
         $SESSION->completioncache[42]['updated'] = $now;
-        $this->assertEquals(array(42=>array(13=>$basicrecord, 14=>(object)array(
-            'id'=>'0', 'coursemoduleid'=>14, 'userid'=>314159, 'completionstate'=>0,
-            'viewed'=>0, 'timemodified'=>0), 'updated'=>$now)), $SESSION->completioncache);
+        $this->assertEquals(array(42 => array(13 => $basicrecord, 14 => (object)array(
+            'id' => 0, 'coursemoduleid' => 14, 'userid' => 314159, 'completionstate' => 0,
+            'viewed' => 0, 'timemodified' => 0, 'timecompleted' => null), 'updated' => $now)), $SESSION->completioncache);
     }
 
     public function test_internal_set_data() {

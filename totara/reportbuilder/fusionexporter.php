@@ -92,7 +92,7 @@ if (!$oauth->table_exists($tablename)) {
 $tables = $oauth->show_tables();
 
 // Switch off the timeout as this could easily be long running.
-@set_time_limit(0);
+core_php_time_limit::raise(0);
 
 // Process the output.
 if ($records = $DB->get_recordset_sql($query, $params)) {

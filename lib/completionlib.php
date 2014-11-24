@@ -1224,6 +1224,7 @@ class completion_info {
                     $data->completionstate = 0;
                     $data->viewed          = 0;
                     $data->timemodified    = 0;
+                    $data->timecompleted   = null;
                 }
                 $SESSION->completioncache[$this->course->id][$othercm->id] = $data;
             }

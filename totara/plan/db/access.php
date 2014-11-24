@@ -124,7 +124,7 @@ $capabilities = array(
         'riskbitmask' => RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetype' => array(
+        'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),
@@ -134,7 +134,7 @@ $capabilities = array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetype' => array(
+        'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),
@@ -144,7 +144,7 @@ $capabilities = array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetype' => array(
+        'archetypes' => array(
             'manager' => CAP_ALLOW,
             'user' => CAP_ALLOW
         )
