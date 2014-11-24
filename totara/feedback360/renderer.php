@@ -840,9 +840,9 @@ class totara_feedback360_renderer extends plugin_renderer_base {
     /**
      * returns the html for a system user item with delete button.
      *
-     * @param string $email     The email used in an email_assignment
-     * @param int $userform     The id of the feedback user_assignment
-     * @param object $resp      The associated resp_assignment, for the timecompleted field
+     * @param string $email             The email used in an email_assignment record.
+     * @param int $userform             The id of the user_assignment record.
+     * @param object $resp              The associated resp_assignment, for the timecompleted field.
      */
     public function external_user_record($email, $userform, $resp) {
         global $CFG;
@@ -851,7 +851,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $removestr = get_string('remove');
         $completestr = get_string('alreadyreplied', 'totara_feedback360');
-        $deleteparams = array('userid' => $CFG->siteguest, 'userform' => $userform, 'email' => $email);
+        $deleteparams = array('respid' => $resp->id, 'email' => $email);
         $deleteurl = new moodle_url('/totara/feedback360/request/delete.php', $deleteparams);
 
         $out .= html_writer::start_tag('div', array('id' => "external_user_{$email}", 'class' => 'external_record'));

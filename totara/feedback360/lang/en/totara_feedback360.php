@@ -115,6 +115,7 @@ $string['error:feedback360isactive'] = 'Feedback must be in \'Draft\' or \'Close
 $string['error:feedback360noteditable'] = 'Feedback can not be edited while in an \'Active\' state';
 $string['error:feedbacknotactive'] = 'Feedback can not be edited unless the form is active';
 $string['error:feedbacktablecreation'] = 'Feedback must be saved before creating answers table';
+$string['error:invalidparams'] = 'Invalid Parameters';
 $string['error:learnersrequired'] = 'Feedback must be assigned to users';
 $string['error:questionsrequired'] = 'Feedback must have at least one basic or review question';
 $string['error:recipientsrequired'] = 'At least one group of recipients must be selected';
@@ -125,6 +126,11 @@ $string['error:submitform'] = 'Please, fill form with valid required data before
 $string['error:unexpectedtype'] = 'The variable {$a} does not meet the expected type';
 $string['error:unrecognisedaction'] = 'Trying to preform an unrecognised action: {$a}';
 $string['error:previewpermissions'] = 'You do not have permission to preview this feedback';
+$string['eventcreatedfeedback'] = 'Created Feedback360';
+$string['eventcreatedrequest'] = 'Created Feedback360 Request';
+$string['eventdeletedfeedback'] = 'Deleted Feedback360';
+$string['eventdeletedrequest'] = 'Deleted Feedback360 Request';
+$string['eventupdatedfeedback'] = 'Updated Feedback360';
 
 $string['feedback360'] = '360&deg; Feedback';
 $string['feedback360:managefeedback360'] = 'Manage Feedback forms';
@@ -278,3 +284,4 @@ $string['viewinguserxfeedback360'] = 'You are viewing {$a}\'s Feedback';
 $string['viewrequest'] = 'View Request';
 $string['viewresponse'] = 'View Response';
 $string['viewuserxresponses'] = 'View {$a}\'s responses';
+
