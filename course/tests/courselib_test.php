@@ -1574,7 +1574,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $sink->close();
 
         // Validate the event.
-        $event = $events[1];
+        $event = $events[count($events) - 1]; // Totara triggers extra bulk events.
         $this->assertInstanceOf('\core\event\course_deleted', $event);
         $this->assertEquals('course', $event->objecttable);
         $this->assertEquals($course->id, $event->objectid);
@@ -1626,7 +1626,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $sink->close();
 
         // Validate the event.
-        $event = $events[0];
+        $event = $events[count($events) - 1]; // Totara triggers extra bulk events.
         $this->assertInstanceOf('\core\event\course_content_deleted', $event);
         $this->assertEquals('course', $event->objecttable);
         $this->assertEquals($course->id, $event->objectid);

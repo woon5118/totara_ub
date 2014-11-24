@@ -27,76 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 // List of observers.
 $observers = array(
-/*
-    'role_assigned_bulk' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'role_assigned_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
 
-    'role_unassigned' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'role_unassigned'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'role_unassigned_bulk' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'role_unassigned_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_enrolled' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_enrolled'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_enrolled_bulk' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_enrolled_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_unenrolled' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_unenrolled'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_unenrolled_bulk' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_unenrolled_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_enrol_modified' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_enrol_modified'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'user_enrol_modified_bulk' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'user_enrol_modified_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'course_deleted' => array (
-        'handlerfile'      => '/enrol/meta/locallib.php',
-        'handlerfunction'  => array('enrol_meta_handler', 'course_deleted'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-*/
     array(
         'eventname'   => '\core\event\user_enrolment_created',
         'callback'    => 'enrol_meta_observer::user_enrolment_created',
@@ -120,5 +51,24 @@ $observers = array(
     array(
         'eventname'   => '\core\event\course_deleted',
         'callback'    => 'enrol_meta_observer::course_deleted',
+    ),
+
+    // Totara performance tricks.
+
+    array(
+        'eventname'   => '\totara_core\event\bulk_enrolments_started',
+        'callback'    => 'enrol_meta_observer::bulk_started',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_enrolments_ended',
+        'callback'    => 'enrol_meta_observer::bulk_finished',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_role_assignments_started',
+        'callback'    => 'enrol_meta_observer::bulk_started',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_role_assignments_ended',
+        'callback'    => 'enrol_meta_observer::bulk_finished',
     ),
 );

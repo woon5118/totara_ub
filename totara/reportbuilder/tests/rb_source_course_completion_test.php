@@ -33,6 +33,9 @@ class totara_reportbuilder_rb_source_course_completion_testcase extends advanced
         $this->resetAfterTest();
         $this->setAdminUser();
 
+        // Make sure there bulk state is not carried over from other tests.
+        totara_core_observer::$bulkenrolling = array();
+
         $users = array();
         $users[] = $this->getDataGenerator()->create_user(array('institution' => 'ABC'));
         $users[] = $this->getDataGenerator()->create_user(array('institution' => 'ABC'));

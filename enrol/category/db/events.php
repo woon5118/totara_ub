@@ -37,26 +37,4 @@ $observers = array (
         'callback'  => 'enrol_category_observer::role_unassigned',
     ),
 
-/*
-    'role_assigned_bulk' => array (
-        'handlerfile'      => '/enrol/category/locallib.php',
-        'handlerfunction'  => array('enrol_category_handler', 'role_assigned_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'role_unassigned' => array (
-        'handlerfile'      => '/enrol/category/locallib.php',
-        'handlerfunction'  => array('enrol_category_handler', 'role_unassigned'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'role_unassigned_bulk' => array (
-        'handlerfile'      => '/enrol/category/locallib.php',
-        'handlerfunction'  => array('enrol_category_handler', 'role_unassigned_bulk'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-*/
 );

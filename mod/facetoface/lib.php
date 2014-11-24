@@ -4744,6 +4744,8 @@ function facetoface_eventhandler_role_unassigned($ra) {
 function facetoface_eventhandler_role_unassigned_bulk($event) {
     global $CFG, $USER, $DB;
 
+    // TODO: This is most probably not used any more.
+
     $now = time();
 
     $tmptable = $event['tmptable'];

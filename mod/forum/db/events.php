@@ -30,27 +30,7 @@ $observers = array(
         'eventname'   => '\core\event\user_enrolment_deleted',
         'callback'    => 'mod_forum_observer::user_enrolment_deleted',
     ),
-/*
-    'user_enrolled_bulk' => array (
-        'handlerfile'      => '/mod/forum/lib.php',
-        'handlerfunction'  => 'forum_user_enrolled_bulk',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
 
-    'user_unenrolled' => array (
-        'handlerfile'      => '/mod/forum/lib.php',
-        'handlerfunction'  => 'forum_user_unenrolled',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-    'user_unenrolled_bulk' => array (
-        'handlerfile'      => '/mod/forum/lib.php',
-        'handlerfunction'  => 'forum_user_unenrolled_bulk',
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-*/
     array(
         'eventname' => '\core\event\role_assigned',
         'callback' => 'mod_forum_observer::role_assigned'

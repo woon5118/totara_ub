@@ -1780,6 +1780,8 @@ function role_assign($roleid, $userid, $contextid, $component = '', $itemid = 0,
 /**
  * This function makes bulk role-assignments (a role for users in a particular context)
  *
+ * @since Totara 2.2
+ *
  * @param int $roleid the role of the id
  * @param array $userids containing objects with userids OR just array of userids
  * @param int|context $contextid id of the context
@@ -1862,15 +1864,9 @@ function role_assign_bulk($roleid, $userids, $contextid, $component = '', $itemi
 
     reload_all_capabilities();
 
-    // TODO: migrate to new events.
-    $ra = new stdClass;
-    $ra->userids = $userids;
-    $ra->roleid = $roleid;
-    $ra->contextid = $contextid;
-    $ra->component = $component;
-    $ra->itemid = $itemid;
-    $ra->timemodified = $timemodified;
-    events_trigger_legacy('role_assigned_bulk', $ra);
+    // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+    \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+    \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
 
     return true;
 }
@@ -2014,6 +2010,8 @@ function role_unassign_all(array $params, $subcontexts = false, $includemanual =
  * Bulk removes multiple role assignments, parameters may contain:
  *   'roleid', 'userids', 'contextid'(required), 'component', 'enrolid'.
  *
+ * @since Totara 2.2
+ *
  * @param array $params role assignment parameters
  * @param bool $subcontexts unassign in subcontexts too
  * @param bool $includemanual include manual role assignments too
@@ -2068,9 +2066,10 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
         if ($context = context::instance_by_id($params['contextid'], IGNORE_MISSING)) {
             // this is a bit expensive but necessary
             $context->mark_dirty();
+            // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+            \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+            \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
         }
-        // TODO: migrate to new events.
-        events_trigger_legacy('role_unassigned_bulk', $ras);
         unset($ras);
     }
 
@@ -2093,8 +2092,9 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
                     $DB->delete_records_select('role_assignments', "id {$sqlin}", $sqlparams);
                     // this is a bit expensive but necessary
                     $context->mark_dirty();
-                    // TODO: migrate to new events.
-                    events_trigger_legacy('role_unassigned_bulk', $ras);
+                    // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+                    \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+                    \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
                 }
             }
             unset($sparams);
