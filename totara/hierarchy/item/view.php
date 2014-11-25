@@ -65,7 +65,7 @@ if ($canmanage) {
     $PAGE->set_context($sitecontext);
     $pagetitle = format_string($framework->fullname.' - '.$item->fullname);
     $PAGE->set_title($pagetitle);
-    $PAGE->set_heading('');
+    $PAGE->set_heading(format_string($SITE->fullname));
     $PAGE->set_url('/totara/hierarchy/item/view.php', array('prefix' => $prefix, 'id' => $id));
     $PAGE->set_pagelayout('admin');
     if ($canviewframeworks) {

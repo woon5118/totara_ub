@@ -138,7 +138,7 @@ $strmodulenameplural = get_string('modulenameplural', 'facetoface');
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($streditinga);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 $icon = '<img src="'.$OUTPUT->pix_url('/facetoface/icon') . '" alt=""/>';

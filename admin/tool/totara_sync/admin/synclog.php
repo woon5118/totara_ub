@@ -94,7 +94,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->navbar->add(get_string('view'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
 $countfiltered = $report->get_filtered_count();
