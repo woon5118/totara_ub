@@ -134,8 +134,6 @@ switch($action) {
 
             $page->set($fromform)->save();
 
-            add_to_log(SITEID, 'appraisal', 'update page', 'page.php?appraisalstageid='.$stageid.'&id='
-                    .$id, 'General Settings: Page ID=' . $id);
             totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
                     array('class' => 'notifysuccess'));
         }

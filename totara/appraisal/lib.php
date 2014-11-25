@@ -171,8 +171,12 @@ class appraisal {
 
             $todb->id = $this->id;
             $DB->update_record('appraisal', $todb);
+
+            \totara_appraisal\event\appraisal_updated::create_from_instance($this)->trigger();
         } else {
             $this->id = $DB->insert_record('appraisal', $todb);
+
+            \totara_appraisal\event\appraisal_created::create_from_instance($this)->trigger();
         }
         // Refresh data.
         $this->load($this->id);
@@ -1150,10 +1154,14 @@ class appraisal {
     public function delete() {
         global $DB, $TEXTAREA_OPTIONS;
 
+        $snapshot = $this->get();
+
         // Set status to draft so that is_locked will return false and thus allow deletion.
         // We don't use appraisal->set_status() because it normally doesn't allow changing to draft status.
-        $this->status = self::STATUS_DRAFT;
-        $this->save(true);
+        if ($this->status !=  self::STATUS_DRAFT) {
+            $this->status = self::STATUS_DRAFT;
+            $this->save(true);
+        }
 
         // Remove question data table.
         sql_drop_table_if_exists('{appraisal_quest_data_' . $this->id . '}');
@@ -1181,6 +1189,8 @@ class appraisal {
         // Remove appraisal.
         $DB->delete_records('appraisal', array('id' => $this->id));
         $this->id = null;
+
+        \totara_appraisal\event\appraisal_deleted::create_from_instance($snapshot)->trigger();
     }
 
     /**
@@ -2025,8 +2035,12 @@ class appraisal_stage {
         if ($this->id > 0) {
             $todb->id = $this->id;
             $DB->update_record('appraisal_stage', $todb);
+
+            \totara_appraisal\event\stage_updated::create_from_instance($this)->trigger();
         } else {
             $this->id = $DB->insert_record('appraisal_stage', $todb);
+
+            \totara_appraisal\event\stage_created::create_from_instance($this)->trigger();
         }
         // Save roles that should be locked on stage completion.
         $this->save_locks();
@@ -2693,6 +2707,7 @@ class appraisal_stage {
     public function delete() {
         global $DB, $TEXTAREA_OPTIONS;
 
+        $snapshot = $this->get();
         if (!appraisal::is_draft($this->appraisalid)) {
             return false;
         }
@@ -2714,6 +2729,9 @@ class appraisal_stage {
 
         $DB->delete_records('appraisal_stage', array('id' => $this->id));
         $this->id = null;
+
+        \totara_appraisal\event\stage_deleted::create_from_instance($snapshot)->trigger();
+
         return true;
     }
 
@@ -2887,8 +2905,12 @@ class appraisal_page {
         if ($this->id > 0) {
             $todb->id = $this->id;
             $DB->update_record('appraisal_stage_page', $todb);
+
+            \totara_appraisal\event\page_updated::create_from_instance($this)->trigger();
         } else {
             $this->id = $DB->insert_record('appraisal_stage_page', $todb);
+
+            \totara_appraisal\event\page_created::create_from_instance($this)->trigger();
         }
         // Refresh data.
         $this->load($this->id);
@@ -3267,6 +3289,7 @@ class appraisal_page {
 
         $page = new appraisal_page($pageid);
         $stage = new appraisal_stage($page->appraisalstageid);
+        $snapshot = $page->get();
         if (!appraisal::is_draft($stage->appraisalid)) {
             return false;
         }
@@ -3277,6 +3300,9 @@ class appraisal_page {
         }
 
         $DB->delete_records('appraisal_stage_page', array('id' => $page->id));
+
+        \totara_appraisal\event\page_deleted::create_from_instance($snapshot)->trigger();
+
         return true;
     }
 
@@ -3414,10 +3440,17 @@ class appraisal_question extends question_storage {
         $obj = new stdClass;
         if ($isform) {
             $this->element->define_get($obj);
+        } else {
+            $this->export_storage_fields($obj);
         }
+
         $obj->appraisalstagepageid = $this->appraisalstagepageid;
         $obj->name = $this->name;
         $obj->sortorder = $this->sortorder;
+        $obj->description = isset($this->description) ? $this->description : '';
+        $obj->descriptionformat = isset($this->descriptionformat) ? $this->descriptionformat : '';
+        $obj->defaultdataformat = isset($this->defaultdataformat) ? $this->defaultdataformat : '';
+        $obj->appraisalscaleid = isset($this->appraisalscaleid) ? $this->appraisalscaleid : '';
 
         // Get roles access.
         $obj->roles = $this->roles;
@@ -3468,9 +3501,13 @@ class appraisal_question extends question_storage {
         if ($this->id > 0) {
             $todb->id = $this->id;
             $DB->update_record('appraisal_quest_field', $todb);
+
+            \totara_appraisal\event\question_updated::create_from_instance($this, $stage->id)->trigger();
         } else {
             $todb->datatype = $this->datatype;
             $this->id = $DB->insert_record('appraisal_quest_field', $todb);
+
+            \totara_appraisal\event\question_created::create_from_instance($this, $stage->id)->trigger();
         }
 
         // Save roles access for quesiton.
@@ -3993,6 +4030,7 @@ class appraisal_question extends question_storage {
     public static function delete($questid) {
         global $DB;
         $question = new appraisal_question($questid);
+        $snapshot = $question->get();
 
         $page = new appraisal_page($question->appraisalstagepageid);
         $stage = new appraisal_stage($page->appraisalstageid);
@@ -4008,6 +4046,8 @@ class appraisal_question extends question_storage {
         }
         $DB->delete_records('appraisal_quest_field_role', array('appraisalquestfieldid' => $question->id));
         $DB->delete_records('appraisal_quest_field', array('id' => $question->id));
+
+        \totara_appraisal\event\question_deleted::create_from_instance($snapshot, $stage->id)->trigger();
 
         return true;
     }
