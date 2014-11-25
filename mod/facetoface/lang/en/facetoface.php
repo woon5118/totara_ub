@@ -1286,6 +1286,14 @@ $string['notificationtype_help'] = 'Notification Type allows the learner to sele
 * Email notification only
 * No Email notification ';
 
+$string['recipients_help'] = '<strong>Booked</strong> - allows you to send the notification to all users who were booked, only those who attended, or only those who did not attend.
+
+Please note, when selecting <strong>All booked</strong>, notifications will be issued to all booked users, regardless of their attendance status, for sessions past and present.
+
+<strong>Wait-listed</strong> - will send a notification to those who are signed up for a session which allows overbooking, but are not yet booked.
+
+<strong>User cancelled</strong> - will send a notification to users for whom a session was cancelled or users who removed themselves from a session.';
+
 $string['reminderinstrmngr'] = '# Notice for Manager';
 $string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a face-to-face session.';
 
