@@ -842,6 +842,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] .= ' first';
+                    $posuplink = $this->output->spacer(array('width' => '21', 'height' => '15'));
                 }
                 if ($page->id != $last->id) {
                     $posdownurl = new moodle_url('/totara/appraisal/ajax/page.php', array('action' => 'posdown',
@@ -850,6 +851,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] .= ' last';
+                    $posdownlink = $this->output->spacer(array('width' => '21', 'height' => '15'));
                 }
                 $pageurl = new moodle_url('/totara/appraisal/ajax/question.php', array('appraisalstagepageid' => $page->id));
                 $editurl = new moodle_url('/totara/appraisal/ajax/page.php', array('action' => 'edit', 'id' => $page->id));
@@ -914,6 +916,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] = ' first';
+                    $posuplink = $this->output->spacer(array('width' => '21', 'height' => '15'));
                 }
                 if ($quest->id != $last->id) {
                     $posdownurl = new moodle_url('/totara/appraisal/ajax/question.php', array('action' => 'posdown',
@@ -922,6 +925,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] .= ' last';
+                    $posdownlink = $this->output->spacer(array('width' => '21', 'height' => '15'));
                 }
                 $editurl = new moodle_url('/totara/appraisal/ajax/question.php', array('action' => 'edit',
                     'id' => $quest->id, 'sesskey' => sesskey()));
