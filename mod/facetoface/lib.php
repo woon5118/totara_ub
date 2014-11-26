@@ -241,94 +241,6 @@ function facetoface_cost($userid, $sessionid, $sessiondata) {
 }
 
 /**
- * Human-readable version of the duration field used to display it to
- * users
- *
- * @param   integer $duration duration in hours
- * @return  string
- */
-function format_duration($duration) {
-
-    $components = explode(':', $duration);
-
-    // Default response
-    $string = '';
-
-    // Check for bad characters
-    if (trim(preg_match('/[^0-9:\.\s]/', $duration))) {
-        return $string;
-    }
-
-    if ($components and count($components) > 1) {
-        // e.g. "1:30" => "1 hour and 30 minutes"
-        $hours = round($components[0]);
-        $minutes = round($components[1]);
-    }
-    else {
-        // e.g. "1.5" => "1 hour and 30 minutes"
-        $hours = floor($duration);
-        $minutes = round(($duration - floor($duration)) * 60);
-    }
-
-    // Check if either minutes is out of bounds
-    if ($minutes >= 60) {
-        return $string;
-    }
-
-    if (1 == $hours) {
-        $string = get_string('onehour', 'facetoface');
-    } elseif ($hours > 1) {
-        $string = get_string('xhours', 'facetoface', $hours);
-    }
-
-    // Insert separator between hours and minutes
-    if ($string != '') {
-        $string .= ' ';
-    }
-
-    if (1 == $minutes) {
-        $string .= get_string('oneminute', 'facetoface');
-    } elseif ($minutes > 0) {
-        $string .= get_string('xminutes', 'facetoface', $minutes);
-    }
-
-    return $string;
-}
-
-/**
- * Converts minutes to hours
- */
-function facetoface_minutes_to_hours($minutes) {
-    if (!intval($minutes)) {
-        return 0;
-    }
-
-    if ($minutes > 0) {
-        $hours = floor($minutes / 60.0);
-        $mins = $minutes - ($hours * 60.0);
-        return "$hours:$mins";
-    } else {
-        return $minutes;
-    }
-}
-
-/**
- * Converts hours to minutes
- */
-function facetoface_hours_to_minutes($hours) {
-    $components = explode(':', $hours);
-    if ($components and count($components) > 1) {
-        // e.g. "1:45" => 105 minutes
-        $hours = $components[0];
-        $minutes = $components[1];
-        return $hours * 60.0 + $minutes;
-    } else {
-        // e.g. "1.75" => 105 minutes
-        return round($hours * 60.0);
-    }
-}
-
-/**
  * Turn undefined manager messages into empty strings and deal with checkboxes
  */
 function facetoface_fix_settings($facetoface) {
@@ -610,9 +522,6 @@ function facetoface_delete_instance($id) {
  * Prepare the user data to go into the database.
  */
 function cleanup_session_data($session) {
-
-    // Convert hours (expressed like "1.75" or "2" or "3.5") to minutes
-    $session->duration = facetoface_hours_to_minutes($session->duration);
 
     // Only numbers allowed here
     $session->capacity = preg_replace('/[^\d]/', '', $session->capacity);
@@ -1240,7 +1149,6 @@ function facetoface_get_session($sessionid) {
 
     if ($session) {
         $session->sessiondates = facetoface_get_session_dates($sessionid);
-        $session->duration = facetoface_minutes_to_hours($session->duration);
     }
 
     return $session;
@@ -1281,7 +1189,6 @@ function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
-            $sessions[$key]->duration = facetoface_minutes_to_hours($sessions[$key]->duration);
             $sessions[$key]->sessiondates = facetoface_get_session_dates($value->id);
         }
     }
@@ -1825,7 +1732,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
 
                 $worksheet->write_string($i,$j++,$starttime);
                 $worksheet->write_string($i,$j++,$finishtime);
-                $worksheet->write_number($i,$j++,(int)$session->duration);
+                $worksheet->write_string($i,$j++,format_time($session->duration));
                 $worksheet->write_string($i,$j++,$status);
 
                 if ($trainerroles) {
@@ -1931,7 +1838,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
 
             $worksheet->write_string($i,$j++,$starttime);
             $worksheet->write_string($i,$j++,$finishtime);
-            $worksheet->write_number($i,$j++,(int)$session->duration);
+            $worksheet->write_string($i,$j++,format_time($session->duration));
             $worksheet->write_string($i,$j++,$status);
 
             if ($trainerroles) {
@@ -3446,7 +3353,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
     if (!empty($session->duration)) {
         $output .= html_writer::tag('dt', get_string('duration', 'facetoface'));
-        $output .= html_writer::tag('dd', format_duration($session->duration));
+        $output .= html_writer::tag('dd', format_time($session->duration));
     }
 
     // Display room information

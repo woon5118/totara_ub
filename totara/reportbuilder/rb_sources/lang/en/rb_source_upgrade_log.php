@@ -17,18 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package modules
- * @subpackage facetoface
+ * @package totara_reportbuilder
  */
 
-////////////////////////////////////////////////////////////////////////////////
-//  Code fragment to define the module version etc.
-//  This fragment is called by /admin/index.php
-////////////////////////////////////////////////////////////////////////////////
+// Lang strings for report builder 'upgrade_log' source.
+$string['colbacktrace'] = 'Backtrace';
+$string['coldetails'] = 'Details';
+$string['colinfo'] = 'Info';
+$string['colplugin'] = 'Component';
+$string['coltargetversion'] = 'Target version';
+$string['coltimemodified'] = 'Time';
+$string['coltype'] = 'Type';
+$string['colversion'] = 'Version';
 
-$module->version   = 2014102201;  // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2012112900;  // Requires this Moodle version
-$module->release   = '2.4.0 (2012112900)'; // User-friendly version number
-$module->component = 'mod_facetoface';
-$module->maturity  = MATURITY_STABLE;
-$module->cron      = 60;
+$string['sourcetitle'] = 'Server upgrade history';
+
+// column types for this source, as strings
+$string['type_upgrade_log'] = 'Upgrade log';

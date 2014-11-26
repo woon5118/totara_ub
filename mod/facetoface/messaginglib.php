@@ -63,7 +63,6 @@ function facetoface_get_unmailed_reminders() {
 
     if ($submissions) {
         foreach ($submissions as $key => $value) {
-            $submissions[$key]->duration = facetoface_minutes_to_hours($submissions[$key]->duration);
             $submissions[$key]->sessiondates = facetoface_get_session_dates($value->sessionid);
         }
     }

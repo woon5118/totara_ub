@@ -28,3 +28,31 @@ function totara_generate_email_user($email) {
     debugging('totara_generate_email_user($email) is deprecated, use \totara_core\totara_user::get_external_user($email) instead', DEBUG_DEVELOPER);
     return \totara_core\totara_user::get_external_user($email);
 }
+
+/**
+ * Human-readable version of the duration field used to display it to
+ * users
+ *
+ * @param   integer $duration duration in hours
+ * @return  string
+ */
+function format_duration($duration) {
+    debugging('format_duration() is deprecated, use format_time() instead', DEBUG_DEVELOPER);
+    return format_time($duration);
+}
+
+/**
+ * Converts minutes to hours
+ */
+function facetoface_minutes_to_hours($minutes) {
+    debugging('facetoface_minutes_to_hours() is deprecated, use format_time() instead', DEBUG_DEVELOPER);
+    return format_time($minutes * MINSECS);
+}
+
+/**
+ * Converts hours to minutes
+ */
+function facetoface_hours_to_minutes($hours) {
+    debugging('facetoface_hours_to_minutes() is deprecated, use format_time() instead', DEBUG_DEVELOPER);
+    return format_time($hours * HOURSECS);
+}

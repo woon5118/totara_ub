@@ -4462,7 +4462,8 @@ class appraisal_message {
                     $eventdata->subject           = $message->name;
                     $eventdata->fullmessage       = $message->content;
                     $eventdata->fullmessageformat = FORMAT_PLAIN;
-                    $eventdata->fullmessagehtml   = $message->content;
+                    // The content is plain text so make sure we convert linebreaks for the HTML content.
+                    $eventdata->fullmessagehtml   = nl2br($message->content);
                     $eventdata->smallmessage      = $message->content;
 
                     if (!isset($sentaddress[$rcpt->email]) || !in_array($message->id, $sentaddress[$rcpt->email])) {

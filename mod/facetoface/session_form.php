@@ -198,9 +198,10 @@ class mod_facetoface_session_form extends moodleform {
         $mform->disabledIf('cutoff', 'datetimeknown', 'eq', 0);
         $mform->addHelpButton('cutoff', 'cutoff', 'facetoface');
 
-        $mform->addElement('text', 'duration', get_string('duration', 'facetoface'), 'size="5"');
-        $mform->setType('duration', PARAM_TEXT);
+        $mform->addElement('duration', 'duration', get_string('duration', 'facetoface'));
+        $mform->setType('duration', PARAM_INT);
         $mform->addHelpButton('duration', 'duration', 'facetoface');
+        $mform->disabledIf('duration', 'datetimeknown', 'eq', 1);
 
         if (!get_config(NULL, 'facetoface_hidecost')) {
             $formarray  = array();

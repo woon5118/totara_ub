@@ -1239,14 +1239,8 @@ $string['discountcodelearner_help'] = 'If you know the discount code enter it he
 $string['discountcost_help'] = 'Discount cost is the amount charged to staff members who have a membership id.';
 
 $string['duration_help'] = '**Duration** is the total length of the training in hours.
-For example:
-
-* "2 hours" is enters as **2** or **2:00**
-* "1 hour and 30 minutes" is entered as **1:30**
-* "45 minutes" is entered as **0:45**
-* "20 minutes" is entered as **0:20**.
-
-If the training occurs over two or more time periods, the duration is the combined total.';
+If the training occurs over two or more time periods, the duration is the combined total.
+If the start and end dates are known, this field is unavailable.';
 
 $string['emailmanagercancellation'] = '# Send notice to manager';
 $string['emailmanagercancellation_help'] = 'When "Send notice to manager" is checked, an email will be sent to the learner\'s manager advising them that the face-to-face booking has been cancelled.';
@@ -1285,6 +1279,14 @@ $string['notificationtype_help'] = 'Notification Type allows the learner to sele
 * Email notification and iCalendar appointment
 * Email notification only
 * No Email notification ';
+
+$string['recipients_help'] = '<strong>Booked</strong> - allows you to send the notification to all users who were booked, only those who attended, or only those who did not attend.
+
+Please note, when selecting <strong>All booked</strong>, notifications will be issued to all booked users, regardless of their attendance status, for sessions past and present.
+
+<strong>Wait-listed</strong> - will send a notification to those who are signed up for a session which allows overbooking, but are not yet booked.
+
+<strong>User cancelled</strong> - will send a notification to users for whom a session was cancelled or users who removed themselves from a session.';
 
 $string['reminderinstrmngr'] = '# Notice for Manager';
 $string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a face-to-face session.';

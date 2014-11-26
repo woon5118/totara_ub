@@ -47,6 +47,7 @@ $id = required_param('id', PARAM_INT);      // the plan id
 // Action params
 $approve = optional_param('approve', 0, PARAM_BOOL);
 $decline = optional_param('decline', 0, PARAM_BOOL);
+$activate = optional_param('activate', 0, PARAM_BOOL);
 $approvalrequest = optional_param('approvalrequest', 0, PARAM_BOOL);
 $delete = optional_param('delete', 0, PARAM_BOOL);
 $complete = optional_param('complete', 0, PARAM_BOOL);
@@ -73,6 +74,7 @@ $PAGE->set_context($context);
 $pageparams = array('id' => $id, 'sesskey' => sesskey());
 if (!empty($approve)) {$pageparams['approve'] = $approve;}
 if (!empty($decline)) {$pageparams['decline'] = $decline;}
+if (!empty($activate)) {$pageparams['activate'] = $activate;}
 if (!empty($approvalrequest)) {$pageparams['approvalrequest'] = $approvalrequest;}
 if (!empty($delete)) {$pageparams['delete'] = $delete;}
 if (!empty($complete)) {$pageparams['complete'] = $complete;}
@@ -125,6 +127,18 @@ if (!empty($decline)) {
         if (empty($ajax)) {
             totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
         }
+    }
+}
+
+
+// Learner activates their own learning plan.
+if (!empty($activate)) {
+    if (in_array($plan->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
+        $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, null);
+        $plan->send_activated_alert();
+        totara_set_notification(get_string('planactivated', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+    } else if (empty($ajax)) {
+        totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);
     }
 }
 

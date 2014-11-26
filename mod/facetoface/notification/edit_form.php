@@ -94,6 +94,7 @@ class mod_facetoface_notification_form extends moodleform {
             $group[] = $mform->createElement('advcheckbox', 'cancelled', get_string('status_user_cancelled', 'facetoface'));
 
             $mform->addGroup($group, 'recipients', get_string('recipients', 'facetoface'), '', false);
+            $mform->addHelpButton('recipients', 'recipients', 'facetoface');
 
             $mform->setType('booked', PARAM_BOOL);
             $mform->setDefault('booked', true);
