@@ -311,6 +311,7 @@ $string['error:couldnotdeletesession'] = 'Could not delete session';
 $string['error:couldnotdeletetrainer'] = 'Could not delete a face-to-face session trainer';
 $string['error:couldnotfindsession'] = 'Could not find the newly inserted session';
 $string['error:couldnotsavecustomfield'] = 'Could not save custom field';
+$string['error:couldnotsaveroom'] = 'There is a room conflict - another session is using the room at the same time';
 $string['error:couldnotupdatecalendar'] = 'Could not update session event in the calendar.';
 $string['error:couldnotupdatefield'] = 'Could not update custom session field.';
 $string['error:couldnotupdatemanageremail'] = 'Could not update manager email address.';

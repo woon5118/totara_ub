@@ -465,6 +465,23 @@ class mod_facetoface_session_form extends moodleform {
             }
         }
 
+        if (!empty($data['pdroomid'])) {
+            // Ensure room is available (if the session date is known).
+            $timeslots = array();
+            foreach ($dates as $d) {
+                $timeslots[] = array($d->timestart, $d->timefinish);
+            }
+            $excludesessions = isset($data['sessionid']) ? array($data['sessionid']) : null;
+            if (!$availablerooms = facetoface_get_available_rooms($timeslots, 'id', $excludesessions)) {
+                // No pre-defined rooms available!
+                $errors['predefinedroom'] = get_string('error:couldnotsaveroom', 'facetoface');
+            }
+            if (!in_array($data['pdroomid'], array_keys($availablerooms))) {
+                // Selected pre-defined room not available!
+                $errors['predefinedroom'] = get_string('error:couldnotsaveroom', 'facetoface');
+            }
+        }
+
         return $errors;
     }
 
