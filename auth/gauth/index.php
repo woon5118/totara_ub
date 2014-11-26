@@ -33,8 +33,9 @@
 
 global $CFG, $USER, $SESSION;
 
-// do the normal Moodle bootstraping so we have access to all config and the DB
+// Do the normal Moodle bootstraping so we have access to all config and the DB.
 require_once('../../config.php');
+require_once($CFG->dirroot . '/auth/gauth/lib.php');
 
 // Check plugin is active
 if (!is_enabled_auth('gauth')) {
@@ -124,12 +125,13 @@ unset($SESSION->wantsurl);
 $data['firstname'] = $data['namePerson/first'];
 $data['lastname']  = $data['namePerson/last'];
 $data['email']     = $data['contact/email'];
-$data['lang']      = (isset ($data['pref/language']) ? strtoupper(array_shift(explode('-', $data['pref/language']))) : '');
+$preflang = explode('-', $data['pref/language']);
+$data['lang']      = (isset ($data['pref/language']) ? strtoupper(array_shift($preflang)) : '');
 if (isset($data['contact/country/home'])) {
     $data['country'] = $data['contact/country/home'];
 }
 else {
-    $data['country']   = (isset ($data['pref/language']) ? strtoupper(array_pop(explode('-', $data['pref/language']))) : '');
+    $data['country'] = (isset ($data['pref/language']) ? strtoupper(array_pop($preflang)) : '');
 }
 
 if (empty($data['firstname']) || empty($data['lastname']) || empty($data['email'])) {
@@ -201,23 +203,20 @@ if ($user_data) {
 }
 
 if (isset($pluginconfig->duallogin) && $pluginconfig->duallogin) {
-    $USER = auth_gauth_authenticate_user_login($username, time());
+    $user = auth_gauth_authenticate_user_login($username, time());
 }
 else {
-    $USER = authenticate_user_login($username, time());
+    $user = authenticate_user_login($username, time());
 }
 
 // check that the signin worked
-if ($USER == false) {
+if ($user == false) {
     print_error('pluginauthfailed', 'auth_gauth', '', $data[$pluginconfig->username]);
 }
-auth_gauth_err('auth_gauth: USER logged in: '.var_export($USER, true));
-
-$USER->loggedin = true;
-$USER->site     = $CFG->wwwroot;
+auth_gauth_err('auth_gauth: USER logged in: '.var_export($user, true));
 
 // complete the user login sequence
-$USER = get_complete_user_data('id', $USER->id);
+$USER = get_complete_user_data('id', $user->id);
 complete_user_login($USER);
 
 // just fast copied this from some other module - might not work...
@@ -230,141 +229,5 @@ auth_gauth_err('auth_gauth: jump to: '.$urltogo);
 
 // flag this as a gauth based login
 $SESSION->GAUTHSessionControlled = true;
-add_to_log(SITEID, 'user', 'login', "view.php?id=$USER->id&course=".SITEID, $USER->id, 0, $USER->id);
+
 redirect($urltogo);
-
-
-/**
- * Copied from moodlelib:authenticate_user_login()
- *
- * WHY? because I need to hard code the plugins to auth_gauth, and this user
- * may be set to any number of other types of login method
- *
- * First of all - make sure that they aren't nologin - we don't mess with that!
- *
- *
- * Given a username and password, this function looks them
- * up using the currently selected authentication mechanism,
- * and if the authentication is successful, it returns a
- * valid $user object from the 'user' table.
- *
- * Uses auth_ functions from the currently active auth module
- *
- * After authenticate_user_login() returns success, you will need to
- * log that the user has logged in, and call complete_user_login() to set
- * the session up.
- *
- * @uses $CFG
- * @param string $username  User's username (with system magic quotes)
- * @param string $password  User's password (with system magic quotes)
- * @return user|flase A {@link $USER} object or false if error
- */
-function auth_gauth_authenticate_user_login($username, $password) {
-
-    global $CFG, $DB;
-
-    // ensure that only gauth auth module is chosen
-    $authsenabled = get_enabled_auth_plugins();
-
-    if ($user = get_complete_user_data('username', $username, $CFG->mnet_localhost_id)) {
-        $auth = empty($user->auth) ? 'manual' : $user->auth;  // use manual if auth not set
-        if (!empty($user->suspended)) {
-            add_to_log(SITEID, 'login', 'error', 'index.php', $username);
-            auth_gauth_err('[client '.getremoteaddr()."]  $CFG->wwwroot  Suspended Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
-            return false;
-        }
-        if ($auth=='nologin' or !is_enabled_auth($auth)) {
-            add_to_log(0, 'login', 'error', 'index.php', $username);
-            auth_gauth_err('[client '.getremoteaddr()."]  $CFG->wwwroot  Disabled Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
-            return false;
-        }
-    } else {
-        // check if there's a deleted record (cheaply)
-        if ($DB->get_field('user', 'id', array('username' => $username, 'deleted' => 1))) {
-            auth_gauth_err('[client '.$_SERVER['REMOTE_ADDR']."]  $CFG->wwwroot  Deleted Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
-            return false;
-        }
-
-        $auths = $authsenabled;
-        $user = new object();
-        $user->id = 0;     // User does not exist
-    }
-
-    // hard code only gauth module
-    $auths = array('gauth');
-    foreach ($auths as $auth) {
-        $authplugin = get_auth_plugin($auth);
-
-        // on auth fail fall through to the next plugin
-        auth_gauth_err($auth.' plugin');
-        if (!$authplugin->user_login($username, $password)) {
-            continue;
-        }
-
-        // successful authentication
-        if ($user->id) {                          // User already exists in database
-            if (empty($user->auth)) {             // For some reason auth isn't set yet
-                $DB->set_field('user', 'auth', $auth, array('username' => $username));
-                $user->auth = $auth;
-            }
-
-            // we don't want to upset the existing authentication schema for the user
-            if ($authplugin->is_synchronised_with_external()) { // update user record from external DB
-                $user = update_user_record($username);
-            }
-        } else {
-            // if user not found, create him
-            $user = create_user_record($username, $password, $auth);
-        }
-
-        $authplugin->sync_roles($user);
-
-        foreach ($authsenabled as $hau) {
-            $hauth = get_auth_plugin($hau);
-            $hauth->user_authenticated_hook($user, $username, $password);
-        }
-
-        if (empty($user->id)) {
-            return false;
-        }
-
-        if (!empty($user->suspended)) {
-            // just in case some auth plugin suspended account
-            add_to_log(SITEID, 'login', 'error', 'index.php', $username);
-            auth_gauth_err('[client '.getremoteaddr()."]  $CFG->wwwroot  Suspended Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
-            return false;
-        }
-
-        return $user;
-    }
-
-    // failed if all the plugins have failed
-    add_to_log(0, 'login', 'error', 'index.php', $username);
-    if (debugging('', DEBUG_ALL)) {
-        auth_gauth_err('[client '.getremoteaddr()."]  $CFG->wwwroot  Failed Login:  $username  ".$_SERVER['HTTP_USER_AGENT']);
-    }
-    return false;
-}
-
-/**
- * Add slashes for single quotes and backslashes
- * so they can be included in single quoted string
- * (for config.php)
- */
-function auth_gauth_addsingleslashes($input){
-    return preg_replace("/(['\\\])/", "\\\\$1", $input);
-}
-
-/**
- *  error log wrapper
- * @param string $msg
- */
-function auth_gauth_err($msg) {
-    global $CFG;
-
-    // check if we are debugging
-    if (! $CFG->debug == DEBUG_DEVELOPER) {
-        return;
-    }
-    error_log('auth/gauth: '.$msg);
-}
