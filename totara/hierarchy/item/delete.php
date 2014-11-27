@@ -47,7 +47,6 @@ $hierarchy = hierarchy::load_hierarchy($prefix);
 
 $item = $hierarchy->get_item($id);
 if (!$item) {
-    add_to_log(SITEID, $prefix, 'delete item fail', "index.php?id={$framework->id}&amp;prefix={$prefix}", "invalid hierarchy item id (ID $id)");
     print_error('noitemid', 'totara_hierarchy');
 }
 // Load framework
@@ -94,7 +93,6 @@ if (!confirm_sesskey()) {
 
 if ($hierarchy->delete_hierarchy_item($item->id)) {
 
-    add_to_log(SITEID, $prefix, 'delete item', "index.php?id={$framework->id}&amp;prefix={$prefix}", substr(strip_tags($item->fullname), 0, 200) . " (ID $item->id)");
     totara_set_notification(get_string('deleted'.$prefix, 'totara_hierarchy', format_string($item->fullname)),
         "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&frameworkid={$item->frameworkid}&page={$page}",
         array('class' => 'notifysuccess'));

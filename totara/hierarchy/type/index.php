@@ -27,13 +27,11 @@ require_once("{$CFG->libdir}/adminlib.php");
 require_once("{$CFG->dirroot}/totara/hierarchy/lib.php");
 
 
-///
-/// Setup / loading data
-///
+// Setup / loading data.
 
 $sitecontext = context_system::instance();
 
-// Get params
+// Get params.
 $prefix        = required_param('prefix', PARAM_ALPHA);
 $edit        = optional_param('edit', -1, PARAM_BOOL);
 $shortprefix = hierarchy::get_short_prefix($prefix);
@@ -42,50 +40,45 @@ hierarchy::check_enable_hierarchy($prefix);
 
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
-// @todo add capabilities
-    // Cache user capabilities
-    $can_add = has_capability('totara/hierarchy:create'.$prefix.'type', $sitecontext);
-    $can_edit = has_capability('totara/hierarchy:update'.$prefix.'type', $sitecontext);
-    $can_delete = has_capability('totara/hierarchy:delete'.$prefix.'type', $sitecontext);
-    $can_edit_custom_fields = has_any_capability(array('totara/hierarchy:update'.$prefix.'customfield', 'totara/hierarchy:create'.$prefix.'customfield', 'totara/hierarchy:delete'.$prefix.'customfield'), $sitecontext);
+// @todo add capabilities.
+// Cache user capabilities.
+$can_add = has_capability('totara/hierarchy:create'.$prefix.'type', $sitecontext);
+$can_edit = has_capability('totara/hierarchy:update'.$prefix.'type', $sitecontext);
+$can_delete = has_capability('totara/hierarchy:delete'.$prefix.'type', $sitecontext);
+$can_edit_custom_fields = has_any_capability(array('totara/hierarchy:update'.$prefix.'customfield', 'totara/hierarchy:create'.$prefix.'customfield', 'totara/hierarchy:delete'.$prefix.'customfield'), $sitecontext);
 
-    // Setup page and check permissions
-    admin_externalpage_setup($prefix.'typemanage', null, array('prefix' => $prefix));
+// Setup page and check permissions.
+admin_externalpage_setup($prefix.'typemanage', null, array('prefix' => $prefix));
 
-///
-/// Load data for type details
-///
+// Load data for type details.
 
-// Get types for this page
+// Get types for this page.
 $types = $hierarchy->get_types(array('custom_field_count' => 1, 'item_count' => 1));
 
-// Get count of unclassified items
+// Get count of unclassified items.
 $unclassified = $hierarchy->get_unclassified_items(true);
 
-///
-/// Generate / display page
-///
+// Generate / display page.
 $str_edit     = get_string('edit');
 $str_delete   = get_string('delete');
 
-
 if ($types) {
-    // Create display table
+    // Create display table.
     $table = new html_table();
 
-    // Setup column headers
+    // Setup column headers.
     $table->head = array(get_string('name', 'totara_hierarchy'),
         get_string($prefix . 'plural', 'totara_hierarchy'),
         get_string("customfields", 'totara_hierarchy'));
     $table->align = array('left', 'center');
 
-    // Add edit column
+    // Add edit column.
     if ($can_edit || $can_delete) {
         $table->head[] = get_string('actions');
         $table->align[] = 'left';
     }
 
-    // Add type rows to table
+    // Add type rows to table.
     foreach ($types as $type) {
         $row = array();
 
@@ -99,7 +92,7 @@ if ($types) {
         $row[] = $type->item_count;
         $row[] = $type->custom_field_count;
 
-        // Add edit link
+        // Add edit link.
         $buttons = array();
         if ($can_edit) {
             $buttons[] = $OUTPUT->action_icon(
@@ -123,7 +116,7 @@ if ($types) {
         $table->data[] = $row;
     }
 
-    // Add a row for unclassified items
+    // Add a row for unclassified items.
     if ($unclassified) {
         $row = array();
         $row[] = get_string('unclassified', 'totara_hierarchy');
@@ -141,9 +134,9 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('types', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false));
 
-// Add type button
+// Add type button.
 if ($can_add) {
-    // Print button for creating new type
+    // Print button for creating new type.
     echo html_writer::tag('div', $hierarchy->display_add_type_button(), array('class' => 'add-type-button'));
 }
 
@@ -153,7 +146,7 @@ if ($types) {
     echo html_writer::table($table);
 
     foreach ($types as $type) {
-        // only let user select type that contain items
+        // Only let user select type that contain items.
         if ($type->item_count > 0) {
             $options[$type->id] = format_string($type->fullname);
         }
@@ -162,10 +155,10 @@ if ($types) {
     echo html_writer::tag("p", get_string($prefix.'notypes', 'totara_hierarchy'));
 }
 
-// only show bulk re-classify form if there is at least one type
+// Only show bulk re-classify form if there is at least one type.
 $showbulkform = (count($types) > 0);
 
-// add an option to change all unclassified items to a new type (if there are any)
+// Add an option to change all unclassified items to a new type (if there are any).
 if ($unclassified) {
     $options[0] = get_string('unclassified', 'totara_hierarchy');
 }
@@ -180,5 +173,6 @@ if ($showbulkform) {
     echo $OUTPUT->single_select(new moodle_url("change.php", array('prefix' => $prefix)), 'typeid', $options, 'changetype');
 }
 
-add_to_log(SITEID, $prefix, 'view type list', "type/index.php?prefix=$prefix", '');
+\totara_hierarchy\event\type_viewed::create_from_prefix($prefix)->trigger();
+
 echo $OUTPUT->footer();

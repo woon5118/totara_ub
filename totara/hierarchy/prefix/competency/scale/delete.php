@@ -97,7 +97,7 @@ $DB->delete_records('comp_scale', array('id' => $scale->id));
 
 $transaction->allow_commit();
 
-add_to_log(SITEID, 'competency', 'delete competency scale', "framework/index.php?id={$scale->id}&amp;prefix=competency", "$scale->name (ID $scale->id)");
+\hierarchy_competency\event\scale_deleted::create_from_instance($scale)->trigger();
 
 // redirect
 totara_set_notification(get_string('deletedcompetencyscale', 'totara_hierarchy', format_string($scale->name)), $CFG->wwwroot . '/totara/hierarchy/framework/index.php?prefix=competency', array('class' => 'notifysuccess'));

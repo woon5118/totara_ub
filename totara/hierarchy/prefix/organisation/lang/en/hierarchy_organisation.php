@@ -24,7 +24,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['eventchangedtype'] = 'Changed Organisation Type';
+$string['eventcompetencyassigned'] = 'Created Competency Assignment';
+$string['eventcompetencyunassigned'] = 'Deleted Competency Assignment';
+$string['eventcreatedframework'] = 'Created Organisation Framework';
+$string['eventcreateditem'] = 'Created Organisation';
+$string['eventcreatedtype'] = 'Created Organisation Type';
+$string['eventdeletedframework'] = 'Deleted Organisation Framework';
+$string['eventdeleteditem'] = 'Deleted Organisation';
+$string['eventdeletedtype'] = 'Deleted Organisation Type';
+$string['eventmoveditem'] = 'Moved Organisation';
+$string['eventupdatedframework'] = 'Updated Organisation Framework';
+$string['eventupdateditem'] = 'Updated Organisation';
+$string['eventupdatedtype'] = 'Updated Organisation Type';
+$string['eventvieweditem'] = 'Viewed Organisation';
 $string['pluginname'] = 'Organisation Hierarchies';
-$string['eventadded'] = 'Organisation Created';
-$string['eventdeleted'] = 'Organisation Deleted';
-$string['eventupdated'] = 'Organisation Updated';

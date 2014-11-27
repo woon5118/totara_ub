@@ -124,16 +124,18 @@ if ($mform->is_cancelled()) {
             $DB->update_record('comp_scale', $scalenew);
         }
         $transaction->allow_commit();
-        // Log
-        add_to_log(SITEID, 'competency', 'added scale', "prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency", '');
+
+        \hierarchy_competency\event\scale_created::create_from_instance($scalenew)->trigger();
+
         $notification->text = 'scaleadded';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency";
         $notification->params = array('class' => 'notifysuccess');
     } else {
         // Existing scale
         $DB->update_record('comp_scale', $scalenew);
-        // Log
-        add_to_log(SITEID, 'competency', 'update scale', "prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency", '');
+
+        \hierarchy_competency\event\scale_updated::create_from_instance($scalenew)->trigger();
+
         $notification->text = 'scaleupdated';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency";
         $notification->params = array('class' => 'notifysuccess');

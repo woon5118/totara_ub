@@ -585,9 +585,6 @@ class competency extends hierarchy {
         }
 
         $DB->update_record('comp_template', $template);
-
-        add_to_log(SITEID, 'competency', 'template remove competency assignment',
-                    "prefix/competency/template/view.php?id={$template->id}", "Competency ID $competencyid");
     }
 
 

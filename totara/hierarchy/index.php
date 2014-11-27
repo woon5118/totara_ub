@@ -95,7 +95,7 @@ if ($canupdateitems) {
 $PAGE->set_context(context_system::instance());
 
 if ($format!='') {
-    add_to_log(SITEID, $prefix, 'export framework', "index.php?id={$frameworkid}&amp;prefix={$prefix}", $framework->fullname);
+    \totara_hierarchy\event\framework_exported::create_from_instance($prefix, $framework)->trigger();
     $hierarchy->export_data($format);
     die;
 }

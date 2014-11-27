@@ -24,7 +24,26 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['eventchangedtype'] = 'Changed Competency Type';
+$string['eventcreatedevidence'] = 'Created Competency Evidence';
+$string['eventcreatedframework'] = 'Created Competency Framework';
+$string['eventcreateditem'] = 'Created competency';
+$string['eventcreatedrelation'] = 'Created Competency Relation';
+$string['eventcreatedscale'] = 'Created Competency Scale';
+$string['eventcreatedscalevalue'] = 'Created Competency Scale Value';
+$string['eventcreatedtype'] = 'Created Competency Type';
+$string['eventdeletedevidence'] = 'Deleted Competency Evidence';
+$string['eventdeletedframework'] = 'Deleted Competency Framework';
+$string['eventdeleteditem'] = 'Deleted Competency';
+$string['eventdeletedrelation'] = 'Deleted Competency Relation';
+$string['eventdeletedscale'] = 'Deleted Competency Scale';
+$string['eventdeletedscalevalue'] = 'Deleted Competency Scale Value';
+$string['eventdeletedtype'] = 'Deleted Competency Type';
+$string['eventmoveditem'] = 'Moved Competency';
+$string['eventupdatedframework'] = 'Updated Competency Framework';
+$string['eventupdateditem'] = 'Updated Competency';
+$string['eventupdatedscale'] = 'Updated Competency Scale';
+$string['eventupdatedscalevalue'] = 'Updated Competency Scale Value';
+$string['eventupdatedtype'] = 'Updated Competency Type';
+$string['eventvieweditem'] = 'Viewed Competency';
 $string['pluginname'] = 'Competency Hierarchies';
-$string['eventadded'] = 'Competency Created';
-$string['eventdeleted'] = 'Competency Deleted';
-$string['eventupdated'] = 'Competency Updated';

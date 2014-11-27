@@ -102,7 +102,10 @@ if ($typeform->is_cancelled()) {
             $notification->text = $prefix . 'error:createtype';
             $notification->params = array();
         } else {
-            add_to_log(SITEID, $prefix, 'create type', "type/index.php?prefix=$prefix", "{$typenew->fullname} (ID {$typenew->id})");
+            $eventname = "\\hierarchy_{$prefix}\\event\\type_created";
+            $event = $eventname::create_from_instance($typenew);
+            $event->trigger();
+
             $notification->text = $prefix . 'createtype';
             $notification->params = array('class' => 'notifysuccess');
         }
@@ -112,7 +115,10 @@ if ($typeform->is_cancelled()) {
             $notification->text = $prefix . 'error:updatetype';
             $notification->params = array();
         } else {
-            add_to_log(SITEID, $prefix, 'update type', "type/edit.php?id={$typenew->id}", "{$typenew->fullname}(ID {$typenew->id})");
+            $eventname = "\\hierarchy_{$prefix}\\event\\type_updated";
+            $event = $eventname::create_from_instance($typenew);
+            $event->trigger();
+
             $notification->text = $prefix . 'updatetype';
             $notification->params = array('class' => 'notifysuccess');
         }

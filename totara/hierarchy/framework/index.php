@@ -208,5 +208,6 @@ if ($hierarchyhasscales) {
     $scales = $hierarchy->get_scales();
     call_user_func("{$prefix}_scale_display_table", $scales);
 }
-add_to_log(SITEID, $prefix, 'view framework', "framework/index.php?prefix=$prefix", '');
+
+\totara_hierarchy\event\framework_viewed::create_from_prefix($prefix)->trigger();
 echo $OUTPUT->footer();

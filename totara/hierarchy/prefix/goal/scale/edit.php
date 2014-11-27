@@ -125,16 +125,18 @@ if ($mform->is_cancelled()) {
             $DB->update_record('goal_scale', $scalenew);
         }
         $transaction->allow_commit();
-        // Log.
-        add_to_log(SITEID, 'goal', 'added scale', "prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal", '');
+
+        \hierarchy_goal\event\scale_created::create_from_instance($scalenew)->trigger();
+
         $notification->text = 'scaleaddedgoal';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal";
         $notification->params = array('class' => 'notifysuccess');
     } else {
         // Existing scale.
         $DB->update_record('goal_scale', $scalenew);
-        // Log.
-        add_to_log(SITEID, 'goal', 'update scale', "prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal", '');
+
+        \hierarchy_goal\event\scale_updated::create_from_instance($scalenew)->trigger();
+
         $notification->text = 'scaleupdatedgoal';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal";
         $notification->params = array('class' => 'notifysuccess');

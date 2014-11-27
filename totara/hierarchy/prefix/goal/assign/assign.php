@@ -165,18 +165,22 @@ if ($add) {
             $scale_default->scalevalueid = $scale->defaultid;
 
             // Create the individual assignment.
-            $DB->insert_record($type->table, $relationship);
+            $relationship->id = $DB->insert_record($type->table, $relationship);
             $goalrecords = goal::get_goal_items(array('goalid' => $item, 'userid' => $assignto), goal::SCOPE_COMPANY);
             if (empty($goalrecords)) {
                 goal::insert_goal_item($scale_default, goal::SCOPE_COMPANY);
             }
+            $eventname = "\\hierarchy_goal\\event\\assignment_user_created";
         } else {
             // Make the assignment, then create all the current user assignments.
             $relationship->id = $DB->insert_record($type->table, $relationship);
             $goal->create_user_assignments($assigntype, $relationship, $relationship->includechildren);
+            $eventname = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_created";
         }
 
-        add_to_log(SITEID, $type->fullname, 'create goal assignments', $returnurl, "{$type->fullname} (ID {$assignto})");
+        $relationship->instanceid = $assignto;
+        $event = $eventname::create_from_instance($relationship);
+        $event->trigger();
     }
 
     // Set up returning the html and closing the dialog.

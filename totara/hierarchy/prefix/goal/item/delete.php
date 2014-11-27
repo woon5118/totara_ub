@@ -82,8 +82,9 @@ if ($delete) {
     // Do the deletion.
     if (goal::delete_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL)) {
         $success = get_string('deletedpersonalgoal', 'totara_hierarchy', format_string($goalpersonal->name));
-        add_to_log(SITEID, 'goal', 'delete personal goal', $ret_url,
-                format_string($goalpersonal->name) . " (ID $goalpersonalid)");
+
+        \hierarchy_goal\event\personal_deleted::create_from_instance($goalpersonal)->trigger();
+
         totara_set_notification($success, $ret_url, array('class' => 'notifysuccess'));
     } else {
         // Failure.

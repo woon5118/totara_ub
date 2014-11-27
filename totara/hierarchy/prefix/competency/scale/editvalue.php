@@ -122,8 +122,8 @@ if ($valueform->is_cancelled()) {
         unset($valuenew->id);
 
         if ($valuenew->id = $DB->insert_record('comp_scale_values', $valuenew)) {
-            // Log
-            add_to_log(SITEID, 'competency', 'added scale value', "prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency");
+            \hierarchy_competency\event\scale_value_created::create_from_instance($valuenew)->trigger();
+
             $notification->text = 'scalevalueadded';
             $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency";
             $notification->params = array('class' => 'notifysuccess');
@@ -134,8 +134,8 @@ if ($valueform->is_cancelled()) {
     // Updating scale value
     } else {
         if ($DB->update_record('comp_scale_values', $valuenew)) {
-            // Log
-            add_to_log(SITEID, 'competency', 'update scale value', "prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency");
+            \hierarchy_competency\event\scale_value_updated::create_from_instance($valuenew)->trigger();
+
             $notification->text = 'scalevalueupdated';
             $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$valuenew->scaleid}&amp;prefix=competency";
             $notification->params = array('class' => 'notifysuccess');

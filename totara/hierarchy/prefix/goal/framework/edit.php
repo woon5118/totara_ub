@@ -146,24 +146,18 @@ if ($frameworkform->is_cancelled()) {
         }
     }
 
-
     // Reload from db.
     $frameworknew = $DB->get_record($shortprefix.'_framework', array('id' => $frameworknew->id));
 
-    // Log.
-    // New framework.
     if ($framework->id == 0) {
-        add_to_log(SITEID, $prefix, 'framework create', "framework/view.php?prefix=$prefix&amp;frameworkid={$frameworknew->id}",
-            "$frameworknew->fullname (ID $frameworknew->id)");
+        \hierarchy_goal\event\framework_created::create_from_instance($frameworknew)->trigger();
     } else {
-        add_to_log(SITEID, $prefix, 'framework update', "framework/view.php?prefix=$prefix&amp;frameworkid={$frameworknew->id}",
-            "$framework->fullname (ID $framework->id)");
+        \hierarchy_goal\event\framework_updated::create_from_instance($frameworknew)->trigger();
     }
 
     redirect("$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=$prefix&id=" . $frameworknew->id);
     // Never reached.
 }
-
 
 // Display page header.
 $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'),

@@ -100,8 +100,7 @@ if (!confirm_sesskey()) {
 
 $DB->delete_records('goal_scale_values', array('id' => $value->id));
 
-add_to_log(SITEID, 'goal', 'delete scale value', "prefix/goal/scale/view.php?id={$value->scaleid}&amp;prefix=goal",
-    "$value->name (ID $value->id)");
+\hierarchy_goal\event\scale_value_deleted::create_from_instance($value)->trigger();
 
 totara_set_notification(get_string('deletedgoalscalevalue', 'totara_hierarchy', format_string($value->name)),
     $returnurl, array('class' => 'notifysuccess'));

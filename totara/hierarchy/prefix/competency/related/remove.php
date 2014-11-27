@@ -27,53 +27,52 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidenceitem/type/abstract.php');
 
-
-///
-/// Setup / loading data
-///
+// Setup / loading data.
 
 $sitecontext = context_system::instance();
 
-// Get params
-$id      = required_param('id', PARAM_INT); // Competency ID
-$related = required_param('related', PARAM_INT); // Related competency ID
+// Get params.
+$id      = required_param('id', PARAM_INT); // Competency ID.
+$related = required_param('related', PARAM_INT); // Related competency ID.
 
-// Delete confirmation hash
+// Delete confirmation hash.
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
 
-// Load data
+// Load data.
 $hierarchy         = new competency();
 
-// The relationship could be recorded in one of two directions
+// The relationship could be recorded in one of two directions.
 $item = $DB->get_record('comp_relations', array('id1' => $id, 'id2' => $related), '*', IGNORE_MISSING); //hack to return false for next step
 if (!$item) {
     $item = $DB->get_record('comp_relations', array('id2' => $id, 'id1' => $related));
 }
 
-// If the relationship's not recorded in either direction
+// If the relationship's not recorded in either direction.
 if (!$item) {
     print_error('competencyrelationshipnotfound', 'totara_hierarchy');
 }
 
-// Load related competency
+// Load competency.
+if (!$competency = $DB->get_record('comp', array('id' => $id))) {
+    print_error('incorrectcompetencyid', 'totara_hierarchy');
+}
+
+// Load related competency.
 if (!$rcompetency = $DB->get_record('comp', array('id' => $related))) {
     print_error('incorrectcompetencyid', 'totara_hierarchy');
 }
 
-// Check capabilities
+// Check capabilities.
 require_capability('totara/hierarchy:update'.$hierarchy->prefix, $sitecontext);
 
-// Setup page and check permissions
+// Setup page and check permissions.
 admin_externalpage_setup($hierarchy->prefix.'manage');
 
-
-///
-/// Display page
-///
+// Display page.
 
 echo $OUTPUT->header();
 
-// Cancel/return url
+// Cancel/return url.
 $return = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix={$hierarchy->prefix}&id={$id}";
 
 
@@ -89,10 +88,7 @@ if (!$delete) {
     exit;
 }
 
-
-///
-/// Delete
-///
+// Delete.
 
 if ($delete != md5($rcompetency->timemodified)) {
     print_error('checkvariable', 'totara_hierarchy');
@@ -102,11 +98,25 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-// Delete relationship
-$DB->delete_records('comp_relations', array('id1' => $id, 'id2' => $related));
-$DB->delete_records('comp_relations', array('id2' => $id, 'id1' => $related));
+// Delete any existing relationships.
+if ($snapshots = $DB->get_records('comp_relations', array('id1' => $id, 'id2' => $related))) {
+    foreach ($snapshots as $snapshot) {
+        $DB->delete_records('comp_relations', array('id' => $snapshot->id));
 
-add_to_log(SITEID, 'competency', 'delete related', "item/view.php?id=$id", $rcompetency->fullname." (ID $related)");
+        $snapshot->fullname = $rcompetency->fullname;
+        \hierarchy_competency\event\relation_deleted::create_from_instance($snapshot)->trigger();
+    }
+}
+
+// Delete any existing reverse relationships.
+if ($snapshots = $DB->get_records('comp_relations', array('id1' => $related, 'id2' => $id))) {
+    foreach ($snapshots as $snapshot) {
+        $DB->delete_records('comp_relations', array('id' => $snapshot->id));
+
+        $snapshot->fullname = $competency->fullname;
+        \hierarchy_competency\event\relation_deleted::create_from_instance($snapshot)->trigger();
+    }
+}
 
 $message = get_string('removed'.$hierarchy->prefix.'relateditem', 'totara_hierarchy', format_string($rcompetency->fullname));
 
