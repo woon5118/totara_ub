@@ -541,9 +541,17 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'status' => 1,
     );
 
+    protected $upgrade_log = array(
+        'id' => 11111111, 'type' => 0, 'plugin' => 'totara_core', 'version' => 2014012345, 'targetversion' => 'targetversion',
+        'info' => 'nothing', 'details' => null, 'backtrace' => null, 'userid' => 0, 'timemodified' => 10,
+    );
+
 
     protected function setUp() {
+        global $DB;
         parent::setup();
+
+        $DB->delete_records('upgrade_log', array());
 
         $this->loadDataSet($this->createArrayDataset(array(
             'user_info_field' => array($this->user_info_field_data),
@@ -647,6 +655,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'course_completion_history' => array($this->course_completion_history_data),
             'badge_issued' => array($this->badges_issued),
             'context' => $this->context_data,
+            'upgrade_log' => array($this->upgrade_log),
         )));
     }
 
