@@ -102,7 +102,7 @@ class rb_source_facetoface_summary extends rb_base_source {
                 'session',
                 'numattendees',
                 get_string('numattendees', 'rb_source_facetoface_sessions'),
-                '(CASE WHEN attendees.statuscode >= ' . MDL_F2F_STATUS_APPROVED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN attendees.statuscode >= ' . MDL_F2F_STATUS_BOOKED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
                     'grouping' => 'count',
@@ -124,7 +124,7 @@ class rb_source_facetoface_summary extends rb_base_source {
                 'session',
                 'waitlistattendees',
                 get_string('waitlistattendees', 'rb_source_facetoface_summary'),
-                '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_REQUESTED . ' THEN 1 ELSE NULL END)',
+                '(CASE WHEN attendees.statuscode = ' . MDL_F2F_STATUS_WAITLISTED . ' THEN 1 ELSE NULL END)',
                 array(
                     'joins' => array('attendees', 'sessions'),
                     'grouping' => 'count',
@@ -459,7 +459,8 @@ class rb_source_facetoface_summary extends rb_base_source {
      * @return string Display html
      */
     function rb_display_session_spaces($count, $row) {
-        return $row->overall_capacity - $count;
+        $spaces = $row->overall_capacity - $count;
+        return ($spaces > 0 ? $spaces : 0);
     }
 
     /**
