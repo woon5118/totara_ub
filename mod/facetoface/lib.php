@@ -4139,21 +4139,17 @@ function facetoface_save_session_room($sessionid, $data) {
 
     if (empty($data->customroom)) {
         // Pre-defined room
-        if (!empty($data->pdroomid) && $data->pdroomid == $session->roomid) {
-            // Same room, no need to update
-            return true;
-        } elseif (!empty($data->pdroomid)) {
-            // Ensure room is available
+        if (!empty($data->pdroomid)) {
+            // Ensure room is available (if the session date is known).
             $sessiondates = $DB->get_records('facetoface_sessions_dates', array('sessionid' => $sessionid));
             $timeslots = array();
             foreach ($sessiondates as $d) {
-                $timeslots = array($d->timestart, $d->timefinish);
+                $timeslots[] = array($d->timestart, $d->timefinish);
             }
             if (!$availablerooms = facetoface_get_available_rooms($timeslots, 'id', array($sessionid))) {
                 // No pre-defined rooms available!
                 return false;
             }
-
             if (!in_array($data->pdroomid, array_keys($availablerooms))) {
                 // Selected pre-defined room not available!
                 return false;
