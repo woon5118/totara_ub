@@ -3,7 +3,6 @@
 $string['sourcetitle'] = 'Feedback Questions';
 // columns
 $string['numfeedbackresponses'] = '# Feedback Responses';
-$string['timecompleted'] = 'Time Completed';
 $string['feedbackactivity'] = 'Feedback Activity';
 $string['ftfsessionid'] = 'Face to Face Session ID';
 $string['trainerid'] = 'Trainer ID';
