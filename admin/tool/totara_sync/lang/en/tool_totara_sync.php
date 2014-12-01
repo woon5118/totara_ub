@@ -326,4 +326,6 @@ $string['notifymailto_help'] = 'A comma-separated list of email addresses so whi
 $string['notifytypes'] = 'Send notifications for';
 $string['schedule'] = 'Schedule';
 $string['csvencoding'] = 'CSV file encoding';
-?>
+
+// Event.
+$string['eventsynccompleted'] = 'Totara sync completed';

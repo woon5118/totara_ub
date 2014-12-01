@@ -247,9 +247,6 @@ else {
             $DB->set_field('pos_assignment', 'description', $data->description, array('id' => $data->id));
         }
 
-        // Log
-        add_to_log($course->id, "user", "position updated", "positions.php?user=$user->id&amp;courseid=$course->id&amp;type=$type", fullname($user)." (ID: {$user->id})");
-
         if (!empty($data->tempmanagerid)) {
             // Update temporary manager.
             // If there is a temporary manager assigned, check temporary manager is valid.
@@ -272,7 +269,8 @@ else {
     }
 
     // Log
-    add_to_log($course->id, "user", "position view", "positions.php?user={$user->id}&amp;courseid={$course->id}&amp;type={$type}", fullname($user)." (ID: {$user->id})");
+    \totara_core\event\position_viewed::create_from_instance($position_assignment, $coursecontext)->trigger();
+
 
     $PAGE->set_title("{$course->fullname}: {$fullname}: {$positiontype}");
     $PAGE->set_heading("{$positiontype}");

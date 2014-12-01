@@ -46,7 +46,6 @@ if ($execute) {
     // Stop time outs, this might take a while
     core_php_time_limit::raise(0);
     // Run the sync
-    add_to_log(SITEID, 'totara_sync', 'Execute Sync', 'admin/syncexecute.php');
     $msg = get_string('runsynccronstart', 'tool_totara_sync');
     $msg .= get_string('runsynccronend', 'tool_totara_sync');
     if (!($succeed = tool_totara_sync_cron(true))) {

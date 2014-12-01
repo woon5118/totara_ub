@@ -201,6 +201,7 @@ $string['eventmenuitemcreated'] = 'Menu item created';
 $string['eventmenuitemdeleted'] = 'Menu item deleted';
 $string['eventmenuitemupdated'] = 'Menu item updated';
 $string['eventmodulecompletion'] = 'Activity completion';
+$string['eventmyreportviewed'] = 'User viewed his reports';
 $string['eventundeleted'] = 'User undeleted';
 $string['eventusersuspended'] = 'User suspended';
 $string['eventuserenrolment'] = 'User enrolled';

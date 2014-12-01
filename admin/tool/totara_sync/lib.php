@@ -140,6 +140,9 @@ function tool_totara_sync_cron($forcerun=false) {
 
         $element->get_source()->drop_table();
     }
+
+    \tool_totara_sync\event\sync_completed::create()->trigger();
+
     totara_sync_notify();
 
     return $status;
