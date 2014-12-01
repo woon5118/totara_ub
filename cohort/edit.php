@@ -138,7 +138,6 @@ if ($editform->is_cancelled()) {
                 tag_set('cohort', $cohort->id, array());
             }
         }
-        add_to_log(SITEID, 'cohort', 'edit', '/cohort/view.php?id='.$cohort->id, $data->idnumber);
         //update textarea
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context, 'cohort', 'cohort', $data->id);
         $DB->set_field('cohort', 'description', $data->description, array('id' => $data->id));
@@ -154,7 +153,6 @@ if ($editform->is_cancelled()) {
                 tag_set('cohort', $cohortid, array());
             }
         }
-        add_to_log(SITEID, 'cohort', 'create', '/cohort/view.php?id='.$cohortid, $data->idnumber);
         //update textarea
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context, 'cohort', 'cohort', $cohortid);
         $DB->set_field('cohort', 'description', $data->description, array('id' => $cohortid));

@@ -45,6 +45,5 @@ if ($type === COHORT_OPERATOR_TYPE_COHORT) {
 } else if ($type === COHORT_OPERATOR_TYPE_RULESET) {
     echo json_encode(array('action' => 'updrulesetop', 'ruleid' => $id, 'value' => $value, 'result' => $result));
 }
-add_to_log(SITEID, 'cohort', 'edit rule operators', 'cohort/view.php?id='.$cohortid);
 
 exit();

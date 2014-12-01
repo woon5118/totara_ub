@@ -41,7 +41,6 @@ if (!$ruleparam = $DB->get_record('cohort_rule_params', array('id' => $ruleparam
 }
 
 $return = json_encode(cohort_delete_param($ruleparam));
-
 echo $return;
 
-add_to_log(SITEID, 'cohort', 'delete rule param ' . $ruleparam->id, 'totara/cohort/rules.php');
+exit();

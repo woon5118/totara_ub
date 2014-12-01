@@ -158,6 +158,12 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
         return false;
     }
 
+    // Get cohort record.
+    $cohort = $DB->get_record('cohort', array('id' => $cohortid));
+    // Create log data.
+    $logaction = 'add ' . $COHORT_ASSN_VALUES[$value] . ' ' . ($COHORT_ASSN_ITEMTYPES[$instancetype]);
+    $log = array(SITEID, 'cohort', $logaction, 'cohort/view.php?id=' . $cohortid);
+
     if ($value == COHORT_ASSN_VALUE_ENROLLED) {
         switch ($instancetype) {
             case COHORT_ASSN_ITEMTYPE_COURSE:
@@ -176,6 +182,11 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
                 // Add a cohort enrol instance to the course
                 $enrolplugin = enrol_get_plugin('cohort');
                 $assid = $enrolplugin->add_instance($course, array('customint1' => $cohortid, 'roleid' => $CFG->learnerroleid));
+                // Trigger event.
+                $log[] = "itemid={$instanceid};associationid={$assid}";
+                $event = \totara_cohort\event\enrolled_course_item_added::create_from_data($assid, $cohort);
+                $event->set_legacy_logdata($log);
+                $event->trigger();
                 return $assid;
                 break;
             case COHORT_ASSN_ITEMTYPE_CERTIF:
@@ -200,6 +211,11 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
                 $todb->assignmenttype = ASSIGNTYPE_COHORT;
                 $todb->assignmenttypeid = $cohortid;
                 $assid = $DB->insert_record('prog_assignment', $todb);
+                // Trigger event.
+                $log[] = "itemid={$instanceid};associationid={$assid}";
+                $event = \totara_cohort\event\enrolled_program_item_added::create_from_data($assid, $cohort);
+                $event->set_legacy_logdata($log);
+                $event->trigger();
                 return $assid;
                 break;
             default:
@@ -215,7 +231,13 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
             $todb->timemodified = time();
             $todb->timecreated = $todb->timemodified;
             $todb->usermodified = $USER->id;
-            return $DB->insert_record('cohort_visibility', $todb);
+            $assid = $DB->insert_record('cohort_visibility', $todb);
+            // Trigger event.
+            $log[] = "itemid={$instanceid};associationid={$assid}";
+            $event = \totara_cohort\event\visible_learning_item_added::create_from_data($assid, $cohort);
+            $event->set_legacy_logdata($log);
+            $event->trigger();
+            return $assid;
         }
     }
     return true;
@@ -235,9 +257,22 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
         return false;
     }
 
+    // Get cohort record.
+    $cohort = $DB->get_record('cohort', array('id' => $cohortid));
+    // Create log data.
+    $log = array(SITEID, 'cohort', 'remove learning item', "cohort/view.php?id={$cohortid}");
+
     if ($value == COHORT_ASSN_VALUE_VISIBLE) {
-        // directly delete from cohort_visibility
-        return $DB->delete_records('cohort_visibility', array('id' => $assid));
+        $assrecord =  $DB->get_record('cohort_visibility', array('id' => $assid));
+        // Directly delete from cohort_visibility
+        $deleted = $DB->delete_records('cohort_visibility', array('id' => $assid));
+        // Trigger event.
+        $log[] = "associationid={$assid}";
+        $event = \totara_cohort\event\visible_learning_item_deleted::create_from_data($assid, $cohort);
+        $event->set_legacy_logdata($log);
+        $event->add_record_snapshot('cohort_visibility', $assrecord);
+        $event->trigger();
+        return $deleted;
     }
 
     switch ($instancetype) {
@@ -251,17 +286,32 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
                 $enrolplugin->delete_instance($enrolinstance);  // this also unenrols peeps - no need to sync
 
                 $transaction->allow_commit();
+
+                // Trigger event.
+                $log[] = "associationid={$assid}";
+                $event = \totara_cohort\event\enrolled_course_item_deleted::create_from_data($assid, $cohort);
+                $event->set_legacy_logdata($log);
+                $event->add_record_snapshot('enrol', $enrolinstance);
+                $event->trigger();
             }
             break;
         case COHORT_ASSN_ITEMTYPE_PROGRAM:
         case COHORT_ASSN_ITEMTYPE_CERTIF:
             if ($progassid = $DB->get_field('prog_assignment', 'id', array('id' => $assid))) {
+                $record = $DB->get_record('prog_assignment', array('id' => $assid));
                 $transaction = $DB->start_delegated_transaction();
 
                 prog_exceptions_manager::delete_exceptions_by_assignment($progassid);
                 $DB->delete_records('prog_assignment', array('id' => $progassid));
 
                 $transaction->allow_commit();
+
+                // Trigger event.
+                $log[] = "associationid={$assid}";
+                $event = \totara_cohort\event\enrolled_program_item_deleted::create_from_data($assid, $cohort);
+                $event->set_legacy_logdata($log);
+                $event->add_record_snapshot('prog_assignment', $record);
+                $event->trigger();
             }
             break;
         default:
@@ -515,7 +565,7 @@ class totaracohort_event_handler {
 function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
     global $DB, $USER;
 
-    $sql = "SELECT c.idnumber, c.draftcollectionid, crc.rulesetoperator, crc.status
+    $sql = "SELECT c.idnumber, c.draftcollectionid, c.id, c.contextid, crc.rulesetoperator, crc.status
         FROM {cohort} c
         INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
         WHERE c.id = ?";
@@ -525,6 +575,9 @@ function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
     if (!$cohort || !in_array($type, array(COHORT_OPERATOR_TYPE_COHORT, COHORT_OPERATOR_TYPE_RULESET)) || empty($id)) {
         return $result;
     }
+
+    // Create log data.
+    $log = array(SITEID, 'cohort', 'edit rule operators', 'cohort/view.php?id='. $cohortid);
 
     if ($type === COHORT_OPERATOR_TYPE_COHORT) {
         // Update cohort operator.
@@ -536,6 +589,11 @@ function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
             $rulecollection->timemodified = time();
             $rulecollection->modifierid = $USER->id;
             $result = $DB->update_record('cohort_rule_collections', $rulecollection);
+
+            // Trigger cohort update operator event.
+            $event = \totara_cohort\event\operator_updated::create_from_instance($rulecollection, $cohort);
+            $event->set_legacy_logdata($log);
+            $event->trigger();
         }
     } else if ($type === COHORT_OPERATOR_TYPE_RULESET) {
         $operator = $DB->get_field('cohort_rulesets', 'operator', array('id' => $id));
@@ -553,6 +611,11 @@ function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
             $rulecollection->id = $cohort->draftcollectionid;
             $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
             $result = $result && $DB->update_record('cohort_rule_collections', $rulecollection);
+
+            // Trigger ruleset update operator event.
+            $event = \totara_cohort\event\ruleset_operator_updated::create_from_instance($ruleset, $cohort);
+            $event->set_legacy_logdata($log);
+            $event->trigger();
         }
     }
 

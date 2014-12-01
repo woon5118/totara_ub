@@ -37,9 +37,9 @@ $type = required_param('type', PARAM_ALPHA);
 $id = required_param('id', PARAM_INT);
 
 if ($type == 'rule') {
-    $rule = $DB->get_record('cohort_rules', array('id' => $id));
+    $ruleobj = $DB->get_record('cohort_rules', array('id' => $id));
     $ruleinstanceid = $id;
-    $rulegroupname = $rule->ruletype . '-' . $rule->name;
+    $rulegroupname = $ruleobj->ruletype . '-' . $ruleobj->name;
 } else {
     $ruleinstanceid = false;
     $rulegroupname = required_param('rule',PARAM_RAW);
@@ -83,39 +83,35 @@ if ($update) {
                 }
 
                 $rulesetid = cohort_rule_create_ruleset($cohort->draftcollectionid);
-                add_to_log(SITEID, 'cohort', 'create ruleset', 'totara/cohort/rules.php?id='.$id, "rulesetid={$rulesetid}");
-                $ruleinstanceid = cohort_rule_create_rule($rulesetid, $rulegroup, $rulename);
                 $cohortid = $id;
-                $logaction = 'create rule';
-                $loginfo = "ruleid={$ruleinstanceid}&ruletype={$rulegroup}&name={$rulename}";
+                $ruleinstanceid = cohort_rule_create_rule($rulesetid, $rulegroup, $rulename);
                 break;
             case 'ruleset':
                 // Given only the ruleset, this indicates we should create a new
                 // rule in the ruleset
                 $ruleinstanceid = cohort_rule_create_rule($id, $rulegroup, $rulename);
                 $rulesetid = $id;
-                $cohortid = $DB->get_field_sql(
-                    "SELECT cohortid
-                    FROM {cohort_rule_collections} crc
-                    INNER JOIN {cohort_rulesets} crs
-                    ON crc.id = crs.rulecollectionid
-                    WHERE crs.id= ?", array($rulesetid));
-                $logaction = 'create rule';
-                $loginfo = "ruleid={$ruleinstanceid}&ruletype={$rulegroup}&name={$rulename}";
                 break;
             case 'rule':
                 // Given the ruleid, indicates we're updating an existing one
                 // ... we don't actually have to do anything here.
                 $ruleinstanceid = $id;
                 $rulesetid = $DB->get_field('cohort_rules', 'rulesetid', array('id' => $id));
-                $cohortid = $DB->get_field_sql(
-                    "SELECT cohortid
-                    FROM {cohort_rule_collections} crc
+
+                $cohort = $DB->get_record_sql(
+                    "SELECT c.id, c.contextid
+                    FROM {cohort} c
+                    INNER JOIN {cohort_rule_collections} crc
+                    ON c.id = crc.cohortid
                     INNER JOIN {cohort_rulesets} crs
                     ON crc.id = crs.rulecollectionid
                     WHERE crs.id = ?", array($rulesetid));
-                $logaction = 'edit rule';
-                $loginfo = "ruleid={$ruleinstanceid}";
+
+                // Trigger rule updated event.
+                $log = array(SITEID, 'cohort', 'edit rule', 'totara/cohort/rules.php?id='. $cohort->id, "ruleid={$id}");
+                $event = \totara_cohort\event\rule_updated::create_from_instance($ruleobj, $cohort);
+                $event->set_legacy_logdata($log);
+                $event->trigger();
                 break;
             default:
                 // error!
@@ -123,10 +119,6 @@ if ($update) {
 
         $sqlhandler->fetch($ruleinstanceid);
         $ui->handleDialogUpdate($sqlhandler);
-
-        $loginfo = $loginfo . "\n" . $ui->printParams();
-        $loginfo = substr($loginfo, 0, 255);
-        add_to_log(SITEID, 'cohort', $logaction, 'totara/cohort/rules.php?id='.$cohortid, $loginfo);
 
         echo "DONE";
 

@@ -87,19 +87,13 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     link.replaceWith(loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
-                        o = JSON.parse(o);
-                        if (o.action == 'delrule'){
-                            remove_rule(o.ruleid);
-                        } else if (o.action == 'delruleset'){
-                            remove_ruleset(o.rulesetid);
-                        }
-
-                        $('#cohort_rules_action_box').show();
-                    } else {
-                        alert(M.util.get_string('error:noresponsefromajax', 'totara_cohort'));
-                        location.reload();
+                    if (o.action == 'delrule'){
+                        remove_rule(o.ruleid);
+                    } else if (o.action == 'delruleset'){
+                        remove_ruleset(o.rulesetid);
                     }
+
+                    $('#cohort_rules_action_box').show();
                 }, // success
                 error: function(h, t, e) {
                     alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
@@ -139,30 +133,24 @@ M.totara_cohortruledelete = M.totara_cohortruledelete || {
                     link.replaceWith(loadingimg);
                 },
                 success: function(o) {
-                    if (o.length > 0) {
-                        o = JSON.parse(o);
-                        if (o.action == 'delruleparam') {
-                            var separator = ruleparamcontainer.next('.ruleparamseparator');
+                    if (o.action == 'delruleparam') {
+                        var separator = ruleparamcontainer.next('.ruleparamseparator');
+                        if (separator.length) {
+                            separator.remove();
+                        } else {
+                            separator = ruleparamcontainer.prev('.ruleparamseparator');
                             if (separator.length) {
                                 separator.remove();
-                            } else {
-                                separator = ruleparamcontainer.prev('.ruleparamseparator');
-                                if (separator.length) {
-                                    separator.remove();
-                                }
                             }
-                            ruleparamcontainer.remove();
-                        } else if (o.action == 'delrule') {
-                            remove_rule(o.ruleid);
-                        } else if (o.action == 'delruleset') {
-                            remove_ruleset(o.rulesetid);
                         }
-
-                        $('#cohort_rules_action_box').show();
-                    } else {
-                        alert(M.util.get_string('error:noresponsefromajax', 'totara_cohort'));
-                        location.reload();
+                        ruleparamcontainer.remove();
+                    } else if (o.action == 'delrule') {
+                        remove_rule(o.ruleid);
+                    } else if (o.action == 'delruleset') {
+                        remove_ruleset(o.rulesetid);
                     }
+
+                    $('#cohort_rules_action_box').show();
                 }, // success
                 error: function(h, t, e) {
                     alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
