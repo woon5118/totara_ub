@@ -257,3 +257,50 @@ totaraDialog_handler_addpdroom.prototype.external_function = function() {
     // Disable custom room if pre-defined room is selected
     $('input[name="croomname"], input[name="croombuilding"], input[name="croomaddress"], input[name="croomcapacity"]').prop('disabled', true);
 }
+
+M.facetoface_datelinkage = M.facetoface_datelinkage || {
+    previousstartvalues: {},
+
+    getdate: function (dateelement) {
+        return new Date(
+            $('.fdate_time_selector select[name="' + dateelement + '[year]"]').val(),
+            $('.fdate_time_selector select[name="' + dateelement + '[month]"]').val() - 1,
+            $('.fdate_time_selector select[name="' + dateelement + '[day]"]').val(),
+            $('.fdate_time_selector select[name="' + dateelement + '[hour]"]').val(),
+            $('.fdate_time_selector select[name="' + dateelement + '[minute]"]').val()
+        ).getTime() / 1000;
+    },
+
+    setdate: function (dateelement, timestamp) {
+        date = new Date(timestamp * 1000);
+        $('.fdate_time_selector select[name="' + dateelement + '[year]"]').val(date.getFullYear());
+        $('.fdate_time_selector select[name="' + dateelement + '[month]"]').val(date.getMonth() + 1);
+        $('.fdate_time_selector select[name="' + dateelement + '[day]"]').val(date.getDate());
+        $('.fdate_time_selector select[name="' + dateelement + '[hour]"]').val(date.getHours());
+        $('.fdate_time_selector select[name="' + dateelement + '[minute]"]').val(date.getMinutes());
+    },
+
+    init: function(){
+        var repeatid = 0;
+        $('input[name^="datedelete["]').each(function() {
+            var element = 'timestart[' + repeatid + ']';
+            var elementrepeatid = repeatid;
+
+            M.facetoface_datelinkage.previousstartvalues[elementrepeatid] = M.facetoface_datelinkage.getdate(element);
+
+            $('.fdate_time_selector select[name^="timestart[' + elementrepeatid + '"]').change(function() {
+                newstartdate = M.facetoface_datelinkage.getdate(element);
+                oldstartdate = M.facetoface_datelinkage.previousstartvalues[elementrepeatid]
+
+                var finishelement = 'timefinish[' + elementrepeatid + ']';
+                currentfinishdate = M.facetoface_datelinkage.getdate(finishelement);
+                newfinishdate = currentfinishdate + (newstartdate - oldstartdate);
+                M.facetoface_datelinkage.setdate(finishelement, newfinishdate);
+
+                M.facetoface_datelinkage.previousstartvalues[elementrepeatid] = M.facetoface_datelinkage.getdate(element);
+            });
+
+            repeatid += 1;
+        });
+    }
+}

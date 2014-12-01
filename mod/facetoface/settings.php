@@ -30,27 +30,28 @@ require_once "$CFG->dirroot/mod/facetoface/lib.php";
 $ADMIN->add('modsettings', new admin_category('modfacetofacefolder', new lang_string('pluginname', 'mod_facetoface'), $module->is_enabled() === false));
 
 $settings = new admin_settingpage($section, get_string('generalsettings', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
+$ADMIN->add('modfacetofacefolder', $settings);
 
 if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),
-                   new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'),
-                   "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/",30));
+        new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'),
+        "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/", 30));
 
     $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
-                   new lang_string('setting:sessionroles', 'facetoface'), array()));
+        new lang_string('setting:sessionroles', 'facetoface'), array()));
 
     $settings->add(new admin_setting_pickroles('facetoface_session_rolesnotify', new lang_string('setting:sessionrolesnotify_caption', 'facetoface'),
-                   new lang_string('setting:sessionrolesnotify', 'facetoface'), array('editingteacher')));
+        new lang_string('setting:sessionrolesnotify', 'facetoface'), array('editingteacher')));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
-                   new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
+        new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
 
     $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),
-                   new lang_string('setting:notificationdisable', 'facetoface'), 0));
+        new lang_string('setting:notificationdisable', 'facetoface'), 0));
 
     $setting = new admin_setting_configcheckbox('facetoface_displaysessiontimezones', new lang_string('setting:displaysessiontimezones_caption', 'facetoface'),
-               new lang_string('setting:displaysessiontimezones', 'facetoface'), 1);
+        new lang_string('setting:displaysessiontimezones', 'facetoface'), 1);
     $setting->set_updatedcallback('facetoface_displaysessiontimezones_updated');
     $settings->add($setting);
 
@@ -67,7 +68,7 @@ if ($ADMIN->fulltree) { // Improve performance.
         new lang_string('setting:allowwaitlisteveryone_caption', 'facetoface'),
         new lang_string('setting:allowwaitlisteveryone', 'facetoface'), 0));
 
-    $settings->add( new admin_setting_configcheckbox('facetoface_lotteryenabled',
+    $settings->add(new admin_setting_configcheckbox('facetoface_lotteryenabled',
         new lang_string('setting:lotteryenabled_caption', 'facetoface'),
         new lang_string('setting:lotteryenabled', 'facetoface'), 0));
 
@@ -77,11 +78,11 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(new admin_setting_heading('facetoface_manageremail_header', new lang_string('manageremailheading', 'facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_addchangemanageremail', new lang_string('setting:addchangemanageremail_caption', 'facetoface'),new lang_string('setting:addchangemanageremail', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_addchangemanageremail', new lang_string('setting:addchangemanageremail_caption', 'facetoface'), new lang_string('setting:addchangemanageremail', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configtext('facetoface_manageraddressformat', new lang_string('setting:manageraddressformat_caption', 'facetoface'),new lang_string('setting:manageraddressformat', 'facetoface'), new lang_string('setting:manageraddressformatdefault', 'facetoface'), PARAM_TEXT));
+    $settings->add(new admin_setting_configtext('facetoface_manageraddressformat', new lang_string('setting:manageraddressformat_caption', 'facetoface'), new lang_string('setting:manageraddressformat', 'facetoface'), new lang_string('setting:manageraddressformatdefault', 'facetoface'), PARAM_TEXT));
 
-    $settings->add(new admin_setting_configtext('facetoface_manageraddressformatreadable', new lang_string('setting:manageraddressformatreadable_caption', 'facetoface'),new lang_string('setting:manageraddressformatreadable', 'facetoface'), new lang_string('setting:manageraddressformatreadabledefault', 'facetoface'), PARAM_NOTAGS));
+    $settings->add(new admin_setting_configtext('facetoface_manageraddressformatreadable', new lang_string('setting:manageraddressformatreadable_caption', 'facetoface'), new lang_string('setting:manageraddressformatreadable', 'facetoface'), new lang_string('setting:manageraddressformatreadabledefault', 'facetoface'), PARAM_NOTAGS));
 
     $settings->add(new admin_setting_heading('facetoface/managerreserveheader',
         new lang_string('setting:managerreserveheader', 'mod_facetoface'), ''));
@@ -104,23 +105,23 @@ if ($ADMIN->fulltree) { // Improve performance.
 
     $settings->add(new admin_setting_heading('facetoface_cost_header', new lang_string('costheading', 'facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_hidecost', new lang_string('setting:hidecost_caption', 'facetoface'),new lang_string('setting:hidecost', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_hidecost', new lang_string('setting:hidecost_caption', 'facetoface'), new lang_string('setting:hidecost', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'),new lang_string('setting:hidediscount', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_hidediscount', new lang_string('setting:hidediscount_caption', 'facetoface'), new lang_string('setting:hidediscount', 'facetoface'), 0));
 
 
     $settings->add(new admin_setting_heading('facetoface_icalendar_header', new lang_string('icalendarheading', 'facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_oneemailperday', new lang_string('setting:oneemailperday_caption', 'facetoface'),new lang_string('setting:oneemailperday', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_oneemailperday', new lang_string('setting:oneemailperday_caption', 'facetoface'), new lang_string('setting:oneemailperday', 'facetoface'), 0));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_disableicalcancel', new lang_string('setting:disableicalcancel_caption', 'facetoface'),new lang_string('setting:disableicalcancel', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_disableicalcancel', new lang_string('setting:disableicalcancel_caption', 'facetoface'), new lang_string('setting:disableicalcancel', 'facetoface'), 0));
 
 
     $settings->add(new admin_setting_heading('facetoface_bulkadd_header', new lang_string('bulkaddheading', 'facetoface'), ''));
 
     $options = array();
     $options['bulkaddsourceidnumber'] = new lang_string('bulkaddsourceidnumber', 'facetoface');
-    $options['bulkaddsourceuserid']   = new lang_string('bulkaddsourceuserid', 'facetoface');
+    $options['bulkaddsourceuserid'] = new lang_string('bulkaddsourceuserid', 'facetoface');
     $options['bulkaddsourceusername'] = new lang_string('bulkaddsourceusername', 'facetoface');
 
     $settings->add(new admin_setting_configselect('facetoface_bulkaddsource',
@@ -145,19 +146,28 @@ if ($ADMIN->fulltree) { // Improve performance.
     // List of facetoface session fields that can be selected as filters.
     $settings->add(new admin_setting_heading('facetoface_calendarfilters_header', new lang_string('calendarfiltersheading', 'facetoface'), ''));
     $calendarfilters = array(
-        'timestart'  => get_string('startdateafter', 'facetoface'),
+        'timestart' => get_string('startdateafter', 'facetoface'),
         'timefinish' => get_string('finishdatebefore', 'facetoface'),
-        'room'       => get_string('room', 'facetoface'),
-        'building'   => get_string('building', 'facetoface'),
-        'address'    => get_string('address', 'facetoface'),
-        'capacity'   => get_string('capacity', 'facetoface')
+        'room' => get_string('room', 'facetoface'),
+        'building' => get_string('building', 'facetoface'),
+        'address' => get_string('address', 'facetoface'),
+        'capacity' => get_string('capacity', 'facetoface')
     );
     $calendarfilters = $calendarfilters + $customfields;
     $settings->add(new admin_setting_configmultiselect('facetoface_calendarfilters', new lang_string('setting:calendarfilterscaption', 'facetoface'), new lang_string('setting:calendarfilters', 'facetoface'), array('room', 'building', 'address'), $calendarfilters));
+}
 
-} // End of if ($ADMIN->fulltree).
-
+// Session default settings page.
+$settings = new admin_settingpage('modfacetofacesessiondefaults', get_string('sessiondefaults', 'mod_facetoface'), 'moodle/site:config', $module->is_enabled() === false);
 $ADMIN->add('modfacetofacefolder', $settings);
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configtext('facetoface/defaultdaystosession', new lang_string('defaultdaystosession', 'facetoface'), new lang_string('defaultdaystosession_desc', 'facetoface'), '1', PARAM_INT));
+    $settings->add(new admin_setting_configcheckbox('facetoface/defaultdaysskipweekends', new lang_string('defaultdaysskipweekends', 'facetoface'),new lang_string('defaultdaysskipweekends_desc', 'facetoface'), 1));
+    $settings->add(new admin_setting_configtime('facetoface/defaultstarttime_hours', 'facetoface/defaultstarttime_minutes', new lang_string('defaultstarttime', 'facetoface'), new lang_string('defaultstarttimehelp', 'facetoface'), array('h' => 9, 'm' => 0)));
+    $settings->add(new admin_setting_configtext('facetoface/defaultdaysbetweenstartfinish', new lang_string('defaultdaysbetweenstartfinish', 'facetoface'), new lang_string('defaultdaysbetweenstartfinish_desc', 'facetoface'), '0', PARAM_INT));
+    $settings->add(new admin_setting_configtime('facetoface/defaultfinishtime_hours', 'facetoface/defaultfinishtime_minutes', new lang_string('defaultfinishtime', 'facetoface'), new lang_string('defaultfinishtimehelp', 'facetoface'), array('h' => 10, 'm' => 0)));
+}
+
 // Tell core we already added the settings structure.
 $settings = null;
 

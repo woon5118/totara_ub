@@ -81,9 +81,55 @@ class mod_facetoface_session_form extends moodleform {
             $repeatarray[] = $mform->createElement('hidden', 'sessiontimezone', '99');
         }
 
+        $now = time();
+        $defaultstart = $now;
+
+        $config = get_config('facetoface');
+
+        if (!empty($config->defaultdaystosession)) {
+            if (!empty($config->defaultdaysskipweekends)) {
+                $defaultstart = strtotime("+{$config->defaultdaystosession} weekdays", $defaultstart);
+            } else {
+                $defaultstart = strtotime("+{$config->defaultdaystosession} days", $defaultstart);
+            }
+        }
+
+        $defaultfinish = $defaultstart;
+
+        if (!empty($config->defaultdaysbetweenstartfinish)) {
+            $days = (int)$config->defaultdaysbetweenstartfinish;
+            if (!empty($config->defaultdaysskipweekends)) {
+                $defaultfinish = strtotime("+{$days} weekdays", $defaultfinish);
+            } else {
+                $defaultfinish = strtotime("+{$days} days", $defaultfinish);
+            }
+        }
+
+        // Adjust for start time hours.
+        if (!empty($config->defaultstarttime_hours)) {
+            $defaultstart = strtotime(date('Y-m-d', $defaultstart).' 00:00:00');
+            $defaultstart += HOURSECS * (int)$config->defaultstarttime_hours;
+        }
+
+        // Adjust for finish time hours.
+        if (!empty($config->defaultfinishtime_hours)) {
+            $defaultfinish = strtotime(date('Y-m-d', $defaultfinish).' 00:00:00');
+            $defaultfinish += HOURSECS * (int)$config->defaultfinishtime_hours;
+        }
+
+        // Adjust for start time minutes.
+        if (!empty($config->defaultstarttime_minutes)) {
+            $defaultstart += MINSECS * (int)$config->defaultstarttime_minutes;
+        }
+
+        // Adjust for finish time minutes.
+        if (!empty($config->defaultfinishtime_minutes)) {
+            $defaultfinish += MINSECS * (int)$config->defaultfinishtime_minutes;
+        }
+
         // NOTE: Do not set type for date elements because it borks timezones!
-        $repeatarray[] = &$mform->createElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'), array('showtimezone' => true));
-        $repeatarray[] = &$mform->createElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'), array('showtimezone' => true));
+        $repeatarray[] = &$mform->createElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'), array('defaulttime' => $defaultstart, 'showtimezone' => true));
+        $repeatarray[] = &$mform->createElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'), array('defaulttime' => $defaultfinish, 'showtimezone' => true));
 
         $checkboxelement = &$mform->createElement('checkbox', 'datedelete', '', get_string('dateremove', 'facetoface'));
         unset($checkboxelement->_attributes['id']); // necessary until MDL-20441 is fixed
