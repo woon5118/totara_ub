@@ -33,9 +33,10 @@ class block_totara_my_learning_nav_renderer extends plugin_renderer_base {
         }
 
         $output = html_writer::start_tag('ul');
+        $access = get_config(null, 'enablelearningplans');
 
         $usercontext = context_user::instance($USER->id);
-        if (has_capability('totara/plan:accessplan', $usercontext)) {
+        if (has_capability('totara/plan:accessplan', $usercontext) && $access == 1) {
             $text = get_string('developmentplan', 'totara_core');
             $icon = new pix_icon('plan', $text, 'totara_core');
             $url = new moodle_url('/totara/plan/index.php');
