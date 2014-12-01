@@ -71,8 +71,18 @@ $strsearchresults = get_string('searchresults');
 $strfacetofaces = get_string('modulenameplural', 'facetoface');
 $strfacetoface = get_string('modulename', 'facetoface');
 
-// Set wait-list
-$waitlist = $session->datetimeknown ? 0 : 1;
+// By default, don't display the waitlist.
+$waitlist = 0;
+// If the date and time of the session is not known attendees are waitlisted automatically
+// until a date and time is applied to the session and they are displayed in the attendees list
+// rather than the waitlist. So, only enable the waitlist tab when the date and time for the
+// session is known and there are attendees with the waitlist status.
+if ($session->datetimeknown) {
+    $waitlistcount = count(facetoface_get_attendees($session->id,array(MDL_F2F_STATUS_WAITLISTED)));
+    if ($waitlistcount > 0) {
+        $waitlist = 1;
+    }
+}
 
 // Set removed users
 $removed = $removedusers ? explode(',', $removedusers) : array();
