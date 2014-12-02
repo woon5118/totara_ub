@@ -813,11 +813,11 @@ function facetoface_delete_session($session) {
         }
     }
 
-    // Load current trainers
+    // Send cancellations for trainers assigned to the session.
     $trainers = $DB->get_records("facetoface_session_roles", array("sessionid" => $session->id));
     if ($trainers and count($trainers) > 0) {
         foreach ($trainers as $trainer) {
-            facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid);
+            facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid, MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION);
         }
     }
 
