@@ -50,7 +50,7 @@ Feature: Award badges
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
-    And I set the field "Trainer" to "1"
+    And I set the field "Teacher" to "1"
     And I press "Save"
     And I press "Enable access"
     And I press "Continue"
@@ -94,7 +94,7 @@ Feature: Award badges
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "type" to "Manual issue by role"
-    And I set the field "Trainer" to "1"
+    And I set the field "Teacher" to "1"
     And I press "Save"
     And I press "Enable access"
     And I press "Continue"

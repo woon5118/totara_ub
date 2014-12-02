@@ -5,14 +5,14 @@ Feature: Add a face to face
   I need to create a face to face activity
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email               |
       | teacher1 | Terry1    | Teacher1 | teacher1@moodle.com |
       | student1 | Sam1      | Student1 | student1@moodle.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
 
@@ -62,6 +62,11 @@ Feature: Add a face to face
     And I click on "Position2" "link_or_button"
     And I click on "OK" "link_or_button"
     And I press "Update position"
+
+    And I set the following administration settings values:
+      | Enhanced catalog | 1 |
+    And I press "Save changes"
+
     And I log out
 
     And I log in as "teacher1"
@@ -96,11 +101,11 @@ Feature: Add a face to face
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
-    And I click on ".rb-display-expand" "css_element"
-    And I click on "[name$='_sid']" "css_element" in the "1 January 2020" "table_row"
+    And I click on "Course 1" "link"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I set the following fields to these values:
       | Select a position | Position2 |
-    And I press "Enrol"
+    And I press "Sign-up"
     Then I should see "Topic 1"
     And I log out
 

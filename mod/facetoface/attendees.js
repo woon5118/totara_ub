@@ -458,7 +458,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 zIndex       : 5,
                 centered     : true,
                 modal        : true,
-                render       : true,
+                render       : true
             });
             var content = $('#' + dialog.get('id'));
             if (typeof data.error !== 'undefined') {

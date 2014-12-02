@@ -83,7 +83,7 @@ Feature: Importing of groups and groupings
     And I follow "Course 1"
     And I expand "Users" node
     And I follow "Permissions"
-    And I override the system permissions of "Editing Trainer" role with:
+    And I override the system permissions of "Teacher" role with:
       | moodle/course:changeidnumber | Prevent |
     And I log out
     And I log in as "teacher1"

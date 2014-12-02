@@ -110,5 +110,8 @@ if ($fromform = $mform->get_data()) {
 
     echo json_encode(array('result' => 'success', 'id' => $userid, 'positiondisplayname' => $label));
 } else {
+    // This should be json_encoded, but for now we need to use html content
+    // type to not break $.get().
+    header('Content-type: text/html; charset=utf-8');
     echo $mform->display();
 }

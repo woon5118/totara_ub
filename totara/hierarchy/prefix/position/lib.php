@@ -483,7 +483,7 @@ class position extends hierarchy {
         $label = '';
         if ($posassignment->positionassignmentname) {
             $label .= $posassignment->positionname;
-        } else {
+        } else if (isset($POSITION_TYPES[$posassignment->positiontype])) {
             $label .= get_string('type' . $POSITION_TYPES[$posassignment->positiontype], 'totara_hierarchy');
         }
         if ($posassignment->positionname) {

@@ -1,4 +1,4 @@
-@enrol
+@totara @totara_coursecatalog @enrol
 Feature: Users can auto-enrol themself in courses where self enrolment is allowed
   In order to participate in courses
   As a user
@@ -11,19 +11,22 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
       | student1 | Student | 1 | student1@asd.com |
       | student2 | Student | 2 | student2@asd.com |
       | student3 | Student | 3 | student3@asd.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
 
-    Given     I log in as "admin"
+    Given I log in as "admin"
     And I expand "Site administration" node
     And I expand "Plugins" node
     And I expand "Enrolments" node
     And I follow "Manage enrol plugins"
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
+    And I set the following administration settings values:
+      | Enhanced catalog | 1 |
+    And I press "Save changes"
     And I log out
 
     Given I log in as "teacher1"
@@ -34,7 +37,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
       | Use group enrolment keys | Yes |
     And I follow "Groups"
     And I press "Create group"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Group name | Group 1 |
       | Enrolment key | Test-groupenrolkey1 |
     And I press "Save changes"
@@ -45,7 +48,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
       | Forum name | Test forum name |
       | Description | Test forum description |
     And I click on "Edit settings" "link" in the "Administration" "block"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Allow guest access | Yes |
       | Password | moodle_rules |
     And I press "Save changes"
@@ -81,10 +84,10 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
   Scenario: Self-enrolment through course catalog requiring a group enrolment key
     When I log in as "student1"
     And I follow "Find Learning"
-    And I click on ".rb-display-expand" "css_element"
-    And I fill the moodle form with:
+    And I click on "Course 1" "link"
+    And I set the following fields to these values:
       | Enrolment key | Test-groupenrolkey1 |
-    And I press "Enrol with - Self enrolment"
+    And I press "Enrol me"
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
     And I should not see "Enrol me in this course"
@@ -92,18 +95,18 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
 
     When I log in as "student2"
     And I follow "Find Learning"
-    And I click on ".rb-display-expand" "css_element"
+    And I click on "Course 1" "link"
     Then I should see "Guest access"
-    And I fill the moodle form with:
+    And I set the following fields to these values:
       | Password | moodle_rules |
-    And I press "Enrol with - Guest access"
+    And I press "Submit"
     And I should see "Test forum name"
     And I log out
 
     When I log in as "student3"
     And I should see "Courses" in the "Navigation" "block"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
-    And I click on ".rb-display-expand" "css_element"
-    And I click on "[name$='_sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Enrol with - Face-to-face direct enrolment"
+    And I click on "Course 1" "link"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
+    And I press "Sign-up"
     Then I should see "Topic 1"

@@ -94,7 +94,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I follow "Course 1"
-    And I check "sid"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I press "Sign-up"
     Then I should see "Your booking has been completed but requires approval from your manager."
     And I log out
@@ -125,7 +125,7 @@ Feature: Users are forced to get manager approval where required
 
     When I log in as "student1"
     And I follow "Course 1"
-    And I check "sid"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I press "Sign-up"
     Then I should see "Your booking has been completed but requires approval from your manager."
     And I log out
@@ -134,7 +134,7 @@ Feature: Users are forced to get manager approval where required
     And I follow "View all sessions"
     And I follow "Attendees"
     And I follow "Approval required"
-    And I click on "input[value='2']" "css_element" in the "Student 1" table row
+    And I click on "input[value='2']" "css_element" in the "Student 1" "table_row"
     And I press "Update requests"
     And I log out
     And I log in as "student1"

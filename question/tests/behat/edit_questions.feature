@@ -38,6 +38,7 @@ Feature: A teacher can edit questions in the question bank
     And I press "Cancel"
     And I click on "Preview" "link" in the "Edited question name" "table_row"
     And I switch to "questionpreview" window
-    And I should see "Edited question name"
+# Totara does not print title in popup windows.
+    #And I should see "Edited question name"
     And I should see "Write a lot about what you want"
     And I switch to the main window

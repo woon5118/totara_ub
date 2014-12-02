@@ -97,7 +97,7 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $sink->close();
 
-        $cohort->cohorttype = '0';
+        $cohort->cohorttype = '1';
         $cohort->visibility = '0';
         $cohort->alertmembers = '0';
         $cohort->startdate = null;
@@ -179,7 +179,7 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $sink->close();
 
-        $cohort->cohorttype = '0';
+        $cohort->cohorttype = '1';
         $cohort->visibility = '0';
         $cohort->alertmembers = '0';
         $cohort->startdate = null;

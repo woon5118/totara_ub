@@ -1,10 +1,15 @@
-@enrol @enrol_guest
-Feature: Guest users can auto-enrol themself in courses where guest access is allowed
+@totara @totara_coursecatalog @enrol @enrol_guest
+Feature: Guest users can auto-enrol themself via course catalog in courses where guest access is allowed
   In order to access courses contents
   As a guest
   I need to access courses as a guest
 
   Background:
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Enhanced catalog | 1 |
+    And I press "Save changes"
+    And I log out
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
@@ -24,27 +29,33 @@ Feature: Guest users can auto-enrol themself in courses where guest access is al
     And I click on "Edit settings" "link" in the "Administration" "block"
 
   @javascript
-  Scenario: Allow guest access without password
+  Scenario: Allow guest access through the course catalog without password
     Given I set the following fields to these values:
       | Allow guest access | Yes |
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
-    When I follow "Test forum name"
-    Then I should not see "Subscribe to this forum"
+    And I follow "Find Learning"
+    And I click on "Course 1" "link"
+    And I wait until the page is ready
+    And I should see "Test forum name"
 
   @javascript
-  Scenario: Allow guest access with password
+  Scenario: Allow guest access through the course catalog with password
     Given I set the following fields to these values:
       | Allow guest access | Yes |
       | Password | moodle_rules |
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    When I follow "Course 1"
+    And I follow "Find Learning"
+    And I click on "Course 1" "link"
     Then I should see "Guest access"
+    And I set the following fields to these values:
+      | Password | moodle_sucks |
+    And I press "Submit"
+    And I should see "Incorrect access password, please try again"
     And I set the following fields to these values:
       | Password | moodle_rules |
     And I press "Submit"
-    And I should see "Test forum name"
+    And I wait until the page is ready

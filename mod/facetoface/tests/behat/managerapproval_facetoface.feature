@@ -5,14 +5,14 @@ Feature: Manager approval
   I need to authorise seminar signups
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email               |
       | teacher1 | Terry1    | Teacher1 | teacher1@moodle.com |
       | student1 | Sam1      | Student1 | student1@moodle.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
@@ -94,5 +94,5 @@ Feature: Manager approval
     And I follow "Test facetoface name"
     And I follow "Attendees"
     And I follow "Approval required"
-    And I click on "input[value='2']" "css_element" in the "Sam1 Student1" table row
+    And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"
     And I press "Update requests"

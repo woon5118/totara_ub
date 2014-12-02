@@ -221,12 +221,12 @@ class behat_hooks extends behat_base {
             $this->throw_unknown_exception($e);
         }
 
-        raise_memory_limit(MEMORY_EXTRA);
+        raise_memory_limit(MEMORY_EXTRA); // Totara includes very many files.
         // Checking that the root path is a Moodle test site.
         if (self::is_first_scenario()) {
             $notestsiteexception = new Exception('The base URL (' . $CFG->wwwroot . ') is not a behat test site, ' .
                 'ensure you started the built-in web server in the correct directory or your web server is correctly started and set up');
-            $this->find("xpath", "//head/child::title[normalize-space(.)='" . behat_util::BEHATSITENAME . ': ' . get_string("loginsite") . "']", $notestsiteexception);
+            $this->find("xpath", "//head/child::title[normalize-space(.)='" . behat_util::BEHATSITENAME . "']", $notestsiteexception);
 
             self::$initprocessesfinished = true;
         }

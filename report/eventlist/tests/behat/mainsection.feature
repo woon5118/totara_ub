@@ -25,7 +25,7 @@ Feature: Page contains a list of events
     And I press "clearbutton"
     And I set the field "eventcrud" to "delete"
     And I press "filterbutton"
-    And I should see "Cohort deleted"
+    And I should see "Audience deleted"
     And I should not see "Cohort updated"
     And I press "clearbutton"
     And I set the field "eventcomponent" to "Assignment"

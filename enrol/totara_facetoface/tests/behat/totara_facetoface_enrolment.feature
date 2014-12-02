@@ -56,7 +56,7 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
-    And I check "sid"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I press "Sign-up"
     Then I should see "Topic 1"
 
@@ -68,6 +68,11 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
 
   @javascript
   Scenario: Enrol through course catalogue
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Enhanced catalog | 1 |
+    And I press "Save changes"
+    And I log out
     Given I log in as "teacher1"
     And I follow "Course 1"
     When I add "Face-to-face direct enrolment" enrolment method with:
@@ -76,7 +81,7 @@ Feature: Users can auto-enrol themself in courses where face to face direct enro
     And I log in as "student1"
     And I should see "Courses" in the "Navigation" "block"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
-    And I click on ".rb-display-expand" "css_element"
-    And I click on "[name$='_sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Enrol"
+    And I click on "Course 1" "link"
+    And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
+    And I press "Sign-up"
     Then I should see "Topic 1"

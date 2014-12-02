@@ -13,7 +13,10 @@ Feature: Course summary block used on the frontpage
     And I log out
     # The course summary block a default front page block, so no need to add it.
 
-  #Scenario: "Guest can view site summary" removed as we require log in
+  Scenario: Guest can view site summary
+    When I am on homepage
+    Then "Course/site summary" "block" should exist
+    And I should see "Proved the summary block works!" in the "Course/site summary" "block"
 
   Scenario: Admin can see an edit icon when edit mode is on and follow it to the front page settings
     When I log in as "admin"

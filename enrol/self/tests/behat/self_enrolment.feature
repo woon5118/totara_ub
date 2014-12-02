@@ -75,30 +75,3 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
     And I should not see "Enrol me in this course"
-
-  @javascript
-  Scenario: Self-enrolment through course catalog requiring a group enrolment key
-    Given I log in as "teacher1"
-    And I follow "Course 1"
-    When I add "Self enrolment" enrolment method with:
-      | Custom instance name | Test student enrolment |
-      | Enrolment key | moodle_rules |
-      | Use group enrolment keys | Yes |
-    And I follow "Groups"
-    And I press "Create group"
-    And I fill the moodle form with:
-      | Group name | Group 1 |
-      | Enrolment key | Test-groupenrolkey1 |
-    And I press "Save changes"
-    And I log out
-    And I log in as "student1"
-    And I follow "Find Learning"
-    And I click on ".rb-display-expand" "css_element"
-    And I press "Enrol"
-    Then I should see "Incorrect enrolment key, please try again"
-    And I fill the moodle form with:
-      | Enrolment key | Test-groupenrolkey1 |
-    And I press "Enrol"
-    Then I should see "Topic 1"
-    And I should not see "Enrolment options"
-    And I should not see "Enrol me in this course"

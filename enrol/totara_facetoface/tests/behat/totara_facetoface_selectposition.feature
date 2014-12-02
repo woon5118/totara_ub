@@ -5,15 +5,15 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
   I need to sign up to seminars when enrolling on the course
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
       | student1 | Student | 1 | student1@asd.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
       | Course 2 | C2 | topics |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | teacher1 | C2 | editingteacher |
@@ -27,7 +27,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     And I expand "Activity modules" node
     And I expand "Face-to-face" node
     And I follow "General Settings"
-    And I fill in "Select position on signup" with "checked_checkbox"
+    And I set the field "Select position on signup" to "checked_checkbox"
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"

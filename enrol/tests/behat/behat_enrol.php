@@ -72,7 +72,8 @@ class behat_enrol extends behat_base {
     public function i_enrol_user_as($userfullname, $rolename) {
 
         $steps = array(
-            new Given('I follow "' . get_string('enrolledusers', 'enrol') . '"'),
+            // Totara does not go to list of users to enrol after course creation.
+            new Given('I navigate to "Enrolled users" node in "Course administration > Users"'),
             new Given('I press "' . get_string('enrolusers', 'enrol') . '"')
         );
 
