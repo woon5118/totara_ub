@@ -202,7 +202,9 @@ class feedback360_test extends feedback360_testcase {
         // Create 3 resp assignments.
         feedback360_responder::update_system_assignments(array($respuser->id, $respuser2->id, $respuser3->id), array(),
                 $userass->id, time());
-        $this->assertDebuggingCalled(null, null, '', 3);
+        $messages = $this->getDebuggingMessages();
+        $this->resetDebugging();
+        $this->assertCount(3, $messages);
         // Check that there 3 resp assignments.
         $userrespass = $DB->get_record('feedback360_resp_assignment', array('feedback360userassignmentid' => $userass->id,
             'userid' => $respuser->id));

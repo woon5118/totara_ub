@@ -48,6 +48,7 @@ class totara_cohort_operators_testcase extends reportcache_advanced_testcase {
     public function setUp() {
         global $DB;
         parent::setup();
+        set_config('enablecompletion', 1);
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $this->preventResetByRollback();

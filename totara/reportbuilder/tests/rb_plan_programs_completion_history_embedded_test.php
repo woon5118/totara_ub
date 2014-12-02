@@ -37,6 +37,7 @@ class totara_reportbuilder_rb_plan_programs_completion_history_embedded_testcase
         global $DB, $POSITION_CODES, $POSITION_TYPES;
 
         parent::setup();
+        set_config('enablecompletion', 1);
         $this->setAdminUser();
         $this->resetAfterTest(true);
         $this->preventResetByRollback();

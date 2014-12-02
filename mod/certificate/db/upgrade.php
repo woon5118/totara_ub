@@ -499,14 +499,5 @@ function xmldb_certificate_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014081901, 'certificate');
     }
 
-
-    // Do not put Totara upgrade code in this file - put it in
-    // totaraupgradelib.php instead and it will be called on every
-    // upgrade.
-    // Always keep this at the end of upgrade and bump up the main
-    // version by .01 after merging upstream changes!
-    require_once(__DIR__ . '/totaraupgradelib.php');
-    mod_certificate_totara_upgrade($oldversion);
-
     return true;
 }

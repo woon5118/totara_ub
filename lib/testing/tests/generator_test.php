@@ -48,6 +48,7 @@ class core_test_generator_testcase extends advanced_testcase {
     }
 
     public function test_get_plugin_generator_no_component_dir() {
+        // TODO: upstream instance completion to Moodle
         $this->setExpectedException('coding_exception', 'Component core_filter does not support ' .
                     'generators yet. Missing tests/generator/lib.php.');
         $generator = $this->getDataGenerator()->get_plugin_generator('core_filter');
@@ -114,7 +115,6 @@ class core_test_generator_testcase extends advanced_testcase {
         }
 
         $this->resetAfterTest(true);
-        $this->setAdminUser();
         $generator = $this->getDataGenerator();
 
         $page = $generator->create_module('page', array('course'=>$SITE->id));

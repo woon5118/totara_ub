@@ -36,12 +36,6 @@ require_once($CFG->dirroot . '/mod/assign/tests/fixtures/event_mod_assign_fixtur
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assign_events_testcase extends mod_assign_base_testcase {
-    protected function setUp() {
-        parent::setUp();
-        $this->resetAfterTest();
-        // Ehm, completion is enabled in Totara by default.
-        set_config('enablecompletion', 0);
-    }
 
     /**
      * Basic tests for the submission_created() abstract class.

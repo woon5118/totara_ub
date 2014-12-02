@@ -25,7 +25,7 @@
  */
 
 /**
- * Function for Totara specific DB changes to core Moodle modules.
+ * Function for Totara specific DB changes to core Moodle plugins.
  *
  * Put code here rather than in db/upgrade.php if you need to change core
  * Moodle database schema for Totara-specific changes.
@@ -33,11 +33,14 @@
  * This is executed during EVERY upgrade. Make sure your code can be
  * re-executed EVERY upgrade without problems.
  *
- * Do not use savepoints in this code.
+ * You need to increment the upstream plugin version by .01 to get
+ * this code executed!
  *
- * @param int $oldversion Current (pre-upgrade) local db version timestamp.
+ * Do not use savepoints in this code!
+ *
+ * @param string $version the plugin version
  */
-function mod_certificate_totara_upgrade($oldversion) {
+function xmldb_certificate_totara_postupgrade($version) {
     global $DB;
 
     $dbman = $DB->get_manager();

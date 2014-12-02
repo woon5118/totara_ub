@@ -28,6 +28,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
+require_once($CFG->libdir . '/testing/generator/lib.php');
 
 /**
  * Test organisation rules.
@@ -50,7 +51,9 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
     private $usersorg2 = array();
     private $usersorg3 = array();
     private $usersorg4 = array();
+    /** @var totara_cohort_generator $cohort_generator */
     private $cohort_generator = null;
+    /** @var totara_hierarchy_generator $hierarchy_generator */
     private $hierarchy_generator = null;
     const TEST_ORGANISATION_COUNT_MEMBERS = 23;
 
@@ -77,13 +80,16 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
 
         // Create organisations and organisation fw.
-        $this->orgfw = $this->hierarchy_generator->create_framework('org', 'orgfw');
+        $name = totara_hierarchy_generator::DEFAULT_NAME_FRAMEWORK_ORGANISATION;
+        $name .= ' ' . totara_generator_util::get_next_record_number('org_framework', 'fullname', $name);
+        $data = array('fullname' => $name);
+        $this->orgfw = $this->hierarchy_generator->create_framework('organisation', $data);
 
         // Create organisations and organisation hierarchies.
         $this->assertEquals(0, $DB->count_records('org'));
-        $this->org1 = $this->hierarchy_generator->create_hierarchy($this->orgfw, 'organisation', 'orgname1', array('idnumber' => 'org1'));
-        $this->org2 = $this->hierarchy_generator->create_hierarchy($this->orgfw, 'organisation', 'orgname2', array('idnumber' => 'org2'));
-        $this->org3 = $this->hierarchy_generator->create_hierarchy($this->orgfw, 'organisation', 'orgname3', array('idnumber' => 'org3'));
+        $this->org1 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation', array('idnumber' => 'org1', 'fullname' => 'orgname1'));
+        $this->org2 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation', array('idnumber' => 'org2', 'fullname' => 'orgname2'));
+        $this->org3 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation', array('idnumber' => 'org3', 'fullname' => 'orgname3'));
         $this->assertEquals(3, $DB->count_records('org'));
 
         // Create some test users and assign them to an organisation.
@@ -92,13 +98,13 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         for ($i = 1; $i <= self::TEST_ORGANISATION_COUNT_MEMBERS; $i++) {
             $this->{'user'.$i} = $this->getDataGenerator()->create_user();
             if ($i%3 === 0) {
-                $orgid = $this->org1; // 7 users.
+                $orgid = $this->org1->id; // 7 users.
                 $org = 'org1';
             } else if ($i%2 === 0){
-                $orgid = $this->org2; // 8 users.
+                $orgid = $this->org2->id; // 8 users.
                 $org = 'org2';
             } else {
-                $orgid = $this->org3; // 8 users.
+                $orgid = $this->org3->id; // 8 users.
                 $org = 'org3';
             }
             $this->hierarchy_generator->assign_primary_position($this->{'user'.$i}->id, null, $orgid, null);
@@ -113,9 +119,9 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->usersorg3 = array_flip($this->usersorg3);
 
         // Check that organisations were assigned correctly.
-        $this->assertEquals(7, $DB->count_records('pos_assignment', array('organisationid' => $this->org1)));
-        $this->assertEquals(8, $DB->count_records('pos_assignment', array('organisationid' => $this->org2)));
-        $this->assertEquals(8, $DB->count_records('pos_assignment', array('organisationid' => $this->org3)));
+        $this->assertEquals(7, $DB->count_records('pos_assignment', array('organisationid' => $this->org1->id)));
+        $this->assertEquals(8, $DB->count_records('pos_assignment', array('organisationid' => $this->org2->id)));
+        $this->assertEquals(8, $DB->count_records('pos_assignment', array('organisationid' => $this->org3->id)));
 
         // Creating dynamic cohort and check that there are no members in the new cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -134,7 +140,6 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         // Add a rule that matches users for the organisation org1. It should match 7 users.
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'org', 'idnumber', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO),  array('org1'));
         cohort_rules_approve_changes($this->cohort);
-
         $members = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', array($this->cohort->id));
         $this->assertEquals(7, count($members));
         $this->assertEmpty(array_diff_key(array_flip($members), $this->usersorg1));
@@ -160,7 +165,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->assertInternalType('int', $orgtype1);
 
         // Assign the type organisation to org1.
-        $this->assertTrue($DB->set_field('org', 'typeid', $orgtype1, array('id' => $this->org1)));
+        $this->assertTrue($DB->set_field('org', 'typeid', $orgtype1, array('id' => $this->org1->id)));
 
         // Create a rule that matches users in the previous created type.
         $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'org', 'orgtype', array('equal' => COHORT_RULES_OP_IN_EQUAL), array($orgtype1));
@@ -207,15 +212,15 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Create some organisatiosn to make a hierarchy.
-        $data = array('idnumber' => 'og4', 'parentid' => $this->org1);
-        $this->org4 = $this->hierarchy_generator->create_hierarchy($this->orgfw, 'organisation', 'org4', $data);
-        $data = array('idnumber' => 'org5', 'parentid' => $this->org2);
-        $this->org5 = $this->hierarchy_generator->create_hierarchy($this->orgfw, 'organisation', 'org5', $data);
+        $data = array('idnumber' => 'og4', 'parentid' => $this->org1->id, 'fullname' => 'org4');
+        $this->org4 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation', $data);
+        $data = array('idnumber' => 'org5', 'parentid' => $this->org2->id, 'fullname' => 'org5');
+        $this->org5 = $this->hierarchy_generator->create_hierarchy($this->orgfw->id, 'organisation', $data);
 
         // Process organisations.
         $listofvalues = array();
         foreach ($organisations as $org) {
-            $listofvalues[] = $this->{$org};
+            $listofvalues[] = $this->{$org}->id;
         }
 
         // Create some users and assign them to the new organisations.
@@ -226,15 +231,15 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
         $newuser5 = $this->getDataGenerator()->create_user(array('username' => 'newuser5'));
 
         // Assign organisations.
-        $this->hierarchy_generator->assign_primary_position($newuser1->id, null, $this->org4, null);
-        $this->hierarchy_generator->assign_primary_position($newuser2->id, null, $this->org5, null);
-        $this->hierarchy_generator->assign_primary_position($newuser3->id, null, $this->org4, null);
-        $this->hierarchy_generator->assign_primary_position($newuser4->id, null, $this->org5, null);
-        $this->hierarchy_generator->assign_primary_position($newuser5->id, null, $this->org4, null);
+        $this->hierarchy_generator->assign_primary_position($newuser1->id, null, $this->org4->id, null);
+        $this->hierarchy_generator->assign_primary_position($newuser2->id, null, $this->org5->id, null);
+        $this->hierarchy_generator->assign_primary_position($newuser3->id, null, $this->org4->id, null);
+        $this->hierarchy_generator->assign_primary_position($newuser4->id, null, $this->org5->id, null);
+        $this->hierarchy_generator->assign_primary_position($newuser5->id, null, $this->org4->id, null);
         $this->usersorg4 = array_flip(array($newuser1->id, $newuser3->id, $newuser5->id));
 
-        $this->assertEquals(3, $DB->count_records('pos_assignment', array('organisationid' => $this->org4)));
-        $this->assertEquals(2, $DB->count_records('pos_assignment', array('organisationid' => $this->org5)));
+        $this->assertEquals(3, $DB->count_records('pos_assignment', array('organisationid' => $this->org4->id)));
+        $this->assertEquals(2, $DB->count_records('pos_assignment', array('organisationid' => $this->org5->id)));
 
         // Process list of users that should match the data.
         $membersincohort = array();

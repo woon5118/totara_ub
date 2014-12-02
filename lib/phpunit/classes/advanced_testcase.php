@@ -270,9 +270,8 @@ abstract class advanced_testcase extends PHPUnit_Framework_TestCase {
      * @param null|string $debugmessage null means any
      * @param null|string $debuglevel null means any
      * @param string $message
-     * @param int $excount expected count of debugging messages in stack
      */
-    public function assertDebuggingCalled($debugmessage = null, $debuglevel = null, $message = '', $excount = 1) {
+    public function assertDebuggingCalled($debugmessage = null, $debuglevel = null, $message = '') {
         $debugging = phpunit_util::get_debugging_messages();
         $count = count($debugging);
 
@@ -282,13 +281,13 @@ abstract class advanced_testcase extends PHPUnit_Framework_TestCase {
             }
             $this->fail($message);
         }
-        if ($count != $excount) {
+        if ($count > 1) {
             if ($message === '') {
-                $message = 'Expectation failed, debugging() triggered '.$count.' times. Expected: '.$excount;
+                $message = 'Expectation failed, debugging() triggered '.$count.' times.';
             }
             $this->fail($message);
         }
-        $this->assertEquals($excount, $count);
+        $this->assertEquals(1, $count);
 
         $debug = reset($debugging);
         if ($debugmessage !== null) {

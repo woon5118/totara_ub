@@ -40,9 +40,6 @@ class filter_glossary_filter_testcase extends advanced_testcase {
         global $CFG;
         $this->resetAfterTest(true);
 
-        // Needed for Totara as $CFG->forcelogin is enabled by default.
-        $this->setAdminUser();
-
         // Enable glossary filter at top level.
         filter_set_global_state('glossary', TEXTFILTER_ON);
         $CFG->glossary_linkentries = 1;

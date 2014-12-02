@@ -1201,7 +1201,7 @@ class hierarchy {
         $cleanprefixname = clean_param($prefixname, PARAM_ALPHA);
         $libpath = $CFG->dirroot.'/totara/hierarchy/prefix/'.$cleanprefixname.'/lib.php';
         if (!file_exists($libpath)) {
-            print_error('error:hierarchyprefixnotfound', 'totara_hierarchy', $cleanprefixname);
+            print_error('error:hierarchyprefixnotfound', 'totara_hierarchy', '', $cleanprefixname);
         }
         require_once($libpath);
         $instance = new $cleanprefixname();

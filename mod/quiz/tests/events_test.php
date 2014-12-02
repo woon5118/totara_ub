@@ -97,9 +97,8 @@ class mod_quiz_events_testcase extends advanced_testcase {
         $sink->close();
 
         // Validate the event.
-        // Submitting the quiz will trigger two module_completion events (submission and grade received) and one attempt_submitted event.
-        $this->assertCount(3, $events);
-        $event = $events[2];
+        $this->assertCount(1, $events);
+        $event = $events[0];
         $this->assertInstanceOf('\mod_quiz\event\attempt_submitted', $event);
         $this->assertEquals('quiz_attempts', $event->objecttable);
         $this->assertEquals($quizobj->get_context(), $event->get_context());

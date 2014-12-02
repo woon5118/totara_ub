@@ -49,7 +49,7 @@ class tool_generator_maketestcourse_testcase extends advanced_testcase {
         // Check user is enrolled.
         $users = get_enrolled_users($context);
         $this->assertEquals(1, count($users));
-        $this->assertEquals('user_tool_generator_000001', reset($users)->username);
+        $this->assertEquals('tool_generator_000001', reset($users)->username);
 
         // Check there's a page on the course.
         $pages = $modinfo->get_instances_of('page');

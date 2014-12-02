@@ -31,7 +31,7 @@ global $CFG;
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
 
-class completion_test extends advanced_testcase {
+class totara_core_completion_testcase extends advanced_testcase {
     protected $user_man, $user_rpl, $course, $mod1, $mod2, $comp_rpl, $comp_man, $modcomp1_man, $modcomp2_man, $now;
 
 
@@ -40,6 +40,7 @@ class completion_test extends advanced_testcase {
         global $DB;
 
         parent::setUp();
+        set_config('enablecompletion', 1);
 
         $this->now = time();
 

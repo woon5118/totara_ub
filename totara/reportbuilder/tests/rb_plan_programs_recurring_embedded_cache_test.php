@@ -66,6 +66,7 @@ class totara_reportbuilder_rb_plan_programs_recurring_embedded_cache_testcase ex
         global $CFG, $DB, $POSITION_CODES, $POSITION_TYPES;
 
         parent::setup();
+        set_config('enablecompletion', 1);
         $this->setAdminUser();
         $this->resetAfterTest(true);
         $this->preventResetByRollback();

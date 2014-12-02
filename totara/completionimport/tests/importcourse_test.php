@@ -46,6 +46,7 @@ class importcourse_testcase extends advanced_testcase {
     public function test_import() {
         global $DB, $CFG;
 
+        set_config('enablecompletion', 1);
         $this->resetAfterTest(true);
 
         $importname = 'course';

@@ -36,9 +36,6 @@ class core_accesslib_testcase extends advanced_testcase {
      * Verify comparison of context instances in phpunit asserts.
      */
     public function test_context_comparisons() {
-
-        $this->resetAfterTest(); // There is some bloody timezone hack somewhere messing up execution of the first test, why???
-
         $frontpagecontext1 = context_course::instance(SITEID);
         context_helper::reset_caches();
         $frontpagecontext2 = context_course::instance(SITEID);
@@ -723,7 +720,6 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $allroles = get_all_roles();
-
         $this->assertInternalType('array', $allroles);
         $this->assertCount(12, $allroles); // there are 12 roles in standard totara install
 
@@ -2190,8 +2186,7 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $this->assertFalse(has_capability('moodle/block:view', $frontpageblockcontext, 0));
         $this->assertFalse(has_capability('mod/page:view', $frontpagepagecontext, 0));
-        // Frontpage is inaccessible for non-loggedin users
-        $this->assertFalse(has_capability('mod/page:view', $frontpagecontext, 0));
+        $this->assertTrue(has_capability('mod/page:view', $frontpagecontext, 0));
         $this->assertFalse(has_capability('mod/page:view', $systemcontext, 0));
 
         $this->assertFalse(has_capability('moodle/course:create', $systemcontext, $testusers[11]));
@@ -2568,7 +2563,7 @@ class core_accesslib_testcase extends advanced_testcase {
         // Test basic test of legacy functions.
         // Note: watch out, the fake site might be pretty borked already.
 
-        $this->assertEquals(context_system::instance(), context_system::instance());
+        $this->assertEquals(get_system_context(), context_system::instance());
 
         foreach ($DB->get_records('context') as $contextid => $record) {
             $context = context::instance_by_id($contextid);

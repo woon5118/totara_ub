@@ -59,7 +59,8 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
             var dbhost = $('#id_database_dbhost').val();
             var dbuser = $('#id_database_dbuser').val();
             var dbpass = $('#id_database_dbpass').val();
-
+            // Encode certain characters.
+            dbpass = encodeURIComponent(dbpass);
             // Assemble url
             var url = M.cfg.wwwroot + '/admin/tool/totara_sync/sources/databasecheck.php' +
                                 '?dbtype=' + dbtype +

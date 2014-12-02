@@ -109,7 +109,9 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
         }
         $this->getDataGenerator()->assign_program($this->program3->id, array($this->user1->id, $this->user2->id));
         if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled(null, null, '', 2);
+            $messages = $this->getDebuggingMessages();
+            $this->resetDebugging();
+            $this->assertCount(2, $messages);
         }
         $this->getDataGenerator()->assign_program($this->program4->id, array($this->user2->id));
         if (!empty($CFG->messaging)) {

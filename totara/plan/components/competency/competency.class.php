@@ -655,7 +655,7 @@ class dp_competency_component extends dp_base_component {
 
                 if (!$this->plan->is_complete() && $this->can_update_items()) {
                     if (!empty($mandatory_list) && in_array($ca->id, $mandatory_list)) {
-                        // If this course has a mandatory link to the compentency disable checkbox
+                        // If this course has a mandatory link to the competency disable checkbox
                         $row[] = html_writer::checkbox('delete_linked_comp_assign['.$ca->id.']', '1', false,
                             get_string('mandatory', 'totara_plan'), array('disabled' => 'true'));
                     } else {
