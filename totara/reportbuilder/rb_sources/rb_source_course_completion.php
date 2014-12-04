@@ -138,6 +138,72 @@ class rb_source_course_completion extends rb_base_source {
             ),
             new rb_column_option(
                 'course_completion',
+                'iscomplete',
+                get_string('iscompleteany', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' OR base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 1 ELSE 0 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'isnotcomplete',
+                get_string('isnotcomplete', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' OR base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 0 ELSE 1 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('isnotcomplete', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'iscompletenorpl',
+                get_string('iscompletenorpl', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' THEN 1 ELSE 0 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'iscompleterpl',
+                get_string('iscompleterpl', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 1 ELSE 0 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'isinprogress',
+                get_string('isinprogress', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_INPROGRESS . ' THEN 1 ELSE 0 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('isinprogress', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
+                'isnotyetstarted',
+                get_string('isnotyetstarted', 'rb_source_course_completion'),
+                'CASE WHEN base.status = ' . COMPLETION_STATUS_NOTYETSTARTED . ' THEN 1 ELSE 0 END',
+                array(
+                    'displayfunc' => 'yes_or_no',
+                    'dbdatatype' => 'integer',
+                    'defaultheading' => get_string('isnotyetstarted', 'rb_source_course_completion'),
+                )
+            ),
+            new rb_column_option(
+                'course_completion',
                 'completeddate',
                 get_string('completiondate', 'rb_source_course_completion'),
                 'base.timecompleted',
@@ -309,6 +375,66 @@ class rb_source_course_completion extends rb_base_source {
                             'joins' => array("LEFT JOIN {course_completions} ccs_filter ON base.id = ccs_filter.id"),
                             'dataalias' => 'ccs_filter',
                             'datafield' => 'status')
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'iscomplete',
+                get_string('iscompleteany', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'isnotcomplete',
+                get_string('isnotcomplete', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'iscompletenorpl',
+                get_string('iscompletenorpl', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'iscompleterpl',
+                get_string('iscompleterpl', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'isinprogress',
+                get_string('isinprogress', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
+                )
+            ),
+            new rb_filter_option(
+                'course_completion',
+                'isnotyetstarted',
+                get_string('isnotyetstarted', 'rb_source_course_completion'),
+                'select',
+                array(
+                    'selectfunc' => 'yesno_list',
+                    'simplemode' => true,
                 )
             ),
             new rb_filter_option(
