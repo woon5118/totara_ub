@@ -32,6 +32,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 ajax_require_login();
 
+// Send the correct headers.
+send_headers('text/html; charset=utf-8', false);
+
 $id = required_param('id', PARAM_INT);
 $expandname = required_param('expandname', PARAM_TEXT);
 

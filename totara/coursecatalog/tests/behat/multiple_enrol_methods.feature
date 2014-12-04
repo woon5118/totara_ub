@@ -84,10 +84,10 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
   Scenario: Self-enrolment through course catalog requiring a group enrolment key
     When I log in as "student1"
     And I follow "Find Learning"
-    And I click on "Course 1" "link"
+    And I click on ".rb-display-expand" "css_element"
     And I set the following fields to these values:
       | Enrolment key | Test-groupenrolkey1 |
-    And I press "Enrol me"
+    And I press "Enrol with - Self enrolment"
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
     And I should not see "Enrol me in this course"
@@ -95,18 +95,18 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
 
     When I log in as "student2"
     And I follow "Find Learning"
-    And I click on "Course 1" "link"
+    And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
     And I set the following fields to these values:
       | Password | moodle_rules |
-    And I press "Submit"
+    And I press "Enrol with - Guest access"
     And I should see "Test forum name"
     And I log out
 
     When I log in as "student3"
     And I should see "Courses" in the "Navigation" "block"
     And I click on "Courses" "link_or_button" in the "Navigation" "block"
-    And I click on "Course 1" "link"
+    And I click on ".rb-display-expand" "css_element"
     And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
-    And I press "Sign-up"
+    And I press "Enrol with - Face-to-face direct enrolment"
     Then I should see "Topic 1"

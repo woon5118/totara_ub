@@ -39,12 +39,12 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I log out
     And I log in as "student1"
     And I follow "Find Learning"
-    And I click on "Course 1" "link"
-    And I press "Enrol me"
+    And I click on ".rb-display-expand" "css_element"
+    And I press "Enrol"
     Then I should see "Incorrect enrolment key, please try again"
     And I set the following fields to these values:
       | Enrolment key | Test-groupenrolkey1 |
-    And I press "Enrol me"
+    And I press "Enrol"
     Then I should see "Topic 1"
     And I should not see "Enrolment options"
     And I should not see "Enrol me in this course"

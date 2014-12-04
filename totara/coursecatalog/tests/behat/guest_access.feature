@@ -36,7 +36,9 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I log out
     And I log in as "student1"
     And I follow "Find Learning"
-    And I click on "Course 1" "link"
+    And I click on ".rb-display-expand" "css_element"
+    Then I should see "Guest access"
+    And I press "Enrol"
     And I wait until the page is ready
     And I should see "Test forum name"
 
@@ -49,13 +51,13 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I log out
     And I log in as "student1"
     And I follow "Find Learning"
-    And I click on "Course 1" "link"
+    And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
     And I set the following fields to these values:
       | Password | moodle_sucks |
-    And I press "Submit"
+    And I press "Enrol"
     And I should see "Incorrect access password, please try again"
     And I set the following fields to these values:
       | Password | moodle_rules |
-    And I press "Submit"
+    And I press "Enrol"
     And I wait until the page is ready
