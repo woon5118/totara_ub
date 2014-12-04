@@ -504,20 +504,27 @@ class totara_feedback360_renderer extends plugin_renderer_base {
             $strup =  get_string('moveup', 'totara_question');
             $strdown =  get_string('movedown', 'totara_question');
             $last = end($quests);
-            $first = reset($quests);
+            $first = true;
+            reset($quests);
 
             $questtypes = question_manager::get_registered_elements();
             foreach ($quests as $quest) {
                 $question = new feedback360_question($quest->id);
                 $posuplink = $posdownlink = '';
-                $attrs['data-questid'] = $quest->id;
-                if ($quest->id != $first->id) {
+                $attrs = array(
+                    'class' => '',
+                    'data-questid' => $quest->id
+                );
+
+                if (!$first) {
                     $posupurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'posup',
                         'id' => $quest->id, 'feedback360id' => $feedback360->id, 'sesskey' => sesskey()));
                     $posuplink = $this->output->action_icon($posupurl, new pix_icon('/t/up', $strup, 'moodle'), null,
                             array('class' => 'action-icon js-hide'));
                 } else {
-                    $attrs['class'] = ' first';
+                    $attrs['class'] .= ' first';
+                    $first = false;
+                    $posuplink = $this->output->spacer(array('width' => 21, 'height' => 15));
                 }
                 if ($quest->id != $last->id) {
                     $posdownurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'posdown',
@@ -526,6 +533,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] .= ' last';
+                    $posdownlink = $this->output->spacer(array('width' => 21, 'height' => 15));
                 }
                 $editurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'edit',
                     'id' => $quest->id, 'feedback360id' => $feedback360->id));
