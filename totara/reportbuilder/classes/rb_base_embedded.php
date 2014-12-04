@@ -106,4 +106,14 @@ class rb_base_embedded {
     function get_extrabuttons() {
         return false;
     }
+
+    /**
+     * Returns true if require_login should be executed when the report is access through a page other than
+     * report.php or an embedded report's webpage, e.g. through ajax calls.
+     *
+     * @return boolean True if require_login should be executed
+     */
+    public function needs_require_login() {
+        return true;
+    }
 }

@@ -26,21 +26,32 @@
  * Page for returning report table for AJAX call
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+// Send the correct headers.
+send_headers('text/html; charset=utf-8', false);
+
+require_sesskey();
 
 $id = required_param('id', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);
 $searched = optional_param_array('submitgroup', array(), PARAM_ALPHANUM);
 
-if ($CFG->forcelogin) {
-    ajax_require_login();
-}
 $PAGE->set_context(context_system::instance());
 
-// New report object.
+// Create the report object. Includes embedded report capability checks.
 $report = new reportbuilder($id, null, false, 0);
-if (!$report->is_capable($id)) {
+
+// Decide if require_login should be executed.
+if ($report->needs_require_login()) {
+    require_login();
+}
+
+// Checks that the report is one that is returned by get_permitted_reports.
+if (!reportbuilder::is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 

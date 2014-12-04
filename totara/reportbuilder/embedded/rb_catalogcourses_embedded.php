@@ -95,6 +95,17 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
         return true;
     }
 
+    /**
+     * Returns true if require_login should be executed when the report is access through a page other than
+     * report.php or an embedded report's webpage, e.g. through ajax calls.
+     *
+     * @return boolean True if require_login should be executed
+     */
+    public function needs_require_login() {
+        global $CFG;
+        return $CFG->forcelogin;
+    }
+
     public function get_extrabuttons() {
         global $OUTPUT, $CFG;
 

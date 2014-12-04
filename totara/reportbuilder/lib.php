@@ -1460,6 +1460,20 @@ class reportbuilder {
         return $permitted;
     }
 
+    /**
+     * Returns true if require_login should be executed.
+     *
+     * Only embedded reports can specify not to run require_login.
+     *
+     * @return boolean True if require_login should be executed
+     */
+    public final function needs_require_login() {
+        if (empty($this->embedded)) {
+            return true;
+        } else {
+            return $this->embedobj->needs_require_login();
+        }
+    }
 
     /**
     * Returns an array of defined reportbuilder access plugins
