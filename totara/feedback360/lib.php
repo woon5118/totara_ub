@@ -163,13 +163,11 @@ class feedback360 {
             $todb->id = $this->id;
             $DB->update_record('feedback360', $todb);
 
-            // Throw a feedback360_updated event in place of an add_to_log.
             \totara_feedback360\event\feedback360_updated::create_from_instance($this)->trigger();
         } else {
             $todb->userid = $USER->id;
             $this->id = $DB->insert_record('feedback360', $todb);
 
-            // Throw a feedback360_created event in place of an add_to_log.
             \totara_feedback360\event\feedback360_created::create_from_instance($this)->trigger();
         }
         // Refresh data.
@@ -205,7 +203,6 @@ class feedback360 {
         // Delete the feedback360.
         $DB->delete_records('feedback360', array('id' => $this->id));
 
-        // Throw a feedback360_deleted event in place of an add_to_log.
         \totara_feedback360\event\feedback360_deleted::create_from_instance($this)->trigger();
     }
 
@@ -508,7 +505,6 @@ class feedback360 {
             tm_alert_send($event);
         }
 
-        // Set up and trigger the deletion event to replace add_to_log().
         \totara_feedback360\event\request_deleted::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
     }
 
@@ -1320,7 +1316,6 @@ class feedback360_responder {
         } else {
             $data->id = $DB->insert_record('feedback360_resp_assignment', $data);
 
-            // Throw a request_created event in place of an add_to_log.
             $userassign = $DB->get_field('feedback360_user_assignment', 'userid', array('id' => $this->feedback360userassignmentid));
             $email = isset($this->email) ? $this->email : '';
             \totara_feedback360\event\request_created::create_from_instance($data, $userassign, $email)->trigger();
@@ -1445,7 +1440,6 @@ class feedback360_responder {
             }
             tm_task_send($eventdata);
 
-            // Throw a request_created event in place of an add_to_log.
             \totara_feedback360\event\request_created::create_from_instance($resp_assignment, $user_assignment->userid)->trigger();
         }
 
@@ -1538,7 +1532,6 @@ class feedback360_responder {
 
             message_send($message);
 
-            // Throw a request_created event in place of an add_to_log.
             \totara_feedback360\event\request_created::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
         }
 

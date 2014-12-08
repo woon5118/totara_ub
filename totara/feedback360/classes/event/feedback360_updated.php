@@ -108,6 +108,15 @@ class feedback360_updated extends \core\event\base {
          return "The feedback360 {$this->objectid} was updated";
     }
 
+    /**
+     * Returns relevant url.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/totara/feedback360/general.php', array('id' => $this->objectid));
+    }
+
     public function get_legacy_logdata() {
         $logdata = array();
         $logdata[] = SITEID;
@@ -122,10 +131,13 @@ class feedback360_updated extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
      */
     protected function validate_data() {
+        if (self::$preventcreatecall) {
+            throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
+        }
+
         parent::validate_data();
     }
 }

@@ -90,7 +90,6 @@ if ($delete && !empty($resp_assignment)) {
     // Then delete the assignment.
     $DB->delete_records('feedback360_resp_assignment', array('id' => $resp_assignment->id));
 
-    // Throw a request_deleted event in place of an add_to_log.
     \totara_feedback360\event\request_deleted::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
 
     totara_set_notification(get_string('feedback360requestdeleted', 'totara_feedback360'), $returnurl,

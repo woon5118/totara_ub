@@ -125,6 +125,16 @@ class request_deleted extends \core\event\base {
         return "The feedback360 request {$this->objectid} was deleted";
     }
 
+    /**
+     * Returns relevant url.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        $urlparams = array('userid' => $this->relateduserid);
+        return new \moodle_url('/totara/feedback360/index.php', $urlparams);
+    }
+
     public function get_legacy_logdata() {
         $urlparams = array('action' => 'users', 'userid' => $this->relateduserid, 'formid' => $this->data['other']['assignmentid']);
 
@@ -144,6 +154,10 @@ class request_deleted extends \core\event\base {
      * @return void
      */
     protected function validate_data() {
+        if (self::$preventcreatecall) {
+            throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
+        }
+
         parent::validate_data();
 
         if (!isset($this->other['assignmentid'])) {

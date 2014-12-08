@@ -108,4 +108,26 @@ class feedback360_created extends \core\event\base {
     public function get_description() {
          return "The feedback360 {$this->objectid} was created";
     }
+
+    /**
+     * Returns relevant url.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url('/totara/feedback360/general.php', array('id' => $this->objectid));
+    }
+
+    /**
+     * Custom validation.
+     *
+     * @return void
+     */
+    protected function validate_data() {
+        if (self::$preventcreatecall) {
+            throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
+        }
+
+        parent::validate_data();
+    }
 }

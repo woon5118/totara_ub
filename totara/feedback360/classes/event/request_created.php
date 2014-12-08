@@ -125,12 +125,26 @@ class request_created extends \core\event\base {
     }
 
     /**
+     * Returns relevant url.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        $urlparams = array('action' => 'users', 'userid' => $this->relateduserid, 'formid' => $this->data['other']['assignmentid']);
+        return new \moodle_url('/totara/feedback360/request.php', $urlparams);
+    }
+
+    /**
      * Custom validation.
      *
      * @throws \coding_exception
      * @return void
      */
     protected function validate_data() {
+        if (self::$preventcreatecall) {
+            throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
+        }
+
         parent::validate_data();
 
         if (!isset($this->other['assignmentid'])) {
