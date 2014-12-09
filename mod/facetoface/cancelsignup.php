@@ -49,6 +49,9 @@ $context = context_module::instance($cm->id);
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
+$PAGE->set_cm($cm);
+$PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions, 'confirm' => $confirm));
+
 $returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
 if ($backtoallsessions) {
     $returnurl = "$CFG->wwwroot/mod/facetoface/view.php?f=$backtoallsessions";
@@ -105,9 +108,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
 }
 
 $pagetitle = format_string($facetoface->name);
-
-$PAGE->set_cm($cm);
-$PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions, 'confirm' => $confirm));
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);

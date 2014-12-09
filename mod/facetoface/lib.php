@@ -699,7 +699,7 @@ function facetoface_update_attendees($session) {
                     if (!$user->id) {
                         // Cope with reserved spaces.
                         facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_WAITLISTED, $USER->id);
-                    } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id, true, $user->usernote)) {
+                    } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id, true, null, $user->usernote)) {
                         // rollback_sql();
                         return false;
                     }
@@ -722,17 +722,21 @@ function facetoface_update_attendees($session) {
             // If booked less than capacity, book some new users
             $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
             if ($booked < $capacity && (!$session->waitlisteveryone || empty($facetoface_allowwaitlisteveryone))) {
+
+                // Get the no reply user object so this can be used
+                // as the from email address further down the process.
+                $fromuser = core_user::get_noreply_user();
+
                 foreach ($users as $user) {
                     if ($booked >= $capacity) {
                         break;
                     }
 
                     if ($user->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-
                         if (!$user->id) {
                             // Cope with reserved spaces.
                             facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_BOOKED, $USER->id);
-                        } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id, true, $user->usernote)) {
+                        } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id, true, $fromuser, $user->usernote)) {
                             // rollback_sql();
                             return false;
                         }
@@ -1883,12 +1887,13 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
  * @param integer $statuscode Status code to set
  * @param integer $userid user to signup
  * @param bool $notifyuser whether or not to send an email confirmation
+ * @param object $fromuser User object describing who the email is from.
  * @param string $usernote
  * @param class $positionassignment object containing information on selected position (positionid, type, assignmnetid)
  */
 function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
-                                $notifyuser = true, $usernote = '', $positionassignment = null) {
+                                $notifyuser = true, $fromuser = null, $usernote = '', $positionassignment = null) {
 
     global $DB, $OUTPUT, $USER;
 
@@ -2005,7 +2010,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
 
     switch ($new_status) {
         case MDL_F2F_STATUS_BOOKED:
-            $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, false);
+            $error = facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, false, $fromuser);
             break;
 
         case MDL_F2F_STATUS_WAITLISTED:
@@ -2396,6 +2401,7 @@ function facetoface_approve_requests($data) {
                         $status,
                         $attendee->id,
                         true,
+                        null,
                         $attendee->usernote
                     )) {
                     continue;
@@ -4457,6 +4463,7 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $status,
         $user->id,
         !$suppressemail,
+        null,
         $usernote,
         $positionassignment)) {
             $result['result'] = get_string('error:addattendee', 'facetoface', fullname($user));
