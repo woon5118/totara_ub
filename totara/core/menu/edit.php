@@ -29,46 +29,55 @@ require_once($CFG->dirroot . '/lib/adminlib.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 require_once($CFG->dirroot . '/totara/core/menu/edit_form.php');
 
-// Category id.
+// Item id.
 $id    = optional_param('id', 0, PARAM_INT);
-$title = optional_param('title', '', PARAM_MULTILANG);
 
 admin_externalpage_setup('totaranavigation');
 
 $PAGE->set_context(\context_system::instance());
+$renderer = $PAGE->get_renderer('totara_core');
 
 $item = \totara_core\totara\menu\menu::get($id);
 $property = $item->get_property();
 $node = \totara_core\totara\menu\menu::node_instance($property);
 
-$redirecturl = new moodle_url('/totara/core/menu/index.php');
-$mform = new edit_form(null, array('item' => $property));
+$cancelurl = new moodle_url('/totara/core/menu/index.php');
+
+$mform = new edit_form(null, array('item' => $item));
 if ($mform->is_cancelled()) {
-    redirect($redirecturl);
+    redirect($cancelurl);
 }
 if ($data = $mform->get_data()) {
     try {
         if ((int)$id > 0) {
             $item->update($data);
         } else {
-            $item->create($data);
+            $item = $item->create($data);
         }
-        totara_set_notification(get_string('menuitem:updatesuccess', 'totara_core'), $redirecturl, array('class' => 'notifysuccess'));
+        totara_set_notification(get_string('menuitem:updatesuccess', 'totara_core'),
+            new moodle_url('/totara/core/menu/edit.php', array('id' => $item->id)),
+            array('class' => 'notifysuccess'));
     } catch (moodle_exception $e) {
         totara_set_notification($e->getMessage());
     }
 }
 
-$url = new moodle_url('/totara/core/menu/edit.php', array('id' => $id, 'sesskey' => sesskey()));
+$url = new moodle_url('/totara/core/menu/edit.php', array('id' => $id));
 $PAGE->set_url($url);
-$PAGE->set_pagelayout('admin');
 $title = ($id ? get_string('menuitem:editingx', 'totara_core', $node->get_title()) : get_string('menuitem:addnew', 'totara_core'));
 $PAGE->set_title($title);
 $PAGE->navbar->add($title, $url);
 $PAGE->set_heading($title);
 
 // Display page header.
-echo $OUTPUT->header();
-echo $OUTPUT->heading($title);
+echo $renderer->header();
+echo $renderer->heading($title);
+
+// Set up tabs for access controls and detail editing.
+// Don't show them when creating a new item.
+if (!empty($id)) {
+    echo $renderer->totara_menu_tabs('edit', $item);
+}
+
 echo $mform->display();
-echo $OUTPUT->footer();
+echo $renderer->footer();

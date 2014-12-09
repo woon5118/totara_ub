@@ -236,11 +236,40 @@ $string['localpostinstfailed'] = 'There was a problem setting up local modificat
 $string['managecertifications'] = 'Manage certifications';
 $string['managecustomicons'] = 'Manage custom icons';
 $string['managers'] = 'Manager\'s ';
+$string['menuitem:accessbyaudience'] = 'Restrict access by audience';
+$string['menuitem:accessbypreset'] = 'Restrict access by preset rule';
+$string['menuitem:accessbyrole'] = 'Restrict access by role';
+$string['menuitem:accesscontrols'] = 'Access Controls';
+$string['menuitem:accessmode'] = 'Access Mode';
+$string['menuitem:accessmode_help'] = '
+Access controls are used to restrict which users can view the menu item.
+
+**Restrict access** determines how the following criteria are applied.
+
+When set to **any**, users will be able to see this menu item if they meet **any one** of the enabled criteria below.
+
+When set to **all**, users will only be able to see this menu item if they meet **all** the enabled criteria below.
+';
+$string['menuitem:accessnotenabled'] = 'The settings below are not currently active because this item\'s visibility is not set to "Use custom access settings".';
+$string['menuitem:addcohorts'] = 'Add audiences';
 $string['menuitem:addnew'] = 'Add new menu item';
+$string['menuitem:anycontext'] = 'Users may have role in any context';
+$string['menuitem:audienceaggregation'] = 'Audience aggregation';
+$string['menuitem:audienceaggregation_help'] = 'Determines whether the user must be a member of all of the selected audiences, or any of the selected audiences.';
+$string['menuitem:context'] = 'Context';
+$string['menuitem:context_help'] = '
+**Context** allows you to specify where a user must have a role assigned in order to view the menu item.
+
+A user can be assigned a role at the system level giving them site wide access or just within a particular context. For instance a trainer may only be assigned the role at the course level.
+
+When **Users must have role in the system context** is selected the user must be assigned the role at a system level (i.e. at a site-wide level) to be able to view the menu item.
+
+When **User may have role in any context** is selected a user can view the report when they have been assigned the selected role anywhere in the system.';
 $string['menuitem:delete'] = 'Are you sure you want to delete the "{$a}" item?';
 $string['menuitem:deletechildren'] = 'All children of "{$a}" will be deleted:';
 $string['menuitem:deletesuccess'] = 'The item was deleted successfully';
 $string['menuitem:edit'] = 'Edit menu item';
+$string['menuitem:editaccess'] = 'Access';
 $string['menuitem:editingx'] = 'Editing menu item "{$a}"';
 $string['menuitem:formitemparent'] = 'Parent item';
 $string['menuitem:formitemtargetattr'] = 'Open link in new window';
@@ -260,15 +289,53 @@ You can also use following placeholders:
 $string['menuitem:formitemvisibility'] = 'Visibility';
 $string['menuitem:hide'] = 'Hide';
 $string['menuitem:movesuccess'] = 'The item was moved successfully';
+$string['menuitem:norolesfound'] = 'No roles found';
+$string['menuitem:presetwithaccess'] = 'Condition required to view';
+$string['menuitem:presetwithaccess_help'] = 'This criteria allows you to restrict access to the menu item using one or more predefined rules.
+
+How these rules are required is determined by the **Preset rule aggregation** setting. If it is set to "all" then the user must meet all of the selected criteria. If it is set to "any" the user must meet only one of the selected criteria.';
+$string['menuitem:presetaggregation'] = 'Preset rule aggregation';
+$string['menuitem:presetaggregation_help'] = 'Determines whether the user must be a meet all of the selected preset rules, or any of the selected preset rules.';
 $string['menuitem:resettodefault'] = 'Reset menu to default configuration';
 $string['menuitem:resettodefaultconfirm'] = 'Are you absolutely sure that you want to reset the main menu to its default configuration? This will permanently erase all customisations.';
 $string['menuitem:resettodefaultcomplete'] = 'Main menu reset to default configuration.';
+$string['menuitem:restrictaccess'] = 'Restrict access';
+$string['menuitem:restrictaccessbyaudience'] = 'Restrict access by audience';
+$string['menuitem:roleaggregation'] = 'Role aggregation';
+$string['menuitem:roleaggregation_help'] = 'Determines whether the user must have all of the selected roles, or any of the selected roles.';
+$string['menuitem:roleswithaccess'] = 'Roles with permission to view';
+$string['menuitem:roleswithaccess_help'] = 'This criteria allows you to restrict access to the menu item based upon the roles a user has been assigned. You can select as many roles as you like and use the other supporting settings to determine how Totara checks those roles.
+
+Whether they need to have any of the selected roles or all of the selected roles is determined by the **Role aggregation** setting.
+
+The **Context** setting can be used to control whether the role is assigned to the user as a system wide role or whether it can occur in any other context.';
+$string['menuitem:rulepreset_can_view_allappraisals'] = 'User can view All Appraisals menu item';
+$string['menuitem:rulepreset_can_view_appraisal'] = 'User can view Appraisal menu item';
+$string['menuitem:rulepreset_can_view_certifications'] = 'User can view Certifications menu item';
+$string['menuitem:rulepreset_can_view_feedback_360s'] = 'User can view 360&deg; Feedback menu item';
+$string['menuitem:rulepreset_can_view_latest_appraisal'] = 'User can view Latest Appraisal menu item';
+$string['menuitem:rulepreset_can_view_learning_plans'] = 'User can view Learning Plans menu item';
+$string['menuitem:rulepreset_can_view_my_goals'] = 'User can view My Goals menu item';
+$string['menuitem:rulepreset_can_view_my_reports'] = 'User can view My Reports menu item';
+$string['menuitem:rulepreset_can_view_my_team'] = 'User can view My Team menu item';
+$string['menuitem:rulepreset_can_view_programs'] = 'User can view Programs menu item';
+$string['menuitem:rulepreset_can_view_required_learning'] = 'User can view Required Learning menu item';
+$string['menuitem:rulepreset_is_guest'] = 'User is logged in as guest';
+$string['menuitem:rulepreset_is_not_guest'] = 'User is <b>not</b> logged in as guest';
+$string['menuitem:rulepreset_is_logged_in'] = 'User is logged in';
+$string['menuitem:rulepreset_is_not_logged_in'] = 'User is <b>not</b> logged in';
+$string['menuitem:rulepreset_is_site_admin'] = 'User is site administrator';
 $string['menuitem:show'] = 'Show';
+$string['menuitem:showcustom'] = 'Use custom access rules';
 $string['menuitem:showwhenrequired'] = 'Show when required';
+$string['menuitem:systemcontext'] = 'Users must have role in the system context';
 $string['menuitem:title'] = 'Item title';
+$string['menuitem:updateaccesssuccess'] = 'Access rules updated successfully';
 $string['menuitem:updatesuccess'] = 'Main menu updated successfully';
 $string['menuitem:url'] = 'Default url address';
 $string['menuitem:visibility'] = 'Visibility';
+$string['menuitem:withrestrictionall'] = 'Users matching <strong>all</strong> of the criteria below can view this menu item.';
+$string['menuitem:withrestrictionany'] = 'Users matching <strong>any</strong> of the criteria below can view this menu item.';
 $string['modulearchive'] = 'Activity archives';
 $string['moodlecore'] = 'Moodle core';
 $string['movedown'] = 'Move Down';

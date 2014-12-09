@@ -22,6 +22,7 @@
  * @package    totara
  * @subpackage navigation
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
+ * @author     Chris Wharton <chris.wharton@catalyst-eu.net>
  */
 namespace totara_core\totara\menu;
 
@@ -60,6 +61,19 @@ class menu implements \renderable, \IteratorAggregate {
     const HIDE_ALWAYS = 0;
     const SHOW_ALWAYS = 1;
     const SHOW_WHEN_REQUIRED = 2;
+    const SHOW_CUSTOM = 3;
+
+    /**
+     * Any access rule operator.
+     * @const AGGREGATION_ANY One or more are required.
+     */
+    const AGGREGATION_ANY = 0;
+
+    /**
+     * All access rule operator.
+     * @const AGGREGATION_ALL All are required.
+     */
+    const AGGREGATION_ALL = 1;
 
     // The target attribute specifies where to open the linked document.
     // Default _self, no target attribute
@@ -87,6 +101,7 @@ class menu implements \renderable, \IteratorAggregate {
         'custom' => array('de', self::DB_ITEM),
         'customtitle' => array('ct', 0),
         'visibility' => array('vi', self::SHOW_ALWAYS),
+        'visibilityold' => array('vo', self::SHOW_ALWAYS),
         'targetattr' => array('ta', self::TARGET_ATTR_SELF),
         'timemodified' => null, // Not cached.
     );
@@ -123,6 +138,9 @@ class menu implements \renderable, \IteratorAggregate {
 
     /** @var int */
     protected $visibility = self::SHOW_ALWAYS;
+
+    /** @var int stores the last visibility state */
+    protected $visibilityold = null;
 
     /** @var int */
     protected $targetattr = self::TARGET_ATTR_SELF;
@@ -207,7 +225,7 @@ class menu implements \renderable, \IteratorAggregate {
      * for calling other functions such as get_children()).
      *
      * @param int $id category id
-     * @return null|totara_core_menu
+     * @return null|menu
      * @throws moodle_exception
      */
     public static function get($id = 0) {
@@ -225,6 +243,7 @@ class menu implements \renderable, \IteratorAggregate {
                 $record->custom = self::DB_ITEM;
                 $record->customtitle = 1;
                 $record->visibility = self::SHOW_ALWAYS;
+                $record->visibilityold = null;
                 $record->targetattr = self::TARGET_ATTR_SELF;
                 $record->timemodified = 0;
                 self::$menucat0 = new menu($record);
@@ -532,6 +551,9 @@ class menu implements \renderable, \IteratorAggregate {
         if (!$this->custom) {
             throw new \moodle_exception('error:menuitemcannotberemoved', 'totara_core', null, $this->title);
         }
+
+        $transaction = $DB->start_delegated_transaction();
+
         // If category has children.
         $children = $this->get_children();
         if ($children) {
@@ -540,8 +562,12 @@ class menu implements \renderable, \IteratorAggregate {
                 $subitem->delete();
             }
         }
+        // Delete the associated settings.
+        $DB->delete_records('totara_navigation_settings', array('itemid' => $this->id));
         // Finally delete the category and it's context.
         $DB->delete_records('totara_navigation', array('id' => $this->id));
+        $transaction->allow_commit();
+
         // Add to log.
         \totara_core\event\menuitem_deleted::create_from_item($this->id)->trigger();
 
@@ -558,6 +584,7 @@ class menu implements \renderable, \IteratorAggregate {
             self::HIDE_ALWAYS => get_string('menuitem:hide', 'totara_core'),
             self::SHOW_ALWAYS => get_string('menuitem:show', 'totara_core'),
             self::SHOW_WHEN_REQUIRED => get_string('menuitem:showwhenrequired', 'totara_core'),
+            self::SHOW_CUSTOM => get_string('menuitem:showcustom', 'totara_core'),
         );
     }
 
@@ -660,18 +687,29 @@ class menu implements \renderable, \IteratorAggregate {
         global $DB;
 
         $itemid = (int)$id;
+        $update = new \stdClass;
+        $update->id = $itemid;
         // Change visibility to hide
         if ($hide) {
-            $DB->set_field('totara_navigation', 'visibility', self::HIDE_ALWAYS, array('id' => $itemid));
+            $visibility = $DB->get_field('totara_navigation', 'visibility', array('id' => $itemid), MUST_EXIST);
+            $update->visibility = self::HIDE_ALWAYS;
+            $update->visibilityold = $visibility;
+            $DB->update_record('totara_navigation', $update);
         } else {
             // Change visibility to show
             $item = self::get($itemid);
-            if ($item->custom == self::DB_ITEM) {
-                $DB->set_field('totara_navigation', 'visibility', self::SHOW_ALWAYS, array('id' => $itemid));
-            } else {
-                $DB->set_field('totara_navigation', 'visibility', self::SHOW_WHEN_REQUIRED, array('id' => $itemid));
+            $visibility = $item->visibilityold;
+            if ($visibility === null) {
+                if ($item->custom == self::DB_ITEM) {
+                    $visibility = self::SHOW_ALWAYS;
+                } else {
+                    $visibility = self::SHOW_WHEN_REQUIRED;
+                }
             }
+            $update->visibility = $visibility;
+            $update->visibilityold = null;
         }
+        $DB->update_record('totara_navigation', $update);
 
         \totara_core\event\menuitem_visibility::create_from_item($itemid, $hide)->trigger();
 
@@ -685,6 +723,8 @@ class menu implements \renderable, \IteratorAggregate {
         global $DB;
         // Truncate the menu table.
         $DB->delete_records('totara_navigation');
+        // And the menu settings.
+        $DB->delete_records('totara_navigation_settings');
         // Then recreate the defaults.
         totara_upgrade_menu();
     }
@@ -781,4 +821,139 @@ class menu implements \renderable, \IteratorAggregate {
         return (int)$highestsort + 10000;
 
     }
+
+    /**
+     * Method for obtaining a item setting.
+     *
+     * @param integer $itemid ID for the item to obtain a setting for.
+     * @param string $type Identifies the class using the setting.
+     * @param string $name Identifies the particular setting.
+     * @return mixed The value of the setting $name or null if it doesn't exist.
+     */
+    public function get_setting($type, $name) {
+        global $DB;
+        return $DB->get_field('totara_navigation_settings', 'value',
+            array('itemid' => $this->id, 'type' => $type, 'name' => $name));
+    }
+
+    /**
+     * Returns all of the settings associated with this item.
+     *
+     * @return array
+     */
+    public function get_settings() {
+        global $DB;
+        $settings = array();
+        foreach ($DB->get_records('totara_navigation_settings', array('itemid' => $this->id)) as $setting) {
+            if (!isset($settings[$setting->type])) {
+                $settings[$setting->type] = array();
+            }
+            $settings[$setting->type][$setting->name] = $setting;
+        }
+        return $settings;
+    }
+
+    /**
+     * Insert or update a single rule for a menu item.
+     *
+     * @param string $type Identifies the class using the setting.
+     * @param string $name Identifies the particular setting.
+     * @param string $value New value for the setting.
+     */
+    public function update_setting($type, $name, $value) {
+        global $DB;
+
+        $existing = $DB->get_record('totara_navigation_settings', array('itemid' => $this->id, 'type' => $type, 'name' => $name));
+
+        $record = new \stdClass();
+        $record->timemodified = time();
+        if ($existing && $existing->value !== $value) {
+            // Its an existing setting whose value has changed.
+            $record->id = $existing->id;
+            $record->value = $value;
+            $DB->update_record('totara_navigation_settings', $record);
+        } else if (!$existing) {
+            // Its a new setting, insert it.
+            $record->itemid = $this->id;
+            $record->type = $type;
+            $record->name = $name;
+            $record->value = $value;
+            $DB->insert_record('totara_navigation_settings', $record);
+        }
+    }
+
+    /**
+     * Update several settings at once.
+     *
+     * The $settings array is expected to be an array of arrays.
+     * Each sub array should associative with three keys: type, name, value.
+     *
+     * @param array[] $settings
+     */
+    public function update_settings(array $settings) {
+        global $DB;
+
+        // Build an array of existing settings so that we don't need to fetch each one individually as we look
+        // at the setting data.
+        $now = time();
+        $existing = $this->get_settings();
+
+        // Look at each setting and either update it, insert it, or skip it (if it has not changed).
+        foreach ($settings as $setting) {
+            $type = $setting['type'];
+            $name = $setting['name'];
+            $value = $setting['value'];
+            if (isset($existing[$type][$name])) {
+                // Its an existing setting, lets check if its actually changed.
+                if ($value === $existing[$type][$name]->value) {
+                    // Nothing to do here, the setting has not changed.
+                    continue;
+                }
+                // The value has changed update the setting.
+                $record = new \stdClass;
+                $record->id = $existing[$type][$name]->id;
+                $record->timemodified = $now;
+                $record->value = $value;
+                $DB->update_record('totara_navigation_settings', $record);
+            } else {
+                // Its the first time this setting has been set.
+                $record = new \stdClass;
+                $record->timemodified = $now;
+                $record->itemid = $this->id;
+                $record->type = $type;
+                $record->name = $name;
+                $record->value = $value;
+                $DB->insert_record('totara_navigation_settings', $record);
+            }
+        }
+    }
+
+    /**
+     * The list of available preset rules to select from.
+     *
+     * @return array $choices Rules to select from.
+     */
+    public static function get_preset_rule_choices() {
+        $choices = array(
+            'is_logged_in'              => get_string('menuitem:rulepreset_is_logged_in', 'totara_core'),
+            'is_not_logged_in'          => get_string('menuitem:rulepreset_is_not_logged_in', 'totara_core'),
+            'is_guest'                  => get_string('menuitem:rulepreset_is_guest', 'totara_core'),
+            'is_not_guest'              => get_string('menuitem:rulepreset_is_not_guest', 'totara_core'),
+            'is_site_admin'             => get_string('menuitem:rulepreset_is_site_admin', 'totara_core'),
+            'can_view_required_learning'=> get_string('menuitem:rulepreset_can_view_required_learning', 'totara_core'),
+            'can_view_my_team'          => get_string('menuitem:rulepreset_can_view_my_team', 'totara_core'),
+            'can_view_my_reports'       => get_string('menuitem:rulepreset_can_view_my_reports', 'totara_core'),
+            'can_view_certifications'   => get_string('menuitem:rulepreset_can_view_certifications', 'totara_core'),
+            'can_view_programs'         => get_string('menuitem:rulepreset_can_view_programs', 'totara_core'),
+            'can_view_allappraisals'    => get_string('menuitem:rulepreset_can_view_allappraisals', 'totara_core'),
+            'can_view_latestappraisal'  => get_string('menuitem:rulepreset_can_view_latest_appraisal', 'totara_core'),
+            'can_view_appraisal'        => get_string('menuitem:rulepreset_can_view_appraisal', 'totara_core'),
+            'can_view_feedback_360s'    => get_string('menuitem:rulepreset_can_view_feedback_360s', 'totara_core'),
+            'can_view_my_goals'         => get_string('menuitem:rulepreset_can_view_my_goals', 'totara_core'),
+            'can_view_learning_plans'   => get_string('menuitem:rulepreset_can_view_learning_plans', 'totara_core'),
+        );
+
+        return $choices;
+    }
+
 }

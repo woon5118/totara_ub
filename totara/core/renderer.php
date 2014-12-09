@@ -744,4 +744,32 @@ class totara_core_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Render the tabs used when editing custom menu items.
+     *
+     * @param string $currenttab Name of the current tab.
+     * @param integer $item The item for linking to.
+     *
+     * @return HTML to render the tabs.
+     */
+    public function totara_menu_tabs($currenttab, $item = null) {
+
+        // Setup the top row of tabs.
+        $toprow = array();
+
+        $disabled = array();
+        // Disable the access tab unless the menu item has custom visibility.
+        if ($item->visibility != \totara_core\totara\menu\menu::SHOW_CUSTOM) {
+            $disabled[] = 'rules';
+        }
+
+        $toprow[] = new tabobject('edit', new moodle_url('/totara/core/menu/edit.php', array('id' => $item->id)),
+                get_string('menuitem:edit', 'totara_core'));
+
+        $toprow[] = new tabobject('rules', new moodle_url('/totara/core/menu/rules.php', array('id' => $item->id)),
+                get_string('menuitem:editaccess', 'totara_core'));
+
+        return print_tabs(array($toprow), $currenttab, $disabled, null, true);
+    }
+
 }

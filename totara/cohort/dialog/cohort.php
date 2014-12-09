@@ -26,8 +26,8 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
 
 $selected   = optional_param('selected', array(), PARAM_SEQUENCE);
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
-$courseid   = optional_param('courseid', 0, PARAM_INT);
+$instancetype = required_param('instancetype', PARAM_INT);
+$instanceid   = required_param('instanceid', PARAM_INT);
 
 require_login();
 try {
@@ -39,10 +39,10 @@ try {
 
 // Check user capabilities.
 $contextsystem = context_system::instance();
-if ((int)$courseid > 0) {
-    $context = context_course::instance((int)$courseid);
-} else if ((int)$categoryid > 0) {
-    $context = context_coursecat::instance((int)$categoryid);
+if ($instancetype === COHORT_ASSN_ITEMTYPE_COURSE) {
+    $context = context_course::instance($instanceid);
+} else if ($instancetype === COHORT_ASSN_ITEMTYPE_CATEGORY) {
+    $context = context_coursecat::instance($instanceid);
 } else {
     $context = $contextsystem;
 }
@@ -85,9 +85,8 @@ $dialog->selected_title = 'itemstoadd';
 
 // Setup search
 $dialog->searchtype = 'cohort';
-
-$dialog->customdata['courseid'] = (int)$courseid;
-$dialog->customdata['categoryid'] = (int)$categoryid;
+$dialog->customdata['instancetype'] = $instancetype;
+$dialog->customdata['instanceid'] = $instanceid;
 
 // Display
 echo $dialog->generate_markup();

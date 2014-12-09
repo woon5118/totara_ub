@@ -98,7 +98,8 @@ if (!empty($CFG->audiencevisibility)) {
                     'name' => 'totara_visiblecohort',
                     'fullpath' => '/totara/cohort/dialog/visiblecohort.js',
                     'requires' => array('json'));
-    $args = array('args'=>'{"visibleselected":"", "type":"program"}');
+    $args = array('args'=>'{"visibleselected":"", "type":"program", "instancetype": "' .
+        COHORT_ASSN_ITEMTYPE_CATEGORY . '", "instanceid": "' . $categoryid . '"}');
     $PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
 }
 

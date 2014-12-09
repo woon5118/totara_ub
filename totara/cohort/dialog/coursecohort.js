@@ -53,13 +53,25 @@ M.totara_coursecohort = M.totara_coursecohort || {
                 }
             }
         }
-        this.config['sesskey'] = $('input:hidden[name="sesskey"]').val();
-        this.config['courseid'] = $('input:hidden[name="id"]').val();
-        this.config['categoryid'] = $('select[name="category"] option:selected').val();
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
             throw new Error('M.totara_cohortlearning.init()-> jQuery dependency required for this module.');
+        }
+
+        this.config['sesskey'] = M.cfg.sesskey;
+
+        // Category instance type: coming from COHORT_ASSN_ITEMTYPE_CATEGORY (=40).
+        if (this.config.instancetype == 40) {
+            // Because the user can set the category in the form
+            // we need to make sure the instanceid reflects the value
+            // in the form, not the original value passed in when the
+            // page loaded.
+            var select = $('select[name="category"] option:selected'),
+                categoryid = (select) ? select.val() : false ;
+            if (categoryid !== undefined && categoryid != this.config.instanceid) {
+                this.config.instanceid = categoryid;
+            }
         }
 
         this.init_dialogs();
@@ -87,8 +99,8 @@ M.totara_coursecohort = M.totara_coursecohort || {
                 title: '<h2>' + M.util.get_string('coursecohortsenrolled', 'totara_cohort') + '</h2>'
             },
             url+'cohort.php?selected=' + this.config.enrolledselected
-                    + '&categoryid=' + this.config.categoryid
-                    + '&courseid=' + this.config.courseid
+                    + '&instancetype=' + this.config.instancetype
+                    + '&instanceid=' + this.config.instanceid
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
