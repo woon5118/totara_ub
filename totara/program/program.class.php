@@ -136,7 +136,7 @@ class program {
         $this->content = new prog_content($id);
         $this->assignments = new prog_assignments($id);
 
-        $this->messagesmanager = new prog_messages_manager($id);
+        $this->messagesmanager = prog_messages_manager::get_program_messages_manager($id);
         $this->exceptionsmanager = new prog_exceptions_manager($id);
 
         $this->context = context_program::instance($this->id);
@@ -190,14 +190,15 @@ class program {
         // Set up some properties that depend on the data.
         $todb->available = prog_check_availability($todb->availablefrom, $todb->availableuntil);
 
-        // Create the program. Done inside a transaction so that failure will undo it.
+        // Create the program, and messages. Done inside a transaction so that failure will undo it.
         $transaction = $DB->start_delegated_transaction();
         $programid = $DB->insert_record('prog', $todb);
-        $program = new program($programid);
-        $transaction->allow_commit();
 
         // Create message manager to add default messages.
         new prog_messages_manager($programid, true);
+        $transaction->allow_commit();
+
+        $program = new program($programid);
 
         // Return the program that was just created.
         return $program;

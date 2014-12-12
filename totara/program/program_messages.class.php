@@ -115,6 +115,26 @@ class prog_messages_manager {
     }
 
     /**
+     * Static cache of program message managers.
+     */
+    protected static $managerscache = array();
+
+    /**
+     * Retrieves a programs message manager from cache or creates and caches it.
+     *
+     * @param $programid        The id of the program
+     * @param $refreshcache     Whether to use the managerscache or ignore it
+     * @return object           An instance of prog_messages_manager
+     */
+    public static function get_program_messages_manager($programid, $refreshcache = false) {
+        if ($refreshcache || !isset(self::$managerscache[$programid])) {
+            self::$managerscache[$programid] = new prog_messages_manager($programid);
+        }
+
+        return self::$managerscache[$programid];
+    }
+
+    /**
      * Used by usort to sort the messages in the $messages array
      * by their sortorder properties
      *

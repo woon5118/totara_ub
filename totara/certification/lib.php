@@ -313,16 +313,8 @@ function recertify_window_opens_stage() {
         $DB->set_field('certif_completion', 'renewalstatus', CERTIFRENEWALSTATUS_DUE,
                         array('certifid' => $user->certifid, 'userid' => $user->id));
 
-        // Sort out the messages manager.
-        if (isset($messagesmanagers[$user->progid])) {
-            // Use the existing messages manager object if it is available.
-            $messagesmanager = $messagesmanagers[$user->progid];
-        } else {
-            // Create a new messages manager object and store it if it has not already been instantiated.
-            $messagesmanager = new prog_messages_manager($user->progid);
-            $messagesmanagers[$user->progid] = $messagesmanager;
-        }
-
+        // Get the messages for the certification, using the message manager cache.
+        $messagesmanager = prog_messages_manager::get_program_messages_manager($user->progid);
         $messages = $messagesmanager->get_messages();
 
         foreach ($messages as $message) {
@@ -375,16 +367,8 @@ function recertify_window_abouttoclose_stage() {
     $results = $DB->get_records_sql($sql, $params);
 
     foreach ($results as $user) {
-        // Sort out the messages manager.
-        if (isset($messagesmanagers[$user->progid])) {
-            // Use the existing messages manager object if it is available.
-            $messagesmanager = $messagesmanagers[$user->progid];
-        } else {
-            // Create a new messages manager object and store it if it has not already been instantiated.
-            $messagesmanager = new prog_messages_manager($user->progid);
-            $messagesmanagers[$user->progid] = $messagesmanager;
-        }
-
+        // Get the messages for the certification, using the message manager cache.
+        $messagesmanager = prog_messages_manager::get_program_messages_manager($user->progid);
         $messages = $messagesmanager->get_messages();
 
         foreach ($messages as $message) {
@@ -436,16 +420,8 @@ function recertify_expires_stage() {
 
         set_course_renewalstatus($courseids, $user->id, CERTIFRENEWALSTATUS_EXPIRED);
 
-        // Sort out the messages manager.
-        if (isset($messagesmanagers[$user->progid])) {
-            // Use the existing messages manager object if it is available.
-            $messagesmanager = $messagesmanagers[$user->progid];
-        } else {
-            // Create a new messages manager object and store it if it has not already been instantiated.
-            $messagesmanager = new prog_messages_manager($user->progid);
-            $messagesmanagers[$user->progid] = $messagesmanager;
-        }
-
+        // Get the messages for the certification, using the message manager cache.
+        $messagesmanager = prog_messages_manager::get_program_messages_manager($user->progid);
         $messages = $messagesmanager->get_messages();
 
         foreach ($messages as $message) {
@@ -692,7 +668,7 @@ function send_certif_message($progid, $userid, $msgtype) {
     global $DB;
 
     $user = $DB->get_record('user', array('id' => $userid));
-    $messagesmanager = new prog_messages_manager($progid);
+    $messagesmanager = prog_messages_manager::get_program_messages_manager($progid);
     $messages = $messagesmanager->get_messages();
 
     $params = array('contextlevel' => CONTEXT_PROGRAM, 'progid' => $progid, 'userid' => $userid);

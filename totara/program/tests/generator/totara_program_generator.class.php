@@ -169,7 +169,6 @@ class totara_program_generator extends component_generator_base {
             'usermodified' => 2,
             'shortname' => 'progshort',
             'idnumber' => '',
-            'available' => 1,
             'sortorder' => !empty($sortorder) ? $sortorder : 0,
             'icon' => 1,
             'exceptionssent' => 0,
@@ -183,11 +182,7 @@ class totara_program_generator extends component_generator_base {
         $properties = array_merge($default, $data);
 
         $todb = (object)$properties;
-        $newid = $DB->insert_record('prog', $todb);
-        $program = new program($newid);
-
-        // Create message manager to add default messages.
-        new prog_messages_manager($newid, true);
+        $program = program::create($todb);
 
         return $program;
     }

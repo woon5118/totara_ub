@@ -39,7 +39,7 @@ class totara_program_observer {
         $userid = $event->userid;
 
         try {
-            $messagesmanager = new prog_messages_manager($programid);
+            $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
             $program = new program($programid);
             $user = $DB->get_record('user', array('id' => $userid));
             $isviewable = $program->is_viewable($user);
@@ -74,7 +74,7 @@ class totara_program_observer {
         $userid = $event->userid;
 
         try {
-            $messagesmanager = new prog_messages_manager($programid);
+            $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
             $program = new program($programid);
             $user = $DB->get_record('user', array('id' => $userid));
             $isviewable = $program->is_viewable($user);
@@ -112,7 +112,7 @@ class totara_program_observer {
         $coursesetid = $event->other['coursesetid'];
 
         try {
-            $messagesmanager = new prog_messages_manager($programid);
+            $messagesmanager = prog_messages_manager::get_program_messages_manager($programid);
             $messages = $messagesmanager->get_messages();
         } catch (ProgramException $e) {
             return true;
