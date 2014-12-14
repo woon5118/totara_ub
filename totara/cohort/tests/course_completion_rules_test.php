@@ -40,6 +40,8 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
 
     private $course1 = null;
     private $course2 = null;
+    private $course3 = null;
+    private $course4 = null;
     private $users = array();
     private $cohort = null;
     private $ruleset = 0;
@@ -62,6 +64,17 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
      |-----------------*----------*--------------*-----------------*-----------------*
      | user37 - user50 |  course2 |  -7 days     |    -1 day       |     6 days      |
      *-----------------*----------*--------------*-----------------*-----------------*
+     *-----------------*----------*--------------*------------*
+     | Group of users  |  course  | time started | completed  |
+     *-----------------*----------*--------------*------------*
+     | user1  - user4  |  course3 |  now         |    yes     |
+     *-----------------*----------*--------------*------------*
+     | user5  - user7  |  course3 |  now         |    no      |
+     *-----------------*----------*--------------*------------*
+     | user1  - user2  |  course4 |  now         |    yes     |
+     *-----------------*----------*--------------*------------*
+     | user3  - user7  |  course4 |  now         |    no      |
+     *-----------------*----------*--------------*------------*
     */
     public function setUp() {
         global $DB;
@@ -87,6 +100,8 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
         $setting = array('enablecompletion' => 1, 'completionstartonenrol' => 1);
         $this->course1 = $this->getDataGenerator()->create_course($setting);
         $this->course2 = $this->getDataGenerator()->create_course($setting);
+        $this->course3 = $this->getDataGenerator()->create_course($setting);
+        $this->course4 = $this->getDataGenerator()->create_course($setting);
         $this->coursestocomplete[$this->course1->id] = 1;
         $this->coursestocomplete[$this->course2->id] = 5;
         $this->assertEquals(0, $DB->count_records('course_completions'));
@@ -113,6 +128,42 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
             }
         }
         $this->assertEquals(86, $DB->count_records('course_completions'));
+
+        // Enrol some users and make them complete some course3 and some course4.
+        $coursetocomplete = array();
+        for ($i = 1; $i <= 7; $i++) {
+            $timestarted = $now;
+            if ($i <= 2) {
+                $coursetocomplete[$this->course3->id] = true;
+                $coursetocomplete[$this->course4->id] = true;
+            } else if ($i <= 4) {
+                $coursetocomplete[$this->course3->id] = true;
+                $coursetocomplete[$this->course4->id] = false;
+            } else {
+                $coursetocomplete[$this->course3->id] = false;
+                $coursetocomplete[$this->course4->id] = false;
+            }
+
+            foreach ($coursetocomplete as $courseid => $completiondate) {
+                $completion = new completion_completion(array('userid' => $this->users[$i]->id, 'course' => $courseid, 'timestarted' => $timestarted));
+                if ($i <= 2) {
+                    $completion->status = COMPLETION_STATUS_COMPLETE;
+                    $completion->mark_complete();
+                } else if ($i <= 4) {
+                    if ($completiondate) {
+                        $completion->status = COMPLETION_STATUS_COMPLETE;
+                        $completion->mark_complete();
+                    } else {
+                        $completion->status = COMPLETION_STATUS_NOTYETSTARTED;
+                        $completion->mark_enrolled();
+                    }
+                } else {
+                    $completion->status = COMPLETION_STATUS_NOTYETSTARTED;
+                    $completion->mark_enrolled();
+                }
+            }
+        }
+        $this->assertEquals(100, $DB->count_records('course_completions'));
 
         // Create cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -243,10 +294,10 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
      */
     public function data_course_completion_list() {
         $data = array(
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_NONE), array('course1', 'course2'), 4),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_ANY), array('course1', 'course2'), 50),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_NOTALL), array('course1', 'course2'), 14),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_ALL), array('course1', 'course2'), 36),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_NONE), array('course3', 'course4'), 3),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_ANY), array('course3', 'course4'), 4),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_NOTALL), array('course3', 'course4'), 5),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_ALL), array('course3', 'course4'), 2),
         );
         return $data;
     }
@@ -270,10 +321,10 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
-        // 1. data1: the skipusers + Admin
-        // 2. data2: users who complete both courses (course1: 36 users, course2:50) = 50
-        // 3. data3: users that doesn't complete all courses (users who do not complete course1).
-        // 4. data4: users have completed course1 and course2 = 36.
+        // 1. data1: 3 (user has NOT completed any of the courses in this list).
+        // 2. data2: 4 (user has completed any of the courses in this list).
+        // 3. data3: 5 (user has NOT completed all of the courses in this list).
+        // 4. data4: 2 (user has completed all of the courses in this list).
         $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
 }

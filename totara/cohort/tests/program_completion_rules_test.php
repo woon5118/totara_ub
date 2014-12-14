@@ -44,6 +44,8 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
     private $ruleset = 0;
     private $program1 = null;
     private $program2 = null;
+    private $program3 = null;
+    private $program4 = null;
 
     /*
      * Program completion data:
@@ -65,6 +67,8 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
      |      user7      | program2            |  -7 days     |    -1 day       |     6 days      |
      |-----------------*---------------------*--------------*-----------------*-----------------*
      |      user8      |  - - - - - - - -    |   - - - - -  |   - - - - - - - |   - - - - -     |
+     *-----------------*---------------------*--------------*-----------------*-----------------*
+     |  user1 - user7  | program3 - program4 |     now      |   - - - - - - - |   - - - - -     |
      *-----------------*---------------------*--------------*-----------------*-----------------*
     */
     public function setUp() {
@@ -91,17 +95,23 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         $setting = array('enablecompletion' => 1, 'completionstartonenrol' => 1);
         $course1 = $this->getDataGenerator()->create_course($setting);
         $course2 = $this->getDataGenerator()->create_course($setting);
-        $this->assertEquals(3, $DB->count_records('course'));
+        $course3 = $this->getDataGenerator()->create_course($setting);
+        $course4 = $this->getDataGenerator()->create_course($setting);
+        $this->assertEquals(5, $DB->count_records('course'));
 
         // Create two programs.
         $this->assertEquals(0, $DB->count_records('prog'));
         $this->program1 = $this->getDataGenerator()->create_program();
         $this->program2 = $this->getDataGenerator()->create_program();
-        $this->assertEquals(2, $DB->count_records('prog'));
+        $this->program3 = $this->getDataGenerator()->create_program();
+        $this->program4 = $this->getDataGenerator()->create_program();
+        $this->assertEquals(4, $DB->count_records('prog'));
 
         // Assign courses to programs.
         $this->getDataGenerator()->add_courseset_program($this->program1->id, array($course1->id));
         $this->getDataGenerator()->add_courseset_program($this->program2->id, array($course2->id));
+        $this->getDataGenerator()->add_courseset_program($this->program3->id, array($course3->id));
+        $this->getDataGenerator()->add_courseset_program($this->program4->id, array($course4->id));
 
         // Assign users to programs.
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id);
@@ -120,6 +130,20 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         }
         $this->userprograms[$this->program1->id] = $usersprogram1;
         $this->userprograms[$this->program2->id] = $usersprogram2;
+
+        $usersprogram3 = array($this->user1->id, $this->user2->id, $this->user3->id, $this->user4->id, $this->user5->id, $this->user6->id, $this->user7->id);
+        $this->getDataGenerator()->assign_program($this->program3->id, $usersprogram3);
+        if (!empty($CFG->messaging)) {
+            $messages = $this->getDebuggingMessages();
+            $this->resetDebugging();
+            $this->assertCount(7, $messages);
+        }
+        $this->getDataGenerator()->assign_program($this->program4->id, $usersprogram3);
+        if (!empty($CFG->messaging)) {
+            $messages = $this->getDebuggingMessages();
+            $this->resetDebugging();
+            $this->assertCount(7, $messages);
+        }
 
         // Create timestarted for each user.
         $now = time();
@@ -153,6 +177,45 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
                 );
                 $program->update_program_complete($userid, $completionsettings);
             }
+        }
+
+        $program = new program($this->program3->id);
+        $j = 1;
+        foreach ($usersprogram3 as $userid) {
+            if ($j <= 4) {
+                $completionsettings = array(
+                    'status' => STATUS_PROGRAM_COMPLETE,
+                    'timestarted' => $timestarted[$userid],
+                    'timecompleted' => $timecompleted[$userid],
+                );
+            } else {
+                $completionsettings = array(
+                    'status' => STATUS_PROGRAM_INCOMPLETE,
+                    'timestarted' => $timestarted[$userid],
+                    'timecompleted' => 0,
+                );
+            }
+            $program->update_program_complete($userid, $completionsettings);
+            $j++;
+        }
+        $program = new program($this->program4->id);
+        $j = 1;
+        foreach ($usersprogram3 as $userid) {
+            if ($j <= 2) {
+                $completionsettings = array(
+                    'status' => STATUS_PROGRAM_COMPLETE,
+                    'timestarted' => $timestarted[$userid],
+                    'timecompleted' => $timecompleted[$userid],
+                );
+            } else {
+                $completionsettings = array(
+                    'status' => STATUS_PROGRAM_INCOMPLETE,
+                    'timestarted' => $timestarted[$userid],
+                    'timecompleted' => 0,
+                );
+            }
+            $program->update_program_complete($userid, $completionsettings);
+            $j++;
         }
 
         // Create a dynamic cohort.
@@ -281,10 +344,10 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
      */
     public function data_program_completion_list() {
         $data = array(
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_NONE),  array('program1', 'program2'), 2),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_ANY), array('program1', 'program2'), 7),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_NOTALL),  array('program1', 'program2'), 6),
-            array(array('operator' => COHORT_RULE_COMPLETION_OP_ALL), array('program1', 'program2'), 1),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_NONE),  array('program3', 'program4'), 3),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_ANY), array('program3', 'program4'), 4),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_NOTALL),  array('program3', 'program4'), 5),
+            array(array('operator' => COHORT_RULE_COMPLETION_OP_ALL), array('program3', 'program4'), 2),
         );
         return $data;
     }
@@ -309,10 +372,10 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         cohort_rules_approve_changes($this->cohort);
 
         // It should match:
-        // 1. data1: 2 (users that had not completed program2 or program3) => user8 + Admin.
-        // 2. data2: 7 (users who completed one of the programs).
-        // 3. data3: 6 (users who have not completed all programs).
-        // 4. data4: 1 (users who has completed both programs).
+        // 1. data1: 3 (users that had not completed program3 or program4).
+        // 2. data2: 4 (users who completed one of the programs).
+        // 3. data3: 5 (users who have not completed all programs).
+        // 4. data4: 2 (users who has completed both programs).
         $this->assertEquals($usercount, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
     }
 }
