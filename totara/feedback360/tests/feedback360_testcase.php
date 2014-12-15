@@ -101,4 +101,26 @@ abstract class feedback360_testcase extends advanced_testcase {
         $this->assertDebuggingCalled();
         return feedback360_responder::by_user($respuserid, $feedback->id, $assigneduserid);
     }
+
+    /**
+     * Unassign response user to user feedback360
+     * @param feedback360 $feedbackid
+     * @param int $assigneduserid user id assigned to feedback (not response)
+     * @param int $respuser user that should be assigned
+     */
+    public function unassign_resp(feedback360 $feedback, $assigneduserid, $respuserid = 0) {
+        global $DB;
+
+        if ($feedback->status != feedback360::STATUS_ACTIVE) {
+            $feedback->activate();
+        }
+        if (!$respuserid) {
+            $respuser = $this->getDataGenerator()->create_user();
+            $respuserid = $respuser->id;
+        }
+        $userassignment = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $feedback->id,
+            'userid' => $assigneduserid));
+        feedback360_responder::update_system_assignments(array(), array($respuserid), $userassignment->id, time());
+        $this->assertDebuggingCalled();
+    }
 }

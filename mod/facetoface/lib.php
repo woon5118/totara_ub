@@ -894,61 +894,6 @@ function facetoface_notify_reserved_session_deleted($facetoface, $session) {
 }
 
 /**
- * Function to be run periodically according to the moodle cron
- * Finds all facetoface notifications that have yet to be mailed out, and mails them.
- */
-function facetoface_cron($testing = false) {
-    global $DB;
-
-    // Send notifications if enabled.
-    $notificationdisable = get_config(null, 'facetoface_notificationdisable');
-    if (empty($notificationdisable)) {
-        // Find "instant" manual notifications that haven't yet been sent.
-        if (!$testing) {
-            mtrace('Checking for instant Face-to-face notifications');
-        }
-        $manual = $DB->get_records_select(
-            'facetoface_notification',
-            'type = ? AND issent <> ? AND status = 1',
-            array(MDL_F2F_NOTIFICATION_MANUAL, MDL_F2F_NOTIFICATION_STATE_FULLY_SENT));
-        if ($manual) {
-            foreach ($manual as $notif) {
-                $notification = new facetoface_notification((array)$notif, false);
-                $notification->send_to_users();
-            }
-        }
-
-        // Find scheduled notifications that haven't yet been sent
-        if (!$testing) {
-            mtrace('Checking for scheduled Face-to-face notifications');
-        }
-        $sched = $DB->get_records_select(
-            'facetoface_notification',
-            'scheduletime IS NOT NULL
-            AND (type = ? OR type = ?)
-            AND status = 1',
-            array(MDL_F2F_NOTIFICATION_SCHEDULED, MDL_F2F_NOTIFICATION_AUTO));
-        if ($sched) {
-            foreach ($sched as $notif) {
-                $notification = new facetoface_notification((array)$notif, false);
-                $notification->send_scheduled();
-            }
-        }
-    }
-
-    // Find any reservations that are too close to the start of the session and delete them.
-    facetoface_remove_reservations_after_deadline($testing);
-
-    // Notify of sessions that are under capacity.
-    if (!$testing) {
-        mtrace("Checking for sessions below minimum capacity");
-    }
-    facetoface_notify_under_capacity();
-
-    return true;
-}
-
-/**
  * Find any reservations that are too close to the start of the session and delete them.
  */
 function facetoface_remove_reservations_after_deadline($testing) {

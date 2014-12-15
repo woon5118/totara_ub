@@ -52,7 +52,7 @@ function get_registration_data() {
     $data['totararelease'] = $TOTARA->release;
     $data['phpversion'] = phpversion();
     $data['dbtype'] = $CFG->dbfamily . ' ' . $db_version;
-    $data['webserversoftware'] = $_SERVER['SERVER_SOFTWARE'];
+    $data['webserversoftware'] = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
     $data['usercount'] = $DB->count_records('user', array('deleted' => '0'));
     $data['coursecount'] = $DB->count_records_select('course', 'format <> ?', array('site'));
     $oneyearago = time() - 60*60*24*365;
@@ -130,29 +130,4 @@ function send_registration_data_email($data) {
     }
 
     return $emailed;
-}
-
-/**
- * Check if registration information should be sent, and if so send it
- *
- * To be used on the cron to manage registrations
- *
- */
-function registration_cron() {
-    global $CFG;
-    $registrationdue = $oktotry = false;
-    if (empty($CFG->registered) || $CFG->registered < (time() - 7 * 60 * 60 * 24)) {
-        // Register up to once a week.
-        $registrationdue = true;
-    }
-    if (empty($CFG->registrationattempted) || $CFG->registrationattempted < (time() - 60 * 60 * 24)) {
-        // Try registering daily if unsuccessful.
-        $oktotry = true;
-    }
-    if ($registrationdue && $oktotry) {
-        mtrace("Performing registration update:");
-        $registerdata = get_registration_data();
-        send_registration_data($registerdata);
-        mtrace("Registration update done");
-    }
 }

@@ -694,9 +694,10 @@ abstract class rb_base_source {
     }
 
     /**
-     * Enpanding content to display when clicking a course.
+     * Expanding content to display when clicking a course.
      * Will be placed inside a table cell which is the width of the table.
      * Call required_param to get any param data that is needed.
+     * Make sure to check that the data requested is permitted for the viewer.
      *
      * @return string
      */
@@ -710,6 +711,11 @@ abstract class rb_base_source {
 
         $courseid = required_param('expandcourseid', PARAM_INT);
         $userid = $USER->id;
+
+        if (!totara_course_is_viewable($courseid)) {
+            ajax_result(false, get_string('coursehidden'));
+            exit();
+        }
 
         $course = $DB->get_record('course', array('id' => $courseid));
 
@@ -875,9 +881,10 @@ abstract class rb_base_source {
     }
 
     /**
-     * Enpanding content to display when clicking a course.
+     * Expanding content to display when clicking a program.
      * Will be placed inside a table cell which is the width of the table.
      * Call required_param to get any param data that is needed.
+     * Make sure to check that the data requested is permitted for the viewer.
      *
      * @return string
      */
@@ -888,6 +895,16 @@ abstract class rb_base_source {
 
         $progid = required_param('expandprogid', PARAM_INT);
         $userid = $USER->id;
+
+        if (!$program = new program($progid)) {
+            ajax_result(false, get_string('error:programid', 'totara_program'));
+            exit();
+        }
+
+        if (!$program->is_viewable()) {
+            ajax_result(false, get_string('error:inaccessible', 'totara_program'));
+            exit();
+        }
 
         $formdata = $DB->get_record('prog', array('id' => $progid));
 
@@ -1792,7 +1809,7 @@ abstract class rb_base_source {
             )
         );
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'lang',
             get_string('userlang', 'totara_reportbuilder'),
             "$join.lang",
@@ -1829,7 +1846,7 @@ abstract class rb_base_source {
             );
         }
         $columnoptions[] = new rb_column_option(
-            'user',
+            $groupname,
             'id',
             get_string('userid', 'totara_reportbuilder'),
             "$join.id",

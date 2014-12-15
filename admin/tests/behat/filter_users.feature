@@ -8,12 +8,12 @@ Feature: An administrator can filter user accounts by role, cohort and other pro
     Given the following "users" exist:
       | username | firstname | lastname | email | auth | confirmed |
       | user1 | User | One | one@asd.com | manual | 0 |
-      | user2 | User | Two | one@asd.com | ldap | 1 |
-      | user3 | User | Three | one@asd.com | manual | 1 |
-      | user4 | User | Four | one@asd.com | ldap | 0 |
+      | user2 | User | Two | two@asd.com | ldap | 1 |
+      | user3 | User | Three | three@asd.com | manual | 1 |
+      | user4 | User | Four | four@asd.com | ldap | 0 |
     And the following "cohorts" exist:
-      | name | idnumber | cohorttype |
-      | Cohort 1 | CH1 | 1 |
+      | name | idnumber |
+      | Cohort 1 | CH1 |
     And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1 | 0 |
@@ -30,7 +30,7 @@ Feature: An administrator can filter user accounts by role, cohort and other pro
   @javascript
   Scenario: Filter user accounts by role and cohort
     When I set the following fields to these values:
-      | courserole_rl | Learner |
+      | courserole_rl | Student |
       | courserole_ct | any category |
       | courserole | C1 |
     And I press "Add filter"

@@ -686,9 +686,9 @@ class facetoface_notification extends data_object {
 
             $event->userto = $manager;
             $event->roleid = $CFG->managerroleid;
-            $event->fullmessage       = $event->manager->fullmessage;
-            $event->fullmessagehtml   = $event->manager->fullmessagehtml;
-            $event->smallmessage      = $event->manager->smallmessage;
+            $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
+            $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
+            $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
             // Do not send iCal attachment.
             $event->attachment = $event->attachname = null;
 

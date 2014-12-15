@@ -941,8 +941,9 @@ class facetoface_lib_testcase extends advanced_testcase {
 
     function test_facetoface_cron() {
         // Test for valid case.
-        $this->assertTrue((bool)facetoface_cron(true), $this->msgtrue);
-
+        $cron = new \mod_facetoface\task\send_notifications_task();
+        $cron->testing = true;
+        $cron->execute();
         $this->resetAfterTest(true);
     }
 

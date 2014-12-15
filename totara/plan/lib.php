@@ -1590,21 +1590,6 @@ function plan_remove_dp_course_assignments($courseid) {
     return $DB->delete_records('dp_plan_course_assign', array('courseid' => $courseid));
 }
 
-
-/**
- * Run the plan cron
- */
-function totara_plan_cron() {
-    global $CFG;
-
-    // Run cron if Learning plans are enabled.
-    if (!totara_feature_disabled('learningplans')) {
-        require_once($CFG->dirroot . '/totara/plan/cron.php');
-        plan_cron();
-    }
-}
-
-
 /**
  * Decide if the Record of Learning tab should be shown
  *

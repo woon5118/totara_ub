@@ -124,7 +124,7 @@ function cohort_rules_get_menu_options() {
 
 /**
  * Create a cohort ruleset
- * @param int $cohortid The id of the cohort to link it to
+ * @param int $collectionid The id of the rule collection id to link it to
  * @return int The ID of the newly created ruleset
  */
 function cohort_rule_create_ruleset($collectionid) {
@@ -141,7 +141,21 @@ function cohort_rule_create_ruleset($collectionid) {
     $todb->timecreated = $todb->timemodified = time();
     $todb->modifierid = $USER->id;
 
-    return $DB->insert_record('cohort_rulesets', $todb);
+    $todb->id = $DB->insert_record('cohort_rulesets', $todb);
+
+    // Get cohort.
+    $cohort = $DB->get_record_sql('SELECT c.*
+        FROM {cohort_rule_collections} crc
+        INNER JOIN {cohort} c ON crc.cohortid = c.id
+        WHERE crc.id = ?', array($collectionid));
+
+    // Trigger ruleset_created event.
+    $log = array(SITEID, 'cohort', 'create ruleset', 'totara/cohort/rules.php?id='.$cohort->id, "rulesetid={$todb->id}");
+    $event = \totara_cohort\event\ruleset_created::create_from_instance($todb, $cohort);
+    $event->set_legacy_logdata($log);
+    $event->trigger();
+
+    return $todb->id;
 }
 
 
@@ -174,7 +188,24 @@ function cohort_rule_create_rule($rulesetid, $type, $name) {
     $todb->timecreated = $todb->timemodified = time();
     $todb->modifierid = $USER->id;
 
-    return $DB->insert_record('cohort_rules', $todb);
+    $todb->id = $DB->insert_record('cohort_rules', $todb);
+
+    $cohort = $DB->get_record_sql("SELECT c.id,  c.contextid
+        FROM {cohort} c
+        INNER JOIN {cohort_rule_collections} crc
+        ON c.id = crc.cohortid
+        INNER JOIN {cohort_rulesets} crs
+        ON crc.id = crs.rulecollectionid
+        WHERE crs.id= ?", array($rulesetid));
+
+    // Trigger rule_created event.
+    $loginfo = "ruleid={$todb->id}&ruletype={$type}&name={$name}";
+    $log = array(SITEID, 'cohort', 'create rule', 'totara/cohort/rules.php?id='.$cohort->id, $loginfo);
+    $event = \totara_cohort\event\rule_created::create_from_instance($todb, $cohort);
+    $event->set_legacy_logdata($log);
+    $event->trigger();
+
+    return $todb->id;
 }
 
 
@@ -288,6 +319,9 @@ function cohort_rules_approve_changes($cohort) {
 
     $transaction->allow_commit();
 
+    // Trigger draft saved event.
+    \totara_cohort\event\draftcollection_saved::create_from_instance($cohort)->trigger();
+
     totara_cohort_update_dynamic_cohort_members($cohort->id, 0, true);
 
     return true;
@@ -308,6 +342,11 @@ function cohort_rules_cancel_changes($cohort) {
     $DB->update_record('cohort', $todb);
 
     $transaction->allow_commit();
+
+    // Trigger draft discarded event.
+    $event = \totara_cohort\event\draftcollection_discarded::create_from_instance($cohort);
+    $event->add_record_snapshot('cohort', $cohort);
+    $event->trigger();
 
     return true;
 }
@@ -490,11 +529,13 @@ function cohort_change_params_rule($rulegroup, $rulename, $ruleid, $params) {
 function cohort_delete_param($ruleparam) {
     global $DB, $USER;
 
-    $sql = "SELECT crc.id AS collectionid, crs.id AS rulesetid, cr.id AS ruleid
+    $sql = "SELECT crc.id AS collectionid, crs.id AS rulesetid, cr.id AS ruleid,
+        c.id AS cohortid, c.contextid AS contextid
         FROM {cohort_rule_params} crp
         INNER JOIN {cohort_rules} cr ON crp.ruleid = cr.id
         INNER JOIN {cohort_rulesets} crs ON cr.rulesetid = crs.id
         INNER JOIN {cohort_rule_collections} crc ON crs.rulecollectionid = crc.id
+        INNER JOIN {cohort} c ON crc.cohortid = c.id
         WHERE crp.id = ?";
     $ruledetails = $DB->get_record_sql($sql, array($ruleparam->id));
 
@@ -525,6 +566,18 @@ function cohort_delete_param($ruleparam) {
     $colldetails->modifierid = $USER->id;
     $colldetails->status = COHORT_COL_STATUS_DRAFT_CHANGED;
     $DB->update_record('cohort_rule_collections', $colldetails);
+
+    // Create cohort instance needed in the event.
+    $cohort = new stdClass();
+    $cohort->id = $ruledetails->cohortid;
+    $cohort->contextid = $ruledetails->contextid;
+
+    // Trigger delete rule param event
+    $log = array(SITEID, 'cohort', 'delete rule param ' . $ruleparam->id, 'totara/cohort/rules.php');
+    $event = \totara_cohort\event\rule_param_deleted::create_from_instance($ruleparam, $cohort);
+    $event->set_legacy_logdata($log);
+    $event->add_record_snapshot('cohort_rule_params', $ruleparam);
+    $event->trigger();
 
     return $return;
 }

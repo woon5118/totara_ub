@@ -811,6 +811,11 @@ if ($fromform = $mform_post->get_data()) {
                     'forumtype' => $forum->type,
                 )
             );
+
+            // Totara archiving flags.
+            $discussion->archived = 0;
+            $fromform->archived = 0;
+
             $event = \mod_forum\event\post_created::create($params);
             $event->add_record_snapshot('forum_posts', $fromform);
             $event->add_record_snapshot('forum_discussions', $discussion);
@@ -867,6 +872,10 @@ if ($fromform = $mform_post->get_data()) {
                     'forumid' => $forum->id,
                 )
             );
+
+            // Totara archiving flag.
+            $discussion->archived = 0;
+
             $event = \mod_forum\event\discussion_created::create($params);
             $event->add_record_snapshot('forum_discussions', $discussion);
             $event->trigger();

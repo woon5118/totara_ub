@@ -650,5 +650,28 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014111300, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2014120400) {
+
+        // Changing nullability of field name on table report_builder_saved to not null.
+        $table = new xmldb_table('report_builder_saved');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'userid');
+
+        // Update existing data to ''.
+        $DB->execute("UPDATE {report_builder_saved} SET name = '' WHERE name IS NULL");
+
+        // Launch change of nullability for field name.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field search on table report_builder_saved to null.
+        $table = new xmldb_table('report_builder_saved');
+        $field = new xmldb_field('search', XMLDB_TYPE_TEXT, null, null, null, null, null, 'name');
+
+        // Launch change of nullability for field search.
+        $dbman->change_field_notnull($table, $field);
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2014120400, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

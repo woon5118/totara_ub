@@ -475,7 +475,8 @@ if (!$onlycontent) {
             '"selectnotset":"'.MDL_F2F_SELECT_NOT_SET.'",'.
             '"courseid":"'.$course->id.'",'.
             '"facetofaceid":"'.$facetoface->id.'",'.
-            '"notsetop":"'.MDL_F2F_STATUS_NOT_SET.'"}');
+            '"notsetop":"'.MDL_F2F_STATUS_NOT_SET.'",'.
+            '"approvalreqd":"'.$facetoface->approvalreqd.'"}');
 
         $PAGE->requires->js_init_call('M.totara_f2f_attendees.init', $args, false, $jsmodule);
     }

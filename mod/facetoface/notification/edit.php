@@ -183,7 +183,7 @@ if ($id) {
 $button = update_module_button($cm->id, $course->id, get_string('modulename', 'facetoface'));
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
 $PAGE->set_button($button);

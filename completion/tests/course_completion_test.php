@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot . '/totara/certification/cron.php');
 require_once($CFG->dirroot . '/completion/cron.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
@@ -215,7 +214,8 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
 
         // Run the cron.
         ob_start();
-        certification_cron();
+        $certcron = new \totara_certification\task\update_certification_task();
+        $certcron->execute();
         ob_end_clean();
 
         /* As the re-certification windows is opened, the completion record for user1-course1 should be deleted

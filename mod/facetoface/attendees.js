@@ -89,9 +89,19 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 url += '&clear=true';
             } // end if - attendee field does not exist
 
-            // Grab suppressemail value
-            if ($('input#suppressemail:checked', handler._container).length) {
+            // Grab suppressemail value.
+            if ($('#suppressemail:checked', handler._container).length) {
                 url += '&suppressemail=1';
+            }
+
+            // Grab suppressccmanager value.
+            if ($('#suppressccmanager:checked', handler._container).length) {
+                url += '&suppressccmanager=1';
+            }
+
+            // Grab ignoreapproval value
+            if ($('input#ignoreapproval:checked', handler._container).length) {
+                url += '&ignoreapproval=1';
             }
 
             this._dialog._request(
@@ -179,16 +189,33 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 }
             }
 
-            // Activate or deactivate approval required tab
-            if (approvalrequiredtab.length > 0) {
-                if (M.totara_f2f_attendees.config.approvalreqd == "1" && $('input[name=requireapproval]').val() == 1) {
+            // Activate, deactivate or create approval required tab.
+            if (M.totara_f2f_attendees.config.approvalreqd == "1" && $('input[name=requireapproval]').val() == 1) {
+                if (approvalrequiredtab.length > 0) {
                     approvalrequiredtab.parent('a').removeClass('nolink');
                     approvalrequiredtab.parent('a').attr("href", M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' +
                         M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
                 } else {
-                    approvalrequiredtab.parent('a').addClass('nolink');
-                    approvalrequiredtab.parent('a').removeAttr("href");
+                    var newtab = document.createElement('li');
+                    var tablink = document.createElement('a');
+                    tablink.setAttribute('href', M.cfg.wwwroot + '/mod/facetoface/attendees.php?s=' +
+                        M.totara_f2f_attendees.config.sessionid + '&action=approvalrequired');
+                    var tabspan = document.createElement('span');
+                    tabspan.innerHTML = M.util.get_string('approvalreqd','facetoface');
+                    newtab.appendChild(tablink);
+                    tablink.appendChild(tabspan);
+
+                    if (takeattendancetab.length > 0) {
+                        takeattendancetab.parent().parent('li').after(newtab);
+                    } else if (cancellationtab.length > 0) {
+                        cancellationtab.parent().parent('li').after(newtab);
+                    } else if (waitlisttab.length > 0) {
+                        waitlisttab.parent().parent('li').after(newtab);
+                    }
                 }
+            } else {
+                approvalrequiredtab.parent('a').addClass('nolink');
+                approvalrequiredtab.parent('a').removeAttr("href");
             }
 
             // Replace any items on the main page with their content (if IDs match)
@@ -216,7 +243,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 {
                     buttons: buttonsObj,
                     title: '<h2>' + M.util.get_string('addremoveattendees', 'facetoface') + '</h2>',
-                    height: 600
+                    height: 705
                 },
                 M.cfg.wwwroot + '/mod/facetoface/editattendees.php?s=' + M.totara_f2f_attendees.config.sessionid + '&clear=1',
                 handler
@@ -458,7 +485,7 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 zIndex       : 5,
                 centered     : true,
                 modal        : true,
-                render       : true,
+                render       : true
             });
             var content = $('#' + dialog.get('id'));
             if (typeof data.error !== 'undefined') {

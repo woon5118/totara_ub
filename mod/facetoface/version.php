@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package modules
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,9 +25,8 @@
 //  This fragment is called by /admin/index.php
 ////////////////////////////////////////////////////////////////////////////////
 
-$module->version   = 2014102201;  // The current module version (Date: YYYYMMDDXX)
+$module->version   = 2014110700;  // The current module version (Date: YYYYMMDDXX)
 $module->requires  = 2012112900;  // Requires this Moodle version
 $module->release   = '2.4.0 (2012112900)'; // User-friendly version number
 $module->component = 'mod_facetoface';
 $module->maturity  = MATURITY_STABLE;
-$module->cron      = 60;

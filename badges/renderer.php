@@ -139,7 +139,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $dl = array();
         $dl[get_string('name')] = $badge->name;
         $dl[get_string('description', 'badges')] = nl2br($badge->description);
-        $dl[get_string('createdon', 'search')] = $badge->timecreated;
+        $dl[get_string('createdon', 'search')] = userdate($badge->timecreated);
         $dl[get_string('badgeimage', 'badges')] = print_badge_image($badge, $context, 'large');
         $display .= $this->definition_list($dl);
 
@@ -527,7 +527,7 @@ class core_badges_renderer extends plugin_renderer_base {
         foreach ($badges->badges as $badge) {
             $badgeimage = print_badge_image($badge, $this->page->context, 'large');
             $name = $badge->name;
-            $description = $badge->description;
+            $description = nl2br($badge->description);
             $criteria = self::print_badge_criteria($badge);
             if ($badge->dateissued) {
                 $icon = new pix_icon('i/valid',

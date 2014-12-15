@@ -81,7 +81,6 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
         $newids = array();
         foreach ($userstoassign as $adduser) {
             cohort_add_member($cohort->id, $adduser->id);
-            add_to_log(SITEID, 'cohort', 'add member', 'cohort/members.php?id='.$cohort->id, "userid={$adduser->id}");
             $newids[$adduser->id] = $adduser->id;
         }
         // Assign roles to new users.
@@ -101,7 +100,6 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
         $delids = array();
         foreach ($userstoremove as $removeuser) {
             cohort_remove_member($cohort->id, $removeuser->id);
-            add_to_log(SITEID, 'cohort', 'remove member', 'cohort/members.php?id='.$cohort->id, "userid={$removeuser->id}");
             $delids[$removeuser->id] = $removeuser->id;
         }
         // Unassign roles to users deleted.

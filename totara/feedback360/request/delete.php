@@ -24,33 +24,49 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
-// The feedback360userassignmentid and user id used to identify the record.
-$userform = required_param('userform', PARAM_INT);
-$userid = required_param('userid', PARAM_INT);
-$email = optional_param('email', '', PARAM_EMAIL);
+$respid = required_param('respid', PARAM_INT); // The id for a resp_assignment record.
+$email = optional_param('email', '', PARAM_EMAIL); // The email field to check against.
 
 // Confirmation hash.
 $delete = optional_param('del', '', PARAM_ALPHANUM);
 
 // Set up some variables.
-$systemcontext = context_system::instance();
-$usercontext = context_user::instance($userform->userid);
 $strdelrequest = get_string('removerequest', 'totara_feedback360');
-$resp_params = array('feedback360userassignmentid' => $userform, 'userid' => $userid);
-$resp_assignment = $DB->get_record('feedback360_resp_assignment', $resp_params);
+
+
+if (!$resp_assignment = $DB->get_record('feedback360_resp_assignment', array('id' => $respid))) {
+    print_error('error:invalidparams');
+}
+
+$user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $resp_assignment->feedback360userassignmentid));
+
+$email_assignment = null;
+if (!empty($resp_assignment->feedback360emailassignmentid)) {
+    $email_assignment = $DB->get_record('feedback360_email_assignment', array('id' => $resp_assignment->feedback360emailassignmentid));
+
+    if ($email_assignment->email != $email) {
+        // There is something wrong here, these should always match.
+        print_error('error:invalidparams');
+    }
+}
+
+$usercontext = context_user::instance($user_assignment->userid);
+$systemcontext = context_system::instance();
 
 // Check user has permission to request feedback.
-if ($USER->id == $userform->userid) {
+if ($USER->id == $user_assignment->userid) {
     require_capability('totara/feedback360:manageownfeedback360', $systemcontext);
-} else if (totara_is_manager($userform->userid)) {
+} else if (totara_is_manager($user_assignment->userid) || is_siteadmin()) {
     require_capability('totara/feedback360:managestafffeedback', $usercontext);
+} else {
+    print_error('error:accessdenied', 'totara_feedback360');
 }
 
 $returnurl = new moodle_url('/totara/feedback360/request.php',
-        array('action' => 'users', 'userid' => $userid, 'formid' => $userform));
+        array('action' => 'users', 'userid' => $user_assignment->userid, 'formid' => $user_assignment->id));
 
 // Set up the page.
-$urlparams = array('userid' => $userid, 'userform' => $userform);
+$urlparams = array('respid' => $respid);
 $PAGE->set_url(new moodle_url('/totara/feedback360/request/delete.php'), $urlparams);
 $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('admin');
@@ -58,43 +74,37 @@ $PAGE->set_totara_menu_selected('myappraisals');
 $PAGE->set_title($strdelrequest);
 $PAGE->set_heading($strdelrequest);
 
-if ($delete) {
+if ($delete && !empty($resp_assignment)) {
     require_sesskey();
 
-    $request_record = $DB->get_record('feedback360_resp_assignment',
-            array('feedback360userassignmentid' => $userform, 'userid' => $userid));
-
     // Delete.
-    if ($delete != md5($request_record->timeassigned)) {
+    if ($delete != md5($resp_assignment->timeassigned)) {
         print_error('error:requestdeletefailure', 'totara_feedback360');
     }
 
-    if (isset($request_record->feedback360emailassignmentid)) {
+    if (isset($resp_assignment->feedback360emailassignmentid)) {
         // Delete email.
-        $DB->delete_records('feedback360_email_assignment', array('id' => $request_record->feedback360emailassignmentid));
+        $DB->delete_records('feedback360_email_assignment', array('id' => $resp_assignment->feedback360emailassignmentid));
     }
 
     // Then delete the assignment.
-    $DB->delete_records('feedback360_resp_assignment', array('id' => $request_record->id));
+    $DB->delete_records('feedback360_resp_assignment', array('id' => $resp_assignment->id));
 
-    add_to_log(SITEID, 'feedback360', 'delete feedback request',
-            "request.php?action=users&amp;userid={$userid}&amp;formid={$userform}");
+    \totara_feedback360\event\request_deleted::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
+
     totara_set_notification(get_string('feedback360requestdeleted', 'totara_feedback360'), $returnurl,
             array('class' => 'notifysuccess'));
 } else {
     // Display confirmation page.
     echo $OUTPUT->header();
-    $delete_params = array('userform' => $userform, 'userid' => $userid,
+    $delete_params = array('respid' => $respid, 'email' => $email,
         'del' => md5($resp_assignment->timeassigned), 'sesskey' => sesskey());
-    if (!empty($email)) {
-        $delete_param['email'] = $email;
-    }
 
     $deleteurl = new moodle_url('/totara/feedback360/request/delete.php', $delete_params);
     if (!empty($email)) {
         $username = $email;
     } else {
-        $username = fullname($DB->get_record('user', array('id' => $userid)));
+        $username = fullname($DB->get_record('user', array('id' => $resp_assignment->userid)));
     }
 
     echo $OUTPUT->confirm(get_string('removerequestconfirm', 'totara_feedback360', $username), $deleteurl, $returnurl);

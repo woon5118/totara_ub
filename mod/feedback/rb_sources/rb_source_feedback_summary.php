@@ -230,7 +230,7 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_filter_option(
                 'responses',
                 'timecompleted',
-                'Time completed',
+                get_string('timecompleted', 'rb_source_feedback_questions'),
                 'date'
             ),
             new rb_filter_option(

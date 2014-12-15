@@ -471,7 +471,7 @@ class mod_facetoface_session_form extends moodleform {
             foreach ($dates as $d) {
                 $timeslots[] = array($d->timestart, $d->timefinish);
             }
-            $excludesessions = isset($data['sessionid']) ? array($data['sessionid']) : null;
+            $excludesessions = isset($data['id']) ? array($data['id']) : null;
             if (!$availablerooms = facetoface_get_available_rooms($timeslots, 'id', $excludesessions)) {
                 // No pre-defined rooms available!
                 $errors['predefinedroom'] = get_string('error:couldnotsaveroom', 'facetoface');

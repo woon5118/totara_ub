@@ -504,20 +504,27 @@ class totara_feedback360_renderer extends plugin_renderer_base {
             $strup =  get_string('moveup', 'totara_question');
             $strdown =  get_string('movedown', 'totara_question');
             $last = end($quests);
-            $first = reset($quests);
+            $first = true;
+            reset($quests);
 
             $questtypes = question_manager::get_registered_elements();
             foreach ($quests as $quest) {
                 $question = new feedback360_question($quest->id);
                 $posuplink = $posdownlink = '';
-                $attrs['data-questid'] = $quest->id;
-                if ($quest->id != $first->id) {
+                $attrs = array(
+                    'class' => '',
+                    'data-questid' => $quest->id
+                );
+
+                if (!$first) {
                     $posupurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'posup',
                         'id' => $quest->id, 'feedback360id' => $feedback360->id, 'sesskey' => sesskey()));
                     $posuplink = $this->output->action_icon($posupurl, new pix_icon('/t/up', $strup, 'moodle'), null,
                             array('class' => 'action-icon js-hide'));
                 } else {
-                    $attrs['class'] = ' first';
+                    $attrs['class'] .= ' first';
+                    $first = false;
+                    $posuplink = $this->output->spacer(array('width' => 21, 'height' => 15));
                 }
                 if ($quest->id != $last->id) {
                     $posdownurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'posdown',
@@ -526,6 +533,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                             array('class' => 'action-icon js-hide'));
                 } else {
                     $attrs['class'] .= ' last';
+                    $posdownlink = $this->output->spacer(array('width' => 21, 'height' => 15));
                 }
                 $editurl = new moodle_url('/totara/feedback360/content.php', array('action' => 'edit',
                     'id' => $quest->id, 'feedback360id' => $feedback360->id));
@@ -840,9 +848,9 @@ class totara_feedback360_renderer extends plugin_renderer_base {
     /**
      * returns the html for a system user item with delete button.
      *
-     * @param string $email     The email used in an email_assignment
-     * @param int $userform     The id of the feedback user_assignment
-     * @param object $resp      The associated resp_assignment, for the timecompleted field
+     * @param string $email             The email used in an email_assignment record.
+     * @param int $userform             The id of the user_assignment record.
+     * @param object $resp              The associated resp_assignment, for the timecompleted field.
      */
     public function external_user_record($email, $userform, $resp) {
         global $CFG;
@@ -851,7 +859,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $removestr = get_string('remove');
         $completestr = get_string('alreadyreplied', 'totara_feedback360');
-        $deleteparams = array('userid' => $CFG->siteguest, 'userform' => $userform, 'email' => $email);
+        $deleteparams = array('respid' => $resp->id, 'email' => $email);
         $deleteurl = new moodle_url('/totara/feedback360/request/delete.php', $deleteparams);
 
         $out .= html_writer::start_tag('div', array('id' => "external_user_{$email}", 'class' => 'external_record'));

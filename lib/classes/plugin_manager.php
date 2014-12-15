@@ -1132,7 +1132,8 @@ class core_plugin_manager {
 
             'report' => array(
                 'backups', 'completion', 'configlog', 'courseoverview', 'eventlist',
-                'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances', 'security', 'stats', 'performance'
+                'log', 'loglive', 'outline', 'participation', 'progress', 'questioninstances', 'security', 'stats', 'performance',
+                'usersessions',
             ),
 
             'repository' => array(

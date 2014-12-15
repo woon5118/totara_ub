@@ -61,7 +61,7 @@ Feature: Automatic deletion of groups and groupings
   Scenario: Delete groups and groupings with and without ID numbers without the 'moodle/course:changeidnumber' capability
     Given I log out
     And I log in as "admin"
-    And I set the following system permissions of "Editing Trainer" role:
+    And I set the following system permissions of "Teacher" role:
      | moodle/course:changeidnumber | Prevent |
     And I log out
     And I log in as "teacher1"

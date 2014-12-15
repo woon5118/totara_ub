@@ -93,9 +93,6 @@ $PAGE->set_url(new moodle_url('/totara/appraisal/snapshot.php', array('role' => 
     'subjectid' => $subjectid, 'appraisalid' => $appraisalid, 'action' => $action)));
 
 $PAGE->set_pagelayout('popup');
-// Force standardtotara theme on this page to avoid responsive theme PDF rendering errors.
-$originalthemeorder = (!empty($CFG->themeorder)) ? $CFG->themeorder : null;
-$CFG->themeorder = array('totarapdf');
 
 $renderer = $PAGE->get_renderer('totara_appraisal');
 $PAGE->requires->js_init_code('window.print()', true);
@@ -111,7 +108,7 @@ if ($action == 'snapshot') {
 }
 
 $out = "";
-$out .= $renderer->header();
+$out .= $renderer->snapshot_header();
 $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
 
 if ($action == 'snapshot') {
@@ -135,10 +132,5 @@ if ($action == 'snapshot') {
             array('class'=>'notifysuccess dialog-nobind'));
 } else {
     echo $out;
-    echo $renderer->footer();
-}
-
-// Reset default themeorder if set.
-if (!empty($originalthemeorder)) {
-    $CFG->themeorder = $originalthemeorder;
+    echo $renderer->snapshot_footer();
 }

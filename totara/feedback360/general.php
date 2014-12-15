@@ -68,7 +68,6 @@ if ($fromform = $mform->get_data()) {
     $feedback360->description = $todb->description;
     $feedback360->save();
 
-    add_to_log(SITEID, 'feedback360', 'update feedback360', 'general.php?id='.$id, 'General Settings: feedback360 ID=' . $id);
     if ($id > 0) {
         totara_set_notification(get_string('feedback360updated', 'totara_feedback360'), $returnurl,
                 array('class' => 'notifysuccess'));

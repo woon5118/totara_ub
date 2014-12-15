@@ -118,7 +118,7 @@ if ($mform->is_cancelled()) {
         print_error('errorpasswordupdate', 'auth');
     }
 
-    if (!empty($CFG->pwchangelogout)) {
+    if (!empty($CFG->passwordchangelogout)) {
         \core\session\manager::kill_user_sessions($USER->id, session_id());
     }
 

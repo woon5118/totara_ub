@@ -18,13 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara
- * @subpackage hierarchy
+ * @package totara_hierarchy
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2014070801;       // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2014120400;       // The current module version (Date: YYYYMMDDXX)
 $plugin->requires = 2011120501;       // Requires this Moodle version
-$plugin->cron = 0;                    // Period for cron to check this module (secs)
 $plugin->component = 'totara_hierarchy'; // To check on upgrade, that module sits in correct place

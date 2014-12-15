@@ -24,7 +24,6 @@
 
 function xmldb_totara_plan_install() {
     global $DB, $CFG;
-    set_config('totara_plan_cron', 60);
 
     //create default priority & objective scales and default template
     /*default priority scale*/

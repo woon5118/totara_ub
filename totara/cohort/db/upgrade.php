@@ -689,5 +689,25 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014090300, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2014120400) {
+
+        // Changing the default of field cohorttype on table cohort to 0.
+        $table = new xmldb_table('cohort');
+        $field = new xmldb_field('cohorttype', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+
+        // Launch change of default for field cohorttype.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field modifierid on table cohort to 0.
+        $table = new xmldb_table('cohort');
+        $field = new xmldb_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cohorttype');
+
+        // Launch change of default for field modifierid.
+        $dbman->change_field_default($table, $field);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2014120400, 'totara', 'cohort');
+    }
+
     return true;
 }

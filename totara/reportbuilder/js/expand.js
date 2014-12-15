@@ -34,6 +34,7 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
     init: function(Y, args) {
         $('body').on('click', '.rb-display-expand', M.totara_reportbuilder_expand.displayExpand);
         $('body').on('click', this.SELECTORS.ENROLMENTBUTTONS, M.totara_reportbuilder_expand.clickEnrol);
+        $('body').on('click', '.rb-display-expand-link', function(event) { event.stopPropagation(); });
     },
 
     /*
@@ -49,7 +50,9 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
             return;
         }
         var id = $('.rb-display-table-container').attr('id');
-        var url = M.cfg.wwwroot + '/totara/reportbuilder/ajax/expand.php?id=' + id + '&expandname=' + $(this).data('name');
+        var url = M.cfg.wwwroot + '/totara/reportbuilder/ajax/expand.php?id=' + id +
+            '&expandname=' + $(this).data('name') +
+            '&sesskey=' + M.cfg.sesskey;
         if ($(this).data('param')) {
             url = url + '&' + $(this).data('param');
         }

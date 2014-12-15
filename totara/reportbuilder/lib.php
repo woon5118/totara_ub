@@ -1460,6 +1460,20 @@ class reportbuilder {
         return $permitted;
     }
 
+    /**
+     * Returns true if require_login should be executed.
+     *
+     * Only embedded reports can specify not to run require_login.
+     *
+     * @return boolean True if require_login should be executed
+     */
+    public final function needs_require_login() {
+        if (empty($this->embedded)) {
+            return true;
+        } else {
+            return $this->embedobj->needs_require_login();
+        }
+    }
 
     /**
     * Returns an array of defined reportbuilder access plugins
@@ -4694,17 +4708,6 @@ class reportbuilder {
 } // End of reportbuilder class
 
 class ReportBuilderException extends Exception { }
-
-
-
-/**
- * Run the reportbuilder cron
- */
-function totara_reportbuilder_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/reportbuilder/cron.php');
-    reportbuilder_cron();
-}
 
 /**
  * Returns the proper SQL to create table based on a query

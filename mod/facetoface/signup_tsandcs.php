@@ -50,4 +50,8 @@ require_capability('mod/facetoface:view', $context);
 $pagetitle = format_string($facetoface->name);
 
 $mform = new signup_tsandcs_form(null, array('tsandcs' => $facetoface->selfapprovaltandc, 's' => $s));
+
+// This should be json_encoded, but for now we need to use html content
+// type to not break $.get().
+header('Content-type: text/html; charset=utf-8');
 $mform->display();

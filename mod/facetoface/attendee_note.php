@@ -83,5 +83,8 @@ if ($fromform = $mform->get_data()) {
     $attendee = $attendee_note->get();
     echo json_encode(array('result' => 'success', 'id' => $attendee->userid, 'usernote' => $attendee->usernote));
 } else {
+    // This should be json_encoded, but for now we need to use html content
+    // type to not break $.get().
+    header('Content-type: text/html; charset=utf-8');
     echo $mform->display();
 }

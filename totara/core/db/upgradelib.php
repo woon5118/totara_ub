@@ -173,3 +173,125 @@ function totara_core_fix_old_upgraded_mssql() {
         }
     }
 }
+
+/**
+ * Fix old sites upgrade from Totara 1.x,
+ */
+function totara_core_fix_upgraded_1x() {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    // Changing nullability of field fullmessage on table message to null.
+    $table = new xmldb_table('message');
+    $field = new xmldb_field('fullmessage', XMLDB_TYPE_TEXT, null, null, null, null, null, 'subject');
+
+    // Launch change of nullability for field fullmessage.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing nullability of field fullmessageformat on table message to null.
+    $table = new xmldb_table('message');
+    $field = new xmldb_field('fullmessageformat', XMLDB_TYPE_INTEGER, '4', null, null, null, '0', 'fullmessage');
+
+    // Launch change of nullability for field fullmessageformat.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing nullability of field fullmessage on table message_read to null.
+    $table = new xmldb_table('message_read');
+    $field = new xmldb_field('fullmessage', XMLDB_TYPE_TEXT, null, null, null, null, null, 'subject');
+
+    // Launch change of nullability for field fullmessage.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing nullability of field fullmessageformat on table message_read to null.
+    $table = new xmldb_table('message_read');
+    $field = new xmldb_field('fullmessageformat', XMLDB_TYPE_INTEGER, '4', null, null, null, '0', 'fullmessage');
+
+    // Launch change of nullability for field fullmessageformat.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing the default of field orientation on table certificate to drop it.
+    $table = new xmldb_table('certificate');
+    $field = new xmldb_field('orientation', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null, 'certificatetype');
+
+    // Launch change of default for field orientation.
+    $dbman->change_field_default($table, $field);
+
+    // Changing the default of field bordercolor on table certificate to 0.
+    $table = new xmldb_table('certificate');
+    $field = new xmldb_field('bordercolor', XMLDB_TYPE_CHAR, '30', null, XMLDB_NOTNULL, null, '0', 'borderstyle');
+
+    // Launch change of default for field bordercolor.
+    $dbman->change_field_default($table, $field);
+
+    // Define field title to be dropped from certificate.
+    $table = new xmldb_table('certificate');
+    $field = new xmldb_field('title');
+
+    // Conditionally launch drop field title.
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->drop_field($table, $field);
+    }
+
+    // Define field coursename to be dropped from certificate.
+    $table = new xmldb_table('certificate');
+    $field = new xmldb_field('coursename');
+
+    // Conditionally launch drop field coursename.
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->drop_field($table, $field);
+    }
+
+    // Changing nullability of field label on table feedback_item to not null.
+    $table = new xmldb_table('feedback_item');
+    $field = new xmldb_field('label', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'name');
+
+    // Update existing data to ''.
+    $DB->execute("UPDATE {feedback_item} SET label = '' WHERE label IS NULL");
+
+    // Launch change of nullability for field label.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing nullability of field dependvalue on table feedback_item to not null.
+    $table = new xmldb_table('feedback_item');
+    $field = new xmldb_field('dependvalue', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'dependitem');
+
+    // Update existing data to ''.
+    $DB->execute("UPDATE {feedback_item} SET dependvalue = '' WHERE dependvalue IS NULL");
+
+    // Launch change of nullability for field dependvalue.
+    $dbman->change_field_notnull($table, $field);
+
+    // Changing nullability of field options on table feedback_item to not null.
+    $table = new xmldb_table('feedback_item');
+    $field = new xmldb_field('options', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'dependvalue');
+
+    // Update existing data to ''.
+    $DB->execute("UPDATE {feedback_item} SET options = '' WHERE options IS NULL");
+
+    // Launch change of nullability for field options.
+    $dbman->change_field_notnull($table, $field);
+
+    // Define field count to be dropped from feedback_tracking.
+    $table = new xmldb_table('feedback_tracking');
+    $field = new xmldb_field('count');
+
+    // Conditionally launch drop field count.
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->drop_field($table, $field);
+    }
+
+    // Changing precision of field icon on table prog to (255).
+    $table = new xmldb_table('prog');
+    $field = new xmldb_field('icon', XMLDB_TYPE_CHAR, '255', null, null, null, '', 'usermodified');
+
+    // Launch change of precision for field icon.
+    $dbman->change_field_precision($table, $field);
+
+    // Changing nullability of field icon on table course to null.
+    $table = new xmldb_table('course');
+    $field = new xmldb_field('icon', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'coursetype');
+
+    // Launch change of nullability for field icon.
+    $dbman->change_field_notnull($table, $field);
+}

@@ -18,13 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage plan
+ * @package totara_plan
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2014082200;       // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 2014120400;       // The current module version (Date: YYYYMMDDXX)
 $plugin->requires = 2011120501;       // Requires this Moodle version
-$plugin->cron = 0;                    // Period for cron to check this module (secs)
 $plugin->component = 'totara_plan';   // To check on upgrade, that module sits in correct place

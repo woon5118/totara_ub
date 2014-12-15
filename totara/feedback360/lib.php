@@ -140,6 +140,7 @@ class feedback360 {
     public function get() {
         $obj = new stdClass();
         $obj->name = $this->name;
+        $obj->userid = $this->userid;
         $obj->description = $this->description;
         $obj->status = $this->status;
         $obj->id = $this->id;
@@ -161,9 +162,13 @@ class feedback360 {
         if ($this->id > 0) {
             $todb->id = $this->id;
             $DB->update_record('feedback360', $todb);
+
+            \totara_feedback360\event\feedback360_updated::create_from_instance($this)->trigger();
         } else {
             $todb->userid = $USER->id;
             $this->id = $DB->insert_record('feedback360', $todb);
+
+            \totara_feedback360\event\feedback360_created::create_from_instance($this)->trigger();
         }
         // Refresh data.
         $this->load($this->id);
@@ -197,6 +202,8 @@ class feedback360 {
         $fs->delete_area_files($TEXTAREA_OPTIONS['context']->id, 'totara_feedback360', 'feedback360', $this->id);
         // Delete the feedback360.
         $DB->delete_records('feedback360', array('id' => $this->id));
+
+        \totara_feedback360\event\feedback360_deleted::create_from_instance($this)->trigger();
     }
 
     /**
@@ -450,6 +457,7 @@ class feedback360 {
         }
 
         // Check for related email_assignment.
+        $email = '';
         if (!empty($resp_assignment->feedback360emailassignmentid)) {
             // Delete email_assignment.
             $param = array('id' => $resp_assignment->feedback360emailassignmentid);
@@ -496,6 +504,8 @@ class feedback360 {
             // Send a cancellation alert.
             tm_alert_send($event);
         }
+
+        \totara_feedback360\event\request_deleted::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
     }
 
     /**
@@ -1304,7 +1314,11 @@ class feedback360_responder {
         if ($this->id > 0) {
             $DB->update_record('feedback360_resp_assignment', $data);
         } else {
-            $DB->insert_record('feedback360_resp_assignment', $data);
+            $data->id = $DB->insert_record('feedback360_resp_assignment', $data);
+
+            $userassign = $DB->get_field('feedback360_user_assignment', 'userid', array('id' => $this->feedback360userassignmentid));
+            $email = isset($this->email) ? $this->email : '';
+            \totara_feedback360\event\request_created::create_from_instance($data, $userassign, $email)->trigger();
         }
     }
 
@@ -1373,12 +1387,8 @@ class feedback360_responder {
 
         $stringmanager = get_string_manager();
 
-        $sql = "SELECT u.*, ua.feedback360id
-                FROM {feedback360_user_assignment} ua
-                JOIN {user} u
-                ON u.id = ua.userid
-                WHERE ua.id = :uaid";
-        $userfrom = $DB->get_record_sql($sql, array('uaid' => $userformid));
+        $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $userformid));
+        $userfrom = $DB->get_record('user', array('id' => $user_assignment->userid));
 
         // Create all the resp_assignments.
         $resp_assignment = new stdClass();
@@ -1403,11 +1413,11 @@ class feedback360_responder {
         // Loop through the users to add and assign them where appropriate.
         foreach ($new as $userid) {
             $resp_assignment->userid = $userid;
-            $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
+            $resp_assignment->id = $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
 
             $userto = $DB->get_record('user', array('id' => $userid));
 
-            $params = array('userid' => $userfrom->id, 'feedback360id' => $userfrom->feedback360id);
+            $params = array('userid' => $userfrom->id, 'feedback360id' => $user_assignment->feedback360id);
             $url = new moodle_url('/totara/feedback360/feedback.php', $params);
             $taskvars->link = html_writer::link($url, $url->out());
             $taskvars->url = $url->out();
@@ -1429,6 +1439,8 @@ class feedback360_responder {
                         $taskvars, $userto->lang);
             }
             tm_task_send($eventdata);
+
+            \totara_feedback360\event\request_created::create_from_instance($resp_assignment, $user_assignment->userid)->trigger();
         }
 
         // Loop through everything in the cancel array and remove their resp_assignment.
@@ -1451,12 +1463,9 @@ class feedback360_responder {
      */
     public static function update_external_assignments($newassignments, $cancellations, $userformid, $duedate, $asmanager = false) {
         global $DB, $CFG, $USER;
-        $sql = "SELECT u.*
-                FROM {feedback360_user_assignment} ua
-                JOIN {user} u
-                ON u.id = ua.userid
-                WHERE ua.id = :uaid";
-        $userfrom = $DB->get_record_sql($sql, array('uaid' => $userformid));
+
+        $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $userformid));
+        $userfrom = $DB->get_record('user', array('id' => $user_assignment->userid));
 
         // Create and link the email and resp assignments.
         $emailvars = new stdClass();
@@ -1488,7 +1497,7 @@ class feedback360_responder {
             // Create and link the feedback360_resp_assignment.
             $resp_assignment->userid = $CFG->siteguest; // They aren't a user so we'll put them down as guests.
             $resp_assignment->feedback360emailassignmentid = $emailid;
-            $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
+            $resp_assignment->id = $DB->insert_record('feedback360_resp_assignment', $resp_assignment);
 
             // Set up some variables for the email.
             $params = array('token' => $email_assignment->token);
@@ -1522,6 +1531,8 @@ class feedback360_responder {
             $message->smallmessage      = $emailplain;
 
             message_send($message);
+
+            \totara_feedback360\event\request_created::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
         }
 
         foreach ($cancellations as $email) {

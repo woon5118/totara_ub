@@ -22,7 +22,7 @@
  */
 
 // lang file for totara/reportbuilder/rb_sources/rb_source_site_logs.php
-$string['sourcetitle'] = 'Site Logs';
+$string['sourcetitle'] = 'Legacy Site Logs';
 // columns
 $string['time'] = 'Time';
 $string['ip'] = 'IP address';

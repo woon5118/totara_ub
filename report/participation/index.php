@@ -204,18 +204,6 @@ if (!empty($instanceid) && !empty($roleid)) {
         $groupsql = "JOIN {groups_members} gm ON (gm.userid = u.id AND gm.groupid = :groupid)";
         $params['groupid'] = $currentgroup;
     }
-    $usernamefields = get_all_user_name_fields(true, 'u');
-    $sql = "SELECT ra.userid, $usernamefields, u.idnumber, l.actioncount AS count
-            FROM (SELECT DISTINCT userid FROM {role_assignments} WHERE contextid $relatedctxsql AND roleid = :roleid ) ra
-            JOIN {user} u ON u.id = ra.userid
-            $groupsql
-            LEFT JOIN (
-                SELECT userid, COUNT(action) AS actioncount FROM {log} WHERE cmid = :instanceid AND time > :timefrom AND $actionsql GROUP BY userid
-            ) l ON (l.userid = ra.userid)";
-    $params = array_merge($params, $relatedctxparams);
-    $params['roleid'] = $roleid;
-    $params['instanceid'] = $instanceid;
-    $params['timefrom'] = $timefrom;
 
     $countsql = "SELECT COUNT(DISTINCT(ra.userid))
                    FROM {role_assignments} ra

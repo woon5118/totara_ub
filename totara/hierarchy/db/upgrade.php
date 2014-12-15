@@ -1075,5 +1075,128 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         $DB->execute($sql, array());
         upgrade_plugin_savepoint(true, 2014070800, 'totara', 'hierarchy');
     }
+
+    if ($oldversion < 2014120400) {
+        // Fix Totara 1.x upgrades.
+
+        // Changing nullability of field path on table comp to null.
+        $table = new xmldb_table('comp');
+        $field = new xmldb_field('path', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'frameworkid');
+
+        // Launch change of nullability for field path.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field itemtype on table comp_criteria to null.
+        $table = new xmldb_table('comp_criteria');
+        $field = new xmldb_field('itemtype', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'competencyid');
+
+        // Conditionally launch drop index compcrit_ite_ix.
+        $index = new xmldb_index('compcrit_ite_ix', XMLDB_INDEX_NOTUNIQUE, array('itemtype'));
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Launch change of nullability for field itemtype.
+        $dbman->change_field_notnull($table, $field);
+        // Readd the index.
+        $dbman->add_index($table, $index);
+
+        // Changing nullability of field itemmodule on table comp_criteria to null.
+        $table = new xmldb_table('comp_criteria');
+        $field = new xmldb_field('itemmodule', XMLDB_TYPE_CHAR, '30', null, null, null, null, 'itemtype');
+
+        // Launch change of nullability for field itemmodule.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field fullname on table comp_framework to not null.
+        $table = new xmldb_table('comp_framework');
+        $field = new xmldb_field('fullname', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null, 'usermodified');
+
+        // Update existing data to ''.
+        $DB->execute("UPDATE {comp_framework} SET fullname = '' WHERE fullname IS NULL");
+
+        // Launch change of nullability for field fullname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field name on table comp_scale to null.
+        $table = new xmldb_table('comp_scale');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'id');
+
+        // Launch change of nullability for field name.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field shortname on table comp_template to null.
+        $table = new xmldb_table('comp_template');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'fullname');
+
+        // Launch change of nullability for field shortname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field shortname on table comp_type_info_field to null.
+        $table = new xmldb_table('comp_type_info_field');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'id');
+
+        // Launch change of nullability for field shortname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field datatype on table comp_type_info_field to null.
+        $table = new xmldb_table('comp_type_info_field');
+        $field = new xmldb_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'typeid');
+
+        // Launch change of nullability for field datatype.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field path on table pos to null.
+        $table = new xmldb_table('pos');
+        $field = new xmldb_field('path', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'frameworkid');
+
+        // Launch change of nullability for field path.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field shortname on table pos_assignment to null.
+        $table = new xmldb_table('pos_assignment');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'fullname');
+
+        // Launch change of nullability for field shortname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field shortname on table pos_assignment_history to null.
+        $table = new xmldb_table('pos_assignment_history');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'fullname');
+
+        // Launch change of nullability for field shortname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field typeid on table pos_type_info_field to null.
+        $table = new xmldb_table('pos_type_info_field');
+        $field = new xmldb_field('typeid', XMLDB_TYPE_INTEGER, '18', null, null, null, null, 'shortname');
+
+        // Launch drop key postypeinfofiel_typ_fk.
+        $key = new xmldb_key('postypeinfofiel_typ_fk', XMLDB_KEY_FOREIGN, array('typeid'), 'pos_type', array('id'));
+        $dbman->drop_key($table, $key);
+
+        // Launch change of nullability for field typeid.
+        $dbman->change_field_notnull($table, $field);
+
+        // Readd the key.
+        $dbman->add_key($table, $key);
+
+        // Changing nullability of field shortname on table org_type_info_field to null.
+        $table = new xmldb_table('org_type_info_field');
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'id');
+
+        // Launch change of nullability for field shortname.
+        $dbman->change_field_notnull($table, $field);
+
+        // Changing nullability of field datatype on table org_type_info_field to null.
+        $table = new xmldb_table('org_type_info_field');
+        $field = new xmldb_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'typeid');
+
+        // Launch change of nullability for field datatype.
+        $dbman->change_field_notnull($table, $field);
+
+        upgrade_plugin_savepoint(true, 2014120400, 'totara', 'hierarchy');
+    }
+
     return true;
 }

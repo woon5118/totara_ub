@@ -52,7 +52,7 @@ class auth_plugin_gauth extends auth_plugin_base {
     */
     function user_login($username, $password) {
         // if true, user_login was initiated by gauth/index.php
-        if($GLOBALS['gauth_login']) {
+        if(isset($GLOBALS['gauth_login']) && $GLOBALS['gauth_login']) {
             unset($GLOBALS['gauth_login']);
             return TRUE;
         }

@@ -27,6 +27,7 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/totara/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/cohort/rules/lib.php');
 require_once($CFG->dirroot.'/totara/cohort/cohort_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
@@ -117,12 +118,14 @@ if (($data = data_submitted()) && confirm_sesskey()) {
         if (!cohort_rules_approve_changes($cohort)) {
             print_error('error:couldnotapprovechanges', 'totara_cohort');
         }
+        // Set notification.
         totara_set_notification(get_string('rulesapprovesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
     }
     if ($canapproverules && isset($data->cancelrulechanges)) {
         if (!cohort_rules_cancel_changes($cohort)) {
             print_error('error:couldnotcancelchanges', 'totara_cohort');
         }
+        // Set notification.
         totara_set_notification(get_string('rulescancelsuccess', 'totara_cohort'), $url->out());
     }
 }
@@ -131,37 +134,16 @@ if ($formdata = $mform->get_data()) {
 
     // Update the cohort operator?
     if (isset($formdata->cohortoperator) && $formdata->cohortoperator <> $cohort->rulesetoperator) {
-        $todb = new stdClass();
-        $todb->id = $cohort->draftcollectionid;
-        $todb->rulesetoperator = $formdata->cohortoperator;
-        $todb->status = COHORT_COL_STATUS_DRAFT_CHANGED;
-        $todb->timemodified = time();
-        $todb->modifierid = $USER->id;
-        $DB->update_record('cohort_rule_collections', $todb);
+        totara_cohort_update_operator($cohort->id, $cohort->id, COHORT_OPERATOR_TYPE_COHORT, $formdata->cohortoperator);
     }
 
     if (isset($formdata->rulesetoperator) && is_array($formdata->rulesetoperator)) {
-        $operatorschanged = false;
         foreach ($formdata->rulesetoperator as $rulesetid => $operator) {
             if (array_key_exists($rulesetid, $rulesets) && $operator <> $rulesets[$rulesetid]->operator) {
-                $todb = new stdClass();
-                $todb->id = $rulesetid;
-                $todb->operator = $operator;
-                $todb->timemodified = time();
-                $todb->modifierid = $USER->id;
-                $DB->update_record('cohort_rulesets', $todb);
-                $operatorschanged = true;
+                totara_cohort_update_operator($cohort->id, $rulesetid, COHORT_OPERATOR_TYPE_RULESET, $operator);
             }
         }
-
-        if ($operatorschanged) {
-            $todb = new stdClass;
-            $todb->id = $cohort->draftcollectionid;
-            $todb->status = COHORT_COL_STATUS_DRAFT_CHANGED;
-            $DB->update_record('cohort_rule_collections', $todb);
-        }
     }
-    add_to_log(SITEID, 'cohort', 'edit rule operators', 'cohort/view.php?id='.$cohort->id, $cohort->idnumber);
     totara_set_notification(get_string('rulesupdatesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
 
     // Regenerate the form so that it'll show the correct values for all the operators.

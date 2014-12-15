@@ -106,15 +106,14 @@ if ($devicetype !== 'mobile' and $devicetype !== 'tablet') {
     </div>
 
     <?php if ($hasfooter) { ?>
-    <footer id="page-footer" class="<?php echo $hideclass; ?>">
-        <div id="course-footer"><?php echo $OUTPUT->course_footer(); ?></div>
-        <p class="helplink"><?php echo $OUTPUT->page_doc_link(); ?></p>
-        <?php
-        echo $OUTPUT->login_info();
-        echo $OUTPUT->home_link();
-        echo $OUTPUT->standard_footer_html();
-        ?>
-    </footer>
+        <footer id="page-footer">
+            <div class="container-fluid">
+                <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">TotaraLMS</a></div>
+                <?php
+                echo $OUTPUT->standard_footer_html();
+                ?>
+            </div>
+        </footer>
     <?php } ?>
 
     <?php echo $OUTPUT->standard_end_of_body_html() ?>

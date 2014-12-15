@@ -270,5 +270,32 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014090803, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2014120900) {
+        // Fix columns definitions.
+
+        // Fix appraisal_role_assignment.
+        $table = new xmldb_table('appraisal_role_assignment');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, null, null, 0);
+        // Change of nullability for appraisal_role_assignment.timecreated.
+        $dbman->change_field_notnull($table, $field);
+
+        // Fix appraisal_role_changes.
+        $table = new xmldb_table('appraisal_role_changes');
+        $field = new xmldb_field('originaluserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        // Change of nullability for appraisal_role_changes.originaluserid.
+        $dbman->change_field_notnull($table, $field);
+        // Change of nullability for appraisal_role_changes.role.
+        $field = new xmldb_field('role', XMLDB_TYPE_INTEGER, '3', null, null, null, null);
+        $dbman->change_field_notnull($table, $field);
+
+        // Fix appraisal_user_assignment.
+        $table = new xmldb_table('appraisal_user_assignment');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecompleted');
+        // Change default to 0 for appraisal_user_assignment.status.
+        $dbman->change_field_default($table, $field);
+
+        upgrade_plugin_savepoint(true, 2014120900, 'totara', 'appraisal');
+    }
+
     return true;
 }

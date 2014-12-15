@@ -46,19 +46,31 @@ $sql = "SELECT crc.*
     WHERE crs.id = ?";
 $colldetails = $DB->get_record_sql($sql, array($rule->rulesetid));
 
+// Get cohort.
+$cohort = $DB->get_record('cohort', array('id' => $colldetails->cohortid));
+
 $success = $DB->delete_records('cohort_rules', array('id' => $ruleid)) && $DB->delete_records('cohort_rule_params', array('ruleid' => $ruleid));
 
-add_to_log(SITEID, 'cohort', 'delete rule', 'totara/cohort/rules.php?id='.$colldetails->cohortid, "ruleid={$ruleid}&rulesetid={$rule->rulesetid}&ruletype={$rule->ruletype}&rulename={$rule->name}");
+// Trigger rule_deleted event.
+$info = "ruleid={$ruleid}&rulesetid={$rule->rulesetid}&ruletype={$rule->ruletype}&rulename={$rule->name}";
+$event = \totara_cohort\event\rule_deleted::create_from_instance($rule, $cohort);
+$event->set_legacy_logdata(array(SITEID, 'cohort', 'delete rule', 'totara/cohort/rules.php?id='.$cohort->id, $info));
+$event->add_record_snapshot('cohort_rules', $rule);
+$event->trigger();
 
-// see if the ruleset has any remaining rules; delete it if not
+// See if the ruleset has any remaining rules; delete it if not.
 if ($DB->record_exists('cohort_rules', array('rulesetid' => $rule->rulesetid))) {
     echo json_encode(array('action'=>'delrule','ruleid'=>$ruleid));
 } else {
+    $ruleset = $DB->get_record('cohort_rulesets', array('id' => $rule->rulesetid));
     $DB->delete_records('cohort_rulesets', array('id' => $rule->rulesetid));
+    $event = \totara_cohort\event\ruleset_deleted::create_from_instance($ruleset, $cohort);
+    $event->add_record_snapshot('cohort_rulesets', $ruleset);
+    $event->trigger();
     echo json_encode(array('action'=>'delruleset', 'rulesetid'=>$rule->rulesetid));
 }
 
-// update rule collection status
+// Update rule collection status.
 $colldetails->timemodified = time();
 $colldetails->modifierid = $USER->id;
 $colldetails->status = COHORT_COL_STATUS_DRAFT_CHANGED;

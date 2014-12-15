@@ -5,15 +5,15 @@ Feature: Manager approval
   I need to authorise seminar signups
 
   Background:
-    Given the following "users" exists:
+    Given the following "users" exist:
       | username | firstname | lastname | email               |
       | teacher1 | Terry1    | Teacher1 | teacher1@moodle.com |
       | teacher2 | Terry2    | Teacher2 | teacher2@moodle.com |
       | student1 | Sam1      | Student1 | student1@moodle.com |
-    And the following "courses" exists:
+    And the following "courses" exist:
       | fullname | shortname | category |
       | Course 1 | C1        | 0        |
-    And the following "course enrolments" exists:
+    And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | teacher2 | C1     | editingteacher |
@@ -28,7 +28,8 @@ Feature: Manager approval
     And I expand "Activity modules" node
     And I expand "Face-to-face" node
     And I follow "General Settings"
-    And I fill in "Select position on signup" with "checked_checkbox"
+    And I set the following fields to these values:
+      | Select position on signup | 1 |
     And I press "Save changes"
     And I log out
 
@@ -125,5 +126,5 @@ Feature: Manager approval
     And I follow "Test facetoface name"
     And I follow "Attendees"
     And I follow "Approval required"
-    And I click on "input[value='2']" "css_element" in the "Sam1 Student1" table row
+    And I click on "input[value='2']" "css_element" in the "Sam1 Student1" "table_row"
     And I press "Update requests"

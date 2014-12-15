@@ -27,13 +27,13 @@ Feature: Allowed blocks controls
   @javascript
   Scenario: Blocks can not be added when the admin restricts the permissions
     Given I log in as "admin"
-    And I set the following system permissions of "Editing Trainer" role:
+    And I set the following system permissions of "Teacher" role:
       | block/activity_modules:addinstance | Prohibit |
     And I am on homepage
     And I follow "Course 1"
     And I expand "Users" node
     And I follow "Permissions"
-    And I override the system permissions of "Editing Trainer" role with:
+    And I override the system permissions of "Teacher" role with:
       | block/completionstatus:addinstance | Prohibit |
     And I log out
     When I log in as "teacher1"

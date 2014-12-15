@@ -53,8 +53,12 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     if (empty($cohort->component)) {
         $cohort->component = '';
     }
-    //todo: Fix this :)
-    $cohort->active = 1;
+    if (!isset($cohort->active)) {
+        $cohort->active = 1;
+    }
+    if (!isset($cohort->cohorttype)) {
+        $cohort->cohorttype = 1;
+    }
 
     $cohort->timecreated = time();
     $cohort->timemodified = $cohort->timecreated;

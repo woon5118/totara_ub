@@ -196,6 +196,7 @@ $string['autoassignpos'] = 'Automatically assign by position';
 $string['autobyitems'] = 'Automatically, when all items have been completed';
 $string['autobyplandate'] = 'Automatically, when the plan completion date has passed';
 $string['autocompleteplan'] = 'Automatic plan completion';
+$string['autcompleteplantask'] = 'Process plan autocompletion';
 $string['autocompleteplantext'] = 'Automatically set approved plans to complete after end date';
 $string['autocreated'] = 'Automatically created plans';
 $string['automateddefault'] = 'Automatic (added to plan)';

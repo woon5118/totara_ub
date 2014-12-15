@@ -93,35 +93,6 @@ class menuitem_sortorder extends \core\event\base {
     }
 
     /**
-     * Return name of the legacy event, which is replaced by this event.
-     *
-     * @return string legacy event name
-     */
-    public static function get_legacy_eventname() {
-        return 'menuitem_sortorder';
-    }
-
-    /**
-     * Return menuitem_sortorder legacy event data.
-     *
-     * @return \stdClass menu item data.
-     */
-    protected function get_legacy_eventdata() {
-        $node = new \stdClass();
-        $node->id = $this->objectid;
-        return $node;
-    }
-
-    /**
-     * Returns array of parameters to be passed to legacy add_to_log() function.
-     *
-     * @return array
-     */
-    protected function get_legacy_logdata() {
-        return array(SITEID, 'totara_core', 'menu item updated', "index.php?{$this->other['action']}={$this->objectid}", $this->objectid);
-    }
-
-    /**
      * Returns relevant URL.
      *
      * @return \moodle_url

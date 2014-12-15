@@ -848,9 +848,13 @@ class appraisal {
      * @return stdClass
      */
     public function import_answers($pageid, stdClass $questdata, appraisal_role_assignment $roleassignment) {
-        $questions = appraisal_question::fetch_page_role($pageid, $roleassignment);
+        $records = appraisal_question::fetch_page($pageid);
         $answers = new stdClass();
-        foreach ($questions as $question) {
+        foreach ($records as $record) {
+            $question = new appraisal_question($record->id, $roleassignment);
+            if ($question->get_element()->get_type() == 'redisplay') {
+                $question = new appraisal_question($question->get_element()->param1, $roleassignment);
+            }
             $answers = $question->get_element()->set_as_db($questdata)->get_as_form($answers, true);
         }
         return $answers;
@@ -3393,32 +3397,6 @@ class appraisal_question extends question_storage {
                     $this->roles[$role] = 0;
                 }
             }
-
-            // TODO: T-11234 Remove question specific code from questions class.
-            // Find all redisplay questions and update their roles.
-            $page = new appraisal_page($this->appraisalstagepageid);
-            $stage = new appraisal_stage($page->appraisalstageid);
-            $appraisalid = $stage->appraisalid;
-            $sql = "SELECT aqf.id, aqf.param1
-                      FROM {appraisal_quest_field} aqf
-                      JOIN {appraisal_stage_page} asp
-                        ON aqf.appraisalstagepageid = asp.id
-                      JOIN {appraisal_stage} ast
-                        ON asp.appraisalstageid = ast.id
-                     WHERE ast.appraisalid = ?
-                       AND aqf.datatype = 'redisplay'
-                       AND " . $DB->sql_compare_text('aqf.param1') . " = ?";
-            $redisplayrecords = $DB->get_records_sql($sql, array($appraisalid, $this->id));
-            if (!empty($redisplayrecords)) {
-                $fromform = new stdClass();
-                $fromform->roles = $todb->roles;
-                foreach ($redisplayrecords as $redisplayrecord) {
-                    $fromform->linkedquestion = $this->id;
-                    $redisplay = new appraisal_question($redisplayrecord->id);
-                    $redisplay->set($fromform)->save();
-                }
-            }
-
         }
 
         return $this;
@@ -3881,7 +3859,21 @@ class appraisal_question extends question_storage {
         foreach ($records as $record) {
             $question = new appraisal_question($record->id, $roleassignment);
             if ($question->get_element()->get_type() == 'redisplay') {
+                $redisplayrolerights = $question->roles;
                 $question = new appraisal_question($question->get_element()->param1, $roleassignment);
+                foreach ($redisplayrolerights as $role => $redisplayrights) {
+                    // We already know that $redisplayrights > 0, since that was checked in the query.
+                    // It must include ACCESS_CANANSWER, otherwise ACCESS_CANVIEWOTHER couldn't be set.
+                    if ($redisplayrights & appraisal::ACCESS_CANVIEWOTHER) {
+                        // Add ACCESS_CANVIEWOTHER to the base question's rights.
+                        if (isset($question->roles[$role])) {
+                            $question->roles[$role] = $question->roles[$role] | appraisal::ACCESS_CANVIEWOTHER;
+                        } else {
+                            $question->roles[$role] = appraisal::ACCESS_CANVIEWOTHER;
+                        }
+                    }
+                    // Else just leave the permissions that are on the base question.
+                }
             }
             $questions[] = $question;
         }
@@ -5200,13 +5192,4 @@ class appraisal_user_assignment {
     public function is_closed() {
         return $this->status == appraisal::STATUS_CLOSED;
     }
-}
-
-/**
- * Run the appraisal cron
- */
-function totara_appraisal_cron() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/appraisal/cron.php');
-    appraisal_cron();
 }

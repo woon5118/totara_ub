@@ -48,37 +48,3 @@ Feature: Guest users can auto-enrol themself in courses where guest access is al
       | Password | moodle_rules |
     And I press "Submit"
     And I should see "Test forum name"
-
-  @javascript
-  Scenario: Allow guest access through the course catalog without password
-    Given I fill the moodle form with:
-      | Allow guest access | Yes |
-    And I press "Save changes"
-    And I log out
-    And I log in as "student1"
-    And I follow "Find Learning"
-    And I click on ".rb-display-expand" "css_element"
-    Then I should see "Guest access"
-    And I press "Enrol"
-    And I wait until the page is ready
-    And I should see "Test forum name"
-
-  @javascript
-  Scenario: Allow guest access through the course catalog with password
-    Given I fill the moodle form with:
-      | Allow guest access | Yes |
-      | Password | moodle_rules |
-    And I press "Save changes"
-    And I log out
-    And I log in as "student1"
-    And I follow "Find Learning"
-    And I click on ".rb-display-expand" "css_element"
-    Then I should see "Guest access"
-    And I fill the moodle form with:
-      | Password | moodle_sucks |
-    And I press "Enrol"
-    And I should see "Incorrect access password, please try again"
-    And I fill the moodle form with:
-      | Password | moodle_rules |
-    And I press "Enrol"
-    And I wait until the page is ready

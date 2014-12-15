@@ -316,7 +316,8 @@ class program {
 
                     // Get the timedue from program completion as it may contain an extension date,
                     // when that extension date is set (approved by the manager), then due date should be that one.
-                    $params = array ('programid' => $this->id, 'userid' => $user->id);
+                    // Make sure coursesetid is zero so we are checking completion on the program.
+                    $params = array ('programid' => $this->id, 'userid' => $user->id, 'coursesetid' => 0);
                     $timedue = $DB->get_field('prog_completion', 'timedue', $params);
                     $timedue = $this->make_timedue($user->id, $assign, $timedue);
 

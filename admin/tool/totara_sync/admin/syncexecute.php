@@ -34,7 +34,7 @@ $PAGE->set_context($systemcontext);
 $PAGE->set_url('/admin/tool/totara_sync/admin/syncexecute.php');
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading('');
+$PAGE->set_heading(format_string($SITE->fullname));
 $execute = optional_param('execute', null, PARAM_BOOL);
 
 echo $OUTPUT->header();

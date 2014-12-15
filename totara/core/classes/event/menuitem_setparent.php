@@ -89,26 +89,6 @@ class menuitem_setparent extends \core\event\base {
     }
 
     /**
-     * Return name of the legacy event, which is replaced by this event.
-     *
-     * @return string legacy event name
-     */
-    public static function get_legacy_eventname() {
-        return 'menuitem_setparent';
-    }
-
-    /**
-     * Return menuitem_setparent legacy event data.
-     *
-     * @return \stdClass menu item data.
-     */
-    protected function get_legacy_eventdata() {
-        $node = new \stdClass();
-        $node->id = $this->objectid;
-        return $node;
-    }
-
-    /**
      * Custom validation.
      *
      * @return void
