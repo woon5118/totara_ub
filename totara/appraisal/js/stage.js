@@ -362,7 +362,9 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
         bodyContent  : bodyContent,
         width        : 300,
         centered     : true,
-        modal        : true
+        modal        : true,
+        visible      : true,
+        render       : true
       });
       dialogue.addButton({
         label: M.util.get_string('yes','moodle'),
