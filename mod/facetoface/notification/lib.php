@@ -608,6 +608,7 @@ class facetoface_notification extends data_object {
         $this->_event->name        = 'alert';
         $this->_event->userto      = $user;
         $this->_event->userfrom    = $fromuser;
+        $this->_event->notification = 1;
         $this->_event->roleid      = $CFG->learnerroleid;
         $this->_event->subject     = $subject;
         $this->_event->fullmessage       = $plaintext;
