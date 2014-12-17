@@ -63,41 +63,17 @@ Feature: Add a face to face
   @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then
             sign in as user with two positions and check attendee list reflects this and the selected position can be updated
-    Given I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Hierarchies" node
-    And I expand "Positions" node
-    And I follow "Manage positions"
-    And I press "Add new position framework"
-    And I set the following fields to these values:
-      | Name | PosHierarchy1 |
-    And I press "Save changes"
-    And I follow "PosHierarchy1"
-    And I press "Add new position"
-    And I set the following fields to these values:
-      | Name | Position1 |
-    And I press "Save changes"
-    And I press "Return to position framework"
-    And I press "Add new position"
-    And I set the following fields to these values:
-      | Name | Position2 |
-    And I press "Save changes"
-    And I expand "Users" node
-    And I expand "Accounts" node
-    And I follow "Browse list of users"
-    And I follow "Sam1 Student1"
-    And I expand "Positions" node
-    And I follow "Primary position"
-    And I press "Choose position"
-    And I click on "Position1" "link_or_button"
-    And I click on "OK" "link_or_button"
-    And I press "Update position"
-    And I follow "Secondary position"
-    And I press "Choose position"
-    And I click on "Position2" "link_or_button"
-    And I click on "OK" "link_or_button"
-    And I press "Update position"
-    And I log out
+    Given the following "position" frameworks exist:
+      | fullname      | idnumber |
+      | PosHierarchy1 | FW001    |
+    And the following "position" hierarchy exists:
+      | framework | idnumber | fullname   |
+      | FW001     | POS001   | Position1  |
+      | FW001     | POS002   | Position2  |
+    And the following position assignments exist:
+      | user     | position | type      |
+      | student1 | POS001   | primary   |
+      | student1 | POS002   | secondary |
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
@@ -147,7 +123,6 @@ Feature: Add a face to face
     And I press "Update position"
     And I should see "Position1"
 
-
   @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for and mandated then try to sign up as user with no pos
     When I log in as "teacher1"
@@ -183,41 +158,17 @@ Feature: Add a face to face
 
   @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for then sign in as user with two positions and check user shown to correct manager.
-    Given I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Hierarchies" node
-    And I expand "Positions" node
-    And I follow "Manage positions"
-    And I press "Add new position framework"
-    And I set the following fields to these values:
-      | Name | PosHierarchy1 |
-    And I press "Save changes"
-    And I follow "PosHierarchy1"
-    And I press "Add new position"
-    And I set the following fields to these values:
-      | Name | Position1 |
-    And I press "Save changes"
-    And I press "Return to position framework"
-    And I press "Add new position"
-    And I set the following fields to these values:
-      | Name | Position2 |
-    And I press "Save changes"
-    And I expand "Users" node
-    And I expand "Accounts" node
-    And I follow "Browse list of users"
-    And I follow "Sam1 Student1"
-    And I expand "Positions" node
-    And I follow "Primary position"
-    And I press "Choose position"
-    And I click on "Position1" "link_or_button"
-    And I click on "OK" "link_or_button"
-    And I press "Update position"
-    And I follow "Secondary position"
-    And I press "Choose position"
-    And I click on "Position2" "link_or_button"
-    And I click on "OK" "link_or_button"
-    And I press "Update position"
-    And I log out
+    Given the following "position" frameworks exist:
+      | fullname      | idnumber |
+      | PosHierarchy1 | FW001    |
+    And the following "position" hierarchy exists:
+      | framework | idnumber | fullname   |
+      | FW001     | POS001   | Position1  |
+      | FW001     | POS002   | Position2  |
+    And the following position assignments exist:
+      | user     | position | type      |
+      | student1 | POS001   | primary   |
+      | student1 | POS002   | secondary |
     And I log in as "teacher1"
     And I follow "Course 1"
     And I turn editing mode on
