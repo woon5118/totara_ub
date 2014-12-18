@@ -314,6 +314,7 @@ abstract class multichoice extends question_base {
             $save[] = $form->createElement('advcheckbox', 'saveoptions', 0, get_string('savechoicesas', 'totara_question'));
             $save[] = $form->createElement('text', 'saveoptionsname');
             $form->addGroup($save, 'savegroup', '', null, false);
+            $form->disabledIf('saveoptions', 'selectchoices', 'neq', 0);
             $form->disabledIf('saveoptionsname', 'saveoptions');
             $form->setType('saveoptionsname', PARAM_TEXT);
             $this->add_choices_js($form, $jsid, $saved, $limitone);

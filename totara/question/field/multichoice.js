@@ -108,17 +108,25 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
 
             $this.find('fieldset').append($makeDefault);
             $this.find('fieldset').append($unselect);
-
-            if ($this.find('input.makedefault').prop('checked')) {
-              $makeDefaultLink.click();
-            }
         }
-
     });
+
+    // Select default options.
+    $allOptions.find('input.makedefault[checked="checked"]').each(function(){
+        $(this).closest('fieldset').find('.makedefaultlink a').click();
+    });
+
+    // Init saved options state.
+    if ($container.find('select[name="selectchoices"]').val() > 0) {
+        disableOptionsChanges();
+    }
 
     // Make visible #addoptionlink_$jsid
     $container.find('a.addoptionlink').addClass('js-show');
     $container.find('a.addoptionlink').on('click', function(){
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
         var $group = $container.find('.fcontainer .fitem_fgroup.js-hide').eq(0);
 
         if ($group.length) {
@@ -154,27 +162,36 @@ M.totara_question_multichoice = M.totara_question_multichoice || {
         });
     }
 
+    // Disable "Save options as" fields.
+    function disableOptionsChanges() {
+        var $optionscheckbox = $container.find("input[name='saveoptions']");
+        $optionscheckbox.attr('checked', false);
+        $optionscheckbox.attr('disabled', true);
+        $container.find("input[name='saveoptionsname']").val('');
+        $container.find(".addoptionlink").addClass('disabled');
+        $allOptions.find("input[type='text']").prop('disabled', true);
+    }
+
     $('#id_selectchoices').on('change', function(e){
         var theVal = $(this).val();
         if (theVal != 0) {
-            if (e.originalEvent) {
-                clearChoices();
-                numVisible = savedchoices[theVal].values.length;
-                for (value in savedchoices[theVal].values) {
-                    $allOptions.eq(value).find("input[type='text']").eq(0).val(savedchoices[theVal].values[value].name);
-                    $allOptions.eq(value).find("input[type='text']").eq(1).val(savedchoices[theVal].values[value].score);
-                }
+            clearChoices();
+            // Disable now, it will be enabled by form rule if value changed to 0.
+            disableOptionsChanges();
+
+            numVisible = savedchoices[theVal].values.length;
+            for (value in savedchoices[theVal].values) {
+                $allOptions.eq(value).find("input[type='text']").eq(0).val(savedchoices[theVal].values[value].name);
+                $allOptions.eq(value).find("input[type='text']").eq(1).val(savedchoices[theVal].values[value].score);
             }
-            $allOptions.find("input[type='text']").prop('disabled', true);
         } else {
             $allOptions.find("input[type='text']").prop('disabled', false);
+
+            // Enable "Add another option link".
+            $container.find(".addoptionlink").removeClass('disabled');
         }
         $container.find('.fcontainer .fitem_fgroup').removeClass('js-hide');
         $allOptions.slice(numVisible, max).addClass('js-hide');
     });
-
-    // Trigger the change handler to check the select after loading.
-    $('#id_selectchoices').trigger('change');
-
-   }
+    }
 }
