@@ -192,7 +192,7 @@ class program_content_edit_form extends moodleform {
                 }
             }
             // check for course sets with no courses
-            if (preg_match('/[0-9]courses/', $elementname)) {
+            if (preg_match('/[0-9]courses$/', $elementname)) {
                 $courses = $elementvalue;
                 if (empty($courses)) {
                     $errors[$elementname] = get_string('error:courses_nocourses', 'totara_program');

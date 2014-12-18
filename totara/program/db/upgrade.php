@@ -398,5 +398,45 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014110703, 'totara_program');
     }
 
+    if ($oldversion < 2014121900) {
+        // Define field mincourses to be added to prog_courseset.
+        $table = new xmldb_table('prog_courseset');
+        $field = new xmldb_field('mincourses', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'completiontype');
+
+        // Conditionally launch add field mincourses.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field coursesumfield to be added to prog_courseset.
+        $table = new xmldb_table('prog_courseset');
+        $field = new xmldb_field('coursesumfield', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'mincourses');
+
+        // Conditionally launch add field coursesumfield.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // Define key coursesumfield (foreign) to be added to prog_courseset.
+            $table = new xmldb_table('prog_courseset');
+            $key = new xmldb_key('coursesumfield', XMLDB_KEY_FOREIGN, array('coursesumfield'), 'course_info_field', array('id'));
+
+            // Launch add key coursesumfield.
+            $dbman->add_key($table, $key);
+        }
+
+        // Define field coursesumfieldtotal to be added to prog_courseset.
+        $table = new xmldb_table('prog_courseset');
+        $field = new xmldb_field('coursesumfieldtotal', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'coursesumfield');
+
+        // Conditionally launch add field coursesumfieldtotal.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014121900, 'totara_program');
+    }
+
+
     return true;
 }

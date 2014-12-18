@@ -528,3 +528,27 @@ function customfield_record($id, $tableprefix) {
 
     return $item;
 }
+
+/**
+ * Get a single custom field instance.
+ *
+ * @param object $item the item the custom fields belong to
+ * @param int $fieldid the custom field id
+ * @param string $tableprefix Prefix to append '_info_field' to
+ * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
+ *
+ * @return boolean/object containing field attributes and the field value, or false
+ */
+function customfield_get_field_instance($item, $fieldid, $tableprefix, $prefix) {
+    global $CFG, $DB;
+
+    if (!$field = $DB->get_record($tableprefix.'_info_field', array('id' => $fieldid))) {
+        return false;
+    }
+
+    require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+    $newfield = 'customfield_'.$field->datatype;
+    $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
+
+    return $formfield;
+}
