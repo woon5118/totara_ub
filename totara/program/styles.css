@@ -9,24 +9,26 @@
 
 /** Grey boxes containing program details (shown when viewing a program) **/
 .programprogress {
-    height: 30px;
-    width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
 }
 .programprogress .item {
-    height: 100%;
     padding-top: 10px;
-    float: left;
     text-align: center;
     width: 30%;
     margin-right: 5px;
+    display: inline-block;
+    vertical-align: top;
 }
 .dir-rtl .programprogress .item {
-    float: right;
     margin-right: 0px;
     margin-left: 5px;
 }
-
+.programprogress .plan_highlight {
+    display: block;
+}
+#extrequestlink {
+    display: block;
+}
 
 /** These styles are applied on the 'view' pages **/
 .nextsetoperator .operator-or,

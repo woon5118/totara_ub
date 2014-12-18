@@ -1259,7 +1259,6 @@ class program {
                 } else {
                     $duedatestr = $this->display_duedate($timedue, $prog_completion->userid);
                 }
-                $duedatestr .= html_writer::empty_tag('br');
                 $duedatestr .= $request;
 
                 $out .= html_writer::start_tag('div', array('class' => 'programprogress'));
@@ -1486,7 +1485,7 @@ class program {
         $out = '';
         $now = time();
         if (isset($duedate)) {
-            $out .= html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'plan_highlight'));
+            $out .= html_writer::start_tag('span', array('class' => 'plan_highlight'));
             if (($duedate < $now) && ($now - $duedate < 60*60*24)) {
                 $out .= get_string('duetoday', 'totara_plan');
             } else if ($duedate < $now) {
