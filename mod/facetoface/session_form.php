@@ -60,6 +60,11 @@ class mod_facetoface_session_form extends moodleform {
 
         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
+        $mform->addElement('duration', 'duration', get_string('duration', 'facetoface'));
+        $mform->setType('duration', PARAM_INT);
+        $mform->addHelpButton('duration', 'duration', 'facetoface');
+        $mform->disabledIf('duration', 'datetimeknown', 'eq', 1);
+
         $formarray  = array();
         $formarray[] = $mform->createElement('selectyesno', 'datetimeknown', get_string('sessiondatetimeknown', 'facetoface'));
         $formarray[] = $mform->createElement('static', 'datetimeknownhint', '', html_writer::tag('span', get_string('datetimeknownhinttext','facetoface'), array('class' => 'hint-text')));
@@ -197,11 +202,6 @@ class mod_facetoface_session_form extends moodleform {
         $mform->disabledIf('cutoff', 'enablemincapacity', 'notchecked');
         $mform->disabledIf('cutoff', 'datetimeknown', 'eq', 0);
         $mform->addHelpButton('cutoff', 'cutoff', 'facetoface');
-
-        $mform->addElement('duration', 'duration', get_string('duration', 'facetoface'));
-        $mform->setType('duration', PARAM_INT);
-        $mform->addHelpButton('duration', 'duration', 'facetoface');
-        $mform->disabledIf('duration', 'datetimeknown', 'eq', 1);
 
         if (!get_config(NULL, 'facetoface_hidecost')) {
             $formarray  = array();
