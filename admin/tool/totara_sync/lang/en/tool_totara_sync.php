@@ -95,7 +95,7 @@ $string['update'] = 'Update';
 ///
 $string['source'] = 'Source';
 $string['sources'] = 'Sources';
-$string['sourcenotfound'] = 'Source not found';
+$string['sourcenotfound'] = 'Source for \'{$a}\' not found';
 $string['sourcesettings'] = 'Source settings';
 $string['configuresource'] = 'Configure source';
 $string['nosources'] = 'No sources';
@@ -104,7 +104,7 @@ $string['nameandloc'] = 'Name and location';
 $string['fieldmappings'] = 'Field mappings';
 $string['uploadsyncfiles'] = 'Upload sync files';
 $string['sourcedoesnotusefiles'] = 'Source does not use files';
-$string['nosourceconfig'] = 'No source configuration';
+$string['nosourceconfig'] = 'No source configuration for \'{$a}\'';
 $string['sourceconfigured'] = 'Source has configuration';
 $string['uploadfilelink'] = 'Files can be uploaded <a href=\'{$a}\'>here</a>';
 
@@ -183,7 +183,8 @@ $string['tablemustincludexdb'] = 'The table "{$a}" must contain the following fi
 ///
 /// Log messages
 ///
-$string['syncnotconfigured'] = 'There are problems with your sync configuration. Please fix the issues before running sync.';
+$string['syncnotconfiguredsummary'] = 'Sync is not configured properly. Please, fix the issues before running sync: {$a}';
+$string['syncnotconfigured'] = 'Sync is not configured properly. Please, fix the issues before running sync.';
 $string['temptableprepfail'] = 'temp table preparation failed';
 $string['temptablecreatefail'] = 'error creating temp table';
 $string['nocsvfilepath'] = 'no CSV filepath specified';

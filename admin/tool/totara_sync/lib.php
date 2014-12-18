@@ -54,7 +54,7 @@ function latest_runid() {
  * @return void
  */
 function tool_totara_sync_cron($forcerun=false) {
-    global $CFG, $OUTPUT;
+    global $CFG;
 
     if (!$forcerun) {
         // Check if the time is ripe for the sync to run.
@@ -76,24 +76,26 @@ function tool_totara_sync_cron($forcerun=false) {
 
     // First run through the sanity checks.
     $configured = true;
+    $problemstext = array();
 
     $fileaccess = get_config('totara_sync', 'fileaccess');
     if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
         $configured = false;
-        echo $OUTPUT->notification(get_string('nofilesdir', 'tool_totara_sync'), 'notifyproblem');
+        $problemstext[] = get_string('nofilesdir', 'tool_totara_sync');
     }
     // Check enabled sync element objects
     $elements = totara_sync_get_elements(true);
     if (empty($elements)) {
         $configured = false;
-        echo $OUTPUT->notification(get_string('noenabledelements', 'tool_totara_sync'), 'notifyproblem');
+        $problemstext[] = get_string('noenabledelements', 'tool_totara_sync');
     } else {
         foreach ($elements as $element) {
             $elname = $element->get_name();
+            $elnametext = get_string('displayname:'.$elname, 'tool_totara_sync');
             //check a source is enabled
             if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
                 $configured = false;
-                echo $OUTPUT->notification($elname . " " . get_string('sourcenotfound', 'tool_totara_sync'));
+                $problemstext[] = get_string('sourcenotfound', 'tool_totara_sync', $elnametext);
             }
             //check source has configs - note get_config returns an object
             if ($sourceclass) {
@@ -101,14 +103,15 @@ function tool_totara_sync_cron($forcerun=false) {
                 $props = get_object_vars($configs);
                 if(empty($props)) {
                     $configured = false;
-                    echo $OUTPUT->notification($elname . " " . get_string('nosourceconfig', 'tool_totara_sync'), 'notifyproblem');
+                    $problemstext[] = get_string('nosourceconfig', 'tool_totara_sync', $elnametext);
                 }
             }
         }
     }
 
     if (!$configured) {
-        echo $OUTPUT->notification(get_string('syncnotconfigured', 'tool_totara_sync'), 'notifyproblem');
+        $problems = implode(", ", $problemstext);
+        mtrace(get_string('syncnotconfiguredsummary', 'tool_totara_sync', $problems));
         return false;
     }
 
