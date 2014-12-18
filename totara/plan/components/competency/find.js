@@ -166,16 +166,16 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
         handler.continueskipurl = continueskipurl;
 
         handler.standard_buttons = {};
-        handler.standard_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
         handler.standard_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._save(saveurl) }
+        handler.standard_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
 
         handler.continue_buttons = {};
-        handler.continue_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
         handler.continue_buttons[M.util.get_string('continue', 'moodle')] = function() { handler._continue(continueurl) }
+        handler.continue_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
 
         handler.continuesave_buttons = {};
-        handler.continuesave_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
         handler.continuesave_buttons[M.util.get_string('save', 'totara_core')] = function() { handler._continueSave(continuesaveurl) }
+        handler.continuesave_buttons[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() }
 
         totaraDialogs['evidence'] = new totaraDialog(
             'assigncompetencies',

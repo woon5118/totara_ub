@@ -103,8 +103,8 @@ M.totara_programassignment = M.totara_programassignment || {
 
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { self.hide(); };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.category.save(); };
+            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { self.hide(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -244,8 +244,8 @@ M.totara_programassignment = M.totara_programassignment || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('editassignments','totara_program')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('saveallchanges','totara_program')] = function() { self.save() };
+            buttonsObj[M.util.get_string('editassignments','totara_program')] = function() { handler._cancel() };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -289,8 +289,8 @@ M.totara_programassignment = M.totara_programassignment || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.save() };
+            buttonsObj[M.util.get_string('cancel','totara_program')] = function() { handler._cancel() };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

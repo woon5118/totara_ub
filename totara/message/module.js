@@ -65,8 +65,8 @@ M.totara_message = M.totara_message || {
             var handler = new totaraDialog_handler_confirm();
             var name = selector+id;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('dismiss', 'totara_message')] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/dismiss.php?id='+id+'&sesskey='+sesskey, clean_fullme) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             // JSON parse extrabuttons if a non-empty string is received
             if (extrabuttonjson && extrabuttonjson !== '') {
@@ -119,8 +119,8 @@ M.totara_message = M.totara_message || {
             var handler = new totaraDialog_handler_confirm();
             var name = action+'msg';
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             buttonsObj[action_str] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/action.php?'+action+'='+action+'&sesskey='+sesskey, clean_fullme) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
@@ -174,8 +174,8 @@ M.totara_message = M.totara_message || {
             var name = type+'msg'+id;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             buttonsObj[type_str] = function() { handler._confirm(M.cfg.wwwroot+'/totara/message/'+type+'.php?id='+id+'&sesskey='+sesskey, returnto) };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
             totaraDialogs[name] = new totaraDialog(
                 name,

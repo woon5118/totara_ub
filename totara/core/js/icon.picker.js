@@ -67,8 +67,10 @@ M.totara_iconpicker = M.totara_iconpicker || {
             var handler = new totaraDialog_handler_selectable(M.totara_iconpicker.config.selected_icon);
             var suffix = ($('#' + btnid).data('ind') === undefined) ? '' : $('#' + btnid).data('ind');
             var buttonsObj = {};
-                buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
-                buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.close(); };
+
+            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.close(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
+
             var dialog = new totaraDialog(
                     'icon-dialog' + suffix,
                     btnid,

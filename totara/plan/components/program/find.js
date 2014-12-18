@@ -58,8 +58,8 @@ M.totara_plan_program_find = M.totara_plan_program_find || {
         var handler = new M.totara_plan_component.totaraDialog_handler_preRequisite();
         handler.baseurl = url;
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
         buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
         totaraDialogs['evidence'] = new totaraDialog(
             'assignprograms',

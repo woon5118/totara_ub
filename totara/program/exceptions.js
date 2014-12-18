@@ -115,8 +115,8 @@ M.totara_programexceptions = M.totara_programexceptions || {
         // Create a dialog to handle stuff
         var handler = new totaraDialog_handler();
         var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
-            buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.save(M.cfg.wwwroot+'/totara/program/exception/resolve.php?id='+module.config.id); };
+        buttonsObj[M.util.get_string('ok', 'moodle')] = function() { dialog.save(M.cfg.wwwroot+'/totara/program/exception/resolve.php?id='+module.config.id); };
+        buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel(); };
         var dialog = new totaraDialog(
                 'applyaction',
                 'applyactionbutton',

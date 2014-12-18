@@ -74,8 +74,8 @@ M.totara_programmessages = M.totara_programmessages || {
             var self = this;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('editmessages', 'totara_program')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('saveallchanges', 'totara_program')] = function() { self.save() };
+            buttonsObj[M.util.get_string('editmessages', 'totara_program')] = function() { handler._cancel() };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

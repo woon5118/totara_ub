@@ -234,8 +234,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'addremove';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('save','admin')] = function() { handler.submit(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
@@ -255,8 +255,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'bulkaddfile';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('uploadfile','facetoface')] = function() {
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
                 if ($('#id_userfile').val() !== "") {
                     $('div#bulkaddfile form.mform').unbind('submit').submit();
                 }
@@ -280,8 +280,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'bulkaddinput';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('submitcsvtext','facetoface')] = function() {
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
                 if ($('#id_csvinput').val() !== "") {
                     handler.submit();
                 }

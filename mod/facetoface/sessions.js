@@ -55,8 +55,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
         handler.setup_delete();
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
         buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._save(); };
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
         totaraDialogs['addpdroom'] = new totaraDialog(
                 'addpdroom-dialog',
