@@ -1602,9 +1602,10 @@ function assign_user_position($assignment, $unittest=false) {
     //          and mdl_enrol and mdl_user_enrolments.
 
     // Skip this bit during testing as we don't have all the required tables for role assignments.
+    // Get context.
+    $context = context_user::instance($assignment->userid);
+
     if (!$unittest) {
-        // Get context.
-        $context = context_user::instance($assignment->userid);
         // Get manager role id.
         $roleid = $CFG->managerroleid;
         // Delete role assignment if there was a manager but it changed.
@@ -1630,6 +1631,8 @@ function assign_user_position($assignment, $unittest=false) {
     $assignment->save($managerchanged);
     $transaction->allow_commit();
 
+    // Event.
+    \totara_core\event\position_updated::create_from_instance($assignment, $context)->trigger();
 }
 
 /**

@@ -105,8 +105,6 @@ switch ($action) {
                 }
             }
 
-            add_to_log(SITEID, 'appraisal', 'update stage', 'stage.php?appraisalid='.$appraisalid.'&action=stageedit&id='
-                    .$id, 'General Settings: Appraisal ID=' . $appraisalid);
             totara_set_notification(get_string('stageupdated', 'totara_appraisal'), $returnurl,
                     array('class' => 'notifysuccess'));
         }

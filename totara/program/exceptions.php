@@ -93,8 +93,9 @@ local_js(array(
     TOTARA_JS_DIALOG
 ));
 
-// Log this request.
-add_to_log(SITEID, 'program', 'view exceptions', "exceptions.php?id={$program->id}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'exceptions'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 echo $OUTPUT->header();

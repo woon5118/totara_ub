@@ -26,6 +26,16 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a courseset of the program is completed.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - coursesetid The Courseset ID
+ * }
+ *
+ */
 class program_courseset_completed extends \core\event\base {
 
     /**

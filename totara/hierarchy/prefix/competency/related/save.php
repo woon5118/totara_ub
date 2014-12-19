@@ -128,6 +128,9 @@ foreach ($relidlist as $relid) {
     $relationship->id2 = $related->id;
 
     $relationship->id = $DB->insert_record('comp_relations', $relationship);
+
+    $relationship->fullname = $competency->fullname;
+    \hierarchy_competency\event\relation_created::create_from_instance($relationship)->trigger();
 }
 
 if ($nojs) {

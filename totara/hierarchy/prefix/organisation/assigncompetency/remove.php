@@ -74,11 +74,14 @@ if ($delete) {
         print_error('confirmsesskeybad', 'error');
     }
 
+    // Retrieve the item for the event, then delete it.
+    $snapshot = $DB->get_record('org_competencies', array('id' => $id));
     $DB->delete_records('org_competencies', array('id' => $id));
 
-    add_to_log(SITEID, 'organisation', 'delete competency assignment', "item/view.php?id={$organisation}&amp;prefix=organisation", "$fullname (ID $assignment->id)");
-    totara_set_notification(get_string('organisationdeletedassignedcompetency','totara_hierarchy'), $returnurl, array('class' => 'notifysuccess'));
+    $snapshot->instanceid = $snapshot->organisationid;
+    \hierarchy_organisation\event\competency_unassigned::create_from_instance($snapshot)->trigger();
 
+    totara_set_notification(get_string('organisationdeletedassignedcompetency', 'totara_hierarchy'), $returnurl, array('class' => 'notifysuccess'));
 } else {
     /// Display page
     echo $OUTPUT->header();

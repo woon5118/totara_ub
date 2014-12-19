@@ -96,6 +96,6 @@ if (!confirm_sesskey()) {
 
 $DB->delete_records('comp_scale_values', array('id' => $value->id));
 
-add_to_log(SITEID, 'competency', 'delete scale value', "prefix/competency/scale/view.php?id={$value->scaleid}&amp;prefix=competency", "$value->name (ID $value->id)");
+\hierarchy_competency\event\scale_value_deleted::create_from_instance($value)->trigger();
 
 totara_set_notification(get_string('deletedcompetencyscalevalue', 'totara_hierarchy', format_string($value->name)), $returnurl, array('class' => 'notifysuccess'));

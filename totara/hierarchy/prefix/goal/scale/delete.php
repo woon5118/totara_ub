@@ -102,8 +102,7 @@ $DB->delete_records('goal_scale', array('id' => $scale->id));
 
 $transaction->allow_commit();
 
-add_to_log(SITEID, 'goal', 'delete goal scale', "framework/index.php?id={$scale->id}&amp;prefix=goal",
-    "$scale->name (ID $scale->id)");
+\hierarchy_goal\event\scale_deleted::create_from_instance($scale)->trigger();
 
 // Redirect.
 totara_set_notification(get_string('deletedgoalscale', 'totara_hierarchy', format_string($scale->name)),

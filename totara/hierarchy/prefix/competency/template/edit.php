@@ -109,8 +109,6 @@ if ($form->is_cancelled()) {
         }
     }
 
-    // Log
-    add_to_log(SITEID, 'competency', 'template update', "hierarchy/prefix/competency/template/view.php?id={$templatenew->id}", '');
     //fix the description field and redirect
     $templatenew = file_postupdate_standard_editor($templatenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_template', $templatenew->id);
     $DB->set_field('comp_template', 'description', $templatenew->description, array('id' => $templatenew->id));

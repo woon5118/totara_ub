@@ -26,6 +26,16 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a program is completed.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - certifid The Certif ID field of the program
+ * }
+ *
+ */
 class program_completed extends \core\event\base {
 
     /**

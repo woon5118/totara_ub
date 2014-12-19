@@ -24,7 +24,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['eventchangedtype'] = 'Changed Position Type';
+$string['eventcompetencyassigned'] = 'Created Competency Assignment';
+$string['eventcompetencyunassigned'] = 'Deleted Competency Assignment';
+$string['eventcreatedframework'] = 'Created Position Framework';
+$string['eventcreateditem'] = 'Position Created';
+$string['eventcreatedtype'] = 'Created Position Type';
+$string['eventdeletedframework'] = 'Deleted Position Framework';
+$string['eventdeleteditem'] = 'Deleted Position';
+$string['eventdeletedtype'] = 'Deleted Position Type';
+$string['eventmoveditem'] = 'Moved Position';
+$string['eventupdatedframework'] = 'Updated Position Framework';
+$string['eventupdateditem'] = 'Updated Position';
+$string['eventupdatedtype'] = 'Updated Position Type';
+$string['eventvieweditem'] = 'Viewed Position';
 $string['pluginname'] = 'Position Hierarchies';
-$string['eventadded'] = 'Position Created';
-$string['eventdeleted'] = 'Position Deleted';
-$string['eventupdated'] = 'Position Updated';

@@ -30,6 +30,7 @@
 require_once("../config.php");
 require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->libdir.'/coursecatlib.php');
+require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 $id = optional_param('categoryid', 0, PARAM_INT); // Category id.
 $page = optional_param('page', 0, PARAM_INT); // Which page to show.

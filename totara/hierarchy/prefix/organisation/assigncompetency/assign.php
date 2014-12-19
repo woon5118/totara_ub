@@ -27,96 +27,96 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/organisation/lib.php');
 
+// Params.
 
-///
-/// Params
-///
-
-// Competency id
+// Competency id.
 $assignto = required_param('assignto', PARAM_INT);
 
-// Framework id
+// Framework id.
 $frameworkid = required_param('frameworkid', PARAM_INT);
 
-// Competencies to add
+// Competencies to add.
 $add = required_param('add', PARAM_SEQUENCE);
 
-// Indicates whether current related items, not in $add list, should be deleted
+// Indicates whether current related items, not in $add list, should be deleted.
 $deleteexisting = optional_param('deleteexisting', 0, PARAM_BOOL);
 
-// Non JS parameters
+// Non JS parameters.
 $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 $s = optional_param('s', '', PARAM_TEXT);
 
-// Setup page
+// Setup page.
 admin_externalpage_setup('organisationmanage');
 
-// Check permissions
+// Check permissions.
 $sitecontext = context_system::instance();
 require_capability('totara/hierarchy:updateorganisation', $sitecontext);
 
-// Setup hierarchy objects
+// Setup hierarchy objects.
 $competencies = new competency();
 $organisations = new organisation();
 
-// Load organisation
+// Load organisation.
 if (!$organisation = $organisations->get_item($assignto)) {
     print_error('positionnotfound', 'totara_hierarchy');
 }
 
-// Currently assigned competencies
+// Currently assigned competencies.
 if (!$currentlyassigned = $organisations->get_assigned_competencies($assignto, $frameworkid)) {
     $currentlyassigned = array();
 }
 
 
-// Parse input
+// Parse input.
 $add = $add ? explode(',', $add) : array();
 $time = time();
 
-///
-/// Delete removed assignments (if specified)
-///
-
+// Delete removed assignments (if specified).
 if ($deleteexisting) {
     $removeditems = array_diff(array_keys($currentlyassigned), $add);
 
     foreach ($removeditems as $rid) {
-        $DB->delete_records('org_competencies', array('organisationid' => $organisation->id, 'competencyid' => $rid));
-        add_to_log(SITEID, 'organisation', 'delete competency assignment', "item/view.php?id={$assignto}&amp;prefix=organisation", "Organisation (ID $organisation->id)");
+        // Retrieve the item for the event, then delete it.
+        $snapshots = $DB->get_record('org_competencies', array('positionid' => $position->id, 'competencyid' => $rid));
+        $DB->delete_records('pos_competencies', array('positionid' => $position->id, 'competencyid' => $rid));
+
+        // There should only be one but we have to do this in a loop to be safe.
+        foreach ($snapshot as $snapshot) {
+
+            $snapshot->instanceid = $snapshot->organisationid;
+            $snapshot->fullname = $DB->get_field('comp', 'fullname', array('id' => $rid));
+            \hierarchy_organisation\event\competency_unassigned::create_from_instance($snapshot)->trigger();
+        }
     }
 }
 
-
-///
-/// Assign competencies
-///
-
+// Assign competencies.
 $str_remove = get_string('remove');
 
 $rc = 0;
 foreach ($add as $addition) {
     $rc = $rc == 0 ? 1 : 0;
     if (in_array($addition, array_keys($currentlyassigned))) {
-        // Skip assignment
+        // Skip assignment.
         continue;
     }
-    // Check id
+
+    // Check id.
     if (!is_numeric($addition)) {
         print_error('baddatanonnumeric', 'totara_hierarchy', 'id');
     }
 
-    // Load competency
+    // Load competency.
     $related = $competencies->get_item($addition);
 
-    // Load framework
+    // Load framework.
     $framework = $competencies->get_framework($related->frameworkid);
 
-    // Load types
+    // Load types.
     $types = $competencies->get_types();
 
-    // Add relationship
+    // Add relationship.
     $relationship = new stdClass();
     $relationship->organisationid = $organisation->id;
     $relationship->competencyid = $related->id;
@@ -124,11 +124,14 @@ foreach ($add as $addition) {
     $relationship->usermodified = $USER->id;
 
     $relationship->id = $DB->insert_record('org_competencies', $relationship);
-    add_to_log(SITEID, 'organisation', 'create competency assignment', "item/view.php?id={$assignto}&amp;prefix=organisation", "$related->fullname (ID $related->id)");
+
+    $relationship->fullname = $related->fullname;
+    $relationship->instanceid = $organisation->id;
+    \hierarchy_organisation\event\competency_assigned::create_from_instance($relationship)->trigger();
 }
 
 if ($nojs) {
-    // If JS disabled, redirect back to original page (only if session key matches)
+    // If JS disabled, redirect back to original page (only if session key matches).
     $url = ($s == sesskey()) ? $returnurl : $CFG->wwwroot;
     redirect($url);
 } else {

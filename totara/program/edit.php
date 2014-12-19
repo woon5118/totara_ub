@@ -148,12 +148,15 @@ $program = file_prepare_standard_editor($program, 'summary', $editoroptions, $ed
 $program = file_prepare_standard_editor($program, 'endnote', $editoroptions, $editoroptions['context'],
     'totara_program', 'endnote', 0);
 
+$programinlist = new program_in_list($DB->get_record('prog', array('id' => $program->id)));
+$overviewfiles = $programinlist->get_program_overviewfiles();
+
 $overviewfilesoptions = prog_program_overviewfiles_options($program);
 if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($program, 'overviewfiles', $overviewfilesoptions, $programcontext, 'totara_program', 'overviewfiles', 0);
 }
 $detailsform = new program_edit_form($currenturl,
-                array('program' => $program, 'action' => $action, 'category' => $progcategory,
+                array('program' => $program, 'overviewfiles' => $overviewfiles, 'action' => $action, 'category' => $progcategory,
                         'editoroptions' => $TEXTAREA_OPTIONS, 'nojs' => $nojs, 'iscertif' =>  $iscertif),
                         'post', '', array('name'=>'form_prog_details'));
 
@@ -229,17 +232,9 @@ if ($data = $detailsform->get_data()) {
             }
         }
 
-        $event = \totara_program\event\program_updated::create(
-            array(
-                'objectid' => $program->id,
-                'context' => context_program::instance($program->id),
-                'userid' => $USER->id,
-                'other' => array(
-                    'certifid' => empty($program->certifid) ? 0 : $program->certifid,
-                ),
-            )
-        );
-        $event->trigger();
+        $other = array('certifid' => empty($program->certifid) ? 0 : $program->certifid);
+        $dataevent = array('id' => $program->id, 'other' => $other);
+        $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();
 
         totara_set_notification(get_string('programdetailssaved', 'totara_program'), $nexturl, array('class' => 'notifysuccess'));
     }
@@ -248,8 +243,9 @@ if ($data = $detailsform->get_data()) {
     $program = new program($id);
 }
 
-// Log this request.
-add_to_log(SITEID, 'program', 'view', "edit.php?id={$program->id}&amp;iscertif={$iscertif}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'general'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 
@@ -277,6 +273,11 @@ require('tabs.php');
 
 $detailsform->set_data($program);
 $detailsform->display();
+
+if ($action == 'view' && $program && has_capability('totara/program:configuredetails', $program->get_context())) {
+    $editbuttonform = new program_edit_details_button_form($editurl, array('program' => $program), 'get');
+    $editbuttonform->display();
+}
 
 // Display content, assignments and messages if in view mode.
 if ($action == 'view') {

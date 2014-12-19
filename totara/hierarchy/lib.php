@@ -298,6 +298,44 @@ class hierarchy {
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Move hierarchy item to new type.
+     * NOTE: Do not use this without first handling custom data
+     *       see type/changeconfirm.php
+     *
+     * @param int $itemid   The id of the hierarchy item
+     * @param int $oldtype  The id of the hierarchy type to change from
+     * @param int $newtype  The id of the hierarchy type to change to
+     */
+    public function move_type($itemid, $oldtype, $newtype) {
+        global $DB;
+
+        $DB->set_field($this->shortprefix, 'typeid', $newtype, array('id' => $itemid));
+
+        $eventdata = array('itemid' => $itemid, 'oldtype' => $oldtype, 'newtype' => $newtype);
+        $eventname = "\\hierarchy_{$this->prefix}\\event\\type_changed";
+        $event = $eventname::create_from_dataobject($eventdata);
+        $event->trigger();
+
+    }
+
+    /**
+     * Move all hierarchy items from and old type to new type.
+     * NOTE: Do not use this without first handling custom data
+     *       see type/changeconfirm.php
+     *
+     * @param int $oldtype  The id of the hierarchy type to change from
+     * @param int $newtype  The id of the hierarchy type to change to
+     */
+    public function bulk_move_type($oldtype, $newtype) {
+        global $DB;
+
+        $itemids = $DB->get_fieldset_select($this->shortprefix, 'id', 'typeid = ?', array($oldtype));
+
+        foreach ($itemids as $itemid) {
+            $this->move_type($itemid, $oldtype, $newtype);
+        }
+    }
 
     /**
      * Get types for a hierarchy
@@ -918,19 +956,21 @@ class hierarchy {
             return false;
         }
 
-        // get array of items to delete (the item specified *and* all its children)
+        $snapshot = $DB->get_record($this->shortprefix, array('id' => $id));
+
+        // Get array of items to delete (the item specified *and* all its children).
         $delete_list = $this->get_item_descendants($id);
-        // make a copy for triggering events
+        // Make a copy for triggering events.
         $deleted_list = $delete_list;
 
-        // make sure we know the item's framework id
+        // Make sure we know the item's framework id.
         $frameworkid = isset($this->frameworkid) ? $this->frameworkid :
             $DB->get_field($this->shortprefix, 'frameworkid', array('id' => $id));
 
             $transaction = $DB->start_delegated_transaction();
 
-            // iterate through 1000 items at a time, because oracle can't use
-            // more than 1000 items in an sql IN clause
+            // Iterate through 1000 items at a time, because oracle can't use.
+            // More than 1000 items in an sql IN clause.
             while ($delete_items = totara_pop_n($delete_list, 1000)) {
                 $delete_ids = array_keys($delete_items);
                 if (!$this->_delete_hierarchy_items($delete_ids)) {
@@ -939,18 +979,12 @@ class hierarchy {
             }
             $transaction->allow_commit();
 
-        // Raise an event for each item deleted to let other parts of the system know
+        // Raise an event for each item deleted to let other parts of the system know.
         if ($triggerevent) {
             foreach ($deleted_list as $deleted_item) {
 
-                $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_deleted';
-                $event = $eventname::create(
-                    array(
-                        'objectid' => $id,
-                        'context' => context_system::instance(),
-                        'userid' => $USER->id,
-                    )
-                );
+                $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_deleted";
+                $event = $eventname::create_from_instance($snapshot);
                 $event->trigger();
             }
         }
@@ -1444,6 +1478,13 @@ class hierarchy {
             $item->usermodified = $USER->id;
             if ($newitem = $this->add_hierarchy_item($item, $parentid, $frameworkid, false, $triggerevent)) {
                 $new_ids[] = $newitem->id;
+
+                // Trigger an event if required.
+                if ($triggerevent) {
+                    $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
+                    $event = $eventname::create_from_instance($newitem);
+                    $event->trigger();
+                }
             } else {
                 // fail if any new items fail to be added
                 return false;
@@ -1484,47 +1525,48 @@ class hierarchy {
     function add_hierarchy_item($item, $parentid, $frameworkid = null, $usetransaction = true, $triggerevent = true, $removedesc = true) {
         global $DB, $USER;
 
-        // figure out the framework if not provided
+        // Figure out the framework if not provided.
         if (!isset($frameworkid)) {
-            // try and use hierarchy's frameworkid, if not look it up based on parent
+            // Try and use hierarchy's frameworkid, if not look it up based on parent.
             if (isset($this->frameworkid)) {
                 $frameworkid = $this->frameworkid;
             } else if ($parentid != 0) {
                 if (!$frameworkid = $DB->get_field($this->shortprefix, 'frameworkid', array('id' => $parentid))) {
-                    // can't determine parent's framework
+                    // Can't determine parent's framework.
                     return false;
                 }
             } else {
-                // we can't work out the framework based on parentid for parentid=0
+                // We can't work out the framework based on parentid for parentid=0.
                 return false;
             }
         }
 
-        // calculate where the new item fits into the hierarchy
-        // handle top level items differently
+        // Calculate where the new item fits into the hierarchy.
+        // Handle top level items differently.
         if ($parentid == 0) {
             $depthlevel = 1;
             $parentpath = '';
         } else {
-            // parent item must exist
+            // Parent item must exist.
             $parent = $DB->get_record($this->shortprefix, array('id' => $parentid));
             $depthlevel = $parent->depthlevel + 1;
             $parentpath = $parent->path;
         }
 
-        // fail if can't successfully determine the sort position
+        // Fail if can't successfully determine the sort position.
         if (!$sortthread = $this->get_next_child_sortthread($parentid, $frameworkid)) {
             return false;
         }
 
-        // set the hierarchy specific data for the new item
+        // Set the hierarchy specific data for the new item.
         $item->frameworkid = $frameworkid;
         $item->depthlevel = $depthlevel;
         $item->parentid = $parentid;
-        $item->path = $parentpath; // we'll add the item's ID to the end of this later
+        $item->path = $parentpath; // We'll add the item's ID to the end of this later.
         $item->timecreated = time();
         $item->sortthread = $sortthread;
-        //set description to NULL, will be fixed in the post-insert html editor operations
+
+        // Set description to NULL, will be fixed in the post-insert html editor operations.
         if ($removedesc) {
             $item->description = NULL;
         }
@@ -1536,23 +1578,17 @@ class hierarchy {
         // Can't set the full path till we know the id!
         $DB->set_field($this->shortprefix, 'path', $item->path . '/' . $newid, array('id' => $newid));
 
-        // load the new item from the db
+        // Load the new item from the db.
         $newitem = $DB->get_record($this->shortprefix, array('id' => $newid));
 
         if ($usetransaction) {
             $transaction->allow_commit();
         }
 
-        // trigger an event if required
+        // Trigger an event if required.
         if ($triggerevent) {
-            $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_added';
-            $event = $eventname::create(
-                array(
-                    'objectid' => $newitem->id,
-                    'context' => context_system::instance(),
-                    'userid' => $USER->id,
-                )
-            );
+            $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
+            $event = $eventname::create_from_instance($newitem);
             $event->trigger();
         }
 
@@ -1581,11 +1617,11 @@ class hierarchy {
     function update_hierarchy_item($itemid, $newitem, $usetransaction = true, $triggerevent = true, $removedesc = true) {
         global $USER, $DB;
 
-        // the itemid must be a valid item
+        // The itemid must be a valid item.
         $olditem = $DB->get_record($this->shortprefix, array('id' => $itemid));
 
         if ($newitem->parentid != $olditem->parentid || $newitem->frameworkid != $olditem->frameworkid) {
-            // The item is being moved - first update item without changing parent or framework, then move afterwards
+            // The item is being moved - first update item without changing parent or framework, then move afterwards.
             $oldparentid = $olditem->parentid;
             $newparentid = $newitem->parentid;
             $newitem->parentid = $oldparentid;
@@ -1595,7 +1631,7 @@ class hierarchy {
             $newitem->frameworkid = $oldframeworkid;
         }
 
-        //set description to NULL, will be fixed in the post-update html editor operations
+        // Set description to NULL, will be fixed in the post-update html editor operations.
         if ($removedesc) {
             $newitem->description = NULL;
         }
@@ -1610,36 +1646,29 @@ class hierarchy {
         $DB->update_record($this->shortprefix, $newitem);
 
         if (isset($newparentid) || isset($newframeworkid)) {
-            // item is also being moved
-            // get a new copy of the updatd item from the db
+            // Item is also being moved.
+            // Get a new copy of the updatd item from the db.
             $updateditem = $DB->get_record($this->shortprefix, array('id' => $itemid));
             $newparentid = isset($newparentid) ? $newparentid : 0;  // top-level
             $newframeworkid = isset($newframeworkid) ? $newframeworkid : $updateditem->frameworkid;  // same framework
-            // move it
+            // Move it.
             $this->move_hierarchy_item($updateditem, $newframeworkid, $newparentid);
         }
-        // get a new copy of the updated item from the db
+        // Get a new copy of the updated item from the db.
         $updateditem = $DB->get_record($this->shortprefix, array('id' => $itemid));
 
         if ($usetransaction) {
             $transaction->allow_commit();
         }
 
-        // Raise an event to let other parts of the system know
+        // Raise an event to let other parts of the system know.
         if ($triggerevent) {
-                $eventname = '\totara_hierarchy\event\\' . $this->prefix . '_updated';
-                $event = $eventname::create(
-                    array(
-                        'objectid' => $updateditem->id,
-                        'context' => context_system::instance(),
-                        'userid' => $USER->id,
-                    )
-                );
+                $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
+                $event = $eventname::create_from_instance($updateditem);
                 $event->trigger();
         }
 
         return $updateditem;
-
     }
 
 
@@ -1759,6 +1788,10 @@ class hierarchy {
         $DB->update_record($this->shortprefix, $todb);
 
         $transaction->allow_commit();
+
+        $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_moved";
+        $event = $eventname::create_from_instance($todb);
+        $event->trigger();
 
         return true;
     }

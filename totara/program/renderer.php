@@ -236,18 +236,9 @@ class totara_program_renderer extends plugin_renderer_base {
     * @return string $out    HTML fragment
     */
     public function display_user_message_box($user, $a) {
-        $table = new html_table();
-        $table->attributes = array('border' => '0', 'width' => '100%');
-        $cells = array();
-        $cell = new html_table_cell($this->output->user_picture($user));
-        $cell->attributes['width'] = '50';
-        $cells[] = $cell;
-        $cell = new html_table_cell(html_writer::start_tag('strong') . get_string('youareviewingxsrequiredlearning', 'totara_program', $a) . html_writer::end_tag('strong'));
-        $cells[] = $cell;
-        $table->data[] = new html_table_row($cells);
-
         $out = html_writer::start_tag('div', array('class' => 'plan_box plan_box_plain'));
-        $out .= html_writer::table($table);
+        $out .= $this->output->user_picture($user);
+        $out .= html_writer::tag('strong', get_string('youareviewingxsrequiredlearning', 'totara_program', $a));
         $out .= html_writer::end_tag('div');
         return $out;
     }

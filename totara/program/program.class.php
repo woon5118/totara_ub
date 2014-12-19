@@ -281,6 +281,8 @@ class program {
                 $newassignusers = array();
                 $newassigncount = 0;
                 $fassignusers = array();
+                $bulkusersassignments = array();
+                $bulkusersfutureassignments = array();
                 $fassigncount = 0;
 
                 // Create instance of assignment type so we can call functions on it.
@@ -362,9 +364,11 @@ class program {
                                 $fassigncount++;
                                 $fassignusers[$user->id] = $user->id;
                                 if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
-                                    $this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id);
-                                    $fassigncount = 0;
-                                    $fassignusers = array();
+                                    if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
+                                        $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
+                                        $fassigncount = 0;
+                                        $fassignusers = array();
+                                    }
                                 }
                                 continue;
                             }
@@ -396,9 +400,11 @@ class program {
                             $fassigncount++;
                             $fassignusers[$user->id] = $user->id;
                             if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
-                                $this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id);
-                                $fassigncount = 0;
-                                $fassignusers = array();
+                                if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
+                                    $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
+                                    $fassigncount = 0;
+                                    $fassignusers = array();
+                                }
                             }
                             continue;
                         }
@@ -410,24 +416,49 @@ class program {
                         $newassignusers[$user->id] = array('timedue' => $timedue, 'exceptions' => $exceptions);
                         if ($newassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
                             $new_queue = $this->assign_learners_bulk($newassignusers, $assign);
-                            $message_queue = array_merge($message_queue, $new_queue);
+                            $bulkusersassignments = array_merge($bulkusersassignments, $new_queue);
                             $newassigncount = 0;
                             $newassignusers = array();
                         }
                     }
                 }
                 if (!empty($fassignusers)) {
-                    // bulk assign remaining future users
-                    $this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id);
+                    // Bulk assign remaining future users.
+                    if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
+                        $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
+                    }
                     unset($fassigncount, $fassignusers);
                 }
                 if (!empty($newassignusers)) {
-                    // bulk assign remaining users
+                    // Bulk assign remaining users.
                     $new_queue = $this->assign_learners_bulk($newassignusers, $assign);
-                    $message_queue = array_merge($message_queue, $new_queue);
+                    $bulkusersassignments = array_merge($bulkusersassignments, $new_queue);
                     unset($newassignusers, $newassigncount);
                 }
 
+                // Trigger bulk future assignments for the current assignment.
+                if (!empty($bulkusersfutureassignments)) {
+                    $other = array('programid' => $this->id, 'assignmentid' => $assign->id, 'userids' => $bulkusersfutureassignments);
+                    \totara_program\event\bulk_future_assignments_started::create_from_data(array('other' => $other))->trigger();
+                    \totara_program\event\bulk_future_assignments_ended::create()->trigger();
+                }
+
+                // Trigger bulk learner assignments for the current assignment.
+                if (!empty($bulkusersassignments)) {
+                    $data = array('other' => array('programid' => $this->id, 'assignmentid' => $assign->id));
+                    \totara_program\event\bulk_learner_assignments_started::create_from_data($data)->trigger();
+                    foreach ($bulkusersassignments as $userid => $eventdata) {
+                        $event = \totara_program\event\program_assigned::create(
+                            array(
+                                'objectid' => $eventdata->programid,
+                                'context' => context_program::instance($eventdata->programid),
+                                'userid' => $eventdata->userid,
+                            )
+                        );
+                        $event->trigger();
+                    }
+                    \totara_program\event\bulk_learner_assignments_ended::create()->trigger();
+                }
             }
         }
 
@@ -1228,7 +1259,6 @@ class program {
                 } else {
                     $duedatestr = $this->display_duedate($timedue, $prog_completion->userid);
                 }
-                $duedatestr .= html_writer::empty_tag('br');
                 $duedatestr .= $request;
 
                 $out .= html_writer::start_tag('div', array('class' => 'programprogress'));
@@ -1455,7 +1485,7 @@ class program {
         $out = '';
         $now = time();
         if (isset($duedate)) {
-            $out .= html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'plan_highlight'));
+            $out .= html_writer::start_tag('span', array('class' => 'plan_highlight'));
             if (($duedate < $now) && ($now - $duedate < 60*60*24)) {
                 $out .= get_string('duetoday', 'totara_plan');
             } else if ($duedate < $now) {

@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 require_once($CFG->libdir.'/filelib.php');
 
-// Get data
+// Get data.
 $prefix        = required_param('prefix', PARAM_ALPHA);
 $id          = required_param('id', PARAM_INT);
 $edit        = optional_param('edit', -1, PARAM_BOOL);
@@ -76,11 +76,9 @@ if ($canmanage) {
     }
 }
 
-///
-/// Display page
-///
+// Display page.
 
-// Run any hierarchy prefix specific code
+// Run any hierarchy prefix specific code.
 $compfw = optional_param('framework', 0, PARAM_INT);
 $setupitem = new stdClass;
 $setupitem->id = $item->id;
@@ -105,7 +103,7 @@ echo $OUTPUT->header();
 
 $heading = format_string("{$framework->fullname} - {$item->fullname}");
 
-// add editing icon
+// Add editing icon.
 $str_edit = get_string('edit');
 
 if ($canupdateitems) {
@@ -119,7 +117,7 @@ $data = $hierarchy->get_item_data($item);
 $cfdata = $hierarchy->get_custom_fields($item->id);
 if ($cfdata) {
     foreach ($cfdata as $cf) {
-        // don't show hidden custom fields
+        // Don't show hidden custom fields.
         if ($cf->hidden) {
             continue;
         }
@@ -136,7 +134,7 @@ $table = new html_table();
 
 foreach ($data as $ditem) {
 
-    // Check if empty
+    // Check if empty.
     if (!strlen($ditem['value'])) {
         continue;
     }
@@ -150,7 +148,7 @@ foreach ($data as $ditem) {
 
 echo html_writer::table($table);
 
-// Print extra info
+// Print extra info.
 $hierarchy->display_extra_view_info($item, $frameworkid);
 
 if ($canmanageframeworks) {
@@ -159,6 +157,10 @@ if ($canmanageframeworks) {
 
     echo html_writer::tag('div', $button, array('class' => 'buttons'));
 }
-/// and proper footer
-add_to_log(SITEID, $prefix, 'view item', "item/view.php?prefix=$prefix&amp;framework={$framework->id}&amp;id={$item->id}", substr(strip_tags($item->fullname), 0, 200) . " (ID {$item->id})");
+
+$eventname = "\\hierarchy_{$prefix}\\event\\{$prefix}_viewed";
+$event = $eventname::create_from_instance($item);
+$event->trigger();
+
+// And proper footer.
 echo $OUTPUT->footer();

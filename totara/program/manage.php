@@ -206,7 +206,13 @@ if ((!empty($moveupcat) or !empty($movedowncat)) and confirm_sesskey()) {
         $DB->set_field('course_categories', 'sortorder', $swapcategory->sortorder, array('id' => $movecategory->id));
         $DB->set_field('course_categories', 'sortorder', $movecategory->sortorder, array('id' => $swapcategory->id));
         cache_helper::purge_by_event('changesincoursecat');
-        add_to_log(SITEID, "category", "move", "editcategory.php?id=$movecategory->id", $movecategory->id);
+
+        // Trigger event.
+        $event = \core\event\course_category_updated::create(array(
+            'objectid' => $movecategory->id,
+            'context' => context_coursecat::instance($movecategory->id)
+        ));
+        $event->trigger();
     }
 
     // Finally reorder programs.
@@ -270,7 +276,12 @@ if ((!empty($hide) or !empty($show)) && confirm_sesskey()) {
         // Set the visibility of the program.
         $params = array('id' => $program->id, 'visible' => $visible, 'timemodified' => time());
         $DB->update_record('prog', $params);
-        add_to_log($program->id, "program", ($visible ? 'show' : 'hide'), "edit.php?id=$program->id", $program->id);
+
+        // Trigger event.
+        $certifid = empty($program->certifid) ? 0 : $program->certifid;
+        $other = array('certifid' => $certifid, 'action' =>  $visible ? 'show' : 'hide');
+        $dataevent = array('id' => $program->id, 'other' => $other);
+        $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();
     }
 }
 
@@ -298,7 +309,12 @@ if ((!empty($moveup) or !empty($movedown)) && confirm_sesskey()) {
         }
         $DB->set_field('prog', 'sortorder', $swapprogram->sortorder, array('id' => $moveprogram->id));
         $DB->set_field('prog', 'sortorder', $moveprogram->sortorder, array('id' => $swapprogram->id));
-        add_to_log($moveprogram->id, "program", "move", "edit.php?id=$moveprogram->id", $moveprogram->id);
+
+        // Trigger update event.
+        $certifid = empty($moveprogram->certifid) ? 0 : $moveprogram->certifid;
+        $other = array('certifid' => $certifid, 'action' => 'move');
+        $dataevent = array('id' => $moveprogram->id, 'other' => $other);
+        $event = \totara_program\event\program_updated::create_from_data($dataevent)->trigger();
     }
 }
 

@@ -26,6 +26,16 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a program is created.
+ *
+ * @property-read array $other {
+ * Extra information about the event.
+ *
+ * - certifid The Certif ID field of the program
+ * }
+ *
+ */
 class program_created extends \core\event\base {
 
     /**
@@ -43,7 +53,7 @@ class program_created extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventcreation', 'totara_program');
+        return get_string('eventcreated', 'totara_program');
     }
 
     /**

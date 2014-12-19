@@ -206,7 +206,6 @@ if ($confirmdelete) {
         strtolower(get_string($prefix, 'totara_hierarchy')) :
         strtolower(get_string($prefix . 'plural', 'totara_hierarchy'));
     if ($status) {
-        add_to_log(SITEID, $prefix, 'bulk delete', new moodle_url('bulkactions.php', array('action' => 'delete', 'frameworkid' => $framework->id, 'prefix' => $prefix)), 'Deleted IDs: '.implode(',', $deleted));
         $a = new stdClass();
         $a->num = count($unique_ids);
         $a->items = $items;
@@ -251,8 +250,6 @@ if ($confirmmove && $newparent !== false) {
     // empty form SESSION data
     $SESSION->hierarchy_bulk_items[$action][$prefix][$frameworkid] = array();
     $SESSION->hierarchy_bulk_search[$action][$prefix][$frameworkid] = '';
-
-    add_to_log(SITEID, $prefix, 'bulk move', new moodle_url('bulkactions.php', array('action' => 'move', 'frameworkid' => $framework->id, 'prefix' => $prefix)), 'Moved IDs: '.implode(',', $unique_ids));
 
     $a = new stdClass();
     $a->num = count($unique_ids);

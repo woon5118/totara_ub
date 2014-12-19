@@ -83,8 +83,16 @@ if ($deleteexisting) {
     $removeditems = array_diff(array_keys($currentlyassigned), $add);
 
     foreach ($removeditems as $rid) {
+        // Retrieve the item for the event, then delete it.
+        $snapshots = $DB->get_records('pos_competencies', array('positionid' => $position->id, 'competencyid' => $rid));
         $DB->delete_records('pos_competencies', array('positionid' => $position->id, 'competencyid' => $rid));
-        add_to_log(SITEID, 'position', 'delete competency assignment', "item/view.php?id={$assignto}&amp;prefix=position", "Position (ID $position->id)");
+
+        // There should only be one but we have to do this in a loop to be safe.
+        foreach ($snapshots as $snapshot) {
+
+            $snapshot->instanceid = $snapshot->positionid;
+            \hierarchy_position\event\competency_unassigned::create_from_instance($snapshot)->trigger();
+        }
     }
 }
 
@@ -119,7 +127,10 @@ foreach ($add as $addition) {
     $relationship->usermodified = $USER->id;
 
     $relationship->id = $DB->insert_record('pos_competencies', $relationship);
-    add_to_log(SITEID, 'position', 'create competency assignment', "item/view.php?id={$assignto}&amp;prefix=position", "$related->fullname (ID $related->id)");
+
+    $relationship->fullname = $related->fullname;
+    $relationship->instanceid = $position->id;
+    \hierarchy_position\event\competency_assigned::create_from_instance($relationship)->trigger();
 }
 
 if ($nojs) {

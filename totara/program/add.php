@@ -139,8 +139,6 @@ $overviewfilesoptions = prog_program_overviewfiles_options($item);
 if ($overviewfilesoptions) {
     file_prepare_standard_filemanager($item, 'overviewfiles', $overviewfilesoptions, $systemcontext, 'totara_program', 'overviewfiles', 0);
 }
-$form = new program_edit_form($currenturl, array('action' => 'add', 'category' => $category, 'editoroptions' => $TEXTAREA_OPTIONS));
-
 $form = new program_edit_form($currenturl, array('action' => 'add', 'category' => $category,
                 'editoroptions' => $TEXTAREA_OPTIONS, 'iscertif' =>  $iscertif));
 
@@ -236,8 +234,6 @@ if ($data = $form->get_data()) {
             }
         }
 
-        add_to_log(SITEID, 'program', 'created', "edit.php?id={$newid}", $program->fullname);
-
         // take them straight to edit page if they have permissions,
         // otherwise view the program
         $programcontext = context_program::instance($newid);
@@ -265,8 +261,6 @@ if ($data = $form->get_data()) {
             $DB->set_field('prog', 'certifid', $newcertid , array('id' => $newid));
 
             $transaction->allow_commit();
-
-            add_to_log(SITEID, 'certification', 'created', "edit.php?id={$newid}", '');
 
             if (has_capability('totara/certification:configuredetails', $programcontext)) {
                 $viewurl = "{$CFG->wwwroot}/totara/program/edit.php?id={$newid}";

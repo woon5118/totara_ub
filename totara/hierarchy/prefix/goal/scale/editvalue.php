@@ -123,9 +123,9 @@ if ($valueform->is_cancelled()) {
         unset($valuenew->id);
 
         if ($valuenew->id = $DB->insert_record('goal_scale_values', $valuenew)) {
-            // Log.
+            \hierarchy_goal\event\scale_value_created::create_from_instance($valuenew)->trigger();
+
             $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-            add_to_log(SITEID, 'goal', 'added scale value', $urlpart);
             $notification->text = 'scalevalueadded';
             $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
             $notification->params = array('class' => 'notifysuccess');
@@ -136,9 +136,9 @@ if ($valueform->is_cancelled()) {
     } else {
         // Updating scale value.
         if ($DB->update_record('goal_scale_values', $valuenew)) {
-            // Log.
+            \hierarchy_goal\event\scale_value_updated::create_from_instance($valuenew)->trigger();
+
             $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-            add_to_log(SITEID, 'goal', 'update scale value', $urlpart);
             $notification->text = 'scalevalueupdatedgoal';
             $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
             $notification->params = array('class' => 'notifysuccess');

@@ -26,6 +26,10 @@
 namespace totara_program\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Event triggered when a user is assigned to a program.
+ *
+ */
 class program_assigned extends \core\event\base {
 
     /**

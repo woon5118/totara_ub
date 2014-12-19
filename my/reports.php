@@ -66,7 +66,7 @@ if ($PAGE->user_allowed_editing()) {
 }
 echo $OUTPUT->header();
 
-add_to_log(SITEID, 'my', 'reports', 'reports.php');
+\totara_core\event\myreport_viewed::create()->trigger();
 
 echo $OUTPUT->heading($strheading);
 

@@ -114,8 +114,6 @@ if (!confirm_sesskey()) {
 
 $item->delete($competency);
 
-add_to_log(SITEID, 'competency', 'delete evidence', "item/view.php?id={$item->id}&amp;prefix=competency", $item->get_name()." (ID $item->id)");
-
 $message = get_string('removed'.$hierarchy->prefix.'evidenceitem', 'totara_hierarchy', format_string($compname .' ('. $item->get_type().')'));
 
 totara_set_notification($message, $return, array('class' => 'notifysuccess'));

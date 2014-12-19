@@ -925,6 +925,21 @@ abstract class question_storage {
      */
     public static $storagefields = array('id', 'param1', 'param2', 'param3', 'param4', 'param5', 'datatype', 'name', 'defaultdata');
 
+    public function get() {
+        $obj = new \stdClass();
+        $obj->id = $this->id;
+        $obj->name = $this->name;
+        $obj->datatype = $this->datatype;
+        $obj->param1 = $this->param1;
+        $obj->param2 = $this->param2;
+        $obj->param3 = $this->param3;
+        $obj->param4 = $this->param4;
+        $obj->param5 = $this->param5;
+        $obj->defaultdata = $this->defaultdata;
+
+        return $obj;
+    }
+
     /**
      * Save method used to save all params and retreive id
      * Save method must save all fields above

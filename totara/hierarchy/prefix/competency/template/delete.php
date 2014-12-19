@@ -77,8 +77,6 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-add_to_log(SITEID, 'competency', 'template delete', "prefix/competency/template/index.php?frameworkid={$template->frameworkid}", "$template->fullname (ID $template->id)");
-
 $hierarchy->delete_template($id);
 
 echo $OUTPUT->heading(get_string('deletedtemplate', $hierarchy->prefix, format_string($template->fullname)));

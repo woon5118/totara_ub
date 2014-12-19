@@ -84,7 +84,14 @@ $completion = new completion_completion(array('userid' => $userid, 'course' => $
 if ($completion->is_complete()) {
     // Toggle as incomplete
     $completion->delete();
-    totara_set_notification(get_string('incompletecourse', 'totara_program'), $progurl, array('class' => 'notifysuccess'));
+    if ($program->certifid) {
+        $incompleterolurl = new moodle_url('/totara/plan/record/certifications.php',
+            array('userid' => $userid, 'status' => 'all'));
+    } else {
+        $incompleterolurl = new moodle_url('/totara/plan/record/programs.php',
+            array('userid' => $userid, 'status' => 'all'));
+    }
+    totara_set_notification(get_string('incompletecourse', 'totara_program'), $incompleterolurl, array('class' => 'notifysuccess'));
 }
 
 $mform = new completecourse_form();
@@ -101,7 +108,14 @@ if ($mform->is_cancelled()) {
     } else {
         $message = get_string('completedcoursemanual', 'totara_program');
     }
-    totara_set_notification($message, $progurl, array('class' => 'notifysuccess'));
+    if ($program->certifid) {
+        $completedrolurl = new moodle_url('/totara/plan/record/certifications.php',
+            array('userid' => $userid, 'status' => 'all'));
+    } else {
+        $completedrolurl = new moodle_url('/totara/plan/record/programs.php',
+            array('userid' => $userid, 'status' => 'all'));
+    }
+    totara_set_notification($message, $completedrolurl, array('class' => 'notifysuccess'));
 } else {
     $data = new stdClass();
     $data->courseid = $courseid;

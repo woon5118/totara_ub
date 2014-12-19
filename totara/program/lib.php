@@ -1170,6 +1170,7 @@ function prog_process_extensions($extensions, $reasonfordecision = array()) {
                     if (!$DB->update_record('prog_extension', $extension_todb)) {
                         $update_fail_count++;
                     }
+                    \totara_program\event\extension_denied::create_from_instance($extension)->trigger();
                 } else {
                     print_error('error:failedsendextensiondenyalert', 'totara_program');
                 }
@@ -1231,6 +1232,7 @@ function prog_process_extensions($extensions, $reasonfordecision = array()) {
                         if (!$DB->update_record('prog_extension', $extension_todb)) {
                             $update_fail_count++;
                         }
+                        \totara_program\event\extension_granted::create_from_instance($extension)->trigger();
                     } else {
                         print_error('error:failedsendextensiongrantalert','totara_program');
                     }

@@ -155,6 +155,9 @@ abstract class competency_evidence_type extends data_object {
         if (!$DB->update_record('comp', $todb)) {
             print_error('updatecompetencyevidencecount', 'totara_hierarchy');
         }
+
+        \hierarchy_competency\event\evidence_created::create_from_instance($this->get_record())->trigger();
+
         return $newid;
     }
 
@@ -166,6 +169,9 @@ abstract class competency_evidence_type extends data_object {
      */
     public function delete($competency = null) {
         global $DB;
+
+        // Store the data for the event before it is deleted.
+        $snapshot = $this->get_record();
 
         // Delete evidence item from database
         if (!parent::delete()) {
@@ -185,6 +191,16 @@ abstract class competency_evidence_type extends data_object {
         if (!$DB->update_record('comp', $todb)) {
             print_error('updatecompetencyevidencecount', 'totara_hierarchy');
         }
+
+        \hierarchy_competency\event\evidence_deleted::create_from_instance($snapshot)->trigger();
+    }
+
+    public function get_record() {
+        global $DB;
+
+        $record = $DB->get_record($this->table, array('id' => $this->id));
+        $record->name = $this->get_name();
+        return $record;
     }
 
     /**

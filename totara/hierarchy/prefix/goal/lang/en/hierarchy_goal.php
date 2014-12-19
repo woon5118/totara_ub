@@ -24,7 +24,27 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['eventchangedtype'] = 'Changed Goal Type';
+$string['eventcreatedassignment'] = 'Created Goal Assignment';
+$string['eventcreatedframework'] = 'Created Goal Framework';
+$string['eventcreateditem'] = 'Created Goal';
+$string['eventcreatedpersonalgoal'] = 'Created Personal Goal';
+$string['eventcreatedscale'] = 'Created Goal Scale';
+$string['eventcreatedscalevalue'] = 'Created Goal Scale Value';
+$string['eventcreatedtype'] = 'Created Goal Type';
+$string['eventdeletedassignment'] = 'Deleted Goal Assignment';
+$string['eventdeletedframework'] = 'Deleted Goal Framework';
+$string['eventdeleteditem'] = 'Deleted Goal';
+$string['eventdeletedpersonalgoal'] = 'Deleted Personal Goal';
+$string['eventdeletedscale'] = 'Deleted Goal Scale';
+$string['eventdeletedscalevalue'] = 'Deleted Goal Scale Value';
+$string['eventdeletedtype'] = 'Deleted Goal Type';
+$string['eventmoveditem'] = 'Moved Goal';
+$string['eventupdatedframework'] = 'Updated Goal Framework';
+$string['eventupdateditem'] = 'Goal Updated';
+$string['eventupdatedpersonalgoal'] = 'Updated Personal Goal';
+$string['eventupdatedscale'] = 'Updated Goal Scale';
+$string['eventupdatedscalevalue'] = 'Updated Goal Scale Value';
+$string['eventupdatedtype'] = 'Updated Goal Type';
+$string['eventvieweditem'] = 'Viewed Goal';
 $string['pluginname'] = 'Goal Hierarchies';
-$string['eventadded'] = 'Goal Created';
-$string['eventdeleted'] = 'Goal Deleted';
-$string['eventupdated'] = 'Goal Updated';

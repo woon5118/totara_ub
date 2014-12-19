@@ -108,9 +108,6 @@ if ($data = data_submitted()) {
     // Update the user assignments
     $program->update_learner_assignments();
 
-    // log this request
-    add_to_log(SITEID, 'program', 'update assignments', "edit_assignments.php?id={$program->id}", $program->fullname);
-
     $prog_update = new stdClass();
     $prog_update->id = $id;
     $prog_update->timemodified = time();
@@ -145,8 +142,9 @@ $currenturl = qualified_me();
 $currenturl_noquerystring = strip_querystring($currenturl);
 $viewurl = $currenturl_noquerystring."?id={$id}&action=view";
 
-// log this request
-add_to_log(SITEID, 'program', 'view assignments', "edit_assignments.php?id={$program->id}", $program->fullname);
+// Trigger event.
+$dataevent = array('id' => $program->id, 'other' => array('section' => 'assignments'));
+$event = \totara_program\event\program_viewed::create_from_data($dataevent)->trigger();
 
 // Display.
 $heading = format_string($program->fullname);

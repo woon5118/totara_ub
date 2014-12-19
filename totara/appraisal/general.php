@@ -70,9 +70,8 @@ if ($fromform = $mform->get_data()) {
     $appraisal->description = $todb->description;
     $appraisal->save();
 
-    add_to_log(SITEID, 'appraisal', 'update appraisal', 'general.php?id='.$id, 'General Settings: Appraisal ID=' . $id);
     if ($id < 0) {
-        totara_set_notification(get_string('appraisalupdated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
+        totara_set_notification(get_string('appraisalcreated', 'totara_appraisal'), $returnurl, array('class' => 'notifysuccess'));
     } else {
         $stageurl = new moodle_url('/totara/appraisal/stage.php', array('appraisalid' => $appraisal->id));
         totara_set_notification(get_string('appraisalupdated', 'totara_appraisal'), $stageurl, array('class' => 'notifysuccess'));

@@ -193,7 +193,7 @@ class rb_source_program_overview extends rb_base_source {
             'base.timedue',
             array(
                 'joins' => 'base',
-                'displayfunc' => 'prog_date',
+                'displayfunc' => 'nice_date',
                 'dbdatatype' => 'timestamp',
             )
         );
@@ -205,7 +205,7 @@ class rb_source_program_overview extends rb_base_source {
             'base.timestarted',
             array(
                 'joins' => 'base',
-                'displayfunc' => 'prog_date',
+                'displayfunc' => 'nice_date',
                 'dbdatatype' => 'timestamp',
                 'extrafields' => array('prog_id' => 'program.id')
             )
@@ -218,7 +218,7 @@ class rb_source_program_overview extends rb_base_source {
             'base.timecompleted',
             array(
                 'joins' => 'base',
-                'displayfunc' => 'prog_date',
+                'displayfunc' => 'nice_date',
                 'dbdatatype' => 'timestamp',
             )
         );
@@ -361,7 +361,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline_date',
+                'displayfunc' => 'nice_date_list',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -374,7 +374,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline_date',
+                'displayfunc' => 'nice_date_list',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -387,7 +387,7 @@ class rb_source_program_overview extends rb_base_source {
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'comma_list',
-                'displayfunc' => 'list_to_newline_date',
+                'displayfunc' => 'nice_date_list',
                 'style' => array('white-space' => 'pre'),
             )
         );
@@ -623,15 +623,6 @@ class rb_source_program_overview extends rb_base_source {
         return implode($items, "\n");
     }
 
-    function rb_display_list_to_newline_date($date, $row) {
-         $items = explode(', ', $date);
-         foreach ($items as $key => $item) {
-             $items[$key] = $this->rb_display_prog_date($item, $row);
-         }
-
-        return implode($items, "\n");
-    }
-
     function rb_display_list_to_newline_coursename($date, $row) {
          $items = explode(', ', $date);
          foreach ($items as $key => $item) {
@@ -674,24 +665,6 @@ class rb_source_program_overview extends rb_base_source {
 
         // Get relevant progress bar and return for display.
         return $totara_renderer->print_totara_progressbar($percentage, 'medium', $isexport, $percentage . '%');
-    }
-
-    /**
-     * Reformat a timestamp into a date, handling -1 which is used by program code for no date.
-     *
-     * If not -1 just call the regular date display function.
-     *
-     * @param integer $date Unix timestamp
-     * @param object $row Object containing all other fields for this row
-     *
-     * @return string Date in a nice format
-     */
-    public function rb_display_prog_date($date, $row) {
-        if ($date == -1) {
-            return '';
-        } else {
-            return $this->rb_display_nice_date($date, $row);
-        }
     }
 
     // Source specific filter display methods.
