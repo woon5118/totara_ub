@@ -62,6 +62,7 @@ class totara_cohort_events_testcase extends advanced_testcase {
 
         // Modify cohort and approve changes.
         $ruleset = cohort_rule_create_ruleset($this->cohort->draftcollectionid);
+
         $sink->clear();
         cohort_rules_approve_changes($this->cohort);
 
@@ -320,6 +321,9 @@ class totara_cohort_events_testcase extends advanced_testcase {
 
         // Trigger creation event.
         $rulesetid = cohort_rule_create_ruleset($this->cohort->draftcollectionid);
+
+        $this->cohort_generator->create_cohort_rule_params($rulesetid, 'user', 'idnumber', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('001'));
+        $this->cohort_generator->create_cohort_rule_params($rulesetid, 'user', 'username', array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('001'));
 
         $events = $sink->get_events();
         $event = $events[0]->get_data();
