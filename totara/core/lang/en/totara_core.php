@@ -205,6 +205,7 @@ $string['eventmyreportviewed'] = 'User viewed his reports';
 $string['eventundeleted'] = 'User undeleted';
 $string['eventusersuspended'] = 'User suspended';
 $string['eventuserenrolment'] = 'User enrolled';
+$string['exportformat'] = 'Export format';
 $string['facetoface'] = 'Face-to-face';
 $string['findcourses'] = 'Find Courses';
 $string['findlearning'] = 'Find Learning';
