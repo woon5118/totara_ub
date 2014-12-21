@@ -1777,7 +1777,6 @@ abstract class rb_base_source {
                 array(
                     'joins' => $join,
                     'displayfunc' => 'user_email_unobscured',
-                    'defaultheading' => get_string('useremail', 'totara_reportbuilder'),
                     // Users must have viewuseridentity to see the
                     // unobscured email address.
                     'capability' => 'moodle/site:viewuseridentity',
@@ -1917,6 +1916,7 @@ abstract class rb_base_source {
      * @return True
      */
     protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user') {
+        global $CFG;
         // auto-generate filters for user fields
         $fields = array(
             'fullname' => get_string('userfullname', 'totara_reportbuilder'),
@@ -1935,6 +1935,12 @@ abstract class rb_base_source {
             'city' => get_string('usercity', 'totara_reportbuilder'),
             'email' => get_string('useremail', 'totara_reportbuilder'),
         );
+        // Only include this filter if email is among fields allowed
+        // by showuseridentity setting.
+        if (!empty($CFG->showuseridentity) && in_array('email', explode(',', $CFG->showuseridentity))) {
+            $fields['emailunobscured'] = get_string('useremailunobscured', 'totara_reportbuilder');
+        }
+
         foreach ($fields as $field => $name) {
             $filteroptions[] = new rb_filter_option(
                 $groupname,
