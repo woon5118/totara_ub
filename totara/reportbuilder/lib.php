@@ -3626,6 +3626,7 @@ class reportbuilder {
         if (!$file) {
             die;
         }
+        @chmod($file, (fileperms(dirname($file)) & 0666));
     }
 
     /** Download current table in XLS format
@@ -3719,6 +3720,7 @@ class reportbuilder {
         if (!$file) {
             die;
         }
+        @chmod($file, (fileperms(dirname($file)) & 0666));
     }
 
      /** Download current table in CSV format
@@ -3765,6 +3767,7 @@ class reportbuilder {
             $fp = fopen($file, "w");
             fwrite($fp, $export->print_csv_data(true));
             fclose($fp);
+            @chmod($file, (fileperms(dirname($file)) & 0666));
         } else {
             $export->download_file();
         }
@@ -3887,14 +3890,16 @@ class reportbuilder {
         }
         $html .= '</tbody></table>';
 
-        $svgdata = $graph->fetch_pdf_svg($portrait);
-        if ($svgdata) {
-            if ($portrait) {
-                $pdf->ImageSVG('@'.$svgdata, 5, 30, 196, 100);
-            } else {
-                $pdf->ImageSVG('@'.$svgdata, 5, 30, 282, 100);
+        if ($graph) {
+            $svgdata = $graph->fetch_pdf_svg($portrait);
+            if ($svgdata) {
+                if ($portrait) {
+                    $pdf->ImageSVG('@' . $svgdata, 5, 30, 196, 100);
+                } else {
+                    $pdf->ImageSVG('@' . $svgdata, 5, 30, 282, 100);
+                }
+                $pdf->SetY(130);
             }
-            $pdf->SetY(130);
         }
 
         // Closing the pdf.
@@ -3908,6 +3913,7 @@ class reportbuilder {
             $pdf->Output($filename, 'D');
         } else {
             $pdf->Output($file, 'F');
+            @chmod($file, (fileperms(dirname($file)) & 0666));
         }
     }
 
@@ -5282,8 +5288,8 @@ function reportbuilder_get_export_filename($report, $userid, $scheduleid) {
     }
 
     $dir = $path . DIRECTORY_SEPARATOR . $username;
-    if (!is_directory_a_preset($dir) && !file_exists($dir)) {
-        mkdir($dir);
+    if (!file_exists($dir)) {
+        mkdir($dir, (fileperms($path) & 02777));
     }
     $reportfilepathname = $dir . DIRECTORY_SEPARATOR . $reportfilename;
 
