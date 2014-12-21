@@ -366,6 +366,7 @@ switch ($searchtype) {
      * Facetoface room search
      */
     case 'facetoface_room':
+        $formdata['hidden']['facetofaceid'] = $this->customdata['facetofaceid'];
         $formdata['hidden']['sessionid'] = $this->customdata['sessionid'];
         $formdata['hidden']['timeslots'] = $this->customdata['timeslots'];
 
