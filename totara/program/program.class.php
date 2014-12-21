@@ -1137,7 +1137,8 @@ class program {
 
         $iscertif = (isset($this->certifid) && $this->certifid > 0) ? true : false;
 
-        $out = '';
+        // Div created to show notifications. Needed when requesting extensions.
+        $out = html_writer::tag('div', '', array('id' => 'totara-header-notifications'));
 
         if (!$this->is_accessible()) {
             // Return if program is not accessible
