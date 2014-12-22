@@ -44,7 +44,9 @@ class course_completion_form extends moodleform {
         $courseconfig = get_config('moodlecourse');
         $mform    =& $this->_form;
 
-        $unlocked = $this->_customdata['unlocked'];
+        $unlockdelete = $this->_customdata['unlockdelete'];
+        $unlockonly = $this->_customdata['unlockonly'];
+        $unlocked = $unlockdelete || $unlockonly;
         $course   = $this->_customdata['course'];
         $completion = new completion_info($course);
 
@@ -288,14 +290,22 @@ class course_completion_form extends moodleform {
             $mform->addElement('static', 'noroles', '', get_string('err_noroles', 'completion'));
         }
 
+        if ($unlockdelete) {
+            $mform->addElement('header', 'warningunlocked', get_string('completionsettingsunlocked', 'completion'));
+            $mform->setExpanded('warningunlocked', true, true);
+            $mform->addElement('static', '', '', get_string('completedunlockedtext', 'completion'));
+        }
+
         // Add common action buttons.
         $this->add_action_buttons();
 
         // Add hidden fields.
         $mform->addElement('hidden', 'id', $course->id);
-        $mform->addElement('hidden', 'unlocked', $unlocked);
+        $mform->addElement('hidden', 'unlockdelete', $unlockdelete);
+        $mform->addElement('hidden', 'unlockonly', $unlockonly);
         $mform->setType('id', PARAM_INT);
-        $mform->setType('unlocked', PARAM_INT);
+        $mform->setType('unlockdelete', PARAM_INT);
+        $mform->setType('unlockonly', PARAM_INT);
 
         // If the criteria are locked, freeze values and submit button.
         if ($completion->is_course_locked(false) && !$unlocked) {
