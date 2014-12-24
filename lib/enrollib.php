@@ -518,7 +518,8 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
  * @return array
  */
 function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder ASC', $limit = 0) {
-    global $DB, $USER;
+    global $DB, $USER, $CFG;
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser() or !isloggedin()) {
@@ -736,7 +737,8 @@ function enrol_user_sees_own_courses($user = null) {
  * @return array
  */
 function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser($userid) or empty($userid)) {
