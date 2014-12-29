@@ -46,4 +46,8 @@ class customfield_multiselect_text extends base {
 
         return $displaytext;
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return false;
+    }
 }

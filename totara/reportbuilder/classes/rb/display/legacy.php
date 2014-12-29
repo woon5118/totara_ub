@@ -53,4 +53,17 @@ class legacy extends base {
 
         return parent::display($value, $format, $row, $column, $report);
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        $displayfunc = $column->get_displayfunc();
+
+        if (!$displayfunc) {
+            return null;
+        }
+
+        // NOTE: report sources may override this via graphable property in rb_column_option.
+        $graphable = array('count', 'round2', 'percent', 'course_grade_percent');
+
+        return in_array($displayfunc, $graphable);
+    }
 }

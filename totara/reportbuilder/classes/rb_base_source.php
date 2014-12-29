@@ -388,6 +388,17 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Returns list of used components.
+     *
+     * The list includes frankenstyle component names of the
+     * current source and all parents.
+     *
+     * @return string[]
+     */
+    public function get_used_components() {
+        return $this->usedcomponents;
+    }
 
     //
     //
@@ -421,18 +432,8 @@ abstract class rb_base_source {
                 continue;
             }
 
-            $displayfunc = $column->get_displayfunc();
-            if ($displayfunc) {
-                foreach ($this->usedcomponents as $component) {
-                    $classname = "\\$component\\rb\\display\\$displayfunc";
-                    if (class_exists($classname)) {
-                        $results[] = $classname::display($row->$field, $format, $row, $column, $report);
-                        continue 2;
-                    }
-                }
-            }
-
-            $results[] = \totara_reportbuilder\rb\display\legacy::display($row->$field, $format, $row, $column, $report);
+            $classname = $column->get_display_class($report);
+            $results[] = $classname::display($row->$field, $format, $row, $column, $report);
         }
 
         return $results;

@@ -276,6 +276,18 @@ class rb_column_option {
     public $outputformat;
 
     /**
+     * Force/prevent the column to be usable as data series in graph?
+     *
+     * This is intended to override is_graphable() in display class or
+     * default for dbdatatype. This cannot override the is_graphable() in
+     * aggregation or transformation classes because it is user configurable
+     * and the results can be predicted reliably in many cases.
+     *
+     * @var bool
+     */
+    public $graphable;
+
+    /**
      * Column transform function
      *
      * @access public
@@ -325,6 +337,7 @@ class rb_column_option {
             'columngenerator' => null,
             'dbdatatype' => 'unspecified',
             'outputformat' => 'unspecified',
+            'graphable' => null,
             'transform' => null,
             'aggregate' => null,
         );

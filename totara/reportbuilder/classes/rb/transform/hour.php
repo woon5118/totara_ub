@@ -40,4 +40,8 @@ class hour extends base {
         }
         return "CASE WHEN ($field IS NULL OR $field = 0) THEN NULL ELSE $expr END";
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
+    }
 }

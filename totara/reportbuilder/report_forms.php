@@ -815,6 +815,7 @@ class report_builder_edit_graph_form extends moodleform {
             'area' => get_string('graphtypearea', 'totara_reportbuilder'),
         );
         $mform->addElement('select', 'type', get_string('graphtype', 'totara_reportbuilder'), $types);
+        $mform->addHelpButton('type', 'graphtype', 'totara_reportbuilder');
 
         $optionoptions = array(
             'C' => get_string('graphorientationcolumn', 'totara_reportbuilder'),
@@ -827,12 +828,18 @@ class report_builder_edit_graph_form extends moodleform {
 
         $catoptions = array('none' => get_string('graphnocategory', 'totara_reportbuilder'));
         $legendoptions = array();
+        $series = array();
         foreach ($report->columns as $key => $column) {
             if (!$column->display_column(true)) {
                 continue;
             }
-            $catoptions[$key] = $report->format_column_heading($column, true);
-            $legendoptions[$key] = $catoptions[$key];
+            $colheading = $report->format_column_heading($column, true);
+            $legendoptions[$key] = $colheading;
+            $catoptions[$key] = $colheading;
+            if (!$column->is_graphable($report)) {
+                continue;
+            }
+            $series[$key] = $colheading;
         }
 
         $mform->addElement('select', 'category', get_string('graphcategory', 'totara_reportbuilder'), $catoptions);
@@ -843,15 +850,14 @@ class report_builder_edit_graph_form extends moodleform {
         $mform->disabledIf('legend', 'type', 'eq', '');
         $mform->disabledIf('legend', 'orientation', 'noteq', 'R');
 
-        $series = array();
-        foreach ($catoptions as $key => $colheading) {
-            if ($key === 'none') {
-                continue;
-            }
-            $series[$key] = $colheading;
+        if ($series) {
+            $mform->addElement('select', 'series', get_string('graphseries', 'totara_reportbuilder'), $series, array('multiple' => true));
+            $mform->disabledIf('series', 'type', 'eq', '');
+        } else {
+            unset($graph->series);
+            $mform->addElement('static', 'series', get_string('graphseries', 'totara_reportbuilder'), get_string('error:nographseries', 'totara_reportbuilder'));
         }
-        $mform->addElement('select', 'series', get_string('graphseries', 'totara_reportbuilder'), $series, array('multiple' => true));
-        $mform->disabledIf('series', 'type', 'eq', '');
+        $mform->addHelpButton('series', 'graphseries', 'totara_reportbuilder');
 
         $mform->addElement('advcheckbox', 'stacked', get_string('graphstacked', 'totara_reportbuilder'));
         $mform->disabledIf('stacked', 'type', 'eq', '');

@@ -38,4 +38,8 @@ class countdistinct extends base {
     public static function is_column_option_compatible(\rb_column_option $option) {
         return true;
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
+    }
 }

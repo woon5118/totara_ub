@@ -93,4 +93,18 @@ class base {
 
         return $result;
     }
+
+    /**
+     * Is the result of this display method usable for graph series?
+     * @param \rb_column $column
+     * @param \rb_column_option $option
+     * @param \reportbuilder $report
+     * @return bool
+     */
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        // NOTE: Override with true if result numeric.
+        //       Override with false if the result cannot be plotted on graph.
+        //       Keep null if not known.
+        return null;
+    }
 }

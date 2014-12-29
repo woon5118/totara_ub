@@ -52,4 +52,8 @@ class nice_date_list extends base {
         // handled as plain text.
         return implode($items, "\n");
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return false;
+    }
 }

@@ -545,4 +545,85 @@ class rb_column {
 
         return $displayfunc;
     }
+
+    /**
+     * Returns class name of totara_reportbuilder\rb\display\ class used for
+     * display of this column data.
+     *
+     * @param reportbuilder $report
+     * @return string class name
+     */
+    public function get_display_class(reportbuilder $report) {
+        $displayfunc = $this->get_displayfunc();
+
+        if (!$displayfunc) {
+            return '\totara_reportbuilder\rb\display\legacy';
+        }
+
+        foreach ($report->src->get_used_components() as $component) {
+            $classname = "\\$component\\rb\\display\\$displayfunc";
+            if (class_exists($classname)) {
+                return $classname;
+            }
+        }
+
+        return '\totara_reportbuilder\rb\display\legacy';
+    }
+
+    /**
+     * Is the column data suitable for data series in graphs?
+     *
+     * @param reportbuilder $report
+     * @return bool
+     */
+    public function is_graphable(reportbuilder $report) {
+        $key = $this->type . '-' . $this->value;
+        if (!isset($report->columnoptions[$key])) {
+            // This is an automatically created column, we do not know much about it, sorry.
+            return true;
+        }
+
+        $option = $report->columnoptions[$key];
+
+        if ($this->grouping === 'none' and $this->transform) {
+            $classname = '\totara_reportbuilder\rb\transform\\' . $this->transform;
+            $graphable = $classname::is_graphable($this, $option, $report);
+            if (isset($graphable)) {
+                return (bool)$graphable;
+            }
+
+        } else if ($this->grouping === 'none' and $this->aggregate) {
+            $classname = '\totara_reportbuilder\rb\aggregate\\' . $this->aggregate;
+            $graphable = $classname::is_graphable($this, $option, $report);
+            if (isset($graphable)) {
+                return (bool)$graphable;
+            }
+        }
+
+        // Now is the time to let the column option override display function/class or grouping.
+        // Note that transformed and aggregated cannot be overridden because they are user controlled .
+        if (isset($option->graphable)) {
+            return (bool)$option->graphable;
+        }
+
+        // Does the display class know if it is usable in graphs?
+        $classname = $this->get_display_class($report);
+        $graphable = $classname::is_graphable($this, $option, $report);
+        if (isset($graphable)) {
+            return (bool)$graphable;
+        }
+
+        if ($this->grouping !== 'none') {
+            // We usually know the result of grouped columns.
+            $graphablegroupings = array('count', 'unique_count', 'sum', 'average', 'max', 'min', 'stddev', 'percent');
+            return in_array($this->grouping,  $graphablegroupings);
+        }
+
+        if ($option->dbdatatype === 'decimal' or $option->dbdatatype === 'integer') {
+            return true;
+        }
+
+        // Not usable in graphs!
+        return false;
+    }
 }

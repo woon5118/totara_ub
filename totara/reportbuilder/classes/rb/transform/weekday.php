@@ -45,4 +45,8 @@ class weekday extends base {
     public static function get_displayfunc(\rb_column $column) {
         return 'weekday';
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
+    }
 }

@@ -158,4 +158,18 @@ abstract class base {
     public static function is_column_option_compatible(\rb_column_option $option) {
         return false;
     }
+
+    /**
+     * Is the result of this aggregation usable for graph series?
+     * @param \rb_column $column
+     * @param \rb_column_option $option
+     * @param \reportbuilder $report
+     * @return bool
+     */
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        // NOTE: Override with true if result numeric or display function can convert it to numeric value.
+        //       Override with false if the result cannot be plotted on graph.
+        //       Keep null if not known.
+        return null;
+    }
 }
