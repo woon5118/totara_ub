@@ -369,10 +369,10 @@ JAVASCRIPT;
     case 'svgNode' :
       $fn = <<<JAVASCRIPT
 function svgNode(e) {
-  var d = e.target.correspondingUseElement || e.target;
-  while(d.parentNode && d.nodeName != '{$namespace}svg')
+  var d = e.target.correspondingUseElement || e.target, nn = '{$namespace}svg';
+  while(d.parentNode && d.nodeName != nn)
     d = d.parentNode;
-  return d
+  return d.nodeName == nn ? d : null;
 }\n
 JAVASCRIPT;
       break;
@@ -380,11 +380,11 @@ JAVASCRIPT;
       $this->AddFunction('svgNode');
       $fn = <<<JAVASCRIPT
 function svgCursorCoords(e) {
-  var d = svgNode(e);
-  if (!d.createSVGPoint || !d.getScreenCTM) {
+  var d = svgNode(e), pt;
+  if(!d || !d.createSVGPoint || !d.getScreenCTM) {
     return [e.clientX,e.clientY];
   }
-  var pt = d.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  pt = d.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
   pt = pt.matrixTransform(d.getScreenCTM().inverse());
   return [pt.x,pt.y];
 }\n
@@ -547,9 +547,17 @@ JAVASCRIPT;
       $show_y = $this->crosshairs_show_v ? 'showhide(yc, on);' : '';
       $fn = <<<JAVASCRIPT
 function crosshairs(e) {
-  var de = svgNode(e), pos = svgCursorCoords(e), xc = de.querySelector('.chX'),
-    yc = de.querySelector('.chY'), grid = de.querySelector('.grid'),
-    bb = grid.getBBox(), x = pos[0], y = pos[1],
+  var de = svgNode(e), pos = svgCursorCoords(e), xc, yc, grid, bb, on, x, y;
+  if(!de)
+    return;
+  xc = de.querySelector('.chX');
+  yc = de.querySelector('.chY');
+  grid = de.querySelector('.grid');
+  if(!grid)
+    return;
+  bb = grid.getBBox();
+  x = pos[0];
+  y = pos[1];
   on = (x >= bb.x && x <= bb.x + bb.width && y >= bb.y && y <= bb.y + bb.height);
   if(on) {
     setattr(xc,'y1',setattr(xc,'y2', y));

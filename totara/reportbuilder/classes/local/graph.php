@@ -57,7 +57,7 @@ class graph {
 
         $this->svggraphsettings = array(
             'preserve_aspect_ratio' => 'xMidYMid meet',
-            'auto_fit_parent' => true,
+            'auto_fit' => true,
             'axis_font' => 'sans-serif',
             'pad_right' => 20,
             'pad_left' => 20,
