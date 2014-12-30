@@ -557,12 +557,13 @@ function totara_upgrade_installed_languages() {
  * Currently the options array only supports a 'class' entry for passing as
  * the second parameter to notification()
  *
- * @param   string  $message    Message to display
- * @param   string  $redirect   Url to redirect to (optional)
- * @param   array   $options    Options array (optional)
- * @return  void
+ * @param string $message Message to display
+ * @param string $redirect Url to redirect to (optional)
+ * @param array $options An array of options to pass to totara_queue_append (optional)
+ * @param bool $immediatesend If set to true the notification is immediately sent
+ * @return void
  */
-function totara_set_notification($message, $redirect = null, $options = array()) {
+function totara_set_notification($message, $redirect = null, $options = array(), $immediatesend = true) {
 
     // Check options is an array
     if (!is_array($options)) {
@@ -579,7 +580,11 @@ function totara_set_notification($message, $redirect = null, $options = array())
     if ($redirect !== null) {
         // Cancel redirect for AJAX scripts.
         if (is_ajax_request($_SERVER)) {
-            ajax_result(true, totara_queue_shift('notifications'));
+            if (!$immediatesend) {
+                ajax_result(true);
+            } else {
+                ajax_result(true, totara_queue_shift('notifications'));
+            }
         } else {
             redirect($redirect);
         }
