@@ -1853,19 +1853,18 @@ function xmldb_facetoface_upgrade($oldversion=0) {
     }
 
     if ($oldversion < 2014021300) {
-        // Get custom fields marked as filters.
-        $selectedfilters = $DB->get_fieldset_select('facetoface_session_field', 'id', 'isfilter = 1');
-        // Activate room, building, and address as default filters.
-        $selectedfilters = array_merge($selectedfilters, array('room', 'building', 'address'));
-        $calendarfilters = count($selectedfilters) ? implode(',', $selectedfilters) : '';
-
-        // Store the selected filters in the DB.
-        set_config('facetoface_calendarfilters', $calendarfilters);
-
-        // Remove isfilter field (now unnecessary).
         $table = new xmldb_table('facetoface_session_field');
         $field = new xmldb_field('isfilter');
+
         if ($dbman->field_exists($table, $field)) {
+            // Get custom fields marked as filters.
+            $selectedfilters = $DB->get_fieldset_select('facetoface_session_field', 'id', 'isfilter = 1');
+            // Activate room, building, and address as default filters.
+            $selectedfilters = array_merge($selectedfilters, array('room', 'building', 'address'));
+            $calendarfilters = count($selectedfilters) ? implode(',', $selectedfilters) : '';
+            // Store the selected filters in the DB.
+            set_config('facetoface_calendarfilters', $calendarfilters);
+            // Remove isfilter field (now unnecessary).
             $dbman->drop_field($table, $field);
         }
 
