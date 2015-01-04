@@ -500,13 +500,12 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     var apprObj = form.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post(form.attr('action'), apprObj).done(function(data) {
-                        var obj = $.parseJSON(data);
-                        if (obj.result == 'success') {
-                            var span = "#usernote"+obj.id;
-                            $(span).html(obj.usernote);
+                        if (data.result == 'success') {
+                            var span = "#usernote"+data.id;
+                            $(span).html(data.usernote);
                             dialog.destroy(true);
                         } else {
-                            $("#attendee_note_err").text(obj.error);
+                            $("#attendee_note_err").text(data.error);
                         }
                     });
                     return false;
