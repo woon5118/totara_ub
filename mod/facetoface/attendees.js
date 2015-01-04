@@ -541,13 +541,12 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     var apprObj = $theFrm.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post($theFrm.attr('action'), apprObj).done(function(data){
-                        var obj = $.parseJSON(data);
-                        if (obj.result == 'success') {
-                            var span = "#position"+obj.id;
-                            $(span).html(obj.positiondisplayname);
+                        if (data.result == 'success') {
+                            var span = "#position"+data.id;
+                            $(span).html(data.positiondisplayname);
                             panel.destroy(true);
                         } else {
-                            $("#attendee_position_err").text(obj.error);
+                            $("#attendee_position_err").text(data.error);
                         }
                     });
                     return false;
