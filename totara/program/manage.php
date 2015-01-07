@@ -64,7 +64,7 @@ $moveto = optional_param('moveto', 0, PARAM_INT);
 $resort = optional_param('resort', 0, PARAM_BOOL);
 
 // Actions to manage categories.
-$deletecat = optional_param('deletecat', 0, PARAM_INT);
+$action = optional_param('action', false, PARAM_ALPHA);
 $hidecat = optional_param('hidecat', 0, PARAM_INT);
 $showcat = optional_param('showcat', 0, PARAM_INT);
 $movecat = optional_param('movecat', 0, PARAM_INT);
@@ -105,17 +105,19 @@ if ($id) {
 $canmanage = has_capability('moodle/category:manage', $context);
 
 // Process any category actions.
-if (!empty($deletecat) and confirm_sesskey()) {
+if ($action == 'deletecategory' and confirm_sesskey()) {
+    // They must have specified a category.
+    required_param('categoryid', PARAM_INT);
     // Delete a category.
-    $cattodelete = coursecat::get($deletecat);
-    $context = context_coursecat::instance($deletecat);
+    $cattodelete = coursecat::get($id);
+    $context = context_coursecat::instance($id);
     require_capability('moodle/category:manage', $context);
     require_capability('moodle/category:manage', get_category_or_system_context($cattodelete->parent));
 
     $heading = get_string('deletecategory', 'moodle', format_string($cattodelete->name, true, array('context' => $context)));
 
-    require_once($CFG->dirroot.'/course/delete_category_form.php');
-    $mform = new delete_category_form(null, $cattodelete);
+    $mform = new core_course_deletecategory_form(null, $cattodelete);
+
     if ($mform->is_cancelled()) {
         redirect(new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype)));
     }
@@ -778,8 +780,8 @@ function print_category_edit(html_table $table, coursecat $category, $catlist, $
             );
             // Delete category.
             $icons[] = $OUTPUT->action_icon(
-                            new moodle_url('/totara/program/manage.php',
-                                           array('deletecat' => $category->id, 'sesskey' => sesskey(), 'viewtype' => $viewtype)),
+                            new moodle_url('/totara/program/manage.php', array('categoryid' => $category->id,
+                                'sesskey' => sesskey(), 'viewtype' => $viewtype, 'action' => 'deletecategory')),
                             new pix_icon('t/delete', $str->delete, 'moodle', array('class' => 'iconsmall')),
                             null, array('title' => $str->delete)
             );
