@@ -186,6 +186,7 @@ $string['ccmanager_note'] = 'Send a copy of this notification to the user\'s man
 $string['chooseroom'] = 'Choose a room';
 $string['choosepredefinedroom'] = 'Choose a pre-defined room';
 $string['cannotapproveatcapacity'] = 'You cannot approve any more attendees as this session is full.';
+$string['cleanuptask'] = 'Cleanup facetoface';
 $string['clearall'] = 'Clear all';
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';

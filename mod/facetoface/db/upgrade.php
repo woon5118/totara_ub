@@ -81,6 +81,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
+    // TODO: remove use of facetoface API because the database may not be upgraded yet!
     require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
     $result = true;
@@ -1912,36 +1913,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014022000, 'facetoface');
-    }
-
-    if ($oldversion < 2014050400) {
-        $del_users = $DB->get_fieldset_select('user', 'id', 'deleted = ?', array(1));
-        $sus_users = $DB->get_fieldset_select('user', 'id', 'deleted = ? AND suspended = ?', array(0, 1));
-
-        foreach ($del_users as $user) {
-            // Cancel already deleted users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
-                foreach ($signups as $signup) {
-                    $session = facetoface_get_session($signup->sessionid);
-                    // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user, false, $null, get_string('userdeletedcancel', 'facetoface'));
-                }
-            }
-        }
-
-        foreach ($sus_users as $user) {
-            // Cancel already suspended users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
-                foreach ($signups as $signup) {
-                    $session = facetoface_get_session($signup->sessionid);
-                    // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user, false, $null, get_string('usersuspendedcancel', 'facetoface'));
-                }
-            }
-        }
-
-        // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014050400, 'facetoface');
     }
 
     if ($oldversion < 2014061600) {
