@@ -27,17 +27,19 @@ class block_totara_alerts_renderer extends plugin_renderer_base {
      *
      * @param array $alerts The list of stats to display in the block.
      * @param integer $total The total number of alerts in this block.
+     * @param object $config Totara alert block config
      *
      * @returns the rendered results.
      */
-    public function display_alerts($alerts, $total) {
+    public function display_alerts($alerts, $total, $config) {
+        global $CFG;
         $output = '';
         $count = count($alerts);
         if ($count) {
             $output .= html_writer::tag('p', get_string('showingxofx', 'block_totara_alerts', array('count' => $count, 'total' => $total)));
         } else {
             if (!empty($CFG->block_totara_alerts_showempty)) {
-                if (!empty($this->config->showempty)) {
+                if (!empty($config->showempty)) {
                     $output .= html_writer::tag('p', get_string('noalerts', 'block_totara_alerts'));
                 } else {
                     return '';
@@ -64,7 +66,7 @@ class block_totara_alerts_renderer extends plugin_renderer_base {
     /**
      * Displays a list of alerts
      *
-     * @param array $alerts the list of stats to display in the block.
+     * @param object $alerts the stat to display in the block.
      *
      * @returns the rendered results.
      */
