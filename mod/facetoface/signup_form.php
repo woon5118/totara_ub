@@ -102,7 +102,8 @@ class mod_facetoface_signup_form extends moodleform {
             );
         }
 
-        $this->add_action_buttons(true, get_string('signup', 'facetoface'));
+        $strsignup = $this->_customdata['signupbywaitlist'] ? 'joinwaitlist' : 'signup';
+        $this->add_action_buttons(true, get_string($strsignup, 'facetoface'));
     }
 
     public static function add_position_selection_formelem ($mform, $f2fid, $sessionid) {

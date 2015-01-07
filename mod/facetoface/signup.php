@@ -94,11 +94,12 @@ $selfapprovaltandc = format_text($facetoface->selfapprovaltandc, FORMAT_PLAIN);
 $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
 $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
 $enableattendeenote = $session->availablesignupnote;
+$signupbywaitlist = facetoface_is_signup_by_waitlist($session);
 
 $f2fid = $session->facetoface;
 
 $params = compact('s', 'backtoallsessions', 'manageremail', 'showdiscountcode',
-    'hasselfapproval', 'selfapprovaltandc', 'f2fid', 'waitlisteveryone', 'enableattendeenote');
+    'hasselfapproval', 'selfapprovaltandc', 'f2fid', 'waitlisteveryone', 'enableattendeenote', 'signupbywaitlist');
 $mform = new mod_facetoface_signup_form(null, $params);
 
 if ($mform->is_cancelled()) {
@@ -143,7 +144,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
             $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
             $cssclass = 'notifymessage';
         } else {
-            $message = get_string('bookingcompleted', 'facetoface');
+            $strmessage = $signupbywaitlist ? 'joinwaitlistcompleted' : 'bookingcompleted';
+            $message = get_string($strmessage, 'facetoface');
             $cssclass = 'notifysuccess';
         }
 
@@ -178,7 +180,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
 echo $OUTPUT->header();
 
-$heading = get_string('signupfor', 'facetoface', $facetoface->name);
+$strheading = $signupbywaitlist ? 'waitlistfor' : 'signupfor';
+$heading = get_string($strheading, 'facetoface', $facetoface->name);
 
 $viewattendees = has_capability('mod/facetoface:viewattendees', $context);
 $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
@@ -218,12 +221,13 @@ if (!facetoface_session_has_capacity($session, $context, MDL_F2F_STATUS_WAITLIST
     exit();
 }
 
-echo facetoface_print_session($session, $viewattendees);
+echo facetoface_print_session($session, $viewattendees, false, false, $signedup);
 
 if ($signedup) {
     if (facetoface_allow_user_cancellation($session)) {
         // Cancellation link.
-        echo html_writer::link(new moodle_url('cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $backtoallsessions)), get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+        $canceltext = facetoface_is_user_on_waitlist($session) ? get_string('cancelwaitlist', 'facetoface') : get_string('cancelbooking', 'facetoface');
+        echo html_writer::link(new moodle_url('cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $backtoallsessions)), $canceltext, array('title' => $canceltext));
         echo ' &ndash; ';
     }
     // See attendees link.

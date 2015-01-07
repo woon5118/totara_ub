@@ -172,6 +172,8 @@ $string['cancellationnotsent'] = 'Face-to-face activity email notifications are 
 $string['cancellationsentmgr'] = 'You and your manager should immediately receive a cancellation email.';
 $string['cancellationstablesummary'] = 'List of people who have cancelled their session signups.';
 $string['cancelreason'] = 'Reason';
+$string['cancelwaitlist'] = 'Cancel waitlist';
+$string['cancelwaitlistfor'] = 'Cancel place on the waitlist for {$a}';
 $string['capacity'] = 'Capacity';
 $string['capacityallowoverbook'] = '{$a} (allow overbooking)';
 $string['capacitycurrentofmaximum'] = '{$a->current} / {$a->maximum}';
@@ -463,6 +465,8 @@ $string['import'] = 'Import';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['internal'] = 'Prevent room conflicts';
+$string['joinwaitlist'] = 'Join waitlist';
+$string['joinwaitlistcompleted'] = 'You have been placed on the waitlist for this session.';
 $string['lastreservation'] = 'Last reservations are {$a->reservedays} days before the session starts. Unallocated reservations will be deleted {$a->reservecanceldays} days before the session starts.';
 $string['late'] = '\{$a} late';
 $string['location'] = 'Location';
@@ -1078,7 +1082,7 @@ Participant:   [firstname] [lastname]
 
 By waitlisting you have registered your interest in this course and will be contacted directly when sessions become available.
 
-To remove yourself from this waitlist please return to this course and click Cancel Booking. Please note there is no waitlist removal confirmation email.
+To remove yourself from this waitlist please return to this course and click Cancel waitlist. Please note there is no waitlist removal confirmation email.
 ';
 $string['setting:defaultwaitlistedsubject'] = 'Default subject line for wait-listed emails.';
 $string['setting:defaultwaitlistedsubject_caption'] = 'Wait-listed subject';
@@ -1216,7 +1220,7 @@ $string['usernoteheading'] = '{$a} - update note';
 $string['usersignedup'] = 'Status: signed up';
 $string['usersignedupmultiple'] = 'User signed up on {$a} sessions';
 $string['usersignedupon'] = 'User signed up on {$a}';
-$string['userwillbewaitlisted'] = 'This session is currently full. By clicking the "Sign-up" button, you will be placed on the sessions\'s wait-list.';
+$string['userwillbewaitlisted'] = 'This session is currently full. By clicking the "Join waitlist" button, you will be placed on the sessions\'s wait-list.';
 $string['validation:needatleastonedate'] = 'You need to provide at least one date, or else mark the session as wait-listed.';
 $string['venue'] = 'Venue';
 $string['viewallsessions'] = 'View all sessions';
@@ -1425,4 +1429,8 @@ $string['cancelusersession'] = 'Cancelled for {$a->usermsg} session {$a->url}';
 $string['approveinstruction'] = 'To approve session registration, press accept';
 $string['rejectinstruction'] = 'To reject session registration, press reject';
 $string['sessiondate_help'] = 'Session date is the date on which the session occurs.';
+$string['waitlistcancelled'] = 'Your place on the waitlist has been cancelled.';
+$string['waitlistcancellationconfirm'] = 'Are you sure you want to cancel your place on the waiting list for this session?';
+$string['waitlistfor'] = 'Waitlist for {$a}';
+$string['waitliststatus'] = 'You have a place on the waitlist of the following session';
 

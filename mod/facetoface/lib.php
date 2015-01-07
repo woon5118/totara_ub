@@ -2629,10 +2629,13 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
+                $userisinwaitlist = facetoface_is_user_on_waitlist($session, $USER->id);
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
+                } else if ($userisinwaitlist) {
+                    $status = get_string('waitliststatus', 'facetoface');
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
@@ -2672,7 +2675,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 }
 
                 if (facetoface_allow_user_cancellation($session)) {
-                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                    $strcancelbooking = $userisinwaitlist ? get_string('cancelwaitlist', 'facetoface') : get_string('cancelbooking', 'facetoface');
                     $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                     $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
                 }
@@ -2727,7 +2730,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     continue;
                 } else {
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-                    $moreinfolink = html_writer::link($signup_url, get_string('signup', 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
+                    $signuptext   = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                    $moreinfolink = html_writer::link($signup_url, get_string($signuptext, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
 
                     $span = html_writer::tag('span', get_string('options', 'facetoface').':', array('class' => 'f2fsessionnotice'));
                 }
@@ -2842,6 +2846,53 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $coursemodule->set_content($output);
 }
 
+/**
+ * Determine if sign-ups to this session should place users on the
+ * waitlist or book them.
+ *
+ * @param object $session A session object
+ * @return bool True if the sign-up should be by waitlist, false otherwise.
+ */
+function facetoface_is_signup_by_waitlist($session) {
+    // Users will be waitlisted if the session date is unknown.
+    if (empty($session->datetimeknown)) {
+        return true;
+    }
+
+    // Get waitlisteveryone setting for the session.
+    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+    $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
+    if ($waitlisteveryone || facetoface_get_num_attendees($session->id) >= $session->capacity) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Determine if a user is in the waitlist of a session.
+ *
+ * @param object $session A session object
+ * @param int $userid The user ID
+ * @return bool True if the user is on waitlist, false otherwise.
+ */
+function facetoface_is_user_on_waitlist($session, $userid = null) {
+    global $DB, $USER;
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    $sql = "SELECT 1
+            FROM {facetoface_signups} su
+            JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+            WHERE su.sessionid = ?
+              AND ss.superceded != 1
+              AND su.userid = ?
+              AND ss.statuscode = ?";
+
+    return $DB->record_exists_sql($sql, array($session->id, $userid, MDL_F2F_STATUS_WAITLISTED));
+}
 
 /**
  * Update grades by firing grade_updated event
