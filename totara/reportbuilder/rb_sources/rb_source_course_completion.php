@@ -143,7 +143,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' OR base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 1 ELSE 0 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
                 )
             ),
@@ -154,7 +154,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' OR base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 0 ELSE 1 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('isnotcomplete', 'rb_source_course_completion'),
                 )
             ),
@@ -165,7 +165,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETE . ' THEN 1 ELSE 0 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
                 )
             ),
@@ -176,7 +176,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN 1 ELSE 0 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('iscomplete', 'rb_source_course_completion'),
                 )
             ),
@@ -187,7 +187,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_INPROGRESS . ' THEN 1 ELSE 0 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('isinprogress', 'rb_source_course_completion'),
                 )
             ),
@@ -198,7 +198,7 @@ class rb_source_course_completion extends rb_base_source {
                 'CASE WHEN base.status = ' . COMPLETION_STATUS_NOTYETSTARTED . ' THEN 1 ELSE 0 END',
                 array(
                     'displayfunc' => 'yes_or_no',
-                    'dbdatatype' => 'integer',
+                    'dbdatatype' => 'boolean',
                     'defaultheading' => get_string('isnotyetstarted', 'rb_source_course_completion'),
                 )
             ),

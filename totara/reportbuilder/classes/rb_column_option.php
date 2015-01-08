@@ -261,6 +261,7 @@ class rb_column_option {
      * 'char'
      * 'text'
      * 'integer' - not intended for ids and foreign keys, the value must have some numerical meaning
+     * 'boolean' - value 0 or 1, this is useful especially for aggregated percentages
      * 'decimal'
      * 'timestamp'
      * Other formats may be defined in the future.

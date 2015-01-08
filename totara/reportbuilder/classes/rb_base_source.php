@@ -563,11 +563,6 @@ abstract class rb_base_source {
         return $item === null ? null : sprintf('%.2f', $item);
     }
 
-    // converts number to percentage with 1 decimal place
-    function rb_display_percent($item, $row) {
-        return $item === null ? null : sprintf('%.1f%%', $item);
-    }
-
     /**
      * Display correct course grade via grade or RPL as a percentage string
      *

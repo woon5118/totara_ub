@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2014 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2015 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,14 @@
  * @package totara_reportbuilder
  */
 
-namespace totara_reportbuilder\rb\aggregate;
+namespace totara_reportbuilder\rb\display;
 
 /**
- * Class describing column aggregation options.
+ * Class describing column display formatting.
  */
-class sum extends base {
-    protected static function get_field_aggregate($field) {
-        return "SUM($field)";
-    }
-
-    public static function is_column_option_compatible(\rb_column_option $option) {
-        return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'boolean');
+class percent extends base {
+    public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        return $value === null ? null : sprintf('%.1f%%', $value);
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
