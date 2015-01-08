@@ -96,6 +96,7 @@ $string['backtoappraisal'] = 'Back to appraisal';
 $string['cancelled'] = 'Cancelled';
 $string['changesnotlive'] = 'Changes within the assigned groups have occurred but are not yet live. Appraisal assignments will be updated on the next cron run';
 $string['changessaved'] = 'Changes saved';
+$string['cleanuptask'] = 'Cleanup appraisals';
 $string['close'] = 'Close';
 $string['closeappraisal'] = 'Close appraisal';
 $string['closed'] = 'Closed';

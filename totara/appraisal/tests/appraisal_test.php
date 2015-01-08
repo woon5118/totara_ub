@@ -870,4 +870,51 @@ class appraisal_test extends appraisal_testcase {
         $this->assertEquals(0, $DB->count_records_sql($u1sql, $u1param));
         $this->assertEquals(4, $DB->count_records_sql($u2sql, $u2param));
     }
+
+    public function test_cleanup_task() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Create appraisal and activate it.
+        list($appraisal, $users) = $this->prepare_appraisal_with_users();
+        $appraisal->activate();
+
+        // Get user assignments.
+        $userassignments = $DB->get_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id));
+
+        $sql = "SELECT ara.id
+                  FROM {appraisal_role_assignment} ara
+            INNER JOIN {appraisal_user_assignment} aua
+                    ON aua.id = ara.appraisaluserassignmentid
+                 WHERE aua.appraisalid = ? ";
+
+        // Let's mark users as deleted.
+        $deletedusers = array();
+        foreach ($userassignments as $userassignment) {
+            if ($userassignment->userid % 2) {
+                $DB->set_field('user', 'deleted', 1, array('id' => $userassignment->userid));
+                $deletedusers[$userassignment->userid] = $userassignment->id;
+            }
+        }
+
+        // Check we have the users assigned to the appraisal and the users has records in the appraisal_role_assignment.
+        $this->assertEquals(count($users), count($userassignments));
+        $this->assertEquals(count($users), count($DB->get_records_sql($sql, array($appraisal->id))));
+
+        // Call the clean up task.
+        $task = new \totara_appraisal\task\cleanup_task();
+        $task->execute();
+
+        // Check the clean up task has done its work and deleted users have been removed from the assignments table.
+        $currentusers = count($users) - count($deletedusers);
+        $this->assertEquals($currentusers, $DB->count_records('appraisal_user_assignment', array('appraisalid' => $appraisal->id)));
+        $this->assertEquals($currentusers, count($DB->get_records_sql($sql, array($appraisal->id))));
+
+        foreach ($deletedusers as $userid => $value) {
+            $params = array('userid' => $userid, 'appraisalid' => $appraisal->id);
+            $paramsrole = array('appraisaluserassignmentid' => $value);
+            $this->assertFalse($DB->record_exists('appraisal_user_assignment', $params));
+            $this->assertFalse($DB->record_exists('appraisal_role_assignment', $paramsrole));
+        }
+    }
 }

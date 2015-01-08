@@ -1,4 +1,4 @@
-<?php
+<<?php
 /*
  * This file is part of Totara LMS
  *
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara_appraisal
+ * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
+ * @package totara_feedback360
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -27,16 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
     array(
-        'classname' => 'totara_appraisal\task\update_learner_assignments_task',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'totara_appraisal\task\cleanup_task',
+        'classname' => 'totara_feedback360\task\cleanup_task',
         'blocking' => 0,
         'minute' => '*',
         'hour' => '3',
