@@ -73,9 +73,11 @@ $string['appraisalinvalid:stagenoonecananswer'] = 'Stage \'{$a}\' has no questio
 $string['appraisalinvalid:stagesamedue'] = 'Two or more stages have the same due date.';
 $string['appraisalinvalid:status'] = 'Cannot activate appraisal that is not draft.';
 $string['appraisalinvalid:learners'] = 'There are no assigned learners.';
-$string['appraisallastwarning'] = 'Activating this appraisal will disable changes to all stages, pages and questions,
+$string['appraisalstaticlastwarning'] = 'Activating this appraisal will disable changes to all stages, pages and questions,
     and will lock the list of assigned users. It will make the appraisal available to those users and send out any messages you
     have configured.';
+$string['appraisaldynamiclastwarning'] = 'Activating this appraisal will disable changes to all stages, pages and questions.
+    It will make the appraisal available to those users and send out any messages you have configured.';
 $string['appraisalupdated'] = 'Appraisal Updated';
 $string['asroleappraiser'] = 'As Appraiser';
 $string['asrolelearner'] = 'My Appraisals';
@@ -196,6 +198,7 @@ $string['error:appraisalisactive'] = 'Appraisal cannot be removed if it is activ
 $string['error:appraisalnoteditable'] = 'Appraisal can not be edited while it is in an \'Active\' state';
 $string['error:appraisalmustdraft'] = 'Parts of appraisal cannot be removed after appraisal activation';
 $string['error:appraisalnotdraft'] = 'Appraisal must be in \'Draft\' or \'Closed\' state to be modified';
+$string['error:attemptupdatestatic'] = 'Active appraisals cannot be updated, to enable dynamic appraisals go to the advanced features page';
 $string['error:beforedisabled'] = 'This type of event cannot be predicted';
 $string['error:cannotchangestatus'] = 'Current status {$a->oldstatus} cannot be changed to {$a->newstatus}';
 $string['error:completebyinvalid'] = 'The complete by date must be in the future';

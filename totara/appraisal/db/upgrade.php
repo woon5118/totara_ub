@@ -297,5 +297,12 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014120900, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2014120901) {
+        // Maintain appraisals static functionality for upgrades in case there are existing appraisals in use.
+        set_config('dynamicappraisals', 0);
+
+        upgrade_plugin_savepoint(true, 2014120901, 'totara', 'appraisal');
+    }
+
     return true;
 }

@@ -56,6 +56,7 @@ If the name you are looking for does not appear in the list, it might be that th
 $string['column'] = 'Column';
 $string['competency_typeicon'] = 'Competency type icon';
 $string['completed'] = 'Completed';
+$string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
 $string['configenhancedcatalog'] = 'This setting allows you to specify if the enhanced catalog appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
     The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.
     When disabled, the standard catalog (i.e., the hierarchical category system configured in the \'Manage categories\' administration area) appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
@@ -127,6 +128,7 @@ $string['deleted'] = 'Deleted';
 $string['developmentplan'] = 'Development Planner';
 $string['disablefeature'] = 'Disable';
 $string['downloaderrorlog'] = 'Download error log';
+$string['dynamicappraisals'] = 'Dynamic Appraisals';
 $string['editheading'] = 'Edit the Report Heading Block';
 $string['edition'] = 'Edition';
 $string['elearning'] = 'E-learning';

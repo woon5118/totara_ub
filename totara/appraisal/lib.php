@@ -282,6 +282,8 @@ class appraisal {
      * @return array with errors / empty if no errors
      */
     public function validate($time = null) {
+        global $CFG;
+
         if (is_null($time)) {
             $time = time();
         }
@@ -299,8 +301,13 @@ class appraisal {
             $err['roles'] = get_string('appraisalinvalid:roles', 'totara_appraisal');
         }
 
-        // Ensure each user has every required role.
-        $war += $this->validate_roles();
+        if ($CFG->dynamicappraisals) {
+            // If dynamic appraisals are enabled warn about missing roles.
+            $war += $this->validate_roles();
+        } else {
+            // If appraisals are static don't allow activation with missing roles.
+            $err += $this->validate_roles();
+        }
 
         // Check that all stages are valid.
         $stages = appraisal_stage::fetch_appraisal($this->id);
@@ -464,6 +471,11 @@ class appraisal {
      */
     public function check_assignment_changes() {
         global $CFG, $DB;
+
+        // Skip if dynamic appraisals is not activated.
+        if (empty($CFG->dynamicappraisals)) {
+            return;
+        }
 
         $assign = new totara_assign_appraisal('appraisal', $this);
 
@@ -4483,7 +4495,7 @@ class appraisal_message {
                     }
 
                     $message = $this->get_message($role);
-                    $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
+                    $rcpt = $DB->get_record('user', array('id' => $rcptuserid), '*', MUST_EXIST);
 
                     // Create a message.
                     $eventdata = new stdClass();
