@@ -116,6 +116,51 @@ class rb_source_program_completion extends rb_base_source {
         );
         $columnoptions[] = new rb_column_option(
             'progcompletion',
+            'iscomplete',
+            get_string('iscomplete', 'rb_source_program_completion'),
+            'CASE WHEN base.status = ' . STATUS_PROGRAM_COMPLETE . ' THEN 1 ELSE 0 END',
+            array(
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('iscomplete', 'rb_source_program_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'isnotcomplete',
+            get_string('isnotcomplete', 'rb_source_program_completion'),
+            'CASE WHEN base.status <> ' . STATUS_PROGRAM_COMPLETE . ' THEN 1 ELSE 0 END',
+            // NOTE: STATUS_PROGRAM_INCOMPLETE comparison would be less future-proof here.
+            array(
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isnotcomplete', 'rb_source_program_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'isinprogress',
+            get_string('isinprogress', 'rb_source_program_completion'),
+            'CASE WHEN base.timestarted > 0 AND base.status <> ' . STATUS_PROGRAM_COMPLETE . ' THEN 1 ELSE 0 END',
+            array(
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isinprogress', 'rb_source_program_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
+            'isnotstarted',
+            get_string('isnotstarted', 'rb_source_program_completion'),
+            'CASE WHEN base.timestarted = 0 AND base.status <> ' . STATUS_PROGRAM_COMPLETE . ' THEN 1 ELSE 0 END',
+            array(
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isnotstarted', 'rb_source_program_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'progcompletion',
             'completeddate',
             get_string('completeddate', 'rb_source_program_completion'),
             'base.timecompleted',
@@ -236,7 +281,46 @@ class rb_source_program_completion extends rb_base_source {
                 'simplemode' => true,
             )
         );
-
+        $filteroptions[] = new rb_filter_option(
+            'progcompletion',
+            'iscomplete',
+            get_string('iscomplete', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'progcompletion',
+            'isnotcomplete',
+            get_string('isnotcomplete', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'progcompletion',
+            'isinprogress',
+            get_string('isinprogress', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'progcompletion',
+            'isnotstarted',
+            get_string('isnotstarted', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'organisationid',
