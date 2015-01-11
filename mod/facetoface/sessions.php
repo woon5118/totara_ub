@@ -228,6 +228,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     if ($canconfigurecancellation) {
         $todb->allowcancellations = $fromform->allowcancellations;
+        $todb->cancellationcutoff = $fromform->cancellationcutoff;
     }
 
     $transaction = $DB->start_delegated_transaction();
@@ -323,6 +324,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     if ($canconfigurecancellation) {
         $toform->allowcancellations = $session->allowcancellations;
+        $toform->cancellationcutoff = $session->cancellationcutoff;
     }
 
     if ($session->sessiondates) {

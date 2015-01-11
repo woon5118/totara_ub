@@ -171,9 +171,26 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addHelpButton('allowoverbook', 'allowoverbook', 'facetoface');
 
         if (has_capability('mod/facetoface:configurecancellation', $this->context)) {
-            $mform->addElement('advcheckbox', 'allowcancellations', get_string('allowcancellations', 'facetoface'));
+            // User cancellation settings.
+            $radioarray = array();
+            $radioarray[] = $mform->createElement('radio', 'allowcancellations', '', get_string('allowcancellationanytime', 'facetoface'), 1);
+            $radioarray[] = $mform->createElement('radio', 'allowcancellations', '', get_string('allowcancellationnever', 'facetoface'), 0);
+            $radioarray[] = $mform->createElement('radio', 'allowcancellations', '', get_string('allowcancellationcutoff', 'facetoface'), 2);
+            $mform->addGroup($radioarray, 'allowcancellations', get_string('allowbookingscancellations', 'facetoface'), array('<br/>'), false);
+            $mform->setType('allowcancellations', PARAM_INT);
             $mform->setDefault('allowcancellations', $this->_customdata['facetoface']->allowcancellationsdefault);
-            $mform->addHelpButton('allowcancellations', 'allowcancellations', 'facetoface');
+            $mform->addHelpButton('allowcancellations', 'allowbookingscancellations', 'facetoface');
+
+            // Cancellation cutoff.
+            $cutoffnotegroup = array();
+            $cutoffnotegroup[] =& $mform->createElement('duration', 'cancellationcutoff', '', array('defaultunit' => HOURSECS, 'optional' => false));
+            $cutoffnotegroup[] =& $mform->createElement('static', 'cutoffnote', null, get_string('cutoffnote', 'facetoface'));
+            $mform->addGroup($cutoffnotegroup, 'cutoffgroup', '', '&nbsp;', false);
+            $mform->setDefault('cancellationcutoff', $this->_customdata['facetoface']->cancellationscutoffdefault);
+            $mform->disabledIf('cancellationcutoff[number]', 'allowcancellations', 'notchecked', 2);
+            $mform->disabledIf('cancellationcutoff[timeunit]', 'allowcancellations', 'notchecked', 2);
+            $mform->disabledIf('cancellationcutoff[number]', 'datetimeknown', 'eq', 0);
+            $mform->disabledIf('cancellationcutoff[timeunit]', 'datetimeknown', 'eq', 0);
         }
 
         $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');

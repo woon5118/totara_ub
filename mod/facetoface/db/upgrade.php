@@ -2428,5 +2428,33 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014110701, 'facetoface');
     }
 
+    if ($oldversion < 2014110703) {
+
+        // Add cancellationcutoffdefault to the facetoface table.
+        $table = new xmldb_table('facetoface');
+
+        // Field defaults to 24 hours (86400 seconds).
+        $field = new xmldb_field('cancellationscutoffdefault', XMLDB_TYPE_INTEGER, '10', null, true, null, '86400', 'allowcancellationsdefault');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add cancellationcutoff to the facetoface_sessions table.
+        $table = new xmldb_table('facetoface_sessions');
+
+        // Field defaults to 24 hours (86400 seconds).
+        $field = new xmldb_field('cancellationcutoff', XMLDB_TYPE_INTEGER, '10', null, true, null, '86400', 'allowcancellations');
+        $field->setComment('The number of seconds before the session start when the user is allowed to cancel');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2014110703, 'facetoface');
+    }
+
     return $result;
 }

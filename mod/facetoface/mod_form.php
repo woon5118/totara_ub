@@ -76,9 +76,24 @@ class mod_facetoface_mod_form extends moodleform_mod {
         $mform->addHelpButton('selfapprovaltandc', 'selfapprovaltandc', 'facetoface');
 
         if (has_capability('mod/facetoface:configurecancellation', $this->context)) {
-            $mform->addElement('advcheckbox', 'allowcancellationsdefault', get_string('allowcancellationsdefault', 'facetoface'));
+            // User cancellation settings.
+            $radioarray = array();
+            $radioarray[] = $mform->createElement('radio', 'allowcancellationsdefault', '', get_string('allowcancellationanytime', 'facetoface'), 1);
+            $radioarray[] = $mform->createElement('radio', 'allowcancellationsdefault', '', get_string('allowcancellationnever', 'facetoface'), 0);
+            $radioarray[] = $mform->createElement('radio', 'allowcancellationsdefault', '', get_string('allowcancellationcutoff', 'facetoface'), 2);
+            $mform->addGroup($radioarray, 'allowcancellationsdefault', get_string('allowbookingscancellationsdefault', 'facetoface'), array('<br/>'), false);
+            $mform->setType('allowcancellationsdefault', PARAM_INT);
             $mform->setDefault('allowcancellationsdefault', 1);
-            $mform->addHelpButton('allowcancellationsdefault', 'allowcancellationsdefault', 'facetoface');
+            $mform->addHelpButton('allowcancellationsdefault', 'allowbookingscancellationsdefault', 'facetoface');
+
+            // Cancellation cutoff.
+            $cutoffnotegroup = array();
+            $cutoffnotegroup[] =& $mform->createElement('duration', 'cancellationscutoffdefault', '', array('defaultunit' => HOURSECS, 'optional' => false));
+            $cutoffnotegroup[] =& $mform->createElement('static', 'cutoffnote', null, get_string('cutoffnote', 'facetoface'));
+            $mform->addGroup($cutoffnotegroup, 'cutoffgroup', '', '&nbsp;', false);
+            $mform->setDefault('cancellationscutoffdefault', DAYSECS);
+            $mform->disabledIf('cancellationscutoffdefault[number]', 'allowcancellationsdefault', 'notchecked', 2);
+            $mform->disabledIf('cancellationscutoffdefault[timeunit]', 'allowcancellationsdefault', 'notchecked', 2);
         }
 
         $mform->addElement('advcheckbox', 'multiplesessions', get_string('multiplesessions', 'facetoface'), '',

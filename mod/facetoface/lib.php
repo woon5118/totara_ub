@@ -90,6 +90,11 @@ define('MDL_F2F_SELECT_NONE', 20);
 define('MDL_F2F_SELECT_SET', 30);
 define('MDL_F2F_SELECT_NOT_SET', 40);
 
+// Define allow cancellation option.
+define('MDL_F2F_ALLOW_CANCELLATION_NEVER', 0);
+define('MDL_F2F_ALLOW_CANCELLATION_ANY_TIME', 1);
+define('MDL_F2F_ALLOW_CANCELLATION_CUT_OFF', 2);
+
 // This array must match the status codes above, and the values
 // must equal the end of the constant name but in lower case
 global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
@@ -955,6 +960,59 @@ function facetoface_remove_reservations_after_deadline($testing) {
 }
 
 /**
+ * Determine if user can or not cancel his/her booking.
+ *
+ * @param stdClass $session Session object like facetoface_get_sessions.
+ * @return bool True if cancellation is allowed, false otherwise.
+ */
+function facetoface_allow_user_cancellation($session) {
+    $timenow = time();
+
+    // If cancellations are not allowed, nothing else to check here.
+    if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_NEVER) {
+        return false;
+    }
+
+    // If no bookedsession set, something went wrong here, return false.
+    if (!property_exists($session, 'bookedsession')) {
+        return false;
+    }
+
+    // If wait-listed, let them cancel.
+    if (!$session->datetimeknown) {
+        return true;
+    }
+
+    // If session has started or the user is not booked, no point in cancelling.
+    if ($session->mintimestart <= $timenow || !$session->bookedsession) {
+        return false;
+    }
+
+    // If the attendance has been marked for the user, then do not let him cancel.
+    $attendancecode = array(MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED);
+    if ($session->bookedsession && in_array($session->bookedsession->statuscode, $attendancecode)) {
+        return false;
+    }
+
+    // If the user has been booked but he is in the waitlist, then he can cancel at any time.
+    if ($session->bookedsession && $session->bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+        return true;
+    }
+
+    // If cancellations are allowed at any time or until cut-off is reached, make the necessary checks.
+    if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_ANY_TIME) {
+        return true;
+    } else if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_CUT_OFF) {
+        // Check if we are in the range of the cancellation cut-off period.
+        if ($timenow <= $session->mintimestart - $session->cancellationcutoff) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
  * Send out email notifications for all sessions that are under capacity at the cut-off.
  */
 function facetoface_notify_under_capacity() {
@@ -1107,7 +1165,18 @@ function facetoface_get_session_dates($sessionid) {
  */
 function facetoface_get_session($sessionid) {
     global $DB;
-    $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+
+    $sql = "SELECT s.*, m.mintimestart, m.maxtimefinish
+              FROM {facetoface_sessions} s
+         LEFT JOIN (
+                SELECT sessionid, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
+                  FROM {facetoface_sessions_dates}
+              GROUP BY sessionid
+              ) m ON m.sessionid = s.id
+             WHERE s.id = ?
+          ORDER BY s.datetimeknown, m.mintimestart, m.maxtimefinish";
+
+    $session = $DB->get_record_sql($sql, array($sessionid));
 
     if ($session) {
         $session->sessiondates = facetoface_get_session_dates($sessionid);
@@ -1140,14 +1209,14 @@ function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
         $roomwhere = ' AND s.roomid = ? ';
         $roomparams[] = $roomid;
     }
-    $sessions = $DB->get_records_sql("SELECT s.*
+    $sessions = $DB->get_records_sql("SELECT s.*, m.mintimestart, m.maxtimefinish
                                    $fromclause
-                        LEFT OUTER JOIN (SELECT sessionid, min(timestart) AS mintimestart
+                        LEFT OUTER JOIN (SELECT sessionid, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
                                            FROM {facetoface_sessions_dates} GROUP BY sessionid) m ON m.sessionid = s.id
                                   WHERE s.facetoface = ?
                                         $locationwhere
                                         $roomwhere
-                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams, $roomparams));
+                               ORDER BY s.datetimeknown, m.mintimestart, m.maxtimefinish", array_merge(array($facetofaceid), $locationparams, $roomparams));
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
@@ -2548,20 +2617,16 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
-                $allowcancellation = false;
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
-                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                        $allowcancellation = true;
-                    }
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
-                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                        $allowcancellation = true;
-                    }
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
+
+                // Add booking information.
+                $session->bookedsession = $submission;
 
                 $sessiondates = '';
 
@@ -2588,21 +2653,17 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 // Don't include the link to cancel a session if it has already occurred.
                 $moreinfolink = '';
                 $cancellink = '';
-                $strcancelbooking = get_string('cancelbooking', 'facetoface');
-                $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                 if (!facetoface_has_session_started($session, $timenow)) {
                     $strmoreinfo  = get_string('moreinfo', 'facetoface');
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
                     $moreinfolink = html_writer::link($signup_url, $strmoreinfo, array('class' => 'f2fsessionlinks f2fsessioninfolink', 'title' => $strmoreinfo));
-
-                    $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
-                } else {
-                    // Session is started.
-                    if ($allowcancellation) {
-                        $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
-                    }
                 }
-                $cancellink = $session->allowcancellations ? $cancellink : '';
+
+                if (facetoface_allow_user_cancellation($session)) {
+                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                    $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
+                    $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
+                }
 
                 // Get room data.
                 $roomtext = '';
