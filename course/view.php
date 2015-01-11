@@ -35,10 +35,6 @@
 
     $course = $DB->get_record('course', $params, '*', MUST_EXIST);
 
-    if (!totara_course_is_viewable($course->id)) {
-        print_error('coursehidden');
-    }
-
     $urlparams = array('id' => $course->id);
 
     // Sectionid should get priority over section number
