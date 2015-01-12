@@ -472,7 +472,7 @@ abstract class rb_base_source {
                 $targetTZ = $row->timezone;
                 $tzstring = get_string(strtolower($targetTZ), 'timezones');
             }
-            $date = userdate($date, get_string('nice_time_in_timezone_format', 'totara_reportbuilder'), $targetTZ) . ' ';
+            $date = userdate($date, get_string('strftimetime', 'langconfig'), $targetTZ) . ' ';
             return $date . $tzstring;
         } else {
             return '';
@@ -494,7 +494,7 @@ abstract class rb_base_source {
             } else {
                 $targetTZ = $row->timezone;
             }
-            $date = userdate($date, get_string('nice_date_in_timezone_format', 'totara_reportbuilder'), $targetTZ) . ' ';
+            $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ) . ' ';
             return $date;
         } else {
             return '';

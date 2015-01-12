@@ -2488,10 +2488,10 @@ function facetoface_format_session_times($start, $end, $tz) {
     } else {
         $targetTZ = totara_get_clean_timezone();
     }
-    $formattedsession->startdate = userdate($start, get_string('sessiondateformat', 'facetoface'), $targetTZ);
-    $formattedsession->starttime = userdate($start, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
-    $formattedsession->enddate = userdate($end, get_string('sessiondateformat', 'facetoface'), $targetTZ);
-    $formattedsession->endtime = userdate($end, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
+    $formattedsession->startdate = userdate($start, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->starttime = userdate($start, get_string('strftimetime', 'langconfig'), $targetTZ);
+    $formattedsession->enddate = userdate($end, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->endtime = userdate($end, get_string('strftimetime', 'langconfig'), $targetTZ);
     if (empty($displaytimezones)) {
         $formattedsession->timezone = '';
     } else if ($tzknown) {

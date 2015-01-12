@@ -259,7 +259,7 @@ class scheduler {
         switch($this->subject->{$this->map['frequency']}) {
             case self::DAILY:
                 $out .= get_string('daily', 'totara_reportbuilder') . ' ' .  get_string('at', 'totara_reportbuilder') . ' ';
-                $out .= strftime('%I:%M%p' , mktime($schedule, 0, 0, $timemonth, $timeday, $timeyear));
+                $out .= strftime(get_string('strftimetime', 'langconfig') , mktime($schedule, 0, 0, $timemonth, $timeday, $timeyear));
                 break;
             case self::WEEKLY:
                 $out .= get_string('weekly', 'totara_reportbuilder') . ' ' . get_string('on', 'totara_reportbuilder') . ' ';

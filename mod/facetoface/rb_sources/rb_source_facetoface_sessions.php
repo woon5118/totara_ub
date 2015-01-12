@@ -1159,7 +1159,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
             } else {
                 $targetTZ = $row->timezone;
             }
-            $strdate = userdate($date, get_string('sessiondateformat', 'facetoface'), $targetTZ);
+            $strdate = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ);
             return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $strdate);
         } else {
             return '';
