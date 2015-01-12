@@ -958,10 +958,16 @@ function facetoface_remove_reservations_after_deadline($testing) {
  * Send out email notifications for all sessions that are under capacity at the cut-off.
  */
 function facetoface_notify_under_capacity() {
-    global $DB;
+    global $CFG, $DB;
 
     $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'facetoface'));
+    $roles = $CFG->facetoface_session_rolesnotify;
     $time = time();
+
+    // If there are no recipients, don't bother.
+    if (empty($roles)) {
+        return;
+    }
 
     $params = array(
         'lastcron' => $lastcron,
@@ -1008,6 +1014,7 @@ function facetoface_notify_under_capacity() {
         );
 
         $eventdata = (object)array(
+            'userfrom' => \mod_facetoface\facetoface_user::get_facetoface_user(),
             'subject' => get_string('sessionundercapacity', 'facetoface', format_string($facetoface->name)),
             'fullmessage' => get_string('sessionundercapacity_body', 'facetoface', $info),
             'msgtype' => TOTARA_MSG_TYPE_FACE2FACE,
@@ -1017,15 +1024,21 @@ function facetoface_notify_under_capacity() {
         );
 
         if (CLI_SCRIPT) {
-            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing course editors.");
+            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles.");
         }
 
-        $coursecontext = context_course::instance($facetoface->course);
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        $users = get_users_by_capability($coursecontext, 'moodle/course:manageactivities',
-             "u.id, $usernamefields, u.email, u.maildisplay, u.suspended, u.deleted, u.emailstop, u.auth");
-        foreach ($users as $user) {
-            $eventdata->userto = $user;
+        // Get all the users who need to receive the under capacity warning.
+        if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course)) {
+            print_error('error:incorrectcoursemodule', 'facetoface');
+        }
+        $modcontext = context_module::instance($cm->id);
+
+        // Note: remove the true to limit to users with the roles within the module.
+        $recipients = get_role_users(explode(',', $roles), $modcontext, true, 'u.*');
+
+        // And send them the notification.
+        foreach ($recipients as $recipient) {
+            $eventdata->userto = $recipient;
             tm_alert_send($eventdata);
         }
     }

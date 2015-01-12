@@ -33,15 +33,24 @@ $settings = new admin_settingpage($section, get_string('generalsettings', 'mod_f
 
 if ($ADMIN->fulltree) { // Improve performance.
 
-    $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'), "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/",30));
+    $settings->add(new admin_setting_configtext('facetoface_fromaddress', new lang_string('setting:fromaddress_caption', 'facetoface'),
+                   new lang_string('setting:fromaddress', 'facetoface'), new lang_string('setting:fromaddressdefault', 'facetoface'),
+                   "/^((?:[\w\.\-])+\@(?:(?:[a-zA-Z\d\-])+\.)+(?:[a-zA-Z\d]{2,4}))$/",30));
 
-    $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'), new lang_string('setting:sessionroles', 'facetoface'), array()));
+    $settings->add(new admin_setting_pickroles('facetoface_session_roles', new lang_string('setting:sessionroles_caption', 'facetoface'),
+                   new lang_string('setting:sessionroles', 'facetoface'), array()));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'), new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
+    $settings->add(new admin_setting_pickroles('facetoface_session_rolesnotify', new lang_string('setting:sessionrolesnotify_caption', 'facetoface'),
+                   new lang_string('setting:sessionrolesnotify', 'facetoface'), array('editingteacher')));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'), new lang_string('setting:notificationdisable', 'facetoface'), 0));
+    $settings->add(new admin_setting_configcheckbox('facetoface_allowschedulingconflicts', new lang_string('setting:allowschedulingconflicts_caption', 'facetoface'),
+                   new lang_string('setting:allowschedulingconflicts', 'facetoface'), 0));
 
-    $setting = new admin_setting_configcheckbox('facetoface_displaysessiontimezones', new lang_string('setting:displaysessiontimezones_caption', 'facetoface'), new lang_string('setting:displaysessiontimezones', 'facetoface'), 1);
+    $settings->add(new admin_setting_configcheckbox('facetoface_notificationdisable', new lang_string('setting:notificationdisable_caption', 'facetoface'),
+                   new lang_string('setting:notificationdisable', 'facetoface'), 0));
+
+    $setting = new admin_setting_configcheckbox('facetoface_displaysessiontimezones', new lang_string('setting:displaysessiontimezones_caption', 'facetoface'),
+               new lang_string('setting:displaysessiontimezones', 'facetoface'), 1);
     $setting->set_updatedcallback('facetoface_displaysessiontimezones_updated');
     $settings->add($setting);
 

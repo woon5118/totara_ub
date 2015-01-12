@@ -448,7 +448,7 @@ class mod_facetoface_session_form extends moodleform {
             // Check the cut-off is at least the day before the earliest start time.
             $cutoff = $data['cutoff'];
             if ($cutoff < DAYSECS) {
-                $errors['cutoff'] = get_string('error:cutofftoolate', 'facetoface');
+                $errors['cutoff'] = get_string('error:cutofftooclose', 'facetoface');
             }
 
             foreach ($dates as $dateid => $date) {
