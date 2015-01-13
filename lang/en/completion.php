@@ -69,6 +69,7 @@ $string['completion_link'] = 'activity/completion';
 $string['completion_manual'] = 'Students can manually mark the activity as completed';
 $string['completion_none'] = 'Do not indicate activity completion';
 $string['completionactivitydefault'] = 'Use activity default';
+$string['completioncriteriachanged'] = 'Course completion criteria changes have been saved. If any active participants already match the criteria for completion then their status will be updated on the next cron run';
 $string['completiondefault'] = 'Default completion tracking';
 $string['completiondisabled'] = 'Disabled, not shown in activity settings';
 $string['completionenabled'] = 'Enabled, control via completion and activity settings';

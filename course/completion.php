@@ -183,6 +183,9 @@ if ($form->is_cancelled()) {
     // Log changes.
     add_to_log($course->id, 'course', 'completion updated', 'completion.php?id='.$course->id);
 
+    // Bulk start users (creates course_completion records for all active participants).
+    completion_start_user_bulk($course->id);
+
     // Trigger an event for course module completion changed.
     $event = \core\event\course_completion_updated::create(
             array(
@@ -192,12 +195,9 @@ if ($form->is_cancelled()) {
             );
     $event->trigger();
 
-    // If any criteria created, bulk start users
-    completion_start_user_bulk($course->id);
-
     // Redirect to the course main page.
     $url = new moodle_url('/course/view.php', array('id' => $course->id));
-    redirect($url);
+    totara_set_notification(get_string('completioncriteriachanged', 'core_completion'), $url, array('class' => 'notifysuccess'));
 }
 
 // Print the form.
