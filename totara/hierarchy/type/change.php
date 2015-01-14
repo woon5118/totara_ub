@@ -153,25 +153,16 @@ echo $OUTPUT->container_end();
 
 echo $OUTPUT->heading(get_string('currenttype', 'totara_hierarchy'), 3, 'hierarchy-bulk-type');
 
-$table = new html_table();
-
-// Setup column headers
-$table->head = array('',
-    get_string('name'),
-    get_string('customfields', 'totara_customfield'));
-
-$row = array();
-$row[] = '&nbsp;';
-$row[] = hierarchy_get_type_name($typeid, $shortprefix);
-$row[] = ($cfs = hierarchy_get_formatted_custom_fields($current_type_cfs)) ?
+echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));
+echo html_writer::tag('dt', get_string('name'));
+echo html_writer::tag('dd', hierarchy_get_type_name($typeid, $shortprefix));
+echo html_writer::tag('dt', get_string('customfields', 'totara_customfield'));
+echo html_writer::tag('dd', ($cfs = hierarchy_get_formatted_custom_fields($current_type_cfs)) ?
     implode(html_writer::empty_tag('br'), $cfs) :
-    get_string('nocustomfields', 'totara_hierarchy');
-$table->data[] = $row;
+    get_string('nocustomfields', 'totara_hierarchy'));
+echo html_writer::end_tag('dl');
 
-echo html_writer::table($table);
-
-// empty table data ready for the list of new type
-$table->data = array();
+$table = new html_table();
 
 foreach ($types as $type) {
     // don't show current type
