@@ -25,6 +25,7 @@
  */
 
 $string['activitiescomplete'] = 'Activities complete';
+$string['clicktomarkusercomplete'] = 'Click to mark user complete';
 $string['complete'] = 'Courses completed';
 $string['completion:view'] = 'View course completion report';
 $string['completiondate'] = 'Completion date';

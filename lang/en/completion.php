@@ -181,6 +181,7 @@ $string['restoringcompletiondata'] = 'Writing completion data';
 $string['roleaggregation'] = 'Condition requires';
 $string['roleaggregation_all'] = 'ALL selected roles to mark when the condition is met';
 $string['roleaggregation_any'] = 'ANY selected roles to mark when the condition is met';
+$string['roleidnotfound'] = 'Role ID {$a} not found';
 $string['rpl'] = 'RPL';
 $string['save'] = 'Save';
 $string['saved'] = 'Saved';
