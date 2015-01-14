@@ -67,8 +67,8 @@ M.totara_assigngroupdialog = M.totara_assigngroupdialog || {
 
         var thandler = new totaraDialog_handler_assigngrouptreeview();
         var tbuttons = {};
-        tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
         tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save(); }
+        tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel(); }
         var tdialog = new totaraDialog(
             'assigngrouptreeviewdialog',
             'nobutton',

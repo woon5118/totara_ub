@@ -71,8 +71,8 @@ M.totara_cohortrules = M.totara_cohortrules || {
         fhandler.baseurl = url;
 
         var fbuttons = {};
-        fbuttons[M.util.get_string('cancel','moodle')] = function() { fhandler._cancel() }
         fbuttons[M.util.get_string('save','totara_core')] = function() { fhandler.submit() }
+        fbuttons[M.util.get_string('cancel','moodle')] = function() { fhandler._cancel() }
         var fdialog = new totaraDialog(
             'cohortruleformdialog',
             'nobutton',
@@ -191,8 +191,8 @@ M.totara_cohortrules = M.totara_cohortrules || {
         var url = M.cfg.wwwroot + '/totara/cohort/rules/ruledetail.php';
         var thandler = new totaraDialog_handler_cohortruletreeview();
         var tbuttons = {};
-        tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel() }
         tbuttons[M.util.get_string('save','totara_core')] = function() { thandler._save() }
+        tbuttons[M.util.get_string('cancel','moodle')] = function() { thandler._cancel() }
         var tdialog = new totaraDialog(
             'cohortruletreeviewdialog',
             'nobutton',

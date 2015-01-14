@@ -63,34 +63,15 @@ Feature: Users are forced to get manager approval where required
 
   @javascript
   Scenario: A user with a manager can request access, withdraw request and be granted access
-    Given I log in as "admin"
-    And I expand "Site administration" node
-    And I expand "Hierarchies" node
-    And I expand "Positions" node
-    And I follow "Manage positions"
-    And I press "Add new position framework"
-    And I set the following fields to these values:
-      | Name | PosHierarchy1 |
-    And I press "Save changes"
-    And I follow "PosHierarchy1"
-    And I press "Add new position"
-    And I set the following fields to these values:
-      | Name | Position1 |
-    And I press "Save changes"
-    And I expand "Users" node
-    And I expand "Accounts" node
-    And I follow "Browse list of users"
-    And I follow "Student 1"
-    And I expand "Positions" node
-    And I follow "Primary position"
-    And I press "Choose position"
-    And I click on "Position1" "link_or_button"
-    And I click on "OK" "link_or_button" in the "div[aria-describedby='position']" "css_element"
-    And I press "Choose manager"
-    And I click on "Teacher 1" "link_or_button"
-    And I click on "OK" "link_or_button" in the "div[aria-describedby='manager']" "css_element"
-    And I press "Update position"
-    And I log out
+    Given the following "position" frameworks exist:
+      | fullname      | idnumber |
+      | PosHierarchy1 | FW001    |
+    And the following "position" hierarchy exists:
+      | framework | idnumber | fullname   |
+      | FW001     | POS001   | Position1  |
+    And the following position assignments exist:
+      | user     | position | type      | manager  |
+      | student1 | POS001   | primary   | teacher1 |
 
     When I log in as "student1"
     And I follow "Course 1"

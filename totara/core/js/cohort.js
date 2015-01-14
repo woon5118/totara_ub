@@ -157,8 +157,8 @@ M.totara_cohort = M.totara_cohort || {
             var handler = new totaraDialog_handler();
             var name = 'confirm';
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('continue', 'moodle')] = function() { submitAllowed = true; $('#mform1').submit(); };
+            buttonsObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
             var dialog = new totaraDialog(
                 name,
                 'id_submitbutton',

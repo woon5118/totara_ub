@@ -82,18 +82,6 @@ img.disabled_action_icon {
     padding: 4px;
 }
 
-#program-content,
-#required-learning{
-    float:right;
-    display:inline; /* <IE7 margin-doubling fix */
-    width:70%;
-}
-
-#edit-program-content{
-    display:inline; /* <IE7 margin-doubling fix */
-    width:70%;
-}
-
 div.plan_box {
     margin:10px 0;
     padding: 10px;

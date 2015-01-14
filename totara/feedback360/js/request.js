@@ -93,8 +93,8 @@ feedback360Dialog = function(name, title, find_url, save_url) {
     var existing = M.totara_requestfeedback.config.existing;
 
     var buttonObj = {};
-    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
     buttonObj[M.util.get_string('save', 'totara_core')] = function() { handler._save(save_url) };
+    buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
     handler.responsegoeshere = $('#system_assignments.replacement_box');
 

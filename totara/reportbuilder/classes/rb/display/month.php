@@ -37,6 +37,10 @@ class month extends base {
             return '';
         }
 
+        if ($format === 'graph') {
+            return $monthnum;
+        }
+
         // Note: following code comes from lib/formslib.php, it uses PHP locale info.
         $months = array(
             1 => date_format_string(strtotime("January 1"), '%B', 99),
@@ -54,5 +58,9 @@ class month extends base {
         );
 
         return $months[$monthnum];
+    }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
     }
 }

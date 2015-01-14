@@ -34,4 +34,8 @@ class avg extends base {
     public static function is_column_option_compatible(\rb_column_option $option) {
         return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal');
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
+    }
 }

@@ -76,8 +76,8 @@ M.totara_coursecohort = M.totara_coursecohort || {
         ehandler.baseurl = url;
 
         var dbuttons = {};
-        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() }
         dbuttons[M.util.get_string('ok', 'moodle')] = function() { ehandler._update() }
+        dbuttons[M.util.get_string('cancel', 'moodle')] = function() { ehandler._cancel() }
 
         totaraDialogs['id_cohortsaddenrolled'] = new totaraDialog(
             'course-cohorts-enrolled-dialog',

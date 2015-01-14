@@ -143,8 +143,8 @@ M.totara_programcontent = M.totara_programcontent || {
             var handler = new totaraDialog_handler_addmulticourse(this.url + this.ajax_url);
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us (totara_dialog.js)
             totaraDialog.call(
@@ -218,8 +218,8 @@ M.totara_programcontent = M.totara_programcontent || {
 
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -289,8 +289,8 @@ M.totara_programcontent = M.totara_programcontent || {
 
             var default_url = this.url + this.find_url;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -365,8 +365,8 @@ M.totara_programcontent = M.totara_programcontent || {
 
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { self.handler._cancel(); };
             buttonsObj[M.util.get_string('ok','totara_program')] = function() { self.handler._save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { self.handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(
@@ -392,8 +392,8 @@ M.totara_programcontent = M.totara_programcontent || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('editcontent', 'totara_program')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('saveallchanges','totara_program')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('editcontent', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

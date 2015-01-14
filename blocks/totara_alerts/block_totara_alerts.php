@@ -45,11 +45,11 @@ class block_totara_alerts extends block_base {
     }
 
     function get_content() {
-        global $CFG, $PAGE, $OUTPUT;
+        global $CFG, $PAGE;
 
         // Cache block contents.
         if ($this->content !== NULL) {
-        return $this->content;
+            return $this->content;
         }
 
         $this->content = new stdClass();
@@ -74,7 +74,7 @@ class block_totara_alerts extends block_base {
         }
 
         $renderer = $this->page->get_renderer('block_totara_alerts');
-        $this->content->text = $renderer->display_alerts($this->msgs, $total);
+        $this->content->text = $renderer->display_alerts($this->msgs, $total, $this->config);
 
         return $this->content;
     }

@@ -55,8 +55,8 @@ M.totara_f2f_room = M.totara_f2f_room || {
         handler.setup_delete();
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
         buttonsObj[M.util.get_string('ok','moodle')] = function() { handler._save(); };
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
         totaraDialogs['addpdroom'] = new totaraDialog(
                 'addpdroom-dialog',
@@ -77,10 +77,19 @@ M.totara_f2f_room = M.totara_f2f_room || {
             var addroombtn = $('input[name="show-addpdroom-dialog"]');
             if ($(this).val() == 1) {
                 addroombtn.removeAttr('disabled');
+                $('input[name="duration[number]"]').val('');
             } else {
                 addroombtn.attr('disabled', 'disabled');
                 clean_pdroom_data();
             }
+        });
+
+        // Clear duration if session start/finish datetimes change.
+        $('select[name^="timestart["]').change(function() {
+            $('input[name="duration[number]"]').val('');
+        });
+        $('select[name^="timefinish["]').change(function() {
+            $('input[name="duration[number]"]').val('');
         });
 
         // Clear pre-defined room selection and set room capacity if custom room is selected

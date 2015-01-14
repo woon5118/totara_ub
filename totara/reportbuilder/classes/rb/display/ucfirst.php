@@ -36,4 +36,8 @@ class ucfirst extends base {
 
         return \core_text::strtoupper(\core_text::substr($value, 0, 1)) . \core_text::substr($value, 1);
     }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return false;
+    }
 }

@@ -74,9 +74,7 @@
 @media screen and (max-width: 979px) {
     #recordoflearning-menu,
     #dp-plans-menu,
-    #dp-plan-content,
-    #program-content,
-    #required-learning {
+    #dp-plan-content {
         float: none;
         width: 100%;
     }

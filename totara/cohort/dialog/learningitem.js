@@ -69,8 +69,8 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var chandler = new totaraDialog_handler_cohortlearning();
         chandler.baseurl = url;
         var cbuttons = {};
-        cbuttons[M.util.get_string('cancel','moodle')] = function() { chandler._cancel() }
         cbuttons[M.util.get_string('save','totara_core')] = function() { chandler._save(csaveurl) }
+        cbuttons[M.util.get_string('cancel','moodle')] = function() { chandler._cancel() }
 
         totaraDialogs['learningitemcourses'] = new totaraDialog(
             'learningitemcourses',
@@ -89,8 +89,8 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var phandler = new totaraDialog_handler_cohortlearning();
         phandler.baseurl = url;
         var pbuttons = {};
-        pbuttons[M.util.get_string('cancel','moodle')] = function() { phandler._cancel() }
         pbuttons[M.util.get_string('save','totara_core')] = function() { phandler._save(psaveurl) }
+        pbuttons[M.util.get_string('cancel','moodle')] = function() { phandler._cancel() }
 
         totaraDialogs['learningitemprograms'] = new totaraDialog(
             'learningitemprograms',
@@ -109,8 +109,8 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var pchandler = new totaraDialog_handler_cohortlearning();
         pchandler.baseurl = url;
         var pcbuttons = {};
-        pcbuttons[M.util.get_string('cancel','moodle')] = function() { pchandler._cancel() }
         pcbuttons[M.util.get_string('save','totara_core')] = function() { pchandler._save(pcsaveurl) }
+        pcbuttons[M.util.get_string('cancel','moodle')] = function() { pchandler._cancel() }
 
         totaraDialogs['learningitemcertifications'] = new totaraDialog(
             'learningitemcertifications',

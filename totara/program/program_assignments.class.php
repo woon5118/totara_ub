@@ -48,16 +48,18 @@ define('COMPLETION_TIME_NOT_SET', -1);
 define('COMPLETION_TIME_UNKNOWN', 0);
 define('COMPLETION_EVENT_NONE', 0);
 define('COMPLETION_EVENT_FIRST_LOGIN', 1);
-define('COMPLETION_EVENT_POSITION_START_DATE', 2);
+define('COMPLETION_EVENT_POSITION_ASSIGNED_DATE', 2);
 define('COMPLETION_EVENT_PROGRAM_COMPLETION', 3);
 define('COMPLETION_EVENT_COURSE_COMPLETION', 4);
 define('COMPLETION_EVENT_PROFILE_FIELD_DATE', 5);
 define('COMPLETION_EVENT_ENROLLMENT_DATE', 6);
+define('COMPLETION_EVENT_POSITION_START_DATE', 7);
 
 global $COMPLETION_EVENTS_CLASSNAMES;
 
 $COMPLETION_EVENTS_CLASSNAMES = array(
     COMPLETION_EVENT_FIRST_LOGIN            => 'prog_assigment_completion_first_login',
+    COMPLETION_EVENT_POSITION_ASSIGNED_DATE => 'prog_assigment_completion_position_assigned_date',
     COMPLETION_EVENT_POSITION_START_DATE    => 'prog_assigment_completion_position_start_date',
     COMPLETION_EVENT_PROGRAM_COMPLETION     => 'prog_assigment_completion_program_completion',
     COMPLETION_EVENT_COURSE_COMPLETION      => 'prog_assigment_completion_course_completion',
@@ -1431,13 +1433,13 @@ class prog_assigment_completion_first_login extends prog_assignment_completion_t
     }
 }
 
-class prog_assigment_completion_position_start_date extends prog_assignment_completion_type {
+class prog_assigment_completion_position_assigned_date extends prog_assignment_completion_type {
     private $names, $timestamps;
     public function get_id() {
-        return COMPLETION_EVENT_POSITION_START_DATE;
+        return COMPLETION_EVENT_POSITION_ASSIGNED_DATE;
     }
     public function get_name() {
-        return get_string('positionstartdate', 'totara_program');
+        return get_string('positionassigneddate', 'totara_program');
     }
     public function get_script() {
         global $CFG;
@@ -1469,7 +1471,7 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
         return $this->names[$instanceid]->fullname;
     }
     public function get_completion_string() {
-        return get_string('startinposition', 'totara_program');
+        return get_string('assigntoposition', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
         // Lazy load data when required.
@@ -1478,6 +1480,57 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
         }
         if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
             return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timeassigned;
+        }
+        return false;
+    }
+}
+
+class prog_assigment_completion_position_start_date extends prog_assignment_completion_type {
+    private $names, $timestamps;
+    public function get_id() {
+        return COMPLETION_EVENT_POSITION_START_DATE;
+    }
+    public function get_name() {
+        return get_string('positionstartdate', 'totara_program');
+    }
+    public function get_script() {
+        global $CFG;
+
+        return "
+            totaraDialogs['completionevent'].default_url = '$CFG->wwwroot/totara/program/assignment/completion/find_position.php?';
+            totaraDialogs['completionevent'].open();
+
+            $('#instancetitle').unbind('click').click(function() {
+                handle_completion_selection();
+                return false;
+            });
+        ";
+    }
+    private function load_data() {
+        global $DB;
+        $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
+        $sql = "SELECT " . $DB->sql_concat('pa.userid', "'-'", "pa.positionid") . " AS hash, pa.timevalidfrom
+                  FROM {pos_assignment} pa
+                 WHERE pa.type = ? AND pa.positionid IS NOT NULL";
+        $this->timestamps = $DB->get_records_sql($sql, array(POSITION_TYPE_PRIMARY));
+    }
+    public function get_item_name($instanceid) {
+        // Lazy load data when required.
+        if (!isset($this->names)) {
+            $this->load_data();
+        }
+        return $this->names[$instanceid]->fullname;
+    }
+    public function get_completion_string() {
+        return get_string('startinposition', 'totara_program');
+    }
+    public function get_timestamp($userid, $assignobject) {
+        // Lazy load data when required.
+        if (!isset($this->timestamps)) {
+            $this->load_data();
+        }
+        if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
+            return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timevalidfrom;
         }
         return false;
     }

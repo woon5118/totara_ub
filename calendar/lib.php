@@ -1987,6 +1987,9 @@ function calendar_normalize_tz($tz) {
         case('Japan Standard Time'):
             $tz = 'Asia/Tokyo';
             break;
+        case('Romance Standard Time'):
+            $tz = 'Europe/Brussels';
+            break;
     }
     return $tz;
 }
@@ -3073,6 +3076,7 @@ function calendar_add_icalendar_event($event, $courseid, $subscriptionid, $timez
     } else {
         $endtz = isset($event->properties['DTEND'][0]->parameters['TZID']) ? $event->properties['DTEND'][0]->parameters['TZID'] :
                 $timezone;
+        $endtz = calendar_normalize_tz($endtz);
         $eventrecord->timeduration = strtotime($event->properties['DTEND'][0]->value . ' ' . $endtz) - $eventrecord->timestart;
     }
 

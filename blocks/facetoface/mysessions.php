@@ -29,23 +29,14 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('lib.php');
+require_once('sessionfilter_form.php');
+require_once('export_form.php');
 
 $PAGE->set_context(context_system::instance());
 require_login();
 
-$timenow = time();
-$timelater = $timenow + 13 * WEEKSECS;
-
-$startyear  = optional_param('startyear',  strftime('%Y', $timenow), PARAM_INT);
-$startmonth = optional_param('startmonth', strftime('%m', $timenow), PARAM_INT);
-$startday   = optional_param('startday',   strftime('%d', $timenow), PARAM_INT);
-$endyear    = optional_param('endyear',    strftime('%Y', $timelater), PARAM_INT);
-$endmonth   = optional_param('endmonth',   strftime('%m', $timelater), PARAM_INT);
-$endday     = optional_param('endday',     strftime('%d', $timelater), PARAM_INT);
 $userid     = optional_param('userid',     $USER->id, PARAM_INT);
-
-$action = optional_param('action',          '', PARAM_ALPHA); // one of: '', export
-$format = optional_param('format',       'ods', PARAM_ALPHA); // one of: ods, xls
+$allfuture  = optional_param('allfuture',  false, PARAM_BOOL);
 
 // filter options
 $coursename   = optional_param('coursename', '', PARAM_TEXT);
@@ -53,51 +44,23 @@ $courseid     = optional_param('courseid',   '', PARAM_TEXT);
 $trainer      = optional_param('trainer',    '', PARAM_TEXT);
 $location     = optional_param('location',   '', PARAM_TEXT);
 
-$startdate = make_timestamp($startyear, $startmonth, $startday);
-$enddate = make_timestamp($endyear, $endmonth, $endday);
+$filter_form = new sessionfilter_form(null, array('allfuture' => $allfuture, 'userid' => $userid));
 
-$urlparams = array('startyear' => $startyear, 'startmonth' => $startmonth, 'startday' => $startday,
-    'endyear' => $endyear, 'endmonth' => $endmonth, 'endday' => $endday, 'userid' => $userid);
-
-$coursenamesql = '';
-$coursenameparam = array();
-$courseidsql = '';
-$courseidparam = array();
-if ($coursename) {
-    $coursenamesql = ' AND c.fullname = ?';
-    $coursenameparam[] = $coursename;
+if (!($data = $filter_form->get_data())) {
+    $data = new stdClass();
+    $data->from = time();
+    $data->to = strtotime('+3 month');
 }
 if ($courseid) {
-    $courseidsql = ' AND c.idnumber = ?';
-    $courseidparam[] = $courseid;
+    $data->courseid = $courseid;
 }
 
-$records = '';
+$export_form = new export_form(null, convert_to_array($data));
+if ($export_data = $export_form->get_data()) {
+    $data = $export_data;
+}
 
-// Get all Face-to-face session dates from the DB
-$records = $DB->get_records_sql("SELECT d.id, cm.id AS cmid, c.id AS courseid, c.fullname AS coursename,
-                                   c.idnumber as cidnumber, f.name, f.id as facetofaceid, s.id as sessionid,
-                                   s.datetimeknown, d.timestart, d.timefinish, d.sessiontimezone, su.nbbookings
-                              FROM {facetoface_sessions_dates} d
-                              JOIN {facetoface_sessions} s ON s.id = d.sessionid
-                              JOIN {facetoface} f ON f.id = s.facetoface
-                   LEFT OUTER JOIN (SELECT sessionid, count(sessionid) AS nbbookings
-                                      FROM {facetoface_signups} su
-                                 LEFT JOIN {facetoface_signups_status} ss
-                                        ON ss.signupid = su.id AND ss.superceded = 0
-                                     WHERE ss.statuscode >= ?
-                                  GROUP BY sessionid) su ON su.sessionid = d.sessionid
-                              JOIN {course} c ON f.course = c.id
-
-                              JOIN {course_modules} cm ON cm.course = f.course
-                                   AND cm.instance = f.id
-                              JOIN {modules} m ON m.id = cm.module
-
-                             WHERE d.timestart >= ? AND d.timefinish <= ?
-                                   AND m.name = 'facetoface'
-                                $coursenamesql
-                                $courseidsql", array_merge(array(MDL_F2F_STATUS_BOOKED, $startdate, $enddate), $coursenameparam, $courseidparam));
-
+$records = get_sessions($data);
 $show_location = add_location_info($records);
 
 // Only keep the sessions for which this user can see attendees
@@ -175,8 +138,8 @@ if ($records) {
 $nbdates = count($dates);
 
 // Process actions if any
-if ('export' == $action) {
-    export_spreadsheet($dates, $format, true);
+if ($export_data) {
+    export_spreadsheet($dates, $export_data->format, true);
     exit;
 }
 
@@ -203,9 +166,7 @@ $renderer = $PAGE->get_renderer('block_facetoface');
 if (empty($users)) {
     // Date range form
     echo $OUTPUT->heading(get_string('filters', 'block_facetoface'), 2);
-    echo html_writer::start_tag('form', array('method' => 'get', 'action' => '')) . html_writer::start_tag('p');
-    print_facetoface_filters($startdate, $enddate, $coursename, $courseid, $location, $trainer);
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('apply', 'block_facetoface'))) . html_writer::end_tag('p') . html_writer::end_tag('form');
+    $filter_form->display();
 }
 
 // Show all session dates
@@ -214,23 +175,8 @@ if ($nbdates > 0) {
     echo $renderer->print_dates($groupeddates, true, false, false, false, false, $show_location);
 
     // Export form
-    echo $OUTPUT->heading(get_string('exportsessiondates', 'block_facetoface'), 3);
-    echo html_writer::start_tag('form', array('method' => 'post', 'action' => "")) . html_writer::start_tag('p');
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startyear', 'value' => $startyear));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startmonth', 'value' => $startmonth));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'startday', 'value' => $startday));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endyear', 'value' => $endyear));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endmonth', 'value' => $endmonth));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'endday', 'value' => $endday));
-    echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'action', 'value' => 'export'));
+    $export_form->display();
 
-    echo get_string('format', 'facetoface').':&nbsp;';
-    echo html_writer::start_tag('select', array('name' => 'format'));
-    echo html_writer::tag('option', get_string('excelformat', 'facetoface'), array('value' => 'excel', 'selected' => 'selected'));
-    echo html_writer::tag('option', get_string('odsformat', 'facetoface'), array('value' => 'ods'));
-    echo html_writer::end_tag('select');
-
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('exporttofile', 'facetoface'))). html_writer::end_tag('p') . html_writer::end_tag('form');
 } else {
     echo $OUTPUT->heading(get_string('sessiondatesview', 'block_facetoface'), 2);
     echo html_writer::tag('p', get_string('sessiondatesviewattendeeszero', 'block_facetoface'));

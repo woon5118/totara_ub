@@ -208,8 +208,8 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             var self = this;
 
             var dbuttons = {};
-            dbuttons[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
             dbuttons[M.util.get_string('save','totara_core')] = function() { self.save() }
+            dbuttons[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
 
             // Call the parent dialog object and link us
             totaraDialog.call(

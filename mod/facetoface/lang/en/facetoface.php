@@ -1244,7 +1244,7 @@ $string['discountcost_help'] = 'Discount cost is the amount charged to staff mem
 
 $string['duration_help'] = '**Duration** is the total length of the training in hours.
 If the training occurs over two or more time periods, the duration is the combined total.
-If the start and end dates are known, this field is unavailable.';
+If the session date is known then this value is automatically recalculated when the session is saved.';
 
 $string['emailmanagercancellation'] = '# Send notice to manager';
 $string['emailmanagercancellation_help'] = 'When "Send notice to manager" is checked, an email will be sent to the learner\'s manager advising them that the face-to-face booking has been cancelled.';

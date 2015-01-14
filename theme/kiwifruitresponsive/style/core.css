@@ -704,8 +704,7 @@ img.smallicon {
     background-image: url([[pix:theme|arw-cal-rtl]]);
     padding:0 20px 0 0;
 }
-#dp-plan-content,
-#program-content, #required-learning {
+#dp-plan-content {
     width:83%;
 }
 .dir-rtl #dp-plan-content #dp-plans-description .instructional_text {

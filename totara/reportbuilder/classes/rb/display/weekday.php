@@ -37,6 +37,10 @@ class weekday extends base {
             return '';
         }
 
+        if ($format === 'graph') {
+            return $daynum;
+        }
+
         $days = array(
             1 => new \lang_string('sunday', 'calendar'),
             2 => new \lang_string('monday', 'calendar'),
@@ -48,5 +52,9 @@ class weekday extends base {
         );
 
         return (string)$days[$daynum];
+    }
+
+    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+        return true;
     }
 }

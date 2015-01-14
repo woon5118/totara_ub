@@ -480,20 +480,20 @@ class program {
         // Get an array of user ids, of the users who should be in this program
         $users_who_should_be_assigned = $assigned_user_ids;
 
+        // Get all users who are assigned, as we want to unassign them all.
+        $alreadyassigned_sql = '';
+        $unassignparams = array();
         if (count($users_who_should_be_assigned) > 0) {
             // Get a list of user ids that are ALREADY assigned, but shouldn't be anymore
-            list($usql, $params) = $DB->get_in_or_equal($users_who_should_be_assigned, SQL_PARAMS_QM, '', false);
+            list($usql, $unassignparams) = $DB->get_in_or_equal($users_who_should_be_assigned, SQL_PARAMS_QM, '', false);
             $alreadyassigned_sql = "userid {$usql} AND";
-        } else {
-            // Get all users who are assigned, as we want to unassign them all
-            $alreadyassigned_sql = '';
-            $params = array();
         }
 
-        $params[] = $this->studentroleid;
-        $params[] = $this->context->id;
+        $unassignparams[] = $this->id;
 
-        $users_to_unassign = $DB->get_records_select('role_assignments', "{$alreadyassigned_sql} roleid = ? AND contextid = ?" , $params, '', 'userid as id');
+        // Validate user to unassign against the prog_user_assignment table.
+        $users_to_unassign = $DB->get_records_select('prog_user_assignment',
+            "{$alreadyassigned_sql} programid = ?", $unassignparams, '', 'userid as id');
 
         if ($users_to_unassign) {
             $this->unassign_learners(array_keys($users_to_unassign));
@@ -1137,7 +1137,8 @@ class program {
 
         $iscertif = (isset($this->certifid) && $this->certifid > 0) ? true : false;
 
-        $out = '';
+        // Div created to show notifications. Needed when requesting extensions.
+        $out = html_writer::tag('div', '', array('id' => 'totara-header-notifications'));
 
         if (!$this->is_accessible()) {
             // Return if program is not accessible

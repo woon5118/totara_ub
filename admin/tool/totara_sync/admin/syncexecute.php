@@ -71,12 +71,13 @@ $table->head  = array(get_string('element', 'tool_totara_sync'), get_string('sou
 foreach ($elements as $element) {
     $cells = array();
     $elname = $element->get_name();
-    $cells[] = new html_table_cell(get_string('displayname:'.$elname, 'tool_totara_sync'));
+    $elnametext = get_string('displayname:'.$elname, 'tool_totara_sync');
+    $cells[] = new html_table_cell($elnametext);
     // Check a source is enabled.
     if (!$sourceclass = get_config('totara_sync', 'source_' . $elname)) {
         $configured = false;
         $url = new moodle_url('/admin/tool/totara_sync/admin/elementsettings.php', array('element' => $elname));
-        $link = html_writer::link($url, get_string('sourcenotfound', 'tool_totara_sync'));
+        $link = html_writer::link($url, get_string('sourcenotfound', 'tool_totara_sync', $elnametext));
         $cells[] = new html_table_cell($link);
         $cells[] = new html_table_cell('');
     } else {
@@ -90,7 +91,7 @@ foreach ($elements as $element) {
         if(empty($props)) {
             $configured = false;
             $url = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', array('element' => $elname, 'source' => $sourceclass));
-            $link = html_writer::link($url, get_string('nosourceconfig', 'tool_totara_sync'));
+            $link = html_writer::link($url, get_string('nosourceconfig', 'tool_totara_sync', $elnametext));
             $cells[] = new html_table_cell($link);
         } else {
             if (core_text::strtolower($source) == 'csv') {

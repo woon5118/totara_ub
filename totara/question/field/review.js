@@ -101,8 +101,8 @@ M.totara_review = M.totara_review || {
         }
 
         var buttonsObj = {};
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); }
         buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl); }
+        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); }
 
         totaraDialogs[this.config.formprefix] = new totaraDialog(
             this.config.formprefix,

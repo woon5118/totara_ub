@@ -459,6 +459,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         if ($enrolstatus === true) {
             return new enrol_totara_facetoface_signup_form(null, $instance);
         }
+
         return $enrolstatus;
     }
 
@@ -541,7 +542,15 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
         // If I already have a pending request, cannot ask again.
         if ($DB->record_exists('enrol_totara_f2f_pending', array('enrolid' => $instance->id, 'userid' => $USER->id))) {
-            return get_string('cannotenrolalreadyrequested', 'enrol_totara_facetoface');
+            $url = new moodle_url('/enrol/totara_facetoface/withdraw.php', array('eid' => $instance->id));
+
+            $output = html_writer::start_tag('p');
+            $output .= get_string('cannotenrolalreadyrequested', 'enrol_totara_facetoface');
+            $output .= html_writer::end_tag('p');
+            $output .= html_writer::start_tag('p');
+            $output .= html_writer::link($url, get_string('withdrawpending', 'enrol_totara_facetoface'), array('class' => 'link-as-button'));
+            $output .= html_writer::end_tag('p');
+            return $output;
         }
 
         return true;

@@ -33,8 +33,8 @@ $row = array();
 $activated = array();
 $inactive = array();
 
-$row[] = new tabobject('attending', new moodle_url('/blocks/facetoface/mysignups.php', $urlparams), get_string('bookings','block_facetoface'));
-$row[] = new tabobject('attendees', new moodle_url('/blocks/facetoface/mysessions.php', $urlparams), get_string('sessions','block_facetoface'));
+$row[] = new tabobject('attending', new moodle_url('/blocks/facetoface/mysignups.php'), get_string('bookings', 'block_facetoface'));
+$row[] = new tabobject('attendees', new moodle_url('/blocks/facetoface/mysessions.php'), get_string('sessions', 'block_facetoface'));
 
 $tabs[] = $row;
 $activated[] = $currenttab;

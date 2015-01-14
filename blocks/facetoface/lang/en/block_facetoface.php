@@ -40,6 +40,7 @@ $string['coursefullname'] = 'Course fullname';
 $string['date'] = 'Date(s)';
 $string['datenotset'] = 'Date not set';
 $string['daterange'] = 'Date range:';
+$string['daterangeincorrect'] = 'From date must be before to date';
 $string['didntattend'] = 'didn\'t attend';
 $string['exportsessiondates'] = 'Export session dates';
 $string['enrolled'] = 'enrolled';

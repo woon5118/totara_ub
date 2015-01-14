@@ -132,8 +132,8 @@ M.totara_programview = M.totara_programview || {
             var self = this;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('ok', 'totara_program')] = function() { handler._save(); };
+            buttonsObj[M.util.get_string('cancel', 'totara_program')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

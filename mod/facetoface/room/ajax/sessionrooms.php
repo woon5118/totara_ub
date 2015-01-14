@@ -111,6 +111,7 @@ $dialog->searchtype = 'facetoface_room';
 $dialog->items = $allrooms;
 $dialog->disabled_items = $unavailablerooms;
 $dialog->lang_file = 'facetoface';
+$dialog->customdata['facetofaceid'] = $facetofaceid;
 $dialog->customdata['timeslots'] = $timeslots;
 $dialog->customdata['sessionid'] = $sessionid;
 $dialog->string_nothingtodisplay = 'error:nopredefinedrooms';

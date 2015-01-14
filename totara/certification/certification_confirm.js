@@ -74,8 +74,8 @@ M.totara_certificationconfirm = M.totara_certificationconfirm  || {
             var self = this;
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('editcertif', 'totara_certification')] = function() { handler._cancel() };
             buttonsObj[M.util.get_string('saveallchanges', 'totara_certification')] = function() { self.save() };
+            buttonsObj[M.util.get_string('editcertif', 'totara_certification')] = function() { handler._cancel() };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

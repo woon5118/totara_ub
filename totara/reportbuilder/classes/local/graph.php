@@ -166,12 +166,7 @@ class graph {
                 if (!isset($this->values[$k])) {
                     continue;
                 }
-                if ($val === '' or !is_numeric($val)) {
-                    // There is no way to plot non-numeric data, sorry.
-                    // TODO: add handling of '%' here
-                    $val = null;
-                }
-                $this->values[$k][$this->processedcount] = $val;
+                $this->values[$k][$this->processedcount] = self::normalize_numeric_value($val);
             }
             $this->processedcount++;
             return;
@@ -186,16 +181,50 @@ class graph {
 
         foreach ($this->series as $i => $key) {
             $val = $recorddata[$i];
-            if ($val === '' or !is_numeric($val)) {
-                // There is no way to plot non-numeric data, sorry.
-                // TODO: add handling of '%' here
-                $val = null;
-            }
-            $value[$i] = $val;
+            $value[$i] = self::normalize_numeric_value($val);
         }
 
         $this->values[] = $value;
         $this->processedcount++;
+    }
+
+    /**
+     * Normalise the value before sending to SVGGraph for display.
+     *
+     * Note: There is a lot of guessing in here.
+     *
+     * @param mixed $val
+     * @return int|float|string
+     */
+    public static function normalize_numeric_value($val) {
+        // Strip the percentage sign, the SVGGraph is not compatible with it.
+        if (substr($val, -1) === '%') {
+            $val = substr($val, 0, -1);
+        }
+
+        // Trim spaces, they might be before the % for example, keep newlines though.
+        if (is_string($val)) {
+            $val = trim($val, ' ');
+        }
+
+        // Normalise decimal values to PHP format, SVGGraph needs to localise the numbers itself.
+        if (substr_count($val, ',') === 1 and substr_count($val, '.') === 0) {
+            $val = str_replace(',', '.', $val);
+        }
+
+        if ($val === null or $val === '' or !is_numeric($val)) {
+            // There is no way to plot non-numeric data, sorry,
+            // we need to use '0' because SVGGraph does not support nulls.
+            $val = 0;
+        } else if (is_string($val)) {
+            if ($val === (string)(int)$val) {
+                $val = (int)$val;
+            } else {
+                $val = (float)$val;
+            }
+        }
+
+        return $val;
     }
 
     public function count_records() {

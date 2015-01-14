@@ -69,8 +69,8 @@ M.totara_cohortplans = M.totara_cohortplans || {
             // Store reference to this
             var self = this;
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('continue','moodle')] = function() { self.save(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
             // Call the parent dialog object and link us
             totaraDialog.call(

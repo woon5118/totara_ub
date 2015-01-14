@@ -234,8 +234,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'addremove';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('save','admin')] = function() { handler.submit(); };
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
 
             totaraDialogs[name] = new totaraDialog(
                 name,
@@ -255,8 +255,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'bulkaddfile';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('uploadfile','facetoface')] = function() {
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
                 if ($('#id_userfile').val() !== "") {
                     $('div#bulkaddfile form.mform').unbind('submit').submit();
                 }
@@ -280,8 +280,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             var name = 'bulkaddinput';
 
             var buttonsObj = {};
-            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
             buttonsObj[M.util.get_string('submitcsvtext','facetoface')] = function() {
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel(); };
                 if ($('#id_csvinput').val() !== "") {
                     handler.submit();
                 }
@@ -500,13 +500,12 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     var apprObj = form.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post(form.attr('action'), apprObj).done(function(data) {
-                        var obj = $.parseJSON(data);
-                        if (obj.result == 'success') {
-                            var span = "#usernote"+obj.id;
-                            $(span).html(obj.usernote);
+                        if (data.result == 'success') {
+                            var span = "#usernote"+data.id;
+                            $(span).html(data.usernote);
                             dialog.destroy(true);
                         } else {
-                            $("#attendee_note_err").text(obj.error);
+                            $("#attendee_note_err").text(data.error);
                         }
                     });
                     return false;
@@ -541,13 +540,12 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                     var apprObj = $theFrm.serialize();
                     apprObj += ('&submitbutton=' + $(this).attr('value'));
                     $.post($theFrm.attr('action'), apprObj).done(function(data){
-                        var obj = $.parseJSON(data);
-                        if (obj.result == 'success') {
-                            var span = "#position"+obj.id;
-                            $(span).html(obj.positiondisplayname);
+                        if (data.result == 'success') {
+                            var span = "#position"+data.id;
+                            $(span).html(data.positiondisplayname);
                             panel.destroy(true);
                         } else {
-                            $("#attendee_position_err").text(obj.error);
+                            $("#attendee_position_err").text(data.error);
                         }
                     });
                     return false;

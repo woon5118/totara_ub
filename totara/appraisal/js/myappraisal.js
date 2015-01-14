@@ -127,8 +127,8 @@ M.totara_appraisal_myappraisal = M.totara_appraisal_myappraisal || {
         }
 
         var buttonObj = {};
-        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
         buttonObj[M.util.get_string('printnow', 'totara_appraisal')] = function(e) { handler._print(e, printurl) };
+        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
         totaraDialogs[name] = new totaraDialog(
             name,
@@ -158,8 +158,8 @@ M.totara_appraisal_myappraisal = M.totara_appraisal_myappraisal || {
         }
 
         var buttonObj = {};
-        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
         buttonObj[M.util.get_string('downloadnow', 'totara_appraisal')] = function() { handler._download() };
+        buttonObj[M.util.get_string('cancel', 'moodle')] = function() { handler._cancel() };
 
         totaraDialogs[name] = new totaraDialog(
             name,

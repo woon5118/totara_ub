@@ -244,82 +244,67 @@ function add_location_info(&$sessions) {
 }
 
 /**
- * Prints form items with the names $day, $month and $year
+ * Gets a list of all Face to Face sessions within the bounds of data
  *
- * @param int $filtername - the name of the filter to set up i.e coursename, courseid, location, trainer
- * @param int $currentvalue
- * @param boolean $return
+ * @param $data stdclass a class with the following possible attributes
+ *      $course     string  a course name
+ *      $courseid   integer a course id
+ *      $from       integer the time to search from
+ *      $to         integer The time to search until
  */
-function print_facetoface_filters($startdate, $enddate, $currentcoursename, $currentcourseid, $currentlocation, $currenttrainer) {
-    global $CFG, $DB;
+function get_sessions($data) {
+    global $DB;
 
-    $coursenames = array();
-    $sessions = array();
-    $locations = array();
-    $courseids = array();
-    $trainers = array();
+    $paramssql = array();
+    $params = array();
 
-    $results = $DB->get_records_sql("SELECT s.id AS sessionid, c.id as courseid, c.idnumber, c.fullname,
-                                       f.id AS facetofaceid
-                                    FROM {course} c
-                                    JOIN {facetoface} f ON f.course = c.id
-                                    JOIN {facetoface_sessions} s ON f.id = s.facetoface
-                                    WHERE c.visible = 1
-                                    GROUP BY c.id, c.idnumber, c.fullname, s.id, f.id
-                                    ORDER BY c.fullname ASC");
-
-    add_location_info($results);
-
-    if (!empty($results)) {
-        foreach ($results as $result) {
-            // create unique list of coursenames
-            if (!array_key_exists($result->fullname, $coursenames)) {
-                $coursenames[$result->fullname] = $result->fullname;
-            }
-
-            // created unique list of locations
-            if (isset($result->location)) {
-                if (!array_key_exists($result->location, $locations)) {
-                    $locations[$result->location] = $result->location;
-                }
-            }
-
-            // create unique list of courseids
-            if (!array_key_exists($result->idnumber, $courseids) and $result->idnumber) {
-                $courseids[$result->idnumber] = $result->idnumber;
-            }
-
-            // create unique list of trainers
-            // check if $trainers hasn't already been populated by the cached list
-            if (empty($trainers)) {
-                if (isset($result->trainers)) {
-                    foreach ($result->trainers as $trainer) {
-                        if (!array_key_exists($trainer,$trainers)) {
-                            $trainers[$trainer] = $trainer;
-                        }
-                    }
-                }
-            }
-        }
+    if (!empty($data->course)) {
+        $paramssql[] = 'c.fullname = ?';
+        $params[] = $data->course;
+    }
+    if (!empty($data->courseid)) {
+        $paramssql[] = 'c.idnumber = ?';
+        $params[] = $data->courseid;
     }
 
-    // Build or print result
-    $table = new html_table();
-    $table->tablealign = 'left';
-    $table->data[] = array(html_writer::tag('label', get_string('daterange', 'block_facetoface'), array('for' => 'menustartdate')),
-                           html_writer::select_time('days', 'startday', $startdate) .
-                           html_writer::select_time('months', 'startmonth', $startdate) .
-                           html_writer::select_time('years', 'startyear', $startdate) . ' ' . strtolower(get_string('to')) . ' ' .
-                           html_writer::select_time('days', 'endday', $enddate) .
-                           html_writer::select_time('months', 'endmonth', $enddate) .
-                           html_writer::select_time('years', 'endyear', $enddate));
-    $table->data[] = array(html_writer::tag('label', get_string('coursefullname','block_facetoface').':', array('for' => 'menucoursename')),
-                           html_writer::select($coursenames, 'coursename', $currentcoursename, array('' => get_string('all'))));
-    if ($locations) {
-        $table->data[] = array(html_writer::tag('label', get_string('location', 'facetoface').':', array('for' => 'menulocation')),
-            html_writer::select($locations, 'location', $currentlocation, array('' => get_string('all'))));
+    if ($data->from) {
+        $paramssql[] = 'd.timestart > ?';
+        $params[] = $data->from;
     }
-    echo html_writer::table($table);
+    if ($data->to) {
+        $paramssql[] = 'd.timefinish < ?';
+        $params[] = $data->to;
+    }
+
+    if (count($paramssql) > 0) {
+        $paramssql = 'AND ' . implode(' AND ', $paramssql);
+    } else {
+        $paramssql = '';
+    }
+
+    // Get all Face-to-face session dates from the DB.
+    $records = $DB->get_records_sql("SELECT d.id, cm.id AS cmid, c.id AS courseid, c.fullname AS coursename,
+                                   c.idnumber as cidnumber, f.name, f.id as facetofaceid, s.id as sessionid,
+                                   s.datetimeknown, d.timestart, d.timefinish, d.sessiontimezone, su.nbbookings
+                              FROM {facetoface_sessions_dates} d
+                              JOIN {facetoface_sessions} s ON s.id = d.sessionid
+                              JOIN {facetoface} f ON f.id = s.facetoface
+                   LEFT OUTER JOIN (SELECT sessionid, count(sessionid) AS nbbookings
+                                      FROM {facetoface_signups} su
+                                 LEFT JOIN {facetoface_signups_status} ss
+                                        ON ss.signupid = su.id AND ss.superceded = 0
+                                     WHERE ss.statuscode >= ?
+                                  GROUP BY sessionid) su ON su.sessionid = d.sessionid
+                              JOIN {course} c ON f.course = c.id
+
+                              JOIN {course_modules} cm ON cm.course = f.course
+                                   AND cm.instance = f.id
+                              JOIN {modules} m ON m.id = cm.module
+
+                             WHERE m.name = 'facetoface' $paramssql",
+        array_merge(array(MDL_F2F_STATUS_BOOKED), $params));
+
+    return $records;
 }
 
 /**

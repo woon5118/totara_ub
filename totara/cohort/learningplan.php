@@ -264,10 +264,10 @@ $table->setup();
 
 echo $OUTPUT->heading(get_string('history', 'totara_cohort'));
 
-$history_sql = 'SELECT cph.id,
+$usernamefields = get_all_user_name_fields(true, 'u');
+$history_sql = "SELECT cph.id,
                        t.fullname as template,
-                       u.firstname,
-                       u.lastname,
+                       {$usernamefields},
                        cph.planstatus,
                        cph.affectedusers,
                        cph.timecreated,
@@ -281,7 +281,7 @@ $history_sql = 'SELECT cph.id,
                         ON cph.templateid = t.id
                         WHERE cph.cohortid = ?
                     ORDER BY
-                        cph.id';
+                        cph.id";
 
 $perpage = COHORT_HISTORY_PER_PAGE;
 
@@ -303,11 +303,7 @@ if ($history_records = $DB->get_records_sql($history_sql, array($cohort->id), $t
         $row = array();
 
         $row[] = $record->template;
-
-        $user = new stdClass();
-        $user->firstname = $record->firstname;
-        $user->lastname = $record->lastname;
-        $fullname = fullname($user);
+        $fullname = fullname($record);
         $row[] = $fullname;
         unset($user);
         $row[] = userdate($record->timecreated, get_string('strfdateattime', 'langconfig'));

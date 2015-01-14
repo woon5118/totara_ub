@@ -1765,67 +1765,6 @@ function prog_format_seconds($seconds, $timeonly = false) {
 }
 
 /**
- * Returns list of programs user is assigned to.
- *
- * @param int $userid ID of a user
- * @param string|array $fields Fields to return
- * @param string $sort
- * @return array
- */
-function prog_get_all_users_programs($userid, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
-
-    // Guest account does not have any programs.
-    if (isguestuser($userid) || !isloggedin()) {
-        return(array());
-    }
-
-    $basefields = array('id', 'category', 'sortorder', 'shortname', 'fullname', 'idnumber', 'visible');
-
-    if (empty($fields)) {
-        $fields = $basefields;
-    } else if (is_string($fields)) {
-        $fields = explode(',', $fields);
-        $fields = array_map('trim', $fields);
-        $fields = array_unique(array_merge($basefields, $fields));
-    } else if (is_array($fields)) {
-        $fields = array_unique(array_merge($basefields, $fields));
-    } else {
-        throw new coding_exception('Invalid $fileds parameter in prog_get_all_users_programs()');
-    }
-    if (in_array('*', $fields)) {
-        $fields = array('*');
-    }
-
-    $orderby = "";
-    $sort = trim($sort);
-    if (!empty($sort)) {
-        $rawsorts = explode(',', $sort);
-        $sorts = array();
-        foreach ($rawsorts as $rawsort) {
-            $rawsort = trim($rawsort);
-            if (strpos($rawsort, 'p.') === 0) {
-                $rawsort = substr($rawsort, 2);
-            }
-            $sorts[] = trim($rawsort);
-        }
-        $sort = 'p.' . implode(',p.', $sorts);
-        $orderby = "ORDER BY $sort";
-    }
-
-    $progfields = 'pua.id AS pgaupuniqueid, p.' . join(',p.', $fields);
-    $sql = "SELECT $progfields
-                FROM {prog} p
-            JOIN {prog_user_assignment} pua ON p.id = pua.programid
-            WHERE pua.userid = :userid
-            $orderby";
-    $params['userid']  = $userid;
-
-    $programs = $DB->get_records_sql($sql, $params);
-    return $programs;
-}
-
-/**
  * updates the course enrolments for a program enrolment plugin, unenrolling students if the program is unavailable.
  *
  * @param enrol_totara_program_plugin $program_plugin

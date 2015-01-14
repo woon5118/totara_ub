@@ -50,16 +50,11 @@ class block_facetoface extends block_base {
             return $this->content;
         }
 
-        $timenow = time();
-        $startyear  = strftime('%Y', $timenow);
-        $startmonth = strftime('%m', $timenow);
-        $startday   = strftime('%d', $timenow);
-
         $this->content->text = '';
         $this->content->text .= html_writer::start_tag('ul');
         $this->content->text .= html_writer::tag('li', html_writer::link(new moodle_url('/blocks/facetoface/mysignups.php'), get_string('mybookings', 'block_facetoface')));
         $this->content->text .= html_writer::tag('li', html_writer::link(new moodle_url('/blocks/facetoface/mysessions.php'), get_string('upcomingsessions', 'block_facetoface')));
-        $this->content->text .= html_writer::tag('li', html_writer::link(new moodle_url('/blocks/facetoface/mysessions.php', array('startday' => $startday, 'startmonth' => $startmonth, 'startyear' => $startyear, 'endday' => 1, 'endmonth' => 1, 'endyear' => '2020')), get_string('allfuturesessions', 'block_facetoface')));
+        $this->content->text .= html_writer::tag('li', html_writer::link(new moodle_url('/blocks/facetoface/mysessions.php', array('allfuture' => true)), get_string('allfuturesessions', 'block_facetoface')));
 
         $this->content->text .= html_writer::end_tag('ul');
 
