@@ -178,7 +178,7 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
                 LEFT JOIN {facetoface_sessions_dates} f2fsd ON (f2fsd.sessionid = f2fses.id)
                 WHERE f2fses.facetoface = ? AND f2fs.userid = ?
                   AND f2fss.statuscode $insql
-                ORDER BY f2fsd.timefinish";
+                ORDER BY f2fsd.timefinish DESC";
         $params = array_merge(array($facetoface->id, $userid), $inparams);
         $status = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
         if ($status) {
@@ -5071,7 +5071,7 @@ function facetoface_archive_completion($userid, $courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $completion = new completion_info($course);
 
-    // All face to face with this course and user
+    // All facetoface sessions with this course and user.
     $sql = "SELECT f.*
             FROM {facetoface} f
             WHERE f.course = :courseid
@@ -5081,26 +5081,29 @@ function facetoface_archive_completion($userid, $courseid) {
                         WHERE s.facetoface = f.id)";
     $facetofaces = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid));
     foreach ($facetofaces as $facetoface) {
-        // Add an archive flag
-        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1);
+        // Add an archive flag.
+        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1, 'timenow' => time());
         $sql = "UPDATE {facetoface_signups}
                 SET archived = :archived
                 WHERE userid = :userid
                 AND archived <> :archived2
-                AND EXISTS (SELECT {facetoface_sessions}.id
-                            FROM {facetoface_sessions}
-                            WHERE {facetoface_sessions}.id = {facetoface_signups}.sessionid
-                            AND {facetoface_sessions}.facetoface = :facetofaceid)";
+                AND EXISTS (SELECT s.id, MAX(sd.timefinish) as maxfinishtime
+                            FROM {facetoface_sessions} s
+                            LEFT JOIN {facetoface_sessions_dates} sd ON s.id = sd.sessionid
+                            WHERE s.id = {facetoface_signups}.sessionid
+                            AND s.facetoface = :facetofaceid
+                            GROUP BY s.id
+                            HAVING MAX(sd.timefinish) < :timenow)";
         $DB->execute($sql, $params);
 
-        // Reset the grades
+        // Reset the grades.
         facetoface_update_grades($facetoface, $userid, true);
 
-        // Set completion to incomplete
-        // Reset viewed
+        // Set completion to incomplete.
+        // Reset viewed.
         $course_module = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid);
         $completion->set_module_viewed_reset($course_module, $userid);
-        // And reset completion, in case viewed is not a required condition
+        // And reset completion, in case viewed is not a required condition.
         $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
         $completion->invalidatecache($courseid, $userid, true);
     }
