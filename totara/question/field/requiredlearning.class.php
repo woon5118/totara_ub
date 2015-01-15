@@ -41,7 +41,7 @@ class question_requiredlearning extends review {
      * @return bool
      */
     public function has_review_items() {
-        return prog_get_required_programs($this->subjectid, '', '', '', true);
+        return prog_get_required_programs($this->subjectid, '', '', '', true, false, false);
     }
 
     /**

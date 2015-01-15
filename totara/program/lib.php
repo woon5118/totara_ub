@@ -126,10 +126,12 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
  * @param bool $showhidden Whether to include hidden programs in records returned
+ * @param bool $onlyrequiredlearning Only return required learning programs
  * @return array|int
  */
-function prog_get_required_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false, $showhidden=false) {
-    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden, true);
+function prog_get_required_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false, $showhidden=false,
+                                    $onlyrequiredlearning=true) {
+    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden, $onlyrequiredlearning);
 }
 
 /**
