@@ -1558,12 +1558,12 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->assertEquals(facetoface_ical_escape($text2, $converthtml2), $text2);
 
         $this->assertEquals(facetoface_ical_escape($text3, $converthtml1),
-            "This string should start repeating at 75 charaters for three repetitions.\r\n\t"
-            . "This string should start repeating at 75 charaters for three repetitions.\r\n\t"
+            "This string should start repeating at 75 charaters for three repetitions. \r\n\t"
+            . "This string should start repeating at 75 charaters for three repetitions. \r\n\t"
             . "This string should start repeating at 75 charaters for three repetitions.");
         $this->assertEquals(facetoface_ical_escape($text3, $converthtml2),
-            "This string should start repeating at 75 charaters for three repetitions.\r\n\t"
-            . "This string should start repeating at 75 charaters for three repetitions.\r\n\t"
+            "This string should start repeating at 75 charaters for three repetitions. \r\n\t"
+            . "This string should start repeating at 75 charaters for three repetitions. \r\n\t"
             . "This string should start repeating at 75 charaters for three repetitions.");
 
         $this->assertEquals(facetoface_ical_escape($text4, $converthtml1), "/'s \; \\\" ' \\n \, . & &nbsp\;");
