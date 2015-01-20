@@ -383,7 +383,7 @@ class rb_source_program_overview extends rb_base_source {
             'course',
             'timecompleted',
             get_string('coursecompletiontimecompleted', 'rb_source_program_overview'),
-            'COALESCE('.sql_cast2char('course_completions.timestarted').', \'-\')',
+            'COALESCE('.sql_cast2char('course_completions.timecompleted').', \'-\')',
             array(
                 'joins' => 'course_completions',
                 'grouping' => 'comma_list',
