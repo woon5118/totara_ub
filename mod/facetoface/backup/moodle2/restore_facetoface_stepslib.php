@@ -38,6 +38,8 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         if ($userinfo) {
             $paths[] = new restore_path_element('facetoface_signup', '/activity/facetoface/sessions/session/signups/signup');
             $paths[] = new restore_path_element('facetoface_signups_status', '/activity/facetoface/sessions/session/signups/signup/signups_status/signup_status');
+            $paths[] = new restore_path_element('facetoface_signup_custom_fields', '/activity/facetoface/sessions/session/signups/signup/signups_status/signup_status/signup_fields/signup_field');
+            $paths[] = new restore_path_element('facetoface_cancellation_custom_fields', '/activity/facetoface/sessions/session/signups/signup/signups_status/signup_status/cancellation_fields/cancellation_field');
             $paths[] = new restore_path_element('facetoface_session_roles', '/activity/facetoface/sessions/session/session_roles/session_role');
             $paths[] = new restore_path_element('facetoface_interest', '/activity/facetoface/interests/interest');
         }
@@ -163,6 +165,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
 
         // insert the entry record
         $newitemid = $DB->insert_record('facetoface_signups_status', $data);
+        $this->set_mapping('facetoface_signups_status', $oldid, $newitemid, true); // Childs and files by itemname.
     }
 
 
@@ -187,24 +190,136 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
 
         if ($data->field_data) {
-            if (!$field = $DB->get_record('facetoface_session_field', array('shortname' => $data->field_name))) {
+            if (!$field = $DB->get_record('facetoface_session_info_field', array('shortname' => $data->field_name))) {
                 debugging("Custom field [{$data->field_name}] in face to face session cannot be restored " .
                         "because it doesn't exist in the target database");
-            } else if ($field->type != $data->field_type) {
+            } else if ($field->datatype != $data->field_type) {
                 debugging("Custom field [{$data->field_name}] in face to face session cannot be restored " .
                         "because there is a data type mismatch - " .
-                        "target type = [{$field->type}] <> restore type = [{$data->field_type}]");
+                        "target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
             } else {
-                if ($customfield = $DB->get_record('facetoface_session_data',
-                        array('fieldid' => $field->id, 'sessionid' => $this->get_new_parentid('facetoface_session')))) {
+                if ($customfield = $DB->get_record('facetoface_session_info_data',
+                        array('fieldid' => $field->id, 'facetofacesessionid' => $this->get_new_parentid('facetoface_session')))) {
                     $customfield->data = $data->field_data;
-                    $DB->update_record('facetoface_session_data', $customfield);
+                    $DB->update_record('facetoface_session_info_data', $customfield);
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $customfield->id;
+                        $param->value  = $data->paramdatavalue;
+                        $params = array('dataid' => $customfield->id, 'value' => $data->paramdatavalue);
+                        if (!$DB->get_record('facetoface_session_info_data_param', $params)) {
+                            $DB->insert_record('facetoface_session_info_data_param', $param);
+                        }
+                    }
                 } else {
                     $customfield = new stdClass();
-                    $customfield->sessionid = $this->get_new_parentid('facetoface_session');
+                    $customfield->facetofacesessionid = $this->get_new_parentid('facetoface_session');
                     $customfield->fieldid = $field->id;
                     $customfield->data    = $data->field_data;
-                    $DB->insert_record('facetoface_session_data', $customfield);
+                    $dataid = $DB->insert_record('facetoface_session_info_data', $customfield);
+
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $dataid;
+                        $param->value  = $data->paramdatavalue;
+                        $DB->insert_record('facetoface_session_info_data_param', $param);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function process_facetoface_signup_custom_fields($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        if ($data->field_data) {
+            if (!$field = $DB->get_record('facetoface_signup_info_field', array('shortname' => $data->field_name))) {
+                debugging("Custom field [{$data->field_name}] in face to face signup cannot be restored " .
+                    "because it doesn't exist in the target database");
+            } else if ($field->datatype != $data->field_type) {
+                debugging("Custom field [{$data->field_name}] in face to face signup cannot be restored " .
+                    "because there is a data type mismatch - " .
+                    "target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
+            } else {
+                if ($customfield = $DB->get_record('facetoface_signup_info_data',
+                    array('fieldid' => $field->id, 'facetofacesignupid' => $this->get_new_parentid('facetoface_signups_status')))) {
+                    $customfield->data = $data->field_data;
+                    $DB->update_record('facetoface_signup_info_data', $customfield);
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $customfield->id;
+                        $param->value  = $data->paramdatavalue;
+                        $params = array('dataid' => $customfield->id, 'value' => $data->paramdatavalue);
+                        if (!$DB->get_record('facetoface_signup_info_data_param', $params)) {
+                            $DB->insert_record('facetoface_signup_info_data_param', $param);
+                        }
+                    }
+                } else {
+                    $customfield = new stdClass();
+                    $customfield->facetofacesignupid = $this->get_new_parentid('facetoface_signups_status');
+                    $customfield->fieldid = $field->id;
+                    $customfield->data    = $data->field_data;
+                    $dataid = $DB->insert_record('facetoface_signup_info_data', $customfield);
+
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $dataid;
+                        $param->value  = $data->paramdatavalue;
+                        $DB->insert_record('facetoface_signup_info_data_param', $param);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function process_facetoface_cancellation_custom_fields($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        if ($data->field_data) {
+            if (!$field = $DB->get_record('facetoface_cancellation_info_field', array('shortname' => $data->field_name))) {
+                debugging("Custom field [{$data->field_name}] in face to face cancellation cannot be restored " .
+                    "because it doesn't exist in the target database");
+            } else if ($field->datatype != $data->field_type) {
+                debugging("Custom field [{$data->field_name}] in face to face cancellation cannot be restored " .
+                    "because there is a data type mismatch - " .
+                    "target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
+            } else {
+                if ($customfield = $DB->get_record('facetoface_cancellation_info_data',
+                    array('fieldid' => $field->id, 'facetofacecancellationid' => $this->get_new_parentid('facetoface_signups_status')))) {
+                    $customfield->data = $data->field_data;
+                    $DB->update_record('facetoface_cancellation_info_data', $customfield);
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $customfield->id;
+                        $param->value  = $data->paramdatavalue;
+                        $params = array('dataid' => $customfield->id, 'value' => $data->paramdatavalue);
+                        if (!$DB->get_record('facetoface_cancellation_info_data_param', $params)) {
+                            $DB->insert_record('facetoface_cancellation_info_data_param', $param);
+                        }
+                    }
+                } else {
+                    $customfield = new stdClass();
+                    $customfield->facetofacecancellationid = $this->get_new_parentid('facetoface_signups_status');
+                    $customfield->fieldid = $field->id;
+                    $customfield->data    = $data->field_data;
+                    $dataid = $DB->insert_record('facetoface_cancellation_info_data', $customfield);
+
+                    // Insert params if exist.
+                    if (!empty($data->paramdatavalue)) {
+                        $param = new stdClass();
+                        $param->dataid = $dataid;
+                        $param->value  = $data->paramdatavalue;
+                        $DB->insert_record('facetoface_cancellation_info_data_param', $param);
+                    }
                 }
             }
         }
@@ -218,7 +333,7 @@ class restore_facetoface_activity_structure_step extends restore_activity_struct
         $oldid = $data->id;
 
         // insert the entry record
-        $newitemid = $DB->insert_record('facetoface_session_field', $data);
+        $newitemid = $DB->insert_record('facetoface_session_info_field', $data);
     }
 
 

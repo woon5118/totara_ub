@@ -466,8 +466,35 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 });
                 return false;
             });
+            // Add handler to view cancellation note.
+            $('a.attendee-cancellation-note').on('click', function(){
+                $.get($(this).attr('href'), function(data){
+                    modalWindow(data);
+                });
+                return false;
+            });
         }
         this.attachCustomClickEvents();
+
+        /**
+         * Modal popup to show generic info.
+         */
+        function modalWindow(data) {
+            var bodyContent = '';
+            if (typeof data.error === 'undefined') {
+                bodyContent = data;
+            }
+            var dialog = new M.core.dialogue ({
+                headerContent: null,
+                bodyContent  : bodyContent,
+                width        : 500,
+                zIndex       : 5,
+                centered     : true,
+                modal        : true,
+                render       : true
+            });
+            dialog.show();
+        }
 
         /**
         * Modal popup for generic single stage form. Requires the existence of standard mform with buttons #id_submitbutton and #id_cancel

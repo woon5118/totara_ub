@@ -29,13 +29,14 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     /**
      * Builds session list table given an array of sessions
      */
-    public function print_session_list_table($customfields, $sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array()) {
+    public function print_session_list_table($sessions, $viewattendees, $editsessions, $displaytimezones, $reserveinfo = array()) {
         $output = '';
 
         $tableheader = array();
-        foreach ($customfields as $field) {
-            if (!empty($field->showinsummary)) {
-                $tableheader[] = format_string($field->name);
+        $customfields = facetoface_get_session_customfields();
+        foreach ($customfields as $customfield) {
+            if (!empty($customfield->showinsummary)) {
+                $tableheader[] = format_string($customfield->fullname);
             }
         }
         $tableheader[] = get_string('date', 'facetoface');
@@ -70,21 +71,16 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
             $sessionrow = array();
 
-            // Custom fields
-            $customdata = $session->customfielddata;
-            foreach ($customfields as $field) {
-                if (empty($field->showinsummary)) {
+            // Custom fields.
+            $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+            foreach ($customfields as $customfield) {
+                if (empty($customfield->showinsummary)) {
                     continue;
                 }
-
-                if (empty($customdata[$field->id])) {
-                    $sessionrow[] = '&nbsp;';
+                if (array_key_exists($customfield->fullname, $customfieldsdata)) {
+                    $sessionrow[] =  $customfieldsdata[$customfield->fullname];
                 } else {
-                    if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                        $sessionrow[] = str_replace(CUSTOMFIELD_DELIMITER, html_writer::empty_tag('br'), format_string($customdata[$field->id]->data));
-                    } else {
-                        $sessionrow[] = format_string($customdata[$field->id]->data);
-                    }
+                    $sessionrow[] = '&nbsp;';
                 }
             }
 
@@ -289,28 +285,43 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      *
      * @return string html
      */
-    public function custom_field_chooser($field, $currentval) {
+    public function custom_field_chooser($field, $currentvalue) {
         global $DB;
 
+        $fieldname = "field_$field->shortname";
+        $value = empty($currentvalue) ? '' : $currentvalue;;
         $values = array();
-        switch ($field->type) {
-        case CUSTOMFIELD_TYPE_TEXT:
-            $records = $DB->get_records('facetoface_session_data', array('fieldid' => $field->id), 'data', 'id, data');
-            foreach ($records as $record) {
-                $values[$record->data] = $record->data;
-            }
-            break;
-
-        case CUSTOMFIELD_TYPE_SELECT:
-        case CUSTOMFIELD_TYPE_MULTISELECT:
-            $values = explode(CUSTOMFIELD_DELIMITER, $field->possiblevalues);
-            break;
-
-        default:
-            return false; // invalid type
+        switch ($field->datatype) {
+            case 'multiselect':
+                $param1 = json_decode($field->param1, true);
+                foreach ($param1 as $option) {
+                    $values[] = $option['option'];
+                }
+                break;
+            case 'menu':
+                $values = explode("\n", $field->param1);
+                break;
+            case 'text':
+                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
+                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                break;
+            case 'checkbox':
+                $values = array(0 => get_string('no'), 1 => get_string('yes'));
+                break;
+            case 'datetime':
+                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 10, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
+                build_datepicker_js('#id_' . $fieldname);
+                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                break;
+            case 'textarea':
+                $label = html_writer::empty_tag('input', array('type' => 'text', 'size' => 15, 'name' => $fieldname, 'value' => $value, 'id' => 'id_' . $fieldname));
+                return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_' . $fieldname)) . $label;
+                break;
+            default:
+                return false;
         }
 
-        // Build up dropdown list of values
+        // Build up dropdown list of values.
         $options = array();
         if (!empty($values)) {
             foreach ($values as $value) {
@@ -322,14 +333,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         }
 
         $nothing = get_string('all');
-        $nothingvalue = '';
+        $nothingvalue = 'all';
 
-        $fieldname = "field_$field->shortname";
-        $currentval = empty($currentval) ? $nothingvalue : $currentval;
+        $currentvalue = empty($currentvalue) ? $nothingvalue : $currentvalue;
 
-        $dropdown = html_writer::select($options, $fieldname, $currentval, array($nothingvalue => $nothing));
+        $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing));
 
-        return format_string($field->name) . ': ' . $dropdown;
+        return html_writer::tag('label', format_string($field->fullname) . ':', array('for' => 'id_customfields')) . $dropdown;
 
     }
 
@@ -499,6 +509,31 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $heading = $this->output->heading(get_string('existingbookings', 'mod_facetoface'), 3);
 
         return $heading . html_writer::table($table);
+    }
+
+    /**
+     * Manage customfield tabs displayed in customfield/index.php
+     *
+     * @param string $currenttab
+     * @return string tabs
+     */
+    public function customfield_management_tabs($currenttab = 'facetofacesession') {
+        $tabs = array();
+        $row = array();
+        $activated = array();
+        $inactive = array();
+
+        $row[] = new tabobject('facetofacesession', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession')),
+            get_string('sessioncustomfieldtab', 'facetoface'));
+        $row[] = new tabobject('facetofacesignup', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesignup')),
+            get_string('signupcustomfieldtab', 'facetoface'));
+        $row[] = new tabobject('facetofacecancellation', new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacecancellation')),
+            get_string('cancellationcustomfieldtab', 'facetoface'));
+
+        $tabs[] = $row;
+        $activated[] = $currenttab;
+
+        return print_tabs($tabs, $currenttab, $inactive, $activated, true);
     }
 }
 ?>

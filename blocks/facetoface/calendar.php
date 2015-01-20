@@ -657,49 +657,11 @@ function defaultfield_chooser($fieldname) {
 }
 
 function customfield_chooser($field) {
-    global $activefilters, $DB;
+    global $activefilters, $PAGE;
 
-    $values = array();
-    switch ($field->type) {
-        case CUSTOMFIELD_TYPE_TEXT:
-            $records = $DB->get_records('facetoface_session_data', array('fieldid' => $field->id), 'data', 'id, data');
-            foreach ($records as $record) {
-                $values[$record->data] = $record->data;
-            }
-            break;
-
-        case CUSTOMFIELD_TYPE_SELECT:
-        case CUSTOMFIELD_TYPE_MULTISELECT:
-            $values = explode(CUSTOMFIELD_DELIMITER, $field->possiblevalues);
-            break;
-
-        default:
-            return false; // Invalid type.
-    }
-
-    // Build up dropdown list of values.
-    $options = array();
-    if (!empty($values)) {
-        foreach ($values as $value) {
-            $v = clean_param(trim($value), PARAM_TEXT);
-            if (!empty($v)) {
-                $options[s($v)] = format_string($v);
-            }
-        }
-    }
-
-    $nothing = get_string('all');
-    $nothingvalue = 'all';
-
-    $fieldname = "field_$field->shortname";
-    $currentvalue = $nothingvalue;
-    if (!empty($activefilters['customfields'][$field->id])) {
-        $currentvalue = $activefilters['customfields'][$field->id];
-    }
-
-    $dropdown = html_writer::select($options, $fieldname, $currentvalue, array($nothingvalue => $nothing, 'id' => 'id_customfields'));
-
-    return html_writer::tag('label', format_string($field->name) . ':', array('for' => 'id_customfields')) . $dropdown;
+    $renderer = $PAGE->get_renderer('mod_facetoface');
+    $value = isset($activefilters['customfields'][$field->id]) ? $activefilters['customfields'][$field->id] : '';
+    return $renderer->custom_field_chooser($field, $value);
 }
 
 /**
@@ -709,28 +671,43 @@ function matches_filter($filterid, $filtervalue, $sessionid)
 {
     global $customfields, $DB;
 
-    if ('all' == $filtervalue) {
-        return true; // Not actually a filter
+    if ('all' == $filtervalue || '' === trim($filtervalue)) {
+        return true; // Not actually a filter.
     }
 
     // Warning: this get_field doesn't show up in the total number of DB queries, but it's called a lot!
-    $sessionvalue = $DB->get_field('facetoface_session_data', 'data', array('fieldid' => $filterid, 'sessionid' => $sessionid));
+    $sessionvalue = $DB->get_field('facetoface_session_info_data', 'data', array('fieldid' => $filterid, 'facetofacesessionid' => $sessionid));
     if (empty($sessionvalue)) {
         // No value at all => no match
         return false;
     }
 
-    if (CUSTOMFIELD_TYPE_MULTISELECT == $customfields[$filterid]->type) {
-        $values = explode(';', $sessionvalue);
-        foreach ($values as $value) {
-            if (trim($value) == $filtervalue) {
-                return true;
+    switch ($customfields[$filterid]->datatype) {
+        case 'multiselect':
+            $values = json_decode($sessionvalue);
+            foreach ($values as $key => $option) {
+                if (trim($option->option) == $filtervalue) {
+                    return true;
+                }
             }
-        }
-        return false;
+            return false;
+            break;
+        case 'checkbox':
+            $filtervalue = ($filtervalue == get_string('yes')) ? 1 : 0;
+            return $filtervalue == $sessionvalue;
+            break;
+        case 'datetime':
+            $cleanedformatdate = str_replace('%', '', get_string('datepickerlongyearphpuserdate', 'totara_core'));
+            $filtervalue = totara_date_parse_from_format($cleanedformatdate, $filtervalue);
+            return $filtervalue == $sessionvalue;
+            break;
+        case 'textarea':
+            return (strpos($sessionvalue, $filtervalue)!= false);
+            break;
+        default:
+            return $filtervalue == $sessionvalue;
+            break;
     }
-
-    return $filtervalue == $sessionvalue;
 }
 
 function get_sessions_by_date($sessionids, $displayinfo) {
@@ -835,19 +812,23 @@ function print_sessions($sessions, $tab) {
         }
 
         // Custom fields
-        $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->sessionid), '', 'fieldid, data');
         $nbcustomcolumns = 0;
+        $sessionobj = new stdClass();
+        $sessionobj->id = $session->sessionid;
+        $customdata = customfield_get_data($sessionobj, 'facetoface_session', 'facetofacesession');
         foreach ($customfields as $field) {
             if (empty($field->showinsummary)) {
                 continue;
             }
-
             $nbcustomcolumns++;
-            if (empty($customdata[$field->id])) {
+            if (empty($customdata[$field->fullname])) {
                 $sessionrow[] = '&nbsp;';
-            }
-            else {
-                $sessionrow[] = format_string($customdata[$field->id]->data);
+            } else {
+                if ($field->datatype == 'textarea') {
+                    $sessionrow[] = format_text($customdata[$field->fullname], FORMAT_HTML);
+                } else {
+                    $sessionrow[] = format_string($customdata[$field->fullname]);
+                }
             }
         }
 
@@ -880,7 +861,7 @@ function print_sessions($sessions, $tab) {
         $headings['name'] = get_string('name');
         foreach ($customfields as $field) {
             if (!empty($field->showinsummary)) {
-                $headings[$field->shortname] = $field->name;
+                $headings[$field->shortname] = $field->fullname;
             }
         }
         if ($tab == 'c') {
@@ -945,7 +926,7 @@ function get_notice($activefilters) {
         //$whereclause = "d{$filternb}.data <> '$value'";
         $whereclause = "d{$filternb}.data <> ?";
         $whereparams = array($fieldvalue);
-        if (CUSTOMFIELD_TYPE_MULTISELECT == $customfields[$fieldid]->type) {
+        if ('multiselect' == $customfields[$fieldid]->datatype) {
             $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, true);
             $whereparams = array('%' . $fieldvalue . '%');
         }
@@ -988,17 +969,32 @@ function get_matching_waitlisted_sessions($activefilters) {
             continue; // Not actually a filter.
         }
 
-        $joincondition = "d1.sessionid = s.id";
+        $joincondition = "d1.facetofacesessionid = s.id";
         if ($filternb > 1) {
-            $joincondition = "d{$filternb}.sessionid = d". ($filternb - 1) .'.sessionid';
+            $joincondition = "d{$filternb}.facetofacesessionid = d". ($filternb - 1) .'.facetofacesessionid';
         }
-        $filterjoins .= " JOIN {facetoface_session_data} d$filternb ON $joincondition";
+        $filterjoins .= " JOIN {facetoface_session_info_data} d$filternb ON $joincondition";
 
         $whereclause = "d{$filternb}.data = ?";
         $whereparams = array($fieldvalue);
-        if (CUSTOMFIELD_TYPE_MULTISELECT == $customfields[$fieldid]->type) {
-            $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, true);
-            $whereparams = array('%' . $fieldvalue . '%');
+        switch ($customfields[$fieldid]->datatype) {
+            case 'multiselect':
+                $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, false);
+                $whereparams = array('%' . $fieldvalue . '%');
+                break;
+            case 'checkbox':
+                $fieldvalue = ($fieldvalue == get_string('yes')) ? 1 : 0;
+                $whereparams = array($fieldvalue);
+                break;
+            case 'datetime':
+                $cleanedformatdate = str_replace('%', '', get_string('datepickerlongyearphpuserdate', 'totara_core'));
+                $fieldvalue = totara_date_parse_from_format($cleanedformatdate, $fieldvalue);
+                $whereparams = array($fieldvalue);
+                break;
+            case 'textarea':
+                $whereclause = $DB->sql_like("d{$filternb}.data", '?', true, true, false);
+                $whereparams = array('%' . $fieldvalue . '%');
+                break;
         }
         $filterwhere .= " AND d{$filternb}.fieldid = ? AND $whereclause ";
         $filterparams = array_merge($filterparams, array($fieldid), $whereparams);

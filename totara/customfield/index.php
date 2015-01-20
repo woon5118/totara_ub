@@ -24,219 +24,108 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->dirroot.'/totara/customfield/indexlib.php');
+require_once($CFG->dirroot.'/totara/customfield/lib.php');
 require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
-require_once($CFG->dirroot.'/totara/customfield/definelib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
-
-require_login();
 
 $prefix         = required_param('prefix', PARAM_ALPHA);        // hierarchy name or mod name
 $typeid         = optional_param('typeid', '0', PARAM_INT);    // typeid if hierarchy
-$action         = optional_param('action', '', PARAM_ALPHA);    // param for some action
+$action         = optional_param('action', 'showlist', PARAM_ALPHA);    // param for some action
 $id             = optional_param('id', 0, PARAM_INT); // id of a custom field
 
+require_login();
 $sitecontext = context_system::instance();
-
-// use $prefix to determine where to get custom field data from
-if (in_array($prefix, array('course', 'program'))) {
-    if ($prefix == 'program') {
-        $tableprefix = $shortprefix = 'prog';
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
-            print_error('programsandcertificationsdisabled', 'totara_program');
-        }
-    } else {
-        $tableprefix = $shortprefix = $prefix;
-    }
-    $adminpagename = 'coursecustomfields';
-
-    $can_add = has_capability('totara/core:create'.$prefix.'customfield', $sitecontext);
-    $can_edit = has_capability('totara/core:update'.$prefix.'customfield', $sitecontext);
-    $can_delete = has_capability('totara/core:delete'.$prefix.'customfield', $sitecontext);
-} else {
-    // Confirm the hierarchy prefix exists
-    $hierarchy = hierarchy::load_hierarchy($prefix);
-    $shortprefix = hierarchy::get_short_prefix($prefix);
-    $adminpagename = $prefix . 'typemanage';
-    $tableprefix = $shortprefix.'_type';
-
-    $can_add = has_capability('totara/hierarchy:create'.$prefix.'customfield', $sitecontext);
-    $can_edit = has_capability('totara/hierarchy:update'.$prefix.'customfield', $sitecontext);
-    $can_delete = has_capability('totara/hierarchy:delete'.$prefix.'customfield', $sitecontext);
-}
-
-$PAGE->set_url('/totara/customfield/index.php');
 $PAGE->set_context($sitecontext);
-$PAGE->set_pagelayout('admin');
 
-$redirectoptions = array('prefix' => $prefix);
-if ($typeid) {
-    $redirectoptions['typeid'] = $typeid;
-}
-if ($id) {
-    $redirectoptions['id'] = $id;
+// Add params to extrainfo in case the customfield need them.
+$extrainfo = array('id' => $id, 'action' => $action, 'typeid' => $typeid);
+$customfieldtype = get_customfield_type_instace($prefix, $sitecontext, $extrainfo);
+
+if (!$customfieldtype) {
+   print_error('nocustomfielddefinedfortheprefix');
 }
 
+/** @var totara_customfield_renderer $renderer*/
+$renderer = $PAGE->get_renderer('totara_customfield');
+
+// Set redirect.
+$redirectoptions = $renderer->get_redirect_options($prefix, $id, $typeid);
+$redirectpage = '/totara/customfield/index.php';
 $redirect = new moodle_url('/totara/customfield/index.php', $redirectoptions);
 
-// get some relevant data
-if ($typeid) {
-    $type = $hierarchy->get_type_by_id($typeid);
-}
+$PAGE->set_url($redirect);
+$adminpagename = $renderer->get_admin_page($prefix);
+admin_externalpage_setup($adminpagename);
 
-// set up breadcrumbs trail
-if ($typeid) {
-    $pagetitle = format_string(get_string($prefix.'depthcustomfields', 'totara_hierarchy'));
-
-    $PAGE->navbar->add(get_string($prefix.'types', 'totara_hierarchy'),
-                        new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => $prefix)));
-
-    $PAGE->navbar->add(format_string($type->fullname));
-
-} else if ($prefix == 'course') {
-    $pagetitle = format_string(get_string('coursecustomfields', 'totara_customfield'));
-    $PAGE->navbar->add(get_string('coursecustomfields', 'totara_customfield'));
-} else if ($prefix == 'program') {
-    $pagetitle = format_string(get_string('programcertcustomfields', 'totara_customfield'));
-    $PAGE->navbar->add(get_string('programcertcustomfields', 'totara_customfield'));
-}
-
-$navlinks = $PAGE->navbar->has_items();
-
-// set the capability prefix
-$capability_prefix = (in_array($prefix, array('course', 'program'))) ? 'core' : 'hierarchy';
-
-admin_externalpage_setup($adminpagename, '', array('prefix' => $prefix));
-
-// check if any actions need to be performed
+// Check if any actions need to be performed.
 switch ($action) {
-   case 'movefield':
-        require_capability('totara/'.$capability_prefix.':update'.$prefix.'customfield', $sitecontext);
+    case 'showlist':
+        echo $OUTPUT->header();
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        echo $renderer->get_heading($prefix, $action);
+
+        $options = customfield_list_datatypes();
+        $can_create = has_capability($customfieldtype->get_capability_createfield(), $sitecontext);
+        $can_edit = has_capability($customfieldtype->get_capability_editfield(), $sitecontext);
+        $can_delete = has_capability($customfieldtype->get_capability_deletefield(), $sitecontext);
+        $fields = $customfieldtype->get_defined_fields($customfieldtype->get_fields_sql_where());
+
+        echo $renderer->totara_customfield_print_list($fields, $can_edit, $can_delete, $can_create, $options, $redirectpage, $redirectoptions);
+        break;
+    case 'movefield':
+        require_capability($customfieldtype->get_capability_movefield(), $sitecontext);
         $id  = required_param('id', PARAM_INT);
         $dir = required_param('dir', PARAM_ALPHA);
 
         if (confirm_sesskey()) {
-            customfield_move_field($id, $dir, $tableprefix, $prefix);
+            $customfieldtype->move($id, $dir);
+            redirect($redirect);
         }
-        redirect($redirect);
         break;
     case 'deletefield':
-        require_capability('totara/'.$capability_prefix.':delete'.$prefix.'customfield', $sitecontext);
+        require_capability($customfieldtype->get_capability_deletefield(), $sitecontext);
         $id      = required_param('id', PARAM_INT);
         $confirm = optional_param('confirm', 0, PARAM_BOOL);
 
         if (data_submitted() and $confirm and confirm_sesskey()) {
-            customfield_delete_field($id, $tableprefix);
+            $customfieldtype->delete($id);
             redirect($redirect);
         }
 
-        //ask for confirmation
-        $datacount = $DB->count_records($tableprefix.'_info_data', array('fieldid' => $id));
-        switch ($datacount) {
-        case 0:
-            $deletestr = get_string('confirmfielddeletionnodata', 'totara_customfield');
-            break;
-        case 1:
-            $deletestr = get_string('confirmfielddeletionsingle', 'totara_customfield');
-            break;
-        default:
-            $deletestr = get_string('confirmfielddeletionplural', 'totara_customfield', $datacount);
-        }
-        $optionsyes = array ('id'=>$id, 'confirm'=>1, 'action'=>'deletefield', 'sesskey'=>sesskey(), 'typeid'=>$typeid);
         echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('deletefield', 'totara_customfield'));
-        $formcontinue = new single_button(new moodle_url($redirect, $optionsyes), get_string('yes'), 'post');
-        $formcancel = new single_button(new moodle_url($redirect, $redirectoptions), get_string('no'), 'get');
-        echo $OUTPUT->confirm($deletestr, $formcontinue, $formcancel);
-        echo $OUTPUT->footer();
-        die;
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        echo $renderer->get_heading($prefix, $action);
+
+        // Ask for confirmation.
+        $datacount = $DB->count_records($customfieldtype->get_table_prefix().'_info_data', array('fieldid' => $id));
+        $optionsyes = array ('prefix' => $prefix, 'id' => $id, 'confirm' => 1, 'action' => 'deletefield', 'sesskey' => sesskey(), 'typeid' => $typeid);
+        echo $renderer->totara_customfield_delete_confirmation($datacount, $redirectpage, $optionsyes, $redirectoptions);
         break;
     case 'editfield':
         $id       = optional_param('id', 0, PARAM_INT);
         $datatype = optional_param('datatype', '', PARAM_ALPHA);
 
-        if ($id == 0) {
-            require_capability('totara/'.$capability_prefix.':create'.$prefix.'customfield', $sitecontext);
-        } else {
-            require_capability('totara/'.$capability_prefix.':update'.$prefix.'customfield', $sitecontext);
+        $heading = $datatype;
+        $capability = $customfieldtype->get_capability_editfield();
+        $tableprefix = $customfieldtype->get_table_prefix();
+        if ($id === 0) {
+            $datatypes = customfield_list_datatypes();
+            $capability = $customfieldtype->get_capability_createfield();
+            $heading = $datatypes[$datatype];
         }
 
-        customfield_edit_field($id, $datatype, $typeid, $redirect, $tableprefix, $prefix, $navlinks);
-        die;
+        $tabs = $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        $heading = $renderer->get_heading($prefix, $action, $heading);
+        require_capability($capability, $sitecontext);
+
+        $field = customfield_get_record_by_id($tableprefix, $id, $datatype);
+        $renderer->customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs);
         break;
     default:
-}
-
-// Display page header.
-echo $OUTPUT->header();
-
-if (in_array($prefix, array('course', 'program'))) {
-    // Show tab.
-    $currenttab = $prefix;
-    include_once('tabs.php');
-} else {
-    // Print return to type link.
-    $url = $OUTPUT->action_link(new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => $prefix, 'typeid' => $typeid)),
-                                "&laquo; " . get_string('alltypes', 'totara_hierarchy'));
-    echo html_writer::tag('p', $url);
-}
-
-if ($prefix == 'course') {
-    $heading = get_string('coursecustomfields', 'totara_customfield');
-} else if ($prefix == 'program') {
-    $heading = get_string('programcertcustomfields', 'totara_customfield');
-} else {
-    $heading = format_string($type->fullname);
-}
-echo $OUTPUT->heading($heading);
-
-// show custom fields for the given type
-$table = new html_table();
-$table->head  = array(get_string('customfield', 'totara_customfield'), get_string('type', 'totara_hierarchy'));
-if ($can_edit || $can_delete) {
-    $table->head[] = get_string('edit');
-}
-if ($prefix == 'course') {
-    $table->id = 'customfields_course';
-} else if ($prefix == 'program') {
-    $table->id = 'customfields_program';
-} else {
-    $table->id = 'customfields_'.$hierarchy->prefix;
-}
-$table->data = array();
-
-$where = ($typeid) ? array('typeid' => $typeid) : array();
-$fields = customfield_get_defined_fields($tableprefix, $where);
-
-$fieldcount = count($fields);
-
-foreach ($fields as $field) {
-    $row = array(format_string($field->fullname), get_string('customfieldtype'.$field->datatype, 'totara_customfield'));
-    if ($can_edit || $can_delete) {
-        $row[] = customfield_edit_icons($field, $fieldcount, $typeid, $prefix, $can_edit, $can_delete);
-    }
-    $table->data[] = $row;
-}
-if (count($table->data)) {
-    echo html_writer::table($table);
-} else {
-    echo $OUTPUT->notification(get_string('nocustomfieldsdefined', 'totara_customfield'));
-}
-echo html_writer::empty_tag('br');
-// Create a new custom field dropdown menu
-$options = customfield_list_datatypes();
-
-if ($can_add) {
-    if (in_array($prefix, array('course', 'program'))) {
-        $select = new single_select(new moodle_url('/totara/customfield/index.php', array('prefix' => $prefix, 'id' => 0, 'action' => 'editfield', 'datatype' => '')), 'datatype', $options, '', array(''=>'choosedots'), 'newfieldform');
-        $select->set_label(get_string('createnewcustomfield', 'totara_customfield'));
-        echo $OUTPUT->render($select);
-    } else {
-        $select = new single_select(new moodle_url('/totara/customfield/index.php', array('prefix' => $prefix, 'id' => 0, 'action' => 'editfield', 'typeid' => $typeid, 'datatype' => '')), 'datatype', $options, '', array(''=>'choosedots'), 'newfieldform');
-        $select->set_label(get_string('createnewcustomfield', 'totara_customfield'));
-        echo $OUTPUT->render($select);
-    }
+        echo $OUTPUT->header();
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        print_error('actiondoesnotexist', 'totara_customfield');
+        break;
 }
 
 echo $OUTPUT->footer();

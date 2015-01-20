@@ -29,139 +29,27 @@ class attendee_note_form extends moodleform {
     public function definition() {
 
         $mform = & $this->_form;
-        $attendee = $this->_customdata['attendee'];
+        $attendeenote = $this->_customdata['attendeenote'];
+        $userfullname = fullname($attendeenote);
 
-        $mform->addElement('header', 'usernoteheader', get_string('usernoteheading', 'facetoface', $attendee->fullname));
+        $mform->addElement('header', 'usernoteheader', get_string('usernoteheading', 'facetoface', $userfullname));
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
+        $mform->setDefault('id', $attendeenote->statusid);
 
-        $mform->addElement('hidden', 's');
+        $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
+        $mform->setType('userid', PARAM_INT);
+
+        $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
 
-        $mform->addElement('html', html_writer::tag('p', '&nbsp;', array('id' => 'attendee_note_err', 'class' => 'error')));
-
-        $mform->addElement('text', 'usernote', get_string('attendeenote', 'facetoface'), 'maxlength="255" size="50"');
-        $mform->setType('usernote', PARAM_TEXT);
+        $signup = new stdClass();
+        $signup->id = $attendeenote->statusid;
+        customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
+        $mform->removeElement('customfields');
 
         $submittitle = get_string('savenote', 'facetoface');
         $this->add_action_buttons(true, $submittitle);
-        $this->set_data($attendee);
-    }
-}
-
-class attendee_note {
-
-    protected $id = 0;
-    /**
-     * Attendee id
-     *
-     * @var int
-     */
-    protected $userid = 0;
-
-    /**
-     * Facetoface session id
-     *
-     * @var type
-     */
-    protected $sessionid = 0;
-
-    /**
-     * Attendee note
-     *
-     * @var string
-     */
-    protected $usernote = '';
-
-    /**
-     * Attendee fullname
-     *
-     * @var string
-     */
-    protected $fullname = '';
-
-    /**
-     * Create instance of attendee
-     *
-     * @param int $id
-     */
-    public function __construct($userid = 0, $sessionid = 0) {
-        if ($userid && $sessionid) {
-            $this->userid = $userid;
-            $this->sessionid = $sessionid;
-            $this->load();
-        }
-    }
-
-    /**
-     * Get stdClass with attendee properties
-     *
-     * @return stdClass
-     */
-    public function get() {
-        $obj = new stdClass();
-        $obj->id = $this->id;
-        $obj->userid = $this->userid;
-        $obj->sessionid = $this->sessionid;
-        $obj->usernote = $this->usernote;
-        $obj->note = $this->usernote;
-        $obj->fullname = $this->fullname;
-        return $obj;
-    }
-
-    /**
-     * Set attendee properties
-     *
-     * @param stdClass $todb
-     * @return $this
-     */
-    public function set(stdClass $todb) {
-        if (isset($todb->id)) {
-            $this->userid = $todb->id;
-        }
-        if (isset($todb->s)) {
-            $this->sessionid = $todb->s;
-        }
-        if (isset($todb->usernote)) {
-            $this->usernote = clean_param($todb->usernote, PARAM_TEXT);
-        }
-        return $this;
-    }
-
-    /**
-     * Saves current attendee properties
-     *
-     * @return $this
-     */
-    public function save() {
-        global $DB;
-
-        $todb = $this->get();
-        $todb->id = $this->id;
-
-        if(!$DB->update_record('facetoface_signups_status', $todb)) {
-            throw new exception('Cannot update facetoface attendee', 21);
-        }
-
-        // Refresh data.
-        $this->load();
-        return $this;
-    }
-
-    /**
-     * load attendee properties from DB
-     *
-     * @return $this
-     */
-    public function load() {
-        $attendee = facetoface_get_attendee($this->sessionid, $this->userid);
-        if (!$attendee) {
-            throw new exception('Cannot load facetoface attendee', 22);
-        }
-        $this->id = $attendee->statusid;
-        $this->usernote = $attendee->usernote;
-        $this->fullname = fullname($attendee);
-        return $this;
     }
 }

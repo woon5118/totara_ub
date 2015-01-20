@@ -76,12 +76,16 @@ if (!facetoface_allow_user_cancellation($session)) {
     print_error('notallowedtocancel', 'facetoface', $returnurl);
 }
 
-$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions'));
+$attendee_note = facetoface_get_attendee($s, $USER->id);
+$attendee_note->id = $attendee_note->statusid;
+customfield_load_data($attendee_note, 'facetofacecancellation', 'facetoface_cancellation');
+
+$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'attendee_note'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
-if ($fromform = $mform->get_data()) { // Form submitted
+if ($fromform = $mform->get_data()) { // Form submitted.
 
     if (empty($fromform->submitbutton)) {
         print_error('error:unknownbuttonclicked', 'facetoface', $returnurl);
@@ -95,8 +99,10 @@ if ($fromform = $mform->get_data()) { // Form submitted
     }
 
     $errorstr = '';
-    if (facetoface_user_cancel($session, false, $forcecancel, $errorstr, $fromform->cancelreason)) {
-        \mod_facetoface\event\booking_cancelled::create_from_session($session, $context)->trigger();
+    if (facetoface_user_cancel($session, false, $forcecancel, $errorstr, '')) {
+        $cancellationrecord = facetoface_get_user_current_status($session->id, $USER->id);
+        $fromform->id = $cancellationrecord->id;
+        customfield_save_data($fromform, 'facetofacecancellation', 'facetoface_cancellation');
 
         $message = get_string('bookingcancelled', 'facetoface');
 

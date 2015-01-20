@@ -67,6 +67,15 @@ class customfield_textarea extends base {
                 case 'prog':
                     $prefix = 'program';
                     break;
+                case 'facetoface_session':
+                    $prefix = 'facetofacesession';
+                    break;
+                case 'facetoface_signup':
+                    $prefix = 'facetofacesignup';
+                    break;
+                case 'facetoface_cancellation':
+                    $prefix = 'facetofacecancellation';
+                    break;
                 default:
                     debugging("Unknown prefix '$cf_prefix'' in custom field '$field'", DEBUG_DEVELOPER);
                     return '';

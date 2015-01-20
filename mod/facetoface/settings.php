@@ -136,8 +136,10 @@ if ($ADMIN->fulltree) { // Improve performance.
     // Create array with existing custom fields (if any), empty array otherwise.
     $customfields = array();
     $allcustomfields = facetoface_get_session_customfields();
+    // Exclude customfields type file.
+    $allcustomfields = totara_search_for_value($allcustomfields, 'datatype', TOTARA_SEARCH_OP_NOT_EQUAL, 'file');
     foreach ($allcustomfields as $fieldid => $fielname) {
-        $customfields[$fieldid] = $fielname->name;
+        $customfields[$fieldid] = $fielname->fullname;
     }
 
     // List of facetoface session fields that can be selected as filters.
@@ -159,7 +161,8 @@ $ADMIN->add('modfacetofacefolder', $settings);
 // Tell core we already added the settings structure.
 $settings = null;
 
-$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), "$CFG->wwwroot/mod/facetoface/customfields.php"));
+$customfieldurl = new moodle_url('/mod/facetoface/customfields.php', array('prefix' => 'facetofacesession'));
+$ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacecustomfields', new lang_string('customfieldsheading','facetoface'), $customfieldurl));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacerooms', new lang_string('rooms','facetoface'), "$CFG->wwwroot/mod/facetoface/room/manage.php"));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacetemplates', new lang_string('notificationtemplates','facetoface'), "$CFG->wwwroot/mod/facetoface/notification/template/index.php"));
 $ADMIN->add('modfacetofacefolder', new admin_externalpage('modfacetofacesitenotices', new lang_string('sitenoticesheading','facetoface'), "$CFG->wwwroot/mod/facetoface/sitenotices.php"));

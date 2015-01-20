@@ -73,4 +73,7 @@ $string['type_status'] = 'Status';
 $string['type_role'] = 'Role';
 $string['type_room'] = 'Room';
 $string['type_facetoface'] = 'Face-to-face';
+$string['type_facetoface_session'] = 'Session customfields';
+$string['type_facetoface_signup'] = 'Signup note customfields';
+$string['type_facetoface_cancellation'] = 'Cancellation note customfields';
 $string['type_date'] = 'Session Date';

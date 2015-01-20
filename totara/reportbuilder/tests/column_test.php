@@ -76,7 +76,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $f2f_session_data_data = array(
-        'id' => 1, 'fieldid' => 1, 'sessionid' => 1, 'data' => 'Training Centre',
+        'id' => 1, 'fieldid' => 1, 'facetofacesessionid' => 1, 'data' => 'Training Centre',
     );
 
     protected $course_completions_data = array(
@@ -570,7 +570,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'pos_type' => $this->type_data,
             'pos' => array($this->pos_data),
             'pos_assignment' => array($this->pos_assignment_data),
-            'facetoface_session_data' => array($this->f2f_session_data_data),
+            'facetoface_session_info_data' => array($this->f2f_session_data_data),
             'course_completion_crit_compl' => array($this->course_completion_crit_compl_data),
             'course_completion_criteria' => array($this->course_completion_criteria_data),
             'course_completions' => array($this->course_completions_data),

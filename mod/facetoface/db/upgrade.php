@@ -2456,5 +2456,401 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014110703, 'facetoface');
     }
 
+    if ($oldversion < 2014110704) {
+
+        // Define tables for facetoface session customfields.
+        $table = new xmldb_table('facetoface_session_info_field');
+
+        // Adding fields to table session_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+        $table->add_field('showinsummary', XMLDB_TYPE_INTEGER, '1', null, true, null, '1');
+
+        // Adding keys to table session_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for session_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table session_info_data to be created.
+        $table = new xmldb_table('facetoface_session_info_data');
+
+        // Adding fields to table session_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofacesessionid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table session_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('sessioninfodata_fieldid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_session_info_field', array('id'));
+        $table->add_key('sessioninfodata_sessionid_fk', XMLDB_KEY_FOREIGN, array('facetofacesessionid'), 'facetoface_sessions', array('id'));
+
+        // Conditionally launch create table for session_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('facetoface_session_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('sessioninfodatapara_dataid_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'facetoface_session_info_data', array('id'));
+        $table->add_index('sessioninfodatapara_value_ix', null, array('value'));
+
+        // Conditionally launch create table for session_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define tables for signup note customfields.
+        $table = new xmldb_table('facetoface_signup_info_field');
+
+        // Adding fields to table signup_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+
+        // Adding keys to table signup_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for signup_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table facetoface_signup_info_data to be created.
+        $table = new xmldb_table('facetoface_signup_info_data');
+
+        // Adding fields to table session_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofacesignupid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table facetoface_signup_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('signupinfodata_fielid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_signup_info_field', array('id'));
+        $table->add_key('signupinfodata_signupid_fk', XMLDB_KEY_FOREIGN, array('facetofacesignupid'), 'facetoface_signups_status', array('id'));
+
+        // Conditionally launch create table for facetoface_signup_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('facetoface_signup_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('signupinfodatapara_dataid_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'facetoface_signup_info_data', array('id'));
+        $table->add_index('signupinfodatapara_value_ix', null, array('value'));
+
+        // Conditionally launch create table for facetoface_signup_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define tables for cancellation note customfields.
+        $table = new xmldb_table('facetoface_cancellation_info_field');
+
+        // Adding fields to table cancellation_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+
+        // Adding keys to table cancellation_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for cancellation_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table cancellation_info_data to be created.
+        $table = new xmldb_table('facetoface_cancellation_info_data');
+
+        // Adding fields to table cancellation_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('facetofacecancellationid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table cancellation_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('cancellationinfodata_fieldid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_cancellation_info_field', array('id'));
+        $table->add_key('cancellationinfodata_cancellationid_fk', XMLDB_KEY_FOREIGN, array('facetofacecancellationid'), 'facetoface_signups_status', array('id'));
+
+        // Conditionally launch create table for cancellation_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('facetoface_cancellation_info_data_param');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('cancellationinfodatapara_dataid_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'facetoface_cancellation_info_data', array('id'));
+        $table->add_index('cancellationinfodatapara_value_ix', null, array('value'));
+
+        // Conditionally launch create table for cancellation_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Update facetoface notice data.
+        $table = new xmldb_table('facetoface_notice_data');
+        $field = new xmldb_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        if ($dbman->table_exists($table) && $dbman->field_exists($table, 'data')) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2014110704, 'facetoface');
+    }
+
+    if ($oldversion < 2014110705) {
+
+        // Passing data to the new signup customfield table.
+        require_once($CFG->dirroot . '/mod/facetoface/db/install.php');
+
+        // Create signup and cancellation notes.
+        list($signupfieldid, $cancellationfieldid) = facetoface_create_signup_cancellation_customfield_notes();
+
+        // Pass all signup and cancellation information to the new tables.
+        $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_BOOKED);
+        list($insql, $inparam) = $DB->get_in_or_equal($status);
+        $sql = "INSERT INTO {facetoface_signup_info_data}
+                    (fieldid, facetofacesignupid, data)
+                SELECT  ". $cancellationfieldid .", id, note
+                  FROM {facetoface_signups_status}
+                 WHERE statuscode {$insql}
+                   AND superceded = 0
+                   AND " . $DB->sql_isnotempty('facetoface_signups_status', 'note', true, true);
+        $DB->execute($sql, $inparam);
+
+        $sql = "INSERT INTO {facetoface_cancellation_info_data}
+                    (fieldid, facetofacecancellationid, data)
+                SELECT  ". $signupfieldid .", id, note
+                  FROM {facetoface_signups_status}
+                 WHERE statuscode = :cancelled
+                   AND superceded = 0
+                   AND " . $DB->sql_isnotempty('facetoface_signups_status', 'note', true, true);
+        $DB->execute($sql, array('cancelled' => MDL_F2F_STATUS_USER_CANCELLED));
+
+        upgrade_mod_savepoint(true, 2014110705, 'facetoface');
+    }
+
+    if ($oldversion < 2014110706) {
+
+        // Passing the old facetoface session customfield data to the new tables.
+        // Migrate text types.
+        $sortorder = $DB->get_field('facetoface_session_info_field',
+            '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1', array());
+        $sql = "INSERT INTO {facetoface_session_info_field}
+                       (shortname, datatype, description, sortorder,hidden, locked, required, forceunique, defaultdata, fullname)
+                SELECT shortname, 'text', '', " . $sortorder . ", 0, 0, required, 0, defaultvalue, name
+                  FROM {facetoface_session_field}
+                 WHERE type = :texttype";
+        $DB->execute($sql, array('texttype' => CUSTOMFIELD_TYPE_TEXT));
+
+        upgrade_mod_savepoint(true, 2014110706, 'facetoface');
+    }
+
+    if ($oldversion < 2014110707) {
+
+        // Migrate menu and multiselect types.
+        list($insql, $inparam) = $DB->get_in_or_equal(array(CUSTOMFIELD_TYPE_SELECT, CUSTOMFIELD_TYPE_MULTISELECT));
+        $sql = "SELECT *
+                  FROM {facetoface_session_field}
+                 WHERE type {$insql}";
+        $rs = $DB->get_recordset_sql($sql, $inparam);
+
+        $todb = array();
+        $sortorder = $DB->get_field('facetoface_session_info_field',
+            '(CASE WHEN MAX(sortorder) IS NULL THEN 0 ELSE MAX(sortorder) END) + 1', array());
+        foreach ($rs as $item) {
+            upgrade_set_timeout();
+            $infofield = new stdClass();
+            $infofield->shortname = $item->shortname;
+            $infofield->fullname = $item->name;
+            $infofield->sortorder = $sortorder++;
+            $infofield->required = $item->required;
+            $infofield->hidden = 0;
+            $infofield->locked = 0;
+            $infofield->forceunique = 0;
+            $infofield->showinsummary = $item->showinsummary;
+            if ($item->type == CUSTOMFIELD_TYPE_SELECT) {
+                $infofield->datatype = 'menu';
+                $infofield->defaultdata = $item->defaultvalue;
+                $infofield->param1 = implode("\n", explode(CUSTOMFIELD_DELIMITER, $item->possiblevalues));
+            }
+            else {
+                $infofield->datatype = 'multiselect';
+                $values = explode(CUSTOMFIELD_DELIMITER, $item->possiblevalues);
+                $defaulvalue = $item->defaultvalue;
+                $options = array();
+                foreach ($values as $value) {
+                    $default = ($value == $defaulvalue) ? "1" : "0";
+                    $options[] = array('option' => $value, 'icon' => '', 'default' => $default, 'delete' => 0);
+                }
+                $infofield->param1 = json_encode($options);
+            }
+            $todb[] = $infofield;
+        }
+        $rs->close();
+
+        if (!empty($todb)) {
+            // This table is new and should not contain any data with type different than text.
+            $invalidrecords = "DELETE FROM {facetoface_session_info_field} WHERE datatype !=:texttype";
+            $DB->execute($invalidrecords, array('texttype' => 'text'));
+            $DB->insert_records_via_batch('facetoface_session_info_field', $todb);
+            unset($todb);
+        }
+
+        upgrade_mod_savepoint(true, 2014110707, 'facetoface');
+    }
+
+    if ($oldversion < 2014110708) {
+
+        // Insert all info data.
+        $sql = "INSERT INTO {facetoface_session_info_data}
+                       (data, fieldid, facetofacesessionid)
+                SELECT fsd.data, fsif.id as fieldid, fsd.sessionid as facetofacesessionid
+                  FROM {facetoface_session_data} fsd
+            INNER JOIN {facetoface_session_field} fsf
+                    ON fsd.fieldid = fsf.id
+            INNER JOIN {facetoface_session_info_field} fsif
+                    ON fsif.shortname = fsf.shortname";
+        $DB->execute($sql);
+
+        upgrade_mod_savepoint(true, 2014110708, 'facetoface');
+    }
+
+    if ($oldversion < 2014110709) {
+
+        // Correct the format multiselect and add new data to facetoface_session_info_data_param.
+        $sql = "SELECT fsid.id, fsid.data
+                  FROM {facetoface_session_info_data} fsid
+            INNER JOIN {facetoface_session_info_field} fsif
+                    ON fsid.fieldid = fsif.id
+                 WHERE datatype =:multiselecttype";
+        $rs = $DB->get_recordset_sql($sql, array('multiselecttype' => 'multiselect'));
+
+        $todb = array();
+        foreach ($rs as $item) {
+            upgrade_set_timeout();
+            $dataformated = array();
+            $options = explode(CUSTOMFIELD_DELIMITER, $item->data);
+            foreach ($options as $option) {
+                $dataformated[md5($option)] = array('option' => $option, 'icon' => '', 'default' => "1", 'delete' => 0);
+                $paramdata = new stdClass();
+                $paramdata->dataid = $item->id;
+                $paramdata->value = md5($option);
+                $todb[] = $paramdata;
+            }
+            $DB->set_field('facetoface_session_info_data', 'data', json_encode($dataformated), array('id' => $item->id));
+        }
+        $rs->close();
+
+        if (!empty($todb)) {
+            // This table is new and shouldn't have data, delete data if found before inserting.
+            $DB->delete_records('facetoface_session_info_data_param');
+            $DB->insert_records_via_batch('facetoface_session_info_data_param', $todb);
+            unset($todb);
+        }
+
+        upgrade_mod_savepoint(true, 2014110709, 'facetoface');
+    }
+
+    if ($oldversion < 2014110710) {
+
+        // Data should be passed now. We can delete the tables.
+        $table = new xmldb_table('facetoface_session_field');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $table = new xmldb_table('facetoface_session_data');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2014110710, 'facetoface');
+    }
+
+    if ($oldversion < 2014110711) {
+
+        // Transform multiselect data in facetoface_notice_data.
+        $sql = 'SELECT fnd.id, fnd.data
+                  FROM {facetoface_notice_data} fnd
+            INNER JOIN {facetoface_session_info_field} sif
+                    ON fnd.fieldid = sif.id
+                 WHERE sif.datatype = :datatype';
+        $sitenoticedata = $DB->get_records_sql($sql, array('datatype' => 'multiselect'));
+        foreach ($sitenoticedata as $noticedata) {
+            $values = explode(CUSTOMFIELD_DELIMITER, $noticedata->data);
+            $options = array();
+            foreach ($values as $value) {
+                $default = "1";
+                $options[] = array('option' => $value, 'icon' => '', 'default' => $default, 'delete' => 0);
+            }
+            $noticedata->data = json_encode($options);
+            $DB->update_record('facetoface_notice_data', $noticedata);
+        }
+
+        upgrade_mod_savepoint(true, 2014110711, 'facetoface');
+    }
+
     return $result;
 }

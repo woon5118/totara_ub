@@ -32,6 +32,7 @@ $string['pluginname'] = 'Face-to-face Summary Report';
 $string['sourcetitle'] = 'Face-to-face Summary';
 $string['totalnumattendees'] = 'Number of Attendees (inc Waiting Approval, Approved and Wait-listed)';
 $string['type_session'] = 'Session';
+$string['type_facetoface_session'] = 'Session custom fields';
 $string['type_facetoface'] = 'Face to face';
 $string['type_date'] = 'Date';
 $string['waitlistattendees'] = 'Number of wait-listed';

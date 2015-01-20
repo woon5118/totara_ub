@@ -186,8 +186,6 @@ function print_session_list($courseid, $facetoface, $sessions) {
          $bookedsession = $submission;
     }
 
-    $customfields = facetoface_get_session_customfields();
-
     $upcomingarray = array();
     $previousarray = array();
     $upcomingtbdarray = array();
@@ -212,10 +210,6 @@ function print_session_list($courseid, $facetoface, $sessions) {
                 $room = $DB->get_record('facetoface_room', array('id' => $session->roomid));
                 $sessiondata->room = $room;
             }
-
-            // Add custom fields to sessiondata
-            $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->id), '', 'fieldid, data');
-            $sessiondata->customfielddata = $customdata;
 
             // Is session waitlisted
             if (!$session->datetimeknown) {
@@ -258,7 +252,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
             $reserveinfo = facetoface_can_reserve_or_allocate($facetoface, $sessions, $context);
             echo html_writer::tag('p', get_string('lastreservation', 'mod_facetoface', $facetoface));
         }
-        echo $f2f_renderer->print_session_list_table($customfields, $upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo);
+        echo $f2f_renderer->print_session_list_table($upcomingarray, $viewattendees, $editsessions, $displaytimezones, $reserveinfo);
     }
 
     if ($editsessions) {
@@ -268,7 +262,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
     // Previous sessions
     if (!empty($previousarray)) {
         echo $OUTPUT->heading(get_string('previoussessions', 'facetoface'));
-        echo $f2f_renderer->print_session_list_table($customfields, $previousarray, $viewattendees, $editsessions, $displaytimezones);
+        echo $f2f_renderer->print_session_list_table($previousarray, $viewattendees, $editsessions, $displaytimezones);
     }
 }
 
@@ -281,7 +275,7 @@ function print_session_list($courseid, $facetoface, $sessions) {
 function get_locations($facetofaceid) {
     global $CFG, $DB;
 
-    $locationfieldid = $DB->get_field('facetoface_session_field', 'id', array('shortname' => 'location'));
+    $locationfieldid = $DB->get_field('facetoface_session_info_field', 'id', array('shortname' => 'location'));
     if (!$locationfieldid) {
         return array();
     }
@@ -289,7 +283,7 @@ function get_locations($facetofaceid) {
     $sql = "SELECT DISTINCT d.data AS location
               FROM {facetoface} f
               JOIN {facetoface_sessions} s ON s.facetoface = f.id
-              JOIN {facetoface_session_data} d ON d.sessionid = s.id
+              JOIN {facetoface_session_info_data} d ON d.facetofacesessionid = s.id
              WHERE f.id = ? AND d.fieldid = ?";
 
     if ($records = $DB->get_records_sql($sql, array($facetofaceid, $locationfieldid))) {

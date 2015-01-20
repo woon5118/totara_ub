@@ -80,11 +80,10 @@ $notice = file_prepare_standard_editor($notice, 'text', $editoroptions, $context
 
 $customfields = facetoface_get_session_customfields();
 foreach ($customfields as $field) {
-    $fieldname = "custom_$field->shortname";
-    $notice->$fieldname = facetoface_get_customfield_value($field, $notice->id, 'notice');
+    facetoface_get_customfield_value($notice, $field, $notice->id, 'notice');
 }
 
-$mform = new mod_facetoface_sitenotice_form(null, compact('id', 'customfields', 'editoroptions'));
+$mform = new mod_facetoface_sitenotice_form(null, compact('id', 'notice', 'editoroptions'));
 $mform->set_data($notice);
 if ($mform->is_cancelled()) {
     redirect($returnurl);
@@ -106,11 +105,11 @@ if ($fromform = $mform->get_data()) {
     }
 
     foreach ($customfields as $field) {
-        $fieldname = "custom_$field->shortname";
+        $fieldname = "customfield_$field->shortname";
         if (empty($fromform->$fieldname)) {
             $fromform->$fieldname = ''; // need to be able to clear fields
         }
-        facetoface_save_customfield_value($field->id, $fromform->$fieldname, $notice->id, 'notice');
+        facetoface_save_customfield_value($field, $fromform->$fieldname, $fromform->id, 'notice');
     }
     $transaction->allow_commit();
     redirect($returnurl);

@@ -51,8 +51,10 @@ class mod_facetoface_sitenotice_form extends moodleform {
         $mform->addElement('html', get_string('conditionsexplanation', 'facetoface'));
 
         // Show all custom fields.
-        $customfields = $this->_customdata['customfields'];
-        facetoface_add_customfields_to_form($mform, $customfields, true);
+        $session = new stdClass();
+        $session->id = 0;
+
+        customfield_definition($mform, $session, 'facetofacesession', 0, 'facetoface_session');
 
         if ($this->_customdata['id']) {
             $label = null;

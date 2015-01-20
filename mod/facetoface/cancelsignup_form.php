@@ -30,6 +30,7 @@ class mod_facetoface_cancelsignup_form extends moodleform {
     function definition()
     {
         $mform =& $this->_form;
+        $attendeenote = $this->_customdata['attendee_note'];
 
         $mform->addElement('header', 'general', get_string('cancelbooking', 'facetoface'));
 
@@ -40,8 +41,13 @@ class mod_facetoface_cancelsignup_form extends moodleform {
 
         $mform->addElement('html', get_string('cancellationconfirm', 'facetoface')); // instructions
 
-        $mform->addElement('text', 'cancelreason', get_string('cancelreason', 'facetoface'), 'size="60" maxlength="255"');
-        $mform->setType('cancelreason', PARAM_TEXT);
+        $cancellation = new stdClass();
+        $cancellation->id = $attendeenote->statusid;
+
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
+        customfield_definition($mform, $cancellation, 'facetofacecancellation', 0, 'facetoface_cancellation');
+        $mform->removeElement('customfields');
 
         $buttonarray=array();
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('yes'));

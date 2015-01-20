@@ -42,10 +42,10 @@
   //        (UL, pk->id, fk->sessionid)             |  |
   //                                                |  |
   //                                                |  |
-  //     facetoface_session_field                   |  |
+  //    facetoface_session_info_field               |  |
   //          (SL, pk->id)  |                       |  |
   //                        |                       |  |
-  //             facetoface_session_data------------+  |
+  //     facetoface_session_info_data---------------+  |
   //    (CL, pk->id, fk->sessionid, fk->fieldid)       |
   //                                                   |
   //                                    facetoface_sessions_dates
@@ -73,7 +73,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             'timecreated', 'timemodified', 'shortname', 'showoncalendar', 'approvalreqd', 'usercalentry',
             'multiplesessions', 'completionstatusrequired', 'managerreserve', 'maxmanagerreserves', 'reservecanceldays',
             'reservedays', 'selfapprovaltandc', 'declareinterest', 'interestonlyiffull', 'selectpositiononsignup',
-            'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault'));
+            'forceselectposition', 'allowcancellationsdefault', 'cancellationscutoffdefault', 'allowsignupnotedefault'));
         $notifications = new backup_nested_element('notifications');
 
         $notification = new backup_nested_element('notification', array('id'), array(
@@ -86,7 +86,8 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $session = new backup_nested_element('session', array('id'), array(
             'facetoface', 'capacity', 'allowoverbook', 'details', 'datetimeknown', 'duration', 'normalcost',
             'discountcost', 'roomid', 'room_name', 'room_building', 'room_address', 'room_custom', 'timecreated',
-            'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone', 'allowcancellations', 'cancellationcutoff'));
+            'timemodified', 'selfapproval', 'mincapacity', 'cutoff', 'waitlisteveryone', 'allowcancellations',
+            'cancellationcutoff', 'availablesignupnote'));
 
         $signups = new backup_nested_element('signups');
 
@@ -107,7 +108,15 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $customfields = new backup_nested_element('custom_fields');
 
         $customfield = new backup_nested_element('custom_field', array('id'), array(
-            'field_name', 'field_type', 'field_data'));
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
+
+        $signup_fields = new backup_nested_element('signup_fields');
+        $signup_field  = new backup_nested_element('signup_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
+
+        $cancellation_fields = new backup_nested_element('cancellation_fields');
+        $cancellation_field  = new backup_nested_element('cancellation_field', array('id'), array(
+            'field_name', 'field_type', 'field_data', 'paramdatavalue'));
 
         $sessions_dates = new backup_nested_element('sessions_dates');
 
@@ -132,6 +141,12 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
         $signup->add_child($signups_status);
         $signups_status->add_child($signup_status);
 
+        $signup_fields->add_child($signup_field);
+        $signup_status->add_child($signup_fields);
+
+        $cancellation_fields->add_child($cancellation_field);
+        $signup_status->add_child($cancellation_fields);
+
         $session->add_child($session_roles);
         $session_roles->add_child($session_role);
 
@@ -153,7 +168,7 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
                                          s.duration, s.normalcost, s.discountcost, s.roomid, r.name AS room_name,
                                          r.building AS room_building, r.custom AS room_custom, r.address AS room_address,
                                          s.timecreated, s.timemodified, s.usermodified, s.selfapproval, s.mincapacity, s.cutoff,
-                                         s.allowcancellations, s.cancellationcutoff
+                                         s.allowcancellations, s.cancellationcutoff, s.availablesignupnote
                                         FROM {facetoface_sessions} s
                                         LEFT JOIN {facetoface_room} r ON s.roomid = r.id
                                        WHERE s.facetoface = ?', array(backup::VAR_PARENTID));
@@ -170,10 +185,26 @@ class backup_facetoface_activity_structure_step extends backup_activity_structur
             $interest->set_source_table('facetoface_interest', array('facetoface' => backup::VAR_PARENTID));
         }
 
-        $customfield->set_source_sql('SELECT d.id, f.shortname AS field_name, f.type AS field_type, d.data AS field_data
-                                        FROM {facetoface_session_field} f
-                                        JOIN {facetoface_session_data} d ON d.fieldid = f.id
-                                       WHERE d.sessionid = ?', array(backup::VAR_PARENTID));
+        $customfield->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
+                                             dp.value AS paramdatavalue
+                                        FROM {facetoface_session_info_field} f
+                                        JOIN {facetoface_session_info_data} d ON d.fieldid = f.id
+                                   LEFT JOIN {facetoface_session_info_data_param} dp ON dp.dataid = d.id
+                                       WHERE d.facetofacesessionid = ?', array(backup::VAR_PARENTID));
+
+        $signup_field->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
+                                             dp.value AS paramdatavalue
+                                        FROM {facetoface_signup_info_field} f
+                                        JOIN {facetoface_signup_info_data} d ON d.fieldid = f.id
+                                   LEFT JOIN {facetoface_signup_info_data_param} dp ON dp.dataid = d.id
+                                       WHERE d.facetofacesignupid = ?', array(backup::VAR_PARENTID));
+
+        $cancellation_field->set_source_sql('SELECT d.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data,
+                                             dp.value AS paramdatavalue
+                                        FROM {facetoface_cancellation_info_field} f
+                                        JOIN {facetoface_cancellation_info_data} d ON d.fieldid = f.id
+                                   LEFT JOIN {facetoface_cancellation_info_data_param} dp ON dp.dataid = d.id
+                                       WHERE d.facetofacecancellationid = ?', array(backup::VAR_PARENTID));
 
         // Define id annotations
         $signup->annotate_ids('user', 'userid');

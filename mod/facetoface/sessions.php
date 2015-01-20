@@ -127,24 +127,18 @@ if ($d and $confirm) {
     redirect($returnurl);
 }
 
-$customfields = facetoface_get_session_customfields();
-
 $sessionid = isset($session->id) ? $session->id : 0;
 
 $canconfigurecancellation = has_capability('mod/facetoface:configurecancellation', $context);
 
-$details = new stdClass();
-$details->id = $sessionid;
-$details->details = isset($session->details) ? $session->details : '';
-$details->detailsformat = FORMAT_HTML;
-$details = file_prepare_standard_editor($details, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $sessionid);
 if (isset($session)) {
     $defaulttimezone = empty($session->sessiondates[0]->sessiontimezone) ? get_string('sessiontimezoneunknown', 'facetoface') : $session->sessiondates[0]->sessiontimezone;
+    customfield_load_data($session, 'facetofacesession', 'facetoface_session');
 } else {
     $defaulttimezone = totara_get_clean_timezone();
 }
 
-$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'nbdays', 'customfields', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm'));
+$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -250,18 +244,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if (!facetoface_save_session_room($sessionid, $fromform)) {
         print_error('error:couldnotsaveroom', 'facetoface');
     }
-
-    foreach ($customfields as $field) {
-        // Need to be able to clear fields.
-        $fieldname = "custom_$field->shortname";
-        if (!isset($fromform->$fieldname)) {
-            $fromform->$fieldname = '';
-        }
-
-        if (!facetoface_save_customfield_value($field->id, $fromform->$fieldname, $sessionid, 'session')) {
-            print_error('error:couldnotsavecustomfield', 'facetoface', $returnurl);
-        }
-    }
+    $fromform->id = $sessionid;
+    customfield_save_data($fromform, 'facetofacesession', 'facetoface_session');
 
     $transaction->allow_commit();
 
@@ -303,23 +287,31 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     redirect($returnurl);
 } else if ($session != null) { // Edit mode
-    // Set values for the form
-    $toform = new stdClass();
-    $toform = file_prepare_standard_editor($details, 'details', $editoroptions, $context, 'mod_facetoface', 'session', $session->id);
+    // Set values for the form and unset some values that will be evaluated later.
+    $sessioncopy = clone($session);
+    if (isset($sessioncopy->sessiondates)) {
+        unset($sessioncopy->sessiondates);
+    }
 
-    $toform->datetimeknown = (1 == $session->datetimeknown);
-    $toform->capacity = $session->capacity;
-    $toform->allowoverbook = $session->allowoverbook;
-    $toform->waitlisteveryone = $session->waitlisteveryone;
-    $toform->duration = $session->duration;
-    $toform->normalcost = $session->normalcost;
-    $toform->discountcost = $session->discountcost;
-    $toform->selfapproval = $session->selfapproval;
-    $toform->availablesignupnote = $session->availablesignupnote;
+    if (isset($sessioncopy->roomid)) {
+        unset($sessioncopy->roomid);
+    }
+
+    if (isset($sessioncopy->allowcancellations)) {
+        unset($sessioncopy->allowcancellations);
+    }
+
+    $sessioncopy->detailsformat = FORMAT_HTML;
+    $editoroptions = $TEXTAREA_OPTIONS;
+    $editoroptions['context'] = $context;
+    $sessioncopy = file_prepare_standard_editor($sessioncopy, 'details', $editoroptions, $editoroptions['context'],
+        'mod_facetoface', 'session', $session->id);
+
+    $sessioncopy->datetimeknown = (1 == $session->datetimeknown);
 
     if ($canconfigurecancellation) {
-        $toform->allowcancellations = $session->allowcancellations;
-        $toform->cancellationcutoff = $session->cancellationcutoff;
+        $sessioncopy->allowcancellations = $session->allowcancellations;
+        $sessioncopy->cancellationcutoff = $session->cancellationcutoff;
     }
 
     if ($session->sessiondates) {
@@ -330,44 +322,34 @@ if ($fromform = $mform->get_data()) { // Form submitted
             $timefinishfield = "timefinish[$i]";
             $timezonefield = "sessiontimezone[$i]";
 
-            $toform->$idfield = $date->id;
-            $toform->$timestartfield = $date->timestart;
-            $toform->$timefinishfield = $date->timefinish;
-            $toform->$timezonefield = $date->sessiontimezone;
+            $sessioncopy->$idfield = $date->id;
+            $sessioncopy->$timestartfield = $date->timestart;
+            $sessioncopy->$timefinishfield = $date->timefinish;
+            $sessioncopy->$timezonefield = $date->sessiontimezone;
             $i++;
-        }
-    }
-
-    foreach ($customfields as $field) {
-        $fieldname = "custom_$field->shortname";
-        $toform->$fieldname = facetoface_get_customfield_value($field, $session->id, 'session');
-        if (empty($toform->$fieldname)) {
-            $toform->$fieldname = $field->defaultvalue;
         }
     }
 
     if (!empty($sroom->id)) {
         if (!$sroom->custom) {
             // Pre-defined room
-            $toform->pdroomid = $session->roomid;
-            $toform->pdroomcapacity = $sroom->capacity;
+            $sessioncopy->pdroomid = $session->roomid;
+            $sessioncopy->pdroomcapacity = $sroom->capacity;
         } else {
             // Custom room
-            $toform->customroom = 1;
-            $toform->croomname = $sroom->name;
-            $toform->croombuilding = $sroom->building;
-            $toform->croomaddress = $sroom->address;
-            $toform->croomcapacity = $sroom->capacity;
+            $sessioncopy->customroom = 1;
+            $sessioncopy->croomname = $sroom->name;
+            $sessioncopy->croombuilding = $sroom->building;
+            $sessioncopy->croomaddress = $sroom->address;
+            $sessioncopy->croomcapacity = $sroom->capacity;
         }
     }
 
     if ($session->mincapacity) {
-        $toform->enablemincapacity = true;
+        $sessioncopy->enablemincapacity = true;
     }
-    $toform->mincapacity = $session->mincapacity;
-    $toform->cutoff = $session->cutoff;
 
-    $mform->set_data($toform);
+    $mform->set_data($sessioncopy);
 }
 
 if ($c) {
