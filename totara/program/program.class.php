@@ -1084,7 +1084,6 @@ class program {
      * @return float
      */
     public function get_progress($userid) {
-
         // first check if the whole program has been completed
         if (prog_is_complete($this->id, $userid)) {
             return (float)100;
@@ -1097,19 +1096,10 @@ class program {
         $courseset_group_complete_count = 0;
 
         foreach ($courseset_groups as $courseset_group) {
-            $courseset_group_complete = false;
-            foreach ($courseset_group as $courseset) {
-                // only one set in a group of course sets needs to be completed for the whole group to be considered complete
-                if ($courseset->is_courseset_complete($userid)) {
-                    $courseset_group_complete = true;
-                    break;
-                }
-            }
-
-            if ($courseset_group_complete) {
+            if (prog_courseset_group_complete($courseset_group, $userid, false)) {
                 $courseset_group_complete_count++;
             }
-            }
+        }
 
         if ($courseset_group_count > 0) {
             return (float)($courseset_group_complete_count / $courseset_group_count) * 100;
@@ -1128,7 +1118,6 @@ class program {
      * @return bool
      */
     public function can_enter_course($userid, $courseid) {
-
         $now = time();
         $available = !isset($this->available) || $this->available == AVAILABILITY_NOT_TO_STUDENTS;
         $from = !empty($this->availablefrom) && $this->availablefrom > $now;
@@ -1149,12 +1138,10 @@ class program {
 
         // Find the last completed groupset, and which groupset the course is in.
         foreach ($courseset_groups as $groupkey => $courseset_group) {
-            $thisgroupcomplete = false;
+            if ($thisgroupcomplete = prog_courseset_group_complete($courseset_group, $userid, false)) {
+                $maxcompletedgroup = $groupkey;
+            }
             foreach ($courseset_group as $courseset) {
-                if ($courseset->is_courseset_complete($userid)) {
-                    $thisgroupcomplete = true;
-                    $maxcompletedgroup = $groupkey;
-                }
                 if ($coursegroup == -1 && $courseset->contains_course($courseid)) {
                     // Get the first occurance of the course.
                     $coursegroup = $groupkey;
@@ -1428,23 +1415,31 @@ class program {
             foreach ($courseset_groups as $courseset_group) {
 
                 // display each course set
+                $prevnextsetoperator = '';
                 foreach ($courseset_group as $courseset) {
                     $previous[] = $courseset;
                     $next = array_splice($next, 1);
+
+                    if ($courseset->nextsetoperator == NEXTSETOPERATOR_AND && $prevnextsetoperator != NEXTSETOPERATOR_AND) {
+                        // Group ANDs.
+                        $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator-group-and'));
+                    }
+
                     $out .= $courseset->display($userid, $previous, $next, $courseset_group_accessible, $viewinganothersprogram);
+
+                    if ($prevnextsetoperator == NEXTSETOPERATOR_AND && $courseset->nextsetoperator != NEXTSETOPERATOR_AND) {
+                        $out .= html_writer::end_tag('div');
+                    }
+
+                    $out .= $courseset->display_nextsetoperator();
+
+                    $prevnextsetoperator = $courseset->nextsetoperator;
                 }
 
                 // check if the current course set group is complete. If not,
                 // set a flag to prevent access to the courses in the following
                 // course sets
-                foreach ($courseset_group as $courseset) {
-                    // only one set in a group of course sets needs to be completed for the whole group to be considered complete
-                    if ($courseset->is_courseset_complete($userid)) {
-                        $courseset_group_accessible = true;
-                        break;
-                    }
-                    $courseset_group_accessible = false;
-                }
+                $courseset_group_accessible = prog_courseset_group_complete($courseset_group, $userid, false) ? true : false;
             }
         }
         return $out;

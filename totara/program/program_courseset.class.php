@@ -35,6 +35,7 @@ define('COMPLETIONTYPE_SOME', 3);
 
 define('NEXTSETOPERATOR_THEN', 1);
 define('NEXTSETOPERATOR_OR', 2);
+define('NEXTSETOPERATOR_AND', 3);
 
 abstract class course_set {
     public $id, $programid, $contenttype, $sortorder, $label;
@@ -367,6 +368,32 @@ abstract class course_set {
     abstract public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false);
 
     /**
+     * Returns the HTML suitable for display the nextsetoperator in a friendly/informative manner
+     *
+     * @return string
+     */
+    public function display_nextsetoperator() {
+        $out = '';
+        if (!isset($this->islastset) || $this->islastset === false) {
+            $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
+            switch ($this->nextsetoperator) {
+                case NEXTSETOPERATOR_THEN:
+                    $out .= html_writer::tag('div', get_string('then', 'totara_program'), array('class' => 'operator-then'));
+                    break;
+                case NEXTSETOPERATOR_OR:
+                    $out .= html_writer::tag('div', get_string('or', 'totara_program'), array('class' => 'operator-or'));
+                    break;
+                case NEXTSETOPERATOR_AND:
+                    $out .= html_writer::tag('div', get_string('and', 'totara_program'), array('class' => 'operator-and'));
+                    break;
+            }
+            $out .= html_writer::end_tag('div');
+        }
+
+        return $out;
+    }
+
+    /**
      * Returns an HTML string suitable for displaying as the label for a course
      * set in the program overview form
      *
@@ -426,7 +453,8 @@ abstract class course_set {
             } else {
                 $options = array(
                     NEXTSETOPERATOR_THEN => get_string('then', 'totara_program'),
-                    NEXTSETOPERATOR_OR => get_string('or', 'totara_program')
+                    NEXTSETOPERATOR_OR => get_string('or', 'totara_program'),
+                    NEXTSETOPERATOR_AND => get_string('and', 'totara_program')
                 );
                 $mform->addElement('select', $prefix.'nextsetoperator', get_string('label:nextsetoperator', 'totara_program'), $options);
                 $mform->setDefault($prefix.'nextsetoperator', $this->nextsetoperator);
@@ -439,7 +467,13 @@ abstract class course_set {
         if ($hidden) {
             $operatorclass = '';
         } else {
-            $operatorclass = ($this->nextsetoperator == NEXTSETOPERATOR_OR) ? 'nextsetoperator-or' : 'nextsetoperator-then';
+            if ($this->nextsetoperator == NEXTSETOPERATOR_THEN) {
+                $operatorclass = 'nextsetoperator-then';
+            } else if ($this->nextsetoperator == NEXTSETOPERATOR_OR) {
+                $operatorclass = 'nextsetoperator-or';
+            } else {
+                $operatorclass = 'nextsetoperator-and';
+            }
         }
 
         $templatehtml .= html_writer::tag('div', '%' . $prefix . 'nextsetoperator%', array('class' => $operatorclass)) . "\n";
@@ -447,96 +481,6 @@ abstract class course_set {
 
         return $templatehtml;
 
-    }
-
-    protected function get_courseset_divider_text($previous_sets=array(), $next_sets=array(), $userid=0, $viewinganothersprogram=false) {
-        global $DB;
-        $out = '';
-
-        if (is_null($userid)) {
-            $userid = 0;
-        }
-
-        // If this divider is inside an OR group
-        $separator = ' ' . get_string('or', 'totara_program') . ' ';
-        if ($previous_sets[count($previous_sets)-1]->nextsetoperator == NEXTSETOPERATOR_OR) {
-            $sets = array();
-
-            // Get the OR's above..
-            for ($i = count($previous_sets)-1; $i > -1; $i--) {
-                if ($previous_sets[$i]->nextsetoperator == NEXTSETOPERATOR_THEN) {
-                    break;
-                }
-                $sets[] = $this->get_course_text($previous_sets[$i]);
-            }
-            $sets = array_reverse($sets);
-
-            // Get the OR's below..
-            for ($i = 0; $i < count($next_sets); $i++) {
-                $sets[] = $this->get_course_text($next_sets[$i]);
-                if ($next_sets[$i]->nextsetoperator != NEXTSETOPERATOR_OR) {
-                    break;
-                }
-            }
-
-            if ($viewinganothersprogram) {
-                if (!$user = $DB->get_record('user', array('id' => $userid))) {
-                    print_error('error:invaliduser', 'totara_program');
-                }
-                $out .= fullname($user) . ' ' . get_string('youmustcompleteormanager', 'totara_program', implode($separator, $sets));
-            } else {
-                if ($userid) {
-                    $out .= get_string('youmustcompleteorlearner', 'totara_program', implode($separator, $sets));
-                } else {
-                    $out .= get_string('youmustcompleteorviewing', 'totara_program', implode($separator, $sets));
-                }
-            }
-        } else {
-            $a = new stdClass();
-
-            // If there is an OR set above us..
-            if (isset($previous_sets[count($previous_sets)-2]) && $previous_sets[count($previous_sets)-2]->nextsetoperator == NEXTSETOPERATOR_OR) { // If set two above is using OR
-                $sets = array($this->get_course_text($previous_sets[count($previous_sets)-1]));
-                for ($i = count($previous_sets)-2; $i > -1; $i--) {
-                    if ($previous_sets[$i]->nextsetoperator == NEXTSETOPERATOR_THEN) {
-                        break;
-                    }
-                    $sets[] = $this->get_course_text($previous_sets[$i]);
-                }
-                $sets = array_reverse($sets);
-                $a->mustcomplete = implode($separator, $sets);
-            } else {
-                $a->mustcomplete = $this->get_course_text($previous_sets[count($previous_sets)-1]);
-            }
-            // fallback for 'proceedto'
-            $a->proceedto = ' ' . get_string('anothercourse', 'totara_program');
-            // If there is an OR set below us..
-            if (isset($next_sets[0]) && $next_sets[0]->nextsetoperator == NEXTSETOPERATOR_OR) { // If the below set is using OR
-                $sets = array();
-                for ($i = 0; $i < count($next_sets); $i++) {
-                    $sets[] = $this->get_course_text($next_sets[$i]);
-                    if ($next_sets[$i]->nextsetoperator != NEXTSETOPERATOR_OR) {
-                        break;
-                    }
-                }
-                $a->proceedto = implode($separator, $sets);
-            } else if (isset($next_sets[0])) {
-                $a->proceedto = $this->get_course_text($next_sets[0]);
-            }
-            if ($viewinganothersprogram) {
-                if (!$user = $DB->get_record('user', array('id' => $userid))) {
-                    print_error('error:invaliduser', 'totara_program');
-                }
-                $out .= fullname($user) . ' ' . get_string('youmustcompletebeforeproceedingtomanager', 'totara_program', $a);
-            } else {
-                if ($userid) {
-                    $out .= get_string('youmustcompletebeforeproceedingtolearner', 'totara_program', $a);
-                } else {
-                    $out .= get_string('youmustcompletebeforeproceedingtoviewing', 'totara_program', $a);
-                }
-            }
-        }
-        return $out;
     }
 
     /**
@@ -1057,26 +1001,7 @@ class multi_course_set extends course_set {
 
         $out .= html_writer::end_tag('div');
 
-        if (!isset($this->islastset) || $this->islastset === false) {
-            switch ($this->nextsetoperator) {
-                case NEXTSETOPERATOR_THEN:
-                    $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-                    $out .= html_writer::tag('div', get_string('then', 'totara_program'), array('class' => 'operator-then'));
-                    $out .= html_writer::tag('div', $this->get_courseset_divider_text($previous_sets, $next_sets, $userid,
-                        $viewinganothersprogram), array('class' => 'nextsethelp'));
-                    $out .= html_writer::end_tag('div');
-                    break;
-                case NEXTSETOPERATOR_OR:
-                    $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-                    $out .= html_writer::tag('div', get_string('or', 'totara_program'), array('class' => 'operator-or'));
-                    $out .= html_writer::tag('div', $this->get_courseset_divider_text($previous_sets, $next_sets, $userid,
-                        $viewinganothersprogram), array('class' => 'nextsethelp'));
-                    $out .= html_writer::end_tag('div');
-                    break;
-            }
-        }
         return $out;
-
     }
 
     /**
@@ -1112,8 +1037,13 @@ class multi_course_set extends course_set {
         if (!isset($this->islastset) || $this->islastset === false) {
             if ($this->nextsetoperator != 0) {
                 $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-                $operatorstr = $this->nextsetoperator == NEXTSETOPERATOR_THEN ? get_string('then', 'totara_program') : get_string('or', 'totara_program');
-                $out .= $operatorstr;
+                if ($this->nextsetoperator == NEXTSETOPERATOR_THEN) {
+                    $out .= get_string('then', 'totara_program');
+                } else if ($this->nextsetoperator == NEXTSETOPERATOR_OR) {
+                    $out .= get_string('or', 'totara_program');
+                } else {
+                    $out .= get_string('and', 'totara_program');
+                }
                 $out .= html_writer::end_tag('div');
             }
         }
@@ -1831,28 +1761,7 @@ class competency_course_set extends course_set {
 
         $out .= html_writer::end_tag('div');
 
-        if (!isset($this->islastset) || $this->islastset === false) {
-            switch($this->nextsetoperator) {
-                case NEXTSETOPERATOR_THEN:
-                    $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-                    $out .= html_writer::tag('div', get_string('then', 'totara_program'), array('class' => 'operator-then'));
-                    $out .= html_writer::tag('div', $this->get_courseset_divider_text($previous_sets, $next_sets, $userid,
-                        $viewinganothersprogram), array('class' => 'nextsethelp'));
-                    $out .= html_writer::end_tag('div');
-                    break;
-                case NEXTSETOPERATOR_OR:
-                    $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-                    $out .= html_writer::tag('div', get_string('or', 'totara_program'), array('class' => 'operator-or'));
-                    $out .= html_writer::tag('div', '', array('class' => 'clearfix'));
-                    $out .= html_writer::tag('div', $this->get_courseset_divider_text($previous_sets, $next_sets, $userid,
-                                    $viewinganothersprogram), array('class' => 'nextsethelp'));
-                    $out .= html_writer::end_tag('div');
-                    break;
-            }
-        }
-
         return $out;
-
     }
 
     /**
@@ -1887,9 +1796,13 @@ class competency_course_set extends course_set {
 
         if ($this->nextsetoperator != 0) {
             $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
-            $operatorstr = $this->nextsetoperator == NEXTSETOPERATOR_THEN ?
-                                            get_string('then', 'totara_program') : get_string('or', 'totara_program');
-            $out .= $operatorstr;
+            if ($this->nextsetoperator == NEXTSETOPERATOR_THEN) {
+                $out .= get_string('then', 'totara_program');
+            } else if ($this->nextsetoperator == NEXTSETOPERATOR_OR) {
+                $out .= get_string('or', 'totara_program');
+            } else {
+                $out .= get_string('and', 'totara_program');
+            }
             $out .= html_writer::end_tag('div');
         }
 
@@ -2386,6 +2299,10 @@ class recurring_course_set extends course_set {
 
         return $out;
 
+    }
+
+    public function display_nextsetoperator() {
+        return '';
     }
 
     /**

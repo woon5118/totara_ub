@@ -1281,29 +1281,12 @@ function prog_update_completion($userid, program $program = null) {
 
         // Go through the course set groups to determine the user's completion status.
         foreach ($courseset_groups as $courseset_group) {
+            $courseset_group_completed = prog_courseset_group_complete($courseset_group, $userid);
 
-            $courseset_group_completed = false;
-
-            // Check if the user has completed any of the course sets in the group - this constitutes completion of the group.
-            foreach ($courseset_group as $courseset) {
-
-                // First check if the course set is already marked as complete.
-                if ($courseset->is_courseset_complete($userid)) {
-                    $courseset_group_completed = true;
-                    $previous_courseset_group_completed = true;
-                    break;
-                }
-
-                // Otherwise carry out a check to see if the course set should be marked as complete and mark it as complete if so.
-                if ($courseset->check_courseset_complete($userid)) {
-                    $courseset_group_completed = true;
-                    $previous_courseset_group_completed = true;
-                    break;
-                }
-            }
-
-            // If the user has not completed the course group the program is not complete.
-            if (!$courseset_group_completed) {
+            if ($courseset_group_completed) {
+                $previous_courseset_group_completed = true;
+            } else {
+                // If the user has not completed the course group the program is not complete.
                 // Set the timedue for the course set in this group with the shortest
                 // time allowance so that course set due reminders will be triggered
                 // at the appropriate time.
@@ -1331,6 +1314,71 @@ function prog_update_completion($userid, program $program = null) {
             $program->update_program_complete($userid, $completionsettings);
         }
     }
+}
+
+/**
+ * Check if a courseset group is completed and optionally update courseset completion.
+ *
+ * @throws ProgramException
+ * @param array $courseset_group a group of coursesets, as returned by get_courseset_groups
+ * @param int $userid of the user for which completion should be checked/updated
+ * @param boolean $updatecomplete also update courseset completion
+ *
+ * @return boolean true/false, dependent on whether the courseset group is complete or not
+ */
+function prog_courseset_group_complete($courseset_group, $userid, $updatecomplete = true) {
+
+    // Keep track of the state of the last run of "and"ed courses.
+    $accumulator = true;
+
+    foreach ($courseset_group as $courseset) {
+        // First check if the course set is already marked as complete.
+        if ($courseset->is_courseset_complete($userid)) {
+            $coursesetcomplete = true;
+        } else if (!$updatecomplete) {
+            $coursesetcomplete = false;
+        } else {
+            // Otherwise carry out a check to see if the course set should be marked as complete and mark it as complete if so.
+            if ($courseset->check_courseset_complete($userid)) {
+                $coursesetcomplete = true;
+            } else {
+                $coursesetcomplete = false;
+            }
+        }
+
+        // Combine the current set into the "and" accumulator.
+        $accumulator = $accumulator && $coursesetcomplete;
+
+        switch ($courseset->nextsetoperator) {
+            case NEXTSETOPERATOR_AND:
+                // Do nothing. The current result was added to the accumulator and the next result will be added as well.
+                break;
+            case NEXTSETOPERATOR_OR:
+                if ($accumulator) {
+                    // The last run of "and"ed course sets were all true.
+                    // We can stop now because the final result must be true.
+                    return true;
+                } else {
+                    // The last run of "and"ed course sets must have had at least one incomplete.
+                    // Reset the accumulator, starting a new run of "and"ed course sets.
+                    $accumulator = true;
+                }
+                break;
+            case NEXTSETOPERATOR_THEN:
+            default:
+                $last = end($courseset_group);
+                if ($courseset == $last) {
+                    // This is the last course set. The final result is determined by the last run of "and"ed course sets.
+                    return $accumulator;
+                } else {
+                    // We got THEN or no operator, but it wasn't at the end of the course set group.
+                    throw new ProgramException(get_string('error:invalidcoursesetgroupoperator', 'totara_program'));
+                }
+                break;
+        }
+    }
+
+    throw new ProgramException(get_string('error:nextcoursesetmissing', 'totara_program'));
 }
 
 /**

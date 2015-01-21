@@ -673,8 +673,8 @@ class prog_content {
             return $courseset_groups;
         }
 
-        // Helpers for handling the sets of OR's
-        $last_handled_OR_operator = false;
+        // Helpers for handling the sets of AND's and OR's.
+        $last_handled_and_or_operator = false;
         $courseset_group = array();
 
         foreach ($this->coursesets as $courseset) {
@@ -682,25 +682,26 @@ class prog_content {
                 continue;
             }
 
-            if ($courseset->nextsetoperator == NEXTSETOPERATOR_OR) {
-                // Add to the outstanding 'or' list
-                $last_handled_OR_operator = true;
+            if (in_array($courseset->nextsetoperator, array(NEXTSETOPERATOR_AND, NEXTSETOPERATOR_OR))) {
+                // Add to the outstanding 'or' list.
+                $last_handled_and_or_operator = true;
                 $courseset_group[] = $courseset;
 
-                // slight hack to check if this is the last course set (nextsetoperator should not be set in this case but sometimes it is)
+                // Slight hack to check if this is the last course set (nextsetoperator should not be set
+                // in this case but sometimes it is).
                 if (isset($courseset->islastset) && $courseset->islastset) {
                     $courseset_groups[] = $courseset_group;
                 }
-            } else { // If THEN operator or no operator next..
-                if ($last_handled_OR_operator) {
-                    // Add each course set in the group of ORs to an array
+            } else { // If THEN operator or no operator next.
+                if ($last_handled_and_or_operator) {
+                    // Add each course set in the group of ANDs and ORs to an array.
                     $courseset_group[] = $courseset;
 
-                    // Add this group of course sets to the array of groups
+                    // Add this group of course sets to the array of groups.
                     $courseset_groups[] = $courseset_group;
 
-                    // Reset the OR bits
-                    $last_handled_OR_operator = false;
+                    // Reset the AND_OR bits.
+                    $last_handled_and_or_operator = false;
                     $courseset_group = array();
                 } else {
                     $courseset_group[] = $courseset;
