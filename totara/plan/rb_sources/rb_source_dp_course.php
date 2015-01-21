@@ -429,14 +429,14 @@ class rb_source_dp_course extends rb_base_source {
                 'course_completion',
                 'grade',
                 get_string('grade', 'rb_source_course_completion'),
-                'grade_grades.finalgrade',
+                'CASE WHEN course_completion.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN course_completion.rplgrade
+                      ELSE grade_grades.finalgrade END',
                 array(
-                    'joins' => 'grade_grades',
-                    'displayfunc' => 'course_grade_percent',
-                    'extrafields' => array(
-                        'rplgrade' => 'course_completion.rplgrade',
-                        'course_completion_status' => 'course_completion.status'
+                    'joins' => array(
+                        'grade_grades',
+                        'course_completion'
                     ),
+                    'displayfunc' => 'course_grade_percent',
                 )
             );
         $columnoptions[] = new rb_column_option(
@@ -453,14 +453,13 @@ class rb_source_dp_course extends rb_base_source {
                 'course_completion',
                 'gradestring',
                 get_string('requiredgrade', 'rb_source_course_completion'),
-                'grade_grades.finalgrade',
+                'CASE WHEN course_completion.status = ' . COMPLETION_STATUS_COMPLETEVIARPL . ' THEN course_completion.rplgrade
+                      ELSE grade_grades.finalgrade END',
                 array(
                     'joins' => array('criteria', 'grade_grades'),
                     'displayfunc' => 'grade_string',
                     'extrafields' => array(
                         'gradepass' => 'criteria.gradepass',
-                        'rplgrade' => 'course_completion.rplgrade',
-                        'course_completion_status' => 'course_completion.status'
                     ),
                     'defaultheading' => get_string('grade', 'rb_source_course_completion'),
                 )
