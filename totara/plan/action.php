@@ -96,7 +96,9 @@ if (!dp_can_view_users_plans($plan->userid)) {
     print_error('error:nopermissions', 'totara_plan');
 }
 
-
+if (!dp_can_manage_users_plans($plan->userid)) {
+    print_error('error:nopermissions', 'totara_plan');
+}
 // @todo: handle action failure alerts
 ///
 /// Approve

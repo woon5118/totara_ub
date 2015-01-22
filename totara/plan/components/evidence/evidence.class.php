@@ -98,7 +98,7 @@ class dp_evidence_relation {
 
         $out .=  $OUTPUT->container_end();
 
-        if (!$plancompleted) {
+        if ($canupdate && !$plancompleted) {
             $out .= $OUTPUT->container_start('buttons');
             $out .= $OUTPUT->container_start('singlebutton dp-plan-assign-button');
             $out .= $OUTPUT->container_start();

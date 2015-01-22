@@ -50,37 +50,14 @@ $PAGE->set_totara_menu_selected($menuitem);
 ///
 /// Permission checks
 ///
-if (!dp_can_view_users_plans($userid)) {
+
+$role = $ownplan ? 'learner' : 'manager';
+$can_manage = dp_can_manage_users_plans($userid);
+$can_create = dp_role_is_allowed_action($role, 'create');
+
+if (!$can_manage || !$can_create) {
     print_error('error:nopermissions', 'totara_plan');
 }
-
-
-// START PERMISSION HACK
-if ($userid != $USER->id) {
-    // Make sure user is manager
-    if (totara_is_manager($userid) || is_siteadmin()) {
-        $role = 'manager';
-    } else {
-        print_error('error:nopermissions', 'totara_plan');
-    }
-} else {
-    $role = 'learner';
-}
-
-// Check if a users has add plan on any template
-$templates = dp_get_templates();
-$canaddplan = false;
-foreach ($templates as $template) {
-    if (dp_get_template_permission($template->id, 'plan', 'create', $role) == DP_PERMISSION_ALLOW) {
-        $canaddplan = true;
-    }
-}
-
-if (!$canaddplan) {
-    print_error('error:nopermissions', 'totara_plan');
-}
-// END HACK
-
 
 ///
 /// Data and actions
@@ -95,7 +72,7 @@ $obj->descriptionformat = FORMAT_HTML;
 $obj = file_prepare_standard_editor($obj, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
                                     'totara_plan', 'dp_plan', $obj->id);
 
-$form = new plan_edit_form($currenturl, array('action' => 'add', 'role' => $role));
+$form = new plan_edit_form($currenturl, array('action' => 'add', 'role' => $role, 'can_manage' => true));
 
 if ($form->is_cancelled()) {
     redirect($allplansurl);
@@ -160,6 +137,7 @@ $jsmodule = array(
     'fullpath' => '/totara/plan/templates.js',
     'requires' => array('json'));
 
+$templates = dp_get_templates();
 $json_templates = json_encode($templates);
 $args = array('args' => '{"templates":' . $json_templates . '}');
 

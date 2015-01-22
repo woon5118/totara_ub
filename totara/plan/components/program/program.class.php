@@ -736,7 +736,7 @@ class dp_program_component extends dp_base_component {
         $markup = '';
 
         // Actions
-        if ($this->can_delete_item($item)) {
+        if ($this->can_delete_item($item) && dp_can_manage_users_plans($this->plan->userid)) {
             $currenturl = $this->get_url();
             $strdelete = get_string('delete', 'totara_plan');
             $delete = $OUTPUT->action_icon(new moodle_url($currenturl, array('d' => $item->id)), new pix_icon('/t/delete', $strdelete));

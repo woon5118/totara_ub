@@ -42,15 +42,15 @@ $currenturl = new moodle_url('/totara/plan/components/objective/approval.php', a
 $returnurl = $component->get_url();
 $canapproveobjective = $component->get_setting('updateobjective') == DP_PERMISSION_APPROVE;
 
+$can_manage = dp_can_manage_users_plans($plan->userid);
+
+if (!$can_manage || !$canapproveobjective) {
+    print_error('nopermission', 'totara_plan');
+}
+
 if ($confirm) {
     if (!confirm_sesskey()) {
         totara_set_notification(get_string('confirmsesskeybad','error'), $returnurl);
-    }
-    if (!$canapproveobjective) {
-        // no permission to complete the action
-        totara_set_notification(get_string('nopermission', 'totara_plan'),
-            $returnurl);
-        die();
     }
 
     $todb = new stdClass();
@@ -81,6 +81,7 @@ echo $OUTPUT->heading($fullname);
 
 echo $OUTPUT->confirm(get_string('confirmrequest'.$action, 'totara_plan'), $currenturl.'&amp;confirm=1&amp;sesskey='.sesskey(), $returnurl);
 
-$component->display_objective_detail($caid);
+$can_update = dp_role_is_allowed_action($plan->role, 'update');
+$component->display_objective_detail($can_manage && $can_update);
 
 echo $OUTPUT->footer();

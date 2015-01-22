@@ -41,10 +41,13 @@ $plan = new development_plan($id);
 $componentname = 'competency';
 $evidence = new dp_evidence_relation($plan->id, $componentname, $caid);
 
-// Permissions check
-$systemcontext = context_system::instance();
-if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
-        print_error('error:nopermissions', 'totara_plan');
+// Permissions check.
+$can_access = dp_can_view_users_plans($plan->userid);
+$can_view = dp_role_is_allowed_action($plan->role, 'view');
+$can_manage = dp_can_manage_users_plans($plan->userid);
+
+if (!$can_access || !$can_view) {
+    print_error('error:nopermissions', 'totara_plan');
 }
 
 // Check the item is in this plan
@@ -52,6 +55,7 @@ if (!$DB->record_exists('dp_plan_competency_assign', array('planid' => $plan->id
     print_error('error:itemnotinplan', 'totara_plan');
 }
 
+$systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 $PAGE->set_url('/totara/plan/components/competency/view.php', array('id' => $id, 'itemid' => $caid));
 $PAGE->set_pagelayout('report');
@@ -62,7 +66,7 @@ $component = $plan->get_component($componentname);
 $currenturl = new moodle_url('/totara/plan/components/competency/view.php', array('id' => $id, 'itemid' => $caid));
 $coursesenabled = $plan->get_component('course')->get_setting('enabled');
 $coursename = get_string('courseplural', 'totara_plan');
-$canupdate = $component->can_update_items();
+$canupdate = $component->can_update_items() && $can_manage;
 $mandatory_list = $component->get_mandatory_linked_components($caid, 'competency');
 
 $role = $plan->get_user_role($USER->id);
@@ -115,7 +119,7 @@ if ($canupdate) {
 }
 
 // Check if we are performing an action
-if ($data = data_submitted() && $canupdate  && !$plan->is_complete()) {
+if ($data = data_submitted() && $canupdate && !$plan->is_complete()) {
     require_sesskey();
 
     switch ($action) {
@@ -193,11 +197,16 @@ if ($coursesenabled) {
         $class = 'plan-remove-selected-hidden';
         echo html_writer::tag('p', get_string('nolinkedx', 'totara_plan', strtolower($coursename)), array('class' => 'noitems-assigncourses'));
     }
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('removeselected', 'totara_plan'), 'class' => $class, 'id' => 'remove-selected-course'));
+
+    if ($canupdate) {
+        echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('removeselected', 'totara_plan'),
+                                    'class' => $class, 'id' => 'remove-selected-course'));
+    }
+
     echo $OUTPUT->container_end();
     echo html_writer::end_tag('form');
 
-    if (!$plancompleted) {
+    if (!$plancompleted && $canupdate) {
         echo $component->display_course_picker($caid);
     }
 }

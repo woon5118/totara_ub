@@ -1097,7 +1097,7 @@ class dp_objective_component extends dp_base_component {
 
         $markup = '';
 
-        if ($this->can_delete_item($item)) {
+        if ($this->can_delete_item($item) && dp_can_manage_users_plans($this->plan->userid)) {
             $deleteurl = new moodle_url('/totara/plan/components/objective/edit.php',
                 array('id' => $this->plan->id, 'itemid' => $item->id, 'd' => 1));
             $strdelete = get_string('delete', 'totara_plan');
@@ -1158,10 +1158,11 @@ class dp_objective_component extends dp_base_component {
     /**
      * Print details about an objective
      * @global object $CFG
-     * @param int $objectiveid
+     * @param int $objectiveid The id of the object to display.
+     * @param boolean $canupdate If the Object can be updated or not.
      * @return void
      */
-    public function display_objective_detail($objectiveid) {
+    public function display_objective_detail($objectiveid, $canupdate) {
         global $DB, $OUTPUT;
 
         $priorityscaleid = ($this->get_setting('priorityscale')) ? $this->get_setting('priorityscale') : -1;
@@ -1208,8 +1209,7 @@ class dp_objective_component extends dp_base_component {
 
         $plancompleted = $this->plan->status == DP_PLAN_STATUS_COMPLETE;
 
-        if (!$plancompleted && ($canupdate = $this->can_update_items())) {
-
+        if (!$plancompleted && $canupdate) {
             if ($this->will_an_update_revoke_approval( $objectiveid )) {
                 $buttonlabel = get_string('editdetailswithapproval', 'totara_plan');
             } else {
@@ -1267,7 +1267,7 @@ class dp_objective_component extends dp_base_component {
 
         $selected = $ca->scalevalueid;
 
-        if (!$plancompleted && $cansetprof) {
+        if (!$plancompleted && $cansetprof && dp_can_manage_users_plans($this->plan->userid)) {
             // Show the menu
             $options = array();
             foreach ($proficiencyvalues as $id => $val) {

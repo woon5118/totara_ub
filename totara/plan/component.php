@@ -53,10 +53,17 @@ $ownplan = ($USER->id == $plan->userid);
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
-if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
-        print_error('error:nopermissions', 'totara_plan');
+// Check if the user can view the component content.
+$can_access = dp_can_view_users_plans($plan->userid);
+$can_view = dp_role_is_allowed_action($plan->role, 'view');
+
+if (!$can_access || !$can_view) {
+    print_error('error:nopermissions', 'totara_plan');
 }
 
+// Check if the user can manage the component content.
+$can_manage = dp_can_manage_users_plans($plan->userid);
+$can_update = dp_role_is_allowed_action($plan->role, 'update');
 
 // Check for valid component, before proceeding
 // Check against active components to prevent hackery
@@ -96,28 +103,34 @@ $PAGE->set_context($systemcontext);
 $PAGE->set_url(new moodle_url('/totara/plan/component.php', array('id' => $id, 'c' => $componentname)));
 
 $plan->print_header($componentname);
-
-echo $component->display_picker();
-
-$form = html_writer::start_tag('form', array('id' => "dp-component-update",  'action' => $component->get_url(), "method" => "POST"));
-$form .= html_writer::empty_tag('input', array('type' => "hidden", 'id' => "sesskey",  'name' => "sesskey", 'value' => sesskey()));
-
 $table = $component->display_list();
-$form .= html_writer::tag('div', $table, array('id' => 'dp-component-update-table'));
 
-if ($component->can_update_settings(false)) {
-    if (!$component->get_assigned_items()) {
-        $display = 'none';
-    } else {
-        $display = 'block';
+if ($can_manage && $can_update) {
+    echo $component->display_picker();
+
+    $form = html_writer::start_tag('form', array('id' => "dp-component-update",  'action' => $component->get_url(),
+                                    "method" => "POST"));
+    $form .= html_writer::empty_tag('input', array('type' => "hidden", 'id' => "sesskey",  'name' => "sesskey",
+                                    'value' => sesskey()));
+    $form .= html_writer::tag('div', $table, array('id' => 'dp-component-update-table'));
+
+    if ($component->can_update_settings(false)) {
+        if (!$component->get_assigned_items()) {
+            $display = 'none';
+        } else {
+            $display = 'block';
+        }
+        $button = html_writer::empty_tag('input', array('type' => "submit", 'name' => "submitbutton",
+                                            'value' => get_string('updatesettings', 'totara_plan')));
+        $form .= html_writer::tag('noscript', $OUTPUT->container($button, array('id' => "dp-component-update-submit",
+                                            'style' => "display: {$display};")));
     }
-    $button = html_writer::empty_tag('input', array('type' => "submit", 'name' => "submitbutton", 'value' => get_string('updatesettings', 'totara_plan')));
-    $form .= html_writer::tag('noscript', $OUTPUT->container($button, array('id' => "dp-component-update-submit",  'style' => "display: {$display};")));
+    $form .= html_writer::end_tag('form');
+    echo $form;
+    echo build_datepicker_js("[id^=duedate_{$componentname}]");
+} else {
+    echo html_writer::tag('div', $table, array('id' => 'dp-component-update-table'));
 }
 
-$form .= html_writer::end_tag('form');
-echo $form;
-
-echo build_datepicker_js("[id^=duedate_{$componentname}]");
 echo $OUTPUT->container_end();
 echo $OUTPUT->footer();

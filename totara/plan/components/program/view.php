@@ -44,10 +44,13 @@ $action = optional_param('action', 'view', PARAM_TEXT);
 $plan = new development_plan($id);
 $plancompleted = $plan->status == DP_PLAN_STATUS_COMPLETE;
 
-//Permissions check
-$systemcontext = context_system::instance();
-if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
-        print_error('error:nopermissions', 'totara_plan');
+// Permissions check.
+$can_access = dp_can_view_users_plans($plan->userid);
+$can_view = dp_role_is_allowed_action($plan->role, 'view');
+$can_manage = dp_can_manage_users_plans($plan->userid);
+
+if (!$can_access || !$can_view) {
+    print_error('error:nopermissions', 'totara_plan');
 }
 
 // Check the item is in this plan
@@ -55,6 +58,7 @@ if (!$DB->record_exists('dp_plan_program_assign', array('planid' => $plan->id, '
     print_error('error:itemnotinplan', 'totara_plan');
 }
 
+$systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 $PAGE->set_url('/totara/plan/components/program/view.php', array('id' => $id, 'itemid' => $progassid));
 $PAGE->set_pagelayout('report');
@@ -82,7 +86,7 @@ if ($programid = $DB->get_field('dp_plan_program_assign', 'programid', array('id
 
 $componentname = 'program';
 $component = $plan->get_component($componentname);
-$canupdate = $component->can_update_items();
+$canupdate = $component->can_update_items() && $can_manage;
 
 $evidence = new dp_evidence_relation($id, $componentname, $progassid);
 

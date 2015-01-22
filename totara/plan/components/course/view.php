@@ -46,10 +46,13 @@ $PAGE->set_url('/totara/plan/components/course/view.php', array('id' => $id, 'it
 $PAGE->set_pagelayout('report');
 $PAGE->set_totara_menu_selected('learningplans');
 
-//Permissions check
-$systemcontext = context_system::instance();
-if (!has_capability('totara/plan:accessanyplan', $systemcontext) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
-        print_error('error:nopermissions', 'totara_plan');
+// Permissions check.
+$can_access = dp_can_view_users_plans($plan->userid);
+$can_view = dp_role_is_allowed_action($plan->role, 'view');
+$can_manage = dp_can_manage_users_plans($plan->userid);
+
+if (!$can_access || !$can_view) {
+    print_error('error:nopermissions', 'totara_plan');
 }
 
 // Check the item is in this plan
@@ -68,7 +71,7 @@ $competenciesenabled = $plan->get_component('competency')->get_setting('enabled'
 $competencyname = get_string('competencyplural', 'totara_plan');
 $objectivesenabled = $plan->get_component('objective')->get_setting('enabled');
 $objectivename = get_string('objectiveplural', 'totara_plan');
-$canupdate = $component->can_update_items();
+$canupdate = $component->can_update_items() && $can_manage;
 $mandatory_list = $component->get_mandatory_linked_components($caid, 'course');
 
 $fullname = $plan->name;
@@ -186,7 +189,7 @@ if ($competenciesenabled) {
     }
     echo $OUTPUT->container_end();
 
-    if (!$plancompleted) {
+    if (!$plancompleted && $canupdate) {
         echo $component->display_competency_picker($caid);
     }
 }
@@ -212,7 +215,7 @@ require_once($CFG->dirroot.'/comment/lib.php');
 comment::init();
 $options = new stdClass;
 $options->area    = 'plan_course_item';
-$options->context = $systemcontext;
+$options->context = context_system::instance();
 $options->itemid  = $caid;
 $options->showcount = true;
 $options->component = 'totara_plan';

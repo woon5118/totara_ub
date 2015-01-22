@@ -62,15 +62,21 @@ $ownplan = $USER->id == $plan->userid;
 $menuitem = ($ownplan) ? 'learningplans' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 
-if (!has_capability('totara/plan:accessanyplan', $context) && ($plan->get_setting('view') < DP_PERMISSION_ALLOW)) {
-        print_error('error:nopermissions', 'totara_plan');
+$can_access = dp_can_view_users_plans($plan->userid);
+$can_view = dp_role_is_allowed_action($plan->role, 'view');
+
+if (!$can_access || !$can_view) {
+    print_error('error:nopermissions', 'totara_plan');
 }
+
+$can_manage = dp_can_manage_users_plans($plan->userid);
+$can_update = dp_role_is_allowed_action($plan->role, 'update');
 
 require_once('edit_form.php');
 $plan->descriptionformat = FORMAT_HTML;
 $plan = file_prepare_standard_editor($plan, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
                                     'totara_plan', 'dp_plan', $plan->id);
-$form = new plan_edit_form($currenturl, array('plan' => $plan, 'action' => $action));
+$form = new plan_edit_form($currenturl, array('plan' => $plan, 'action' => $action, 'can_manage' => $can_manage));
 
 if ($form->is_cancelled()) {
     totara_set_notification(get_string('planupdatecancelled', 'totara_plan'), $viewurl, array('class' => 'notifysuccess'));
@@ -82,6 +88,9 @@ if ($plan->get_setting('view') != DP_PERMISSION_ALLOW) {
 
 // Handle form submits
 if ($data = $form->get_data()) {
+    if (!$can_manage) {
+        print_error('error:nopermissions', 'totara_plan');
+    }
     if (isset($data->edit)) {
         if ($plan->get_setting('update') < DP_PERMISSION_ALLOW) {
             print_error('error:nopermissions', 'totara_plan');

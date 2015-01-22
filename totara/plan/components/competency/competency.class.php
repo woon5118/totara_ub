@@ -1442,7 +1442,7 @@ class dp_competency_component extends dp_base_component {
      * @return string the items status
      */
     protected function display_list_item_progress($item) {
-        if ($this->can_update_competency_evidence($item)) {
+        if ($this->can_update_competency_evidence($item) && dp_can_manage_users_plans($this->plan->userid)) {
             return $this->get_competency_menu($item);
         } else {
             return $this->is_item_approved($item->approved) ? $this->display_status($item) : '';
@@ -1497,8 +1497,10 @@ class dp_competency_component extends dp_base_component {
     protected function display_list_item_actions($item) {
 
         $markup = '';
-        $markup .= $this->display_comp_delete_icon($item);
-        $markup .= $this->display_comp_add_evidence_icon($item);
+        if (dp_can_manage_users_plans($this->plan->userid)) {
+            $markup .= $this->display_comp_delete_icon($item);
+            $markup .= $this->display_comp_add_evidence_icon($item);
+        }
 
         return $markup;
     }

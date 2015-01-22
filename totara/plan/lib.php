@@ -196,14 +196,15 @@ function totara_plan_pluginfile($course, $cm, $context, $filearea, $args, $force
 
 
 /**
- * Can logged in user view user's plans
+ * Can logged in user view specified user's plans.
+ * This only checks capabilities, it does not check plan permissions.
  *
  * @access  public
- * @param   int     $ownerid   Plan's owner
+ * @param   int     $ownerid   Plan user
  * @return  boolean
  */
 function dp_can_view_users_plans($ownerid) {
-    global $USER, $DB;
+    global $USER;
 
     if (!isloggedin()) {
         return false;
@@ -211,35 +212,121 @@ function dp_can_view_users_plans($ownerid) {
 
     $systemcontext = context_system::instance();
 
-    // Check plan templates exist
-    static $templateexists;
-    if (!isset($templateexists)) {
-        $templateexists = (bool) $DB->count_records('dp_template');
-    }
-
-    if (!$templateexists) {
-        return false;
-    }
-
-    // If the user can view any plans
-    if (has_capability('totara/plan:accessanyplan', $systemcontext)) {
+    // If the user can access all plans on the site. Implicitly includes site admins.
+    if (has_capability('totara/plan:accessanyplan', $systemcontext) ||
+        has_capability('totara/plan:manageanyplan', $systemcontext)) {
+        // The current user has manager's capability (whether or not they are the actual manager, includes site admin).
         return true;
     }
 
-    // If the user cannot view any plans
+    // If the user can access their own plans or the plans of their staff.
     if (!has_capability('totara/plan:accessplan', $systemcontext)) {
+        // The user has no capability to access either their own plans or those of their staff.
         return false;
     }
 
-    // If this is the current user's own plans
     if ($ownerid == $USER->id) {
+        // This is the current user's own plan.
         return true;
     }
 
-    // If this user is their manager
     if (totara_is_manager($ownerid)) {
+        // The current user is the actual manager.
         return true;
     }
+
+    // It's not their plan and they aren't manager of the plan's owner.
+    return false;
+}
+
+
+/**
+ * Can logged in user manage user's plans.
+ * This only checks capabilities, it does not check plan permissions.
+ *
+ * @access  public
+ * @param   int     $ownerid   Plan user
+ * @return  boolean
+ */
+function dp_can_manage_users_plans($ownerid) {
+    global $USER;
+
+    if (!isloggedin()) {
+        return false;
+    }
+
+    $systemcontext = context_system::instance();
+
+    // If the user can manage all plans on the site. Implicitly includes site admins.
+    if (has_capability('totara/plan:manageanyplan', $systemcontext)) {
+        // The current user has manager's capability (whether or not they are the actual manager, includes site admin).
+        return true;
+    }
+
+    // There is no manageplan capability. Users can manage their own plans and managers can manage
+    // their staff's plans if they can see them.
+    if (!has_capability('totara/plan:accessplan', $systemcontext)) {
+        // The user has no capability to manage either their own plans or those of their staff.
+        return false;
+    }
+
+    if ($ownerid == $USER->id) {
+        // This is the current user's own plan.
+        return true;
+    }
+
+    if (totara_is_manager($ownerid)) {
+        // The current user is the actual manager.
+        return true;
+    }
+
+    // It's not their plan and they aren't manager of the plan's owner.
+    return false;
+}
+
+
+/**
+ * Check if there is a template which allows the given role to perform the given action.
+ *
+ * @param string $role from $DP_AVAILABLE_ROLES
+ * @param string/array $action
+ * @param string $permission The permission that action should be checked for.
+ * @return bool
+ */
+function dp_role_is_allowed_action($role, $action, $permission = 'allow') {
+    global $DB;
+
+    // We can't determine the permissions if there's no template.
+    if (!$templates = dp_get_templates()) {
+        return false;
+    }
+
+    switch ($permission) {
+        case 'approve':
+            $permission = DP_PERMISSION_APPROVE;
+            break;
+        case 'deny':
+            $permission = DP_PERMISSION_DENY;
+            break;
+        case 'request':
+            $permission = DP_PERMISSION_REQUEST;
+            break;
+        default: // Allow.
+            $permission = DP_PERMISSION_ALLOW;
+    }
+
+    foreach ($templates as $template) {
+        if (is_array($action)) {
+            foreach ($action as $value) {
+                if (dp_get_template_permission($template->id, 'plan', $value, $role) == $permission) {
+                    return true;
+                }
+            }
+        } else if (dp_get_template_permission($template->id, 'plan', $action, $role) == $permission) {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -648,6 +735,11 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     $statuses_undrsc = str_replace(',', '_', $statuses_string);
     $cols = is_array($cols) ? $cols : array($cols);
 
+    // Check if the user can manage the plans.
+    $role = ($userid == $USER->id) ? 'learner' : 'manager';
+    $can_manage = dp_can_manage_users_plans($userid);
+    $can_update = dp_role_is_allowed_action($role, 'update');
+
     // Construct sql query
     $count = 'SELECT COUNT(*) ';
     $select = 'SELECT p.id, p.name AS "name_'.$statuses_undrsc.'"';
@@ -699,8 +791,10 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
     }
 
     // Actions
-    $tableheaders[] = get_string('actions', 'totara_plan');
-    $tablecols[] = 'actioncontrols';
+    if ($can_manage && $can_update) {
+        $tableheaders[] = get_string('actions', 'totara_plan');
+        $tablecols[] = 'actioncontrols';
+    }
 
     $baseurl = $CFG->wwwroot . '/totara/plan/index.php';
     if ($userid != $USER->id) {
@@ -716,7 +810,9 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
         TABLE_VAR_SORT    => 'tsort',
     ));
     $table->sortable(true);
-    $table->no_sorting('actioncontrols');
+    if ($can_manage && $can_update) {
+        $table->no_sorting('actioncontrols');
+    }
     if (in_array('status', $cols)) {
         $table->no_sorting('status_'.$statuses_undrsc);
     }
@@ -745,8 +841,9 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
             if (in_array('completed', $cols)) {
                 $row[] = $plan->display_completeddate();
             }
-            $row[] = $plan->display_actions();
-
+            if ($can_manage && $can_update) {
+                $row[] = $plan->display_actions();
+            }
             if (++$rownumber >= $count) {
                 $table->add_data($row, 'last');
             } else {

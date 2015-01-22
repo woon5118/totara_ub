@@ -32,42 +32,15 @@ require_login();
 
 $planuser = optional_param('userid', $USER->id, PARAM_INT); // show plans for this user
 
-//
-/// Permission checks
-//
-if (!dp_can_view_users_plans($planuser)) {
+// Permission checks.
+$role = ($planuser == $USER->id) ? 'learner' : 'manager';
+$can_access = dp_can_view_users_plans($planuser);
+$can_manage = dp_can_manage_users_plans($planuser);
+$can_view = dp_role_is_allowed_action($role, 'view');
+
+if (!$can_access || !$can_view) {
     print_error('error:nopermissions', 'totara_plan');
 }
-
-// Check if we are viewing these plans as a manager or a learner
-if ($planuser != $USER->id) {
-    $role = 'manager';
-} else {
-    $role = 'learner';
-}
-
-$canaddplan = false;
-
-if (has_capability('totara/plan:canselectplantemplate', context_system::instance())) {
-    // Check if a users has add plan permissions on any template
-    $templates = dp_get_templates();
-    $allowed_templates = dp_template_has_permission('plan', 'create', $role, DP_PERMISSION_ALLOW);
-
-    $templatelist = array();
-    foreach ($templates as $template) {
-        if (in_array($template->id, $allowed_templates)) {
-            $canaddplan = true;
-            break;
-        }
-    }
-} else {
-    $default_template = dp_get_default_template();
-
-    if (dp_get_template_permission($default_template->id, 'plan', 'create', $role) == DP_PERMISSION_ALLOW) {
-        $canaddplan = true;
-    }
-}
-
 
 //
 // Display plan list
@@ -110,7 +83,7 @@ if ($planuser == $USER->id) {
     $userfullname = fullname($user);
     $planinstructions = get_string('planinstructionsuser', 'totara_plan', $userfullname) . ' ';
 }
-if ($canaddplan) {
+if ($can_manage) {
     $planinstructions .= get_string('planinstructions_add', 'totara_plan');
 }
 
@@ -118,7 +91,7 @@ if ($canaddplan) {
 
 echo html_writer::tag('p', $planinstructions, array('class' => 'instructional_text'));
 
-if ($canaddplan) {
+if ($can_manage) {
     $renderer = $PAGE->get_renderer('totara_plan');
     echo $renderer->print_add_plan_button($planuser);
 }

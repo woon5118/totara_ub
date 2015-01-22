@@ -51,7 +51,7 @@ abstract class dp_base_component {
      */
     protected $plan;
 
-
+    
     /**
      * Constructor, add reference to plan object and
      * check required properties are set
@@ -124,6 +124,10 @@ abstract class dp_base_component {
             return false;
         }
 
+        if (!dp_can_manage_users_plans($this->plan->userid)) {
+            return false;
+        }
+
         // Get permission
         $updateitem = $this->get_setting('update'.$this->component);
 
@@ -163,9 +167,12 @@ abstract class dp_base_component {
         // Get permissions
         $can = array();
 
-        $can['setduedate'] = $this->get_setting('duedatemode') && $this->get_setting('setduedate') >= DP_PERMISSION_ALLOW;
-        $can['setpriority'] = $this->get_setting('prioritymode') && $this->get_setting('setpriority') >= DP_PERMISSION_ALLOW;
-        $can['approve'.$this->component] = $this->get_setting('update'.$this->component) == DP_PERMISSION_APPROVE;
+        $can['setduedate'] = dp_can_manage_users_plans($this->plan->userid) && $this->get_setting('duedatemode') &&
+            $this->get_setting('setduedate') >= DP_PERMISSION_ALLOW;
+        $can['setpriority'] = dp_can_manage_users_plans($this->plan->userid) && $this->get_setting('prioritymode') &&
+            $this->get_setting('setpriority') >= DP_PERMISSION_ALLOW;
+        $can['approve'.$this->component] = dp_can_manage_users_plans($this->plan->userid) &&
+            $this->get_setting('update'.$this->component) == DP_PERMISSION_APPROVE;
 
         if (method_exists($this, 'can_update_settings_extra')) {
             $can = $this->can_update_settings_extra($can);
@@ -1440,8 +1447,8 @@ abstract class dp_base_component {
         $baddates = explode(',',optional_param('badduedates', null, PARAM_TEXT));
 
         $plancompleted = $this->plan->status == DP_PLAN_STATUS_COMPLETE;
-        $cansetduedate = !$plancompleted && ($this->get_setting('setduedate') == DP_PERMISSION_ALLOW);
-
+        $cansetduedate = dp_can_manage_users_plans($this->plan->userid) && !$plancompleted
+                            && ($this->get_setting('setduedate') == DP_PERMISSION_ALLOW);
         $out = '';
 
         // only show a form if they have permission to change due dates
@@ -1526,7 +1533,8 @@ abstract class dp_base_component {
         // Load permissions
         $plancompleted = $this->plan->is_complete();
 
-        $cansetpriority = !$plancompleted && ($this->get_setting('setpriority') == DP_PERMISSION_ALLOW);
+        $cansetpriority = dp_can_manage_users_plans($this->plan->userid) && !$plancompleted
+                            && ($this->get_setting('setpriority') == DP_PERMISSION_ALLOW);
         $priorityenabled = $this->get_setting('prioritymode') != DP_PRIORITY_NONE;
         $priorityrequired = ($this->get_setting('prioritymode') == DP_PRIORITY_REQUIRED);
         $prioritydefaultid = $this->get_default_priority();

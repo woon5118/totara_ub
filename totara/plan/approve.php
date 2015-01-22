@@ -48,7 +48,11 @@ $PAGE->set_pagelayout('report');
 $planurl = "{$CFG->wwwroot}/totara/plan/view.php?id={$id}";
 $plan = new development_plan($id);
 
-if (!dp_can_view_users_plans($plan->userid)) {
+// If the user can't manage and approve this plan, they shouldn't be able to approve changes.
+$can_manage = dp_can_manage_users_plans($plan->userid);
+$can_approve = dp_role_is_allowed_action($plan->role, 'approve', 'approve');
+
+if (!$can_manage || !$can_approve) {
     print_error('error:nopermissions', 'totara_plan');
 }
 

@@ -33,12 +33,15 @@ class dp_manager_role extends dp_base_role {
         if (!isset($userid)) {
             $userid = $USER->id;
         }
-        // are they the manager of this plan's owner?
-        if (totara_is_manager($this->plan->userid, $userid)) {
-            return 'manager';
 
+        $context = context_system::instance();
+
+        // Are they the manager of this plan's owner?
+        if (totara_is_manager($this->plan->userid, $userid) && has_capability('totara/plan:accessplan', $context, $userid)) {
+            return 'manager';
         // Are they an administrative super-user?
-        } else if (has_capability('totara/plan:accessanyplan', context_system::instance(), $userid )) {
+        } else if (has_capability('totara/plan:accessanyplan', $context, $userid)
+                    || has_capability('totara/plan:manageanyplan', $context, $userid)) {
             return 'manager';
         } else {
             return false;
