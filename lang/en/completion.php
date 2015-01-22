@@ -91,6 +91,7 @@ $string['completionprogressonviewhelp'] = 'Mark course completion status as In P
 $string['completionprogressonview_help'] = 'Mark course completion status as In Progress as soon as students view the course the first time (instead of when they meet the first criterion).';
 $string['completionduration'] = 'Enrolment';
 $string['completionsettingslocked'] = 'Completion settings locked';
+$string['completionsettingsunlocked'] = 'Completion settings unlocked';
 $string['completionusegrade'] = 'Require grade';
 $string['completionusegrade_desc'] = 'Student must receive a grade to complete this activity';
 $string['completionusegrade_help'] = 'If enabled, the activity is considered complete when a student receives a grade. Pass and fail icons may be displayed if a pass grade for the activity has been set.';

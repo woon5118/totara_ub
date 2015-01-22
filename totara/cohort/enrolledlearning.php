@@ -74,12 +74,15 @@ local_js(
 );
 // Include cohort learning js module.
 $PAGE->requires->strings_for_js(array('none'), 'moodle');
-$PAGE->requires->strings_for_js(array('assignenrolledlearning', 'deletelearningconfirm', 'savinglearning'), 'totara_cohort');
+$PAGE->requires->strings_for_js(array('assignenrolledlearningcourse', 'assignenrolledlearningprogram',
+                                        'assignenrolledlearningcertification', 'deletelearningconfirm', 'savinglearning'),
+                                        'totara_cohort');
 $jsmodule = array(
         'name' => 'totara_cohortlearning',
         'fullpath' => '/totara/cohort/dialog/learningitem.js',
         'requires' => array('json'));
 $args = array('args'=>'{"cohortid":'.$cohort->id.','.
+        '"COHORT_ASSN_ITEMTYPE_CERTIF":' . COHORT_ASSN_ITEMTYPE_CERTIF . ',' .
         '"COHORT_ASSN_ITEMTYPE_PROGRAM":' . COHORT_ASSN_ITEMTYPE_PROGRAM . ','.
         '"COHORT_ASSN_ITEMTYPE_COURSE":' . COHORT_ASSN_ITEMTYPE_COURSE . ','.
         '"COHORT_ASSN_VALUE_VISIBLE":' . COHORT_ASSN_VALUE_VISIBLE .','.
@@ -124,13 +127,19 @@ echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-cour
     'value' => get_string('addcourses', 'totara_cohort')));
 echo html_writer::end_tag('div');
 
-// add programs
+// Add programs and certifications.
 if (totara_feature_visible('programs')) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
         'value' => get_string('addprograms', 'totara_cohort')));
     echo html_writer::end_tag('div');
+
+    echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+    echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
+        'value' => get_string('addcertifications', 'totara_cohort')));
+    echo html_writer::end_tag('div');
 }
+
 echo html_writer::end_tag('div');
 
 $report->display_search();

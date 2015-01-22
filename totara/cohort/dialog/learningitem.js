@@ -64,8 +64,8 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
         var assgnstring = this.config.assign_string ? this.config.assign_string : 'enrolled';
 
         // Init courses dialog.
-        var csaveurl = url + 'updatelearning.php?type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE + '&cohortid=' + this.config.cohortid + '&sesskey=' + 
-            M.cfg.sesskey + '&v=' + assgnval + '&u=';
+        var csaveurl = url + 'updatelearning.php?type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE
+            + '&cohortid=' + this.config.cohortid + '&sesskey=' + M.cfg.sesskey + '&v=' + assgnval + '&u=';
         var chandler = new totaraDialog_handler_cohortlearning();
         chandler.baseurl = url;
         var cbuttons = {};
@@ -77,7 +77,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             'add-course-learningitem-dialog',
             {
                 buttons: cbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learning', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningcourse', 'totara_cohort') + '</h2>'
             },
             url+'browselearning.php?cohortid=' + this.config.cohortid  + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_COURSE,
             chandler
@@ -97,7 +97,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             'add-program-learningitem-dialog',
             {
                 buttons: pbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learning', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningprogram', 'totara_cohort') + '</h2>'
             },
             url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_PROGRAM,
             phandler
@@ -117,7 +117,7 @@ M.totara_cohortlearning = M.totara_cohortlearning || {
             'add-certification-learningitem-dialog',
             {
                 buttons: pcbuttons,
-                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learning', 'totara_cohort') + '</h2>'
+                title: '<h2>' + M.util.get_string('assign'+assgnstring+'learningcertification', 'totara_cohort') + '</h2>'
             },
             url+'browselearning.php?cohortid=' + this.config.cohortid + '&v=' + assgnval + '&type=' + this.config.COHORT_ASSN_ITEMTYPE_CERTIF,
             pchandler

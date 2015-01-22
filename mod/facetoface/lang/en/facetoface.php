@@ -347,6 +347,7 @@ $string['error:nopermissiontosignup'] = 'You don\'t have permission to signup to
 $string['error:nopositionselected'] = 'You must have a suitable position assigned to sign up for this facetoface session.';
 $string['error:nopositionselectedactivity'] = 'You must have a suitable position assigned to sign up for this facetoface activity.';
 $string['error:nopredefinedrooms'] = 'No pre-defined rooms';
+$string['error:norecipientsselected'] = 'You must choose which learners will receive this notification';
 $string['error:noticeidincorrect'] = 'Notice ID is incorrect: {$a}';
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the session.';

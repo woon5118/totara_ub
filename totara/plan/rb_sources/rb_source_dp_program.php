@@ -195,11 +195,13 @@ class rb_source_dp_program extends rb_base_source {
             "program_completion.timedue",
             array(
                 'joins' => 'program_completion',
-                'displayfunc' => 'timedue_date',
                 'dbdatatype' => 'timestamp',
+                'displayfunc' => 'program_duedate',
                 'extrafields' => array(
-                    'program_id' => "base.id",
-                    'completionstatus' => "program_completion.status"
+                    'timedue' => 'program_completion.timedue',
+                    'programid' => 'base.id',
+                    'userid' => 'program_completion.userid',
+                    'status' => 'program_completion.status',
                 )
             )
         );
@@ -295,14 +297,26 @@ class rb_source_dp_program extends rb_base_source {
         return $columnoptions;
     }
 
-    function rb_display_program_completion_progress($status,$row) {
-        $program = new program($row->programid);
-        return $program->display_progress($row->userid);
+    public function rb_display_program_completion_progress($status, $row) {
+        return prog_display_progress($row->programid, $row->userid);
     }
 
-    function rb_display_timedue_date($time,$row) {
-        $program = new program($row->program_id);
-        return $program->display_timedue_date($row->completionstatus, $time);
+    /**
+     * Reformat a timestamp into a date, handling -1 which is used by program code for no date.
+     *
+     * If not -1 just call the regular date display function.
+     *
+     * @param integer $date Unix timestamp
+     * @param object $row Object containing all other fields for this row
+     *
+     * @return string Date in a nice format
+     */
+    public function rb_display_prog_date($date, $row) {
+        if ($date == -1) {
+            return '';
+        } else {
+            return $this->rb_display_nice_date($date, $row);
+        }
     }
 
     function rb_display_mandatory_status($id) {
@@ -318,15 +332,14 @@ class rb_source_dp_program extends rb_base_source {
 
         $userid = $row->userid;
 
-        $program = new program($programid);
-        $program_content = $program->get_content();
+        $program_content = new prog_content($programid);
         $coursesets = $program_content->get_course_sets();
         if (isset($coursesets[0])) {
             $courseset = $coursesets[0];
             if ($courseset->is_recurring()) {
                 $recurringcourse = $courseset->course;
                 $link = get_string('yes');
-                $link .= $OUTPUT->action_link(new moodle_url('/totara/plan/record/programs_recurring.php', array('programid' => $program->id, 'userid' => $userid)), get_string('viewrecurringprogramhistory', 'totara_program'));
+                $link .= $OUTPUT->action_link(new moodle_url('/totara/plan/record/programs_recurring.php', array('programid' => $programid, 'userid' => $userid)), get_string('viewrecurringprogramhistory', 'totara_program'));
                 return $link;
             }
         }
@@ -334,8 +347,7 @@ class rb_source_dp_program extends rb_base_source {
     }
 
     function rb_display_link_program_icon($programname, $row) {
-        $program = new program($row->program_id);
-        return $program->display_link_program_icon($programname, $row->program_id, $row->program_icon, $row->userid);
+        return prog_display_link_icon($row->program_id, $row->userid);
     }
 
     public function rb_display_program_previous_completion($name, $row) {

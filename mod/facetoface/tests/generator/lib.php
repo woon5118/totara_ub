@@ -22,6 +22,8 @@
  * @package    mod_facetoface
  * @subpackage phpunit
  * @author     Maria Torres <maria.torres@totaralms.com>
+ * @author     Nathan Lewis <nathan.lewis@totaralms.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  *
  */
 
@@ -51,29 +53,38 @@ class mod_facetoface_generator extends testing_module_generator {
         }
 
         $defaults = array();
+        $defaults['intro'] = 'Test facetoface ' . $i;
+        $defaults['introformat'] = FORMAT_MOODLE;
         $defaults['name'] = get_string('pluginname', 'facetoface').' '.$i;
-        $defaults['shortname'] = $defaults['name'];
+        $defaults['shortname'] = 'facetoface' . $i;
         $defaults['description'] = 'description';
-        $defaults['thirdparty'] = 'Test feedback '.$i;
+        $defaults['thirdparty'] = null; // Default to username
         $defaults['thirdpartywaitlist'] = 0;
-        $defaults['display'] = 1;
+        $defaults['display'] = 6;
+        $defaults['showoncalendar'] = '1';
         $defaults['approvalreqd'] = 0;
+        $defaults['usercalentry'] = 1;
         $defaults['multiplesessions'] = 0;
+        $defaults['completionstatusrequired'] = '{"100":1}';
         $defaults['managerreserve'] = 0;
         $defaults['maxmanagerreserves'] = 1;
         $defaults['reservecanceldays'] = 1;
         $defaults['reservedays'] = 2;
-        $defaults['showcalendar'] = 1;
-        $defaults['showoncalendar'] = 1;
-        $defaults['introformat'] = FORMAT_MOODLE;
-
         foreach ($defaults as $field => $value) {
             if (!isset($record->$field)) {
                 $record->$field = $value;
             }
         }
 
-        return parent::create_instance($record, $options);
+        if (isset($options['idnumber'])) {
+            $record->cmidnumber = $options['idnumber'];
+        } else {
+            $record->cmidnumber = '';
+        }
+
+        $record->coursemodule = $this->precreate_course_module($record->course, $options);
+        $id = facetoface_add_instance($record, null);
+        return $this->post_add_instance($id, $record->coursemodule);
     }
 
     /**
@@ -131,6 +142,10 @@ class mod_facetoface_generator extends testing_module_generator {
         if (!isset($record->timemodified)) {
             $record->timemodified = time();
         }
+        if (!isset($record->waitlisteveryone)) {
+            $record->waitlisteveryone = 0;
+        }
+
         $record->usermodified = $USER->id;
 
         return facetoface_add_session($record, $sessiondates);

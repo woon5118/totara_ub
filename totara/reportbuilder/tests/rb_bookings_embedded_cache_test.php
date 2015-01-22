@@ -179,9 +179,9 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         $sink = $this->redirectMessages();
         $usernote = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
         facetoface_user_signup($session, $facetoface1, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
-            $initiator->id, false, $usernote);
+            $initiator->id, false, null, $usernote);
         facetoface_user_signup($session, $facetoface1, $course, 0, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED,
-            $attender->id, false, $usernote);
+            $attender->id, false, null, $usernote);
         $this->assertCount(2, $sink->get_messages());
         $sink->close();
     }

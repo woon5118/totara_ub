@@ -443,6 +443,33 @@ class totara_program_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Display due date for a program with task info
+     *
+     * @param int $duedate
+     * @return string
+     */
+    public function display_duedate_highlight_info($duedate) {
+        $out = '';
+        $now = time();
+        if (!empty($duedate)) {
+            $out .= html_writer::empty_tag('br') . html_writer::start_tag('span', array('class' => 'plan_highlight'));
+
+            if ($duedate < $now) {
+                    $out .= $this->notification(get_string('overdue', 'totara_plan'), 'notifyproblem');
+            } else {
+                $days = floor(($duedate - $now) / DAYSECS);
+                if ($days == 0) {
+                    $out .= $this->notification(get_string('duetoday', 'totara_plan'), 'notifyproblem');
+                } else if ($days > 0 && $days < 10) {
+                    $out .= $this->notification(get_string('dueinxdays', 'totara_plan', $days), 'notifynotice');
+                }
+            }
+            $out .= html_writer::end_tag('span');
+        }
+        return $out;
+    }
+
+    /**
      * Returns HTML to display a course category as a part of a tree
      *
      * This is an internal function, to display a particular category and all its contents

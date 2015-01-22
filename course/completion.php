@@ -59,10 +59,8 @@ if ($id) {
 }
 
 // Form unlocked override
-$unlocked = optional_param('unlocked', false, PARAM_BOOL);
-// Check permissions
-$unlocked = $unlocked && completion_can_unlock_data($course->id);
-
+$unlockdelete = optional_param('unlockdelete', false, PARAM_BOOL);
+$unlockonly = optional_param('unlockonly', false, PARAM_BOOL);
 
 // Load completion object
 $completion = new completion_info($course);
@@ -76,7 +74,7 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('admin');
 
 // Create the settings form instance.
-$form = new course_completion_form('completion.php?id='.$id, compact('course', 'unlocked'));
+$form = new course_completion_form('completion.php?id='.$id, compact('course', 'unlockdelete', 'unlockonly'));
 
 /// set data
 $currentdata = array('criteria_course_value' => array());
@@ -96,31 +94,30 @@ if ($form->is_cancelled()) {
 } else if ($data = $form->get_data()) {
 
 
-/// process criteria unlocking if requested
-    if (!empty($data->settingsunlockdelete) && completion_can_unlock_data($course->id)) {
+    // Process criteria unlocking if requested.
+    if (completion_can_unlock_data($course->id)) {
+        // Check and reload if the user clicked one of the unlock buttons.
+        if (!empty($data->settingsunlockdelete)) {
+            redirect(new moodle_url('/course/completion.php', array('id' => $course->id, 'unlockdelete' => 1)));
+        } else if (!empty($data->settingsunlock)) {
+            redirect(new moodle_url('/course/completion.php', array('id' => $course->id, 'unlockonly' => 1)));
+        }
 
-        add_to_log($course->id, 'course', 'completion data reset', 'completion.php?id='.$course->id);
-
-        $completion->delete_course_completion_data();
-
-        // Return to form (now unlocked)
-        redirect(new moodle_url('/course/completion.php', array('id' => $course->id)));
-    }
-
-    if (!empty($data->settingsunlock) && completion_can_unlock_data($course->id)) {
-
-        add_to_log($course->id, 'course', 'completion unlocked without reset', 'completion.php?id='.$course->id);
-
-        // Return to form (now unlocked)
-        redirect("{$CFG->wwwroot}/course/completion.php?id={$course->id}&unlocked=1");
+        // Check if the form was submitted while unlocked.
+        if ($unlockdelete) {
+            // The "Unlock and delete" button was clicked, so log and delete the course completion data.
+            add_to_log($course->id, 'course', 'completion data reset', 'completion.php?id='.$course->id);
+            $completion->delete_course_completion_data();
+        } else if ($unlockonly) {
+            // The "Unlock without deleting" button was clicked, so just log it and continue.
+            add_to_log($course->id, 'course', 'completion unlocked without reset', 'completion.php?id='.$course->id);
+        }
+    } else if ($completion->is_course_locked(false)) {
+        // Abort saving changes if the course is locked (and it wasn't unlocked above).
+        print_error('coursecompletionislocked');
     }
 
 /// process data if submitted
-    // Delete old data if required
-    if (completion_can_unlock_data($course->id) && !$unlocked) {
-        $completion->delete_course_completion_data();
-    }
-
     // Loop through each criteria type and run update_config
     $transaction = $DB->start_delegated_transaction();
 

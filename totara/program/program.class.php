@@ -239,7 +239,7 @@ class program {
     public function delete_completion_record($userid, $deletecompleted=false) {
         global $DB;
 
-        if ($deletecompleted === true || ! $this->is_program_complete($userid)) {
+        if ($deletecompleted === true || !prog_is_complete($this->id, $userid)) {
             $DB->delete_records('prog_completion', array('programid' => $this->id, 'userid' => $userid));
         }
 
@@ -260,16 +260,26 @@ class program {
     public function update_learner_assignments() {
         global $DB, $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
-        // Get program assignments
+        // Get program assignments.
         $prog_assignments = $this->assignments->get_assignments();
         if (!$prog_assignments) {
             $prog_assignments = $DB->get_records('prog_assignment', array('programid' => $this->id));
         }
 
-        // Get user assignments only if there assignments for this program
-        if ($prog_assignments) {
-            $user_assignments = $DB->get_records('prog_user_assignment', array('programid' => $this->id), 'timeassigned DESC, userid');
+        // Get user assignments only if there are assignments for this program.
+        $params = array('programid' => $this->id);
+        $fields = 'id, userid, assignmentid, timeassigned, exceptionstatus';
+        $rawuserassignments = $DB->get_recordset('prog_user_assignment', $params, '', $fields);
+        $alluserassignments = array();
+
+        foreach ($rawuserassignments as $rawassign) {
+            $alluserassignments[$rawassign->assignmentid][$rawassign->userid] = array('uaid' => $rawassign->id,
+                                                                                      'exception' => $rawassign->exceptionstatus,
+                                                                                      'timeassigned' => $rawassign->timeassigned);
         }
+
+        // Get a list of all enrolment messages for the program.
+        $enrolment_msgids = $DB->get_fieldset_select('prog_message', 'id', 'programid = ? and messagetype = ?', array($this->id, MESSAGETYPE_ENROLMENT));
 
         $assigned_user_ids = array();
         $active_assignments = array();
@@ -278,6 +288,7 @@ class program {
         if ($prog_assignments) {
             foreach ($prog_assignments as $assign) {
                 $active_assignments[] = $assign->id;
+                $userassignments = isset($alluserassignments[$assign->id]) ? $alluserassignments[$assign->id] : array();
                 $newassignusers = array();
                 $newassigncount = 0;
                 $fassignusers = array();
@@ -292,20 +303,17 @@ class program {
                 $affected_users = $assignment_class->get_affected_users_by_assignment($assign);
 
                 // Delete user assigned that no longer match the category assignment.
-                if (!empty($user_assignments)) {
-                    // Get prog_user_assignment records for this assignment.
-                    $select = "programid = ? AND assignmentid = ?";
-                    $params = array($this->id, $assign->id);
-                    $userassignments = $DB->get_fieldset_select('prog_user_assignment', 'userid', $select, $params);
+                if (!empty($userassignments)) {
+                    $assigneduserids = array_keys($userassignments);
 
-                    // Transform $affected_users into an array of ids.
-                    $useraffected = array();
+                    // Transform $affected_users into an array of userids.
+                    $affecteduserids = array();
                     foreach ($affected_users as $user) {
-                        $useraffected[] = $user->id;
+                        $affecteduserids[] = $user->id;
                     }
 
                     // Get users that no longer match the category assignment.
-                    $userstoremove = array_diff($userassignments, $useraffected);
+                    $userstoremove = array_diff($assigneduserids, $affecteduserids);
 
                     if (!empty($userstoremove)) {
                         $assignment_class->remove_outdated_assignments($this->id, $assign->assignmenttypeid, $userstoremove);
@@ -325,33 +333,30 @@ class program {
 
                     $user_exists = false;
                     $user_assign_data = null;
-                    foreach ($user_assignments as $ua) {
-                        // Check user exists for current assignment
-                        if ($user->id == $ua->userid && $ua->assignmentid == $assign->id) {
-                            $sendmessage = false;
 
-                            $exception = $DB->get_record('prog_exception', array('userid' => $ua->userid, 'assignmentid' => $ua->assignmentid));
+                    // Check if the user is already assigned.
+                    $userexists = false;
+                    if (isset($userassignments[$user->id])) {
+                        $userexists = true;
+                        $sendmessage = false;
+                        $user_assign_data = $userassignments[$user->id];
 
-                            if (!empty($exception) && $exception->timeraised == $ua->timeassigned) {
-                                // This exception was raised the first time they were assigned, they haven't received an assignment message yet.
-                                $sendmessage = true;
-                            }
-
-                            $user_exists = true;
-                            $user_assign_data = $ua;
-                            break;
+                        $exception = $DB->get_record('prog_exception', array('userid' => $user->id, 'assignmentid' => $assign->id));
+                        if (!empty($exception) && $exception->timeraised == $user_assign_data['timeassigned']) {
+                            // This exception was raised the first time they were assigned, meaning they haven't received an assignment message yet.
+                            $sendmessage = true;
                         }
                     }
 
-                    if ($user_exists) {
-                        // Check if updates need to be made
+                    if ($userexists) {
+                        // Check if updates need to be made.
 
-                        // Create user assignment object
-                        $current_assignment = new user_assignment($user->id, $user_assign_data->assignmentid, $this->id);
+                        // Create user assignment object.
+                        $current_assignment = new user_assignment($user->id, $assign->id, $this->id);
 
                         // Skip resolved and dismissed exceptions to allow users to override group duedates.
                         $skipstatus = array(PROGRAM_EXCEPTION_RESOLVED, PROGRAM_EXCEPTION_DISMISSED);
-                        if (isset($user_assign_data->exceptionstatus) && in_array($user_assign_data->exceptionstatus, $skipstatus)) {
+                        if (isset($user_assign_data['exceptionstatus']) && in_array($user_assign_data['exceptionstatus'], $skipstatus)) {
                             continue;
                         }
 
@@ -359,8 +364,8 @@ class program {
                             // The timedue has changed, we'll need to update it and check for exceptions.
 
                             if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
-                                // this means that the user hasn't logged in yet
-                                // create a future assignment so we can assign them when they do login
+                                // This means that the user hasn't logged in yet.
+                                // Create a future assignment so we can assign them when they do login.
                                 $fassigncount++;
                                 $fassignusers[$user->id] = $user->id;
                                 if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
@@ -374,10 +379,10 @@ class program {
                             }
 
                             $exceptions = $this->update_exceptions($user->id, $assign, $timedue);
-                            // Update user assignment including checking for exceptions
+                            // Update user assignment including checking for exceptions.
                             if ($current_assignment->update($timedue)) {
                                 $user_assign_todb = new stdClass();
-                                $user_assign_todb->id = $user_assign_data->id;
+                                $user_assign_todb->id = $user_assign_data['uaid'];
                                 $user_assign_todb->exceptionstatus = $exceptions ? PROGRAM_EXCEPTION_RAISED : PROGRAM_EXCEPTION_NONE;
 
                                 $DB->update_record('prog_user_assignment', $user_assign_todb);
@@ -395,8 +400,8 @@ class program {
                         }
                     } else {
                         if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
-                            // this means that the user hasn't logged in yet
-                            // create a future assignment so we can assign them when they do login
+                            // This means that the user hasn't logged in yet.
+                            // Create a future assignment so we can assign them when they do login.
                             $fassigncount++;
                             $fassignusers[$user->id] = $user->id;
                             if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
@@ -411,7 +416,7 @@ class program {
 
                         $exceptions = $this->update_exceptions($user->id, $assign, $timedue);
 
-                        // No record in user_assignment we need to make one
+                        // No record in user_assignment we need to make one.
                         $newassigncount++;
                         $newassignusers[$user->id] = array('timedue' => $timedue, 'exceptions' => $exceptions);
                         if ($newassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
@@ -477,7 +482,7 @@ class program {
             }
         }
 
-        // Get an array of user ids, of the users who should be in this program
+        // Get an array of user ids, of the users who should be in this program.
         $users_who_should_be_assigned = $assigned_user_ids;
 
         // Get all users who are assigned, as we want to unassign them all.
@@ -499,17 +504,15 @@ class program {
             $this->unassign_learners(array_keys($users_to_unassign));
         }
 
-        // Users can have multiple assignments to a program
-        // We need this to clean up unnecessary redundant assignments caused
-        // when removing an assignment type
+        // Users can have multiple assignments to a program.
+        // We need this to clean up unnecessary redundant assignments caused when removing an assignment type.
         if (count($active_assignments) > 0) {
             list($usql, $params) = $DB->get_in_or_equal($active_assignments, SQL_PARAMS_QM, '', false);
             $params[] = $this->id;
 
             $DB->delete_records_select('prog_user_assignment', "assignmentid {$usql} AND programid = ?", $params);
 
-            // delete any future_user_assignment records too that are related to
-            // assignment types that have been deleted too
+            // Delete any future_user_assignment records too that are related to assignment types that have been deleted too.
             $DB->delete_records_select('prog_future_user_assignment', "assignmentid {$usql} AND programid = ?", $params);
         }
 
@@ -693,7 +696,7 @@ class program {
             // check if this program is also part of any of the user's learning plans
             if (!$this->assigned_to_users_non_required_learning($userid)) {
                 // delete the completion record if the program is not complete
-                if (!$this->is_program_complete($userid)) {
+                if (!prog_is_complete($this->id, $userid)) {
                     $this->delete_completion_record($userid);
                 }
             }
@@ -863,13 +866,8 @@ class program {
      * @return bool
      */
     public function is_program_complete($userid) {
-        global $DB;
-        if ($prog_completion_status = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0))) {
-            if ($prog_completion_status->status == STATUS_PROGRAM_COMPLETE) {
-                return true;
-            }
-        }
-        return false;
+        debugging('$program->is_program_complete() is deprecated, use the lib function prog_is_complete() instead', DEBUG_DEVELOPER);
+        prog_is_complete($this->id, $userid);
     }
 
     /**
@@ -880,13 +878,8 @@ class program {
      * @return bool
      */
     public function is_program_inprogress($userid) {
-        global $DB;
-        if ($prog_completion_status = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0))) {
-            if ($prog_completion_status->status == STATUS_PROGRAM_INCOMPLETE && $prog_completion_status->timestarted > 0) {
-                return true;
-            }
-        }
-        return false;
+        debugging('$program->is_program_inprogress() is deprecated, use the lib function prog_is_inprogress() instead', DEBUG_DEVELOPER);
+        prog_is_inprogress($this->id, $userid);
     }
 
     /**
@@ -1025,7 +1018,7 @@ class program {
     public function get_progress($userid) {
 
         // first check if the whole program has been completed
-        if ($this->is_program_complete($userid)) {
+        if (prog_is_complete($this->id, $userid)) {
             return (float)100;
         }
 
@@ -1140,7 +1133,7 @@ class program {
         // Div created to show notifications. Needed when requesting extensions.
         $out = html_writer::tag('div', '', array('id' => 'totara-header-notifications'));
 
-        if (!$this->is_accessible()) {
+        if (!prog_is_accessible($this)) {
             // Return if program is not accessible
             return html_writer::tag('p', get_string('programnotcurrentlyavailable', 'totara_program'));
         }
@@ -1256,9 +1249,9 @@ class program {
                                 ? $this->display_date_as_text($prog_completion->timestarted)
                                 : get_string('nostartdate', 'totara_program'));
                 if ($iscertif) {
-                    $duedatestr = $this->display_duedate($timedue, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
+                    $duedatestr = prog_display_duedate($timedue, $this->id, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
                 } else {
-                    $duedatestr = $this->display_duedate($timedue, $prog_completion->userid);
+                    $duedatestr = prog_display_duedate($timedue, $this->id, $prog_completion->userid);
                 }
                 $duedatestr .= $request;
 
@@ -1268,7 +1261,7 @@ class program {
                 $out .= html_writer::tag('div', get_string('duedate', 'totara_program').': '
                                 . $duedatestr, array('class' => 'item'));
                 $out .= html_writer::tag('div', get_string('progress', 'totara_program') . ': '
-                                . $this->display_progress($userid), array('class' => 'item'));
+                                . prog_display_progress($this->id, $userid), array('class' => 'item'));
                 $out .= html_writer::end_tag('div');
             }
         }
@@ -1390,33 +1383,6 @@ class program {
     }
 
     /**
-     * Display widget containing a program summary
-     *
-     * @return string $out
-     */
-    function display_summary_widget($userid=null) {
-        global $USER;
-
-        $params = array();
-        if (($userid != null) && ($userid != $USER->id)) {
-            $params['userid'] = $userid;
-        }
-        $params['id'] = $this->id;
-        $url = new moodle_url("/totara/program/required.php", $params);
-        $summary = file_rewrite_pluginfile_urls($this->summary, 'pluginfile.php',
-                context_program::instance($this->id)->id, 'totara_program', 'summary', 0);
-
-        $out = '';
-        $out .= html_writer::start_tag('div', array('class' => 'cell'));
-        $out .= html_writer::link($url, $this->fullname);
-        $out .= html_writer::end_tag('div');
-        $out .= html_writer::start_tag('div', array('class' => 'dp-summary-widget-description'));
-        $out .= $summary . html_writer::end_tag('div');
-
-        return $out;
-    }
-
-    /**
      * Display the due date for a program
      *
      * @param int $duedate
@@ -1426,36 +1392,8 @@ class program {
      * @return string
      */
     function display_duedate($duedate, $userid, $certifpath = null, $certstatus = null) {
-        global $OUTPUT;
-
-        if (empty($duedate) || $duedate == COMPLETION_TIME_NOT_SET) {
-            if ($certifpath == null && $certstatus == null) {
-                // This is a program, display no due date set.
-                return get_string('duedatenotset', 'totara_program');
-            } else if ($certifpath == CERTIFPATH_CERT) {
-                if ($certstatus == CERTIFSTATUS_EXPIRED) {
-                    // This certification has expired.
-                    return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
-                } else {
-                    // This is the first run through of the certification and no due date was set.
-                    return get_string('duedatenotset', 'totara_program');
-                }
-            } else {
-                // Something has gone wrong here, a certification on recert should always have a duedate.
-                print_error('error:recertduedatenotset', 'totara_program');
-            }
-
-        }
-
-        $out = '';
-        $out .= $this->display_date_as_text($duedate);
-
-        // Highlight dates that are overdue or due soon if program is not complete.
-        if (!$this->is_program_complete($userid)) {
-            $out .= $this->display_duedate_highlight_info($duedate);
-        }
-
-        return $out;
+        debugging('$program->display_duedate() is deprecated, use the lib function display_duedate() instead', DEBUG_DEVELOPER);
+        prog_display_duedate($duedate, $this->id, $userid, $certifpath, $certstatus);
     }
 
     /**
@@ -1481,23 +1419,11 @@ class program {
      * @return string
      */
     function display_duedate_highlight_info($duedate) {
-        global $OUTPUT;
+        global $PAGE;
 
-        $out = '';
-        $now = time();
-        if (isset($duedate)) {
-            $out .= html_writer::start_tag('span', array('class' => 'plan_highlight'));
-            if (($duedate < $now) && ($now - $duedate < 60*60*24)) {
-                $out .= get_string('duetoday', 'totara_plan');
-            } else if ($duedate < $now) {
-                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_plan'));
-            } else if ($duedate - $now < 60*60*24*7) {
-                $days = ceil(($duedate - $now)/(60*60*24));
-                $out .= get_string('dueinxdays', 'totara_plan', $days);
-            }
-            $out .= html_writer::end_tag('span');
-        }
-        return $out;
+        debugging('$program->display_duedate_highligh_info() is deprecated, use the renderer function display_duedate_highlight_info() instead', DEBUG_DEVELOPER);
+        $renderer = $PAGE->get_renderer('totara_program');
+        $renderer->display_duedate_highlight_info($duedate);
     }
 
     /**
@@ -1510,24 +1436,9 @@ class program {
      * @return  string
      */
     public function display_progress($userid) {
-        global $DB, $PAGE;
-
-        $prog_completion = $DB->get_record('prog_completion', array('programid' => $this->id, 'userid' => $userid, 'coursesetid' => 0));
-
-        if (!$prog_completion) {
-            $out = get_string('notassigned', 'totara_program');
-            return $out;
-        } else if ($prog_completion->status == STATUS_PROGRAM_COMPLETE) {
-            $overall_progress = 100;
-        } else {
-            $overall_progress = $this->get_progress($userid);
-        }
-
-        $tooltipstr = 'DEFAULTTOOLTIP';
-
-        // Get relevant progress bar and return for display
-        $renderer = $PAGE->get_renderer('totara_core');
-        return $renderer->print_totara_progressbar($overall_progress, 'medium', false, $tooltipstr);
+        // Deprecate instead of remove incase someone is using this.
+        debugging('$program->display_progress() is deprecated, use the lib function prog_display_progress() instead', DEBUG_DEVELOPER);
+        prog_display_progress($this->id, $userid);
     }
 
     public function display_timedue_date($completionstatus, $time, $format = '') {
@@ -1545,7 +1456,7 @@ class program {
 
         $days = '';
         if ($completionstatus != STATUS_PROGRAM_COMPLETE) {
-            $days_remaining = floor(($time - time()) / 86400);
+            $days_remaining = floor(($time - time()) / DAYSECS);
             if ($days_remaining == 1) {
                 $days = get_string('onedayremaining', 'totara_program');
             } else if ($days_remaining < 10 && $days_remaining > 0) {
@@ -1562,32 +1473,9 @@ class program {
     }
 
     public function display_link_program_icon($programname, $program_id, $program_icon, $userid = null) {
-        global $OUTPUT, $USER;
-        if ($userid == null) {
-            $userid = $USER->id;
-        }
-        $programid = $program_id;
-
-        $program = new program($programid);
-        $icon = html_writer::empty_tag('img', array('src' => totara_get_icon($programid, TOTARA_ICON_TYPE_PROGRAM),
-            'class' => 'course_icon', 'alt' => ''));
-
-        if ($program->is_required_learning($userid) && $program->is_accessible()) {
-            $html = $OUTPUT->action_link(
-                new moodle_url('/totara/program/required.php', array('id' => $programid, 'userid' => $userid)),
-                $icon . $programname
-            );
-        } else if ($program->is_accessible()) {
-            $html = $OUTPUT->action_link(
-                new moodle_url('/totara/program/view.php', array('id' => $programid)),
-                $icon . $programname
-            );
-        } else {
-            $html = $icon . $programname;
-        }
-
-        return $html;
-
+        // Deprecate instead of remove incase someone is using this.
+        debugging('$program->display_link_program_icon() is deprecated, use the lib function prog_display_link_icon() instead', DEBUG_DEVELOPER);
+        prog_display_link_icon($program_id, $userid);
     }
 
     /**
@@ -1669,7 +1557,7 @@ class program {
             }
         }
 
-        if (!$this->is_accessible()) {
+        if (!prog_is_accessible($this)) {
             $data->statusstr = 'programnotavailable';
         }
 
@@ -1721,61 +1609,12 @@ class program {
      * passed to the function otherwise checks if the program is generally
      * accessible.
      *
-     * @global object $USER
      * @param object $user If this parameter is included check availibilty to this user
      * @return boolean
      */
     public function is_accessible($user = null) {
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/cohort/lib.php');
-
-        // If a user is set check if they area a site admin, if so, let them have access.
-        if (!empty($user->id)) {
-            if (is_siteadmin($user->id)) {
-                return true;
-            }
-        }
-
-        // Check if this program is not available, if it's not then deny access
-        if ($this->available == AVAILABILITY_NOT_TO_STUDENTS) {
-            return false;
-        }
-
-        // Check if this program has from and until dates set, if so, enforce them
-        if (!empty($this->availablefrom) || !empty($this->availableuntil)) {
-
-            if (isset($user->timezone)) {
-                $now = usertime(time(), $user->timezone);
-            } else {
-                $now = usertime(time());
-            }
-
-            // Check if the program isn't accessible yet
-            if (!empty($this->availablefrom) && $this->availablefrom > $now) {
-                return false;
-            }
-
-            // Check if the program isn't accessible anymore
-            if (!empty($this->availableuntil) && $this->availableuntil < $now) {
-                return false;
-            }
-        }
-
-        // Check audience visibility.
-        if ($this->certifid) {
-            $capability = 'totara/certification:viewhiddencertifications';
-        } else {
-            $capability = 'totara/program:viewhiddenprograms';
-        }
-
-        $syscontext = context_system::instance();
-        $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $syscontext) ||
-            has_capability($capability, $syscontext);
-        if (!empty($CFG->audiencevisibility) && !$canmanagevisibility && $this->audiencevisible == COHORT_VISIBLE_NOUSERS) {
-            return false;
-        }
-
-        return true;
+        debugging('$program->is_accessible() is deprecated, use the lib function prog_is_accessible() instead', DEBUG_DEVELOPER);
+        prog_is_accessible($this);
     }
 
     /**
@@ -1820,35 +1659,20 @@ class program {
     }
 
     /**
-     * Checks if this proram is required learning for
+     * Checks if this program is required learning for
      * given user or current user
      *
      * @param int $userid User ID to check (optional)
      * @return bool Returns true if this program is required learning
      */
-    public function is_required_learning($userid=0) {
-        global $DB, $USER;
+    public function is_required_learning($userid = 0) {
+        global $USER;
 
-        if (!$userid) {
-            $userid = $USER->id;
-        }
-        list($usql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED), SQL_PARAMS_QM, '', false);
-        $params[] = $this->id;
-        $params[] = $userid;
-        $sql = "SELECT COUNT(*)
-            FROM
-                {prog_user_assignment}
-            WHERE
-                exceptionstatus $usql
-            AND
-                programid = ?
-            AND
-                userid = ?";
-        if ($DB->count_records_sql($sql, $params) > 0 && !$this->is_program_complete($userid)) {
-            return true;
-        }
+        // Deprecate instead of remove incase someone is using this.
+        debugging('$program->is_required_learning() is deprecated, use the lib function prog_required_for_user() instead', DEBUG_DEVELOPER);
 
-        return false;
+        $userid = !empty($userid) ? $userid : $USER->id;
+        return prog_required_for_user($this->id, $userid);
     }
 
     /**

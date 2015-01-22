@@ -179,6 +179,7 @@ $string['confirmsesskeybad'] = 'Sorry, but your session key could not be confirm
 $string['couldnotassignrole'] = 'A serious but unspecified error occurred while trying to assign a role to you';
 $string['couldnotupdatenoexistinguser'] = 'Cannot update the user - user doesn\'t exist';
 $string['countriesphpempty'] = 'Error: The file countries.php in language pack {$a} is empty or missing.';
+$string['coursecompletionislocked'] = 'Course completion settings could not be saved because they are locked';
 $string['coursedoesnotbelongtocategory'] = 'The course doesn\'t belong to this category';
 $string['courseformatnotfound'] = 'The course format \'{$a}\' doesn\'t exist or is not recognized';
 $string['coursegroupunknown'] = 'Course corresponding to group {$a} not specified';

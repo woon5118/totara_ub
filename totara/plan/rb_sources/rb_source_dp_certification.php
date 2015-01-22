@@ -263,13 +263,14 @@ class rb_source_dp_certification extends rb_base_source {
                       ELSE 0 END',
                 array(
                     'joins' => array('prog_completion', 'certif_completion'),
-                    'displayfunc' => 'timedue_date',
                     'dbdatatype' => 'timestamp',
+                    'displayfunc' => 'certification_duedate',
                     'extrafields' => array(
                         'timedue' => 'prog_completion.timedue',
                         'status' => 'certif_completion.status',
                         'programid' => 'base.id',
                         'certifpath' => 'certif_completion.certifpath',
+                        'certifstatus' => 'certif_completion.status',
                         'timeexpires' => 'certif_completion.timeexpires',
                         'userid' => 'prog_completion.userid',
                     )
@@ -392,7 +393,8 @@ class rb_source_dp_certification extends rb_base_source {
                 'defaultheading' => get_string('progress', 'rb_source_dp_course'),
                 'extrafields' => array(
                     'programid' => "base.id",
-                    'userid' => "certif_completion.userid"
+                    'userid' => "certif_completion.userid",
+                    'certifpath' => "certif_completion.certifpath"
                 )
             )
         );
@@ -690,32 +692,7 @@ class rb_source_dp_certification extends rb_base_source {
 
 
     function rb_display_link_program_icon($certificationname, $row) {
-        $program = new program($row->programid);
-        return $program->display_link_program_icon($certificationname, $row->programid, $row->program_icon, $row->userid);
-    }
-
-
-    function rb_display_timedue_date($time, $row) {
-        global $OUTPUT;
-
-        $program = new program($row->programid);
-
-        if (empty($row->timeexpires)) {
-            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
-                // There is no time due set.
-                return get_string('duedatenotset', 'totara_program');
-            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
-                // User is still in the first stage of certification, not overdue yet.
-                return $program->display_duedate($row->timedue, $row->userid, $row->certifpath, $row->status);
-            } else {
-                // Looks like the certification has expired, overdue!
-                return $OUTPUT->error_text(get_string('overdue', 'totara_program'));
-            }
-        } else {
-            return $program->display_duedate($row->timeexpires, $row->userid, $row->certifpath, $row->status);
-        }
-
-        return '';
+        return prog_display_link_icon($row->programid, $row->userid);
     }
 
 
@@ -818,8 +795,7 @@ class rb_source_dp_certification extends rb_base_source {
     }
 
     function rb_display_progress($status, $row) {
-        $program = new program($row->programid);
-        return $program->display_progress($row->userid);
+        return prog_display_progress($row->programid, $row->userid, $row->certifpath);
     }
 
 

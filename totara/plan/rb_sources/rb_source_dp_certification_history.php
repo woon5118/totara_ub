@@ -435,7 +435,6 @@ class rb_source_dp_certification_history extends rb_base_source {
 
 
     function rb_display_link_program_icon($certificationname, $row) {
-        $program = new program($row->programid);
-        return $program->display_link_program_icon($certificationname, $row->programid, $row->program_icon, $row->userid);
+        return prog_display_link_icon($row->programid, $row->userid);
     }
 }

@@ -620,7 +620,7 @@ class dp_program_component extends dp_base_component {
             }
 
             // check that the program is not complete (don't delete the history record if the program has already been completed)
-            if (!$program->is_program_complete($userid)) {
+            if (!prog_is_complete($program->id, $userid)) {
                 $result = $program->delete_completion_record($userid);
             }
             return $result;
@@ -694,8 +694,7 @@ class dp_program_component extends dp_base_component {
      * @return string the item status
      */
     protected function display_list_item_progress($item) {
-        $program = new program($item->programid);
-        return $this->is_item_approved($item->approved) ? $program->display_progress($this->plan->userid) : get_string('unapproved', 'totara_plan');
+        return $this->is_item_approved($item->approved) ? prog_display_progress($item->programid, $this->plan->userid) : get_string('unapproved', 'totara_plan');
     }
 
     /**
@@ -748,7 +747,7 @@ class dp_program_component extends dp_base_component {
      * @return  string
      */
     public function display_item_name($item) {
-        global $CFG, $OUTPUT;
+        global $CFG, $DB, $OUTPUT;
         $approved = $this->is_item_approved($item->approved);
         $viewingasmanager = $this->plan->role == 'manager';
 
@@ -757,8 +756,8 @@ class dp_program_component extends dp_base_component {
             $extraparams = $this->plan->userid;
         }
 
-        $prog = new program($item->programid);
-        $accessible = $prog->is_accessible();
+        $prog = $DB->get_record('prog', array('id' => $item->programid));
+        $accessible = prog_is_accessible($prog);
 
         $itemicon = ($item && !empty($item->icon)) ? $item->icon : 'default';
         $img = html_writer::empty_tag('img', array('src' => totara_get_icon($item->programid, TOTARA_ICON_TYPE_PROGRAM),
@@ -833,17 +832,12 @@ class dp_program_component extends dp_base_component {
                     continue;
                 }
                 // Determine program completion
-                $prog = new program($p->programid);
-                if (!$prog) {
-                    continue;
-                }
-
-                if ($prog->is_program_complete($this->plan->userid)) {
+                if (prog_is_complete($p->programid, $this->plan->userid)) {
                     $completionsum ++;
                     $completedcount++;
                 }
 
-                if ($prog->is_program_inprogress($this->plan->userid)) {
+                if (prog_is_inprogress($p->programid, $this->plan->userid)) {
                     $inprogresscount ++;
                 }
             }

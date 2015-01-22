@@ -374,6 +374,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
 
 
     public function rb_cols_generator_totals($columnoption, $hidden) {
+        global $DB;
+
         if (empty($this->appraisalid)) {
             return array();
         }
@@ -392,7 +394,7 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
             if ($field != '') {
                 $field .= ' + ';
             }
-            $field .= 'COALESCE(' . $columnoption->field . $question->id . ', 0)';
+            $field .= 'COALESCE(' . $DB->sql_cast_char2int( $columnoption->field . $question->id . 'score') . ',0)';
             $maximum += $question->get_element()->get_max();
             $minimum += $question->get_element()->get_min();
         }

@@ -1195,6 +1195,7 @@ class facetoface_lib_testcase extends advanced_testcase {
             MDL_F2F_STATUS_REQUESTED,
             $user1->id,
             true,
+            null,
             '',
             $posasssec
         );
@@ -1857,6 +1858,7 @@ class facetoface_lib_testcase extends advanced_testcase {
             MDL_F2F_STATUS_BOOKED,
             $user1->id,
             true,
+            null,
             ''
         );
 
@@ -1870,6 +1872,7 @@ class facetoface_lib_testcase extends advanced_testcase {
             MDL_F2F_STATUS_WAITLISTED,
             $user2->id,
             true,
+            null,
             ''
         );
         $messages = $sink->get_messages();
@@ -1925,6 +1928,6 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->assertCount(1, $messages);
         $message = reset($messages);
         $this->assertEquals($user2->id, $message->useridto);
-        $this->assertEquals(0, $message->useridfrom);
+        $this->assertEquals(-10, $message->useridfrom);
     }
 }

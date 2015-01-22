@@ -190,7 +190,9 @@ class totara_dialog_content_programs extends totara_dialog_content {
      * @return  boolean
      */
     public function search_can_display_result($programid) {
-        $prog = new program($programid);
-        return $prog->is_accessible();
+        global $DB;
+
+        $prog = $DB->get_record('prog', array('id' => $programid));
+        return prog_is_accessible($prog);
     }
 }

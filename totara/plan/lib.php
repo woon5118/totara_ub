@@ -880,8 +880,7 @@ function dp_display_plans_menu_required($programs, $extraparams, $progcount=0) {
             break;
         }
         // hide inaccessible programs
-        $prog = new program($p->id);
-        if (!$prog->is_accessible()) {
+        if (!prog_is_accessible($p)) {
             continue;
         }
         $urlparams['id'] = $p->id;

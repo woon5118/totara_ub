@@ -1355,6 +1355,57 @@ abstract class rb_base_source {
         return $link;
     }
 
+    /**
+     * Generates the HTML to display the due/expiry date of a program/certification.
+     *
+     * @param int $time     The duedate of the program
+     * @param record $row   The whole row, including some required fields
+     * @return html
+     */
+    public function rb_display_program_duedate($time, $row) {
+        // Get the necessary fields out of the row.
+        $duedate = $row->timedue;
+        $userid = $row->userid;
+        $progid = $row->programid;
+        $status = $row->status;
+        $certifpath = isset($row->certifpath) ? $row->certifpath : null;
+        $certifstatus = isset($row->certifstatus) ? $row->certifstatus : null;
+
+        return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status);
+    }
+
+    /**
+     * Generates the HTML to display the due/expiry date of a certification.
+     *
+     * @param int $time     The duedate of the program
+     * @param record $row   The whole row, including some required fields
+     * @return html
+     */
+    public function rb_display_certification_duedate($time, $row) {
+        global $OUTPUT, $CFG;
+
+        if (empty($row->timeexpires)) {
+            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
+                // There is no time due set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+                // User is still in the first stage of certification, not overdue yet.
+                return $this->rb_display_program_duedate($time, $row);
+            } else {
+                // Looks like the certification has expired, overdue!
+                $out = '';
+                $out .= userdate($row->timedue, get_string('strfdateshortmonth', 'langconfig'), $CFG->timezone, false);
+                $out .= html_writer::empty_tag('br');
+                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+                return $out;
+            }
+        } else {
+            return $this->rb_display_program_duedate($time, $row);
+        }
+
+        return '';
+    }
+
 
     // display grade along with passing grade if it is known
     function rb_display_grade_string($item, $row) {
@@ -1777,7 +1828,6 @@ abstract class rb_base_source {
                 array(
                     'joins' => $join,
                     'displayfunc' => 'user_email_unobscured',
-                    'defaultheading' => get_string('useremail', 'totara_reportbuilder'),
                     // Users must have viewuseridentity to see the
                     // unobscured email address.
                     'capability' => 'moodle/site:viewuseridentity',
@@ -1917,6 +1967,7 @@ abstract class rb_base_source {
      * @return True
      */
     protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user') {
+        global $CFG;
         // auto-generate filters for user fields
         $fields = array(
             'fullname' => get_string('userfullname', 'totara_reportbuilder'),
@@ -1935,6 +1986,12 @@ abstract class rb_base_source {
             'city' => get_string('usercity', 'totara_reportbuilder'),
             'email' => get_string('useremail', 'totara_reportbuilder'),
         );
+        // Only include this filter if email is among fields allowed
+        // by showuseridentity setting.
+        if (!empty($CFG->showuseridentity) && in_array('email', explode(',', $CFG->showuseridentity))) {
+            $fields['emailunobscured'] = get_string('useremailunobscured', 'totara_reportbuilder');
+        }
+
         foreach ($fields as $field => $name) {
             $filteroptions[] = new rb_filter_option(
                 $groupname,

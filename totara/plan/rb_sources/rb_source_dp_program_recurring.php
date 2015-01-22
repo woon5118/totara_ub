@@ -196,8 +196,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
     }
 
     function rb_display_link_program_icon($programname, $row) {
-        $program = new program($row->programid);
-        return $program->display_link_program_icon($programname, $row->programid, $row->program_icon);
+        return prog_display_link_icon($row->programid, $row->userid);
     }
 
 

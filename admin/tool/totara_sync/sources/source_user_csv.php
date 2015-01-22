@@ -220,7 +220,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
         // Throw an exception if fields contain invalid characters
         foreach ($fields as $field) {
-            $invalidchars = preg_replace('/[?!A-Za-z0-9_-]/i', '', $field);
+            $invalidchars = preg_replace('/[ ?!A-Za-z0-9_-]/i', '', $field);
             if (strlen($invalidchars)) {
                 $errorvar = new stdClass();
                 $errorvar->invalidchars = $invalidchars[0];

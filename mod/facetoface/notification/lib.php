@@ -541,9 +541,10 @@ class facetoface_notification extends data_object {
      * @param   object  $user       User object
      * @param   int     $sessionid
      * @param   int     $sessiondate The specific sessiondate which this message is for.
+     * @param   object  $fromuser User object describing who the email is from.
      * @return  object
      */
-    public function set_newevent($user, $sessionid, $sessiondate = null) {
+    public function set_newevent($user, $sessionid, $sessiondate = null, $fromuser = null) {
         global $CFG, $USER, $DB;
 
         // Load facetoface object
@@ -565,6 +566,10 @@ class facetoface_notification extends data_object {
 
         if (!empty($sessiondate)) {
             $this->_sessions[$sessionid]->sessiondates = array($sessiondate);
+        }
+
+        if (empty($fromuser)) {
+            $fromuser = $USER;
         }
 
         $options = array('context' => context_course::instance($this->_facetoface->course));
@@ -601,7 +606,7 @@ class facetoface_notification extends data_object {
         $this->_event->component   = 'totara_message';
         $this->_event->name        = 'alert';
         $this->_event->userto      = $user;
-        $this->_event->userfrom    = $USER;
+        $this->_event->userfrom    = $fromuser;
         $this->_event->roleid      = $CFG->learnerroleid;
         $this->_event->subject     = $subject;
         $this->_event->fullmessage       = $plaintext;
@@ -861,9 +866,10 @@ class facetoface_notification extends data_object {
  * @param array $params The parameters for the notification
  * @param int $icalattachmenttype The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
  * @param int $icalattachmentmethod The ical method type: MDL_F2F_INVITE or MDL_F2F_CANCEL
+ * @param object $fromuser User object describing who the email is from.
  * @return string Error message (or empty string if successful)
  */
-function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE) {
+function facetoface_send_notice($facetoface, $session, $userid, $params, $icalattachmenttype = MDL_F2F_TEXT, $icalattachmentmethod = MDL_F2F_INVITE, $fromuser = null) {
     global $DB, $CFG;
 
     $notificationdisable = get_config(null, 'facetoface_notificationdisable');
@@ -910,7 +916,7 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
             $ical_attach = facetoface_get_ical_attachment($icalattachmentmethod, $facetoface, $session, $userid);
             $notice->set_ical_attachment($ical_attach);
         }
-        $notice->set_newevent($user, $session->id);
+        $notice->set_newevent($user, $session->id, null, $fromuser);
         if ($session->notifyuser) {
             $notice->send_to_user($user, $session->id);
         }
@@ -996,9 +1002,10 @@ function facetoface_send_datetime_change_notice($facetoface, $session, $userid) 
  * @param integer $userid ID of the recipient of the email
  * @param integer $notificationtype Type of notifications to be sent @see {{MDL_F2F_INVITE}}
  * @param boolean $iswaitlisted If the user has been waitlisted
+ * @param object $fromuser User object describing who the email is from.
  * @returns string Error message (or empty string if successful)
  */
-function facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, $iswaitlisted) {
+function facetoface_send_confirmation_notice($facetoface, $session, $userid, $notificationtype, $iswaitlisted, $fromuser = null) {
     global $DB;
 
     $params = array(
@@ -1012,7 +1019,7 @@ function facetoface_send_confirmation_notice($facetoface, $session, $userid, $no
         $params['conditiontype'] = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
     }
 
-    return facetoface_send_notice($facetoface, $session, $userid, $params, $notificationtype, MDL_F2F_INVITE);
+    return facetoface_send_notice($facetoface, $session, $userid, $params, $notificationtype, MDL_F2F_INVITE, $fromuser);
 }
 
 
