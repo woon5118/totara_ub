@@ -229,7 +229,7 @@ class feedback360_add_quest_form extends question_choose_element_form {
         $mform->setType('feedback360id', PARAM_INT);
         $mform->addElement('hidden', 'questionid')->setValue(0);
         $mform->setType('questionid', PARAM_INT);
-        parent::definition(array(question_manager::GROUP_REVIEW), array('redisplay'));
+        parent::definition(array(question_manager::GROUP_REVIEW), array('redisplay', 'aggregate'));
     }
 }
 

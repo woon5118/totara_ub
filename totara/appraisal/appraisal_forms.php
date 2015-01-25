@@ -441,6 +441,8 @@ class appraisal_quest_edit_form extends question_base_form {
                 $this->add_role_matrix();
             } else if ($element->inherits_permissions()) {
                 $this->add_role_inherits_matrix();
+            } else if ($element instanceof question_aggregate) {
+                $this->add_role_override_matrix();
             } else {
                 $this->add_role_viewers();
             }
@@ -490,6 +492,47 @@ class appraisal_quest_edit_form extends question_base_form {
         }
         $mform->addElement('html', html_writer::start_tag('tr') .
                 html_writer::start_tag('td', array('class' => 'cell', 'colspan' => '4')));
+        $mform->addElement('static', 'roleserr', '');
+        $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
+
+        $mform->addElement('html', html_writer::end_tag('tbody') . html_writer::end_tag('table'));
+        $mform->addElement('html', get_string('roleaccessnotice', 'totara_appraisal'));
+    }
+
+    /**
+     * Add role override matrix to aggregate question field definition form
+     */
+    protected function add_role_override_matrix() {
+        $mform = & $this->_form;
+        $headcolumns = html_writer::tag('th', get_string('role', 'totara_appraisal'), array('class' => 'header')) .
+            html_writer::tag('th', get_string('view', 'totara_appraisal'), array('class' => 'header')) .
+            html_writer::tag('th', get_string('viewother', 'totara_appraisal'), array('class' => 'header'));
+        $header = html_writer::tag('thead', html_writer::tag('tr', $headcolumns));
+        $mform->addElement('html', html_writer::start_tag('table', array('class' => 'role_matrix')) . $header .
+            html_writer::start_tag('tbody'));
+
+        $permission_cananswer = appraisal::ACCESS_CANANSWER; // Used to determine if the users aggregate should be displayed.
+        $permission_viewother = appraisal::ACCESS_CANVIEWOTHER; // If set, overrides base question.
+
+        $roles = appraisal::get_roles();
+        $odd = false;
+        foreach ($roles as $roleid => $name) {
+            $odd = !$odd;
+            $rowclass = ($odd) ? 'r0' : 'r1';
+            $strrolename = html_writer::start_tag('tr', array('class' => $rowclass)) .
+                html_writer::tag('td', get_string($name, 'totara_appraisal')) .
+                html_writer::start_tag('td', array('class' => 'cell'));
+            $strnextcell = html_writer::end_tag('td') . html_writer::start_tag('td', array('class' => 'cell'));
+            $strclosingrow = html_writer::end_tag('td') . html_writer::end_tag('tr');
+            $mform->addElement('html', $strrolename);
+            $mform->addElement('advcheckbox', "roles[{$roleid}][{$permission_cananswer}]", '', '');
+            $mform->addElement('html', $strnextcell);
+            $mform->addElement('advcheckbox', "roles[{$roleid}][$permission_viewother]", '', '');
+            $mform->disabledIf("roles[{$roleid}][{$permission_viewother}]", "roles[{$roleid}][$permission_cananswer]");
+            $mform->addElement('html', $strclosingrow);
+        }
+        $mform->addElement('html', html_writer::start_tag('tr') .
+            html_writer::start_tag('td', array('class' => 'cell', 'colspan' => '4')));
         $mform->addElement('static', 'roleserr', '');
         $mform->addElement('html', html_writer::end_tag('td') . html_writer::end_tag('tr'));
 

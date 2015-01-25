@@ -25,6 +25,16 @@
 
 $string['add'] = 'Add';
 $string['addanotheroption'] = 'Add another option';
+$string['aggregate'] = 'Aggregate rating questions';
+$string['aggregate_help'] = 'Aggregate rating questions allow you to select ratings questions from previous pages
+    and aggregate the scores.';
+$string['aggregateaverage'] = 'Display average';
+$string['aggregatedisplayavg'] = ' Average score: {$a}';
+$string['aggregatedisplaymed'] = ' Median score: {$a}';
+$string['aggregatemedian'] = 'Display median';
+$string['aggregatenooptions'] = 'There are no selectable options for aggregation, options must be numerical or custom ratings questions and on an earlier page than the aggregate question.';
+$string['aggregatequestions'] = 'Rating questions';
+$string['aggregatetype'] = 'Aggregation Type';
 $string['answerrange'] = 'Answer range';
 $string['atleastonerequired'] = 'You must specify at least one item';
 $string['availablechoices'] = 'Available choices';
@@ -54,6 +64,7 @@ $string['defaultvalueoutrange'] = 'Default value out of range';
 $string['delete'] = 'Delete';
 $string['deletedquestion'] = 'Question deleted';
 $string['displaysettings'] = 'Display settings';
+$string['error:aggregatedisplayselect'] = 'You must select one (or both) of the average / median display options';
 $string['error:allowselectgoals'] = 'You must allow some goals to be added to the question';
 $string['error:invalidfunctioncalledinredisplay'] = 'A call was made to a function in a redisplay question which should never be
 called. This is caused by a programming error. This probably happened because a function in this module loaded a question
@@ -124,6 +135,7 @@ $string['questionaddheader'] = 'Add {$a}';
 $string['questioneditheader'] = 'Edit {$a}';
 $string['questionviewheader'] = 'View {$a}';
 $string['questionmanage'] = 'Manage question';
+$string['questiontypeaggregate'] = 'Aggregate rating questions';
 $string['questiontypetext'] = 'Short text';
 $string['questiontypelongtext'] = 'Long text';
 $string['questiontypemultichoice'] = 'Multiple choice (one answer)';
