@@ -248,7 +248,15 @@ $string['menuitem:formitemtargetattr_help'] = 'If selected, clicking this menu i
 $string['menuitem:formitemtitle'] = 'Menu title';
 $string['menuitem:formitemtitle_help'] = 'The name of this menu item. This field supports the <a href="http://docs.moodle.org/20/en/Multi-language_content_filter">multi-language content filter</a>.';
 $string['menuitem:formitemurl'] = 'Menu default url address';
-$string['menuitem:formitemurl_help'] = 'Start the URL with a "/" to make the link relative to your site URL. Otherwise start the URL with http:// or https://, i.e. http://extdomain.com';
+$string['menuitem:formitemurl_help'] = 'Start the URL with a "/" to make the link relative to your site URL. Otherwise start the URL with http:// or https://, i.e. http://extdomain.com
+
+You can also use following placeholders:
+
+* ##userid## - current user id
+* ##username## - current username
+* ##useremail## - current user email
+* ##courseid## - current course id
+';
 $string['menuitem:formitemvisibility'] = 'Visibility';
 $string['menuitem:hide'] = 'Hide';
 $string['menuitem:movesuccess'] = 'The item was moved successfully';

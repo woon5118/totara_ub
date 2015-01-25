@@ -542,7 +542,7 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
         $dimmed = ($item->visibility ? '' : ' dimmed');
         $url = '/totara/core/menu/index.php';
         $itemurl = new moodle_url($node->get_url());
-        $itemurl = html_writer::link($itemurl, $itemurl, array('class' => $dimmed));
+        $itemurl = html_writer::link($itemurl, $node->get_url(false), array('class' => $dimmed));
         $itemtitle = $node->get_title();
         $attributes = array();
         $attributes['title'] = $str->edit;

@@ -389,6 +389,7 @@ class menu implements \renderable, \IteratorAggregate {
      * @return array $errors
      */
     public static function validation($data) {
+        global $CFG;
 
         $errors = array();
 
@@ -406,8 +407,15 @@ class menu implements \renderable, \IteratorAggregate {
             if (\core_text::strlen($data->url) > 255) {
                 $errors['url'] = get_string('error:menuitemurltoolong', 'totara_core');
             }
-            if (!empty($data->url) && $data->url[0] != '/' && !filter_var($data->url, FILTER_VALIDATE_URL)) {
-                $errors['url'] = get_string('error:menuitemurlinvalid', 'totara_core');
+            if (!empty($data->url)) {
+                $url = $data->url;
+                if ($url[0] === '/') {
+                    $url = $CFG->wwwroot . $url;
+                }
+                $url = self::replace_url_parameter_placeholders($url);
+                if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                    $errors['url'] = get_string('error:menuitemurlinvalid', 'totara_core');
+                }
             }
         }
 
@@ -425,6 +433,31 @@ class menu implements \renderable, \IteratorAggregate {
 
         return $errors;
 
+    }
+
+    /**
+     * Replace url placeholders in custom menu items.
+     *
+     * @param string $url
+     * @return string
+     */
+    public static function replace_url_parameter_placeholders($url) {
+        global $USER, $COURSE;
+
+        $search = array(
+            '##userid##',
+            '##username##',
+            '##useremail##',
+            '##courseid##',
+        );
+        $replace = array(
+            isset($USER->id) ? $USER->id : 0,
+            isset($USER->username) ? urlencode($USER->username) : '',
+            isset($USER->email) ? urlencode($USER->email) : '',
+            isset($COURSE->id) ? $COURSE->id : SITEID,
+        );
+
+        return str_replace($search, $replace, $url);
     }
 
     /**

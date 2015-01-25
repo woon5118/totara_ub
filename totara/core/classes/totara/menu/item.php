@@ -98,13 +98,17 @@ class item {
      * Check for custom flag, if it is not set then returns default url.
      * Otherwise returns modified url by client.
      *
+     * @param bool $replaceparams replace ##params##
      * @return string node url
      */
-    public function get_url() {
+    public function get_url($replaceparams = true) {
         if ((int)$this->custom == 0) {
             $this->url = $this->get_default_url();
         }
-        return $this->url;
+        if (!$replaceparams) {
+            return $this->url;
+        }
+        return menu::replace_url_parameter_placeholders($this->url);
     }
 
     /**
