@@ -158,11 +158,23 @@ class scheduler {
                 $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear) + $offset + ($schedule * 60 * 60);
                 break;
             case self::WEEKLY:
-                $calendardays = calendar_get_days();
-                if (($calendardays[$schedule]['fullname'] == strftime('%A', $this->time)) && (!$is_cron)) {
+                // Calculate the day of the week index.
+                $calendartype = \core_calendar\type_factory::get_calendar_instance();
+                $timeweekday = $calendartype->get_weekday($timeyear, $timemonth, $timeday);
+                if (($schedule == $timeweekday) && (!$is_cron)) {
+                    // The scheduled day of the week is the same as the given day of the week, so schedule for this day.
                     $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
                 } else {
-                    $nextevent = strtotime('next ' . $calendardays[$schedule]['fullname'], $this->time);
+                    // The scheduled day of the week is different (or one week future on cron), so schedule for the future.
+                    if ($schedule <= $timeweekday) {
+                        // An earlier or same weekday. Add one week to the schedule index and then find the difference.
+                        $daysinweek = count($calendartype->get_weekdays());
+                        $days = $schedule + $daysinweek - $timeweekday;
+                    } else {
+                        // Just find the difference.
+                        $days = $schedule - $timeweekday;
+                    }
+                    $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear) + DAYSECS * $days;
                 }
                 break;
             case self::MONTHLY:
