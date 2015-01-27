@@ -1556,6 +1556,26 @@ function totara_get_members_cohort($cohortid) {
 }
 
 /**
+ * Get cohorts which user is memeber of.
+ *
+ * @param int $userid The user id
+ * @param bool $activeonly return only active cohorts
+ * @return array List of cohort ids.
+ */
+function totara_cohort_get_user_cohorts($userid, $activeonly = true) {
+    global $DB;
+    $sql = 'SELECT c.id FROM {cohort} c
+            INNER JOIN {cohort_members} cm ON (c.id = cm.cohortid)
+            WHERE cm.userid = ?';
+    if ($activeonly) {
+        $sqltime = totara_cohort_date_where_clause('c');
+        $sql .= ' AND ' . $sqltime;
+    }
+
+    return array_keys($DB->get_records_sql($sql, array($userid)));
+}
+
+/**
  * Get roles assigned to a cohort
  *
  * @param int $cohortid The cohort id where the roles are assigned.

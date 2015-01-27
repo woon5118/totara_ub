@@ -484,6 +484,11 @@ define('HOMEPAGE_MY', 1);
 define('HOMEPAGE_USER', 2);
 
 /**
+ * The home page shold be totara dashboard
+ */
+define('HOMEPAGE_TOTARA_DASHBOARD', 105);
+
+/**
  * Hub directory url (should be moodle.org)
  */
 define('HUB_HUBDIRECTORYURL', "http://hubdirectory.moodle.org");
@@ -9646,9 +9651,18 @@ function mnet_get_idp_jump_url($user) {
  * @return int One of HOMEPAGE_*
  */
 function get_home_page() {
-    global $CFG;
+    global $CFG, $USER;
 
-    if (isloggedin() && !isguestuser() && !empty($CFG->defaulthomepage)) {
+    if (isloggedin() && !isguestuser() && (!empty($CFG->defaulthomepage))) {
+        if ($CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD) {
+            require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+
+            // Check for dashboard assignments.
+            if (count(totara_dashboard::get_user_dashboards($USER->id))) {
+                return HOMEPAGE_TOTARA_DASHBOARD;
+            }
+            return HOMEPAGE_MY;
+        }
         if ($CFG->defaulthomepage == HOMEPAGE_MY) {
             return HOMEPAGE_MY;
         } else {

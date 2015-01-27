@@ -116,7 +116,8 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // sp
     $choices = array(
         HOMEPAGE_SITE => new lang_string('site'),
         HOMEPAGE_MY => new lang_string('mymoodle', 'admin'),
-        HOMEPAGE_USER => new lang_string('userpreference', 'admin')
+        HOMEPAGE_USER => new lang_string('userpreference', 'admin'),
+        HOMEPAGE_TOTARA_DASHBOARD => new lang_string('totaradashboard', 'admin')
     );
     $temp->add(new admin_setting_configselect('defaulthomepage', new lang_string('defaulthomepage', 'admin'), new lang_string('configdefaulthomepage', 'admin'), HOMEPAGE_SITE, $choices));
     $temp->add(new admin_setting_configcheckbox('allowguestmymoodle', new lang_string('allowguestmymoodle', 'admin'), new lang_string('configallowguestmymoodle', 'admin'), 1));
@@ -203,12 +204,16 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // sp
     $temp->add(new admin_setting_configcheckbox('doctonewwindow', new lang_string('doctonewwindow', 'admin'), new lang_string('configdoctonewwindow', 'admin'), 0));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_externalpage('mypage', new lang_string('mypage', 'admin'), $CFG->wwwroot . '/my/indexsys.php',  
+    $temp = new admin_externalpage('mypage', new lang_string('mypage', 'admin'), $CFG->wwwroot . '/my/indexsys.php',
         array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     $temp = new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php',
             array('totara/core:appearance'));
+    $ADMIN->add('appearance', $temp);
+
+    $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'), $CFG->wwwroot . '/totara/dashboard/manage.php',
+        array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.

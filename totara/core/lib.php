@@ -310,25 +310,51 @@ function sql_drop_table_if_exists($table) {
  * Reorder elements based on order field
  *
  * @param int $id Element ID
- * @param int $pos It's new relative position
+ * @param int $pos It's new relative position, or -1 to make it last
  * @param string $table Table name
  * @param string $parentfield Field name
  * @param string $orderfield Order field name
  */
-function db_reorder($id, $pos, $table, $parentfield, $orderfield='sortorder') {
+function db_reorder($id, $pos, $table, $parentfield = '', $orderfield = 'sortorder') {
     global $DB;
     $transaction = $DB->start_delegated_transaction();
-    $sql = 'SELECT tosort.id
-              FROM {'.$table.'} tosort
-              LEFT JOIN {'.$table.'} element
-                ON (element.'.$parentfield.' = tosort.'.$parentfield.')
-             WHERE element.id = ?
-               AND tosort.id <> ?
-             ORDER BY tosort.'.$orderfield;
-    $records = $DB->get_records_sql($sql, array($id, $id));
+    if ($parentfield != '') {
+        $sql = 'SELECT tosort.id
+                FROM {' . $table . '} tosort
+                LEFT JOIN {' . $table . '} element
+                    ON (element.' . $parentfield . ' = tosort.' . $parentfield . ')
+                WHERE element.id = ?
+                    AND tosort.id <> ?
+                ORDER BY tosort.' . $orderfield;
+        $records = $DB->get_records_sql($sql, array($id, $id));
+    } else {
+        $sql = 'SELECT tosort.id
+                FROM {' . $table . '} tosort
+                WHERE tosort.id <> ?
+                ORDER BY tosort.' . $orderfield;
+        $records = $DB->get_records_sql($sql, array($id));
+    }
     $newpos = 0;
     $todb = new stdClass();
     $todb->id = $id;
+
+    // Handle placing last.
+    if ($pos == -1) {
+        if ($parentfield != '') {
+            $parentid = $DB->get_field($table, $parentfield, array('id' => $id));
+            $sql = 'SELECT COUNT(*) FROM {' . $table . '} WHERE ' . $parentfield . ' = ?';
+            $count = $DB->count_records_sql($sql, array($parentid));
+        } else {
+            $count = $DB->count_records($table);
+        }
+
+        if ($count > 0) {
+            $pos = $count - 1;
+        } else {
+            $pos = 0;
+        }
+    }
+
     $todb->$orderfield = $pos;
     foreach ($records as $record) {
         if ($newpos == $pos) {
