@@ -25,8 +25,11 @@
 require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/message/lib.php');
 
-$userid = optional_param('id', $USER->id, PARAM_INT);    // user id
+$userid = optional_param('id', 0, PARAM_INT);    // user id
 $disableall = optional_param('disableall', 0, PARAM_BOOL); //disable all of this user's notifications
+if (!$userid) {
+    $userid = $USER->id;
+}
 
 $url = new moodle_url('/message/edit.php');
 $url->param('id', $userid);
