@@ -38,7 +38,8 @@ class rb_filter_text extends rb_filter_type {
                      2 => get_string('isequalto', 'filters'),
                      3 => get_string('startswith', 'filters'),
                      4 => get_string('endswith', 'filters'),
-                     5 => get_string('isempty', 'filters'));
+                     5 => get_string('isempty', 'filters'),
+                     6 => get_string('isnotempty', 'totara_reportbuilder'));
     }
 
     /**
@@ -60,6 +61,7 @@ class rb_filter_text extends rb_filter_type {
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
         $mform->addHelpButton($grp->_name, 'filtertext', 'filters');
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', 5);
+        $mform->disabledIf($this->name, $this->name . '_op', 'eq', 6);
         if ($advanced) {
             $mform->setAdvanced($this->name . '_grp');
         }
@@ -86,8 +88,8 @@ class rb_filter_text extends rb_filter_type {
         $operator = $field . '_op';
         $value = (isset($formdata->$field)) ? $formdata->$field : '';
         if (array_key_exists($operator, $formdata)) {
-            if ($formdata->$operator != 5 and $value == '') {
-                // no data - no change except for empty filter
+            if ($formdata->$operator != 5 && $formdata->$operator != 6 && $value == '') {
+                // No data - no change except for empty and not empty filters.
                 return false;
             }
             return array('operator' => (int)$formdata->$operator, 'value' => $value);
@@ -110,7 +112,7 @@ class rb_filter_text extends rb_filter_type {
         $value    = $data['value'];
         $query    = $this->get_field();
 
-        if ($operator != 5 and $value === '') {
+        if ($operator != 5 && $operator != 6 && $value === '') {
             return array('', array());
         }
 
@@ -130,6 +132,8 @@ class rb_filter_text extends rb_filter_type {
                 return search_get_keyword_where_clause($query, array($value), false, 'endswith');
             case 5: // empty - may also be null
                 return array("({$query} = '' OR ({$query}) IS NULL)", array());
+            case 6: // Not empty (NOT NULL).
+                return array("({$query} != '' AND ({$query}) IS NOT NULL)", array());
             default:
                 return array('', array());
         }
@@ -161,6 +165,8 @@ class rb_filter_text extends rb_filter_type {
             case 4: // ends with
                 return get_string('textlabel', 'filters', $a);
             case 5: // empty
+                return get_string('textlabelnovalue', 'filters', $a);
+            case 6: // Not empty.
                 return get_string('textlabelnovalue', 'filters', $a);
         }
 

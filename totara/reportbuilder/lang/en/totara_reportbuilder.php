@@ -354,6 +354,7 @@ $string['isaftertoday'] = 'days after today';
 $string['isbeforetoday'] = 'days before today';
 $string['isrelativetotoday'] = ' (date of report generation)';
 $string['isbelow'] = 'is below';
+$string['isnotempty'] = 'is not empty (NOT NULL)';
 $string['isnotfound'] = ' is NOT FOUND';
 $string['isnt'] = 'isn\'t';
 $string['isnttaggedwith'] = 'isn\'t tagged with';
