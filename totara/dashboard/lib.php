@@ -446,11 +446,14 @@ class totara_dashboard {
                                                                     'pagetypepattern' => 'my-totara-dashboard-' . $this->id,
                                                                     'subpagepattern' => 'default'));
         foreach ($blockinstances as $instance) {
+            $originalid = $instance->id;
             unset($instance->id);
             $instance->parentcontextid = $usercontext->id;
             $instance->subpagepattern = $userpageid;
             $instance->id = $DB->insert_record('block_instances', $instance);
             context_block::instance($instance->id);  // Just creates the context record.
+            $block = block_instance($instance->blockname, $instance);
+            $block->instance_copy($originalid);
         }
 
         return $userpageid;
