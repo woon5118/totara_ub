@@ -691,7 +691,21 @@ class totara_program_renderer extends plugin_renderer_base {
         $content = '';
         $attributes = $chelper->get_and_erase_attributes('course_category_tree clearfix');
         $content .= html_writer::start_tag('div',
-                        array('id' => $id, 'data-showcourses' => $chelper->get_show_programs()) + $attributes);
+            array('id' => $id, 'data-showcourses' => $chelper->get_show_programs()) + $attributes);
+
+        if ($coursecat->get_children_count()) {
+            $classes = array(
+                'collapseexpand',
+                'expand-all',
+            );
+
+            // Show the collapse/expand.
+            $content .= html_writer::start_tag('div', array('class' => 'collapsible-actions'));
+            $content .= html_writer::link('#', get_string('expandall'),
+                array('class' => implode(' ', $classes)));
+            $content .= html_writer::end_tag('div');
+            $this->page->requires->strings_for_js(array('collapseall', 'expandall'), 'moodle');
+        }
 
         $content .= html_writer::tag('div', $categorycontent, array('class' => 'content'));
 
@@ -841,6 +855,30 @@ class totara_program_renderer extends plugin_renderer_base {
         }
 
         return $output;
+    }
+
+    public function progcat_ajax($category, $categorytype) {
+        global $DB, $CFG;
+
+        $depth = required_param('depth', PARAM_INT);
+        $chelper = new programcat_helper();
+        $baseurl = new moodle_url('/totara/program/index.php', array('categoryid' => $category->id));
+        $coursedisplayoptions = array(
+            'limit' => $CFG->coursesperpage,
+            'viewmoreurl' => new moodle_url($baseurl, array('browse' => 'categories', 'page' => 1))
+        );
+        $catdisplayoptions = array(
+            'limit' => $CFG->coursesperpage,
+            'viewmoreurl' => new moodle_url($baseurl, array('browse' => 'categories', 'page' => 1))
+        );
+
+        $chelper->set_show_programs(self::COURSECAT_SHOW_PROGRAMS_AUTO)->
+            set_courses_display_options($coursedisplayoptions)->
+            set_categories_display_options($catdisplayoptions);
+
+        $content = $this->coursecat_category_content($chelper, $category, $depth, $categorytype);
+
+        return $content;
     }
 
     /**
