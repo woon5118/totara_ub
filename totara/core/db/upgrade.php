@@ -1414,5 +1414,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014120502, 'totara_core');
     }
 
+    if ($oldversion < 2015020200) {
+        // Clean traces of old totara dashboard.
+        $DB->delete_records_select('config_plugins', 'plugin = ? AND name = ? and value < ? ',
+                array('totara_dashboard', 'version', '2015012200'));
+
+        // Core savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015020200, 'totara_core');
+    }
     return true;
 }
