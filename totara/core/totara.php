@@ -1606,6 +1606,63 @@ function sql_cast2float($fieldname) {
     return $sql;
 }
 
+/**
+ * Returns as case sensitive field name.
+ *
+ * @param string $field table field name
+ * @return string SQL code fragment
+ */
+function sql_collation($field) {
+    global $DB;
+
+    $namefield = $field;
+    switch ($DB->get_dbfamily()) {
+        case('sqlsrv'):
+        case('mssql'):
+            $namefield  = "{$field} COLLATE " . mssql_get_collation(). " AS {$field}";
+            break;
+        case('mysql'):
+            $namefield = "(BINARY {$field}) AS {$field}";
+            break;
+        case('postgres'):
+            $namefield = $field;
+            break;
+    }
+
+    return $namefield;
+}
+
+/**
+ * Returns 'collation' part of a query.
+ *
+ * @param bool $casesensitive use case sensitive search
+ * @param bool $accentsensitive use accent sensitive search
+ * @return string SQL code fragment
+ */
+function mssql_get_collation($casesensitive = true, $accentsensitive = true) {
+    global $DB, $CFG;
+
+    // Make some default.
+    $collation = 'Latin1_General_CI_AI';
+
+    $sql = "SELECT CAST(DATABASEPROPERTYEX('{$CFG->dbname}', 'Collation') AS varchar(255)) AS SQLCollation";
+    $record = $DB->get_record_sql($sql, null, IGNORE_MULTIPLE);
+    if ($record) {
+        $collation = $record->sqlcollation;
+        if ($casesensitive) {
+            $collation = str_replace('_CI', '_CS', $collation);
+        } else {
+            $collation = str_replace('_CS', '_CI', $collation);
+        }
+        if ($accentsensitive) {
+            $collation = str_replace('_AI', '_AS', $collation);
+        } else {
+            $collation = str_replace('_AS', '_AI', $collation);
+        }
+    }
+
+    return $collation;
+}
 
 /**
  * Assign a user a position assignment and create/delete role assignments as required
