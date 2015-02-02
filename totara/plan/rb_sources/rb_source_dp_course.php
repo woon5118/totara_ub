@@ -398,7 +398,16 @@ class rb_source_dp_course extends rb_base_source {
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );
-
+        $columnoptions[] = new rb_column_option(
+                'course_completion',
+                'enroldate',
+                get_string('enrolled', 'totara_core'),
+                "course_completion.timeenrolled",
+                array(
+                    'joins' => array('course_completion'),
+                    'displayfunc' => 'nice_date',
+                )
+            );
         $columnoptions[] = new rb_column_option(
                 'course_completion',
                 'statusandapproval',
