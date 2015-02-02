@@ -64,19 +64,16 @@
         redirect($CFG->wwwroot .'/'. $CFG->admin .'/index.php');
     }
 
-    // Check that homepage set to dashboard and user assigned to dashboard.
-    if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD && optional_param('redirect', 1, PARAM_BOOL) === 1) {
-        redirect($CFG->wwwroot .'/totara/dashboard/index.php');
-    }
-
     if (get_home_page() != HOMEPAGE_SITE) {
         // Redirect logged-in users to My Moodle overview if required
         if (optional_param('setdefaulthome', false, PARAM_BOOL)) {
             set_user_preference('user_home_page_preference', HOMEPAGE_SITE);
-        } else if (!empty($CFG->defaulthomepage) &&
-                ($CFG->defaulthomepage == HOMEPAGE_MY || $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD) &&
+        } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_MY  &&
                 optional_param('redirect', 1, PARAM_BOOL) === 1) {
             redirect($CFG->wwwroot .'/my/');
+        } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD &&
+                optional_param('redirect', 1, PARAM_BOOL) === 1) {
+            redirect(new moodle_url('/totara/dashboard/index.php'));
         } else if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_USER)) {
             $PAGE->settingsnav->get('usercurrentsettings')->add(get_string('makethismyhome'), new moodle_url('/', array('setdefaulthome'=>true)), navigation_node::TYPE_SETTING);
         }

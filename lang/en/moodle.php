@@ -430,6 +430,7 @@ $string['currentlyselectedusers'] = 'Currently selected users';
 $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
+$string['dashboard'] = 'Dashboard';
 $string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';
