@@ -41,6 +41,7 @@ class totara_dashboard_generator extends component_generator_base {
      * @return totara_dashboard instance
      */
     public function create_dashboard(array $data = array()) {
+        global $DB;
         $dashboard = new totara_dashboard();
         if (!isset($data['name'])) {
             $data['name'] = 'Test' . self::$ind++;
@@ -50,6 +51,26 @@ class totara_dashboard_generator extends component_generator_base {
         }
         if (!isset($data['published'])) {
             $data['published'] = true;
+        }
+        if (isset($data['cohorts'])) {
+            $cohorts = $data['cohorts'];
+            if (!is_array($data['cohorts'])) {
+                $cohorts = explode(', ', $data['cohorts']);
+            }
+            $data['cohorts'] = array();
+            foreach ($cohorts as $cohort) {
+                $cohort = trim($cohort);
+                if ($cohort == '') {
+                    continue;
+                }
+                if ((string)intval($cohort) == $cohort) {
+                    $data['cohorts'][] = (int)$cohort;
+                } else {
+                    // Convert cohort name to id.
+                    $record = $DB->get_record_select('cohort', 'name = ? OR idnumber = ?', array($cohort, $cohort));
+                    $data['cohorts'][] = $record->id;
+                }
+            }
         }
         $dashboard->set_from_form((object)$data)->save();
 

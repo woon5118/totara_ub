@@ -306,7 +306,7 @@ class totara_dashboard {
                 $exploded = explode(',', $data->cohorts);
                 foreach ($exploded as $check) {
                     if ((int)$check < 1) {
-                        throw coding_exception("Couldn't parse cohorts data");
+                        throw new coding_exception("Couldn't parse cohorts data:" . $data->cohorts);
                     }
                 }
                 $this->cohorts = $exploded;

@@ -73,20 +73,10 @@ class behat_totara_dashboards extends behat_base {
             $record = array();
             $allfields = array_merge($required, $optional);
             foreach ($row as $fieldname => $value) {
-                if ($fieldname == 'cohorts') {
-                    $value = explode(',', $value);
-                    array_walk($value, function(&$item) {
-                        global $DB;
-                        $idnumber = trim($item);
-                        $cohort = $DB->get_record('cohort', array('idnumber' => $idnumber));
-                        $item = $cohort->id;
-                    });
-
-                }
                 if (in_array($fieldname, $allfields)) {
                     $record[$fieldname] = $value;
                 } else {
-                    throw new Exception('Unknown field '.$fieldname.' in totara dashboard definition');
+                    throw new coding_exception('Unknown field '.$fieldname.' in totara dashboard definition');
                 }
             }
             $this->get_data_generator()->create_dashboard($row);
