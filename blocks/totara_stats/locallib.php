@@ -194,7 +194,7 @@ function totara_stats_sql_helper($statsql) {
         $stringparam->count = $DB->count_records_sql($stat->sql, $stat->sqlparams);
         $data = new stdClass();
         $data->displaystring = get_string($stat->string, 'block_totara_stats', $stringparam);
-        $data->icon = $OUTPUT->pix_icon($stat->string, $data->displaystring, 'block_totara_stats');
+        $data->icon = $OUTPUT->pix_icon($stat->string, '', 'block_totara_stats');
         $results[$i] = $data;
         $i++;
     }
