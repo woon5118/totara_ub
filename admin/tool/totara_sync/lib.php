@@ -284,7 +284,7 @@ function totara_sync_make_dirs($dirpath) {
 function totara_sync_clean_fields($fields, $encoding) {
     if ($encoding !== 'UTF-8') {
         foreach ($fields as $key => $value) {
-            $value = textlib::convert(trim($value), $encoding, 'UTF-8');
+            $value = core_text::convert(trim($value), $encoding, 'UTF-8');
             $fields[$key] = clean_param($value, PARAM_TEXT);
         }
     } else {

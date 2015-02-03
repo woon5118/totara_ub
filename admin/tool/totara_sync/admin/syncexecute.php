@@ -86,25 +86,31 @@ foreach ($elements as $element) {
     }
     // Check source has configs - note get_config returns an object.
     if ($sourceclass) {
-        $configs = get_config($sourceclass);
-        $props = get_object_vars($configs);
-        if(empty($props)) {
-            $configured = false;
-            $url = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php', array('element' => $elname, 'source' => $sourceclass));
-            $link = html_writer::link($url, get_string('nosourceconfig', 'tool_totara_sync', $elnametext));
-            $cells[] = new html_table_cell($link);
+        // Sanity checks.
+        $nosourceconfigurl = new moodle_url('/admin/tool/totara_sync/admin/sourcesettings.php',
+            array('element' => $elname, 'source' => $sourceclass));
+        $nosourceconfiglink = html_writer::link($nosourceconfigurl, get_string('nosourceconfig', 'tool_totara_sync', $elnametext));
+        if (core_text::strtolower($source) == 'csv') {
+            $fileaccess = get_config('totara_sync', 'fileaccess');
+            $encoding = get_config('totara_sync_source_' . $elname . '_csv', 'csv' . $elname . 'encoding');
+            if (empty($encoding)) {
+                // If the encoding config key doesn't exist then the configuration settings have not been saved.
+                $configured = false;
+                $cells[] = new html_table_cell($nosourceconfiglink);
+            } else if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
+                $configured = false;
+                $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
+                $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
+                $cells[] = new html_table_cell($link);
+            } else {
+                $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
+            }
         } else {
-            if (core_text::strtolower($source) == 'csv') {
-                // Sanity checks.
-                $fileaccess = get_config('totara_sync', 'fileaccess');
-                if ($fileaccess == FILE_ACCESS_DIRECTORY && !$filesdir = get_config('totara_sync', 'filesdir')) {
-                    $configured = false;
-                    $url = new moodle_url('/admin/tool/totara_sync/admin/settings.php');
-                    $link = html_writer::link($url, get_string('nofilesdir', 'tool_totara_sync'));
-                    $cells[] = new html_table_cell($link);
-                } else {
-                    $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
-                }
+            $dbtype = get_config('totara_sync_source_' . $elname . '_database', 'database_dbtype');
+            if (empty($dbtype)) {
+                // If the dbtype config key doesn't exist then the configuration settings have not been saved.
+                $configured = false;
+                $cells[] = new html_table_cell($nosourceconfiglink);
             } else {
                 $cells[] = new html_table_cell(get_string('sourceconfigured', 'tool_totara_sync'));
             }
