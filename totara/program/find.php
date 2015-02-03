@@ -31,7 +31,6 @@ $format = optional_param('format','', PARAM_TEXT); // Export format.
 $debug = optional_param('debug', 0, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_totara_menu_selected('program');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_url('/totara/program/find.php');
 if ($CFG->forcelogin) {

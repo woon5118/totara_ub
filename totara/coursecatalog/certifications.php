@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 $debug = optional_param('debug', 0, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_totara_menu_selected('certification');
+$PAGE->set_totara_menu_selected('certifications');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_url('/totara/coursecatalog/certifications.php');
 if ($CFG->forcelogin) {

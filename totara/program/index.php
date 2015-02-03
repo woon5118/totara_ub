@@ -76,7 +76,8 @@ if ($categoryid && !$category->visible && !has_capability('moodle/category:viewh
     throw new moodle_exception('unknowncategory');
 }
 
-$PAGE->set_totara_menu_selected('findlearning');
+// This 's' is needed so that the correct Totara menu item has the selected css class added.
+$PAGE->set_totara_menu_selected($viewtype . 's');
 $PAGE->set_heading(format_string($site->fullname));
 $content = $programrenderer->program_category($categoryid, $viewtype);
 
