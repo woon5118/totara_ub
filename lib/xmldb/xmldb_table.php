@@ -44,7 +44,7 @@ class xmldb_table extends xmldb_object {
      *
      * @const maximum length of field names
      */
-    const NAME_MAX_LENGTH = 28;
+    const NAME_MAX_LENGTH = 40; // Totara will never support Oracle, limit is 40 since 2.7, YAY!
 
     /**
      * Creates one new xmldb_table
@@ -714,7 +714,7 @@ class xmldb_table extends xmldb_object {
         // table parameter is ignored
         $name = $this->getName();
         if (strlen($name) > self::NAME_MAX_LENGTH) {
-            return 'Invalid table name {'.$name.'}: name is too long. Limit is 28 chars.';
+            return 'Invalid table name {'.$name.'}: name is too long. Limit is 40 chars.';
         }
         if (!preg_match('/^[a-z][a-z0-9_]*$/', $name)) {
             return 'Invalid table name {'.$name.'}: name includes invalid characters.';
