@@ -233,6 +233,7 @@ $string['cannotreviveuserx'] = 'cannot revive user {$a}';
 $string['cannotcreateuserassignments'] = 'cannot create user assignments (user: {$a})';
 $string['createduserx'] = 'created user {$a}';
 $string['cannotcreateuserx'] = 'cannot create user {$a}';
+$string['invalidauthforuserx'] = 'invalid authentication plugin {$a}';
 $string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
 $string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
 $string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
