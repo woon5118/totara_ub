@@ -1560,6 +1560,124 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertTrue(strpos($messages[0]->fullmessage, fullname($user1)) !== false, fullname($user1));
     }
 
+    /**
+     * Test that sending scheduled notices can't lead to duplicate notices for managers if the user failed to receive it.
+     *
+     * This is a direct test for the situation described in T-14140.
+     */
+    function test_facetoface_send_notice_duplicates() {
+        global $CFG;
+        // Turn this stuff off. We need to fix these tests one day!
+        $CFG->noemailever = false;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        $fields = array('username', 'email', 'institution', 'department', 'city', 'idnumber', 'icq', 'skype',
+            'yahoo', 'aim', 'msn', 'phone1', 'phone2', 'address', 'url', 'description');
+
+        $usernamefields = get_all_user_name_fields();
+        $fields = array_merge($fields, array_values($usernamefields));
+
+        $noticebody = '';
+        foreach ($fields as $field) {
+            $noticebody .= get_string('placeholder:'.$field, 'mod_facetoface') . ' ';
+        }
+
+        $noticebody .= get_string('placeholder:fullname', 'mod_facetoface') . ' ';
+
+        $userdata = array();
+        foreach ($fields as $field) {
+            $userdata[$field] = 'display_' . $field;
+        }
+
+        // Set up three users, one learner, a primary mgr and a secondary mgr.
+        $userdata['username'] = 'learner';
+        $userdata['email'] = 'learner@local.host';
+        $user1 = $this->getDataGenerator()->create_user($userdata);
+        $userdata['username'] = 'manager';
+        $userdata['email'] = 'manager@local.host';
+        $user2 = $this->getDataGenerator()->create_user($userdata);
+
+        $assignment = new position_assignment(array('userid' => $user1->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $user2->id;
+        assign_user_position($assignment, true);
+
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course1->id, 'multiplesessions' => 1));
+        $facetofaces[$facetoface->id] = $facetoface;
+
+        // Create session with capacity and date in 2 years.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (YEARSECS * 2);
+        $sessiondate->timefinish = time() + (YEARSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        $sink = $this->redirectMessages();
+
+        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, false, $user2);
+
+        // Check the manager got their email.
+        $messages = $sink->get_messages();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user2->id, $messages[0]->useridto);
+
+        $notification = new facetoface_notification();
+        $notification->booked = 0;
+        $notification->courseid = $course1->id;
+        $notification->facetofaceid = $facetoface->id;
+        $notification->ccmanager = 1;
+        $notification->status = 1;
+        $notification->title = 'hello';
+        $notification->body = $noticebody;
+        $notification->managerprefix = '';
+        $notification->type = MDL_F2F_NOTIFICATION_MANUAL;
+        $notification->save();
+
+        $CFG->facetoface_notificationdisable = true;
+
+        $notification->send_to_users($sessionid);
+
+        // Check the expected number of messages got sent.
+        $messages = $sink->get_messages();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user2->id, $messages[0]->useridto);
+
+        $CFG->facetoface_notificationdisable = false;
+        $notification->send_to_users($sessionid);
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Check the expected number of messages got sent.
+        $this->assertCount(3, $messages);
+        $this->assertSame($user2->id, $messages[0]->useridto);
+        $this->assertSame($user1->id, $messages[1]->useridto);
+
+        foreach ($fields as $field) {
+            if ($field === 'username' || $field === 'email') {
+                continue;
+            }
+            $uservalue = 'display_' . $field;
+            $this->assertTrue(strpos($messages[1]->fullmessage, $uservalue) !== false, $uservalue);
+        }
+
+        $this->assertTrue(strpos($messages[1]->fullmessage, fullname($user1)) !== false, fullname($user1));
+
+        $sink->close();
+        $CFG->noemailever = true;
+    }
+
     function test_facetoface_send_confirmation_notice() {
         $this->resetAfterTest();
         $this->preventResetByRollback();

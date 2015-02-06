@@ -451,9 +451,15 @@ class facetoface_notification extends data_object {
             foreach ($recipients as $recipient) {
                 $count++;
                 $this->set_newevent($recipient, $recipient->sessionid);
-                $this->send_to_user($recipient, $recipient->sessionid);
-                $this->send_to_manager($recipient, $recipient->sessionid);
-                $this->send_to_thirdparty($recipient, $recipient->sessionid);
+                $senttouser = $this->send_to_user($recipient, $recipient->sessionid);
+                // If the message was successfully sent to the recipient then we want to ensure that it gets sent to the manager and
+                // any third party users.
+                // If the message was not successfully sent then we do not want to send it to the manager or third party as the
+                // notification will be queued and sent again in the future.
+                if ($senttouser) {
+                    $this->send_to_manager($recipient, $recipient->sessionid);
+                    $this->send_to_thirdparty($recipient, $recipient->sessionid);
+                }
                 $this->delete_ical_attachment();
             }
             if (!CLI_SCRIPT) {
@@ -486,14 +492,14 @@ class facetoface_notification extends data_object {
      * @param   object  $user       User object
      * @param   int     $sessionid
      * @param   int     $sessiondate The specific sessiondate which this message is for.
-     * @return  void
+     * @return  boolean true if message sent
      */
     public function send_to_user($user, $sessionid, $sessiondate = null) {
         global $CFG, $USER, $DB;
 
         // Check that the notification is enabled and that all facetoface notifications are not disabled.
         if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
-            return;
+            return false;
         }
 
         $success = message_send($this->_event);
@@ -532,6 +538,8 @@ class facetoface_notification extends data_object {
             $sent->userid = $user->id;
             $DB->insert_record('facetoface_notification_sent', $sent);
         }
+
+        return !empty($success);
     }
 
     /**
