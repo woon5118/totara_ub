@@ -34,6 +34,24 @@ require_once($CFG->dirroot.'/enrol/meta/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_meta_observer extends enrol_meta_handler {
+    /** @var bool $bulkinprogress bulk indicator */
+    static protected $bulkinprogress = false;
+
+    /**
+     * Start of bulk processing.
+     * @param \core\event\base $event
+     */
+    public static function bulk_started(\core\event\base $event) {
+        self::$bulkinprogress = true;
+    }
+
+    /**
+     * End of bulk processing.
+     * @param \core\event\base $event
+     */
+    public static function bulk_finished(\core\event\base $event) {
+        self::$bulkinprogress = false;
+    }
 
     /**
      * Triggered via user_enrolment_created event.
@@ -49,6 +67,11 @@ class enrol_meta_observer extends enrol_meta_handler {
 
         if ($event->other['enrol'] === 'meta') {
             // Prevent circular dependencies - we can not sync meta enrolments recursively.
+            return true;
+        }
+
+        if (self::$bulkinprogress) {
+            // Wait till cron.
             return true;
         }
 
@@ -70,6 +93,11 @@ class enrol_meta_observer extends enrol_meta_handler {
 
         if ($event->other['enrol'] === 'meta') {
             // Prevent circular dependencies - we can not sync meta enrolments recursively.
+            return true;
+        }
+
+        if (self::$bulkinprogress) {
+            // Wait till cron.
             return true;
         }
 
@@ -116,6 +144,11 @@ class enrol_meta_observer extends enrol_meta_handler {
             return true;
         }
 
+        if (self::$bulkinprogress) {
+            // Wait till cron.
+            return true;
+        }
+
         // Only course level roles are interesting.
         if (!$parentcontext = context::instance_by_id($event->contextid, IGNORE_MISSING)) {
             return true;
@@ -143,6 +176,11 @@ class enrol_meta_observer extends enrol_meta_handler {
 
         // Prevent circular dependencies - we can not sync meta roles recursively.
         if ($event->other['component'] === 'enrol_meta') {
+            return true;
+        }
+
+        if (self::$bulkinprogress) {
+            // Wait till cron.
             return true;
         }
 

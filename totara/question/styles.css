@@ -81,3 +81,8 @@ table.generaltable.question-review-table .r0 {
 .review-multifield .fitem_ftextarea {
     margin-top: -10px !important;
 }
+
+select.aggregateselector[multiple] {
+    height: 150px;
+    max-width: 335px;
+}

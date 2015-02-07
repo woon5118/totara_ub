@@ -303,7 +303,7 @@ class core_ddl_testcase extends database_driver_testcase {
         $dbman->drop_table($table);
 
         // Table name is too long.
-        $table = new xmldb_table('test_table0123456789_____xyz9');
+        $table = new xmldb_table('test_table0123456789_____xyz9_djkfskjldfsjkhdfjksjkhdfshjkldfshjkhjkldfshkjldfshjklf'); // Totara has limit 40 since 2.7.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '2');
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));

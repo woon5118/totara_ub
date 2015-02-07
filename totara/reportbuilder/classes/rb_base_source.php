@@ -472,7 +472,7 @@ abstract class rb_base_source {
                 $targetTZ = $row->timezone;
                 $tzstring = get_string(strtolower($targetTZ), 'timezones');
             }
-            $date = userdate($date, get_string('nice_time_in_timezone_format', 'totara_reportbuilder'), $targetTZ) . ' ';
+            $date = userdate($date, get_string('strftimetime', 'langconfig'), $targetTZ) . ' ';
             return $date . $tzstring;
         } else {
             return '';
@@ -494,7 +494,7 @@ abstract class rb_base_source {
             } else {
                 $targetTZ = $row->timezone;
             }
-            $date = userdate($date, get_string('nice_date_in_timezone_format', 'totara_reportbuilder'), $targetTZ) . ' ';
+            $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ) . ' ';
             return $date;
         } else {
             return '';
@@ -561,11 +561,6 @@ abstract class rb_base_source {
     // convert floats to 2 decimal places
     function rb_display_round2($item, $row) {
         return $item === null ? null : sprintf('%.2f', $item);
-    }
-
-    // converts number to percentage with 1 decimal place
-    function rb_display_percent($item, $row) {
-        return $item === null ? null : sprintf('%.1f%%', $item);
     }
 
     /**

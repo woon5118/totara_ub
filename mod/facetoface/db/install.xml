@@ -30,6 +30,7 @@
         <FIELD NAME="declareinterest" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow users to declare interest in the facetoface"/>
         <FIELD NAME="interestonlyiffull" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"  COMMENT="Only allow users to declare interest if all sessions are full"/>
         <FIELD NAME="allowcancellationsdefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="cancellationscutoffdefault" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="86400" SEQUENCE="false"/>
         <FIELD NAME="selectpositiononsignup" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Users with multiple positions will select one on signup"/>
         <FIELD NAME="forceselectposition" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Error if no suitable position is available when signing up"/>
         <FIELD NAME="allowsignupnotedefault" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Allow 'User sign-up note' default"/>
@@ -66,6 +67,7 @@
         <FIELD NAME="discountcost" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Discounted cost of the event"/>
         <FIELD NAME="roomid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Foreign key to facetoface_room"/>
         <FIELD NAME="allowcancellations" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="cancellationcutoff" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="86400" SEQUENCE="false" COMMENT="The number of seconds before the session start when the user is allowed to cancel"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="usermodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>

@@ -1374,5 +1374,45 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014120500, 'totara_core');
     }
 
+    if ($oldversion < 2014120501) {
+
+        // Define table totara_navigation_settings to be created.
+        $table = new xmldb_table('totara_navigation_settings');
+
+        // Adding fields to table totara_navigation_settings.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table totara_navigation_settings.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('nav_item_id', XMLDB_KEY_FOREIGN, array('itemid'), 'totara_navigation', array('id'));
+
+        // Conditionally launch create table for totara_navigation_settings.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2014120501, 'totara_core');
+    }
+
+    if ($oldversion < 2014120502) {
+
+        // Define field visibilityold to be added to totara_navigation.
+        $table = new xmldb_table('totara_navigation');
+        $field = new xmldb_field('visibilityold', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'visibility');
+
+        // Conditionally launch add field visibilityold.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Core savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014120502, 'totara_core');
+    }
+
     return true;
 }

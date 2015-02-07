@@ -303,6 +303,7 @@ $string['learningplan'] = 'Learning Plan';
 $string['manageaudincevisibility'] = 'Manage audience-based visibility';
 $string['members'] = 'Members';
 $string['memberscount'] = 'Size';
+$string['menucohortsvisible'] = 'Menu item audiences';
 $string['msg:membersadded_toaffected_emailsubject'] = 'You have been added to the audience "{$a->cohortname}"';
 $string['msg:membersadded_toaffected_notice'] = 'You have been added to the audience "{$a->cohortname}"';
 $string['msg:membersadded_toall_emailsubject'] = 'New members have been added to your audience "{$a->cohortname}"';

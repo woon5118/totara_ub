@@ -90,6 +90,11 @@ define('MDL_F2F_SELECT_NONE', 20);
 define('MDL_F2F_SELECT_SET', 30);
 define('MDL_F2F_SELECT_NOT_SET', 40);
 
+// Define allow cancellation option.
+define('MDL_F2F_ALLOW_CANCELLATION_NEVER', 0);
+define('MDL_F2F_ALLOW_CANCELLATION_ANY_TIME', 1);
+define('MDL_F2F_ALLOW_CANCELLATION_CUT_OFF', 2);
+
 // This array must match the status codes above, and the values
 // must equal the end of the constant name but in lower case
 global $MDL_F2F_STATUS, $F2F_SELECT_OPTIONS;
@@ -955,13 +960,72 @@ function facetoface_remove_reservations_after_deadline($testing) {
 }
 
 /**
+ * Determine if user can or not cancel his/her booking.
+ *
+ * @param stdClass $session Session object like facetoface_get_sessions.
+ * @return bool True if cancellation is allowed, false otherwise.
+ */
+function facetoface_allow_user_cancellation($session) {
+    $timenow = time();
+
+    // If cancellations are not allowed, nothing else to check here.
+    if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_NEVER) {
+        return false;
+    }
+
+    // If no bookedsession set, something went wrong here, return false.
+    if (!property_exists($session, 'bookedsession')) {
+        return false;
+    }
+
+    // If wait-listed, let them cancel.
+    if (!$session->datetimeknown) {
+        return true;
+    }
+
+    // If session has started or the user is not booked, no point in cancelling.
+    if ($session->mintimestart <= $timenow || !$session->bookedsession) {
+        return false;
+    }
+
+    // If the attendance has been marked for the user, then do not let him cancel.
+    $attendancecode = array(MDL_F2F_STATUS_NO_SHOW, MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED);
+    if ($session->bookedsession && in_array($session->bookedsession->statuscode, $attendancecode)) {
+        return false;
+    }
+
+    // If the user has been booked but he is in the waitlist, then he can cancel at any time.
+    if ($session->bookedsession && $session->bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
+        return true;
+    }
+
+    // If cancellations are allowed at any time or until cut-off is reached, make the necessary checks.
+    if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_ANY_TIME) {
+        return true;
+    } else if ($session->allowcancellations == MDL_F2F_ALLOW_CANCELLATION_CUT_OFF) {
+        // Check if we are in the range of the cancellation cut-off period.
+        if ($timenow <= $session->mintimestart - $session->cancellationcutoff) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
  * Send out email notifications for all sessions that are under capacity at the cut-off.
  */
 function facetoface_notify_under_capacity() {
-    global $DB;
+    global $CFG, $DB;
 
     $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'facetoface'));
+    $roles = $CFG->facetoface_session_rolesnotify;
     $time = time();
+
+    // If there are no recipients, don't bother.
+    if (empty($roles)) {
+        return;
+    }
 
     $params = array(
         'lastcron' => $lastcron,
@@ -1008,6 +1072,7 @@ function facetoface_notify_under_capacity() {
         );
 
         $eventdata = (object)array(
+            'userfrom' => \mod_facetoface\facetoface_user::get_facetoface_user(),
             'subject' => get_string('sessionundercapacity', 'facetoface', format_string($facetoface->name)),
             'fullmessage' => get_string('sessionundercapacity_body', 'facetoface', $info),
             'msgtype' => TOTARA_MSG_TYPE_FACE2FACE,
@@ -1017,15 +1082,21 @@ function facetoface_notify_under_capacity() {
         );
 
         if (CLI_SCRIPT) {
-            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing course editors.");
+            mtrace("Facetoface '{$info->name}' in course {$facetoface->course} is under capacity - {$info->booked}/{$info->capacity} (min capacity {$info->mincapacity}) - emailing session roles.");
         }
 
-        $coursecontext = context_course::instance($facetoface->course);
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        $users = get_users_by_capability($coursecontext, 'moodle/course:manageactivities',
-             "u.id, $usernamefields, u.email, u.maildisplay, u.suspended, u.deleted, u.emailstop, u.auth");
-        foreach ($users as $user) {
-            $eventdata->userto = $user;
+        // Get all the users who need to receive the under capacity warning.
+        if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $facetoface->course)) {
+            print_error('error:incorrectcoursemodule', 'facetoface');
+        }
+        $modcontext = context_module::instance($cm->id);
+
+        // Note: remove the true to limit to users with the roles within the module.
+        $recipients = get_role_users(explode(',', $roles), $modcontext, true, 'u.*');
+
+        // And send them the notification.
+        foreach ($recipients as $recipient) {
+            $eventdata->userto = $recipient;
             tm_alert_send($eventdata);
         }
     }
@@ -1094,7 +1165,18 @@ function facetoface_get_session_dates($sessionid) {
  */
 function facetoface_get_session($sessionid) {
     global $DB;
-    $session = $DB->get_record('facetoface_sessions', array('id' => $sessionid));
+
+    $sql = "SELECT s.*, m.mintimestart, m.maxtimefinish
+              FROM {facetoface_sessions} s
+         LEFT JOIN (
+                SELECT sessionid, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
+                  FROM {facetoface_sessions_dates}
+              GROUP BY sessionid
+              ) m ON m.sessionid = s.id
+             WHERE s.id = ?
+          ORDER BY s.datetimeknown, m.mintimestart, m.maxtimefinish";
+
+    $session = $DB->get_record_sql($sql, array($sessionid));
 
     if ($session) {
         $session->sessiondates = facetoface_get_session_dates($sessionid);
@@ -1127,14 +1209,14 @@ function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
         $roomwhere = ' AND s.roomid = ? ';
         $roomparams[] = $roomid;
     }
-    $sessions = $DB->get_records_sql("SELECT s.*
+    $sessions = $DB->get_records_sql("SELECT s.*, m.mintimestart, m.maxtimefinish
                                    $fromclause
-                        LEFT OUTER JOIN (SELECT sessionid, min(timestart) AS mintimestart
+                        LEFT OUTER JOIN (SELECT sessionid, MIN(timestart) AS mintimestart, MAX(timefinish) AS maxtimefinish
                                            FROM {facetoface_sessions_dates} GROUP BY sessionid) m ON m.sessionid = s.id
                                   WHERE s.facetoface = ?
                                         $locationwhere
                                         $roomwhere
-                               ORDER BY s.datetimeknown, m.mintimestart", array_merge(array($facetofaceid), $locationparams, $roomparams));
+                               ORDER BY s.datetimeknown, m.mintimestart, m.maxtimefinish", array_merge(array($facetofaceid), $locationparams, $roomparams));
 
     if ($sessions) {
         foreach ($sessions as $key => $value) {
@@ -1534,7 +1616,8 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         AND ss.statuscode >= ?
         ORDER BY
             s.id, u.firstname, u.lastname";
-    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY, $facetofaceid, MDL_F2F_STATUS_APPROVED);
+    $signupparams =  array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, POSITION_TYPE_PRIMARY,
+                           $facetofaceid, MDL_F2F_STATUS_WAITLISTED);
     $signups = $DB->get_records_sql($signupsql, $signupparams);
 
     if ($signups) {
@@ -2370,12 +2453,6 @@ function facetoface_approve_requests($data) {
 
             // Approve
             case 2:
-                facetoface_update_signup_status(
-                        $attendee->submissionid,
-                        MDL_F2F_STATUS_APPROVED,
-                        $USER->id
-                );
-
                 if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
                     print_error('error:incorrectcoursemodule', 'facetoface');
                 }
@@ -2388,8 +2465,18 @@ function facetoface_approve_requests($data) {
                 } else {
                     if ($session->allowoverbook) {
                         $status = MDL_F2F_STATUS_WAITLISTED;
+                    } else {
+                        $url = new moodle_url('/mod/facetoface/attendees.php',
+                            array('s' => $sessionid, 'action' => 'approvalrequired'));
+                        totara_set_notification(get_string('error:cannotapprovefull', 'facetoface'), $url);
                     }
                 }
+
+                facetoface_update_signup_status(
+                    $attendee->submissionid,
+                    MDL_F2F_STATUS_APPROVED,
+                    $USER->id
+                );
 
                 // Signup user
                 if (!facetoface_user_signup(
@@ -2470,10 +2557,10 @@ function facetoface_format_session_times($start, $end, $tz) {
     } else {
         $targetTZ = totara_get_clean_timezone();
     }
-    $formattedsession->startdate = userdate($start, get_string('sessiondateformat', 'facetoface'), $targetTZ);
-    $formattedsession->starttime = userdate($start, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
-    $formattedsession->enddate = userdate($end, get_string('sessiondateformat', 'facetoface'), $targetTZ);
-    $formattedsession->endtime = userdate($end, get_string('sessiondatetimeformat', 'facetoface'), $targetTZ);
+    $formattedsession->startdate = userdate($start, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->starttime = userdate($start, get_string('strftimetime', 'langconfig'), $targetTZ);
+    $formattedsession->enddate = userdate($end, get_string('strftimedate', 'langconfig'), $targetTZ);
+    $formattedsession->endtime = userdate($end, get_string('strftimetime', 'langconfig'), $targetTZ);
     if (empty($displaytimezones)) {
         $formattedsession->timezone = '';
     } else if ($tzknown) {
@@ -2530,20 +2617,16 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
-                $allowcancellation = false;
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
-                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                        $allowcancellation = true;
-                    }
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
-                    if ($submission->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                        $allowcancellation = true;
-                    }
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
+
+                // Add booking information.
+                $session->bookedsession = $submission;
 
                 $sessiondates = '';
 
@@ -2570,21 +2653,17 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 // Don't include the link to cancel a session if it has already occurred.
                 $moreinfolink = '';
                 $cancellink = '';
-                $strcancelbooking = get_string('cancelbooking', 'facetoface');
-                $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                 if (!facetoface_has_session_started($session, $timenow)) {
                     $strmoreinfo  = get_string('moreinfo', 'facetoface');
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
                     $moreinfolink = html_writer::link($signup_url, $strmoreinfo, array('class' => 'f2fsessionlinks f2fsessioninfolink', 'title' => $strmoreinfo));
-
-                    $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
-                } else {
-                    // Session is started.
-                    if ($allowcancellation) {
-                        $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
-                    }
                 }
-                $cancellink = $session->allowcancellations ? $cancellink : '';
+
+                if (facetoface_allow_user_cancellation($session)) {
+                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                    $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
+                    $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
+                }
 
                 // Get room data.
                 $roomtext = '';
@@ -4664,6 +4743,8 @@ function facetoface_eventhandler_role_unassigned($ra) {
  */
 function facetoface_eventhandler_role_unassigned_bulk($event) {
     global $CFG, $USER, $DB;
+
+    // TODO: This is most probably not used any more.
 
     $now = time();
 

@@ -71,6 +71,8 @@ if ($id) {
     require_capability('moodle/course:update', $coursecontext);
 
     customfield_load_data($course, 'course', 'course');
+    $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
+    $instanceid = $course->id;
 } else if ($categoryid) {
     // Creating new course in this category.
     $course = null;
@@ -79,10 +81,12 @@ if ($id) {
     $catcontext = context_coursecat::instance($category->id);
     require_capability('moodle/course:create', $catcontext);
     $PAGE->set_context($catcontext);
+    $instancetype = COHORT_ASSN_ITEMTYPE_CATEGORY;
+    $instanceid = $categoryid;
 
 } else {
     require_login();
-    print_error('needcoursecategroyid');
+    print_error('needcoursecategoryid');
 }
 
 // Set up JS
@@ -106,7 +110,8 @@ $jsmodule = array(
         'fullpath' => '/totara/cohort/dialog/coursecohort.js',
         'requires' => array('json'));
 $args = array('args'=>'{"enrolledselected":"' . $enrolledselected . '",'.
-        '"COHORT_ASSN_VALUE_ENROLLED":' . COHORT_ASSN_VALUE_ENROLLED . '}');
+    '"COHORT_ASSN_VALUE_ENROLLED":' . COHORT_ASSN_VALUE_ENROLLED .
+    ', "instancetype":"' . $instancetype . '", "instanceid":"' . $instanceid . '"}');
 $PAGE->requires->js_init_call('M.totara_coursecohort.init', $args, true, $jsmodule);
 unset($enrolledselected);
 
@@ -123,7 +128,8 @@ if (!empty($CFG->audiencevisibility)) {
                     'name' => 'totara_visiblecohort',
                     'fullpath' => '/totara/cohort/dialog/visiblecohort.js',
                     'requires' => array('json'));
-    $args = array('args'=>'{"visibleselected":"' . $visibleselected . '", "type":"course"}');
+    $args = array('args'=>'{"visibleselected":"' . $visibleselected .
+        '", "type":"course", "instancetype":"' . $instancetype . '", "instanceid":"' . $instanceid . '"}');
     $PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
     unset($visibleselected);
 }

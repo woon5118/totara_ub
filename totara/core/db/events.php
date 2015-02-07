@@ -18,29 +18,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Jonathan Newman <jonathan.newman@catalyst.net.nz>
- * @package totara
- * @subpackage totara_core
+ * @package totara_core
  */
 
 /**
- * this file should be used for all the custom event definitions and handers.
- * event names should all start with totara_.
+ * This lists event observers.
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
-
+defined('MOODLE_INTERNAL') || die();
 
 $observers = array (
     array(
         'eventname' => '\totara_core\event\module_completion',
-        'callback' => 'totara_core_event_handler::criteria_course_calc',
-        'includefile' => '/totara/core/lib.php'
+        'callback'  => 'totara_core_observer::criteria_course_calc',
     ),
     array(
-        'eventname' => '\totara_core\event\user_enrolment',
-        'callback' => 'totara_core_event_handler::user_enrolment',
-        'includefile' => '/totara/core/lib.php'
+        'eventname' => '\core\event\user_enrolment_created',
+        'callback'  => 'totara_core_observer::user_enrolment',
+    ),
+    array(
+        'eventname' => '\totara_core\event\bulk_enrolments_started',
+        'callback'  => 'totara_core_observer::bulk_enrolments_started',
+    ),
+    array(
+        'eventname' => '\totara_core\event\bulk_enrolments_ended',
+        'callback'  => 'totara_core_observer::bulk_enrolments_ended',
     ),
 );

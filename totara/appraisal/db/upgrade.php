@@ -57,40 +57,6 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013080501, 'totara', 'appraisal');
     }
 
-    if ($oldversion < 2014061600) {
-        require_once($CFG->dirroot.'/totara/appraisal/lib.php');
-        $usercount = $DB->count_records('user', array('deleted' => 1));
-        if ($usercount > 0) {
-            // This could take some time and use a lot of resources.
-            core_php_time_limit::raise(0);
-            raise_memory_limit(MEMORY_EXTRA);
-            $i = 0;
-            $deletedusers = $DB->get_recordset('user', array('deleted' => 1), null, 'id, username, firstname, lastname, email, idnumber, picture, mnethostid');
-            $context = context_system::instance();
-            $pbar = new progress_bar('fixdeleteduserappraisal', 500, true);
-            $pbar->update($i, $usercount, "Fixing Appraisals for deleted users - {$i}/{$usercount}.");
-            foreach ($deletedusers as $user) {
-                $event = \core\event\user_deleted::create(
-                    array(
-                        'objectid' => $user->id,
-                        'context' => $context,
-                        'other' => array(
-                            'username' => $user->username,
-                            'email' => $user->email,
-                            'idnumber' => $user->idnumber,
-                            'picture' => $user->picture,
-                            'mnethostid' => $user->mnethostid
-                        )
-                ));
-                totara_appraisal_observer::user_deleted($event);
-                $i++;
-                $pbar->update($i, $usercount, "Fixing Appraisals for deleted users - {$i}/{$usercount}.");
-            }
-            $deletedusers->close();
-        }
-        upgrade_plugin_savepoint(true, 2014061600, 'totara', 'appraisal');
-    }
-
     if ($oldversion < 2014062000) {
         $users = $DB->get_fieldset_select('user', 'id', 'deleted = ? ', array(1));
 
@@ -295,6 +261,13 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         $dbman->change_field_default($table, $field);
 
         upgrade_plugin_savepoint(true, 2014120900, 'totara', 'appraisal');
+    }
+
+    if ($oldversion < 2014120901) {
+        // Maintain appraisals static functionality for upgrades in case there are existing appraisals in use.
+        set_config('dynamicappraisals', 0);
+
+        upgrade_plugin_savepoint(true, 2014120901, 'totara', 'appraisal');
     }
 
     return true;

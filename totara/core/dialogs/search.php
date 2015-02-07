@@ -278,11 +278,11 @@ switch ($searchtype) {
      * Cohort search
      */
     case 'cohort':
-        if (!empty($this->customdata['courseid'])) {
-            $formdata['hidden']['courseid'] = $this->customdata['courseid'];
+        if (!empty($this->customdata['instancetype'])) {
+            $formdata['hidden']['instancetype'] = $this->customdata['instancetype'];
         }
-        if (!empty($this->customdata['categoryid'])) {
-            $formdata['hidden']['categoryid'] = $this->customdata['categoryid'];
+        if (!empty($this->customdata['instanceid'])) {
+            $formdata['hidden']['instanceid'] = $this->customdata['instanceid'];
         }
         // Generate search SQL.
         $keywords = totara_search_parse_keywords($query);

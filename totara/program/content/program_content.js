@@ -526,12 +526,53 @@ M.totara_programcontent = M.totara_programcontent || {
      * generally set up the display of course sets
      */
     initCoursesets: function(){
+        var config = this.config;
         $('input[name=cancel]').css('display', 'none');
         $('input[name=update]').css('display', 'none');
         $('input.deletebutton').css('display', 'none');
         $('div.courseadder select').css('display', 'none');
         $('div.courseadder input:submit').val(M.util.get_string('addcourses', 'totara_program'));
         $('div.setbuttons .updatebutton').css('display', 'none');
+
+        var setprefixes_ce = $('input:hidden[name=setprefixes_ce]').val();
+        var setprefixesarray = [];
+        if (setprefixes_ce != '') {
+            setprefixesarray = setprefixes_ce.split(',');
+        }
+        for (i=0; i < setprefixesarray.length; i++) {
+            var prefix = setprefixesarray[i];
+            if ($('select[name='+prefix+'completiontype]').val() != config.COMPLETIONTYPE_SOME) {
+                $('input[name='+prefix+'mincourses]').prop('disabled', true);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', true);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
+            } else if ($('select[name='+prefix+'coursesumfield]').val() == 0) {
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
+            }
+        }
+
+        $('div#course_sets_ce fieldset.course_set select[name$=completiontype]').on('change', function () {
+            var prefix = $(this).closest('fieldset.course_set').prop('id');
+            if ($(this).val() == config.COMPLETIONTYPE_SOME) {
+                $('input[name='+prefix+'mincourses]').prop('disabled', false);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', false);
+                if ($('select[name='+prefix+'coursesumfield]').val() != 0) {
+                    $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', false);
+                }
+            } else {
+                $('input[name='+prefix+'mincourses]').prop('disabled', true);
+                $('select[name='+prefix+'coursesumfield]').prop('disabled', true);
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
+            }
+        });
+        $('div#course_sets_ce fieldset.course_set select[name$=coursesumfield]').on('change', function () {
+            var prefix = $(this).closest('fieldset.course_set').prop('id');
+            if ($(this).val() == 0) {
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', true);
+            } else {
+                $('input[name='+prefix+'coursesumfieldtotal]').prop('disabled', false);
+            }
+
+        });
     },
 
     /**
@@ -541,7 +582,7 @@ M.totara_programcontent = M.totara_programcontent || {
      * to match the selection
      */
     changeCompletionTypeString: function(el, prefix){
-        if (el.value == this.config.COMPLETIONTYPE_ANY) {
+        if (el.value == this.config.COMPLETIONTYPE_ANY || el.value == this.config.COMPLETIONTYPE_SOME) {
             var completiontypestr = M.util.get_string('or', 'totara_program');
         } else {
             var completiontypestr = M.util.get_string('and', 'totara_program');

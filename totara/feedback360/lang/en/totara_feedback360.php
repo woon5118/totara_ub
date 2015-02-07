@@ -40,17 +40,13 @@ $string['assigngrouptype'] = 'Assignment Type';
 $string['assignments'] = 'Assignments';
 $string['assignnumusers'] = 'Assigned Users';
 $string['assignsourcename'] = 'Assigned Group';
-
 $string['backtofeedback360'] = 'Back to feedback';
 $string['backtofeedbackrequest'] = 'Back to feedback request';
 $string['byduedate'] = 'by {$a}';
-
+$string['cleanuptask'] = 'Cleanup Feedback360';
 $string['cancellationalert'] = '{$a->userfrom} has cancelled their feedback request "{$a->feedbackname}", you no longer need to respond.';
 $string['cancellationemail'] = '{$a->userfrom} has cancelled their feedback request "{$a->feedbackname}", you no longer need to respond.';
 $string['cancellationsubject'] = '{$a->userfrom} Feedback request cancellation';
-$string['managercancellationalert'] = '{$a->userfrom} has cancelled their staff member {$a->staffname}\'s feedback request "{$a->feedbackname}", you no longer need to respond.';
-$string['managercancellationemail'] = '{$a->userfrom} has cancelled their staff member {$a->staffname}\'s feedback request "{$a->feedbackname}", you no longer need to respond.';
-$string['managercancellationsubject'] = '{$a->staffname} Feedback request cancellation';
 $string['cancelrequest'] = 'Cancel Feedback Request';
 $string['cancelrequestconfirm'] = 'Are you sure you want to cancel this feedback request?';
 $string['cancelrequestcontinued'] = ' No further feedback will be accepted but all current replies will be kept.';
@@ -77,7 +73,6 @@ $string['createfeedback360heading'] = 'Create a new 360&deg; Feedback';
 $string['currentrequestees'] = 'Current requestees';
 $string['currentusers'] = 'Current users';
 $string['currentusersmatching'] = 'Current matching users \'{$a}\'';
-
 $string['delete'] = 'Delete';
 $string['deletedfeedback360'] = 'Successfully Deleted Feedback';
 $string['deletefeedback360s'] = 'Delete Feedback - {$a}';
@@ -88,7 +83,6 @@ $string['description_help'] = 'When a feedback description is created the inform
 $string['draft'] = 'Draft';
 $string['duedate'] = 'Due Date';
 $string['duedate_help'] = 'The date requested users should reply by';
-
 $string['emailmissing'] = 'Email missing';
 $string['emailrequestsexisting'] = 'Existing External Feedback Request(s)';
 $string['emailrequestsnew'] = 'Add External Feedback Request(s)';
@@ -131,7 +125,6 @@ $string['eventcreatedrequest'] = 'Created Feedback360 Request';
 $string['eventdeletedfeedback'] = 'Deleted Feedback360';
 $string['eventdeletedrequest'] = 'Deleted Feedback360 Request';
 $string['eventupdatedfeedback'] = 'Updated Feedback360';
-
 $string['feedback360'] = '360&deg; Feedback';
 $string['feedback360:managefeedback360'] = 'Manage Feedback forms';
 $string['feedback360:managestafffeedback'] = 'Manage staff members Feedback requests';
@@ -162,15 +155,14 @@ $string['feedback360selectform'] = 'Select the type of feedback you want to rece
 $string['feedback360selectform_help'] = 'This is the form the users will have to fill in and submit as your feedback, click the preview link next to the name to see the form.';
 $string['feedback360updated'] = 'Successfully updated Feedback';
 $string['feedbacksubmitted'] = 'Feedback submitted';
-
 $string['givefeedback'] = 'Give Feedback';
-
 $string['invalidsesskey'] = 'The given session key is not valid. Please resend data again';
-
 $string['loadfeedback360failure'] = 'Failed to load the 360 Feedback';
-
 $string['managefeedback360'] = 'Manage Feedback';
 $string['managefeedback360s'] = 'Manage 360&deg; Feedbacks';
+$string['managercancellationalert'] = '{$a->userfrom} has cancelled their staff member {$a->staffname}\'s feedback request "{$a->feedbackname}", you no longer need to respond.';
+$string['managercancellationemail'] = '{$a->userfrom} has cancelled their staff member {$a->staffname}\'s feedback request "{$a->feedbackname}", you no longer need to respond.';
+$string['managercancellationsubject'] = '{$a->staffname} Feedback request cancellation';
 $string['manageremailrequesthtml'] = '<p>{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please click the link below to start filling out the form:<\p>
 <p>{$a->link}</p>';
 $string['manageremailrequeststr'] = '{$a->fullname} has requested you fill in their staff member {$a->staffname}\'s feedback form. Please visit the url below to start filling out the form:
@@ -189,7 +181,6 @@ $string['managerreminderemailsubject'] = 'Reminder: {$a->staffname}\'s feedback 
 $string['manageuserrequests'] = 'Manage user requests';
 $string['messages'] = 'Messages';
 $string['myfeedback'] = 'My Feedback';
-
 $string['name'] = 'Name';
 $string['nameemail'] = 'Name/Email';
 $string['name_help'] = 'This is the name that will appear at the top of your feedback forms and reports';
@@ -202,10 +193,8 @@ $string['nofeedback360s'] = 'No feedbacks have been created';
 $string['nogroupassignments'] = 'There are currently no groups assigned';
 $string['notcompleted'] = 'Not Completed';
 $string['nouserassignments'] = 'There are currently no users assigned';
-
 $string['options'] = 'Options';
 $string['overdue'] = 'Overdue';
-
 $string['pending'] = '(pending)';
 $string['pluginname'] = 'Totara Feedback';
 $string['potentialrequestees'] = 'Potential requestees';
@@ -216,7 +205,6 @@ $string['preview'] = 'Preview';
 $string['previewencased'] = '(Preview)';
 $string['previewheader'] = 'Previewing "{$a}"';
 $string['previewsubheader'] = 'This shows the page as someone responding to a feedback request would view it.';
-
 $string['recipient:email'] = 'External email addresses';
 $string['recipient:anyuser'] = 'Any site user';
 $string['recipient:linemanager'] = 'Their line manager';
@@ -254,16 +242,13 @@ $string['requestuserssystemchoose'] = 'Choose the users who you would like to ge
 $string['requestusersemail'] = 'Request Feedback from external users';
 $string['reviewnow'] = 'View your response';
 $string['reviewnowmanager'] = 'View their response';
-
 $string['saveprogress'] = 'Save progress';
 $string['settings'] = 'Settings';
 $string['status'] = 'Status';
 $string['statusat'] = 'Status: ';
 $string['stop'] = 'stop';
 $string['submitfeedback'] = 'Submit feedback';
-
 $string['timedue'] = 'Due: ';
-
 $string['update'] = 'Update';
 $string['updatealert'] = '{$a->userfrom} has updated the due date of their feedback request "{$a->feedbackname}", you now have until {$a->timedue} to respond.';
 $string['updateemail'] = '{$a->userfrom} has updated the due date of their feedback request "{$a->feedbackname}", you now have until {$a->timedue} to respond.';
@@ -278,7 +263,6 @@ $string['userheaderfeedbackbyemail'] = 'Feedback for {$a->username} <a href="{$a
 $string['userheaderfeedbackwolinks'] = 'Feedback for {$a->username}';
 $string['userownheaderfeedback'] = 'Feedback about you';
 $string['userxfeedback360'] = '{$a}\'s Feedback';
-
 $string['validationfailed'] = 'Validation Failed';
 $string['viewinguserxfeedback360'] = 'You are viewing {$a}\'s Feedback';
 $string['viewrequest'] = 'View Request';

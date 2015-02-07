@@ -105,7 +105,9 @@ if ($action == 'edit') {
                         'name' => 'totara_visiblecohort',
                         'fullpath' => '/totara/cohort/dialog/visiblecohort.js',
                         'requires' => array('json'));
-        $args = array('args'=>'{"visibleselected":"' . $visibleselected . '", "type":"program"}');
+        $args = array('args'=>'{"visibleselected":"' . $visibleselected .
+            '", "type":"program", "instancetype": "' . $instancetype .
+            '", "instanceid": "' . $id . '"}');
         $PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
         unset($visibleselected);
     }

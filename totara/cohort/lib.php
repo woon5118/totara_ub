@@ -56,23 +56,30 @@ $COHORT_ALERT = array(
     COHORT_ALERT_ALL => get_string('alertmembersall', 'totara_cohort'),
 );
 
+define('COHORT_ASSN_ITEMTYPE_CATEGORY', 40);
 define('COHORT_ASSN_ITEMTYPE_COURSE', 50);
 define('COHORT_ASSN_ITEMTYPE_PROGRAM', 45);
 define('COHORT_ASSN_ITEMTYPE_CERTIF', 55);
+define('COHORT_ASSN_ITEMTYPE_MENU', 65);
+
 global $COHORT_ASSN_ITEMTYPES;
 $COHORT_ASSN_ITEMTYPES = array(
+    COHORT_ASSN_ITEMTYPE_CATEGORY => 'category',
     COHORT_ASSN_ITEMTYPE_COURSE => 'course',
     COHORT_ASSN_ITEMTYPE_PROGRAM => 'program',
     COHORT_ASSN_ITEMTYPE_CERTIF => 'certification',
+    COHORT_ASSN_ITEMTYPE_MENU => 'menu',
 );
 
 // This should be extended when adding other tabs.
 define ('COHORT_ASSN_VALUE_VISIBLE', 10);
 define ('COHORT_ASSN_VALUE_ENROLLED', 30);
+define ('COHORT_ASSN_VALUE_PERMITTED', 50);
 global $COHORT_ASSN_VALUES;
 $COHORT_ASSN_VALUES = array(
     COHORT_ASSN_VALUE_VISIBLE => 'visible',
-    COHORT_ASSN_VALUE_ENROLLED => 'enrolled'
+    COHORT_ASSN_VALUE_ENROLLED => 'enrolled',
+    COHORT_ASSN_VALUE_PERMITTED => 'permitted'
 );
 
 // Visibility constants.
@@ -141,11 +148,11 @@ function totara_cohort_update_audience_visibility($type, $instanceid, $visibleva
 
 /**
  * Add or update a cohort association
- * @param $cohortid
- * @param $instanceid course/program id
- * @param $instancetype COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_ITEMTYPE_PROGRAM, etc.
- * @param $value COHORT_ASSN_VALUE_ENROLLED, COHORT_ASSN_VALUE_VISIBLE
- * @return boolean
+ * @param int $cohortid
+ * @param int $instanceid course/program id
+ * @param int $instancetype COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_ITEMTYPE_PROGRAM, etc.
+ * @param int $value COHORT_ASSN_VALUE_ENROLLED, COHORT_ASSN_VALUE_VISIBLE, COHORT_ASSN_VALUE_PERMITTED
+ * @return bool
  */
 function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $value=COHORT_ASSN_VALUE_ENROLLED) {
     global $CFG, $DB, $USER, $COHORT_ASSN_ITEMTYPES, $COHORT_ASSN_VALUES;
@@ -221,7 +228,7 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
             default:
                 break;
         }
-    } else { // assigning visible learning
+    } else { // Assigning visible learning or menu item.
         if (!$DB->record_exists_sql('SELECT 1 FROM {cohort_visibility} WHERE cohortid = ? AND instanceid = ? AND '
                 . 'instancetype = ? ', array($cohortid, $instanceid, $instancetype))) {
             $todb = new stdClass();
@@ -245,10 +252,11 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
 
 /**
  * Delete a cohort association
- * @param $cohortid
- * @param $assid
- * @param $asstype
- * @param $value COHORT_ASSN_VALUE_ENROLLED, COHORT_ASSN_VALUE_VISIBLE
+ * @param int $cohortid
+ * @param int $assid
+ * @param int $instancetype
+ * @param int $value COHORT_ASSN_VALUE_ENROLLED, COHORT_ASSN_VALUE_VISIBLE, COHORT_ASSN_VALUE_PERMITTED
+ * @return bool
  */
 function totara_cohort_delete_association($cohortid, $assid, $instancetype, $value=COHORT_ASSN_VALUE_ENROLLED) {
     global $DB, $COHORT_ASSN_ITEMTYPES;
@@ -1545,6 +1553,26 @@ function totara_get_members_cohort($cohortid) {
     global $DB;
 
     return $DB->get_records('cohort_members', array('cohortid' => $cohortid), '', 'userid');
+}
+
+/**
+ * Get cohorts which user is memeber of.
+ *
+ * @param int $userid The user id
+ * @param bool $activeonly return only active cohorts
+ * @return array List of cohort ids.
+ */
+function totara_cohort_get_user_cohorts($userid, $activeonly = true) {
+    global $DB;
+    $sql = 'SELECT c.id FROM {cohort} c
+            INNER JOIN {cohort_members} cm ON (c.id = cm.cohortid)
+            WHERE cm.userid = ?';
+    if ($activeonly) {
+        $sqltime = totara_cohort_date_where_clause('c');
+        $sql .= ' AND ' . $sqltime;
+    }
+
+    return array_keys($DB->get_records_sql($sql, array($userid)));
 }
 
 /**

@@ -619,7 +619,7 @@ class rb_column {
             return in_array($this->grouping,  $graphablegroupings);
         }
 
-        if ($option->dbdatatype === 'decimal' or $option->dbdatatype === 'integer') {
+        if ($option->dbdatatype === 'decimal' or $option->dbdatatype === 'integer' or $option->dbdatatype === 'boolean') {
             return true;
         }
 

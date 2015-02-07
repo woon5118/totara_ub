@@ -142,6 +142,9 @@ The operator options within a competency course set (\'one course\' or \'all cou
 $string['complete'] = 'Complete';
 $string['completeallcourses'] = 'All courses in this set must be completed (unless this is an optional set).';
 $string['completeanycourse'] = 'Any one course in this set must be completed.';
+$string['completemincoursesminsum'] = 'At least {$a->mincourses} course(s) and at least {$a->sumfieldtotal} {$a->sumfield} must be completed to complete this set.';
+$string['completemincourses'] = 'At least {$a->mincourses} course(s) in this set must be completed.';
+$string['completeminsumfield'] = 'At least {$a->sumfieldtotal} {$a->sumfield} must be completed to complete this set.';
 $string['completeby'] = 'Complete by';
 $string['completebytime'] = 'Complete by {$a}';
 $string['completecourse'] = 'Course completion';
@@ -201,6 +204,9 @@ $string['coursesetduemessage_help'] = 'This message will be sent at the specifie
 $string['coursesetoverdue'] = 'Course set overdue';
 $string['coursesetoverduemessage'] = 'Course set overdue message';
 $string['coursesetoverduemessage_help'] = 'This message will be sent at the specified time after a course set becomes due.';
+$string['coursescorefield'] = 'Course score field';
+$string['coursescorefield_help'] = 'Specify a course custom field which is used to allocate a score to each course in the set. This is used in conjunction with "Minimum score" below to determine the course set\'s completion criteria.
+The selected field should have numeric values.';
 $string['createandnext'] = 'Create and go to next step';
 $string['createandreturn'] = 'Create and return to overview';
 $string['createcourse'] = 'Create course';
@@ -365,6 +371,7 @@ $string['header:hash'] = '#';
 $string['header:id'] = 'ID';
 $string['header:issue'] = 'Issue';
 $string['header:learners'] = 'Learners';
+$string['hiddenfield'] = '**Hidden field**';
 $string['holdposof'] = 'Hold position of \'{$a}\'';
 $string['hours'] = 'Hour(s)';
 $string['icon'] = 'Icon';
@@ -385,8 +392,10 @@ $string['instructions:programmessages'] = 'Define program messages and reminders
 $string['invalidtype'] = 'Invalid type param';
 $string['label:competencyname'] = 'Competency name';
 $string['label:coursecreation'] = 'When to create new course';
+$string['label:coursescorefield'] = 'Course score field';
 $string['label:learnermustcomplete'] = 'Learner must complete';
 $string['label:message'] = 'Message';
+$string['label:minimumscore'] = 'Minimum score';
 $string['label:minimumtimerequired'] = 'Minimum time required';
 $string['label:nextsetoperator'] = 'Next set operator';
 $string['label:noticeformanager'] = 'Notice for manager';
@@ -529,6 +538,12 @@ In program messages, certain variables can be inserted into the subject and/or b
 
 %setlabel%
 :   This will be replaced by the course set label (it will only be replaced if the message relates to a course set';
+$string['mincourses'] = 'Minimum courses completed';
+$string['mincourses_help'] = 'The minimum number of courses within this course set the assignees must complete for this course set to be considered complete.';
+$string['minimumscore'] = 'Minimum score';
+$string['minimumscore_help'] = 'A minimum score that must be reached for the course set to be marked as complete. The score is calculated by summing the values from the “Course score field” for all the courses a user has completed.
+
+For example, you might have a “Credits” custom field on your courses, so you could use this setting to mark a course set as complete when a certain number of credits have been achieved.';
 $string['minimumtimerequired'] = 'Minimum time required';
 $string['minimumtimerequired_help'] = 'This value indicates a minimum amount of time that a user might realistically be able to complete the course set. It is used to determine if the completion period set on the "assignments" tab is realistic for a particular group of users. If the assignment is not realistic, a "time allowance" exception will be generated and the user will not be assigned to the program until the exception has been resolved.
 
@@ -763,6 +778,8 @@ $string['setrealistictimeallowance'] = 'Set realistic time allowance';
 $string['settimerelativetoevent'] = 'Set time relative to event';
 $string['shortname'] = 'Short name';
 $string['showingresults'] = 'Showing results {$a->from} - {$a->to} of {$a->total}';
+$string['somecourses'] = 'Some courses';
+$string['somecoursesfrom'] = 'some courses from';
 $string['source'] = 'Source';
 $string['startdate'] = 'Start date';
 $string['startinposition'] = 'start in position';

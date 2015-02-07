@@ -494,4 +494,51 @@ class feedback360_test extends feedback360_testcase {
         $canother = feedback360::can_view_feedback360s($user2->id);
         $this->assertFalse($canother);
     }
+
+    public function test_cleanup_task() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Create feedback360 and activate it.
+        list($fdbck, $users) = $this->prepare_feedback_with_users(5);
+        $fdbck->activate();
+
+        // Get assignment records.
+        $userassignments = $DB->get_records('feedback360_user_assignment', array('feedback360id' => $fdbck->id));
+
+        $sql = "SELECT fra.id
+                  FROM {feedback360_resp_assignment} fra
+            INNER JOIN {feedback360_user_assignment} fua
+                    ON fua.id = fra.feedback360userassignmentid
+                 WHERE fua.feedback360id = ? ";
+
+        // Create records for feedback360_resp_assignment and mark users as deleted.
+        $deletedusers = array();
+        foreach ($userassignments as $userassignment) {
+            feedback360_responder::update_system_assignments(array($userassignment->userid), array(), $userassignment->id, time());
+            if ($userassignment->userid % 2) {
+                $DB->set_field('user', 'deleted', 1, array('id' => $userassignment->userid));
+                $deletedusers[$userassignment->userid] = $userassignment->id;
+            }
+        }
+
+        // Check we have 5 users assigned to the feedback360.
+        $this->assertEquals(count($users), count($userassignments));
+        $this->assertEquals(count($users), count($DB->get_records_sql($sql, array($fdbck->id))));
+
+        // Call the clean up task.
+        $task = new \totara_feedback360\task\cleanup_task();
+        $task->execute();
+
+        // Check the clean up task has done its work and deleted users have been removed from the assignments table.
+        $currentusers = count($users) - count($deletedusers);
+        $this->assertEquals($currentusers, $DB->count_records('feedback360_user_assignment', array('feedback360id' => $fdbck->id)));
+        $this->assertEquals($currentusers, count($DB->get_records_sql($sql, array($fdbck->id))));
+
+        foreach ($deletedusers as $userid => $value) {
+            $this->assertFalse(feedback360::has_user_assignment($userid, $fdbck->id));
+            $params = array('feedback360userassignmentid' => $value);
+            $this->assertFalse($DB->record_exists('feedback360_resp_assignment', $params));
+        }
+    }
 }

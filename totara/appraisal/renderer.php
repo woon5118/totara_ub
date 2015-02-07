@@ -85,7 +85,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @return string HTML table
      */
     public function appraisal_manage_table($appraisals = array(), $userid = null) {
-        global $USER;
+        global $CFG, $USER;
 
         if (!$userid) {
             $userid = $USER->id;
@@ -150,7 +150,11 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $options = '';
             if (has_capability('totara/appraisal:manageappraisals', $systemcontext, $userid)) {
                 if ($appraisal->status == appraisal::STATUS_ACTIVE) {
-                    $options .= $this->output->action_icon($assignurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
+                    if (empty($CFG->dynamicappraisals)) {
+                        $options .= $this->output->pix_icon('/t/edit_gray', $strnoteditable, 'moodle', array('class' => 'disabled iconsmall'));
+                    } else {
+                        $options .= $this->output->action_icon($assignurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
+                    }
                     $options .= $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'));
                     $options .= $this->output->pix_icon('/t/delete_gray', $strcannotdelete, 'moodle', array('class' => 'disabled iconsmall'));
                 } else {
@@ -1012,6 +1016,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @return string HTML
      */
     public function confirm_appraisal_activation($appraisal, $errors, $warnings) {
+        global $CFG;
+
         $out = '';
         if (!empty($errors)) {
             $out .= $this->heading(get_string('appraisalinvalid', 'totara_appraisal'));
@@ -1037,7 +1043,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                     format_string($appraisal->name)), 'get');
             $out .= html_writer::tag('div', implode(' ', $buttons), array('class' => 'buttons'));
         } else {
-            $out .= html_writer::tag('p', get_string('appraisallastwarning', 'totara_appraisal'));
+            $warnstr = empty($CFG->dynamicappraisals) ? 'appraisalstaticlastwarning' : 'appraisaldynamiclastwarning';
+            $out .= html_writer::tag('p', get_string($warnstr, 'totara_appraisal'));
             // Output the warnings to the screen.
             if (!empty($warnings)) {
                 $out .= html_writer::tag('p', get_string('confirmactivatewarning', 'totara_appraisal'));
@@ -1235,8 +1242,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $row[] = new html_table_cell($assign->sourcefullname);
                 $row[] = new html_table_cell($includechildren);
                 $row[] = new html_table_cell($assign->groupusers);
-                // Only show delete if appraisal is draft status.
-                if (!appraisal::is_closed($itemid)) {
+                // Only show delete if appraisal is draft status, or active with dynamic appraisals enabled.
+                if ((!empty($CFG->dynamicappraisals) && appraisal::is_active($itemid)) || appraisal::is_draft($itemid)) {
                     $delete = $this->output->action_icon(
                             new moodle_url('/totara/appraisal/learners.php',
                             array('appraisalid' => $itemid, 'deleteid' => $assign->id, 'sesskey' => sesskey())),
@@ -1340,7 +1347,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
      * @return string HTML
      */
     public function display_appraisal_header($appraisal, $userassignment, $roleassignments, $preview = false) {
-        global $DB;
+        global $CFG, $DB;
 
         $out = html_writer::tag('h3', format_string($appraisal->name));
 
@@ -1357,7 +1364,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $participant = $rolestring . ": " . fullname($user);
             }
 
-            if ($appraisal->status == appraisal::STATUS_ACTIVE && $roleassignments[$role]->userid != $actual[$role]) {
+            $dynamic = !empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE;
+            if ($dynamic && $roleassignments[$role]->userid != $actual[$role]) {
                 $participant .= $this->container(get_string('rolehaschanged', 'totara_appraisal'), 'rolechangedwarning');
             }
 
@@ -1380,7 +1388,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
                 $userfullname = fullname($userassignment->user);
                 $out .= html_writer::tag('p', $icon . get_string('appraisalclosedforuser', 'totara_appraisal', $userfullname));
             }
-
         }
 
         return html_writer::tag('div', $out, array('class' => 'appraisal-title'));

@@ -129,7 +129,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if ($session->datetimeknown) {
                 $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_BOOKED);
             } else {
-                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED);
+                $signupcount = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_WAITLISTED);
             }
             if ($viewattendees) {
                 if ($session->datetimeknown) {
@@ -138,7 +138,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                     if ($signupcount > $session->capacity) {
                         $stats .= get_string('capacityoverbooked', 'facetoface');
                     }
-                    $waitlisted = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_APPROVED) - $signupcount;
+                    $waitlisted = facetoface_get_num_attendees($session->id, MDL_F2F_STATUS_WAITLISTED) - $signupcount;
                     if ($waitlisted > 0) {
                         $stats .= " (" . $waitlisted . " " . get_string('status_waitlisted', 'facetoface') . ")";
                     }
@@ -151,22 +151,13 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $sessionrow[] = $stats;
 
             // Status.
-            $allowcancellation = false;
             $status  = get_string('bookingopen', 'facetoface');
             if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                 $status = get_string('sessioninprogress', 'facetoface');
                 $sessionstarted = true;
-                // If user status is wait-listed.
-                if ($bookedsession && $bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                    $allowcancellation = true;
-                }
             } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                 $status = get_string('sessionover', 'facetoface');
                 $sessionstarted = true;
-                // If user status is wait-listed.
-                if ($bookedsession && $bookedsession->statuscode == MDL_F2F_STATUS_WAITLISTED) {
-                    $allowcancellation = true;
-                }
             } else if ($bookedsession && $session->id == $bookedsession->sessionid) {
                 $signupstatus = facetoface_get_status($bookedsession->statuscode);
                 $status = get_string('status_'.$signupstatus, 'facetoface');
@@ -175,7 +166,8 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 $status = get_string('bookingfull', 'facetoface');
                 $sessionfull = true;
             }
-            $allowcancellation = $allowcancellation && $session->allowcancellations;
+            // Check if the user is allowed to cancel his booking.
+            $allowcancellation = facetoface_allow_user_cancellation($session);
 
             $sessionrow[] = $status;
 
@@ -227,7 +219,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             if ($isbookedsession) {
                 $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                 $options .= html_writer::link($signupurl, get_string('moreinfo', 'facetoface'), array('title' => get_string('moreinfo', 'facetoface')));
-                if ($session->allowcancellations) {
+                if ($allowcancellation) {
                     $options .= html_writer::empty_tag('br');
                     $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
                     $options .= html_writer::link($cancelurl, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));

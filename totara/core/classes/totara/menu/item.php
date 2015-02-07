@@ -22,6 +22,7 @@
  * @package    totara
  * @subpackage navigation
  * @author     Oleg Demeshev <oleg.demeshev@totaralms.com>
+ * @author     Chris Wharton <chris.wharton@catalyst-eu.net>
  */
 namespace totara_core\totara\menu;
 
@@ -98,13 +99,17 @@ class item {
      * Check for custom flag, if it is not set then returns default url.
      * Otherwise returns modified url by client.
      *
+     * @param bool $replaceparams replace ##params##
      * @return string node url
      */
-    public function get_url() {
+    public function get_url($replaceparams = true) {
         if ((int)$this->custom == 0) {
             $this->url = $this->get_default_url();
         }
-        return $this->url;
+        if (!$replaceparams) {
+            return $this->url;
+        }
+        return menu::replace_url_parameter_placeholders($this->url);
     }
 
     /**
@@ -143,6 +148,9 @@ class item {
         }
         if ($calculated && $this->visibility == menu::SHOW_WHEN_REQUIRED) {
             return $this->check_visibility();
+        }
+        if ($calculated && $this->visibility == menu::SHOW_CUSTOM) {
+            return $this->get_visibility_custom();
         }
         return $this->visibility;
     }
@@ -256,5 +264,257 @@ class item {
     private function get_original_classname($classname) {
         $path = \core_text::strrchr($classname, "\\");
         return \core_text::substr($path, 1);
+    }
+
+    /**
+     * Menu items that have their visibility set to use custom access rules use this function to check
+     * their visibility.
+     *
+     * @return bool true if item is visible to current user.
+     */
+    protected function get_visibility_custom() {
+        global $DB;
+
+        // The set of rules for this menu item.
+        $ruleset = $DB->get_records('totara_navigation_settings', array('itemid' => $this->id));
+
+        $visibility = true; // Default to being visible.
+        $activerules = array();
+        $ruleaggregations = array();
+        foreach ($ruleset as $rule) {
+            if ($rule->name === 'enable' && $rule->value === '1') {
+                $activerules[] = $rule->type;
+                unset($ruleset[$rule->id]);
+            }
+            if ($rule->name === 'aggregation') {
+                $ruleaggregations[$rule->type] = $rule->value;
+                unset($ruleset[$rule->id]);
+            }
+            if ($rule->type === 'visibility_restriction' && $rule->name === 'item_visibility') {
+                $visibility = $rule->value;
+                unset($ruleset[$rule->id]);
+            }
+            if ($rule->type === 'role_access' && $rule->name === 'context') {
+                $context = $rule->value;
+                unset($ruleset[$rule->id]);
+            }
+        }
+        $result = array();
+        foreach ($ruleset as $rule) {
+            if (in_array($rule->type, $activerules)) {
+                $aggregation =  $visibility;
+                if (isset($ruleaggregations[$rule->type])) {
+                    $aggregation = $ruleaggregations[$rule->type];
+                }
+                switch ($rule->name) {
+                    case 'active_roles':
+                        $result[] = $this->get_visibility_by_role($rule, $aggregation, $context);
+                        break;
+                    case 'active_presets':
+                        $result[] = $this->get_visibility_by_preset_rule($rule, $aggregation);
+                        break;
+                    case 'active_audiences':
+                        $result[] = $this->get_visibility_by_audience($rule, $aggregation);
+                        break;
+                    default:
+                        continue 2;
+                }
+            } else {
+                continue;
+            }
+        }
+
+        if ($visibility == menu::AGGREGATION_ANY) {
+            return in_array(true, $result); // Any true result.
+        } else if ($visibility == menu::AGGREGATION_ALL) {
+            return !in_array(false, $result); // None false results.
+        }
+    }
+
+    /**
+     * Checks the preset rules for this menu item.
+     *
+     * To add another rule, just add to the switch statement, and {@link menu::get_preset_rule_choices()}.
+     *
+     * @param object $rule The rule that applies to the particular menu item.
+     * @param int $visibility Logical operator for combining multiple results - one of the menu::AGGREGATION_* constants.
+     * @return bool $result True if the item is visible.
+     */
+    private function get_visibility_by_preset_rule($rule, $visibility) {
+        global $USER;
+
+        $result = array();
+        $presets = explode(',', $rule->value);
+        foreach ($presets as $preset) {
+            switch ($preset) {
+                case 'is_logged_in':
+                    $result[] = isloggedin();
+                    break;
+                case 'is_not_logged_in':
+                    $result[] = !(isloggedin());
+                    break;
+                case 'is_guest':
+                    $result[] = isloggedin() && isguestuser();
+                    break;
+                case 'is_not_guest':
+                    $result[] = !isloggedin() || !isguestuser();
+                    break;
+                case 'is_site_admin':
+                    $result[] = is_siteadmin($USER);
+                    break;
+                case 'can_view_required_learning':
+                    $result[] = $this->check_menu_item_visibility('\totara_program\totara\menu\requiredlearning');
+                    break;
+                case 'can_view_my_team':
+                    $result[] = $this->check_menu_item_visibility('\totara_core\totara\menu\myteam');
+                    break;
+                case 'can_view_my_reports':
+                    $result[] = $this->check_menu_item_visibility('\totara_core\totara\menu\myreports');
+                    break;
+                case 'can_view_certifications':
+                    $result[] = $this->check_menu_item_visibility('\totara_coursecatalog\totara\menu\certifications');
+                    break;
+                case 'can_view_programs':
+                    $result[] = $this->check_menu_item_visibility('\totara_coursecatalog\totara\menu\programs');
+                    break;
+                case 'can_view_allappraisals':
+                    $result[] = $this->check_menu_item_visibility('\totara_appraisal\totara\menu\allappraisals');
+                    break;
+                case 'can_view_latestappraisal':
+                    $result[] = $this->check_menu_item_visibility('\totara_appraisal\totara\menu\latestappraisal');
+                    break;
+                case 'can_view_appraisal':
+                    $result[] = $this->check_menu_item_visibility('\totara_appraisal\totara\menu\appraisal');
+                    break;
+                case 'can_view_feedback_360s':
+                    $result[] = $this->check_menu_item_visibility('\totara_feedback360\totara\menu\feedback360');
+                    break;
+                case 'can_view_my_goals':
+                    $result[] = $this->check_menu_item_visibility('\totara_hierarchy\totara\menu\mygoals');
+                    break;
+                case 'can_view_learning_plans':
+                    $result[] = $this->check_menu_item_visibility('\totara_plan\totara\menu\learningplans');
+                    break;
+                default:
+                    debugging('The preset rule: ' . $preset . ' is not defined.', DEBUG_DEVELOPER);
+                    $result[] = true;
+                    break;
+            }
+        }
+
+        if ($visibility == menu::AGGREGATION_ANY) {
+            return in_array(true, $result); // Any true result.
+        } else if ($visibility == menu::AGGREGATION_ALL) {
+            return !in_array(false, $result); // None false results.
+        }
+    }
+
+    /**
+     * Instantiate a menu item instance of the specified class and
+     * use it to determine that menu item's visibility to the current
+     * user.
+     *
+     * @param string $menuclass Class name for a menu item.
+     * @return bool True if the current user can see that type of menu item.
+     */
+    private function check_menu_item_visibility($menuclass) {
+        $menuinstance = new $menuclass(array());
+        $visibility = $menuinstance->get_visibility();
+        return (bool) $visibility == menu::SHOW_ALWAYS;
+    }
+
+    /**
+     * Checks the role rules for this menu item.
+     *
+     * @param object $rule The rule that applies to the particular menu item.
+     * @param int $aggregation Logical operator for combining multiple results - one of the menu::AGGREGATION_* constants.
+     * @param string $contextsetting If 'site', check for role in the system context. If 'any' check for role in any context.
+     *
+     * @return bool $result True if the item is visible.
+     */
+    private function get_visibility_by_role($rule, $aggregation, $contextsetting) {
+        global $DB, $USER, $CFG, $PAGE;
+
+        $userroles = array();
+        $allowedroles = explode('|', $rule->value);
+
+        // First get all system roles the user has been assigned.
+        $data = get_user_roles_with_special(\context_system::instance(), $USER->id);
+        foreach ($data as $item) {
+            $userroles[] = $item->roleid;
+        }
+
+        // We need to check for the front page role id using the current page context. Its a special case.
+        // We've got special roles against the system context but authenticated user on frontpage is against the course context
+        // and we don't want to include front page roles as the setting
+        $defaultfrontpageroleid = isset($CFG->defaultfrontpageroleid) ? $CFG->defaultfrontpageroleid : 0;
+        $isfrontpage = ($PAGE->context->contextlevel == CONTEXT_COURSE && $PAGE->context->instanceid == SITEID) ||
+            is_inside_frontpage($PAGE->context);
+        if ($defaultfrontpageroleid && $isfrontpage) {
+            // The user is on the frontpage and is authenticated.
+            $userroles[] = $defaultfrontpageroleid;
+        }
+
+        // We need to add the guest role if the user is the guest.
+        // This can be potentially painful depending upon the state of the site.
+        // We would hope that if the menu has been configured this stuff should already be set up and there should be a nice
+        // CFG var with the guest role id in it.
+        if (isguestuser()) {
+            if (!empty($CFG->guestroleid)) {
+                $userroles[] = $CFG->guestroleid;
+            } else {
+                $guestrole = get_guest_role();
+                $userroles[] = $guestrole->id;
+            }
+        }
+
+        // Final nasty wee hack here, sorry this is just nasty. Messing with roles is nobodies idea of fun.
+        // We add any roles the user has been assigned in any other contexts.
+        // This can't be considered accurate as there is no relational checking of roles against the contexts that they belong
+        // within nor access controls on those things.
+        // The only thing that should be looking at the roles table is the roles API.
+        if ($contextsetting == 'any') {
+            // Find roles the user has in any context.
+            $allroles = $DB->get_fieldset_sql('SELECT DISTINCT roleid
+                FROM {role_assignments}
+                WHERE userid = ?', array($USER->id));
+            foreach ($allroles as $role) {
+                $userroles[] = $role;
+            }
+        }
+        $userroles = array_unique($userroles);
+        if ($aggregation == menu::AGGREGATION_ANY) {
+            return (count(array_intersect($allowedroles, $userroles)) != 0);
+        } else if ($aggregation == menu::AGGREGATION_ALL) {
+            return (count(array_intersect($allowedroles, $userroles)) == count($allowedroles));
+        }
+    }
+
+    /**
+     * Checks the audience rules for this menu item.
+     *
+     * @param object $rule The rule that applies to the particular menu item.
+     * @param int $visibility Logical operator for combining multiple results - one of the menu::AGGREGATION_* constants.
+     * @return bool True if user has access rights.
+     */
+    private function get_visibility_by_audience($rule, $visibility) {
+        global $DB, $USER;
+
+        if (!isloggedin() || isguestuser()) {
+            return false;
+        }
+
+        $allowedaudiences = explode(',', $rule->value);
+
+        $sql = "SELECT cohortid
+                  FROM {cohort_members}
+                 WHERE userid = ?";
+        $useraudiences = $DB->get_fieldset_sql($sql, array($USER->id));
+
+        if ($visibility == menu::AGGREGATION_ANY) {
+            return (count(array_intersect($allowedaudiences, $useraudiences)) != 0);
+        } else if ($visibility == menu::AGGREGATION_ALL) {
+            return (count(array_intersect($allowedaudiences, $useraudiences)) == count($allowedaudiences));
+        }
     }
 }

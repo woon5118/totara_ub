@@ -81,6 +81,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
+    // TODO: remove use of facetoface API because the database may not be upgraded yet!
     require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
     $result = true;
@@ -1914,36 +1915,6 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014022000, 'facetoface');
     }
 
-    if ($oldversion < 2014050400) {
-        $del_users = $DB->get_fieldset_select('user', 'id', 'deleted = ?', array(1));
-        $sus_users = $DB->get_fieldset_select('user', 'id', 'deleted = ? AND suspended = ?', array(0, 1));
-
-        foreach ($del_users as $user) {
-            // Cancel already deleted users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
-                foreach ($signups as $signup) {
-                    $session = facetoface_get_session($signup->sessionid);
-                    // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user, false, $null, get_string('userdeletedcancel', 'facetoface'));
-                }
-            }
-        }
-
-        foreach ($sus_users as $user) {
-            // Cancel already suspended users facetoface signups.
-            if ($signups = $DB->get_records('facetoface_signups', array('userid' => $user))) {
-                foreach ($signups as $signup) {
-                    $session = facetoface_get_session($signup->sessionid);
-                    // Using $null, null fails because of passing by reference.
-                    facetoface_user_cancel($session, $user, false, $null, get_string('usersuspendedcancel', 'facetoface'));
-                }
-            }
-        }
-
-        // Facetoface savepoint reached.
-        upgrade_mod_savepoint(true, 2014050400, 'facetoface');
-    }
-
     if ($oldversion < 2014061600) {
 
         // Create the a userid field for the facetoface_notification_sent table.
@@ -2379,6 +2350,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014102200, 'facetoface');
     }
 
+
     if ($oldversion < 2014102201) {
         // Change the f2f session duration fields from minutes to seconds.
         $sessions = $DB->get_recordset('facetoface_sessions', null, 'id', 'id, duration');
@@ -2391,6 +2363,97 @@ function xmldb_facetoface_upgrade($oldversion=0) {
 
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2014102201, 'facetoface');
+    }
+
+    /* T-13006: It should not be possible for a signup status record to have a statuscode of
+     * MDL_F2F_STATUS_APPROVED unless there has been an error (failed to sign up to full
+     *  session due to someone filling the last spot). This upgrade cancels all signups with
+     * statuscode MDL_F2F_STATUS_APPROVED and displays the list of affected users during upgrade.
+     */
+    if ($oldversion < 2014110701) {
+        // Find signup status records with statuscode MDL_F2F_STATUS_APPROVED.
+        $sql = "SELECT fss.id AS signupstatusid,
+                       f.id AS facetofaceid,
+                       fs.sessionid,
+                       s.datetimeknown,
+                       c.id AS courseid,
+                       f.name AS facetofacename,
+                       u.id AS userid,
+                       u.*
+                  FROM {facetoface_signups_status} fss
+                  JOIN {facetoface_signups} fs ON fs.id = fss.signupid
+                  JOIN {facetoface_sessions} s ON s.id = fs.sessionid
+                  JOIN {facetoface} f ON f.id = s.facetoface
+                  JOIN {user} u ON u.id = fs.userid
+                  JOIN {course} c ON c.id = f.course
+                 WHERE fss.statuscode = ?
+                   AND fss.superceded = 0
+                 ORDER BY fss.timecreated DESC";
+        $affectedusersignups = $DB->get_records_sql($sql, array(MDL_F2F_STATUS_APPROVED));
+
+        $affected = "";
+        $timenow = time();
+        foreach ($affectedusersignups as $usersignup) {
+            $cm = get_coursemodule_from_instance("facetoface", $usersignup->facetofaceid, $usersignup->courseid);
+
+            // Update the record.
+            $DB->set_field('facetoface_signups_status', 'statuscode', MDL_F2F_STATUS_DECLINED,
+                    array('id' => $usersignup->signupstatusid));
+
+            // Add a log message.
+            upgrade_log(UPGRADE_LOG_NOTICE, 'mod_facetoface', 'Invalid user signup cancelled: userid ' .
+                    $usersignup->userid . ', facetofaceid ' . $usersignup->facetofaceid);
+
+            // Calculate strings for upgrade output.
+            $userurl = new moodle_url('/user/view.php', array('id' => $usersignup->userid));
+            $f2furl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $usersignup->sessionid));
+            $userstring = html_writer::link($userurl, format_string(fullname($usersignup)));
+            $f2fstring = html_writer::link($f2furl, format_string($usersignup->facetofacename));
+
+            // Add the string to the set of results.
+            if ($affected) {
+                $affected .= "<br>";
+            }
+            $affected .= get_string('upgradefixstatusapprovedlimbousersdetail', 'facetoface',
+                    array('user' => $userstring, 'f2f' => $f2fstring));
+        }
+
+        if ($affected) {
+            // Display a message indicating that invalid records were found and fixed.
+            $message = get_string('upgradefixstatusapprovedlimbousersdescription', 'facetoface', $affected);
+            echo $OUTPUT->notification($message, 'notifynotice');
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2014110701, 'facetoface');
+    }
+
+    if ($oldversion < 2014110703) {
+
+        // Add cancellationcutoffdefault to the facetoface table.
+        $table = new xmldb_table('facetoface');
+
+        // Field defaults to 24 hours (86400 seconds).
+        $field = new xmldb_field('cancellationscutoffdefault', XMLDB_TYPE_INTEGER, '10', null, true, null, '86400', 'allowcancellationsdefault');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add cancellationcutoff to the facetoface_sessions table.
+        $table = new xmldb_table('facetoface_sessions');
+
+        // Field defaults to 24 hours (86400 seconds).
+        $field = new xmldb_field('cancellationcutoff', XMLDB_TYPE_INTEGER, '10', null, true, null, '86400', 'allowcancellations');
+        $field->setComment('The number of seconds before the session start when the user is allowed to cancel');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2014110703, 'facetoface');
     }
 
     return $result;

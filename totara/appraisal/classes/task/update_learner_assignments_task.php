@@ -46,16 +46,18 @@ class update_learner_assignments_task extends \core\task\scheduled_task {
 
         $timenow = time();
 
-        // Execute the cron if Appraisals are not disabled.
+        // Execute the cron if Appraisals are not disabled or static.
         if (totara_feature_disabled('appraisals')) {
             return;
         }
 
-        // Update learner assignments for active appraisals.
-        $appraisals = $DB->get_records('appraisal', array('status' => \appraisal::STATUS_ACTIVE));
-        foreach ($appraisals as $app) {
-            $appraisal = new \appraisal($app->id);
-            $appraisal->check_assignment_changes();
+        if (!empty($CFG->dynamicappraisals)) {
+            // Update learner assignments for active appraisals.
+            $appraisals = $DB->get_records('appraisal', array('status' => \appraisal::STATUS_ACTIVE));
+            foreach ($appraisals as $app) {
+                $appraisal = new \appraisal($app->id);
+                $appraisal->check_assignment_changes();
+            }
         }
 
         \totara_appraisal_observer::send_scheduled($timenow);

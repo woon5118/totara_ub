@@ -10,7 +10,7 @@
 
   <xs:simpleType name="tableName" >
     <xs:restriction base="xs:string" >
-     <xs:pattern value='[0-9a-z_]{1,28}'/>
+     <xs:pattern value='[0-9a-z_]{1,40}'/><!-- Totara will never support Oracle, limit is 40 since 2.7, YAY! -->
     </xs:restriction >
   </xs:simpleType >
 

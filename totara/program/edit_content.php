@@ -229,6 +229,7 @@ $args = array('args'=> '{"id":'.$program->id.','.
                         '"display_selected_addcompetency":'.$selected_addcompetency.','.
                         '"display_selected_addrecurringcourse":'.$selected_addrecurringcourse.','.
                         '"COMPLETIONTYPE_ANY":"'.COMPLETIONTYPE_ANY.'",'.
+                        '"COMPLETIONTYPE_SOME":"'.COMPLETIONTYPE_SOME.'",'.
                         '"CONTENTTYPE_MULTICOURSE":"'.CONTENTTYPE_MULTICOURSE.'",'.
                         '"CONTENTTYPE_COMPETENCY":"'.CONTENTTYPE_COMPETENCY.'",'.
                         '"CONTENTTYPE_RECURRING":"'.CONTENTTYPE_RECURRING.'"}');

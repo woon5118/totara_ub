@@ -444,7 +444,7 @@ class rb_source_facetoface_summary extends rb_base_source {
             } else {
                 $targetTZ = $row->timezone;
             }
-            $date = userdate($date, get_string('nice_date_in_timezone_format', 'totara_reportbuilder'), $targetTZ);
+            $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ);
             return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $date);
         } else {
             return '';

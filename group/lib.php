@@ -595,7 +595,10 @@ function groups_delete_group_members($courseid, $userid=0, $showfeedback=false) 
 }
 
 /**
- * Bulk remove all users (or one user) from all groups in a course
+ * Bulk remove all users (or several users) from all groups in a course
+ *
+ * @since Totara 2.2
+ *
  * @param int $courseid
  * @param array $userids or 0 for all
  * @param bool $showfeedback

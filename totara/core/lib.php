@@ -27,113 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/totara/core/totara.php');
 require_once($CFG->dirroot . '/totara/core/deprecatedlib.php');
 
-/* Core event handler classes.
- *
- */
-class totara_core_event_handler {
-
-    /**
-    * Triggered by the user_enrolled event,  this function is run when a user is enrolled in the course
-    * and creates a completion_completion record for the user if completion is enabled for this course
-    *
-    * @param   object      $event
-    * @return  boolean
-    */
-    public static function user_enrolment(\totara_core\event\user_enrolment $event) {
-        global $CFG, $DB;
-        include_once($CFG->dirroot . '/completion/completion_completion.php');
-
-        $eventdata = $event->get_data();
-
-        $courseid = $eventdata['other']['courseid'];
-        $userid = $eventdata['other']['userid'];
-        $timestart = $eventdata['other']['timestart'];
-
-        // Load course
-        if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-            debugging('Could not load course id '.$courseid);
-            return true;
-        }
-
-        // Create completion object.
-        $cinfo = new completion_info($course);
-
-        // Check completion is enabled for this site and course.
-        if (!$cinfo->is_enabled()) {
-            return true;
-        }
-
-        // If no start on enrol, don't create a record
-        if (empty($course->completionstartonenrol)) {
-            return true;
-        }
-
-        // Create completion record
-        $data = array(
-            'userid'    => $userid,
-            'course'    => $course->id
-        );
-        $completion = new completion_completion($data);
-        $completion->mark_enrolled($timestart);
-
-        // Review criteria
-        completion_handle_criteria_recalc($course->id, $userid);
-
-        return true;
-    }
-
-    /**
-    * Triggered by the module_completion event, this function
-    * checks if the criteria exists, if it is applicable to the user
-    * and then reviews the user's state in it.
-    *
-    * @param   object      $event
-    * @return  boolean
-    */
-    public static function criteria_course_calc(\totara_core\event\module_completion $event) {
-        global $CFG, $DB;
-        include_once($CFG->dirroot . '/completion/completion_completion.php');
-
-        $eventdata = $event->get_data();
-        // Check if applicable course criteria exists.
-        $criteria = completion_criteria::factory($eventdata['other']);
-        $params = array_intersect_key($eventdata['other'], array_flip($criteria->required_fields));
-
-        $criteria = $DB->get_records('course_completion_criteria', $params);
-        if (!$criteria) {
-            return true;
-        }
-
-        // Loop through, and see if the criteria apply to this user.
-        foreach ($criteria as $criterion) {
-
-            $course = new stdClass();
-            $course->id = $criterion->course;
-            $cinfo = new completion_info($course);
-
-
-            if (!$cinfo->is_tracked_user($eventdata['other']['userid'])) {
-                continue;
-            }
-
-            // Load criterion.
-            $criterion = completion_criteria::factory((array) $criterion);
-
-            // Load completion record.
-            $data = array(
-                'criteriaid'    => $criterion->id,
-                'userid'        => $eventdata['other']['userid'],
-                'course'        => $criterion->course
-            );
-            $completion = new completion_criteria_completion($data);
-
-            // Review and mark complete if necessary.
-            $criterion->review($completion);
-        }
-
-        return true;
-    }
-}
 /**
  *  * Resize an image to fit within the given rectange, maintaing aspect ratio
  *
@@ -310,25 +203,51 @@ function sql_drop_table_if_exists($table) {
  * Reorder elements based on order field
  *
  * @param int $id Element ID
- * @param int $pos It's new relative position
+ * @param int $pos It's new relative position, or -1 to make it last
  * @param string $table Table name
  * @param string $parentfield Field name
  * @param string $orderfield Order field name
  */
-function db_reorder($id, $pos, $table, $parentfield, $orderfield='sortorder') {
+function db_reorder($id, $pos, $table, $parentfield = '', $orderfield = 'sortorder') {
     global $DB;
     $transaction = $DB->start_delegated_transaction();
-    $sql = 'SELECT tosort.id
-              FROM {'.$table.'} tosort
-              LEFT JOIN {'.$table.'} element
-                ON (element.'.$parentfield.' = tosort.'.$parentfield.')
-             WHERE element.id = ?
-               AND tosort.id <> ?
-             ORDER BY tosort.'.$orderfield;
-    $records = $DB->get_records_sql($sql, array($id, $id));
+    if ($parentfield != '') {
+        $sql = 'SELECT tosort.id
+                FROM {' . $table . '} tosort
+                LEFT JOIN {' . $table . '} element
+                    ON (element.' . $parentfield . ' = tosort.' . $parentfield . ')
+                WHERE element.id = ?
+                    AND tosort.id <> ?
+                ORDER BY tosort.' . $orderfield;
+        $records = $DB->get_records_sql($sql, array($id, $id));
+    } else {
+        $sql = 'SELECT tosort.id
+                FROM {' . $table . '} tosort
+                WHERE tosort.id <> ?
+                ORDER BY tosort.' . $orderfield;
+        $records = $DB->get_records_sql($sql, array($id));
+    }
     $newpos = 0;
     $todb = new stdClass();
     $todb->id = $id;
+
+    // Handle placing last.
+    if ($pos == -1) {
+        if ($parentfield != '') {
+            $parentid = $DB->get_field($table, $parentfield, array('id' => $id));
+            $sql = 'SELECT COUNT(*) FROM {' . $table . '} WHERE ' . $parentfield . ' = ?';
+            $count = $DB->count_records_sql($sql, array($parentid));
+        } else {
+            $count = $DB->count_records($table);
+        }
+
+        if ($count > 0) {
+            $pos = $count - 1;
+        } else {
+            $pos = 0;
+        }
+    }
+
     $todb->$orderfield = $pos;
     foreach ($records as $record) {
         if ($newpos == $pos) {
@@ -542,7 +461,7 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
         $dimmed = ($item->visibility ? '' : ' dimmed');
         $url = '/totara/core/menu/index.php';
         $itemurl = new moodle_url($node->get_url());
-        $itemurl = html_writer::link($itemurl, $itemurl, array('class' => $dimmed));
+        $itemurl = html_writer::link($itemurl, $node->get_url(false), array('class' => $dimmed));
         $itemtitle = $node->get_title();
         $attributes = array();
         $attributes['title'] = $str->edit;

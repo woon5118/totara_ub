@@ -36,11 +36,11 @@ class minimum extends base {
     }
 
     public static function is_column_option_compatible(\rb_column_option $option) {
-        return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'timestamp');
+        return ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'timestamp' or $option->dbdatatype === 'boolean');
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
-        if ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal') {
+        if ($option->dbdatatype === 'integer' or $option->dbdatatype === 'decimal' or $option->dbdatatype === 'boolean') {
             return true;
         }
         return null;

@@ -59,7 +59,7 @@ class edit_form extends moodleform {
         $mform->setType('visibility', PARAM_INT);
 
         if ($item->custom == menu::DB_ITEM) {
-            $mform->addElement('text', 'url', get_string('menuitem:formitemurl', 'totara_core'), 'maxlength="255"');
+            $mform->addElement('text', 'url', get_string('menuitem:formitemurl', 'totara_core'), 'maxlength="255" size="100"');
             $mform->setType('url', PARAM_TEXT);
             $mform->addHelpButton('url', 'menuitem:formitemurl', 'totara_core');
         }

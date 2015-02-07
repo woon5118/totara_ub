@@ -251,7 +251,7 @@ if (strlen($result) > 0) {
             $eventdata->modulename        = 'moodle';
             $eventdata->component         = 'enrol_paypal';
             $eventdata->name              = 'paypal_enrolment';
-            $eventdata->userfrom          = empty($teacher) ? get_admin() : $teacher;
+            $eventdata->userfrom          = empty($teacher) ? core_user::get_support_user() : $teacher;
             $eventdata->userto            = $user;
             $eventdata->subject           = $strmgr->get_string("enrolmentnew", 'enrol', $shortname, $user->lang);
             $eventdata->fullmessage       = $strmgr->get_string('welcometocoursetext', 'moodle', $a, $user->lang);

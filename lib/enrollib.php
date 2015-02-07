@@ -1287,7 +1287,7 @@ abstract class enrol_plugin {
         }
 
         if ($inserted) {
-            // Trigger events.
+            // Trigger event.
             $event = \core\event\user_enrolment_created::create(
                     array(
                         'objectid' => $ue->id,
@@ -1297,20 +1297,9 @@ abstract class enrol_plugin {
                         'other' => array('enrol' => $name)
                         )
                     );
+            $event->add_record_snapshot('enrol', $instance); // TODO: Upstream to Moodle.
+            $event->add_record_snapshot('user_enrolments', $ue); // TODO: Upstream to Moodle.
             $event->trigger();
-            // Totara "completion starts on enrol" event.
-            $completionevent = \totara_core\event\user_enrolment::create(
-                    array(
-                        'objectid'  => $ue->id,
-                        'context'   => $context,
-                        'other' => array(
-                                   'courseid'  => $courseid,
-                                    'userid'    => $ue->userid,
-                                    'timestart' => $ue->timestart
-                                   )
-                        )
-                    );
-            $completionevent->trigger();
         }
 
         if ($roleid) {
@@ -1340,9 +1329,10 @@ abstract class enrol_plugin {
         }
     }
 
-
     /**
      * Bulk enrol users into a course
+     *
+     * @since Totara 2.2
      *
      * @param stdClass $instance an enrol instance to use
      * @param array $userids containing objects of userids
@@ -1393,18 +1383,11 @@ abstract class enrol_plugin {
             $newenrolments[] = $enrolobj;
         }
 
-        $inserted = $DB->insert_records_via_batch('user_enrolments', $newenrolments);
+        $DB->insert_records_via_batch('user_enrolments', $newenrolments);
         unset($newenrolments);
-        if ($inserted) {
-            // TODO: migrate to new events.
-            // add extra info and trigger event
-            $ue = new stdClass;
-            $ue->courseid = $courseid;
-            $ue->enrol    = $name;
-            $ue->userids  = $userids;
-            events_trigger_legacy('user_enrolled_bulk', $ue);
-            completion_start_user_bulk($courseid);
-        }
+
+        \totara_core\event\bulk_enrolments_started::create_from_instance($instance)->trigger();
+        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
 
         if ($roleid) {
             // this must be done after the enrolment event so that the role_assigned event is triggered afterwards
@@ -1485,6 +1468,8 @@ abstract class enrol_plugin {
                     'other' => array('enrol' => $name)
                     )
                 );
+        $event->add_record_snapshot('enrol', $instance); // TODO: upstream to Moodle
+        $event->add_record_snapshot('user_enrolments', $ue); // TODO: upstream to Moodle
         $event->trigger();
     }
 
@@ -1579,10 +1564,11 @@ abstract class enrol_plugin {
         }
     }
 
-
     /**
      * Unenrol users from course in a bulk way,
      * the last unenrolment removes all remaining roles.
+     *
+     * @since Totara 2.2
      *
      * @param stdClass $instance enrol instance
      * @param array $userids
@@ -1619,22 +1605,17 @@ abstract class enrol_plugin {
             'component' => 'enrol_' . $name, 'itemid' => $instance->id));
         $DB->delete_records_list('user_enrolments', 'id', array_keys($ue));
 
+        \totara_core\event\bulk_enrolments_started::create_from_instance($instance)->trigger();
+        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
+
         $sql = "SELECT ue.*
                   FROM {user_enrolments} ue
                   JOIN {enrol} e ON (e.id = ue.enrolid)
                   WHERE e.courseid = ?
                   AND ue.userid {$sqlin}";
         $uenotlast = $DB->get_records_sql($sql, array_merge(array($courseid), $sqlinparams));
-        if (!empty($uenotlast)) {
-            // TODO: migrate to new events.
-            // user still has some enrolments in the course, no big cleanup needed
-            $eventdata = new stdClass;
-            $eventdata->ue = $ue;
-            $eventdata->courseid = $courseid;
-            $eventdata->enrol = $name;
-            $eventdata->lastenrol = false;
-            events_trigger_legacy('user_unenrolled_bulk', $eventdata);
-        } else {
+
+        if (empty($uenotlast)) {
             // users' last enrolment intance in course - do big cleanup
 
             require_once("$CFG->dirroot/group/lib.php");
@@ -1653,14 +1634,6 @@ abstract class enrol_plugin {
 
             list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
             $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}", array_merge(array($courseid), $sqlinparams));
-
-            // TODO: migrate to new events.
-            $eventdata = new stdClass;
-            $eventdata->ue = $ue;
-            $eventdata->courseid = $courseid;
-            $eventdata->enrol = $name;
-            $eventdata->lastenrol = true; // means users not enrolled any more
-            events_trigger_legacy('user_unenrolled_bulk', $eventdata);
         }
 
         // reset all enrol caches

@@ -282,6 +282,8 @@ class appraisal {
      * @return array with errors / empty if no errors
      */
     public function validate($time = null) {
+        global $CFG;
+
         if (is_null($time)) {
             $time = time();
         }
@@ -299,8 +301,13 @@ class appraisal {
             $err['roles'] = get_string('appraisalinvalid:roles', 'totara_appraisal');
         }
 
-        // Ensure each user has every required role.
-        $war += $this->validate_roles();
+        if ($CFG->dynamicappraisals) {
+            // If dynamic appraisals are enabled warn about missing roles.
+            $war += $this->validate_roles();
+        } else {
+            // If appraisals are static don't allow activation with missing roles.
+            $err += $this->validate_roles();
+        }
 
         // Check that all stages are valid.
         $stages = appraisal_stage::fetch_appraisal($this->id);
@@ -464,6 +471,11 @@ class appraisal {
      */
     public function check_assignment_changes() {
         global $CFG, $DB;
+
+        // Skip if dynamic appraisals is not activated.
+        if (empty($CFG->dynamicappraisals)) {
+            return;
+        }
 
         $assign = new totara_assign_appraisal('appraisal', $this);
 
@@ -1365,6 +1377,170 @@ class appraisal {
         return $list;
     }
 
+    /**
+     * Get list of questions that can be aggregated.
+     *
+     * @param int $currentpageid The id of the current appraisalstagepage
+     * @return array or items
+     */
+    public static function get_aggregation_question_list($currentpageid) {
+        $currentpage = new appraisal_page($currentpageid);
+        $currentstage = new appraisal_stage($currentpage->appraisalstageid);
+        $appraisalid = $currentstage->appraisalid;
+        $aggregatetypes = question_aggregate::available_question_types();
+
+        $list = array();
+        $strvar = new \stdClass();
+        $stages = appraisal_stage::fetch_appraisal($appraisalid);
+        foreach ($stages as $stage) {
+            $strvar->stagename = $stage->name;
+
+            $pages = appraisal_page::fetch_stage($stage->id);
+            foreach ($pages as $page) {
+                $strvar->pagename = $page->name;
+
+                if ($page->id == $currentpage->id) {
+                    return $list;
+                }
+
+                $questionrecords = appraisal_question::fetch_page($page->id);
+                foreach ($questionrecords as $questionrecord) {
+                    $question = new appraisal_question($questionrecord->id);
+                    $info = $question->get_element()->get_info();
+                    if (in_array($info['type'], $aggregatetypes)) {
+                        $strvar->questionname = $question->name;
+                        $list[$question->id] = get_string('aggregateselectordisplay', 'totara_appraisal', $strvar);
+                    }
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * Retrieve the role information and answers for all questions in the aggregation.
+     *
+     * @param int $userid           The userid connected to the appraisal_user_assignment.
+     * @param int $stagepageid      The appraisalstagepageid connected to the appraisal.
+     * @param int $questionid       The id of the question.
+     * @param array $paramids       An array of question ids we are aggregating.
+     * @return array                of database records.
+     */
+    public static function get_aggregate_question_answers($userid, $stagepageid, $questionid, $paramids) {
+        global $USER, $DB;
+
+        // Get the appraisalid from the pageid.
+        $appsql = "SELECT a.id
+                     FROM {appraisal} a
+               INNER JOIN {appraisal_stage} ast
+                       ON ast.appraisalid = a.id
+               INNER JOIN {appraisal_stage_page} asp
+                       ON asp.appraisalstageid = ast.id
+                    WHERE asp.id = :aspid";
+        $appraisalid = $DB->get_field_sql($appsql, array('aspid' => $stagepageid));
+
+        // Set up some variables needed to get the answer data.
+        $anstable = 'appraisal_quest_data_' . $appraisalid;
+        $ansfields = '';
+
+        list($insql, $inparams) = $DB->get_in_or_equal(explode(',', $paramids));
+        $sql = "SELECT id, datatype
+                  FROM {appraisal_quest_field}
+                 WHERE id {$insql}";
+        $types = $DB->get_records_sql($sql, $inparams);
+
+        foreach ($types as $qst) {
+            if (!empty($ansfields)) {
+                $ansfields .= ', ';
+            }
+
+            if ($qst->datatype == 'ratingnumeric') {
+                $ansfields .= "ans.data_{$qst->id}";
+            } else if ($qst->datatype == 'ratingcustom') {
+                $ansfields .= "ans.data_{$qst->id}score";
+            } else {
+                print_error('error:invalidquestiontype', 'totara_appraisal');
+            }
+        }
+
+        // Get the role variables and answers.
+        $rolesql = "SELECT ara.id, ara.userid, perm.rights, ara.appraisalrole, {$ansfields}
+                      FROM {appraisal_role_assignment} ara
+                INNER JOIN {appraisal_user_assignment} aua
+                        ON ara.appraisaluserassignmentid = aua.id
+                INNER JOIN {appraisal_quest_field_role} perm
+                        ON perm.appraisalquestfieldid = :qid
+                       AND perm.appraisalrole = ara.appraisalrole
+                 LEFT JOIN {{$anstable}} ans
+                        ON ans.appraisalroleassignmentid = ara.id
+                     WHERE aua.userid = :uid
+                       AND aua.appraisalid = :aid
+                  ORDER BY ara.appraisalrole";
+        $roleparam = array('qid' => $questionid, 'uid' => $userid, 'aid' => $appraisalid);
+        $raw_answers = $DB->get_records_sql($rolesql, $roleparam);
+
+        // Check role permissions before returning the answers.
+        $answers = array();
+        $rights = 0;
+        $userrole = 0;
+        foreach ($raw_answers as $answer) {
+            $answer = (array) $answer;
+            $id = array_shift($answer);
+            $userid = array_shift($answer);
+            $perm = array_shift($answer);
+            $role = array_shift($answer);
+
+            if ($userid == $USER->id) {
+                $rights = $perm;
+                $userrole = $role;
+            }
+            $answers[$role] = $answer;
+        }
+
+        if (($rights & appraisal::ACCESS_CANANSWER) == appraisal::ACCESS_CANANSWER) {
+            if (($rights & appraisal::ACCESS_CANVIEWOTHER) == appraisal::ACCESS_CANVIEWOTHER) {
+                // Then can view everyones answers, return all the results.
+                return $answers;
+            } else {
+                // They can only view their own answers, only return their results.
+                return array($userrole => $answers[$userrole]);
+            }
+        }
+
+        return array();
+    }
+
+    /**
+     * Get the element for the specified question, to be used by a redisplay question.
+     *
+     * @param  array $questionids array of questionids
+     * @return array              array of items
+     */
+    public static function get_aggregate_question_elements($questionids) {
+        $allroles = self::get_roles();
+
+        foreach ($questionids as $qid) {
+            $question = new appraisal_question($qid);
+            $element = $question->get_element();
+
+            foreach ($allroles as $role => $rolename) {
+                if (isset($question->roles[$role])) {
+                    $rolevalue = $question->roles[$role];
+                    $element->roleinfo[$role][self::ACCESS_CANVIEWOTHER] = $rolevalue & self::ACCESS_CANVIEWOTHER;
+                    $element->roleinfo[$role][self::ACCESS_CANANSWER] = $rolevalue & self::ACCESS_CANANSWER;
+                    $element->roleinfo[$role][self::ACCESS_MUSTANSWER] = $rolevalue & self::ACCESS_MUSTANSWER;
+                } else {
+                    $element->roleinfo[$role][self::ACCESS_CANVIEWOTHER] = 0;
+                    $element->roleinfo[$role][self::ACCESS_CANANSWER] = 0;
+                    $element->roleinfo[$role][self::ACCESS_MUSTANSWER] = 0;
+                }
+            }
+            $elements[$qid] = $element;
+        }
+
+        return $elements;
+    }
 
     /**
      * Get the element for the specified question, to be used by a redisplay question.
@@ -1721,17 +1897,33 @@ class appraisal {
             $stage->duplicate($newappraisal->id, $daysoffset);
         }
 
-        // Redirect redisplay questions to the new appraisal.
+        // Set up some keyed arrays to map between old questions and new.
         $originalquestions = appraisal_question::fetch_appraisal($appraisalid);
         $originalkeys = array_keys($originalquestions);
-        $newredisplay = appraisal_question::fetch_appraisal($newappraisal->id, null, null, array('redisplay'));
         $newquestions = appraisal_question::fetch_appraisal($newappraisal->id);
         $newkeys = array_keys($newquestions);
 
+        // Redirect redisplay questions to the new appraisal.
+        $newredisplay = appraisal_question::fetch_appraisal($newappraisal->id, null, null, array('redisplay'));
         foreach ($newredisplay as $redisplay) {
             $originalindex = array_search($redisplay->param1, $originalkeys);
             $redisplay->param1 = $newkeys[$originalindex];
             $DB->update_record('appraisal_quest_field', $redisplay);
+        }
+
+        // Redirect aggregate questions to the new appraisal.
+        $newaggregate = appraisal_question::fetch_appraisal($newappraisal->id, null, null, array('aggregate'));
+        foreach ($newaggregate as $aggregate) {
+            $oldqids = explode(',', $aggregate->param1);
+            $newqids = array();
+
+            foreach ($oldqids as $oldqid) {
+                $originalindex = array_search($oldqid, $originalkeys);
+                $newqids[] = $newkeys[$originalindex];
+            }
+
+            $aggregate->param1 = implode(',', $newqids);
+            $DB->update_record('appraisal_quest_field', $aggregate);
         }
 
         // Clone assigned groups (since the new appraisal is draft, we don't need to clone user or role assignments).
@@ -4483,7 +4675,7 @@ class appraisal_message {
                     }
 
                     $message = $this->get_message($role);
-                    $rcpt = $DB->get_record('user', array('id' => $rcptuserid));
+                    $rcpt = $DB->get_record('user', array('id' => $rcptuserid), '*', MUST_EXIST);
 
                     // Create a message.
                     $eventdata = new stdClass();

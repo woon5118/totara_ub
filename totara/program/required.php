@@ -180,7 +180,7 @@ if ($programid) {
 
     if (($filter == 'all' || $filter == 'program') && totara_feature_visible('programs')) {
         echo $OUTPUT->container_start('', 'required-learning-list');
-        echo $OUTPUT->heading(get_string('programs', 'totara_program'), 4);
+        echo $OUTPUT->heading(get_string('programs', 'totara_program'), 3);
 
         $requiredlearninghtml = prog_display_required_programs($userid);
 
@@ -195,7 +195,7 @@ if ($programid) {
 
     if (($filter == 'all' || $filter == 'certification') && totara_feature_visible('certifications')) {
         echo $OUTPUT->container_start('', 'certification-learning-list');
-        echo $OUTPUT->heading(get_string('certifications', 'totara_program'), 4);
+        echo $OUTPUT->heading(get_string('certifications', 'totara_program'), 3);
 
         $certificationhtml = prog_display_certification_programs($userid);
 

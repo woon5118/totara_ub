@@ -57,6 +57,25 @@ if ($backtoallsessions) {
     $returnurl = "$CFG->wwwroot/mod/facetoface/view.php?f=$backtoallsessions";
 }
 
+// Add booking information.
+$session->bookedsession = null;
+if ($booked = facetoface_get_user_submissions($facetoface->id,
+    $USER->id, MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_BOOKED, $session->id)) {
+    $session->bookedsession = reset($booked);
+}
+
+$viewattendees = has_capability('mod/facetoface:viewattendees', $context);
+$multisessionid = ($facetoface->multiplesessions ? $session->id : null);
+$signedup = facetoface_check_signup($facetoface->id, $multisessionid);
+
+if (!$signedup) {
+    print_error('notsignedup', 'facetoface', $returnurl);
+}
+
+if (!facetoface_allow_user_cancellation($session)) {
+    print_error('notallowedtocancel', 'facetoface', $returnurl);
+}
+
 $mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
@@ -116,20 +135,11 @@ echo $OUTPUT->header();
 
 $heading = get_string('cancelbookingfor', 'facetoface', $facetoface->name);
 
-$viewattendees = has_capability('mod/facetoface:viewattendees', $context);
-$multisessionid = ($facetoface->multiplesessions ? $session->id : null);
-$signedup = facetoface_check_signup($facetoface->id, $multisessionid);
-
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($heading);
 
-if ($signedup) {
-    facetoface_print_session($session, $viewattendees);
-    $mform->display();
-}
-else {
-    print_error('notsignedup', 'facetoface', $returnurl);
-}
+facetoface_print_session($session, $viewattendees);
+$mform->display();
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer($course);

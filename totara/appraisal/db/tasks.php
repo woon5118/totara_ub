@@ -35,4 +35,13 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*'
     ),
+    array(
+        'classname' => 'totara_appraisal\task\cleanup_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '3',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
 );

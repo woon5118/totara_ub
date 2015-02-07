@@ -93,6 +93,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new admin_setting_configcheckbox('enhancedcatalog',
             new lang_string('enhancedcatalog', 'totara_core'),
             new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced));
+
+    // Dynamic Appraisals.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisals',
+            new lang_string('dynamicappraisals', 'totara_core'),
+            new lang_string('configdynamicappraisals', 'totara_core'), 1));
+
     // Totara Settings.
     $featureoptions = array(
         TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),

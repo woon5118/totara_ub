@@ -59,6 +59,11 @@ $confirm = optional_param('confirm', false, PARAM_BOOL);
 if ($deleteid && $canassign && (!appraisal::is_closed($appraisalid))) {
     list($grp, $aid) = explode("_", $deleteid);
 
+    // Do not allow changes to active appraisals unless dynamic appraisals is enabled.
+    if (empty($CFG->dynamicappraisals) && appraisal::is_active($appraisalid)) {
+        print_error('error:attemptupdatestatic', 'totara_appraisal');
+    }
+
     if (appraisal::is_active($appraisalid) && !$confirm) {
 
         $deleteparams = array('appraisalid' => $appraisalid, 'deleteid' => $deleteid, 'confirm' => true, 'sesskey' => sesskey());
@@ -89,11 +94,17 @@ if ($update && $canassign) {
         print_error('confirmsesskeybad', 'error');
     }
 
+    // Do not allow changes to active appraisals unless dynamic appraisals is enabled.
+    if (empty($CFG->dynamicappraisals) && appraisal::is_active($appraisalid)) {
+        print_error('error:attemptupdatestatic', 'totara_appraisal');
+    }
+
     $appraisal->check_assignment_changes();
     redirect($returnurl);
 }
 
 $notlivenotice = $output->display_notlive_notice($appraisalid, $canassign);
+
 // Setup the JS.
 totara_setup_assigndialogs($module, $appraisalid, $canviewusers, $notlivenotice);
 echo $output->header();
@@ -102,7 +113,7 @@ if ($appraisal->id) {
     echo $output->appraisal_additional_actions($appraisal->status, $appraisal->id);
 }
 
-if ($appraisal->status == appraisal::STATUS_ACTIVE) {
+if (!empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE) {
     $warnings = $appraisal->validate_roles(true);
     echo $output->display_learner_warnings($appraisal->id, $warnings, $canviewusers);
 }
@@ -114,6 +125,8 @@ echo $output->heading(get_string('assigncurrentgroups', 'totara_appraisal'), 3);
 if ($canassign) {
     if ($appraisal->status == appraisal::STATUS_CLOSED) {
         echo get_string('appraisalclosednochangesallowed', 'totara_appraisal');
+    } else if (empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE) {
+        echo get_string('appraisalactivenochangesallowed', 'totara_appraisal');
     } else {
         $options = array_merge(array("" => get_string('assigngroup', 'totara_core')),
                 $grouptypes);
@@ -134,7 +147,7 @@ if ($appraisal->status == appraisal::STATUS_ACTIVE) {
     $groupassignments = $assign->get_current_users(null, null, null, true);
     $differences = $appraisal->compare_assignments($userassignments, $groupassignments);
     echo html_writer::start_tag('div', array('id' => 'notlivenotice'));
-    if ($differences) {
+    if (!empty($CFG->dynamicappraisals) && $differences) {
         echo $notlivenotice;
     }
     echo html_writer::end_tag('div');
