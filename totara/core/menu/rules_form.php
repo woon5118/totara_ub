@@ -37,7 +37,7 @@ class rules_form extends moodleform {
         $mform->addElement('hidden', 'id', $item->id);
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('html', html_writer::tag('hr', ''));
+        $mform->addElement('html', html_writer::empty_tag('hr'));
 
         $mform->addElement('header', "accesscontrols", get_string('menuitem:accesscontrols', 'totara_core'));
 
