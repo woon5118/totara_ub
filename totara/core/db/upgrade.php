@@ -1422,5 +1422,23 @@ function xmldb_totara_core_upgrade($oldversion) {
         // Core savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015020200, 'totara_core');
     }
+
+    if ($oldversion < 2015021001) {
+        $DB->execute("UPDATE {course} SET coursetype = 0 WHERE coursetype IS NULL");
+
+        // Changing the default of field coursetype on table course to 0.
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('coursetype', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'cacherev');
+
+        // Launch change of default for field coursetype.
+        $dbman->change_field_default($table, $field);
+
+        // Launch change of nullability for field coursetype.
+        $dbman->change_field_notnull($table, $field);
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015021001, 'totara_core');
+    }
+
     return true;
 }
