@@ -217,7 +217,7 @@ define('SITEID', 1);
 $databases = array('mysqli' => moodle_database::get_driver_instance('mysqli', 'native'),
                    'mariadb'=> moodle_database::get_driver_instance('mariadb', 'native'),
                    'pgsql'  => moodle_database::get_driver_instance('pgsql',  'native'),
-                   'oci'    => moodle_database::get_driver_instance('oci',    'native'),
+                   // 'oci'    => moodle_database::get_driver_instance('oci',    'native'), // Totara: no Oracle!
                    'sqlsrv' => moodle_database::get_driver_instance('sqlsrv', 'native'), // MS SQL*Server PHP driver
                    'mssql'  => moodle_database::get_driver_instance('mssql',  'native'), // FreeTDS driver
                   );
