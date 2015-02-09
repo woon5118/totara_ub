@@ -79,7 +79,6 @@ if ($delete && $cohort->id) {
 if ($clone && $cohort->id) {
     if ($confirm && confirm_sesskey()) {
         $result = totara_cohort_clone_cohort($cohort->id);
-        add_to_log(SITEID, 'cohort', 'clone', 'cohort/view.php?id='.$result, "origid={$cohort->id}");
         if ($result) {
             $successurl = new moodle_url($CFG->wwwroot.'/cohort/view.php', array('id'=>$result));
             totara_set_notification(

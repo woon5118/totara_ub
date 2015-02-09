@@ -58,7 +58,7 @@ if ($delete) {
     $reminder->deleted = 1;
     $reminder->update();
 
-    add_to_log($course->id, 'course', 'reminder deleted', 'reminders.php?courseid='.$course->id, $reminder->title);
+    \totara_core\event\reminder_deleted::create_from_reminder($reminder)->trigger();
 
     $PAGE->set_title(get_string('editcoursereminders', 'totara_coursecatalog'));
     $PAGE->set_heading($course->fullname);
@@ -118,15 +118,13 @@ else if ($data = $reminderform->get_data()) {
             print_error('error:createreminder', 'totara_coursecatalog');
         }
 
-        add_to_log($course->id, 'course', 'reminder added',
-            'reminders.php?courseid='.$course->id.'&id='.$reminder->id, $reminder->title);
+        \totara_core\event\reminder_created::create_from_reminder($reminder)->trigger();
     }
     else {
         if (!$reminder->update()) {
             print_error('error:updatereminder', 'totara_coursecatalog');
         }
-        add_to_log($course->id, 'course', 'reminder updated',
-            'reminders.php?courseid='.$course->id.'&id='.$reminder->id, $reminder->title);
+        \totara_core\event\reminder_updated::create_from_reminder($reminder)->trigger();
     }
 
     // Create the messages

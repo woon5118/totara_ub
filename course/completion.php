@@ -106,11 +106,11 @@ if ($form->is_cancelled()) {
         // Check if the form was submitted while unlocked.
         if ($unlockdelete) {
             // The "Unlock and delete" button was clicked, so log and delete the course completion data.
-            add_to_log($course->id, 'course', 'completion data reset', 'completion.php?id='.$course->id);
+            \totara_core\event\course_completion_reset::create_from_course($course)->trigger();
             $completion->delete_course_completion_data();
         } else if ($unlockonly) {
             // The "Unlock without deleting" button was clicked, so just log it and continue.
-            add_to_log($course->id, 'course', 'completion unlocked without reset', 'completion.php?id='.$course->id);
+            \totara_core\event\course_completion_unlocked::create_from_course($course)->trigger();
         }
     } else if ($completion->is_course_locked(false)) {
         // Abort saving changes if the course is locked (and it wasn't unlocked above).
@@ -180,20 +180,17 @@ if ($form->is_cancelled()) {
         }
     }
 
-    // Log changes.
-    add_to_log($course->id, 'course', 'completion updated', 'completion.php?id='.$course->id);
+    // Trigger an event for course module completion changed.
+    $event = \core\event\course_completion_updated::create(
+        array(
+            'courseid' => $course->id,
+            'context' => context_course::instance($course->id)
+        )
+    );
+    $event->trigger();
 
     // Bulk start users (creates course_completion records for all active participants).
     completion_start_user_bulk($course->id);
-
-    // Trigger an event for course module completion changed.
-    $event = \core\event\course_completion_updated::create(
-            array(
-                'courseid' => $course->id,
-                'context' => context_course::instance($course->id)
-                )
-            );
-    $event->trigger();
 
     // Redirect to the course main page.
     $url = new moodle_url('/course/view.php', array('id' => $course->id));

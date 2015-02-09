@@ -116,7 +116,7 @@ if (!$archive) {
         archive_course_activities($user->userid, $course->id);
     }
 
-    add_to_log(SITEID, "course", "archive", "archivecompletions.php?id=$course->id", "$course->fullname (ID $course->id)");
+    \totara_core\event\course_completion_archived::create_from_course($course)->trigger();
 
     // The above archive_course_activities() calls set_module_viewed() which needs to be called before $OUTPUT->header()
     echo $OUTPUT->header();
