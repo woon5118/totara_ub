@@ -71,10 +71,10 @@ class totara_dashboard_renderer extends plugin_renderer_base {
             $name = format_string($dashboard->name);
             $urllayout = new moodle_url('/totara/dashboard/layout.php', array('id' => $id));
             $urledit = new moodle_url('/totara/dashboard/edit.php', array('id' => $id));
-            $urlpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'publish', 'id' => $id));
-            $urlunpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'unpublish', 'id' => $id));
-            $urlup = new moodle_url('/totara/dashboard/manage.php', array('action' => 'up', 'id' => $id));
-            $urldown = new moodle_url('/totara/dashboard/manage.php', array('action' => 'down', 'id' => $id));
+            $urlpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'publish', 'id' => $id, 'sesskey' => sesskey()));
+            $urlunpublish = new moodle_url('/totara/dashboard/manage.php', array('action' => 'unpublish', 'id' => $id, 'sesskey' => sesskey()));
+            $urlup = new moodle_url('/totara/dashboard/manage.php', array('action' => 'up', 'id' => $id, 'sesskey' => sesskey()));
+            $urldown = new moodle_url('/totara/dashboard/manage.php', array('action' => 'down', 'id' => $id, 'sesskey' => sesskey()));
             $deleteurl = new moodle_url('/totara/dashboard/manage.php', array('action' => 'delete', 'id' => $id));
 
             $row = array();
