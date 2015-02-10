@@ -569,6 +569,7 @@ class facetoface_notification extends data_object {
         }
 
         if (empty($fromuser)) {
+            // NOTE: this is far from optimal because nobody might be logged in.
             $fromuser = $USER;
         }
 
@@ -728,11 +729,6 @@ class facetoface_notification extends data_object {
      * @return  void
      */
     public function send_to_thirdparty($user, $sessionid) {
-
-        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
-            return true;
-        }
-
         // Third-party notification.
         if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
             $event = clone $this->_event;
@@ -1105,7 +1101,7 @@ function facetoface_send_request_notice($facetoface, $session, $userid) {
 
     $selectpositiononsignupglobal = get_config(null, 'facetoface_selectpositiononsignupglobal');
     if ($selectpositiononsignupglobal && empty($positiontype)) {
-        $manager = totara_get_most_primary_manager($USER->id);
+        $manager = totara_get_most_primary_manager($userid);
     } else {
         $manager = totara_get_manager($userid, $positiontype);
     }
