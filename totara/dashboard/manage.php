@@ -52,18 +52,22 @@ switch ($action) {
         }
         break;
     case 'publish':
+        require_sesskey();
         $dashboard->publish()->save();
         redirect($returnurl);
         break;
     case 'unpublish':
+        require_sesskey();
         $dashboard->unpublish()->save();
         redirect($returnurl);
         break;
     case 'up':
+        require_sesskey();
         $dashboard->move_up();
         redirect($returnurl);
         break;
     case 'down':
+        require_sesskey();
         $dashboard->move_down();
         redirect($returnurl);
         break;

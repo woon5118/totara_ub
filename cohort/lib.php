@@ -53,15 +53,16 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     if (empty($cohort->component)) {
         $cohort->component = '';
     }
+    if (!isset($cohort->timecreated)) {
+        $cohort->timecreated = time();
+    }
+    if (!isset($cohort->timemodified)) {
+        $cohort->timemodified = $cohort->timecreated;
+    }
     if (!isset($cohort->active)) {
         $cohort->active = 1;
     }
-    if (!isset($cohort->cohorttype)) {
-        $cohort->cohorttype = 1;
-    }
 
-    $cohort->timecreated = time();
-    $cohort->timemodified = $cohort->timecreated;
     $cohort->modifierid = $USER->id;
 
     $cohort->id = $DB->insert_record('cohort', $cohort);

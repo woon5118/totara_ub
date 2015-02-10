@@ -690,14 +690,6 @@ function xmldb_totara_cohort_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014120400) {
-
-        // Changing the default of field cohorttype on table cohort to 0.
-        $table = new xmldb_table('cohort');
-        $field = new xmldb_field('cohorttype', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
-
-        // Launch change of default for field cohorttype.
-        $dbman->change_field_default($table, $field);
-
         // Changing the default of field modifierid on table cohort to 0.
         $table = new xmldb_table('cohort');
         $field = new xmldb_field('modifierid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'cohorttype');
@@ -707,6 +699,24 @@ function xmldb_totara_cohort_upgrade($oldversion) {
 
         // Main savepoint reached.
         upgrade_plugin_savepoint(true, 2014120400, 'totara', 'cohort');
+    }
+
+    if ($oldversion < 2015020900) {
+        $DB->execute("UPDATE {cohort} SET cohorttype = 1 WHERE cohorttype IS NULL");
+        $DB->execute("UPDATE {cohort} SET cohorttype = 1 WHERE cohorttype = 0");
+
+        // Changing the default of field cohorttype on table cohort to 1.
+        $table = new xmldb_table('cohort');
+        $field = new xmldb_field('cohorttype', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'timemodified');
+
+        // Launch change of default for field cohorttype.
+        $dbman->change_field_default($table, $field);
+
+        // Launch change of nullability for field cohorttype.
+        $dbman->change_field_notnull($table, $field);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2015020900, 'totara', 'cohort');
     }
 
     return true;

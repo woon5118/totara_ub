@@ -96,7 +96,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     $errorstr = '';
     if (facetoface_user_cancel($session, false, $forcecancel, $errorstr, $fromform->cancelreason)) {
-        add_to_log($course->id, 'facetoface', 'cancel booking', "cancelsignup.php?s=$session->id", $facetoface->id, $cm->id);
+        \mod_facetoface\event\booking_cancelled::create_from_session($session, $context)->trigger();
 
         $message = get_string('bookingcancelled', 'facetoface');
 
@@ -118,9 +118,7 @@ if ($fromform = $mform->get_data()) { // Form submitted
         totara_set_notification($message, $returnurl, array('class' => 'notifysuccess'));
     }
     else {
-        add_to_log($course->id, 'facetoface', "cancel booking (FAILED)", "cancelsignup.php?s=$session->id", $facetoface->id, $cm->id);
-        $timemessage = 4;
-        redirect($returnurl, $errorstr, $timemessage);
+        print_error($errorstr);
     }
 
     redirect($returnurl);

@@ -935,15 +935,16 @@ function facetoface_send_notice($facetoface, $session, $userid, $params, $icalat
  * @param class $facetoface record from the facetoface table
  * @param class $session record from the facetoface_sessions table
  * @param integer $userid ID of the recipient of the email
+ * @param integer $conditiontype Optional override of the standard cancellation confirmation
  * @returns string Error message (or empty string if successful)
  */
-function facetoface_send_cancellation_notice($facetoface, $session, $userid) {
+function facetoface_send_cancellation_notice($facetoface, $session, $userid, $conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION) {
     global $CFG;
 
     $params = array(
         'facetofaceid'  => $facetoface->id,
         'type'          => MDL_F2F_NOTIFICATION_AUTO,
-        'conditiontype' => MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION
+        'conditiontype' => $conditiontype
     );
 
     $includeical = empty($CFG->facetoface_disableicalcancel);

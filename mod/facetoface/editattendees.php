@@ -71,8 +71,18 @@ $strsearchresults = get_string('searchresults');
 $strfacetofaces = get_string('modulenameplural', 'facetoface');
 $strfacetoface = get_string('modulename', 'facetoface');
 
-// Set wait-list
-$waitlist = $session->datetimeknown ? 0 : 1;
+// By default, don't display the waitlist.
+$waitlist = 0;
+// If the date and time of the session is not known attendees are waitlisted automatically
+// until a date and time is applied to the session and they are displayed in the attendees list
+// rather than the waitlist. So, only enable the waitlist tab when the date and time for the
+// session is known and there are attendees with the waitlist status.
+if ($session->datetimeknown) {
+    $waitlistcount = count(facetoface_get_attendees($session->id,array(MDL_F2F_STATUS_WAITLISTED)));
+    if ($waitlistcount > 0) {
+        $waitlist = 1;
+    }
+}
 
 // Set removed users
 $removed = $removedusers ? explode(',', $removedusers) : array();
@@ -149,11 +159,6 @@ if ($save && $onlycontent) {
     }
 
     // Adding new attendees.
-    // Setup language string object for Site Log entry on adding/removing attendees.
-    $a = new stdClass();
-    $a->f2fname = $facetoface->name;
-    $a->sessionid = $session->id;
-    $a->action = get_string('addremoveattendees', 'facetoface');
     // Check if we need to add anyone.
     $attendeestoadd = array_diff_key($attendees, $original);
     if (!empty($attendeestoadd) && has_capability('mod/facetoface:addattendees', $context)) {
@@ -207,10 +212,7 @@ if ($save && $onlycontent) {
 
     // Log that users were edited.
     if (count($added) > 0 || count($errors) > 0) {
-        $a->usercount = count($added);
-        $a->errorcount = count($errors);
-        $info = get_string('sitelogseditattendees', 'facetoface', $a);
-        add_to_log($course->id, 'facetoface', $a->action, "editattendees.php?s={$session->id}&clear=1", $info, $cm->id);
+        \mod_facetoface\event\attendees_updated::create_from_session($session, $context)->trigger();
     }
     $_SESSION['f2f-bulk-results'][$session->id] = array($added, $errors);
 

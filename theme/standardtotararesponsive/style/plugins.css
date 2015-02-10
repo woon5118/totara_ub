@@ -97,8 +97,19 @@
         width: 23%;
     }
 
-    .f2f dd {
+    .dir-rtl .f2f dt {
+        clear: right;
+        float: right;
+        text-align: left;
+    }
+
+    .dir-ltr .f2f dd {
         margin-left: 23%;
         padding-left: 5px;
+    }
+
+    .dir-rtl .f2f dd {
+        margin-right: 23%;
+        padding-right: 5px;
     }
 }

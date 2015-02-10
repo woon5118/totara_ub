@@ -38,7 +38,7 @@ class edit_form extends moodleform {
         $mform->addElement('hidden', 'custom');
         $mform->setType('custom', PARAM_INT);
 
-        $mform->addElement('html', html_writer::tag('hr', ''));
+        $mform->addElement('html', html_writer::empty_tag('hr'));
 
         $options = menu::make_menu_list($item->id);
         $mform->addElement('select', 'parentid', get_string('menuitem:formitemparent', 'totara_core'), $options);

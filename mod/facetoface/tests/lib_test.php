@@ -263,7 +263,7 @@ class facetoface_lib_testcase extends advanced_testcase {
             4, 4, 1),
     );
 
-    protected $course_modules_data =array(
+    protected $course_modules_data = array(
         array('id', 'course', 'module', 'instance', 'section', 'idnumber',
             'added', 'score', 'indent', 'visible', 'visibleold', 'groupmode',
             'groupingid', 'groupmembersonly', 'completion', 'completiongradeitemnumber',
@@ -285,6 +285,11 @@ class facetoface_lib_testcase extends advanced_testcase {
             0, 11, 12, 13,
             14, 1),
         array(4, 2, 3, 4, 5, '1004',
+            6, 1, 7, 1, 1, 0,
+            8, 0, 0, 10,
+            0, 11, 12, 13,
+            14, 1),
+        array(5, 1, 8, 1, 5, '1005',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
@@ -1121,7 +1126,7 @@ class facetoface_lib_testcase extends advanced_testcase {
 
         $discountcode1 = 'disc1';
         $notificationtype1 = 1;
-        $statuscode1 = 1;
+        $statuscode1 = MDL_F2F_STATUS_REQUESTED;
 
         // Test for valid case.
         $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
@@ -1246,7 +1251,6 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_update_signup_status() {
-
         global $DB;
 
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -1290,7 +1294,7 @@ class facetoface_lib_testcase extends advanced_testcase {
 
         $discountcode1 = 'disc1';
         $notificationtype1 = 1;
-        $statuscode1 = 1;
+        $statuscode1 = MDL_F2F_STATUS_BOOKED;
 
         // Test for valid case.
         facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1, $student1->id);
@@ -1380,7 +1384,7 @@ class facetoface_lib_testcase extends advanced_testcase {
         $sessionid = $facetofacegenerator->add_session($sessiondata);
         $session = facetoface_get_session($sessionid);
 
-        facetoface_user_signup($session, $facetoface, $this->course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, false);
+        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, false);
 
         $notification = new facetoface_notification();
         $notification->booked = 0;
@@ -1444,7 +1448,7 @@ class facetoface_lib_testcase extends advanced_testcase {
         // Grab any messages that get sent.
         $sink = $this->redirectMessages();
 
-        facetoface_user_signup($session, $facetoface, $this->course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true);
+        facetoface_user_signup($session, $facetoface, $course1, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true);
 
         // Grab the messages that got sent.
         $messages = $sink->get_messages();

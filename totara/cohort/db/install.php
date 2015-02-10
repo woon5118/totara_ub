@@ -40,7 +40,7 @@ function xmldb_totara_cohort_install() {
     $table = new xmldb_table('cohort');
 
     $field = new xmldb_field('cohorttype');
-    $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+    $field->set_attributes(XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'timemodified');
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
     }

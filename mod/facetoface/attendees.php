@@ -330,10 +330,7 @@ if ($form = data_submitted()) {
 
     // Approve requests
     if ($action == 'approvalrequired' && !empty($form->requests)) {
-        if (facetoface_approve_requests($form)) {
-            add_to_log($course->id, 'facetoface', 'approve requests', "view.php?id=$cm->id", $facetoface->id, $cm->id);
-        }
-
+        facetoface_approve_requests($form);
         redirect($return);
         die();
     }
@@ -487,7 +484,7 @@ if (!$onlycontent) {
         $PAGE->requires->js_init_call('M.totara_f2f_attendees.init', $args, false, $jsmodule);
     }
 
-    add_to_log($course->id, 'facetoface', 'view attendees', "view.php?id=$cm->id", $facetoface->id, $cm->id);
+    \mod_facetoface\event\attendees_viewed::create_from_session($session, $context, $action)->trigger();
 
     $pagetitle = format_string($facetoface->name);
 

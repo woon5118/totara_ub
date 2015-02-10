@@ -477,6 +477,8 @@ class totara_core_renderer extends plugin_renderer_base {
             // Print out Structure
             $output .= html_writer::start_tag('ul');
             foreach ($currentlevel as $menuitem) {
+                $url = new moodle_url($menuitem->url);
+
                 $class = 'menu-' . $menuitem->name;
                 if ($count == 0) {
                     $class .= ' first';
@@ -486,12 +488,12 @@ class totara_core_renderer extends plugin_renderer_base {
                     $class .= ' last';
                 }
 
-                if (in_array($menuitem->name, $selected_items)) {
+                // If the menu item is known to be selected or it if its a direct match to the current pages URL.
+                if (in_array($menuitem->name, $selected_items) || $this->page->url->compare($url)) {
                     $class .= ' selected';
                 }
 
                 $output .= html_writer::start_tag('li', array('class' => $class));
-                $url = new moodle_url($menuitem->url);
 
                 $output .= $this->output->action_link($url, $menuitem->linktext, null, array('target' => $menuitem->target));
 

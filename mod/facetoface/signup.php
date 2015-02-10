@@ -110,11 +110,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
         print_error('error:unknownbuttonclicked', 'facetoface', $returnurl);
     }
 
-    // User can not update Manager's email (depreciated functionality)
-    if (!empty($fromform->manageremail)) {
-        add_to_log($course->id, 'facetoface', 'update manageremail (FAILED)', "signup.php?s=$session->id", $facetoface->id, $cm->id);
-    }
-
     // If multiple sessions are allowed then just check against this session
     // Otherwise check against all sessions
     $multisessionid = ($facetoface->multiplesessions ? $session->id : null);
@@ -139,7 +134,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
-        add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
 
         if (!empty($facetoface->approvalreqd) && !$hasselfapproval) {
             $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
@@ -166,7 +160,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
         if ((isset($result['conflict']) && $result['conflict']) || isset($result['nogoodpos'])) {
             totara_set_notification($result['result'], $returnurl);
         } else {
-            add_to_log($course->id, 'facetoface', 'signup (FAILED)', "signup.php?s=$session->id", $session->id, $cm->id);
             print_error('error:problemsigningup', 'facetoface', $returnurl);
         }
     }

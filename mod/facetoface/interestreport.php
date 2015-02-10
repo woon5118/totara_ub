@@ -29,11 +29,10 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 $debug = optional_param('debug', 0, PARAM_INT);
 $facetofaceid = optional_param('facetofaceid', 0, PARAM_INT);
 
-$PAGE->set_context(context_system::instance());
-
 if (!$facetofaceid) {
     $url = new moodle_url('/mod/facetoface/interestreport.php');
     $PAGE->set_url($url);
+    $PAGE->set_context(context_system::instance());
     echo $OUTPUT->header();
     echo $OUTPUT->container(get_string('gettointerestreport', 'mod_facetoface', $url->out()));
     echo $OUTPUT->footer();
@@ -43,6 +42,9 @@ if (!$facetofaceid) {
 $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $facetoface->course), '*', MUST_EXIST);
 $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id, false, MUST_EXIST);
+$context = context_module::instance($cm->id);
+$PAGE->set_context($context);
+
 $format = optional_param('format', '', PARAM_TEXT); // Export format.
 $PAGE->set_pagelayout('standard');
 $PAGE->set_cm($cm);
@@ -56,7 +58,7 @@ if (!$report = reportbuilder_get_embedded_report('facetoface_interest', array('f
 
 $logurl = $PAGE->url->out_as_local_url();
 
-add_to_log(SITEID, 'rbembedded', 'view report', $logurl, $report->fullname);
+\mod_facetoface\event\interest_report_viewed::create_from_facetoface($facetoface, $context)->trigger();
 
 if ($format != '') {
     $report->export_data($format);

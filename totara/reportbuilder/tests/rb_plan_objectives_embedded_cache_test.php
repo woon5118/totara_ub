@@ -105,11 +105,6 @@ class totara_reportbuilder_rb_plan_objectives_embedded_cache_testcase extends re
         $this->objectives[] = $this->create_objective($this->plan3->id);
         $this->objectives[] = $this->create_objective($this->plan3->id);
 
-        // TODO: kill add_to_log() calls
-        $debugs = $this->getDebuggingMessages();
-        $this->assertCount(3, $debugs);
-        $this->resetDebugging();
-
         $syscontext = context_system::instance();
 
         // Assign user2 to be user1's manager and remove viewallmessages from manager role.

@@ -78,10 +78,10 @@ if ($fromform = $mform->get_data()) {
         die();
     }
 
-    add_to_log($course->id, 'facetoface', 'update attendee note', "attendee_note.php?id={$userid}&s={$sessionid}", $sessionid, $cm->id);
+    \mod_facetoface\event\attendee_note_updated::create_from_instance($attendee, $context)->trigger();
 
     $attendee = $attendee_note->get();
-    echo json_encode(array('result' => 'success', 'id' => $attendee->userid, 'usernote' => $attendee->usernote));
+    echo json_encode(array('result' => 'success'));
 } else {
     // This should be json_encoded, but for now we need to use html content
     // type to not break $.get().

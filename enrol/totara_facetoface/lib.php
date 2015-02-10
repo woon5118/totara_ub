@@ -254,7 +254,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                     $facetoface = $facetofaces[$session->facetoface];
                     $cm = get_coursemodule_from_instance('facetoface', $facetoface->id);
                     facetoface_user_import($course, $facetoface, $session, $USER->id, $signupparams);
-                    add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
                     $joinedsessions++;
                 }
 
@@ -281,14 +280,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
 
             // User can not update Manager's email (depreciated functionality).
             if (!empty($manageremail)) {
-                add_to_log(
-                    $course->id,
-                    'facetoface',
-                    'update manageremail (FAILED)',
-                    "signup.php?s=$session->id",
-                    $facetoface->id,
-                    $cm->id
-                );
+                print_error('cannotupdatemanageremail', 'enrol_facetoface');
             }
 
             // If multiple sessions are allowed then just check against this session.
@@ -311,8 +303,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $signupparams);
 
             if ($result['result'] === true) {
-                add_to_log($course->id, 'facetoface', 'signup', "signup.php?s=$session->id", $session->id, $cm->id);
-
                 if (!empty($facetoface->approvalreqd) && !$hasselfapproval) {
                     $message = get_string('bookingcompleted_approvalrequired', 'facetoface');
                     $cssclass = 'notifymessage';
@@ -339,7 +329,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
                 if ((isset($result['conflict']) && $result['conflict']) || isset($result['result'])) {
                     totara_set_notification($result['result'], $returnurl);
                 } else {
-                    add_to_log($course->id, 'facetoface', 'signup (FAILED)', "signup.php?s=$session->id", $session->id, $cm->id);
                     print_error('error:problemsigningup', 'facetoface', $returnurl);
                 }
             }
@@ -355,13 +344,6 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             } else {
                 $this->enrol_user($instance, $USER->id, $instance->roleid, $timestart, $timeend);
                 $enrolled = true;
-                add_to_log(
-                    $instance->courseid,
-                    'course',
-                    'enrol',
-                    '../enrol/totara_facetoface/signup.phpusers.php?id='.$instance->courseid,
-                    $instance->courseid
-                );
             }
         }
 

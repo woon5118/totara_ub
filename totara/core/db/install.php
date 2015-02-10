@@ -36,7 +36,7 @@ function xmldb_totara_core_install() {
 
     $field = new xmldb_field('coursetype');
     if (!$dbman->field_exists($table, $field)) {
-        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', null, null, null, null, null);
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', null);
         $dbman->add_field($table, $field);
     }
 

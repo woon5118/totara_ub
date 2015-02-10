@@ -813,11 +813,11 @@ function facetoface_delete_session($session) {
         }
     }
 
-    // Load current trainers
+    // Send cancellations for trainers assigned to the session.
     $trainers = $DB->get_records("facetoface_session_roles", array("sessionid" => $session->id));
     if ($trainers and count($trainers) > 0) {
         foreach ($trainers as $trainer) {
-            facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid);
+            facetoface_send_cancellation_notice($facetoface, $session, $trainer->userid, MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION);
         }
     }
 
@@ -2138,6 +2138,11 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
 
     facetoface_withdraw_interest($facetoface, $userid);
 
+    // Add log entry.
+    $cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id);
+    $context = context_module::instance($cm->id);
+    \mod_facetoface\event\session_signup::create_from_instance($usersignup, $context)->trigger();
+
     return true;
 }
 
@@ -2191,12 +2196,7 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
         $context = context_module::instance($cm->id);
         $signupstatus->id = $statusid;
 
-        $event = \mod_facetoface\event\signupstatus_updated::create(array(
-            'context' => $context,
-            'objectid' => $signupstatus->id,
-        ));
-        $event->add_record_snapshot('facetoface_signups_status', $signupstatus);
-        $event->trigger();
+        \mod_facetoface\event\signup_status_updated::create_from_signup($signupstatus, $context, $signup)->trigger();
 
         return $statusid;
     } else {
@@ -2412,6 +2412,16 @@ function facetoface_approve_requests($data) {
         return false;
     }
 
+    // Load cm.
+    if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
+        error_log('F2F: Could not load cm');
+        return false;
+    }
+
+    $context = context_module::instance($cm->id);
+    $approved = array();
+    $rejected = array();
+
     // Loop through requests
     foreach ($data->requests as $key => $value) {
 
@@ -2446,21 +2456,17 @@ function facetoface_approve_requests($data) {
                         $USER->id
                 );
 
+                // Declined users.
+                $rejected[$attendee->id] = $attendee->id;
+
                 // Send a decline notice to the user.
                 facetoface_send_decline_notice($facetoface, $session, $attendee->id);
-
                 break;
 
             // Approve
             case 2:
-                if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course->id)) {
-                    print_error('error:incorrectcoursemodule', 'facetoface');
-                }
-
-                $contextmodule = context_module::instance($cm->id);
-
                 // Check if there is capacity
-                if (facetoface_session_has_capacity($session, $contextmodule)) {
+                if (facetoface_session_has_capacity($session, $context)) {
                     $status = MDL_F2F_STATUS_BOOKED;
                 } else {
                     if ($session->allowoverbook) {
@@ -2494,6 +2500,8 @@ function facetoface_approve_requests($data) {
                     continue;
                 }
 
+                // Approved users.
+                $approved[$attendee->id] = $attendee->id;
                 break;
 
             case 0:
@@ -2501,6 +2509,16 @@ function facetoface_approve_requests($data) {
                 // Change nothing
                 continue;
         }
+    }
+
+    // Trigger events for approving or declining request in this session
+    if (!empty($approved)) {
+        $data = array('sessionid' => $session->id, 'userids' => implode(', ', $approved));
+        \mod_facetoface\event\booking_requests_approved::create_from_data($data, $context)->trigger();
+    }
+    if (!empty($rejected)) {
+        $data = array('sessionid' => $session->id, 'userids' => implode(', ', $rejected));
+        \mod_facetoface\event\booking_requests_rejected::create_from_data($data, $context)->trigger();
     }
 
     return true;
@@ -5907,7 +5925,7 @@ function facetoface_activity_can_declare_interest($facetoface, $userid = null) {
  * @param  object $facetoface A database fieldset object for the facetoface activity
  * @param  string $reason     Reason provided by user
  * @param  object $userid     Default to current user if null
- * @return boolean            Success
+ * @return bool|int           Result of the insert
  */
 function facetoface_declare_interest($facetoface, $reason = '', $userid = null) {
     global $DB, $USER;
