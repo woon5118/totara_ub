@@ -49,9 +49,9 @@ if ($confirm and confirm_sesskey()) {
     $userlist = $DB->get_records_select_menu('user', "id $in", $params, 'fullname', 'id,'.$DB->sql_fullname().' AS fullname');
     $usernames = implode(', ', $userlist);
     echo $OUTPUT->heading(get_string('confirmation', 'admin'));
-    $formcontinue = new single_button(new moodle_url('user_bulk_delete.php', array('confirm' => 1)), get_string('yes'));
-    $formcancel = new single_button(new moodle_url('user_bulk.php'), get_string('no'), 'get');
-    echo $OUTPUT->confirm(get_string('deletecheckfull', '', $usernames), $formcontinue, $formcancel);
+    $formcontinue = new single_button(new moodle_url('user_bulk_delete.php', array('confirm' => 1)), get_string('delete'));
+    $formcancel = new single_button(new moodle_url('user_bulk.php'), get_string('cancel'), 'get');
+    echo $OUTPUT->confirm(get_string('deleteusercheckfull', 'totara_core', $usernames), $formcontinue, $formcancel);
 }
 
 echo $OUTPUT->footer();

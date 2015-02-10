@@ -125,6 +125,29 @@ $string['datepickerlongyearregexphp'] = '@^(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[
 $string['debugstatus'] = 'Debug status';
 $string['delete'] = 'Delete';
 $string['deleted'] = 'Deleted';
+$string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?<br />All associated data, including but not limited to the following, will be deleted and is not recoverable:
+<ul>
+<li>course completion</li>
+<li>appraisals where the user is in the learner role</li>
+<li>grades</li>
+<li>tags</li>
+<li>roles</li>
+<li>preferences</li>
+<li>user custom fields</li>
+<li>private keys</li>
+<li>customised pages</li>
+<li>facetoface signups</li>
+<li>feedback360 assignments and responses</li>
+<li>position assignments</li>
+<li>programs & certifications</li>
+<li>goals</li>
+<li>will be unenroled from courses</li>
+<li>will be unassigned from manager, appraiser and temp manager positions</li>
+<li>will be removed from cohorts</li>
+<li>will be removed from groups</li>
+<li>messages will be marked as read</li>
+</ul>
+If you wish to retain any data you may wish to consider suspending the user instead.';
 $string['developmentplan'] = 'Development Planner';
 $string['disablefeature'] = 'Disable';
 $string['downloaderrorlog'] = 'Download error log';
