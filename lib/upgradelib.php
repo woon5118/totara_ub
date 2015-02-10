@@ -396,6 +396,9 @@ function upgrade_stale_php_files_present() {
         // Removed in 2.0.
         '/blocks/admin/block_admin.php',
         '/blocks/admin_tree/block_admin_tree.php',
+
+        // Removed in Totara 2.7.
+        '/admin/bulk-course-restore.php',
     );
 
     foreach ($someexamplesofremovedfiles as $file) {
