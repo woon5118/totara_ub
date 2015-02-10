@@ -260,6 +260,10 @@ class program {
     public function update_learner_assignments() {
         global $DB, $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
+        // Check program availability.
+        if (!prog_check_availability($this->availablefrom, $this->availableuntil)) {
+            return false;
+        }
         // Get program assignments.
         $prog_assignments = $this->assignments->get_assignments();
         if (!$prog_assignments) {
@@ -277,9 +281,6 @@ class program {
                                                                                       'exception' => $rawassign->exceptionstatus,
                                                                                       'timeassigned' => $rawassign->timeassigned);
         }
-
-        // Get a list of all enrolment messages for the program.
-        $enrolment_msgids = $DB->get_fieldset_select('prog_message', 'id', 'programid = ? and messagetype = ?', array($this->id, MESSAGETYPE_ENROLMENT));
 
         $assigned_user_ids = array();
         $active_assignments = array();
@@ -331,7 +332,6 @@ class program {
                     $timedue = $DB->get_field('prog_completion', 'timedue', $params);
                     $timedue = $this->make_timedue($user->id, $assign, $timedue);
 
-                    $user_exists = false;
                     $user_assign_data = null;
 
                     // Check if the user is already assigned.
@@ -434,6 +434,7 @@ class program {
                     }
                     unset($fassigncount, $fassignusers);
                 }
+
                 if (!empty($newassignusers)) {
                     // Bulk assign remaining users.
                     $new_queue = $this->assign_learners_bulk($newassignusers, $assign);
