@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * A basic totara message
  */
-class tm_message_eventdata {
+class tm_message_eventdata extends stdClass {
     /**
      * The mdl_user row for the recipient
      * @var object
