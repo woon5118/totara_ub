@@ -49,7 +49,7 @@ class plan_reactivate_form extends moodleform {
         $mform->addElement('hidden', 'sesskey', sesskey());
         $mform->setType('sesskey', PARAM_ALPHA);
         $mform->addElement('hidden', 'confirm', true);
-        $mform->setType('confim', PARAM_BOOL);
+        $mform->setType('confirm', PARAM_BOOL);
         $mform->addElement('hidden', 'referer', $this->_customdata['referer']);
         $mform->setType('referer', PARAM_LOCALURL);
 

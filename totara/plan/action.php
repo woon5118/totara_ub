@@ -307,7 +307,11 @@ if (!empty($reactivate)) {
 
         if ($data = $form->get_data()) {
 
-            $new_date = $data->enddate;
+            if (isset($data->enddate)) {
+                $new_date = $data->enddate;
+            } else {
+                $new_date = null;
+            }
 
             $referer = $data->referer;
 
