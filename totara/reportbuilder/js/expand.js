@@ -93,6 +93,25 @@ M.totara_reportbuilder_expand = M.totara_reportbuilder_expand || {
         var that = $('[data-param="expandcourseid=' + courseid + '"]');
 
         $.post(url, formdata).done(function(data) {
+            if (data.hasOwnProperty('error')) {
+                // Oh nuts. Its an exception, lets try to handle it.
+                // If debugdeveloper is off we will not actually do anything here.
+                if (M.cfg.developerdebug) {
+                    // Developer debug has been enabled. Lets display the exception nicely so that developers can hear something
+                    // has gone wrong.
+                    YUI().use('moodle-core-notification-ajaxexception', function () {
+                        new M.core.ajaxException(data);
+                    });
+                } else {
+                    // No developer debug. Lets just throw up an alert so that the user at least knows that something went wrong
+                    // and can talk to their superior about it.
+                    YUI().use('moodle-core-notification-alert', function() {
+                        // Tiny reliance issue here, we don't actually load the error string into JS. It is already loaded by
+                        // some other code and we just use it,
+                        new M.core.alert({message: data.error, title: M.util.get_string('error', 'moodle')});
+                    });
+                }
+            }
             var redirect = $(data).find('input[type="hidden"][name="redirect"]');
             if (redirect.length) {
                 window.location = redirect.attr('value');
