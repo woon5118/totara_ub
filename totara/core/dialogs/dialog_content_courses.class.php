@@ -186,9 +186,10 @@ class totara_dialog_content_courses extends totara_dialog_content {
      *
      * @access  public
      * @param   array  $where  Alternate where clause in the for array($condition, $params)
+     * @param   int    $userid ID of a learner plan user
      */
-    public function load_courses($where = false) {
-        global $DB;
+    public function load_courses($where = false, $userid = 0) {
+
         $params = array();
         if ($this->categoryid) {
             $coursecat = coursecat::get($this->categoryid);
@@ -219,7 +220,8 @@ class totara_dialog_content_courses extends totara_dialog_content {
 
                 $where .= " category = :dialogcoursecat ";
                 $params['dialogcoursecat'] = $this->categoryid;
-                $this->courses = $coursecat->get_course_records($where, $params, array());
+                $params['userid'] = $userid;
+                $this->courses = $coursecat->get_course_records($where, $params, array(), true);
             } else {
                 $this->courses = $coursecat->get_courses();
             }

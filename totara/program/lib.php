@@ -451,6 +451,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
 
     $offset = !empty($options['offset']) ? $options['offset'] : 0;
     $limit = !empty($options['limit']) ? $options['limit'] : null;
+    $userid = !empty($options['userid']) ? $options['userid'] : $USER->id;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
     if ((int)$categoryid > 0) {
@@ -471,7 +472,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     }
 
     // Manage visibility.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id,
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
                                                                         'p.id',
                                                                         'p.visible',
                                                                         'p.audiencevisible',
