@@ -585,6 +585,8 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             });
         }
 
+        var lastactionvalue = null;
+
         // Handle actions drop down.
         $(document).on('change', 'select#menuf2f-actions', function() {
             var select = $(this);
@@ -597,8 +599,17 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
 
             // Get current value
             var current = select.val();
-
-            // Reset to default
+            // If its the empty or if its the same as the last action.
+            if (current === '' || current === lastactionvalue) {
+                // No need to do anything here we're returning to the default value.
+                lastactionvalue = null;
+                return;
+            }
+            // Record the current selection as the last value. The next line triggers a change again and some browsers
+            // we not have an updated empty value when this happen.
+            lastactionvalue = current;
+            // Reset to default.
+            // This triggers the change event for a second time but we catch it with the above check.
             select.val(0);
 
             // Do an action dependant on what value was chosen
