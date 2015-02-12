@@ -17,14 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage customfield
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_customfield
+ */
+
+/**
+ * This lists event observers.
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015021300;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires = 2011120501;       // Requires this Moodle version
-$plugin->cron = 0;                    // Period for cron to check this module (secs)
-$plugin->component = 'totara_customfield';   // To check on upgrade, that module sits in correct place
+$observers = array (
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => 'totara_customfield_observer::course_deleted',
+    ),
+    array(
+        'eventname' => '\totara_program\event\program_deleted',
+        'callback'  => 'totara_customfield_observer::program_deleted',
+    ),
+);

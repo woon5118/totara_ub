@@ -101,18 +101,14 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
     public function test_courses($usecache) {
         $this->resetAfterTest();
 
-        $cfids = $this->getDataGenerator()->add_multiselect_cf(array('cf1' => array('op1cf1', 'op2cf1'),
-                    'cf2' => array('op1cf2', 'op2cf2')), 'course');
-        $this->getDataGenerator()->set_multiselect_cf($this->course1, $cfids['cf1'],
-                array('op1cf1'), 'course', 'course');
-        $this->getDataGenerator()->set_multiselect_cf($this->course2, $cfids['cf1'],
-                array('op2cf1'), 'course', 'course');
-        $this->getDataGenerator()->set_multiselect_cf($this->course2, $cfids['cf2'],
-                array('op2cf2'), 'course', 'course');
-        $this->getDataGenerator()->set_multiselect_cf($this->course3, $cfids['cf1'],
-                array('op1cf1', 'op2cf1'), 'course', 'course');
-        $this->getDataGenerator()->set_multiselect_cf($this->course3, $cfids['cf2'],
-                array('op1cf2', 'op2cf2'), 'course', 'course');
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+        $cfids = $cfgenerator->create_multiselect('course', array('cf1' => array('op1cf1', 'op2cf1'),
+                    'cf2' => array('op1cf2', 'op2cf2')));
+        $cfgenerator->set_multiselect($this->course1, $cfids['cf1'], array('op1cf1'), 'course', 'course');
+        $cfgenerator->set_multiselect($this->course2, $cfids['cf1'], array('op2cf1'), 'course', 'course');
+        $cfgenerator->set_multiselect($this->course2, $cfids['cf2'], array('op2cf2'), 'course', 'course');
+        $cfgenerator->set_multiselect($this->course3, $cfids['cf1'], array('op1cf1', 'op2cf1'), 'course', 'course');
+        $cfgenerator->set_multiselect($this->course3, $cfids['cf2'], array('op1cf2', 'op2cf2'), 'course', 'course');
 
         // Add CF filters.
         $this->report_builder_cf_filters_data[0]['value'] = "custom_field_{$cfids['cf1']}_text";

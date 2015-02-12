@@ -102,18 +102,14 @@ class totara_reportbuilder_rb_catalogcertifications_embedded_cache_testcase exte
     public function test_certifications($usecache) {
         $this->resetAfterTest();
 
-        $cfids = $this->getDataGenerator()->add_multiselect_cf(array('cf1' => array('op<1> cf"1"', 'op[2]-cf[1]'),
-                    'cf2' => array('op1cf2', 'op2cf2')), 'prog');
-        $this->getDataGenerator()->set_multiselect_cf($this->certification1, $cfids['cf1'],
-                array('op<1> cf"1"'), 'program', 'prog');
-        $this->getDataGenerator()->set_multiselect_cf($this->certification2, $cfids['cf1'],
-                array('op[2]-cf[1]'), 'program', 'prog');
-        $this->getDataGenerator()->set_multiselect_cf($this->certification2, $cfids['cf2'],
-                array('op2cf2'), 'program', 'prog');
-        $this->getDataGenerator()->set_multiselect_cf($this->certification3, $cfids['cf1'],
-                array('op<1> cf"1"', 'op[2]-cf[1]'), 'program', 'prog');
-        $this->getDataGenerator()->set_multiselect_cf($this->certification3, $cfids['cf2'],
-                array('op1cf2', 'op2cf2'), 'program', 'prog');
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+        $cfids = $cfgenerator->create_multiselect('prog', array('cf1' => array('op<1> cf"1"', 'op[2]-cf[1]'),
+                    'cf2' => array('op1cf2', 'op2cf2')));
+        $cfgenerator->set_multiselect($this->certification1, $cfids['cf1'], array('op<1> cf"1"'), 'program', 'prog');
+        $cfgenerator->set_multiselect($this->certification2, $cfids['cf1'], array('op[2]-cf[1]'), 'program', 'prog');
+        $cfgenerator->set_multiselect($this->certification2, $cfids['cf2'], array('op2cf2'), 'program', 'prog');
+        $cfgenerator->set_multiselect($this->certification3, $cfids['cf1'], array('op<1> cf"1"', 'op[2]-cf[1]'), 'program', 'prog');
+        $cfgenerator->set_multiselect($this->certification3, $cfids['cf2'], array('op1cf2', 'op2cf2'), 'program', 'prog');
 
         // Add CF filters.
         $this->report_builder_cf_filters_data[0]['value'] = "custom_field_{$cfids['cf1']}_text";
