@@ -45,44 +45,29 @@ abstract class hierarchy_moved extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $item;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy item record.
-     * @return  item_moved
+     * @return  hierarchy_moved
      */
     public static function create_from_instance(\stdClass $instance) {
         $data = array(
             'objectid' => $instance->id,
             'context' => \context_system::instance(),
-            'other' => array(),
         );
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->item = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy item record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_item() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_item() is intended for event observers only');
-        }
-        return $this->item;
     }
 
     /**
@@ -91,7 +76,13 @@ abstract class hierarchy_moved extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix}: {$this->objectid} was moved";
+        $prefix = $this->get_prefix();
+        return "The {$prefix}: {$this->objectid} was moved";
+    }
+
+    public function get_url() {
+        $urlparams = array('prefix' => $this->get_prefix(), 'id' => $this->objectid);
+        return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
     }
 
     protected function validate_data() {

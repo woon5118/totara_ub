@@ -122,35 +122,32 @@ if ($valueform->is_cancelled()) {
         // New scale value.
         unset($valuenew->id);
 
-        if ($valuenew->id = $DB->insert_record('goal_scale_values', $valuenew)) {
-            \hierarchy_goal\event\scale_value_created::create_from_instance($valuenew)->trigger();
+        $valuenew->id = $DB->insert_record('goal_scale_values', $valuenew);
+        $valuenew = file_postupdate_standard_editor($valuenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', 'goal_scale_values', $valuenew->id);
+        $DB->set_field('goal_scale_values', 'description', $valuenew->description, array('id' => $valuenew->id));
 
-            $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-            $notification->text = 'scalevalueadded';
-            $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
-            $notification->params = array('class' => 'notifysuccess');
-        } else {
-            print_error('createscalevaluerecord', 'totara_hierarchy');
-        }
+        $valuenew = $DB->get_record('goal_scale_values', array('id' => $valuenew->id));
+        \hierarchy_goal\event\scale_value_created::create_from_instance($valuenew)->trigger();
+
+        $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
+        $notification->text = 'scalevalueadded';
+        $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
+        $notification->params = array('class' => 'notifysuccess');
 
     } else {
         // Updating scale value.
-        if ($DB->update_record('goal_scale_values', $valuenew)) {
-            \hierarchy_goal\event\scale_value_updated::create_from_instance($valuenew)->trigger();
+        $valuenew = file_postupdate_standard_editor($valuenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', 'goal_scale_values', $valuenew->id);
+        $DB->update_record('goal_scale_values', $valuenew);
+        $valuenew = $DB->get_record('goal_scale_values', array('id' => $valuenew->id));
+        \hierarchy_goal\event\scale_value_updated::create_from_instance($valuenew)->trigger();
 
-            $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
-            $notification->text = 'scalevalueupdatedgoal';
-            $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
-            $notification->params = array('class' => 'notifysuccess');
-        } else {
-            print_error('updatescalevaluerecord', 'totara_hierarchy');
-        }
+        $urlpart = "prefix/goal/scale/view.php?id={$valuenew->scaleid}&amp;prefix=goal";
+        $notification->text = 'scalevalueupdatedgoal';
+        $notification->url = "$CFG->wwwroot/totara/hierarchy/" . $urlpart;
+        $notification->params = array('class' => 'notifysuccess');
     }
-
-    // Fix the description field and redirect.
-    $valuenew = file_postupdate_standard_editor($valuenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-        'totara_hierarchy', 'goal_scale_values', $valuenew->id);
-    $DB->set_field('goal_scale_values', 'description', $valuenew->description, array('id' => $valuenew->id));
     totara_set_notification(get_string($notification->text, 'totara_hierarchy', format_string($valuenew->name)),
                         $notification->url, $notification->params);
 }

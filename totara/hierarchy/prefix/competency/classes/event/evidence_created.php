@@ -48,12 +48,6 @@ class evidence_created extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
-     */
-    protected $evidence;
-
-    /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy evidence record.
@@ -72,24 +66,10 @@ class evidence_created extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->evidence = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy evidence record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_evidence() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_evidence() is intended for event observers only');
-        }
-        return $this->evidence;
     }
 
     /**
@@ -134,15 +114,15 @@ class evidence_created extends \core\event\base {
 
         parent::validate_data();
 
-        if (!isset($this->other['competencyid'])) {
+        if (empty($this->other['competencyid'])) {
             throw new \coding_exception('competencyid must be set in $other');
         }
 
-        if (!isset($this->other['itemtype'])) {
+        if (empty($this->other['itemtype'])) {
             throw new \coding_exception('itemtype must be set in $other');
         }
 
-        if (!isset($this->other['instanceid'])) {
+        if (empty($this->other['instanceid'])) {
             throw new \coding_exception('instanceid must be set in $other');
         }
     }

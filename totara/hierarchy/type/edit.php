@@ -98,33 +98,29 @@ if ($typeform->is_cancelled()) {
         unset($typenew->id);
         $typenew->timecreated = time();
 
-        if (!$typenew->id = $DB->insert_record($shortprefix.'_type', $typenew)) {
-            $notification->text = $prefix . 'error:createtype';
-            $notification->params = array();
-        } else {
-            $eventname = "\\hierarchy_{$prefix}\\event\\type_created";
-            $event = $eventname::create_from_instance($typenew);
-            $event->trigger();
+        $typenew->id = $DB->insert_record($shortprefix.'_type', $typenew);
+        $typenew = file_postupdate_standard_editor($typenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_type', $typenew->id);
+        $DB->set_field($shortprefix.'_type', 'description', $typenew->description, array('id' => $typenew->id));
 
-            $notification->text = $prefix . 'createtype';
-            $notification->params = array('class' => 'notifysuccess');
-        }
+        $typenew = $DB->get_record($shortprefix.'_type', array('id' => $typenew->id));
+        $eventname = "\\hierarchy_{$prefix}\\event\\type_created";
+        $eventname::create_from_instance($typenew)->trigger();
+
+        $notification->text = $prefix . 'createtype';
+        $notification->params = array('class' => 'notifysuccess');
+
     // Existing type
     } else {
-        if (!$DB->update_record($shortprefix.'_type', $typenew)) {
-            $notification->text = $prefix . 'error:updatetype';
-            $notification->params = array();
-        } else {
-            $eventname = "\\hierarchy_{$prefix}\\event\\type_updated";
-            $event = $eventname::create_from_instance($typenew);
-            $event->trigger();
+        $typenew = file_postupdate_standard_editor($typenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_type', $typenew->id);
+        $DB->update_record($shortprefix.'_type', $typenew);
 
-            $notification->text = $prefix . 'updatetype';
-            $notification->params = array('class' => 'notifysuccess');
-        }
+        $typenew = $DB->get_record($shortprefix.'_type', array('id' => $typenew->id));
+        $eventname = "\\hierarchy_{$prefix}\\event\\type_updated";
+        $eventname::create_from_instance($typenew)->trigger();
+
+        $notification->text = $prefix . 'updatetype';
+        $notification->params = array('class' => 'notifysuccess');
     }
-    $typenew = file_postupdate_standard_editor($typenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_type', $typenew->id);
-    $DB->set_field($shortprefix.'_type', 'description', $typenew->description, array('id' => $typenew->id));
     totara_set_notification(get_string($notification->text, 'totara_hierarchy', $typenew->fullname), $notification->url, $notification->params);
 }
 

@@ -90,9 +90,8 @@ if (!confirm_sesskey()) {
 $deleteresult = $hierarchy->delete_type($type->id);
 
 if ($deleteresult === true) {
-    $eventname = "\\hierarchy_{$prefix}\\event\\type_deleted";
-    $event = $eventname::create_from_instance($type);
-    $event->trigger();
+    $eventclass = "\\hierarchy_{$prefix}\\event\\type_deleted";
+    $eventclass::create_from_instance($type)->trigger();
 
     totara_set_notification(get_string($prefix.'deletedtype', 'totara_hierarchy', $type->fullname), "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
 } else {

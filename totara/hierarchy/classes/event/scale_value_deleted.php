@@ -45,16 +45,16 @@ abstract class scale_value_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $scalevalue;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy scalevalue record.
-     * @return  scalevalue_deleted
+     * @return  scale_value_deleted
      */
     public static function create_from_instance(\stdClass $instance) {
         $data = array(
@@ -67,25 +67,10 @@ abstract class scale_value_deleted extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->scalevalue = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy scalevalue record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_scalevalue() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_scalevalue() is intended for event observers only');
-        }
-        return $this->scalevalue;
     }
 
     /**
@@ -94,19 +79,28 @@ abstract class scale_value_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The scale value: {$this->objectid} was delete from {$this->prefix} scale {$this->data['other']['scaleid']}";
+        $prefix = $this->get_prefix();
+        return "The scale value: {$this->objectid} was delete from {$prefix} scale {$this->data['other']['scaleid']}";
+    }
+
+    public function get_url() {
+        $prefix = $this->get_prefix();
+
+        $urlparams = array('id' => $this->data['other']['scaleid'], 'prefix' => $prefix);
+        $urlpath = "/totara/hierarchy/prefix/{$prefix}/scale/view.php";
+
+        return new \moodle_url($urlpath, $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('id' => $this->data['other']['scaleid'], 'prefix' => $this->prefix);
-        $urlpath = "/totara/hierarchy/prefix/{$this->prefix}/scale/view.php";
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'delete scale value';
-        $logdata[] = new \moodle_url($urlpath, $urlparams);
-        $logdata[] = "{$this->prefix} scale value: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} scale value: {$this->objectid}";
 
         return $logdata;
     }
@@ -124,7 +118,7 @@ abstract class scale_value_deleted extends \core\event\base {
 
         parent::validate_data();
 
-        if (!isset($this->other['scaleid'])) {
+        if (empty($this->other['scaleid'])) {
             throw new \coding_exception('scaleid must be set in $other');
         }
     }

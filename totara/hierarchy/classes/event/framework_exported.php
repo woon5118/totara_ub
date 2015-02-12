@@ -47,16 +47,11 @@ class framework_exported extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
-     */
-    protected $framework;
-
-    /**
      * Create instance of event.
      *
-     * @param   string $prefix The type of framework exported (pos/org/comp/goal)
-     * @return  framework_exported
+     * @param string $prefix The type of framework exported (pos/org/comp/goal)
+     * @param \stdClass $framework
+     * @return framework_exported
      */
     public static function create_from_instance($prefix, $framework) {
         $data = array(
@@ -69,24 +64,9 @@ class framework_exported extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->framework = $framework;
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy framework record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_framework() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_framework() is intended for event observers only');
-        }
-        return $this->framework;
     }
 
     /**
@@ -117,14 +97,17 @@ class framework_exported extends \core\event\base {
         return "The {$this->data['other']['prefix']} framework: {$this->data['other']['frameworkid']} was exported";
     }
 
-    public function get_legacy_logdata() {
+    public function get_url() {
         $urlparams = array('id' => $this->data['other']['frameworkid'], 'prefix' => $this->data['other']['prefix']);
+        return new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
+    }
 
+    public function get_legacy_logdata() {
         $logdata = array();
         $logdata[] = SITEID;
         $logdata[] = $this->data['other']['prefix'];
         $logdata[] = 'export framework';
-        $logdata[] = new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
+        $logdata[] = $this->get_url()->out_as_local_url(false);
         $logdata[] = "{$this->data['other']['prefix']} framework: {$this->data['other']['frameworkid']}";
 
         return $logdata;
@@ -143,11 +126,11 @@ class framework_exported extends \core\event\base {
 
         parent::validate_data();
 
-        if (!isset($this->other['prefix'])) {
+        if (empty($this->other['prefix'])) {
             throw new \coding_exception('prefix must be set in $other');
         }
 
-        if (!isset($this->other['frameworkid'])) {
+        if (empty($this->other['frameworkid'])) {
             throw new \coding_exception('frameworkid must be set in $other');
         }
     }

@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * }
  *
  * @author David Curry <david.curry@totaralms.com>
- * @package totara_competency_assignment
+ * @package totara_hierarchy
  */
 abstract class competency_assigned extends \core\event\base {
 
@@ -48,48 +48,10 @@ abstract class competency_assigned extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $assignment;
-
-    /**
-     * Create instance of event.
-     *
-     * @param   \stdClass $instance A competency_assignment assignment record.
-     * @return  assignment_created
-     */
-    public static function create_from_instance(\stdClass $instance) {
-        $data = array(
-            'objectid' => $instance->id,
-            'context' => \context_system::instance(),
-            'other' => array(
-                'competencyid' => $instance->competencyid,
-                'instanceid' => $instance->instanceid, // The id of the pos/org.
-            ),
-        );
-
-        self::$preventcreatecall = false;
-        $event = self::create($data);
-        $event->assignment = $instance;
-        self::$preventcreatecall = true;
-
-        return $event;
-    }
-
-    /**
-     * Get competency_assignment assignment record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_assignment() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_assignment() is intended for event observers only');
-        }
-        return $this->assignment;
-    }
+    abstract public function get_prefix();
 
     /**
      * Returns description of what happened.
@@ -99,19 +61,25 @@ abstract class competency_assigned extends \core\event\base {
     public function get_description() {
         $competencyid = $this->data['other']['competencyid'];
         $instanceid = $this->data['other']['instanceid'];
+        $prefix = $this->get_prefix();
 
-        return "The competency: {$competencyid} was assigned to the {$this->prefix}: {$instanceid}";
+        return "The competency: {$competencyid} was assigned to the {$prefix}: {$instanceid}";
+    }
+
+    public function get_url() {
+        $urlparams = array('id' => $this->data['other']['instanceid'], 'prefix' => $this->get_prefix());
+        return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('id' => $this->data['other']['instanceid'], 'prefix' => $this->prefix);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'create competency assignment';
-        $logdata[] = new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $logdata[] = "{$this->prefix}: {$this->data['other']['instanceid']} - competency: {$this->data['other']['competencyid']}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix}: {$this->data['other']['instanceid']} - competency: {$this->data['other']['competencyid']}";
 
         return $logdata;
     }
@@ -129,11 +97,11 @@ abstract class competency_assigned extends \core\event\base {
 
         parent::validate_data();
 
-        if (!isset($this->other['competencyid'])) {
+        if (empty($this->other['competencyid'])) {
             throw new \coding_exception('competencyid must be set in $other');
         }
 
-        if (!isset($this->other['instanceid'])) {
+        if (empty($this->other['instanceid'])) {
             throw new \coding_exception('instanceid must be set in $other');
         }
     }

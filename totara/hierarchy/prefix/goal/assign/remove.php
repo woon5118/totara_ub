@@ -119,17 +119,15 @@ if ($delete) {
     $snapshot = $DB->get_record($type->table, $delete_params);
     if ($assigntype == GOAL_ASSIGNMENT_INDIVIDUAL) {
         goal::delete_user_assignments($delete_params);
-        $eventname = "\\hierarchy_goal\\event\\assignment_user_deleted";
+        $eventclass = "\\hierarchy_goal\\event\\assignment_user_deleted";
     } else {
         // If it's not an individual assignment delete/transfer user assignments.
         $assignmentid = $DB->get_field($type->table, 'id', $delete_params);
         goal::delete_group_assignment($assigntype, $assignmentid, $type, $delete_params);
-        $eventname = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_deleted";
+        $eventclass = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_deleted";
     }
 
-    $snapshot->instanceid = $modid;
-    $event = $eventname::create_from_instance($snapshot);
-    $event->trigger();
+    $eventclass::create_from_instance($snapshot)->trigger();
 
     totara_set_notification(get_string('goaldeletedassignment', 'totara_hierarchy'), $returnurl,
             array('class' => 'notifysuccess'));

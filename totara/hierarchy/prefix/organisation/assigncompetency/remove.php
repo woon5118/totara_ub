@@ -78,7 +78,6 @@ if ($delete) {
     $snapshot = $DB->get_record('org_competencies', array('id' => $id));
     $DB->delete_records('org_competencies', array('id' => $id));
 
-    $snapshot->instanceid = $snapshot->organisationid;
     \hierarchy_organisation\event\competency_unassigned::create_from_instance($snapshot)->trigger();
 
     totara_set_notification(get_string('organisationdeletedassignedcompetency', 'totara_hierarchy'), $returnurl, array('class' => 'notifysuccess'));

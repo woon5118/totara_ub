@@ -47,51 +47,10 @@ abstract class assignment_created extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns type.
+     * @return string
      */
-    protected $assignment;
-
-    /**
-     * Create instance of event.
-     *
-     * @param   \stdClass $instance A  goal record.
-     * @return  item_created
-     */
-    public static function create_from_instance(\stdClass $instance) {
-        $userid = isset($instance->userid) ? $instance->userid : null;
-
-        $data = array(
-            'objectid' => $instance->id,
-            'context' => \context_system::instance(),
-            'relateduserid' => $userid,
-            'other' => array(
-                'goalid' => $instance->goalid,
-                'instanceid' => $instance->instanceid,
-            ),
-        );
-
-        self::$preventcreatecall = false;
-        $event = self::create($data);
-        $event->assignment = $instance;
-        self::$preventcreatecall = true;
-
-        return $event;
-    }
-
-    /**
-     * Get goal assignment record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_assignment() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_assignment() is intended for event observers only');
-        }
-        return $this->assignment;
-    }
+    abstract public function get_type();
 
     /**
      * Return localised event name.
@@ -111,22 +70,23 @@ abstract class assignment_created extends \core\event\base {
         return "The  goal: {$this->data['other']['goalid']} was assigned to {$this->type}: {$this->data['other']['instanceid']}";
     }
 
-    public function get_legacy_logdata() {
+    public function get_url() {
+        debugging('get_url() must be overridden in child events.');
         $urlparams = array('id' => $this->data['other']['goalid'], 'prefix' => 'goal');
+        return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
+    }
+
+    public function get_legacy_logdata() {
+        $type = $this->get_type();
 
         $logdata = array();
         $logdata[] = SITEID;
         $logdata[] = 'goal';
         $logdata[] = 'create goal assignments';
-        $logdata[] = $this->get_legacy_url();
-        $logdata[] = "goal: {$this->data['other']['goalid']} - {$this->type}: {$this->data['other']['instanceid']}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "goal: {$this->data['other']['goalid']} - {$type}: {$this->data['other']['instanceid']}";
 
         return $logdata;
-    }
-
-    // NOTE:: This function must be overridden in child events.
-    protected function get_legacy_url() {
-        return '';
     }
 
     /**

@@ -84,9 +84,8 @@ if (!confirm_sesskey()) {
 }
 
 if ($hierarchy->delete_framework()) {
-    $eventname = "\\hierarchy_{$prefix}\\event\\framework_deleted";
-    $event = $eventname::create_from_instance($framework);
-    $event->trigger();
+    $eventclass = "\\hierarchy_{$prefix}\\event\\framework_deleted";
+    $eventclass::create_from_instance($framework)->trigger();
 
     totara_set_notification(get_string($prefix.'deletedframework', 'totara_hierarchy', $framework->fullname), "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
 } else {

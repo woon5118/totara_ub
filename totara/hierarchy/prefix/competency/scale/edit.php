@@ -98,6 +98,8 @@ if ($mform->is_cancelled()) {
         unset($scalenew->id);
         $transaction = $DB->start_delegated_transaction();
         $scalenew->id = $DB->insert_record('comp_scale', $scalenew);
+        $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_scale', $scalenew->id);
+        $DB->set_field('comp_scale', 'description', $scalenew->description, array('id' => $scalenew->id));
         $scalevalues = explode("\n", trim($scalenew->scalevalues));
         unset($scalenew->scalevalues);
         $sortorder = 1;
@@ -125,6 +127,7 @@ if ($mform->is_cancelled()) {
         }
         $transaction->allow_commit();
 
+        $scalenew = $DB->get_record('comp_scale', array('id' => $scalenew->id));
         \hierarchy_competency\event\scale_created::create_from_instance($scalenew)->trigger();
 
         $notification->text = 'scaleadded';
@@ -132,17 +135,16 @@ if ($mform->is_cancelled()) {
         $notification->params = array('class' => 'notifysuccess');
     } else {
         // Existing scale
+        $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_scale', $scalenew->id);
         $DB->update_record('comp_scale', $scalenew);
 
+        $scalenew = $DB->get_record('comp_scale', array('id' => $scalenew->id));
         \hierarchy_competency\event\scale_updated::create_from_instance($scalenew)->trigger();
 
         $notification->text = 'scaleupdated';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/competency/scale/view.php?id={$scalenew->id}&amp;prefix=competency";
         $notification->params = array('class' => 'notifysuccess');
     }
-    //fix the description field and redirect
-    $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_scale', $scalenew->id);
-    $DB->set_field('comp_scale', 'description', $scalenew->description, array('id' => $scalenew->id));
     totara_set_notification(get_string($notification->text, 'totara_hierarchy', $scalenew->name),
                     $notification->url, $notification->params);
 

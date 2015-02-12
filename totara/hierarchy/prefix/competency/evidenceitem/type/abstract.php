@@ -152,9 +152,7 @@ abstract class competency_evidence_type extends data_object {
         $todb->id = $competency->id;
         $todb->evidencecount = (int) $count;
 
-        if (!$DB->update_record('comp', $todb)) {
-            print_error('updatecompetencyevidencecount', 'totara_hierarchy');
-        }
+        $DB->update_record('comp', $todb);
 
         \hierarchy_competency\event\evidence_created::create_from_instance($this->get_record())->trigger();
 
@@ -188,9 +186,7 @@ abstract class competency_evidence_type extends data_object {
         $todb->id = $competency->id;
         $todb->evidencecount = (int) $count;
 
-        if (!$DB->update_record('comp', $todb)) {
-            print_error('updatecompetencyevidencecount', 'totara_hierarchy');
-        }
+        $DB->update_record('comp', $todb);
 
         \hierarchy_competency\event\evidence_deleted::create_from_instance($snapshot)->trigger();
     }

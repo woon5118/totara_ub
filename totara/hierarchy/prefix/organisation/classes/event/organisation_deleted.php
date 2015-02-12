@@ -37,11 +37,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class organisation_deleted extends \totara_hierarchy\event\hierarchy_deleted {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'organisation';
+    public function get_prefix() {
+        return 'organisation';
+    }
 
     /**
      * Initialise the event data.

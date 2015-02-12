@@ -170,17 +170,16 @@ if ($add) {
             if (empty($goalrecords)) {
                 goal::insert_goal_item($scale_default, goal::SCOPE_COMPANY);
             }
-            $eventname = "\\hierarchy_goal\\event\\assignment_user_created";
+            $eventclass = "\\hierarchy_goal\\event\\assignment_user_created";
         } else {
             // Make the assignment, then create all the current user assignments.
             $relationship->id = $DB->insert_record($type->table, $relationship);
             $goal->create_user_assignments($assigntype, $relationship, $relationship->includechildren);
-            $eventname = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_created";
+            $eventclass = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_created";
         }
 
-        $relationship->instanceid = $assignto;
-        $event = $eventname::create_from_instance($relationship);
-        $event->trigger();
+        $relationship = $DB->get_record($type->table, array('id' => $relationship->id));
+        $eventclass::create_from_instance($relationship)->trigger();
     }
 
     // Set up returning the html and closing the dialog.

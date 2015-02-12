@@ -94,14 +94,17 @@ class framework_viewed extends \core\event\base {
         return "The {$this->data['other']['prefix']} frameworks were viewed";
     }
 
-    public function get_legacy_logdata() {
+    public function get_url() {
         $urlparams = array('prefix' => $this->data['other']['prefix']);
+        return new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
+    }
 
+    public function get_legacy_logdata() {
         $logdata = array();
         $logdata[] = SITEID;
         $logdata[] = $this->data['other']['prefix'];
         $logdata[] = 'view framework';
-        $logdata[] = new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
+        $logdata[] = $this->get_url()->out_as_local_url(false);
         $logdata[] = "{$this->data['other']['prefix']} framework list";
 
         return $logdata;
@@ -120,7 +123,7 @@ class framework_viewed extends \core\event\base {
 
         parent::validate_data();
 
-        if (!isset($this->other['prefix'])) {
+        if (empty($this->other['prefix'])) {
             throw new \coding_exception('prefix must be set in $other');
         }
     }

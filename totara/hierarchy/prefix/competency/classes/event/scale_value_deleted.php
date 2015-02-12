@@ -36,11 +36,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class scale_value_deleted extends \totara_hierarchy\event\scale_value_deleted {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'competency';
+    public function get_prefix() {
+        return 'competency';
+    }
 
     /**
      * Init method.

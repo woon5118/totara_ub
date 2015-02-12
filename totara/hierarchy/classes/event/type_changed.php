@@ -48,15 +48,15 @@ abstract class type_changed extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $dataobject;
+    abstract public function get_prefix();
 
     /**
      * Create dataobject of event.
      *
-     * @param   \stdClass $dataobject A data object holding the following data:
+     * @param array $dataobject A data object holding the following data:
      *              -> oldtypeid
      *              -> newtypeid
      * @return  type_changed
@@ -73,24 +73,9 @@ abstract class type_changed extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->dataobject = $dataobject;
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy type record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_dataobject() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_dataobject() is intended for event observers only');
-        }
-        return $this->dataobject;
     }
 
     /**
@@ -99,20 +84,30 @@ abstract class type_changed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} type {$this->objectid} was changed";
+        $prefix = $this->get_prefix();
+
+        return "The {$prefix} type {$this->objectid} was changed";
+    }
+
+    public function get_url() {
+        $prefix = $this->get_prefix();
+
+        $urlparams = array('prefix' => $prefix, 'id' => $this->objectid);
+
+        return new \moodle_url('/totara/hierarchy/item/edit.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
+        $prefix = $this->get_prefix();
         $oldtypeid = $this->data['other']['oldtypeid'];
         $newtypeid = $this->data['other']['newtypeid'];
-        $urlparams = array('prefix' => $this->prefix, 'id' => $this->objectid);
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'change type';
-        $logdata[] = new \moodle_url('/totara/hierarchy/item/edit.php', $urlparams);
-        $logdata[] = "{$this->prefix}: {$this->objectid} (type: {$oldtypeid} -> type: {$newtypeid})";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix}: {$this->objectid} (type: {$oldtypeid} -> type: {$newtypeid})";
 
         return $logdata;
     }

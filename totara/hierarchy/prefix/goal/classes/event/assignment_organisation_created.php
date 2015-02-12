@@ -37,11 +37,40 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class assignment_organisation_created extends \hierarchy_goal\event\assignment_created {
+    /**
+     * Returns type.
+     * @return string
+     */
+    public function get_type() {
+        return 'organisation';
+    }
 
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Create instance of event.
+     *
+     * @param   \stdClass $instance A  goal record.
+     * @return  assignment_created
      */
-    protected $type = 'organisation';
+    public static function create_from_instance(\stdClass $instance) {
+        $userid = isset($instance->userid) ? $instance->userid : null;
+
+        $data = array(
+            'objectid' => $instance->id,
+            'context' => \context_system::instance(),
+            'relateduserid' => $userid,
+            'other' => array(
+                'goalid' => $instance->goalid,
+                'instanceid' => $instance->orgid,
+            ),
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        $event->add_record_snapshot($event->objecttable, $instance);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Init method.
@@ -54,8 +83,8 @@ class assignment_organisation_created extends \hierarchy_goal\event\assignment_c
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    protected function get_legacy_url() {
-        $params = array('prefix' => $this->type, 'id' => $this->data['other']['instanceid']);
+    public function get_url() {
+        $params = array('prefix' => $this->get_type(), 'id' => $this->data['other']['instanceid']);
         return new \moodle_url('/totara/hierarchy/item/view.php', $params);
     }
 }

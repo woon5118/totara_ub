@@ -45,10 +45,10 @@ abstract class type_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $type;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
@@ -65,25 +65,10 @@ abstract class type_deleted extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->type = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy type record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_type() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_type() is intended for event observers only');
-        }
-        return $this->type;
     }
 
     /**
@@ -92,18 +77,28 @@ abstract class type_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} type {$this->objectid} was deleted";
+        $prefix = $this->get_prefix();
+
+        return "The {$prefix} type {$this->objectid} was deleted";
+    }
+
+    public function get_url() {
+        $prefix = $this->get_prefix();
+
+        $urlparams = array('prefix' => $prefix);
+
+        return new \moodle_url('/totara/hierarchy/type/index.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('prefix' => $this->prefix);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'delete type';
-        $logdata[] = new \moodle_url('/totara/hierarchy/type/index.php', $urlparams);
-        $logdata[] = "{$this->prefix} type: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} type: {$this->objectid}";
 
         return $logdata;
     }
