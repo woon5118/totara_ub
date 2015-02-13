@@ -246,7 +246,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             }
         }
 
-        // Check field integrity
+        // Check field integrity for general fields.
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f}) || in_array($f, $fieldmappings)) {
                 // Disabled or mapped fields can be ignored
@@ -254,6 +254,17 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             }
             if (!in_array($f, $fields)) {
                 throw new totara_sync_exception($this->get_element_name(), 'importdata', 'csvnotvalidmissingfieldx', $f);
+            }
+        }
+
+        // Check field integrity for custom fields.
+        foreach ($this->customfields as $cf => $name) {
+            if (empty($this->config->{'import_'. $cf}) || in_array($cf, $fieldmappings)) {
+                // Disabled or mapped fields can be ignored.
+                continue;
+            }
+            if (!in_array($cf, $fields)) {
+                throw new totara_sync_exception($this->get_element_name(), 'importdata', 'csvnotvalidmissingfieldx', $cf);
             }
         }
 
