@@ -39,7 +39,6 @@ class rb_source_certification_completion extends rb_source_program_completion {
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification_completion');
         $this->sourcewhere = $this->define_sourcewhere();
-        $this->joinlist = $this->define_joinlist();
     }
 
     protected function define_sourcewhere() {
@@ -55,7 +54,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
     protected function define_joinlist() {
         $joinlist = parent::define_joinlist();
 
-        $this->add_certification_table_to_joinlist($joinlist, 'base', 'certifid');
+        $this->add_certification_table_to_joinlist($joinlist, 'program', 'certifid');
 
         $joinlist[] = new rb_join(
             'certif_completion',

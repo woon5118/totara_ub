@@ -686,7 +686,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         // Loop through installed sources.
         $sourcelist = reportbuilder::get_source_list(true);
         foreach ($sourcelist as $sourcename => $title) {
-            $sourcecheck = in_array($sourcename, array('dp_certification_history', 'program_completion', 'user'));
+            $sourcecheck = in_array($sourcename, array('dp_certification_history', 'user'));
             // echo '<h3>Title : [' . $title . '] Sourcename : [' . $sourcename . ']</h3>' . "\n";
             $src = reportbuilder::get_source_object($sourcename);
             $sortorder = 1;
@@ -722,8 +722,12 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $columnoption = reportbuilder::get_single_item($rb->columnoptions, $column->type, $column->value);
 
                 // The answer here depends on if the column we are testing is grouped or not.
-                if ($sourcecheck || ($sourcename == 'program_overview' && $columnoption->grouping == 'none')) {
+                if ($sourcecheck) {
                     $this->assertEquals('2', $rb->get_full_count(), $message);
+                } else if ($sourcename === 'certification_overview'
+                    and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress')) {
+                    // TODO: Add more test data.
+                    $this->assertEquals(0, $rb->get_full_count(), $message);
                 } else {
                     $this->assertEquals('1', $rb->get_full_count(), $message);
                 }
@@ -743,8 +747,12 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $columnoption = reportbuilder::get_single_item($rb->columnoptions, $column->type, $column->value);
 
                 // The answer here depends on if the column we are testing is grouped or not.
-                if ($sourcecheck || ($sourcename == 'program_overview' && $columnoption->grouping == 'none')) {
+                if ($sourcecheck) {
                     $this->assertEquals('2', $rb->get_full_count(), $message);
+                } else if ($sourcename === 'certification_overview'
+                    and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress')) {
+                    // TODO: Add more test data.
+                    $this->assertEquals(0, $rb->get_full_count(), $message);
                 } else {
                     $this->assertEquals('1', $rb->get_full_count(), $message);
                 }
