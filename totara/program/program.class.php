@@ -285,6 +285,7 @@ class program {
         $assigned_user_ids = array();
         $active_assignments = array();
         $message_queue = array();
+        $users_with_removed_assignments = array();
 
         if ($prog_assignments) {
             foreach ($prog_assignments as $assign) {
@@ -318,6 +319,8 @@ class program {
 
                     if (!empty($userstoremove)) {
                         $assignment_class->remove_outdated_assignments($this->id, $assign->assignmenttypeid, $userstoremove);
+                        // Store the user id to check later.
+                        $users_with_removed_assignments = array_merge($users_with_removed_assignments, $userstoremove);
                     }
                 }
 
@@ -486,11 +489,11 @@ class program {
         // Get an array of user ids, of the users who should be in this program.
         $users_who_should_be_assigned = $assigned_user_ids;
 
-        // Get all users who are assigned, as we want to unassign them all.
+        // Now we want to find and remove previously-assigned users, who no longer meet the current assignment criteria.
         $alreadyassigned_sql = '';
         $unassignparams = array();
         if (count($users_who_should_be_assigned) > 0) {
-            // Get a list of user ids that are ALREADY assigned, but shouldn't be anymore
+            // Create a NOT IN exclusion clause of the users who meet current criteria and SHOULD currently be assigned.
             list($usql, $unassignparams) = $DB->get_in_or_equal($users_who_should_be_assigned, SQL_PARAMS_QM, '', false);
             $alreadyassigned_sql = "userid {$usql} AND";
         }
@@ -498,11 +501,14 @@ class program {
         $unassignparams[] = $this->id;
 
         // Validate user to unassign against the prog_user_assignment table.
-        $users_to_unassign = $DB->get_records_select('prog_user_assignment',
-            "{$alreadyassigned_sql} programid = ?", $unassignparams, '', 'userid as id');
-
+        $users_to_unassign = $DB->get_fieldset_select('prog_user_assignment', 'userid',
+                             "{$alreadyassigned_sql} programid = ?", $unassignparams);
+        // We also need to double-check users who have had assignments removed e.g. have left an audience.
+        // Find users who HAVE had assignments removed and are NOT in the final assigned list.
+        $obsoleteusers = array_diff($users_with_removed_assignments, $users_who_should_be_assigned);
+        $users_to_unassign = array_merge($users_to_unassign, $obsoleteusers);
         if ($users_to_unassign) {
-            $this->unassign_learners(array_keys($users_to_unassign));
+            $this->unassign_learners($users_to_unassign);
         }
 
         // Users can have multiple assignments to a program.
