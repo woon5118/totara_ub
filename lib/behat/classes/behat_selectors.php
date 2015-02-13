@@ -40,6 +40,7 @@ class behat_selectors {
      */
     protected static $allowedtextselectors = array(
         'dialogue' => 'dialogue',
+        'totaradialogue' => 'totaradialogue',
         'block' => 'block',
         'region' => 'region',
         'table_row' => 'table_row',
@@ -55,6 +56,7 @@ class behat_selectors {
      */
     protected static $allowedselectors = array(
         'dialogue' => 'dialogue',
+        'totaradialogue' => 'totaradialogue',
         'block' => 'block',
         'region' => 'region',
         'table_row' => 'table_row',
@@ -96,6 +98,19 @@ XPATH
         ]) = %locator%] |
 //div[contains(concat(' ', normalize-space(@class), ' '), ' yui-dialog ') and
     normalize-space(descendant::div[@class='hd']) = %locator%]
+XPATH
+        , 'totaradialogue' => <<<XPATH
+//div[
+  contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog ')
+and
+  contains(concat(' ', normalize-space(@class), ' '), ' totara-dialog ')
+and
+  descendant::div[
+    contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog-titlebar ')
+  ]//*/text()[normalize-space(.)=%locator%]
+|
+  descendant::div[@id=%locator%]
+]
 XPATH
         , 'block' => <<<XPATH
 //div[contains(concat(' ', normalize-space(@class), ' '), ' block ') and

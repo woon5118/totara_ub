@@ -288,7 +288,10 @@ function facetoface_ical_escape($text, $converthtml=false) {
     // Text should be wordwrapped at 75 octets, and there should be one
     // whitespace after the newline that does the wrapping.
     // More info: http://tools.ietf.org/html/rfc5545#section-3.1
+    // For spacing issues see http://php.net/wordwrap#52532
+    $text = str_replace(' ', chr(26), $text);
     $text = wordwrap($text, 74, "\r\n\t", true);
+    $text = str_replace(chr(26), ' ', $text);
 
     return $text;
 }

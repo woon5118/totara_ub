@@ -139,7 +139,7 @@ class block_totara_report_graph extends block_base {
             //       when multiple graphs present on on page - this is the reasons for object embedding.
             $svgurl = new moodle_url('/blocks/totara_report_graph/ajax_graph.php', array('blockid' => $this->instance->id, 'type' => 'svg'));
             $nosvg = get_string('error:nosvg', 'totara_reportbuilder');
-            $this->content->text = "<div class=\"rb-block-svggraph\"><object type=\"image/svg+xml\" data=\"$svgurl\" width=\"100%\" height=\"100%\">$nosvg</object>";
+            $this->content->text = "<div class=\"rb-block-svggraph\"><object type=\"image/svg+xml\" data=\"$svgurl\" width=\"100%\" height=\"100%\">$nosvg</object></div>";
         }
 
         return $this->content;

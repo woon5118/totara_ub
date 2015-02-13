@@ -4270,6 +4270,7 @@ function facetoface_get_sessions_within($times, $userid = null, $extrawhere = ''
                     f.name,
                     f.id AS f2fid,
                     s.id AS sessionid,
+                    d.sessiontimezone,
                     d.timestart,
                     d.timefinish
     ";
@@ -4331,12 +4332,12 @@ function facetoface_get_session_involvement($user, $info) {
     $data = new object();
 
     // Session time data
-    $data->timestart = userdate($info->timestart, get_string('strftimetime'));
-    $data->timefinish = userdate($info->timefinish, get_string('strftimetime'));
-    $data->datestart = userdate($info->timestart, get_string('strftimedate'));
-    $data->datefinish = userdate($info->timefinish, get_string('strftimedate'));
-    $data->datetimestart = userdate($info->timestart, get_string('strftimedatetime'));
-    $data->datetimefinish = userdate($info->timefinish, get_string('strftimedatetime'));
+    $data->timestart = userdate($info->timestart, get_string('strftimetime'), $info->sessiontimezone);
+    $data->timefinish = userdate($info->timefinish, get_string('strftimetime'), $info->sessiontimezone);
+    $data->datestart = userdate($info->timestart, get_string('strftimedate'), $info->sessiontimezone);
+    $data->datefinish = userdate($info->timefinish, get_string('strftimedate'), $info->sessiontimezone);
+    $data->datetimestart = userdate($info->timestart, get_string('strftimedatetime'), $info->sessiontimezone);
+    $data->datetimefinish = userdate($info->timefinish, get_string('strftimedatetime'), $info->sessiontimezone);
 
     // Session name/link
     $data->session = html_writer::link(new moodle_url('/mod/facetoface/view.php', array('f' => $info->f2fid)), format_string($info->name));

@@ -364,10 +364,21 @@ class mod_facetoface_session_form extends moodleform {
                     }
                 }
             }
-            // If valid date, add to array
-            $date = new object();
-            $date->timestart = $starttime;
-            $date->timefinish = $endtime;
+            // If valid date, add to array.
+            $date = new stdClass();
+            $timestartfield = "timestart[$i]_raw";
+            $timefinishfield = "timefinish[$i]_raw";
+            // Is the timezone set? Use the raw ISO date string to get an accurate Unix timestamp.
+            if (!empty($data['datetimeknown']) && ($data["sessiontimezone"][$i] != get_string('sessiontimezoneunknown', 'facetoface'))) {
+                $timezone = $data["sessiontimezone"][$i];
+                $startdt = new DateTime($data[$timestartfield], new DateTimeZone($timezone));
+                $finishdt = new DateTime($data[$timefinishfield], new DateTimeZone($timezone));
+                $date->timestart = $startdt->getTimestamp();
+                $date->timefinish = $finishdt->getTimestamp();
+            } else {
+                $date->timestart = $starttime;
+                $date->timefinish = $endtime;
+            }
             $dates[] = $date;
         }
 
@@ -401,7 +412,8 @@ class mod_facetoface_session_form extends moodleform {
             $hasconflicts = 0;
             foreach ($trainerdata as $roleid => $trainers) {
                 // Attempt to load users with this role in this context.
-                $trainerlist = get_role_users($roleid, $this->context, true, 'u.id, u.firstname, u.lastname', 'u.id ASC');
+                $usernamefields = get_all_user_name_fields(true, 'u');
+                $trainerlist = get_role_users($roleid, $this->context, true, "u.id, {$usernamefields}", 'u.id ASC');
                 // Initialize error variable.
                 $trainererrors = '';
                 // Loop through trainers in this role.
@@ -488,7 +500,8 @@ class mod_facetoface_session_form extends moodleform {
             foreach ($dates as $d) {
                 $timeslots[] = array($d->timestart, $d->timefinish);
             }
-            $excludesessions = isset($data['id']) ? array($data['id']) : null;
+            $iscopying = isset($data['c']) && !empty($data['c']);
+            $excludesessions = isset($data['id']) && !$iscopying ? array($data['id']) : null;
             if (!$availablerooms = facetoface_get_available_rooms($timeslots, 'id', $excludesessions)) {
                 // No pre-defined rooms available!
                 $errors['predefinedroom'] = get_string('error:couldnotsaveroom', 'facetoface');

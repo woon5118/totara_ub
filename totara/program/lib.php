@@ -451,17 +451,14 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
 
     $offset = !empty($options['offset']) ? $options['offset'] : 0;
     $limit = !empty($options['limit']) ? $options['limit'] : null;
+    $userid = !empty($options['userid']) ? $options['userid'] : $USER->id;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
+    $selectsql = ($type == 'program') ? " WHERE p.certifid IS NULL" : " WHERE p.certifid IS NOT NULL";
+
     if ((int)$categoryid > 0) {
-        $certifsql = ($type == 'program') ? " AND p.certifid IS NULL" : " AND p.certifid IS NOT NULL";
-        $categoryselect = "WHERE p.category = :category {$certifsql}";
+        $selectsql .= " AND p.category = :category";
         $params['category'] = (int)$categoryid;
-    } else if ($categoryid === "all") {
-        // Returns all programs for Program Overview reportbuilder.
-        $categoryselect = "";
-    } else {
-        return array();
     }
 
     if (empty($sort)) {
@@ -471,7 +468,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
     }
 
     // Manage visibility.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id,
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
                                                                         'p.id',
                                                                         'p.visible',
                                                                         'p.audiencevisible',
@@ -487,7 +484,7 @@ function prog_get_programs($categoryid="all", $sort="p.sortorder ASC",
                                     JOIN {context} ctx
                                       ON (p.id = ctx.instanceid
                                           AND ctx.contextlevel = :contextlevel)
-                                    {$categoryselect} AND {$visibilitysql}
+                                    {$selectsql} AND {$visibilitysql}
                                     {$sortstatement}", $params, $offset, $limit);
 
     return $programs;

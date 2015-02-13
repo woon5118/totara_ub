@@ -36,17 +36,21 @@ function xmldb_totara_reportbuilder_install() {
     // MySQL supports by default. The code below adds Postgres support.
     // See sql_group_concat() function for usage.
     if ($DB->get_dbfamily() == 'postgres') {
-        $type_check_sql = "select exists (select 1 from pg_type where typname = 'tp_concat') as exst;";
-        $type_exists = $DB->get_record_sql($type_check_sql);
+        $typesql = "SELECT 1
+                      FROM pg_type t
+                      JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+                     WHERE n.nspname = current_schema AND t.typname = 'tp_concat'";
+        $type_exists = $DB->get_record_sql("SELECT EXISTS ($typesql) AS exst");
 
         if ($type_exists->exst == 'f') {
-            $sql = 'CREATE TYPE tp_concat AS (data TEXT[], delimiter TEXT);';
-        }
-        else {
-            $sql = '';
+            try {
+                $DB->change_database_structure("CREATE TYPE tp_concat AS (data TEXT[], delimiter TEXT)");
+            } catch (Exception $e) {
+                // Let's ignore errors here, we will get the failure in the next query if there are problems.
+            }
         }
 
-        $sql = $sql . '
+        $sql = '
             CREATE OR REPLACE FUNCTION group_concat_iterate(_state
                 tp_concat, _value TEXT, delimiter TEXT, is_distinct boolean)
                 RETURNS tp_concat AS
@@ -72,15 +76,16 @@ function xmldb_totara_reportbuilder_install() {
             CREATE AGGREGATE group_concat(text, text, boolean) (SFUNC =
                 group_concat_iterate, STYPE = tp_concat, FINALFUNC =
                 group_concat_finish)';
+        $DB->change_database_structure($sql);
 
-
-        return $DB->change_database_structure($sql);
         /* To undo this, use the following:
          * DROP AGGREGATE group_concat(text, text, boolean);
          * DROP FUNCTION group_concat_finish(tp_concat);
          * DROP FUNCTION group_concat_iterate(tp_concat, text, text, boolean);
          * DROP TYPE tp_concat;
          */
+
+        return true;
     }
 
     return true;

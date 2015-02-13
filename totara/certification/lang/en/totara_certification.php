@@ -22,6 +22,7 @@
  * @subpackage certification
  */
 
+$string['activeperiod'] = 'Active Period';
 $string['addcertifprogramcontent'] = 'Add certification program content';
 $string['addcertifprogramcontent_help'] = 'By adding sets of course you can build up the learning path of the certification program.
 Once sets are added the relationships between them can be defined. Sets are created from manually adding courses.
@@ -35,6 +36,8 @@ An example program with four course sets defined could have dependencies as foll
 
 Once the learning path is completed, the learner has finished the certification program.';
 $string['addnewcertification'] = 'Add new certification';
+$string['availablefrom'] = 'Available From';
+$string['availableuntil'] = 'Available Until';
 $string['beforewindowduetoclose'] = 'Before window is due to close';
 $string['cancelcertificationmanagement'] = 'Clear unsaved changes';
 $string['certcomplete'] = 'Your certification is complete.';
@@ -120,12 +123,14 @@ $string['prog_recert_failrecert_message'] = 'Program recertification failure mes
 $string['prog_recert_windowdueclose_message'] = 'Program Recertification Window due close message';
 $string['prog_recert_windowopen_message'] = 'Program recertification window open message';
 $string['program'] = 'Program';
+$string['programenrolledincohort'] = 'Certification is enrolled in by audience';
 $string['programexpandlink'] = 'Certification Name (expanding details)';
 $string['programname'] = 'Certification Name';
 $string['programshortname'] = 'Certification Short Name';
 $string['programidnumber'] = 'Certification ID number';
 $string['programid'] = 'Certification ID';
 $string['programsummary'] = 'Certification Summary';
+$string['programvisible'] = 'Certification Visible';
 $string['prognamelinkedicon'] = 'Certification Name and Linked Icon';
 $string['recertfailrecert'] = 'Failure to recertify';
 $string['recertfailrecertmessage'] = 'Failure to recertify message';
@@ -166,6 +171,7 @@ $string['weeks'] = 'Week(s)';
 $string['windowopen'] = 'Open';
 $string['windowopenin1day'] = 'Opens in 1 day';
 $string['windowopeninxdays'] = 'Opens in {$a} days';
+$string['windowperiod'] = 'Window Period';
 $string['years'] = 'Year(s)';
 $string['youhaveunsavedchanges'] = 'You have unsaved changes.';
 $string['youareassigned'] = 'You are assigned to this certification';

@@ -850,6 +850,22 @@ function totara_print_report_manager() {
     $context = context_system::instance();
     $canedit = has_capability('totara/reportbuilder:managereports',$context);
 
+    foreach ($reportbuilder_permittedreports as $key => $reportrecord) {
+        if ($reportrecord->embedded) {
+            try {
+                new reportbuilder($reportrecord->id);
+            } catch (moodle_exception $e) {
+                if ($e->errorcode == "nopermission") {
+                    // The report creation failed, almost certainly due to a failed is_capable check in an embedded report.
+                    // In this case, we just skip it.
+                    unset($reportbuilder_permittedreports[$key]);
+                } else {
+                    throw ($e);
+                }
+            }
+        }
+    }
+
     if (count($reportbuilder_permittedreports) > 0) {
         $renderer = $PAGE->get_renderer('totara_core');
         $returnstr = $renderer->print_report_manager($reportbuilder_permittedreports, $canedit);

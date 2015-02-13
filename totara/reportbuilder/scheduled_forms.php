@@ -113,7 +113,19 @@ class scheduled_reports_add_form extends moodleform {
             }
 
             if ($sources[$report->source]->scheduleable) {
-                $reportselect[$report->id] = $report->fullname;
+                try {
+                    if ($report->embedded) {
+                        $reportobject = new reportbuilder($report->id);
+                    }
+                    $reportselect[$report->id] = $report->fullname;
+                } catch (moodle_exception $e) {
+                    if ($e->errorcode != "nopermission") {
+                        // The embedded report creation failed, almost certainly due to a failed is_capable check.
+                        // In this case, we just don't add it to $reportselect.
+                    } else {
+                        throw ($e);
+                    }
+                }
             }
         }
 

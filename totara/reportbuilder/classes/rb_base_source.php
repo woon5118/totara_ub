@@ -563,6 +563,37 @@ abstract class rb_base_source {
         return $item === null ? null : sprintf('%.2f', $item);
     }
 
+    // converts number to percentage with 1 decimal place
+    function rb_display_percent($item, $row) {
+        return $item === null ? null : sprintf('%.1f%%', $item);
+    }
+
+    // Displays a comma separated list of strings as one string per line.
+    // Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
+    function rb_display_list_to_newline($list, $row) {
+        $items = explode(', ', $list);
+        foreach ($items as $key => $item) {
+            if (empty($item)) {
+                $items[$key] = '-';
+            }
+        }
+        return implode($items, "\n");
+    }
+
+    // Displays a comma separated list of ints as one nice_date per line.
+    // Assumes you used "'grouping' => 'comma_list'", which concatenates with ', ', to construct the string.
+    function rb_display_list_to_newline_date($datelist, $row) {
+        $items = explode(', ', $datelist);
+        foreach ($items as $key => $item) {
+            if (empty($item) || $item === '-') {
+                $items[$key] = '-';
+            } else {
+                $items[$key] = $this->rb_display_nice_date($item, $row);
+            }
+        }
+        return implode($items, "\n");
+    }
+
     /**
      * Display correct course grade via grade or RPL as a percentage string
      *
@@ -687,6 +718,36 @@ abstract class rb_base_source {
         $alturl = new moodle_url('/totara/program/view.php', array('id' => $row->prog_id));
         return $this->create_expand_link($program, 'prog_details',
                 array('expandprogid' => $row->prog_id), $alturl, $attr);
+    }
+
+    /**
+     * Certification display the certification path as string.
+     *
+     * @param string $certifpath    CERTIFPATH_X constant to describe cert or recert coursesets
+     * @param array $row            The record used to generate the table row
+     * @return string
+     */
+    function rb_display_certif_certifpath($certifpath, $row) {
+        global $CERTIFPATH;
+        if ($certifpath && isset($CERTIFPATH[$certifpath])) {
+            return get_string($CERTIFPATH[$certifpath], 'totara_certification');
+        }
+    }
+
+    /**
+     * Certification display the certification renewal status as string.
+     *
+     * @param string $renewalstatus CERTIFRENEWALSTATUS_X constant to describe current renewal status
+     * @param array $row            The record used to generate the table row
+     * @return string
+     */
+    function rb_display_certif_renewalstatus($renewalstatus, $row) {
+        global $CERTIFRENEWALSTATUS;
+        if ($renewalstatus && isset($CERTIFRENEWALSTATUS[$renewalstatus])) {
+            return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
+        } else {
+            return get_string($CERTIFRENEWALSTATUS[CERTIFRENEWALSTATUS_NOTDUE], 'totara_certification');
+        }
     }
 
     /**
@@ -2504,7 +2565,7 @@ abstract class rb_base_source {
         $columnoptions[] = new rb_column_option(
             'prog',
             'availablefrom',
-            get_string('availablefrom', 'totara_program'),
+            get_string('availablefrom', $langfile),
             "$join.availablefrom",
             array(
                 'joins' => $join,
@@ -2515,7 +2576,7 @@ abstract class rb_base_source {
         $columnoptions[] = new rb_column_option(
             'prog',
             'availableuntil',
-            get_string('availableuntil', 'totara_program'),
+            get_string('availableuntil', $langfile),
             "$join.availableuntil",
             array(
                 'joins' => $join,
@@ -2559,7 +2620,7 @@ abstract class rb_base_source {
         $columnoptions[] = new rb_column_option(
             'prog',
             'visible',
-            get_string('programvisible', 'totara_program'),
+            get_string('programvisible', $langfile),
             "$join.visible",
             array(
                 'joins' => $join,
@@ -2616,15 +2677,101 @@ abstract class rb_base_source {
         $filteroptions[] = new rb_filter_option(
             'prog',
             'availablefrom',
-            get_string('availablefrom', 'totara_program'),
+            get_string('availablefrom', $langfile),
             'date'
         );
         $filteroptions[] = new rb_filter_option(
             'prog',
             'availableuntil',
-            get_string('availableuntil', 'totara_program'),
+            get_string('availableuntil', $langfile),
             'date'
         );
+        return true;
+    }
+
+    /**
+     * Adds the certification table to the $joinlist array
+     *
+     * @param array &$joinlist Array of current join options
+     *                         Passed by reference and updated to
+     *                         include new table joins
+     * @param string $join Name of the join that provides the
+     *                     'certif id' field
+     * @param string $field Name of table containing program id field to join on
+     */
+    protected function add_certification_table_to_joinlist(&$joinlist, $join, $field) {
+
+        $joinlist[] = new rb_join(
+            'certif',
+            'inner',
+            '{certif}',
+            "certif.id = $join.$field",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
+    }
+
+    /**
+     * Adds some common certification info to the $columnoptions array
+     *
+     * @param array &$columnoptions Array of current column options
+     *                              Passed by reference and updated by
+     *                              this method
+     * @param string $join Name of the join that provides the 'program' table
+     * @param string $langfile Source for translation, totara_program or totara_certification
+     *
+     * @return Boolean
+     */
+    protected function add_certification_fields_to_columns(&$columnoptions, $join = 'certif', $langfile = 'totara_certification') {
+        global $DB;
+
+        $columnoptions[] = new rb_column_option(
+            'certif',
+            'activeperiod',
+            get_string('activeperiod', $langfile),
+            "$join.activeperiod",
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'certif',
+            'windowperiod',
+            get_string('windowperiod', $langfile),
+            "$join.windowperiod",
+            array('joins' => $join,
+                  'dbdatatype' => 'char',
+                  'outputformat' => 'text')
+        );
+
+        return true;
+    }
+
+    /**
+     * Adds some common certification filters to the $filteroptions array
+     *
+     * @param array &$filteroptions Array of current filter options
+     *                              Passed by reference and updated by
+     *                              this method
+     * @param string $langfile Source for translation, totara_program or totara_certification
+     * @return boolean
+     */
+    protected function add_certification_fields_to_filters(&$filteroptions, $langfile = 'totara_certification') {
+        $filteroptions[] = new rb_filter_option(
+            'certif',
+            'activeperiod',
+            get_string('activeperiod', $langfile),
+            'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'certif',
+            'windowperiod',
+            get_string('windowperiod', $langfile),
+            'text'
+        );
+
         return true;
     }
 
@@ -4014,14 +4161,16 @@ abstract class rb_base_source {
      * @param array &$columnoptions Array of current filter options
      *                              Passed by reference and updated by
      *                              this method
+     * @param string $langfile Source for translation, totara_program or totara_certification
+     *
      * @return True
      */
-    protected function add_cohort_program_fields_to_filters(&$filteroptions) {
+    protected function add_cohort_program_fields_to_filters(&$filteroptions, $langfile) {
 
         $filteroptions[] = new rb_filter_option(
             'cohort',
             'enrolledprogramcohortids',
-            get_string('programenrolledincohort', 'totara_reportbuilder'),
+            get_string('programenrolledincohort', $langfile),
             'cohort'
         );
 

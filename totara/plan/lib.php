@@ -737,25 +737,32 @@ function dp_display_plans($userid, $statuses=array(DP_PLAN_STATUSAPPROVED), $col
  * @return string $out              the form to display
  */
 function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage='courses', $rolstatus='none', $showrol=true, $selectedprogid=0, $showrequired=true) {
-    global $OUTPUT, $DB, $CFG, $PAGE;
+    global $OUTPUT, $DB, $PAGE;
     $list = array();
     $attr = array();
     $enableplans = totara_feature_visible('learningplans');
 
     $out = $OUTPUT->container_start(null, 'dp-plans-menu');
-
+    $class = $userid == 0 ? 'dp-menu-selected' : '';
     if ($role == 'manager') {
         // Print out the All team members link
         $out .= $OUTPUT->heading(get_string('teammembers', 'totara_plan'), 3, 'main');
-        $class = $userid == 0 ? 'dp-menu-selected' : '';
         $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/my/teammembers.php'), get_string('allteammembers', 'totara_plan'))), array('class' => $class));
         if ($userid) {
-            // Display who we are currently viewing if appropriate
-            $out .= $OUTPUT->heading(get_string('currentlyviewing', 'totara_plan'), 3, 'main');
-            // TODO: make this more efficient
-            $user = $DB->get_record('user', array('id' => $userid));
-            $class = $selectedid == 0 ? 'dp-menu-selected' : '';
-            $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/totara/plan/index.php', array('userid' => $userid)), "$user->firstname $user->lastname")), array('class' => $class));
+            if ($enableplans && !totara_feature_disabled('learningplans')) {
+                // TODO: make this more efficient
+                $user = $DB->get_record('user', array('id' => $userid));
+                $class = $selectedid == 0 ? 'dp-menu-selected' : '';
+                // Display who we are currently viewing if appropriate.
+                $out .= $OUTPUT->heading(fullname($user), 3, 'main');
+                $out .= $OUTPUT->heading(get_string('learningplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
+                $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/totara/plan/index.php', array('userid' => $userid)), get_string('manageplans', 'totara_plan'))), array('class' => $class));
+            }
+        }
+    } else {
+        if ($enableplans && !totara_feature_disabled('learningplans')) {
+            $out .= $OUTPUT->heading(get_string('learningplans', 'totara_plan'), 3, 'main');
+            $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/totara/plan/index.php'), get_string('manageplans', 'totara_plan'))), array('class' => $class));
         }
     }
 
@@ -763,10 +770,9 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_APPROVED))) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
+            $out .= $OUTPUT->heading(get_string('activeplans', 'totara_plan'), 5);
+        } else {
             $out .= $OUTPUT->heading(get_string('activeplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
-        }
-        else {
-            $out .= $OUTPUT->heading(get_string('activeplans', 'totara_plan'), 3, 'main');
         }
 
         $list = array();
@@ -784,10 +790,9 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     if ($enableplans && $plans = dp_get_plans($userid, array(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_STATUS_PENDING))) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
+            $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 5);
+        } else {
             $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
-        }
-        else {
-            $out .= $OUTPUT->heading(get_string('unapprovedplans', 'totara_plan'), 3, 'main');
         }
 
         $list = array();
@@ -806,10 +811,9 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     if ($enableplans && $plans = dp_get_plans($userid, DP_PLAN_STATUS_COMPLETE)) {
         if ($role == 'manager') {
             $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
+            $out .= $OUTPUT->heading(get_string('completedplans', 'totara_plan'), 5);
+        } else {
             $out .= $OUTPUT->heading(get_string('completedplans', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
-        }
-        else {
-            $out .= $OUTPUT->heading(get_string('completedplans', 'totara_plan'), 3, 'main');
         }
 
         $list = array();
@@ -836,18 +840,27 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
             if ($role == 'manager') {
                 $extraparams['userid'] = $userid;
                 $out .= $OUTPUT->container_start(null, 'dp-plans-menu-section');
-                $headingclass = 'dp-plans-menu-sub-header';
+                $out .= $OUTPUT->heading(get_string('requiredlearning', 'totara_program'), 4, 'dp-plans-menu-sub-header');
+            } else {
+                $out .= $OUTPUT->heading(get_string('requiredlearning', 'totara_program'), 3, 'main');
             }
-            $out .= $OUTPUT->heading(get_string('requiredlearning', 'totara_program'), 3, $headingclass);
 
             if ($programs && $canviewprograms) {
                 $list = dp_display_plans_menu_required($programs, $extraparams);
-                $out .= $OUTPUT->heading(get_string('programs', 'totara_program'), 5);
+                if ($role == 'manager') {
+                    $out .= $OUTPUT->heading(get_string('programs', 'totara_program'), 5);
+                } else {
+                    $out .= $OUTPUT->heading(get_string('programs', 'totara_program'), 4, 'dp-plans-menu-sub-header');
+                }
                 $out .= html_writer::alist($list, $attr);
             }
             if ($certifications && $canviewcertifications) {
                 $list = dp_display_plans_menu_required($certifications, $extraparams, count($list));
-                $out .= $OUTPUT->heading(get_string('certifications', 'totara_program'), 5);
+                if ($role == 'manager') {
+                    $out .= $OUTPUT->heading(get_string('certifications', 'totara_program'), 5);
+                } else {
+                    $out .= $OUTPUT->heading(get_string('certifications', 'totara_program'), 4, 'dp-plans-menu-sub-header');
+                }
                 $out .= html_writer::alist($list, $attr);
             }
             if ($role == 'manager') {
@@ -858,7 +871,7 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
 
     // Print Record of Learning menu
     if ($showrol) {
-        $out .= dp_record_status_menu($rolpage, $rolstatus, $userid);
+        $out .= dp_record_status_menu($rolpage, $rolstatus, $userid, $role);
     }
 
     $out .= $OUTPUT->container_end();
@@ -1039,14 +1052,19 @@ function dp_record_status_picker($pagename, $status, $userid=null) {
  * @param string $pagename Name of the current page (filename without .php)
  * @param string $status The status for the current page
  * @param int $userid The current users id
+ * @param string $role User role
  *
  * @return string HTML to display the menu
  */
 
-function dp_record_status_menu($pagename, $status, $userid=null) {
+function dp_record_status_menu($pagename, $status, $userid=null, $role) {
     global $OUTPUT;
 
-    $out = $OUTPUT->heading(get_string('recordoflearning', 'totara_core'), 3, 'main');
+    if ($role == 'manager') {
+        $out = $OUTPUT->heading(get_string('recordoflearning', 'totara_core'), 4, 'dp-plans-menu-sub-header');
+    } else {
+        $out = $OUTPUT->heading(get_string('recordoflearning', 'totara_core'), 3, 'main');
+    }
 
     // generate options for menu display
     $filter = array();

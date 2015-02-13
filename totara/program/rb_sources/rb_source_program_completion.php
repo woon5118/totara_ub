@@ -25,11 +25,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 class rb_source_program_completion extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
     public $sourcewhere;
+
+    protected $instancetype = 'program';
 
     function __construct() {
         global $CFG;
@@ -43,17 +47,22 @@ class rb_source_program_completion extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle','rb_source_program_completion');
-        // only consider whole programs - not courseset completion
-        $this->sourcewhere = 'base.coursesetid = 0';
+        $this->sourcewhere = $this->define_sourcewhere();
 
         parent::__construct();
     }
 
-    //
-    //
-    // Methods for defining contents of source
-    //
-    //
+    // Methods for defining contents of source.
+
+    protected function define_sourcewhere() {
+         // Only consider whole programs - not courseset completion.
+         $sourcewhere = 'base.coursesetid = 0';
+
+         // Exclude certifications (they have their own source).
+         $sourcewhere .= ' AND program.certifid IS NULL';
+
+         return $sourcewhere;
+    }
 
     protected function define_joinlist() {
         global $CFG;
@@ -107,6 +116,7 @@ class rb_source_program_completion extends rb_base_source {
                 'displayfunc' => 'program_completion_status'
             )
         );
+
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'starteddate',
@@ -159,6 +169,7 @@ class rb_source_program_completion extends rb_base_source {
                 'defaultheading' => get_string('isnotstarted', 'rb_source_program_completion'),
             )
         );
+
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'completeddate',
@@ -166,6 +177,7 @@ class rb_source_program_completion extends rb_base_source {
             'base.timecompleted',
             array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
         );
+
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'duedate',
@@ -180,6 +192,7 @@ class rb_source_program_completion extends rb_base_source {
             get_string('completionorgid', 'rb_source_program_completion'),
             'base.organisationid'
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'organisationid2',
@@ -187,6 +200,7 @@ class rb_source_program_completion extends rb_base_source {
             'base.organisationid',
             array('selectable' => false)
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'organisationpath',
@@ -194,6 +208,7 @@ class rb_source_program_completion extends rb_base_source {
             'completion_organisation.path',
             array('joins' => 'completion_organisation', 'selectable' => false)
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'organisation',
@@ -203,12 +218,14 @@ class rb_source_program_completion extends rb_base_source {
                   'dbdatatype' => 'char',
                   'outputformat' => 'text')
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'positionid',
             get_string('completionposid', 'rb_source_program_completion'),
             'base.positionid'
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'positionid2',
@@ -216,6 +233,7 @@ class rb_source_program_completion extends rb_base_source {
             'base.positionid',
             array('selectable' => false)
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'positionpath',
@@ -223,6 +241,7 @@ class rb_source_program_completion extends rb_base_source {
             'completion_position.path',
             array('joins' => 'completion_position', 'selectable' => false)
         );
+
         $columnoptions[] =new rb_column_option(
             'progcompletion',
             'position',
@@ -233,12 +252,12 @@ class rb_source_program_completion extends rb_base_source {
                   'outputformat' => 'text')
         );
 
-        // include some standard columns
+        // Include some standard columns.
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_position_fields_to_columns($columnoptions);
         $this->add_manager_fields_to_columns($columnoptions);
         $this->add_course_category_fields_to_columns($columnoptions, 'course_category', 'program');
-        $this->add_program_fields_to_columns($columnoptions);
+        $this->add_program_fields_to_columns($columnoptions, 'program', "totara_{$this->instancetype}");
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_program_fields_to_columns($columnoptions);
 
@@ -255,18 +274,21 @@ class rb_source_program_completion extends rb_base_source {
             get_string('starteddate', 'rb_source_program_completion'),
             'date'
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'completeddate',
             get_string('completeddate', 'rb_source_program_completion'),
             'date'
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'duedate',
             get_string('duedate', 'rb_source_program_completion'),
             'date'
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'status',
@@ -331,6 +353,7 @@ class rb_source_program_completion extends rb_base_source {
                 'attributes' => rb_filter_option::select_width_limiter(),
             )
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'organisationid2',
@@ -340,6 +363,7 @@ class rb_source_program_completion extends rb_base_source {
                 'hierarchytype' => 'org',
             )
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'organisationpath',
@@ -349,6 +373,7 @@ class rb_source_program_completion extends rb_base_source {
                 'hierarchytype' => 'org',
             )
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'positionid',
@@ -359,6 +384,7 @@ class rb_source_program_completion extends rb_base_source {
                 'attributes' => rb_filter_option::select_width_limiter()
             )
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'positionid2',
@@ -368,6 +394,7 @@ class rb_source_program_completion extends rb_base_source {
                 'hierarchytype' => 'pos',
             )
         );
+
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'positionpath',
@@ -378,13 +405,14 @@ class rb_source_program_completion extends rb_base_source {
             )
         );
 
+        // Include some standard filters.
         $this->add_user_fields_to_filters($filteroptions);
         $this->add_course_category_fields_to_filters($filteroptions, 'prog', 'category');
         $this->add_position_fields_to_filters($filteroptions);
         $this->add_manager_fields_to_filters($filteroptions);
-        $this->add_program_fields_to_filters($filteroptions);
+        $this->add_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
         $this->add_cohort_user_fields_to_filters($filteroptions);
-        $this->add_cohort_program_fields_to_filters($filteroptions);
+        $this->add_cohort_program_fields_to_filters($filteroptions, "totara_{$this->instancetype}");
 
         return $filteroptions;
     }
@@ -491,11 +519,7 @@ class rb_source_program_completion extends rb_base_source {
         return $requiredcolumns;
     }
 
-    //
-    //
-    // Source specific column display methods
-    //
-    //
+    // Source specific column display methods.
 
     function rb_display_program_completion_status($status, $row) {
         if (is_null($status)) {
@@ -508,10 +532,6 @@ class rb_source_program_completion extends rb_base_source {
         }
     }
 
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
+    // Source specific filter display methods.
 
-} // end of rb_source_program_completion class
+}

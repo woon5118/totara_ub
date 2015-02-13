@@ -159,10 +159,12 @@ class totara_dialog_content_programs extends totara_dialog_content {
      * Load programs to display
      *
      * @access  public
+     * @param   int $userid ID of a learner plan user
      */
-    public function load_programs() {
+    public function load_programs($userid = 0) {
         if ($this->categoryid) {
-            $progs = prog_get_programs($this->categoryid, "fullname ASC", 'p.id, p.fullname, p.sortorder, p.visible', 'program');
+            $progs = prog_get_programs($this->categoryid, "fullname ASC", 'p.id, p.fullname, p.sortorder, p.visible',
+                'program', array('userid' => $userid));
             $this->programs = $progs;
         }
     }

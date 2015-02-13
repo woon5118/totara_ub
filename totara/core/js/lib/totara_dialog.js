@@ -1223,7 +1223,7 @@ totaraDialog_handler_treeview_singleselect.prototype._save = function() {
     if (this.text_element_id) {
 
         if (selected_text) {
-            $('#'+this.text_element_id).text(selected_text);
+            $('#'+this.text_element_id).html(selected_text);
             $('#'+this.text_element_id).addClass('nonempty');
         } else {
             $('#'+this.text_element_id).removeClass('nonempty');
