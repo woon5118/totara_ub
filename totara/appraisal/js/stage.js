@@ -284,7 +284,7 @@ M.totara_appraisal_stage = M.totara_appraisal_stage || {
           $roles.each(function(){
             var $this = $(this);
             $this.off('click.props');
-            if (prevRoles.indexOf($this.attr('id')) != -1) {
+            if ($.inArray($this.attr('id'), prevRoles) != -1) { // IE8 doesn't support indexOf.
               if (!$this.prop('checked')) {
                 $this.click();
                 $this.prop('checked', true);
