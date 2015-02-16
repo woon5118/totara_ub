@@ -198,7 +198,6 @@ class rb_source_dp_program extends rb_base_source {
                 'dbdatatype' => 'timestamp',
                 'displayfunc' => 'program_duedate',
                 'extrafields' => array(
-                    'timedue' => 'program_completion.timedue',
                     'programid' => 'base.id',
                     'userid' => 'program_completion.userid',
                     'status' => 'program_completion.status',

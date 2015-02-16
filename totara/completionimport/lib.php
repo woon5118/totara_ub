@@ -969,6 +969,8 @@ function import_certification($importname, $importtime) {
     $programid = 0;
     $programs = $DB->get_recordset_sql($sql, $params);
 
+    $now = time();
+
     if ($programs->valid()) {
         foreach ($programs as $program) {
             if (empty($programid) || ($programid != $program->progid) || (($insertcount++ % BATCH_INSERT_MAX_ROW_COUNT) == 0)) {
@@ -1036,8 +1038,6 @@ function import_certification($importname, $importtime) {
                 SET importerrormsg = " . $DB->sql_concat('importerrormsg', ':errorstring') . ",
                     importerror = :importerror
                     WHERE id = :importid";
-
-            $now = time();
 
             // Do recert times.
             $timecompleted = totara_date_parse_from_format($csvdateformat, $program->completiondate);
@@ -1139,7 +1139,7 @@ function import_certification($importname, $importtime) {
             $pcdata->coursesetid = 0;
             $pcdata->status = STATUS_PROGRAM_COMPLETE; // Assume complete.
             $pcdata->timestarted = $timecompleted;
-            $pcdata->timedue = $timecompleted;
+            $pcdata->timedue = $ccdata->timeexpires;
             $pcdata->timecompleted = $timecompleted;
 
             if (empty($program->pcid)) {
@@ -1246,6 +1246,24 @@ function import_certification($importname, $importtime) {
         unset($updateids);
         $updateids = array();
     }
+
+    // Copy the timeexpires of new/replaced certif_completion records to their matching prog_completion timedue.
+    $sql = "UPDATE {prog_completion} pc
+               SET timedue = (SELECT cc.timeexpires
+                                FROM {certif_completion} cc
+                                JOIN {prog} prog
+                                  ON prog.certifid = cc.certifid
+                               WHERE pc.programid = prog.id
+                                 AND pc.userid = cc.userid)
+             WHERE pc.coursesetid = 0
+               AND EXISTS (SELECT 1
+                             FROM {certif_completion} cc
+                             JOIN {prog} prog
+                               ON prog.certifid = cc.certifid
+                            WHERE pc.programid = prog.id
+                              AND pc.userid = cc.userid
+                              AND cc.timemodified = :now)";
+    $DB->execute($sql, array('now' => $now));
 
     return $errors;
 }
