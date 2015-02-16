@@ -478,35 +478,11 @@ function facetoface_delete_instance($id) {
 
     $transaction = $DB->start_delegated_transaction();
 
-    $DB->delete_records_select(
-        'facetoface_signups_status',
-        "signupid IN
-        (
-            SELECT
-            id
-            FROM
-    {facetoface_signups}
-    WHERE
-    sessionid IN
-    (
-        SELECT
-        id
-        FROM
-    {facetoface_sessions}
-    WHERE
-    facetoface = ? ))
-    ", array($facetoface->id));
-
-    $DB->delete_records_select('facetoface_signups', "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-
-    $DB->delete_records_select('facetoface_sessions_dates', "sessionid in (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-
-    // Notifications.
-    $DB->delete_records('facetoface_notification', array('facetofaceid' => $facetoface->id));
-    $DB->delete_records_select('facetoface_notification_sent',
-            "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-    $DB->delete_records_select('facetoface_notification_hist',
-            "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
+    // Get sessions for the facetoface to delete.
+    $sessions = $DB->get_records('facetoface_sessions', array('facetoface' => $id));
+    foreach ($sessions as $session) {
+        facetoface_delete_session($session);
+    }
 
     $DB->delete_records('facetoface_interest', array('facetoface' => $facetoface->id));
 
@@ -842,7 +818,60 @@ function facetoface_delete_session($session) {
     // Delete session details
     $DB->delete_records('facetoface_sessions_dates',array('sessionid' => $session->id));
     $DB->delete_records('facetoface_session_roles', array('sessionid' => $session->id));
-    $DB->delete_records('facetoface_session_info_data',  array('facetofacesessionid' => $session->id));
+
+    // Get session data to delete.
+    $sessiondataids = $DB->get_fieldset_select(
+        'facetoface_session_info_data',
+        'id',
+        "facetofacesessionid = :facetofacesessionid",
+        array('facetofacesessionid' => $session->id));
+
+    if (!empty($sessiondataids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($sessiondataids);
+        $DB->delete_records_select('facetoface_session_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_session_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Get signup ids to delete.
+    $signupstatus = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_REQUESTED);
+    list($statussql, $statusparams) = $DB->get_in_or_equal($signupstatus, SQL_PARAMS_NAMED);
+    $statusparams['sessionid'] = $session->id;
+    $signupids = $DB->get_fieldset_select(
+        'facetoface_signup_info_data',
+        'id',
+        "facetofacesignupid IN (
+            SELECT ss.id
+              FROM {facetoface_signups_status} ss
+        INNER JOIN {facetoface_signups} s
+                ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid
+               AND ss.statuscode {$statussql})",
+        $statusparams);
+
+    if (!empty($signupids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($signupids);
+        $DB->delete_records_select('facetoface_signup_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_signup_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Get cancellation ids to delete.
+    $cancellationids = $DB->get_fieldset_select(
+        'facetoface_cancellation_info_data',
+        'id',
+        "facetofacecancellationid IN (
+            SELECT ss.id
+              FROM {facetoface_signups_status} ss
+        INNER JOIN {facetoface_signups} s
+                ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid
+               AND ss.statuscode = :cancellationstatus)",
+        array('sessionid' => $session->id, 'cancellationstatus' => MDL_F2F_STATUS_USER_CANCELLED));
+
+    if (!empty($cancellationids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($cancellationids);
+        $DB->delete_records_select('facetoface_cancellation_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_cancellation_info_data', "id {$sqlin}", $inparams);
+    }
 
     $DB->delete_records_select(
         'facetoface_signups_status',
