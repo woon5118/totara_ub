@@ -66,7 +66,8 @@ function get_columnnames($importname) {
         'username',
         'certificationshortname',
         'certificationidnumber',
-        'completiondate'
+        'completiondate',
+        'duedate',
     );
     return $columns[$importname];
 }
@@ -963,10 +964,12 @@ function import_certification($importname, $importtime) {
     $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
     $sql = "SELECT DISTINCT i.id as importid,
                     i.completiondateparsed,
+                    i.duedate,
                     p.id AS progid,
                     c.id AS certifid,
                     c.recertifydatetype,
                     c.activeperiod,
+                    c.minimumactiveperiod,
                     c.windowperiod,
                     cc.timeexpires,
                     u.id AS userid,
@@ -1070,10 +1073,10 @@ function import_certification($importname, $importtime) {
             if (!$timecompleted) {
                 $timecompleted = $now;
             }
-            // In imports we always use CERTIFRECERT_COMPLETION, instead of the user's value from $program->recertifydatetype.
-            // That is because when importing we only have the completion date so "use certification expiry date" doesn't make
-            // sense. See T-11684.
-            $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $program->timeexpires, $timecompleted);
+            $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+            $timedue = totara_date_parse_from_format($csvdateformat, $program->duedate);
+            $base = get_certiftimebase($program->recertifydatetype, $program->timeexpires, $timecompleted, $timedue,
+                                       $program->activeperiod, $program->minimumactiveperiod);
             $ccdata->timeexpires = get_timeexpires($base, $program->activeperiod);
             $ccdata->timewindowopens = get_timewindowopens($ccdata->timeexpires, $program->windowperiod);
 

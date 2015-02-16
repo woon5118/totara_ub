@@ -72,12 +72,14 @@ $CERTIFRENEWALSTATUS = array(
 define('CERTIFRECERT_UNSET', 0);
 define('CERTIFRECERT_COMPLETION', 1);
 define('CERTIFRECERT_EXPIRY', 2);
+define('CERTIFRECERT_FIXED', 3);
 
 global $CERTIFRECERT;
 $CERTIFRECERT = array(
     CERTIFRECERT_UNSET => 'unset',
     CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
     CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification'),
+    CERTIFRECERT_FIXED => get_string('editdetailsrcfixed', 'totara_certification'),
 );
 
 // Certifcation path constants.
@@ -494,8 +496,7 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
         if (!$lastcompleted) {
             $lastcompleted = time();
         }
-        // The base date is 'now' if the COMPLETION option set (or if first re-certification (where timexpires would be 0))
-        // else its the expired date (ie at the end of the full certification period).
+        // See get_certiftimebase to see how the base time used for calculating re-certification is calculated.
         //
         // Prior learning:
         // Normally when the program completion event is called (and hence this function) we just need to record the current
@@ -506,13 +507,19 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
         // the current time.
         // Note: the completion date in prog_completion will still be 'now' - not the last course-completion date so will
         // differ from certification completion.
-        $base = get_certiftimebase($certification->recertifydatetype, $certificationcompletion->timeexpires, $lastcompleted);
+        $programid = $DB->get_field('prog', 'id', array('certifid' => $certificationid));
+
+        $timedue = $DB->get_field('prog_completion', 'timedue',
+            array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
+
+        $base = get_certiftimebase($certification->recertifydatetype, $certificationcompletion->timeexpires,
+            $lastcompleted, $timedue, $certification->activeperiod, $certification->minimumactiveperiod);
+
         $todb->timeexpires = get_timeexpires($base, $certification->activeperiod);
         $todb->timewindowopens = get_timewindowopens($todb->timeexpires, $certification->windowperiod);
         $todb->timecompleted = $lastcompleted;
 
         // Put the new timeexpires into the timedue field in the prog_completion, so that it will be there if the cert expires.
-        $programid = $DB->get_field('prog', 'id', array('certifid' => $certificationid));
         $DB->set_field('prog_completion', 'timedue', $todb->timeexpires,
             array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
     } else { // Certifying.
@@ -1272,19 +1279,65 @@ function certif_delete_messagelog($progid, $userid, $messagetype) {
 }
 
 /**
- * Get the time the re-certification is estimated from: the actual completion
- * date (now) or the original expiration date.
+ * Get the time the re-certification is estimated from:
+ * - if using CERTIFRECERT_COMPLETION then the actual time of completion.
+ * - if using CERTIFRECERT_EXPIRY then timeexpires, timedue or timecompleted (the first that is set),
+ * - if using CERTIFRECERT_FIXED then based on timeexpires, timedue or timecompleted (the first that is set) and
+ *   bumped forward repeatedly by active period until at least minimum active period into the future.
  *
  * @param integer $recertifydatetype
  * @param integer $timeexpires
  * @param integer $timecompleted
+ * @param integer $timedue
+ * @param string $activeperiod
+ * @param string $minimumactiveperiod
  * @return integer
  */
-function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted) {
-    if ($recertifydatetype == CERTIFRECERT_COMPLETION || $timeexpires == 0) {
+function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod) {
+    if ($recertifydatetype == CERTIFRECERT_COMPLETION) {
         return $timecompleted;
-    } else {
-        return $timeexpires;
+
+    } else if ($recertifydatetype == CERTIFRECERT_EXPIRY) {
+        if ($timeexpires > 0 and $timecompleted > $timeexpires) { // Overdue for recertification.
+            return $timecompleted;
+
+        } else if ($timeexpires > 0) { // Recertified on time.
+            return $timeexpires;
+
+        } else if ($timedue > 0 and $timecompleted > $timedue) { // Overdue for primary certification.
+            return $timecompleted;
+
+        } else if ($timedue > 0) { // Certified on time.
+            return $timedue;
+
+        } else { // Primary certification, no due date set.
+            return $timecompleted;
+        }
+
+    } else if ($recertifydatetype == CERTIFRECERT_FIXED) {
+        if ($timeexpires > 0) { // Recertifying.
+            $base = $timeexpires;
+
+        } else if ($timedue > 0) { // Primary certification, assignment due date set.
+            $base = $timedue;
+
+        } else { // Primary certification, no assignment due date set.
+            $base = $timecompleted;
+        }
+        if (strtotime($activeperiod, 0) <= 0) {
+            // Invalid active period. Stop now, because the following code would cause an infinite loop.
+            print_error('error:nullactiveperiod', 'totara_certification');
+        }
+        $now = time();
+        // First, if the base is currently too far in the future, move it back (only usually occurs with primary certification).
+        while (strtotime('-' . $minimumactiveperiod, $base) > $now) {
+            $base = strtotime('-' . $activeperiod, $base);
+        }
+        // Then, if the base is too far in the past, move it forward (can occur with near primary certification or very overdue).
+        while (strtotime($activeperiod, $base) < strtotime($minimumactiveperiod, $now)) {
+            $base = strtotime($activeperiod, $base);
+        }
+        return $base;
     }
 }
 

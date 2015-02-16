@@ -82,10 +82,25 @@ $string['editdetailsactive_help'] = 'The period the certification is active for,
 $string['editdetailsactivep'] = 'Active Period';
 $string['editdetailsdesc'] = 'Define the recertification details rules for all learners assigned to the certification';
 $string['editdetailshdr'] = 'Recertification Details';
+$string['editdetailsminimumactive'] = 'Minumum active period';
+$string['editdetailsminimumactive_help'] = 'When "Use fixed expiry date" is set, this option allows you to specify the minumum length of time that the certification will be guaranteed to be active. If a user completes their certification and there is less than this amount of time until it would be due to expire, the expiry date is pushed forward by another whole "active period".
+
+For example:
+
+* if a user was newly assigned to a certification in July, the active period is 1 year, the window opens 2 months before expiring, the minimum active period is 6 months and they have an assignment due date of 1 December, then when they complete in August, their expiry date will be set to 1 December of the following year (actual active period of about 16 months).
+* if a user in the same certification completes their recertification in November while the window is open, then their certification would be set to expire on 1 December of the following year (actual active period of about 13 months).
+* if a user in the same certification failed to recertify on time and subsequently completed the primary certification in April, then their certification would be set to expire on 1 December of that year (actual active period of about 8 months).';
 $string['editdetailsrccmpl'] = 'Use certification completion date';
 $string['editdetailsrcexp'] = 'Use certification expiry date';
+$string['editdetailsrcfixed'] = 'Use fixed expiry date';
 $string['editdetailsrcopt'] = 'Recertification date';
-$string['editdetailsrcopt_help'] = 'New active period to start from completion of the recertification or on date original certification was due to expire';
+$string['editdetailsrcopt_help'] = 'This setting determines how the expiry date is calculated when a user completes primary certification or recertifies.
+
+<b>Use certification completion date:</b> The active period is added to the completion date. Over the span of several recertifications, this option can cause the expiry date to "drift" backwards (when completed early) and forwards (when completed overdue).
+
+<b>Use certification expiry date:</b> Uses the last expiry date to calculate the next. The first time this is calculated, it adds the active period to the assignment due date if there is one, otherwise it uses the date the certification was completed. If the user is overdue or expired, it adds the "active period" to the date the primary certification was just completed (as if the user was newly assigned), so that certifications are active for a minimum of the active period. Over the span of several recertifications, this option can cause the expiry date to "drift" forwards (when completed overdue) but not backwards.
+
+<b>Use fixed expiry date:</b> This option causes the expiry time to be calculated based on the specified assignment due date (if available, otherwise the <b>first</b> completion date), and subsequent completion expiry dates will be calculated using that same base date, regardless of whether they are late or early. The active period is repeatedly added to the base date until the first future date is discovered. The "Minimum active period" is available only with this setting, and must be at least as big as the "Recertification Window" (see the "Minimum active period" help for more information). Over the span of several recertifications, this option will prevent the expiry date from "drifting" forwards or backwards.';
 $string['editdetailsrcwin'] = 'Recertification Window';
 $string['editdetailsvalid'] = 'Define how long the certification should be valid once complete';
 $string['editdetailswindow'] = 'Period window opens before expiration';
@@ -98,6 +113,8 @@ $string['error:incorrectcertifid'] = 'Incorrect certification ID certifid={$a}';
 $string['error:incorrectid'] = 'Incorrect certification completion ID or user ID';
 $string['error:invalidaction'] = 'Invalid action: {$a}';
 $string['error:minimumactiveperiod'] = 'Active period must be greater than the recertification window period';
+$string['error:minimumactiveperiodactive'] = 'Minimum active period cannot be greater than the active period';
+$string['error:minimumactiveperiodwindow'] = 'Minimum active period cannot be less than the recertification window period';
 $string['error:minimumwindowperiod'] = 'Recertification window period must be at least {$a}';
 $string['error:missingprogcompletion'] = 'Missing program completion record for certifid={$a->certifid} userid={$a->userid}';
 $string['error:mustbepositive'] = 'Number must be positive';

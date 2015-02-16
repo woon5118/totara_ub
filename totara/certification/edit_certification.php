@@ -87,6 +87,7 @@ if ($data = $form->get_data()) {
 
     if (isset($data->savechanges)) {
         $certification->activeperiod = $data->activenum.' '.$data->activeperiod;
+        $certification->minimumactiveperiod = $data->minimumactivenum.' '.$data->minimumactiveperiod;
         $certification->windowperiod = $data->windownum.' '.$data->windowperiod;
         $certification->timemodified = time();
         $certification->recertifydatetype = $data->recertifydatetype;

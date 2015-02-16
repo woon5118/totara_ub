@@ -27,6 +27,7 @@ $string['sourcetitle'] = 'Completion import: Certification status';
 $string['columnbasecertificationidnumber'] = 'Certification ID Number';
 $string['columnbasecertificationshortname'] = 'Certification Shortname';
 $string['columnbasecompletiondate'] = 'Completion date';
+$string['columnbaseduedate'] = 'Due date';
 $string['columnbaseid'] = 'ID';
 $string['columnbaseimporterrormsg'] = 'Errors';
 $string['columnbaseimportevidence'] = 'Imported as evidence?';

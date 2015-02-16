@@ -199,6 +199,13 @@ class rb_source_completionimport_certification extends rb_base_source {
                 array('dbdatatype' => 'timestamp')
         );
 
+        $columnoptions[] = new rb_column_option(
+                'base',
+                'duedate',
+                get_string('columnbaseduedate', 'rb_source_completionimport_certification'),
+                'base.duedate'
+        );
+
         return $columnoptions;
     }
 

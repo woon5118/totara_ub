@@ -9,6 +9,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="learningcomptype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="Type of component - program, course, competency"/>
         <FIELD NAME="activeperiod" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How long is the certificate active for - stored as seconds"/>
+        <FIELD NAME="minimumactiveperiod" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="When using fixed expiry date, calculated expiry dates must be at least this far in the future"/>
         <FIELD NAME="windowperiod" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="How long before a learners certification is due for renewal and that the recertification window should open - stored as seconds"/>
         <FIELD NAME="recertifydatetype" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Indicator for which date is used for the recertification, either the completion date or the certificate expiry date"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

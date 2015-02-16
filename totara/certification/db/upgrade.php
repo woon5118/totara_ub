@@ -170,5 +170,21 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030203, 'totara_certification');
     }
 
+    // TL-6329 Add minimumactiveperiod to certif.
+    if ($oldversion < 2015030204) {
+
+        // Define field and table.
+        $table = new xmldb_table('certif');
+        $field = new xmldb_field('minimumactiveperiod', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'activeperiod');
+
+        // Conditionally add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certification savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030204, 'totara_certification');
+    }
+
     return true;
 }

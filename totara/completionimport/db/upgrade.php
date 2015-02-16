@@ -81,5 +81,21 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015030201, 'totara', 'completionimport');
     }
 
+    // T-14308 Add "Use fixed expiry date" recertification option.
+    // This adds field duedate to the certification completion import tool.
+    if ($oldversion < 2015030202) {
+
+        // Define field duedate to be added to totara_compl_import_cert.
+        $table = new xmldb_table('totara_compl_import_cert');
+        $field = new xmldb_field('duedate');
+        $field->set_attributes(XMLDB_TYPE_CHAR, '10', null, null, null, null, null);
+
+        // Launch add field duedate.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2015030202, 'totara', 'completionimport');
+    }
+
     return true;
 }
