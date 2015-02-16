@@ -47,6 +47,7 @@ class rb_source_program_overview extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program_overview');
         $this->sourcewhere = $this->define_sourcewhere();
+        $this->sourcejoins = $this->get_source_joins();
 
         parent::__construct();
     }
@@ -63,6 +64,10 @@ class rb_source_program_overview extends rb_base_source {
         $sourcewhere .= ' AND program.certifid IS NULL';
 
         return $sourcewhere;
+    }
+
+    protected function get_source_joins() {
+        return array('program');
     }
 
     protected function define_joinlist() {
