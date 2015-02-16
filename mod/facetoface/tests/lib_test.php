@@ -89,21 +89,21 @@ class facetoface_lib_testcase extends advanced_testcase {
         array(4,    4,    1,     0,  'dtl4',     0,     25200,    '$10',     '$8',      500,   1900, 2),
         );
 
-    protected $facetoface_sessions_field_data = array(
-        array('id',     'name',     'shortname',    'type',     'possiblevalues',
-            'required',     'defaultvalue',   'showinsummary'),
-        array(1,    'name1',    'shortname1',   0,  'possible1',    0,  'defaultvalue1',    1),
-        array(2,    'name2',    'shortname2',   2,  'possible2',    0,  'defaultvalue2',    1),
-        array(3,    'name3',    'shortname3',   3,  'possible3',    1,  'defaultvalue3',    1),
-        array(4,    'name4',    'shortname4',   4,  'possible4',    1,  'defaultvalue4',    1),
+    protected $session_info_field = array(
+        array('id', 'shortname', 'datatype', 'description', 'sortorder', 'hidden', 'locked', 'required',
+            'forceunique', 'defaultdata', 'param1', 'fullname'),
+        array(1, 'shortname1', 'text', '', 1, 0, 0, 0, 0, 'defaultvalue1',  'defaultvalue1', 'fullname1'),
+        array(2, 'shortname2', 'menu', '',  2, 0, 0, 0, 0, 'possible2', "possible1\npossible2", 'fullname2'),
+        array(3, 'shortname3', 'menu', '', 3, 0, 1, 0, 0, 'possible3',  'possible3', 'fullname3'),
+        array(4, 'shortname4', 'menu', '', 4, 0, 1, 0, 0, 'possible4',  'possible4', 'fullname4'),
     );
 
-    protected $facetoface_sessions_data_data = array(
-        array('id', 'fieldid', 'sessionid', 'data'),
-        array(1,    0,  0,  'test data1'),
-        array(2,    1,  1,  'test data2'),
-        array(3,    2,  2,  'test data3'),
-        array(4,    3,  3,  'test data4'),
+    protected $session_info_data = array(
+        array('id', 'fieldid', 'facetofacesessionid', 'data'),
+        array(1,    1,  0,  'test data1'),
+        array(2,    2,  1,  'test data2'),
+        array(3,    3,  2,  'test data3'),
+        array(4,    4,  3,  'test data4'),
     );
 
     protected $facetoface_sessions_dates_data = array(
@@ -738,27 +738,27 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->loadDataSet(
             $this->createArrayDataset(
                 array(
-                    'facetoface_signups'        => $this->facetoface_signups_data,
-                    'facetoface_sessions'       => $this->facetoface_sessions_data,
-                    'facetoface_session_field'  => $this->facetoface_sessions_field_data,
-                    'facetoface_session_data'   => $this->facetoface_sessions_data_data,
-                    'facetoface'                => $this->facetoface_data,
-                    'facetoface_sessions_dates' => $this->facetoface_sessions_dates_data,
-                    'facetoface_signups_status' => $this->facetoface_signups_status_data,
-                    'event'                     => $this->event_data,
-                    'role_assignments'          => $this->role_assignments_data,
-                    'pos_assignment'            => $this->pos_assignment_data,
-                    'course_modules'            => $this->course_modules_data,
-                    'grade_items'               => $this->grade_items_data,
-                    'grade_categories'          => $this->grade_categories_data,
-                    'grade_grades'              => $this->grade_grades_data,
-                    'user_info_field'           => $this->user_info_field_data,
-                    'user_info_data'            => $this->user_info_data_data,
-                    'user_info_category'        => $this->user_info_category_data,
-                    'course_categories'         => $this->course_categories_data,
-                    'facetoface_session_roles'  => $this->facetoface_session_roles_data,
-                    'facetoface_notice'         => $this->facetoface_notice_data,
-                    'user_preferences'          => $this->user_preferences_data,
+                    'facetoface_signups'            => $this->facetoface_signups_data,
+                    'facetoface_sessions'           => $this->facetoface_sessions_data,
+                    'facetoface_session_info_field' => $this->session_info_field,
+                    'facetoface_session_info_data'  => $this->session_info_data,
+                    'facetoface'                    => $this->facetoface_data,
+                    'facetoface_sessions_dates'     => $this->facetoface_sessions_dates_data,
+                    'facetoface_signups_status'     => $this->facetoface_signups_status_data,
+                    'event'                         => $this->event_data,
+                    'role_assignments'              => $this->role_assignments_data,
+                    'pos_assignment'                => $this->pos_assignment_data,
+                    'course_modules'                => $this->course_modules_data,
+                    'grade_items'                   => $this->grade_items_data,
+                    'grade_categories'              => $this->grade_categories_data,
+                    'grade_grades'                  => $this->grade_grades_data,
+                    'user_info_field'               => $this->user_info_field_data,
+                    'user_info_data'                => $this->user_info_data_data,
+                    'user_info_category'            => $this->user_info_category_data,
+                    'course_categories'             => $this->course_categories_data,
+                    'facetoface_session_roles'      => $this->facetoface_session_roles_data,
+                    'facetoface_notice'             => $this->facetoface_notice_data,
+                    'user_preferences'              => $this->user_preferences_data,
                 )
             )
         );

@@ -22,7 +22,9 @@
  * @package totara
  * @subpackage totara_customfield
  */
+defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/totara/customfield/definelib.php');
 class customfield_define_multiselect extends customfield_define_base {
     const MAX_CHOICES = 64;
 

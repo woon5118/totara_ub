@@ -126,8 +126,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
                  }),
                  success: function(o) {
                      // If success, update operators description in the client side.
-                     if (o.length > 0) {
-                         o = JSON.parse(o);
+                     if (o) {
                          var operator = null;
                          if (o.result === false) {
                              show_notifications(o.action, id, o.result);
@@ -142,7 +141,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
                              $("div .cohort-oplabel").html(operator);
                              // Enable approve - cancel options and notify success.
                              show_notifications(o.action, id, o.result);
-                         } else {
+                         } else if (o.action === 'updrulesetop') {
                              operator = M.util.get_string('and', 'totara_cohort');
                              if (o.value !== 0) {
                                  operator = M.util.get_string('or', 'totara_cohort');
@@ -150,13 +149,14 @@ M.totara_cohortrules = M.totara_cohortrules || {
                              var divid = '#id_cohort-ruleset-header' + id + " td.operator ";
                              $(divid).each(function (index, value) {
                                  if (index !== 0) {
-                                      // Change ruleset operator.
-                                      $(this).text(operator);
+                                     // Change ruleset operator.
+                                     $(this).text(operator);
                                  }
                              });
                              // Enable approve - cancel options and notify success.
                              show_notifications(o.action, id, o.result);
                          }
+                         window.onbeforeunload = null;
                      }
                  }
              });
@@ -169,22 +169,23 @@ M.totara_cohortrules = M.totara_cohortrules || {
                 // Show approve - cancel options
                 $('div#cohort_rules_action_box').removeAttr("style");
             } else {
+                // If there are any issues show a message about the error.
                 notification_class = 'notifyproblem';
                 notification_message = M.util.get_string('rulesupdatefailure', 'totara_cohort');
-            }
 
-            // Notify result of operation.
-            var notice = "<div id='notify"+ id +"' class="+notification_class+">" +
-                notification_message + "<div>";
+                // Notify result of operation.
+                var notice = "<div id='notify"+ id +"' class="+notification_class+">" +
+                    notification_message + "<div>";
 
-            if ($('div#notify'+ id).length === 0) {
-                if (type === 'updcohortop') {
-                    $('#fgroup_id_cohortoperator').prepend(notice);
-                } else {
-                    $('#fgroup_id_rulesetoperator_' + id).prepend(notice);
+                if ($('div#notify'+ id).length === 0) {
+                    if (type === 'updcohortop') {
+                        $('#fgroup_id_cohortoperator').prepend(notice);
+                    } else {
+                        $('#fgroup_id_rulesetoperator_' + id).prepend(notice);
+                    }
                 }
+                $('div#notify'+ id).fadeOut(600).fadeIn(600);
             }
-            $('div#notify'+ id).fadeOut(600).fadeIn(600);
         }
 
         // Dialog & handler for hierarchy picker

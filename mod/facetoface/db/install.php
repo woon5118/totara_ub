@@ -69,5 +69,50 @@ function xmldb_facetoface_install() {
 
     // Setting room, building, and address as default filters.
     set_config('facetoface_calendarfilters', 'room,building,address');
+
+    facetoface_create_signup_cancellation_customfield_notes();
 }
-?>
+
+/**
+ * Create signup and cancellation default text notes.
+ */
+function facetoface_create_signup_cancellation_customfield_notes() {
+    global $DB;
+
+    // Clear data. This tables are new and should not contain any data.
+    $DB->delete_records('facetoface_signup_info_field');
+    $DB->delete_records('facetoface_cancellation_info_field');
+
+    $data = new stdClass();
+    $data->id = 0;
+    $data->datatype = 'text';
+    $data->shortname = 'signupnote';
+    $data->fullname = 'Signup note';
+    $data->description = '';
+    $data->defaultdata = '';
+    $data->forceunique = 0;
+    $data->hidden = 0;
+    $data->locked = 0;
+    $data->required = 0;
+    $data->sortorder = 1;
+    $data->description_editor = array('text' => '', 'format' => 0);
+    $signupinfofieldid = $DB->insert_record('facetoface_signup_info_field', $data);
+
+    // Cancellation note default field.
+    $data = new stdClass();
+    $data->id = 0;
+    $data->datatype = 'text';
+    $data->shortname = 'cancellationnote';
+    $data->fullname = 'Cancellation note';
+    $data->description = '';
+    $data->defaultdata = '';
+    $data->forceunique = 0;
+    $data->hidden = 0;
+    $data->locked = 0;
+    $data->required = 0;
+    $data->sortorder = 1;
+    $data->description_editor = array('text' => '', 'format' => 0);
+    $cancellationinfofieldid = $DB->insert_record('facetoface_cancellation_info_field', $data);
+
+    return array($signupinfofieldid,$cancellationinfofieldid);
+}

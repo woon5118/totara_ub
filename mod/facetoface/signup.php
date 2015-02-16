@@ -124,7 +124,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $params = array();
     $params['discountcode']     = $fromform->discountcode;
     $params['notificationtype'] = $fromform->notificationtype;
-    $params['usernote']         = ($enableattendeenote ? $fromform->usernote : '');
 
     $f2fselectedpositionelemid = 'selectedposition_' . $session->facetoface;
 
@@ -134,6 +133,11 @@ if ($fromform = $mform->get_data()) { // Form submitted
 
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
+        if ($enableattendeenote) {
+            $signupstatus = facetoface_get_attendee($session->id, $USER->id);
+            $fromform->id = $signupstatus->statusid;
+            customfield_save_data($fromform, 'facetofacesignup', 'facetoface_signup');
+        }
 
         if (!empty($facetoface->approvalreqd) && !$hasselfapproval) {
             $message = get_string('bookingcompleted_approvalrequired', 'facetoface');

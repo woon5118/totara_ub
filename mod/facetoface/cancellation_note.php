@@ -49,33 +49,28 @@ if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course
 // Check essential permissions.
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
-if (!has_capability('mod/facetoface:manageattendeesnote', $context) || (bool)$session->availablesignupnote == false) {
-    print_error('nopermissions', 'error', '', 'Update attendee note');
+if (!has_capability('mod/facetoface:manageattendeesnote', $context)) {
+    print_error('nopermissions', 'error', '', 'Showing cancellation note');
 }
 
-/* @var mod_facetoface_renderer|core_renderer $renderer */
-$renderer = $PAGE->get_renderer('mod_facetoface');
+// Get custom field values of the cancellation.
+$cancellationnote = facetoface_get_attendee($sessionid, $userid);
+$cancellationnote->id = $cancellationnote->statusid;
+$customfields = customfield_get_data($cancellationnote, 'facetoface_cancellation', 'facetofacecancellation');
 
-$attendee_note = facetoface_get_attendee($sessionid, $userid);
-$attendee_note->userid = $attendee_note->id;
-$attendee_note->id = $attendee_note->statusid;
-$attendee_note->sessionid = $sessionid;
-$customfields = customfield_get_data($attendee_note, 'facetoface_signup', 'facetofacesignup');
+// Prepare output.
+$user = $DB->get_record('user', array('id' => $userid));
+$output = get_string('usernoteheading', 'facetoface', fullname($user));
+$output .= html_writer::empty_tag('hr');
 if (!empty($customfields)) {
     foreach ($customfields as $cftitle => $cfvalue) {
         $output .= html_writer::tag('strong', str_replace(' ', '&nbsp;', format_string($cftitle)) . ': ')
-            . html_writer::span($cfvalue);
+                 . html_writer::span($cfvalue);
         $output .= html_writer::empty_tag('br');
     }
 } else {
     $output .= get_string('none');
 }
-$output .= '<hr />';
-$output .= $renderer->single_button(
-    new moodle_url('/mod/facetoface/editattendeesnote.php', array('userid' => $userid, 's' => $sessionid, 'sesskey' => sesskey())),
-    get_string('edit', 'mod_facetoface'),
-    'get'
-);
 
 header('Content-type: text/html; charset=utf-8');
 echo $output;

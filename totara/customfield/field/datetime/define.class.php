@@ -21,8 +21,9 @@
  * @package totara
  * @subpackage customfield
  */
+defined('MOODLE_INTERNAL') || die();
 
-
+require_once($CFG->dirroot.'/totara/customfield/definelib.php');
 class customfield_define_datetime extends customfield_define_base {
 
     /**

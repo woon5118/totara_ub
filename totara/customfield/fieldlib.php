@@ -484,7 +484,7 @@ function customfield_save_data($itemnew, $prefix, $tableprefix) {
  * empty fields are not returned. Data has been passed through the appropriate
  * display_data() method.
  *
- * @param integer $itemid ID of the item the fields belong to
+ * @param integer $item The item the fields belong to
  * @param string $tableprefix Prefix to append '_info_field' to
  * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
  *
@@ -502,6 +502,98 @@ function customfield_get_fields($item, $tableprefix, $prefix) {
         $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
         if (!$formfield->is_hidden() and !$formfield->is_empty()) {
             $out[s($formfield->field->fullname)] = $formfield->display_data();
+        }
+    }
+    return $out;
+}
+
+/**
+ * Get custom fields and their data.
+ *
+ * @param stdClass $item The Item associated with the customfield
+ * @param string $tableprefix the table prefix of the customfield
+ * @param string $prefix The prefix of the custom field
+ * @param bool $indexfullname If true the index for each value will be the fullname of the field, otherwise the shortname
+ * @return array Array with the customfield and its associated value
+ */
+function customfield_get_data($item, $tableprefix, $prefix, $indexfullname = true) {
+    global $DB, $CFG;
+    $out = array();
+
+    $fieldid = $prefix . 'id';
+    $sql = "SELECT tif.id, tif.datatype, tif.fullname, tif.shortname, tid.id AS dataid, tid.data
+              FROM {{$tableprefix}_info_field} tif
+        INNER JOIN {{$tableprefix}_info_data} tid
+                ON tif.id = tid.fieldid
+             WHERE tif.hidden = 0
+               AND tid.{$fieldid} = :itemid
+          ORDER BY tif.sortorder ASC";
+
+    $fields = $DB->get_records_sql($sql, array('itemid' => $item->id));
+    foreach ($fields as $field) {
+        $data = $field->data;
+        switch ($field->datatype) {
+            case 'checkbox':
+                $data = ($field->data == 1) ? get_string('yes') : get_string('no');
+                break;
+            case 'multiselect':
+                $datavalue = json_decode($field->data, true);
+                $values = array();
+                $dataparams = $DB->get_records("{$tableprefix}_info_data_param", array('dataid' => $field->dataid));
+                foreach ($dataparams as $dataparams) {
+                    if (isset($datavalue[$dataparams->value])) {
+                        $option = $datavalue[$dataparams->value];
+                        $values[] = $option['option'];
+                    }
+                }
+                $data = implode(', ', $values);
+                break;
+            case 'file':
+                require_once($CFG->dirroot.'/totara/customfield/field/file/field.class.php');
+                $extradata = array('prefix' => $prefix, 'itemid' => $item->id, 'isexport' => false);
+                $data = \customfield_file::display_item_data($data, $extradata);
+                break;
+            case 'datetime':
+                $data = userdate($data, get_string('strfdateshortmonth', 'langconfig'));
+                break;
+            case 'textarea':
+                require_once($CFG->dirroot.'/totara/customfield/field/textarea/field.class.php');
+                $extradata = array('prefix' => $prefix, 'itemid' => $field->dataid);
+                $data = \customfield_textarea::display_item_data($data, $extradata);
+                break;
+
+        }
+        $index = ($indexfullname) ? 'fullname' : 'shortname';
+        $out[s($field->{$index})] = $data;
+    }
+    return $out;
+}
+
+/**
+ * Return an associative array of custom field shortname/value pairs for display
+ *
+ * The array contains values formatted for printing to the page. Hidden and
+ * empty fields are not returned. Data has been passed through the appropriate
+ * display_data() method.
+ *
+ * @param integer $item The item the fields belong to
+ * @param string $tableprefix Prefix to append '_info_field' to
+ * @param string $prefix Custom field prefix (e.g. 'course' or 'position')
+ *
+ * @return array Associate array of field names and data values
+ */
+function customfield_get_data_shortname_key($item, $tableprefix, $prefix) {
+    global $CFG, $DB;
+    $out = array();
+
+    $fields = $DB->get_records($tableprefix.'_info_field', array(), 'sortorder ASC');
+
+    foreach ($fields as $field) {
+        require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
+        $newfield = 'customfield_'.$field->datatype;
+        $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
+        if (!$formfield->is_hidden() and !$formfield->is_empty()) {
+            $out[$formfield->field->shortname] = $formfield->display_data();
         }
     }
     return $out;

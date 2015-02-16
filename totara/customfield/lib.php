@@ -43,3 +43,65 @@ function totara_customfield_pluginfile($course, $cm, $context, $filearea, $args,
     // finally send the file
     send_stored_file($file, 86400, 0, true, $options); // download MUST be forced - security!
 }
+
+/**
+ * Retrieve a list of all the available data types
+ * @return   array   a list of the datatypes suitable to use in a select statement
+ */
+function customfield_list_datatypes() {
+    global $CFG;
+
+    $datatypes = array();
+
+    if ($dirlist = get_directory_list($CFG->dirroot.'/totara/customfield/field', '', false, true, false)) {
+        foreach ($dirlist as $type) {
+            $datatypes[$type] = get_string('customfieldtype'.$type, 'totara_customfield');
+            if (strpos($datatypes[$type], '[[') !== false) {
+                $datatypes[$type] = get_string('customfieldtype'.$type, 'admin');
+            }
+        }
+    }
+    asort($datatypes);
+
+    return $datatypes;
+}
+
+/**
+ * Get custom field record based on it's id.
+ *
+ * @param string $tableprefix The table prefix where the custom field should be
+ * @param int $id The ID of the customfield we want to find
+ * @param string $datatype Custom field type
+ * @return stdClass $field an instance of the custom field. If it's not found, a new instance is create with default values
+ */
+function customfield_get_record_by_id($tableprefix, $id, $datatype) {
+    global $DB;
+
+    if (!$field = $DB->get_record($tableprefix.'_info_field', array('id' => $id))) {
+        $field = new stdClass();
+        $field->id = 0;
+        $field->datatype = $datatype;
+        $field->description = '';
+        $field->defaultdata = '';
+        $field->forceunique = 0;
+    }
+
+    return $field;
+}
+
+/**
+ * Get an instance of a custom field type. Used when creating a new custom field.
+ *
+ * @param string $prefix The custom field prefix
+ * @param \context $sitecontext The context
+ * @param array $extrainfo Array with extra info to create the custom field instance
+ * @return a custom field instance based on the information provided
+ */
+function get_customfield_type_instace($prefix, $sitecontext, $extrainfo) {
+    $classname = 'totara_customfield\\prefix\\'. $prefix . '_type';
+    if (!class_exists($classname)) {
+        print_error('prefixtypeclassnotfound', 'totara_customfield');
+    }
+
+    return new $classname($prefix, $sitecontext, $extrainfo);
+}

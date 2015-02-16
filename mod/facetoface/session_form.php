@@ -38,6 +38,7 @@ class mod_facetoface_session_form extends moodleform {
         global $CFG, $DB;
 
         $mform =& $this->_form;
+        $session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
 
         $this->context = context_module::instance($this->_customdata['cm']->id);
 
@@ -53,10 +54,6 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $editoroptions = $this->_customdata['editoroptions'];
-
-        // Show all custom fields
-        $customfields = $this->_customdata['customfields'];
-        facetoface_add_customfields_to_form($mform, $customfields);
 
         $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
@@ -326,6 +323,15 @@ class mod_facetoface_session_form extends moodleform {
             $mform->addHelpButton('allowconflicts', 'allowschedulingconflicts', 'facetoface');
             $mform->setType('allowconflicts', PARAM_BOOL);
         }
+
+        // Show all custom fields. Customfield support.
+        if (!$session) {
+            $session = new stdClass();
+        }
+        if (empty($session->id)) {
+            $session->id = 0;
+        }
+        customfield_definition($mform, $session, 'facetofacesession', 0, 'facetoface_session');
 
         $this->add_action_buttons();
     }

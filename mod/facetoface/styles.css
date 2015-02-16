@@ -104,3 +104,7 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .path-mod-facetoface.yui3-skin-sam .yui3-panel .yui3-widget-ft {
     background: none;
 }
+
+.f2f dt {
+    word-wrap: break-word;
+}

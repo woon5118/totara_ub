@@ -221,19 +221,19 @@ function add_location_info(&$sessions) {
         return false;
     }
 
-    $locationfieldid = $DB->get_field('facetoface_session_field', 'id', array('shortname' => 'location'));
+    $locationfieldid = $DB->get_field('facetoface_session_info_field', 'id', array('shortname' => 'location'));
     if (!$locationfieldid) {
         return false;
     }
 
-    $alllocations = $DB->get_records_sql('SELECT d.sessionid, d.data
+    $alllocations = $DB->get_records_sql('SELECT d.facetofacesessionid, d.data
               FROM {facetoface_sessions} s
-              JOIN {facetoface_session_data} d ON d.sessionid = s.id
+              JOIN {facetoface_session_info_data} d ON d.facetofacesessionid = s.id
              WHERE d.fieldid = ?', array($locationfieldid));
 
     foreach ($sessions as $session) {
-        if (!empty($alllocations[$session->sessionid])) {
-            $session->location = $alllocations[$session->sessionid]->data;
+        if (!empty($alllocations[$session->facetofacesessionid])) {
+            $session->location = $alllocations[$session->facetofacesessionid]->data;
         }
         else {
             $session->location = '';

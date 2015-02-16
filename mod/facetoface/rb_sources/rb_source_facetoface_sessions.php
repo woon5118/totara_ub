@@ -41,6 +41,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_facetoface_sessions');
+        $this->add_customfields();
         parent::__construct();
     }
 
@@ -161,8 +162,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
             'position_assignment', 'reportstoid');
         $this->add_tag_tables_to_joinlist('course', $joinlist, 'facetoface', 'course');
 
-        $this->add_facetoface_session_custom_fields_to_joinlist($joinlist);
-        // add joins for session custom fields and session roles
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
 
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'base', 'userid');
@@ -240,18 +239,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'base.discountcode',
                 array('dbdatatype' => 'text',
                       'outputformat' => 'text')
-            ),
-             new rb_column_option(
-                'session',
-                'usernote',
-                get_string('usernote', 'rb_source_facetoface_sessions'),
-                'status.note',
-                array(
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'joins' => 'status',
-                    'capability' => 'mod/facetoface:viewattendeesnote',
-                )
             ),
             new rb_column_option(
                 'session',
@@ -376,15 +363,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
             ),
             new rb_column_option(
                 'session',
-                'cancellationreason',
-                get_string('cancellationreason', 'rb_source_facetoface_sessions'),
-                'cancellationstatus.note',
-                array('joins' => 'cancellationstatus',
-                      'dbdatatype' => 'text',
-                      'outputformat' => 'text')
-            ),
-            new rb_column_option(
-                'session',
                 'bookedby',
                 get_string('bookedby', 'rb_source_facetoface_sessions'),
                 $DB->sql_fullname('bookedby.firstname', 'bookedby.lastname'),
@@ -471,7 +449,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
         $this->add_manager_fields_to_columns($columnoptions);
         $this->add_tag_fields_to_columns('course', $columnoptions);
 
-        $this->add_facetoface_session_custom_fields_to_columns($columnoptions);
         $this->add_facetoface_session_roles_to_columns($columnoptions);
 
         $this->add_cohort_user_fields_to_columns($columnoptions);
@@ -542,12 +519,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'session',
                 'discountcode',
                 get_string('discountcode', 'rb_source_facetoface_sessions'),
-                'text'
-            ),
-            new rb_filter_option(
-                'session',
-                'usernote',
-                get_string('usernote', 'rb_source_facetoface_sessions'),
                 'text'
             ),
             new rb_filter_option(
@@ -664,8 +635,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
         $this->add_manager_fields_to_filters($filteroptions);
         $this->add_tag_fields_to_filters('course', $filteroptions);
 
-        // add session custom fields to filters
-        $this->add_facetoface_session_custom_fields_to_filters($filteroptions);
         // add session role fields to filters
         $this->add_facetoface_session_role_fields_to_filters($filteroptions);
 
@@ -825,6 +794,13 @@ class rb_source_facetoface_sessions extends rb_base_source {
         return $defaultfilters;
     }
 
+    protected function add_customfields() {
+        $this->add_custom_fields_for('facetoface_session', 'sessions', 'facetofacesessionid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_custom_fields_for('facetoface_signup', 'status', 'facetofacesignupid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+        $this->add_custom_fields_for('facetoface_cancellation', 'cancellationstatus', 'facetofacecancellationid', $this->joinlist, $this->columnoptions, $this->filteroptions);
+    }
+
+
     //
     //
     // Methods for adding commonly used data to source definitions
@@ -834,34 +810,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
     //
     // Join data
     //
-
-    /*
-     * Adds any facetoface session custom fields to the $joinlist array
-     *
-     * @param array &$joinlist Array of current join options
-     *                         Passed by reference and updated if
-     *                         any session custom fields exist
-     * @return boolean True if session custom fields exist
-     */
-    function add_facetoface_session_custom_fields_to_joinlist(&$joinlist) {
-        global $CFG, $DB;
-        // add all session custom fields to join list
-        if ($session_fields = $DB->get_records('facetoface_session_field', null, '','id')) {
-            foreach ($session_fields as $session_field) {
-                $id = $session_field->id;
-                $key = "session_$id";
-                $joinlist[] = new rb_join(
-                    $key,
-                    'LEFT',
-                    '{facetoface_session_data}',
-                    "($key.sessionid = base.sessionid AND $key.fieldid = $id)",
-                    REPORT_BUILDER_RELATION_ONE_TO_ONE
-                );
-            }
-            return true;
-        }
-        return false;
-    }
 
     /*
      * Adds any facetoface session roles to the $joinlist array
@@ -922,37 +870,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
     //
     // Column data
     //
-
-    /*
-     * Adds any session custom fields to the $columnoptions array
-     *
-     * @param array &$columnoptions Array of current column options
-     *                              Passed by reference and updated if
-     *                              any session custom fields exist
-     * @return boolean True if session custom fields exist
-     */
-    function add_facetoface_session_custom_fields_to_columns(&$columnoptions) {
-        global $DB;
-        // add all session custom fields to column options list
-        if ($session_fields = $DB->get_records('facetoface_session_field', null, '', 'id,name')) {
-            foreach ($session_fields as $session_field) {
-                $name = $session_field->name;
-                $key = "session_$session_field->id";
-                $columnoptions[] = new rb_column_option(
-                    'session',
-                    $key,
-                    get_string('sessionx', 'rb_source_facetoface_sessions', $name),
-                    $key.'.data',
-                    array('joins' => $key,
-                          'dbdatatype' => 'char',
-                          'outputformat' => 'text')
-                );
-            }
-            return true;
-        }
-        return false;
-    }
-
 
     /*
      * Adds any session role fields to the $columnoptions array
@@ -1045,73 +962,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
             );
         }
         return true;
-    }
-
-
-    /*
-     * Adds some common session custom field filters to the $filteroptions array
-     *
-     * @param array &$filteroptions Array of current filter options
-     *                              Passed by reference and updated by
-     *                              this method
-     * @return True if there are any session custom fields
-     */
-    protected function add_facetoface_session_custom_fields_to_filters(&$filteroptions) {
-        global $DB;
-        // because session fields can be added/removed by the user
-        // check that the custom field exists before making an option
-        // available
-
-        // filters to try and add
-
-        $possible_filters = array(
-            'pilot' => array(
-                'text' => get_string('pilot', 'rb_source_facetoface_sessions'),
-                'type' => 'select',
-                'options' => array('selectchoices' => array('Yes' => get_string('yes'), 'No' => get_string('no')))
-            ),
-            'audit' => array(
-                'text' => get_string('audit', 'rb_source_facetoface_sessions'),
-                'type' => 'select',
-                'options' => array('selectchoices' => array('Yes' => get_string('yes'), 'No' => get_string('no')))
-            ),
-            'coursedelivery' => array(
-                'text' => get_string('coursedelivery', 'rb_source_facetoface_sessions'),
-                'type' => 'select',
-                'options' => array(
-                    'selectfunc' => 'coursedelivery_list',
-                    'attributes' => rb_filter_option::select_width_limiter(),
-                )
-            )
-        );
-
-        // add all valid session custom fields to filter options list
-        if ($session_fields = $DB->get_records('facetoface_session_field')) {
-            foreach ($session_fields as $session_field) {
-                foreach ($possible_filters as $key => $filter_data) {
-                    if ($key == $session_field->shortname) {
-                        $filter = new rb_filter_option(
-                            'session',
-                            'session_' . $session_field->id,
-                            $filter_data['text'],
-                            $filter_data['type'],
-                            $filter_data['options']
-                        );
-                        break;
-                    } else {
-                        $filter = new rb_filter_option(
-                            'session',
-                            'session_' . $session_field->id,
-                            $session_field->name,
-                            'text'
-                        );
-                    }
-                }
-                $filteroptions[] = $filter;
-            }
-            return true;
-        }
-        return false;
     }
 
     //

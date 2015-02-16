@@ -17,20 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage totara_customfield
+ * @author Maria Torres <maria.torres@totaralms.com>
+ * @package totara_customfield
  */
+
+namespace totara_customfield\prefix;
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/totara/customfield/definelib.php');
-class customfield_define_checkbox extends customfield_define_base {
+class organisation_type extends hierarchy_type {
 
-    function define_form_specific(&$form) {
-        /// select whether or not this should be checked by default
-        $form->addElement('selectyesno', 'defaultdata', get_string('defaultchecked', 'totara_customfield'));
-        $form->setDefault('defaultdata', 0); // defaults to 'no'
-        $form->setType('defaultdata', PARAM_BOOL);
-        $form->addHelpButton('defaultdata', 'customfielddefaultdatacheckbox', 'totara_customfield');
+    public function get_capability_movefield() {
+        return 'totara/hierarchy:updateorganisationcustomfield';
+    }
+
+    public function get_capability_editfield() {
+        return 'totara/hierarchy:updateorganisationcustomfield';
+    }
+
+    public function get_capability_createfield() {
+        return 'totara/hierarchy:createorganisationcustomfield';
+    }
+
+    public function get_capability_deletefield() {
+        return 'totara/hierarchy:deleteorganisationcustomfield';
     }
 }

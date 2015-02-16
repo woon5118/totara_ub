@@ -17,20 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage totara_customfield
+ * @author Maria Torres <maria.torres@totaralms.com>
+ * @package totara_customfield
  */
+
+namespace totara_customfield\prefix;
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/totara/customfield/definelib.php');
-class customfield_define_checkbox extends customfield_define_base {
+class course_type extends type_base {
 
-    function define_form_specific(&$form) {
-        /// select whether or not this should be checked by default
-        $form->addElement('selectyesno', 'defaultdata', get_string('defaultchecked', 'totara_customfield'));
-        $form->setDefault('defaultdata', 0); // defaults to 'no'
-        $form->setType('defaultdata', PARAM_BOOL);
-        $form->addHelpButton('defaultdata', 'customfielddefaultdatacheckbox', 'totara_customfield');
+    public function __construct($prefix, $context, $extrainfo = array()) {
+        parent::__construct($prefix, 'course', 'course', $context, $extrainfo);
+    }
+
+    public function get_capability_movefield() {
+        return 'totara/core:updateprogramcustomfield';
+    }
+
+    public function get_capability_editfield() {
+        return 'totara/core:updateprogramcustomfield';
+    }
+
+    public function get_capability_createfield() {
+        return 'totara/core:createprogramcustomfield';
+    }
+
+    public function get_capability_deletefield() {
+        return 'totara/core:deleteprogramcustomfield';
     }
 }

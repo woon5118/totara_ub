@@ -23,73 +23,117 @@
 
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/totara/customfield/lib.php');
 
 $page = optional_param('page', 0, PARAM_INT);
+$prefix = required_param('prefix', PARAM_ALPHA);
+$action = optional_param('action', 'showlist', PARAM_ALPHA);
+$id = optional_param('id', 0, PARAM_INT);
 
 $contextsystem = context_system::instance();
-admin_externalpage_setup('modfacetofacecustomfields');
+$PAGE->set_context($contextsystem);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('customfieldsheading', 'facetoface'));
+// Add params to extrainfo in case the customfield need them.
+$extrainfo = array('prefix' => $prefix, 'id' => $id, 'action' => $action);
+$customfieldtype = get_customfield_type_instace($prefix, $contextsystem, $extrainfo);
 
-$str_edit = get_string('edit', 'moodle');
-$str_remove = get_string('delete', 'moodle');
+// Set redirect options.
+$redirectoptions = array('prefix' => $prefix, 'id' => $id);
+$redirectpage = '/mod/facetoface/customfields.php';
+$redirect = new moodle_url($redirectpage, $redirectoptions);
 
-$columns = array('name', 'shortname', 'type', 'options');
-$headers = array(get_string('name'), get_string('shortname'), get_string('setting:type', 'facetoface'), get_string('options', 'facetoface'));
+$PAGE->set_url($redirect);
+admin_externalpage_setup('modfacetofacecustomfields', '', array('prefix' => $prefix));
 
-$table = new flexible_table('facetoface_notification_customfields');
-$table->define_baseurl($CFG->wwwroot . '/mod/facetoface/customfields.php');
-$table->define_columns($columns);
-$table->define_headers($headers);
-$table->set_attribute('class', 'generalbox mod-facetoface-customfield-list');
-$table->sortable(true, 'name');
-$table->no_sorting('options');
-$table->setup();
+/** @var totara_customfield_renderer $renderer*/
+$renderer = $PAGE->get_renderer('totara_customfield');
 
-if ($sort = $table->get_sql_sort()) {
-    $sort = ' ORDER BY ' . $sort;
+/** @var mod_facetoface_renderer $renderer*/
+$facetofacerenderer = $PAGE->get_renderer('mod_facetoface');
+
+// Check if any actions need to be performed.
+switch ($action) {
+    case 'showlist':
+        echo $OUTPUT->header();
+        echo $facetofacerenderer->customfield_management_tabs($prefix);
+        echo $OUTPUT->heading(get_string('customfieldsheading', 'facetoface'));
+
+        $options = customfield_list_datatypes();
+        $cancreate = has_capability($customfieldtype->get_capability_createfield(), $contextsystem);
+        $canedit = has_capability($customfieldtype->get_capability_editfield(), $contextsystem);
+        $candelete = has_capability($customfieldtype->get_capability_deletefield(), $contextsystem);
+        $fields = $customfieldtype->get_defined_fields($customfieldtype->get_fields_sql_where());
+
+        echo $renderer->totara_customfield_print_list($fields, $canedit, $candelete, $cancreate, $options, $redirectpage, $redirectoptions);
+        break;
+    case 'movefield':
+        require_capability($customfieldtype->get_capability_movefield(), $contextsystem);
+        $id  = required_param('id', PARAM_INT);
+        $dir = required_param('dir', PARAM_ALPHA);
+
+        if (confirm_sesskey()) {
+            $customfieldtype->move($id, $dir);
+            redirect($redirect);
+        }
+        break;
+    case 'deletefield':
+        require_capability($customfieldtype->get_capability_deletefield(), $contextsystem);
+        $id      = required_param('id', PARAM_INT);
+        $confirm = optional_param('confirm', 0, PARAM_BOOL);
+
+        if (data_submitted() and $confirm and confirm_sesskey()) {
+            $customfieldtype->delete($id);
+            redirect($redirect);
+        }
+
+        echo $OUTPUT->header();
+        echo $facetofacerenderer->customfield_management_tabs($prefix);
+        echo $OUTPUT->heading(get_string('customfieldsheadingaction', 'facetoface', get_string('delete')));
+
+        // Ask for confirmation.
+        $datacount = $DB->count_records($customfieldtype->get_table_prefix().'_info_data', array('fieldid' => $id));
+        $optionsyes = array ('prefix' => $prefix, 'id' => $id, 'confirm' => 1, 'action' => 'deletefield', 'sesskey' => sesskey(), 'typeid' => 0);
+        echo $renderer->totara_customfield_delete_confirmation($datacount, $redirectpage, $optionsyes, $redirectoptions);
+        break;
+    case 'editfield':
+        $id       = optional_param('id', 0, PARAM_INT);
+        $datatype = optional_param('datatype', '', PARAM_ALPHA);
+
+        $heading = $datatype;
+        $capability = $customfieldtype->get_capability_editfield();
+        $tableprefix = $customfieldtype->get_table_prefix();
+        if ($id === 0) {
+            $datatypes = customfield_list_datatypes();
+            $capability = $customfieldtype->get_capability_createfield();
+            $heading = $datatypes[$datatype];
+        }
+
+        $tabs = $facetofacerenderer->customfield_management_tabs($prefix);
+        $heading = $OUTPUT->heading(get_string('customfieldsheadingaction', 'facetoface', $heading));
+        require_capability($capability, $contextsystem);
+
+        $field = customfield_get_record_by_id($tableprefix, $id, $datatype);
+
+        $appendedfields = array();
+        if ($prefix == 'facetofacesession') {
+            // Pass additional fields to be displayed in the customfield form.
+            $showinsummary = array(
+                'element' => 'advcheckbox',
+                'name' => 'showinsummary',
+                'label' => get_string('setting:showinsummary', 'facetoface'),
+                'type' => PARAM_BOOL,
+                'defaultvalue' => true,
+            );
+            $appendedfields = array($showinsummary);
+        }
+
+        $renderer->customfield_manage_edit_form($prefix, 0, $tableprefix, $field, $redirect, $heading, $tabs, $appendedfields);
+        break;
+    default:
+        echo $OUTPUT->header();
+        echo $facetofacerenderer->customfield_management_tabs($prefix);
+        print_error('actiondoesnotexist', 'totara_customfield');
+        break;
 }
-
-$sql = 'SELECT * FROM {facetoface_session_field}';
-
-$perpage = 25;
-
-$totalcount = $DB->count_records('facetoface_session_field');
-
-$table->initialbars($totalcount > $perpage);
-$table->pagesize($perpage, $totalcount);
-
-$fields = $DB->get_records_sql($sql.$sort, array(), $table->get_page_start(), $table->get_page_size());
-
-$options = array(CUSTOMFIELD_TYPE_TEXT        => get_string('field:text', 'facetoface'),
-                 CUSTOMFIELD_TYPE_SELECT      => get_string('field:select', 'facetoface'),
-                 CUSTOMFIELD_TYPE_MULTISELECT => get_string('field:multiselect', 'facetoface'),
-);
-
-foreach ($fields as $field) {
-    $row = array();
-    $buttons = array();
-
-    $row[] = $field->name;
-    $row[] = $field->shortname;
-
-    $row[] = $options[$field->type];
-
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/customfield.php', array('id' => $field->id, 'page' => $page)), new pix_icon('t/edit', $str_edit));
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/customfield.php', array('id' => $field->id, 'd' => 1, 'sesskey' => sesskey())), new pix_icon('t/delete', $str_remove));
-
-    $row[] = implode($buttons, '');
-
-    $table->add_data($row);
-}
-
-$table->finish_html();
-
-$addurl = new moodle_url('/mod/facetoface/customfield.php', array('id' => 0));
-
-echo $OUTPUT->container_start('buttons');
-echo $OUTPUT->single_button($addurl, get_string('addnewfieldlink', 'facetoface'), 'get');
-echo $OUTPUT->container_end();
 
 echo $OUTPUT->footer();

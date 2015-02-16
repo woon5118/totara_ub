@@ -60,6 +60,14 @@ class field_form extends moodleform {
 
         $this->field->define_form($mform, $typeid, $tableprefix);
 
+        // Add additional fields.
+        $additionalfields = $datasent['additionalelements'];
+        foreach ($additionalfields as $additionalfield) {
+            $mform->addElement($additionalfield['element'], $additionalfield['name'], $additionalfield['label']);
+            $mform->setType($additionalfield['name'], $additionalfield['type']);
+            $mform->setDefault($additionalfield['name'], $additionalfield['defaultvalue']);
+        }
+
         $this->add_action_buttons(true);
     }
 

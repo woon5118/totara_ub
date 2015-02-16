@@ -842,7 +842,7 @@ function facetoface_delete_session($session) {
     // Delete session details
     $DB->delete_records('facetoface_sessions_dates',array('sessionid' => $session->id));
     $DB->delete_records('facetoface_session_roles', array('sessionid' => $session->id));
-    $DB->delete_records('facetoface_session_data',  array('sessionid' => $session->id));
+    $DB->delete_records('facetoface_session_info_data',  array('facetofacesessionid' => $session->id));
 
     $DB->delete_records_select(
         'facetoface_signups_status',
@@ -1198,8 +1198,8 @@ function facetoface_get_sessions($facetofaceid, $location='', $roomid=0) {
     $locationwhere = '';
     $locationparams = array();
     if (!empty($location)) {
-        $fromclause = "FROM {facetoface_session_data} d
-                       JOIN {facetoface_sessions} s ON s.id = d.sessionid";
+        $fromclause = "FROM {facetoface_session_info_data} d
+                       JOIN {facetoface_sessions} s ON s.id = d.facetofacesessionid";
         $locationwhere .= " AND d.data = ?";
         $locationparams[] = $location;
     }
@@ -1480,7 +1480,7 @@ function facetoface_write_worksheet_header(&$worksheet, $context) {
     $customfields = facetoface_get_session_customfields();
     foreach ($customfields as $field) {
         if (!empty($field->showinsummary)) {
-            $worksheet->write_string(0, $pos++, $field->name);
+            $worksheet->write_string(0, $pos++, $field->fullname);
         }
     }
     $worksheet->write_string(0, $pos++, get_string('sessionstartdateshort', 'facetoface'));
@@ -1679,7 +1679,7 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
     foreach ($sessions as $session) {
-        $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->id), '', 'fieldid, data');
+        $customdata = $DB->get_records('facetoface_session_info_data', array('facetofacesessionid' => $session->id), '', 'fieldid, data');
 
         $sessionstartdate = false;
         $sessionenddate = false;
@@ -1724,20 +1724,16 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
         if (!empty($sessionsignups[$session->id])) {
             foreach ($sessionsignups[$session->id] as $attendee) {
                 $i++; $j=0;
-
-                // Custom session fields
-                foreach ($customsessionfields as $field) {
-                    if (empty($field->showinsummary)) {
-                        continue; // skip
+                // Custom fields.
+                $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+                foreach ($customsessionfields as $customfield) {
+                    if (empty($customfield->showinsummary)) {
+                        continue; // Skip.
                     }
-
-                    $data = '-';
-                    if (!empty($customdata[$field->id])) {
-                        if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                            $data = str_replace(CUSTOMFIELD_DELIMITER, "\n", $customdata[$field->id]->data);
-                        } else {
-                            $data = $customdata[$field->id]->data;
-                        }
+                    if (array_key_exists($customfield->fullname, $customfieldsdata)) {
+                        $data = format_string($customfieldsdata[$customfield->fullname]);
+                    } else {
+                        $data = '-';
                     }
                     $worksheet->write_string($i, $j++, $data);
                 }
@@ -1831,19 +1827,16 @@ function facetoface_write_activity_attendance(&$worksheet, $coursecontext, $star
             // no one is sign-up, so let's just print the basic info
             $i++; $j=0;
 
-            // Custom session fields
-            foreach ($customsessionfields as $field) {
-                if (empty($field->showinsummary)) {
-                    continue; // skip
+            // Custom fields.
+            $customfieldsdata = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+            foreach ($customsessionfields as $customfield) {
+                if (empty($customfield->showinsummary)) {
+                    continue; // Skip.
                 }
-
-                $data = '-';
-                if (!empty($customdata[$field->id])) {
-                    if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                        $data = str_replace(CUSTOMFIELD_DELIMITER, "\n", $customdata[$field->id]->data);
-                    } else {
-                        $data = $customdata[$field->id]->data;
-                    }
+                if (array_key_exists($customfield->fullname, $customfieldsdata)) {
+                    $data = format_string($customfieldsdata[$customfield->fullname]);
+                } else {
+                    $data = '-';
                 }
                 $worksheet->write_string($i, $j++, $data);
             }
@@ -3327,21 +3320,13 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
     $output = html_writer::start_tag('dl', array('class' => 'f2f'));
 
-    $customfields = facetoface_get_session_customfields();
-    $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $session->id), '', 'fieldid, data');
-    foreach ($customfields as $field) {
-        $data = '';
-        if (!empty($customdata[$field->id])) {
-            if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                $values = explode(CUSTOMFIELD_DELIMITER, format_string($customdata[$field->id]->data));
-                $data = implode(html_writer::empty_tag('br'), $values);
-            }
-            else {
-                $data = format_string($customdata[$field->id]->data);
-            }
+    // Print customfields.
+    $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession');
+    if (!empty($customfields)) {
+        foreach ($customfields as $cftitle => $cfvalue) {
+            $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($cftitle)));
+            $output .= html_writer::tag('dd', $cfvalue);
         }
-        $output .= html_writer::tag('dt', str_replace(' ', '&nbsp;', format_string($field->name)));
-        $output .= html_writer::tag('dd', $data);
     }
 
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
@@ -3485,18 +3470,26 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 /**
  * Update the value of a customfield for the given session/notice.
  *
- * @param integer $fieldid    ID of a record from the facetoface_session_field table
+ * @param integer $field    ID of a record from the facetoface_session_field table
  * @param string  $data       Value for that custom field
  * @param integer $otherid    ID of a record from the facetoface_(sessions|notice) table
  * @param string  $table      'session' or 'notice' (part of the table name)
  * @returns true if it succeeded, false otherwise
  */
-function facetoface_save_customfield_value($fieldid, $data, $otherid, $table) {
+function facetoface_save_customfield_value($field, $data, $otherid, $table) {
     global $DB;
 
     $dbdata = null;
     if (is_array($data)) {
-        $dbdata = trim(implode(CUSTOMFIELD_DELIMITER, $data), ';');
+        // Get param1.
+        $param1 = json_decode($field->param1);
+        $values = array();
+        foreach ($param1 as $key => $option) {
+            $option->default = $data[$key];
+            $values[md5($option->option)] = $option;
+        }
+
+        $dbdata = json_encode($values);
     }
     else {
         $dbdata = trim($data);
@@ -3506,7 +3499,7 @@ function facetoface_save_customfield_value($fieldid, $data, $otherid, $table) {
     $newrecord->data = $dbdata;
 
     $fieldname = "{$table}id";
-    if ($record = $DB->get_record("facetoface_{$table}_data", array('fieldid' => $fieldid, $fieldname => $otherid))) {
+    if ($record = $DB->get_record("facetoface_{$table}_data", array('fieldid' => $field->id, $fieldname => $otherid))) {
         if (empty($dbdata)) {
             // Clear out the existing value
             return $DB->delete_records("facetoface_{$table}_data", array('id' => $record->id));
@@ -3520,32 +3513,39 @@ function facetoface_save_customfield_value($fieldid, $data, $otherid, $table) {
             return true; // no need to store empty values
         }
 
-        $newrecord->fieldid = $fieldid;
+        $newrecord->fieldid = $field->id;
         $newrecord->$fieldname = $otherid;
         return $DB->insert_record("facetoface_{$table}_data", $newrecord);
     }
 }
 
 /**
- * Return the value of a customfield for the given session/notice.
+ * Add the customfield names-values for the given session/notice to the object passed.
  *
+ * @param stdClass  $object   Object to add the customfield
  * @param object  $field    A record from the facetoface_session_field table
  * @param integer $otherid  ID of a record from the facetoface_(sessions|notice) table
  * @param string  $table    'session' or 'notice' (part of the table name)
- * @returns string The data contained in this custom field (empty string if it doesn't exist)
  */
-function facetoface_get_customfield_value($field, $otherid, $table) {
+function facetoface_get_customfield_value(&$object, $field, $otherid, $table) {
     global $DB;
 
     if ($record = $DB->get_record("facetoface_{$table}_data", array('fieldid' => $field->id, "{$table}id" => $otherid))) {
         if (!empty($record->data)) {
-            if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                return explode(CUSTOMFIELD_DELIMITER, $record->data);
+            if ('multiselect' == $field->datatype) {
+                $data = json_decode($record->data, true);
+                $index = 0;
+                foreach ($data as $key => $item) {
+                    $fieldname = "customfield_$field->shortname[$index]";
+                    $object->$fieldname =  $item['default'];
+                    $index++;
+                }
+            } else {
+                $fieldname = "customfield_$field->shortname";
+                $object->$fieldname =  $record->data;
             }
-            return $record->data;
         }
     }
-    return '';
 }
 
 /**
@@ -3555,27 +3555,50 @@ function facetoface_get_customfield_value($field, $otherid, $table) {
  * @returns array Indexed by field shortnames
  */
 function facetoface_get_customfielddata($sessionid) {
-    global $CFG, $DB;
+    $session = facetoface_get_session($sessionid);
 
-    $sql = "SELECT f.shortname, d.data
-              FROM {facetoface_session_field} f
-              JOIN {facetoface_session_data} d ON f.id = d.fieldid
-              WHERE d.sessionid = ?";
-
-    $records = $DB->get_records_sql($sql, array($sessionid));
-
-    return $records;
+    return customfield_get_data_shortname_key($session, 'facetoface_session', 'facetofacesession');
 }
 
 /**
- * Return a cached copy of all records in facetoface_session_field
+ * Return a cached copy of all records in session_info_field
  */
 function facetoface_get_session_customfields() {
     global $DB;
 
     static $customfields = null;
     if (null == $customfields) {
-        if (!$customfields = $DB->get_records('facetoface_session_field')) {
+        if (!$customfields = $DB->get_records('facetoface_session_info_field', array('hidden' => 0))) {
+            $customfields = array();
+        }
+    }
+    return $customfields;
+}
+
+/**
+ * Return a cached copy of all records in facetoface_signup_info_field
+ */
+function facetoface_get_signup_customfields() {
+    global $DB;
+
+    static $customfields = null;
+    if (null == $customfields) {
+        if (!$customfields = $DB->get_records('facetoface_signup_info_field', array('hidden' => 0))) {
+            $customfields = array();
+        }
+    }
+    return $customfields;
+}
+
+/**
+ * Return a cached copy of all records in facetoface_cancellation_info_field
+ */
+function facetoface_get_cancellation_customfields() {
+    global $DB;
+
+    static $customfields = null;
+    if (null == $customfields) {
+        if (!$customfields = $DB->get_records('facetoface_cancellation_info_field', array('hidden' => 0))) {
             $customfields = array();
         }
     }
@@ -3792,50 +3815,6 @@ function facetoface_manager_needed($facetoface){
 function facetoface_session_has_selfapproval($facetoface, $session) {
     return $facetoface->approvalreqd && $session->selfapproval;
 }
-
-/**
- * Add formslib fields for all custom fields defined site-wide.
- * (used by the session add/edit page and the site notices)
- */
-function facetoface_add_customfields_to_form(&$mform, $customfields, $alloptional=false) {
-    foreach ($customfields as $field) {
-        $fieldname = "custom_$field->shortname";
-
-        $options = array();
-        if (!$field->required || $field->type == CUSTOMFIELD_TYPE_SELECT) {
-            $options[''] = get_string('none');
-        }
-        foreach (explode(CUSTOMFIELD_DELIMITER, $field->possiblevalues) as $value) {
-            $v = trim($value);
-            if (!empty($v)) {
-                $options[$v] = $v;
-            }
-        }
-
-        switch ($field->type) {
-        case CUSTOMFIELD_TYPE_TEXT:
-            $mform->addElement('text', $fieldname, $field->name);
-            break;
-        case CUSTOMFIELD_TYPE_SELECT:
-            $mform->addElement('select', $fieldname, $field->name, $options);
-            break;
-        case CUSTOMFIELD_TYPE_MULTISELECT:
-            $select = &$mform->addElement('select', $fieldname, $field->name, $options);
-            $select->setMultiple(true);
-            break;
-        default:
-            error_log("facetoface: invalid field type for custom field ID $field->id");
-            continue;
-        }
-
-        $mform->setType($fieldname, PARAM_TEXT);
-        $mform->setDefault($fieldname, $field->defaultvalue);
-        if ($field->required and !$alloptional) {
-            $mform->addRule($fieldname, null, 'required', null, 'client');
-        }
-    }
-}
-
 
 /**
  * Get session cancellations
@@ -5038,12 +5017,12 @@ function facetoface_filter_calendar_events(&$events) {
             if (empty($fval)) {  // ignore empty filters
                 continue;
             }
-            if (empty($cfield_vals[$shortname]->data)) {
+            if (empty($cfield_vals[$shortname])) {
                 // no reason comparing empty values :D
                 unset($events[$eid]);
                 break;
             }
-            if ($fval != $cfield_vals[$shortname]->data) {
+            if ($fval != $cfield_vals[$shortname]) {
                 unset($events[$eid]);
                 break;
             }
@@ -5089,7 +5068,7 @@ function facetoface_get_customfield_filters() {
         }
         if (!empty($customfieldids)) {
             list($sessionfieldids, $params) = $DB->get_in_or_equal($customfieldids);
-            $sql = "SELECT * FROM {facetoface_session_field} WHERE id $sessionfieldids";
+            $sql = "SELECT * FROM {facetoface_session_info_field} WHERE id $sessionfieldids";
             $fields = $DB->get_records_sql($sql, $params);
         }
     }
@@ -6033,3 +6012,19 @@ function facetoface_waitlist_randomly_confirm_users($sessionid, $userids) {
 
     return $winners;
 }
+
+function facetoface_get_user_current_status($sessionid, $userid) {
+    global $DB;
+
+    $sql = "
+        SELECT ss.*
+          FROM {facetoface_signups} su
+          JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+         WHERE su.sessionid = ?
+           AND su.userid = ?
+           AND ss.superceded = 0";
+
+    return $DB->get_record_sql($sql, array($sessionid, $userid));
+
+}
+

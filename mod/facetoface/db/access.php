@@ -260,4 +260,34 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+
+
+    // Managing facetoface custom fields.
+    'mod/facetoface:createfacetofacecustomfield' => array(
+        'riskbitmask'   => RISK_CONFIG,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'totara/core:createcoursecustomfield'
+    ),
+    'mod/facetoface:updatefacetofacecustomfield' => array(
+        'riskbitmask'   => RISK_CONFIG | RISK_DATALOSS,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'totara/core:updatecoursecustomfield'
+    ),
+    'mod/facetoface:deletefacetofacecustomfield' => array(
+        'riskbitmask'   => RISK_CONFIG | RISK_DATALOSS,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'totara/core:deletecoursecustomfield'
+    ),
 );

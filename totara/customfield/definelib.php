@@ -174,9 +174,10 @@ class customfield_define_base {
     }
 
     /**
-     * Add a new custom field or save changes to current field
-     * @param   object   data from the add/edit custom field form
-     * @return  boolean  status of the insert/update record
+     * Format the customfield data to be saved.
+     * @param   object $data Data from the add/edit custom field form
+     * @param   string $tableprefix The table prefix where the custom field is
+     * @return  data to be saved
      */
     function define_save($data, $tableprefix) {
         global $DB, $TEXTAREA_OPTIONS;

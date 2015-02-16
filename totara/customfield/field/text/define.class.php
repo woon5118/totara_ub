@@ -21,7 +21,9 @@
  * @package totara
  * @subpackage totara_customfield
  */
+defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/totara/customfield/definelib.php');
 class customfield_define_text extends customfield_define_base {
 
     function define_form_specific(&$form) {

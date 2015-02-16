@@ -149,16 +149,18 @@ class facetoface_events_testcase extends advanced_testcase {
         $this->session->sessiondates = array();
 
         facetoface_user_signup($this->session, $this->facetoface, $this->course, '', MDL_F2F_NONE, MDL_F2F_STATUS_BOOKED, $user1->id);
-        $attendee_note = new attendee_note($user1->id, $this->session->id);
-        $attendee = $attendee_note->get();
+        $attendee_note = facetoface_get_attendee($this->session->id, $user1->id);
+        $attendee_note->userid = $attendee_note->id;
+        $attendee_note->id = $attendee_note->statusid;
+        $attendee_note->sessionid = $this->session->id;
 
-        $event = \mod_facetoface\event\attendee_note_updated::create_from_instance($attendee, $this->context);
+        $event = \mod_facetoface\event\attendee_note_updated::create_from_instance($attendee_note, $this->context);
         $event->trigger();
         $data = $event->get_data();
 
         $this->assertEquals($this->context, $event->get_context());
-        $this->assertSame($attendee, $event->get_instance());
-        $this->assertSame($attendee->id, $event->objectid);
+        $this->assertSame($attendee_note, $event->get_instance());
+        $this->assertSame($attendee_note->id, $event->objectid);
         $this->assertSame('u', $data['crud']);
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array($this->course->id, 'facetoface', 'update attendee note',

@@ -1242,20 +1242,11 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     }
 
     // Custom session fields (they look like "session:shortname" in the templates)
-    $customfields = facetoface_get_session_customfields();
-    $customdata = $DB->get_records('facetoface_session_data', array('sessionid' => $sessionid), '', 'fieldid, data');
-    foreach ($customfields as $field) {
-        $placeholder = "[session:{$field->shortname}]";
-        $value = '';
-        if (!empty($customdata[$field->id])) {
-            if (CUSTOMFIELD_TYPE_MULTISELECT == $field->type) {
-                $value = str_replace(CUSTOMFIELD_DELIMITER, ', ', $customdata[$field->id]->data);
-            } else {
-                $value = $customdata[$field->id]->data;
-            }
-        }
-
-        $msg = str_replace($placeholder, $value, $msg);
+    $session = facetoface_get_session($sessionid);
+    $customfields = customfield_get_data($session, 'facetoface_session', 'facetofacesession', false);
+    foreach ($customfields as $cftitle => $cfvalue) {
+        $placeholder = "[session:{$cftitle}]";
+        $msg = str_replace($placeholder, $cfvalue, $msg);
     }
 
     $msg = facetoface_message_substitutions_userfields($msg, $user);
