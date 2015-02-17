@@ -278,12 +278,26 @@ function totara_import_timezonelist() {
  * @return array a clean timezone list that can be used safely
  */
 function totara_get_clean_timezone_list($assoc=false) {
-    $zones = DateTimeZone::listIdentifiers();
-    if ($assoc == false) {
-        return $zones;
-    } else {
-        return array_combine($zones, $zones);
+    global $DB;
+
+    static $moodletimezones;
+    if (PHPUNIT_TEST or (!during_initial_install() and !$moodletimezones)) {
+        $moodletimezones = $DB->get_records_sql_menu("SELECT name, MAX(id) FROM {timezone} GROUP BY name");
     }
+
+    $zones = array();
+    foreach (DateTimeZone::listIdentifiers() as $zone) {
+        if ($moodletimezones and !isset($moodletimezones[$zone])) {
+            // Zones need to be supported both by Moodle and PHP.
+            continue;
+        }
+        if ($assoc) {
+            $zones[$zone] = $zone;
+        } else {
+            $zones[] = $zone;
+        }
+    }
+    return $zones;
 }
 
 /**

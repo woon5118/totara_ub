@@ -7132,40 +7132,40 @@ function get_list_of_themes() {
 /**
  * Returns a list of timezones in the current language
  *
- * @param string|float $extrazone - a deprecated timezone still set in the database in CFG or user profiles, to be added to the approved timezone list in dropdowns
+ * @param string $extrazone - current timezone, invalid timezone prefix will be added if not supported
  * @return array
  */
-function get_list_of_timezones($extrazone=null) {
-    global $CFG, $DB;
-
-    static $timezones;
-
-    if (!empty($timezones)) {    // This function has been called recently.
-        return $timezones;
-    }
-
+function get_list_of_timezones($extrazone = null) {
     $goodzones = totara_get_clean_timezone_list(true);
 
+    // Localise.
     foreach($goodzones as $tzkey => $tzval) {
         if (get_string_manager()->string_exists(strtolower($tzkey), 'timezones')) {
             $goodzones[$tzkey] = get_string(strtolower($tzkey), 'timezones');
         }
-        if (substr($goodzones[$tzkey], 0, 1) == '[') {  // No translation found
-            $goodzones[$tzkey] = $tzval;
-        }
     }
-    asort($goodzones);
-    //add the extra timezone if set to a deprecated or unknown zone
-    if (!empty($extrazone) && $extrazone != 99) {
-        if (!in_array($extrazone, $goodzones)) {
-            if (is_numeric($extrazone)) {
-                //UTC offset
-                $modifier = ($extrazone > 0) ? '+' : '';
-                $goodzones[$extrazone] = 'UTC' . $modifier . number_format($extrazone, 1);
-            } else {
-                //some string we don't recognise
-                $goodzones[$extrazone] = $extrazone;
-            }
+    core_collator::asort($goodzones);
+
+    if (empty($extrazone) or isset($goodzones[$extrazone])) {
+        return $goodzones;
+    }
+
+    if ($extrazone == 99) {
+        $a = get_string('serverlocaltime');
+        $goodzones[99] = get_string('timezoneinvalid', 'totara_core', $a);
+        return $goodzones;
+    }
+
+    // Add the extra timezone if set to a deprecated or unknown zone.
+    if (!in_array($extrazone, $goodzones)) {
+        if (is_numeric($extrazone)) {
+            // UTC offset.
+            $modifier = ($extrazone > 0) ? '+' : '';
+            $a = 'UTC' . $modifier . number_format($extrazone, 1);
+            $goodzones[$extrazone] = get_string('timezoneinvalid', 'totara_core', $a);
+        } else {
+            // Some string we don't recognise.
+            $goodzones[$extrazone] = get_string('timezoneinvalid', 'totara_core', $extrazone);
         }
     }
 

@@ -1253,6 +1253,28 @@ function update_timezone_records($timezones) {
         }
         $DB->insert_record('timezone', $timezone);
     }
+
+    // Totara: make sure we have the pure UTC too.
+    if (!$DB->record_exists('timezone', array('name' => 'UTC'))) {
+        $utc = array(
+            'name' => 'UTC',
+            'year' => '1970',
+            'tzrule' => '',
+            'gmtoff' => '0',
+            'dstoff' => '0',
+            'dst_month' => '0',
+            'dst_startday' => '0',
+            'dst_weekday' => '0',
+            'dst_skipweeks' => '0',
+            'dst_time' => '00:00',
+            'std_month' => '0',
+            'std_startday' => '0',
+            'std_weekday' => '0',
+            'std_skipweeks' => '0',
+            'std_time' => '00:00',
+        );
+        $DB->insert_record('timezone', $utc);
+    }
 }
 
 /**

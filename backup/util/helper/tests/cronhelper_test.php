@@ -53,6 +53,9 @@ class backup_cron_helper_testcase extends advanced_testcase {
         $this->resetAfterTest();
         set_config('backup_auto_active', '1', 'backup');
 
+        // Totara: the 99 timezone is a mess!
+        set_config('timezone', 99);
+
         // Notes
         // - backup_auto_weekdays starts on Sunday
         // - Tests cannot be done in the past

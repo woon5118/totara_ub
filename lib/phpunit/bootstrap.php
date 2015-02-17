@@ -208,6 +208,9 @@ error_reporting($CFG->debug);
 ini_set('display_errors', '1');
 ini_set('log_errors', '1');
 
+// Totara tweaks.
+$CFG->phpinitimezone = date_default_timezone_get(); // This adds phpinitimezone to newly created $CFG.
+
 $CFG->noemailever = true; // better not mail anybody from tests, override temporarily if necessary
 
 // some ugly hacks
