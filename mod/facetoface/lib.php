@@ -1018,7 +1018,8 @@ function facetoface_allow_user_cancellation($session) {
 function facetoface_notify_under_capacity() {
     global $CFG, $DB;
 
-    $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'facetoface'));
+    $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\send_notifications_task');
+    $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
     $roles = $CFG->facetoface_session_rolesnotify;
     $time = time();
 
