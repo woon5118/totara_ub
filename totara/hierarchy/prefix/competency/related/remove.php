@@ -103,7 +103,6 @@ if ($snapshots = $DB->get_records('comp_relations', array('id1' => $id, 'id2' =>
     foreach ($snapshots as $snapshot) {
         $DB->delete_records('comp_relations', array('id' => $snapshot->id));
 
-        $snapshot->fullname = $rcompetency->fullname;
         \hierarchy_competency\event\relation_deleted::create_from_instance($snapshot)->trigger();
     }
 }
@@ -113,7 +112,6 @@ if ($snapshots = $DB->get_records('comp_relations', array('id1' => $related, 'id
     foreach ($snapshots as $snapshot) {
         $DB->delete_records('comp_relations', array('id' => $snapshot->id));
 
-        $snapshot->fullname = $competency->fullname;
         \hierarchy_competency\event\relation_deleted::create_from_instance($snapshot)->trigger();
     }
 }

@@ -45,10 +45,10 @@ abstract class framework_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $framework;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
@@ -60,30 +60,14 @@ abstract class framework_deleted extends \core\event\base {
         $data = array(
             'objectid' => $instance->id,
             'context' => \context_system::instance(),
-            'other' => array(),
         );
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->framework = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy framework record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_framework() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_framework() is intended for event observers only');
-        }
-        return $this->framework;
     }
 
     /**
@@ -92,18 +76,24 @@ abstract class framework_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} framework {$this->objectid} was deleted";
+        $prefix = $this->get_prefix();
+        return "The {$prefix} framework {$this->objectid} was deleted";
+    }
+
+    public function get_url() {
+        $urlparams = array('prefix' => $this->get_prefix());
+        return new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('prefix' => $this->prefix);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'framework delete';
-        $logdata[] = new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
-        $logdata[] = "{$this->prefix} framework: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} framework: {$this->objectid}";
 
         return $logdata;
     }

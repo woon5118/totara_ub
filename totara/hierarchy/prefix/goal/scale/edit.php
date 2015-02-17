@@ -99,6 +99,9 @@ if ($mform->is_cancelled()) {
         unset($scalenew->id);
         $transaction = $DB->start_delegated_transaction();
         $scalenew->id = $DB->insert_record('goal_scale', $scalenew);
+        $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', 'goal_scale', $scalenew->id);
+        $DB->set_field('goal_scale', 'description', $scalenew->description, array('id' => $scalenew->id));
         $scalevalues = explode("\n", trim($scalenew->scalevalues));
         unset($scalenew->scalevalues);
         $sortorder = 1;
@@ -126,6 +129,7 @@ if ($mform->is_cancelled()) {
         }
         $transaction->allow_commit();
 
+        $scalenew = $DB->get_record('goal_scale', array('id' => $scalenew->id));
         \hierarchy_goal\event\scale_created::create_from_instance($scalenew)->trigger();
 
         $notification->text = 'scaleaddedgoal';
@@ -133,18 +137,17 @@ if ($mform->is_cancelled()) {
         $notification->params = array('class' => 'notifysuccess');
     } else {
         // Existing scale.
+        $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', 'goal_scale', $scalenew->id);
         $DB->update_record('goal_scale', $scalenew);
 
+        $scalenew = $DB->get_record('goal_scale', array('id' => $scalenew->id));
         \hierarchy_goal\event\scale_updated::create_from_instance($scalenew)->trigger();
 
         $notification->text = 'scaleupdatedgoal';
         $notification->url = "$CFG->wwwroot/totara/hierarchy/prefix/goal/scale/view.php?id={$scalenew->id}&amp;prefix=goal";
         $notification->params = array('class' => 'notifysuccess');
     }
-    // Fix the description field and redirect.
-    $scalenew = file_postupdate_standard_editor($scalenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-        'totara_hierarchy', 'goal_scale', $scalenew->id);
-    $DB->set_field('goal_scale', 'description', $scalenew->description, array('id' => $scalenew->id));
     totara_set_notification(get_string($notification->text, 'totara_hierarchy', $scalenew->name),
                     $notification->url, $notification->params);
 

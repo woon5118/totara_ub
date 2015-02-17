@@ -158,9 +158,8 @@ if ($canmanageframeworks) {
     echo html_writer::tag('div', $button, array('class' => 'buttons'));
 }
 
-$eventname = "\\hierarchy_{$prefix}\\event\\{$prefix}_viewed";
-$event = $eventname::create_from_instance($item);
-$event->trigger();
+$eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_viewed";
+$eventclass::create_from_instance($item)->trigger();
 
 // And proper footer.
 echo $OUTPUT->footer();

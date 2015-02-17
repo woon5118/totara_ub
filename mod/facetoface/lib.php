@@ -1971,7 +1971,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
                                 $notifyuser = true, $fromuser = null, $usernote = '', $positionassignment = null) {
 
-    global $DB, $OUTPUT, $USER;
+    global $DB, $USER;
 
     // Get user id
     if (!$userid) {
@@ -2103,7 +2103,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
             print_error($error, 'facetoface');
         } else {
             // Don't fail if email isn't sent, just display a warning
-            echo $OUTPUT->notification(get_string($error, 'facetoface'), 'notifyproblem');
+            debugging(get_string($error, 'facetoface'), DEBUG_NORMAL);
         }
     }
 

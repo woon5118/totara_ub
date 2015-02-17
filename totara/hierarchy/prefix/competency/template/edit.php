@@ -98,20 +98,15 @@ if ($form->is_cancelled()) {
         $templatenew->timecreated = $time;
         $templatenew->competencycount = 0;
 
-        if (!$templatenew->id = $DB->insert_record('comp_template', $templatenew)) {
-            print_error('createcompetencytemplaterecord', 'totara_hierarchy');
-        }
+        $templatenew->id = $DB->insert_record('comp_template', $templatenew);
+        $templatenew = file_postupdate_standard_editor($templatenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_template', $templatenew->id);
+        $DB->set_field('comp_template', 'description', $templatenew->description, array('id' => $templatenew->id));
 
     // Existing template
     } else {
-        if (!$DB->update_record('comp_template', $templatenew)) {
-            print_error('updatecompetencytemplaterecord', 'totara_hierarchy');
-        }
+        $templatenew = file_postupdate_standard_editor($templatenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_template', $templatenew->id);
+        $DB->update_record('comp_template', $templatenew);
     }
-
-    //fix the description field and redirect
-    $templatenew = file_postupdate_standard_editor($templatenew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', 'comp_template', $templatenew->id);
-    $DB->set_field('comp_template', 'description', $templatenew->description, array('id' => $templatenew->id));
     redirect("$CFG->wwwroot/totara/hierarchy/framework/view.php?prefix=competency&frameworkid=".$framework->id);
     //never reached
 }

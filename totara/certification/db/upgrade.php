@@ -52,5 +52,51 @@ function xmldb_totara_certification_upgrade($oldversion) {
         // Certification savepoint reached.
         totara_upgrade_mod_savepoint(true, 2013111200, 'totara_certification');
     }
+
+    if ($oldversion < 2014110701) {
+        // Find orphaned certif_completion records, archive them, delete them.
+        $sql = "SELECT cc.* FROM {certif_completion} cc
+             LEFT JOIN {prog} p ON cc.certifid = p.certifid
+       LEFT OUTER JOIN {prog_user_assignment} pua on p.id = pua.programid AND cc.userid = pua.userid
+                 WHERE pua.id IS NULL";
+        $orphans = $DB->get_recordset_sql($sql, array());
+        $deletecollection = array();
+        $deleteids = array();
+        $idcount = 0;
+        foreach ($orphans as $orphan) {
+            $deleteids[] = $orphan->id;
+            $idcount++;
+            $orphan->timemodified = time();
+            $orphan->unassigned = true;
+            // Move the record to history.
+            $completionhistory = $DB->get_record('certif_completion_history',
+                    array('certifid' => $orphan->certifid, 'userid' => $orphan->userid, 'timeexpires' => $orphan->timeexpires));
+            if ($completionhistory) {
+                $orphan->id = $completionhistory->id;
+                $DB->update_record('certif_completion_history', $orphan);
+            } else {
+                $DB->insert_record('certif_completion_history', $orphan);
+            }
+            // In case there are many thousands of records chunk the ids for deletion later.
+            if ($idcount >= BATCH_INSERT_MAX_ROW_COUNT) {
+                $deletecollection[] = $deleteids;
+                $deleteids = array();
+                $idcount = 0;
+            }
+        }
+        // Store any leftovers.
+        if ($idcount > 0) {
+            $deletecollection[] = $deleteids;
+        }
+        foreach ($deletecollection as $key => $idarray) {
+            // Remove the original orphaned records.
+            if (!empty($idarray)) {
+                list($usql, $uparams) = $DB->get_in_or_equal($idarray, SQL_PARAMS_QM);
+                $DB->delete_records_select('certif_completion', "id {$usql}", $uparams);
+            }
+        }
+        // Certification savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2014110701, 'totara_certification');
+    }
     return true;
 }

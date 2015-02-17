@@ -29,19 +29,46 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @property-read array $other {
  *      Extra information about the event.
- *
- *      - fullname  The name of the assignment
  * }
  *
  * @author David Curry <david.curry@totaralms.com>
  * @package totara_hierarchy
  */
 class assignment_cohort_deleted extends \hierarchy_goal\event\assignment_deleted {
+    /**
+     * Returns type.
+     * @return string
+     */
+    public function get_type() {
+        return 'cohort';
+    }
 
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Create instance of event.
+     *
+     * @param   \stdClass $instance A  goal record.
+     * @return  assignment_deleted
      */
-    protected $type = 'cohort';
+    public static function create_from_instance(\stdClass $instance) {
+        $userid = isset($instance->userid) ? $instance->userid : null;
+
+        $data = array(
+            'objectid' => $instance->id,
+            'context' => \context_system::instance(),
+            'relateduserid' => $userid,
+            'other' => array(
+                'goalid' => $instance->goalid,
+                'instanceid' => $instance->cohortid,
+            ),
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        $event->add_record_snapshot($event->objecttable, $instance);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Init method.

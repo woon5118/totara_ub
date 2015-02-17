@@ -100,33 +100,27 @@ if ($frameworkform->is_cancelled()) {
 
         $frameworknew->timecreated = $time;
 
-        if (!$frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew)) {
-           print_error('createframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew);
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
 
-        $eventname = "\\hierarchy_{$prefix}\\event\\framework_created";
-        $event = $eventname::create_from_instance($frameworknew);
-        $event->trigger();
+        $frameworknew = $DB->get_record($shortprefix.'_framework', array('id' => $frameworknew->id));
+        $eventclass = "\\hierarchy_{$prefix}\\event\\framework_created";
+        $eventclass::create_from_instance($frameworknew)->trigger();
 
         $notification->text = 'addedframework';
     } else {
         // Existing framework.
-        if (!$DB->update_record($shortprefix.'_framework', $frameworknew)) {
-           print_error('updateframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->update_record($shortprefix.'_framework', $frameworknew);
 
-        $eventname = "\\hierarchy_{$prefix}\\event\\framework_updated";
-        $event = $eventname::create_from_instance($frameworknew);
-        $event->trigger();
+        $frameworknew = $DB->get_record($shortprefix.'_framework', array('id' => $frameworknew->id));
+        $eventclass = "\\hierarchy_{$prefix}\\event\\framework_updated";
+        $eventclass::create_from_instance($frameworknew)->trigger();
 
         $notification->text = 'updatedframework';
     }
-    // Fix the description field and redirect.
-    $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
-    $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
-
     totara_set_notification(get_string($prefix.$notification->text, 'totara_hierarchy', format_string($frameworknew->fullname)), "$CFG->wwwroot/totara/hierarchy/framework/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
-
 }
 
 // Display page header.

@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
-class hierarchy_event_test extends advanced_testcase {
+class totara_hierarchy_events_testcase extends advanced_testcase {
 
     // TODO - extend the hierarchy datagenerator to support types.
     protected $pos_type_data = array(
@@ -79,9 +79,7 @@ class hierarchy_event_test extends advanced_testcase {
     protected $pos, $org, $comp, $comp2, $goal;
     protected $user, $cohort, $course, $module;
 
-    public function setUp() {
-        global $DB;
-
+    protected function setUp() {
         parent::setup();
         $this->resetAfterTest(true);
         $datagen = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
@@ -101,203 +99,123 @@ class hierarchy_event_test extends advanced_testcase {
         $this->user = $this->getDataGenerator()->create_user();
         $this->cohort = $this->getDataGenerator()->create_cohort();
         $this->course = $this->getDataGenerator()->create_course();
-        $record = new stdClass();
-        $record->course = $this->course->id;
-        $this->module = $this->getDataGenerator()->create_module('choice', $record);
+        $this->module = $this->getDataGenerator()->create_module('choice', array('course' => $this->course->id));
     }
-
 
     public function test_framework_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move framework functionality into lib functions & write tests.
-        $this->assertTrue(true);
-        $sink->close();
-    }
-
-    public function test_framework_legacyevents() {
         // Test Position Framework Created legacy data.
         $event = \hierarchy_position\event\framework_created::create_from_instance($this->pos_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'position', 'frameworkid' => $this->pos_framework->id));
+        $oldurl = "/totara/hierarchy/framework/index.php?prefix=position&frameworkid={$this->pos_framework->id}";
         $olddata = array(SITEID, 'position', 'framework create', $oldurl, "position framework: {$this->pos_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Framework Updated legacy data.
         $event = \hierarchy_position\event\framework_updated::create_from_instance($this->pos_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/view.php', array('prefix' => 'position', 'frameworkid' => $this->pos_framework->id));
+        $oldurl = "/totara/hierarchy/framework/view.php?prefix=position&frameworkid={$this->pos_framework->id}";
         $olddata = array(SITEID, 'position', 'framework update', $oldurl, "position framework: {$this->pos_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Framework Deleted legacy data.
         $event = \hierarchy_position\event\framework_deleted::create_from_instance($this->pos_framework);
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'position'));
+        $oldurl = '/totara/hierarchy/framework/index.php?prefix=position';
         $olddata = array(SITEID, 'position', 'framework delete', $oldurl, "position framework: {$this->pos_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Framework Created legacy data.
         $event = \hierarchy_organisation\event\framework_created::create_from_instance($this->org_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'organisation', 'frameworkid' => $this->org_framework->id));
+        $oldurl = "/totara/hierarchy/framework/index.php?prefix=organisation&frameworkid={$this->org_framework->id}";
         $olddata = array(SITEID, 'organisation', 'framework create', $oldurl, "organisation framework: {$this->org_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Framework Updated legacy data.
         $event = \hierarchy_organisation\event\framework_updated::create_from_instance($this->org_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/view.php', array('prefix' => 'organisation', 'frameworkid' => $this->org_framework->id));
+        $oldurl = "/totara/hierarchy/framework/view.php?prefix=organisation&frameworkid={$this->org_framework->id}";
         $olddata = array(SITEID, 'organisation', 'framework update', $oldurl, "organisation framework: {$this->org_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Framework Deleted legacy data.
         $event = \hierarchy_organisation\event\framework_deleted::create_from_instance($this->org_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'organisation'));
+        $oldurl = '/totara/hierarchy/framework/index.php?prefix=organisation';
         $olddata = array(SITEID, 'organisation', 'framework delete', $oldurl, "organisation framework: {$this->org_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Framework Created legacy data.
         $event = \hierarchy_competency\event\framework_created::create_from_instance($this->comp_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'competency', 'frameworkid' => $this->comp_framework->id));
+        $oldurl = "/totara/hierarchy/framework/index.php?prefix=competency&frameworkid={$this->comp_framework->id}";
         $olddata = array(SITEID, 'competency', 'framework create', $oldurl, "competency framework: {$this->comp_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Framework Updated legacy data.
         $event = \hierarchy_competency\event\framework_updated::create_from_instance($this->comp_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/view.php', array('prefix' => 'competency', 'frameworkid' => $this->comp_framework->id));
+        $oldurl = "/totara/hierarchy/framework/view.php?prefix=competency&frameworkid={$this->comp_framework->id}";
         $olddata = array(SITEID, 'competency', 'framework update', $oldurl, "competency framework: {$this->comp_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Framework Deleted legacy data.
         $event = \hierarchy_competency\event\framework_deleted::create_from_instance($this->comp_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'competency'));
+        $oldurl = '/totara/hierarchy/framework/index.php?prefix=competency';
         $olddata = array(SITEID, 'competency', 'framework delete', $oldurl, "competency framework: {$this->comp_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Framework Created legacy data.
         $event = \hierarchy_goal\event\framework_created::create_from_instance($this->goal_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'goal', 'frameworkid' => $this->goal_framework->id));
+        $oldurl = "/totara/hierarchy/framework/index.php?prefix=goal&frameworkid={$this->goal_framework->id}";
         $olddata = array(SITEID, 'goal', 'framework create', $oldurl, "goal framework: {$this->goal_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Framework Updated legacy data.
         $event = \hierarchy_goal\event\framework_updated::create_from_instance($this->goal_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/view.php', array('prefix' => 'goal', 'frameworkid' => $this->goal_framework->id));
+        $oldurl = "/totara/hierarchy/framework/view.php?prefix=goal&frameworkid={$this->goal_framework->id}";
         $olddata = array(SITEID, 'goal', 'framework update', $oldurl, "goal framework: {$this->goal_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Framework Deleted legacy data.
         $event = \hierarchy_goal\event\framework_deleted::create_from_instance($this->goal_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'goal'));
+        $oldurl = '/totara/hierarchy/framework/index.php?prefix=goal';
         $olddata = array(SITEID, 'goal', 'framework delete', $oldurl, "goal framework: {$this->goal_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Hierarchy Framework Viewed legacy data.
         $event = \totara_hierarchy\event\framework_viewed::create_from_prefix('position');
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => 'position'));
+        $oldurl = '/totara/hierarchy/framework/index.php?prefix=position';
         $olddata = array(SITEID, 'position', 'view framework', $oldurl, "position framework list");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Hierarchy Framework Exported legacy data.
         $event = \totara_hierarchy\event\framework_exported::create_from_instance('position', $this->pos_framework);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
-        $urlparams = array('id' => $this->pos_framework->id, 'prefix' => 'position');
-        $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
+        $oldurl = "/totara/hierarchy/framework/index.php?id={$this->pos_framework->id}&prefix=position";
         $olddata = array(SITEID, 'position', 'export framework', $oldurl, "position framework: {$this->pos_framework->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_type_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move type functionality into lib functions & write tests.
-        $this->assertTrue(true);
-
-        $sink->close();
-    }
-
-    public function test_type_legacyevents() {
         // Set up some variables for the tests.
         $pos_type = (object) $this->pos_type_data;
         $org_type = (object) $this->org_type_data;
@@ -307,386 +225,248 @@ class hierarchy_event_test extends advanced_testcase {
 
         // Test Position Type Created legacy data.
         $event = \hierarchy_position\event\type_created::create_from_instance($pos_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'create type', $oldurl, "position type: {$pos_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'create type', $oldurl->out_as_local_url(false), "position type: {$pos_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Type Updated legacy data.
         $event = \hierarchy_position\event\type_updated::create_from_instance($pos_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/edit.php', array('id' => $pos_type->id));
-        $olddata = array(SITEID, 'position', 'update type', $oldurl, "position type: {$pos_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'update type', $oldurl->out_as_local_url(false), "position type: {$pos_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Type Deleted legacy data.
         $event = \hierarchy_position\event\type_deleted::create_from_instance($pos_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'delete type', $oldurl, "position type: {$pos_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'delete type', $oldurl->out_as_local_url(false), "position type: {$pos_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Type Changed legacy data.
         $event = \hierarchy_position\event\type_changed::create_from_dataobject($type_changed);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/edit.php', array('prefix' => 'position', 'id' => $type_changed['itemid']));
         $olddesc = "position: {$type_changed['itemid']} (type: {$type_changed['oldtype']} -> type: {$type_changed['newtype']})";
-        $olddata = array(SITEID, 'position', 'change type', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'change type', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Type Created legacy data.
         $event = \hierarchy_organisation\event\type_created::create_from_instance($org_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'organisation'));
-        $olddata = array(SITEID, 'organisation', 'create type', $oldurl, "organisation type: {$org_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'create type', $oldurl->out_as_local_url(false), "organisation type: {$org_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Type Updated legacy data.
         $event = \hierarchy_organisation\event\type_updated::create_from_instance($org_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/edit.php', array('id' => $org_type->id));
-        $olddata = array(SITEID, 'organisation', 'update type', $oldurl, "organisation type: {$org_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'update type', $oldurl->out_as_local_url(false), "organisation type: {$org_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Type Deleted legacy data.
         $event = \hierarchy_organisation\event\type_deleted::create_from_instance($org_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'organisation'));
-        $olddata = array(SITEID, 'organisation', 'delete type', $oldurl, "organisation type: {$org_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'delete type', $oldurl->out_as_local_url(false), "organisation type: {$org_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Type Changed legacy data.
         $event = \hierarchy_organisation\event\type_changed::create_from_dataobject($type_changed);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/edit.php', array('prefix' => 'organisation', 'id' => $type_changed['itemid']));
         $olddesc = "organisation: {$type_changed['itemid']} (type: {$type_changed['oldtype']} -> type: {$type_changed['newtype']})";
-        $olddata = array(SITEID, 'organisation', 'change type', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'change type', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Type Created legacy data.
         $event = \hierarchy_competency\event\type_created::create_from_instance($comp_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'create type', $oldurl, "competency type: {$comp_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'create type', $oldurl->out_as_local_url(false), "competency type: {$comp_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Type Updated legacy data.
         $event = \hierarchy_competency\event\type_updated::create_from_instance($comp_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/edit.php', array('id' => $comp_type->id));
-        $olddata = array(SITEID, 'competency', 'update type', $oldurl, "competency type: {$comp_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'update type', $oldurl->out_as_local_url(false), "competency type: {$comp_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Type Deleted legacy data.
         $event = \hierarchy_competency\event\type_deleted::create_from_instance($comp_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete type', $oldurl, "competency type: {$comp_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'delete type', $oldurl->out_as_local_url(false), "competency type: {$comp_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Type Changed legacy data.
         $event = \hierarchy_competency\event\type_changed::create_from_dataobject($type_changed);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/edit.php', array('prefix' => 'competency', 'id' => $type_changed['itemid']));
         $olddesc = "competency: {$type_changed['itemid']} (type: {$type_changed['oldtype']} -> type: {$type_changed['newtype']})";
-        $olddata = array(SITEID, 'competency', 'change type', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'change type', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Type Created legacy data.
         $event = \hierarchy_goal\event\type_created::create_from_instance($goal_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'create type', $oldurl, "goal type: {$goal_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'create type', $oldurl->out_as_local_url(false), "goal type: {$goal_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Type Updated legacy data.
         $event = \hierarchy_goal\event\type_updated::create_from_instance($goal_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/edit.php', array('id' => $goal_type->id));
-        $olddata = array(SITEID, 'goal', 'update type', $oldurl, "goal type: {$goal_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'update type', $oldurl->out_as_local_url(false), "goal type: {$goal_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Type Deleted legacy data.
         $event = \hierarchy_goal\event\type_deleted::create_from_instance($goal_type);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'delete type', $oldurl, "goal type: {$goal_type->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete type', $oldurl->out_as_local_url(false), "goal type: {$goal_type->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Type Changed legacy data.
         $event = \hierarchy_goal\event\type_changed::create_from_dataobject($type_changed);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/edit.php', array('prefix' => 'goal', 'id' => $type_changed['itemid']));
         $olddesc = "goal: {$type_changed['itemid']} (type: {$type_changed['oldtype']} -> type: {$type_changed['newtype']})";
-        $olddata = array(SITEID, 'goal', 'change type', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'change type', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Hierarchy Type View legacy data.
         $event = \totara_hierarchy\event\type_viewed::create_from_prefix('position');
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/type/index.php', array('prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'view type list', $oldurl, 'position type list');
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'view type list', $oldurl->out_as_local_url(false), 'position type list');
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_item_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move type functionality into lib functions & write tests.
-        $this->assertTrue(true);
-    }
-
-    public function test_item_legacyevents() {
         // Test Position Item Created legacy data.
         $event = \hierarchy_position\event\position_created::create_from_instance($this->pos);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->pos->id, 'prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'added item', $oldurl, "position: {$this->pos->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'added item', $oldurl->out_as_local_url(false), "position: {$this->pos->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Item Deleted legacy data.
         $event = \hierarchy_position\event\position_deleted::create_from_instance($this->pos);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/index.php', array('id' => $this->pos_framework->id, 'prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'delete item', $oldurl, "position: {$this->pos->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'delete item', $oldurl->out_as_local_url(false), "position: {$this->pos->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Position Item Viewed legacy data.
         $event = \hierarchy_position\event\position_viewed::create_from_instance($this->pos);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $urlparams = array('prefix' => 'position', 'id' => $this->pos->id);
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $olddata = array(SITEID, 'position', 'view item', $oldurl, "position: {$this->pos->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'position', 'view item', $oldurl->out_as_local_url(false), "position: {$this->pos->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Item Created legacy data.
         $event = \hierarchy_organisation\event\organisation_created::create_from_instance($this->org);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->org->id, 'prefix' => 'organisation'));
-        $olddata = array(SITEID, 'organisation', 'added item', $oldurl, "organisation: {$this->org->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'added item', $oldurl->out_as_local_url(false), "organisation: {$this->org->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Item Deleted legacy data.
         $event = \hierarchy_organisation\event\organisation_deleted::create_from_instance($this->org);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/index.php', array('id' => $this->org_framework->id, 'prefix' => 'organisation'));
-        $olddata = array(SITEID, 'organisation', 'delete item', $oldurl, "organisation: {$this->org->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'delete item', $oldurl->out_as_local_url(false), "organisation: {$this->org->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Organisation Item Viewed legacy data.
         $event = \hierarchy_organisation\event\organisation_viewed::create_from_instance($this->org);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $urlparams = array('prefix' => 'organisation', 'id' => $this->org->id);
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $olddata = array(SITEID, 'organisation', 'view item', $oldurl, "organisation: {$this->org->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'organisation', 'view item', $oldurl->out_as_local_url(false), "organisation: {$this->org->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Item Created legacy data.
         $event = \hierarchy_competency\event\competency_created::create_from_instance($this->comp);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->comp->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'added item', $oldurl, "competency: {$this->comp->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'added item', $oldurl->out_as_local_url(false), "competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Item Deleted legacy data.
         $event = \hierarchy_competency\event\competency_deleted::create_from_instance($this->comp);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/index.php', array('id' => $this->comp_framework->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete item', $oldurl, "competency: {$this->comp->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'delete item', $oldurl->out_as_local_url(false), "competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Item Viewed legacy data.
         $event = \hierarchy_competency\event\competency_viewed::create_from_instance($this->comp);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $urlparams = array('prefix' => 'competency', 'id' => $this->comp->id);
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $olddata = array(SITEID, 'competency', 'view item', $oldurl, "competency: {$this->comp->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'view item', $oldurl->out_as_local_url(false), "competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Item Created legacy data.
         $event = \hierarchy_goal\event\goal_created::create_from_instance($this->goal);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->goal->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'added item', $oldurl, "goal: {$this->goal->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'added item', $oldurl->out_as_local_url(false), "goal: {$this->goal->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Item Deleted legacy data.
         $event = \hierarchy_goal\event\goal_deleted::create_from_instance($this->goal);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/index.php', array('id' => $this->goal_framework->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'delete item', $oldurl, "goal: {$this->goal->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete item', $oldurl->out_as_local_url(false), "goal: {$this->goal->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Item Viewed legacy data.
         $event = \hierarchy_goal\event\goal_viewed::create_from_instance($this->goal);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $urlparams = array('prefix' => 'goal', 'id' => $this->goal->id);
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $olddata = array(SITEID, 'goal', 'view item', $oldurl, "goal: {$this->goal->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'view item', $oldurl->out_as_local_url(false), "goal: {$this->goal->id}");
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_scale_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move scale functionality into lib functions & write tests.
-        $this->assertTrue(true);
-    }
-
-    public function test_scale_legacyevents() {
         // Set up some variables for the tests.
         $comp_scale = (object) $this->comp_scale_data;
         $comp_scale_value = (object) $this->comp_scale_value_data;
@@ -695,222 +475,195 @@ class hierarchy_event_test extends advanced_testcase {
 
         // Test Competency Scale Created legacy data.
         $event = \hierarchy_competency\event\scale_created::create_from_instance($comp_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'added scale', $oldurl, "competency scale: {$comp_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'added scale', $oldurl->out_as_local_url(false), "competency scale: {$comp_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Scale Updated legacy data.
         $event = \hierarchy_competency\event\scale_updated::create_from_instance($comp_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'update scale', $oldurl, "competency scale: {$comp_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'update scale', $oldurl->out_as_local_url(false), "competency scale: {$comp_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Scale Deleted legacy data.
         $event = \hierarchy_competency\event\scale_deleted::create_from_instance($comp_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete competency scale', $oldurl, "competency scale: {$comp_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'delete competency scale', $oldurl->out_as_local_url(false), "competency scale: {$comp_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Scale Value Created legacy data.
         $event = \hierarchy_competency\event\scale_value_created::create_from_instance($comp_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'added scale value', $oldurl, "competency scale value: {$comp_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'added scale value', $oldurl->out_as_local_url(false), "competency scale value: {$comp_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Scale Value Updated legacy data.
         $event = \hierarchy_competency\event\scale_value_updated::create_from_instance($comp_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'update scale value', $oldurl, "competency scale value: {$comp_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'update scale value', $oldurl->out_as_local_url(false), "competency scale value: {$comp_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Competency Scale Value Deleted legacy data.
         $event = \hierarchy_competency\event\scale_value_deleted::create_from_instance($comp_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/competency/scale/view.php', array('id' => $comp_scale->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete scale value', $oldurl, "competency scale value: {$comp_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'delete scale value', $oldurl->out_as_local_url(false), "competency scale value: {$comp_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Created legacy data.
         $event = \hierarchy_goal\event\scale_created::create_from_instance($goal_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'added scale', $oldurl, "goal scale: {$goal_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'added scale', $oldurl->out_as_local_url(false), "goal scale: {$goal_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Updated legacy data.
         $event = \hierarchy_goal\event\scale_updated::create_from_instance($goal_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'update scale', $oldurl, "goal scale: {$goal_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'update scale', $oldurl->out_as_local_url(false), "goal scale: {$goal_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Deleted legacy data.
         $event = \hierarchy_goal\event\scale_deleted::create_from_instance($goal_scale);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/framework/index.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'delete goal scale', $oldurl, "goal scale: {$goal_scale->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete goal scale', $oldurl->out_as_local_url(false), "goal scale: {$goal_scale->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Value Created legacy data.
         $event = \hierarchy_goal\event\scale_value_created::create_from_instance($goal_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'added scale value', $oldurl, "goal scale value: {$goal_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'added scale value', $oldurl->out_as_local_url(false), "goal scale value: {$goal_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Value Updated legacy data.
         $event = \hierarchy_goal\event\scale_value_updated::create_from_instance($goal_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'update scale value', $oldurl, "goal scale value: {$goal_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'update scale value', $oldurl->out_as_local_url(false), "goal scale value: {$goal_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Scale Value Deleted legacy data.
         $event = \hierarchy_goal\event\scale_value_deleted::create_from_instance($goal_scale_value);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/scale/view.php', array('id' => $goal_scale->id, 'prefix' => 'goal'));
-        $olddata = array(SITEID, 'goal', 'delete scale value', $oldurl, "goal scale value: {$goal_scale_value->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete scale value', $oldurl->out_as_local_url(false), "goal scale value: {$goal_scale_value->id}");
+        $this->assertSame($olddata, $legacydata);
     }
 
-    public function test_competency_assignment_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
+    public function test_competency_assigned_events() {
+        global $USER, $DB;
 
-        // TODO - move scale functionality into lib functions & write tests.
-        $this->assertTrue(true);
-    }
+        $this->setAdminUser();
 
-    public function test_competency_assignment_legacyevents() {
-        $eventdata = new \stdClass();
-        $eventdata->id = 1;
-        $eventdata->instanceid = $this->pos->id;
-        $eventdata->competencyid = $this->comp->id;
-        $eventdata->fullname = $this->comp->fullname;
+        // Add relationship.
+        $relationship = new stdClass();
+        $relationship->positionid = $this->pos->id;
+        $relationship->competencyid = $this->comp->id;
+        $relationship->timecreated = time();
+        $relationship->usermodified = $USER->id;
 
-        // And some extras necessary for snapshots.
-        $eventdata->positionid = $this->pos->id;
-        $eventdata->organisationid = $this->org->id;
-        $eventdata->templateid = 0;
-        $eventdata->timecreated = 1234567890;
-        $eventdata->usermodified = 2;
-        $eventdata->linktype = 1;
+        $relationship->id = $DB->insert_record('pos_competencies', $relationship);
+        $relationship = $DB->get_record('pos_competencies', array('id' => $relationship->id));
 
-        // Test Position Competency Assigned legacy data.
-        $event = \hierarchy_position\event\competency_assigned::create_from_instance($eventdata);
+        $event = \hierarchy_position\event\competency_assigned::create_from_instance($relationship);
+        $event->trigger();
+
+        $this->assertEventContextNotUsed($event);
+        $this->assertSame('c', $event->crud);
+        $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
+        $this->assertNotEmpty($event->get_name());
+
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->comp->id, 'prefix' => 'position'));
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->comp->id}&prefix=position";
         $olddata = array(SITEID, 'position', 'create competency assignment', $oldurl, "position: {$this->pos->id} - competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
 
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        // Add relationship.
+        $relationship = new stdClass();
+        $relationship->organisationid = $this->org->id;
+        $relationship->competencyid = $this->comp->id;
+        $relationship->timecreated = time();
+        $relationship->usermodified = $USER->id;
 
-        // Test Position Competency Unassigned legacy data.
-        $event = \hierarchy_position\event\competency_unassigned::create_from_instance($eventdata);
+        $relationship->id = $DB->insert_record('org_competencies', $relationship);
+        $relationship = $DB->get_record('org_competencies', array('id' => $relationship->id));
+
+        $event = \hierarchy_organisation\event\competency_assigned::create_from_instance($relationship);
+        $event->trigger();
+
+        $this->assertEventContextNotUsed($event);
+        $this->assertSame('c', $event->crud);
+        $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
+        $this->assertNotEmpty($event->get_name());
+
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->pos->id, 'prefix' => 'position'));
-        $olddata = array(SITEID, 'position', 'delete competency assignment', $oldurl, "position: {$this->pos->id} - competency: {$this->comp->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
-
-        // Probably the same but switching to the org->id just in case.
-        $eventdata->instanceid = $this->org->id;
-
-        // Test Organisation Competency Assigned legacy data.
-        $event = \hierarchy_organisation\event\competency_assigned::create_from_instance($eventdata);
-        $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->org->id, 'prefix' => 'organisation'));
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->comp->id}&prefix=organisation";
         $olddata = array(SITEID, 'organisation', 'create competency assignment', $oldurl, "organisation: {$this->org->id} - competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
+    }
 
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+    public function test_competency_unassigned_events() {
+        global $USER, $DB;
 
-        // Test Organisation Competency Unassigned legacy data.
-        $event = \hierarchy_organisation\event\competency_unassigned::create_from_instance($eventdata);
+        $this->setAdminUser();
+
+        // Add relationship.
+        $relationship = new stdClass();
+        $relationship->positionid = $this->pos->id;
+        $relationship->competencyid = $this->comp->id;
+        $relationship->timecreated = time();
+        $relationship->usermodified = $USER->id;
+
+        $relationship->id = $DB->insert_record('pos_competencies', $relationship);
+        $relationship = $DB->get_record('pos_competencies', array('id' => $relationship->id));
+        $DB->delete_records('pos_competencies', array('id' => $relationship->id));
+
+        $event = \hierarchy_position\event\competency_unassigned::create_from_instance($relationship);
+        $event->trigger();
+
         $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->org->id, 'prefix' => 'organisation'));
-        $olddata = array(SITEID, 'organisation', 'delete competency assignment', $oldurl, "organisation: {$this->org->id} - competency: {$this->comp->id}");
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->pos->id}&prefix=position";
+        $olddata = array(SITEID, 'position', 'delete competency assignment', $oldurl, "position: {$this->pos->id} - competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
 
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        // Add relationship.
+        $relationship = new stdClass();
+        $relationship->organisationid = $this->org->id;
+        $relationship->competencyid = $this->comp->id;
+        $relationship->timecreated = time();
+        $relationship->usermodified = $USER->id;
+
+        $relationship->id = $DB->insert_record('org_competencies', $relationship);
+        $relationship = $DB->get_record('org_competencies', array('id' => $relationship->id));
+        $DB->delete_records('org_competencies', array('id' => $relationship->id));
+
+        $event = \hierarchy_organisation\event\competency_unassigned::create_from_instance($relationship);
+        $event->trigger();
+
+        $legacydata = $event->get_legacy_logdata();
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->pos->id}&prefix=organisation";
+        $olddata = array(SITEID, 'organisation', 'delete competency assignment', $oldurl, "organisation: {$this->org->id} - competency: {$this->comp->id}");
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_evidence_events() {
@@ -972,26 +725,15 @@ class hierarchy_event_test extends advanced_testcase {
 
         // Test Competency Evidence Deleted legacy data.
         $event = \hierarchy_competency\event\evidence_deleted::create_from_instance($evidence->get_record());
-        $legacydata = $event->get_legacy_logdata();
-        $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->comp->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete evidence', $oldurl, "competency evidence: {$evidence->id}");
+        $event->trigger();
 
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $legacydata = $event->get_legacy_logdata();
+        $oldurl = "/totara/hierarchy/item/view.php?id={$this->comp->id}&prefix=competency";
+        $olddata = array(SITEID, 'competency', 'delete evidence', $oldurl, "competency evidence: {$evidence->id}");
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_competency_relation_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move relation functionality into lib functions & write tests.
-        $this->assertTrue(true);
-    }
-
-    public function test_competency_relation_legacyevents() {
         $eventdata = new \stdClass();
         $eventdata->id = 1;
         $eventdata->description = '';
@@ -1001,26 +743,15 @@ class hierarchy_event_test extends advanced_testcase {
 
         // Test Competency Relation Deleted legacy data.
         $event = \hierarchy_competency\event\relation_deleted::create_from_instance($eventdata);
+        $event->trigger();
+
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $this->comp->id, 'prefix' => 'competency'));
-        $olddata = array(SITEID, 'competency', 'delete related', $oldurl, "competency: {$this->comp->id} - competency: {$this->comp2->id}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'competency', 'delete related', $oldurl->out_as_local_url(false), "competency: {$this->comp->id} - competency: {$this->comp2->id}");
+        $this->assertSame($olddata, $legacydata);
     }
 
     public function test_goal_assignment_events() {
-        $this->resetAfterTest();
-        $sink = $this->redirectEvents();
-
-        // TODO - move assignment events into lib functions & write tests.
-        $this->assertTrue(true);
-    }
-
-    public function test_goal_assignment_legacyevents() {
         // Create some dummy data for the events.
         $eventdata = new \stdClass();
         $eventdata->id = 1;
@@ -1037,111 +768,70 @@ class hierarchy_event_test extends advanced_testcase {
         $eventdata->usermodified = 2;
 
         // Test Goal Assignment User Created legacy data.
-        $eventdata->instanceid = $eventdata->userid;
         $event = \hierarchy_goal\event\assignment_user_created::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', array('userid' => $eventdata->userid));
-        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl, "goal: {$this->goal->id} - individual: {$eventdata->userid}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl->out_as_local_url(false), "goal: {$this->goal->id} - individual: {$eventdata->userid}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Cohort Created legacy data.
-        $eventdata->instanceid = $eventdata->cohortid;
         $event = \hierarchy_goal\event\assignment_cohort_created::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/cohort/view.php', array('id' => $eventdata->cohortid));
-        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl, "goal: {$this->goal->id} - cohort: {$eventdata->cohortid}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl->out_as_local_url(false), "goal: {$this->goal->id} - cohort: {$eventdata->cohortid}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Position Created legacy data.
-        $eventdata->instanceid = $eventdata->posid;
         $event = \hierarchy_goal\event\assignment_position_created::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'position', 'id' => $eventdata->posid));
-        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl, "goal: {$this->goal->id} - position: {$eventdata->posid}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl->out_as_local_url(false), "goal: {$this->goal->id} - position: {$eventdata->posid}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Organisation Created legacy data.
-        $eventdata->instanceid = $eventdata->orgid;
         $event = \hierarchy_goal\event\assignment_organisation_created::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'organisation', 'id' => $eventdata->orgid));
-        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl, "goal: {$this->goal->id} - organisation: {$eventdata->orgid}");
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'create goal assignments', $oldurl->out_as_local_url(false), "goal: {$this->goal->id} - organisation: {$eventdata->orgid}");
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment User Deleted legacy data.
-        $eventdata->instanceid = $eventdata->userid;
         $event = \hierarchy_goal\event\assignment_user_deleted::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $eventdata->goalid, 'prefix' => 'goal'));
         $olddesc = "goal {$this->goal->id} - individual {$this->user->id}";
-        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Cohort Deleted legacy data.
-        $eventdata->instanceid = $eventdata->cohortid;
         $event = \hierarchy_goal\event\assignment_cohort_deleted::create_from_instance($eventdata);
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $eventdata->goalid, 'prefix' => 'goal'));
         $olddesc = "goal {$this->goal->id} - cohort {$this->cohort->id}";
-        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Position Deleted legacy data.
-        $eventdata->instanceid = $eventdata->posid;
         $event = \hierarchy_goal\event\assignment_position_deleted::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $eventdata->goalid, 'prefix' => 'goal'));
         $olddesc = "goal {$this->goal->id} - position {$this->pos->id}";
-        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
 
         // Test Goal Assignment Organisation Deleted legacy data.
-        $eventdata->instanceid = $eventdata->orgid;
         $event = \hierarchy_goal\event\assignment_organisation_deleted::create_from_instance($eventdata);
+        $event->trigger();
         $legacydata = $event->get_legacy_logdata();
         $oldurl = new moodle_url('/totara/hierarchy/item/view.php', array('id' => $eventdata->goalid, 'prefix' => 'goal'));
         $olddesc = "goal {$this->goal->id} - organisation {$this->org->id}";
-        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl, $olddesc);
-
-        $this->assertEquals($legacydata[0], $olddata[0]);
-        $this->assertEquals($legacydata[1], $olddata[1]);
-        $this->assertEquals($legacydata[2], $olddata[2]);
-        $this->assertEquals($legacydata[3]->out(), $olddata[3]->out());
-        $this->assertEquals($legacydata[4], $olddata[4]);
+        $olddata = array(SITEID, 'goal', 'delete goal assignment', $oldurl->out_as_local_url(false), $olddesc);
+        $this->assertSame($olddata, $legacydata);
     }
 }

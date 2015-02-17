@@ -100,25 +100,24 @@ if ($frameworkform->is_cancelled()) {
 
     // Save.
     if ($frameworknew->id == 0) {
+        $new = true;
         // New framework.
         unset($frameworknew->id);
 
         $frameworknew->timecreated = $time;
 
-        if (!$frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew)) {
-            print_error('createframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew);
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
 
     } else {
+        $new = false;
         // Existing framework.
-        if (!$DB->update_record($shortprefix.'_framework', $frameworknew)) {
-            print_error('createframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
+            'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->update_record($shortprefix.'_framework', $frameworknew);
     }
-    // Fix the description field.
-    $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'],
-        'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
-    $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
     // Handle scale assignments.
     // Get new assignments.
     if (isset($frameworknew->scale)) {
@@ -129,9 +128,7 @@ if ($frameworkform->is_cancelled()) {
             $assignment->frameworkid = $frameworknew->id;
             $assignment->timemodified = $time;
             $assignment->usermodified = $USER->id;
-            if (!$DB->insert_record($shortprefix.'_scale_assignments', $assignment)) {
-                print_error('addscaleassignment', 'totara_hierarchy');
-            }
+            $DB->insert_record($shortprefix.'_scale_assignments', $assignment);
         }
 
         // Get removed assignments.
@@ -141,15 +138,13 @@ if ($frameworkform->is_cancelled()) {
     }
 
     foreach ($scales_removed as $key) {
-        if (!$DB->delete_records($shortprefix.'_scale_assignments', array('scaleid' => $key, 'frameworkid' => $frameworknew->id))) {
-            print_error('deletescaleassignment', 'totara_hierarchy');
-        }
+        $DB->delete_records($shortprefix.'_scale_assignments', array('scaleid' => $key, 'frameworkid' => $frameworknew->id));
     }
 
     // Reload from db.
     $frameworknew = $DB->get_record($shortprefix.'_framework', array('id' => $frameworknew->id));
 
-    if ($framework->id == 0) {
+    if ($new) {
         \hierarchy_goal\event\framework_created::create_from_instance($frameworknew)->trigger();
     } else {
         \hierarchy_goal\event\framework_updated::create_from_instance($frameworknew)->trigger();

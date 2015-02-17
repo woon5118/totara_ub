@@ -125,8 +125,10 @@ if ($itemform->is_cancelled()) {
 
     if ($itemnew->id == 0) {
         // Add New item
-        if ($updateditem = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false)) {
+        if ($updateditem = $hierarchy->add_hierarchy_item($itemnew, $itemnew->parentid, $itemnew->frameworkid, false, false)) {
             $itemnew->id = $updateditem->id;
+            $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
+            $DB->set_field($shortprefix, 'description', $itemnew->description, array('id' => $itemnew->id));
 
             $notification->text = 'added';
             $notification->url = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix=$prefix&id={$updateditem->id}";
@@ -138,6 +140,7 @@ if ($itemform->is_cancelled()) {
         }
     } else {
         // Update existing item
+        $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
         $transaction = $DB->start_delegated_transaction();
         $updateditem = $hierarchy->update_hierarchy_item($itemnew->id, $itemnew, false, false);
         customfield_save_data($itemnew, $prefix, $shortprefix.'_type');
@@ -147,9 +150,16 @@ if ($itemform->is_cancelled()) {
         $notification->url = "{$CFG->wwwroot}/totara/hierarchy/item/view.php?prefix=$prefix&id={$itemnew->id}";
         $notification->params = array('class' => 'notifysuccess');
     }
-    //fix the description field and redirect
-    $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
-    $DB->set_field($shortprefix, 'description', $itemnew->description, array('id' => $itemnew->id));
+
+    $itemnew = $DB->get_record($shortprefix, array('id' => $itemnew->id));
+    if ($notification->text === 'added') {
+        $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_created";
+        $eventclass::create_from_instance($itemnew)->trigger();
+    } if ($notification->text === 'updated') {
+        $eventclass = "\\hierarchy_{$prefix}\\event\\{$prefix}_updated";
+        $eventclass::create_from_instance($itemnew)->trigger();
+    }
+
     totara_set_notification(get_string($notification->text . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notification->url, $notification->params);
 }
 

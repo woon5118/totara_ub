@@ -123,7 +123,8 @@ if ($mform->is_cancelled()) {
         // Update the record.
         goal::update_goal_item($todb, goal::SCOPE_PERSONAL);
 
-        \hierarchy_goal\event\personal_updated::create_from_instance($todb)->trigger();
+        $instance = $DB->get_record('goal_personal', array('id' => $todb->id));
+        \hierarchy_goal\event\personal_updated::create_from_instance($instance)->trigger();
     } else {
         // Handle creating a new goal.
 
@@ -156,7 +157,8 @@ if ($mform->is_cancelled()) {
             'totara_hierarchy', 'goal', $todb->id);
         $DB->set_field('goal_personal', 'description', $fromform->description, array('id' => $todb->id));
 
-        \hierarchy_goal\event\personal_created::create_from_instance($todb)->trigger();
+        $instance = $DB->get_record('goal_personal', array('id' => $todb->id));
+        \hierarchy_goal\event\personal_created::create_from_instance($instance)->trigger();
     }
 
     redirect("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$todb->userid}");

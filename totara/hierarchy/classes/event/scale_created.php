@@ -45,10 +45,10 @@ abstract class scale_created extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $scale;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
@@ -65,24 +65,10 @@ abstract class scale_created extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->scale = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy scale record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_scale() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_scale() is intended for event observers only');
-        }
-        return $this->scale;
     }
 
     /**
@@ -91,19 +77,27 @@ abstract class scale_created extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} scale {$this->objectid} was created";
+        $prefix = $this->get_prefix();
+
+        return "The {$prefix} scale {$this->objectid} was created";
+    }
+
+    public function get_url() {
+        $prefix = $this->get_prefix();
+        $urlparams = array('id' => $this->objectid, 'prefix' => $prefix);
+        return new \moodle_url("/totara/hierarchy/prefix/{$prefix}/scale/view.php", $urlparams);
+
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('id' => $this->objectid, 'prefix' => $this->prefix);
-        $urlpath = "/totara/hierarchy/prefix/{$this->prefix}/scale/view.php";
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'added scale';
-        $logdata[] = new \moodle_url($urlpath, $urlparams);
-        $logdata[] = "{$this->prefix} scale: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} scale: {$this->objectid}";
 
         return $logdata;
     }

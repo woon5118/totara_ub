@@ -48,12 +48,6 @@ class evidence_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
-     */
-    protected $evidence;
-
-    /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy evidence record.
@@ -72,25 +66,10 @@ class evidence_deleted extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->evidence = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy evidence record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_evidence() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_evidence() is intended for event observers only');
-        }
-        return $this->evidence;
     }
 
     /**
@@ -122,14 +101,17 @@ class evidence_deleted extends \core\event\base {
         return "The evidence item: {$this->objectid} was removed from competency: {$this->data['other']['competencyid']}";
     }
 
-    public function get_legacy_logdata() {
+    public function get_url() {
         $urlparams = array('id' => $this->objectid, 'prefix' => 'competency');
+        return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
+    }
 
+    public function get_legacy_logdata() {
         $logdata = array();
         $logdata[] = SITEID;
         $logdata[] = 'competency';
         $logdata[] = 'delete evidence';
-        $logdata[] = new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
+        $logdata[] = $this->get_url()->out_as_local_url(false);
         $logdata[] = "competency evidence: {$this->objectid}";
 
         return $logdata;

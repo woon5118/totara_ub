@@ -36,11 +36,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class framework_created extends \totara_hierarchy\event\framework_created {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'competency';
+    public function get_prefix() {
+        return 'competency';
+    }
 
     /**
      * Init method.

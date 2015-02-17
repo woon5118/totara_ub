@@ -35,11 +35,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class position_moved extends \totara_hierarchy\event\hierarchy_moved {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'position';
+    public function get_prefix() {
+        return 'position';
+    }
 
     /**
      * Initialise the event data.

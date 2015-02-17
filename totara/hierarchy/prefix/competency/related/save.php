@@ -129,7 +129,7 @@ foreach ($relidlist as $relid) {
 
     $relationship->id = $DB->insert_record('comp_relations', $relationship);
 
-    $relationship->fullname = $competency->fullname;
+    $relationship = $DB->get_record('comp_relations', array('id' => $relationship->id));
     \hierarchy_competency\event\relation_created::create_from_instance($relationship)->trigger();
 }
 

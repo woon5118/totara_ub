@@ -45,16 +45,16 @@ abstract class hierarchy_viewed extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $item;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy item record.
-     * @return  item_viewed
+     * @return  hierarchy_viewed
      */
     public static function create_from_instance(\stdClass $instance) {
         $data = array(
@@ -65,24 +65,10 @@ abstract class hierarchy_viewed extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->item = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy item record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_item() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_item() is intended for event observers only');
-        }
-        return $this->item;
     }
 
     /**
@@ -91,18 +77,24 @@ abstract class hierarchy_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix}: {$this->objectid} was viewed";
+        $prefix = $this->get_prefix();
+        return "The {$prefix}: {$this->objectid} was viewed";
+    }
+
+    public function get_url() {
+        $urlparams = array('prefix' => $this->get_prefix(), 'id' => $this->objectid);
+        return new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('prefix' => $this->prefix, 'id' => $this->objectid);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'view item';
-        $logdata[] = new \moodle_url('/totara/hierarchy/item/view.php', $urlparams);
-        $logdata[] = "{$this->prefix}: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix}: {$this->objectid}";
 
         return $logdata;
     }

@@ -45,10 +45,10 @@ abstract class scale_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $scale;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
@@ -65,25 +65,10 @@ abstract class scale_deleted extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->scale = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy scale record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_scale() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_scale() is intended for event observers only');
-        }
-        return $this->scale;
     }
 
     /**
@@ -92,18 +77,25 @@ abstract class scale_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} scale {$this->objectid} was deleted";
+        $prefix = $this->get_prefix();
+
+        return "The {$prefix} scale {$this->objectid} was deleted";
+    }
+
+    public function get_url() {
+        $urlparams = array('id' => $this->objectid, 'prefix' => $this->get_prefix());
+        return new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('id' => $this->objectid, 'prefix' => $this->prefix);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
-        $logdata[] = "delete {$this->prefix} scale";
-        $logdata[] = new \moodle_url('/totara/hierarchy/framework/index.php', $urlparams);
-        $logdata[] = "{$this->prefix} scale: {$this->objectid}";
+        $logdata[] = $prefix;
+        $logdata[] = "delete {$prefix} scale";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} scale: {$this->objectid}";
 
         return $logdata;
     }

@@ -35,11 +35,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class goal_moved extends \totara_hierarchy\event\hierarchy_moved {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'goal';
+    public function get_prefix() {
+        return 'goal';
+    }
 
     /**
      * Initialise the event data.

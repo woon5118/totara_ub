@@ -103,23 +103,21 @@ if ($frameworkform->is_cancelled()) {
     // Save
     // New framework
     if ($frameworknew->id == 0) {
+        $new = true;
         unset($frameworknew->id);
 
         $frameworknew->timecreated = $time;
 
-        if (!$frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew)) {
-            print_error('createframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $frameworknew->id = $DB->insert_record($shortprefix.'_framework', $frameworknew);
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
 
     // Existing framework
     } else {
-        if (!$DB->update_record($shortprefix.'_framework', $frameworknew)) {
-            print_error('createframeworkrecord', 'totara_hierarchy', $prefix);
-        }
+        $new = false;
+        $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
+        $DB->update_record($shortprefix.'_framework', $frameworknew);
     }
-    //fix the description field
-    $frameworknew = file_postupdate_standard_editor($frameworknew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix.'_framework', $frameworknew->id);
-    $DB->set_field($shortprefix.'_framework', 'description', $frameworknew->description, array('id' => $frameworknew->id));
     // Handle scale assignments
     // Get new assignments
     if (isset($frameworknew->scale)) {
@@ -143,15 +141,13 @@ if ($frameworkform->is_cancelled()) {
     }
 
     foreach ($scales_removed as $key) {
-        if (!$DB->delete_records($shortprefix.'_scale_assignments', array('scaleid' => $key, 'frameworkid' => $frameworknew->id))) {
-            print_error('deletescaleassignment', 'totara_hierarchy');
-        }
+        $DB->delete_records($shortprefix.'_scale_assignments', array('scaleid' => $key, 'frameworkid' => $frameworknew->id));
     }
 
     // Reload from db
     $frameworknew = $DB->get_record($shortprefix.'_framework', array('id' => $frameworknew->id));
 
-    if ($framework->id == 0) {
+    if ($new) {
         \hierarchy_competency\event\framework_created::create_from_instance($frameworknew)->trigger();
 
     } else {

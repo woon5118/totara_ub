@@ -80,7 +80,6 @@ if ($delete) {
     $snapshot = $DB->get_record('pos_competencies', array('id' => $id));
     $DB->delete_records('pos_competencies', array('id' => $id));
 
-    $snapshot->instanceid = $snapshot->positionid;
     \hierarchy_position\event\competency_unassigned::create_from_instance($snapshot)->trigger();
 
     totara_set_notification(get_string('positiondeletedassignedcompetency', 'totara_hierarchy'), $returnurl, array('class' => 'notifysuccess'));

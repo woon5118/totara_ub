@@ -154,8 +154,29 @@ class scheduler {
 
         switch ($frequency) {
             case self::DAILY:
-                $offset = (date('G', $this->time) < $schedule) ? 0 : DAYSECS;
-                $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear) + $offset + ($schedule * 60 * 60);
+                // We need to account for DST boundary changes.
+                // A particular hour the next day across the boundary may be 23-25 hours from the last run.
+                $userzoneobject = new DateTimeZone($usertz);
+                // Pad the date components with a leading zero if needed
+                $schedule =  sprintf("%02s", $schedule);
+                $timeday =  sprintf("%02s", $timeday);
+                $timemonth =  sprintf("%02s", $timemonth);
+                // Calculate time strings to build DateTime objects using the actual scheduled time.
+                $datestring = "{$timeyear}-{$timemonth}-{$timeday} ";
+                $nowdatestring = $datestring . date('H', $this->time) . ':00:00';
+                $targetdatestring = $datestring . $schedule . ':00:00';
+                // Create the DateTime objects to compare properly the current time and the scheduled time.
+                $ts1 = DateTime::createFromFormat('Y-m-d H:i:s', $nowdatestring, $userzoneobject);
+                $ts2 = DateTime::createFromFormat('Y-m-d H:i:s', $targetdatestring, $userzoneobject);
+                // If the report is already overdue for today, bump the day for the next run.
+                if ($ts1->getTimestamp() >= $ts2->getTimestamp()) {
+                    $timeday = (int)$timeday + 1;
+                    $timeday =  sprintf("%02s", $timeday);
+                }
+                // Calculate the next run using the correct day/timezone/DST.
+                $newdatestring = "{$timeyear}-{$timemonth}-{$timeday} {$schedule}:00:00";
+                $newts = DateTime::createFromFormat('Y-m-d H:i:s', $newdatestring, $userzoneobject);
+                $nextevent = $newts->getTimestamp();
                 break;
             case self::WEEKLY:
                 // Calculate the day of the week index.
@@ -196,11 +217,8 @@ class scheduler {
                 }
                 break;
         }
-        // Make the appropriate conversion in case the user is using a different timezone from the server.
-        $datetime = new DateTime(date('Y-m-d H:i:s', $nextevent), new DateTimeZone($usertz));
-        $datetime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-        $this->subject->{$this->map['nextevent']} = strtotime($datetime->format('Y-m-d H:i:s'));
 
+        $this->subject->{$this->map['nextevent']} = $nextevent;
         return $this;
     }
 

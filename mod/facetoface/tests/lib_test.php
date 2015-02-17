@@ -1083,10 +1083,18 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_user_signup() {
-        global $DB;
+        global $DB, $CFG;
+        require_once("$CFG->dirroot/totara/hierarchy/prefix/position/lib.php");
 
         $teacher1 = $this->getDataGenerator()->create_user();
         $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $manager = $this->getDataGenerator()->create_user();
+
+        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $manager->id;
+        assign_user_position($assignment, true);
+
         $course1 = $this->getDataGenerator()->create_course();
 
         $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
@@ -1094,6 +1102,7 @@ class facetoface_lib_testcase extends advanced_testcase {
 
         $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
         $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id, $studentrole->id);
 
         $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
 
@@ -1128,7 +1137,13 @@ class facetoface_lib_testcase extends advanced_testcase {
         $notificationtype1 = 1;
         $statuscode1 = MDL_F2F_STATUS_REQUESTED;
 
+        // No manager - problem.
+        $this->setUser($student1);
+        $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+        $this->assertDebuggingCalled(get_string('error:nomanagersemailset', 'facetoface'));
+
         // Test for valid case.
+        $this->setUser($student2);
         $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
 
         $this->resetAfterTest(true);

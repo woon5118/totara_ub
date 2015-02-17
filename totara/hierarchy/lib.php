@@ -313,9 +313,8 @@ class hierarchy {
         $DB->set_field($this->shortprefix, 'typeid', $newtype, array('id' => $itemid));
 
         $eventdata = array('itemid' => $itemid, 'oldtype' => $oldtype, 'newtype' => $newtype);
-        $eventname = "\\hierarchy_{$this->prefix}\\event\\type_changed";
-        $event = $eventname::create_from_dataobject($eventdata);
-        $event->trigger();
+        $eventclass = "\\hierarchy_{$this->prefix}\\event\\type_changed";
+        $eventclass::create_from_dataobject($eventdata)->trigger();
 
     }
 
@@ -983,9 +982,8 @@ class hierarchy {
         if ($triggerevent) {
             foreach ($deleted_list as $deleted_item) {
 
-                $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_deleted";
-                $event = $eventname::create_from_instance($snapshot);
-                $event->trigger();
+                $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_deleted";
+                $eventclass::create_from_instance($snapshot)->trigger();
             }
         }
 
@@ -1233,8 +1231,8 @@ class hierarchy {
      * return an instance
      *
      * @access  public
-     * @param   $prefix   string  Hierarchy prefix
-     * @return  $object Instance of the hierarchy prefix object
+     * @param   string $prefix string  Hierarchy prefix
+     * @return  hierarchy Instance of the hierarchy prefix object
      */
     static function load_hierarchy($prefix) {
         global $CFG;
@@ -1437,11 +1435,8 @@ class hierarchy {
      * @param integer $parentid ID of the item to append the new children to
      * @param array $items_to_add Array of objects suitable for inserting
      * @param integer $frameworkid ID of the framework to add the items to (optional if set in hierarchy object)
-     * @deprecated boolean $escapeitems If true, the objects in the $items_to_add array will be escaped before being passed to
-     *                            insert_record(). If passing data from a form that has already been escaped,
-     *                            this should be set to false. If passing in a raw object from a get_records()
-     *                            call, this should be true (the default)
      * @param boolean $triggerevent If true, this command will trigger a "{$prefix}_added" event handler for each new item
+     * @return bool
      */
     function add_multiple_hierarchy_items($parentid, $items_to_add, $frameworkid = null, $triggerevent = true) {
         global $USER, $DB;
@@ -1478,13 +1473,6 @@ class hierarchy {
             $item->usermodified = $USER->id;
             if ($newitem = $this->add_hierarchy_item($item, $parentid, $frameworkid, false, $triggerevent)) {
                 $new_ids[] = $newitem->id;
-
-                // Trigger an event if required.
-                if ($triggerevent) {
-                    $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
-                    $event = $eventname::create_from_instance($newitem);
-                    $event->trigger();
-                }
             } else {
                 // fail if any new items fail to be added
                 return false;
@@ -1513,12 +1501,9 @@ class hierarchy {
      *                      - timecreated
      * @param integer $parentid The ID of the parent to attach to, or 0 for top level
      * @param integer $frameworkid ID of the parent's framework (optional, unless parentid == 0)
-     * @deprecated boolean $escapeitem If true, the $item object will be escaped before being passed to
-     *                            insert_record(). If passing data from a form that has already been escaped,
-     *                            this should be set to false. If passing in a raw object from a get_records()
-     *                            call, this should be true (the default)
      * @param boolean $usetransaction If true this function will use transactions (optional, default: true)
      * @param boolean $triggerevent If true, this command will trigger a "{$prefix}_added" event handler
+     * @param boolean $removedesc
      *
      * @return object|false A copy of the new item, or false if it could not be added
      */
@@ -1587,9 +1572,8 @@ class hierarchy {
 
         // Trigger an event if required.
         if ($triggerevent) {
-            $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
-            $event = $eventname::create_from_instance($newitem);
-            $event->trigger();
+            $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_created";
+            $eventclass::create_from_instance($newitem)->trigger();
         }
 
         return $newitem;
@@ -1663,9 +1647,8 @@ class hierarchy {
 
         // Raise an event to let other parts of the system know.
         if ($triggerevent) {
-                $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
-                $event = $eventname::create_from_instance($updateditem);
-                $event->trigger();
+                $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_updated";
+            $eventclass::create_from_instance($updateditem)->trigger();
         }
 
         return $updateditem;
@@ -1789,9 +1772,9 @@ class hierarchy {
 
         $transaction->allow_commit();
 
-        $eventname = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_moved";
-        $event = $eventname::create_from_instance($todb);
-        $event->trigger();
+        $todb = $DB->get_record($this->shortprefix, array('id' => $todb->id));
+        $eventclass = "\\hierarchy_{$this->prefix}\\event\\{$this->prefix}_moved";
+        $eventclass::create_from_instance($todb)->trigger();
 
         return true;
     }

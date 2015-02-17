@@ -43,16 +43,10 @@ class personal_deleted extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
-     */
-    protected $personal_goal;
-
-    /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A personal goal record.
-     * @return  item_deleted
+     * @return  personal_deleted
      */
     public static function create_from_instance(\stdClass $instance) {
         $data = array(
@@ -64,25 +58,10 @@ class personal_deleted extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->personal_goal = $instance;
         $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy item record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_personal_goal() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_personal_goal() is intended for event observers only');
-        }
-        return $this->personal_goal;
     }
 
     /**
@@ -112,14 +91,17 @@ class personal_deleted extends \core\event\base {
         return "The personal goal: {$this->objectid} was deleted for user: {$this->relateduserid}";
     }
 
-    public function get_legacy_logdata() {
+    public function get_url() {
         $urlparams = array('user' => $this->relateduserid);
+        return new \moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', $urlparams);
+    }
 
+    public function get_legacy_logdata() {
         $logdata = array();
         $logdata[] = SITEID;
         $logdata[] = 'goal';
         $logdata[] = 'delete personal goal';
-        $logdata[] = new \moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', $urlparams);
+        $logdata[] = $this->get_url()->out_as_local_url(false);
         $logdata[] = "Personal goal: {$this->objectid}";
         $logdata[] = 0;
         $logdata[] = $this->relateduserid;
@@ -131,5 +113,7 @@ class personal_deleted extends \core\event\base {
         if (self::$preventcreatecall) {
             throw new \coding_exception('cannot call create() directly, use create_from_instance() instead.');
         }
+
+        parent::validate_data();
     }
 }

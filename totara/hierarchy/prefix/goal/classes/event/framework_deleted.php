@@ -35,11 +35,13 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class framework_deleted extends \totara_hierarchy\event\framework_deleted {
-
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $prefix = 'goal';
+    public function get_prefix() {
+        return 'goal';
+    }
 
     /**
      * Init method.

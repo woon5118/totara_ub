@@ -45,10 +45,10 @@ abstract class framework_updated extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
+     * Returns hierarchy prefix.
+     * @return string
      */
-    protected $framework;
+    abstract public function get_prefix();
 
     /**
      * Create instance of event.
@@ -65,24 +65,10 @@ abstract class framework_updated extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->framework = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy framework record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_framework() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_framework() is intended for event observers only');
-        }
-        return $this->framework;
     }
 
     /**
@@ -91,18 +77,24 @@ abstract class framework_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The {$this->prefix} framework {$this->objectid} was updated";
+        $prefix = $this->get_prefix();
+        return "The {$prefix} framework {$this->objectid} was updated";
+    }
+
+    public function get_url() {
+        $urlparams = array('prefix' => $this->get_prefix(), 'frameworkid' => $this->objectid);
+        return new \moodle_url('/totara/hierarchy/framework/view.php', $urlparams);
     }
 
     public function get_legacy_logdata() {
-        $urlparams = array('prefix' => $this->prefix, 'frameworkid' => $this->objectid);
+        $prefix = $this->get_prefix();
 
         $logdata = array();
         $logdata[] = SITEID;
-        $logdata[] = $this->prefix;
+        $logdata[] = $prefix;
         $logdata[] = 'framework update';
-        $logdata[] = new \moodle_url('/totara/hierarchy/framework/view.php', $urlparams);
-        $logdata[] = "{$this->prefix} framework: {$this->objectid}";
+        $logdata[] = $this->get_url()->out_as_local_url(false);
+        $logdata[] = "{$prefix} framework: {$this->objectid}";
 
         return $logdata;
     }

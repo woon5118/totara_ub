@@ -39,11 +39,37 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_hierarchy
  */
 class competency_unassigned extends \totara_hierarchy\event\competency_unassigned {
+    /**
+     * Returns hierarchy prefix.
+     * @return string
+     */
+    public function get_prefix() {
+        return 'organisation';
+    }
 
     /**
-     * The hierarchy prefix for use in name/descriptions.
+     * Create instance of event.
+     *
+     * @param   \stdClass $instance A competency_assignment assignment record.
+     * @return  competency_unassigned
      */
-    protected $prefix = 'organisation';
+    public static function create_from_instance(\stdClass $instance) {
+        $data = array(
+            'objectid' => $instance->id,
+            'context' => \context_system::instance(),
+            'other' => array(
+                'competencyid' => $instance->competencyid,
+                'instanceid' => $instance->organisationid,
+            ),
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        $event->add_record_snapshot($event->objecttable, $instance);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Init method.

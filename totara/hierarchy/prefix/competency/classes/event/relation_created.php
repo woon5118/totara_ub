@@ -47,12 +47,6 @@ class relation_created extends \core\event\base {
     protected static $preventcreatecall = true;
 
     /**
-     * The database record used to create the event.
-     * @var \stdClass
-     */
-    protected $relation;
-
-    /**
      * Create instance of event.
      *
      * @param   \stdClass $instance A hierarchy relation record.
@@ -70,24 +64,10 @@ class relation_created extends \core\event\base {
 
         self::$preventcreatecall = false;
         $event = self::create($data);
-        $event->relation = $instance;
+        $event->add_record_snapshot($event->objecttable, $instance);
         self::$preventcreatecall = true;
 
         return $event;
-    }
-
-    /**
-     * Get hierarchy relation record.
-     *
-     * NOTE: to be used from observers only.
-     *
-     * @return \stdClass
-     */
-    public function get_relation() {
-        if ($this->is_restored()) {
-            throw new \coding_exception('get_relation() is intended for event observers only');
-        }
-        return $this->relation;
     }
 
     /**

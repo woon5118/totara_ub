@@ -89,8 +89,6 @@ if ($deleteexisting) {
 
         // There should only be one but we have to do this in a loop to be safe.
         foreach ($snapshots as $snapshot) {
-
-            $snapshot->instanceid = $snapshot->positionid;
             \hierarchy_position\event\competency_unassigned::create_from_instance($snapshot)->trigger();
         }
     }
@@ -128,8 +126,7 @@ foreach ($add as $addition) {
 
     $relationship->id = $DB->insert_record('pos_competencies', $relationship);
 
-    $relationship->fullname = $related->fullname;
-    $relationship->instanceid = $position->id;
+    $relationship = $DB->get_record('pos_competencies', array('id' => $relationship->id));
     \hierarchy_position\event\competency_assigned::create_from_instance($relationship)->trigger();
 }
 
