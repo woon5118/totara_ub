@@ -58,6 +58,9 @@ class send_messages_task extends \core\task\scheduled_task {
         // the same program more than once.
         $programs = array();
 
+        // Send enrolment messages to any new enrolments.
+        $this->program_cron_enrolment_messages($programs);
+
         // Send alerts if any programs are due.
         $this->program_cron_programs_due($programs);
 
@@ -75,6 +78,75 @@ class send_messages_task extends \core\task\scheduled_task {
 
         // Send alerts if any programs have outstanding exceptions.
         $this->program_cron_exceptions_raised($programs);
+    }
+
+    /**
+     * Checks for any new assignments to a program and sends them enrolment message(s)
+     *
+     * @param array $programs An array of program objects. This is passed by reference so that it can be populated and re-used
+     */
+    protected function program_cron_enrolment_messages(&$programs) {
+        global $DB;
+
+        $debugging = debugging();
+        if ($debugging) {
+            mtrace('Checking programs that have had recent enrolments');
+        }
+
+        $lastrun = $this->get_last_run_time();
+        if (empty($lastrun)) {
+            // Must be the first time run since upgrading, use the old cron value.
+            $lastrun = $DB->get_field('config_plugins', 'value', array('plugin' => 'totara_program', 'name' => 'lastcron'));
+            if (empty($lastrun)) {
+                // There really is no past value to use here, must be a fresh install.
+                $lastrun = 0;
+            }
+        }
+
+        $sql = "SELECT pua.id, pua.userid, pua.programid, pm.id as messageid
+                  FROM {prog_user_assignment} pua
+            INNER JOIN {prog_message} pm
+                    ON pm.programid = pua.programid AND pm.messagetype = :enroltype
+             LEFT JOIN {prog_messagelog} pml
+                    ON pml.messageid = pm.id AND pml.userid = pua.userid
+                 WHERE pua.timeassigned >= :lastrun
+                   AND pml.id IS NULL
+              ORDER BY pua.programid, pua.userid";
+        $params = array('enroltype' => MESSAGETYPE_ENROLMENT, 'lastrun' => $lastrun);
+
+        $enrolments = $DB->get_records_sql($sql, $params);
+
+        // Transaction start.
+        $transaction = $DB->start_delegated_transaction();
+        foreach ($enrolments as $enrolment) {
+            if (isset($programs[$enrolment->programid])) {
+                // Use the existing program object if it is available.
+                $program = $programs[$enrolment->programid];
+            } else {
+                // Create a new program object and store it if it has not already been instantiated.
+                $program = new \program($enrolment->programid);
+                $programs[$enrolment->programid] = $program;
+            }
+            $messagesmanager = $program->get_messagesmanager();
+            $messages = $messagesmanager->get_messages();
+            $user = $DB->get_record('user', array('id' => $enrolment->userid), '*', MUST_EXIST);
+            $isviewable = $program->is_viewable($user);
+            $completion = $DB->get_field('prog_completion', 'status', array('programid' => $enrolment->programid, 'userid' => $enrolment->userid, 'coursesetid' => 0));
+
+            // If the user can view the program and has not previously completed it, carry on.
+            if ($isviewable && (empty($completion) || $completion != STATUS_PROGRAM_COMPLETE)) {
+                // Send notifications to user and (optionally) the user's manager.
+                foreach ($messages as $message) {
+                    if ($message->messagetype == MESSAGETYPE_ENROLMENT) {
+                        if ($message->send_message($user) && $debugging) {
+                            mtrace("Message {$message->id} sent(Program:{$enrolment->programid}-User:{$enrolment->userid})");
+                        }
+                    }
+                }
+            }
+        }
+        // Success, close the transaction.
+        $transaction->allow_commit();
     }
 
     /**

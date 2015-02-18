@@ -116,34 +116,16 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
         // Assign users to programs.
         $usersprogram1 = array($this->user1->id, $this->user2->id, $this->user3->id);
         $this->getDataGenerator()->assign_program($this->program1->id, $usersprogram1);
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(3, $messages);
-        }
+
         $usersprogram2 = array($this->user3->id, $this->user4->id, $this->user5->id, $this->user6->id, $this->user7->id);
         $this->getDataGenerator()->assign_program($this->program2->id, $usersprogram2);
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(5, $messages);
-        }
+
         $this->userprograms[$this->program1->id] = $usersprogram1;
         $this->userprograms[$this->program2->id] = $usersprogram2;
 
         $usersprogram3 = array($this->user1->id, $this->user2->id, $this->user3->id, $this->user4->id, $this->user5->id, $this->user6->id, $this->user7->id);
         $this->getDataGenerator()->assign_program($this->program3->id, $usersprogram3);
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(7, $messages);
-        }
         $this->getDataGenerator()->assign_program($this->program4->id, $usersprogram3);
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(7, $messages);
-        }
 
         // Create timestarted for each user.
         $now = time();

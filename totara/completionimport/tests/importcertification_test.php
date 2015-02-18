@@ -239,21 +239,10 @@ class importcertification_testcase extends reportcache_advanced_testcase {
 
         // Assign audience to the certification.
         $this->getDataGenerator()->assign_to_program($program->id, ASSIGNTYPE_COHORT, $cohort->id);
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(5, $messages);
-        }
 
         // Assign some users as individual to the certification - (users: 6 and 7).
         $this->getDataGenerator()->assign_to_program($program->id, ASSIGNTYPE_INDIVIDUAL, $users[6]->id);
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
         $this->getDataGenerator()->assign_to_program($program->id, ASSIGNTYPE_INDIVIDUAL, $users[7]->id);
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
 
         // Assign user 8 as an individual but set completion date in the future.
         $record = array('completiontime' => '15 2'  , 'completionevent' => COMPLETION_EVENT_FIRST_LOGIN);

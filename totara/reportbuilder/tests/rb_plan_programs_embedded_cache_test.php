@@ -100,23 +100,9 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
         $this->program4 = $this->getDataGenerator()->create_program();
 
         $this->getDataGenerator()->assign_program($this->program1->id, array($this->user1->id));
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
         $this->getDataGenerator()->assign_program($this->program2->id, array($this->user2->id));
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
         $this->getDataGenerator()->assign_program($this->program3->id, array($this->user1->id, $this->user2->id));
-        if (!empty($CFG->messaging)) {
-            $messages = $this->getDebuggingMessages();
-            $this->resetDebugging();
-            $this->assertCount(2, $messages);
-        }
         $this->getDataGenerator()->assign_program($this->program4->id, array($this->user2->id));
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
 
         $syscontext = context_system::instance();
 
