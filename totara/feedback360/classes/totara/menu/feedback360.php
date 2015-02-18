@@ -49,12 +49,18 @@ class feedback360 extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/feedback360/lib.php');
         if (totara_feature_visible('feedback360') && \feedback360::can_view_feedback360s($USER->id)) {
-            return menu::SHOW_ALWAYS;
+            $cache = menu::SHOW_ALWAYS;
         } else {
-            return menu::HIDE_ALWAYS;
+            $cache = menu::HIDE_ALWAYS;
         }
+        return $cache;
     }
 
     protected function get_default_parent() {

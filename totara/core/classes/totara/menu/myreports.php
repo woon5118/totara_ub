@@ -48,15 +48,21 @@ class myreports extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $reportbuilder_permittedreports;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
         if (!isset($reportbuilder_permittedreports) || !is_array($reportbuilder_permittedreports)) {
             $reportbuilder_permittedreports = \reportbuilder::get_permitted_reports();
         }
         $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
         if ($hasreports) {
-            return menu::SHOW_ALWAYS;
+            $cache = menu::SHOW_ALWAYS;
         } else {
-            return menu::HIDE_ALWAYS;
+            $cache = menu::HIDE_ALWAYS;
         }
+        return $cache;
     }
 }
