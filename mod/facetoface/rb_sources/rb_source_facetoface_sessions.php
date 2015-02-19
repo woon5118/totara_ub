@@ -212,9 +212,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 get_string('sessduration', 'rb_source_facetoface_sessions'),
                 'CASE WHEN sessions.datetimeknown = 1
                     THEN
-                        (sessiondate.timefinish-sessiondate.timestart)/60
+                        (sessiondate.timefinish-sessiondate.timestart)/' . MINSECS . '
                     ELSE
-                        sessions.duration
+                        sessions.duration/' . MINSECS . '
                     END',
                 array(
                     'joins' => array('sessiondate','sessions'),
