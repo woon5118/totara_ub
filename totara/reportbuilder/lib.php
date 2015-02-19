@@ -4793,10 +4793,17 @@ function sql_table_from_select($table, $select, array $params) {
 
         // db engines specifics
         switch ($DB->get_dbfamily()) {
+            // NOTE: Continue inside switch needs to use "2" because switch behaves like a looping structure.
             case 'mysql':
                 // Do not index fields with size 0
                 if (strpos($field->type, '(0)') !== false) {
                     continue 2;
+                }
+                if (preg_match('/varchar\(([0-9]*)\)/', $field->type, $matches)) {
+                    if ($matches[1] > 255); {
+                        // Bad luck, we cannot create indexes on large mysql varchar fields.
+                        continue 2;
+                    }
                 }
                 if (strpos($field->type, 'blob') !== false || strpos($field->type, 'text') !== false) {
                     // Index only first 255 symbols (mysql maximum = 767)
@@ -4805,7 +4812,7 @@ function sql_table_from_select($table, $select, array $params) {
             break;
             case 'mssql':
                 if ($field->field_type == 'image' || $field->field_type == 'binary') { // image
-                    continue;
+                    continue 2;
                 }
                 if ($field->field_type == 'text' || $field->field_type == 'ntext'
                         || ($field->field_type == 'nvarchar' && ($field->max_length == -1 || $field->max_length > 450))) {
@@ -4816,7 +4823,7 @@ function sql_table_from_select($table, $select, array $params) {
                     } catch (dml_write_exception $e) {
                         // Recoverable exception
                         // Field has data longer than maximum index, proceed unindexed
-                        continue;
+                        continue 2;
                     }
                 }
             break;
