@@ -2018,7 +2018,7 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
  * @param int $certifpath (defaults to cert for programs)
  * @return  string
  */
-function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CERT) {
+function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CERT, $export = false) {
     global $DB, $PAGE;
 
     $prog_completion = $DB->get_record('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
@@ -2047,6 +2047,10 @@ function prog_display_progress($programid, $userid, $certifpath = CERTIFPATH_CER
         if ($csgroup_count > 0) {
             $overall_progress = (float)($csgroup_complete_count / $csgroup_count) * 100;
         }
+    }
+
+    if ($export) {
+        return $overall_progress;
     }
 
     $tooltipstr = 'DEFAULTTOOLTIP';
