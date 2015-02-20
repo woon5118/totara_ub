@@ -78,11 +78,11 @@ function prog_can_view_users_required_learning($learnerid) {
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
  * @param bool $showhidden Whether to include hidden programs in records returned
- * @param bool $onlyrequiredlearning Only return required learning programs
+ * @param bool $onlyprograms Only return programs (excludes certifications)
  * @return array|int
  */
 function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum = '', $returncount = false, $showhidden = false,
-        $onlyrequiredlearning = false) {
+        $onlyprograms = false) {
     global $DB;
 
     // Construct sql query.
@@ -98,7 +98,7 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
 
     $where = "WHERE pc.userid = ?
             AND pc.status <> ?";
-    if ($onlyrequiredlearning) {
+    if ($onlyprograms) {
         $where .= " AND p.certifid IS NULL";
     }
 
@@ -126,12 +126,12 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
  * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
  * @param bool $showhidden Whether to include hidden programs in records returned
- * @param bool $onlyrequiredlearning Only return required learning programs
+ * @param bool $onlyprograms Only return programs (excludes certifications)
  * @return array|int
  */
 function prog_get_required_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false, $showhidden=false,
-                                    $onlyrequiredlearning=true) {
-    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden, $onlyrequiredlearning);
+                                    $onlyprograms=true) {
+    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden, $onlyprograms);
 }
 
 /**
