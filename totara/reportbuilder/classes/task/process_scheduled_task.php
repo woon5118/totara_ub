@@ -42,7 +42,7 @@ class process_scheduled_task extends \core\task\scheduled_task {
      * Process Scheduled reports
      */
     public function execute() {
-        global $CFG, $DB;
+        global $CFG, $DB, $SESSION;
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
         require_once($CFG->dirroot . '/totara/reportbuilder/groupslib.php');
         require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
@@ -104,6 +104,11 @@ class process_scheduled_task extends \core\task\scheduled_task {
                 } else {
                     mtrace('Failed to send email for report ' . $report->id);
                 }
+
+                // Unset $SESSION->reportbuilder to ensure that scheduled reports don't have the incorrect
+                // filters applied to them. This is because filters are set in the session which means they
+                // get applied to all scheduled reports that are based on the same report.
+                unset($SESSION->reportbuilder);
 
                 // Restore original export setting if we have changed it because file export is disabled.
                 if ($report->exporttofilesystem != $origexportsetting) {
