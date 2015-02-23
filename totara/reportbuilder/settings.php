@@ -35,9 +35,19 @@ $rb = new admin_settingpage('rbsettings',
                             new lang_string('globalsettings','totara_reportbuilder'),
                             array('totara/reportbuilder:managereports'));
 
+// We want the following exports options to be default.
+$defaultoptions = array(
+    'xls',
+    'csv',
+    'ods',
+    'pdf_portrait',
+    'pdf_landscape'
+);
 foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
     $formatbyname[$code] = new lang_string('export' . $option, 'totara_reportbuilder');
-    $defaultformats[$code] = 1;
+    if (in_array($option, $defaultoptions)) {
+        $defaultformats[$code] = 1;
+    }
 }
 
 $rb->add(new admin_setting_configmulticheckbox('reportbuilder/exportoptions', new lang_string('exportoptions', 'totara_reportbuilder'),
