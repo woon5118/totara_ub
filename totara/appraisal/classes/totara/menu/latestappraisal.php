@@ -49,15 +49,21 @@ class latestappraisal extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/appraisal/lib.php');
         if (!totara_feature_visible('appraisals')) {
             return menu::HIDE_ALWAYS;
         }
         if (\appraisal::can_view_own_appraisals($USER->id)) {
-            return menu::SHOW_ALWAYS;
+            $cache = menu::SHOW_ALWAYS;
         } else {
-            return menu::HIDE_ALWAYS;
+            $cache = menu::HIDE_ALWAYS;
         }
+        return $cache;
     }
 
     protected function get_default_parent() {

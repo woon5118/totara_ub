@@ -112,12 +112,20 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
         $defaultcat = $CFG->defaultrequestcategory;
         $catcontext = context_coursecat::instance($defaultcat);
 
+        $buttons = "";
+
+        // Show the course request button, if it is enabled (returns empty string if not).
+        ob_start();
+        print_course_request_buttons(context_system::instance());
+        $buttons .= ob_get_contents();
+        ob_end_clean();
+
         if (has_capability('moodle/course:create', $catcontext)) {
             $createurl = new moodle_url("/course/edit.php", array('category' => $defaultcat));
             $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get');
-            return $OUTPUT->render($createbutton);
+            $buttons .= $OUTPUT->render($createbutton);
         }
 
-        return false;
+        return $buttons;
     }
 }

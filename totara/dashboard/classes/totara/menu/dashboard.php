@@ -50,11 +50,18 @@ class dashboard extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
         if (get_home_page() != HOMEPAGE_TOTARA_DASHBOARD && count(\totara_dashboard::get_user_dashboards($USER->id))) {
-            return menu::SHOW_ALWAYS;
+            $cache = menu::SHOW_ALWAYS;
+        } else {
+            $cache = menu::HIDE_ALWAYS;
         }
-        return menu::HIDE_ALWAYS;
+        return $cache;
     }
 }

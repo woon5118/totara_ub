@@ -46,10 +46,16 @@ class myteam extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
-        if ($staff = totara_get_staff() || is_siteadmin()) {
-            return menu::SHOW_ALWAYS;
-        } else {
-            return menu::HIDE_ALWAYS;
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
         }
+
+        if ($staff = totara_get_staff() || is_siteadmin()) {
+            $cache = menu::SHOW_ALWAYS;
+        } else {
+            $cache = menu::HIDE_ALWAYS;
+        }
+        return $cache;
     }
 }

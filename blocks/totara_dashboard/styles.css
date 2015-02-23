@@ -1,7 +1,4 @@
-.dir-rtl .block_totara_dashboard .name {
-    float: right;
-}
-
+.dir-rtl .block_totara_dashboard ul,
 .block_totara_dashboard ul {
     list-style-type: none;
     margin: 0;

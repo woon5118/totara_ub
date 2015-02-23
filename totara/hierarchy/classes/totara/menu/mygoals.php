@@ -49,12 +49,18 @@ class mygoals extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
         if (totara_feature_visible('goals') && \goal::can_view_goals($USER->id)) {
-            return menu::SHOW_ALWAYS;
+            $cache = menu::SHOW_ALWAYS;
         } else {
-            return menu::HIDE_ALWAYS;
+            $cache = menu::HIDE_ALWAYS;
         }
+        return $cache;
     }
 
     protected function get_default_parent() {

@@ -71,22 +71,33 @@ class appraisal extends \totara_core\totara\menu\item {
     protected function check_visibility() {
         global $CFG, $USER;
 
+        static $cache = null;
+        if (isset($cache)) {
+            return $cache;
+        }
+
         require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 
-        $isappraisalenabled = totara_feature_visible('appraisals');
-        $viewownappraisals = $isappraisalenabled && \appraisal::can_view_own_appraisals($USER->id);
-        $viewappraisals = $isappraisalenabled && ($viewownappraisals || \appraisal::can_view_staff_appraisals($USER->id));
-
-        $feedbackmenu = new \totara_feedback360\totara\menu\feedback360(array());
-        $viewfeedback = $feedbackmenu->get_visibility();
-
+        // Start checking from least consuming requests.
         $goalmenu = new \totara_hierarchy\totara\menu\mygoals(array());
-        $viewgoals = $goalmenu->get_visibility();
+        $show = $goalmenu->get_visibility();
 
-        if ($viewappraisals || $viewfeedback || $viewgoals) {
-            return menu::SHOW_ALWAYS;
-        } else {
-            return menu::HIDE_ALWAYS;
+        if (!$show) {
+            $feedbackmenu = new \totara_feedback360\totara\menu\feedback360(array());
+            $show = $feedbackmenu->get_visibility();
         }
+
+        if (!$show) {
+            $isappraisalenabled = totara_feature_visible('appraisals');
+            $show = $isappraisalenabled &&
+                (\appraisal::can_view_own_appraisals($USER->id) || \appraisal::can_view_staff_appraisals($USER->id));
+        }
+
+        if ($show) {
+            $cache = menu::SHOW_ALWAYS;
+        } else {
+            $cache = menu::HIDE_ALWAYS;
+        }
+        return $cache;
     }
 }

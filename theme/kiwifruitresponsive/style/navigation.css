@@ -65,6 +65,17 @@ select.langmenu {
 div#totaramenu {
     clear: none;
 }
+
+@media screen and (max-width: 979px) {
+    div#totaramenu {
+        clear: both;
+    }
+
+    div#totaramenu ul li.selected {
+        margin-top: 2px;
+    }
+}
+
 div#totaramenu ul li,
 .dir-rtl div#totaramenu ul li {
     /* .dir-rtl needed here as otherwise it gets overwritten from standard totara responsive */
@@ -344,9 +355,16 @@ div#custommenu ul li ul ul li {
     background:transparent;
 }
 #main-menu .btn-navbar {
-    float: right;
-    margin: 20px 5px 0 0;
-    padding-top: 8px
+    display: none;
+}
+
+@media screen and (max-width: 979px) {
+    #main-menu .btn-navbar {
+        display: block;
+        float: right;
+        margin: 20px 5px 0 0;
+        padding-top: 8px
+    }
 }
 
 .dir-rtl #main-menu .btn-navbar {

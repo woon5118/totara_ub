@@ -149,6 +149,7 @@ class totara_sync_element_user extends totara_sync_element {
 
         $invalidids = $this->check_sanity($synctable, $synctable_clone);
         $issane = (empty($invalidids) ? true : false);
+        $problemswhileapplying = false;
 
         // Delete obsolete users.
         if (!empty($this->config->allow_delete)) {
@@ -175,7 +176,10 @@ class totara_sync_element_user extends totara_sync_element {
                             $this->addlog(get_string('deleteduserx', 'tool_totara_sync', $user->idnumber), 'info', 'deleteuser');
                         }
                     } catch (Exception $e) {
-                        throw new totara_sync_exception('user', 'deleteuser', 'cannotdeleteuserx', $user->idnumber, $e->getMessage());
+                        $this->addlog(get_string('cannotdeleteuserx', 'tool_totara_sync', $user->idnumber) . ': ' .
+                                $e->getMessage(), 'warn', 'deleteuser');
+                        $problemswhileapplying = true;
+                        continue; // Continue processing users.
                     }
                 }
                 $rs->close();
@@ -223,7 +227,10 @@ class totara_sync_element_user extends totara_sync_element {
                         $this->create_user($suser);
                         $this->addlog(get_string('createduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'createuser');
                     } catch (Exception $e) {
-                        $this->addlog(get_string('cannotcreateuserx', 'tool_totara_sync', $suser->idnumber), 'error', 'createuser');
+                        $this->addlog(get_string('cannotcreateuserx', 'tool_totara_sync', $suser->idnumber) . ': ' .
+                                $e->getMessage(), 'error', 'createuser');
+                        $problemswhileapplying = true;
+                        continue; // Continue processing users.
                     }
                 }
                 $rscreateaccounts->close(); // Free memory.
@@ -260,22 +267,24 @@ class totara_sync_element_user extends totara_sync_element {
                         $this->addlog(get_string('reviveduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
                     } else {
                         $this->addlog(get_string('cannotreviveuserx', 'tool_totara_sync', $suser->idnumber), 'warn', 'updateusers');
+                        $problemswhileapplying = true;
+                        // Try to continue with other operations to this user.
                     }
                 }
 
                 // Check if the user is going to be suspended before updating the $user object.
                 $suspenduser = $user->suspended == 0 && (isset($suser->suspended) && $suser->suspended == 1);
 
-                $transaction = $DB->start_delegated_transaction();
-
                 // Update user.
                 $this->set_sync_user_fields($user, $suser);
 
                 try {
                     $DB->update_record('user', $user);
-                } catch (dml_exception $e) {
-                    $transaction->rollback($e);
-                    throw new totara_sync_exception('user', 'updateusers', 'cannotupdateuserx', $user->idnumber, $e->getMessage());
+                } catch (Exception $e) {
+                    $this->addlog(get_string('cannotupdateuserx', 'tool_totara_sync', $suser->idnumber) . ': ' .
+                            $e->getMessage(), 'warn', 'updateusers');
+                    $problemswhileapplying = true;
+                    // Try to continue with other operations to this user.
                 }
 
                 // Update user password.
@@ -283,10 +292,16 @@ class totara_sync_element_user extends totara_sync_element {
                     $userauth = get_auth_plugin(strtolower($user->auth));
                     if ($userauth->can_change_password()) {
                         if (!$userauth->user_update_password($user, $suser->password)) {
-                            $this->addlog(get_string('cannotsetuserpassword', 'tool_totara_sync', $user->idnumber), 'warn', 'updateusers');
+                            $this->addlog(get_string('cannotsetuserpassword', 'tool_totara_sync', $user->idnumber),
+                                    'warn', 'updateusers');
+                            $problemswhileapplying = true;
+                            // Try to continue with other operations to this user.
                         }
                     } else {
-                        $this->addlog(get_string('cannotsetuserpasswordnoauthsupport', 'tool_totara_sync', $user->idnumber), 'warn', 'updateusers');
+                        $this->addlog(get_string('cannotsetuserpasswordnoauthsupport', 'tool_totara_sync', $user->idnumber),
+                                'warn', 'updateusers');
+                        $problemswhileapplying = true;
+                        // Try to continue with other operations to this user.
                     }
                     unset($userauth);
                 }
@@ -297,8 +312,6 @@ class totara_sync_element_user extends totara_sync_element {
                 $user = $this->put_custom_field_data($user, $suser);
 
                 $this->addlog(get_string('updateduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
-
-                $transaction->allow_commit();
 
                 \core\event\user_updated::create_from_userid($user->id)->trigger();
 
@@ -316,7 +329,10 @@ class totara_sync_element_user extends totara_sync_element {
             try {
                 $this->sync_user_assignments($suser->uid, $suser);
             } catch (Exception $e) {
-                throw new totara_sync_exception('user', 'syncuserassignments', 'cannotcreateuserassignments', $suser->idnumber, $e->getMessage());
+                $this->addlog(get_string('cannotcreateuserassignments', 'tool_totara_sync', $suser->idnumber) . ': ' .
+                        $e->getMessage(), 'warn', 'updateusers');
+                $problemswhileapplying = true;
+                continue; // Continue processing users.
             }
         }
         // Free memory used by user assignment array.
@@ -325,7 +341,7 @@ class totara_sync_element_user extends totara_sync_element {
         $this->get_source()->drop_table();
         $this->addlog(get_string('syncfinished', 'tool_totara_sync'), 'info', 'usersync');
 
-        return $issane;
+        return $issane && !$problemswhileapplying;
     }
 
     /**
@@ -356,11 +372,17 @@ class totara_sync_element_user extends totara_sync_element {
         try {
             $user->id = $DB->insert_record('user', $user);  // Insert user.
         } catch (Exception $e) {
-            $transaction->rollback($e);
-            throw new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $user->idnumber);
+            // Throws exception which will be captured by caller.
+            $transaction->rollback(new totara_sync_exception('user', 'createusers', 'cannotcreateuserx', $user->idnumber));
         }
 
-        $userauth = get_auth_plugin(strtolower($user->auth));
+        try {
+            $userauth = get_auth_plugin(strtolower($user->auth));
+        } catch (Exception $e) {
+            // Throws exception which will be captured by caller.
+            $transaction->rollback(new totara_sync_exception('user', 'createusers', 'invalidauthforuserx', $user->auth));
+        }
+
         if ($userauth->can_change_password()) {
             if (!isset($suser->password) || trim($suser->password) === '') {
                 // Tag for password generation.

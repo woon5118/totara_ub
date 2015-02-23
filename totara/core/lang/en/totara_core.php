@@ -24,6 +24,8 @@
  * these should be called like get_string('key', 'totara_core');
  */
 
+$string['activitycompletionunlockedtext'] = 'When you save changes, completion state for all students who have completed this activity will be erased. If you change your mind about this, do not save the form.';
+$string['activitycompletionunlockednoresettext'] = 'Completion has been unlocked without deleting activity completion data. After this change different users may have received their completion status for different reasons.';
 $string['addanothercolumn'] = 'Add another column...';
 $string['allf2fbookings'] = 'All Face to Face Bookings';
 $string['alllearningrecords'] = 'All Learning Records';
@@ -56,6 +58,9 @@ If the name you are looking for does not appear in the list, it might be that th
 $string['column'] = 'Column';
 $string['competency_typeicon'] = 'Competency type icon';
 $string['completed'] = 'Completed';
+$string['completedwarningtext'] = 'Modifying activity completion criteria after some users have already completed the activity is not recommended as it can lead to different users being marked as completed for different reasons.<br />
+At this point you can choose to delete all completion records for users who have achieved completion in either this activity or this course. Their completion status for both this activity and this course will be recalculated next time cron runs and they may be marked as complete again.<br />
+Alternatively you can choose to keep all existing completion records and accept that different users may have received their status for different accomplishments.';
 $string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
 $string['configenhancedcatalog'] = 'This setting allows you to specify if the enhanced catalog appears when clicking on \'Find Learning\' or any of the menu options under \'Find Learning\'.
     The enhanced catalog supports faceted search by multiple criteria using custom fields instead of relying on a single category.
@@ -522,6 +527,8 @@ $string['undeletedx'] = 'Undeleted {$a}';
 $string['undeleteuser'] = 'Undelete User';
 $string['undeleteusernoperm'] = 'You do not have the required permission to undelete a user';
 $string['unexpected_installer_result'] = 'Unspecified component install error: {$a}';
+$string['unlockcompletion'] = 'Unlock completion and delete completion data';
+$string['unlockcompletionnoreset'] = 'Unlock completion and keep completion data';
 $string['unsupported_branch_text'] = 'The version you are using ({$a})  is no longer supported. That means that bugs and security issues are no longer being fixed. You should upgrade to a supported version (such as [[CURRENT_MAJOR_VERSION]]) as soon as possible';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
 $string['uploadcompletionrecords'] = 'Upload completion records';

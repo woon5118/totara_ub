@@ -1612,9 +1612,10 @@ class appraisal {
      * Check if user is able to see any appraisals for their staff.
      *
      * @param int $userid
+     * @param bool $forcereload Do not use static cache
      * @return bool
      */
-    public static function can_view_staff_appraisals($userid = null) {
+    public static function can_view_staff_appraisals($userid = null, $forcereload = false) {
         global $USER, $DB;
 
         if (!isloggedin()) {
@@ -1623,6 +1624,11 @@ class appraisal {
 
         if (!$userid) {
             $userid = $USER->id;
+        }
+
+        static $cache = array();
+        if (!$forcereload && isset($cache[$userid])) {
+            return $cache[$userid];
         }
 
         $sql = "SELECT COUNT(ara.id)
@@ -1635,7 +1641,8 @@ class appraisal {
                    AND ara.userid = ?";
         $count = $DB->count_records_sql($sql, array(self::STATUS_DRAFT, $userid));
 
-        return ($count > 0);
+        $cache[$userid] = ($count > 0);
+        return $cache[$userid];
     }
 
 
@@ -1643,9 +1650,10 @@ class appraisal {
      * Check if user is able to see any appraisals as a learner.
      *
      * @param int $userid
+     * @param bool $forcereload Do not use static cache
      * @return bool
      */
-    public static function can_view_own_appraisals($userid = null) {
+    public static function can_view_own_appraisals($userid = null, $forcereload = false) {
         global $USER, $DB;
 
         if (!isloggedin()) {
@@ -1654,6 +1662,11 @@ class appraisal {
 
         if (!$userid) {
             $userid = $USER->id;
+        }
+
+        static $cache = array();
+        if (!$forcereload && isset($cache[$userid])) {
+            return $cache[$userid];
         }
 
         $sql = "SELECT COUNT(aua.id)
@@ -1668,7 +1681,8 @@ class appraisal {
                    AND ara.appraisalrole = ?";
         $count = $DB->count_records_sql($sql, array(self::STATUS_DRAFT, $userid, $userid, self::ROLE_LEARNER));
 
-        return ($count > 0);
+        $cache[$userid] = ($count > 0);
+        return $cache[$userid];
     }
 
 

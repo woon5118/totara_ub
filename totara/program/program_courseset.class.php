@@ -171,6 +171,30 @@ abstract class course_set {
     }
 
     /**
+     * Returns a html string with warnings or blank if none
+     *
+     * @global object $DB
+     * @param object $course
+     * @return string html content
+     */
+   protected function get_course_warnings($course) {
+       global $DB, $OUTPUT;
+
+       $content = '';
+       $modinfo = get_fast_modinfo($course);
+       if (!empty($modinfo->instances['facetoface'])) {
+           // Is facetoface multiple session set to true?
+           $facetofaceids = array_keys($modinfo->get_instances_of('facetoface'));
+           list($sql, $params) = $DB->get_in_or_equal($facetofaceids);
+
+           if ($DB->record_exists_select('facetoface', 'multiplesessions = 0 AND id ' . $sql, $params)) {
+               $content .= $OUTPUT->notification(get_string('multiplefacetofacewarning', 'totara_program'), 'notifyproblem');
+           }
+       }
+       return $content;
+   }
+
+    /**
      * Returns true or false depending on whether or not this course set
      * contains the specified course
      *
@@ -1531,30 +1555,6 @@ class multi_course_set extends course_set {
         else {
             return get_string('onecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
         }
-    }
-
-    /**
-     * Returns a html string with warnings or blank if none
-     *
-     * @global object $DB
-     * @param object $course
-     * @return string html content
-     */
-    private function get_course_warnings($course) {
-        global $DB, $OUTPUT;
-
-        $content = '';
-        $modinfo = get_fast_modinfo($course);
-        if (!empty($modinfo->instances['facetoface'])) {
-            // Is facetoface multiple session set to true?
-            $facetofaceids = array_keys($modinfo->get_instances_of('facetoface'));
-            list($sql, $params) = $DB->get_in_or_equal($facetofaceids);
-
-            if ($DB->record_exists_select('facetoface', 'multiplesessions = 0 AND id ' . $sql, $params)) {
-                $content .= $OUTPUT->notification(get_string('multiplefacetofacewarning', 'totara_program'), 'notifyproblem');
-            }
-        }
-        return $content;
     }
 }
 
