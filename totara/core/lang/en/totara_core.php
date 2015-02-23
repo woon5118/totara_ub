@@ -91,7 +91,7 @@ $string['courseprogress'] = 'Course progress';
 $string['courseprogresshelp'] = 'This specifies if the course progress block appears on the homepage';
 $string['coursetype'] = 'Course Type';
 $string['csvdateformat'] = 'CSV Import date format';
-$string['csvdateformatconfig'] = 'Date format to be used in CSV imports like user uploads with date custom profile fields, or Totara Sync.
+$string['csvdateformatconfig'] = 'Date format to be used in CSV imports like user uploads with date custom profile fields, or HR Import.
 
 The date format should be compatible with the formats defined in the <a target="_blank" href="http://www.php.net/manual/en/datetime.createfromformat.php">PHP DateTime class</a>
 
@@ -160,7 +160,7 @@ $string['editheading'] = 'Edit the Report Heading Block';
 $string['edition'] = 'Edition';
 $string['elearning'] = 'E-learning';
 $string['elementlibrary'] = 'Element Library';
-$string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update Totara Sync for {$a}';
+$string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
 $string['enabletempmanagers'] = 'Enable temporary managers';
 $string['enabletempmanagersdesc'] = 'Enable functionality that allows for assigning a temporary manager to a user. Disabling this will cause all current temporary managers to be unassigned on next cron run.';
 $string['enhancedcatalog'] = 'Enhanced catalog';
@@ -188,7 +188,7 @@ $string['error:datenotinfuture'] = 'The date needs to be in the future';
 $string['error:dialognotreeitems'] = 'No items available';
 $string['error:duplicaterecordsdeleted'] = 'Duplicate {$a} record deleted: ';
 $string['error:duplicaterecordsfound'] = '{$a->count} duplicate record(s) found in the {$a->tablename} table...fixing (see error log for details)';
-$string['error:emptyidnumberwithsync'] = 'Totara Sync is enabled but the ID number field is empty. Either disable sync for this user or provide a valid ID number.';
+$string['error:emptyidnumberwithsync'] = 'HR Import is enabled but the ID number field is empty. Either disable HR Import for this user or provide a valid ID number.';
 $string['error:findingmenuitem'] = 'Error finding the menu item';
 $string['error:importtimezonesfailed'] = 'Failed to update timezone information.';
 $string['error:itemhaschildren'] = 'You cannot change the parent of this item while it has children. Please move this items children first.';
@@ -483,10 +483,10 @@ $string['tempmanagerselectionallusers'] = 'All users';
 $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['timecompleted'] = 'Time completed';
-$string['toggletotarasync'] = 'Toggle Totara sync';
-$string['toggletotarasyncerror'] = 'Could not enable/disable the totara sync field for user {$a}';
-$string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so totara sync cannot be enabled for these users: {$a}';
-$string['tooltotarasynctask'] = 'Sync Totara elements with external sources';
+$string['toggletotarasync'] = 'Toggle HR Import';
+$string['toggletotarasyncerror'] = 'Could not enable/disable the HR Import field for user {$a}';
+$string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so HR Import cannot be enabled for these users: {$a}';
+$string['tooltotarasynctask'] = 'Import HR elements from external sources';
 $string['totarabuild'] = 'Totara build number';
 $string['totaracopyright'] = '<p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> is a distribution of Moodle. A "distro" or distribution is a ready-made extended version of the standard product with its own particular focus and vision. Totara is specifically designed for the requirements of corporate, industry and vocational training in contrast to standard Moodle\'s traditional educational setting.</p><p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> extensions are Copyright &copy; 2010 onwards, Totara Learning Solutions Limited.</p>';
 $string['totaracore'] = 'Totara core';

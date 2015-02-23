@@ -21,5 +21,5 @@
  * @subpackage totara_sync
  */
 
-$string['sourcetitle'] = 'Totara Sync Log';
-$string['type_totara_sync_log'] = 'Totara Sync Log';
+$string['sourcetitle'] = 'HR Import Log';
+$string['type_totara_sync_log'] = 'HR Import Log';

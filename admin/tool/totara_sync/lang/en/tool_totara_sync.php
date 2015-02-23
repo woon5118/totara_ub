@@ -21,31 +21,31 @@
  * @package totara
  * @subpackage totara_sync
  */
-$string['pluginname'] = 'Totara sync';
+$string['pluginname'] = 'HR Import';
 
-$string['sync'] = 'Sync';
-$string['totarasync'] = 'Totara sync';
-$string['totarasync_help'] = 'Enabling Totara syncing will cause the element to be updated/deleted (synced) from an external source (if configured). The idnumber field MUST have a value to enable this field.
-See the Sync settings in the Administration menu.';
-$string['totara_sync:manage'] = 'Manage Totara sync';
-$string['totara_sync:runsync'] = 'Run Totara sync via the web interface';
-$string['totara_sync:setfileaccess'] = 'Set Totara sync file access';
-$string['totara_sync:manageuser'] = 'Manage Totara sync users';
-$string['totara_sync:manageorg'] = 'Manage Totara sync organisations';
-$string['totara_sync:managepos'] = 'Manage Totara sync positions';
-$string['totara_sync:uploaduser'] = 'Upload Totara sync users';
-$string['totara_sync:uploadorg'] = 'Upload Totara sync organisations';
-$string['totara_sync:uploadpos'] = 'Upload Totara sync positions';
-$string['totara_sync:deletesynclog'] = 'Clear the sync logs';
+$string['sync'] = 'Import';
+$string['totarasync'] = 'HR Import';
+$string['totarasync_help'] = 'Enabling HR Import will cause the element to be updated/deleted from an external source (if configured). The idnumber field MUST have a value to enable this field.
+See the HR Import settings in the Administration menu.';
+$string['totara_sync:manage'] = 'Manage HR Import';
+$string['totara_sync:runsync'] = 'Run HR Import via the web interface';
+$string['totara_sync:setfileaccess'] = 'Set HR Import file access';
+$string['totara_sync:manageuser'] = 'Manage HR Import users';
+$string['totara_sync:manageorg'] = 'Manage HR Import organisations';
+$string['totara_sync:managepos'] = 'Manage HR Import positions';
+$string['totara_sync:uploaduser'] = 'Upload HR Import users';
+$string['totara_sync:uploadorg'] = 'Upload HR Import organisations';
+$string['totara_sync:uploadpos'] = 'Upload HR Import positions';
+$string['totara_sync:deletesynclog'] = 'Clear the HR Import Logs';
 $string['settingssaved'] = 'Settings saved';
 $string['elementenabled'] = 'Element enabled';
 $string['elementdisabled'] = 'Element disabled';
-$string['uploadsuccess'] = 'Sync files uploaded successfully';
+$string['uploadsuccess'] = 'HR Import files uploaded successfully';
 $string['uploaderror'] = 'The was a problem with uploading the file(s)...';
-$string['uploadaccessdenied'] = 'Your Totara Sync configuration is set to look for files in a server directory, not to use uploaded files. To change this go {$a}';
+$string['uploadaccessdenied'] = 'Your HR Import configuration is set to look for files in a server directory, not to use uploaded files. To change this go {$a}';
 $string['uploadaccessdeniedlink'] = 'here';
 $string['couldnotmakedirsforx'] = 'Could not make necessary directories for {$a}';
-$string['note:syncfilepending'] = 'NOTE: A pending sync file exists. Uploading another file now will overwrite the pending one.';
+$string['note:syncfilepending'] = 'NOTE: A pending HR Import file exists. Uploading another file now will overwrite the pending one.';
 //
 // Elements
 //
@@ -53,7 +53,7 @@ $string['element'] = 'Element';
 $string['elements'] = 'Elements';
 $string['elementnotfound'] = 'Element not found';
 $string['manageelements'] = 'Manage elements';
-$string['managesyncelements'] = 'Manage sync elements';
+$string['managesyncelements'] = 'Manage HR Import elements';
 $string['noenabledelements'] = 'No enabled elements';
 $string['elementxnotfound'] = 'Element {$a} not found';
 $string['notadirerror'] = 'Directory \'{$a}\' does not exist or not accessible';
@@ -66,24 +66,24 @@ $string['settings:org'] = 'Organisation element settings';
 $string['displayname:pos'] = 'Position';
 $string['settings:pos'] = 'Position element settings';
 $string['removeitems'] = 'Remove items';
-$string['removeitemsdesc'] = 'Specify what to do with internal items during sync when item was removed from source.';
+$string['removeitemsdesc'] = 'Specify what to do with internal items during HR Import when item was removed from source.';
 
 // User
 $string['displayname:user'] = 'User';
 $string['settings:user'] = 'User element settings';
 $string['deleted'] = 'Deleted';
 $string['sourceallrecords'] = 'Source contains all records';
-$string['sourceallrecordsdesc'] = 'Does the source provide all sync records, everytime <strong>OR</strong> are only records that need to be updated/deleted provided? If "No" (only records to be updated/deleted), then the source must use the <strong>"delete" flag</strong>.';
+$string['sourceallrecordsdesc'] = 'Does the source provide all HR Import records, everytime <strong>OR</strong> are only records that need to be updated/deleted provided? If "No" (only records to be updated/deleted), then the source must use the <strong>"delete" flag</strong>.';
 $string['allowduplicatedemails'] = 'Allow duplicate emails';
 $string['allowduplicatedemailsdesc'] = 'If "Yes" duplicated emails are allowed from the source. If "No" only unique emails are allowed.';
 $string['defaultemailaddress'] = 'Default Email Address';
-$string['emailsettingsdesc'] = 'If duplicate emails are allowed you can set a default email address that will be used when syncing users with a blank or invalid email. If duplicates are not allowed every user must have a unique email, if they do not they will be skipped.';
-$string['ignoreexistingpass'] = 'Only sync new users\' passwords';
+$string['emailsettingsdesc'] = 'If duplicate emails are allowed you can set a default email address that will be used when creating/updating users with a blank or invalid email. If duplicates are not allowed every user must have a unique email, if they do not they will be skipped.';
+$string['ignoreexistingpass'] = 'Only import new users\' passwords';
 $string['ignoreexistingpassdesc'] = 'If "Yes" passwords are only updated for new users, if "No" all users\' passwords are updated';
 $string['forcepwchange'] = 'Force password change for new users';
 $string['forcepwchangedesc'] = 'If "yes" new users have their password set but are forced to change it on first login';
 $string['checkuserconfig'] = 'These settings change the expected <a href=\'{$a}\'>source configuration</a>. You should check the format of your data source matches the new source configuration';
-$string['allowedactions'] = 'Allowed sync actions';
+$string['allowedactions'] = 'Allowed HR Import actions';
 $string['create'] = 'Create';
 $string['delete'] = 'Delete';
 $string['keep'] = 'Keep';
@@ -102,7 +102,7 @@ $string['nosources'] = 'No sources';
 $string['filedetails'] = 'File details';
 $string['nameandloc'] = 'Name and location';
 $string['fieldmappings'] = 'Field mappings';
-$string['uploadsyncfiles'] = 'Upload sync files';
+$string['uploadsyncfiles'] = 'Upload HR Import files';
 $string['sourcedoesnotusefiles'] = 'Source does not use files';
 $string['nosourceconfig'] = 'No source configuration for \'{$a}\'';
 $string['sourceconfigured'] = 'Source has configuration';
@@ -177,21 +177,21 @@ $string['dbtestconnectsuccess'] = 'Successfully connected to database';
 $string['dbtestconnectfail'] = 'Failed to connect to database';
 
 $string['dbconnectiondetails'] = 'Please enter database connection details.';
-$string['selectfieldsdb'] = 'Please select some fields to sync by checking the boxes below.';
+$string['selectfieldsdb'] = 'Please select some fields to import by checking the boxes below.';
 $string['tablemustincludexdb'] = 'The table "{$a}" must contain the following fields:';
 
 ///
 /// Log messages
 ///
-$string['syncnotconfiguredsummary'] = 'Sync is not configured properly. Please, fix the issues before running sync: {$a}';
-$string['syncnotconfigured'] = 'Sync is not configured properly. Please, fix the issues before running sync.';
+$string['syncnotconfiguredsummary'] = 'HR Import is not configured properly. Please, fix the issues before running: {$a}';
+$string['syncnotconfigured'] = 'HR Import is not configured properly. Please, fix the issues before running.';
 $string['temptableprepfail'] = 'temp table preparation failed';
 $string['temptablecreatefail'] = 'error creating temp table';
 $string['nocsvfilepath'] = 'no CSV filepath specified';
-$string['nofilesdir'] = 'No sync files directory configured';
-$string['nofiletosync'] = 'No file to sync (file path: {$a})';
-$string['nofileuploaded'] = 'No file was uploaded for {$a} sync';
-$string['nochangesskippingsync'] = 'no changes, skipping sync';
+$string['nofilesdir'] = 'No HR Import files directory configured';
+$string['nofiletosync'] = 'No file to import (file path: {$a})';
+$string['nofileuploaded'] = 'No file was uploaded for {$a} import';
+$string['nochangesskippingsync'] = 'no changes, skipping import';
 $string['cannotopenx'] = 'cannot open {$a}';
 $string['cannotreadx'] = 'cannot read {$a}';
 $string['csvnotvalidmissingfieldx'] = 'CSV file not valid, missing field "{$a}"';
@@ -199,8 +199,8 @@ $string['csvnotvalidmissingfieldxmappingx'] = 'CSV file not valid, missing field
 $string['csvnotvalidinvalidchars'] = 'CSV file not valid. It contains invalid characters ("{$a->invalidchars}"). Fields in a CSV file must be separated by a selected delimiter ("{$a->delimiter}").';
 $string['couldnotimportallrecords'] = 'could not import all records';
 $string['lengthlimitexceeded'] = 'value "{$a->value}" is too long for "{$a->field}" field. It cannot be longer than {$a->length} characters. Skipped {$a->source} {$a->idnumber}';
-$string['syncstarted'] = 'sync started';
-$string['syncfinished'] = 'sync finished';
+$string['syncstarted'] = 'HR Import started';
+$string['syncfinished'] = 'HR Import finished';
 $string['couldnotgetsourcetable'] = 'could not get source table, aborting...';
 $string['couldnotcreateclonetable'] = 'could not create clone table, aborting...';
 $string['sanitycheckfailed'] = 'sanity check failed, aborting...';
@@ -208,14 +208,14 @@ $string['cannotdeletex'] = 'cannot delete {$a} (might already be deleted)';
 $string['deletedx'] = 'deleted {$a}';
 $string['frameworkxnotfound'] = 'framework {$a} not found...';
 $string['parentxnotfound'] = 'parent {$a} not found...';
-$string['cannotsyncitemparent'] = 'cannot sync item\'s parent {$a}';
+$string['cannotsyncitemparent'] = 'cannot import item\'s parent {$a}';
 $string['cannotcreatex'] = 'cannot create {$a}';
 $string['cannotcreatedirx'] = 'cannot create directory: {$a}';
 $string['createdx'] = 'created {$a}';
 $string['cannotupdatex'] = 'cannot update {$a}';
 $string['updatedx'] = 'updated {$a}';
 $string['frameworkxnotexist'] = 'framework {$a} does not exist';
-$string['parentxnotexistinfile'] = 'parent {$a} does not exist in sync file';
+$string['parentxnotexistinfile'] = 'parent {$a} does not exist in HR Import file';
 $string['typexnotexist'] = 'type {$a} does not exist';
 $string['circularreferror'] = 'circular reference error between items {$a->naughtynodes}';
 $string['customfieldsnotype'] = 'custom fields specified, but no type {$a}';
@@ -223,7 +223,7 @@ $string['typexnotfound'] = 'type {$a} not found...';
 $string['customfieldnotexist'] = 'custom field {$a->shortname} does not exist (type:{$a->typeidnumber})';
 $string['cannotdeleteuserx'] = 'cannot delete user {$a}';
 $string['deleteduserx'] = 'deleted user {$a}';
-$string['syncaborted'] = 'sync aborted';
+$string['syncaborted'] = 'HR Import aborted';
 $string['cannotupdateuserx'] = 'cannot update user {$a}';
 $string['cannotsetuserpassword'] = 'cannot set user password (user:{$a})';
 $string['cannotsetuserpasswordnoauthsupport'] = 'cannot set user password (user:{$a}), auth plugin does not support password changes';
@@ -261,22 +261,22 @@ $string['sourcefilexnotfound'] = 'Source file {$a} not found.';
 $string['sourceclassxnotfound'] = 'Source class {$a} not found. This must be fixed by a programmer.';
 $string['nosourceenabled'] = 'No source enabled for this element.';
 
-$string['syncexecute'] = 'Run Sync';
-$string['runsynccronstart'] = 'Running totara_sync cron...';
+$string['syncexecute'] = 'Run HR Import';
+$string['runsynccronstart'] = 'Running HR Import cron...';
 $string['runsynccronend'] = 'Done!';
 $string['runsynccronendwithproblem'] = 'However, there have been some problems';
 $string['deleteallsynclog'] = 'Clear all records';
 $string['deletepartialsynclog'] = 'Clear all except latest records';
-$string['deleteallsynclogcheck'] = 'Are you absolutely sure you want to delete all the Totara Sync log records?';
-$string['deletepartialsynclogcheck'] = 'Are you absolutely sure you want to delete all the Totara Sync log records except for the most recent run?';
-$string['error:deletesynclogpermission'] = 'You do not have permission to delete sync log records!';
+$string['deleteallsynclogcheck'] = 'Are you absolutely sure you want to delete all the HR Import log records?';
+$string['deletepartialsynclogcheck'] = 'Are you absolutely sure you want to delete all the HR Import log records except for the most recent run?';
+$string['error:deletesynclogpermission'] = 'You do not have permission to delete HR Import Log records!';
 
 ///
-/// Totara sync log reports
+/// HR Import log reports
 ///
-$string['synclog'] = 'Sync log';
-$string['viewsynclog'] = 'View the results in the Sync Log <a href=\'{$a}\'>here</a>';
-$string['sourcetitle'] = 'Totara Sync Log';
+$string['synclog'] = 'HR Import Log';
+$string['viewsynclog'] = 'View the results in the HR Import Log <a href=\'{$a}\'>here</a>';
+$string['sourcetitle'] = 'HR Import Log';
 $string['datetime'] = 'Date/Time';
 $string['logtype'] = 'Log type';
 $string['error'] = 'Error';
@@ -292,13 +292,13 @@ $string['action'] = 'Action';
 $string['info'] = 'Info';
 
 ///
-/// Totara sync help strings
+/// HR Import help strings
 ///
 $string['country_help'] = "This should be formatted within the CSV as the 2 character code of the country. For example 'New Zealand' should be 'NZ'<br />
 see <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2\">http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2</a> for details";
-$string['fileaccess_help'] = '**Directory**: This option allows you to specify a directory on the server to be checked for sync files automatically
+$string['fileaccess_help'] = '**Directory**: This option allows you to specify a directory on the server to be checked for HR Import files automatically
 
-**Upload**: This option requires you to upload files via the \'upload sync files\' page under sources in site administration';
+**Upload**: This option requires you to upload files via the \'upload HR Import files\' page under sources in site administration';
 //Delimiter strings
 $string['delimiter'] = 'Delimiter';
 $string['comma'] = 'Comma (,)';
@@ -309,12 +309,12 @@ $string['pipe'] = 'Pipe (|)';
 
 $string['errorplural'] = 'Errors';
 $string['notifymessage'] = 'Server time: {$a->time}, Element: {$a->element}, Action: {$a->action}, {$a->logtype}: {$a->info}';
-$string['notifymessagestart'] = '{$a->count} new Totara sync log messages ({$a->logtypes}) since {$a->since}. See below for most recent messages:';
-$string['notifysubject'] = '{$a} :: Totara sync notification';
-$string['syncnotifications'] = 'Totara sync notifications';
-$string['viewsyncloghere'] = 'For more information, view the sync log at {$a}';
+$string['notifymessagestart'] = '{$a->count} new HR Import log messages ({$a->logtypes}) since {$a->since}. See below for most recent messages:';
+$string['notifysubject'] = '{$a} :: HR Import notification';
+$string['syncnotifications'] = 'HR Import notifications';
+$string['viewsyncloghere'] = 'For more information, view the HR Import Log at {$a}';
 $string['warnplural'] = 'Warnings';
-$string['enablescheduledsync'] = 'Enable scheduled syncing';
+$string['enablescheduledsync'] = 'Enable scheduled HR Importing';
 $string['files'] = 'Files';
 $string['filesdir'] = 'Files directory';
 $string['fileaccess'] = 'File Access';
@@ -330,4 +330,4 @@ $string['schedule'] = 'Schedule';
 $string['csvencoding'] = 'CSV file encoding';
 
 // Event.
-$string['eventsynccompleted'] = 'Totara sync completed';
+$string['eventsynccompleted'] = 'HR Import completed';
