@@ -132,7 +132,6 @@ $string['delete'] = 'Delete';
 $string['deleted'] = 'Deleted';
 $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?<br />All associated data, including but not limited to the following, will be deleted and is not recoverable:
 <ul>
-<li>course completion</li>
 <li>appraisals where the user is in the learner role</li>
 <li>grades</li>
 <li>tags</li>
