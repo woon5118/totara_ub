@@ -62,7 +62,7 @@ class rb_source_assign extends rb_base_source {
             // Join assignment grade.
             new rb_join(
                 'assign_grades',
-                'INNER',
+                'LEFT',
                 '{assign_grades}',
                 'assign.id = assign_grades.assignment AND base.userid = assign_grades.userid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
