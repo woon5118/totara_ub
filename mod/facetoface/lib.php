@@ -547,7 +547,7 @@ function cleanup_session_data($session) {
 function facetoface_add_session($session, $sessiondates) {
     global $USER, $DB;
 
-    $session->timecreated = time();
+    $session->timemodified = $session->timecreated = time();
     $session = cleanup_session_data($session);
 
     $session->id = $DB->insert_record('facetoface_sessions', $session);
