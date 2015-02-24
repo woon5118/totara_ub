@@ -62,6 +62,7 @@ class totara_program_messages_testcase extends advanced_testcase {
 
         unset_config('noemailever');
         $sink = $this->redirectEmails();
+        ob_start(); // Start a buffer to catch all the mtraces in the task.
 
         // Create 8 users.
         $this->assertEquals(2, $DB->count_records('user'));
@@ -131,5 +132,6 @@ class totara_program_messages_testcase extends advanced_testcase {
         // Check that they all had logs created.
         $this->assertEquals(10, $DB->count_records('prog_messagelog'));
 
+        ob_end_clean(); // Throw away the buffer content.
     }
 }
