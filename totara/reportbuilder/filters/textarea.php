@@ -33,8 +33,8 @@ class rb_filter_textarea extends rb_filter_type {
      * @return array of comparison operators
      */
     function getOperators() {
-        return array(0 => get_string('contains', 'filters'),
-                     1 => get_string('doesnotcontain', 'filters'),
+        return array(self::RB_FILTER_CONTAINS => get_string('contains', 'filters'),
+                     self::RB_FILTER_DOESNOTCONTAIN => get_string('doesnotcontain', 'filters'),
         );
     }
 
@@ -110,10 +110,10 @@ class rb_filter_textarea extends rb_filter_type {
         }
 
         switch($operator) {
-            case 0: // contains
+            case self::RB_FILTER_CONTAINS:
                 $keywords = totara_search_parse_keywords($value);
                 return search_get_keyword_where_clause($query, $keywords);
-            case 1: // does not contain
+            case self::RB_FILTER_DOESNOTCONTAIN:
                 $keywords = totara_search_parse_keywords($value);
                 return search_get_keyword_where_clause($query, $keywords, true);
             default:
@@ -139,8 +139,8 @@ class rb_filter_textarea extends rb_filter_type {
 
 
         switch ($operator) {
-            case 0: // contains
-            case 1: // doesn't contain
+            case self::RB_FILTER_CONTAINS:
+            case self::RB_FILTER_DOESNOTCONTAIN:
                 return get_string('textlabel', 'filters', $a);
         }
 

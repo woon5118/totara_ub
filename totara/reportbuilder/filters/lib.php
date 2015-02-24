@@ -30,6 +30,15 @@ class rb_filter_type {
     const RB_FILTER_REGION_STANDARD = 0;
     const RB_FILTER_REGION_SIDEBAR = 1;
 
+    // Constants for filter types.
+    const RB_FILTER_CONTAINS = 0;
+    const RB_FILTER_DOESNOTCONTAIN = 1;
+    const RB_FILTER_ISEQUALTO = 2;
+    const RB_FILTER_STARTSWITH = 3;
+    const RB_FILTER_ENDSWITH = 4;
+    const RB_FILTER_ISEMPTY = 5;
+    const RB_FILTER_ISNOTEMPTY = 6;
+
     public $type;
     public $value;
     public $advanced;

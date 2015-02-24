@@ -33,13 +33,13 @@ class rb_filter_text extends rb_filter_type {
      * @return array of comparison operators
      */
     function getOperators() {
-        return array(0 => get_string('contains', 'filters'),
-                     1 => get_string('doesnotcontain', 'filters'),
-                     2 => get_string('isequalto', 'filters'),
-                     3 => get_string('startswith', 'filters'),
-                     4 => get_string('endswith', 'filters'),
-                     5 => get_string('isempty', 'filters'),
-                     6 => get_string('isnotempty', 'totara_reportbuilder'));
+        return array(self::RB_FILTER_CONTAINS => get_string('contains', 'filters'),
+                     self::RB_FILTER_DOESNOTCONTAIN => get_string('doesnotcontain', 'filters'),
+                     self::RB_FILTER_ISEQUALTO => get_string('isequalto', 'filters'),
+                     self::RB_FILTER_STARTSWITH => get_string('startswith', 'filters'),
+                     self::RB_FILTER_ENDSWITH => get_string('endswith', 'filters'),
+                     self::RB_FILTER_ISEMPTY => get_string('isempty', 'filters'),
+                     self::RB_FILTER_ISNOTEMPTY => get_string('isnotempty', 'totara_reportbuilder'));
     }
 
     /**
@@ -60,8 +60,8 @@ class rb_filter_text extends rb_filter_type {
         $mform->setType($this->name, PARAM_TEXT);
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
         $mform->addHelpButton($grp->_name, 'filtertext', 'filters');
-        $mform->disabledIf($this->name, $this->name . '_op', 'eq', 5);
-        $mform->disabledIf($this->name, $this->name . '_op', 'eq', 6);
+        $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISEMPTY);
+        $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISNOTEMPTY);
         if ($advanced) {
             $mform->setAdvanced($this->name . '_grp');
         }
@@ -88,7 +88,7 @@ class rb_filter_text extends rb_filter_type {
         $operator = $field . '_op';
         $value = (isset($formdata->$field)) ? $formdata->$field : '';
         if (array_key_exists($operator, $formdata)) {
-            if ($formdata->$operator != 5 && $formdata->$operator != 6 && $value == '') {
+            if ($formdata->$operator != self::RB_FILTER_ISEMPTY && $formdata->$operator != self::RB_FILTER_ISNOTEMPTY && $value == '') {
                 // No data - no change except for empty and not empty filters.
                 return false;
             }
@@ -112,27 +112,27 @@ class rb_filter_text extends rb_filter_type {
         $value    = $data['value'];
         $query    = $this->get_field();
 
-        if ($operator != 5 && $operator != 6 && $value === '') {
+        if ($operator != self::RB_FILTER_ISEMPTY && $operator != self::RB_FILTER_ISNOTEMPTY && $value === '') {
             return array('', array());
         }
 
         switch($operator) {
-            case 0: // contains
+            case self::RB_FILTER_CONTAINS:
                 $keywords = totara_search_parse_keywords($value);
                 return search_get_keyword_where_clause($query, $keywords);
-            case 1: // does not contain
+            case self::RB_FILTER_DOESNOTCONTAIN:
                 $keywords = totara_search_parse_keywords($value);
                 list($sql, $params) = search_get_keyword_where_clause($query, $keywords, true);
                 return array("(({$query}) IS NULL OR {$sql})", $params);
-            case 2: // equal to
+            case self::RB_FILTER_ISEQUALTO:
                 return search_get_keyword_where_clause($query, array($value), false, 'equal');
-            case 3: // starts with
+            case self::RB_FILTER_STARTSWITH:
                 return search_get_keyword_where_clause($query, array($value), false, 'startswith');
-            case 4: // ends with
+            case self::RB_FILTER_ENDSWITH:
                 return search_get_keyword_where_clause($query, array($value), false, 'endswith');
-            case 5: // empty - may also be null
+            case self::RB_FILTER_ISEMPTY: // Empty - may also be null.
                 return array("({$query} = '' OR ({$query}) IS NULL)", array());
-            case 6: // Not empty (NOT NULL).
+            case self::RB_FILTER_ISNOTEMPTY: // Not empty (NOT NULL).
                 return array("({$query} != '' AND ({$query}) IS NOT NULL)", array());
             default:
                 return array('', array());
@@ -158,15 +158,15 @@ class rb_filter_text extends rb_filter_type {
 
 
         switch ($operator) {
-            case 0: // contains
-            case 1: // doesn't contain
-            case 2: // equal to
-            case 3: // starts with
-            case 4: // ends with
+            case self::RB_FILTER_CONTAINS:
+            case self::RB_FILTER_DOESNOTCONTAIN:
+            case self::RB_FILTER_ISEQUALTO:
+            case self::RB_FILTER_STARTSWITH:
+            case self::RB_FILTER_ENDSWITH:
                 return get_string('textlabel', 'filters', $a);
-            case 5: // empty
+            case self::RB_FILTER_ISEMPTY:
                 return get_string('textlabelnovalue', 'filters', $a);
-            case 6: // Not empty.
+            case self::RB_FILTER_ISNOTEMPTY:
                 return get_string('textlabelnovalue', 'filters', $a);
         }
 
