@@ -88,10 +88,10 @@ class item {
     /**
      * Check if get_default_title() method exists, if not throw exception.
      *
-     * @throws \moodle_exception
+     * @throws \coding_exception
      */
     protected function get_default_title() {
-        throw new \moodle_exception('error:menuitemtitleismissing', 'totara_core', null, get_called_class());
+        throw new \coding_exception('Menu item get_default_title() method is missing', get_called_class());
     }
 
     /**
@@ -115,10 +115,10 @@ class item {
     /**
      * Check if get_default_url() method exists, if not throw exception.
      *
-     * @throws \moodle_exception
+     * @throws \coding_exception
      */
     protected function get_default_url() {
-        throw new \moodle_exception('error:menuitemurlismissing', 'totara_core', null, get_called_class());
+        throw new \coding_exception('Menu item get_default_url() method is missing', get_called_class());
     }
 
     /**
@@ -168,10 +168,10 @@ class item {
     /**
      * Check if get_default_visibility() method exists, if not throw exception.
      *
-     * @throws \moodle_exception
+     * @throws \coding_exception
      */
     public function get_default_visibility() {
-        throw new \moodle_exception('error:menuitemvisibilityismissing', 'totara_core', null, get_called_class());
+        throw new \coding_exception('Menu item get_default_visibility() method is missing', get_called_class());
     }
 
     /**
