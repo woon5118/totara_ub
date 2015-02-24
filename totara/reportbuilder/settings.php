@@ -43,6 +43,8 @@ $defaultoptions = array(
     'pdf_portrait',
     'pdf_landscape'
 );
+$defaultformats = array();
+$formatbyname = array();
 foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
     $formatbyname[$code] = new lang_string('export' . $option, 'totara_reportbuilder');
     if (in_array($option, $defaultoptions)) {
