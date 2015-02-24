@@ -440,7 +440,7 @@ function olson_simple_zone_parser($filename, $maxyear) {
         if (preg_match('/^#/', $line)) {
             continue;
         }
-        if (preg_match('/^(?:Rule|Link|Leap)/',$line)) {
+        if (preg_match('/^(?:Rule|Leap)/',$line)) {
             $lastzone = NULL; // reset lastzone
             continue;
         }
@@ -473,7 +473,20 @@ function olson_simple_zone_parser($filename, $maxyear) {
          *** We remove "until" from the data we keep, but preserve
          *** it in $lastzone.
          */
-        if (preg_match('/^Zone/', $line)) { // a new zone
+        if (preg_match('/^Link/', $line)) {
+            $lastzone = null;
+            $line = trim($line);
+            $line = preg_split('/\s+/', $line);
+            if (count($line) >= 3) {
+                if (isset($zones[$line[1]])) {
+                    foreach ($zones[$line[1]] as $k => $v) {
+                        $v['name'] = $line[2];
+                        $zones[$line[2]][$k] = $v;
+                    }
+                }
+            }
+            continue;
+        } else if (preg_match('/^Zone/', $line)) { // a new zone
             $line = trim($line);
             $line = preg_split('/\s+/', $line);
             $zone = array();

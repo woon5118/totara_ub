@@ -241,8 +241,8 @@ function totara_import_timezonelist() {
         }
     }
 
-    // Otherwise, let's try moodle.org's copy.
-    $source = 'https://download.moodle.org/timezone/';
+    // Otherwise, let's try our online version.
+    $source = 'https://download.totaralms.com/timezone.txt';
     if (!$importdone && ($content=download_file_content($source))) {
         if ($file = fopen($CFG->tempdir.'/timezone.txt', 'w')) {            // Make local copy
             fwrite($file, $content);
