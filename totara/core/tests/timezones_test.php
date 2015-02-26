@@ -24,6 +24,59 @@
 defined('MOODLE_INTERNAL') || die();
 
 class totara_core_timezones_testcase extends advanced_testcase {
+    public function test_totara_date_parse_from_format() {
+        global $USER, $CFG;
+
+        $this->markTestSkipped('TODO: see T-14103');
+
+        $this->resetAfterTest();
+
+        $USER->timezone = 99;
+
+        $timezones = get_list_of_timezones('99');
+        $timezones = array_keys($timezones);
+
+        $dates = array(
+            array(2, 1, 0, 40, 40),
+            array(4, 3, 0, 30, 22),
+            array(9, 5, 0, 20, 19),
+            array(11, 28, 0, 10, 45),
+        );
+        $years = array(1999, 2009, 2014, 2018);
+
+        $format = 'j. n. Y. H:i:s';
+
+        date_default_timezone_set('Pacific/Auckland');
+        $CFG->timezone = 'Pacific/Auckland';
+        foreach ($timezones as $tz) {
+            foreach ($years as $year) {
+                foreach ($dates as $date) {
+                    $expected = new DateTime('now', new DateTimeZone(($tz == 99 ? 'Pacific/Auckland' : $tz)));
+                    $expected->setDate($year, $date[0], $date[1]);
+                    $expected->setTime($date[2], $date[3], $date[4]);
+                    $string = $expected->format($format);
+                    $result = totara_date_parse_from_format($format, $string, $tz);
+                    $this->assertSame($expected->getTimestamp(), $result, "$string in $tz is expected to have different timestamp");
+                }
+            }
+        }
+
+        date_default_timezone_set('Pacific/Auckland');
+        $CFG->timezone = '99';
+        foreach ($timezones as $tz) {
+            foreach ($years as $year) {
+                foreach ($dates as $date) {
+                    $expected = new DateTime('now', new DateTimeZone(($tz == 99 ? 'Pacific/Auckland' : $tz)));
+                    $expected->setDate($year, $date[0], $date[1]);
+                    $expected->setTime($date[2], $date[3], $date[4]);
+                    $string = $expected->format($format);
+                    $result = totara_date_parse_from_format($format, $string, $tz);
+                    $this->assertSame($expected->getTimestamp(), $result, "$string in $tz is expected to have different timestamp");
+                }
+            }
+        }
+    }
+
     public function test_get_list_of_timezones() {
         global $DB;
 
@@ -225,6 +278,7 @@ class totara_core_timezones_testcase extends advanced_testcase {
                     $expected->setDate($year, $date[0], $date[1]);
                     $expected->setTime($date[2], $date[3], $date[4]);
                     $result = usergetdate($expected->getTimestamp(), $tz);
+                    unset($result[0]); // extra introduced by getdate().
                     $ex = array(
                         'seconds' => $date[4],
                         'minutes' => $date[3],
@@ -251,9 +305,7 @@ class totara_core_timezones_testcase extends advanced_testcase {
                     $expected->setDate($year, $date[0], $date[1]);
                     $expected->setTime($date[2], $date[3], $date[4]);
                     $result = usergetdate($expected->getTimestamp(), $tz);
-                    if ($tz == 99) {
-                        unset($result[0]); // What the hell?
-                    }
+                    unset($result[0]); // extra introduced by getdate().
                     $ex = array(
                         'seconds' => $date[4],
                         'minutes' => $date[3],
@@ -267,6 +319,48 @@ class totara_core_timezones_testcase extends advanced_testcase {
                         'month' => $expected->format('F'),
                     );
                     $this->assertSame($ex, $result, 'Incorrect result for data ' . $expected->format("D, d M Y H:i:s O") . ' ' . $tz);
+                }
+            }
+        }
+    }
+
+    public function test_userdate() {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $dates = array(
+            array(2, 1, 0, 40, 40),
+            array(4, 3, 0, 30, 22),
+            array(9, 5, 0, 20, 19),
+            array(11, 28, 0, 10, 45),
+        );
+        $years = array(1999, 2009, 2014, 2018);
+
+        $users = array();
+        $users[] = $this->getDataGenerator()->create_user(array('timezone' => 99));
+        $users[] = $this->getDataGenerator()->create_user(array('timezone' => 'Europe/Prague'));
+        $users[] = $this->getDataGenerator()->create_user(array('timezone' => 'Pacific/Auckland'));
+        $users[] = $this->getDataGenerator()->create_user(array('timezone' => 'Australia/Perth'));
+
+        $format = get_string('strftimedaydatetime', 'langconfig');
+
+        date_default_timezone_set('Pacific/Auckland');
+        $CFG->timezone = 'Pacific/Auckland';
+        foreach ($years as $year) {
+            foreach ($dates as $date) {
+                $expected = new DateTime('now', new DateTimeZone('UTC'));
+                $expected->setDate($year, $date[0], $date[1]);
+                $expected->setTime($date[2], $date[3], $date[4]);
+
+                foreach ($users as $user) {
+                    $this->setUser($user);
+                    $expected->setTimezone(new DateTimeZone(($user->timezone == 99 ? 'Pacific/Auckland' : $user->timezone)));
+                    $result = userdate($expected->getTimestamp(), '', 99, false, false);
+                    date_default_timezone_set($expected->getTimezone()->getName());
+                    $ex = strftime($format, $expected->getTimestamp());
+                    date_default_timezone_set($CFG->timezone);
+                    $this->assertSame($ex, $result);
                 }
             }
         }

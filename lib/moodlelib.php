@@ -2053,7 +2053,9 @@ function make_timestamp($year, $month=1, $day=1, $hour=0, $minute=0, $second=0, 
 
     $timezone = get_user_timezone_offset($timezone);
 
-    if (abs($timezone) > 13) {
+    // Totara: use PHP time stuff at least for server timezone.
+    $tzname = get_user_timezone($passedtimezone);
+    if (abs($timezone) > 13 or $tzname === date_default_timezone_get()) {
         // Server time.
         $time = mktime((int)$hour, (int)$minute, (int)$second, (int)$month, (int)$day, (int)$year);
     } else {
@@ -2246,7 +2248,9 @@ function usergetdate($time, $timezone=99) {
 
     $timezone = get_user_timezone_offset($timezone);
 
-    if (abs($timezone) > 13) {
+    // Totara: use PHP time stuff at least for server timezone.
+    $tzname = get_user_timezone($passedtimezone);
+    if (abs($timezone) > 13 or $tzname === date_default_timezone_get()) {
         // Server time.
         return getdate($time);
     }
