@@ -70,18 +70,18 @@ Feature: Manager approval
 
     When I log in as "student2"
     And I follow "Course 1"
-    And I follow "Sign-up"
-    Then I should see "This session is currently full. By clicking the \"Sign-up\" button, you will be placed on the sessions's wait-list."
-    And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I follow "Join waitlist"
+    Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this session."
     And I log out
 
     When I log in as "student3"
     And I follow "Course 1"
-    And I follow "Sign-up"
-    Then I should see "This session is currently full. By clicking the \"Sign-up\" button, you will be placed on the sessions's wait-list."
-    And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I follow "Join waitlist"
+    Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this session."
     And I log out
 
     When I log in as "teacher1"

@@ -62,18 +62,18 @@ Feature: Play waiting list lottery
 
     When I log in as "student1"
     And I follow "Course 1"
-    And I follow "Sign-up"
+    And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this session"
-    And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this session."
     And I log out
 
     When I log in as "student2"
     And I follow "Course 1"
-    And I follow "Sign-up"
+    And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this session"
-    And I press "Sign-up"
-    And I should see "Your booking has been completed."
+    And I press "Join waitlist"
+    And I should see "You have been placed on the waitlist for this session."
     And I log out
 
     When I log in as "teacher1"
