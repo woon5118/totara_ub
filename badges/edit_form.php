@@ -54,8 +54,9 @@ class edit_details_form extends moodleform {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
         $mform->addElement('textarea', 'description', get_string('description', 'badges'), 'wrap="virtual" rows="8" cols="70"');
-        $mform->setType('description', PARAM_NOTAGS);
+        $mform->setType('description', PARAM_TEXT);
         $mform->addRule('description', null, 'required');
+        $mform->addHelpButton('description', 'description', 'badges');
 
         $str = $action == 'new' ? get_string('badgeimage', 'badges') : get_string('newimage', 'badges');
         $imageoptions = array('maxbytes' => 262144, 'accepted_types' => array('web_image'));
@@ -72,7 +73,7 @@ class edit_details_form extends moodleform {
         $mform->addElement('header', 'issuerdetails', get_string('issuerdetails', 'badges'));
 
         $mform->addElement('text', 'issuername', get_string('name'), array('size' => '70'));
-        $mform->setType('issuername', PARAM_NOTAGS);
+        $mform->setType('issuername', PARAM_TEXT);
         $mform->addRule('issuername', null, 'required');
         if (isset($CFG->badges_defaultissuername)) {
             $mform->setDefault('issuername', $CFG->badges_defaultissuername);
@@ -83,7 +84,7 @@ class edit_details_form extends moodleform {
         if (isset($CFG->badges_defaultissuercontact)) {
             $mform->setDefault('issuercontact', $CFG->badges_defaultissuercontact);
         }
-        $mform->setType('issuercontact', PARAM_RAW);
+        $mform->setType('issuercontact', PARAM_EMAIL);
         $mform->addHelpButton('issuercontact', 'contact', 'badges');
 
         $mform->addElement('header', 'issuancedetails', get_string('issuancedetails', 'badges'));

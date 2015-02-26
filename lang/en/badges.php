@@ -212,6 +212,7 @@ $string['deletehelp'] = '<p>Fully deleting a badge means that all its informatio
 $string['delcritconfirm'] = 'Are you sure that you want to delete this criterion?';
 $string['delparamconfirm'] = 'Are you sure that you want to delete this parameter?';
 $string['description'] = 'Description';
+$string['description_help'] = 'A short description of the badge. This can only be plain text without any formatting. (This is a requirement of the Mozilla OpenBadges standard.)';
 $string['disconnect'] = 'Disconnect';
 $string['donotaward'] = 'Currently, this badge is not active, so it cannot be awarded to users. If you would like to award this badge, please set its status to active.';
 $string['editsettings'] = 'Edit settings';
