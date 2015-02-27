@@ -515,7 +515,9 @@ class feedback360_test extends feedback360_testcase {
         // Create records for feedback360_resp_assignment and mark users as deleted.
         $deletedusers = array();
         foreach ($userassignments as $userassignment) {
+            $sink = $this->redirectMessages();
             feedback360_responder::update_system_assignments(array($userassignment->userid), array(), $userassignment->id, time());
+            $sink->close();
             if ($userassignment->userid % 2) {
                 $DB->set_field('user', 'deleted', 1, array('id' => $userassignment->userid));
                 $deletedusers[$userassignment->userid] = $userassignment->id;
