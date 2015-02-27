@@ -28,7 +28,14 @@ namespace totara_reportbuilder\rb\aggregate;
  */
 class percent extends base {
     protected static function get_field_aggregate($field) {
-        return "AVG($field)*100.0";
+        global $DB;
+
+        $dbfamily = $DB->get_dbfamily();
+        if ($dbfamily === 'mssql') {
+            return "AVG(1.0*$field)*100.0";
+        } else {
+            return "AVG($field)*100.0";
+        }
     }
 
     public static function get_displayfunc(\rb_column $column) {
