@@ -852,7 +852,9 @@ class facetoface_lib_testcase extends advanced_testcase {
         $id = 1;
 
         // Test.
+        $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_delete_instance($id));
+        $sink->close();
 
         $this->resetAfterTest(true);
     }
@@ -1017,13 +1019,17 @@ class facetoface_lib_testcase extends advanced_testcase {
         $statuscode1 = MDL_F2F_STATUS_REQUESTED;
 
         // Signup user1.
+        $sink = $this->redirectMessages();
         $this->setUser($student1);
         $this->assertTrue((bool)facetoface_user_signup($session1, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+        $sink->close();
 
         // Signup user2.
+        $sink = $this->redirectMessages();
         $this->setUser($student2);
         $this->assertTrue((bool)facetoface_user_signup($session1, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
         $this->assertTrue((bool)facetoface_user_signup($session2, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+        $sink->close();
 
         // Check we have data in before deleting session data.
         $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1id)));
@@ -1049,7 +1055,9 @@ class facetoface_lib_testcase extends advanced_testcase {
         $this->assertCount(1, $session2params);
 
         // Call facetoface_delete_session function for session1.
+        $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_delete_session($session1));
+        $sink->close();
 
         // Check data after calling facetoface_delete_session.
         $this->assertFalse($DB->record_exists('facetoface_sessions', array('id' => $session1id)));
@@ -1276,7 +1284,9 @@ class facetoface_lib_testcase extends advanced_testcase {
 
         // Test for valid case.
         $this->setUser($student2);
+        $sink = $this->redirectMessages();
         $this->assertTrue((bool)facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+        $sink->close();
 
         $this->resetAfterTest(true);
     }
@@ -1393,7 +1403,10 @@ class facetoface_lib_testcase extends advanced_testcase {
         //$this->assertEquals(facetoface_send_request_notice($f2f, $sess0, $userid1), '');
 
         // Test for invalid case.
+        $sink = $this->redirectMessages();
         $this->assertEquals(get_string(facetoface_send_request_notice($f2f, $sess0, $userid2), 'facetoface'), 'No manager email is set');
+        $sink->close();
+
         $this->resetAfterTest(true);
     }
 
@@ -1444,12 +1457,16 @@ class facetoface_lib_testcase extends advanced_testcase {
         $statuscode1 = MDL_F2F_STATUS_BOOKED;
 
         // Test for valid case.
+        $sink = $this->redirectMessages();
         facetoface_user_signup($session, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1, $student1->id);
+        $sink->close();
 
         $params = array('sessionid' => $sessionid, 'userid' => $student1->id);
         $signup = $DB->get_record('facetoface_signups', $params);
         // Test for valid case.
+        $sink = $this->redirectMessages();
         $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id, 'testnote'), 6);
+        $sink->close();
 
         // Test for invalid case.
         // TODO invlaid case - how to cause sql error from here?

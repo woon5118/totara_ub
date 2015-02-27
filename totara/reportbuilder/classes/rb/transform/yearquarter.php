@@ -32,7 +32,7 @@ class yearquarter extends base {
         $dbfamily = $DB->get_dbfamily();
 
         if ($dbfamily === 'mysql') {
-            $expr = "CONCAT(FROM_UNIXTIME($field, '%Y-'), FLOOR(FROM_UNIXTIME($field, '%c') / 3) + 1)";
+            $expr = "CONCAT(FROM_UNIXTIME($field, '%Y-'), FLOOR((FROM_UNIXTIME($field, '%c') - 1) / 3) + 1)";
         } else if ($dbfamily === 'mssql') {
             $year = "YEAR(DATEADD(second, $field, {d '1970-01-01'}))";
             $q = "FLOOR((MONTH(DATEADD(second, $field, {d '1970-01-01'})) - 1) / 3) + 1";
