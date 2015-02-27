@@ -181,6 +181,11 @@ class availability_date_condition_testcase extends advanced_testcase {
     public function test_get_description() {
         global $SITE;
 
+        // Totara: Moodle timezone code is a total mess - especially when it comes from OU!
+        set_config('timezone', 'Europe/London');
+        date_default_timezone_set('Europe/London');
+        $this->resetAfterTest();
+
         $modinfo = get_fast_modinfo($SITE);
         $info = new \core_availability\mock_info();
         $time = strtotime('2014-02-18 14:55:01 GMT');

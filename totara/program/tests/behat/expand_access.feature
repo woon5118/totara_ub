@@ -12,7 +12,7 @@ Feature: Users can expand the program info
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
     And I log in as "admin"
-    And I click on "Find Learning" "link"
+    And I focus on "Find Learning" "link"
     And I follow "Programs"
     And I press "Add a new program"
     And I press "Save changes"
@@ -23,7 +23,7 @@ Feature: Users can expand the program info
 
   @javascript
   Scenario: Allow not logged in users to expand program when forcelogin disabled
-    Given I click on "Find Learning" "link"
+    Given I focus on "Find Learning" "link"
     And I follow "Programs"
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"
@@ -35,7 +35,7 @@ Feature: Users can expand the program info
       | forcelogin | 1 |
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
-    And I click on "Find Learning" "link"
+    And I focus on "Find Learning" "link"
     And I follow "Programs"
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"
@@ -48,7 +48,7 @@ Feature: Users can expand the program info
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I log in as "student1"
-    And I click on "Find Learning" "link"
+    And I focus on "Find Learning" "link"
     And I follow "Programs"
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"

@@ -320,13 +320,20 @@ class structure extends type_base {
             $format = $formatnohour;
         }
 
-        // Add daylight saving offset for string timezones only, as we can't get dst for
-        // float values. if timezone is 99 (user default timezone), then try update dst.
-        if ((99 == $timezone) || !is_numeric($timezone)) {
-            $time += dst_offset_on($time, $timezone);
-        }
+        // Totara: use PHP time stuff at least for server timezone.
+        $tzname = get_user_timezone($timezone);
+        if ($tzname == 99 or $tzname === date_default_timezone_get()) {
+            $timezone = 99;
 
-        $timezone = get_user_timezone_offset($timezone);
+        } else {
+            // Add daylight saving offset for string timezones only, as we can't get dst for
+            // float values. if timezone is 99 (user default timezone), then try update dst.
+            if ((99 == $timezone) || !is_numeric($timezone)) {
+                $time += dst_offset_on($time, $timezone);
+            }
+
+            $timezone = get_user_timezone_offset($timezone);
+        }
 
         // If we are running under Windows convert to windows encoding and then back to UTF-8
         // (because it's impossible to specify UTF-8 to fetch locale info in Win32).

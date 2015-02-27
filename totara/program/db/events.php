@@ -32,10 +32,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $observers = array(
     array(
-        'eventname' => '\totara_program\event\program_assigned',
-        'callback' => 'totara_program_observer::assigned',
-    ),
-    array(
         'eventname' => '\totara_program\event\program_unassigned',
         'callback' => 'totara_program_observer::unassigned',
     ),

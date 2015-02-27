@@ -1050,7 +1050,7 @@ class report_builder_edit_performance_form extends moodleform {
             $mform->addHelpButton('schedulegroup', 'reportbuildercachescheduler', 'totara_reportbuilder');
 
             $mform->addElement('static', 'servertime', get_string('reportbuildercacheservertime', 'totara_reportbuilder'),
-                    date_format_string(time(), get_string('strftimedaydatetime', 'langconfig')));
+                userdate(time(), get_string('strftimedaydatetime', 'langconfig')));
             $mform->addHelpButton('servertime', 'reportbuildercacheservertime', 'totara_reportbuilder');
 
             $usertz = totara_get_clean_timezone();

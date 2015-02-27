@@ -1029,6 +1029,14 @@ class global_navigation extends navigation_node {
                 'text' => get_string('home'),
                 'action' => new moodle_url('/')
             );
+        } else if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+            // We are using totara dashboard for the root element.
+            $properties = array(
+                'key' => 'mydashboard',
+                'type' => navigation_node::TYPE_SYSTEM,
+                'text' => get_string('dashboard'),
+                'action' => new moodle_url('/totara/dashboard/index.php')
+            );
         } else {
             // We are using the users my moodle for the root element
             $properties = array(
@@ -1098,11 +1106,22 @@ class global_navigation extends navigation_node {
         } else {
             // The home element should be the site because the root node is my moodle
             $this->rootnodes['home'] = $this->add(get_string('sitehome'), new moodle_url('/'), self::TYPE_SETTING, null, 'home');
-            if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY || $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD)) {
+            if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY ||
+                    $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD)) {
                 // We need to stop automatic redirection
                 $this->rootnodes['home']->action->param('redirect', '0');
             }
         }
+        if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+            // Add access to my home as well.
+            $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null,
+                    'myhome');
+        } else {
+            // Dashboards not in the root, so add here.
+            $this->rootnodes['dashboard'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'),
+                    self::TYPE_ROOTNODE, null, 'dashboard');
+        }
+
         $this->rootnodes['site'] = $this->add_course($SITE);
         $this->rootnodes['myprofile'] = $this->add(get_string('myprofile'), null, self::TYPE_USER, null, 'myprofile');
         $this->rootnodes['currentcourse'] = $this->add(get_string('currentcourse'), null, self::TYPE_ROOTNODE, null, 'currentcourse');
@@ -1307,9 +1326,9 @@ class global_navigation extends navigation_node {
 
         // Remove any empty root nodes
         foreach ($this->rootnodes as $node) {
-            // Dont remove the home node
+            // Dont remove the home node (or any that can be set as home).
             /** @var navigation_node $node */
-            if ($node->key !== 'home' && !$node->has_children() && !$node->isactive) {
+            if (!in_array($node->key, array('home', 'myhome', 'dashboard')) && !$node->has_children() && !$node->isactive) {
                 $node->remove();
             }
         }

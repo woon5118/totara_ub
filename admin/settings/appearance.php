@@ -212,8 +212,8 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // sp
             array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'), $CFG->wwwroot . '/totara/dashboard/manage.php',
-        array('totara/core:appearance'));
+    $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'),
+            $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.

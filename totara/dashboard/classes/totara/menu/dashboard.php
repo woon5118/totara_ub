@@ -57,7 +57,7 @@ class dashboard extends \totara_core\totara\menu\item {
 
         require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
-        if (get_home_page() != HOMEPAGE_TOTARA_DASHBOARD && count(\totara_dashboard::get_user_dashboards($USER->id))) {
+        if ($CFG->defaulthomepage != HOMEPAGE_TOTARA_DASHBOARD && count(\totara_dashboard::get_user_dashboards($USER->id))) {
             $cache = menu::SHOW_ALWAYS;
         } else {
             $cache = menu::HIDE_ALWAYS;

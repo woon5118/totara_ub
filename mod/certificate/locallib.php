@@ -31,8 +31,6 @@ require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
 require_once($CFG->dirroot.'/grade/querylib.php');
 
-require_once($CFG->dirroot.'/mod/certificate/archivelib.php'); // Totara feature.
-
 /** The border image folder */
 define('CERT_IMAGE_BORDER', 'borders');
 /** The watermark image folder */

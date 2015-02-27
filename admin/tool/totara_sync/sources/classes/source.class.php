@@ -229,9 +229,13 @@ abstract class totara_sync_source {
         foreach ($datarows as $i => $datarow) {
             foreach ($datarow as $name => $value) {
                 if ((($columnsinfo[$name]->type == 'varchar' || $columnsinfo[$name]->type == 'nvarchar') &&
-                        strlen($value)) && (strlen($value) > $columnsinfo[$name]->max_length) &&
+                        core_text::strlen($value)) && (core_text::strlen($value) > $columnsinfo[$name]->max_length) &&
                         $columnsinfo[$name]->max_length != -1) {
                     $field = in_array($name, $fieldmappings) ? array_search($name, $fieldmappings) : $name;
+                    // Prepare value to display in error message and for totara_sync_log table.
+                    if (core_text::strlen($value) > 75) {
+                        $value = core_text::substr($value, 0, 75) . ' ...';
+                    }
                     $this->addlog(get_string('lengthlimitexceeded', 'tool_totara_sync', (object)array('idnumber' => $datarow['idnumber'], 'field' => $field,
                         'value' => $value, 'length' => $columnsinfo[$name]->max_length, 'source' => $source)), 'error', 'populatesynctablecsv');
                 }

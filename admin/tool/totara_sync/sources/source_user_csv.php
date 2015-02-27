@@ -96,9 +96,9 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
         }
 
-        $encodings = textlib::get_encodings();
+        $encodings = core_text::get_encodings();
         $mform->addElement('select', 'csvuserencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
-        $mform->setType('csvuserencoding', PARAM_TEXT);
+        $mform->setType('csvuserencoding', PARAM_ALPHANUMEXT);
         $default = $this->get_config('csvuserencoding');
         $default = (!empty($default) ? $default : 'UTF-8');
         $mform->setDefault('csvuserencoding', $default);
@@ -199,6 +199,11 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
+        $encoding = core_text::strtoupper($this->get_config('csvuserencoding'));
+        if (!empty($fields) && substr($encoding, 0, 3) === 'UTF') {
+            // The file may begin with a UTF BOM (byte order mark), which needs to be stripped off.
+            $fields[0] = core_text::trim_utf8_bom($fields[0]);
+        }
         $fieldmappings = array();
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f})) {
@@ -277,7 +282,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
-        $encoding = textlib::strtoupper($this->get_config('csvuserencoding'));
         $badtimezones = false;
         $goodtimezones = totara_get_clean_timezone_list();
 

@@ -189,7 +189,7 @@ function cohort_rules_list(){
                     $sql->select = "DISTINCT {$DB->sql_compare_text('data', 255)} AS mkey, {$DB->sql_compare_text('data', 255)} AS mval";
                     $sql->from = "{user_info_data}";
                     $sql->where = "fieldid = ?";
-                    $sql->orderby = 'data';
+                    $sql->orderby = "{$DB->sql_compare_text('data', 255)}";
                     $sql->valuefield = "{$DB->sql_compare_text('data', 255)}";
                     $sql->sqlparams = array($id);
                     $dialogui = new cohort_rule_ui_menu(

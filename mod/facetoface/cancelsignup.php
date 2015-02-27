@@ -49,8 +49,12 @@ $context = context_module::instance($cm->id);
 require_login($course, false, $cm);
 require_capability('mod/facetoface:view', $context);
 
-$PAGE->set_cm($cm);
+$userisinwaitlist = facetoface_is_user_on_waitlist($session, $USER->id);
+$pagetitle = format_string($facetoface->name);
+
 $PAGE->set_url('/mod/facetoface/cancelsignup.php', array('s' => $s, 'backtoallsessions' => $backtoallsessions, 'confirm' => $confirm));
+$PAGE->set_title($pagetitle);
+$PAGE->set_heading($course->fullname);
 
 $returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
 if ($backtoallsessions) {
@@ -80,7 +84,7 @@ $attendee_note = facetoface_get_attendee($s, $USER->id);
 $attendee_note->id = $attendee_note->statusid;
 customfield_load_data($attendee_note, 'facetofacecancellation', 'facetoface_cancellation');
 
-$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'attendee_note'));
+$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'attendee_note', 'userisinwaitlist'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -104,20 +108,23 @@ if ($fromform = $mform->get_data()) { // Form submitted.
         $fromform->id = $cancellationrecord->id;
         customfield_save_data($fromform, 'facetofacecancellation', 'facetoface_cancellation');
 
-        $message = get_string('bookingcancelled', 'facetoface');
+        $strmessage = $userisinwaitlist ? 'waitlistcancelled' : 'bookingcancelled';
+        $message = get_string($strmessage, 'facetoface');
 
         if ($session->datetimeknown) {
-            $error = facetoface_send_cancellation_notice($facetoface, $session, $USER->id);
-            if (empty($error)) {
-                if ($session->datetimeknown && isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationstrmngr)) {
-                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsentmgr', 'facetoface');
+            // Users in waitlist should not receive a cancellation email.
+            if ($userisinwaitlist === false) {
+                $error = facetoface_send_cancellation_notice($facetoface, $session, $USER->id);
+                if (empty($error)) {
+                    if ($session->datetimeknown && isset($facetoface->cancellationinstrmngr) && !empty($facetoface->cancellationstrmngr)) {
+                        $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string('cancellationsentmgr', 'facetoface');
+                    } else {
+                        $msg = ($CFG->facetoface_notificationdisable ? 'cancellationnotsent' : 'cancellationsent');
+                        $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string($msg, 'facetoface');
+                    }
+                } else {
+                    print_error($error, 'facetoface');
                 }
-                else {
-                    $msg = ($CFG->facetoface_notificationdisable ? 'cancellationnotsent' : 'cancellationsent');
-                    $message .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . get_string($msg, 'facetoface');
-                }
-            } else {
-                print_error($error, 'facetoface');
             }
         }
 
@@ -129,15 +136,10 @@ if ($fromform = $mform->get_data()) { // Form submitted.
 
     redirect($returnurl);
 }
-
-$pagetitle = format_string($facetoface->name);
-
-$PAGE->set_title($pagetitle);
-$PAGE->set_heading($course->fullname);
-
 echo $OUTPUT->header();
 
-$heading = get_string('cancelbookingfor', 'facetoface', $facetoface->name);
+$strheading = $userisinwaitlist ? 'cancelwaitlistfor' : 'cancelbookingfor';
+$heading = get_string($strheading, 'facetoface', $facetoface->name);
 
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading($heading);

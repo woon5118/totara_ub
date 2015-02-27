@@ -61,6 +61,7 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
         var templates = M.totara_f2f_notification_template.config.templates;
 
         $(function() {
+
             // Attach event to drop down
             $('select#id_template').change(function() {
                 var select = $(this);
@@ -72,19 +73,35 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                 if (current !== '0') {
                     $('input#id_title').val(templates[current].title);
                     $('textarea#id_body_editor').val(templates[current].body);
-                    $('textarea#id_managerprefix_editor').val(templates[current].managerprefix);
-                    tinyMCE.get('id_body_editor').setContent(templates[current].body);
+
+                    var templatecontent = "";
                     if (templates[current].managerprefix) {
-                        tinyMCE.get('id_managerprefix_editor').setContent(templates[current].managerprefix);
-                    } else {
-                        tinyMCE.get('id_managerprefix_editor').setContent('');
+                        templatecontent = templates[current].managerprefix;
+                    }
+                    $('textarea#id_managerprefix_editor').val(templatecontent);
+
+                    if (typeof tinyMCE !== "undefined") {
+                        tinyMCE.get('id_body_editor').setContent(templates[current].body);
+                        tinyMCE.get('id_managerprefix_editor').setContent(templatecontent);
                     }
                 } else {
                     $('input#id_title').val('');
                     $('textarea#id_body_editor').val('');
                     $('textarea#id_managerprefix_editor').val('');
-                    tinyMCE.get('id_body_editor').setContent('');
-                    tinyMCE.get('id_managerprefix_editor').setContent('');
+                    if (typeof tinyMCE !== "undefined") {
+                        tinyMCE.get('id_body_editor').setContent('');
+                        tinyMCE.get('id_managerprefix_editor').setContent('');
+                    }
+                }
+                // Try to update editor
+                var bodyeditor = Y.one('#id_body_editor').getData('Editor');
+                if(bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
+                    bodyeditor.updateFromTextArea();
+                }
+
+                var prefixeditor = Y.one('#id_managerprefix_editor').getData('Editor');
+                if(prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
+                    prefixeditor.updateFromTextArea();
                 }
             });
 

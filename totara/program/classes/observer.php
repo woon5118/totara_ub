@@ -27,40 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 class totara_program_observer {
 
     /**
-     * Handler function called when a program_assigned event is triggered
-     *
-     * @param \totara_program\event\program_assigned $event
-     * @return bool Success status
-     */
-    public static function assigned(\totara_program\event\program_assigned $event) {
-        global $DB;
-
-        $programid = $event->objectid;
-        $userid = $event->userid;
-
-        try {
-            $messagesmanager = new prog_messages_manager($programid);
-            $program = new program($programid);
-            $user = $DB->get_record('user', array('id' => $userid));
-            $isviewable = $program->is_viewable($user);
-            $messages = $messagesmanager->get_messages();
-            $completion = $DB->get_field('prog_completion', 'status', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
-        } catch (exception $e) {
-            return true;
-        }
-
-        // Send notifications to user and (optionally) the user's manager.
-        foreach ($messages as $message) {
-            if ($message->messagetype == MESSAGETYPE_ENROLMENT) {
-                if ($user && $completion != STATUS_PROGRAM_COMPLETE && $isviewable) {
-                    $message->send_message($user);
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * Handler function called when a program_unassigned event is triggered
      *
      * @param \totara_program\event\program_unassigned $event

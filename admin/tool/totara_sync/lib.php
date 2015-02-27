@@ -284,7 +284,7 @@ function totara_sync_make_dirs($dirpath) {
 function totara_sync_clean_fields($fields, $encoding) {
     if ($encoding !== 'UTF-8') {
         foreach ($fields as $key => $value) {
-            $value = textlib::convert(trim($value), $encoding, 'UTF-8');
+            $value = core_text::convert(trim($value), $encoding, 'UTF-8');
             $fields[$key] = clean_param($value, PARAM_TEXT);
         }
     } else {
@@ -391,11 +391,11 @@ function totara_sync_notify() {
     $a = new stdClass();
     $a->logtypes = implode(', ', $notifytypes_str);
     $a->count = $logcount;
-    $a->since = date_format_string($lastnotify, $dateformat);
+    $a->since = userdate($lastnotify, $dateformat);
     $message = get_string('notifymessagestart', 'tool_totara_sync', $a);
     $message .= "\n\n";
     foreach ($logitems as $logentry) {
-        $logentry->time = date_format_string($logentry->time, $dateformat);
+        $logentry->time = userdate($logentry->time, $dateformat);
         $logentry->logtype = get_string($logentry->logtype, 'tool_totara_sync');
         $message .= get_string('notifymessage', 'tool_totara_sync', $logentry) . "\n\n";
     }
@@ -404,7 +404,7 @@ function totara_sync_notify() {
 
     // Send emails.
     mtrace("\n{$logcount} relevant totara sync log messages since " .
-            date_format_string($lastnotify, $dateformat)) . ". Sending notifications...";
+        userdate($lastnotify, $dateformat)) . ". Sending notifications...";
     $supportuser = core_user::get_support_user();
     foreach ($notifyemails as $emailaddress) {
         $userto = \totara_core\totara_user::get_external_user(trim($emailaddress));

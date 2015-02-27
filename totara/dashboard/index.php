@@ -94,7 +94,8 @@ if (!$id) {
         set_user_preference('user_home_totara_dashboard_id', $id);
     } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_USER) {
         $newhomeurl = new moodle_url('/totara/dashboard/index.php', array('setdefaulthome'=>true, 'id' => $id));
-        $PAGE->settingsnav->get('usercurrentsettings')->add(get_string('makethismyhome'), $newhomeurl, navigation_node::TYPE_SETTING);
+        $PAGE->settingsnav->get('usercurrentsettings')->add(get_string('makethismyhome'), $newhomeurl,
+                navigation_node::TYPE_SETTING);
     }
 
     $resetbutton = '';

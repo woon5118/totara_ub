@@ -478,35 +478,11 @@ function facetoface_delete_instance($id) {
 
     $transaction = $DB->start_delegated_transaction();
 
-    $DB->delete_records_select(
-        'facetoface_signups_status',
-        "signupid IN
-        (
-            SELECT
-            id
-            FROM
-    {facetoface_signups}
-    WHERE
-    sessionid IN
-    (
-        SELECT
-        id
-        FROM
-    {facetoface_sessions}
-    WHERE
-    facetoface = ? ))
-    ", array($facetoface->id));
-
-    $DB->delete_records_select('facetoface_signups', "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-
-    $DB->delete_records_select('facetoface_sessions_dates', "sessionid in (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-
-    // Notifications.
-    $DB->delete_records('facetoface_notification', array('facetofaceid' => $facetoface->id));
-    $DB->delete_records_select('facetoface_notification_sent',
-            "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
-    $DB->delete_records_select('facetoface_notification_hist',
-            "sessionid IN (SELECT id FROM {facetoface_sessions} WHERE facetoface = ?)", array($facetoface->id));
+    // Get sessions for the facetoface to delete.
+    $sessions = $DB->get_records('facetoface_sessions', array('facetoface' => $id));
+    foreach ($sessions as $session) {
+        facetoface_delete_session($session);
+    }
 
     $DB->delete_records('facetoface_interest', array('facetoface' => $facetoface->id));
 
@@ -547,7 +523,7 @@ function cleanup_session_data($session) {
 function facetoface_add_session($session, $sessiondates) {
     global $USER, $DB;
 
-    $session->timecreated = time();
+    $session->timemodified = $session->timecreated = time();
     $session = cleanup_session_data($session);
 
     $session->id = $DB->insert_record('facetoface_sessions', $session);
@@ -842,7 +818,60 @@ function facetoface_delete_session($session) {
     // Delete session details
     $DB->delete_records('facetoface_sessions_dates',array('sessionid' => $session->id));
     $DB->delete_records('facetoface_session_roles', array('sessionid' => $session->id));
-    $DB->delete_records('facetoface_session_info_data',  array('facetofacesessionid' => $session->id));
+
+    // Get session data to delete.
+    $sessiondataids = $DB->get_fieldset_select(
+        'facetoface_session_info_data',
+        'id',
+        "facetofacesessionid = :facetofacesessionid",
+        array('facetofacesessionid' => $session->id));
+
+    if (!empty($sessiondataids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($sessiondataids);
+        $DB->delete_records_select('facetoface_session_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_session_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Get signup ids to delete.
+    $signupstatus = array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_REQUESTED);
+    list($statussql, $statusparams) = $DB->get_in_or_equal($signupstatus, SQL_PARAMS_NAMED);
+    $statusparams['sessionid'] = $session->id;
+    $signupids = $DB->get_fieldset_select(
+        'facetoface_signup_info_data',
+        'id',
+        "facetofacesignupid IN (
+            SELECT ss.id
+              FROM {facetoface_signups_status} ss
+        INNER JOIN {facetoface_signups} s
+                ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid
+               AND ss.statuscode {$statussql})",
+        $statusparams);
+
+    if (!empty($signupids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($signupids);
+        $DB->delete_records_select('facetoface_signup_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_signup_info_data', "id {$sqlin}", $inparams);
+    }
+
+    // Get cancellation ids to delete.
+    $cancellationids = $DB->get_fieldset_select(
+        'facetoface_cancellation_info_data',
+        'id',
+        "facetofacecancellationid IN (
+            SELECT ss.id
+              FROM {facetoface_signups_status} ss
+        INNER JOIN {facetoface_signups} s
+                ON ss.signupid = s.id
+             WHERE s.sessionid = :sessionid
+               AND ss.statuscode = :cancellationstatus)",
+        array('sessionid' => $session->id, 'cancellationstatus' => MDL_F2F_STATUS_USER_CANCELLED));
+
+    if (!empty($cancellationids)) {
+        list($sqlin, $inparams) = $DB->get_in_or_equal($cancellationids);
+        $DB->delete_records_select('facetoface_cancellation_info_data_param', "dataid {$sqlin}", $inparams);
+        $DB->delete_records_select('facetoface_cancellation_info_data', "id {$sqlin}", $inparams);
+    }
 
     $DB->delete_records_select(
         'facetoface_signups_status',
@@ -1018,7 +1047,8 @@ function facetoface_allow_user_cancellation($session) {
 function facetoface_notify_under_capacity() {
     global $CFG, $DB;
 
-    $lastcron = $DB->get_field('modules', 'lastcron', array('name' => 'facetoface'));
+    $conditions = array('component' => 'mod_facetoface', 'classname' => '\mod_facetoface\task\send_notifications_task');
+    $lastcron = $DB->get_field('task_scheduled', 'lastruntime', $conditions);
     $roles = $CFG->facetoface_session_rolesnotify;
     $time = time();
 
@@ -2628,10 +2658,13 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
         foreach ($submissions as $submission) {
 
             if ($session = facetoface_get_session($submission->sessionid)) {
+                $userisinwaitlist = facetoface_is_user_on_waitlist($session, $USER->id);
                 if ($session->datetimeknown && facetoface_has_session_started($session, $timenow) && facetoface_is_session_in_progress($session, $timenow)) {
                     $status = get_string('sessioninprogress', 'facetoface');
                 } else if ($session->datetimeknown && facetoface_has_session_started($session, $timenow)) {
                     $status = get_string('sessionover', 'facetoface');
+                } else if ($userisinwaitlist) {
+                    $status = get_string('waitliststatus', 'facetoface');
                 } else {
                     $status = get_string('bookingstatus', 'facetoface');
                 }
@@ -2671,7 +2704,7 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                 }
 
                 if (facetoface_allow_user_cancellation($session)) {
-                    $strcancelbooking = get_string('cancelbooking', 'facetoface');
+                    $strcancelbooking = $userisinwaitlist ? get_string('cancelwaitlist', 'facetoface') : get_string('cancelbooking', 'facetoface');
                     $cancel_url = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id));
                     $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
                 }
@@ -2726,7 +2759,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     continue;
                 } else {
                     $signup_url   = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id));
-                    $moreinfolink = html_writer::link($signup_url, get_string('signup', 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
+                    $signuptext   = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                    $moreinfolink = html_writer::link($signup_url, get_string($signuptext, 'facetoface'), array('class' => 'f2fsessionlinks f2fsessioninfolink'));
 
                     $span = html_writer::tag('span', get_string('options', 'facetoface').':', array('class' => 'f2fsessionnotice'));
                 }
@@ -2841,6 +2875,53 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
     $coursemodule->set_content($output);
 }
 
+/**
+ * Determine if sign-ups to this session should place users on the
+ * waitlist or book them.
+ *
+ * @param object $session A session object
+ * @return bool True if the sign-up should be by waitlist, false otherwise.
+ */
+function facetoface_is_signup_by_waitlist($session) {
+    // Users will be waitlisted if the session date is unknown.
+    if (empty($session->datetimeknown)) {
+        return true;
+    }
+
+    // Get waitlisteveryone setting for the session.
+    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+    $waitlisteveryone = !empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone;
+    if ($waitlisteveryone || facetoface_get_num_attendees($session->id) >= $session->capacity) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Determine if a user is in the waitlist of a session.
+ *
+ * @param object $session A session object
+ * @param int $userid The user ID
+ * @return bool True if the user is on waitlist, false otherwise.
+ */
+function facetoface_is_user_on_waitlist($session, $userid = null) {
+    global $DB, $USER;
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    $sql = "SELECT 1
+            FROM {facetoface_signups} su
+            JOIN {facetoface_signups_status} ss ON su.id = ss.signupid
+            WHERE su.sessionid = ?
+              AND ss.superceded != 1
+              AND su.userid = ?
+              AND ss.statuscode = ?";
+
+    return $DB->record_exists_sql($sql, array($session->id, $userid, MDL_F2F_STATUS_WAITLISTED));
+}
 
 /**
  * Update grades by firing grade_updated event

@@ -933,14 +933,146 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_delete_session() {
-        // Test. method - returns boolean
-        $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
+        global $DB, $CFG;
+        require_once("$CFG->dirroot/totara/hierarchy/prefix/position/lib.php");
 
-        //TODO invalid test
-        // Test variables.
-        $session1 = $this->sessions['sess0'];
-        $sess0 = $this->array_to_object($session1);
+        $teacher1 = $this->getDataGenerator()->create_user();
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $manager = $this->getDataGenerator()->create_user();
+
+        $assignment = new position_assignment(array('userid' => $student1->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $manager->id;
+        assign_user_position($assignment, true);
+
+        $assignment = new position_assignment(array('userid' => $student2->id, 'type' => POSITION_TYPE_PRIMARY));
+        $assignment->managerid = $manager->id;
+        assign_user_position($assignment, true);
+
+        $course1 = $this->getDataGenerator()->create_course();
+
+        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+
+        $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id, $studentrole->id);
+
+        // Create facetoface customfields.
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
+        $textids = $cfgenerator->create_text('facetoface_session', array('text1'));
+        $multids = $cfgenerator->create_multiselect('facetoface_session', array('multi1'=>array('opt1', 'opt2')));
+
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $facetofacedata = array(
+            'name' => 'facetoface1',
+            'course' => $course1->id
+        );
+        $facetoface1 = $facetofacegenerator->create_instance($facetofacedata);
+
+        // Session that starts in 24hrs time.
+        // This session should trigger a mincapacity warning now as cutoff is 24:01 hrs before start time.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + DAYSECS;
+        $sessiondate->timefinish = time() + DAYSECS + 60;
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+
+        $session1data = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS - 60
+        );
+
+        $session2data = array(
+            'facetoface' => $facetoface1->id,
+            'capacity' => 5,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1',
+            'mincapacity' => '1',
+            'cutoff' => DAYSECS
+        );
+        $session1id = $facetofacegenerator->add_session($session1data);
+        $session2id = $facetofacegenerator->add_session($session2data);
+
+        $session1 = $DB->get_record('facetoface_sessions', array('id' => $session1id));
+        $session1->sessiondates = facetoface_get_session_dates($session1->id);
+
+        $session2 = $DB->get_record('facetoface_sessions', array('id' => $session2id));
+        $session2->sessiondates = facetoface_get_session_dates($session2->id);
+
+        // Add customfields data to these facetoface sessions.
+        $cfgenerator->set_text($session1, $textids['text1'], 'value1', 'facetofacesession', 'facetoface_session');
+        $cfgenerator->set_multiselect($session1, $multids['multi1'], array('opt1', 'opt2'), 'facetofacesession', 'facetoface_session');
+        $cfgenerator->set_text($session2, $textids['text1'], 'value2', 'facetofacesession', 'facetoface_session');
+        $cfgenerator->set_multiselect($session2, $multids['multi1'], array('opt1'), 'facetofacesession', 'facetoface_session');
+
+        $discountcode1 = 'disc1';
+        $notificationtype1 = 1;
+        $statuscode1 = MDL_F2F_STATUS_REQUESTED;
+
+        // Signup user1.
+        $this->setUser($student1);
+        $this->assertTrue((bool)facetoface_user_signup($session1, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+
+        // Signup user2.
+        $this->setUser($student2);
+        $this->assertTrue((bool)facetoface_user_signup($session1, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+        $this->assertTrue((bool)facetoface_user_signup($session2, $facetoface1, $course1, $discountcode1, $notificationtype1, $statuscode1), $this->msgtrue);
+
+        // Check we have data in before deleting session data.
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session1id)));
+        $this->assertTrue($DB->record_exists('facetoface_signups', array('id' => $session1id)));
+        $this->assertEquals(2, $DB->count_records_select(
+            'facetoface_signups_status',
+            "signupid IN (SELECT id FROM {facetoface_signups} WHERE sessionid = :sessionid)",
+            array('sessionid' => $session1id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions_dates', array('sessionid' => $session1id)));
+
+        // Check customfield data for session1 and session2.
+        $cfsession1 = $DB->get_records('facetoface_session_info_data', array('facetofacesessionid' => $session1->id));
+        $this->assertCount(2, $cfsession1);
+        list($sqlin, $paramin) = $DB->get_in_or_equal(array_keys($cfsession1));
+        $sqlparams = 'SELECT id FROM {facetoface_session_info_data_param} WHERE dataid ';
+        $session1params = $DB->get_records_sql($sqlparams . $sqlin, $paramin);
+        $this->assertCount(2, $session1params);
+
+        $cfsession2 = $DB->get_records('facetoface_session_info_data', array('facetofacesessionid' => $session2->id));
+        $this->assertCount(2, $cfsession2);
+        list($sqlin2, $paramin2) = $DB->get_in_or_equal(array_keys($cfsession2));
+        $session2params = $DB->get_records_sql($sqlparams . $sqlin2, $paramin2);
+        $this->assertCount(1, $session2params);
+
+        // Call facetoface_delete_session function for session1.
         $this->assertTrue((bool)facetoface_delete_session($session1));
+
+        // Check data after calling facetoface_delete_session.
+        $this->assertFalse($DB->record_exists('facetoface_sessions', array('id' => $session1id)));
+        $this->assertFalse($DB->record_exists('facetoface_signups', array('sessionid' => $session1id)));
+        $this->assertEquals(0, $DB->count_records_select(
+            'facetoface_signups_status',
+            "signupid IN (SELECT id FROM {facetoface_signups} WHERE sessionid = :sessionid)",
+            array('sessionid' => $session1id)));
+        $this->assertFalse($DB->record_exists('facetoface_sessions_dates', array('sessionid' => $session1id)));
+        $this->assertEquals(0, $DB->count_records('facetoface_session_info_data', array('facetofacesessionid' => $session1->id)));
+        $this->assertEmpty($DB->get_records_sql($sqlparams . $sqlin, $paramin));
+
+        // Check data for session2 is intact.
+        $this->assertTrue($DB->record_exists('facetoface_sessions', array('id' => $session2id)));
+        $this->assertTrue($DB->record_exists('facetoface_signups', array('sessionid' => $session2id)));
+        $this->assertEquals(1, $DB->count_records_select(
+            'facetoface_signups_status',
+            "signupid IN (SELECT id FROM {facetoface_signups} WHERE sessionid = :sessionid)",
+            array('sessionid' => $session2id)));
+        $this->assertTrue($DB->record_exists('facetoface_sessions_dates', array('sessionid' => $session2id)));
+        $this->assertEquals(2, $DB->count_records('facetoface_session_info_data', array('facetofacesessionid' => $session2->id)));
+        $session2params = $DB->get_records_sql($sqlparams . $sqlin2, $paramin2);
+        $this->assertCount(1, $session2params);
         $this->resetAfterTest(true);
     }
 

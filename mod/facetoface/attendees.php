@@ -128,6 +128,8 @@ if (has_capability('mod/facetoface:takeattendance', $context)) {
     }
 }
 
+$includeattendeesnote = (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context));
+
 $attendees = array();
 $cancellations = array();
 $requests = array();
@@ -659,7 +661,7 @@ if ($show_table) {
             $columns[] = 'attendance';
 
             if ($session->availablesignupnote && $action != 'takeattendance') {
-                if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+                if ($includeattendeesnote) {
 
                     $headers[] = get_string('attendeenote', 'facetoface');
                     $columns[] = 'usernote';
@@ -812,7 +814,7 @@ if ($show_table) {
                         $showpix = new pix_icon('/t/preview', get_string('showattendeesnote', 'facetoface'));
                         $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-add-note pull-right'));
                     }
-                    if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+                    if ($includeattendeesnote) {
                         // Get signup note. Only show the note if there is only one field and it's text.
                         $datanote = '';
                         $customfields = facetoface_get_signup_customfields();
@@ -918,10 +920,20 @@ if ($action == 'approvalrequired') {
 
     unset($actionurl);
 
+    $headings = array();
+    $headings[] = get_string('name');
+    $headings[] = get_string('timerequested', 'facetoface');
+    if ($includeattendeesnote) {
+        // The user has to hold specific permissions to view this.
+        $headings[] = get_string('attendeenote', 'facetoface');
+    }
+    $headings[] = get_string('decidelater', 'facetoface');
+    $headings[] = get_string('decline', 'facetoface');
+    $headings[] = get_string('approve', 'facetoface');
+
     $table = new html_table();
     $table->summary = get_string('requeststablesummary', 'facetoface');
-    $table->head = array(get_string('name'), get_string('timerequested', 'facetoface'), get_string('attendeenote', 'facetoface'),
-        get_string('decidelater', 'facetoface'), get_string('decline', 'facetoface'), get_string('approve', 'facetoface'));
+    $table->head = $headings;
     $table->align = array('left', 'center', 'center', 'center', 'center');
 
     foreach ($requests as $attendee) {
@@ -936,7 +948,7 @@ if ($action == 'approvalrequired') {
                 $url = new moodle_url('/mod/facetoface/attendee_note.php', array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
                 $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
             }
-            if (has_any_capability(array('mod/facetoface:viewattendeesnote', 'mod/facetoface:manageattendeesnote'), $context)) {
+            if ($includeattendeesnote) {
                 // Get signup note. Only show the note if there is only one field and it's text.
                 $datanote = '';
                 $customfields = facetoface_get_signup_customfields();

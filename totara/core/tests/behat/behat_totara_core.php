@@ -183,4 +183,16 @@ class behat_totara_core extends behat_base {
         );
         $node->click();
     }
+
+    /**
+     * Generic focus action.
+     *
+     * @When /^I focus on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     */
+    public function i_focus_on($element, $selectortype) {
+        $node = $this->get_selected_node($selectortype, $element);
+        $node->focus();
+    }
 }

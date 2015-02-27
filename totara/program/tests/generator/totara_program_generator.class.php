@@ -144,13 +144,13 @@ class totara_program_generator extends component_generator_base {
         $now = time();
         $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
         $default = array(
-            'fullname' => $data['fullname'],
+            'fullname' => 'Program Fullname',
             'availablefrom' => 0,
             'availableuntil' => 0,
             'timecreated' => $now,
             'timemodified' => $now,
             'usermodified' => 2,
-            'shortname' => preg_replace('/[^A-Z0-9]/', '', $data['fullname']),
+            'shortname' => 'progshort',
             'idnumber' => '',
             'available' => 1,
             'sortorder' => !empty($sortorder) ? $sortorder : 0,
@@ -304,6 +304,54 @@ class totara_program_generator extends component_generator_base {
         $programcontent = $program->get_content();
         $programcontent->setup_content($rawdata);
         $programcontent->save_content();
+    }
+
+    /**
+     * Get empty program assignment
+     *
+     * @param int $programid
+     * @return stdClass
+     */
+    protected function get_empty_prog_assignment($programid) {
+        $data = new stdClass();
+        $data->id = $programid;
+        $data->item = array(ASSIGNTYPE_INDIVIDUAL => array());
+        $data->completiontime = array(ASSIGNTYPE_INDIVIDUAL => array());
+        $data->completionevent = array(ASSIGNTYPE_INDIVIDUAL => array());
+        $data->completioninstance = array(ASSIGNTYPE_INDIVIDUAL => array());
+        return $data;
+    }
+
+    /**
+     * Add mock program to user
+     *
+     * @param int $programid Program id
+     * @param array $userids User ids array of int
+     */
+    public function assign_program($programid, $userids) {
+        $data = $this->get_empty_prog_assignment($programid);
+        $category = new individuals_category();
+        $a = 0;
+        foreach ($userids as $key => $userid) {
+            $data->item[ASSIGNTYPE_INDIVIDUAL][$userid] = 1;
+            $data->completiontime[ASSIGNTYPE_INDIVIDUAL][$userid] = -1;
+            $data->completionevent[ASSIGNTYPE_INDIVIDUAL][$userid] = 0;
+            $data->completioninstance[ASSIGNTYPE_INDIVIDUAL][$userid] = 0;
+            unset($userids[$key]);
+            $a++;
+            if ($a > 500) {
+                $a = 0;
+                // Write chunk.
+                $category->update_assignments($data);
+            }
+        }
+        // Last chunk.
+        $category->update_assignments($data);
+
+        $program = new program($programid);
+        $assignments = $program->get_assignments();
+        $assignments->init_assignments($programid);
+        $program->update_learner_assignments();
     }
 
     /**

@@ -91,7 +91,7 @@ $string['courseprogress'] = 'Course progress';
 $string['courseprogresshelp'] = 'This specifies if the course progress block appears on the homepage';
 $string['coursetype'] = 'Course Type';
 $string['csvdateformat'] = 'CSV Import date format';
-$string['csvdateformatconfig'] = 'Date format to be used in CSV imports like user uploads with date custom profile fields, or Totara Sync.
+$string['csvdateformatconfig'] = 'Date format to be used in CSV imports like user uploads with date custom profile fields, or HR Import.
 
 The date format should be compatible with the formats defined in the <a target="_blank" href="http://www.php.net/manual/en/datetime.createfromformat.php">PHP DateTime class</a>
 
@@ -132,7 +132,6 @@ $string['delete'] = 'Delete';
 $string['deleted'] = 'Deleted';
 $string['deleteusercheckfull'] = 'Are you absolutely sure you want to completely delete {$a} ?<br />All associated data, including but not limited to the following, will be deleted and is not recoverable:
 <ul>
-<li>course completion</li>
 <li>appraisals where the user is in the learner role</li>
 <li>grades</li>
 <li>tags</li>
@@ -161,7 +160,7 @@ $string['editheading'] = 'Edit the Report Heading Block';
 $string['edition'] = 'Edition';
 $string['elearning'] = 'E-learning';
 $string['elementlibrary'] = 'Element Library';
-$string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update Totara Sync for {$a}';
+$string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
 $string['enabletempmanagers'] = 'Enable temporary managers';
 $string['enabletempmanagersdesc'] = 'Enable functionality that allows for assigning a temporary manager to a user. Disabling this will cause all current temporary managers to be unassigned on next cron run.';
 $string['enhancedcatalog'] = 'Enhanced catalog';
@@ -189,26 +188,21 @@ $string['error:datenotinfuture'] = 'The date needs to be in the future';
 $string['error:dialognotreeitems'] = 'No items available';
 $string['error:duplicaterecordsdeleted'] = 'Duplicate {$a} record deleted: ';
 $string['error:duplicaterecordsfound'] = '{$a->count} duplicate record(s) found in the {$a->tablename} table...fixing (see error log for details)';
-$string['error:emptyidnumberwithsync'] = 'Totara Sync is enabled but the ID number field is empty. Either disable sync for this user or provide a valid ID number.';
+$string['error:emptyidnumberwithsync'] = 'HR Import is enabled but the ID number field is empty. Either disable HR Import for this user or provide a valid ID number.';
 $string['error:findingmenuitem'] = 'Error finding the menu item';
 $string['error:importtimezonesfailed'] = 'Failed to update timezone information.';
-$string['error:itemhaschildren'] = 'Note: you cannot change the parent of this item as it has children. Two menu levels are supported. Please move this item\'s children first.';
+$string['error:itemhaschildren'] = 'You cannot change the parent of this item while it has children. Please move this items children first.';
 $string['error:managernotselected'] = 'Please select a manager';
 $string['error:menuitemcannotberemoved'] = '"{$a}" item can not be removed, please review your settings.';
 $string['error:menuitemcannotremove'] = '"{$a}" has the children which can not be removed, please review your settings.';
 $string['error:menuitemcannotremovechild'] = ' - can not delete this item';
 $string['error:menuitemclassnametoolong'] = 'Class name too long';
-$string['error:menuitemparentismissing'] = 'Menu item get_default_parent() method is missing in {$a} class';
-$string['error:menuitemtargetattrismissing'] = 'Menu item get_default_targetattr() method is missing in {$a} class';
 $string['error:menuitemtargetattrtoolong'] = 'Menu target attribute too long';
-$string['error:menuitemtitleismissing'] = 'Menu item get_default_title() method is missing in {$a} class';
 $string['error:menuitemtitletoolong'] = 'Menu title too long';
 $string['error:menuitemtitlerequired'] = 'Menu title required';
 $string['error:menuitemurlinvalid'] = 'Menu url address is invalid. Use "/" for a relative link of your domain name or full address for external link, i.e. http://extdomain.com';
-$string['error:menuitemurlismissing'] = 'Menu item get_default_url() method is missing in {$a} class';
 $string['error:menuitemurltoolong'] = 'Menu url address too long';
 $string['error:menuitemurlrequired'] = 'Menu url address required';
-$string['error:menuitemvisibilityismissing'] = 'Menu item get_default_visibility() method is missing in {$a} class';
 $string['error:morethanxitemsatthislevel'] = 'There are more than {$a} items at this level.';
 $string['error:norolesfound'] = 'No roles found';
 $string['error:notificationsparamtypewrong'] = 'Incorrect param type sent to Totara notifications';
@@ -386,6 +380,9 @@ $string['mypastbookings'] = 'My Past Bookings';
 $string['myprofile'] = 'My Profile';
 $string['myrecordoflearning'] = 'My Record of Learning';
 $string['myreports'] = 'My Reports';
+$string['mysqlneedsbarracuda'] = 'Advanced Totara features require InnoDB Barracuda storage format';
+$string['mysqlneedsfilepertable'] = 'Advanced Totara features require InnoDB File-Per-Table mode to be enabled';
+$string['mysqlneedsinnodb'] = 'The current database engine "{$a}" may not be compatible with Totara, it is strongly recommended to use InnoDB or XtraDB engine.';
 $string['myteam'] = 'My Team';
 $string['myteaminstructionaltext'] = 'Choose a team member from the table on the right.';
 $string['noassessors'] = 'No assessors found';
@@ -489,10 +486,11 @@ $string['tempmanagerselectionallusers'] = 'All users';
 $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['timecompleted'] = 'Time completed';
-$string['toggletotarasync'] = 'Toggle Totara sync';
-$string['toggletotarasyncerror'] = 'Could not enable/disable the totara sync field for user {$a}';
-$string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so totara sync cannot be enabled for these users: {$a}';
-$string['tooltotarasynctask'] = 'Sync Totara elements with external sources';
+$string['timezoneinvalid'] = 'Invalid timezone: {$a}';
+$string['toggletotarasync'] = 'Toggle HR Import';
+$string['toggletotarasyncerror'] = 'Could not enable/disable the HR Import field for user {$a}';
+$string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so HR Import cannot be enabled for these users: {$a}';
+$string['tooltotarasynctask'] = 'Import HR elements from external sources';
 $string['totarabuild'] = 'Totara build number';
 $string['totaracopyright'] = '<p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> is a distribution of Moodle. A "distro" or distribution is a ready-made extended version of the standard product with its own particular focus and vision. Totara is specifically designed for the requirements of corporate, industry and vocational training in contrast to standard Moodle\'s traditional educational setting.</p><p class="totara-copyright"><a href="http://www.totaralms.com">TotaraLMS</a> extensions are Copyright &copy; 2010 onwards, Totara Learning Solutions Limited.</p>';
 $string['totaracore'] = 'Totara core';

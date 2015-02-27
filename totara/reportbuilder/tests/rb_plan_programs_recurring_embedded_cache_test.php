@@ -86,13 +86,7 @@ class totara_reportbuilder_rb_plan_programs_recurring_embedded_cache_testcase ex
         $this->program2 = $this->getDataGenerator()->create_program();
 
         $this->getDataGenerator()->assign_program($this->program1->id, array($this->user1->id, $this->user1->id));
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
         $this->getDataGenerator()->assign_program($this->program2->id, array($this->user2->id));
-        if (!empty($CFG->messaging)) {
-            $this->assertDebuggingCalled();
-        }
 
         $this->course1 = $this->getDataGenerator()->create_course();
         $this->course2 = $this->getDataGenerator()->create_course();

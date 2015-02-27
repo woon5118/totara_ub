@@ -1548,7 +1548,7 @@ class hierarchy {
         $item->depthlevel = $depthlevel;
         $item->parentid = $parentid;
         $item->path = $parentpath; // We'll add the item's ID to the end of this later.
-        $item->timecreated = time();
+        $item->timecreated = $item->timemodified = time();
         $item->sortthread = $sortthread;
 
         // Set description to NULL, will be fixed in the post-insert html editor operations.

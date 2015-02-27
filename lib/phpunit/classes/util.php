@@ -237,6 +237,9 @@ class phpunit_util extends testing_util {
         // fix PHP settings
         error_reporting($CFG->debug);
 
+        // Totara tweaks.
+        date_default_timezone_set($CFG->phpinitimezone);
+
         // verify db writes just in case something goes wrong in reset
         if (self::$lastdbwrites != $DB->perf_get_writes()) {
             error_log('Unexpected DB writes in phpunit_util::reset_all_data()');

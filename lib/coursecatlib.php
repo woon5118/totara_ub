@@ -1527,7 +1527,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      */
     public function can_delete_full() {
         global $DB, $CFG;
-        if (!$this->id) {
+        // Prevent deletion the default category.
+        if (!$this->id || $CFG->defaultrequestcategory == $this->id) {
             // Fool-proof.
             return false;
         }

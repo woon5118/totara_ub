@@ -218,20 +218,23 @@ class mod_facetoface_renderer extends plugin_renderer_base {
                 if ($allowcancellation) {
                     $options .= html_writer::empty_tag('br');
                     $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
-                    $options .= html_writer::link($cancelurl, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                    $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
+                    $options .= html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface')));
                 }
             } else if (!$sessionstarted and !$bookedsession) {
                 if (!facetoface_session_has_capacity($session, $this->context, MDL_F2F_STATUS_WAITLISTED) && !$session->allowoverbook) {
                     $options .= get_string('none', 'facetoface');
                 } else {
                     $signupurl = new moodle_url('/mod/facetoface/signup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
-                    $options .= html_writer::link($signupurl, get_string('signup', 'facetoface'));
+                    $signuptext = facetoface_is_signup_by_waitlist($session) ? 'joinwaitlist' : 'signup';
+                    $options .= html_writer::link($signupurl, get_string($signuptext, 'facetoface'));
                 }
             }
             if (empty($options)) {
                 if ($sessionstarted && $allowcancellation) {
                     $cancelurl = new moodle_url('/mod/facetoface/cancelsignup.php', array('s' => $session->id, 'backtoallsessions' => $session->facetoface));
-                    $options = html_writer::link($cancelurl, get_string('cancelbooking', 'facetoface'), array('title' => get_string('cancelbooking', 'facetoface')));
+                    $canceltext = facetoface_is_user_on_waitlist($session) ? 'cancelwaitlist' : 'cancelbooking';
+                    $options = html_writer::link($cancelurl, get_string($canceltext, 'facetoface'), array('title' => get_string($canceltext, 'facetoface')));
                 } else {
                     $options = get_string('none', 'facetoface');
                 }

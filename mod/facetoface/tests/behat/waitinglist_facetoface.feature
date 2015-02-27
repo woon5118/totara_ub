@@ -92,14 +92,12 @@ Feature: Manager approval
     And I follow "Wait-list"
     Then I should see "Sam2 Student2"
     And I click on "input[type=checkbox]" "css_element" in the "Sam2 Student2" "table_row"
-    And I set the following fields to these values:
-      | menuf2f-actions | Confirm  |
+    And I set the field "menuf2f-actions" to "Confirm"
     And I press "Yes"
     And I should see "Successfully updated attendance"
     Then I should not see "Sam2 Student2"
     And I click on "input[type=checkbox]" "css_element" in the "Sam3 Student3" "table_row"
-    And I set the following fields to these values:
-      | menuf2f-actions | Cancel  |
+    And I set the field "menuf2f-actions" to "Cancel"
     And I should see "Successfully updated attendance"
     Then I should not see "Sam3 Student3"
     And I follow "Attendees"

@@ -78,9 +78,9 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
             $mform->addElement('static', 'uploadfilelink', get_string('uploadfilelink', 'tool_totara_sync', $link));
         }
 
-        $encodings = textlib::get_encodings();
+        $encodings = core_text::get_encodings();
         $mform->addElement('select', 'csvposencoding', get_string('csvencoding', 'tool_totara_sync'), $encodings);
-        $mform->setType('csvposencoding', PARAM_TEXT);
+        $mform->setType('csvposencoding', PARAM_ALPHANUMEXT);
         $default = $this->get_config('csvposencoding');
         $default = (!empty($default) ? $default : 'UTF-8');
         $mform->setDefault('csvposencoding', $default);
@@ -179,6 +179,11 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
         // Map CSV fields with db fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
+        $encoding = core_text::strtoupper($this->get_config('csvposencoding'));
+        if (!empty($fields) && substr($encoding, 0, 3) === 'UTF') {
+            // The file may begin with a UTF BOM (byte order mark), which needs to be stripped off.
+            $fields[0] = core_text::trim_utf8_bom($fields[0]);
+        }
         $fieldmappings = array();
         foreach ($this->fields as $field) {
             if (empty($this->config->{'import_'.$field})) {
@@ -244,7 +249,6 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
         $fieldcount->headercount = count($fields);
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
-        $encoding = textlib::strtoupper($this->get_config('csvposencoding'));
 
         while ($row = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;

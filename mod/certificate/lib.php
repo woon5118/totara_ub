@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/mod/certificate/archivelib.php'); // Totara feature.
+
 /**
  * Add certificate instance.
  *

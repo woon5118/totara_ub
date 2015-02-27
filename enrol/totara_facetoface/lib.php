@@ -390,7 +390,9 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             return $OUTPUT->box($output);
         }
 
-        if ($enrolstatus == get_string('cannotenrolalreadyrequested', 'enrol_totara_facetoface')) {
+        // This is a hack, unfortunately can_self_enrol returns error strings, an in this case it returns a string wrapped
+        // in rich HTML content.
+        if (strpos($enrolstatus, get_string('cannotenrolalreadyrequested', 'enrol_totara_facetoface')) !== false) {
             $url = new moodle_url('/enrol/totara_facetoface/withdraw.php', array('eid' => $instance->id));
 
             $output = html_writer::start_tag('p');

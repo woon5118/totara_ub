@@ -31,15 +31,21 @@ class mod_facetoface_cancelsignup_form extends moodleform {
     {
         $mform =& $this->_form;
         $attendeenote = $this->_customdata['attendee_note'];
+        $strheader = 'cancelbooking';
+        $strcancellationconfirm = 'cancellationconfirm';
+        if ($this->_customdata['userisinwaitlist']) {
+            $strheader = 'cancelwaitlist';
+            $strcancellationconfirm = 'waitlistcancellationconfirm';
+        }
 
-        $mform->addElement('header', 'general', get_string('cancelbooking', 'facetoface'));
+        $mform->addElement('header', 'general', get_string($strheader, 'facetoface'));
 
         $mform->addElement('hidden', 's', $this->_customdata['s']);
         $mform->setType('s', PARAM_INT);
         $mform->addElement('hidden', 'backtoallsessions', $this->_customdata['backtoallsessions']);
         $mform->setType('backtoallsessions', PARAM_INT);
 
-        $mform->addElement('html', get_string('cancellationconfirm', 'facetoface')); // instructions
+        $mform->addElement('html', get_string($strcancellationconfirm, 'facetoface')); // Instructions.
 
         $cancellation = new stdClass();
         $cancellation->id = $attendeenote->statusid;
