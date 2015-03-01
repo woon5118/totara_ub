@@ -5878,9 +5878,14 @@ class admin_setting_configdaymonthpicker extends admin_setting {
             $defaultinfo = null;
         }
 
-        // Saved settings.
-        $day = substr($data, 0, 2);
-        $month = substr($data, 2, 2);
+        // Saved settings - needs to parse the default array as well for upgrades.
+        if (is_array($data)) {
+            $day = $data['d'];
+            $month = $data['m'];
+        } else {
+            $day = substr($data, 0, 2);
+            $month = substr($data, 2, 2);
+        }
 
         $days = array_combine(range(1,31), range(1,31));
         $months = array();
