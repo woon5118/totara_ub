@@ -117,6 +117,30 @@ abstract class course_set {
         return $completiontypestr;
     }
 
+    /**
+     * Get html definition list of completion settings details (any, some, or all courses, min. number)
+     * This does not include list of courses itself.
+     *
+     * @return string
+     */
+    protected function get_completion_explanation_html() {
+        $out = '';
+        // Explain some or all courses must be completed.
+        $typestr = get_string('completeallcourses', 'totara_program');
+        if ($this->completiontype != COMPLETIONTYPE_ALL) {
+            if ($this->completiontype == COMPLETIONTYPE_ANY) {
+                // Only one course must be completed.
+                $typestr = get_string('completeanycourse', 'totara_program');
+            } else {
+                $a = new stdClass();
+                $a->mincourses = $this->mincourses;
+                $typestr = get_string('completemincourses', 'totara_program', $a);
+            }
+        }
+        $out .= html_writer::div($typestr);
+        return $out;
+    }
+
     public function get_set_prefix() {
         return $this->uniqueid;
     }
@@ -1041,7 +1065,7 @@ class multi_course_set extends course_set {
      */
     public function display_form_element() {
 
-        $completiontypestr = $this->completiontype == COMPLETIONTYPE_ALL ? get_string('and', 'totara_program') : get_string('or', 'totara_program');
+        $completiontypestr = $this->get_completion_type_string();
         $courses = $this->courses;
 
         $out = '';
@@ -1061,6 +1085,7 @@ class multi_course_set extends course_set {
         }
 
         $out .= html_writer::end_tag('div');
+        $out .= $this->get_completion_explanation_html();
 
         if (!isset($this->islastset) || $this->islastset === false) {
             if ($this->nextsetoperator != 0) {
@@ -1814,7 +1839,7 @@ class competency_course_set extends course_set {
      */
     public function display_form_element() {
 
-        $completiontypestr = $this->get_completion_type() == COMPLETIONTYPE_ALL ? get_string('and', 'totara_program') : get_string('or', 'totara_program');
+        $completiontypestr = $this->get_completion_type_string();
         $courses = $this->get_competency_courses();
 
         $out = '';
@@ -1834,6 +1859,7 @@ class competency_course_set extends course_set {
         }
 
         $out .= html_writer::end_tag('div');
+        $out .= $this->get_completion_explanation_html();
 
         if ($this->nextsetoperator != 0) {
             $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator'));
