@@ -6040,7 +6040,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         $mail->Encoding = '8bit';
         $mail->LE = "\r\n";
         $mail->AddCustomHeader("Content-class: urn:content-classes:calendarmessage\r\n");
-        $mail->AddCustomHeader("Content-Transfer-Encoding: 8bit\r\n");
+        // Do not add transfer encoding here because PHPMailer does it now.
     }
 
     if ($mail->send()) {
