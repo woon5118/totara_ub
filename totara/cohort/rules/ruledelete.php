@@ -33,9 +33,6 @@ $ruleid = required_param('ruleid', PARAM_INT);
 require_login();
 require_sesskey();
 
-$syscontext = context_system::instance();
-require_capability('totara/cohort:managerules', $syscontext);
-
 //todo don't delete while this cohort is being processed?
 
 $rule = $DB->get_record('cohort_rules', array('id' => $ruleid), '*', MUST_EXIST);
@@ -48,6 +45,10 @@ $colldetails = $DB->get_record_sql($sql, array($rule->rulesetid));
 
 // Get cohort.
 $cohort = $DB->get_record('cohort', array('id' => $colldetails->cohortid));
+
+// Get context based on the context level of the cohort.
+$context = context::instance_by_id($cohort->contextid);
+require_capability('totara/cohort:managerules', $context);
 
 $success = $DB->delete_records('cohort_rules', array('id' => $ruleid)) && $DB->delete_records('cohort_rule_params', array('ruleid' => $ruleid));
 

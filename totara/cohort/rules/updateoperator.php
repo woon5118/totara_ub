@@ -36,8 +36,9 @@ $cohortid = required_param('cohortid', PARAM_INT);
 require_login();
 require_sesskey();
 
-$syscontext = context_system::instance();
-require_capability('totara/cohort:managerules', $syscontext);
+$cohort = $DB->get_record('cohort', array('id' => $cohortid));
+$context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+require_capability('totara/cohort:managerules', $context);
 
 $result = totara_cohort_update_operator($cohortid, $id, $type, $value);
 if ($type === COHORT_OPERATOR_TYPE_COHORT) {

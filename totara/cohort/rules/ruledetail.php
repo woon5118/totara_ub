@@ -29,12 +29,33 @@ require_once($CFG->dirroot.'/totara/cohort/rules/lib.php');
 
 require_login();
 
-$syscontext = context_system::instance();
-require_capability('totara/cohort:managerules', $syscontext);
-$PAGE->set_context($syscontext);
-
 $type = required_param('type', PARAM_ALPHA);
 $id = required_param('id', PARAM_INT);
+
+// Get the cohort contextid so we can determin permissions.
+if ($type == 'rule' || $type == 'ruleset') {
+    if ($type == 'rule') {
+        $rulesetid = $DB->get_field('cohort_rules', 'rulesetid', array('id' => $id));
+    } else {
+        $rulesetid = $id;
+    }
+
+    $cohort = $DB->get_record_sql(
+        "SELECT c.id, c.contextid
+        FROM {cohort} c
+        INNER JOIN {cohort_rule_collections} crc
+        ON c.id = crc.cohortid
+        INNER JOIN {cohort_rulesets} crs
+        ON crc.id = crs.rulecollectionid
+        WHERE crs.id = ?", array($rulesetid)
+    );
+} else {
+    $cohort = $DB->get_record('cohort', array('id' => $id));
+}
+
+$context = context::instance_by_id($cohort->contextid);
+require_capability('totara/cohort:managerules', $context);
+$PAGE->set_context($context);
 
 if ($type == 'rule') {
     $ruleobj = $DB->get_record('cohort_rules', array('id' => $id));

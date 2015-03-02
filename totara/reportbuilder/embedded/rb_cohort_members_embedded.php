@@ -29,7 +29,7 @@ class rb_cohort_members_embedded extends rb_base_embedded {
     public $hidden, $accessmode, $accesssettings, $shortname;
 
     public function __construct($data) {
-    $cohortid = array_key_exists('cohortid', $data) ? $data['cohortid'] : null;
+        $cohortid = array_key_exists('cohortid', $data) ? $data['cohortid'] : null;
         $this->url = '/cohort/members.php';
         $this->source = 'cohort_members';
         $this->shortname = 'cohort_members';
@@ -82,7 +82,14 @@ class rb_cohort_members_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
-        $context = context_system::instance();
+        global $DB;
+
+        if (isset($this->embeddedparams['cohortid'])) {
+            $cohort = $DB->get_record('cohort', array('id' => $this->embeddedparams['cohortid']));
+            $context = context::instance_by_id($cohort->contextid);
+        } else {
+            $context = context_system::instance();
+        }
         return has_capability('moodle/cohort:view', $context, $reportfor);
     }
 }

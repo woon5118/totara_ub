@@ -32,22 +32,35 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format','',PARAM_TEXT); //export format
 $debug  = optional_param('debug', false, PARAM_BOOL);
 
-$context = context_system::instance();
-
-$PAGE->set_context($context);
-
-$url = new moodle_url('/cohort/members.php', array('id' => $id, 'format' => $format, 'debug' => $debug));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
-
 if (!$id) {
+    $context = context_system::instance();
+    $PAGE->set_context($context);
+
+    $url = new moodle_url('/cohort/members.php', array('id' => $id, 'format' => $format, 'debug' => $debug));
+    admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
+
     echo $OUTPUT->header();
     $url = new moodle_url('/cohort/index.php');
     echo $OUTPUT->container(get_string('cohortmembersselect', 'totara_cohort', $url->out()));
     echo $OUTPUT->footer();
     exit;
-}
+} else {
+    $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 
-$cohort = $DB->get_record('cohort',array('id' => $id), '*', MUST_EXIST);
+    $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+    $PAGE->set_context($context);
+
+    $url = new moodle_url('/cohort/members.php', array('id' => $id));
+
+    if ($context->contextlevel == CONTEXT_SYSTEM) {
+        admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
+    } else {
+        $PAGE->set_heading($COURSE->fullname);
+        $PAGE->set_pagelayout('report');
+        $PAGE->set_url($url);
+        $PAGE->set_title($cohort->name . ' : ' . get_string('members', 'totara_cohort'));
+    }
+}
 
 $report = reportbuilder_get_embedded_report('cohort_members', array('cohortid' => $id), false, $sid);
 
@@ -56,6 +69,13 @@ if ($format != '') {
     die;
 }
 
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid'=>$cohort->contextid)));
+
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
 $strheading = get_string('viewmembers', 'totara_cohort');
 totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
 echo $OUTPUT->header();

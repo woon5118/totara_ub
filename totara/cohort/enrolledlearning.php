@@ -32,19 +32,16 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$context = context_system::instance();
-
 $id     = optional_param('id', false, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // Export format.
 $debug  = optional_param('debug', false, PARAM_BOOL);
 
-$PAGE->set_context($context);
-
-$url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id, 'format' => $format, 'debug' => $debug));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
-
 if (!$id) {
+    $context = context_system::instance();
+    $PAGE->set_context($context);
+    $PAGE->set_url(new moodle_url('/totara/cohort/enrolledlearning.php'));
+
     echo $OUTPUT->header();
     $url = new moodle_url('/cohort/index.php');
     echo $OUTPUT->container(get_string('cohortenrolledlearningselect', 'totara_cohort', $url->out()));
@@ -52,7 +49,21 @@ if (!$id) {
     exit;
 }
 
+$cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
+
+$context = context::instance_by_id($cohort->contextid);
+$PAGE->set_context($context);
+
 $report = reportbuilder_get_embedded_report('cohort_associations_enrolled', array('cohortid' => $id), false, $sid);
+
+$url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id));
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
+} else {
+    $PAGE->set_url($url);
+    $PAGE->set_heading($COURSE->fullname);
+    $PAGE->set_title($cohort->name . ' : ' . get_string('enrolledlearning', 'totara_cohort'));
+}
 
 // Handle a request for export
 if ($format != '') {
@@ -61,8 +72,6 @@ if ($format != '') {
 }
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
-
-$cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 
 // Setup lightbox.
 local_js(
@@ -108,6 +117,12 @@ $args = array('args'=>'{"cohortid":'.$cohort->id.','.
         '"COMPLETION_EVENT_ENROLLMENT_DATE":'.COMPLETION_EVENT_ENROLLMENT_DATE.'}');
 $PAGE->requires->js_init_call('M.totara_cohortprogramcompletion.init', $args, false, $jsmodule);
 
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $category = $DB->get_record('course_categories', array('id' => $context->instanceid), '*', MUST_EXIST);
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid' => $cohort->contextid)));
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
 $strheading = get_string('enrolledlearning', 'totara_cohort');
 totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
 echo $OUTPUT->header();
@@ -121,20 +136,22 @@ echo cohort_print_tabs('enrolledlearning', $cohort->id, $cohort->cohorttype, $co
 
 echo html_writer::start_tag('div', array('class' => 'buttons'));
 
-// add courses
-echo html_writer::start_tag('div', array('class' => 'singlebutton'));
-echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-course-learningitem-dialog',
-    'value' => get_string('addcourses', 'totara_cohort')));
-echo html_writer::end_tag('div');
+// Add courses.
+if (has_capability('moodle/course:update', $context)) {
+    echo html_writer::start_tag('div', array('class' => 'singlebutton'));
+    echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-course-learningitem-dialog',
+        'value' => get_string('addcourses', 'totara_cohort')));
+    echo html_writer::end_tag('div');
+}
 
 // Add programs and certifications.
-if (totara_feature_visible('programs')) {
+if (totara_feature_visible('programs') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
         'value' => get_string('addprograms', 'totara_cohort')));
     echo html_writer::end_tag('div');
 }
-if (totara_feature_visible('certifications')) {
+if (totara_feature_visible('certifications') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
         'value' => get_string('addcertifications', 'totara_cohort')));

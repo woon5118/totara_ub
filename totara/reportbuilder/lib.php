@@ -5798,7 +5798,8 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
                 }
             }
         }
-        $report = new reportbuilder($newid);
+
+        $report = new reportbuilder($newid, null, false, null, null, false, $embed->embeddedparams);
         \totara_reportbuilder\event\report_created::create_from_report($report, true)->trigger();
 
         $transaction->allow_commit();

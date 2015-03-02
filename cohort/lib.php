@@ -389,16 +389,17 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
     $inactive = NULL;
     $activetwo = NULL;
     $toprow = array();
+    $cohortcontext = context::instance_by_id($cohort->contextid, MUST_EXIST);
     $systemcontext = context_system::instance();
-    $canmanage = has_capability('moodle/cohort:manage', $systemcontext);
-    $canmanagerules = has_capability('totara/cohort:managerules', $systemcontext);
+    $canmanage = has_capability('moodle/cohort:manage', $cohortcontext);
+    $canmanagerules = has_capability('totara/cohort:managerules', $cohortcontext);
+    $cancreateplancohort = has_capability('totara/plan:cancreateplancohort', $systemcontext);
     $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext);
-    $canassign = has_capability('moodle/cohort:assign', $systemcontext);
+    $canassign = has_capability('moodle/cohort:assign', $cohortcontext);
     $canassignroles = has_capability('moodle/role:assign', $systemcontext);
-    $canview = has_capability('moodle/cohort:view', $systemcontext);
+    $canview = has_capability('moodle/cohort:view', $cohortcontext);
 
     if ($canview) {
-
         $toprow[] = new tabobject('view', new moodle_url('/cohort/view.php', array('id' => $cohortid)),
                     get_string('overview','totara_cohort'));
     }
@@ -436,12 +437,12 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('visiblelearning', 'totara_cohort'));
     }
 
-    if (totara_feature_visible('learningplans') && $canmanage) {
+    if (totara_feature_visible('learningplans') && $canmanage && $cancreateplancohort) {
         $toprow[] = new tabobject('plans', new moodle_url('/totara/cohort/learningplan.php', array('id' => $cohortid)),
             get_string('learningplan', 'totara_cohort'));
     }
 
-    if (totara_feature_visible('goals') && $canmanage) {
+    if (totara_feature_visible('goals') && $canview) {
         $toprow[] = new tabobject('goals', new moodle_url('/totara/cohort/goals.php', array('id' => $cohortid)),
             get_string('goals', 'totara_hierarchy'));
     }

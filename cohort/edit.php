@@ -39,10 +39,6 @@ $contextid = optional_param('contextid', 0, PARAM_INT);
 $delete    = optional_param('delete', 0, PARAM_BOOL);
 $confirm   = optional_param('confirm', 0, PARAM_BOOL);
 
-$url = new moodle_url('/cohort/edit.php', array('id' => $id, 'contextid' => $contextid,
-    'delete' => $delete, 'confirm' => $confirm));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
-
 require_login();
 
 $category = null;
@@ -51,6 +47,7 @@ if ($id) {
     if ($usetags) {
         $cohort->otags = array_keys(tag_get_tags_array('cohort', $cohort->id, 'official'));
     }
+
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {
     $context = context::instance_by_id($contextid, MUST_EXIST);
@@ -78,6 +75,7 @@ $PAGE->set_context($context);
 $PAGE->set_url('/cohort/edit.php', array('contextid'=>$context->id, 'id'=>$cohort->id));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_heading($COURSE->fullname);
 
 if ($context->contextlevel == CONTEXT_COURSECAT) {
     $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
@@ -85,6 +83,9 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 
 } else {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
+if ($id && $cohort->name) {
+    $PAGE->navbar->add(s($cohort->name), $CFG->wwwroot.'/cohort/view.php?id='.$id);
 }
 
 if ($delete and $cohort->id) {
@@ -116,7 +117,7 @@ if ($cohort->id) {
     $strheading = get_string('addcohort', 'cohort');
 }
 
-$PAGE->set_title($strheading);
+$PAGE->set_title($cohort->name . ' : ' . $strheading);
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->navbar->add($strheading);
 
@@ -156,10 +157,13 @@ if ($editform->is_cancelled()) {
         //update textarea
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context, 'cohort', 'cohort', $cohortid);
         $DB->set_field('cohort', 'description', $data->description, array('id' => $cohortid));
-        if ($data->cohorttype == cohort::TYPE_STATIC) {
+
+        if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
             $url = new moodle_url('/cohort/assign.php', array('id' => $cohortid));
-        } else {
+        } else if (has_capability('totara/cohort:managerules', $context)) {
             $url = new moodle_url('/totara/cohort/rules.php', array('id' => $cohortid));
+        } else {
+            $url = new moodle_url('/cohort/view.php', array('id' => $cohortid));
         }
         redirect($url);
     }
