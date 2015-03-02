@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014031200; // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2013050100; // Requires this Moodle version
+$plugin->version  = 2015030200;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2014051205;       // Requires this Moodle version.
 $plugin->component = 'theme_customtotararesponsive'; // Full name of the plugin (used for diagnostics)
