@@ -349,7 +349,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      */
     public function cache_pending_notification($report = 0) {
         global $CFG;
-        if (!$CFG->enablereportcaching) {
+        if (empty($CFG->enablereportcaching)) {
             return '';
         }
         if (is_numeric($report)) {
