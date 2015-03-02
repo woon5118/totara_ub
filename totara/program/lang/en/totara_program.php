@@ -212,6 +212,7 @@ $string['createandreturn'] = 'Create and return to overview';
 $string['createcourse'] = 'Create course';
 $string['createnewprogram'] = 'Create new program';
 $string['createprogram'] = 'Create program';
+$string['criteriacompletioncourseset'] = 'Criteria completion for this course set is based on: {$a}';
 $string['currentduedate'] = 'Current due date';
 $string['currenticon'] = 'Current icon';
 $string['currentlyassigned'] = 'User already assigned to program via learning plan';
