@@ -54,6 +54,27 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * We expect to be on a Totara site.
+     *
+     * @Given /^I am on a totara site$/
+     */
+    public function i_am_on_a_totara_site() {
+        global $DB;
+        // Set Totara defaults. This is to undo the work done in /lib/behat/classes/util.php around line 90
+        set_config('enablecompletion', 1);
+        set_config('forcelogin', 1);
+        set_config('enrol_plugins_enabled', 'manual,guest,self,cohort,totara_program');
+        set_config('enhancedcatalog', 1);
+        set_config('preventexecpath', 1);
+        $DB->set_field('role', 'name', 'Site Manager', array('shortname' => 'manager'));
+        $DB->set_field('role', 'name', 'Editing Trainer', array('shortname' => 'editingteacher'));
+        $DB->set_field('role', 'name', 'Trainer',array('shortname' => 'teacher'));
+        $DB->set_field('role', 'name', 'Learner', array('shortname' => 'student'));
+        $DB->set_field('modules', 'visible', 0, array('name'=>'workshop'));
+        $DB->set_field('modules', 'visible', 0, array('name'=>'feedback'));
+    }
+
+    /**
      * Finds a totara menu item and returns the node.
      *
      * @param string $text
