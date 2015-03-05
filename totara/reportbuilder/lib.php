@@ -5104,6 +5104,8 @@ function reportbuilder_generate_cache($reportid) {
  */
 function reportbuilder_send_scheduled_report($sched) {
     global $CFG, $DB, $REPORT_BUILDER_EXPORT_OPTIONS;
+    require_once($CFG->dirroot . '/totara/reportbuilder/email_setting_schedule.php');
+
     $export_codes = array_flip($REPORT_BUILDER_EXPORT_OPTIONS);
 
     if (!$user = $DB->get_record('user', array('id' => $sched->userid))) {
@@ -5173,7 +5175,21 @@ function reportbuilder_send_scheduled_report($sched) {
     $emailed = false;
 
     if ($sched->exporttofilesystem != REPORT_BUILDER_EXPORT_SAVE) {
-        $emailed = email_to_user($user, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
+        // Get all emails set in the schedule report.
+        $scheduleemail = new email_setting_schedule($sched->id);
+        $systemusers   = $scheduleemail->get_all_system_users_to_email();
+        $externalusers = email_setting_schedule::get_external_users_to_email($sched->id);
+
+        // Sending email to all system users.
+        foreach ($systemusers as $user) {
+            $emailed = email_to_user($user, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
+        }
+
+        // Sending email to external users.
+        foreach ($externalusers as $email) {
+            $userto = \totara_core\totara_user::get_external_user($email);
+            $emailed = email_to_user($userto, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
+        }
     }
 
     if (!unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $attachment)) {

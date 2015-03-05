@@ -40,7 +40,9 @@ $string['addanothersearchcolumn'] = 'Add another search column...';
 $string['addbadges'] = 'Add badges';
 $string['addcohorts'] = 'Add audiences';
 $string['addedscheduledreport'] = 'Added new scheduled report';
+$string['addexternalemail'] = 'Add email';
 $string['addscheduledreport'] = 'Add scheduled report';
+$string['addsystemusers'] = 'Add system user(s)';
 $string['addnewscheduled'] = 'Add scheduled';
 $string['advanced'] = 'Advanced?';
 $string['advancedcolumnheading'] = 'Aggregation or grouping';
@@ -187,6 +189,9 @@ $string['editingsavedsearch'] = 'Editing saved search';
 $string['editreport'] = 'Edit Report \'{$a}\'';
 $string['editscheduledreport'] = 'Edit Scheduled Report';
 $string['editthisreport'] = 'Edit this report';
+$string['emailexternaluserisonthelist'] = 'This email is already on the external users email list';
+$string['emailexternalusers'] = 'External users email';
+$string['emailexternalusers_help'] = 'Please enter one email address in the box below';
 $string['embedded'] = 'Embedded';
 $string['embeddedaccessnotes'] = '<strong>Warning:</strong> Embedded reports may have their own access restrictions applied to the page they are embedded into. They may ignore the settings below, or they may apply them as well as their own restrictions.';
 $string['embeddedcontentnotes'] = '<strong>Warning:</strong> Embedded reports may have further content restrictions applied via <em>embedded parameters</em>. These can further limit the content that is shown in the report';
@@ -715,6 +720,7 @@ $string['savesearch'] = 'Save this search';
 $string['saving'] = 'Saving...';
 $string['schedule'] = 'Schedule';
 $string['scheduledaily'] = 'Daily';
+$string['scheduledemailtosettings'] = 'Email Settings';
 $string['scheduledreportmessage'] = 'Attached is a copy of the \'{$a->reportname}\' report in {$a->exporttype}. {$a->savedtext}
 
 You can also view this report online at:
@@ -809,6 +815,7 @@ from the dropdown menu and clicking **Save changes**.';
 $string['suspendedonly'] = 'Suspended users only';
 $string['suspendeduser'] = 'Suspended user';
 $string['systemcontext'] = 'Users must have role in the system context';
+$string['systemusers'] = 'System users';
 $string['tagenable'] = 'Show records by tag';
 $string['taggedx'] = 'Tagged \'{$a}\'';
 $string['tagids'] = 'Tag IDs';
