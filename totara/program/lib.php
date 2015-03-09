@@ -2109,8 +2109,8 @@ function prog_is_accessible($program, $user = null) {
         $capability = 'totara/program:viewhiddenprograms';
     }
 
-    $syscontext = context_system::instance();
-    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $syscontext) || has_capability($capability, $syscontext);
+    $context = context_program::instance($program->id);
+    $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $context) || has_capability($capability, $context);
     if (!empty($CFG->audiencevisibility) && !$canmanagevisibility && $program->audiencevisible == COHORT_VISIBLE_NOUSERS) {
         return false;
     }

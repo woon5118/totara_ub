@@ -44,12 +44,12 @@ class program_edit_form extends moodleform {
         $nojs = (isset($this->_customdata['nojs'])) ? $this->_customdata['nojs'] : 0 ;
         $iscertif = (isset($this->_customdata['iscertif'])) ? $this->_customdata['iscertif'] : 0;
 
-        $systemcontext = context_system::instance();
-        $categorycontext = context_coursecat::instance($category->id);
         $config = get_config('moodlecourse');
 
         if ($program) {
-            $programcontext = context_program::instance($program->id);
+            $context = context_program::instance($program->id);
+        } else {
+            $context = context_coursecat::instance($category->id);
         }
 
         // Add some hidden fields
@@ -84,7 +84,7 @@ class program_edit_form extends moodleform {
         }
 
         // Must have create program capability in both categories in order to move program
-        if (has_capability('totara/program:createprogram', $categorycontext)) {
+        if (has_capability('totara/program:createprogram', $context)) {
             $displaylist = array();
             $attributes = array();
             $attributes['class'] = 'totara-limited-width';
@@ -98,7 +98,7 @@ class program_edit_form extends moodleform {
 
         if ($action == 'view') {
             $mform->hardFreeze('category');
-        } else if ($program and !has_capability('moodle/course:changecategory', $categorycontext)) {
+        } else if ($program and !has_capability('moodle/course:changecategory', $context)) {
         // Use the course permissions to decide if a user can change a program's category
         // (as programs are treated like courses in this respect)
             $mform->hardFreeze('category');
@@ -164,7 +164,7 @@ class program_edit_form extends moodleform {
         if ($action == 'view') {
             if ($program) {
                 $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php',
-                    $programcontext->id, 'totara_program', 'summary', 0);
+                    $context->id, 'totara_program', 'summary', 0);
                 if (!empty($summary)) {
                     $mform->addElement('static', null, get_string('description', 'totara_program'), $summary);
                 }
@@ -210,7 +210,7 @@ class program_edit_form extends moodleform {
         if ($action == 'view') {
             if ($program) {
                 $endnote = file_rewrite_pluginfile_urls($program->endnote, 'pluginfile.php',
-                    $programcontext->id, 'totara_program', 'endnote', 0);
+                    $context->id, 'totara_program', 'endnote', 0);
                 if (!empty($endnote)) {
                     $mform->addElement('static', null, get_string('endnote', 'totara_program'), $endnote);
                 }
@@ -249,7 +249,7 @@ class program_edit_form extends moodleform {
                 $mform->setExpanded('visiblecohortshdr');
             } else {
                 // Only show the Audiences Visibility functionality to users with the appropriate permissions.
-                if (has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext)) {
+                if (has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
                     $mform->addElement('header', 'visiblecohortshdr', get_string('audiencevisibility', 'totara_cohort'));
                     $mform->addElement('select', 'audiencevisible', get_string('visibility', 'totara_cohort'), $COHORT_VISIBILITY);
                     $mform->addHelpButton('audiencevisible', 'visiblelearning', 'totara_cohort');

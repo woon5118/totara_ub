@@ -38,18 +38,22 @@ try {
 }
 
 // Check user capabilities.
-$contextsystem = context_system::instance();
 if ($instancetype === COHORT_ASSN_ITEMTYPE_COURSE) {
     $context = context_course::instance($instanceid);
 } else if ($instancetype === COHORT_ASSN_ITEMTYPE_CATEGORY) {
     $context = context_coursecat::instance($instanceid);
+} else if ($instancetype === COHORT_ASSN_ITEMTYPE_PROGRAM || $instancetype === COHORT_ASSN_ITEMTYPE_CERTIF) {
+    $context = context_program::instance($instanceid);
 } else {
-    $context = $contextsystem;
+    $context = context_system::instance();
 }
 $capable = false;
-if (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $contextsystem)) {
+if (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $context)) {
     $capable = true;
 }
+
+// Check cohort permissions.
+require_capability('totara/coursecatalog:manageaudiencevisibility', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/cohort/dialog/cohort.php');

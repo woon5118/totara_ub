@@ -35,21 +35,22 @@ try {
     die(json_encode($error));
 }
 
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
-$courseid   = optional_param('courseid', 0, PARAM_INT);
+$instancetype = required_param('instancetype', PARAM_INT);
+$instanceid = required_param('instanceid', PARAM_INT);
 $itemids = required_param('itemid', PARAM_SEQUENCE);
 $itemids = explode(',', $itemids);
 
 // Check user capabilities.
-$contextsystem = context_system::instance();
-if ((int)$courseid > 0) {
-    $context = context_course::instance((int)$courseid);
-} else if ((int)$categoryid > 0) {
-    $context = context_coursecat::instance((int)$categoryid);
+if ($instancetype === COHORT_ASSN_ITEMTYPE_COURSE) {
+    $context = context_course::instance($instanceid);
+} else if ($instancetype === COHORT_ASSN_ITEMTYPE_PROGRAM ||
+           $instancetype === COHORT_ASSN_ITEMTYPE_CERTIF) {
+    $context = context_program::instance($instanceid);
 } else {
-    $context = $contextsystem;
+    $context = context_system::instance();
 }
-if (false == (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $contextsystem))) {
+
+if ((!has_capability('moodle/cohort:view', $context)) && (!has_capability('moodle/cohort:manage', $contextsystem))) {
     print_error('error:capabilitycohortview', 'totara_cohort');
 }
 
