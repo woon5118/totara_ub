@@ -58,13 +58,30 @@ class clean_enrolment_plugins_task extends \core\task\scheduled_task {
         $program_plugin = enrol_get_plugin('totara_program');
 
         // Fix courses that are in a courseset but do not have the enrolment plugin.
+        // Or where enrolments are incorrectly suspended.
         $program_courses = prog_get_courses_associated_with_programs();
         foreach ($program_courses as $course) {
             $program_plugin->add_instance($course);
+            // Check for suspended program enrolments that should be active on this course.
+            $sql = "SELECT DISTINCT ue.userid from {user_enrolments} ue
+                          LEFT JOIN {enrol} e ON ue.enrolid=e.id AND e.enrol = ?
+                          LEFT JOIN {prog_user_assignment} pua ON ue.userid = pua.userid
+                          LEFT JOIN {prog_courseset} pc ON pua.programid = pc.programid
+                          LEFT JOIN {prog_courseset_course} pcc ON pc.id = pcc.coursesetid AND pcc.courseid = ?
+                              WHERE ue.status = ?
+                                AND e.courseid = ?";
+            $params = array('totara_program', $course->id, ENROL_USER_SUSPENDED, $course->id);
+            $records = $DB->get_recordset_sql($sql, $params);
+            if ($records) {
+                $instance = $program_plugin->get_instance_for_course($course->id);
+                foreach ($records as $record) {
+                    $program_plugin->update_user_enrol($instance, $record->userid, ENROL_USER_ACTIVE);
+                }
+            }
         }
 
         // Now the other way round: get courses with the plugin that are NOT in coursesets -
-        // need to check if they are linked to a program via a competency.
+        // Need to check if they are linked to a program via a competency.
         $params = array('totara_program');
         if (count($program_courses) > 0) {
             list($notinsql, $notinparams) = $DB->get_in_or_equal(array_keys($program_courses), SQL_PARAMS_QM, 'param', false);

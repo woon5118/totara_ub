@@ -1784,6 +1784,7 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
     $courses = $DB->get_records_sql($coursesql, $courseparams);
 
     foreach ($courses as $course) {
+        $userstosuspend = array();
         if (CLI_SCRIPT && $debugging) {
             mtrace("Checking enrolments for Course-{$course->id}...");
         }
@@ -1800,7 +1801,7 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
         $instance = $program_plugin->get_instance_for_course($course->id);
 
         foreach ($enrolments as $enrolment) {
-            // Check to see if they user should still be able to access the course.
+            // Check to see if the user should still be able to access the course.
             if (CLI_SCRIPT && $debugging) {
                 mtrace("Checking enrolment-{$enrolment->id}");
             }
@@ -1808,14 +1809,17 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
             $user = $DB->get_record('user', array('id' => $enrolment->userid));
             $access = prog_can_enter_course($user, $course);
             if (!$access->enroled) {
-                // If they can't, then remove the enrolment.
+                // If they can't, then add the user to the list of users to suspend.
                 if (CLI_SCRIPT && $debugging) {
-                    mtrace("unenrolling user-{$enrolment->userid}");
+                    mtrace("suspending enrolment for user-{$enrolment->userid}");
                 }
-                $program_plugin->unenrol_user($instance, $enrolment->userid);
+                $userstosuspend[] = $enrolment->userid;
             } else if (CLI_SCRIPT && $debugging) {
                 mtrace("user-{$enrolment->userid} can still access the course");
             }
+        }
+        if (!empty($userstosuspend)) {
+            $program_plugin->process_program_unassignments($instance, $userstosuspend);
         }
     }
 }
