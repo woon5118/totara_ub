@@ -3941,17 +3941,17 @@ class reportbuilder {
      * @return string The appropriate font based on the language
      */
     function get_font($language) {
-        if (in_array($language, array('zh_cn', 'ja'))) {
-            return 'droidsansfallback';
-        } else if ($language == 'th') {
-            return 'cordiaupc';
-        } else {
-            // NOTE: previously used 'dejavusans' is not compatible with iOS 7 and older devices,
-            //       'freesans' on the other hand does not support all languages.
-            //       Ideally this should be admin configurable so that multilingual sites
-            //       may decide to use Arial Unicode here.
+        $setting = get_config('reportbuilder', 'pdffont');
+        if (empty($setting)) {
+            // If the setting is empty we will select an appropriate default font.
+            if (in_array($language, array('zh_cn', 'ja'))) {
+                return 'droidsansfallback';
+            } else if ($language == 'th') {
+                return 'cordiaupc';
+            }
             return 'freeserif';
         }
+        return $setting;
     }
 
     /* Download current table to Google Fusion

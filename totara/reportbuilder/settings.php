@@ -64,6 +64,9 @@ $rb->add(new admin_setting_configdirectory('reportbuilder/exporttofilesystempath
 $rb->add(new admin_setting_configdaymonthpicker('reportbuilder/financialyear', new lang_string('financialyear', 'totara_reportbuilder'),
          new lang_string('reportbuilderfinancialyear_help', 'totara_reportbuilder'), array('d'=> 1, 'm'=>7)));
 
+$rb->add(new totara_core_admin_setting_font('reportbuilder/pdffont', new lang_string('pdffont', 'totara_reportbuilder'),
+    new lang_string('pdffont_help', 'totara_reportbuilder'), ''));
+
 // Add all above settings to the report builder settings node.
 $ADMIN->add('totara_reportbuilder', $rb);
 

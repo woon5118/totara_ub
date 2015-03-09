@@ -242,6 +242,7 @@ $string['exportformat'] = 'Export format';
 $string['facetoface'] = 'Face-to-face';
 $string['findcourses'] = 'Find Courses';
 $string['findlearning'] = 'Find Learning';
+$string['fontdefault'] = 'Appropriate default';
 $string['framework'] = 'Framework';
 $string['heading'] = 'Heading';
 $string['headingcolumnsdescription'] = 'The fields below define which data appear in the Report Heading Block. This block contains information about a specific user, and can appear in many locations throughout the site.';
