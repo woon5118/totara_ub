@@ -90,6 +90,7 @@ $string['courseicon'] = 'Course icon';
 $string['courseprogress'] = 'Course progress';
 $string['courseprogresshelp'] = 'This specifies if the course progress block appears on the homepage';
 $string['coursetype'] = 'Course Type';
+$string['cronscheduleregularity'] = 'Your cron is not run very regularly. We recommend configuring the cron to run every minute, this way scheduled tasks will run as configured below and system load will be minimised.';
 $string['csvdateformat'] = 'CSV Import date format';
 $string['csvdateformatconfig'] = 'Date format to be used in CSV imports like user uploads with date custom profile fields, or HR Import.
 

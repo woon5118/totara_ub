@@ -1711,7 +1711,7 @@ abstract class rb_base_source {
     function rb_group_percent($field) {
         global $DB;
 
-        return $DB->sql_cast_char2int("AVG($field)*100.0");
+        return $DB->sql_round("AVG($field*100.0)", 0);
     }
 
     // return list as single field, separated by commas

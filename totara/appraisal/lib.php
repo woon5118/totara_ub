@@ -739,8 +739,15 @@ class appraisal {
             $alert->fullmessage = $formdata->alertbody;
             $alert->fullmessagehtml = $alert->fullmessage;
 
-            $params = array('appraisalid' => $formdata->id, 'timecompleted' => null, 'status' => self::STATUS_ACTIVE);
-            $learners = $DB->get_records('appraisal_user_assignment', $params, null, 'userid AS id');
+            $learnersql = "SELECT u.*
+                            FROM {appraisal_user_assignment} aua
+                       LEFT JOIN {user} u
+                              ON aua.userid = u.id
+                           WHERE aua.appraisalid = :appraisalid
+                             AND aua.timecompleted IS NULL
+                             AND aua.status = :status";
+            $learnerparams = array('appraisalid' => $formdata->id, 'status' => self::STATUS_ACTIVE);
+            $learners = $DB->get_records_sql($learnersql, $learnerparams);
 
             foreach ($learners as $learner) {
                 $alert->userto = $learner;
@@ -751,7 +758,7 @@ class appraisal {
             $alert->subject = get_string('closealerttitledefault', 'totara_appraisal', $this);
 
             // Find all users in roles that are not learner, who have a learner who is not finished.
-            $sql = 'SELECT ara.userid AS id,
+            $rolesql = 'SELECT ara.userid AS id,
                            ' . sql_group_concat($DB->sql_fullname('usr.firstname', 'usr.lastname')) . ' AS staff
                       FROM {appraisal_user_assignment} aua
                       JOIN {appraisal_role_assignment} ara
@@ -759,13 +766,13 @@ class appraisal {
                       JOIN {user} usr
                         ON aua.userid = usr.id
                      WHERE aua.timecompleted IS NULL
-                       AND aua.appraisalid = ?
-                       AND aua.status = ?
-                       AND ara.appraisalrole != ?
+                       AND aua.appraisalid = :appraisalid
+                       AND aua.status = :status
+                       AND ara.appraisalrole != :roletype
                        AND ara.userid <> 0
-                     GROUP BY ara.userid';
-
-            $roleusers = $DB->get_records_sql($sql, array($formdata->id, self::STATUS_ACTIVE, self::ROLE_LEARNER));
+                  GROUP BY ara.userid';
+            $roleparams = array('appraisalid' => $formdata->id, 'status' => self::STATUS_ACTIVE, 'roletype' => self::ROLE_LEARNER);
+            $roleusers = $DB->get_records_sql($rolesql, $roleparams);
 
             foreach ($roleusers as $roleuser) {
                 $formdata->staff = $roleuser->staff;
@@ -4653,7 +4660,7 @@ class appraisal_message {
         $params = array($this->appraisalid);
 
         // If this gets any more complex we might want to replace it with get_in_or_equal().
-        if ($this->type == 'appraisal_stage_completion') {
+        if ($this->type == self::EVENT_STAGE_COMPLETE) {
             $where .= " AND (status = ? OR status = ?)";
             $params[] = appraisal::STATUS_ACTIVE;
             $params[] = appraisal::STATUS_COMPLETED;
@@ -4669,7 +4676,7 @@ class appraisal_message {
             $params = array('appraisaluserassignmentid' => $learner->id);
             $assignedroles = $DB->get_records('appraisal_role_assignment', $params, '', 'appraisalrole, id, userid');
             foreach ($this->roles as $role) {
-                if (isset($assignedroles[$role])) {
+                if (isset($assignedroles[$role]) && !empty($assignedroles[$role]->userid)) {
                     $rcptuserid = $assignedroles[$role]->userid;
                     // Send only if complete/incomplete.
                     if ($this->type == self::EVENT_STAGE_DUE && $this->stageiscompleted != 0) {

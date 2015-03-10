@@ -2668,7 +2668,7 @@ class reportbuilder {
     function build_query($countonly = false, $filtered = false, $allowcache = true) {
         global $CFG;
 
-        if ($allowcache && $CFG->enablereportcaching) {
+        if ($allowcache && !empty($CFG->enablereportcaching)) {
             $cached = $this->build_cache_query($countonly, $filtered);
             if ($cached[0] != '') {
                 return $cached;
@@ -5448,7 +5448,7 @@ function reportbuilder_get_cached($reportid) {
  */
 function reportbuilder_get_all_cached() {
     global $DB, $CFG;
-    if (!$CFG->enablereportcaching) {
+    if (empty($CFG->enablereportcaching)) {
         return array();
     }
     $sql = "SELECT rbc.*, rb.cache, rb.fullname, rb.shortname, rb.embedded
@@ -5878,9 +5878,14 @@ class admin_setting_configdaymonthpicker extends admin_setting {
             $defaultinfo = null;
         }
 
-        // Saved settings.
-        $day = substr($data, 0, 2);
-        $month = substr($data, 2, 2);
+        // Saved settings - needs to parse the default array as well for upgrades.
+        if (is_array($data)) {
+            $day = $data['d'];
+            $month = $data['m'];
+        } else {
+            $day = substr($data, 0, 2);
+            $month = substr($data, 2, 2);
+        }
 
         $days = array_combine(range(1,31), range(1,31));
         $months = array();
