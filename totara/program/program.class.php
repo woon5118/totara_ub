@@ -1322,7 +1322,7 @@ class program {
                 }
                 $duedatestr .= $request;
 
-                $out .= html_writer::start_tag('div', array('class' => 'programprogress'));
+                $out .= html_writer::start_tag('div', array('id' => 'progressbar', 'class' => 'programprogress'));
                 $out .= html_writer::tag('div', get_string('startdate', 'totara_program') . ': '
                                 . $startdatestr, array('class' => 'item'));
                 $out .= html_writer::tag('div', get_string('duedate', 'totara_program').': '
