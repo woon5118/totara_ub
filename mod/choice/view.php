@@ -65,7 +65,6 @@
         }
         // Redirection after all POSTs breaks block editing, we need to be more specific!
         $answer = optional_param('answer', '', PARAM_INT);
-
         if ($answer) {
             choice_user_submit_response($answer, $choice, $USER->id, $course, $cm);
             redirect(new moodle_url('/mod/choice/view.php',
@@ -78,16 +77,16 @@
         }
     }
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($choice->name), 2, null);
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(format_string($choice->name), 2, null);
 
-if ($notify and confirm_sesskey()) {
-    if ($notify === 'choicesaved') {
-        echo $OUTPUT->notification(get_string('choicesaved', 'choice'), 'notifysuccess');
-    } else if ($notify === 'mustchooseone') {
-        echo $OUTPUT->notification(get_string('mustchooseone', 'choice'), 'notifyproblem');
+    if ($notify and confirm_sesskey()) {
+        if ($notify === 'choicesaved') {
+            echo $OUTPUT->notification(get_string('choicesaved', 'choice'), 'notifysuccess');
+        } else if ($notify === 'mustchooseone') {
+            echo $OUTPUT->notification(get_string('mustchooseone', 'choice'), 'notifyproblem');
+        }
     }
-}
 
 /// Display the choice and possibly results
     $eventdata = array();
