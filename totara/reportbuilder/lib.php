@@ -167,6 +167,11 @@ class reportbuilder {
     private $_post_config_restrictions;
 
     /**
+     * @var array $filterurlparams URL parameters that need to be reapplied when report reloaded
+     */
+    private $filterurlparams = array();
+
+    /**
      * @var bool $cache Cache state for current report
      */
     public $cache;
@@ -1312,6 +1317,12 @@ class reportbuilder {
                 $url->remove_params($name);
             }
         }
+        // Reapply filter url params.
+        foreach ($this->filterurlparams as $filtername => $filtervalue) {
+            if (is_null($url->param($filtername))) {
+                $url->param($filtername, $filtervalue);
+            }
+        }
         return html_entity_decode($url->out());
     }
 
@@ -1366,21 +1377,23 @@ class reportbuilder {
                     $res = new rb_param($name, $this->_paramoptions);
                     $res->value = $var; // Save the value.
                     $out[] = $res;
-                    $SESSION->reportbuilder[$this->_id][$name] = $var; // And save to session variable.
-                } else {
-                    unset($SESSION->reportbuilder[$this->_id][$name]);
+                    $this->set_filter_url_param($name, $var);
                 }
-            } else if (isset($SESSION->reportbuilder[$this->_id][$name])) {
-                // This param is stored in the session variable.
-                $res = new rb_param($name, $this->_paramoptions);
-                $res->value = $SESSION->reportbuilder[$this->_id][$name];
-                $out[] = $res;
             }
-
         }
         return $out;
     }
 
+    /**
+     * Set parameter related to report filters and settings that need to be reapplied when report reloaded
+     * This should be used when columns sorting are changed, filters reconfigured, etc.
+     *
+     * @param int $name Name of param
+     * @param string $value current value of param
+     */
+    public function set_filter_url_param($name, $value) {
+        $this->filterurlparams[$name] = $value;
+    }
 
     /**
      * Wrapper for displaying search form from filtering class
