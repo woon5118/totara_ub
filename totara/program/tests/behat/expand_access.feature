@@ -12,12 +12,9 @@ Feature: Users can expand the program info
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
-    And I log in as "admin"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
-    And I press "Create Program"
-    And I press "Save changes"
-    And I log out
+    And the following "programs" exist in "totara_program" plugin:
+      | fullname                 | shortname |
+      | Visibility Program Tests | vistest   |
 
   @javascript
   Scenario: Allow not logged in users to expand program when forcelogin disabled
