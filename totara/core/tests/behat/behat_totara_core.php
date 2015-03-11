@@ -291,6 +291,50 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * Winds back the timestamps for certifications so you can trigger recerts.
+     *
+     * @Then /^I wind back certification dates by (\d+) months$/
+     */
+    public function i_wind_back_certification_dates_by_months($windback) {
+        global $DB;
+
+        $windback = (int)$windback * (4 * WEEKSECS); // Assuming 4 weeks per month (close enough).
+
+        // A list of all the places we need to windback, table => fields.
+        $databasefields = array(
+            'prog_completion' => array('timestarted', 'timedue', 'timecompleted'),
+            'certif_completion' => array('timewindowopens', 'timeexpires', 'timecompleted'),
+            'certif_completion_history' => array('timewindowopens', 'timeexpires', 'timecompleted', 'timemodified'),
+        );
+
+        // Windback all the timestamps by the specified amount, but don't fall into negatives.
+        foreach ($databasefields as $table => $fields) {
+            foreach ($fields as $field) {
+                $sql = "UPDATE {{$table}}
+                           SET {$field} = {$field} - {$windback}
+                         WHERE {$field} > {$windback}";
+                $DB->execute($sql);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Not ideal but we need to run the recertification task and
+     * there is no way (currently) to do so through the interface.
+     *
+     * @Then /^I run the recertification task$/
+     */
+    public function i_run_recertification_task() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/certification/lib.php');
+        recertify_window_opens_stage();
+        recertify_window_abouttoclose_stage();
+        recertify_expires_stage();
+    }
+
+    /**
      * Not ideal but we need to run the programs update learner task and
      * there is no way (currently) to do so through the interface.
      *
