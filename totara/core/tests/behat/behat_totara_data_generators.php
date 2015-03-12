@@ -64,7 +64,55 @@ class behat_totara_data_generators extends behat_base {
                 'switchids' => array(
                     'user' => 'userid',
                     'program' => 'programid',
-                )
+                ),
+            ),
+        ),
+        'totara_hierarchy' => array(
+            'position frameworks' => array(
+                'datagenerator' => 'pos_frame',
+                'required' => array('idnumber'),
+            ),
+            'positions' => array(
+                'datagenerator' => 'pos',
+                'required' => array('fullname', 'idnumber', 'pos_framework'),
+                'switchids' => array(
+                    'pos_framework' => 'frameworkid',
+                ),
+            ),
+            'position assignments' => array(
+                'datagenerator' => 'pos_assign',
+                'required' => array('user', 'position'),
+                'switchids' => array(
+                    'user' => 'userid',
+                    'position' => 'positionid',
+                ),
+            ),
+            'organisation frameworks' => array(
+                'datagenerator' => 'org_frame',
+                'required' => array('idnumber'),
+            ),
+            'organisations' => array(
+                'datagenerator' => 'org',
+                'required' => array('fullname', 'idnumber', 'org_framework'),
+                'switchids' => array(
+                    'org_framework' => 'frameworkid',
+                ),
+            ),
+            'organisation assignments' => array(
+                'datagenerator' => 'org_assign',
+                'required' => array('user', 'organisation'),
+                'switchids' => array(
+                    'user' => 'userid',
+                    'organisation' => 'organisationid',
+                ),
+            ),
+            'manager assignments' => array(
+                'datagenerator' => 'man_assign',
+                'required' => array('user', 'manager'),
+                'switchids' => array(
+                    'user' => 'userid',
+                    'manager' => 'managerid',
+                ),
             ),
         ),
     );
@@ -154,19 +202,37 @@ class behat_totara_data_generators extends behat_base {
         }
     }
 
-    /**
-     * Switches the $user->username to $user->id
-     */
+    public function get_manager_id($username) {
+        return $this->get_user_id($username);
+    }
+
     public function get_user_id($username) {
         global $DB;
         return $DB->get_field('user', 'id', array('username' => $username), MUST_EXIST);
     }
 
-    /**
-     * Switches the $program->shortname to $program->id
-     */
     public function get_program_id($shortname) {
         global $DB;
         return $DB->get_field('prog', 'id', array('shortname' => $shortname), MUST_EXIST);
+    }
+
+    public function get_org_framework_id($idnumber) {
+        global $DB;
+        return $DB->get_field('org_framework', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_organisation_id($idnumber) {
+        global $DB;
+        return $DB->get_field('org', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_pos_framework_id($idnumber) {
+        global $DB;
+        return $DB->get_field('pos_framework', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_position_id($idnumber) {
+        global $DB;
+        return $DB->get_field('pos', 'id', array('idnumber' => $idnumber));
     }
 }

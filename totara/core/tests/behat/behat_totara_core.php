@@ -216,4 +216,21 @@ class behat_totara_core extends behat_base {
         $node = $this->get_selected_node($selectortype, $element);
         $node->focus();
     }
+
+    /**
+     * Not ideal but we need to run the programs update learner task and
+     * there is no way (currently) to do so through the interface.
+     *
+     * @When /^I run the program assignments task$/
+     */
+    public function i_run_program_assignments_task() {
+        global $DB;
+
+        // Get all programs.
+        $progrecords = $DB->get_records('prog');
+        foreach ($progrecords as $prog) {
+            $program = new \program($prog->id);
+            $program->update_learner_assignments();
+        }
+    }
 }

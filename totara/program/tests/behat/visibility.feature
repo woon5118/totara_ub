@@ -1,4 +1,4 @@
-@totar @totara_program @current
+@totara @totara_program
 Feature: Users visibility of programs can be toggled
   In order to view a program
   As a user
