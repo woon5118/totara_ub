@@ -297,8 +297,8 @@ class rb_source_dp_program extends rb_base_source {
         return $columnoptions;
     }
 
-    public function rb_display_program_completion_progress($status, $row) {
-        return prog_display_progress($row->programid, $row->userid);
+    public function rb_display_program_completion_progress($status, $row, $export=false) {
+        return prog_display_progress($row->programid, $row->userid, null, $export);
     }
 
     /**

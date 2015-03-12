@@ -5734,14 +5734,21 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
     if (!$managerid) {
         $managerid = $USER->id;
     }
+
     $ret = (object)array('potential' => array(), 'current' => array(), 'othersession' => array(), 'cannotunallocate' => array());
     if (!$staff = totara_get_staff($managerid)) {
         return $ret;
     }
 
+    // Get facetoface "multiple signups per session" setting.
+    $multiplesignups = $facetoface->multiplesessions;
+
     list($usql, $params) = $DB->get_in_or_equal($staff, SQL_PARAMS_NAMED);
-    // Get list of sign-ups that already exist for these users.
-    $sql = "SELECT u.*, su.sessionid, su.bookedby, b.firstname AS bookedbyfirstname, b.lastname AS bookedbylastname,
+    // Get list of signed-ups that already exist for these users.
+    $sql = 'SELECT CASE
+                   WHEN su.sessionid IS NULL THEN '. sql_cast2char('u.id') .'
+                   ELSE '. $DB->sql_concat(sql_cast2char('u.id'), "'_'", sql_cast2char('su.sessionid')) . ' END
+                   AS uniqueid , u.*, su.sessionid, su.bookedby, b.firstname AS bookedbyfirstname, b.lastname AS bookedbylastname,
                    su.statuscode
               FROM {user} u
               LEFT JOIN (
@@ -5752,41 +5759,83 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
                    WHERE s.facetoface = :facetofaceid AND sus.statuscode > :status
               ) su ON su.userid = u.id
               LEFT JOIN {user} b ON b.id = su.bookedby
-             WHERE u.id $usql";
+             WHERE u.id ' . $usql;
 
     $params['facetofaceid'] = $facetoface->id;
     // Statuses greater than declined to handle cases where people change their mind.
     $params['status'] = MDL_F2F_STATUS_DECLINED;
     $users = $DB->get_records_sql($sql, $params);
 
-    foreach ($users as $user) {
-        if (!$user->sessionid) {
-            // User has no bookings for this activity => potentially can be allocated.
-            $ret->potential[$user->id] = $user;
-        } else {
-            if ($user->bookedby != $managerid) {
-                if ($user->bookedby == 0) {
-                    $user->cannotremove = 'selfbooked';
-                } else {
-                    $user->cannotremove = 'otherbookedby'; // Booked by someone else - cannot be unbooked.
-                }
-                $ret->cannotunallocate[$user->id] = $user;
+    foreach ($staff as $member) {
+        // Get the signups for the user in this activity.
+        $usersignups = totara_search_for_value($users, 'id', TOTARA_SEARCH_OP_EQUAL, $member);
+
+        // Get signup for this user in this session (if exists).
+        $usersignupsession = totara_search_for_value($usersignups, 'sessionid', TOTARA_SEARCH_OP_EQUAL, $session->id);
+
+        // Remove current sign-up for session from $usersignups.
+        if (!empty($usersignupsession)) {
+            $usersignupsession = reset($usersignupsession);
+            unset($usersignups[$usersignupsession->uniqueid]);
+        }
+
+        // Loop through all user sessions except the current session $session.
+        foreach ($usersignups as $user) {
+            // If sessionid is null, nothing to do here.
+            if ($user->sessionid === null) {
+                continue;
             }
 
-            if ($user->sessionid != $session->id) {
-                // Allocated to a different session - cannot be booked/unbooked.
-                $ret->othersession[$user->id] = $user;
-            } else {
-                if (empty($user->cannotremove) && $user->statuscode && $user->statuscode > MDL_F2F_STATUS_BOOKED) {
-                    $user->cannotremove = 'attendancetaken'; // Attendance taken - cannot be unbooked.
-                    $ret->cannotunallocate[$user->id] = $user;
-                }
-                $ret->current[$user->id] = $user;
+            if (!facetoface_user_can_be_unallocated($user, $managerid)) {
+                $ret->cannotunallocate[$user->id] = $user;
             }
+            // Allocated to a different session - cannot be unbooked here.
+            $ret->othersession[$user->id] = $user;
+
+        }
+
+        // If the user doesn't have a sign-up for this session check if we can put him in the potential list.
+        // Otherwise, verify if the user can or cannot be unallocated.
+        if (empty($usersignupsession)) {
+            // Multiple sign-ups on OR user has not sign-ups for other sessions in the facetoface.
+            $currentuser = reset($usersignups);
+            if ($multiplesignups) {
+                $ret->potential[$member] = $currentuser;
+            } else if (array_key_exists($currentuser->id, $ret->othersession) === false) {
+                $ret->potential[$member] = $currentuser;
+            }
+        } else {
+            if (!facetoface_user_can_be_unallocated($usersignupsession, $managerid)) {
+                $ret->cannotunallocate[$usersignupsession->id] = $usersignupsession;
+            }
+            $ret->current[$member] = $usersignupsession;
         }
     }
 
     return $ret;
+}
+
+/**
+ * Given a user, determine if he can be unallocated from the list.
+ * If he/she cannot be unallocated, add the reason why.
+ *
+ * This function is used by facetoface_get_staff_to_allocate.
+ *
+ * @param object $user A user object that must contain id, bookedby and status code
+ * @param int $managerid The user's manager ID.
+ * @return bool True if the user can be unallocated, false otherwise.
+ */
+function facetoface_user_can_be_unallocated(&$user, $managerid) {
+    // Booked by someone else or self booking - cannot be unbooked.
+    if ($user->bookedby != $managerid) {
+        $user->cannotremove = ($user->bookedby == 0) ? 'selfbooked' : 'otherbookedby';
+        return false;
+    } else if ($user->statuscode && $user->statuscode > MDL_F2F_STATUS_BOOKED) {
+        $user->cannotremove = 'attendancetaken'; // Attendance taken - cannot be unbooked.
+        return false;
+    }
+
+    return true;
 }
 
 /**
