@@ -99,10 +99,10 @@ class rb_source_assign extends rb_base_source {
                 'grade_items'
             ),
 
-            // Join comments.
+            // Join feedback comments.
             new rb_join(
                 'assign_comments',
-                'INNER',
+                'LEFT',
                 '{assignfeedback_comments}',
                 'assign_comments.assignment = assign.id AND assign_comments.grade = assign_grades.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
@@ -179,11 +179,11 @@ class rb_source_assign extends rb_base_source {
                 )
             ),
 
-            // Submission comment.
+            // Feedback comment.
             new rb_column_option(
                 'base',
                 'comment',
-                get_string('submissioncomment', 'rb_source_assign'),
+                get_string('feedbackcomment', 'rb_source_assign'),
                 'assign_comments.commenttext',
                 array(
                     'joins' => 'assign_comments',
@@ -192,23 +192,22 @@ class rb_source_assign extends rb_base_source {
                 )
             ),
 
-            // Last modified.
+            // Submission last modified date.
             new rb_column_option(
                 'base',
                 'timemodified',
-                get_string('lastmodified', 'rb_source_assign'),
-                'assign_grades.timemodified',
+                get_string('lastmodifiedsubmission', 'rb_source_assign'),
+                'base.timemodified',
                 array(
-                    'displayfunc' => 'nice_datetime',
-                    'joins' => 'assign_grades'
+                    'displayfunc' => 'nice_datetime'
                 )
             ),
 
-            // Last marked.
+            // Grade last modified date.
             new rb_column_option(
                 'base',
                 'timemarked',
-                get_string('lastmarked', 'rb_source_assign'),
+                get_string('lastmodifiedgrade', 'rb_source_assign'),
                 'assign_grades.timemodified',
                 array(
                     'displayfunc' => 'nice_datetime',
@@ -272,19 +271,19 @@ class rb_source_assign extends rb_base_source {
                 'number'
             ),
 
-            // Last modifieid.
+            // Last modified (submission).
             new rb_filter_option(
                 'base',
                 'timemodified',
-                get_string('lastmodified', 'rb_source_assign'),
+                get_string('lastmodifiedsubmission', 'rb_source_assign'),
                 'date'
             ),
 
-            // Last marked.
+            // Last modified (grade).
             new rb_filter_option(
                 'base',
                 'timemarked',
-                get_string('lastmarked', 'rb_source_assign'),
+                get_string('lastmodifiedgrade', 'rb_source_assign'),
                 'date'
             ),
         );
