@@ -85,8 +85,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Completion Program Tests"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -133,8 +132,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Completion Program Tests"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -152,8 +150,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Completion Program Tests"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -171,8 +168,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Completion Program Tests"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -222,8 +218,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Completion Program Tests"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"

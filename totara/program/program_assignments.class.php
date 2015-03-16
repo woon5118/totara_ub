@@ -635,7 +635,7 @@ abstract class prog_assignment_category {
             $show_deletecompletionlink = true;
         }
 
-        $html = '';
+        $html = html_writer::start_tag('div', array('class' => "completionlink_{$item->id}"));
         if ($item->completiontime != COMPLETION_TIME_NOT_SET && !empty($item->completiontime)) {
             $html .= html_writer::empty_tag('input', array('type' => 'hidden',
                 'name' => 'completiontime['.$this->id.']['.$item->id.']', 'value' => $item->completiontime));
@@ -652,6 +652,7 @@ abstract class prog_assignment_category {
         if ($show_deletecompletionlink) {
             $html .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('removecompletiondate', 'totara_program')), null, array('class' => 'deletecompletiondatelink'));
         }
+        html_writer::end_tag('div');
         return $html;
     }
 

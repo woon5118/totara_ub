@@ -1,5 +1,5 @@
 @totara @totara_program
-Feature: Users completion of programs and coursesets
+Feature: Users assignments to a program
   In order to view a program
   As a user
   I need to login if forcelogin enabled
@@ -87,6 +87,14 @@ Feature: Users completion of programs and coursesets
     And I follow "Required Learning"
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "user003"
+    And I focus on "My Learning" "link"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
+    Then I should not see "Assignment Program Tests"
+
   @javascript
   Scenario: Test program assignments and updates via audience assigments
     Given I log in as "admin"
@@ -117,6 +125,14 @@ Feature: Users completion of programs and coursesets
     Then I should see "Assignment Program Tests"
 
     When I log out
+    And I log in as "user004"
+    And I focus on "My Learning" "link"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
+    Then I should not see "Assignment Program Tests"
+
+    When I log out
     And I log in as "admin"
     And the following "cohort members" exist:
       | user    | cohort |
@@ -131,7 +147,9 @@ Feature: Users completion of programs and coursesets
     When I log out
     And I log in as "user002"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
     Then I should not see "Assignment Program Tests"
 
     When I log out
@@ -175,6 +193,14 @@ Feature: Users completion of programs and coursesets
     And I follow "Required Learning"
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "user003"
+    And I focus on "My Learning" "link"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
+    Then I should not see "Assignment Program Tests"
+
     When the following "position assignments" exist in "totara_hierarchy" plugin:
       | user    | position |
       | user001 | pos2     |
@@ -185,7 +211,9 @@ Feature: Users completion of programs and coursesets
     When I log out
     And I log in as "user001"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
     Then I should not see "Assignment Program Tests"
 
     When I log out
@@ -229,6 +257,14 @@ Feature: Users completion of programs and coursesets
     And I follow "Required Learning"
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "user003"
+    And I focus on "My Learning" "link"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
+    Then I should not see "Assignment Program Tests"
+
     And the following "organisation assignments" exist in "totara_hierarchy" plugin:
       | user    | organisation |
       | user001 | org2         |
@@ -239,7 +275,9 @@ Feature: Users completion of programs and coursesets
     When I log out
     And I log in as "user001"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
     Then I should not see "Assignment Program Tests"
 
     When I log out
@@ -284,6 +322,14 @@ Feature: Users completion of programs and coursesets
     And I follow "Required Learning"
     Then I should see "Assignment Program Tests"
 
+    When I log out
+    And I log in as "user004"
+    And I focus on "My Learning" "link"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
+    Then I should not see "Assignment Program Tests"
+
     When the following "manager assignments" exist in "totara_hierarchy" plugin:
       | user    | manager |
       | user001 | admin   |
@@ -296,7 +342,9 @@ Feature: Users completion of programs and coursesets
     When I log out
     And I log in as "user002"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    Then I should not see "Required Learning"
+
+    When I follow "Record of Learning"
     Then I should not see "Assignment Program Tests"
 
     When I log out

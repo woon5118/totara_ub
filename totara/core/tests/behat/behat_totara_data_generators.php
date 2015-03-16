@@ -66,6 +66,10 @@ class behat_totara_data_generators extends behat_base {
                     'program' => 'programid',
                 ),
             ),
+            'certifications' => array(
+                'datagenerator' => 'certification',
+                'required' => array('shortname'),
+            ),
         ),
         'totara_hierarchy' => array(
             'position frameworks' => array(
