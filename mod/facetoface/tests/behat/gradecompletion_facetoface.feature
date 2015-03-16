@@ -16,6 +16,7 @@ Feature: Give a grade to a student for a face to face
             | teacher1 | C1     | editingteacher |
             | student1 | C1     | student        |
         And I log in as "admin"
+        And I follow "Find Learning"
         And I follow "Course 1"
         And I turn editing mode on
         And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -25,19 +26,20 @@ Feature: Give a grade to a student for a face to face
             | Require grade       | 1 |
         And I follow "Course completion"
         And I click on "Condition: Activity completion" "link"
-        And I click on "Facetoface - Test facetoface name" "checkbox"
+        And I click on "Face-to-face - Test facetoface name" "checkbox"
         And I press "Save changes"
         And I log out
         
     @javascript
     Scenario: Set grade for student to complete face to face
         When I log in as "teacher1"
+        And I follow "Find Learning"
         And I follow "Course 1"
         And I follow "Grades"
         And I turn editing mode on
         And I set the field "grade_4_2" to "100"
 
-        And I press "Update"
+        And I press "Save changes"
         And I navigate to "Course completion" node in "Course administration > Reports"
         And I should see "Sam1 Student1"
         And "//tr[@id='user-4']/td[2]/img[@alt='Completed']" "xpath_element" should exist

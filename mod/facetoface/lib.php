@@ -5969,8 +5969,8 @@ function facetoface_get_manager_list() {
 function facetoface_get_other_reservations($facetoface, $session, $managerid) {
     global $DB;
 
-    // Get a list of all the bookings the manager has made (not including the current session).
     $usernamefields = get_all_user_name_fields(true, 'u');
+    // Get a list of all the bookings the manager has made (not including the current session).
     $sql = "SELECT su.id, s.id AS sessionid, s.datetimeknown, u.id AS userid, {$usernamefields}
               FROM {facetoface_signups} su
               JOIN {facetoface_sessions} s ON s.id = su.sessionid

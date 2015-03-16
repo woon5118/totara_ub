@@ -35,6 +35,7 @@ Feature: Play waiting list lottery
   @javascript
   Scenario: The second student to sign up to the session should go on waiting list
     Given I log in as "teacher1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -61,6 +62,7 @@ Feature: Play waiting list lottery
     And I log out
 
     When I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this session"
@@ -69,6 +71,7 @@ Feature: Play waiting list lottery
     And I log out
 
     When I log in as "student2"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I follow "Join waitlist"
     And I should see "You will be added to the waiting list for this session"
@@ -77,6 +80,7 @@ Feature: Play waiting list lottery
     And I log out
 
     When I log in as "teacher1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"
