@@ -110,7 +110,9 @@ class totara_plan_events_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $planrecord = $plangenerator->create_learning_plan(array('userid' => $user->id));
+        $sink = $this->redirectMessages();
         $plangenerator->add_learning_plan_competency($planrecord->id, $competency->id);
+        $sink->close();
 
         $plan = new development_plan($planrecord->id);
 

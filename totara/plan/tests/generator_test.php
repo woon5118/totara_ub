@@ -88,8 +88,11 @@ class totara_plan_generator_testcase extends advanced_testcase {
         $plan = $plangenerator->create_learning_plan(array('userid' => $user->id));
 
         $this->setAdminUser(); // Arrgh, this low level API includes access control.
+        $sink = $this->redirectMessages();
         $result = $plangenerator->add_learning_plan_competency($plan->id, $competency->id);
         $this->assertTrue($result);
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
 
         $this->assertTrue($DB->record_exists('dp_plan_competency_assign', array('planid' => $plan->id, 'competencyid' => $competency->id)));
     }
@@ -107,7 +110,10 @@ class totara_plan_generator_testcase extends advanced_testcase {
 
         $this->setAdminUser();
 
+        $sink = $this->redirectMessages();
         $result = $plangenerator->create_learning_plan_objective($plan->id, $USER->id, null);
+        $this->assertCount(1, $sink->get_messages());
+        $sink->close();
 
         $this->assertEquals($plan->id, $result->planid);
         $this->assertNotEmpty($result->fullname);
