@@ -81,6 +81,18 @@ class rb_source_dp_course extends rb_base_source {
                 $DB->sql_concat_join(
                         "','",
                         array(
+                            sql_cast2char('cc.userid'),
+                            sql_cast2char('cc.course')
+                        )
+                ) . " as id, ".
+                "cc.userid as userid, cc.course as courseid ".
+                "from {course_completions} cc ".
+                "where cc.status > " . COMPLETION_STATUS_NOTYETSTARTED .
+                " UNION ".
+                "select distinct ".
+                $DB->sql_concat_join(
+                        "','",
+                        array(
                             sql_cast2char('p1.userid'),
                             sql_cast2char('pca1.courseid')
                         )

@@ -410,7 +410,10 @@ function dp_get_rol_tabs_visible($userid) {
     }
 
     $course_count = enrol_get_users_courses($userid);
-    if (!empty($course_count) || $show_course_tab) {
+    $select = "userid = :userid AND status > :status";
+    $coursecompletioncount = $DB->record_exists_select('course_completions', $select,
+        array('userid' => $userid, 'status' => COMPLETION_STATUS_NOTYETSTARTED));
+    if (!empty($course_count) || !empty($coursecompletioncount) || $show_course_tab) {
         $visible[] = 'courses';
     }
 
