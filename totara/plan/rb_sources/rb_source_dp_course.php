@@ -81,6 +81,18 @@ class rb_source_dp_course extends rb_base_source {
                 $DB->sql_concat_join(
                         "','",
                         array(
+                            sql_cast2char('cc.userid'),
+                            sql_cast2char('cc.course')
+                        )
+                ) . " as id, ".
+                "cc.userid as userid, cc.course as courseid ".
+                "from {course_completions} cc ".
+                "where cc.status > " . COMPLETION_STATUS_NOTYETSTARTED .
+                " UNION ".
+                "select distinct ".
+                $DB->sql_concat_join(
+                        "','",
+                        array(
                             sql_cast2char('p1.userid'),
                             sql_cast2char('pca1.courseid')
                         )
@@ -386,7 +398,16 @@ class rb_source_dp_course extends rb_base_source {
                     'extrafields' => array('userid' => 'base.userid', 'courseid' => 'base.courseid'),
                 )
             );
-
+        $columnoptions[] = new rb_column_option(
+                'course_completion',
+                'enroldate',
+                get_string('enrolled', 'totara_core'),
+                "course_completion.timeenrolled",
+                array(
+                    'joins' => array('course_completion'),
+                    'displayfunc' => 'nice_date',
+                )
+            );
         $columnoptions[] = new rb_column_option(
                 'course_completion',
                 'statusandapproval',

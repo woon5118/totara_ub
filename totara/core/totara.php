@@ -965,30 +965,18 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
 }
 
 function totara_print_my_courses() {
-    global $USER, $PAGE, $COMPLETION_STATUS;
-    $content = '';
-    $courses = completion_info::get_all_courses($USER->id, 10);
-    $displaycourses = array();
-    if ($courses) {
-        foreach ($courses as $course) {
-            $displaycourse = new stdClass();
-            $displaycourse->course = $course->course;
-            $displaycourse->name = format_string($course->name);
-            $enrolled = $course->timeenrolled;
-            $completed = $course->timecompleted;
-            $starteddate = '';
-            if ($course->timestarted != 0) {
-                $starteddate = userdate($course->timestarted, get_string('strfdateshortmonth', 'langconfig'));
-            }
-            $displaycourse->starteddate = $starteddate;
-            $displaycourse->enroldate = isset($enrolled) && $enrolled != 0 ? userdate($enrolled, get_string('strfdateshortmonth', 'langconfig')) : null;
-            $displaycourse->completeddate = isset($completed) && $completed != 0 ? userdate($completed, get_string('strfdateshortmonth', 'langconfig')) : null;
-            $displaycourse->status = $course->status ? $course->status : COMPLETION_STATUS_NOTYETSTARTED;
-            $displaycourses[] = $displaycourse;
-        }
+    global $OUTPUT;
+
+    echo $OUTPUT->heading(get_string('mycurrentprogress', 'totara_core'));
+
+    $sid = optional_param('sid', '0', PARAM_INT);
+
+    if (!$report = reportbuilder_get_embedded_report('course_progress', array(), false, $sid)) {
+        print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
     }
-    $renderer = $PAGE->get_renderer('totara_core');
-    echo $renderer->print_my_courses($displaycourses, $USER->id);
+
+    $report->include_js();
+    $report->display_table();
 }
 
 

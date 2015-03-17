@@ -374,6 +374,7 @@ $string['moveup'] = 'Move Up';
 $string['mssqlgroupconcatfail'] = 'Automatic update failed with reason "{$a}". Please, copy code from textarea below and execute it in MSSQL Server as Administrator. Afterwards refresh this page.';
 $string['mybookings'] = 'My Bookings';
 $string['mycoursecompletions'] = 'My Course Completions';
+$string['mycurrentprogress'] = 'My Current Courses';
 $string['mydevelopmentplans'] = 'My development plans';
 $string['myfuturebookings'] = 'My Future Bookings';
 $string['mylearning'] = 'My Learning';

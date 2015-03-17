@@ -278,7 +278,7 @@ class program {
 
         foreach ($rawuserassignments as $rawassign) {
             $alluserassignments[$rawassign->assignmentid][$rawassign->userid] = array('uaid' => $rawassign->id,
-                                                                                      'exception' => $rawassign->exceptionstatus,
+                                                                                      'exceptionstatus' => $rawassign->exceptionstatus,
                                                                                       'timeassigned' => $rawassign->timeassigned);
         }
 
@@ -359,7 +359,11 @@ class program {
 
                         // Skip resolved and dismissed exceptions to allow users to override group duedates.
                         $skipstatus = array(PROGRAM_EXCEPTION_RESOLVED, PROGRAM_EXCEPTION_DISMISSED);
-                        if (isset($user_assign_data['exceptionstatus']) && in_array($user_assign_data['exceptionstatus'], $skipstatus)) {
+                        if (!isset($user_assign_data['exceptionstatus'])) {
+                            throw new coding_exception('The property "exceptionstatus" is missing.');
+                        }
+
+                        if (in_array($user_assign_data['exceptionstatus'], $skipstatus)) {
                             continue;
                         }
 

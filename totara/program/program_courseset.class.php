@@ -915,10 +915,10 @@ class multi_course_set extends course_set {
             case COMPLETIONTYPE_SOME:
                 $str = new stdClass();
                 $str->mincourses = $this->mincourses;
-                if (!$str->sumfield = $DB->get_field('course_info_field', 'fullname', array('id' => $this->coursesumfield))) {
-                    $str->sumfield = '';
+                $str->sumfield = '';
+                if ($coursecustomfield = $DB->get_record('course_info_field', array('id' => $this->coursesumfield))) {
+                    $str->sumfield = format_string($coursecustomfield->fullname);
                 }
-                $str->sumfield = format_string($str->sumfield);
                 $str->sumfieldtotal = $this->coursesumfieldtotal;
                 if (!empty($str->mincourses) && !empty($str->sumfield) && !empty($str->sumfieldtotal)) {
                     $completestr = get_string('completemincoursesminsum', 'totara_program', $str);
@@ -927,7 +927,15 @@ class multi_course_set extends course_set {
                 } else {
                     $completestr = get_string('completeminsumfield', 'totara_program', $str);
                 }
+
+
                 $out .= html_writer::tag('p', html_writer::tag('strong', $completestr));
+                if (!empty($str->sumfield)) {
+                    // Add information about the criteria.
+                    $criteriacompletionset = get_string('criteriacompletioncourseset', 'totara_program', $str->sumfield);
+                    $out .= html_writer::tag('p', html_writer::tag('strong', $criteriacompletionset));
+                }
+
                 break;
         }
 
@@ -939,9 +947,17 @@ class multi_course_set extends course_set {
             $out .= html_writer::tag('p', get_string('allowtimeforsetinfinity', 'totara_program'));
         }
 
+        $customfieldcriteria = $this->completiontype == COMPLETIONTYPE_SOME &&
+            $coursecustomfield && $coursecustomfield->hidden != 1;
         if (count($this->courses) > 0) {
             $table = new html_table();
-            $table->head = array(get_string('coursename', 'totara_program'), get_string('actions'));
+            $table->head = array(get_string('coursename', 'totara_program'));
+
+            if ($customfieldcriteria) {
+                $table->head[] = $str->sumfield;
+                $table->colclasses[] = 'criteriacourseset';
+            }
+            $table->head[] = get_string('actions');
             $table->colclasses = array('coursename', 'launchcourse');
             $table->attributes['class'] = 'fullwidth generaltable';
             if ($userid) {
@@ -1000,6 +1016,14 @@ class multi_course_set extends course_set {
                     }
                 }
                 $cells[] = new html_table_cell($coursedetails);
+                if ($customfieldcriteria) {
+                    $customfieldsdata = customfield_get_data($course, 'course', 'course');
+                    $criteria = $coursecustomfield->defaultdata;
+                    if (array_key_exists($coursecustomfield->fullname, $customfieldsdata)) {
+                        $criteria = $customfieldsdata[$coursecustomfield->fullname];
+                    }
+                    $cells[] = new html_table_cell($criteria);
+                }
                 $cells[] = new html_table_cell($launch);
 
                 if ($userid) {
