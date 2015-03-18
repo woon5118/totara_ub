@@ -8,6 +8,7 @@ Security issues:
     MoodleHQ       Security fixes from MoodleHQ http://docs.moodle.org/dev/Moodle_2.7.7_release_notes
     T-13996        Removed potential CSRF when setting course completion via RPL
     T-14175        Fixed file access in attachments for Record Of Learning Evidence items
+                   Thanks to Emmanuel Law from Aura Infosec for reporting this issue.
 
 
 API Changes:
