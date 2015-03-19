@@ -171,6 +171,8 @@ if (!empty($approvalrequest)) {
                     if (empty($duplicates)) {
                         //only send email/task if there is not already one for that learning plan
                         $plan->send_manager_plan_approval_request();
+                    } else {
+                        $plan->set_status(DP_PLAN_STATUS_PENDING, DP_PLAN_REASON_APPROVAL_REQUESTED);
                     }
                 }
                 else {
