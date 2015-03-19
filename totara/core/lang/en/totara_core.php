@@ -531,6 +531,7 @@ $string['unlockcompletion'] = 'Unlock completion and delete completion data';
 $string['unlockcompletionnoreset'] = 'Unlock completion and keep completion data';
 $string['unsupported_branch_text'] = 'The version you are using ({$a})  is no longer supported. That means that bugs and security issues are no longer being fixed. You should upgrade to a supported version (such as [[CURRENT_MAJOR_VERSION]]) as soon as possible';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
+$string['upgradenonlinear'] = 'Upgrades must be to a higher version built on or after the date of the current version {$a}';
 $string['uploadcompletionrecords'] = 'Upload completion records';
 $string['userdoesnotexist'] = 'User does not exist';
 $string['viewmyteam'] = 'View My Team';
