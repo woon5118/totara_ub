@@ -975,9 +975,14 @@ function totara_print_my_courses() {
     echo $OUTPUT->heading(get_string('mycurrentprogress', 'totara_core'));
 
     $sid = optional_param('sid', '0', PARAM_INT);
+    $debug  = optional_param('debug', 0, PARAM_INT);
 
     if (!$report = reportbuilder_get_embedded_report('course_progress', array(), false, $sid)) {
         print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+    }
+
+    if ($debug) {
+        $report->debug($debug);
     }
 
     $report->include_js();
