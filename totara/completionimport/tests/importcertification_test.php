@@ -199,7 +199,6 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         $data['category'] = 1;
         $data['shortname'] = 'CP1';
         $data['idnumber'] = 1;
-        $data['available'] = 1;
         $program = $this->getDataGenerator()->create_program($data);
 
         $this->assertEquals(1, $DB->count_records('prog'), 'Record count mismatch in program table');
