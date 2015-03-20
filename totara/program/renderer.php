@@ -209,7 +209,7 @@ class totara_program_renderer extends plugin_renderer_base {
         // Display the drop-down if there's any categories that aren't yet being used
         if (!empty($dropdown_options)) {
             $out .= html_writer::start_tag('div', array('id' => 'category_select'));
-            $out .= get_string('addnew', 'totara_program');
+            $out .= html_writer::tag('label', get_string('addnew', 'totara_program'), array('for' => 'menucategory_select_dropdown'));
             $out .= html_writer::select($dropdown_options, 'category_select_dropdown', array('initialvalue' => 1));
             $out .= get_string('toprogram', 'totara_program');
             $out .= html_writer::tag('button', get_string('add'));

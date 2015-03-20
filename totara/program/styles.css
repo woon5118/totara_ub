@@ -431,3 +431,7 @@ div#prog-completion-relative-date label {
         width: 85%;
     }
 }
+
+#category_select label {
+    display: inline;
+}
