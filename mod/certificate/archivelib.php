@@ -35,7 +35,9 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool always true
  */
 function certificate_archive_completion($userid, $courseid) {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/lib/completionlib.php');
+    require_once($CFG->dirroot . '/mod/certificate/locallib.php');
 
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $completion = new completion_info($course);
@@ -291,8 +293,10 @@ function certificate_archive_display_list($archives, $params) {
  * @param int $userid userid
  */
 function certificate_get_date_completed($certificate, $certrecord, $course, $userid) {
-    global $DB;
-    // Set certificate date to current time, can be overwritten later
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/mod/certificate/locallib.php');
+
+    // Set certificate date to current time, can be overwritten later.
     $date = $certrecord->timecreated;
 
     if ($certificate->printdate == '2') {
