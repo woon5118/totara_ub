@@ -1320,9 +1320,8 @@ class multi_course_set extends course_set {
 
         // Add the course set label
         if ($updateform) {
-            $mform->addElement('text', $prefix.'label', $this->label, array('size' => '40', 'maxlength' => '255'));
+            $mform->addElement('text', $prefix.'label', $this->label, array('size' => '40', 'maxlength' => '255', 'id' => $prefix.'label'));
             $mform->setType($prefix.'label', PARAM_TEXT);
-            //$mform->addRule($prefix.'label', get_string('required'), 'required', null, 'client');
             $template_values['%'.$prefix.'label%'] = array('name' => $prefix.'label', 'value' => null);
         }
         $helpbutton = $OUTPUT->help_icon('setlabel', 'totara_program');
@@ -1344,7 +1343,7 @@ class multi_course_set extends course_set {
             );
             $onchange = 'return M.totara_programcontent.changeCompletionTypeString(this, '.$prefix.');';
             $mform->addElement('select', $prefix.'completiontype', get_string('label:learnermustcomplete', 'totara_program'),
-                             $completiontypeoptions, array('onchange' => $onchange));
+                             $completiontypeoptions, array('onchange' => $onchange, 'id' => $prefix.'completiontype'));
             $mform->setType($prefix.'completiontype', PARAM_INT);
             $mform->setDefault($prefix.'completiontype', COMPLETIONTYPE_ALL);
             $template_values['%'.$prefix.'completiontype%'] = array('name' => $prefix.'completiontype', 'value' => null);
@@ -1361,7 +1360,7 @@ class multi_course_set extends course_set {
 
         // Min courses.
         if ($updateform) {
-            $mform->addElement('text', $prefix.'mincourses', $this->mincourses, array('size' => '10', 'maxlength' => '255'));
+            $mform->addElement('text', $prefix.'mincourses', $this->mincourses, array('size' => '10', 'maxlength' => '255', 'id' => $prefix.'mincourses'));
             $mform->setType($prefix.'mincourses', PARAM_INT);
             $template_values['%'.$prefix.'mincourses%'] = array('name' => $prefix.'mincourses', 'value' => null);
         }
@@ -1388,7 +1387,7 @@ class multi_course_set extends course_set {
             }
             $customfields = array(0 => get_string('none')) + $customfields;
             $mform->addElement('select', $prefix.'coursesumfield', get_string('label:coursescorefield', 'totara_program'),
-                             $customfields);
+                             $customfields, array('id' => $prefix.'coursesumfield'));
             $mform->setType($prefix.'coursesumfield', PARAM_INT);
             $template_values['%'.$prefix.'coursesumfield%'] = array('name' => $prefix.'coursesumfield', 'value' => null);
         }
@@ -1404,7 +1403,7 @@ class multi_course_set extends course_set {
 
         // Course field sum min val.
         if ($updateform) {
-            $mform->addElement('text', $prefix.'coursesumfieldtotal', $this->coursesumfieldtotal, array('size' => '10', 'maxlength' => '255'));
+            $mform->addElement('text', $prefix.'coursesumfieldtotal', $this->coursesumfieldtotal, array('size' => '10', 'maxlength' => '255', 'id' => $prefix.'coursesumfieldtotal'));
             $mform->setType($prefix.'coursesumfieldtotal', PARAM_INT);
             $template_values['%'.$prefix.'coursesumfieldtotal%'] = array('name' => $prefix.'coursesumfieldtotal', 'value' => null);
         }
@@ -1420,13 +1419,14 @@ class multi_course_set extends course_set {
 
         // Add the time allowance selection group
         if ($updateform) {
-            $mform->addElement('text', $prefix.'timeallowednum', $this->timeallowednum, array('size' => 4, 'maxlength' => 3));
+            $element = $mform->addElement('text', $prefix.'timeallowednum', $this->timeallowednum, array('size' => 4, 'maxlength' => 3, 'id' => $prefix.'timeallowance'));
             $mform->setType($prefix.'timeallowednum', PARAM_INT);
             $mform->addRule($prefix.'timeallowednum', get_string('required'), 'required', null, 'server');
 
             $timeallowanceoptions = program_utilities::get_standard_time_allowance_options(true);
-            $mform->addElement('select', $prefix.'timeallowedperiod', '', $timeallowanceoptions);
+            $select = $mform->addElement('select', $prefix.'timeallowedperiod', '', $timeallowanceoptions, array('id' => $prefix.'timeperiod'));
             $mform->setType($prefix.'timeallowedperiod', PARAM_INT);
+            $templatehtml .= html_writer::tag('label', get_string('timeperiod', 'totara_program'), array('for' => $prefix.'timeperiod', 'class' => 'accesshide'));
 
             $template_values['%'.$prefix.'timeallowednum%'] = array('name'=>$prefix.'timeallowednum', 'value'=>null);
             $template_values['%'.$prefix.'timeallowedperiod%'] = array('name'=>$prefix.'timeallowedperiod', 'value'=>null);
@@ -1452,7 +1452,11 @@ class multi_course_set extends course_set {
         $templatehtml .= html_writer::start_tag('div', array('class' => 'fitem'));
         $templatehtml .= html_writer::tag('div', '', array('class' => 'fitemtitle'));
         $templatehtml .= html_writer::start_tag('div', array('class' => 'courseadder felement'));
-        $courseoptions = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
+        $coursenames = $DB->get_records_select_menu('course', 'id <> ?', array(SITEID), 'fullname ASC', 'id,fullname');
+        $courseoptions = array();
+        foreach ($coursenames as $coursename) {
+            $courseoptions[] = format_string($coursename);
+        }
         if (count($courseoptions) > 0) {
             if ($updateform) {
                 $mform->addElement('select',  $prefix.'courseid', '', $courseoptions);
@@ -1522,7 +1526,7 @@ class multi_course_set extends course_set {
                 $content .= $this->get_course_warnings($course);
                 $list .= html_writer::tag('li', $content);
             }
-            $ulattrs = array('id' => $prefix.'courselist', 'class' => 'course_list');
+            $ulattrs = array('id' => $prefix.'displaycourselist', 'class' => 'course_list');
             $templatehtml .= html_writer::tag('div', html_writer::tag('ul', $list, $ulattrs), array('class' => 'felement'));
 
             $courseidsarray = array();
