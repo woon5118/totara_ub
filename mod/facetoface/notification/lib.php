@@ -734,12 +734,12 @@ class facetoface_notification extends data_object {
         if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
             $event = clone $this->_event;
             $event->attachment = null; // Leave out the ical attachments in the third-parties notification.
+            $event->fullmessage       = $event->manager->fullmessage . $event->fullmessage;
+            $event->fullmessagehtml   = $event->manager->fullmessagehtml . $event->fullmessagehtml;
+            $event->smallmessage      = $event->manager->smallmessage . $event->smallmessage;
             $recipients = array_map('trim', explode(',', $this->_facetoface->thirdparty));
             foreach ($recipients as $recipient) {
                 $event->userto = \totara_core\totara_user::get_external_user($recipient);
-                $event->fullmessage       = $event->manager->fullmessage;
-                $event->fullmessagehtml   = $event->manager->fullmessagehtml;
-                $event->smallmessage      = $event->manager->smallmessage;
                 message_send($event);
             }
         }
