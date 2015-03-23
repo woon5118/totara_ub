@@ -1414,13 +1414,14 @@ class completion_info {
      * @param string $where Where clause sql (use 'u.whatever' for user table fields)
      * @param array $whereparams Where clause params
      * @param int $groupid Group id
+     * @param bool $activeonly consider only active enrolments in enabled plugins and time restrictions
      * @return int Number of tracked users
      */
-    public function get_num_tracked_users($where = '', $whereparams = array(), $groupid = 0) {
+    public function get_num_tracked_users($where = '', $whereparams = array(), $groupid = 0, $activeonly = true) {
         global $DB;
 
         list($enrolledsql, $enrolledparams) = get_enrolled_sql(
-                context_course::instance($this->course->id), 'moodle/course:isincompletionreports', $groupid, true);
+                context_course::instance($this->course->id), 'moodle/course:isincompletionreports', $groupid, $activeonly);
         $sql  = 'SELECT COUNT(eu.id) FROM (' . $enrolledsql . ') eu JOIN {user} u ON u.id = eu.id';
         if ($where) {
             $sql .= " WHERE $where";
@@ -1443,16 +1444,17 @@ class completion_info {
      * @param int $limitnum Result max size (optional)
      * @param context $extracontext If set, includes extra user information fields
      *   as appropriate to display for current user in this context
+     * @param bool $activeonly consider only active enrolments in enabled plugins and time restrictions
      * @return array Array of user objects with standard user fields
      */
     public function get_tracked_users($where = '', $whereparams = array(), $groupid = 0,
-             $sort = '', $limitfrom = '', $limitnum = '', context $extracontext = null) {
+             $sort = '', $limitfrom = '', $limitnum = '', context $extracontext = null, $activeonly = true) {
 
         global $DB;
 
         list($enrolledsql, $params) = get_enrolled_sql(
                 context_course::instance($this->course->id),
-                'moodle/course:isincompletionreports', $groupid, true);
+                'moodle/course:isincompletionreports', $groupid, $activeonly);
 
         $allusernames = get_all_user_name_fields(true, 'u');
         $sql = 'SELECT u.id, u.idnumber, ' . $allusernames;
@@ -1492,17 +1494,18 @@ class completion_info {
      * @param int $start User to start at if paging (optional)
      * @param context $extracontext If set, includes extra user information fields
      *   as appropriate to display for current user in this context
+     * @param bool $activeonly consider only active enrolments in enabled plugins and time restrictions
      * @return stdClass with ->total and ->start (same as $start) and ->users;
      *   an array of user objects (like mdl_user id, firstname, lastname)
      *   containing an additional ->progress array of coursemoduleid => completionstate
      */
     public function get_progress_all($where = '', $where_params = array(), $groupid = 0,
-            $sort = '', $pagesize = '', $start = '', context $extracontext = null) {
+            $sort = '', $pagesize = '', $start = '', context $extracontext = null, $activeonly = true) {
         global $CFG, $DB;
 
         // Get list of applicable users
         $users = $this->get_tracked_users($where, $where_params, $groupid, $sort,
-                $start, $pagesize, $extracontext);
+                $start, $pagesize, $extracontext, $activeonly);
 
         // Get progress information for these users in groups of 1, 000 (if needed)
         // to avoid making the SQL IN too long
