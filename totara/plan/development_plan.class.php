@@ -1217,7 +1217,8 @@ class development_plan {
             $out .= html_writer::start_tag('form', array('action' => new moodle_url('/totara/plan/action.php'), 'method' => 'post'));
             $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'id', 'value' => $this->id));
             $out .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
+            $out .= html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'sendapprovalrequest',
+                                        'name' => 'approvalrequest', 'value' => get_string('sendapprovalrequest', 'totara_plan')));
             $out .= html_writer::end_tag('form');
         }
 
