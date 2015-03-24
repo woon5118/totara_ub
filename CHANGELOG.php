@@ -1,6 +1,163 @@
 <?php
 /*
 
+Release 2.7.1 (18th March 2015):
+==================================================
+
+Security issues:
+    MoodleHQ       Security fixes from MoodleHQ http://docs.moodle.org/dev/Moodle_2.7.7_release_notes
+    T-13996        Removed potential CSRF when setting course completion via RPL
+    T-14175        Fixed file access in attachments for Record Of Learning Evidence items
+                   Thanks to Emmanuel Law from Aura Infosec for reporting this issue.
+
+
+API Changes:
+    T-14084        Renamed $onlyrequiredlearning parameter in prog_get_all_programs and prog_get_required_programs functions
+    T-14058        Converted all Learning Plan add_to_log() calls to events
+
+                   Plan logging was migrated to new events system
+
+    T-14104        Added courses which have completion records to the record of learning
+
+                   Previously, if a user had been enrolled into a course, made some progress
+                   or completed it, then been unenrolled from the course, the record of course
+                   participation disappeared from the user's record of learning. With this
+                   patch, courses will still show when a user has been unenrolled, if their
+                   course status was In Progress, Complete or Complete by RPL. This change was
+                   made to the Record of Learning: Courses report source, so all reports based
+                   on this source will be affected.
+
+Improvements:
+    T-13950        Improved display of long text strings in the alerts block
+    T-13944        Improved contents of Course Progress and Record of Learning Courses report sources
+
+                   The Course Progress now uses Report Builder (meaning that you can sort,
+                   change columns, etc) and contains the same records as Record of Learning
+                   Active Courses. The Record of Learning report source has been updated to
+                   include course records based on course completion data, so if a user was
+                   previously enrolled in a course and had a course completion record then
+                   that course will show in the Record of Learning reports.
+
+    T-13951        Implemented sql_round dml function to fix MySQL rounding problems
+    T-13867        Added "is not empty" option to text filters in Reportbuilder
+    T-13939        Added course custom field value to Program and Certification overview
+
+                   When a courseset is using "Some courses" completion logic and a course
+                   custom field is being used as part of the course completion criteria the
+                   custom field is now displayed along with the course so that learners are
+                   aware of such completion criteria.
+
+    T-14039        Removed HTML table from tasks block
+
+                   Changed to better meet Accessibility guidelines
+
+    T-12395        Improved HTML heading on calendar page
+
+                   Changed to better meet Accessibility guidelines
+
+    T-13938        Improved required courses message on Program overview
+
+                   The "Some courses" option was recently added to the courseset completion
+                   requirements for a program. The overview page for the program however did
+                   not change to reflect accurately the possible range of different courseset
+                   completion requirements.
+
+    T-14015        Added warning messages to the scheduled tasks page if cron has not run recently
+    T-14007        Improved contrast on show/hide icons in HR Import -> Manage Elements
+
+                   Changed to better meet Accessibility guidelines
+
+    T-14095        Improved labels for all filter inputs on the "Browse list of users" page
+
+                   Changed to better meet Accessibility guidelines
+
+    T-13734        Improved labels of all inputs on Reportbuilder filters
+
+                   Changed to better meet Accessibility guidelines
+
+Bug Fixes:
+    T-14057        Fixed saving of default content for course and program custom fields
+    T-12991        Fixed Facetoface manager reservations with multiple bookings
+
+                   Before, if a learner had been assigned a reserved place they could not be
+                   assigned to any other sessions; even if multiple sign-ups was on.
+
+                   Now, it should allow managers to assign members of their staff to multiple
+                   sessions if "Allow multiple sessions signup per user" setting is on, but
+                   not allow more than one user assignment per Facetoface activity if that
+                   setting is off.
+
+    T-13920        Fixed export to Excel of completion progress column in Record Of Learning - Programs report source
+    T-13884        Fixed error in Appraisals dialog box when selecting required learning for review
+    T-14114        Fixed program and certification exceptions being regenerated after being resolved
+
+                   This patch also prevents certification exceptions being generated when an
+                   assignment date is in the past and the user is in the recertification stage
+                   (at which point the assignment date is not relevant, as the due date is
+                   controlled by the certification expiry date instead).
+
+    T-14093        Fixed dynamic audiences rules based on Position and Organisation custom fields
+
+                   Thanks to Eugene Venter at Catalyst for contributing to this
+
+    T-13628        Fixed deletion of custom fields if missing from the HR Import CSV file
+    T-13926        Fixed copying instance data when copying block instances
+
+                   When users click the "Customise this page" button in My Learning, blocks
+                   copied from the default My Learning page to the user's personal My Learning
+                   page can also copy instance specific data. This allows Quick Links blocks
+                   to correctly copy the default URLs.
+
+    T-14070        Fixed MySQL 5.6 compatibility issues
+
+                   Totara would not install on MySQL 5.6, and also unit tests were failing
+                   with "Specified key was too long" errors
+
+    T-14170        Fixed Course categories path issue due to changes in 2.7 features
+    T-14120        Fixed sort in all Audience dialog boxes
+    T-13622        Fixed an issue with the validation of aspirational positions
+    T-14142        Fixed display of Submission Feedback Comment and Last modified date in Assignment Submissions report source
+    T-13472        Fixed several problems where scheduled Appraisal messages were not sent at the right times
+    T-14135        Fixed paging when adding items to a learning plan
+    T-14158        Fixed the display of Facetoface sessions spanning several days on the calendar
+
+                   Thanks to Eugene Venter at Catalyst for contributing to this
+
+    T-14023        Fixed expansion of the Totara menu when using Standard Totara Responsive theme on small screens
+    T-14098        Fixed visibility of hidden/disabled Certifications and Programs in Audience Enrolled Learning
+    T-13984        Fixed editing/deleting of blocks when viewing a Choice activity module
+
+                   Thanks to Ben Lobo at Kineo for contributing to this
+
+    T-13962        Fixed error on site settings page after upgrading to Totara 2.7 from Moodle 2.7
+    T-13964        Fixed issue with sending appraisal messages to unassigned roles
+    T-14046        Fixed the redirection behaviour of custom menu management pages
+    T-14021        Fixed the default title of the Mentees block
+    T-14125        Fixed compatibility of iCal email attachments with some SMTP servers
+    T-14074        Fixed theme precedence issues
+
+                   Currently if you set a mobile theme in Site Administration > Appearance >
+                   Themes > Theme Selector, the mobile theme will take precedence over any
+                   user, course or category themes when viewing Totara on a mobile device.
+                   This patch reverses this (so that User, Course and Category themes will
+                   take precedence over a mobile theme).
+
+                   If you wish to maintain the current (pre patch) behaviour add the line
+                   "$CFG->themeorder = array('device', 'course', 'category', 'session',
+                   'user', 'site');" to your config.php file
+
+    T-13661        Fixed joinlist for the Assignment Submissions report source
+
+                   When viewing the 'Assignment submissions' report source, no assignment
+                   submissions were displayed unless they were either graded, or the
+                   'Submission grade' column was removed from the report.
+
+    T-14101        Fixed uppercase column names in Facetoface enrolment plugin
+
+                   Can cause database query errors on MSSQL installations using case sensitive
+                   collations
+
+
 Release 2.7.0 (2nd March 2015):
 ==================================================
 

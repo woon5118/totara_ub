@@ -352,7 +352,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
             $this->email_welcome_message($instance, $USER);
         }
 
-        totara_set_notification($message, $returnurl, array('class' => $cssclass));
+        totara_set_notification($message, $returnurl, array('class' => $cssclass), false);
 
         return $enrolled;
     }

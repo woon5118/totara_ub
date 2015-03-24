@@ -426,7 +426,7 @@ $string['recordnotcreated'] = 'Record could not be created';
 $string['recordnotupdated'] = 'Record could not be updated';
 $string['recordoflearning'] = 'Record of Learning';
 $string['recordoflearningfor'] = 'Record of Learning for ';
-$string['remotetotaralangnotavailable'] = 'Because Totara can not connect to download.totaralms.com, we are unable to do language pack installation automatically. Please download the appropriate zip file(s) from http://download.totaralms.com/lang/T{$a->totaraversion}/, copy them to your {$a->langdir} directory and unzip them manually.';
+$string['remotetotaralangnotavailable'] = 'Because Totara can not connect to download.totaralms.com, we are unable to do language pack installation automatically. Please download the appropriate zip file(s) from https://download.totaralms.com/lang/T{$a->totaraversion}/, copy them to your {$a->langdir} directory and unzip them manually.';
 $string['replaceareyousure'] = 'Are you sure you want to replace \'{$a->search}\' with \'{$a->replace}\'? (y/n)';
 $string['replacedevdebuggingrequired'] = 'Error, you must have developer debugging enabled to run this script.';
 $string['replacedonotrunlive'] = 'DO NOT RUN THIS ON A LIVE SITE.';
@@ -506,7 +506,7 @@ These updates allow Totara to know what versions of Totaralms and support softwa
 This information will allow Totara to better examine and resolve any support issues you face in the future.</p>
 <p>This information will be securely transmitted and held in confidence.</p>';
 $string['totararelease'] = 'Totara release identifier';
-$string['totarareleaselink'] = 'See the <a href="http://community.totaralms.com/mod/forum/view.php?id=1834" target=\"_blank\">release notes</a> for more details.';
+$string['totarareleaselink'] = 'See the <a href="https://community.totaralms.com/mod/forum/view.php?id=1834" target=\"_blank\">release notes</a> for more details.';
 $string['totararequiredupgradeversion'] = 'Totara 2.2.13';
 $string['totarauniqueidnumbercheckfail'] = 'The following tables contain non-unique values in the column idnumber:<br/><br/>
 {$a}
@@ -531,6 +531,7 @@ $string['unlockcompletion'] = 'Unlock completion and delete completion data';
 $string['unlockcompletionnoreset'] = 'Unlock completion and keep completion data';
 $string['unsupported_branch_text'] = 'The version you are using ({$a})  is no longer supported. That means that bugs and security issues are no longer being fixed. You should upgrade to a supported version (such as [[CURRENT_MAJOR_VERSION]]) as soon as possible';
 $string['updatetemporarymanagerstask'] = 'Update temporary managers';
+$string['upgradenonlinear'] = 'Upgrades must be to a higher version built on or after the date of the current version {$a}';
 $string['uploadcompletionrecords'] = 'Upload completion records';
 $string['userdoesnotexist'] = 'User does not exist';
 $string['viewmyteam'] = 'View My Team';
