@@ -1284,7 +1284,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         $filterall = (!empty($CFG->filterall)) ? $CFG->filterall : 0;
         $CFG->filterall = 0;
         // Remove the hardcoded defaultfor and defaultinfofor strings in question_categories
-        $categories = $DB->get_recordset_select('question_categories', '', array());
+        $sql = "SELECT qc1.*
+                  FROM {question_categories} qc1
+                 WHERE qc1.parent = 0
+                   AND qc1.id = (SELECT MIN(qc2.id)
+                                   FROM {question_categories} qc2
+                                  WHERE qc2.contextid = qc1.contextid)";
+        $categories = $DB->get_recordset_sql($sql, array());
         $todelete = array();
         foreach ($categories as $category) {
             if ($context = context::instance_by_id($category->contextid, IGNORE_MISSING)) {
