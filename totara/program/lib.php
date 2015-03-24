@@ -1122,27 +1122,44 @@ function prog_get_tab_link($userid) {
  * Processes extension request to grant or deny them given
  * an array of exceptions and the action to take
  *
- * @param array $extensions list of extension ids and actions in the form array(id => action)
+ * @param array $extensionslist list of extension ids and actions in the form array(id => action)
  * @param array $reasonfordecision Reason for granting or denying the extension
  * @return array Contains count of extensions processed and number of failures
  */
-function prog_process_extensions($extensions, $reasonfordecision = array()) {
+function prog_process_extensions($extensionslist, $reasonfordecision = array()) {
     global $CFG, $DB, $USER;
 
-    if (!empty($extensions)) {
+    if (empty($CFG->enableprogramextensionrequests)) {
+        print_error('error:notextensionallowed', 'totara_program');
+    }
+
+    if (!empty($extensionslist)) {
         $update_fail_count = 0;
         $update_extension_count = 0;
 
-        foreach ($extensions as $id => $action) {
+        // Get valid extensions to process. Extensions that are in prog_extensions and extensions for programs that allow them.
+        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($extensionslist));
+        $inparams[] = 1;
+        $sql = "SELECT pe.*
+                  FROM {prog_extension} pe
+            INNER JOIN {prog} p
+                    ON pe.programid = p.id
+                 WHERE pe.id {$insql}
+                   AND p.allowextensionrequests = ?";
+        $extensions = $DB->get_records_sql($sql, $inparams);
+
+        // Update fail count in case some of them are not valid at this point.
+        $update_fail_count = count($extensionslist) - count($extensions);
+
+        foreach ($extensions as $extension) {
+            $id = $extension->id;
+            $action = $extensionslist[$extension->id];
+
             if ($action == 0) {
                 continue;
             }
 
             $update_extension_count++;
-
-            if (!$extension = $DB->get_record('prog_extension', array('id' => $id))) {
-                print_error('error:couldnotloadextension', 'totara_program');
-            }
 
             if (!totara_is_manager($extension->userid)) {
                 print_error('error:notusersmanager', 'totara_program');
@@ -2263,4 +2280,16 @@ function totara_prog_completion_to_history($record) {
     global $DB;
 
     return $DB->insert_record('prog_completion_history', $record);
+}
+
+/**
+ * Get extension request setting for a particular program.
+ *
+ * @param int $programid The program ID
+ * @return mixed
+ */
+function totara_prog_extension_allowed($programid) {
+    global $DB;
+
+    return $DB->get_field('prog', 'allowextensionrequests', array('id' => $programid));
 }

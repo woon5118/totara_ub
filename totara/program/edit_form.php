@@ -279,6 +279,23 @@ class program_edit_form extends moodleform {
         $programicon = ($program && !empty($program->icon)) ? $program->icon : 'default';
         totara_add_icon_picker($mform, $action, 'program', $programicon, $nojs, false);
 
+        // If program extension request is ON, show setting to allow request extension in this program.
+        if (!empty($CFG->enableprogramextensionrequests)) {
+            $label = get_string('allowextensionrequests', 'totara_program');
+            $mform->addElement('header','othersettings', get_string('othersettings', 'totara_program'));
+
+            $mform->addElement('advcheckbox','allowextensionrequests', $label, null, null, array(0, 1));
+            $mform->setType('allowextensionrequests', PARAM_BOOL);
+            $allowextensionrequests = (!$program || !empty($program->allowextensionrequests)) ? 1 : 0;
+            $mform->setDefault('allowextensionrequests', $allowextensionrequests);
+            if ($action == 'view') {
+                $mform->hardFreeze('allowextensionrequests');
+            } else {
+                $mform->addHelpButton('allowextensionrequests', 'allowextensionrequests', 'totara_program');
+            }
+            $mform->setExpanded('othersettings');
+        }
+
         // Customfield support.
         if (!$program) {
             $program = new stdClass();

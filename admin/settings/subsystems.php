@@ -107,6 +107,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
             new lang_string('showhierarchyshortnames', 'totara_hierarchy'),
             new lang_string('configshowhierarchyshortnames', 'totara_hierarchy'), 0));
 
+    // Program extension request setting.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enableprogramextensionrequests',
+        new lang_string('enableprogramextensionrequests', 'totara_core'),
+        new lang_string('enableprogramextensionrequests_help', 'totara_core'), 1));
+
     // Totara Settings.
     $featureoptions = array(
         TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),

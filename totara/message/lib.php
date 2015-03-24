@@ -185,15 +185,25 @@ function totara_message_alert_popup($id, $extrabuttons=array(), $messagetype) {
 
     $metadata = $DB->get_record('message_metadata', array('messageid' => $id));
     $eventdata = totara_message_eventdata($id, 'onaccept', $metadata);
+    if ($eventdata && isset($eventdata->action)) {
+        switch ($eventdata->action) {
+            case 'facetoface':
+                require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
-    if ($eventdata && $eventdata->action == 'facetoface') {
-        require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+                $canbook = facetoface_task_check_capacity($eventdata->data);
 
-        $canbook = facetoface_task_check_capacity($eventdata->data);
-
-        if (!$canbook) {
-            // Remove accept / reject buttons
-            $extrabuttons = array();
+                if (!$canbook) {
+                    // Remove accept / reject buttons
+                    $extrabuttons = array();
+                }
+                break;
+            case 'prog_extension':
+                require_once($CFG->dirroot . '/totara/program/lib.php');
+                if (empty($CFG->enableprogramextensionrequests) || !totara_prog_extension_allowed($eventdata->data['programid'])) {
+                    // Remove Grant/Deny/Manage extension requests buttons.
+                    $extrabuttons = array();
+                }
+                break;
         }
     }
 
@@ -249,7 +259,7 @@ function totara_message_action_button($action) {
  * @return string HTML of accept/reject button
  */
 function totara_message_accept_reject_action($id) {
-    global $CFG, $FULLME, $PAGE;
+    global $CFG, $FULLME, $PAGE, $DB, $OUTPUT;
 
     // Button Lang Strings
     $cancel_string = get_string('cancel');

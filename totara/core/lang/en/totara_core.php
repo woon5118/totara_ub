@@ -184,6 +184,8 @@ $string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Hide/Disa
 * If Show is chosen, all links, menus, tabs and option related to My Team will be accessible.
 * If Hide is chosen, all links and tabs related to My Team will be hidden.
 * If Disable is chosen, My Team will disappear from any menu on the site and will not be accessible.';
+$string['enableprogramextensionrequests'] = 'Enable program extension requests';
+$string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';
 $string['enabletempmanagers'] = 'Enable temporary managers';
 $string['enabletempmanagersdesc'] = 'Enable functionality that allows for assigning a temporary manager to a user. Disabling this will cause all current temporary managers to be unassigned on next cron run.';
 $string['enhancedcatalog'] = 'Enhanced catalog';

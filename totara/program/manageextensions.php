@@ -38,6 +38,12 @@ $PAGE->set_url(new moodle_url("/totara/program/manageextensions.php", array('use
 if ((!empty($userid) && !totara_is_manager($userid, $USER->id)) && !is_siteadmin()) {
     print_error('nopermissions', 'error', '', get_string('manageextensions', 'totara_program'));
 }
+
+// Don't show any information if Program extensions are not allowed on this site.
+if (empty($CFG->enableprogramextensionrequests)) {
+    print_error('error:notextensionallowed', 'totara_program');
+}
+
 $extensionsselceted = array_filter($extensions);
 if (data_submitted() && confirm_sesskey() && (!empty($extensionsselceted))) {
     $result = prog_process_extensions($extensionsselceted, $reasons);
@@ -46,7 +52,7 @@ if (data_submitted() && confirm_sesskey() && (!empty($extensionsselceted))) {
         $failcount = $result['failcount'];
         $update_fail_count = $result['updatefailcount'];
         $update_extension_count = $total;
-        if ($total == 0) {
+        if ($total == 0 && $update_fail_count == 0) {
             redirect('manageextensions.php');
         } elseif ($update_fail_count == $update_extension_count && $update_fail_count > 0) {
             totara_set_notification(get_string('updateextensionfailall', 'totara_program'), 'manageextensions.php?userid='.$userid);
@@ -126,15 +132,27 @@ if (!empty($staff_ids)) {
         $currenturl = qualified_me();
         echo html_writer::start_tag('form', array('id'=>'program-extension-update', 'action'=>$currenturl, 'method'=>'POST'));
 
+        $programs = array();
+        $extensionstoprocess = 0;
         foreach ($extensions as $extension) {
             $tablerow = array();
+
+            // Get program record.
+            if (!isset($programs[$extension->programid])) {
+                $params = array('id' => $extension->programid);
+                $programs[$extension->programid] = $DB->get_record('prog', $params, 'fullname, allowextensionrequests');
+            }
+
+            // Don't take into account programs that don't allow extension requests as they won't be processed.
+            if (!$programs[$extension->programid] || $programs[$extension->programid]->allowextensionrequests == 0) {
+                continue;
+            }
 
             if ($prog_completion = $DB->get_record('prog_completion', array('programid' => $extension->programid, 'userid' => $extension->userid, 'coursesetid' => 0))) {
                 $duedatestr = empty($prog_completion->timedue) ? get_string('duedatenotset', 'totara_program') : userdate($prog_completion->timedue, get_string('strftimedate', 'langconfig'), 99, false);
             }
 
-            $prog_name = $DB->get_field('prog', 'fullname', array('id' => $extension->programid));
-            $prog_name = empty($prog_name) ? '' : $prog_name;
+            $prog_name = $programs[$extension->programid]->fullname;
 
             $user = $DB->get_record('user', array('id' => $extension->userid));
             $tablerow[] = fullname($user);
@@ -155,16 +173,19 @@ if (!empty($staff_ids)) {
             $pulldown_menu = html_writer::select($options, $pulldown_name, $extension->status, array(0 => 'choose'), $attributes);
             $tablerow[] = $pulldown_menu;
             $table->add_data($tablerow);
+            $extensionstoprocess++;
         }
 
         if (!empty($userid)) {
             echo html_writer::tag('p', get_string('viewinguserextrequests', 'totara_program', $user_fullname));
         }
 
-        echo html_writer::empty_tag('input', array('type'=>'hidden', 'id' => 'sesskey', 'name'=>'sesskey', 'value'=>sesskey()));
         $table->finish_html();
-        echo html_writer::empty_tag('br');
-        echo html_writer::empty_tag('input', array('type'=>'submit', 'name' => 'submitbutton', 'value' => get_string('updateextensions', 'totara_program')));
+        if ($extensionstoprocess > 0) {
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'id' => 'sesskey', 'name' => 'sesskey', 'value' => sesskey()));
+            echo html_writer::empty_tag('br');
+            echo html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'submitbutton', 'value' => get_string('updateextensions', 'totara_program')));
+        }
         html_writer::end_tag('form');
 
     } elseif (!empty($userid)) {

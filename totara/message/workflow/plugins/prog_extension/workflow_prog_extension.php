@@ -47,7 +47,12 @@ class totara_message_workflow_prog_extension extends totara_message_workflow_plu
         $reason = array($extensionid => $reasonfordecision);
 
         // Approve extensions
-        prog_process_extensions($extensions, $reason);
+        $result = prog_process_extensions($extensions, $reason);
+
+        if (isset($result['failcount']) && $result['failcount'] === 1) {
+            // Print error message.
+            print_error('error:extensionnotprocessed', 'totara_program');
+        }
 
         return true;
     }
@@ -68,7 +73,12 @@ class totara_message_workflow_prog_extension extends totara_message_workflow_plu
         $reason = array($extensionid => $reasonfordecision);
 
         // Decline extensions.
-        prog_process_extensions($extensions, $reason);
+        $result = prog_process_extensions($extensions, $reason);
+
+        if (isset($result['failcount']) && $result['failcount'] === 1) {
+            // Print error message.
+            print_error('error:extensionnotprocessed', 'totara_program');
+        }
 
         return true;
     }

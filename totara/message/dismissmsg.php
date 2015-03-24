@@ -47,13 +47,22 @@ if (!$msg || $msg->useridto != $USER->id || !confirm_sesskey()) {
 
 $canbook = false;
 $isfacetoface = false;
+$isprogextensionallowed = true;
 $metadata = $DB->get_record('message_metadata', array('messageid' => $id));
 
 $eventdata = totara_message_eventdata($id, 'onaccept', $metadata);
-if ($eventdata && $eventdata->action == 'facetoface') {
-    require_once($CFG->dirroot . '/mod/facetoface/lib.php');
-    $isfacetoface = true;
-    $canbook = facetoface_task_check_capacity($eventdata->data);
+if ($eventdata && isset($eventdata->action)) {
+    switch ($eventdata->action) {
+        case 'facetoface':
+            require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+            $isfacetoface = true;
+            $canbook = facetoface_task_check_capacity($eventdata->data);
+            break;
+        case 'prog_extension':
+            require_once($CFG->dirroot . '/totara/program/lib.php');
+            $isprogextensionallowed = !empty($CFG->enableprogramextensionrequests) && totara_prog_extension_allowed($eventdata->data['programid']);
+            break;
+    }
 }
 
 $from     = totara_get_sender_from_user_by_id($msg->useridfrom);
@@ -65,6 +74,12 @@ if ($isfacetoface && !$DB->record_exists('facetoface_sessions', array('id' => $e
 } else if ($isfacetoface && !$canbook) {
         $subject .= ' (' . html_writer::tag('strong', get_string('f2fsessionfull', 'block_totara_tasks')) . ')';
 }
+
+// Add info to the subject to explain that program extension is not allowed.
+if (!$isprogextensionallowed) {
+    $subject .= ' (' . html_writer::tag('strong', get_string('allowextensionrequestsdisabled', 'totara_program')) . ')';
+}
+
 global $TOTARA_MESSAGE_TYPES;
 $msgtype = get_string($TOTARA_MESSAGE_TYPES[$metadata->msgtype], 'totara_message');
 $icon = $OUTPUT->pix_icon('msgicons/' . $metadata->icon, format_string($msgtype), 'totara_core', array('class' => 'msgicon',  'alt' => format_string($msgtype)));
@@ -90,8 +105,9 @@ if ($msg->contexturl && $msg->contexturlname) {
     echo html_writer::tag('dd', html_writer::tag('a', $msg->contexturlname, array('href' => $msg->contexturl)));
 }
 echo html_writer::end_tag('dl');
+
 // Create input reason for declining/approving the request.
-if ($eventdata && $eventdata->action != 'facetoface') {
+if ($eventdata && ($eventdata->action === 'plan' || ($eventdata->action === 'prog_extension' && $isprogextensionallowed))) {
     echo html_writer::tag('label', get_string('reasonfordecision', 'totara_message'), array('for' => 'dismiss-reasonfordecision'));
     echo html_writer::empty_tag('input', array('class' => 'reasonfordecision', 'type' => 'text', 'name' => 'reasonfordecision', 'id' => 'reasonfordecision', 'size' => '80', 'maxlength' => '255'));
 }

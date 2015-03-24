@@ -482,5 +482,19 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030203, 'totara_program');
     }
 
+    if ($oldversion < 2015062600) {
+        // Define field allowrequestextensions to be added to prog.
+        $table = new xmldb_table('prog');
+        $field = new xmldb_field('allowextensionrequests', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'assignmentsdeferred');
+
+        // Conditionally launch add field allowrequestextensions.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015062600, 'totara_program');
+    }
+
     return true;
 }

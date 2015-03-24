@@ -105,7 +105,7 @@ class program {
     public $idnumber, $summary, $endnote, $visible;
     public $availablefrom, $availableuntil, $available;
     public $timecreated, $timemodified, $usermodified, $icon;
-    public $content;
+    public $content, $allowextensionrequests;
 
     protected $assignments, $messagesmanager;
     protected $exceptionsmanager, $context, $studentroleid;
@@ -140,6 +140,7 @@ class program {
         $this->audiencevisible = $program->audiencevisible;
         $this->certifid = $program->certifid;
         $this->assignmentsdeferred = $program->assignmentsdeferred;
+        $this->allowextensionrequests = $program->allowextensionrequests;
 
         $this->content = new prog_content($id);
         $this->assignments = new prog_assignments($id);
@@ -1356,8 +1357,11 @@ class program {
 
             // Setup the request extension link.
             $request = '';
-            if ($this->assigned_to_users_required_learning($userid) && $prog_completion->timedue != COMPLETION_TIME_NOT_SET && $prog_completion->timecompleted == 0) {
+            $extrequestavailable = !empty($CFG->enableprogramextensionrequests) && $this->allowextensionrequests;
+            if ($this->assigned_to_users_required_learning($userid) && $prog_completion->timedue != COMPLETION_TIME_NOT_SET
+                && $prog_completion->timecompleted == 0 && $extrequestavailable) {
                 // Only show the extension link if the user is assigned via required learning, and it has a due date and they haven't completed it yet.
+                // And program extension request is enabled in site level and for this program instance.
                 if (!$extension = $DB->get_record('prog_extension', array('userid' => $userid, 'programid' => $this->id, 'status' => 0))) {
                     if (!$viewinganothersprogram && totara_get_manager($userid)) {
                         // Show extension request link if it is their assignment and they have a manager to request it from.

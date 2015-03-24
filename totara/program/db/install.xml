@@ -26,6 +26,7 @@
         <FIELD NAME="audiencevisible" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="2" SEQUENCE="false"/>
         <FIELD NAME="certifid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="FK to certification table"/>
         <FIELD NAME="assignmentsdeferred" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates that user assignments need to be updated"/>
+        <FIELD NAME="allowextensionrequests" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Indicates if the program allows extension requests"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
