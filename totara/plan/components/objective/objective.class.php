@@ -1123,14 +1123,8 @@ class dp_objective_component extends dp_base_component {
             return '';
         }
 
-        // Decide on button text
-        if ($permission >= DP_PERMISSION_ALLOW) {
-            $btntext = get_string('addnewobjective', 'totara_plan');
-        } else {
-            $btntext = get_string('requestednewobjective', 'totara_plan');
-        }
-
-        $button = $OUTPUT->single_button(new moodle_url("/totara/plan/components/objective/edit.php", array('id' => $this->plan->id)), $btntext, 'get');
+        $button = $OUTPUT->single_button(new moodle_url("/totara/plan/components/objective/edit.php",
+                                            array('id' => $this->plan->id)), get_string('addnewobjective', 'totara_plan'), 'get');
 
         return $OUTPUT->container($button, "buttons plan-add-item-button-wrapper");
     }
