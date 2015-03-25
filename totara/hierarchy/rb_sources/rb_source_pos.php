@@ -25,13 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class rb_source_org extends rb_base_source {
+class rb_source_pos extends rb_base_source {
     public $base, $joinlist, $columnoptions, $filteroptions;
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
     function __construct() {
-        $this->base = '{org}';
+        $this->base = '{pos}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -40,7 +40,7 @@ class rb_source_org extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
         $this->requiredcolumns = $this->define_requiredcolumns();
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_org');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_pos');
 
         parent::__construct();
     }
@@ -57,39 +57,39 @@ class rb_source_org extends rb_base_source {
             new rb_join(
                 'framework',
                 'INNER',
-                '{org_framework}',
+                '{pos_framework}',
                 'base.frameworkid = framework.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
                 'parent',
                 'LEFT',
-                '{org}',
+                '{pos}',
                 'base.parentid = parent.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
                 'comps',
                 'LEFT',
-                '(SELECT oc.organisationid, ' .
+                '(SELECT oc.positionid, ' .
                 sql_group_concat(sql_cast2char('c.fullname'), '<br>', true) .
-                " AS list FROM {org_competencies} oc LEFT JOIN {comp} c ON oc.competencyid = c.id GROUP BY oc.organisationid)",
-                'comps.organisationid = base.id',
+                " AS list FROM {pos_competencies} oc LEFT JOIN {comp} c ON oc.competencyid = c.id GROUP BY oc.positionid)",
+                'comps.positionid = base.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'orgtype',
+                'postype',
                 'LEFT',
-                '{org_type}',
-                'base.typeid = orgtype.id',
+                '{pos_type}',
+                'base.typeid = postype.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            // This join is required to keep the joining of org custom fields happy :D
+            // This join is required to keep the joining of pos custom fields happy :D
             new rb_join(
-                'organisation',
+                'position',
                 'INNER',
-                '{org}',
-                'base.id = organisation.id',
+                '{pos}',
+                'base.id = position.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
         );
@@ -100,39 +100,39 @@ class rb_source_org extends rb_base_source {
     protected function define_columnoptions() {
         $columnoptions = array(
         new rb_column_option(
-                'org',
+                'pos',
                 'idnumber',
-                get_string('idnumber', 'rb_source_org'),
+                get_string('idnumber', 'rb_source_pos'),
                 "base.idnumber",
                 array('dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'fullname',
-                get_string('name', 'rb_source_org'),
+                get_string('name', 'rb_source_pos'),
                 "base.fullname",
-                array('displayfunc' => 'orgnamelink',
-                      'extrafields' => array('orgid' => 'base.id'),
+                array('displayfunc' => 'posnamelink',
+                      'extrafields' => array('posid' => 'base.id'),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'shortname',
-                get_string('shortname', 'rb_source_org'),
+                get_string('shortname', 'rb_source_pos'),
                 "base.shortname",
                 array('dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'description',
-                get_string('description', 'rb_source_org'),
+                get_string('description', 'rb_source_pos'),
                 "base.description",
                 array('displayfunc' => 'tinymce_textarea',
                     'extrafields' => array(
-                        'filearea' => '\'org\'',
+                        'filearea' => '\'pos\'',
                         'component' => '\'totara_hierarchy\'',
                         'fileid' => 'base.id'
                     ),
@@ -140,98 +140,98 @@ class rb_source_org extends rb_base_source {
                     'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
-                'orgtypeid',
-                get_string('type', 'rb_source_org'),
-                'orgtype.id',
+                'pos',
+                'postypeid',
+                get_string('type', 'rb_source_pos'),
+                'postype.id',
                 array(
-                    'joins' => 'orgtype',
+                    'joins' => 'postype',
                     'hidden' => true,
                     'selectable' => false
                 )
             ),
             new rb_column_option(
-                'org',
-                'orgtype',
-                get_string('type', 'rb_source_org'),
-                'orgtype.fullname',
-                array('joins' => 'orgtype',
+                'pos',
+                'postype',
+                get_string('type', 'rb_source_pos'),
+                'postype.fullname',
+                array('joins' => 'postype',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
-                'orgtypeidnumber',
-                get_string('typeidnumber', 'rb_source_org'),
-                'orgtype.idnumber',
-                array('joins' => 'orgtype',
+                'pos',
+                'postypeidnumber',
+                get_string('typeidnumber', 'rb_source_pos'),
+                'postype.idnumber',
+                array('joins' => 'postype',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text'
                 )
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'framework',
-                get_string('framework', 'rb_source_org'),
+                get_string('framework', 'rb_source_pos'),
                 "framework.fullname",
                 array('joins' => 'framework',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'frameworkidnumber',
-                get_string('frameworkidnumber', 'rb_source_org'),
+                get_string('frameworkidnumber', 'rb_source_pos'),
                 "framework.idnumber",
                 array('joins' => 'framework',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'visible',
-                get_string('visible', 'rb_source_org'),
+                get_string('visible', 'rb_source_pos'),
                 'base.visible',
                 array('displayfunc' => 'yes_no')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'parentidnumber',
-                get_string('parentidnumber', 'rb_source_org'),
+                get_string('parentidnumber', 'rb_source_pos'),
                 'parent.idnumber',
                 array('joins' => 'parent',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'parentfullname',
-                get_string('parentfullname', 'rb_source_org'),
+                get_string('parentfullname', 'rb_source_pos'),
                 'parent.fullname',
                 array('joins' => 'parent',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'comps',
-                get_string('competencies', 'rb_source_org'),
+                get_string('competencies', 'rb_source_pos'),
                 'comps.list',
                 array('joins' => 'comps',
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'timecreated',
-                get_string('timecreated', 'rb_source_org'),
+                get_string('timecreated', 'rb_source_pos'),
                 'base.timecreated',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
-                'org',
+                'pos',
                 'timemodified',
-                get_string('timemodified', 'rb_source_org'),
+                get_string('timemodified', 'rb_source_pos'),
                 'base.timemodified',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
@@ -243,70 +243,70 @@ class rb_source_org extends rb_base_source {
     protected function define_filteroptions() {
         $filteroptions = array(
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'idnumber',         // value
-                get_string('idnumber', 'rb_source_org'), // label
+                get_string('idnumber', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'fullname',         // value
-                get_string('name', 'rb_source_org'), // label
+                get_string('name', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'shortname',        // value
-                get_string('shortname', 'rb_source_org'), // label
+                get_string('shortname', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'description',      // value
-                get_string('description', 'rb_source_org'), // label
+                get_string('description', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'parentidnumber',   // value
-                get_string('parentidnumber', 'rb_source_org'), // label
+                get_string('parentidnumber', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'parentfullname',   // value
-                get_string('parentfullname', 'rb_source_org'), // label
+                get_string('parentfullname', 'rb_source_pos'), // label
                 'text'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'timecreated',      // value
-                get_string('timecreated', 'rb_source_org'), // label
+                get_string('timecreated', 'rb_source_pos'), // label
                 'date'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'timemodified',     // value
-                get_string('timemodified', 'rb_source_org'), // label
+                get_string('timemodified', 'rb_source_pos'), // label
                 'date'              // filtertype
             ),
             new rb_filter_option(
-                'org',              // type
-                'orgtypeid',        // value
-                get_string('type', 'rb_source_org'), // label
+                'pos',              // type
+                'postypeid',        // value
+                get_string('type', 'rb_source_pos'), // label
                 'select',           // filtertype
                 array(
-                    'selectfunc' => 'orgtypes',
+                    'selectfunc' => 'postypes',
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
             ),
             new rb_filter_option(
-                'org',              // type
+                'pos',              // type
                 'visible',          // value
-                get_string('visible', 'rb_source_org'), // label
+                get_string('visible', 'rb_source_pos'), // label
                 'select',           // filtertype
                 array(
-                    'selectfunc' => 'org_yesno',
+                    'selectfunc' => 'pos_yesno',
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
             ),
@@ -330,23 +330,23 @@ class rb_source_org extends rb_base_source {
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'idnumber',
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'fullname',
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'framework',
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'parentidnumber',
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'comps',
             ),
         );
@@ -356,17 +356,17 @@ class rb_source_org extends rb_base_source {
     protected function define_defaultfilters() {
         $defaultfilters = array(
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'fullname',
                 'advanced' => 0,
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'idnumber',
                 'advanced' => 0,
             ),
             array(
-                'type' => 'org',
+                'type' => 'pos',
                 'value' => 'parentidnumber',
                 'advanced' => 0,
             ),
@@ -397,10 +397,10 @@ class rb_source_org extends rb_base_source {
     // Source specific column display methods
     //
     //
-    function rb_display_orgnamelink($orgname, $row) {
-        $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'organisation', 'id' => $row->orgid));
+    function rb_display_posnamelink($posname, $row) {
+        $url = new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => 'position', 'id' => $row->posid));
 
-        return html_writer::link($url, $orgname);
+        return html_writer::link($url, $posname);
     }
 
 
@@ -409,17 +409,17 @@ class rb_source_org extends rb_base_source {
     // Source specific filter display methods
     //
     //
-    function rb_filter_org_yesno() {
+    function rb_filter_pos_yesno() {
         return array(
             1 => get_string('yes'),
             0 => get_string('no')
         );
     }
 
-    function rb_filter_orgtypes() {
+    function rb_filter_postypes() {
         global $DB;
 
-        $types = $DB->get_records('org_type', null, 'fullname', 'id, fullname');
+        $types = $DB->get_records('pos_type', null, 'fullname', 'id, fullname');
         $list = array();
         foreach ($types as $type) {
             $list[$type->id] = $type->fullname;
@@ -427,4 +427,4 @@ class rb_source_org extends rb_base_source {
         return $list;
     }
 
-} // end of rb_source_org class
+} // end of rb_source_pos class
