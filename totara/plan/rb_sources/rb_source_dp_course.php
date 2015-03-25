@@ -64,43 +64,19 @@ class rb_source_dp_course extends rb_base_source {
      */
     public static function get_base_sql() {
         global $DB;
-        return "(select distinct ".
-                $DB->sql_concat_join(
-                        "','",
-                        array(
-                            sql_cast2char('ra.userid'),
-                            sql_cast2char('ctx.instanceid')
-                        )
-                ) . " as id, ".
-                "ra.userid as userid, ctx.instanceid as courseid ".
-                "from {role_assignments} ra ".
-                "inner join {context} ctx ".
-                "on ra.contextid = ctx.id and ctx.contextlevel = " . CONTEXT_COURSE .
-                " UNION ".
-                "select distinct ".
-                $DB->sql_concat_join(
-                        "','",
-                        array(
-                            sql_cast2char('cc.userid'),
-                            sql_cast2char('cc.course')
-                        )
-                ) . " as id, ".
-                "cc.userid as userid, cc.course as courseid ".
-                "from {course_completions} cc ".
-                "where cc.status > " . COMPLETION_STATUS_NOTYETSTARTED .
-                " UNION ".
-                "select distinct ".
-                $DB->sql_concat_join(
-                        "','",
-                        array(
-                            sql_cast2char('p1.userid'),
-                            sql_cast2char('pca1.courseid')
-                        )
-                )." as id, ".
-                "p1.userid as userid, pca1.courseid as courseid ".
-                "from {dp_plan_course_assign} pca1 ".
-                "inner join {dp_plan} p1 ".
-                "on pca1.planid = p1.id)";
+        $uniqueid = $DB->sql_concat_join("','", array(sql_cast2char('userid'), sql_cast2char('courseid')));
+        return "(SELECT " . $uniqueid . " AS id, userid, courseid
+                   FROM (SELECT ue.userid AS userid, e.courseid AS courseid
+                           FROM {user_enrolments} ue
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                          UNION
+                         SELECT cc.userid AS userid, cc.course AS courseid
+                           FROM {course_completions} cc
+                          WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
+                          UNION
+                         SELECT p1.userid AS userid, pca1.courseid AS courseid
+                           FROM {dp_plan_course_assign} pca1
+                           JOIN {dp_plan} p1 ON pca1.planid = p1.id) basesub)";
     }
 
     //
