@@ -17,12 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Eugene Venter <eugene@catalyst.net.nz>
- * @package totara
- * @subpackage reportbuilder
+ * @author Maria Torres <maria.torres@totaralms.com>
+ * @package totara_reportbuilder
  */
 
-$string['sourcetitle'] = 'Organisations';
+$string['sourcetitle'] = 'Positions';
 $string['idnumber'] = 'ID number';
 $string['name'] = 'Name';
 $string['shortname'] = 'Short name';
@@ -39,4 +38,4 @@ $string['type'] = 'Type';
 $string['typeidnumber'] = 'Type ID number';
 
 // column types for this source, as strings
-$string['type_org'] = 'Organisation';
+$string['type_pos'] = 'Position';
