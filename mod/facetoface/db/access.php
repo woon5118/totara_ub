@@ -225,6 +225,15 @@ $capabilities = array(
         ),
     ),
 
+    // Can approve any attendance
+    'mod/facetoface:approveanyrequest' => array(
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(),
+    ),
+
     // Can view declare interest report.
     'mod/facetoface:viewinterestreport' => array(
         'captype' => 'read',

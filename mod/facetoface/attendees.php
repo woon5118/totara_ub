@@ -166,20 +166,25 @@ if ($facetoface->approvalreqd) {
     }
 }
 
-if (is_siteadmin() || !empty($staff)) {
+$canapproveanyrequest = has_capability('mod/facetoface:approveanyrequest', $context);
+if ($canapproveanyrequest || !empty($staff)) {
     // Check if any staff have requests awaiting approval.
     $get_requests = facetoface_get_requests($session->id);
     if ($get_requests) {
         // Calculate which requesting users are relevant to the viewer.
-        $requests = (is_siteadmin() ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
+        $requests = ($canapproveanyrequest ? $get_requests : array_intersect_key($get_requests, array_flip($staff)));
 
         if ($requests) {
             $allowed_actions[] = 'approvalrequired';
             $available_actions[] = 'approvalrequired';
         }
     }
+}
 
-    // Check if any staff are attending
+// Check if we are NOT already showing attendees and the user has staff.
+// If this is true then we need to show attendees but limit it to just those attendees that are also staff.
+if (!in_array('attendees', $allowed_actions) && !empty($staff)) {
+    // Check if any staff are attending.
     if ($session->datetimeknown) {
         $get_attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
@@ -187,21 +192,25 @@ if (is_siteadmin() || !empty($staff)) {
         $get_attendees = facetoface_get_attendees($session->id, array(MDL_F2F_STATUS_WAITLISTED, MDL_F2F_STATUS_BOOKED, MDL_F2F_STATUS_NO_SHOW,
             MDL_F2F_STATUS_PARTIALLY_ATTENDED, MDL_F2F_STATUS_FULLY_ATTENDED));
     }
-    if ($get_attendees && !in_array('attendees', $allowed_actions)) {
+    if ($get_attendees) {
         // Calculate which attendees are relevant to the viewer.
-        $attendees = (is_siteadmin() ? $get_attendees : array_intersect_key($get_attendees, array_flip($staff)));
+        $attendees = array_intersect_key($get_attendees, array_flip($staff));
 
         if ($attendees) {
             $allowed_actions[] = 'attendees';
             $available_actions[] = 'attendees';
         }
     }
+}
 
-    // Check if any staff have cancelled
+// Check if we are NOT already showing cancellations and the user has has staff.
+// If this is true then we still need to show cancellations but limit it to just those cancellations that are also staff.
+if (!in_array('cancellations', $allowed_actions) && !empty($staff)) {
+    // Check if any staff have cancelled.
     $get_cancellations = facetoface_get_cancellations($session->id);
-    if ($get_cancellations && !in_array('cancellations', $allowed_actions)) {
+    if ($get_cancellations) {
         // Calculate which cancelled users are relevant to the viewer.
-        $attendees = (is_siteadmin() ? $get_cancellations : array_intersect_key($get_cancellations, array_flip($staff)));
+        $cancellations = array_intersect_key($get_cancellations, array_flip($staff));
 
         if ($cancellations) {
             $allowed_actions[] = 'cancellations';

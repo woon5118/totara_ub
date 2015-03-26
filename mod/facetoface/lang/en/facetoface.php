@@ -423,6 +423,7 @@ $string['f2f-waitlist-actions_help'] = '<p><strong>Confirm:</strong> Book the se
 $string['facetoface'] = 'Face-to-face';
 $string['facetoface:addattendees'] = 'Add attendees to a face-to-face session';
 $string['facetoface:addinstance'] = 'Add a new facetoface';
+$string['facetoface:approveanyrequest'] = 'Approve any booking requests';
 $string['facetoface:configurecancellation'] = 'Allow the configuration of booking cancellations, upon adding/editing a face-to-face activity.';
 $string['facetoface:changesignedupjobposition'] = 'Change signed up job position';
 $string['facetoface:createfacetofacecustomfield'] = 'Create face-to-face custom fields';
