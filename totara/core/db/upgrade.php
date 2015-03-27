@@ -1466,5 +1466,23 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015021100, 'totara_core');
     }
 
+
+    if ($oldversion < 2015030202) {
+        // Backport MDL-49543 from Moodle 2.9dev.
+
+        $table = new xmldb_table('badge_criteria');
+        $field = new xmldb_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        // Conditionally add description field to the badge_criteria table.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('descriptionformat', XMLDB_TYPE_INTEGER, 2, null, XMLDB_NOTNULL, null, 0);
+        // Conditionally add description format field to the badge_criteria table.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        totara_upgrade_mod_savepoint(true, 2015030202, 'totara_core');
+    }
+
     return true;
 }
