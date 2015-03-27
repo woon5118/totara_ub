@@ -155,7 +155,9 @@ class rb_source_course_completion_by_org extends rb_base_source {
                 'user',
                 'allparticipants',
                 get_string('participants', 'rb_source_course_completion_by_org'),
-                $DB->sql_fullname('auser.firstname', 'auser.lastname'),
+                // Note: This technically should be changed to use fullname() but the effort and performance hit
+                //       to do that for just this column isn't justified.
+                $DB->sql_concat('auser.firstname', "' '", 'auser.lastname'),
                 array(
                     'joins' => 'auser',
                     'grouping' => 'comma_list_unique',

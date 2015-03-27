@@ -1034,7 +1034,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // Override user display function to show 'Reserved' for reserved spaces.
     function rb_display_link_user($user, $row, $isexport = false) {
-        if ($row->user_id) {
+        if ($row->id) {
             return parent::rb_display_link_user($user, $row, $isexport);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
@@ -1042,7 +1042,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // Override user display function to show 'Reserved' for reserved spaces.
     function rb_display_link_user_icon($user, $row, $isexport = false) {
-        if ($row->user_id) {
+        if ($row->id) {
             return parent::rb_display_link_user_icon($user, $row, $isexport);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
@@ -1050,7 +1050,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // Override user display function to show 'Reserved' for reserved spaces.
     function rb_display_user($user, $row, $isexport = false) {
-        if ($row->user_id) {
+        if ($row->id) {
             return $user;
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');

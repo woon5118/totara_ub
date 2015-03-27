@@ -100,7 +100,7 @@ class rb_column {
      *
      * or even:
      *
-     * <code>sql_fullname('join.first', 'join.last')</code>
+     * <code>$DB->sql_concat_join("' '", totara_get_all_user_name_fields())</code>
      *
      * @access public
      * @var string

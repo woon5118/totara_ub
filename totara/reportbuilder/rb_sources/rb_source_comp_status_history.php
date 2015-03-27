@@ -93,6 +93,9 @@ class rb_source_comp_status_history extends rb_base_source {
     protected function define_columnoptions() {
         global $DB;
 
+        $usednamefields = totara_get_all_user_name_fields(false, 'usermodified', null, null, true);
+        $allnamefields = totara_get_all_user_name_fields(false, 'usermodified');
+
         $columnoptions = array(
             new rb_column_option(
                 'competency',
@@ -141,11 +144,13 @@ class rb_source_comp_status_history extends rb_base_source {
                 'history',
                 'usermodifiednamelink',
                 get_string('compusermodifiedcolumn', 'rb_source_comp_status_history'),
-                $DB->sql_fullname('usermodified.firstname', 'usermodified.lastname'),
+                $DB->sql_concat_join("' '", $usednamefields),
                 array('defaultheading' => get_string('compusermodifiedheading', 'rb_source_comp_status_history'),
                       'joins' => 'usermodified',
                       'displayfunc' => 'link_user',
-                      'extrafields' => array('user_id' => 'usermodified.id'))
+                      'extrafields' => array_merge(array('id' => 'usermodified.id'),
+                                                   $allnamefields)
+                )
             )
         );
 

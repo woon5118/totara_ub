@@ -34,11 +34,29 @@ send_headers('text/html; charset=utf-8', false);
 
 $PAGE->set_context($context);
 
-// Get all users
-$guest = guest_user();
-$fullname = $DB->sql_fullname();
-$items = $DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id != ?', array($guest->id), '',
-    'id, ' . $fullname . ' AS fullname, email');
+// Get all users.
+$usernamefields = get_all_user_name_fields(true, 'u');
+$items = $DB->get_records_sql(
+    "
+        SELECT
+            u.id, u.email,
+            {$usernamefields}
+        FROM
+            {user} u
+        WHERE
+            u.deleted = 0
+        AND u.suspended = 0
+        AND u.id != :guestid
+        ORDER BY
+            {$usernamefields}
+    ",
+    array('guestid' => guest_user()->id), 0, TOTARA_DIALOG_MAXITEMS + 1);
+// Limit results to 1 more than the maximum number that might be displayed
+// there is no point returning any more as we will never show them.
+
+foreach ($items as $item) {
+    $item->fullname = fullname($item);
+}
 
 ///
 /// Setup dialog.
@@ -59,6 +77,7 @@ $selected = optional_param('selected', null, PARAM_SEQUENCE);
 if (!empty($selected)) {
     $selectedids = explode(',', $selected);
     $disable = array();
+    $fullname = $DB->sql_concat_join("' '", get_all_user_name_fields());
     foreach ($selectedids as $selectedid) {
         $disable[$selectedid] = $DB->get_record('user', array('id' => $selectedid), 'id, '. $fullname . 'AS fullname');
     }

@@ -104,6 +104,9 @@ class rb_source_competency_evidence extends rb_base_source {
     protected function define_columnoptions() {
         global $DB;
 
+        $usednamefields = totara_get_all_user_name_fields(false, 'assessor', null, null, true);
+        $allnamefields = totara_get_all_user_name_fields(false, 'assessor');
+
         $columnoptions = array(
             new rb_column_option(
                 'competency_evidence',  // Type.
@@ -189,10 +192,13 @@ class rb_source_competency_evidence extends rb_base_source {
                 'competency_evidence',
                 'assessor',
                 get_string('assessorname', 'rb_source_competency_evidence'),
-                $DB->sql_fullname("assessor.firstname", "assessor.lastname"),
+                $DB->sql_concat_join("' '", $usednamefields),
                 array('joins' => 'assessor',
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'displayfunc' => 'user',
+                      'extrafields' => $allnamefields
+                )
             ),
             new rb_column_option(
                 'competency_evidence',

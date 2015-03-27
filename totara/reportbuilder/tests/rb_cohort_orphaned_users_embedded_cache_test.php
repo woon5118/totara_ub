@@ -116,7 +116,7 @@ class totara_reportbuilder_rb_cohort_orphaned_users_embedded_cache_testcase exte
     public function test_cohort_members() {
         $this->resetAfterTest();
         // NOTE: this report is not cacheable because it uses current time in SQL query, it should be fast anyway.
-        $useridalias = reportbuilder_get_extrafield_alias('user', 'namelinkicon', 'user_id');
+        $useridalias = reportbuilder_get_extrafield_alias('user', 'namelinkicon', 'id');
         $result = $this->get_report_result($this->report_builder_data['shortname'],  array(), false);
         $this->assertCount(4, $result);
         $was = array();

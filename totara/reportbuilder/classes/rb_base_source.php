@@ -159,17 +159,6 @@ abstract class rb_base_source {
                                 );
 
         }
-
-        // Validate column extrafields don't have alias named 'id'.
-        foreach ($this->columnoptions as $columnoption) {
-            if (isset($columnoption->extrafields) && is_array($columnoption->extrafields)) {
-                foreach ($columnoption->extrafields as $extrakey => $extravalue) {
-                    if ($extrakey == 'id') {
-                        throw new ReportBuilderException(get_string('error:columnextranameid', 'totara_reportbuilder', $extravalue), 101);
-                    }
-                }
-            }
-        }
     }
 
 
@@ -605,77 +594,157 @@ abstract class rb_base_source {
     function rb_display_course_grade_percent($item, $row) {
         return $item === null ? null : sprintf('%.1f%%', $item);
     }
-    // link user's name to profile page
-    // requires the user_id extra field
-    // in column definition
-    function rb_display_link_user($user, $row, $isexport = false) {
-        if ($isexport) {
-            return $user;
-        }
-
-        $userid = $row->user_id;
-        $url = new moodle_url('/user/view.php', array('id' => $userid));
-        return html_writer::link($url, $user);
-    }
-
-    function rb_display_link_user_icon($user, $row, $isexport = false) {
-        global $OUTPUT;
-
-        if ($isexport) {
-            return $user;
-        }
-
-        if ($row->user_id == 0) {
-            return '';
-        }
-
-        $userid = $row->user_id;
-        $url = new moodle_url('/user/view.php', array('id' => $userid));
-
-        $picuser = new stdClass();
-        $picuser->id = $userid;
-        $picuser->picture = $row->userpic_picture;
-        $picuser->imagealt = $row->userpic_imagealt;
-        $picuser->firstname = $row->userpic_firstname;
-        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
-        $picuser->middlename = $row->userpic_middlename;
-        $picuser->lastname = $row->userpic_lastname;
-        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
-        $picuser->alternatename = $row->userpic_alternatename;
-        $picuser->email = $row->userpic_email;
-
-        return $OUTPUT->user_picture($picuser, array('courseid' => 1)) . "&nbsp;" . html_writer::link($url, $user);
-    }
 
     /**
-     * A rb_column_options->displayfunc helper function for showing a user's
-     * profile picture
-     * @param integer $itemid ID of the user
-     * @param object $row The rest of the data for the row
+     * A rb_column_options->displayfunc helper function for showing a user's name and links to their profile.
+     * To pass the correct data, first:
+     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     * then your "field" param should be:
+     *      $DB->sql_concat_join("' '", $usednamefields)
+     * to allow sorting and filtering, and finally your extrafields should be:
+     *      array_merge(array('id' => $base . '.id'),
+     *                  $allnamefields)
+     * When exporting, only the user's full name is displayed (without link).
+     *
+     * @param string $user Unused
+     * @param object $row All the data required to display a user's name
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
      */
-    function rb_display_user_picture($itemid, $row, $isexport = false) {
+    function rb_display_link_user($user, $row, $isexport = false) {
+
+        // Process obsolete calls to this display function.
+        if (isset($row->user_id)) {
+            $fullname = $user;
+        } else {
+            $fullname = fullname($row);
+        }
+
+        // Don't show links in spreadsheet.
+        if ($isexport) {
+            return $fullname;
+        }
+
+        $url = new moodle_url('/user/view.php', array('id' => $row->id));
+        return html_writer::link($url, $fullname);
+    }
+
+    /**
+     * A rb_column_options->displayfunc helper function for showing a user's profile picture, name and links to their profile.
+     * To pass the correct data, first:
+     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     * then your "field" param should be:
+     *      $DB->sql_concat_join("' '", $usednamefields)
+     * to allow sorting and filtering, and finally your extrafields should be:
+     *      array_merge(array('id' => $base . '.id',
+     *                        'picture' => $base . '.picture',
+     *                        'imagealt' => $base . '.imagealt',
+     *                        'email' => $base . '.email'),
+     *                  $allnamefields)
+     * When exporting, only the user's full name is displayed (without icon or link).
+     *
+     * @param string $user Unused
+     * @param object $row All the data required to display a user's name, icon and link
+     * @param boolean $isexport If the report is being exported or viewed
+     * @return string
+     */
+    function rb_display_link_user_icon($user, $row, $isexport = false) {
         global $OUTPUT;
 
-        $picuser = new stdClass();
-        $picuser->id = $itemid;
-        $picuser->picture = $row->userpic_picture;
-        $picuser->imagealt = $row->userpic_imagealt;
-        $picuser->firstname = $row->userpic_firstname;
-        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
-        $picuser->middlename = $row->userpic_middlename;
-        $picuser->lastname = $row->userpic_lastname;
-        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
-        $picuser->alternatename = $row->userpic_alternatename;
-        $picuser->email = $row->userpic_email;
-
-        // don't show picture in spreadsheet
-        if ($isexport) {
-            return '';
-        } else {
-            return $OUTPUT->user_picture($picuser, array('courseid' => 1));
+        // Process obsolete calls to this display function.
+        if (isset($row->userpic_picture)) {
+            $picuser = new stdClass();
+            $picuser->id = $row->user_id;
+            $picuser->picture = $row->userpic_picture;
+            $picuser->imagealt = $row->userpic_imagealt;
+            $picuser->firstname = $row->userpic_firstname;
+            $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+            $picuser->middlename = $row->userpic_middlename;
+            $picuser->lastname = $row->userpic_lastname;
+            $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+            $picuser->alternatename = $row->userpic_alternatename;
+            $picuser->email = $row->userpic_email;
+            $row = $picuser;
         }
+
+        if ($row->id == 0) {
+            return '';
+        }
+
+        // Don't show picture in spreadsheet.
+        if ($isexport) {
+            return fullname($row);
+        }
+
+        $url = new moodle_url('/user/view.php', array('id' => $row->id));
+        return $OUTPUT->user_picture($row, array('courseid' => 1)) . "&nbsp;" . html_writer::link($url, $user);
+    }
+
+    /**
+     * A rb_column_options->displayfunc helper function for showing a user's profile picture.
+     * To pass the correct data, first:
+     *      $usernamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     * then your "field" param should be:
+     *      $DB->sql_concat_join("' '", $usednamefields)
+     * to allow sorting and filtering, and finally your extrafields should be:
+     *      array_merge(array('id' => $base . '.id',
+     *                        'picture' => $base . '.picture',
+     *                        'imagealt' => $base . '.imagealt',
+     *                        'email' => $base . '.email'),
+     *                  $allnamefields)
+     * When exporting, only the user's full name is displayed (instead of picture).
+     *
+     * @param string $user Unused
+     * @param object $row All the data required to display a user's name and icon
+     * @param boolean $isexport If the report is being exported or viewed
+     * @return string
+     */
+    function rb_display_user_picture($user, $row, $isexport = false) {
+        global $OUTPUT;
+
+        // Process obsolete calls to this display function.
+        if (isset($row->userpic_picture)) {
+            $picuser = new stdClass();
+            $picuser->id = $user;
+            $picuser->picture = $row->userpic_picture;
+            $picuser->imagealt = $row->userpic_imagealt;
+            $picuser->firstname = $row->userpic_firstname;
+            $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+            $picuser->middlename = $row->userpic_middlename;
+            $picuser->lastname = $row->userpic_lastname;
+            $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+            $picuser->alternatename = $row->userpic_alternatename;
+            $picuser->email = $row->userpic_email;
+            $row = $picuser;
+        }
+
+        // Don't show picture in spreadsheet.
+        if ($isexport) {
+            return fullname($row);
+        } else {
+            return $OUTPUT->user_picture($row, array('courseid' => 1));
+        }
+    }
+
+    /**
+     * A rb_column_options->displayfunc helper function for showing a user's name.
+     * To pass the correct data, first:
+     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     * then your "field" param should be:
+     *      $DB->sql_concat_join("' '", $usednamefields)
+     * to allow sorting and filtering, and finally your extrafields should be:
+     *      $allnamefields
+     *
+     * @param string $user Unused
+     * @param object $row All the data required to display a user's name
+     * @param boolean $isexport If the report is being exported or viewed
+     * @return string
+     */
+    function rb_display_user($user, $row, $isexport = false) {
+        return fullname($row);
     }
 
     /**
@@ -1799,48 +1868,47 @@ abstract class rb_base_source {
         $join='auser', $groupname = 'user') {
         global $DB, $CFG;
 
+        $usednamefields = totara_get_all_user_name_fields(false, $join, null, null, true);
+        $allnamefields = totara_get_all_user_name_fields(false, $join);
+
         $columnoptions[] = new rb_column_option(
             $groupname,
             'fullname',
             get_string('userfullname', 'totara_reportbuilder'),
-            $DB->sql_fullname("$join.firstname", "$join.lastname"),
+            $DB->sql_concat_join("' '", $usednamefields),
             array('joins' => $join,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'extrafields' => $allnamefields,
+                  'displayfunc' => 'user')
         );
         $columnoptions[] = new rb_column_option(
             $groupname,
             'namelink',
             get_string('usernamelink', 'totara_reportbuilder'),
-            $DB->sql_fullname("$join.firstname", "$join.lastname"),
+            $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
                 'displayfunc' => 'link_user',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
-                'extrafields' => array('user_id' => "$join.id"),
+                'extrafields' => array_merge(array('id' => "$join.id"),
+                                             $allnamefields),
             )
         );
         $columnoptions[] = new rb_column_option(
             $groupname,
             'namelinkicon',
             get_string('usernamelinkicon', 'totara_reportbuilder'),
-            $DB->sql_fullname("$join.firstname", "$join.lastname"),
+            $DB->sql_concat_join("' '", $usednamefields),
             array(
                 'joins' => $join,
                 'displayfunc' => 'link_user_icon',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
-                'extrafields' => array(
-                    'user_id' => "$join.id",
-                    'userpic_picture' => "$join.picture",
-                    'userpic_firstname' => "$join.firstname",
-                    'userpic_firstnamephonetic' => "$join.firstnamephonetic",
-                    'userpic_middlename' => "$join.middlename",
-                    'userpic_lastname' => "$join.lastname",
-                    'userpic_lastnamephonetic' => "$join.lastnamephonetic",
-                    'userpic_alternatename' => "$join.alternatename",
-                    'userpic_email' => "$join.email",
-                    'userpic_imagealt' => "$join.imagealt"
-                ),
+                'extrafields' => array_merge(array('id' => "$join.id",
+                                                   'picture' => "$join.picture",
+                                                   'imagealt' => "$join.imagealt",
+                                                   'email' => "$join.email"),
+                                             $allnamefields),
                 'style' => array('white-space' => 'nowrap'),
             )
         );
@@ -3858,14 +3926,19 @@ abstract class rb_base_source {
         $manager='manager') {
         global $DB;
 
+        $usednamefields = totara_get_all_user_name_fields(false, $manager, null, null, true);
+        $allnamefields = totara_get_all_user_name_fields(false, $manager);
+
         $columnoptions[] = new rb_column_option(
             'user',
             'managername',
             get_string('usersmanagername', 'totara_reportbuilder'),
-            $DB->sql_fullname("$manager.firstname", "$manager.lastname"),
+            $DB->sql_concat_join("' '", $usednamefields),
             array('joins' => $manager,
                   'dbdatatype' => 'char',
-                  'outputformat' => 'text')
+                  'outputformat' => 'text',
+                  'extrafields' => $allnamefields,
+                  'displayfunc' => 'user')
         );
         $columnoptions[] = new rb_column_option(
             'user',

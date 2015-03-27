@@ -871,7 +871,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // should return an array
         $this->assertTrue((bool)is_array($columns));
         // the array should contain the correct number of columns
-        $this->assertEquals(10, count($columns));
+        $this->assertEquals(16, count($columns));
         // the strings should have the correct format
         // can't check exactly because different dbs use different concat format
         $this->assertRegExp('/auser\.firstname/', current($columns));

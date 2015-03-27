@@ -2219,3 +2219,77 @@ function totara_feature_disabled($feature) {
 function totara_feature_hidden($feature) {
     return totara_feature_check_state($feature, TOTARA_HIDEFEATURE);
 }
+
+/**
+ * A centralised location for getting all name fields. Returns an array or sql string snippet.
+ * Moodle's get_all_user_name_fields function is faulty - it ignores the $tableprefix and $fieldprefix
+ * when $returnsql is false. This wrapper function uses get_all_user_name_fields to get the list of fields,
+ * then applies the given parameters to the raw list.
+ *
+ * @param bool $returnsql True for an sql select field snippet.
+ * @param string $tableprefix table query prefix to use in front of each field.
+ * @param string $prefix prefix added to the name fields e.g. authorfirstname.
+ * @param string $fieldprefix sql field prefix e.g. id AS userid.
+ * @param bool $onlyused true to only return the fields used by fullname() (and sorted as they appear)
+ * @return array|string All name fields.
+ */
+function totara_get_all_user_name_fields($returnsql = false, $tableprefix = null, $prefix = null, $fieldprefix = null, $onlyused = false) {
+    global $CFG, $SESSION;
+
+    $fields = get_all_user_name_fields();
+
+    // Find the fields that are used by fullname() and sort them as they would appear.
+    if ($onlyused) {
+        // Get the setting for user name display format.
+        if (!empty($SESSION->fullnamedisplay)) {
+            $CFG->fullnamedisplay = $SESSION->fullnamedisplay;
+        }
+        $fullnamedisplay = $CFG->fullnamedisplay;
+
+        // Find the fields that are used.
+        $usedfields = array();
+        foreach ($fields as $field) {
+            $posfound = strpos($fullnamedisplay, $field);
+            if ($posfound !== false) {
+                $usedfields[$posfound] = $field;
+            }
+        }
+
+        // Sorts the fields.
+        ksort($usedfields);
+        $fields = $usedfields;
+
+        // Make sure that something is returned.
+        if (empty($fields)) {
+            $fields = array('firstname', 'lastname');
+        }
+    }
+
+    // Add the prefix if provided.
+    if ($prefix) {
+        foreach ($fields as $key => $field) {
+            $fields[$key] = $prefix . $field;
+        }
+    }
+
+    if ($tableprefix) {
+        $tableprefix = $tableprefix . ".";
+    }
+
+    // Add the tableprefix and fieldprefix and set up the sql. Do this even if tableprefix, fieldprefix and
+    // returnsql are all unused, as this will set the correct array keys (field aliases).
+    $prefixedfields = array();
+    foreach ($fields as $field) {
+        if ($returnsql && $fieldprefix) {
+            $prefixedfields[$fieldprefix . $field] = $tableprefix . $field . ' AS ' . $fieldprefix . $field;
+        } else {
+            $prefixedfields[$fieldprefix . $field] = $tableprefix . $field;
+        }
+    }
+
+    if ($returnsql) {
+        return implode(',', $prefixedfields);
+    } else {
+        return $prefixedfields;
+    }
+}
