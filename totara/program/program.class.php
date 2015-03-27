@@ -45,7 +45,8 @@ define('TIME_SELECTOR_DAYS', 2);
 define('TIME_SELECTOR_WEEKS', 3);
 define('TIME_SELECTOR_MONTHS', 4);
 define('TIME_SELECTOR_YEARS', 5);
-define('TIME_SELECTOR_INFINITY', 6); // To infinity and beyond!!
+define('TIME_SELECTOR_INFINITY', 6); // Deprecated.
+define('TIME_SELECTOR_NOMINIMUM', 6);
 
 define('DURATION_MINUTE', 60);
 define('DURATION_HOUR',   60 * DURATION_MINUTE);
@@ -73,7 +74,7 @@ $TIMEALLOWANCESTRINGS = array(
     TIME_SELECTOR_WEEKS => 'weeks',
     TIME_SELECTOR_MONTHS => 'months',
     TIME_SELECTOR_YEARS => 'years',
-    TIME_SELECTOR_INFINITY => 'infinity',
+    TIME_SELECTOR_NOMINIMUM => 'nominimumtime',
 );
 
 
@@ -1863,7 +1864,7 @@ class program_utilities {
 
         if ($duration == 0) {
             $ob->num = 0;
-            $ob->period = TIME_SELECTOR_INFINITY;
+            $ob->period = TIME_SELECTOR_NOMINIMUM;
         } else if ($duration % DURATION_YEAR == 0) {
             $ob->num = $duration / DURATION_YEAR;
             $ob->period = TIME_SELECTOR_YEARS;
@@ -1937,15 +1938,15 @@ class program_utilities {
         return $out;
     }
 
-    public static function get_standard_time_allowance_options($infinity=false) {
+    public static function get_standard_time_allowance_options($includenominimum=false) {
         $timeallowances = array(
             TIME_SELECTOR_DAYS => get_string('days', 'totara_program'),
             TIME_SELECTOR_WEEKS => get_string('weeks', 'totara_program'),
             TIME_SELECTOR_MONTHS => get_string('months', 'totara_program'),
             TIME_SELECTOR_YEARS => get_string('years', 'totara_program')
         );
-        if ($infinity) {
-            $timeallowances[TIME_SELECTOR_INFINITY] = get_string('infinity', 'totara_program');
+        if ($includenominimum) {
+            $timeallowances[TIME_SELECTOR_NOMINIMUM] = get_string('nominimumtime', 'totara_program');
         }
         return $timeallowances;
     }

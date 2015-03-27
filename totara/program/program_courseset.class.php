@@ -381,7 +381,7 @@ abstract class course_set {
 
         $out = '';
         $out .= $this->label.' (';
-        if ($this->timeallowedperiod !== TIME_SELECTOR_INFINITY) {
+        if ($this->timeallowedperiod !== TIME_SELECTOR_NOMINIMUM) {
             $out .= $this->timeallowednum.' ';
         }
         $out .= $timeallowedperiodstr.')';
@@ -943,8 +943,6 @@ class multi_course_set extends course_set {
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
-        } else {
-            $out .= html_writer::tag('p', get_string('allowtimeforsetinfinity', 'totara_program'));
         }
 
         $customfieldcriteria = $this->completiontype == COMPLETIONTYPE_SOME &&
@@ -1785,8 +1783,6 @@ class competency_course_set extends course_set {
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
-        } else {
-            $out .= html_writer::tag('p', get_string('allowtimeforsetinfinity', 'totara_program'));
         }
 
         $courses = $this->get_competency_courses();
@@ -2341,8 +2337,6 @@ class recurring_course_set extends course_set {
 
         if ($this->timeallowed > 0) {
             $out .= html_writer::tag('p', get_string('allowtimeforset', 'totara_program', $timeallowance));
-        } else {
-            $out .= html_writer::tag('p', get_string('allowtimeforsetinfinity', 'totara_program'));
         }
 
         if (is_object($this->course)) {
