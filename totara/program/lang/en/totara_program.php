@@ -795,6 +795,7 @@ $string['therearenoprogramstodisplay'] = 'There are no programs to display.';
 $string['thisactioncannotbeundone'] = 'This action cannot be undone';
 $string['thiswillaffect'] = 'This will affect {$a} learners';
 $string['timeallowance'] = 'Time allowance';
+$string['timeperiod'] = 'Time period';
 $string['toprogram'] = 'to program';
 $string['tosaveassignments'] = 'To save all assignment changes click \'Save all changes\'. To edit assignment changes click \'Edit assignments\'. Saving assignments cannot be undone.';
 $string['tosavecontent'] = 'To save content changes click \'Save all changes\'. To edit content changes click \'Edit content\'. Saving content changes cannot be undone.';

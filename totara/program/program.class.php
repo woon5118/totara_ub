@@ -145,6 +145,62 @@ class program {
         }
     }
 
+    /**
+     * Create a new program.
+     *
+     * @since totara-2.7.2
+     * @param mixed $data stdClass or array of program settings.
+     * @return program
+     */
+    public static function create($data) {
+        global $DB, $USER;
+
+        // Convert stdClass object to array.
+        if (is_object($data)) {
+            $data = (array)$data;
+        }
+
+        if (isset($data['available'])) {
+            throw new coding_exception("Property 'available' is automatically calculated based on the given from and until dates " .
+                "and should not be manually specified");
+        }
+
+        // Set up the defaults.
+        $now = time();
+        $sortorder = $DB->get_field('prog', 'MAX(sortorder) + 1', array());
+        $sortorder = !empty($sortorder) ? $sortorder : 0;
+
+        $defaults = array(
+            'timecreated' => $now,
+            'timemodified' => $now,
+            'usermodified' => $USER->id,
+            'sortorder' => $sortorder,
+            'exceptionssent' => 0,
+            'summary' => '',
+            'endnote' => '',
+            'availablefrom' => 0,
+            'availableuntil' => 0,
+        );
+
+        // Merge the defaults and given data. The given data overrides the defaults.
+        $todb = (object)array_merge($defaults, (array)$data);
+
+        // Set up some properties that depend on the data.
+        $todb->available = prog_check_availability($todb->availablefrom, $todb->availableuntil);
+
+        // Create the program. Done inside a transaction so that failure will undo it.
+        $transaction = $DB->start_delegated_transaction();
+        $programid = $DB->insert_record('prog', $todb);
+        $program = new program($programid);
+        $transaction->allow_commit();
+
+        // Create message manager to add default messages.
+        new prog_messages_manager($programid, true);
+
+        // Return the program that was just created.
+        return $program;
+    }
+
     public function get_content() {
         return $this->content;
     }
