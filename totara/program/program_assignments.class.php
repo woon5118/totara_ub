@@ -623,7 +623,7 @@ abstract class prog_assignment_category {
             if ($item->completiontime != COMPLETION_TIME_NOT_SET) {
                 // Print a date.
                 $item->completiontime = trim(userdate($item->completiontime,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false));
+                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false));
                 $completion_string = self::build_completion_string($item->completiontime, $item->completionevent, $item->completioninstance);
                 $show_deletecompletionlink = true;
             }

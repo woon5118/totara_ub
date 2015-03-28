@@ -553,7 +553,7 @@ if (empty($site->shortname)) {
     // probably new installation - lets return to frontpage after this step
     // remove settings that we want uninitialised
     //unset_config('registerauth'); // Not useful for Totara customers.
-    unset_config('timezone');       // We need to ask everybody installing Totara.
+    unset_config('timezone'); // Force admin to select timezone!
     redirect('upgradesettings.php?return=site');
 }
 

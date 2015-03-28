@@ -419,8 +419,8 @@ class dp_program_component extends dp_base_component {
                     $programprinted = true;
                     $updates .= get_string('duedate', 'totara_plan').' - '.
                         get_string('changedfromxtoy', 'totara_plan', (object)array('before' => empty($oldrecords[$itemid]->duedate) ? '' :
-                                    userdate($oldrecords[$itemid]->duedate, get_string('strfdateshortmonth', 'langconfig'), $CFG->timezone, false),
-                                    'after' => userdate($record->duedate, get_string('strfdateshortmonth', 'langconfig'), $CFG->timezone, false))).html_writer::empty_tag('br');
+                                    userdate($oldrecords[$itemid]->duedate, get_string('strfdateshortmonth', 'langconfig'), 99, false),
+                                    'after' => userdate($record->duedate, get_string('strfdateshortmonth', 'langconfig'), 99, false))).html_writer::empty_tag('br');
                 }
                 if (!empty($record->approved) && $oldrecords[$itemid]->approved != $record->approved) {
                     $approval = new stdClass();

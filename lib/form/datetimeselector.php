@@ -44,6 +44,8 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
     /**
      * Options for the element.
      *
+     * NOTE: Do NOT set parameter type for this element!
+     *
      * startyear => int start of range of years that can be selected
      * stopyear => int last year that can be selected
      * defaulttime => default time value if the field is currently not set
@@ -81,7 +83,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
         // Get the calendar type used - see MDL-18375.
         $calendartype = \core_calendar\type_factory::get_calendar_instance();
         $this->_options = array('startyear' => $calendartype->get_min_year(), 'stopyear' => $calendartype->get_max_year(),
-            'defaulttime' => 0, 'timezone' => 99, 'step' => 5, 'optional' => false);
+            'defaulttime' => 0, 'timezone' => 99, 'step' => 5, 'optional' => false, 'showtimezone' => false);
 
         $this->HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
@@ -144,6 +146,12 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                     null, '#', $image,
                     array('class' => 'visibleifjs'));
         }
+        if ($this->_options['showtimezone']) {
+            $timezones = core_date::get_list_of_timezones();
+            $this->_elements[] = @MoodleQuickForm::createElement('select', 'timezone', get_string('timezone'), $timezones, $this->getAttributes(), true);
+        } else {
+            $this->_elements[] = @MoodleQuickForm::createElement('hidden', 'timezone');
+        }
         // If optional we add a checkbox which the user can use to turn if on
         if ($this->_options['optional']) {
             $this->_elements[] = @MoodleQuickForm::createElement('checkbox', 'enabled', null, get_string('enable'), $this->getAttributes(), true);
@@ -187,9 +195,10 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                     }
                 }
                 if (!is_array($value)) {
-                    //use the timezone set in _options
+                    // Use the timezone set in _options.
+                    $tz = core_date::get_user_timezone($this->_options['timezone']);
                     $calendartype = \core_calendar\type_factory::get_calendar_instance();
-                    $currentdate = $calendartype->timestamp_to_date_array($value, $this->_options['timezone']);
+                    $currentdate = $calendartype->timestamp_to_date_array($value, $tz);
                     // Round minutes to the previous multiple of step.
                     $currentdate['minutes'] -= $currentdate['minutes'] % $this->_options['step'];
                     $value = array(
@@ -197,20 +206,26 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                         'hour' => $currentdate['hours'],
                         'day' => $currentdate['mday'],
                         'month' => $currentdate['mon'],
-                        'year' => $currentdate['year']);
+                        'year' => $currentdate['year'],
+                        'timezone' => $tz,
+                        );
                     // If optional, default to off, unless a date was provided.
                     if ($this->_options['optional']) {
                         $value['enabled'] = $requestvalue != 0;
                     }
                 } else {
                     $value['enabled'] = isset($value['enabled']);
+                    if (isset($value['timezone']) and $value['timezone'] === 0) {
+                        debugging('Coding problem: parameter type cleaning must not be set on date_time_selector forms element ' . $this->_name, DEBUG_NORMAL);
+                        $value['timezone'] = core_date::get_user_timezone($this->_options['timezone']);
+                    }
                 }
                 if (null !== $value) {
                     $this->setValue($value);
                 }
                 break;
             case 'createElement':
-                if ($arg[2]['optional']) {
+                if (!empty($arg[2]['optional'])) {
                     // When using the function addElement, rather than createElement, we still
                     // enter this case, making this check necessary.
                     if ($this->_usedcreateelement) {
@@ -219,6 +234,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                         $caller->disabledIf($arg[0] . '[year]', $arg[0] . '[enabled]');
                         $caller->disabledIf($arg[0] . '[hour]', $arg[0] . '[enabled]');
                         $caller->disabledIf($arg[0] . '[minute]', $arg[0] . '[enabled]');
+                        $caller->disabledIf($arg[0] . '[timezone]', $arg[0] . '[enabled]');
                     } else {
                         $caller->disabledIf($arg[0], $arg[0] . '[enabled]');
                     }
@@ -293,11 +309,15 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                     return $value;
                 }
             }
-            $valuearray=$valuearray + array('year' => 1970, 'month' => 1, 'day' => 1, 'hour' => 0, 'minute' => 0);
+            $valuearray = $valuearray + array('year' => 1970, 'month' => 1, 'day' => 1, 'hour' => 0, 'minute' => 0,
+                'timezone' => core_date::get_user_timezone($this->_options['timezone']));
+            $valuearray['timezone'] = core_date::normalise_timezone($valuearray['timezone']);
+
             //add the raw datestring in case we want to process the value differently
             $rawvalue = $valuearray['year'] . '-' . str_pad($valuearray['month'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($valuearray['day'], 2, '0', STR_PAD_LEFT);
             $rawvalue .= ' ' . str_pad($valuearray['hour'], 2, '0', STR_PAD_LEFT)  . ':' . str_pad($valuearray['minute'], 2, '0', STR_PAD_LEFT)  . ':00';
             $value[$pickername . '_raw'] = $rawvalue;
+            $value[$pickername . '_timezone'] = $valuearray['timezone'];
 
             // Get the calendar type used - see MDL-18375.
             $calendartype = \core_calendar\type_factory::get_calendar_instance();
@@ -312,7 +332,7 @@ class MoodleQuickForm_date_time_selector extends MoodleQuickForm_group {
                                                       $gregoriandate['hour'],
                                                       $gregoriandate['minute'],
                                                       0,
-                                                      $this->_options['timezone'],
+                                                      $valuearray['timezone'],
                                                       true);
 
             return $value;

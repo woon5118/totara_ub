@@ -143,7 +143,7 @@ echo html_writer::tag('p', $scalevaluestr);
 // Target Date.
 $targetdate = '';
 if (!empty($goalpersonal->targetdate)) {
-    $targetdate = userdate($goalpersonal->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+    $targetdate = userdate($goalpersonal->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
 }
 $targetstr = html_writer::tag('strong', get_string('goaltargetdate', 'totara_hierarchy')) . ': ' . $targetdate;
 echo html_writer::tag('p', $targetstr);

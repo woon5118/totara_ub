@@ -283,7 +283,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
         $fieldcount->rownum = 0;
         $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
         $badtimezones = false;
-        $goodtimezones = totara_get_clean_timezone_list();
 
         while ($csvrow = fgetcsv($file, 0, $this->config->delimiter)) {
             $fieldcount->rownum++;
@@ -322,7 +321,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                 $dbrow['timemodified'] = $now;
             } else {
                 // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow['timemodified']));
+                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow['timemodified']), true);
                 if ($parsed_date) {
                     $dbrow['timemodified'] = $parsed_date;
                 }
@@ -335,7 +334,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                         $dbrow[$posdate] = 0;
                     } else {
                         // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$posdate]));
+                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($csvrow[$posdate]), true);
                         if ($parsed_date) {
                             $dbrow[$posdate] = $parsed_date;
                         }
@@ -354,8 +353,8 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
             if (isset($dbrow['timezone'])) {
                 // Clean deprecated timezones if possible
-                $timezone = $dbrow['timezone'];
-                if ($timezone != '99' && $badtimezones == false && !in_array($timezone, $goodtimezones)) {
+                $timezone = core_date::normalise_timezone($dbrow['timezone']);
+                if ($timezone != '99' and $timezone !== $dbrow['timezone']) {
                     // Unsupported timezone, output message at end of process
                     $badtimezones = true;
                 }
@@ -373,7 +372,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                         switch ($datatype) {
                             case 'datetime':
                                 // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
-                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
+                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
                                 if ($parsed_date) {
                                     $value = $parsed_date;
                                 } else {

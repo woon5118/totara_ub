@@ -1207,7 +1207,9 @@ function prog_process_extensions($extensions, $reasonfordecision = array()) {
                     $messagedata->subject          = $stringmanager->get_string('extensiongranted', 'totara_program', null, $userto->lang);
                     $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                     $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
-                    $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program', userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), $CFG->timezone), null, $userto->lang);
+                    $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program',
+                        userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), core_date::get_user_timezone($userto)),
+                        $userto->lang);
                     $messagedata->icon             = 'program-approve';
                     $messagedata->msgtype          = TOTARA_MSG_TYPE_PROGRAM;
 
@@ -1845,13 +1847,10 @@ function check_certification_enabled() {
  * @param int $availableuntil   - A time stamp of the time a program becomes unavailable
  * @return int                  - Either AVAILABILITY_NOT_TO_STUDENTS or AVAILABILITY_TO_STUDENTS
  */
-function prog_check_availability($availablefrom, $availableuntil, $timezone = null) {
+function prog_check_availability($availablefrom, $availableuntil) {
+    // Note: there used to be $timezone parameter which is now ignored.
 
-    if (isset($timezone)) {
-        $now = usertime(time(), $timezone);
-    } else {
-        $now = time();
-    }
+    $now = time();
 
     if (!empty($availablefrom) && $availablefrom > $now) {
         return AVAILABILITY_NOT_TO_STUDENTS;
@@ -1911,7 +1910,7 @@ function prog_display_link_icon($progid, $userid = null) {
     $prog = $DB->get_record('prog', array('id' => $progid));
     $user = isset($userid) ? $DB->get_record('user', array('id' => $userid)) : $USER;
 
-    $accessibility = prog_check_availability($prog->availablefrom, $prog->availableuntil, $user->timezone);
+    $accessibility = prog_check_availability($prog->availablefrom, $prog->availableuntil);
     $accessible = $accessibility == AVAILABILITY_TO_STUDENTS;
     $required = prog_required_for_user($prog->id, $user->id);
 
@@ -1994,7 +1993,7 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
 
     $out = '';
     if (!empty($duedate)) {
-        $out .= userdate($duedate, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
+        $out .= userdate($duedate, get_string('strftimedate', 'langconfig'), 99, false);
     }
 
     $completed = isset($completion) ? $completion == STATUS_PROGRAM_COMPLETE : prog_is_complete($progid, $userid);
@@ -2087,11 +2086,7 @@ function prog_is_accessible($program, $user = null) {
     // Check if this program has from and until dates set, if so, enforce them.
     if (!empty($program->availablefrom) || !empty($program->availableuntil)) {
 
-        if (isset($user->timezone)) {
-            $now = usertime(time(), $user->timezone);
-        } else {
-            $now = usertime(time());
-        }
+        $now = time();
 
         // Check if the program isn't accessible yet.
         if (!empty($program->availablefrom) && $program->availablefrom > $now) {
@@ -2174,7 +2169,7 @@ function get_programs_availability_sql($fieldalias, $separator, $userid = null) 
     }
 
     $user = $DB->get_record('user', array('id' => $userid));
-    $now = isset($user->timezone) ? usertime(time(), $user->timezone) : usertime(time());
+    $now = time();
 
     $availabilitysql = " (({$fieldalias}{$separator}available = :available) AND
                           ({$fieldalias}{$separator}availablefrom = 0 OR {$fieldalias}{$separator}availablefrom < :timefrom) AND

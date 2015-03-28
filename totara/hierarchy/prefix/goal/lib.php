@@ -224,8 +224,7 @@ class goal extends hierarchy {
 
         // Display the target date if appropriate.
         if (!empty($item->targetdate)) {
-            $format_date = userdate($item->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'),
-                    $CFG->timezone, false);
+            $format_date = userdate($item->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
             $data[] = array(
                 'title' => get_string('goaltargetdate', 'totara_hierarchy'),
                 'value' => $format_date,
@@ -341,7 +340,7 @@ class goal extends hierarchy {
 
         // Display the goal's target date.
         if (!empty($item->targetdate)) {
-            $targetdate = userdate($item->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+            $targetdate = userdate($item->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
             $out .= html_writer::tag('div', html_writer::tag('strong', get_string('goaltargetdate', 'totara_hierarchy') . ': ') . $targetdate,
                 array('class' => 'itemtargetdate ' . $cssclass));
         }

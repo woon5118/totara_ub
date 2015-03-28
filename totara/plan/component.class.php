@@ -1467,7 +1467,7 @@ abstract class dp_base_component {
      */
     function display_duedate_as_form($duedate, $name, $inputclass='', $itemid) {
         global $CFG;
-        $duedatestr = !empty($duedate) ? userdate($duedate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false) : '';
+        $duedatestr = !empty($duedate) ? userdate($duedate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false) : '';
         return html_writer::empty_tag('input',
             array('id' => $name, 'type' => "text", 'name' => $name, 'placeholder' => get_string('datepickerlongyearplaceholder', 'totara_core'),
                 'value' => $duedatestr, 'size' => "8", 'maxlength' => "20", 'class' => $inputclass));
@@ -1483,7 +1483,7 @@ abstract class dp_base_component {
     function display_duedate_as_text($duedate) {
         global $CFG;
         if (!empty($duedate)) {
-            return userdate($duedate, get_string('strftimedate'), $CFG->timezone, false);
+            return userdate($duedate, get_string('strftimedate'), 99, false);
         } else {
             return '';
         }

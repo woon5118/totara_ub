@@ -504,6 +504,7 @@ $string['tempmanagerselectiononlymanagers'] = 'Only staff managers';
 $string['tempmanagersupporttext'] = ' Note, only current team managers can be selected.';
 $string['timecompleted'] = 'Time completed';
 $string['timezoneinvalid'] = 'Invalid timezone: {$a}';
+$string['timezoneuser'] = 'User timezone';
 $string['toggletotarasync'] = 'Toggle HR Import';
 $string['toggletotarasyncerror'] = 'Could not enable/disable the HR Import field for user {$a}';
 $string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so HR Import cannot be enabled for these users: {$a}';

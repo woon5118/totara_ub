@@ -130,7 +130,7 @@ if (!empty($staff_ids)) {
             $tablerow = array();
 
             if ($prog_completion = $DB->get_record('prog_completion', array('programid' => $extension->programid, 'userid' => $extension->userid, 'coursesetid' => 0))) {
-                $duedatestr = empty($prog_completion->timedue) ? get_string('duedatenotset', 'totara_program') : userdate($prog_completion->timedue, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
+                $duedatestr = empty($prog_completion->timedue) ? get_string('duedatenotset', 'totara_program') : userdate($prog_completion->timedue, get_string('strftimedate', 'langconfig'), 99, false);
             }
 
             $prog_name = $DB->get_field('prog', 'fullname', array('id' => $extension->programid));
@@ -140,7 +140,7 @@ if (!empty($staff_ids)) {
             $tablerow[] = fullname($user);
             $tablerow[] = $prog_name;
             $tablerow[] = $duedatestr;
-            $tablerow[] = userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
+            $tablerow[] = userdate($extension->extensiondate, get_string('strftimedate', 'langconfig'), 99, false);
             $tablerow[] = $extension->extensionreason;
 
             $pulldown_name = "extension[{$extension->id}]";

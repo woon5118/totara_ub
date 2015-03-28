@@ -466,11 +466,11 @@ abstract class rb_base_source {
     function rb_display_nice_time_in_timezone($date, $row) {
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
-                $targetTZ = totara_get_clean_timezone();
+                $targetTZ = core_date::get_user_timezone();
                 $tzstring = get_string('nice_time_unknown_timezone', 'totara_reportbuilder');
             } else {
-                $targetTZ = $row->timezone;
-                $tzstring = get_string(strtolower($targetTZ), 'timezones');
+                $targetTZ = core_date::normalise_timezone($row->timezone);
+                $tzstring = core_date::get_localised_timezone($targetTZ);
             }
             $date = userdate($date, get_string('strftimetime', 'langconfig'), $targetTZ) . ' ';
             return $date . $tzstring;
@@ -490,9 +490,9 @@ abstract class rb_base_source {
     function rb_display_nice_date_in_timezone($date, $row) {
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
-                $targetTZ = totara_get_clean_timezone();
+                $targetTZ = core_date::get_user_timezone();
             } else {
-                $targetTZ = $row->timezone;
+                $targetTZ = core_date::normalise_timezone($row->timezone);
             }
             $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ) . ' ';
             return $date;
@@ -512,11 +512,11 @@ abstract class rb_base_source {
     function rb_display_nice_datetime_in_timezone($date, $row) {
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
-                $targetTZ = totara_get_clean_timezone();
+                $targetTZ = core_date::get_user_timezone();
                 $tzstring = get_string('nice_time_unknown_timezone', 'totara_reportbuilder');
             } else {
-                $targetTZ = $row->timezone;
-                $tzstring = get_string(strtolower($targetTZ), 'timezones');
+                $targetTZ = core_date::normalise_timezone($row->timezone);
+                $tzstring = core_date::get_localised_timezone($targetTZ);
             }
             $date = userdate($date, get_string('strftimedatetime', 'langconfig'), $targetTZ) . ' ';
             return $date . $tzstring;
@@ -1424,6 +1424,39 @@ abstract class rb_base_source {
 
         return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status);
     }
+
+    /**
+     * Generates the HTML to display the due/expiry date of a certification.
+     *
+     * @param int $time     The duedate of the program
+     * @param record $row   The whole row, including some required fields
+     * @return html
+     */
+    public function rb_display_certification_duedate($time, $row) {
+        global $OUTPUT, $CFG;
+
+        if (empty($row->timeexpires)) {
+            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
+                // There is no time due set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+                // User is still in the first stage of certification, not overdue yet.
+                return $this->rb_display_program_duedate($time, $row);
+            } else {
+                // Looks like the certification has expired, overdue!
+                $out = '';
+                $out .= userdate($row->timedue, get_string('strfdateshortmonth', 'langconfig'), 99, false);
+                $out .= html_writer::empty_tag('br');
+                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+                return $out;
+            }
+        } else {
+            return $this->rb_display_program_duedate($time, $row);
+        }
+
+        return '';
+    }
+
 
     // Display grade along with passing grade if it is known.
     function rb_display_grade_string($item, $row) {

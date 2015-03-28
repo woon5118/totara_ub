@@ -36,8 +36,6 @@ $c = optional_param('c', 0, PARAM_INT); // copy session
 $d = optional_param('d', 0, PARAM_INT); // delete session
 $confirm = optional_param('confirm', false, PARAM_BOOL); // delete confirmation
 
-$nbdays = 1; // default number to show
-
 $session = null;
 if ($id && !$s) {
     if (!$cm = get_coursemodule_from_id('facetoface', $id)) {
@@ -66,7 +64,6 @@ if ($id && !$s) {
         print_error('error:incorrectroomid', 'facetoface');
      }
 
-     $nbdays = count($session->sessiondates);
 } else {
     if (!$facetoface = $DB->get_record('facetoface', array('id' => $f))) {
         print_error('error:incorrectfacetofaceid', 'facetoface');
@@ -131,14 +128,81 @@ $sessionid = isset($session->id) ? $session->id : 0;
 
 $canconfigurecancellation = has_capability('mod/facetoface:configurecancellation', $context);
 
-if (isset($session)) {
-    $defaulttimezone = empty($session->sessiondates[0]->sessiontimezone) ? get_string('sessiontimezoneunknown', 'facetoface') : $session->sessiondates[0]->sessiontimezone;
+$defaulttimezone = '99';
+if (!isset($session)) {
+    if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
+        $defaulttimezone = core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
+    }
     customfield_load_data($session, 'facetofacesession', 'facetoface_session');
+    $sessiondata = new stdClass();
+    $sessiondata->id = 0;
+    $sessiondata->allowcancellations = $facetoface->allowcancellationsdefault;
+    $sessiondata->cancellationcutoff = $facetoface->cancellationscutoffdefault;
+    $nbdays = 1;
+
 } else {
-    $defaulttimezone = totara_get_clean_timezone();
+    // Set values for the form and unset some values that will be evaluated later.
+    $sessiondata = clone($session);
+    if (isset($sessiondata->sessiondates)) {
+        unset($sessiondata->sessiondates);
+    }
+
+    if (isset($sessiondata->roomid)) {
+        unset($sessiondata->roomid);
+    }
+
+    $sessiondata->detailsformat = FORMAT_HTML;
+    $editoroptions = $TEXTAREA_OPTIONS;
+    $editoroptions['context'] = $context;
+    $sessiondata = file_prepare_standard_editor($sessiondata, 'details', $editoroptions, $editoroptions['context'],
+        'mod_facetoface', 'session', $session->id);
+
+    $sessiondata->datetimeknown = (int)(1 == $session->datetimeknown);
+
+    $nbdays = count($session->sessiondates);
+    if ($session->sessiondates) {
+        $i = 0;
+        foreach ($session->sessiondates as $date) {
+            $idfield = "sessiondateid[$i]";
+            $timestartfield = "timestart[$i]";
+            $timefinishfield = "timefinish[$i]";
+            $timezonefield = "sessiontimezone[$i]";
+
+            if ($date->sessiontimezone === '') {
+                $date->sessiontimezone = '99';
+            } else if ($date->sessiontimezone != 99) {
+                $date->sessiontimezone = core_date::normalise_timezone($date->sessiontimezone);
+            }
+
+            $sessiondata->$idfield = $date->id;
+            $sessiondata->$timestartfield = $date->timestart;
+            $sessiondata->$timefinishfield = $date->timefinish;
+            $sessiondata->$timezonefield = $date->sessiontimezone;
+            $i++;
+        }
+    }
+
+    if (!empty($sroom->id)) {
+        if (!$sroom->custom) {
+            // Pre-defined room
+            $sessiondata->pdroomid = $session->roomid;
+            $sessiondata->pdroomcapacity = $sroom->capacity;
+        } else {
+            // Custom room
+            $sessiondata->customroom = 1;
+            $sessiondata->croomname = $sroom->name;
+            $sessiondata->croombuilding = $sroom->building;
+            $sessiondata->croomaddress = $sroom->address;
+            $sessiondata->croomcapacity = $sroom->capacity;
+        }
+    }
+
+    if ($session->mincapacity) {
+        $sessiondata->enablemincapacity = 1;
+    }
 }
 
-$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm'));
+$mform = new mod_facetoface_session_form(null, compact('id', 'f', 's', 'c', 'session', 'nbdays', 'course', 'editoroptions', 'defaulttimezone', 'facetoface', 'cm', 'sessiondata'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -178,17 +242,13 @@ if ($fromform = $mform->get_data()) { // Form submitted
         if (!empty($fromform->datedelete[$i])) {
             continue; // skip this date
         }
-        $timezonefield = $fromform->sessiontimezone;
-        $timestartfield = "timestart[$i]_raw";
-        $timefinishfield = "timefinish[$i]_raw";
-        if (!empty($fromform->$timestartfield) && !empty($fromform->$timefinishfield) && !empty($timezonefield[$i])) {
+        $timestartfield = "timestart[$i]";
+        $timefinishfield = "timefinish[$i]";
+        if (!empty($fromform->$timestartfield) && !empty($fromform->$timefinishfield)) {
             $date = new stdClass();
-            //Use the raw ISO date string to get an accurate Unix timestamp
-            $date->sessiontimezone = $timezonefield[$i];
-            $startdt = new DateTime($fromform->$timestartfield, new DateTimeZone($date->sessiontimezone));
-            $finishdt = new DateTime($fromform->$timefinishfield, new DateTimeZone($date->sessiontimezone));
-            $date->timestart = $startdt->getTimestamp();
-            $date->timefinish = $finishdt->getTimestamp();
+            $date->sessiontimezone = $fromform->sessiontimezone[$i];
+            $date->timestart = $fromform->$timestartfield;
+            $date->timefinish = $fromform->$timefinishfield;
             if ($fromform->datetimeknown === '1') {
                 $fromform->duration += ($date->timefinish - $date->timestart);
             }
@@ -221,6 +281,14 @@ if ($fromform = $mform->get_data()) { // Form submitted
     if ($canconfigurecancellation) {
         $todb->allowcancellations = $fromform->allowcancellations;
         $todb->cancellationcutoff = $fromform->cancellationcutoff;
+    } else {
+        if ($session) {
+            $todb->allowcancellations = $session->allowcancellations;
+            $todb->cancellationcutoff = $session->cancellationcutofs;
+        } else {
+            $todb->allowcancellations = $facetoface->allowcancellationsdefault;
+            $todb->cancellationcutoff = $facetoface->cancellationscutoffdefault;
+        }
     }
 
     $transaction = $DB->start_delegated_transaction();
@@ -289,70 +357,6 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $DB->set_field('facetoface_sessions', 'details', $data->details, array('id' => $session->id));
 
     redirect($returnurl);
-} else if ($session != null) { // Edit mode
-    // Set values for the form and unset some values that will be evaluated later.
-    $sessioncopy = clone($session);
-    if (isset($sessioncopy->sessiondates)) {
-        unset($sessioncopy->sessiondates);
-    }
-
-    if (isset($sessioncopy->roomid)) {
-        unset($sessioncopy->roomid);
-    }
-
-    if (isset($sessioncopy->allowcancellations)) {
-        unset($sessioncopy->allowcancellations);
-    }
-
-    $sessioncopy->detailsformat = FORMAT_HTML;
-    $editoroptions = $TEXTAREA_OPTIONS;
-    $editoroptions['context'] = $context;
-    $sessioncopy = file_prepare_standard_editor($sessioncopy, 'details', $editoroptions, $editoroptions['context'],
-        'mod_facetoface', 'session', $session->id);
-
-    $sessioncopy->datetimeknown = (1 == $session->datetimeknown);
-
-    if ($canconfigurecancellation) {
-        $sessioncopy->allowcancellations = $session->allowcancellations;
-        $sessioncopy->cancellationcutoff = $session->cancellationcutoff;
-    }
-
-    if ($session->sessiondates) {
-        $i = 0;
-        foreach ($session->sessiondates as $date) {
-            $idfield = "sessiondateid[$i]";
-            $timestartfield = "timestart[$i]";
-            $timefinishfield = "timefinish[$i]";
-            $timezonefield = "sessiontimezone[$i]";
-
-            $sessioncopy->$idfield = $date->id;
-            $sessioncopy->$timestartfield = $date->timestart;
-            $sessioncopy->$timefinishfield = $date->timefinish;
-            $sessioncopy->$timezonefield = $date->sessiontimezone;
-            $i++;
-        }
-    }
-
-    if (!empty($sroom->id)) {
-        if (!$sroom->custom) {
-            // Pre-defined room
-            $sessioncopy->pdroomid = $session->roomid;
-            $sessioncopy->pdroomcapacity = $sroom->capacity;
-        } else {
-            // Custom room
-            $sessioncopy->customroom = 1;
-            $sessioncopy->croomname = $sroom->name;
-            $sessioncopy->croombuilding = $sroom->building;
-            $sessioncopy->croomaddress = $sroom->address;
-            $sessioncopy->croomcapacity = $sroom->capacity;
-        }
-    }
-
-    if ($session->mincapacity) {
-        $sessioncopy->enablemincapacity = true;
-    }
-
-    $mform->set_data($sessioncopy);
 }
 
 if ($c) {

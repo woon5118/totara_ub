@@ -352,9 +352,9 @@ class rb_source_facetoface_summary extends rb_base_source {
         $sessionid = $row->session_id;
         if ($date && is_numeric($date)) {
             if (empty($row->timezone)) {
-                $targetTZ = totara_get_clean_timezone();
+                $targetTZ = core_date::get_user_timezone();
             } else {
-                $targetTZ = $row->timezone;
+                $targetTZ = core_date::normalise_timezone($row->timezone);
             }
             $date = userdate($date, get_string('strftimedate', 'langconfig'), $targetTZ);
             return $OUTPUT->action_link(new moodle_url('/mod/facetoface/attendees.php', array('s' => $sessionid)), $date);

@@ -4,24 +4,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     // "locations" settingpage
     $temp = new admin_settingpage('locationsettings', new lang_string('locationsettings', 'admin'));
-    $extraoption = null;
-    if (isset($CFG->timezone)) {
-        $extraoption = $CFG->timezone;
-    }
-    $options = get_list_of_timezones($extraoption);
-    $default = $CFG->phpinitimezone;
-    if ($default === 'UTC') {
-        $default = 'Europe/London';
-    }
-    $temp->add(new admin_setting_configselect('timezone', new lang_string('timezone','admin'), new lang_string('configtimezone', 'admin'), $default, $options));
-    $extraoption = null;
-    if (isset($CFG->forcetimezone) && $CFG->forcetimezone != 99) {
-        $extraoption = $CFG->forcetimezone;
-    }
-    $options = get_list_of_timezones($extraoption);
-    $options[99] = new lang_string('timezonenotforced', 'admin');
-    $temp->add(new admin_setting_configselect('forcetimezone', new lang_string('forcetimezone', 'admin'), new lang_string('helpforcetimezone', 'admin'), 99, $options));
+    $temp->add(new admin_setting_servertimezone());
+    $temp->add(new admin_setting_forcetimezone());
+
+    // Totara feature.
     $temp->add(new admin_setting_configtext('csvdateformat', new lang_string('csvdateformat', 'totara_core'), new lang_string('csvdateformatconfig', 'totara_core'), new lang_string('csvdateformatdefault', 'totara_core')));
+
     $temp->add(new admin_settings_country_select('country', new lang_string('country', 'admin'), new lang_string('configcountry', 'admin'), 0));
     $temp->add(new admin_setting_configtext('defaultcity', new lang_string('defaultcity', 'admin'), new lang_string('defaultcity_help', 'admin'), ''));
 

@@ -114,7 +114,6 @@ class question_datepicker extends question_base{
             'startyear' => $this->param1['startyear'],
             'stopyear'  => $this->param1['stopyear'],
             'timezone'  => 99,
-            'applydst'  => true,
             'optional'  => !$this->required
         );
 
@@ -124,7 +123,6 @@ class question_datepicker extends question_base{
         } else {
             $form->addElement('date_selector', $this->get_prefix_form(), $this->label, $attributes);
         }
-        $form->setType($this->get_prefix_form(), PARAM_INT);
         if ($this->required) {
             $form->addRule($this->get_prefix_form(), get_string('required'), 'required');
         }

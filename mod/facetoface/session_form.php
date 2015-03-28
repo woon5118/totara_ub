@@ -39,6 +39,7 @@ class mod_facetoface_session_form extends moodleform {
 
         $mform =& $this->_form;
         $session = (isset($this->_customdata['session'])) ? $this->_customdata['session'] : false;
+        $sessiondata = $this->_customdata['sessiondata'];
 
         $this->context = context_module::instance($this->_customdata['cm']->id);
 
@@ -71,16 +72,19 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addHelpButton('datetimeknown_group', 'sessiondatetimeknown', 'facetoface');
 
         $repeatarray = array();
-        $timezones = totara_get_clean_timezone_list(true);
-        $timezones[get_string('sessiontimezoneunknown', 'facetoface')] = get_string('sessiontimezoneunknown', 'facetoface');
         $repeatarray[] = &$mform->createElement('hidden', 'sessiondateid', 0);
-        if (!empty($displaytimezones)) {
+
+        if ($displaytimezones) {
+            $timezones = array('99' => get_string('timezoneuser', 'totara_core')) + core_date::get_list_of_timezones();
             $repeatarray[] = $mform->createElement('select', 'sessiontimezone', get_string('sessiontimezone', 'facetoface'), $timezones);
         } else {
-            $repeatarray[] = $mform->createElement('hidden', 'sessiontimezone', $this->_customdata['defaulttimezone']);
+            $repeatarray[] = $mform->createElement('hidden', 'sessiontimezone', '99');
         }
-        $repeatarray[] = &$mform->createElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'));
-        $repeatarray[] = &$mform->createElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'));
+
+        // NOTE: Do not set type for date elements because it borks timezones!
+        $repeatarray[] = &$mform->createElement('date_time_selector', 'timestart', get_string('timestart', 'facetoface'), array('showtimezone' => true));
+        $repeatarray[] = &$mform->createElement('date_time_selector', 'timefinish', get_string('timefinish', 'facetoface'), array('showtimezone' => true));
+
         $checkboxelement = &$mform->createElement('checkbox', 'datedelete', '', get_string('dateremove', 'facetoface'));
         unset($checkboxelement->_attributes['id']); // necessary until MDL-20441 is fixed
         $repeatarray[] = $checkboxelement;
@@ -91,13 +95,11 @@ class mod_facetoface_session_form extends moodleform {
         $repeatoptions = array();
         $repeatoptions['timestart']['disabledif'] = array('datetimeknown', 'eq', 0);
         $repeatoptions['timefinish']['disabledif'] = array('datetimeknown', 'eq', 0);
-        if (!empty($displaytimezones)) {
+        if ($displaytimezones) {
             $repeatoptions['sessiontimezone']['disabledif'] = array('datetimeknown', 'eq', 0);
             $repeatoptions['sessiontimezone']['default'] = $this->_customdata['defaulttimezone'];
         }
-        $mform->setType('sessiontimezone', PARAM_TEXT);
-        $mform->setType('timestart', PARAM_INT);
-        $mform->setType('timefinish', PARAM_INT);
+        $mform->setType('sessiontimezone', PARAM_TIMEZONE);
         $mform->setType('sessiondateid', PARAM_INT);
         $this->repeat_elements($repeatarray, $repeatcount, $repeatoptions, 'date_repeats', 'date_add_fields',
                                1, get_string('dateadd', 'facetoface'), true);
@@ -174,7 +176,6 @@ class mod_facetoface_session_form extends moodleform {
             $radioarray[] = $mform->createElement('radio', 'allowcancellations', '', get_string('allowcancellationcutoff', 'facetoface'), 2);
             $mform->addGroup($radioarray, 'allowcancellations', get_string('allowbookingscancellations', 'facetoface'), array('<br/>'), false);
             $mform->setType('allowcancellations', PARAM_INT);
-            $mform->setDefault('allowcancellations', $this->_customdata['facetoface']->allowcancellationsdefault);
             $mform->addHelpButton('allowcancellations', 'allowbookingscancellations', 'facetoface');
 
             // Cancellation cutoff.
@@ -182,7 +183,6 @@ class mod_facetoface_session_form extends moodleform {
             $cutoffnotegroup[] =& $mform->createElement('duration', 'cancellationcutoff', '', array('defaultunit' => HOURSECS, 'optional' => false));
             $cutoffnotegroup[] =& $mform->createElement('static', 'cutoffnote', null, get_string('cutoffnote', 'facetoface'));
             $mform->addGroup($cutoffnotegroup, 'cutoffgroup', '', '&nbsp;', false);
-            $mform->setDefault('cancellationcutoff', $this->_customdata['facetoface']->cancellationscutoffdefault);
             $mform->disabledIf('cancellationcutoff[number]', 'allowcancellations', 'notchecked', 2);
             $mform->disabledIf('cancellationcutoff[timeunit]', 'allowcancellations', 'notchecked', 2);
             $mform->disabledIf('cancellationcutoff[number]', 'datetimeknown', 'eq', 0);
@@ -333,6 +333,8 @@ class mod_facetoface_session_form extends moodleform {
         customfield_definition($mform, $session, 'facetofacesession', 0, 'facetoface_session');
 
         $this->add_action_buttons();
+
+        $this->set_data($sessiondata);
     }
 
     function validation($data, $files) {
@@ -341,13 +343,6 @@ class mod_facetoface_session_form extends moodleform {
         $dateids = $data['sessiondateid'];
         $datecount = count($dateids);
         for ($i=0; $i < $datecount; $i++) {
-            //only check timezones if datetimeknown is set
-            if (!empty($data['datetimeknown'])) {
-                $timezone = $data["sessiontimezone"][$i];
-                if ($timezone == get_string('sessiontimezoneunknown', 'facetoface')) {
-                    $errors['sessiontimezone['.$i.']'] =  get_string('error:mustspecifytimezone', 'facetoface');
-                }
-            }
             $starttime = $data["timestart[$i]"];
             $endtime = $data["timefinish[$i]"];
             $removecheckbox = empty($data["datedelete"]) ? array() : $data["datedelete"];
@@ -371,20 +366,8 @@ class mod_facetoface_session_form extends moodleform {
             }
             // If valid date, add to array.
             $date = new stdClass();
-            $timestartfield = "timestart[$i]_raw";
-            $timefinishfield = "timefinish[$i]_raw";
-            // Is the timezone set? Use the raw ISO date string to get an accurate Unix timestamp.
-            if (!empty($data['datetimeknown']) && ($data["sessiontimezone"][$i] != get_string('sessiontimezoneunknown', 'facetoface'))) {
-                $timezone = $data["sessiontimezone"][$i];
-                $startdt = new DateTime($data[$timestartfield], new DateTimeZone($timezone));
-                $finishdt = new DateTime($data[$timefinishfield], new DateTimeZone($timezone));
-                $date->timestart = $startdt->getTimestamp();
-                $date->timefinish = $finishdt->getTimestamp();
-            } else {
-                $date->timestart = $starttime;
-                $date->timefinish = $endtime;
-            }
-            $dates[] = $date;
+            $date->timestart = $starttime;
+            $date->timefinish = $endtime;
         }
 
         $datefound = false;
@@ -518,22 +501,5 @@ class mod_facetoface_session_form extends moodleform {
         }
 
         return $errors;
-    }
-
-    function set_data($values) {
-        $mform =& $this->_form;
-        foreach ($values as $key => $val) {
-            if (strpos($key, 'sessiontimezone') !== false) {
-                $idx1 = strpos($key, '[');
-                $idx2 = strpos($key, ']');
-                $idx = substr($key, $idx1 + 1, ($idx2 - $idx1) - 1);
-                $tz = ($val == 'UTC') ? 0 : $val;
-                $el = $mform->getElement('timestart['.$idx. ']');
-                $el->set_option('timezone', $tz);
-                $el = $mform->getElement('timefinish['.$idx. ']');
-                $el->set_option('timezone', $tz);
-            }
-        }
-        parent::set_data($values);
     }
 }

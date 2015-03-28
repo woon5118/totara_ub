@@ -1298,7 +1298,7 @@ function facetoface_message_substitutions_userfields($msg, $user) {
     $countryvalue = output_country_code($user->country);
     $msg = str_replace(get_string('placeholder:country', 'mod_facetoface'), $countryvalue, $msg);
 
-    $timezone = usertimezone($user->timezone);
+    $timezone = core_date::get_user_timezone($user);
     $msg = str_replace(get_string('placeholder:timezone', 'mod_facetoface'), $timezone, $msg);
 
     // Check to see if we need to load and process custom profile fields.

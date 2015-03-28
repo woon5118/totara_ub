@@ -211,86 +211,21 @@ function totara_version_info($version, $release) {
 
 /**
  * Import the latest timezone information - code taken from admin/tool/timezoneimport
+ * @deprecated since Totara 2.7.2
  * @return bool success or failure
  */
 function totara_import_timezonelist() {
-    global $CFG, $OUTPUT;
-    require_once($CFG->libdir.'/adminlib.php');
-    require_once($CFG->libdir.'/datalib.php');
-    require_once($CFG->libdir.'/filelib.php');
-    require_once($CFG->libdir.'/olson.php');
-
-    // Try to find a source of timezones to import from.
-    $importdone = false;
-
-    // First, look for an Olson file locally.
-    $source = $CFG->tempdir.'/olson.txt';
-    if (!$importdone and is_readable($source)) {
-        if ($timezones = olson_to_timezones($source)) {
-            update_timezone_records($timezones);
-            $importdone = $source;
-        }
-    }
-
-    // Next, look for a CSV file locally.
-    $source = $CFG->tempdir.'/timezone.txt';
-    if (!$importdone and is_readable($source)) {
-        if ($timezones = get_records_csv($source, 'timezone')) {
-            update_timezone_records($timezones);
-            $importdone = $source;
-        }
-    }
-
-    // Otherwise, let's try our online version.
-    $source = 'https://download.totaralms.com/timezone.txt';
-    if (!$importdone && ($content=download_file_content($source))) {
-        if ($file = fopen($CFG->tempdir.'/timezone.txt', 'w')) {            // Make local copy
-            fwrite($file, $content);
-            fclose($file);
-            if ($timezones = get_records_csv($CFG->tempdir.'/timezone.txt', 'timezone')) {  // Parse it
-                update_timezone_records($timezones);
-                $importdone = $source;
-            }
-            unlink($CFG->tempdir.'/timezone.txt');
-        }
-    }
-
-    // Final resort, use the copy included in Moodle.
-    $source = $CFG->dirroot.'/lib/timezone.txt';
-    if (!$importdone and is_readable($source)) {  // Distribution file
-        if ($timezones = get_records_csv($source, 'timezone')) {
-            update_timezone_records($timezones);
-            $importdone = $source;
-        }
-    }
-
-    if ($importdone) {
-        echo $OUTPUT->notification(get_string('importtimezonessuccess', 'totara_core', $importdone), 'notifysuccess');
-    } else {
-        echo $OUTPUT->notification(get_string('error:importtimezonesfailed', 'totara_core'), 'notifyproblem');
-    }
-
-    return $importdone;
+    return true;
 }
+
 /**
  * gets a clean timezone array compatible with PHP DateTime, DateTimeZone etc functions
  * @param bool $assoc return a simple numerical index array or an associative array
  * @return array a clean timezone list that can be used safely
  */
 function totara_get_clean_timezone_list($assoc=false) {
-    global $DB;
-
-    static $moodletimezones;
-    if (PHPUNIT_TEST or (!during_initial_install() and !$moodletimezones)) {
-        $moodletimezones = $DB->get_records_sql_menu("SELECT name, MAX(id) FROM {timezone} GROUP BY name");
-    }
-
     $zones = array();
     foreach (DateTimeZone::listIdentifiers() as $zone) {
-        if ($moodletimezones and !isset($moodletimezones[$zone])) {
-            // Zones need to be supported both by Moodle and PHP.
-            continue;
-        }
         if ($assoc) {
             $zones[$zone] = $zone;
         } else {
@@ -1351,41 +1286,37 @@ function totara_get_appraiser($userid, $postype=null) {
 
 
 /**
-* returns unix timestamp from a date string depending on the date format
-*
-* @param string $format e.g. "d/m/Y" - see date_parse_from_format for supported formats
-* @param string $date a date to be converted e.g. "12/06/12"
-* @return int unix timestamp (0 if fails to parse)
-*/
-function totara_date_parse_from_format ($format, $date) {
-
-    global $CFG;
-    $tz = isset($CFG->timezone) ? $CFG->timezone : 99;
-    $timezone = get_user_timezone_offset($tz);
-    $dateArray = array();
+ * Returns unix timestamp from a date string depending on the date format
+ * for the current $USER or server timezone.
+ *
+ * Note: timezone info in $format is not supported
+ *
+ * @param string $format e.g. "d/m/Y" - see date_parse_from_format for supported formats
+ * @param string $date a date to be converted e.g. "12/06/12"
+ * @param bool $servertimezone
+ * @return int unix timestamp (0 if fails to parse)
+ */
+function totara_date_parse_from_format($format, $date, $servertimezone = false) {
     $dateArray = date_parse_from_format($format, $date);
-    if (is_array($dateArray) && isset($dateArray['error_count']) &&
-        $dateArray['error_count'] == 0) {
-        if (abs($timezone) > 13) {
-            $time = mktime($dateArray['hour'],
-                    $dateArray['minute'],
-                    $dateArray['second'],
-                    $dateArray['month'],
-                    $dateArray['day'],
-                    $dateArray['year']);
-        } else {
-            $time = gmmktime($dateArray['hour'],
-                    $dateArray['minute'],
-                    $dateArray['second'],
-                    $dateArray['month'],
-                    $dateArray['day'],
-                    $dateArray['year']);
-            $time = usertime($time, $timezone);
-        }
-        return $time;
-    } else {
+    if (!is_array($dateArray) or !empty($dateArray['error_count'])) {
         return 0;
     }
+    if ($dateArray['is_localtime']) {
+        // Not timezone support, sorry.
+        return 0;
+    }
+
+    if ($servertimezone) {
+        $tzobj = core_date::get_server_timezone_object();
+    } else {
+        $tzobj = core_date::get_user_timezone_object();
+    }
+
+    $date = new DateTime('now', $tzobj);
+    $date->setDate($dateArray['year'], $dateArray['month'], $dateArray['day']);
+    $date->setTime($dateArray['hour'], $dateArray['minute'], $dateArray['second']);
+
+    return $date->getTimestamp();
 }
 
 

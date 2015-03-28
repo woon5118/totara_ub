@@ -248,18 +248,11 @@ function get_display_info($d, $m, $y) {
     list($day, $month, $year) = array($date['mday'], $date['mon'], $date['year']); // This is what we want to display
     $display->maxdays = calendar_days_in_month($m, $y);
 
-    $startwday = 0;
-    if (get_user_timezone_offset() < 99) {
-        // We 'll keep these values as GMT here, and offset them when the time comes to query the db
-        $display->tstart = gmmktime(0, 0, 0, $m, 1, $y); // This is GMT
-        $display->tend = gmmktime(23, 59, 59, $m, $display->maxdays, $y); // GMT
-        $startwday = gmdate('w', $display->tstart); // $display->tstart is already GMT, so don't use date(): messes with server's TZ
-    } else {
-        // no timezone info specified
-        $display->tstart = mktime(0, 0, 0, $m, 1, $y);
-        $display->tend = mktime(23, 59, 59, $m, $display->maxdays, $y);
-        $startwday = date('w', $display->tstart); // $display->tstart not necessarily GMT, so use date()
-    }
+    date_default_timezone_set(core_date::get_user_timezone());
+    $display->tstart = mktime(0, 0, 0, $m, 1, $y);
+    $display->tend = mktime(23, 59, 59, $m, $display->maxdays, $y);
+    $startwday = date('w', $display->tstart);
+    core_date::set_default_server_timezone();
 
     // Align the starting weekday to fall in our display range
     if ($startwday < $display->minwday) {
@@ -275,7 +268,7 @@ function get_sessions($display, $groups, $users, $courses, $activefilters, &$eve
     global $cfgcalendarfilters;
 
     // Get events from database.
-    $events = calendar_get_events(usertime($display->tstart), usertime($display->tend), $users, $groups, $courses);
+    $events = calendar_get_events($display->tstart, $display->tend, $users, $groups, $courses);
     if (!empty($events)) {
         // Check if any filters has been selected.
         if ($cfgcalendarfilters) {
@@ -718,8 +711,8 @@ function get_sessions_by_date($sessionids, $displayinfo) {
     }
 
     // If timestart/timefinish has a date, it uses that date. It uses the current month otherwise.
-    $timestart = $hasvalue['timestart'] ? $activefilters['defaultfields']['unixtimestart'] : usertime($displayinfo->tstart);
-    $timeend = $hasvalue['timefinish'] ? $activefilters['defaultfields']['unixtimefinish'] : usertime($displayinfo->tend);
+    $timestart = $hasvalue['timestart'] ? $activefilters['defaultfields']['unixtimestart'] : $displayinfo->tstart;
+    $timeend = $hasvalue['timefinish'] ? $activefilters['defaultfields']['unixtimefinish'] : $displayinfo->tend;
 
     list($insql, $params) = $DB->get_in_or_equal($sessionids);
     $params[] = $timestart;
@@ -754,8 +747,8 @@ function get_sessions_by_course($sessionids, $displayinfo, $waitlistedsessions) 
     list($insql, $params) = $DB->get_in_or_equal($sessionids, SQL_PARAMS_NAMED);
 
     // If timestart/timefinish has a date, it uses that date. It uses the current month otherwise.
-    $timestart = $hasvalue['timestart'] ? $activefilters['defaultfields']['unixtimestart'] : usertime($displayinfo->tstart);
-    $timeend = $hasvalue['timefinish'] ? $activefilters['defaultfields']['unixtimefinish'] : usertime($displayinfo->tend);
+    $timestart = $hasvalue['timestart'] ? $activefilters['defaultfields']['unixtimestart'] : $displayinfo->tstart;
+    $timeend = $hasvalue['timefinish'] ? $activefilters['defaultfields']['unixtimefinish'] : $displayinfo->tend;
     $params['timestart'] = $timestart;
     $params['timeend'] = $timeend;
 

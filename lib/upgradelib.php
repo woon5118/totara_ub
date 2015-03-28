@@ -1532,8 +1532,6 @@ function install_core($version, $verbose) {
         events_update_definition('moodle');
         \core\task\manager::reset_scheduled_tasks_for_component('moodle');
         message_update_providers('moodle');
-        // Populate the timezone table.
-        totara_import_timezonelist();
         // Write default settings unconditionally
         admin_apply_default_settings(NULL, true);
 
@@ -1629,8 +1627,6 @@ function upgrade_noncore($verbose) {
     print_upgrade_part_start('Totara', false, $verbose);
     // Upgrade all language packs if we can.
     totara_upgrade_installed_languages();
-    // Ensure timezones are updated.
-    totara_import_timezonelist();
     print_upgrade_part_end('Totara', false, $verbose);
     // upgrade all plugins types
     try {

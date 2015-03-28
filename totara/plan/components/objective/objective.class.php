@@ -594,8 +594,8 @@ class dp_objective_component extends dp_base_component {
                     $updates .= $stringmanager->get_string('duedate', 'totara_plan', null, $currentuserobj->lang).' - '.
                             get_string('changedfromxtoy', 'totara_plan',
                             (object)array('before'=>empty($orig_objectives[$itemid]->duedate) ? '' :
-                                userdate($orig_objectives[$itemid]->duedate, get_string('strftimedate'), $CFG->timezone, false),
-                                'after' => userdate($record->duedate, get_string('strftimedate'), $CFG->timezone, false))) . html_writer::empty_tag('br');
+                                userdate($orig_objectives[$itemid]->duedate, get_string('strftimedate'), 99, false),
+                                'after' => userdate($record->duedate, get_string('strftimedate'), 99, false))) . html_writer::empty_tag('br');
                 }
 
                 // proficiency may have been updated

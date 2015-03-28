@@ -229,7 +229,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
                 $dbrow['timemodified'] = $now;
             } else {
                 //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow['timemodified']));
+                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow['timemodified']), true);
                 if ($parsed_date) {
                     $dbrow['timemodified'] = $parsed_date;
                 }
@@ -247,7 +247,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
                         switch ($datatype) {
                             case 'datetime':
                                 //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
+                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
                                 if ($parsed_date) {
                                     $value = $parsed_date;
                                 }
