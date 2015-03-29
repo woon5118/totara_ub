@@ -851,6 +851,22 @@ class facetoface_notification extends data_object {
     public function is_frozen() {
         return $this->id && $this->status && $this->type == MDL_F2F_NOTIFICATION_MANUAL;
     }
+
+    /**
+     * Sets notification object properties from the given user input fields.
+     * Throws an exception for any invalid data.
+     *
+     * @param facetoface_notification $instance
+     * @param stdClass $params
+     * @throws moodle_exception
+     */
+    public static function set_from_form(facetoface_notification $instance, stdClass $params) {
+        // Manually check the length of the title and throw an exception if its too long.
+        if (isset($params->title) && core_text::strlen($params->title) > 255) {
+            throw new moodle_exception('error:notificationtitletoolong', 'mod_facetoface');
+        }
+        parent::set_properties($instance, $params);
+    }
 }
 
 
