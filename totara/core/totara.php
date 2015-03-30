@@ -970,7 +970,10 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
 }
 
 function totara_print_my_courses() {
-    global $OUTPUT;
+    global $CFG, $OUTPUT;
+
+    // Report builder lib is required for the embedded report.
+    require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
     echo $OUTPUT->heading(get_string('mycurrentprogress', 'totara_core'));
 
