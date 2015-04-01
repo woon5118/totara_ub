@@ -138,5 +138,18 @@ function xmldb_totara_certification_upgrade($oldversion) {
         // Certification savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015030201, 'totara_certification');
     }
+
+    if ($oldversion < 2015030202) {
+        require_once($CFG->dirroot.'/totara/certification/lib.php');
+
+        $sql = "UPDATE {certif_completion}
+            SET status = ?
+            WHERE renewalstatus = ?";
+        $DB->execute($sql, array(CERTIFSTATUS_EXPIRED, CERTIFRENEWALSTATUS_EXPIRED));
+
+        // Certification savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030202, 'totara_certification');
+    }
+
     return true;
 }

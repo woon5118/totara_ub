@@ -540,7 +540,11 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
         $DB->set_field('prog_completion', 'timedue', $todb->timeexpires,
             array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
     } else { // Certifying.
-        $todb->status =  CERTIFSTATUS_ASSIGNED;
+        if ($renewalstatus == CERTIFRENEWALSTATUS_EXPIRED) {
+            $todb->status =  CERTIFSTATUS_EXPIRED;
+        } else {
+            $todb->status =  CERTIFSTATUS_ASSIGNED;
+        }
         // Window/expires not relevant for CERTIFPATH_CERT as should be doing in program 'due' time.
         $todb->timewindowopens = 0;
         $todb->timeexpires = 0;
