@@ -79,6 +79,8 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
         $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
         $mform->setType('database_dbpass', PARAM_RAW);
+        $mform->addElement('text', 'database_dbport', get_string('dbport', 'tool_totara_sync'));
+        $mform->setType('database_dbport', PARAM_INT);
 
         // Table name
         $mform->addElement('text', 'database_dbtable', get_string('dbtable', 'tool_totara_sync'));
@@ -105,7 +107,8 @@ class totara_sync_source_org_database extends totara_sync_source_org {
     function config_save($data) {
         //Check database connection when saving
         try {
-            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'}, $data->{'database_dbuser'}, $data->{'database_dbpass'});
+            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
+                $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
         } catch (Exception $e) {
             totara_set_notification(get_string('cannotconnectdbsettings', 'tool_totara_sync'), qualified_me());
         }
@@ -115,6 +118,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         $this->set_config('database_dbhost', $data->{'database_dbhost'});
         $this->set_config('database_dbuser', $data->{'database_dbuser'});
         $this->set_config('database_dbpass', $data->{'database_dbpass'});
+        $this->set_config('database_dbport', $data->{'database_dbport'});
         $this->set_config('database_dbtable', $data->{'database_dbtable'});
 
         parent::config_save($data);
@@ -129,10 +133,11 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         $dbhost = $this->config->{'database_dbhost'};
         $dbuser = $this->config->{'database_dbuser'};
         $dbpass = $this->config->{'database_dbpass'};
+        $dbport = $this->config->{'database_dbport'};
         $db_table = $this->config->{'database_dbtable'};
 
         try {
-            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass);
+            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array('dbport' => $dbport));
         } catch (Exception $e) {
             $this->addlog(get_string('databaseconnectfail', 'tool_totara_sync'), 'error', 'importdata');
         }

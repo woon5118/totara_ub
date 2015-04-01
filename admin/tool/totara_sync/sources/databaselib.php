@@ -31,7 +31,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
  * @global object
  * @return moodle_database instance
  */
-function setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass) {
+function setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array $dboptions = array()) {
     global $CFG;
 
     $prefix = ' ';
@@ -68,10 +68,6 @@ function setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass) {
             $dbtype = 'mysqli';
             break;
         }
-    }
-
-    if (!isset($dboptions)) {
-        $dboptions = array();
     }
 
     if (!$sync_db = moodle_database::get_driver_instance($dbtype, $dblibrary)) {

@@ -59,6 +59,7 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
             var dbhost = $('#id_database_dbhost').val();
             var dbuser = $('#id_database_dbuser').val();
             var dbpass = $('#id_database_dbpass').val();
+            var dbport = $('#id_database_dbport').val();
             // Encode certain characters.
             dbpass = encodeURIComponent(dbpass);
             // Assemble url
@@ -68,6 +69,7 @@ M.totara_syncdatabaseconnect = M.totara_syncdatabaseconnect || {
                                 '&dbhost=' + dbhost +
                                 '&dbuser=' + dbuser +
                                 '&dbpass=' + dbpass +
+                                '&dbport=' + dbport +
                                 '&sesskey=' + M.cfg.sesskey;
 
             // Run script to check DB connectivity and display success or failure message
