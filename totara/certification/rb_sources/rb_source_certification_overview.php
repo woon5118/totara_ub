@@ -120,6 +120,32 @@ class rb_source_certification_overview extends rb_source_program_overview {
 
         $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
 
+        // Override the parent (program) timeduenice columnoption
+        foreach ($columnoptions as $i => $co) {
+            if ($co->value == 'timeduenice') {
+                $timedueindex = $i;
+                break;
+            }
+        }
+        unset($columnoptions[$timedueindex], $timedueindex);
+        $columnoptions[] = new rb_column_option(
+            'program_completion',
+            'timeduenice',
+            get_string('duedateextra', 'rb_source_program_overview'),
+            'base.timedue',
+            array(
+                'joins' => array('base', 'certif_completion'),
+                'displayfunc' => 'program_duedate',
+                'extrafields' => array(
+                    'status' => 'certif_completion.status',
+                    'programid' => 'base.programid',
+                    'certifpath' => 'certif_completion.certifpath',
+                    'certifstatus' => 'certif_completion.status',
+                    'userid' => 'base.userid',
+                )
+            )
+        );
+
         // Certification path col.
         $columnoptions[] = new rb_column_option(
             'certif_completion',

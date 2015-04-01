@@ -3,6 +3,7 @@
 $string['dateassigned'] = 'Date assigned';
 $string['sourcetitle'] = 'Program Overview';
 $string['duedate'] = 'Due Date';
+$string['duedateextra'] = 'Due Date (extra info)';
 $string['programnameselect'] = 'Program name (select box)';
 $string['programcompletionstatus'] = 'Program Status';
 $string['programcompletionprogress'] = 'Progress';

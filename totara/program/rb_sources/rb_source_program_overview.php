@@ -225,6 +225,22 @@ class rb_source_program_overview extends rb_base_source {
 
         $columnoptions[] = new rb_column_option(
             'program_completion',
+            'timeduenice',
+            get_string('duedateextra', 'rb_source_program_overview'),
+            'base.timedue',
+            array(
+                'joins' => 'base',
+                'displayfunc' => 'program_duedate',
+                'extrafields' => array(
+                    'programid' => 'base.programid',
+                    'userid' => 'base.userid',
+                    'status' => 'base.status',
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'program_completion',
             'timestarted',
             get_string('dateassigned', 'rb_source_program_overview'),
             'base.timestarted',
