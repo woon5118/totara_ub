@@ -4009,7 +4009,7 @@ function facetoface_get_cancellations($sessionid) {
                 pa.type,
                 pa.fullname
             ORDER BY
-                " . $DB->sql_fullname('u.firstname', 'u.lastname') . ",
+                {$usernamefields},
                 c.timecreated
     ";
     $params = array_merge(array(MDL_F2F_STATUS_USER_CANCELLED), $inparams);
@@ -4049,8 +4049,8 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
     global $DB;
 
     // If no select SQL supplied, use default
+    $usernamefields = get_all_user_name_fields(true, 'u');
     if (!$select) {
-        $usernamefields = get_all_user_name_fields(true, 'u');
         $select = "u.id, su.id AS signupid, {$usernamefields}, ss.timecreated, u.email";
         if ($includereserved) {
             $select = "su.id, ".$select;
@@ -4073,7 +4073,7 @@ function facetoface_get_users_by_status($sessionid, $status, $select = '', $incl
           $userjoin {user} u ON u.id = su.userid
          WHERE su.sessionid = ? AND ss.superceded != 1
            AND ss.statuscode = ?
-         ORDER BY " . $DB->sql_fullname('u.firstname', 'u.lastname') . ", ss.timecreated
+         ORDER BY {$usernamefields}, ss.timecreated
     ";
 
     return $DB->get_records_sql($sql, array($sessionid, $status));
@@ -5949,7 +5949,8 @@ function facetoface_get_other_reservations($facetoface, $session, $managerid) {
     global $DB;
 
     // Get a list of all the bookings the manager has made (not including the current session).
-    $sql = "SELECT su.id, s.id AS sessionid, s.datetimeknown, u.id AS userid, u.firstname, u.lastname
+    $usernamefields = get_all_user_name_fields(true, 'u');
+    $sql = "SELECT su.id, s.id AS sessionid, s.datetimeknown, u.id AS userid, {$usernamefields}
               FROM {facetoface_signups} su
               JOIN {facetoface_sessions} s ON s.id = su.sessionid
               JOIN {facetoface_signups_status} sus ON sus.signupid = su.id AND sus.superceded = 0

@@ -172,6 +172,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     protected function define_columnoptions() {
         global $DB;
+        $usernamefieldscreator = get_all_user_name_fields(false, null, 'creator.');
+        $usernamefieldsbooked  = get_all_user_name_fields(false, null, 'bookedby.');
         $columnoptions = array(
             new rb_column_option(
                 'session',                  // Type.
@@ -287,12 +289,12 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'status',
                 'createdby',
                 get_string('createdby', 'rb_source_facetoface_sessions'),
-                $DB->sql_fullname('creator.firstname', 'creator.lastname'),
+                $DB->sql_concat_join("' '", $usernamefieldscreator),
                 array(
                     'joins' => 'creator',
                     'displayfunc' => 'link_f2f_actionedby',
-                    'extrafields' => array('actionedbyid' => 'creator.id')
-                    )
+                    'extrafields' => array_merge(array('user_id' => 'creator.id'), $usernamefieldscreator),
+                )
             ),
             new rb_column_option(
                 'date',
@@ -365,9 +367,9 @@ class rb_source_facetoface_sessions extends rb_base_source {
                 'session',
                 'bookedby',
                 get_string('bookedby', 'rb_source_facetoface_sessions'),
-                $DB->sql_fullname('bookedby.firstname', 'bookedby.lastname'),
+                $DB->sql_concat_join("' '", $usernamefieldsbooked),
                 array('joins' => 'bookedby', 'displayfunc' => 'link_f2f_bookedby',
-                     'extrafields' => array('bookedby_id' => 'bookedby.id'))
+                     'extrafields' => array_merge(array('user_id' => 'bookedby.id')), $usernamefieldsbooked)
             ),
             new rb_column_option(
                 'room',
@@ -881,6 +883,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
      */
     function add_facetoface_session_roles_to_columns(&$columnoptions) {
         global $CFG, $DB;
+
         $allowedroles = get_config(null, 'facetoface_sessionroles');
         if (!isset($allowedroles) || $allowedroles == '') {
             return false;
@@ -901,11 +904,12 @@ class rb_source_facetoface_sessions extends rb_base_source {
             $name = $sessionrole->name;
             $key = "session_role_$field";
             $userkey = "session_role_user_$field";
+            $usernamefields = get_all_user_name_fields(false, null, "$userkey.");
             $columnoptions[] = new rb_column_option(
                 'role',
                 $field . '_name',
                 'Session '.$name . ' Name',
-                $DB->sql_fullname($userkey.'.firstname', $userkey.'.lastname'),
+                $DB->sql_concat_join("' '", $usernamefields),
                 array(
                     'joins' => $userkey,
                     'grouping' => 'comma_list_unique',
@@ -1018,16 +1022,14 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // Output the booking managers name (linked to their profile).
     function rb_display_link_f2f_bookedby($name, $row) {
-        global $OUTPUT;
-        $bookedbyid = $row->bookedby_id;
-        return $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $bookedbyid)), $name);
+        $user = fullname($row);
+        return $this->rb_display_link_user($user, $row, false);
     }
 
     // Output the actioning users name (linked to their profile).
     function rb_display_link_f2f_actionedby($name, $row) {
-        global $OUTPUT;
-        $actionedbyid = $row->actionedbyid;
-        return $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $actionedbyid)), $name);
+        $user = fullname($row);
+        return $this->rb_display_link_user($user, $row, false);
     }
 
     // Override user display function to show 'Reserved' for reserved spaces.
