@@ -1343,7 +1343,7 @@ class multi_course_set extends course_set {
             );
             $onchange = 'return M.totara_programcontent.changeCompletionTypeString(this, '.$prefix.');';
             $mform->addElement('select', $prefix.'completiontype', get_string('label:learnermustcomplete', 'totara_program'),
-                             $completiontypeoptions, array('onchange' => $onchange, 'id' => $prefix.'completiontype'));
+                             $completiontypeoptions, array('class' => 'completiontype', 'onchange' => $onchange, 'id' => $prefix.'completiontype'));
             $mform->setType($prefix.'completiontype', PARAM_INT);
             $mform->setDefault($prefix.'completiontype', COMPLETIONTYPE_ALL);
             $template_values['%'.$prefix.'completiontype%'] = array('name' => $prefix.'completiontype', 'value' => null);

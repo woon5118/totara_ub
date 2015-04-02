@@ -820,11 +820,12 @@ function prog_can_enter_course($user, $course) {
     $result->notify = false;
     $result->program = null;
 
-    $studentrole = get_archetype_roles('student');
-    if (empty($studentrole)) {
+    // Get program enrolment plugin class, and default role.
+    $program_plugin = enrol_get_plugin('totara_program');
+    $defaultrole = $program_plugin->get_config('roleid');
+    if (empty($defaultrole)) {
         return $result;
     }
-    $studentrole = reset($studentrole);
 
     // Get programs containing this course that this user is assigned to, either via learning plans or required learning
     $get_programs = "
@@ -861,8 +862,6 @@ function prog_can_enter_course($user, $course) {
     $program_records = $DB->get_records_sql($get_programs, $params);
 
     if (!empty($program_records)) {
-        //get program enrolment plugin class
-        $program_plugin = enrol_get_plugin('totara_program');
         foreach ($program_records as $program_record) {
             $program = new program($program_record->id);
             if (prog_is_accessible($program_record) && $program->can_enter_course($user->id, $course->id)) {
@@ -877,7 +876,7 @@ function prog_can_enter_course($user, $course) {
                 //check if user is already enroled under the program plugin
                 if (!$ue = $DB->get_record('user_enrolments', array('enrolid' => $instance->id, 'userid' => $user->id))) {
                     //enrol them
-                    $program_plugin->enrol_user($instance, $user->id, $studentrole->id);
+                    $program_plugin->enrol_user($instance, $user->id, $defaultrole);
                     $result->enroled = true;
                     $result->notify = true;
                     $result->program = $program->fullname;

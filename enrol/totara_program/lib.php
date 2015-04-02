@@ -213,7 +213,8 @@ class enrol_totara_program_plugin extends enrol_plugin {
         }
 
         if ($enrol) {
-            $this->enrol_user($instance, $userid, null, $data->timestart, $data->timeend, $data->status);
+            $defaultrole = $this->get_config('roleid');
+            $this->enrol_user($instance, $userid, $defaultrole, $data->timestart, $data->timeend, $data->status);
         }
     }
 
