@@ -401,6 +401,8 @@ function totara_get_clean_timezone($tz=null) {
         if (intval($tz) == 99) {
             //no useful CFG settings, try a system call
             $tz = date_default_timezone_get();
+            // From PHP 5.4 this may return UTC if no info is set in php.ini etc.
+            $tz = ($tz == 'UTC') ? $default : $tz;
         }
         //do we have something useful yet?
         if (in_array($tz, $cleanzones, true)) {
