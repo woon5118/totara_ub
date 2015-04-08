@@ -1261,25 +1261,11 @@ class program {
                 $out .= html_writer::start_tag('p', array('class' => 'certifpath'));
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
                     if ($certifcompletion->renewalstatus == CERTIFRENEWALSTATUS_EXPIRED) {
-                        $sql = 'SELECT MAX(timeexpires)
-                                FROM {certif_completion_history}
-                                WHERE userid = :uid
-                                AND certifid = :cid';
-                        $params = array('uid' => $userid, 'cid' => $this->certifid);
-                        $pasttimedue = $DB->get_field_sql($sql, $params);
-
-                        // Prog_completion timedue changes when setting completion for the assignment (Set completion link).
-                        // If the certification for this user has expired and a new completion is set,
-                        // we should take the new completion date as the due date. Following discussion in Zoho ticket #598.
-                        if ($timedue < $pasttimedue) {
-                            $timedue = $pasttimedue;
-                            $out .= get_string('certexpired', 'totara_certification');
-                        }
+                        $out .= get_string('certexpired', 'totara_certification');
                     } else {
                         $out .= get_string('certinprogress', 'totara_certification');
                     }
                 } else {
-                    $timedue = $certifcompletion->timeexpires;
                     if ($now > $certifcompletion->timewindowopens) {
                         $out .= get_string('recertwindowopen', 'totara_certification');
                         $out .= get_string('recertwindowexpiredate', 'totara_certification',
