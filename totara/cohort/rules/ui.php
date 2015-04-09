@@ -393,8 +393,8 @@ class cohort_rule_ui_menu extends cohort_rule_ui_form {
             'equal',
             '',
             array(
-                COHORT_RULES_OP_IN_CONTAINS => get_string('contains','totara_cohort'),
-                COHORT_RULES_OP_IN_NOTCONTAIN => get_string('doesnotcontain', 'totara_cohort')
+                COHORT_RULES_OP_IN_EQUAL    => get_string('equalto','totara_cohort'),
+                COHORT_RULES_OP_IN_NOTEQUAL => get_string('notequalto', 'totara_cohort')
             )
         );
         if (is_object($this->options)) {
@@ -402,6 +402,9 @@ class cohort_rule_ui_menu extends cohort_rule_ui_form {
         } else {
             $options = $this->options;
         }
+        // Remove empty values from select $options.
+        // Should not use UserCustomField(Choose) to select empty values.
+        $options = array_filter($options);
         $row[1] = $mform->createElement(
             'select',
             'listofvalues',
@@ -466,7 +469,7 @@ JS;
      * @return string
      */
     public function getRuleDescription($ruleid, $static=true) {
-        global $COHORT_RULES_OP_IN_LIST;
+        global $COHORT_RULES_OP_IN;
 
         if (!isset($this->equal) || !isset($this->listofvalues)) {
             return get_string('error:rulemissingparams', 'totara_cohort');
@@ -474,7 +477,7 @@ JS;
 
         $strvar = new stdClass();
         $strvar->desc = $this->description;
-        $strvar->join = $COHORT_RULES_OP_IN_LIST[$this->equal];
+        $strvar->join = get_string("is{$COHORT_RULES_OP_IN[$this->equal]}to", 'totara_cohort');
 
         if (is_object($this->options)) {
             $selected = $this->options_from_sqlobj($this->options, $this->listofvalues);

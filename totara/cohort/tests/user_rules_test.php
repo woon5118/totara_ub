@@ -28,6 +28,9 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/cohort/lib.php');
+require_once($CFG->dirroot.'/user/profile/lib.php');
+require_once($CFG->dirroot.'/user/profile/definelib.php');
+require_once($CFG->dirroot.'/user/profile/field/text/define.class.php');
 
 /**
  * Test user rules.
@@ -38,9 +41,16 @@ require_once($CFG->dirroot . '/totara/cohort/lib.php');
  */
 class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
 
+    /**
+     * @var totara_cohort_generator The cohort data generator.
+     */
     private $cohort_generator = null;
     private $cohort = null;
     private $ruleset = 0;
+    /**
+     * @var int The ID of the vegetable profile field.
+     */
+    private $profilevegetableid;
     const TEST_USER_COUNT_MEMBERS = 53;
 
     public function setUp() {
@@ -51,10 +61,16 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
         $this->preventResetByRollback();
         $userscreated = 0;
 
+        $this->profilevegetableid = $this->add_user_profile_text_field('vegetable', 'parsnip');
+
+        // We need to reset the rules after adding the custom user profile fields.
+        cohort_rules_list(true);
+
         // Set totara_cohort generator.
         $this->cohort_generator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
 
         // Create users.
+        $users = array();
         for ($i = 1; $i <= self::TEST_USER_COUNT_MEMBERS; $i++) {
             $userdata = array(
                 'username' => 'user' . $i,
@@ -81,10 +97,54 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
                 $userdata['institution'] = 'Totara';
             }
 
-            $this->getDataGenerator()->create_user($userdata);
+            $user = $this->getDataGenerator()->create_user($userdata);
+            $users[$user->id] = $user;
             $userscreated++;
         }
         $this->assertEquals(self::TEST_USER_COUNT_MEMBERS, $userscreated);
+
+        // Set custom field values for some of them.
+        reset($users);
+        for ($i = 0; $i < 10; $i++) {
+            next($users);
+            $user = new stdClass;
+            $user->id = key($users);
+            $user->profile_field_vegetable = 'potato';
+            profile_save_data($user);
+            $user = current($users);
+            profile_load_custom_fields($user);
+            $this->assertSame('potato', $user->profile['vegetable']);
+        }
+        for ($i = 10; $i < 19; $i++) {
+            next($users);
+            $user = new stdClass;
+            $user->id = key($users);
+            $user->profile_field_vegetable = 'brussels sprout';
+            profile_save_data($user);
+            $user = current($users);
+            profile_load_custom_fields($user);
+            $this->assertSame('brussels sprout', $user->profile['vegetable']);
+        }
+        for ($i = 20; $i < 25; $i++) {
+            next($users);
+            $user = new stdClass;
+            $user->id = key($users);
+            $user->profile_field_vegetable = '';
+            profile_save_data($user);
+            $user = current($users);
+            profile_load_custom_fields($user);
+            $this->assertSame('', $user->profile['vegetable']);
+        }
+        for ($i = 30; $i < 37; $i++) {
+            next($users);
+            $user = new stdClass;
+            $user->id = key($users);
+            $user->profile_field_vegetable = 'parsnip';
+            profile_save_data($user);
+            $user = current($users);
+            profile_load_custom_fields($user);
+            $this->assertSame('parsnip', $user->profile['vegetable']);
+        }
 
         // Creating an empty dynamic cohort.
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));
@@ -93,6 +153,333 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
 
         // Creating a ruleset.
         $this->ruleset = cohort_rule_create_ruleset($this->cohort->draftcollectionid);
+    }
+
+    /**
+     * Adds a "text" custom user profile field.
+     *
+     * @param string $name
+     * @param string $default
+     * @return int
+     */
+    protected function add_user_profile_text_field($name, $default) {
+        global $DB;
+        $formfield = new profile_define_text();
+
+        if (!$DB->record_exists('user_info_category', array())) {
+            // Copied from user/profile/index.php.
+            $defaultcategory = new stdClass();
+            $defaultcategory->name = 'Default category';
+            $defaultcategory->sortorder = 1;
+
+            $DB->insert_record('user_info_category', $defaultcategory);
+        }
+
+        $data = new stdClass;
+        $data->name = $name;
+        $data->shortname = $name;
+        $data->descriptionformat = FORMAT_HTML;
+        $data->description = 'This custom user profile field was added by unit tests.';
+        $data->defaultdataformat = FORMAT_PLAIN;
+        $data->defaultdata = $default;
+        $data->categoryid = $DB->get_field('user_info_category', 'id', array(), IGNORE_MULTIPLE);
+        $data->datatype = 'text';
+
+        $formfield->define_save($data);
+        profile_reorder_fields();
+        profile_reorder_categories();
+
+        return $DB->get_field('user_info_field', 'id', array('shortname' => $name), IGNORE_MULTIPLE);
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_ISEQUALTO operation with custom fields.
+     */
+    public function test_user_profile_field_isequalto() {
+        global $DB;
+
+        // First test a complete value.
+        $params = array('equal' => COHORT_RULES_OP_IN_ISEQUALTO);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(10, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test a value with a space in it.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test matching empty string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(5, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test a value no one has.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'tomato\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Now test the default, we manually set 7 people to the same value as the default.
+        // There are 54 real users total in the system (55 if you counted the guest).
+        // 24 users have an actual value that isn't the default.
+        // There must be 54 - 24 = 30 users with the default value.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'parsnip\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_CONTAINS operation with custom fields.
+     */
+    public function test_user_profile_field_contains() {
+        global $DB;
+
+        // First test the complete string.
+        $params = array('equal' => COHORT_RULES_OP_IN_CONTAINS);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(10, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now change it to brussels sprout and update.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a partial string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'sse\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Test the default, we manually set 7 people to the same value as the default.
+        // There are 54 real users total in the system (55 if you counted the guest).
+        // 24 users have an actual value that isn't the default.
+        // There must be 54 - 24 = 30 users with the default value.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'parsnip\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test an empty string, this should return EVERYONE!
+        // There are 54 real users (53 generated + the admin).
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(54, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_STARTSWITH operation with custom fields.
+     */
+    public function test_user_profile_field_startswith() {
+        global $DB;
+
+        // First test the complete string.
+        $params = array('equal' => COHORT_RULES_OP_IN_STARTSWITH);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(10, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now change it to brussels sprout and update.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a starting string we have.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'bru\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a starting string we don't have but that would match middle of the string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'sse\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a starting string we don't have but that would match end of the string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'out\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Test a partial default, we manually set 7 people to the same value as the default.
+        // There are 54 real users total in the system (55 if you counted the guest).
+        // 24 users have an actual value that isn't the default.
+        // There must be 54 - 24 = 30 users with the default value.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'par\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test an empty string, this should return EVERYONE!
+        // There are 54 real users (53 generated + the admin).
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(54, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_ENDSWITH operation with custom fields.
+     */
+    public function test_user_profile_field_endswith() {
+        global $DB;
+
+        // First test the complete string.
+        $params = array('equal' => COHORT_RULES_OP_IN_ENDSWITH);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(10, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now change it to brussels sprout and update.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a ending string we have.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'out\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(9, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a ending string we don't have but that would match middle of the string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'sse\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a ending string we don't have but that would match start of the string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'bru\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Test a partial default, we manually set 7 people to the same value as the default.
+        // There are 54 real users total in the system (55 if you counted the guest).
+        // 24 users have an actual value that isn't the default.
+        // There must be 54 - 24 = 30 users with the default value.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'nip\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test an empty string, this should return EVERYONE!
+        // There are 54 real users (53 generated + the admin).
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(54, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_NOTCONTAIN operation with custom fields.
+     */
+    public function test_user_profile_field_notcontain() {
+        global $DB;
+
+        // First test the complete string with one we know exists.
+        // 10 people have the value so there should be 44 who pass this condition.
+        $params = array('equal' => COHORT_RULES_OP_IN_NOTCONTAIN);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(44, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now change it to brussels sprout and update.
+        // There should be 9 people with so 45 without.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(45, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a string we don't have.
+        // There should be all 54 users here.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'dinosaur\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(54, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Test the default. There are 24 people with a value that is not the default.
+        // That leaves 30 people who should pass this test and be included in the cohort.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'parsnip\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test an empty string, there are 5 users with an empty string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(5, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_NOTEQUALTO operation with custom fields.
+     */
+    public function test_user_profile_field_notequalto() {
+        global $DB;
+
+        // First test the complete string with one we know exists.
+        // 10 people have the value so there should be 44 who pass this condition.
+        $params = array('equal' => COHORT_RULES_OP_IN_NOTEQUALTO);
+        $values = array('potato');
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        $ruleparamid = $DB->get_field('cohort_rule_params', 'id', array('value' => 'potato'));
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(44, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now change it to brussels sprout and update.
+        // There should be 9 people with so 45 without.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'brussels sprout\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(45, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Now test matching a string we don't have.
+        // There should be all 54 users here.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'dinosaur\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(54, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        /**
+         * This will be fixed by TL-6578
+        // Test the default. There are 24 people with a value that is not the default.
+        // That leaves 30 people who should pass this test and be included in the cohort.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'parsnip\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(30, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+
+        // Test an empty string, there are 5 users with an empty string.
+        $DB->execute('UPDATE {cohort_rule_params} SET value=\'\' WHERE id=\''.$ruleparamid.'\'');
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(5, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
+    }
+
+    /**
+     * Tests the COHORT_RULES_OP_IN_ISEMPTY operation with custom fields.
+     */
+    public function test_user_profile_field_is_empty() {
+        global $DB;
+
+        /**
+         * This will be fixed by TL-6578
+        // Test getting a custom field with an empty string.
+        // There are 5 users who have a value set to ''.
+        // The 30 users without a value essentially have the default value.
+        $params = array('equal' => COHORT_RULES_OP_IN_ISEMPTY);
+        $values = array();
+        $this->cohort_generator->create_cohort_rule_params($this->ruleset, 'usercustomfields', 'customfield'.$this->profilevegetableid.'_0', $params, $values);
+        cohort_rules_approve_changes($this->cohort);
+        $this->assertEquals(5, $DB->count_records('cohort_members', array('cohortid' => $this->cohort->id)));
+         */
     }
 
     /**
@@ -129,6 +516,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
         $data = array(
             array(array('equal' => COHORT_RULES_OP_IN_STARTSWITH), array('user'), 53),
             array(array('equal' => COHORT_RULES_OP_IN_ISEQUALTO), array('user1'), 1),
+            array(array('equal' => COHORT_RULES_OP_IN_ISEMPTY), array(), 0), // No user can have an empty username.
         );
         return $data;
     }
@@ -155,6 +543,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
         $data = array(
             array(array('equal' => COHORT_RULES_OP_IN_CONTAINS), array('@nz.com'), 26),
             array(array('equal' => COHORT_RULES_OP_IN_CONTAINS), array('@123'), 27),
+            array(array('equal' => COHORT_RULES_OP_IN_ISEMPTY), array(), 0),
         );
         return $data;
     }

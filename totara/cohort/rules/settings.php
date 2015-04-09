@@ -43,12 +43,14 @@ define('COHORT_RULES_TYPE_TEXT', 0);
 
 /**
  * Get the list of defined cohort rules
+ *
+ * @param bool $reset Set to true to reset the cache.
  */
-function cohort_rules_list(){
+function cohort_rules_list($reset = false){
     global $CFG, $DB;
     static $rules = false;
 
-    if (!$rules){
+    if (!$rules || $reset) {
         $rules = array();
 
         // User's idnumber
@@ -347,20 +349,20 @@ function cohort_rules_list(){
                         get_string('usersposx', 'totara_cohort', $field->name),
                         array_combine($options, $options)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
                 case 'text':
                     $dialog = new cohort_rule_ui_text(
                         get_string('usersposx', 'totara_cohort', $field->name),
                         get_string('separatemultiplebycommas', 'totara_cohort')
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
                 case 'datetime':
                     $dialog = new cohort_rule_ui_date(
                         get_string('usersposx', 'totara_cohort', $field->name)
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_date_poscustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_date_poscustomfield($id, $field->datatype);
                     break;
 
                 case 'checkbox':
@@ -371,7 +373,7 @@ function cohort_rules_list(){
                             0 => get_string('checkboxno', 'totara_cohort')
                         )
                     );
-                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id);
+                    $sqlhandler = new cohort_rule_sqlhandler_in_poscustomfield($id, $field->datatype);
                     break;
                 default:
                     // Skip field types we haven't defined a rule for yet.
