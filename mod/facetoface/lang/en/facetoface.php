@@ -360,6 +360,7 @@ $string['error:nopositionselectedactivity'] = 'You must have a suitable position
 $string['error:nopredefinedrooms'] = 'No pre-defined rooms';
 $string['error:norecipientsselected'] = 'You must choose which learners will receive this notification';
 $string['error:noticeidincorrect'] = 'Notice ID is incorrect: {$a}';
+$string['error:notificationtitletoolong'] = 'The title you have used is too long. The title is typically used as an email subject and should be no more than 78 characters long. Longer titles may be truncated by the users email client.';
 $string['error:problemsigningup'] = 'There was a problem signing you up.';
 $string['error:removeattendee'] = 'Could not remove {$a} from the session.';
 $string['error:sessionstartafterend'] = 'Session start date/time is after end.';

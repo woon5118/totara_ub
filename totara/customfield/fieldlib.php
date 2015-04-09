@@ -133,10 +133,22 @@ class customfield_base {
         $data->data         = $itemnew->{$this->inputname};
 
         if ($dataid = $DB->get_field($tableprefix.'_info_data', 'id', array($prefix.'id' => $itemnew->id, 'fieldid' => $data->fieldid))) {
-            $data->id = $dataid;
-            $DB->update_record($tableprefix.'_info_data', $data);
+            if ($itemnew->{$this->inputname} !== null) {
+                $data->id = $dataid;
+                $DB->update_record($tableprefix.'_info_data', $data);
+            } else {
+                // Don't update a field with a null value. Just delete the field data.
+                // This is mostly for the case when the field is null. Could be when resetting an option to the default
+                // For example in menu options when resetting to "Choose" option.
+                $DB->delete_records($tableprefix.'_info_data', array($prefix.'id' => $itemnew->id, 'fieldid' => $data->fieldid));
+            }
         } else {
-            $this->dataid = $DB->insert_record($tableprefix.'_info_data', $data);
+            if ($itemnew->{$this->inputname} !== null) {
+                $this->dataid = $DB->insert_record($tableprefix . '_info_data', $data);
+            } else {
+                // Invalid value. Don't save.
+                return;
+            }
         }
         $this->edit_save_data_postprocess($rawdata);
     }

@@ -327,8 +327,33 @@ function facetoface_add_instance($facetoface) {
     $defaults['status'] = 1;
     $defaults['ccmanager'] = 0;
 
+    // We need to validate the content of these language strings to make sure that they are not too long for the database field
+    // they are about to be written to.
+    $titles = array(
+        'setting:defaultconfirmationsubjectdefault' => get_string('setting:defaultconfirmationsubjectdefault', 'facetoface'),
+        'setting:defaultwaitlistedsubjectdefault' => get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface'),
+        'setting:defaultcancellationsubjectdefault' => get_string('setting:defaultcancellationsubjectdefault', 'facetoface'),
+        'setting:defaultdeclinesubjectdefault' => get_string('setting:defaultdeclinesubjectdefault', 'facetoface'),
+        'setting:defaultremindersubjectdefault' => get_string('setting:defaultremindersubjectdefault', 'facetoface'),
+        'setting:defaultrequestsubjectdefault' => get_string('setting:defaultrequestsubjectdefault', 'facetoface'),
+        'setting:defaultdatetimechangesubjectdefault' => get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface'),
+        'setting:defaulttrainerconfirmationsubjectdefault' => get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface'),
+        'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
+        'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
+        'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
+        'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface')
+    );
+    foreach ($titles as $key => $title) {
+        if (core_text::strlen($title) > 255) {
+            // We choose to truncate here. If we throw an exception like we should then the user won't be able to add face to face
+            // sessions and the user may not be able to edit the language pack to fix it. Thus we truncate and debug.
+            $titles[$key] = core_text::substr($title, 0, 255);
+            debugging('A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
+        }
+    }
+
     $confirmation = new facetoface_notification($defaults, false);
-    $confirmation->title = get_string('setting:defaultconfirmationsubjectdefault', 'facetoface');
+    $confirmation->title = $titles['setting:defaultconfirmationsubjectdefault'];
     $confirmation->body = text_to_html(get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
     $confirmation->managerprefix = text_to_html(get_string('setting:defaultconfirmationinstrmngrdefault', 'facetoface'));
     $confirmation->conditiontype = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
@@ -336,13 +361,13 @@ function facetoface_add_instance($facetoface) {
     $confirmation->save();
 
     $waitlist = new facetoface_notification($defaults, false);
-    $waitlist->title = get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface');
+    $waitlist->title = $titles['setting:defaultwaitlistedsubjectdefault'];
     $waitlist->body = text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'));
     $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
     $waitlist->save();
 
     $cancellation = new facetoface_notification($defaults, false);
-    $cancellation->title = get_string('setting:defaultcancellationsubjectdefault', 'facetoface');
+    $cancellation->title = $titles['setting:defaultcancellationsubjectdefault'];
     $cancellation->body = text_to_html(get_string('setting:defaultcancellationmessagedefault', 'facetoface'));
     $cancellation->managerprefix = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
     $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
@@ -351,7 +376,7 @@ function facetoface_add_instance($facetoface) {
     $cancellation->save();
 
     $decline = new facetoface_notification($defaults, false);
-    $decline->title = get_string('setting:defaultdeclinesubjectdefault', 'facetoface');
+    $decline->title = $titles['setting:defaultdeclinesubjectdefault'];
     $decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
     $decline->managerprefix = text_to_html(get_string('setting:defaultdeclineinstrmngrdefault', 'facetoface'));
     $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
@@ -360,7 +385,7 @@ function facetoface_add_instance($facetoface) {
     $decline->save();
 
     $reminder = new facetoface_notification($defaults, false);
-    $reminder->title = get_string('setting:defaultremindersubjectdefault', 'facetoface');
+    $reminder->title = $titles['setting:defaultremindersubjectdefault'];
     $reminder->body = text_to_html(get_string('setting:defaultremindermessagedefault', 'facetoface'));
     $reminder->managerprefix = text_to_html(get_string('setting:defaultreminderinstrmngrdefault', 'facetoface'));
     $reminder->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
@@ -372,7 +397,7 @@ function facetoface_add_instance($facetoface) {
     $reminder->save();
 
     $request = new facetoface_notification($defaults, false);
-    $request->title = get_string('setting:defaultrequestsubjectdefault', 'facetoface');
+    $request->title = $titles['setting:defaultrequestsubjectdefault'];
     $request->body = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
     $request->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
     $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
@@ -380,7 +405,7 @@ function facetoface_add_instance($facetoface) {
     $request->save();
 
     $session_change = new facetoface_notification($defaults, false);
-    $session_change->title = get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface');
+    $session_change->title = $titles['setting:defaultdatetimechangesubjectdefault'];
     $session_change->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
     $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
     $reminder->booked = 1;
@@ -388,32 +413,32 @@ function facetoface_add_instance($facetoface) {
     $session_change->save();
 
     $trainer_confirmation = new facetoface_notification($defaults, false);
-    $trainer_confirmation->title = get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface');
+    $trainer_confirmation->title = $titles['setting:defaulttrainerconfirmationsubjectdefault'];
     $trainer_confirmation->body = text_to_html(get_string('setting:defaulttrainerconfirmationmessagedefault', 'facetoface'));
     $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
     $trainer_confirmation->save();
 
     $trainer_cancellation = new facetoface_notification($defaults, false);
-    $trainer_cancellation->title = get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface');
+    $trainer_cancellation->title = $titles['setting:defaulttrainersessioncancellationsubjectdefault'];
     $trainer_cancellation->body = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault', 'facetoface'));
     $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
     $trainer_cancellation->save();
 
     $trainer_unassigned = new facetoface_notification($defaults, false);
-    $trainer_unassigned->title = get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface');
+    $trainer_unassigned->title = $titles['setting:defaulttrainersessionunassignedsubjectdefault'];
     $trainer_unassigned->body = text_to_html(get_string('setting:defaulttrainersessionunassignedmessagedefault', 'facetoface'));
     $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
     $trainer_unassigned->save();
 
     $cancelreservation = new facetoface_notification($defaults, false);
-    $cancelreservation->title = get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface');
+    $cancelreservation->title = $titles['setting:defaultcancelreservationsubjectdefault'];
     $cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
     $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
     $cancelreservation->cancelled = 1;
     $cancelreservation->save();
 
     $cancelallreservations = new facetoface_notification($defaults, false);
-    $cancelallreservations->title = get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface');
+    $cancelallreservations->title = $titles['setting:defaultcancelallreservationssubjectdefault'];
     $cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
     $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
     $cancelallreservations->cancelled = 1;
