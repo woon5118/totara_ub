@@ -285,7 +285,7 @@ function recertify_window_opens_stage() {
     global $DB, $CFG;
 
     // Find any users who have reached this point.
-    $sql = "SELECT cfc.id as uniqueid, u.*, cf.id as certifid, cfc.userid, p.id as progid
+    $sql = "SELECT cfc.id as uniqueid, u.*, cf.id as certifid, cfc.userid, p.id as progid, cfc.timewindowopens as windowopens
             FROM {certif_completion} cfc
             JOIN {certif} cf on cf.id = cfc.certifid
             JOIN {prog} p on p.certifid = cf.id
@@ -1230,7 +1230,7 @@ function reset_certifcomponent_completions($certifcompletion, $courses=null) {
     foreach ($courseids as $courseid) {
         // Call course/lib.php functions.
         archive_course_completion($userid, $courseid);
-        archive_course_activities($userid, $courseid);
+        archive_course_activities($userid, $courseid, $certifcompletion->windowopens);
     }
 
     // Remove mesages for prog&user so we can resend them.
