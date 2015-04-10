@@ -2936,6 +2936,25 @@ abstract class rb_base_source {
                 'organisation'
         );
 
+        $joinlist[] = new rb_join(
+            'org_framework',
+            'LEFT',
+            '{org_framework}',
+            'organisation.frameworkid = org_framework.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'organisation'
+        );
+
+        $joinlist[] = new rb_join(
+            'pos_framework',
+            'LEFT',
+            '{pos_framework}',
+            'position.frameworkid = pos_framework.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'position'
+        );
+
+
         return true;
     }
 
@@ -3090,6 +3109,128 @@ abstract class rb_base_source {
                 'dbdatatype' => 'timestamp',
             )
         );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'positionframework',
+            get_string('positionframework', 'totara_reportbuilder'),
+            'pos_framework.fullname',
+            array(
+                'joins' => array(
+                    $posassign,
+                    'pos_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'positionframeworkid',
+            get_string('positionframeworkid', 'totara_reportbuilder'),
+            'pos_framework.id',
+            array(
+                'joins' => array(
+                    $posassign,
+                    'pos_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'positionframeworkidnumber',
+            get_string('positionframeworkidnumber', 'totara_reportbuilder'),
+            'pos_framework.idnumber',
+            array(
+                'joins' => array(
+                    $posassign,
+                    'pos_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'positionframeworkdescription',
+            get_string('positionframeworkdescription', 'totara_reportbuilder'),
+            'pos_framework.description',
+            array(
+                'joins' => array(
+                    $posassign,
+                    'pos_framework'
+                ),
+                'displayfunc' => 'tinymce_textarea',
+                'extrafields' => array(
+                    'filearea' => '\'pos_framework\'',
+                    'component' => '\'totara_hierarchy\'',
+                    'fileid' => 'pos_framework.id'
+                ),
+                'dbdatatype' => 'text',
+                'outputformat' => 'text'
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'organisationframework',
+            get_string('organisationframework', 'totara_reportbuilder'),
+            'org_framework.fullname',
+            array(
+                'joins' => array(
+                    $org,
+                    'org_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'organisationframeworkid',
+            get_string('organisationframeworkid', 'totara_reportbuilder'),
+            'org_framework.id',
+            array(
+                'joins' => array(
+                    $org,
+                    'org_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'organisationframeworkidnumber',
+            get_string('organisationframeworkidnumber', 'totara_reportbuilder'),
+            'org_framework.idnumber',
+            array(
+                'joins' => array(
+                    $org,
+                    'org_framework'
+                )
+            )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'user',
+            'organisationframeworkdescription',
+            get_string('organisationframeworkdescription', 'totara_reportbuilder'),
+            'org_framework.description',
+            array(
+                'joins' => array(
+                    $org,
+                    'org_framework'
+                ),
+                'displayfunc' => 'tinymce_textarea',
+                'extrafields' => array(
+                    'filearea' => '\'org_framework\'',
+                    'component' => '\'totara_hierarchy\'',
+                    'fileid' => 'org_framework.id'
+                ),
+                'dbdatatype' => 'text',
+                'outputformat' => 'text'
+            )
+        );
+
+
         return true;
     }
 
@@ -3179,6 +3320,55 @@ abstract class rb_base_source {
                     'attributes' => rb_filter_option::select_width_limiter(),
                 )
         );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'positionframework',
+                get_string('positionframework', 'totara_reportbuilder'),
+                'text'
+            );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'positionframeworkid',
+                get_string('positionframeworkid', 'totara_reportbuilder'),
+                'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'positionframeworkidnumber',
+                get_string('positionframeworkidnumber', 'totara_reportbuilder'),
+                'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'positionframeworkdescription',
+                get_string('positionframeworkdescription', 'totara_reportbuilder'),
+                'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'organisationframework',
+                get_string('organisationframework', 'totara_reportbuilder'),
+                'text'
+            );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'organisationframeworkid',
+                get_string('organisationframeworkid', 'totara_reportbuilder'),
+                'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'organisationframeworkidnumber',
+                get_string('organisationframeworkidnumber', 'totara_reportbuilder'),
+                'text'
+        );
+        $filteroptions[] = new rb_filter_option(
+                'user',
+                'organisationframeworkdescription',
+                get_string('organisationframeworkdescription', 'totara_reportbuilder'),
+                'text'
+        );
+
 
         return true;
     }
