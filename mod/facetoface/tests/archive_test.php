@@ -85,7 +85,7 @@ class mod_facetoface_archive_testcase extends advanced_testcase {
         $data = new stdClass();
         $data->id = $course->id;
         $data->overall_aggregation = COMPLETION_AGGREGATION_ANY;
-        $data->criteria_activity_value = array($facetoface->id => 1);
+        $data->criteria_activity_value = array($facetoface->cmid => 1);
         $criterion = new completion_criteria_activity();
         $criterion->update_config($data);
         $aggdata = array(
