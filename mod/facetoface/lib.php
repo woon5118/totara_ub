@@ -1324,8 +1324,8 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
     $reservedfields = '';
     $userjoin = 'JOIN';
     if ($includereserved) {
-        $reservedfields = 'su.id AS signupid, bb.firstname AS bookedbyfirstname,
-                        bb.lastname AS bookedbylastname, bb.id AS bookedby, ';
+        $bookedbyusernamefields = get_all_user_name_fields(true, 'bb', null, 'bookedby');
+        $reservedfields = 'su.id AS signupid, '.$bookedbyusernamefields.', bb.id AS bookedby, ';
         $userjoin = 'LEFT JOIN {user} bb ON bb.id = su.bookedby
                      LEFT JOIN';
     }
