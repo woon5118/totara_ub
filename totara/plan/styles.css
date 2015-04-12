@@ -87,6 +87,10 @@ div.plan_box {
     padding: 10px;
 }
 
+.plan_box img {
+    padding: 5px;
+}
+
 #dp-plans-description .instructional_text {
     float: left;
     width: 73%;

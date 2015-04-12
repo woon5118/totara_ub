@@ -962,15 +962,7 @@ function dp_display_user_message_box($planuser) {
     $a->userid = $planuser;
     $a->site = $CFG->wwwroot;
 
-    $r = new html_table_row(array(
-        $OUTPUT->user_picture($user),
-        get_string('youareviewingxsplans', 'totara_plan', $a),
-    ));
-
-    $t = new html_table();
-    $t->attributes['class'] = 'invisiblepadded';
-    $t->data[] = $r;
-    return html_writer::tag('div', html_writer::table($t), array('class' => "plan_box notifymessage"));
+    return html_writer::tag('div', $OUTPUT->user_picture($user) . get_string('youareviewingxsplans', 'totara_plan', $a), array('class' => "plan_box notifymessage"));
 }
 
 /*

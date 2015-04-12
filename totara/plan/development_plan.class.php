@@ -1243,11 +1243,7 @@ class development_plan {
         $a->userid = $userid;
         $a->site = $CFG->wwwroot;
 
-        $table = new html_table();
-        $table->attributes['class'] = 'invisiblepadded';
-        $cells = array($OUTPUT->user_picture($user), get_string('youareviewingxsplan', 'totara_plan', $a));
-        $table->data[] = new html_table_row($cells);
-        return html_writer::table($table);
+        return $OUTPUT->user_picture($user) . get_string('youareviewingxsplan', 'totara_plan', $a);
     }
 
 
