@@ -551,14 +551,26 @@ function completion_status_aggregate($method, $data, &$state) {
 }
 
 /**
- * Triggered by changing course completion criteria, this function
- * bulk marks users as started in the course completion system.
+ * Triggered by changing course completion criteria, changing course settings and running cron.
  *
- * @param   integer     $courseid       Course ID
+ * This function bulk creates course completion records.
+ *
+ * @param   integer     $courseid       Course ID default 0 indicates update all courses
  * @return  bool
  */
-function completion_start_user_bulk($courseid) {
-    global $DB;
+function completion_start_user_bulk($courseid = 0) {
+    global $CFG, $DB;
+
+    if (empty($CFG->enablecompletion)) {
+        // Never create completion records if site completion is disabled.
+        return;
+    }
+
+    if ($courseid) {
+        $coursesql = "AND c.id = :courseid";
+    } else {
+        $coursesql = "";
+    }
 
     /*
      * A quick explaination of this horrible looking query
@@ -585,8 +597,8 @@ function completion_start_user_bulk($courseid) {
                 ELSE MIN(ue.timecreated)
             END,
             0,
-            ?,
-            ?
+            :reaggregate,
+            :completionstatus
         FROM
             {user_enrolments} ue
         INNER JOIN
@@ -601,12 +613,11 @@ function completion_start_user_bulk($courseid) {
         AND crc.userid = ue.userid
         WHERE
             c.enablecompletion = 1
-        AND c.completionstartonenrol = 1
         AND crc.id IS NULL
-        AND c.id = ?
-        AND ue.status = ?
-        AND e.status = ?
-        AND (ue.timeend > ? OR ue.timeend = 0)
+        {$coursesql}
+        AND ue.status = :userenrolstatus
+        AND e.status = :instanceenrolstatus
+        AND (ue.timeend > :timeendafter OR ue.timeend = 0)
         GROUP BY
             c.id,
             ue.userid
@@ -614,12 +625,14 @@ function completion_start_user_bulk($courseid) {
 
     $now = time();
     $params = array(
-        $now,
-        COMPLETION_STATUS_NOTYETSTARTED,
-        $courseid,
-        ENROL_USER_ACTIVE,
-        ENROL_INSTANCE_ENABLED,
-        $now
+        'reaggregate' => $now,
+        'completionstatus' => COMPLETION_STATUS_NOTYETSTARTED,
+        'userenrolstatus' => ENROL_USER_ACTIVE,
+        'instanceenrolstatus' => ENROL_INSTANCE_ENABLED,
+        'timeendafter' => $now // Excludes user enrolments that have ended already.
     );
+    if ($courseid) {
+        $params['courseid'] = $courseid;
+    }
     $DB->execute($sql, $params, true);
 }

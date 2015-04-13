@@ -87,18 +87,19 @@ class totara_core_observer {
             return true;
         }
 
-        // If no start on enrol, don't create a record.
-        if (empty($course->completionstartonenrol)) {
-            return true;
-        }
-
         // Create completion record.
         $data = array(
             'userid'    => $userid,
             'course'    => $course->id
         );
         $completion = new completion_completion($data);
-        $completion->mark_enrolled($timestart);
+
+        // If no start on enrol, don't mark as started.
+        if (empty($course->completionstartonenrol)) {
+            $completion->mark_enrolled();
+        } else {
+            $completion->mark_enrolled($timestart);
+        }
 
         // Review criteria.
         completion_handle_criteria_recalc($course->id, $userid);

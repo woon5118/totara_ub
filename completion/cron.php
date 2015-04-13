@@ -34,6 +34,9 @@ function completion_cron() {
 
     completion_cron_criteria();
 
+    // Make sure that all course_completion records exist as required.
+    completion_start_user_bulk();
+
     completion_cron_completions();
 }
 

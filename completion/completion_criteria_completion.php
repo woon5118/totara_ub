@@ -182,7 +182,7 @@ class completion_criteria_completion extends data_object {
  */
 function completion_handle_criteria_recalc($courseid, $userid) {
     global $DB;
-    if (PHPUNIT_TEST) {
+    if (PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING')) {
         // TODO: static variables break phpunit execution very very badly, we need to rework the caching here.
         $courses = array();
     } else {

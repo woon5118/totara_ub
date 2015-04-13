@@ -350,4 +350,18 @@ class behat_totara_core extends behat_base {
             $program->update_learner_assignments();
         }
     }
+
+    /**
+     * Run the specified scheduled task.
+     * You need to specify the class name, as shown in Site administration -> Server -> Scheduled tasks.
+     *
+     * @Then /^I run the "([^"]*)" task$/
+     */
+    public function i_run_the_task($taskname) {
+        if (!$task = \core\task\manager::get_scheduled_task($taskname)) {
+            mtrace("Task '{$taskname}' not found");
+            exit(1);
+        }
+        $task->execute();
+    }
 }

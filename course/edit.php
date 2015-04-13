@@ -236,6 +236,8 @@ if ($editform->is_cancelled()) {
     } else {
         // Save any changes to the files used in the editor.
         update_course($data, $editoroptions);
+        // Ensure all completion records are created.
+        completion_start_user_bulk($course->id);
         if ($usetags) {
             if (isset($data->otags)) {
                 tag_set('course', $course->id, tag_get_name($data->otags));
