@@ -3386,17 +3386,8 @@ abstract class rb_base_source {
      * @return array $result array of list items
      */
     function list_to_array($list, $sep) {
-        $result = array();
-        $unfilteredbase = explode($sep, $list);
-        $filteredbase = array();
-        if (!empty($unfilteredbase)) {
-            foreach ($unfilteredbase as $base) {
-                // Run through format_string in case the options are using multilang filter.
-                $filteredbase[] = format_string($base);
-            }
-            $result = array_combine($filteredbase, $filteredbase);
-        }
-        return $result;
+        $base = explode($sep, $list);
+        return array_combine($base, $base);
     }
 
     /**

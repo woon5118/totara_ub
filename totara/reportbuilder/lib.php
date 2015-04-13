@@ -511,14 +511,27 @@ class reportbuilder {
     }
 
     /**
+     * Static cache of source objects to speed up pages loading multiple report sources,
+     * primarily used by get_source_object().
+     */
+    protected static $sourceobjects = array();
+
+    /**
      * Searches for and returns an instance of the specified source class
      *
-     * @param string $source The name of the source class to return
-     *                       (excluding the rb_source prefix)
+     * @param string  $source       The name of the source class to return
+     *                                 (excluding the rb_source prefix)
+     * @param boolean $usecache     Whether to use the source cache or load from scratch
+     * @param boolean $exception    Whether bad sources should throw exceptions or be ignored
      * @return rb_base_source An instance of the source. Returns false if
      *                the source can't be found
      */
-    static function get_source_object($source) {
+    public static function get_source_object($source, $usecache = false, $exception = true) {
+
+        if ($usecache && isset(self::$sourceobjects[$source])) {
+            return self::$sourceobjects[$source];
+        }
+
         $sourcepaths = self::find_source_dirs();
         foreach ($sourcepaths as $sourcepath) {
             $classfile = $sourcepath . 'rb_source_' . $source . '.php';
@@ -526,7 +539,8 @@ class reportbuilder {
                 include_once($classfile);
                 $classname = 'rb_source_' . $source;
                 if (class_exists($classname)) {
-                    return new $classname();
+                    self::$sourceobjects[$source] = new $classname();
+                    return self::$sourceobjects[$source];
                 }
             }
         }
@@ -543,7 +557,8 @@ class reportbuilder {
                     include_once($classfile);
                     $classname = 'rb_source_' . $basesource;
                     if (class_exists($classname)) {
-                        return new $classname($groupid);
+                        self::$sourceobjects[$source] = new $classname($groupid);
+                        return self::$sourceobjects[$source];
                     }
                 }
             }
@@ -560,15 +575,103 @@ class reportbuilder {
                     include_once($classfile);
                     $classname = 'rb_source_' . $basesource;
                     if (class_exists($classname)) {
-                        return new $classname(0);
+                        self::$sourceobjects[$source] = new $classname(0);
+                        return self::$sourceobjects[$source];
                     }
                 }
             }
         }
 
+        // Source not found.
+        if ($exception) {
+            throw new ReportBuilderException("Source '$source' not found");
+        }
 
-        // bad source
-        throw new ReportBuilderException("Source '$source' not found");
+        return false;
+    }
+
+    protected static $reportrecordcache = null;
+
+    /**
+     * Retreives or creates a cached array of data objects for reports,
+     * and returns the specified types of report, defaulting to all reports.
+     *
+     * @param boolean $embedded         True if we want the results to include embedded reports.
+     * @param boolean $generated        True if we want the results to include user generated reports.
+     * @param boolean $refreshcache     Regenerates any existing cache.
+     * @return array                    Of normalised database objects.
+     */
+    protected static function get_report_records($embedded = true, $generated = true, $refreshcache = false) {
+        // Generate or refresh the reportbuilder records cache.
+        if ($refreshcache || is_null(self::$reportrecordcache)) {
+            $reports = self::get_normalised_report_records();
+            self::$reportrecordcache = $reports;
+        }
+
+        $records = array();
+        foreach (self::$reportrecordcache as $report) {
+            if ($report->embedded && $embedded) {
+                // Include embedded reports.
+                $records[$report->id] = $report;
+            } else if (!$report->embedded && $generated) {
+                // Include user generated reports.
+                $records[$report->id] = $report;
+            }
+        }
+        return $records;
+    }
+
+    /**
+     * @return array()  Of normalised database objects for user generated reports.
+     */
+    public static function get_user_generated_reports() {
+        return self::get_report_records(false, true);
+    }
+
+    /**
+     * @return array()  Of normalised database objects for embedded reports.
+     */
+    public static function get_embedded_reports() {
+        return self::get_report_records(true, false);
+    }
+
+    /**
+     * @return array()  Of normalised database ojected for all reports.
+     */
+    protected static function get_normalised_report_records() {
+        global $DB;
+        $reports = $DB->get_records('report_builder', array());
+        $reportsclasses = reportbuilder_get_all_embedded_reports();
+        $error = null;
+
+        // Update the url property for any embedded reports.
+        foreach ($reportsclasses as $object) {
+            foreach ($reports as $id => $report) {
+                if ($report->shortname === $object->shortname) {
+                    $report->url = $object->url;
+                    break;
+                }
+            }
+        }
+
+        $cache = reportbuilder_get_all_cached();
+        foreach ($reports as $report) {
+            // Add extra cache properties for cached reports.
+            if (isset($cache[$report->id])) {
+                $report->cache = true;
+                $report->nextreport = $cache[$report->id]->nextreport;
+            }
+
+            // Add extra sourcetitle property to the report object to avoid loading later.
+            $src = self::get_source_object($report->source, true, false);
+            if ($src) {
+                $report->sourcetitle = $src->sourcetitle;
+            } else {
+                // If you can't find the reports source, toss it.
+                unset($reports[$report->id]);
+            }
+        }
+        return $reports;
     }
 
     /**
@@ -624,31 +727,37 @@ class reportbuilder {
      *
      * @return array An array of paths to source directories
      */
-    static function find_source_dirs() {
-        global $CFG;
+    public static function find_source_dirs() {
+        static $sourcepaths;
 
-        $sourcepaths = array();
-
-        $locations = array(
-            'mod',
-            'block',
-            'tool',
-            'totara',
-            'local',
-            'enrol',
-            'repository',
-        );
-
-        // Search for rb_sources directories for each plugin type.
-        foreach ($locations as $modtype) {
-            foreach (core_component::get_plugin_list($modtype) as $mod => $path) {
-                $dir = "$path/rb_sources/";
-                if (file_exists($dir) && is_dir($dir)) {
-                    $sourcepaths[] = $dir;
-                }
-            }
+        if ($sourcepaths !== null) {
+            return $sourcepaths;
         }
 
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'totara_reportbuilder', 'rb_sources');
+        $sourcepaths = $cache->get('all');
+        if (!is_array($sourcepaths)) {
+            $sourcepaths = array();
+            $locations = array(
+                'mod',
+                'block',
+                'tool',
+                'totara',
+                'local',
+                'enrol',
+                'repository',
+            );
+            // Search for rb_sources directories for each plugin type.
+            foreach ($locations as $modtype) {
+                foreach (core_component::get_plugin_list($modtype) as $mod => $path) {
+                    $dir = "$path/rb_sources/";
+                    if (file_exists($dir) && is_dir($dir)) {
+                        $sourcepaths[] = $dir;
+                    }
+                }
+            }
+            $cache->set('all', $sourcepaths);
+        }
         return $sourcepaths;
     }
 
@@ -5521,7 +5630,11 @@ function reportbuilder_get_embedded_id_from_shortname($shortname, $embedded_ids)
     // return existing ID if a database record exists already
     if (is_array($embedded_ids)) {
         foreach ($embedded_ids as $id => $embed_shortname) {
-            if ($shortname == $embed_shortname) {
+            if (is_string($embed_shortname)) {
+                if ($shortname == $embed_shortname) {
+                    return $id;
+                }
+            } else if (isset($embed_shortname->shortname) && $shortname === $embed_shortname->shortname) {
                 return $id;
             }
         }

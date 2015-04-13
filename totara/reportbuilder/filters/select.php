@@ -79,9 +79,25 @@ class rb_filter_select extends rb_filter_type {
         global $SESSION;
         $label = format_string($this->label);
         $advanced = $this->advanced;
-        $options = $this->options['selectchoices'];
         $simplemode = $this->options['simplemode'];
         $attr = $this->options['attributes'];
+
+        $options = array();
+        foreach ($this->options['selectchoices'] as $key => $option) {
+            $formattedoption = format_string($option);
+            if (!is_numeric($key)) {
+                if ($key === $option) {
+                    $formattedkey = $formattedoption;
+                } else {
+                    $formattedkey = format_string($key);
+                }
+            } else {
+                // If the key is numeric just use it as is.
+                $formattedkey = $key;
+            }
+
+            $options[$formattedkey] = $formattedoption;
+        }
 
         if ($simplemode) {
             // simple select mode

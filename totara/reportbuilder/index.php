@@ -205,34 +205,19 @@ if ($fromform = $mform->get_data()) {
     }
 }
 
+$custom = reportbuilder::get_user_generated_reports();
+$embedded = reportbuilder::get_embedded_reports();
+
+/** @var totara_reportbuilder_renderer $output */
 echo $output->header();
 
-// Cache info
-$cache = reportbuilder_get_all_cached();
-//  User-generated (non-embedded) reports
+// User generated reports.
 echo $output->heading(get_string('usergeneratedreports', 'totara_reportbuilder'));
-$reports = $DB->get_records('report_builder', array('embedded' => 0), 'fullname');
-foreach ($reports as $report) {
-    if (isset($cache[$report->id])) {
-        $report->cache = true;
-        $report->nextreport = $cache[$report->id]->nextreport;
-    }
-}
-echo $output->user_generated_reports_table($reports);
+echo $output->user_generated_reports_table($custom);
 
 // Embedded reports
 echo $output->heading(get_string('embeddedreports', 'totara_reportbuilder'));
-$embeds = reportbuilder_get_all_embedded_reports();
-$embedded_ids = $DB->get_records_menu('report_builder', array('embedded' => 1), 'id', 'id, shortname');
-foreach ($embeds as $embed) {
-    // ensure db record exists and add id to object
-    $embed->id = reportbuilder_get_embedded_id_from_shortname($embed->shortname, $embedded_ids);
-    if (isset($cache[$embed->id])) {
-        $embed->cache = true;
-        $embed->nextreport = $cache[$embed->id]->nextreport;
-    }
-}
-echo $output->embedded_reports_table($embeds);
+echo $output->embedded_reports_table($embedded);
 
 // display mform
 $mform->display();

@@ -61,9 +61,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                 $row[] = html_writer::link($editurl, format_string($report->fullname)) . ' (' .
                     html_writer::link($viewurl, get_string('view')) . ')';
 
-                $src = reportbuilder::get_source_object($report->source);
-                $srcname = $src->sourcetitle;
-                $row[] = $srcname;
+                $row[] = $report->sourcetitle;
 
                 $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
                 $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
@@ -132,9 +130,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $row[] = html_writer::link($editurl, $fullname) . ' (' .
                 html_writer::link($viewurl, get_string('view')) . ')';
 
-            $src = reportbuilder::get_source_object($report->source);
-            $srcname = $src->sourcetitle;
-            $row[] = $srcname;
+            $row[] = $report->sourcetitle;
 
             $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
             $reload = $this->output->action_icon($reloadurl, new pix_icon('/t/reload', $strreload, 'moodle'));
