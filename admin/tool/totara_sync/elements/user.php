@@ -27,6 +27,9 @@ require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
 class totara_sync_element_user extends totara_sync_element {
+    const KEEP_USERS = 0;
+    const DELETE_USERS = 1;
+    const SUSPEND_USERS = 2;
 
     protected $customfieldsdb = array();
 
@@ -83,8 +86,12 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->setDefault('allow_create', 1);
         $mform->addElement('checkbox', 'allow_update', get_string('update', 'tool_totara_sync'));
         $mform->setDefault('allow_update', 1);
-        $mform->addElement('checkbox', 'allow_delete', get_string('delete', 'tool_totara_sync'));
-        $mform->setDefault('allow_delete', 1);
+        $deleteopt = array();
+        $deleteopt[self::KEEP_USERS] = get_string('auth_remove_keep','auth');
+        $deleteopt[self::SUSPEND_USERS] = get_string('auth_remove_suspend','auth');
+        $deleteopt[self::DELETE_USERS] = get_string('auth_remove_delete','auth');
+        $mform->addElement('select', 'allow_delete', get_string('delete', 'tool_totara_sync'), $deleteopt);
+        $mform->setDefault('allow_delete', self::KEEP_USERS);
         $mform->setExpanded('crudheading');
     }
 
@@ -96,7 +103,7 @@ class totara_sync_element_user extends totara_sync_element {
         $this->set_config('forcepwchange', $data->forcepwchange);
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
-        $this->set_config('allow_delete', !empty($data->allow_delete));
+        $this->set_config('allow_delete', $data->allow_delete);
         if (!empty($data->source_user)) {
             $source = $this->get_source($data->source_user);
             // Build link to source config.
@@ -115,6 +122,7 @@ class totara_sync_element_user extends totara_sync_element {
 
     function sync() {
         global $DB, $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
 
         $this->addlog(get_string('syncstarted', 'tool_totara_sync'), 'info', 'usersync');
         // Array to store the users we create or update that
@@ -151,22 +159,53 @@ class totara_sync_element_user extends totara_sync_element {
         $issane = (empty($invalidids) ? true : false);
         $problemswhileapplying = false;
 
-        // Delete obsolete users.
-        if (!empty($this->config->allow_delete)) {
-            if (empty($this->config->sourceallrecords)) {
-                // Get records with "deleted" flag set.
-                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
-                         FROM {{$synctable}} s
-                   INNER JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
-                        WHERE u.totarasync=1 AND u.deleted = 0 AND s.deleted = 1";
-            } else {
+        // Initialise to safe defaults if settings not present.
+        if (!isset($this->config->sourceallrecords)) {
+            $this->config->sourceallrecords = 0;
+        }
+        if (!isset($this->config->allow_create)) {
+            $this->config->allow_create = 0;
+        }
+        if (!isset($this->config->allow_update)) {
+            $this->config->allow_update = 0;
+        }
+        if (!isset($this->config->allow_delete)) {
+            $this->config->allow_delete = self::KEEP_USERS;
+        }
+
+        // May sure the required deleted column is present if necessary.
+        $synctablecolumns = $DB->get_columns($synctable);
+        $deletedcolumnpresent = isset($synctablecolumns['deleted']);
+
+        if ($this->config->allow_delete == self::DELETE_USERS) {
+            $sql = null;
+            if ($this->config->sourceallrecords == 0) {
+                if ($deletedcolumnpresent) {
+                    // Get records with "deleted" flag set.
+                    // Do not use DISTINCT here, idnumber may not be unique - we want errors for all duplicates.
+                    // If there are repeated rows in external table we will just delete twice.
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {{$synctable}} s
+                              JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1 AND u.deleted = 0 AND s.deleted = 1";
+                }
+            } else if ($this->config->sourceallrecords == 1) {
                 // All records provided by source - get missing user records.
-                $sql = "SELECT DISTINCT u.id, u.idnumber, u.auth
-                          FROM {user} u
-               LEFT OUTER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
-                         WHERE u.totarasync=1 AND s.idnumber IS NULL AND u.deleted=0";
+                // Also consider the deleted flag if present.
+                if ($deletedcolumnpresent) {
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {user} u
+                         LEFT JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1 AND u.deleted = 0 AND (s.idnumber IS NULL OR s.deleted = 1)";
+                } else {
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {user} u
+                         LEFT JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1 AND u.deleted = 0 AND s.idnumber IS NULL";
+                }
             }
-            if ($rs = $DB->get_recordset_sql($sql)) {
+            if ($sql) {
+                $rs = $DB->get_recordset_sql($sql);
                 foreach ($rs as $user) {
                     // Remove user.
                     try {
@@ -177,20 +216,63 @@ class totara_sync_element_user extends totara_sync_element {
                         }
                     } catch (Exception $e) {
                         $this->addlog(get_string('cannotdeleteuserx', 'tool_totara_sync', $user->idnumber) . ': ' .
-                                $e->getMessage(), 'warn', 'deleteuser');
+                            $e->getMessage(), 'warn', 'deleteuser');
                         $problemswhileapplying = true;
                         continue; // Continue processing users.
                     }
                 }
                 $rs->close();
             }
+
+        } else if ($this->config->allow_delete == self::SUSPEND_USERS) {
+            $sql = null;
+            if ($this->config->sourceallrecords == 0) {
+                if ($deletedcolumnpresent) {
+                    // Get records with "deleted" flag set.
+                    // Do not use DISTINCT here, idnumber may not be unique - we want errors for all duplicates.
+                    // If there are repeated rows in external table we will just delete twice.
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {{$synctable}} s
+                              JOIN {user} u ON (s.idnumber = u.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1 AND u.deleted = 0 AND u.suspended = 0 AND s.deleted = 1";
+                }
+            } else if ($this->config->sourceallrecords == 1) {
+                // All records provided by source - get missing user records.
+                // Also consider the deleted flag if present.
+                if ($deletedcolumnpresent) {
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {user} u
+                         LEFT JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1 AND u.deleted = 0 AND u.suspended = 0 AND (s.idnumber IS NULL OR s.deleted = 1)";
+                } else {
+                    $sql = "SELECT u.id, u.idnumber, u.auth
+                              FROM {user} u
+                         LEFT JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != '')
+                             WHERE u.totarasync = 1  AND u.deleted = 0 AND u.suspended = 0 AND s.idnumber IS NULL";
+                }
+            }
+            if ($sql) {
+                $rs = $DB->get_recordset_sql($sql);
+                foreach ($rs as $user) {
+                    // Do not suspend the records which have invalid values(e.g. spelling mistake).
+                    if (array_search($user->idnumber, $invalidids) === false) {
+                        $user = $DB->get_record('user', array('id' => $user->id));
+                        $user->suspended = 1;
+                        \core\session\manager::kill_user_sessions($user->id);
+                        user_update_user($user, false);
+                        \totara_core\event\user_suspended::create_from_user($user)->trigger();
+                        $this->addlog(get_string('suspendeduserx', 'tool_totara_sync', $user->idnumber), 'info', 'suspenduser');
+                    }
+                }
+                $rs->close();
+            }
         }
 
-        if (isset($this->config->sourceallrecords) && $this->config->sourceallrecords == 0) {
+        if ($deletedcolumnpresent) {
             // Remove the deleted records from the sync table.
             // This ensures that our create/update queries runs smoothly.
-            $DB->execute("DELETE FROM {{$synctable}} WHERE deleted = 1");
-            $DB->execute("DELETE FROM {{$synctable_clone}} WHERE deleted = 1");
+            $DB->execute("DELETE FROM {{$synctable}} WHERE deleted <> 0");
+            $DB->execute("DELETE FROM {{$synctable_clone}} WHERE deleted <> 0");
         }
 
         if (!empty($this->config->allow_update)) {
@@ -209,7 +291,7 @@ class totara_sync_element_user extends totara_sync_element {
             $sql = "SELECT s.*
                       FROM {{$synctable}} s
            LEFT OUTER JOIN {user} u ON (s.idnumber=u.idnumber)
-                     WHERE (u.idnumber IS NULL AND s.idnumber IS NOT NULL)";
+                     WHERE u.idnumber IS NULL AND s.idnumber IS NOT NULL AND s.idnumber != ''";
             $rscreateaccounts = $DB->get_recordset_sql($sql);
 
             // The idea of doing this is to get the accounts that need to be created. Since users are created first and then user assignments,
@@ -220,34 +302,32 @@ class totara_sync_element_user extends totara_sync_element {
                             FROM {user} u
                       INNER JOIN {{$synctable}} s ON (u.idnumber = s.idnumber AND u.idnumber != ''))");
 
-            if ($rscreateaccounts->valid()) {
-                // Create missing accounts.
-                foreach ($rscreateaccounts as $suser) {
-                    try {
-                        $this->create_user($suser);
-                        $this->addlog(get_string('createduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'createuser');
-                    } catch (Exception $e) {
-                        $this->addlog(get_string('cannotcreateuserx', 'tool_totara_sync', $suser->idnumber) . ': ' .
-                                $e->getMessage(), 'error', 'createuser');
-                        $problemswhileapplying = true;
-                        continue; // Continue processing users.
-                    }
+            // Create missing accounts.
+            foreach ($rscreateaccounts as $suser) {
+                try {
+                    $this->create_user($suser);
+                    $this->addlog(get_string('createduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'createuser');
+                } catch (Exception $e) {
+                    $this->addlog(get_string('cannotcreateuserx', 'tool_totara_sync', $suser->idnumber) . ': ' .
+                            $e->getMessage(), 'error', 'createuser');
+                    $problemswhileapplying = true;
+                    continue; // Continue processing users.
                 }
-                $rscreateaccounts->close(); // Free memory.
-
-                // Get data for user assignments for assignment sync later.
-                $sql = "SELECT sc.*, u.id as uid
-                          FROM {{$synctable_clone}} sc
-                    INNER JOIN {user} u ON (sc.idnumber = u.idnumber AND u.idnumber != '')";
-                $rscreateassignments = $DB->get_recordset_sql($sql);
-                foreach ($rscreateassignments as $suser) {
-                    $assign_sync_users[] = $suser;
-                }
-                $rscreateassignments->close(); // Free memory.
             }
+            $rscreateaccounts->close(); // Free memory.
+
+            // Get data for user assignments for assignment sync later.
+            $sql = "SELECT sc.*, u.id as uid
+                      FROM {{$synctable_clone}} sc
+                INNER JOIN {user} u ON (sc.idnumber = u.idnumber AND u.idnumber != '')";
+            $rscreateassignments = $DB->get_recordset_sql($sql);
+            foreach ($rscreateassignments as $suser) {
+                $assign_sync_users[] = $suser;
+            }
+            $rscreateassignments->close(); // Free memory.
         }
 
-        if (!empty($this->config->allow_update) && $rsupdateaccounts->valid()) {
+        if (!empty($this->config->allow_update)) {
             foreach ($rsupdateaccounts as $suser) {
                 $user = $DB->get_record('user', array('id' => $suser->uid));
 
@@ -272,8 +352,18 @@ class totara_sync_element_user extends totara_sync_element {
                     }
                 }
 
-                // Check if the user is going to be suspended before updating the $user object.
-                $suspenduser = $user->suspended == 0 && (isset($suser->suspended) && $suser->suspended == 1);
+                $suspenduser = false;
+                if (isset($suser->suspended)) {
+                    // Check if the user is going to be suspended before updating the $user object.
+                    if ($user->suspended == 0 and $suser->suspended == 1) {
+                        $suspenduser = true;
+                    }
+                } else {
+                    if ($user->suspended == 1 and $this->config->allow_delete == self::SUSPEND_USERS) {
+                        // User was previously deleted which resulted in suspension of account, enable the account now.
+                        $suser->suspended = '0';
+                    }
+                }
 
                 // Update user.
                 $this->set_sync_user_fields($user, $suser);
@@ -316,6 +406,7 @@ class totara_sync_element_user extends totara_sync_element {
                 \core\event\user_updated::create_from_userid($user->id)->trigger();
 
                 if ($suspenduser) {
+                    \core\session\manager::kill_user_sessions($user->id);
                     \totara_core\event\user_suspended::create_from_user($user)->trigger();
                 }
             }
@@ -359,14 +450,14 @@ class totara_sync_element_user extends totara_sync_element {
 
         // Prep a few params.
         $user = new stdClass;
-        $user->username = strtolower($suser->username);  // Usernames always lowercase in moodle.
+        $user->username = core_text::strtolower($suser->username);  // Usernames always lowercase in moodle.
         $user->idnumber = $suser->idnumber;
         $user->confirmed = 1;
         $user->totarasync = 1;
         $user->mnethostid = $CFG->mnet_localhost_id;
         $user->lang = $CFG->lang;
         $user->timecreated = time();
-        $user->auth = isset($suser->auth) ? core_text::strtolower($suser->auth) : 'manual';
+        $user->auth = isset($suser->auth) ? strtolower($suser->auth) : 'manual';
         $this->set_sync_user_fields($user, $suser);
 
         try {
@@ -547,12 +638,12 @@ class totara_sync_element_user extends totara_sync_element {
                     switch ($field) {
                         case 'username':
                             // Must be lower case.
-                            $user->$field = strtolower($suser->$field);
+                            $user->$field = core_text::strtolower($suser->$field);
                             break;
                         case 'country':
                             if (!empty($suser->$field)) {
                                 // Must be upper case.
-                                $user->$field = strtoupper($suser->$field);
+                                $user->$field = core_text::strtoupper($suser->$field);
                             } else if (empty($user->$field) && isset($CFG->country) && !empty($CFG->country)) {
                                 // Sync and target are both empty - so use the default country.
                                 $user->$field = $CFG->country;

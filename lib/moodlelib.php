@@ -4338,7 +4338,19 @@ function delete_user(stdClass $user) {
     $updateuser = new stdClass();
     $updateuser->id           = $user->id;
     $updateuser->deleted      = 1;
+    $updateuser->username     = $delname;            // Remember it just in case.
+    $updateuser->email        = md5($user->username);// Store hash of username, useful importing/restoring users.
+    $updateuser->idnumber     = '';                  // Clear this field to free it up.
+    $updateuser->picture      = 0;
     $updateuser->timemodified = time();
+
+    // Legacy Totara user deleting - it is now recommended to suspend users instead.
+    if ($CFG->authdeleteusers === 'partial') {
+        unset($updateuser->username);
+        unset($updateuser->email);
+        unset($updateuser->idnumber);
+    }
+    // End of Totara hack.
 
     // Don't trigger update event, as user is being deleted.
     user_update_user($updateuser, false, false);
@@ -4393,8 +4405,8 @@ function undelete_user($user) {
         return false;
     }
 
-    if ($user->email !== '' and strpos($user->email, '@') === false) {
-        // This account was deleted in Moodle most likely.
+    if (preg_match('/^[0-9a-f]{32}$/i', $user->email)) {
+        // This account was deleted in Moodle or $CFG->partialuserdelete was not active.
         return false;
     }
 

@@ -67,6 +67,7 @@ class totara_core_event_user_undeleted_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $original = $DB->get_record('user', array('id' => $user->id));
 
+        set_config('authdeleteusers', 'partial'); // The old totara delete that can be partially reverted.
         delete_user($user);
 
         $deleted = $DB->get_record('user', array('id' => $user->id));

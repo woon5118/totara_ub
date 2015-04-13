@@ -24,21 +24,9 @@
  * Unit tests for admin/tool/totara_sync
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    //  It must be included from a Moodle page.
-}
+defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_org_csv.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/admin/forms.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/user.php');
-require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_csv.php');
-
-class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
-
-    protected function setUp() {
-        parent::setup();
-    }
+class tool_totara_sync_elements_testcase extends advanced_testcase {
 
     /**
      * Test elements path validation and canonization
@@ -46,6 +34,10 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
      * For best coverage must be run in both Unix and Windows environments
      */
     public function test_elements_path() {
+        global $CFG;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_org_csv.php');
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/admin/forms.php');
+
         $suffix = '/test/csv';
         $suffixos = str_replace('/', DIRECTORY_SEPARATOR, $suffix);
         $paths = array(__DIR__ => array(__DIR__ . $suffixos, true),
@@ -58,7 +50,6 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
             $paths['c:\\pathmustnotexists'][1] = true;
         }
 
-        error_reporting(E_ALL & ~E_STRICT);
         $source = new totara_sync_source_org_csv();
         $form = new totara_sync_config_form();
         foreach ($paths as $path => $expected) {
@@ -75,9 +66,14 @@ class totara_sync_elements_test extends PHPUnit_Framework_TestCase {
      * Test that the user sync function inserts, updates and deletes the correct records.
      */
     public function test_user_sync() {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/user.php');
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_csv.php');
 
-        $generator = new testing_data_generator();
+        $this->resetAfterTest();
+        set_config('authdeleteusers', 'partial');
+
+        $generator = $this->getDataGenerator();
 
         // We run the tests twice, with sourceallrecords set to true or false.
         $key = 0;
