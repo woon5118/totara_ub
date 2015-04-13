@@ -3160,7 +3160,24 @@ function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason=''
     $result = facetoface_update_signup_status($signup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id, $cancelreason);
 
     if ($result) {
-        // notify cancelled
+        // Save cancellation note if cancellation note exists to keep the function working as before.
+        if (!empty($cancelreason)) {
+            $params = array('shortname' => 'cancellationnote', 'datatype' => 'text');
+            if ($cancelfieldid = $DB->get_field('facetoface_cancellation_info_field', 'id', $params)) {
+                $canceldataparams = array('fieldid' => $cancelfieldid, 'facetofacecancellationid' => $result);
+                if ($DB->record_exists('facetoface_cancellation_info_data', $canceldataparams)) {
+                    $DB->set_field('facetoface_cancellation_info_data', 'data', $cancelreason, $canceldataparams);
+                } else {
+                    $todb = new stdClass();
+                    $todb->data = $cancelreason;
+                    $todb->fieldid = $cancelfieldid;
+                    $todb->facetofacecancellationid = $result;
+                    $DB->insert_record('facetoface_cancellation_info_data', $todb);
+                }
+            }
+        }
+
+        // Notify cancelled.
         if (!$session = facetoface_get_session($sessionid)) {
             error_log('F2F: Could not load facetoface session');
             return false;
