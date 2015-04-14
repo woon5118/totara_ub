@@ -1395,6 +1395,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     $defaults['status'] = 1;
                     $defaults['ccmanager'] = 0;
 
+                    // Booking confirmation
                     $confirmation = new facetoface_notification($defaults, false);
                     $confirmation->title = $facetoface->confirmationsubject;
                     $confirmation->body = text_to_html($facetoface->confirmationmessage);
@@ -1405,12 +1406,14 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     }
                     $result = $result && $confirmation->save();
 
+                    // Waitlist confirmation.
                     $waitlist = new facetoface_notification($defaults, false);
                     $waitlist->title = $facetoface->waitlistedsubject;
                     $waitlist->body = text_to_html($facetoface->waitlistedmessage);
                     $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
                     $result = $result && $waitlist->save();
 
+                    // Booking cancellation.
                     $cancellation = new facetoface_notification($defaults, false);
                     $cancellation->title = $facetoface->cancellationsubject;
                     $cancellation->body = text_to_html($facetoface->cancellationmessage);
@@ -1421,6 +1424,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     }
                     $result = $result && $cancellation->save();
 
+                    // Booking reminder.
                     $reminder = new facetoface_notification($defaults, false);
                     $reminder->title = $facetoface->remindersubject;
                     $reminder->body = text_to_html($facetoface->remindermessage);
@@ -1433,17 +1437,55 @@ function xmldb_facetoface_upgrade($oldversion=0) {
                     }
                     $result = $result && $reminder->save();
 
-                    if (!empty($facetoface->approvalreqd)) {
-                        $request = new facetoface_notification($defaults, false);
-                        $request->title = $facetoface->requestsubject;
-                        $request->body = text_to_html($facetoface->requestmessage);
-                        $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
-                        if (!empty($facetoface->requestinstrmngr)) {
-                            $request->ccmanager = 1;
-                            $request->managerprefix = text_to_html($facetoface->requestinstrmngr);
-                        }
-                        $result = $result && $request->save();
+                    // Booking request.
+                    $request = new facetoface_notification($defaults, false);
+                    $request->title = $facetoface->requestsubject;
+                    $request->body = text_to_html($facetoface->requestmessage);
+                    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+                    if (!empty($facetoface->requestinstrmngr)) {
+                        $request->ccmanager = 1;
+                        $request->managerprefix = text_to_html($facetoface->requestinstrmngr);
                     }
+                    $result = $result && $request->save();
+
+                    //Add new notifications for 2.4
+
+                    // Date time changed.
+                    $datetimechange = new facetoface_notification($defaults, false);
+                    $datetimechange->title = get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface');
+                    $datetimechange->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
+                    $datetimechange->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
+                    $datetimechange->booked = 1;
+                    $datetimechange->waitlisted = 1;
+                    $result = $result && $datetimechange->save();
+
+                    // Booking declined.
+                    $decline = new facetoface_notification($defaults, false);
+                    $decline->title = get_string('setting:defaultdeclinesubjectdefault', 'facetoface');
+                    $decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+                    $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
+                    $result = $result && $decline->save();
+
+                    // Course session trainer cancellation.
+                    $sessiontrainercancel = new facetoface_notification($defaults, false);
+                    $sessiontrainercancel->title = get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface');
+                    $sessiontrainercancel->body = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault', 'facetoface'));
+                    $sessiontrainercancel->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
+                    $result = $result && $sessiontrainercancel->save();
+
+                    // Course session trainer unassigned.
+                    $sessiontrainerunassign = new facetoface_notification($defaults, false);
+                    $sessiontrainerunassign->title = get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface');
+                    $sessiontrainerunassign->body = text_to_html(get_string('setting:defaulttrainersessionunassignedmessagedefault', 'facetoface'));
+                    $sessiontrainerunassign->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
+                    $result = $result && $sessiontrainerunassign->save();
+
+                    // Course trainer confirmation.
+                    $trainerconfirm = new facetoface_notification($defaults, false);
+                    $trainerconfirm->title = get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface');
+                    $trainerconfirm->body = text_to_html(get_string('setting:defaulttrainerconfirmationmessagedefault', 'facetoface'));
+                    $trainerconfirm->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
+                    $result = $result && $trainerconfirm->save();
                 }
             }
 
