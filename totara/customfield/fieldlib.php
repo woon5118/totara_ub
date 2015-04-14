@@ -199,6 +199,18 @@ class customfield_base {
     }
 
     /**
+     * Does some extra pre-processing for totara sync uploads.
+     * Only required for custom fields with several options
+     * like menu of choices, and multi-select.
+     *
+     * @param  object $itemnew The item being saved
+     * @return object          The same item after processing
+     */
+    function sync_data_preprocess($itemnew) {
+        return $itemnew;
+    }
+
+    /**
      * Sets the required flag for the field in the form object
      * @param   object   instance of the moodleform class
      */
@@ -469,7 +481,15 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
     return $err;
 }
 
-function customfield_save_data($itemnew, $prefix, $tableprefix) {
+/**
+ * Process the data for a custom field and save it to the appropriate database table.
+ *
+ * @param object  $itemnew      The data we are saving
+ * @param string  $prefix       The custom field prefix (organisation, position, etc)
+ * @param string  $tableprefix  The table prefix (org_type, pos_type, etc)
+ * @param boolean $sync         Whether this is being called from sync and needs pre-preprocessing.
+ */
+function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false) {
     global $CFG, $DB;
 
     $typestr = '';
@@ -485,6 +505,9 @@ function customfield_save_data($itemnew, $prefix, $tableprefix) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
         $newfield = 'customfield_'.$field->datatype;
         $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix);
+        if ($sync) {
+            $itemnew = $formfield->sync_data_preprocess($itemnew);
+        }
         $formfield->edit_save_data($itemnew, $prefix, $tableprefix);
     }
 }

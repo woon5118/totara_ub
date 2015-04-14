@@ -199,7 +199,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                 foreach ($customfields as $name=>$value) {
                     $hitem->{$name} = $value;
                 }
-                customfield_save_data($hitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type');
+                customfield_save_data($hitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);
             }
 
             $this->addlog(get_string('createdx', 'tool_totara_sync', "{$elname} {$hitem->idnumber}"), 'info', 'syncitem');
@@ -239,7 +239,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
                 foreach ($newcustomfields as $name=>$value) {
                     $newitem->{$name} = $value;
                 }
-                customfield_save_data($newitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type');
+                customfield_save_data($newitem, $this->hierarchy->prefix, $this->hierarchy->shortprefix.'_type', true);
             }
         }
 
