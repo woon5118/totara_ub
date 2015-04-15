@@ -130,6 +130,23 @@ class totara_program_generator extends component_generator_base {
     }
 
     /**
+     * Create a mock certification via the program generator + a few extra settings
+     *
+     * @param array $data Override default properties
+     * @return int        Program->id
+     */
+    public function create_certification($data = array()) {
+        $activeperiod = isset($data['activeperiod']) ? $data['activeperiod'] : '1 year';
+        $windowperiod = isset($data['windowperiod']) ? $data['windowperiod'] : '1 month';
+        $recertifydatetype  = isset($data['recertifydatetype']) ? $data['recertifydatetype'] : CERTIFRECERT_EXPIRY;
+
+        $program = $this->create_program($data);
+        $this->create_certification_settings($program->id, $activeperiod, $windowperiod, $recertifydatetype);
+
+        return $program->id;
+    }
+
+    /**
      * Create mock program
      *
      * @param array $data Override default properties

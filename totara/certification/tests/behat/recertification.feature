@@ -64,8 +64,7 @@ Feature: User recertification and expiry of certification
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Test Certification"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -91,8 +90,7 @@ Feature: User recertification and expiry of certification
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Test Certification"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -118,8 +116,7 @@ Feature: User recertification and expiry of certification
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Test Certification"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -147,8 +144,7 @@ Feature: User recertification and expiry of certification
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Test Certification"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
@@ -174,8 +170,7 @@ Feature: User recertification and expiry of certification
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     And I focus on "My Learning" "link"
-    And I follow "Required Learning"
-    Then I should not see "Test Certification"
+    Then I should not see "Required Learning"
 
     When I focus on "My Learning" "link"
     And I follow "Record of Learning"
