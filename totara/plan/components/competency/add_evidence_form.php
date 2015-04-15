@@ -114,7 +114,9 @@ class totara_competency_evidence_form extends moodleform {
         $mform->addRule('userid', null, 'numeric');
         $mform->setType('userid', PARAM_INT);
         $mform->addElement('hidden', 'id', $id);
+        $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'evidenceid', $evidenceid);
+        $mform->setType('evidenceid', PARAM_INT);
         $mform->addElement('hidden', 'returnurl', $returnurl);
         $mform->setType('returnurl', PARAM_LOCALURL);
 
@@ -147,18 +149,24 @@ class totara_competency_evidence_form extends moodleform {
         $mform->addRule('competencyid',null,'numeric');
 
         if ($assessorroleid = $CFG->assessorroleid) {
-            $sql = "SELECT DISTINCT u.id, " . $DB->sql_fullname('u.firstname','u.lastname') . " AS name
+            $sql = "SELECT DISTINCT u.id, " . get_all_user_name_fields(true, 'u') . "
                 FROM {role_assignments} ra
                 JOIN {user} u ON ra.userid = u.id
                 WHERE roleid = ?
-                ORDER BY " . $DB->sql_fullname('u.firstname','u.lastname');
+                ORDER BY firstname, lastname";
             $params = array($assessorroleid);
+            $result = $DB->get_records_sql($sql, $params);
 
-            $selectoptions = $DB->get_records_sql_menu($sql, $params);
+            $selectoptions = array ();
+
+            foreach($result as $assessor) {
+                $selectoptions[$assessor->id] = fullname($assessor);
+            }
         } else {
             // no assessor role
             $selectoptions = false;
         }
+
         if ($selectoptions) {
             $selector = array(0 => get_string('selectanassessor', 'totara_core'));
             $mform->addElement('select', 'assessorid', get_string('assessor', 'totara_core'), $selector + $selectoptions);
