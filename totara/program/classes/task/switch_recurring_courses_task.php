@@ -103,8 +103,10 @@ class switch_recurring_courses_task extends \core\task\scheduled_task {
                                 FROM {prog_completion}
                                 WHERE programid = ?
                                 AND coursesetid = ?) pc
-                            JOIN {user} u
-                            ON pc.id = u.id";
+                            JOIN {user} u ON pc.id = u.id
+                            WHERE u.username <> 'guest'
+                            AND u.deleted = 0
+                            AND u.confirmed = 1";
 
                     // Get all the users matching the query.
                     $users = $DB->get_records_sql($sql, array($program->id, 0));
