@@ -27,6 +27,7 @@
  */
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) .'/config.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
+require_once($CFG->dirroot . '/enrol/cohort/locallib.php');
 
 // this could take a while
 core_php_time_limit::raise(0);
@@ -42,9 +43,17 @@ $cohortid = required_param('cohortid', PARAM_INT);
 $updateids = optional_param('u', 0, PARAM_SEQUENCE);
 $value = optional_param('v', COHORT_ASSN_VALUE_ENROLLED, PARAM_INT);
 
+// List of courses where we need to resync enrolments.
+$courseids = array();
+
 if (!empty($updateids)) {
     $updateids = explode(',', $updateids);
     foreach ($updateids as $instanceid) {
+        if ($type == COHORT_ASSN_ITEMTYPE_COURSE) {
+            if ($course = $DB->get_record('course', array('id' => $instanceid), 'id')) {
+                $courseids[$course->id] = $course->id;
+            }
+        }
         totara_cohort_add_association($cohortid, $instanceid, $type, $value);
     }
 }
@@ -52,6 +61,15 @@ if (!empty($updateids)) {
 $delid = optional_param('d', 0, PARAM_INT);
 if (!empty($delid)) {
     if (!empty($type) && !empty($delid)) {
+        if ($type == COHORT_ASSN_ITEMTYPE_COURSE) {
+            if ($enrolinstance = $DB->get_record('enrol', array('id' => $delid), 'id, courseid')) {
+                $courseids[$enrolinstance->courseid] = $enrolinstance->courseid;
+            }
+        }
         totara_cohort_delete_association($cohortid, $delid, $type, $value);
     }
+}
+
+foreach ($courseids as $courseid) {
+    enrol_cohort_sync(new null_progress_trace(), $courseid);
 }
