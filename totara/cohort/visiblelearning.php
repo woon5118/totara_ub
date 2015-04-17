@@ -71,7 +71,9 @@ if($format != '') {
 local_js(array(TOTARA_JS_DIALOG, TOTARA_JS_TREEVIEW));
 
 $PAGE->requires->strings_for_js(array('none'), 'moodle');
-$PAGE->requires->strings_for_js(array('deletelearningconfirm', 'savinglearning'), 'totara_cohort');
+$PAGE->requires->strings_for_js(array('assignvisiblelearningcourse', 'assignvisiblelearningprogram',
+                                      'assignvisiblelearningcertification', 'deletelearningconfirm', 'savinglearning'),
+                                      'totara_cohort');
 $jsmodule = array(
         'name' => 'totara_cohortlearning',
         'fullpath' => '/totara/cohort/dialog/learningitem.js',

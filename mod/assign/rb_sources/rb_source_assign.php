@@ -221,7 +221,13 @@ class rb_source_assign extends rb_base_source {
                 'maxgrade',
                 get_string('maxgrade', 'rb_source_assign'),
                 'grade_grades.rawgrademax',
-                array('displayfunc' => 'maxgrade', 'joins' => 'grade_grades')
+                array(
+                    'displayfunc' => 'maxgrade',
+                    'joins' => 'grade_grades',
+                    'extrafields' => array(
+                        'scale_values' => 'scale.scale'
+                    )
+                )
             ),
 
             // Min grade.
@@ -230,7 +236,13 @@ class rb_source_assign extends rb_base_source {
                 'mingrade',
                 get_string('mingrade', 'rb_source_assign'),
                 'grade_grades.rawgrademin',
-                array('displayfunc' => 'mingrade', 'joins' => 'grade_grades')
+                array(
+                    'displayfunc' => 'mingrade',
+                    'joins' => 'grade_grades',
+                    'extrafields' => array(
+                        'scale_values' => 'scale.scale'
+                    )
+                )
             )
         );
 
@@ -369,13 +381,13 @@ class rb_source_assign extends rb_base_source {
      * @param boolean $isexport
      */
     public function rb_display_scalevalues($field, $record, $isexport) {
-        // if there's no scale values, return an empty string
-        if (empty($record->scale_values)) {
+        // If there's no scale values, return an empty string.
+        if (empty($field)) {
             return '';
         }
 
-        // if there are scale values, format them nicely
-        $v = explode(',', $record->scale_values);
+        // If there are scale values, format them nicely.
+        $v = explode(',', $field);
         $v = implode(', ', $v);
         return $v;
     }
@@ -388,7 +400,8 @@ class rb_source_assign extends rb_base_source {
      */
     public function rb_display_submissiongrade($field, $record, $isexport) {
         // If there's no grade (yet), then return a string saying so.
-        if ($field == -1) {
+        // If $field is 0, it is may be $mingrade or $grade.
+        if ((integer)$field < 0 || empty($field)) {
             return get_string('nograde', 'rb_source_assign');
         }
 

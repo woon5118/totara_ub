@@ -232,7 +232,7 @@ abstract class rb_base_source {
         global $OUTPUT;
 
         // Serialize the data so that it can be passed as a single value.
-        $paramstring = http_build_query($params);
+        $paramstring = http_build_query($params, '', '&');
 
         $class_link = 'rb-display-expand-link ';
         if (array_key_exists('class', $attributes)) {
