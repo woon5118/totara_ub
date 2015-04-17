@@ -1673,26 +1673,6 @@ class global_navigation extends navigation_node {
             $sqlwhere .= " OR cc.parent {$select}{$basecategorysql})";
         }
 
-        // Take into account the visibility of courses.
-        list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
-        // Show categories if there are courses visible for the current user.
-        $sqlwhere .= " AND (EXISTS (
-                       SELECT 1
-                         FROM {course} c
-                   INNER JOIN {context} ctx
-                           ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
-                        WHERE c.category = cc.id
-                          AND {$visibilitysql}
-                       ) OR
-                        NOT EXISTS (
-                       SELECT 1
-                         FROM {course} c
-                        WHERE c.category = cc.id
-                        ))";
-        // Add visibility params.
-        $visibilityparams = array_merge(array('contextlevel' => CONTEXT_COURSE), $visibilityparams);
-        $params = array_merge($params, $visibilityparams);
-
         $categoriesrs = $DB->get_recordset_sql("$sqlselect $sqlwhere $sqlorder", $params);
         $categories = array();
         foreach ($categoriesrs as $category) {
@@ -2965,30 +2945,14 @@ class global_navigation_for_ajax extends global_navigation {
             $limit = (int)$CFG->navcourselimit;
         }
 
-        // Take into account the visibility of courses inside this particular category.
-        list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
-
         $catcontextsql = context_helper::get_preload_record_columns_sql('ctx');
         $sql = "SELECT cc.*, $catcontextsql
                   FROM {course_categories} cc
                   JOIN {context} ctx ON cc.id = ctx.instanceid
-                 WHERE ctx.contextlevel = ".CONTEXT_COURSECAT." AND
-                       (cc.id = :categoryid1 OR cc.parent = :categoryid2) AND
-                       (EXISTS (
-                       SELECT 1
-                         FROM {course} c
-                   INNER JOIN {context} ctx
-                           ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
-                        WHERE c.category = cc.id
-                        AND {$visibilitysql}) OR
-                        NOT EXISTS (
-                       SELECT 1
-                         FROM {course} c
-                        WHERE c.category = cc.id)
-                    )
+                 WHERE ctx.contextlevel = ".CONTEXT_COURSECAT."
+                   AND (cc.id = :categoryid1 OR cc.parent = :categoryid2)
               ORDER BY cc.depth ASC, cc.sortorder ASC, cc.id ASC";
         $params = array('categoryid1' => $categoryid, 'categoryid2' => $categoryid);
-        $params = array_merge($params, array('contextlevel' => CONTEXT_COURSE), $visibilityparams);
         $categories = $DB->get_recordset_sql($sql, $params, 0, $limit);
         $categorylist = array();
         $subcategories = array();
@@ -3055,6 +3019,9 @@ class global_navigation_for_ajax extends global_navigation {
                     $this->add_category($category, $basecategory, $nodetype);
                 }
             }
+
+            // Take into account the visibility of courses inside this particular category.
+            list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
 
             // Get courses based on the categoryid.
             $sql = "SELECT c.*
