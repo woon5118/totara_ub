@@ -47,15 +47,18 @@ class totara_sync_element_user extends totara_sync_element {
     function set_customfieldsdb() {
         global $DB;
 
-        $rs = $DB->get_recordset('user_info_field', array(), '', 'id,shortname,datatype,required,locked,forceunique,param1');
+        $rs = $DB->get_recordset('user_info_field', array(), '', 'id,shortname,datatype,required,defaultdata,locked,forceunique,param1');
         if ($rs->valid()) {
             foreach ($rs as $r) {
                 $this->customfieldsdb['customfield_'.$r->shortname]['id'] = $r->id;
                 $this->customfieldsdb['customfield_'.$r->shortname]['required'] = $r->required;
                 $this->customfieldsdb['customfield_'.$r->shortname]['forceunique'] = $r->forceunique;
+                $this->customfieldsdb['customfield_'.$r->shortname]['default'] = $r->defaultdata;
 
                 if ($r->datatype == 'menu') {
-                    $this->customfieldsdb['customfield_'.$r->shortname]['menu_options'] = array_map('strtolower', explode("\n", $r->param1));
+                    // Set all options to lower case to match values to options without case sensitivity.
+                    $options = explode("\n", core_text::strtolower($r->param1));
+                    $this->customfieldsdb['customfield_'.$r->shortname]['menu_options'] = $options;
                 }
             }
         }
@@ -546,11 +549,15 @@ class totara_sync_element_user extends totara_sync_element {
         if ($customfields) {
             require_once($CFG->dirroot.'/user/profile/lib.php');
             foreach ($customfields as $name => $value) {
+                if ($value === null) {
+                    continue; // Don't make empty records, it messes with defaults.
+                }
+
                 $profile = str_replace('customfield_', 'profile_field_', $name);
-                // If the custom field is a menu, we need to use the option index rather than the value.
-                $user->{$profile} = (isset($this->customfieldsdb[$name]['menu_options'])) ? array_search(strtolower($value), $this->customfieldsdb[$name]['menu_options']) : $value;
+                // If the custom field is a menu, the option index will be set by function totara_sync_data_preprocess.
+                $user->{$profile} = $value;
             }
-            profile_save_data($user);
+            profile_save_data($user, true);
         }
 
         return $user;
@@ -941,6 +948,9 @@ class totara_sync_element_user extends totara_sync_element {
         $invalidids = array();
         $rs = $DB->get_recordset($synctable, $params, '', 'id, idnumber, customfields');
 
+        // Used to force a warning on the sync completion message without skipping users.
+        $forcewarning = false;
+
         // Keep track of the fields that need to be tested for having unique values.
         $unique_fields = array ();
 
@@ -950,18 +960,19 @@ class totara_sync_element_user extends totara_sync_element {
                 foreach ($customfields as $name => $value) {
                     // Check each of the fields that have attributes that may affect
                     // whether the sync data will be accepted or not.
-                    if ($this->customfieldsdb[$name]['required'] && trim($value) == '') {
-                        $this->addlog(get_string('fieldrequired', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'fieldname' => $name)), 'error', 'checksanity');
-                        $invalidids[] = intval($r->id);
-                        break;
-                    } else if (isset($this->customfieldsdb[$name]['menu_options'])) {
-                        // Check menu value matches one of the available options.
-                        if (!in_array(strtolower($value), $this->customfieldsdb[$name]['menu_options'])) {
-                            $this->addlog(get_string('optionxnotexist', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'option' => $value, 'fieldname' => $name)), 'error', 'checksanity');
-                            $invalidids[] = intval($r->id);
-                            break;
+                    if ($this->customfieldsdb[$name]['required'] && trim($value) == '' && empty($this->customfieldsdb[$name]['default'])) {
+                        $this->addlog(get_string('fieldrequired', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'fieldname' => $name)), 'warn', 'checksanity');
+                        $forcewarning = true;
+                    }
+
+                    if (isset($this->customfieldsdb[$name]['menu_options'])) {
+                        if (trim($value) != '' && !in_array(core_text::strtolower($value), $this->customfieldsdb[$name]['menu_options'])) {
+                            // Check menu value matches one of the available options, add an warning to the log if not.
+                            $this->addlog(get_string('optionxnotexist', 'tool_totara_sync', (object)array('idnumber' => $r->idnumber, 'option' => $value, 'fieldname' => $name)), 'warn', 'checksanity');
+                            $forcewarning = true;
                         }
                     } else if ($this->customfieldsdb[$name]['forceunique']) {
+                        // Note: Skipping this for menu custom fields as the UI does not enforce uniqueness for them.
 
                         $sql = "SELECT uid.data
                                   FROM {user} usr
@@ -1020,6 +1031,11 @@ class totara_sync_element_user extends totara_sync_element {
                 $this->addlog(get_string('fieldmustbeunique', 'tool_totara_sync', $log_data), 'error', 'checksanity');
             }
             $invalidids = array_merge ($invalidids, $error_ids);
+        }
+
+        if ($forcewarning) {
+            // Put a dummy record in here to flag a problem without skipping the user.
+            $invalidids[] = 0;
         }
 
         $invalidids = array_unique($invalidids);

@@ -247,9 +247,9 @@ $string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Ski
 $string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
 $string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';
 $string['selfassignedappraiserx'] = 'User {$a->idnumber} cannot be their own appraiser. Skipped user {$a->idnumber}';
-$string['optionxnotexist'] = 'Option \'{$a->option}\' does not exist for {$a->fieldname} field. Skipped user {$a->idnumber}';
-$string['fieldrequired'] = '{$a->fieldname} is a required field and must have a value. Skipped user {$a->idnumber}';
-$string['fieldduplicated'] = 'The value \'{$a->value}\' for {$a->fieldname} is a dupliicate of existing data and must be unique. Skipped user {$a->idnumber}';
+$string['optionxnotexist'] = 'Option \'{$a->option}\' does not exist for {$a->fieldname} field. Please check user {$a->idnumber}';
+$string['fieldrequired'] = '{$a->fieldname} is a required field and must have a value. Please check user {$a->idnumber}';
+$string['fieldduplicated'] = 'The value \'{$a->value}\' for {$a->fieldname} is a duplicate of existing data and must be unique. Skipped user {$a->idnumber}';
 $string['fieldmustbeunique'] = 'The value \'{$a->value}\' for {$a->fieldname} is duplicated in the uploaded data and must be unique. Skipped user {$a->idnumber}';
 $string['nosourceconfigured'] = 'No source configured, please set configuration <a href=\'{$a}\'>here</a>';
 $string['duplicateuserswithidnumberx'] = 'Duplicate users with idnumber {$a->idnumber}. Skipped user {$a->idnumber}';

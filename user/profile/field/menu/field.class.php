@@ -55,19 +55,23 @@ class profile_field_menu extends profile_field_base {
             $options = array();
         }
         $this->options = array();
-        if (!empty($this->field->required)) {
-            $this->options[''] = get_string('choose').'...';
-        }
+
+        // TOTARA - changed to always use choosedots as it never makes sense to blindly save the first value.
+        $this->options[''] = get_string('choosedots');
         foreach ($options as $key => $option) {
-            $this->options[$option] = format_string($option); // Multilang formatting with filters.
+            $this->options[$key] = format_string($option); // Multilang formatting.
         }
 
-        // Set the data key.
+        // TODO: TL-7042 decide if we want MDL-43205 in Totara 2.9.0
+
+        /// Set the data key.
+        $this->datakey = '';
         if ($this->data !== null) {
-            $key = $this->data;
-            if (isset($this->options[$key]) || ($key = array_search($key, $this->options)) !== false) {
-                $this->data = $key;
-                $this->datakey = $key;
+            // Returns false if no match found, so we can't just
+            // cast to an integer.
+            $match = array_search($this->data, $this->options);
+            if ($match !== false) {
+                $this->datakey = (int)$match;
             }
         }
     }
@@ -87,13 +91,45 @@ class profile_field_menu extends profile_field_base {
      * @param moodleform $mform Moodle form instance
      */
     public function edit_field_set_default($mform) {
-        $key = $this->field->defaultdata;
-        if (isset($this->options[$key]) || ($key = array_search($key, $this->options)) !== false){
-            $defaultkey = $key;
+        if (false !== array_search($this->field->defaultdata, $this->options)) {
+            $defaultkey = (int)array_search($this->field->defaultdata, $this->options);
         } else {
             $defaultkey = '';
         }
         $mform->setDefault($this->inputname, $defaultkey);
+    }
+
+    /**
+     * Totara-specific function.
+     * Changes the customfield value from a string to the key that matches
+     * the string in the array of options.
+     *
+     * @param  stdClass $itemnew    The original sync record to be processed, an incomplete user record.
+     * @return stdClass             The same $itemnew record after processing the customfield.
+     */
+    public function totara_sync_data_preprocess($itemnew) {
+        // Get the sync value out of the item.
+        $fieldname = $this->inputname;
+
+        if (isset($itemnew->$fieldname)) {
+            $value = $itemnew->$fieldname;
+        } else {
+            // No point preprocessing a non-existant value.
+            return $itemnew;
+        }
+
+        // Now get the corresponding option for that value.
+        $selected = null;
+        foreach ($this->options as $key => $option) {
+            // Totara Sync matches with case insensitivity, do the same in sync preprocess for consistency.
+            if (core_text::strtolower($option) === core_text::strtolower($value)) {
+                $selected = $key;
+                break;
+            }
+        }
+
+        $itemnew->$fieldname = $selected;
+        return $itemnew;
     }
 
     /**
@@ -107,7 +143,7 @@ class profile_field_menu extends profile_field_base {
      * @return mixed Data or null
      */
     public function edit_save_data_preprocess($data, $datarecord) {
-        return isset($this->options[$data]) ? $data : null;
+        return (isset($this->options[$data]) && $data !== '') ? $this->options[$data] : '';
     }
 
     /**
@@ -132,7 +168,7 @@ class profile_field_menu extends profile_field_base {
         }
         if ($this->is_locked() and !has_capability('moodle/user:update', context_system::instance())) {
             $mform->hardFreeze($this->inputname);
-            $mform->setConstant($this->inputname, format_string($this->datakey));
+            $mform->setConstant($this->inputname, $this->datakey);
         }
     }
     /**
@@ -142,11 +178,7 @@ class profile_field_menu extends profile_field_base {
      * @return int options key for the menu
      */
     public function convert_external_data($value) {
-        if (isset($this->options[$value])) {
-            $retval = $value;
-        } else {
-            $retval = array_search($value, $this->options);
-        }
+        $retval = array_search($value, $this->options);
 
         // If value is not found in options then return null, so that it can be handled
         // later by edit_save_data_preprocess.

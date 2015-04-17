@@ -204,6 +204,26 @@ class profile_field_base {
     }
 
     /**
+     * Totara-specific function.
+     * Does some extra pre-processing for totara sync uploads.
+     * Only required for custom fields with several options
+     * like menu of choices
+     *
+     * @param  stdClass $itemnew    The original syncitem to be processed, an incomplete user record from sync.
+     * @return stdClass             The same $itemnew record after processing the customfield.
+     */
+    public function totara_sync_data_preprocess($itemnew) {
+        $fieldname = $this->inputname;
+
+        // Consistently ignore empty strings for sync.
+        if (property_exists($itemnew, $fieldname) && $itemnew->$fieldname === '') {
+            unset($itemnew->$fieldname);
+        }
+
+        return $itemnew;
+    }
+
+    /**
      * Sets the required flag for the field in the form object
      *
      * @param moodleform $mform instance of the moodleform class
@@ -564,8 +584,9 @@ function profile_display_hierarchy_fields($userid) {
 /**
  * Saves profile data for a user.
  * @param stdClass $usernew
+ * @param boolean $sync     Totara - Whether this is being called from sync and needs pre-preprocessing.
  */
-function profile_save_data($usernew) {
+function profile_save_data($usernew, $sync = false) {
     global $CFG, $DB;
 
     if ($fields = $DB->get_records('user_info_field')) {
@@ -573,6 +594,9 @@ function profile_save_data($usernew) {
             require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
             $newfield = 'profile_field_'.$field->datatype;
             $formfield = new $newfield($field->id, $usernew->id);
+            if ($sync) {
+                $usernew = $formfield->totara_sync_data_preprocess($usernew);
+            }
             $formfield->edit_save_data($usernew);
         }
     }
