@@ -134,8 +134,16 @@ class rb_source_site_logstore extends rb_base_source {
                 'component',
                 get_string('component', 'rb_source_site_logstore'),
                 'base.component',
-                array('dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                array('displayfunc' => 'component',
+                      'extrafields' => $eventextrafields)
+            ),
+            new rb_column_option(
+                'logstore_standard_log',
+                'context',
+                get_string('context', 'rb_source_site_logstore'),
+                'base.contextid',
+                array('displayfunc' => 'context',
+                      'extrafields' => $eventextrafields)
             ),
             new rb_column_option(
                 'logstore_standard_log',
@@ -203,6 +211,15 @@ class rb_source_site_logstore extends rb_base_source {
             ),
             new rb_column_option(
                 'logstore_standard_log',
+                'namelink',
+                get_string('namelink', 'rb_source_site_logstore'),
+                'base.id',
+                array('displayfunc' => 'name_link',
+                      'extrafields' => $eventextrafields
+                     )
+            ),
+            new rb_column_option(
+                'logstore_standard_log',
                 'description',
                 get_string('description', 'moodle'),
                 'base.id',
@@ -235,6 +252,15 @@ class rb_source_site_logstore extends rb_base_source {
                 get_string('action', 'rb_source_site_logstore'),
                 'text',
                 array()
+            ),
+            new rb_filter_option(
+                'logstore_standard_log',
+                'eventname',
+                get_string('name', 'rb_source_site_logstore'),
+                'select',
+                array(
+                    'selectfunc' => 'event_names_list',
+                )
             ),
             new rb_filter_option(
                 'logstore_standard_log',
@@ -364,7 +390,11 @@ class rb_source_site_logstore extends rb_base_source {
             ),
             array(
                 'type' => 'logstore_standard_log',
-                'value' => 'targetaction',
+                'value' => 'eventname',
+            ),
+            array(
+                'type' => 'logstore_standard_log',
+                'value' => 'action',
                 'advanced' => 1,
             ),
             array(
@@ -420,12 +450,6 @@ class rb_source_site_logstore extends rb_base_source {
             'base'
         );
     }
-
-    //
-    //
-    // Source specific column display methods.
-    //
-    //
 
     /**
      * Display serialized info in preformated view.
@@ -499,17 +523,29 @@ class rb_source_site_logstore extends rb_base_source {
         }
         return get_string('unrecognized', 'rb_source_site_logstore', $crud);
     }
+
     /**
-     * Displays CRUD verbs.
+     * Displays event name
      * @param string $id
      * @param stdClass $row
      * @return string
      */
     public function rb_display_name($id, $row) {
-        $eventdata = (array)$row;
-        $event = \core\event\base::restore($eventdata, array());
+        $event = \core\event\base::restore((array)$row, array());
         return $event->get_name();
     }
+
+    /**
+     * Displays event name as link to event
+     * @param string $id
+     * @param stdClass $row
+     * @return string
+     */
+    public function rb_display_name_link($id, $row) {
+        $event = \core\event\base::restore((array)$row, array());
+        return html_writer::link($event->get_url(), $event->get_name());
+    }
+
     /**
      * Displays event description.
      * @param string $id
@@ -521,6 +557,97 @@ class rb_source_site_logstore extends rb_base_source {
         $eventdata['other'] = unserialize($eventdata['other']);
         $event = \core\event\base::restore($eventdata, array());
         return $event->get_description();
+    }
+
+    /**
+     * Generate the context column.
+     * @param string $id
+     * @param stdClass $row
+     * @return string
+     */
+    public function rb_display_context($id, $row) {
+        $event = \core\event\base::restore((array)$row, array());
+        // Code used from report/log/classes/table_log.php:col_context.
+        // Add context name.
+        if ($event->contextid) {
+            // If context name was fetched before then return, else get one.
+            if (isset($this->contextname[$event->contextid])) {
+                return $this->contextname[$event->contextid];
+            } else {
+                $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
+                if ($context) {
+                    $contextname = $context->get_context_name(true);
+                    if (empty($this->download) && $url = $context->get_url()) {
+                        $contextname = html_writer::link($url, $contextname);
+                    }
+                } else {
+                    $contextname = get_string('other');
+                }
+            }
+        } else {
+            $contextname = get_string('other');
+        }
+
+        $this->contextname[$event->contextid] = $contextname;
+        return $contextname;
+    }
+
+    /**
+     * Generate the component localised name.
+     * @param string $componentname
+     * @return string
+     */
+    protected function get_component_str($componentname) {
+        // Code used from report/log/classes/table_log.php:col_component.
+        if (($componentname === 'core') || ($componentname === 'legacy')) {
+            return  get_string('coresystem');
+        } else if (get_string_manager()->string_exists('pluginname', $componentname)) {
+            return get_string('pluginname', $componentname);
+        } else {
+            return $componentname;
+        }
+    }
+
+    /**
+     * Generate the component column.
+     * @param string $desc
+     * @param stdClass $row
+     * @return string
+     */
+    public function rb_display_component($desc, $row) {
+        return $this->get_component_str($row->component);
+    }
+
+    /**
+     * Get list of event names
+     * @return array
+     */
+    function rb_filter_event_names_list() {
+        global $DB;
+
+        $completelist = $DB->get_recordset_sql("SELECT DISTINCT(eventname) FROM $this->base");
+
+        if (empty($completelist)) {
+            return array("" => get_string("nofilteroptions", "totara_reportbuilder"));
+        }
+
+        $events = array();
+        foreach ($completelist as $eventfullpath => $eventname) {
+            if (method_exists($eventfullpath, 'get_static_info')) {
+                $ref = new \ReflectionClass($eventfullpath);
+                if (!$ref->isAbstract()) {
+                    // Get additional information.
+                    $strdata = new stdClass();
+                    $strdata->eventfullpath = $eventfullpath;
+                    $strdata->eventname = $eventfullpath::get_name();
+                    // Add to list.
+                    $events[$eventfullpath] = get_string('eventandcomponent', 'rb_source_site_logstore', $strdata);
+                }
+            }
+        }
+        uasort($events, 'strcoll');
+
+        return $events;
     }
 }
 

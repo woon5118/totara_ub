@@ -25,8 +25,11 @@ $string['sourcetitle'] = 'Site Logs';
 // Columns.
 $string['action'] = 'Action';
 $string['component'] = 'Component';
+$string['context'] = 'Context';
+$string['eventandcomponent'] = '{$a->eventname} ({$a->eventfullpath})';
 $string['eventclass'] = 'Event Class Name';
 $string['name'] = 'Event Name';
+$string['namelink'] = 'Event Name (linked to event source)';
 $string['ip'] = 'IP address';
 $string['origin'] = 'Origin';
 $string['other'] = 'Other info';

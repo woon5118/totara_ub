@@ -98,6 +98,7 @@ $string['editfield'] = 'Editing custom field: {$a}';
 $string['endyear'] = 'End year';
 $string['error:abstractmethod'] = 'This abstract method must be overriden';
 $string['error:updatecustomfield'] = 'Error updating custom field!';
+$string['eventdeleted'] = 'Customfield deleted';
 $string['fieldcolumns'] = 'Columns';
 $string['fieldispassword'] = 'Is this a password field?';
 $string['fieldmaxlength'] = 'Maximum length';
