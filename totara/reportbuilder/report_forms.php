@@ -1201,7 +1201,6 @@ class report_builder_standard_search_form extends moodleform {
             }
 
             $submitgroup = array();
-            $submitgroup[] =& $mform->createElement('html', '&nbsp;', html_writer::empty_tag('br'));
             $submitgroup[] =& $mform->createElement('submit', 'addfilter',
                     get_string('search', 'totara_reportbuilder'));
             $submitgroup[] =& $mform->createElement('submit', 'clearstandardfilters',
@@ -1243,7 +1242,6 @@ class report_builder_sidebar_search_form extends moodleform {
             }
 
             $submitgroup = array();
-            $submitgroup[] =& $mform->createElement('html', '&nbsp;', html_writer::empty_tag('br'));
             $submitgroup[] =& $mform->createElement('submit', 'addfilter',
                     get_string('search', 'totara_reportbuilder'));
             $submitgroup[] =& $mform->createElement('submit', 'clearsidebarfilters',
