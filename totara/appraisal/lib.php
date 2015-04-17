@@ -759,7 +759,7 @@ class appraisal {
 
             // Find all users in roles that are not learner, who have a learner who is not finished.
             $rolesql = 'SELECT ara.userid AS id,
-                           ' . sql_group_concat($DB->sql_fullname('usr.firstname', 'usr.lastname')) . ' AS staff
+                           ' . sql_group_concat(sql_cast2char('usr.id'),',') . ' AS staff
                       FROM {appraisal_user_assignment} aua
                       JOIN {appraisal_role_assignment} ara
                         ON aua.id = ara.appraisaluserassignmentid
@@ -774,11 +774,40 @@ class appraisal {
             $roleparams = array('appraisalid' => $formdata->id, 'status' => self::STATUS_ACTIVE, 'roletype' => self::ROLE_LEARNER);
             $roleusers = $DB->get_records_sql($rolesql, $roleparams);
 
+            // Collect all distinct staff ids.
+            $staffids = array();
             foreach ($roleusers as $roleuser) {
-                $formdata->staff = $roleuser->staff;
+                $ids = explode(',', $roleuser->staff);
+                $staffids = array_merge($staffids, $ids);
+            }
+
+            // Get data from DB for staff names.
+            $userfieldssql = get_all_user_name_fields(true);
+            list($staffsql, $staffparams) = $DB->get_in_or_equal($staffids);
+            $staff = $DB->get_records_sql("SELECT id, {$userfieldssql} FROM {user} WHERE id {$staffsql}", $staffparams);
+
+            unset($staffids);
+
+            // Create array of staff names keyed by id.
+            $staffnames = array();
+            foreach ($staff as $staffmember) {
+                $staffnames[$staffmember->id] = fullname($staffmember);
+            }
+
+            foreach ($roleusers as $roleuser) {
+                $staff = explode(',', $roleuser->staff);
+
+                $affectedstaff = array();
+                foreach ($staff as $staffmember) {
+                    $affectedstaff[] = $staffnames[$staffmember];
+                }
+
+                $formdata->staff = implode(', ', $affectedstaff);
                 $alert->fullmessage = get_string('closealertadminbody', 'totara_appraisal', $formdata);
+
                 $alert->fullmessagehtml = $alert->fullmessage;
-                $alert->userto = $roleuser;
+                // Get full user record for message.
+                $alert->userto = core_user::get_user($roleuser->id);
                 tm_alert_send($alert);
             }
         }
