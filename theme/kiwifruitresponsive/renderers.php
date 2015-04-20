@@ -87,12 +87,14 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
         $attrs = array(
             'class' => 'btn btn-navbar',
             'data-toggle' => 'collapse',
-            'data-target' => '.nav-collapse, .langmenu'
+            'data-target' => '.nav-collapse, .langmenu',
+            'href' => '#'
         );
         $output = html_writer::start_tag('a', $attrs);
         $output .= html_writer::tag('span', '', array('class' => 'icon-bar')); // Chrome doesn't like self closing spans.
         $output .= html_writer::tag('span', '', array('class' => 'icon-bar'));
         $output .= html_writer::tag('span', '', array('class' => 'icon-bar'));
+        $output .= html_writer::tag('span', get_string('expand'), array('class' => 'accesshide'));
         $output .= html_writer::end_tag('a');
 
         return $output;
