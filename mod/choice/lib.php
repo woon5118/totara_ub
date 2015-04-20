@@ -104,7 +104,7 @@ function choice_user_complete($course, $user, $mod, $choice) {
  * @param int $userid
  * @param int $courseid
  */
-function choice_archive_completion($userid, $courseid) {
+function choice_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB;
 
     $sql = "SELECT ca.id AS answerid,

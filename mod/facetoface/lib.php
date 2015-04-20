@@ -157,13 +157,30 @@ function facetoface_get_status($statuscode) {
  *   value depends on comparison type)
  */
 function facetoface_get_completion_state($course, $cm, $userid, $type) {
-    global $DB;
+    global $CFG, $DB;
+
+    require_once($CFG->libdir . '/completionlib.php');
 
     $result = $type;
 
     // Get face to face.
-    if (!$facetoface = $DB->get_record('facetoface', array('id' => $cm->instance))) {
+    $sql = "SELECT f.*, cm.completion, cm.completionview
+              FROM {facetoface} f
+        INNER JOIN {course_modules} cm
+                ON cm.instance = f.id
+               AND cm.course = f.course
+        INNER JOIN {modules} m
+                ON m.id = cm.module
+             WHERE m.name='facetoface'
+               AND f.id = :fid";
+    $params = array('fid' => $cm->instance);
+    if (!$facetoface = $DB->get_record_sql($sql, $params)) {
         print_error('cannotfindfacetoface');
+    }
+
+    // If the module is set to manual completion or completion on view we don't need to do anything.
+    if ($facetoface->completion == COMPLETION_TRACKING_MANUAL || $facetoface->completionview) {
+        return $result;
     }
 
     // Only check for existence of tracks and return false if completionstatusrequired.
@@ -192,8 +209,20 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
             return completion_info::aggregate_completion_states($type, $result, true);
         }
         return completion_info::aggregate_completion_states($type, $result, false);
+    } else {
+        // At least check they have a valid signup.
+        $sql = "SELECT 1
+                  FROM {facetoface_signups} fs
+                  JOIN {facetoface_sessions} fss
+                    ON fs.sessionid = fss.id
+                 WHERE fs.userid = :uid
+                   AND fss.facetoface = :fid
+                   AND archived != 1";
+        $params = array('fid' => $facetoface->id, 'uid' => $userid);
+        $status = $DB->record_exists_sql($sql, $params);
+
+        return completion_info::aggregate_completion_states($type, $result, $status);
     }
-    return $result;
 }
 
 /**
@@ -5261,10 +5290,14 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
  * @param int $courseid
  * @return boolean
  */
-function facetoface_archive_completion($userid, $courseid) {
+function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
 
     require_once($CFG->libdir . '/completionlib.php');
+
+    if (!isset($windowopens)) {
+        $windowopens = time();
+    }
 
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
     $completion = new completion_info($course);
@@ -5280,7 +5313,7 @@ function facetoface_archive_completion($userid, $courseid) {
     $facetofaces = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid));
     foreach ($facetofaces as $facetoface) {
         // Add an archive flag.
-        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1, 'timenow' => time());
+        $params = array('facetofaceid' => $facetoface->id, 'userid' => $userid, 'archived' => 1, 'archived2' => 1, 'windowopens' => $windowopens);
         $sql = "UPDATE {facetoface_signups}
                 SET archived = :archived
                 WHERE userid = :userid
@@ -5291,7 +5324,7 @@ function facetoface_archive_completion($userid, $courseid) {
                             WHERE s.id = {facetoface_signups}.sessionid
                             AND s.facetoface = :facetofaceid
                             GROUP BY s.id
-                            HAVING MAX(sd.timefinish) < :timenow)";
+                            HAVING MAX(sd.timefinish) < :windowopens)";
         $DB->execute($sql, $params);
 
         // Reset the grades.
@@ -6189,3 +6222,64 @@ function facetoface_get_user_current_status($sessionid, $userid) {
 
 }
 
+/**
+ * Get a count of the number of spaces reserved by each manager
+ * for a given session.
+ *
+ * @param int $sessionid
+ *
+ * @return array Array of reservations
+ */
+function facetoface_get_session_reservations($sessionid) {
+    global $DB;
+
+    $userfields =  get_all_user_name_fields(true, 'u');
+
+    $reservation_sql = "SELECT bookedby, COUNT(fs.id) as reservedspaces, sessionid, {$userfields}
+        FROM {facetoface_signups} fs
+        JOIN {user} u ON fs.bookedby = u.id
+        WHERE bookedby != :bookedby
+        AND userid = :userid
+        AND sessionid = :sessionid
+        GROUP BY
+        bookedby, sessionid, {$userfields}";
+
+    $reservation_params = array('bookedby' => 0, 'userid' => 0, 'sessionid' => $sessionid);
+
+    $reservations = $DB->get_records_sql($reservation_sql, $reservation_params);
+
+    return $reservations;
+}
+
+/**
+ * Delete reservations for a given session and manager
+ *
+ * @param int $sessionid
+ * @param int $managerid
+ *
+ * @return bool True if dng of the reservations succeeded
+ */
+function facetoface_delete_reservations($sessionid, $managerid) {
+    global $DB;
+
+    $signups = $DB->get_records_sql('SELECT id FROM {facetoface_signups} WHERE userid = 0 AND sessionid = :sessionid AND bookedby = :managerid',
+        array('sessionid' => $sessionid, 'managerid' => $managerid));
+
+    $transaction = $DB->start_delegated_transaction();
+    $result = true;
+
+    if ($signups) {
+        list($signupwhere, $signupparams) = $DB->get_in_or_equal(array_keys($signups));
+        // Delete signup status records.
+        $result = $DB->delete_records_select('facetoface_signups_status', 'signupid ' . $signupwhere
+            , $signupparams);
+    }
+
+    // Delete signups.
+    $result = $result && $DB->delete_records('facetoface_signups',
+            array('userid' => 0, 'sessionid' => $sessionid, 'bookedby' => $managerid));
+
+    $transaction->allow_commit();
+
+    return $result;
+}

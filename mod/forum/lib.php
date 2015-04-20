@@ -8672,7 +8672,7 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
  * @param type $courseid
  * @return boolean
  */
-function forum_archive_completion($userid, $courseid) {
+function forum_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
 
     require_once($CFG->libdir . '/completionlib.php');

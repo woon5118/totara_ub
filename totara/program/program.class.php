@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/totara/program/program_message.class.php');
 require_once($CFG->dirroot . '/totara/program/program_exceptions.class.php');
 require_once($CFG->dirroot . '/totara/program/program_exception.class.php');
 require_once($CFG->dirroot . '/totara/program/program_user_assignment.class.php');
+require_once($CFG->dirroot . '/totara/program/lib.php');
 
 define('STATUS_PROGRAM_INCOMPLETE', 0);
 define('STATUS_PROGRAM_COMPLETE', 1);
