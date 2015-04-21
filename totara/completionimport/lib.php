@@ -1272,20 +1272,20 @@ function import_certification($importname, $importtime) {
     }
 
     // Copy the timeexpires of new/replaced certif_completion records to their matching prog_completion timedue.
-    $sql = "UPDATE {prog_completion} pc
+    $sql = "UPDATE {prog_completion}
                SET timedue = (SELECT cc.timeexpires
                                 FROM {certif_completion} cc
                                 JOIN {prog} prog
                                   ON prog.certifid = cc.certifid
-                               WHERE pc.programid = prog.id
-                                 AND pc.userid = cc.userid)
-             WHERE pc.coursesetid = 0
+                               WHERE {prog_completion}.programid = prog.id
+                                 AND {prog_completion}.userid = cc.userid)
+             WHERE coursesetid = 0
                AND EXISTS (SELECT 1
                              FROM {certif_completion} cc
                              JOIN {prog} prog
                                ON prog.certifid = cc.certifid
-                            WHERE pc.programid = prog.id
-                              AND pc.userid = cc.userid
+                            WHERE {prog_completion}.programid = prog.id
+                              AND {prog_completion}.userid = cc.userid
                               AND cc.timemodified = :now)";
     $DB->execute($sql, array('now' => $now));
 
