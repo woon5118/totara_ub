@@ -79,7 +79,7 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('selectyesno', 'ignoreexistingpass', get_string('ignoreexistingpass', 'tool_totara_sync'));
         $mform->addElement('static', 'ignoreexistingpassdesc', '', get_string('ignoreexistingpassdesc', 'tool_totara_sync'));
         $mform->addElement('selectyesno', 'forcepwchange', get_string('forcepwchange', 'tool_totara_sync'));
-        $mform->addElement('static', 'forcepwchangedesc', '', get_string('forcepwchange', 'tool_totara_sync'));
+        $mform->addElement('static', 'forcepwchangedesc', '', get_string('forcepwchangedesc', 'tool_totara_sync'));
 
         $mform->addElement('header', 'crudheading', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
@@ -331,18 +331,26 @@ class totara_sync_element_user extends totara_sync_element {
             foreach ($rsupdateaccounts as $suser) {
                 $user = $DB->get_record('user', array('id' => $suser->uid));
 
+                // Decide now if we'll try to update the password later.
+                $updatepassword = empty($this->config->ignoreexistingpass) &&
+                                  isset($suser->password) &&
+                                  trim($suser->password) !== '';
+
                 if (!empty($this->config->allow_create) && !empty($user->deleted)) {
                     // Revive previously-deleted user.
                     if (undelete_user($user)) {
                         $user->deleted = 0;
 
-                        // Tag the revived user for new password generation (if applicable).
-                        $userauth = get_auth_plugin(strtolower($user->auth));
-                        if ($userauth->can_change_password()) {
-                            set_user_preference('auth_forcepasswordchange', 1, $user->id);
-                            set_user_preference('create_password',          1, $user->id);
+                        if (!$updatepassword) {
+                            // If the password wasn't supplied in the sync then tag the revived
+                            // user for new password generation (if applicable).
+                            $userauth = get_auth_plugin(strtolower($user->auth));
+                            if ($userauth->can_change_password()) {
+                                set_user_preference('auth_forcepasswordchange', 1, $user->id);
+                                set_user_preference('create_password',          1, $user->id);
+                            }
+                            unset($userauth);
                         }
-                        unset($userauth);
 
                         $this->addlog(get_string('reviveduserx', 'tool_totara_sync', $suser->idnumber), 'info', 'updateusers');
                     } else {
@@ -378,7 +386,7 @@ class totara_sync_element_user extends totara_sync_element {
                 }
 
                 // Update user password.
-                if (empty($this->config->ignoreexistingpass) && isset($suser->password) && trim($suser->password) !== '') {
+                if ($updatepassword) {
                     $userauth = get_auth_plugin(strtolower($user->auth));
                     if ($userauth->can_change_password()) {
                         if (!$userauth->user_update_password($user, $suser->password)) {
