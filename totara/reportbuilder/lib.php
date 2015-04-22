@@ -5951,6 +5951,16 @@ function reportbuilder_delete_report($id) {
     // Delete report source cache.
     reportbuilder_purge_cache($id, true);
 
+    // Delete graph related data.
+    $DB->delete_records('report_builder_graph', array('reportid' => $id));
+    // Delete scheduling related data.
+    $select = "scheduleid IN (SELECT s.id FROM {report_builder_schedule} s WHERE s.reportid = ?)";
+    $DB->delete_records_select('report_builder_schedule_email_audience', $select, array($id));
+    $DB->delete_records_select('report_builder_schedule_email_systemuser', $select, array($id));
+    $DB->delete_records_select('report_builder_schedule_email_external', $select, array($id));
+    $DB->delete_records('report_builder_schedule', array('reportid' => $id));
+    // Delete search related data.
+    $DB->delete_records('report_builder_search_cols', array('reportid' => $id));
     // Delete any columns.
     $DB->delete_records('report_builder_columns', array('reportid' => $id));
     // Delete any filters.

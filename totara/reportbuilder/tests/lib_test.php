@@ -1434,4 +1434,15 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         }
 
     }
+
+    public function test_reportbuilder_delete_report() {
+        global $DB;
+
+        $rb = $this->rb;
+
+        // Make sure the delete SQL does not throw any exceptions.
+        $this->assertTrue($DB->record_exists('report_builder', array('id' => $rb->_id)));
+        reportbuilder_delete_report($rb->_id);
+        $this->assertFalse($DB->record_exists('report_builder', array('id' => $rb->_id)));
+    }
 }

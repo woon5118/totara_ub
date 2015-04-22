@@ -77,6 +77,10 @@ if ($action === 'delete') {
     if ($confirm) {
         require_sesskey();
         $transaction = $DB->start_delegated_transaction();
+        $select = "scheduleid IN (SELECT s.id FROM {report_builder_schedule} s WHERE s.savedsearchid = ?)";
+        $DB->delete_records_select('report_builder_schedule_email_audience', $select, array($sid));
+        $DB->delete_records_select('report_builder_schedule_email_systemuser', $select, array($sid));
+        $DB->delete_records_select('report_builder_schedule_email_external', $select, array($sid));
         $DB->delete_records('report_builder_schedule', array('savedsearchid' => $sid));
         $DB->delete_records('report_builder_saved', array('id' => $sid));
         $transaction->allow_commit();
