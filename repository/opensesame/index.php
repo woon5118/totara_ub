@@ -33,7 +33,7 @@ admin_externalpage_setup('opensesamereport', '', null, '', array('pagelayout'=>'
 
 $opensesame = core_plugin_manager::instance()->get_plugin_info('repository_opensesame');
 if (!$opensesame->is_enabled()) {
-    redirect(new moodle_url('/'));
+    redirect(new moodle_url('/repository/opensesame/register.php'));
 }
 
 $report = reportbuilder_get_embedded_report('opensesame', array(), false, $sid);

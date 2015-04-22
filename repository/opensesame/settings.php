@@ -48,6 +48,14 @@ if (get_config('repository_opensesame', 'tenantkey')) {
     );
 } else {
     $ADMIN->add('opensesamecourses',
+        new admin_externalpage('opensesamereport',
+            new lang_string('browsepackages', 'repository_opensesame'),
+            $CFG->wwwroot . '/repository/opensesame/index.php',
+            'repository/opensesame:managepackages',
+            true
+        )
+    );
+    $ADMIN->add('opensesamecourses',
         new admin_externalpage('opensesameregister',
             new lang_string('register', 'repository_opensesame'),
             $CFG->wwwroot . '/repository/opensesame/register.php',
