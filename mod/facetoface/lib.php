@@ -1377,7 +1377,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             ss.statuscode,
             ss.note AS usernote,
             (
-                SELECT MIN(timecreated)
+                SELECT MAX(timecreated)
                 FROM {facetoface_signups_status} ss2
                 WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
             ) as timesignedup,
