@@ -401,14 +401,16 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
      *
      * @param   string      Request url
      * @param   object      What to do on success (optional)
-     * @param   string      Type of request ('GET', 'POST') (optional, GET is default)
+     * @param   string      Type of request ('GET', 'POST') (optional, POST is default)
      * @param   string      GET or POST query string style data, also accepts an object (optional)
      */
     this._request = function(url, success, type, query_data) {
         var dialog = this;
 
         if (type == undefined) {
-            type = 'GET';
+            // Use post by default to support large number of items being
+            // selected in a dialog.
+            type = 'POST';
         }
 
         $.ajax({
