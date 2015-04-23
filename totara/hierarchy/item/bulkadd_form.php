@@ -96,6 +96,7 @@ class item_bulkadd_form extends moodleform {
         $mform->addElement('textarea', 'itemnames', get_string('enternamesoneperline', 'totara_hierarchy', get_string($prefix, 'totara_hierarchy')), 'rows="15" cols="50"');
         $mform->addRule('itemnames', null, 'required');
         $mform->setType('itemnames', PARAM_TEXT);
+        $mform->addHelpButton('itemnames', 'bulkadditemnames', 'totara_hierarchy');
 
         // See if any hierarchy specific form definition exists
         $hierarchy->add_additional_item_form_fields($mform);

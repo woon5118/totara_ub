@@ -29,7 +29,7 @@ class item_edit_form extends moodleform {
 
     // Define the form
     function definition() {
-        global $TEXTAREA_OPTIONS;
+        global $CFG, $TEXTAREA_OPTIONS;
         $mform =& $this->_form;
 
         $prefix = $this->_customdata['prefix'];
@@ -80,10 +80,9 @@ class item_edit_form extends moodleform {
         $mform->addRule('fullname', get_string($prefix.'missingname', 'totara_hierarchy'), 'required', null);
         $mform->setType('fullname', PARAM_MULTILANG);
 
-        if (HIERARCHY_DISPLAY_SHORTNAMES) {
+        if (!empty($CFG->showhierarchyshortnames)) {
             $mform->addElement('text', 'shortname', get_string($prefix.'shortname', 'totara_hierarchy'), 'maxlength="100" size="20"');
             $mform->addHelpButton('shortname', $prefix.'shortname', 'totara_hierarchy');
-            $mform->addRule('shortname', get_string($prefix.'missingshortname', 'totara_hierarchy'), 'required', null);
             $mform->setType('shortname', PARAM_MULTILANG);
         }
 

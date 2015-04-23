@@ -120,9 +120,6 @@ function hierarchy_construct_items_to_add($formdata) {
         // copy the form object and set the item name
         $new = clone $formdata;
         $new->fullname = substr(trim($item), 0, 1024);
-        if (HIERARCHY_DISPLAY_SHORTNAMES) {
-            $new->shortname = substr(trim($item), 0, 100);
-        }
 
         $items_to_add[] = $new;
 

@@ -28,7 +28,7 @@ class framework_edit_form extends moodleform {
 
     // Define the form.
     public function definition() {
-        global $DB, $TEXTAREA_OPTIONS;
+        global $DB, $CFG, $TEXTAREA_OPTIONS;
 
         $mform =& $this->_form;
         $strgeneral  = get_string('general');
@@ -63,11 +63,10 @@ class framework_edit_form extends moodleform {
         $mform->addRule('fullname', get_string('goalmissingnameframework', 'totara_hierarchy'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_MULTILANG);
 
-        if (HIERARCHY_DISPLAY_SHORTNAMES) {
+        if (!empty($CFG->showhierarchyshortnames)) {
             $mform->addElement('text', 'shortname', get_string('shortnameframework', 'totara_hierarchy'),
                 'maxlength="100" size="20"');
             $mform->addHelpButton('shortname', 'goalframeworkshortname', 'totara_hierarchy');
-            $mform->addRule('shortname', get_string('missingshortnameframework', 'totara_hierarchy'), 'required', null, 'client');
             $mform->setType('shortname', PARAM_MULTILANG);
         }
 

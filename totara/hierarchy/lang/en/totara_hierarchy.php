@@ -119,6 +119,10 @@ $string['assignrelatedcompetencies'] = 'Assign related competencies';
 $string['assignrelatedgoals'] = 'Assign related goals';
 $string['availablex'] = 'Available {$a}';
 $string['bulkactions'] = 'Bulk actions';
+$string['bulkadditemnames'] = 'Bulk Add Items';
+$string['bulkadditemnames_help'] = 'This bulk add functionality is mostly for use if you only wish to create simple items, in the same location in the framework, with the same type, and with no additional information such as ID Numbers and Shortnames.
+
+If you wish to have more control over defining the value of fields such as shortname or idnumber, set individual item types etc. you should use the HR Import tool instead.';
 $string['bulkaddfailed'] = 'There was a problem adding those items to the hierarchy';
 $string['bulkaddsuccess'] = '{$a} items were successfully added to the hierarchy';
 $string['bulkdeletecompetency'] = 'Bulk delete competencies';
@@ -254,6 +258,7 @@ $string['competencyframeworkscale'] = 'Competency Framework Scale';
 $string['competencyframeworkscale_help'] = 'Competency scales enable you to define the criteria by which a competency can be measured. For example, a scale might have three values ‘competent, competent with supervision, not competent’.
 
 The first step is to use the Competency scales option to add a new scale, then to add the scale values which are used to define a learner’s progress for a competency. You can add as many values as you wish. Note also the Default and Proficient value settings.';
+$string['competencyframeworkshortname'] = 'Competency Framework shortname';
 $string['competencyframeworkshortname_help'] = 'The framework short name is a quick reference to the framework\'s full name and can be used for display purposes.';
 $string['competencyframeworkview'] = 'View framework';
 $string['competencyfullname'] = 'Competency full name';
@@ -348,6 +353,7 @@ $string['configenablegoals'] = 'This option will let you: Enable(show)/Hide/Disa
 * If Hide is chosen, all links and tabs related to goals will be hidden.
 * If Disable is chosen, goals will disappear from any menu on the site and will not be accessible.
 ';
+$string['configshowhierarchyshortnames'] = 'Toggles the use of shortnames in addition to fullnames in hierarchy forms. When enabled, hierarchies will include a shortname field in the framework, item and type forms';
 $string['confirmmoveitems'] = 'Are you sure you want to move {$a->num} {$a->items} into "{$a->parentname}"?<br /><br />Any children of the {$a->items} being moved will also be relocated at the same time.';
 $string['confirmpersonaldelete'] = 'Are you sure you want to delete {$a->username}\'s personal goal {$a->goalname}';
 $string['confirmproceed'] = 'Are you sure you want to proceed?';
@@ -632,6 +638,7 @@ $string['goalframeworkscale'] = 'Goal Framework Scale';
 $string['goalframeworkscale_help'] = 'Goal scales enable you to define the criteria by which a goal can be measured. For example, a scale might have three values ‘Complete, In Progress, Started’.
 
 The first step is to use the Goal scales option to add a new scale, then to add the scale values which are used to define a learner’s progress for a goal. You can add as many values as you wish. Note also the Default and \'consider complete\' value settings.';
+$string['goalframeworkshortname'] = 'Goal Framework shortname';
 $string['goalframeworkshortname_help'] = 'The framework short name is a quick reference to the framework\'s full name and can be used for display purposes.';
 $string['goalframeworkview'] = 'View framework';
 $string['goalfullname'] = 'Goal full name';
@@ -1008,6 +1015,7 @@ $string['organisationframeworks'] = 'Organisation Frameworks';
 $string['organisationframeworks_help'] = 'An **Organisational Framework** is set up to hold the organisational structure of your organisation.
 
 You can set up multiple organisational frameworks. For example: set up a framework for subdivisions or subsidiaries of a business.';
+$string['organisationframeworkshortname'] = 'Organisation Framework short name';
 $string['organisationframeworkshortname_help'] = 'The framework short name is a quick reference to the framework\'s full name and can be used for display purposes.';
 $string['organisationfullname'] = 'Organisation full name';
 $string['organisationfullname_help'] = 'Organisation full name is the complete title of the organisation.';
@@ -1111,6 +1119,7 @@ $string['positionframeworks'] = 'Position frameworks';
 $string['positionframeworks_help'] = 'A **Position framework** is used to set up and hold the different positions in the organisation.
 
 You can set up multiple positions\' taxonomies (frameworks) within an organisation.';
+$string['positionframeworkshortname'] = 'Position Framework shortname';
 $string['positionframeworkshortname_help'] = 'The framework short name is a quick reference to the framework’s full name and can be used for display purposes.';
 $string['positionfullname'] = 'Position full name';
 $string['positionfullname_help'] = '**Position full name** is the complete job title.';
@@ -1220,10 +1229,12 @@ $string['selectgoal'] = 'Select goal';
 $string['selectgoalframework'] = 'Select a goal framework';
 $string['set'] = 'Set';
 $string['settingsupdated'] = 'Settings updated';
+$string['showhierarchyshortnames'] = 'Display Hierarchy Shortnames';
 $string['shortnamedepth'] = 'Depth level short name';
 $string['shortnameframework'] = 'Shortname';
 $string['shortnametemplate'] = 'Template short name';
 $string['shortnametype'] = 'Type short name';
+$string['shortnametype_help'] = 'The type short name is a quick reference to the type\'s full name and can be used for display purposes.';
 $string['shortnameview'] = 'Short name';
 $string['showdepthfullname'] = 'Show Depth Fullname';
 $string['showdetails'] = 'Show details';

@@ -56,10 +56,9 @@ class type_edit_form extends moodleform {
         $mform->addRule('fullname', get_string($prefix.'missingnametype', 'totara_hierarchy'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_MULTILANG);
 
-        if (HIERARCHY_DISPLAY_SHORTNAMES) {
+        if (!empty($CFG->showhierarchyshortnames)) {
             $mform->addElement('text', 'shortname', get_string('shortnametype', 'totara_hierarchy'), 'maxlength="100" size="20"');
             $mform->addHelpButton('shortname', 'shortnametype', 'totara_hierarchy');
-            $mform->addRule('shortname', get_string('missingshortnametype', 'totara_hierarchy'), 'required', null, 'client');
             $mform->setType('shortname', PARAM_MULTILANG);
         }
 
