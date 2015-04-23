@@ -453,5 +453,34 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030202, 'totara_program');
     }
 
+    if ($oldversion < 2015030203) {
+        // Remove references to deleted courses in programs or certifications
+        // also deletes empty coursesets if they are created as they are not allowed.
+
+        $missingcoursesetcourses = $DB->get_records_sql('SELECT cc.id from {prog_courseset_course} cc LEFT JOIN {course} c ON cc.courseid = c.id WHERE c.id IS null');
+        $missingcoursesetcourses = array_keys($missingcoursesetcourses);
+
+        $transaction = $DB->start_delegated_transaction();
+
+        // Delete any broken records.
+        if (!empty($missingcoursesetcourses)) {
+            list($missingcoursesql, $missingcourseparams) = $DB->get_in_or_equal($missingcoursesetcourses);
+            $DB->delete_records_select('prog_courseset_course', "id {$missingcoursesql}", $missingcourseparams);
+
+            // Get IDs of empty coursesets so we can delete them.
+            $emptycoursesets = $DB->get_fieldset_sql('SELECT cs.id FROM {prog_courseset} cs LEFT JOIN {prog_courseset_course} c ON cs.id = c.coursesetid WHERE c.coursesetid IS NULL GROUP BY cs.id');
+
+            if (!empty($emptycoursesets)) {
+                list($insql, $inparams) = $DB->get_in_or_equal($emptycoursesets);
+                $DB->delete_records_select('prog_courseset', "id {$insql}", $inparams);
+            }
+        }
+
+        $transaction->allow_commit();
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030203, 'totara_program');
+    }
+
     return true;
 }

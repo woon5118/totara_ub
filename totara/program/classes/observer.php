@@ -195,4 +195,35 @@ class totara_program_observer {
 
         return true;
     }
+
+    /**
+     * This function is to clean up any references to courses within
+     * programs when they are deleted. Any coursesets that become empty
+     * due to this are also deleted as programs does not allow empty
+     * coursesets.
+     *
+     * @param \core\event\course_deleted $event
+     * @return boolean True if all references to the course are deleted correctly
+     */
+    public static function course_deleted(\core\event\course_deleted $event) {
+        global $DB;
+
+        $courseid = $event->objectid;
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $DB->delete_records('prog_courseset_course', array('courseid' => $courseid));
+
+        // Get IDs of empty coursesets so we can delete them.
+        $emptycoursesets = $DB->get_fieldset_sql('SELECT cs.id FROM {prog_courseset} cs LEFT JOIN {prog_courseset_course} c ON cs.id = c.coursesetid WHERE c.coursesetid IS NULL GROUP BY cs.id');
+
+        if (!empty($emptycoursesets)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($emptycoursesets);
+            $DB->delete_records_select('prog_courseset', "id {$insql}", $inparams);
+        }
+
+        $transaction->allow_commit();
+
+        return true;
+    }
 }
