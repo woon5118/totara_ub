@@ -549,12 +549,12 @@ abstract class rb_base_source {
 
     // convert floats to 2 decimal places
     function rb_display_round2($item, $row) {
-        return $item === null ? null : sprintf('%.2f', $item);
+        return ($item === null or $item === '') ? '-' : sprintf('%.2f', $item);
     }
 
     // converts number to percentage with 1 decimal place
     function rb_display_percent($item, $row) {
-        return $item === null ? null : sprintf('%.1f%%', $item);
+        return ($item === null or $item === '') ? '-' : sprintf('%.1f%%', $item);
     }
 
     // Displays a comma separated list of strings as one string per line.
@@ -592,7 +592,7 @@ abstract class rb_base_source {
      * @return string The percentage with 1 decimal place
      */
     function rb_display_course_grade_percent($item, $row) {
-        return $item === null ? null : sprintf('%.1f%%', $item);
+        return ($item === null or $item === '') ? '-' : sprintf('%.1f%%', $item);
     }
 
     /**
@@ -1288,7 +1288,7 @@ abstract class rb_base_source {
 
 
     function rb_display_yes_no($item, $row) {
-        if ($item === null) {
+        if ($item === null or $item === '') {
             return '';
         } else if ($item) {
             return get_string('yes');
@@ -1300,7 +1300,7 @@ abstract class rb_base_source {
     // convert an integer number of minutes into a
     // formatted duration (e.g. 90 mins => 1h 30m)
     function rb_display_hours_minutes($mins, $row) {
-        if ($mins === null) {
+        if ($item === null or $item === '') {
             return '';
         } else {
             $minutes = abs((int) $mins);
@@ -1533,7 +1533,7 @@ abstract class rb_base_source {
         $passgrade = isset($row->gradepass) ? sprintf('%d', $row->gradepass) : null;
         $usergrade = sprintf('%d', $item);
 
-        if ($item === null) {
+        if ($item === null or $item === '') {
             return '';
         } else if ($passgrade === null) {
             return "{$usergrade}%";
