@@ -358,6 +358,7 @@ $string['reviewconfirm'] = '<p>This will make your badge visible to users and al
 <p>Are you sure you want to enable access to the badge \'{$a}\'?</p>';
 $string['save'] = 'Save';
 $string['searchname'] = 'Search by name';
+$string['searchbadgesfor'] = 'Search badges for';
 $string['selectaward'] = 'Please select the role you would like to use to award this badge: ';
 $string['selectgroup_end'] = 'Only public collections are shown, <a href="http://backpack.openbadges.org">visit your backpack</a> to create more public collections.';
 $string['selectgroup_start'] = 'Select collections from your backpack to display on this site:';

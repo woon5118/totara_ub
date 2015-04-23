@@ -907,7 +907,7 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $mform->addElement('hidden', 'sesskey', sesskey());
 
-        $el[] = $mform->createElement('text', 'search', '', array('size' => 20));
+        $el[] = $mform->createElement('text', 'search', get_string('searchbadgesfor', 'badges'), array('size' => 20));
         $mform->setType('search', PARAM_TEXT);
         $mform->setDefault('search', $search);
         $el[] = $mform->createElement('submit', 'submitsearch', get_string('searchname', 'badges'));
