@@ -34,6 +34,7 @@ $deactivate = optional_param('deactivate', 0, PARAM_INT);
 $activate = optional_param('activate', 0, PARAM_INT);
 $delete = optional_param('delete', 0, PARAM_INT);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
+$restoredefaults = optional_param('restoredefaults', 0, PARAM_BOOL);
 
 
 if (!$cm = get_coursemodule_from_id('facetoface', $update)) {
@@ -96,6 +97,30 @@ if ($delete && $confirm) {
     $notification->delete();
 
     totara_set_notification(get_string('notificationdeleted', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
+}
+
+if ($restoredefaults && $confirm) {
+    if (!confirm_sesskey()) {
+        print_error('confirmsesskeybad', 'error');
+    }
+
+    // Get all current notifications.
+    $currentnotifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id));
+
+    // Recreate all default notifications.
+    $defaultnotifications = facetoface_get_default_notifications($facetoface->id);
+
+    // Remove all defaults that exist already.
+    foreach ($currentnotifications as $current) {
+        unset($defaultnotifications[$current->conditiontype]);
+    }
+
+    // Create missing defaults.
+    foreach ($defaultnotifications as $default) {
+        $default->save();
+    }
+
+    totara_set_notification(get_string('notificationssuccessfullyreset', 'facetoface'), $redirectto, array('class' => 'notifysuccess'));
 }
 
 // Check for form submission
@@ -161,6 +186,23 @@ if ($delete) {
     die();
 }
 
+// Print reset confirmation page
+if ($restoredefaults) {
+    $f2fname = $facetoface->name;
+
+    $confirmurl = clone($redirectto);
+    $confirmurl->param('restoredefaults', $restoredefaults);
+    $confirmurl->param('sesskey', sesskey());
+    $confirmurl->param('confirm', '1');
+
+    echo $OUTPUT->heading(get_string('restoremissingdefaultnotifications', 'facetoface'));
+    echo $OUTPUT->confirm(get_string('restoremissingdefaultnotificationsconfirm', 'facetoface', format_string($f2fname)), $confirmurl, $redirectto);
+    echo $OUTPUT->footer($course);
+    unset($confirmurl);
+    die();
+
+}
+
 $heading = get_string('notifications', 'facetoface');
 $report_data = array(
     'display'       => $display,
@@ -172,6 +214,20 @@ $report_data = array(
 $notifications = $DB->get_records('facetoface_notification', array('facetofaceid' => $facetoface->id), 'title,type');
 
 echo $OUTPUT->heading_with_help($heading, 'notifications', 'facetoface');
+
+// Detect missing default notifications.
+$defaultnotifications = facetoface_get_default_notifications($facetoface->id);
+
+foreach ($notifications as $note) {
+    unset($defaultnotifications[$note->conditiontype]);
+}
+
+if (!empty($defaultnotifications)) {
+    $message = get_string('missingdefaultnotifications', 'facetoface', count($defaultnotifications));
+    $addmissingdefaulturl = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id, 'restoredefaults' => 1));
+    $link = html_writer::link($addmissingdefaulturl, get_string('missingdefaultsfix', 'facetoface'));
+    echo $OUTPUT->notification($message . ' ' . $link, 'notifymessage');
+}
 
 $str_edit = get_string('edit', 'moodle');
 $str_active = get_string('setactive', 'facetoface');
@@ -199,6 +255,7 @@ $table->define_columns($columns);
 $table->define_headers($headers);
 $table->set_attribute('class', 'generalbox mod-facetoface-notification-list');
 $table->setup();
+
 
 foreach ($notifications as $note) {
     $row = array();

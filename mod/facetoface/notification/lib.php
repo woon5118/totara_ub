@@ -48,7 +48,7 @@ define('MDL_F2F_SCHEDULE_UNIT_DAY',      2);
 define('MDL_F2F_SCHEDULE_UNIT_WEEK',     4);
 
 /**
- * Notification conditions
+ * Notification conditions for system generated notificaitons.
  */
 define('MDL_F2F_CONDITION_BEFORE_SESSION',              1);
 define('MDL_F2F_CONDITION_AFTER_SESSION',               2);
@@ -1571,4 +1571,151 @@ function facetoface_reset_selected_report_items($type, $id = null) {
 function facetoface_is_notification_frozen($id) {
     $notification = new facetoface_notification(array('id' => $id), true);
     return $notification->is_frozen();
+}
+
+
+/**
+ * Returns an array of default notifications for a face-to-face
+ * activity
+ *
+ * @param int $facetofaceid
+ * @return array Array of facetoface_notification objects
+ */
+function facetoface_get_default_notifications($facetofaceid) {
+    global $DB;
+
+    $notifications = array();
+
+    $facetoface = $DB->get_record('facetoface', array('id' => $facetofaceid));
+
+    // Add default notifications
+    $defaults = array();
+    $defaults['facetofaceid'] = $facetoface->id;
+    $defaults['courseid'] = $facetoface->course;
+    $defaults['type'] = MDL_F2F_NOTIFICATION_AUTO;
+    $defaults['booked'] = 0;
+    $defaults['waitlisted'] = 0;
+    $defaults['cancelled'] = 0;
+    $defaults['issent'] = 0;
+    $defaults['status'] = 1;
+    $defaults['ccmanager'] = 0;
+
+    // We need to validate the content of these language strings to make sure that they are not too long for the database field
+    // they are about to be written to.
+    $titles = array(
+        'setting:defaultconfirmationsubjectdefault' => get_string('setting:defaultconfirmationsubjectdefault', 'facetoface'),
+        'setting:defaultwaitlistedsubjectdefault' => get_string('setting:defaultwaitlistedsubjectdefault', 'facetoface'),
+        'setting:defaultcancellationsubjectdefault' => get_string('setting:defaultcancellationsubjectdefault', 'facetoface'),
+        'setting:defaultdeclinesubjectdefault' => get_string('setting:defaultdeclinesubjectdefault', 'facetoface'),
+        'setting:defaultremindersubjectdefault' => get_string('setting:defaultremindersubjectdefault', 'facetoface'),
+        'setting:defaultrequestsubjectdefault' => get_string('setting:defaultrequestsubjectdefault', 'facetoface'),
+        'setting:defaultdatetimechangesubjectdefault' => get_string('setting:defaultdatetimechangesubjectdefault', 'facetoface'),
+        'setting:defaulttrainerconfirmationsubjectdefault' => get_string('setting:defaulttrainerconfirmationsubjectdefault', 'facetoface'),
+        'setting:defaulttrainersessioncancellationsubjectdefault' => get_string('setting:defaulttrainersessioncancellationsubjectdefault', 'facetoface'),
+        'setting:defaulttrainersessionunassignedsubjectdefault' => get_string('setting:defaulttrainersessionunassignedsubjectdefault', 'facetoface'),
+        'setting:defaultcancelreservationsubjectdefault' => get_string('setting:defaultcancelreservationsubjectdefault', 'facetoface'),
+        'setting:defaultcancelallreservationssubjectdefault' => get_string('setting:defaultcancelallreservationssubjectdefault', 'facetoface')
+    );
+
+    foreach ($titles as $key => $title) {
+        if (core_text::strlen($title) > 255) {
+            // We choose to truncate here. If we throw an exception like we should then the user won't be able to add face to face
+            // sessions and the user may not be able to edit the language pack to fix it. Thus we truncate and debug.
+            $titles[$key] = core_text::substr($title, 0, 255);
+            debugging('A face to face notification title was truncated due to its length: ' . $key, DEBUG_NORMAL);
+        }
+    }
+
+    $confirmation = new facetoface_notification($defaults, false);
+    $confirmation->title = $titles['setting:defaultconfirmationsubjectdefault'];
+    $confirmation->body = text_to_html(get_string('setting:defaultconfirmationmessagedefault', 'facetoface'));
+    $confirmation->managerprefix = text_to_html(get_string('setting:defaultconfirmationinstrmngrdefault', 'facetoface'));
+    $confirmation->conditiontype = MDL_F2F_CONDITION_BOOKING_CONFIRMATION;
+    $confirmation->ccmanager = 1;
+    $notifications[MDL_F2F_CONDITION_BOOKING_CONFIRMATION] = $confirmation;
+
+    $waitlist = new facetoface_notification($defaults, false);
+    $waitlist->title = $titles['setting:defaultwaitlistedsubjectdefault'];
+    $waitlist->body = text_to_html(get_string('setting:defaultwaitlistedmessagedefault', 'facetoface'));
+    $waitlist->conditiontype = MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION;
+    $notifications[MDL_F2F_CONDITION_WAITLISTED_CONFIRMATION] = $waitlist;
+
+    $cancellation = new facetoface_notification($defaults, false);
+    $cancellation->title = $titles['setting:defaultcancellationsubjectdefault'];
+    $cancellation->body = text_to_html(get_string('setting:defaultcancellationmessagedefault', 'facetoface'));
+    $cancellation->managerprefix = text_to_html(get_string('setting:defaultcancellationinstrmngrdefault', 'facetoface'));
+    $cancellation->conditiontype = MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION;
+    $cancellation->ccmanager = 1;
+    $cancellation->cancelled = 1;
+    $notifications[MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION] = $cancellation;
+
+    $decline = new facetoface_notification($defaults, false);
+    $decline->title = $titles['setting:defaultdeclinesubjectdefault'];
+    $decline->body = text_to_html(get_string('setting:defaultdeclinemessagedefault', 'facetoface'));
+    $decline->managerprefix = text_to_html(get_string('setting:defaultdeclineinstrmngrdefault', 'facetoface'));
+    $decline->conditiontype = MDL_F2F_CONDITION_DECLINE_CONFIRMATION;
+    $decline->ccmanager = 0;
+    $decline->status = $facetoface->approvalreqd ? 1 : 0;
+    $notifications[MDL_F2F_CONDITION_DECLINE_CONFIRMATION] = $decline;
+
+    $reminder = new facetoface_notification($defaults, false);
+    $reminder->title = $titles['setting:defaultremindersubjectdefault'];
+    $reminder->body = text_to_html(get_string('setting:defaultremindermessagedefault', 'facetoface'));
+    $reminder->managerprefix = text_to_html(get_string('setting:defaultreminderinstrmngrdefault', 'facetoface'));
+    $reminder->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
+    $reminder->scheduleunit = MDL_F2F_SCHEDULE_UNIT_DAY;
+    $reminder->scheduleamount = 2;
+    $reminder->ccmanager = 1;
+    $reminder->booked = 1;
+    $notifications[MDL_F2F_CONDITION_BEFORE_SESSION] = $reminder;
+
+    $request = new facetoface_notification($defaults, false);
+    $request->title = $titles['setting:defaultrequestsubjectdefault'];
+    $request->body = text_to_html(get_string('setting:defaultrequestmessagedefault', 'facetoface'));
+    $request->managerprefix = text_to_html(get_string('setting:defaultrequestinstrmngrdefault', 'facetoface'));
+    $request->conditiontype = MDL_F2F_CONDITION_BOOKING_REQUEST;
+    $request->ccmanager = 1;
+    $notifications[MDL_F2F_CONDITION_BOOKING_REQUEST] = $request;
+
+    $session_change = new facetoface_notification($defaults, false);
+    $session_change->title = $titles['setting:defaultdatetimechangesubjectdefault'];
+    $session_change->body = text_to_html(get_string('setting:defaultdatetimechangemessagedefault', 'facetoface'));
+    $session_change->conditiontype = MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE;
+    $session_change->booked = 1;
+    $session_change->waitlisted = 1;
+    $notifications[MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE] = $session_change;
+
+    $trainer_confirmation = new facetoface_notification($defaults, false);
+    $trainer_confirmation->title = $titles['setting:defaulttrainerconfirmationsubjectdefault'];
+    $trainer_confirmation->body = text_to_html(get_string('setting:defaulttrainerconfirmationmessagedefault', 'facetoface'));
+    $trainer_confirmation->conditiontype = MDL_F2F_CONDITION_TRAINER_CONFIRMATION;
+    $notifications[MDL_F2F_CONDITION_TRAINER_CONFIRMATION] = $trainer_confirmation;
+
+    $trainer_cancellation = new facetoface_notification($defaults, false);
+    $trainer_cancellation->title = $titles['setting:defaulttrainersessioncancellationsubjectdefault'];
+    $trainer_cancellation->body = text_to_html(get_string('setting:defaulttrainersessioncancellationmessagedefault', 'facetoface'));
+    $trainer_cancellation->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION;
+    $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_CANCELLATION] = $trainer_cancellation;
+
+    $trainer_unassigned = new facetoface_notification($defaults, false);
+    $trainer_unassigned->title = $titles['setting:defaulttrainersessionunassignedsubjectdefault'];
+    $trainer_unassigned->body = text_to_html(get_string('setting:defaulttrainersessionunassignedmessagedefault', 'facetoface'));
+    $trainer_unassigned->conditiontype = MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT;
+    $notifications[MDL_F2F_CONDITION_TRAINER_SESSION_UNASSIGNMENT] = $trainer_unassigned;
+
+    $cancelreservation = new facetoface_notification($defaults, false);
+    $cancelreservation->title = $titles['setting:defaultcancelreservationsubjectdefault'];
+    $cancelreservation->body = text_to_html(get_string('setting:defaultcancelreservationmessagedefault', 'facetoface'));
+    $cancelreservation->conditiontype = MDL_F2F_CONDITION_RESERVATION_CANCELLED;
+    $cancelreservation->cancelled = 1;
+    $notifications[MDL_F2F_CONDITION_RESERVATION_CANCELLED] = $cancelreservation;
+
+    $cancelallreservations = new facetoface_notification($defaults, false);
+    $cancelallreservations->title = $titles['setting:defaultcancelallreservationssubjectdefault'];
+    $cancelallreservations->body = text_to_html(get_string('setting:defaultcancelallreservationsmessagedefault', 'facetoface'));
+    $cancelallreservations->conditiontype = MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED;
+    $cancelallreservations->cancelled = 1;
+    $notifications[MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED] = $cancelallreservations;
+
+    return $notifications;
 }
