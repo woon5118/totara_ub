@@ -123,23 +123,7 @@ if ($fromform = $mform->get_data()) {
 
         // by default we'll require a role but not set any, which will restrict report access to
         // the site administrators only
-        $todb = new stdClass();
-        $todb->reportid = $newid;
-        $todb->type = 'role_access';
-        $todb->name = 'enable';
-        $todb->value = 1;
-        $DB->insert_record('report_builder_settings', $todb);
-
-        // restrict access to new report to site managers (and implicitly admins)
-        // (if role doesn't exist report will not be visible to anyone)
-        if ($managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager'))) {
-            $todb = new stdClass();
-            $todb->reportid = $newid;
-            $todb->type = 'role_access';
-            $todb->name = 'activeroles';
-            $todb->value = $managerroleid;
-            $DB->insert_record('report_builder_settings', $todb);
-        }
+        reportbuilder_set_default_access($newid);
 
         // create columns for new report based on default columns
         $src = reportbuilder::get_source_object($fromform->source);

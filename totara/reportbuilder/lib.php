@@ -5814,6 +5814,7 @@ function reportbuilder_delete_report($id) {
 
     // Delete any columns.
     $DB->delete_records('report_builder_columns', array('reportid' => $id));
+
     // Delete any filters.
     $DB->delete_records('report_builder_filters', array('reportid' => $id));
     // Delete any content and access settings.
@@ -5828,6 +5829,113 @@ function reportbuilder_delete_report($id) {
     $transaction->allow_commit();
 
     return true;
+}
+
+/**
+ * Set default restrictive access for new report
+ * @param int $reportid
+ */
+function reportbuilder_set_default_access($reportid) {
+    global $DB;
+    $accessdata = new stdClass();
+    $accessdata->role_enable = 1;
+    $accessdata->role_context = 'site';
+
+    if ($managerroleid = $DB->get_field('role', 'id', array('shortname' => 'manager'))) {
+        $accessdata->role_activeroles = array($managerroleid => 1);
+    }
+    $acess = new rb_role_access();
+    $acess->form_process($reportid, $accessdata);
+}
+
+/**
+ * Makes clone of report
+ *
+ * @param reportbuilder $report Original report instance
+ * @param string $clonename Name of clone
+ *
+ * @return int Id of new report if report was successfully cloned
+ */
+function reportbuilder_clone_report(reportbuilder $report, $clonename) {
+    global $DB;
+
+    $transaction = $DB->start_delegated_transaction();
+    $reportid = $report->_id;
+
+    // Copy report.
+    $reportrec = $DB->get_record('report_builder', array('id' => $reportid));
+    $embedded = $report->embedded;
+
+    $reportrec->id = null;
+    $reportrec->cache = 0;
+    $reportrec->embedded = 0;
+    $reportrec->timemodified = time();
+    $reportrec->fullname = $clonename;
+
+    if ($embedded) {
+        $reportrec->accessmode = REPORT_BUILDER_ACCESS_MODE_ANY;
+    }
+
+    // Search for shortname.
+    $count = 1;
+    while ($DB->get_field('report_builder', 'shortname', array('shortname' => $reportrec->shortname . $count),
+            IGNORE_MISSING)) {
+        $count++;
+    }
+    $reportrec->shortname .= $count;
+
+    $cloneid = $DB->insert_record('report_builder', $reportrec);
+
+    // Restrict acces to Site Manager only for embedded reports.
+    if ($embedded) {
+        reportbuilder_set_default_access($cloneid);
+    }
+
+    // Copy columns.
+    $colrecs = $DB->get_records('report_builder_columns', array('reportid' => $reportid));
+    foreach ($colrecs as $colrec) {
+        $colrec->id = null;
+        $colrec->reportid = $cloneid;
+        $DB->insert_record('report_builder_columns', $colrec);
+    }
+
+    // Copy search columns.
+    $searchcolrecs = $DB->get_records('report_builder_search_cols', array('reportid' => $reportid));
+    foreach ($searchcolrecs as $searchcolrec) {
+        $searchcolrec->id = null;
+        $searchcolrec->reportid = $cloneid;
+        $DB->insert_record('report_builder_search_cols', $searchcolrec);
+    }
+
+    // Copy filters.
+    $filterrecs = $DB->get_records('report_builder_filters', array('reportid' => $reportid));
+    foreach ($filterrecs as $filterrec) {
+        $filterrec->id = null;
+        $filterrec->reportid = $cloneid;
+        $DB->insert_record('report_builder_filters', $filterrec);
+    }
+
+    // Copy settings.
+    $settingsrecs = $DB->get_records('report_builder_settings', array('reportid' => $reportid));
+    foreach ($settingsrecs as $settingsrec) {
+        $settingsrec->id = null;
+        $settingsrec->reportid = $cloneid;
+        $DB->insert_record('report_builder_settings', $settingsrec);
+    }
+
+    // Copy graph.
+    $graphrecs = $DB->get_records('report_builder_graph', array('reportid' => $reportid));
+    foreach ($graphrecs as $graphrec) {
+        $graphrec->id = null;
+        $graphrec->reportid = $cloneid;
+        $graphrec->timemodified = time();
+        $DB->insert_record('report_builder_graph', $graphrec);
+    }
+
+    // All okay commit changes.
+    $transaction->allow_commit();
+
+    return $cloneid;
 }
 
 /**

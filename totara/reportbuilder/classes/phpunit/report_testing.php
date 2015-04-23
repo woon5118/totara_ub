@@ -112,6 +112,103 @@ trait report_testing {
     }
 
     /**
+     * Add a new filter to report
+     * This will not update report instance, so use it before new reportbuiler.
+     *
+     * @param int $reportid
+     * @param string $type
+     * @param string $value
+     * @param int $advanced
+     * @param string $filtername
+     * @param int $customname
+     * @param int $region
+     * @return array of records
+     */
+    protected function add_filter($reportid, $type, $value, $advanced, $filtername, $customname, $region) {
+        global $DB;
+
+        $sortorder = $DB->get_field('report_builder_filters', 'MAX(sortorder) + 1', array('reportid' => $reportid));
+        if (!$sortorder) {
+            $sortorder = 1;
+        }
+
+        $todb = new \stdClass();
+        $todb->reportid = $reportid;
+        $todb->type = $type;
+        $todb->value = $value;
+        $todb->advanced = $advanced;
+        $todb->filtername = $filtername;
+        $todb->customname = $customname;
+        $todb->region = $region;
+        $todb->sortorder = $sortorder;
+        $id = $DB->insert_record('report_builder_filters', $todb);
+
+        return $DB->get_records('report_builder_filters', array('id' => $id));
+    }
+
+    /**
+     * Set report settings
+     * This will not update report instance, so use it before new reportbuiler.
+     *
+     * @param int $reportid
+     * @param string $type
+     * @param string $name
+     * @param int $value
+     * @return array of records
+     */
+    protected function set_setting($reportid, $type, $name, $value) {
+        global $DB;
+
+        $todb = new \stdClass();
+        $todb->reportid = $reportid;
+        $todb->type = $type;
+        $todb->name = $name;
+        $todb->value = $value;
+        $id = $DB->get_field('report_builder_settings', 'id', array('reportid' => $reportid, 'type' => $type, 'name' => $name),
+                IGNORE_MISSING);
+        if ($id) {
+            $todb->id = $id;
+            $DB->update_record('report_builder_settings', $todb);
+        } else {
+            $id = $DB->insert_record('report_builder_settings', $todb);
+        }
+
+        return $DB->get_records('report_builder_settings', array('id' => $id));
+    }
+
+    /**
+     * Add report graph settings
+     * This will not update report instance, so use it before new reportbuiler.
+     *
+     * @param int $reportid
+     * @param string $type
+     * @param int $stacked
+     * @param int $maxrecords
+     * @param string $category
+     * @param string $legend
+     * @param array $series
+     * @param string $settings
+     * @return array of records
+     */
+    protected function add_graph($reportid, $type, $stacked, $maxrecords, $category, $legend, array $series, $settings) {
+        global $DB;
+
+        $todb = new \stdClass();
+        $todb->reportid = $reportid;
+        $todb->type = $type;
+        $todb->stacked = $stacked;
+        $todb->maxrecords = $maxrecords;
+        $todb->category = $category;
+        $todb->legend = $legend;
+        $todb->series = json_encode($series);
+        $todb->settings = $settings;
+
+        $id = $DB->insert_record('report_builder_graph', $todb);
+
+        return $DB->get_records('report_builder_graph', array('id' => $id));
+    }
+
+    /**
      * Create new reportbuilder report.
      *
      * @param string $source

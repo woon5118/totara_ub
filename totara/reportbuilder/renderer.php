@@ -49,14 +49,18 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                              get_string('source', 'totara_reportbuilder'),
                              get_string('options', 'totara_reportbuilder'));
         $data = array();
+
+        $strsettings = get_string('settings', 'totara_reportbuilder');
+        $strclone = get_string('clonereport', 'totara_reportbuilder');
+        $strdelete = get_string('delete', 'totara_reportbuilder');
+
         foreach ($reports as $report) {
             try {
                 $row = array();
-                $strsettings = get_string('settings', 'totara_reportbuilder');
-                $strdelete = get_string('delete', 'totara_reportbuilder');
                 $viewurl = new moodle_url(reportbuilder_get_report_url($report));
                 $editurl = new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
                 $deleteurl = new moodle_url('/totara/reportbuilder/index.php', array('id' => $report->id, 'd' => 1));
+                $cloneurl = new moodle_url('/totara/reportbuilder/clone.php', array('id' => $report->id));
 
                 $row[] = html_writer::link($editurl, format_string($report->fullname)) . ' (' .
                     html_writer::link($viewurl, get_string('view')) . ')';
@@ -65,13 +69,17 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                 $srcname = $src->sourcetitle;
                 $row[] = $srcname;
 
-                $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
-                $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'));
+                $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'), null,
+                    array('title' => $strsettings));
+                $delete = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'), null,
+                    array('title' => $strdelete));
                 $cache = '';
                 if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
                     $cache = $this->cachenow_button($report->id, true);
                 }
-                $row[] = "{$settings}{$cache}{$delete}";
+                $clone = $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'), null,
+                    array('title' => $strclone));
+                $row[] = "{$settings}{$cache}{$clone}{$delete}";
 
                 $data[] = $row;
             } catch (Exception $e) {
@@ -115,6 +123,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                              get_string('options', 'totara_reportbuilder'));
         $strsettings = get_string('settings', 'totara_reportbuilder');
         $strreload = get_string('restoredefaults', 'totara_reportbuilder');
+        $strclone = get_string('clonereport', 'totara_reportbuilder');
 
         $embeddedreportstable = new html_table();
         $embeddedreportstable->summary = '';
@@ -127,6 +136,7 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $viewurl = new moodle_url($report->url);
             $editurl = new moodle_url('/totara/reportbuilder/general.php', array('id' => $report->id));
             $reloadurl = new moodle_url('/totara/reportbuilder/index.php', array('id' => $report->id, 'em' => 1, 'd' => 1));
+            $cloneurl = new moodle_url('/totara/reportbuilder/clone.php', array('id' => $report->id));
 
             $row = array();
             $row[] = html_writer::link($editurl, $fullname) . ' (' .
@@ -136,13 +146,17 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
             $srcname = $src->sourcetitle;
             $row[] = $srcname;
 
-            $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'));
-            $reload = $this->output->action_icon($reloadurl, new pix_icon('/t/reload', $strreload, 'moodle'));
+            $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'), null,
+                    array('title' => $strsettings));
+            $reload = $this->output->action_icon($reloadurl, new pix_icon('/t/reload', $strreload, 'moodle'), null,
+                    array('title' => $strreload));
             $cache = '';
             if (!empty($CFG->enablereportcaching) && !empty($report->cache)) {
                  $cache = $this->cachenow_button($report->id, true);
             }
-            $row[] = "{$settings}{$reload}{$cache}";
+            $clone = $this->output->action_icon($cloneurl, new pix_icon('/t/copy', $strclone, 'moodle'), null,
+                    array('title' => $strclone));
+            $row[] = "{$settings}{$reload}{$cache}{$clone}";
 
             $data[] = $row;
         }
@@ -151,7 +165,45 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         return html_writer::table($embeddedreportstable);
     }
 
+    /**
+     * Output report clone confirmation message
+     * @param reportbuilder $report Original report instance
+     * @return string
+     */
+    public function confirm_clone(reportbuilder $report) {
+        global $OUTPUT;
+        // Prepare list of supported clonable properties.
+        $supportedproperties = array('clonereportfilters', 'clonereportcolumns', 'clonereportsearchcolumns',
+            'clonereportsettings', 'clonereportgraph');
+        if ($report->embedded) {
+            $supportedproperties[] = 'clonereportaccessreset';
+        }
+        $strproperties = array();
+        foreach ($supportedproperties as $propertyname) {
+            $strproperties[] = get_string($propertyname, 'totara_reportbuilder');
+        }
+        $strpropertylist = html_writer::alist($strproperties);
 
+        $out = '';
+        if ($report->embedded){
+            $out .= $OUTPUT->notification(get_string('clonereportaccesswarning', 'totara_reportbuilder'), 'notifynotice');
+        }
+
+        $info = new stdClass();
+        $info->origname = $report->fullname;
+        $info->clonename = get_string('clonenamepattern', 'totara_reportbuilder', $report->fullname);
+        $info->properties = $strpropertylist;
+
+        $out .= html_writer::tag('p', get_string('clonedescrhtml', 'totara_reportbuilder', $info));
+        $buttons = array();
+        $buttons[] = $this->output->single_button(new moodle_url('/totara/reportbuilder/clone.php',
+                array('confirm' => 1, 'id' => $report->_id)),
+                get_string('clone', 'totara_reportbuilder'), 'post');
+        $buttons[] = $this->output->single_button(new moodle_url('/totara/reportbuilder/index.php'),
+                get_string('cancel', 'moodle'), 'get');
+        $out .= html_writer::tag('div', implode(' ', $buttons), array('class' => 'buttons'));
+        return $out;
+    }
     /**
      * Renders a table containing reporting activity groups
      *

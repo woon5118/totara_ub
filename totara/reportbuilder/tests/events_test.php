@@ -131,6 +131,34 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'reload report', 'index.php', 'Audience members (ID='.$report->_id.')'), $event);
     }
 
+    public function test_report_cloned_event() {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $rid = $this->create_report('user', 'Test user report');
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $this->add_column($report, 'user', 'id', null, null, null, 0);
+        $this->add_column($report, 'user', 'firstname', null, null, null, 0);
+
+        $report = new reportbuilder($rid);
+
+        reportbuilder_clone_report($report, 'New Name');
+
+        $event = \totara_reportbuilder\event\report_cloned::create_from_report($report);
+        $event->trigger();
+        $data = $event->get_data();
+        $this->assertSame($report, $event->get_report());
+        $this->assertSame($report->_id, $event->objectid);
+        $this->assertSame('c', $data['crud']);
+
+        $this->assertEventContextNotUsed($event);
+        $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'cloned report', 'index.php',
+            'Test user report (ID='.$report->_id.')'), $event);
+
+    }
+
     public function test_report_viewed_event() {
         $this->resetAfterTest();
         $this->setAdminUser();
