@@ -39,8 +39,8 @@ $tasks = array(
     array(
         'classname' => 'totara_reportbuilder\task\process_scheduled_task',
         'blocking' => 0,
-        'minute' => '0',
-        'hour' => '0',
+        'minute' => '*',
+        'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
@@ -48,8 +48,8 @@ $tasks = array(
     array(
         'classname' => 'totara_reportbuilder\task\refresh_cache_task',
         'blocking' => 0,
-        'minute' => '0',
-        'hour' => '0',
+        'minute' => '*',
+        'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
