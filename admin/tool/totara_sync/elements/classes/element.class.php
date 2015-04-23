@@ -44,6 +44,10 @@ abstract class totara_sync_element {
 
     abstract function config_save($data);
 
+    function validation($data, $file) {
+        return array();
+    }
+
     /**
      * Function that handles sync between external sources and Totara
      *

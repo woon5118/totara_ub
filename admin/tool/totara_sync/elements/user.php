@@ -100,9 +100,29 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->setExpanded('crudheading');
     }
 
+    function validation($data, $files) {
+        $errors = array();
+        if ($data['allowduplicatedemails'] && !empty($data['defaultsyncemail']) && !validate_email($data['defaultsyncemail'])) {
+            $errors['defaultsyncemail'] = get_string('invalidemail');
+        }
+        return $errors;
+    }
+
     function config_save($data) {
         $this->set_config('sourceallrecords', $data->sourceallrecords);
         $this->set_config('allowduplicatedemails', $data->allowduplicatedemails);
+        if (!empty($data->allow_create)) {
+            // When user creation is allowed, force change the first name and last name settings on.
+            set_config('import_firstname', "1", 'totara_sync_source_user_csv');
+            set_config('import_firstname', "1", 'totara_sync_source_user_database');
+            set_config('import_lastname', "1", 'totara_sync_source_user_csv');
+            set_config('import_lastname', "1", 'totara_sync_source_user_database');
+            if (empty($data->allowduplicatedemails)) {
+                // When user creation is allowed and duplicate emails are not allowed, force change the email settings on.
+                set_config('import_email', "1", 'totara_sync_source_user_csv');
+                set_config('import_email', "1", 'totara_sync_source_user_database');
+            }
+        }
         $this->set_config('defaultsyncemail', $data->defaultsyncemail);
         $this->set_config('ignoreexistingpass', $data->ignoreexistingpass);
         $this->set_config('forcepwchange', $data->forcepwchange);
@@ -747,6 +767,18 @@ class totara_sync_element_user extends totara_sync_element {
         $badids = $this->check_values_in_db($synctable, 'username', 'duplicateusernamexdb');
         $invalidids = array_merge($invalidids, $badids);
 
+        // Get empty firstnames. If it is provided then it must have a non-empty value.
+        if (isset($syncfields->firstname)) {
+            $badids = $this->check_empty_values($synctable, 'firstname', 'emptyvaluefirstnamex');
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
+        // Get empty lastnames. If it is provided then it must have a non-empty value.
+        if (isset($syncfields->lastname)) {
+            $badids = $this->check_empty_values($synctable, 'lastname', 'emptyvaluelastnamex');
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
         if (empty($this->config->allow_create)) {
             $badids = $this->check_users_unable_to_revive($synctable);
             $invalidids = array_merge($invalidids, $badids);
@@ -767,6 +799,9 @@ class totara_sync_element_user extends totara_sync_element {
             $invalidids = array_merge($invalidids, $badids);
             // Check emails against the DB to avoid saving repeated values.
             $badids = $this->check_values_in_db($synctable, 'email', 'duplicateusersemailxdb');
+            $invalidids = array_merge($invalidids, $badids);
+            // Get invalid emails.
+            $badids = $this->get_invalid_emails($synctable);
             $invalidids = array_merge($invalidids, $badids);
         }
 
@@ -1160,6 +1195,39 @@ class totara_sync_element_user extends totara_sync_element {
         foreach ($rs as $r) {
             $this->addlog(get_string('cannotupdatedeleteduserx', 'tool_totara_sync', $r->idnumber), 'error', 'checksanity');
             $invalidids[] = $r->id;
+        }
+        $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Get invalid email addresses in the email field
+     *
+     * @param string $synctable sync table name
+     *
+     * @return array with invalid ids from synctable for invalid emails
+     */
+    protected function get_invalid_emails($synctable) {
+        global $DB;
+
+        $params = array();
+        $invalidids = array();
+        $extracondition = '';
+        if (empty($this->config->sourceallrecords)) {
+            $extracondition = "AND deleted = ?";
+            $params[0] = 0;
+        }
+        $sql = "SELECT id, idnumber, email
+                  FROM {{$synctable}}
+                 WHERE email IS NOT NULL {$extracondition}";
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $r) {
+            if (!validate_email($r->email)) {
+                $this->addlog(get_string('invalidemailx', 'tool_totara_sync', $r), 'error', 'checksanity');
+                $invalidids[] = $r->id;
+            }
+            unset($r);
         }
         $rs->close();
 

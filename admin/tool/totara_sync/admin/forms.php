@@ -69,6 +69,15 @@ class totara_sync_element_settings_form extends moodleform {
 
         $this->add_action_buttons(false);
     }
+
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $element = $this->_customdata['element'];
+        $errors = array_merge($errors, $element->validation($data, $files));
+
+        return $errors;
+    }
 }
 
 
@@ -103,6 +112,15 @@ class totara_sync_source_settings_form extends moodleform {
         if ($this->elementname == 'user') {
             unset($data->import_username);
             unset($data->import_deleted);
+            if (get_config('totara_sync_element_user', 'allow_create')) {
+                // If users can be created then the firstname and lastname settings will be determined by code.
+                unset($data->import_firstname);
+                unset($data->import_lastname);
+                if (!get_config('totara_sync_element_user', 'allowduplicatedemails')) {
+                    // If users can be created and duplicate emails are not allowed then the setting will be determined by code.
+                    unset($data->import_email);
+                }
+            }
         }
         parent::set_data($data);
     }

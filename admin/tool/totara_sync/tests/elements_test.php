@@ -79,17 +79,24 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
         $key = 0;
         foreach (array(1, 0) as $sourceallrecords) {
 
+            set_config('allowduplicatedemails', "1", 'totara_sync_element_user');
+
             // Initialise the source. We could use csv or database, it's an arbitrary choice since we only use the base class methods.
             $source = new totara_sync_source_user_csv();
+
+            // Modify the config values in the source's config variable, which are protected.
+            $reflection = new ReflectionClass($source);
+            $reflection_property = $reflection->getProperty('config');
+            $reflection_property->setAccessible(true);
+            $sourceconfig = $reflection_property->getValue($source);
             if (!$sourceallrecords) {
-                // Modify the "import_deleted" value in the source's config variable, which is protected.
-                $reflection = new ReflectionClass($source);
-                $reflection_property = $reflection->getProperty('config');
-                $reflection_property->setAccessible(true);
-                $sourceconfig = $reflection_property->getValue($source);
                 $sourceconfig->import_deleted = true;
-                $reflection_property->setValue($source, $sourceconfig);
             }
+            // Required fields because allow_create is enabled.
+            $sourceconfig->import_firstname = true;
+            $sourceconfig->import_lastname = true;
+            // Don't include alternatename because we don't want it to be synced (wasn't checked, but was in sync csv).
+            $reflection_property->setValue($source, $sourceconfig);
 
             // Create the sync table.
             $temptable = $source->prepare_temp_table();
@@ -118,8 +125,10 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
                                         if ($userexists) {
                                             // The user record exists, so create it.
                                             $userrecord = new stdClass();
-                                            $userrecord->username = 'tsetorigusername' . $key;
-                                            $userrecord->firstname = 'origname' . $key;
+                                            $userrecord->username = 'testorigusername' . $key;
+                                            $userrecord->firstname = 'origfirstname' . $key;
+                                            $userrecord->lastname = 'origlastname' . $key;
+                                            $userrecord->alternatename = 'origalternatename' . $key; // Not synced.
                                             $userrecord->totarasync = $usersync;
                                             if ($useridnumber) {
                                                 $userrecord->idnumber = 'key' . $key;
@@ -136,6 +145,8 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
                                             $expectedresult->id = $newuser->id;
                                             $expectedresult->username = $userrecord->username;
                                             $expectedresult->firstname = $userrecord->firstname;
+                                            $expectedresult->lastname = $userrecord->lastname;
+                                            $expectedresult->alternatename = $userrecord->alternatename;
                                             $expectedresult->deleted = $userrecord->deleted;
                                             $expectedresult->totarasync = $userrecord->totarasync;
                                             if ($useridnumber) {
@@ -146,7 +157,10 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
                                             // The sync record exists, so create it.
                                             $syncrecord = new stdClass();
                                             $syncrecord->timemodified = 0;
-                                            $syncrecord->username = 'tsetsyncusername' . $key;
+                                            $syncrecord->firstname = 'syncfistname' . $key;
+                                            $syncrecord->lastname = 'synclastname' . $key;
+                                            $syncrecord->alternatename = 'syncalternatename' . $key; // Not synced.
+                                            $syncrecord->username = 'testsyncusername' . $key;
                                             $syncrecord->deleted = $syncdeleted;
                                             if ($syncidnumber) {
                                                 $syncrecord->idnumber = 'key' . $key;
@@ -164,7 +178,9 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
                                                         $expectedresult->idnumber = $syncrecord->idnumber;
                                                         $expectedresult->deleted = $syncrecord->deleted;
                                                         if (!$syncrecord->deleted) {
-                                                            // Don't update the record if the sync record is set to delete.
+                                                            // Only update the record if the sync record is not set to delete.
+                                                            $expectedresult->firstname = $syncrecord->firstname;
+                                                            $expectedresult->lastname = $syncrecord->lastname;
                                                             $expectedresult->username = $syncrecord->username;
                                                         }
                                                     } else {
@@ -286,7 +302,15 @@ class tool_totara_sync_elements_testcase extends advanced_testcase {
                 }
                 if (!empty($expectedresult->firstname)) {
                     $this->assertEquals($expectedresult->firstname, $finalresult->firstname,
-                            "Unexpected result for firstname\n{$settings}");
+                        "Unexpected result for firstname\n{$settings}");
+                }
+                if (!empty($expectedresult->lastname)) {
+                    $this->assertEquals($expectedresult->lastname, $finalresult->lastname,
+                        "Unexpected result for lastname\n{$settings}");
+                }
+                if (!empty($expectedresult->alternatename)) {
+                    $this->assertEquals($expectedresult->alternatename, $finalresult->alternatename,
+                        "Unexpected result for alternatename\n{$settings}");
                 }
                 if (!empty($expectedresult->deleted)) {
                     $this->assertEquals((bool)$expectedresult->deleted, (bool)$finalresult->deleted,

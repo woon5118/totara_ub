@@ -125,8 +125,14 @@ abstract class totara_sync_source_user extends totara_sync_source {
             if (in_array($f, array('idnumber', 'username', 'timemodified'))) {
                 $mform->addElement('hidden', $name, '1');
                 $mform->setType($name, PARAM_INT);
-            } elseif ($f == 'deleted') {
-                $mform->addElement('hidden', $name, $this->config->import_deleted);
+            } else if (in_array($f, array('firstname', 'lastname')) && $this->element->config->allow_create) {
+                $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else if ($f == 'email' && !$this->element->config->allowduplicatedemails) {
+                $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else if ($f == 'deleted') {
+                $mform->addElement('hidden', $name, $this->config->$name);
                 $mform->setType($name, PARAM_INT);
             } else {
                 $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
@@ -204,10 +210,10 @@ abstract class totara_sync_source_user extends totara_sync_source {
             $table->add_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         }
         if (!empty($this->config->import_firstname)) {
-            $table->add_field('firstname', XMLDB_TYPE_CHAR, '100');
+            $table->add_field('firstname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
         }
         if (!empty($this->config->import_lastname)) {
-            $table->add_field('lastname', XMLDB_TYPE_CHAR, '100');
+            $table->add_field('lastname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
         }
         if (!empty($this->config->import_firstnamephonetic)) {
             $table->add_field('firstnamephonetic', XMLDB_TYPE_CHAR, '255');

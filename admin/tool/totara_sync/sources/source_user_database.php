@@ -35,7 +35,15 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $this->config->import_idnumber = "1";
         $this->config->import_username = "1";
         $this->config->import_timemodified = "1";
-        $this->config->import_deleted = (isset($this->element->config->sourceallrecords) && $this->element->config->sourceallrecords == 0) ? "1" : '0';
+        if (!empty($this->element->config->allow_create)) {
+            $this->config->import_firstname = "1";
+            $this->config->import_lastname = "1";
+        }
+        if (empty($this->element->config->allowduplicatedemails)) {
+            $this->config->import_email = "1";
+        }
+        $this->config->import_deleted = (isset($this->element->config->sourceallrecords) &&
+            $this->element->config->sourceallrecords == 0) ? "1" : "0";
 
         // Display required db table columns
         $fieldmappings = array();
