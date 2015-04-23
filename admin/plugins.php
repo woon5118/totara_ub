@@ -78,7 +78,7 @@ if ($uninstall) {
     }
 
     $pluginname = $pluginman->plugin_name($pluginfo->component);
-    $PAGE->set_title($pluginname);
+    $PAGE->set_title(get_string('uninstalling', 'core_plugin', array('name' => $pluginname)));
     $PAGE->navbar->add(get_string('uninstalling', 'core_plugin', array('name' => $pluginname)));
 
     if (!$pluginman->can_uninstall_plugin($pluginfo->component)) {
