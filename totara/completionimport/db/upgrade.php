@@ -52,6 +52,33 @@ function xmldb_totara_completionimport_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2014030400, 'totara', 'completionimport');
+    }
+
+    // T-14233 Add completiondateparsed columns to course and certification import tables.
+    if ($oldversion < 2015030201) {
+
+        $field = new xmldb_field('completiondateparsed', XMLDB_TYPE_INTEGER, '10', null, null, null, null,
+            'importevidence');
+
+        $table = new xmldb_table('totara_compl_import_course');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('totara_compl_import_cert');
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2015030201, 'totara', 'completionimport');
     }
 
     return true;

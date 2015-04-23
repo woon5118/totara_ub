@@ -62,11 +62,22 @@ class csv_iterator extends SplFileObject
     private $importtime;
 
     /**
+     * @var string $csvdateformat the format to use when parsing date fields
+     */
+    private $csvdateformat;
+
+    /**
+     * @var array(string sourcefield => string destinationfield) $datefields the field mappings that represent dates
+     */
+    private $datefieldmap;
+
+    /**
      * @var int $userid current user id
      */
     private $userid;
 
-    public function __construct($filename, $separator, $delimiter, $encoding, $requiredfields, $importtime) {
+    public function __construct($filename, $separator, $delimiter, $encoding, $requiredfields, $importtime,
+                                $csvdateformat, $datefieldmap) {
         global $USER;
         parent::__construct($filename, 'r');
         // Drop new line doesn't work - not keen on using SplFileObject::SKIP_EMPTY because the rownumber will be incorect.
@@ -77,6 +88,8 @@ class csv_iterator extends SplFileObject
         $this->encoding = $encoding;
         $this->requiredfields = $requiredfields;
         $this->importtime = $importtime;
+        $this->csvdateformat = $csvdateformat;
+        $this->datefieldmap = $datefieldmap;
         $this->rowcount = 0;
         $this->fieldcount = 0;
         $this->importfields = array();
@@ -140,6 +153,10 @@ class csv_iterator extends SplFileObject
                 if ($this->importfields[$field]) {
                     $data->$field = $value;
                     $emptyrow .= $data->$field;
+                    if (!empty($this->datefieldmap[$field])) {
+                        $mapto = $this->datefieldmap[$field];
+                        $data->$mapto = totara_date_parse_from_format($this->csvdateformat, $value);
+                    }
                 }
             }
             if ($emptyrow === '') {
@@ -161,7 +178,7 @@ class csv_iterator extends SplFileObject
         if (!empty($fields) && is_array($fields)) {
             foreach ($fields as $key => $value) {
                 $value = html_entity_decode(clean_text(trim($value)), ENT_QUOTES, 'UTF-8');
-                $fields[$key] = textlib::convert($value, $this->encoding, 'utf-8');
+                $fields[$key] = core_text::convert($value, $this->encoding, 'utf-8');
             }
         }
         return $fields;

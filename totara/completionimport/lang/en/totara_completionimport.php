@@ -78,6 +78,7 @@ $string['erroropeningfile'] = 'Error opening file : {$a}';
 $string['evidence_certificationidnumber'] = 'Certification ID number : {$a}';
 $string['evidence_certificationshortname'] = 'Certification Short name : {$a}';
 $string['evidence_completiondate'] = 'Completion date : {$a}';
+$string['evidence_completiondateparsed'] = 'Completion date (timestamp) : {$a}';
 $string['evidence_courseidnumber'] = 'Course ID number : {$a}';
 $string['evidence_courseshortname'] = 'Course Short name : {$a}';
 $string['evidence_grade'] = 'Grade : {$a}';
