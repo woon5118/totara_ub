@@ -100,3 +100,5 @@ require_once($CFG->dirroot . '/backup/util/ui/backup_ui_setting.class.php');
 // And some moodle stuff too
 require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->libdir.'/gradelib.php');
+// And any Totara stuff.
+require_once($CFG->dirroot.'/totara/cohort/lib.php');

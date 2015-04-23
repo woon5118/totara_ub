@@ -1429,6 +1429,7 @@ class restore_course_structure_step extends restore_structure_step {
         $course = new restore_path_element('course', '/course');
         $category = new restore_path_element('category', '/course/category');
         $tag = new restore_path_element('tag', '/course/tags/tag');
+        $visibleaudience = new restore_path_element('visibleaudience', '/course/visibleaudiences/visibleaudience');
         $custom_field = new restore_path_element('custom_field', '/course/custom_fields/custom_field');
 
         // Apply for 'format' plugins optional paths at course level
@@ -1449,7 +1450,7 @@ class restore_course_structure_step extends restore_structure_step {
         // Apply for local plugins optional paths at course level
         $this->add_plugin_structure('local', $course);
 
-        return array($course, $category, $tag, $custom_field);
+        return array($course, $category, $tag, $visibleaudience, $custom_field);
 
     }
 
@@ -1484,6 +1485,14 @@ class restore_course_structure_step extends restore_structure_step {
             // Do not reset idnumber.
         } else {
             $data->idnumber = '';
+        }
+
+        // Restore audience visibility settings.
+        if (empty($data->audiencevisibility)) {
+            // If audience visibility is enabled, set the value to the site default, otherwise leave empty.
+            if ($CFG->audiencevisibility) {
+                $data->audiencevisibility = get_config('moodlecourse', 'visiblelearning');
+            }
         }
 
         // Any empty value for course->hiddensections will lead to 0 (default, show collapsed).
@@ -1542,6 +1551,16 @@ class restore_course_structure_step extends restore_structure_step {
 
     public function process_category($data) {
         // Nothing to do with the category. UI sets it before restore starts
+    }
+
+    public function process_visibleaudience($data){
+        global $CFG;
+        $data = (object)$data;
+        // Only restore if audience visibility is enabled and there is real data.
+        if ($CFG->audiencevisibility && !empty($data->cohortid)) {
+            $courseid = $this->get_courseid();
+            totara_cohort_add_association($data->cohortid, $courseid, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
+        }
     }
 
     public function process_tag($data) {

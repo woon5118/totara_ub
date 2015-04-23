@@ -98,3 +98,5 @@ require_once($CFG->dirroot . '/lib/gradelib.php');
 require_once($CFG->dirroot . '/lib//questionlib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once ($CFG->dirroot . '/blocks/moodleblock.class.php');
+// And any Totara stuff.
+require_once($CFG->dirroot.'/totara/cohort/lib.php');
