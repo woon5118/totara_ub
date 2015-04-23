@@ -418,6 +418,8 @@ function cohort_rules_clone_collection($collid, $status=null, $usetrans=true, $c
     $newcollection = new stdClass;
     $newcollection->cohortid =        !empty($cohortid) ? $cohortid : $collection->cohortid;
     $newcollection->rulesetoperator = $collection->rulesetoperator;
+    $newcollection->addnewmembers =   $collection->addnewmembers;
+    $newcollection->removeoldmembers = $collection->removeoldmembers;
     $newcollection->status =          !empty($status) ? $status : $collection->status;
     $newcollection->timecreated =     $now;
     $newcollection->timemodified =    $now;

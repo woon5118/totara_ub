@@ -630,6 +630,42 @@ function totara_cohort_update_operator($cohortid, $id, $type, $operatorvalue) {
     return $result;
 }
 
+
+/**
+ * Update the rule set membership options.
+ *
+ * @param $id integer Record id for the audience to be updated.
+ * @param $addnewmembers integer The new value for the option to enable / disable new members being added to the audience.
+ * @param $removeoldmember integer The new value for the option to enable / disable new members being removed from the audience.
+ * @eturn integer Success / fail for the database update result.
+ */
+function totara_cohort_update_membership_options($id, $addnewmembers, $removeoldmembers) {
+    global $DB, $USER;
+
+    $cohort = $DB->get_record('cohort', array('id' => $id));
+
+    $rulecollection = new stdClass();
+    $rulecollection->id = $cohort->draftcollectionid;
+    $rulecollection->status = COHORT_COL_STATUS_DRAFT_CHANGED;
+    $rulecollection->timemodified = time();
+    $rulecollection->modifierid = $USER->id;
+
+    if (isset($addnewmembers)) {
+        $rulecollection->addnewmembers = $addnewmembers;
+    } else if (isset($removeoldmembers)) {
+        $rulecollection->removeoldmembers = $removeoldmembers;
+    }
+
+    $result = $DB->update_record('cohort_rule_collections', $rulecollection);
+
+    // Trigger update to the operators and membership options.
+    $event = \totara_cohort\event\option_updated::create_from_instance($rulecollection, $cohort);
+    $event->trigger();
+
+    return $result;
+}
+
+
 /**
  * Get the where clause for a dynamic cohort's query. The where clause will assume that
  * the "mdl_user" table has the alias "u".
@@ -707,8 +743,6 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
         }
     }
 
-    $beforecount = $DB->count_records('cohort_members', array('cohortid' => $cohortid));
-
     /// find members who should be added and deleted
     $sql = "
        SELECT userid AS id, MAX(inrules) AS addme, MAX(inmembers) AS deleteme
@@ -753,7 +787,14 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
         $changedmembers = array();
     }
 
-    /// update memberships in batches
+    // Get the membersip options so we know whether to add and / remove users.
+    $sql = "SELECT crc.id, crc.addnewmembers, crc.removeoldmembers
+        FROM {cohort} c
+        INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
+        WHERE c.id = ?";
+    $cohort = $DB->get_record_sql($sql, array($cohortid));
+
+    // Update memberships in batches.
     $newmembers = array();
     $delmembers = array();
     $cmcount = 0;
@@ -762,10 +803,10 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
     $currentcohortroles = totara_get_cohort_roles($cohortid); // Current roles assigned to this cohort.
     foreach ($changedmembers as $mem) {
         $cmcount++;
-        if ($mem->addme) {
+        if ($mem->addme && $cohort->addnewmembers) {
             $newmembers[$mem->id] = $mem;
         }
-        if ($mem->deleteme) {
+        if ($mem->deleteme && $cohort->removeoldmembers) {
             $delmembers[$mem->id] = $mem;
         }
         if ($cmcount < 2000) {

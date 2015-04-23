@@ -89,6 +89,37 @@ M.totara_cohortrules = M.totara_cohortrules || {
         // Hide update operators buttons
         $('#fgroup_id_buttonar').hide();
 
+        // Membership options checkboxes.
+        $('input.memberoptions').click(function() {
+
+            id = M.totara_cohortrules.config.cohortid;
+
+            var ajaxdata = {
+                'sesskey':  M.cfg.sesskey,
+                'id':       id
+            };
+
+            // Use the checkbox name for to create an appropriate parameter.
+            var checkbox = $(this);
+            var param = checkbox.attr('name');
+            var value = checkbox.prop('checked') ? 1 : 0
+            ajaxdata[param] = value;
+
+            $.ajax({
+                url: M.cfg.wwwroot + '/totara/cohort/rules/updateoptions.php',
+                data: ajaxdata,
+                error: function(h, t, e) {
+                    // Display a message and reload the broken page.
+                    alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
+                    location.reload();
+                },
+                success: function(o) {
+                    show_notifications(o.action, id, o.result);
+                    window.onbeforeunload = null;
+                }
+            });
+        });
+
         // Update AND/OR operators
         $(document).on('click', 'input:radio', function(event) {
 
@@ -124,6 +155,11 @@ M.totara_cohortrules = M.totara_cohortrules || {
                      cohortid : cohortid,
                      sesskey: M.cfg.sesskey
                  }),
+                 error: function(h, t, e) {
+                     // Display a message and reload the broken page.
+                     alert(M.util.get_string('error:badresponsefromajax', 'totara_cohort'));
+                     location.reload();
+                 },
                  success: function(o) {
                      // If success, update operators description in the client side.
                      if (o) {
@@ -180,7 +216,7 @@ M.totara_cohortrules = M.totara_cohortrules || {
                 if ($('div#notify'+ id).length === 0) {
                     if (type === 'updcohortop') {
                         $('#fgroup_id_cohortoperator').prepend(notice);
-                    } else {
+                    } else if (type === 'updrulesetop') {
                         $('#fgroup_id_rulesetoperator_' + id).prepend(notice);
                     }
                 }

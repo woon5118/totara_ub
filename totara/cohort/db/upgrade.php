@@ -719,5 +719,29 @@ function xmldb_totara_cohort_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015020900, 'totara', 'cohort');
     }
 
+    if ($oldversion < 2015042200) {
+
+        // Define field addnewmembers to be added to cohort_rule_collections
+        $table = new xmldb_table('cohort_rule_collections');
+        $field = new xmldb_field('addnewmembers');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'rulesetoperator');
+
+        // Launch add field addnewmembers
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('removeoldmembers');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'addnewmembers');
+
+        // Launch add field removeoldmembers
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2015042200, 'totara', 'cohort');
+    }
+
     return true;
 }

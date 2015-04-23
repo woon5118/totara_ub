@@ -57,9 +57,8 @@ local_js(array(
 $args = array('args' => '{"cohortid":' . $id . ',
     "operator_type_cohort":'  . COHORT_OPERATOR_TYPE_COHORT  . ',
     "operator_type_ruleset":' . COHORT_OPERATOR_TYPE_RULESET .'}');
-$PAGE->requires->strings_for_js(
-    array('error:baddate', 'error:badduration', 'addrule', 'orcohort', 'andcohort', 'or', 'and', 'rulesupdatesuccess', 'rulesupdatefailure'),
-    'totara_cohort');
+$PAGE->requires->strings_for_js(array('error:baddate', 'error:badduration', 'error:couldnotupdatemembershipoption', 'addrule',
+        'orcohort', 'andcohort', 'or', 'and', 'rulesupdatesuccess', 'rulesupdatefailure'), 'totara_cohort');
 $PAGE->requires->strings_for_js(array('datepickerlongyearregexjs', 'datepickerlongyeardisplayformat'), 'totara_core');
 $jsmodule = array(
         'name' => 'totara_cohortrules',
@@ -89,6 +88,8 @@ if (!$cohort->cohorttype == cohort::TYPE_DYNAMIC) {
 }
 
 $rulesets = $DB->get_records('cohort_rulesets', array('rulecollectionid' => $cohort->draftcollectionid), 'sortorder');
+$collections = $DB->get_record('cohort_rule_collections', array('id' => $cohort->draftcollectionid));
+
 if (!$rulesets) {
     $rulesets = array();
 }
@@ -141,7 +142,7 @@ if (($data = data_submitted()) && confirm_sesskey()) {
 }
 
 if ($formdata = $mform->get_data()) {
-
+    
     // Update the cohort operator?
     if (isset($formdata->cohortoperator) && $formdata->cohortoperator <> $cohort->rulesetoperator) {
         totara_cohort_update_operator($cohort->id, $cohort->id, COHORT_OPERATOR_TYPE_COHORT, $formdata->cohortoperator);
@@ -168,6 +169,8 @@ if ($formdata = $mform->get_data()) {
 } else {
     $formdata = array();
     $formdata['cohortoperator'] = $cohort->rulesetoperator;
+    $formdata['addnewmembers'] = $collections->addnewmembers;
+    $formdata['removeoldmembers'] = $collections->removeoldmembers;
     foreach ($rulesets as $ruleset) {
         $formdata["rulesetoperator[{$ruleset->id}]"] = $ruleset->operator;
     }

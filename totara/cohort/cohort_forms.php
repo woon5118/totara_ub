@@ -41,11 +41,24 @@ class cohort_rules_form extends moodleform {
         $mform->addElement('hidden', 'id', $cohort->id);
         $mform->setType('id', PARAM_INT);
 
+        $addremovegroup = array();
+        $addremovegroup[] =& $mform->createElement('advcheckbox', 'addnewmembers', '', get_string('addnewmembers', 'totara_cohort'),
+                                                    array('class' => 'memberoptions'));
+        $addremovegroup[] =& $mform->createElement('advcheckbox', 'removeoldmembers', '', get_string('removeoldmembers',
+                                                    'totara_cohort'), array('class' => 'memberoptions'));
+
+        // Set all checkboxs to be checked by default
+        $mform->setDefault('addnewmembers', 1);
+        $mform->setDefault('removeoldmembers', 1);
+
+        $mform->addGroup($addremovegroup, 'addremove', get_string('addremovelabel', 'totara_cohort'), html_writer::empty_tag('br'), false);
+        $mform->addHelpButton('addremove', 'addremovehelp', 'totara_cohort');
+
         // The menu for the operator between rulesets.
         $radiogroup = array();
         $radiogroup[] =& $mform->createElement('radio', 'cohortoperator', '', get_string('cohortoperatorandlabel', 'totara_cohort'), COHORT_RULES_OP_AND);
         $radiogroup[] =& $mform->createElement('radio', 'cohortoperator', '', get_string('cohortoperatororlabel', 'totara_cohort'), COHORT_RULES_OP_OR);
-        $mform->addGroup($radiogroup, 'cohortoperator', get_string('cohortoperatorlabel', 'totara_cohort'), '<br />', false);
+        $mform->addGroup($radiogroup, 'cohortoperator', get_string('cohortoperatorlabel', 'totara_cohort'), html_writer::empty_tag('br'), false);
         $mform->addHelpButton('cohortoperator', 'cohortoperatorlabel', 'totara_cohort');
         $mform->setDefault('cohortoperator', COHORT_RULES_OP_AND);
         $mform->setType('cohortoperator', PARAM_INT);
