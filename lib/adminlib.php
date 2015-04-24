@@ -2846,7 +2846,7 @@ class admin_setting_configmulticheckbox extends admin_setting {
         }
         $return .= '</div>';
 
-        return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $defaultinfo, $query);
+        return format_admin_setting($this, $this->visiblename, $return, $this->description, $this->get_id().'_'.array_keys($this->choices)[0], '', $defaultinfo, $query);
 
     }
 }
