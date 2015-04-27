@@ -534,9 +534,8 @@ function position_save_data($userprofile) {
  * @return  void
  */
 function profile_display_hierarchy_fields($userid) {
-    global $OUTPUT, $DB;
-    $sql = "SELECT p.fullname as pos, o.fullname as org, u.id as manid,
-                " . $DB->sql_fullname('u.firstname', 'u.lastname') . " AS fullname
+    global $DB;
+    $sql = "SELECT p.fullname as pos, o.fullname as org, u.id as manid, " . get_all_user_name_fields(true, 'u') . "
                 FROM {pos_assignment} pa
                     LEFT JOIN {pos} p ON pa.positionid = p.id
                     LEFT JOIN {org} o ON pa.organisationid = o.id
@@ -556,7 +555,7 @@ function profile_display_hierarchy_fields($userid) {
     }
 
     if (isset($record->manid)) {
-        $manurl = html_writer::link(new moodle_url('/user/profile.php', array("id" => $record->manid)), $record->fullname);
+        $manurl = html_writer::link(new moodle_url('/user/profile.php', array("id" => $record->manid)), fullname($record));
         echo html_writer::tag('dt', get_string('manager', 'totara_hierarchy'));
         echo html_writer::tag('dd', $manurl);
     }

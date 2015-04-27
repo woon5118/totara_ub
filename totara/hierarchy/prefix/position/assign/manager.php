@@ -40,12 +40,13 @@ if (!(get_config('totara_hierarchy', 'allowsignupmanager') && $userid == 0)) {
 //get guest user for exclusion purposes
 $guest = guest_user();
 
-// Load potential managers for this user
+// Load potential managers for this user.
+$usernamefields = get_all_user_name_fields(true, 'u');
 $managers = $DB->get_records_sql(
     "
         SELECT
             u.id, u.email,
-            ".$DB->sql_fullname('u.firstname', 'u.lastname')." AS fullname
+            {$usernamefields}
         FROM
             {user} u
         WHERE
@@ -54,8 +55,7 @@ $managers = $DB->get_records_sql(
         AND u.id != ?
         AND u.id != ?
         ORDER BY
-            u.firstname,
-            u.lastname
+            {$usernamefields}
     ",
     array($guest->id, $userid), 0, TOTARA_DIALOG_MAXITEMS + 1);
 // Limit results to 1 more than the maximum number that might be displayed
@@ -64,6 +64,9 @@ $managers = $DB->get_records_sql(
 ///
 /// Display page
 ///
+foreach ($managers as $manager) {
+    $manager->fullname = fullname($manager);
+}
 
 $dialog = new totara_dialog_content();
 $dialog->searchtype = 'user';

@@ -42,24 +42,29 @@ $guest = guest_user();
 // Load potential managers for this user.
 $currentmanager = totara_get_manager($userid, null, true);
 $currentmanagerid = empty($currentmanager) ? 0 : $currentmanager->id;
+$usernamefields = get_all_user_name_fields(true, 'u');
 if (empty($CFG->tempmanagerrestrictselection)) {
     // All users.
-    $sql = "SELECT u.id, u.email, ".$DB->sql_fullname('u.firstname', 'u.lastname')." AS fullname
+    $sql = "SELECT u.id, u.email, {$usernamefields}
               FROM {user} u
              WHERE u.deleted = 0
                AND u.suspended = 0
                AND u.id NOT IN(?, ?, ?)
-          ORDER BY fullname, u.id";
+          ORDER BY {$usernamefields}, u.id";
 } else {
-    $sql = "SELECT DISTINCT u.id, u.email, ".$DB->sql_fullname('u.firstname', 'u.lastname')." AS fullname
+    $sql = "SELECT DISTINCT u.id, u.email, {$usernamefields}
               FROM {pos_assignment} pa
               JOIN {user} u ON pa.managerid = u.id
              WHERE u.deleted = 0
                AND u.suspended = 0
                AND u.id NOT IN(?, ?, ?)
-          ORDER BY fullname, u.id";
+          ORDER BY {$usernamefields}, u.id";
 }
 $managers = $DB->get_records_sql($sql, array($guest->id, $userid, $currentmanagerid));
+
+foreach ($managers as $manager) {
+    $manager->fullname = fullname($manager);
+}
 
 /*
  * Display page.
