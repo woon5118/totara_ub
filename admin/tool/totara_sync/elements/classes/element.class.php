@@ -93,8 +93,8 @@ abstract class totara_sync_element {
     /**
      * Get the enabled source for the element
      *
-     * @param string sourceclass name
-     * @return stdClass source object or false if no source could be detemined
+     * @param string $sourceclass name
+     * @return totara_sync_source source object or false if no source could be determined
      * @throws totara_sync_exception
      */
     function get_source($sourceclass=null) {

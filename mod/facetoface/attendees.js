@@ -779,16 +779,16 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
             }
         }
 
-        function removeselect_onfocus() {
+        $(document).on('focus', '#removeselect', function() {
             $('form#assignform input[name=add]').attr('disabled', 'disabled');
             $('form#assignform input[name=remove]').removeAttr('disabled');
             $('#addselect').val(-1);
-        }
+        });
 
-        function addselect_onfocus() {
+        $(document).on('focus', '#addselect', function() {
             $('form#assignform input[name=remove]').attr('disabled', 'disabled');
             $('form#assignform input[name=add]').removeAttr('disabled');
             $('#removeselect').val(-1);
-        }
+        })
     }
 }

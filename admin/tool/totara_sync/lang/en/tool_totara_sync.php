@@ -206,6 +206,7 @@ $string['couldnotcreateclonetable'] = 'could not create clone table, aborting...
 $string['sanitycheckfailed'] = 'sanity check failed, aborting...';
 $string['cannotdeletex'] = 'cannot delete {$a} (might already be deleted)';
 $string['deletedx'] = 'deleted {$a}';
+$string['suspendeduserx'] = 'suspended {$a}';
 $string['frameworkxnotfound'] = 'framework {$a} not found...';
 $string['parentxnotfound'] = 'parent {$a} not found...';
 $string['cannotsyncitemparent'] = 'cannot import item\'s parent {$a}';

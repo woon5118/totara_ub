@@ -1484,5 +1484,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030202, 'totara_core');
     }
 
+    if ($oldversion < 2015030203) {
+        // Do not use the Moodle delete in existing upgraded sites.
+        set_config('authdeleteusers', 'partial');
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030203, 'totara_core');
+    }
+
     return true;
 }

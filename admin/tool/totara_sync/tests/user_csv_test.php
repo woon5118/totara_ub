@@ -1,0 +1,827 @@
+<?php
+/*
+ * This file is part of Totara LMS
+ *
+ * Copyright (C) 2015 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @package tool_totara_sync
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+class tool_totara_sync_user_csv_testcase extends advanced_testcase {
+    public function test_sync_changed_users() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
+
+        $this->resetAfterTest();
+
+        $this->assertCount(2, $DB->get_records('user'));
+        $this->assertCount(0, $DB->get_records('user', array('deleted' => 1)));
+
+        $filedir = $CFG->dataroot . '/totara_sync';
+        mkdir($filedir . '/csv/ready', 0777, true);
+
+        set_config('authdeleteusers', 'full');
+
+        set_config('element_user_enabled', 1, 'totara_sync');
+        set_config('source_user', 'totara_sync_source_user_csv', 'totara_sync');
+        set_config('fileaccess', FILE_ACCESS_DIRECTORY, 'totara_sync');
+        set_config('filesdir', $filedir, 'totara_sync');
+
+        $configcsv = array(
+            'csvuserencoding' => 'UTF-8',
+            'delimiter' => ',',
+            'fieldmapping_address' => '',
+            'fieldmapping_alternatename' => '',
+            'fieldmapping_appraiseridnumber' => '',
+            'fieldmapping_auth' => '',
+            'fieldmapping_city' => '',
+            'fieldmapping_country' => '',
+            'fieldmapping_deleted' => '',
+            'fieldmapping_department' => '',
+            'fieldmapping_description' => '',
+            'fieldmapping_email' => '',
+            'fieldmapping_emailstop' => '',
+            'fieldmapping_firstname' => '',
+            'fieldmapping_firstnamephonetic' => '',
+            'fieldmapping_idnumber' => '',
+            'fieldmapping_institution' => '',
+            'fieldmapping_lang' => '',
+            'fieldmapping_lastname' => '',
+            'fieldmapping_lastnamephonetic' => '',
+            'fieldmapping_manageridnumber' => '',
+            'fieldmapping_middlename' => '',
+            'fieldmapping_orgidnumber' => '',
+            'fieldmapping_password' => '',
+            'fieldmapping_phone1' => '',
+            'fieldmapping_phone2' => '',
+            'fieldmapping_posenddate' => '',
+            'fieldmapping_posidnumber' => '',
+            'fieldmapping_posstartdate' => '',
+            'fieldmapping_postitle' => '',
+            'fieldmapping_suspended' => '',
+            'fieldmapping_timemodified' => '',
+            'fieldmapping_timezone' => '',
+            'fieldmapping_url' => '',
+            'fieldmapping_username' => '',
+            'import_address' => '0',
+            'import_alternatename' => '0',
+            'import_appraiseridnumber' => '0',
+            'import_auth' => '0',
+            'import_city' => '0',
+            'import_country' => '0',
+            'import_deleted' => '1',
+            'import_department' => '0',
+            'import_description' => '0',
+            'import_email' => '0',
+            'import_emailstop' => '0',
+            'import_firstname' => '1',
+            'import_firstnamephonetic' => '0',
+            'import_idnumber' => '1',
+            'import_institution' => '0',
+            'import_lang' => '0',
+            'import_lastname' => '1',
+            'import_lastnamephonetic' => '0',
+            'import_manageridnumber' => '0',
+            'import_middlename' => '0',
+            'import_orgidnumber' => '0',
+            'import_password' => '0',
+            'import_phone1' => '0',
+            'import_phone2' => '0',
+            'import_posenddate' => '0',
+            'import_posidnumber' => '0',
+            'import_posstartdate' => '0',
+            'import_postitle' => '0',
+            'import_suspended' => '0',
+            'import_timemodified' => '1',
+            'import_timezone' => '0',
+            'import_url' => '0',
+            'import_username' => '1',
+        );
+        foreach ($configcsv as $k => $v) {
+            set_config($k, $v, 'totara_sync_source_user_csv');
+        }
+
+        // Try no action first.
+
+        $config = array(
+            'allow_create' => '0',
+            'allow_delete' => '0',
+            'allow_update' => '0',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_1.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(2, $users);
+
+        // Try adding new some users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '0',
+            'allow_update' => '0',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_1.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(5, $users);
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+
+        // Add more users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '0',
+            'allow_update' => '0',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_2.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        // Modify users with no deletes.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '0',
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_3.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'username' => 'xxxx001')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'username' => 'import002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'username' => 'import003')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'username' => 'import004')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'username' => 'import005')));
+
+        // Suspend deleted users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '2', // Suspend flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_4.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 1)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'username' => 'xxxx001'))); // No udpate expected.
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'username' => 'import002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'username' => 'import003')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'username' => 'import004')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'username' => 'import005')));
+
+        // Full user delete.
+
+        set_config('authdeleteusers', 'full');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_5.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 1)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(1, $DB->get_records('user', array('deleted' => 1)));
+
+        // Legacy partial delete.
+
+        set_config('authdeleteusers', 'partial');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_6.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 1)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 1, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(2, $DB->get_records('user', array('deleted' => 1)));
+
+        // Legacy undelete after partial delete.
+
+        set_config('authdeleteusers', 'partial');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '0',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_changed_7.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 1)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(1, $DB->get_records('user', array('deleted' => 1)));
+    }
+
+    public function test_sync_all_users() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
+
+        $this->resetAfterTest();
+
+        $this->assertCount(2, $DB->get_records('user'));
+        $this->assertCount(0, $DB->get_records('user', array('deleted' => 1)));
+
+        $filedir = $CFG->dataroot . '/totara_sync';
+        mkdir($filedir . '/csv/ready', 0777, true);
+
+        set_config('authdeleteusers', 'full');
+
+        set_config('element_user_enabled', 1, 'totara_sync');
+        set_config('source_user', 'totara_sync_source_user_csv', 'totara_sync');
+        set_config('fileaccess', FILE_ACCESS_DIRECTORY, 'totara_sync');
+        set_config('filesdir', $filedir, 'totara_sync');
+
+        $configcsv = array(
+            'csvuserencoding' => 'UTF-8',
+            'delimiter' => ',',
+            'fieldmapping_address' => '',
+            'fieldmapping_alternatename' => '',
+            'fieldmapping_appraiseridnumber' => '',
+            'fieldmapping_auth' => '',
+            'fieldmapping_city' => '',
+            'fieldmapping_country' => '',
+            'fieldmapping_deleted' => '',
+            'fieldmapping_department' => '',
+            'fieldmapping_description' => '',
+            'fieldmapping_email' => '',
+            'fieldmapping_emailstop' => '',
+            'fieldmapping_firstname' => '',
+            'fieldmapping_firstnamephonetic' => '',
+            'fieldmapping_idnumber' => '',
+            'fieldmapping_institution' => '',
+            'fieldmapping_lang' => '',
+            'fieldmapping_lastname' => '',
+            'fieldmapping_lastnamephonetic' => '',
+            'fieldmapping_manageridnumber' => '',
+            'fieldmapping_middlename' => '',
+            'fieldmapping_orgidnumber' => '',
+            'fieldmapping_password' => '',
+            'fieldmapping_phone1' => '',
+            'fieldmapping_phone2' => '',
+            'fieldmapping_posenddate' => '',
+            'fieldmapping_posidnumber' => '',
+            'fieldmapping_posstartdate' => '',
+            'fieldmapping_postitle' => '',
+            'fieldmapping_suspended' => '',
+            'fieldmapping_timemodified' => '',
+            'fieldmapping_timezone' => '',
+            'fieldmapping_url' => '',
+            'fieldmapping_username' => '',
+            'import_address' => '0',
+            'import_alternatename' => '0',
+            'import_appraiseridnumber' => '0',
+            'import_auth' => '0',
+            'import_city' => '0',
+            'import_country' => '0',
+            'import_deleted' => '0',
+            'import_department' => '0',
+            'import_description' => '0',
+            'import_email' => '0',
+            'import_emailstop' => '0',
+            'import_firstname' => '1',
+            'import_firstnamephonetic' => '0',
+            'import_idnumber' => '1',
+            'import_institution' => '0',
+            'import_lang' => '0',
+            'import_lastname' => '1',
+            'import_lastnamephonetic' => '0',
+            'import_manageridnumber' => '0',
+            'import_middlename' => '0',
+            'import_orgidnumber' => '0',
+            'import_password' => '0',
+            'import_phone1' => '0',
+            'import_phone2' => '0',
+            'import_posenddate' => '0',
+            'import_posidnumber' => '0',
+            'import_posstartdate' => '0',
+            'import_postitle' => '0',
+            'import_suspended' => '0',
+            'import_timemodified' => '1',
+            'import_timezone' => '0',
+            'import_url' => '0',
+            'import_username' => '1',
+        );
+        foreach ($configcsv as $k => $v) {
+            set_config($k, $v, 'totara_sync_source_user_csv');
+        }
+
+        // Try no action first.
+
+        $config = array(
+            'allow_create' => '0',
+            'allow_delete' => '0',
+            'allow_update' => '0',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_1.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(2, $users);
+
+        // Try adding new some users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '0',
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_1.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(5, $users);
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+
+        // Add more users and update existing, ignore deleted flag.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '0',
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_2.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'username' => 'xxxx001')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'username' => 'import002'))); // No timemodified, change ignored.
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'username' => 'import003')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'username' => 'import004')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'username' => 'import005')));
+
+        // Suspend deleted users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '2', // Suspend flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_3.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 1)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'username' => 'xxxx001'))); // Suspended not updated!
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'username' => 'import002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'username' => 'import003')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'username' => 'import004')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'username' => 'import005')));
+
+
+        // Unsuspend deleted users.
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '2', // Suspend flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_4.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'username' => 'import001')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp002', 'username' => 'import002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'username' => 'import003')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'username' => 'import004')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'username' => 'import005')));
+
+        // Full user delete.
+
+        set_config('authdeleteusers', 'full');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_5.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(1, $DB->get_records('user', array('deleted' => 1)));
+
+        // Legacy partial delete.
+
+        set_config('authdeleteusers', 'partial');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_6.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 1, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(2, $DB->get_records('user', array('deleted' => 1)));
+
+        // Legacy undelete after partial delete.
+
+        set_config('authdeleteusers', 'partial');
+
+        $config = array(
+            'allow_create' => '1',
+            'allow_delete' => '1', // Delete flag, do not use constant here!
+            'allow_update' => '1',
+            'allowduplicatedemails' => '0',
+            'defaultsyncemail' => '',
+            'forcepwchange' => '0',
+            'ignoreexistingpass' => '0',
+            'sourceallrecords' => '1',
+        );
+        foreach ($config as $k => $v) {
+            set_config($k, $v, 'totara_sync_element_user');
+        }
+
+        $elements = totara_sync_get_elements(true);
+        /** @var totara_sync_element_user $element */
+        $element = $elements['user'];
+
+        $data = file_get_contents(__DIR__ . '/fixtures/user_all_5.csv');
+        $filepath = $filedir . '/csv/ready/user.csv';
+        file_put_contents($filepath, $data);
+
+        $result = $element->sync();
+        $this->assertTrue($result);
+
+        $users = $DB->get_records('user');
+        $this->assertCount(7, $users);
+
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp001', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertFalse($DB->record_exists('user', array('idnumber' => 'imp002')));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp003', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp004', 'deleted' => 0, 'suspended' => 0)));
+        $this->assertTrue($DB->record_exists('user', array('idnumber' => 'imp005', 'deleted' => 0, 'suspended' => 0)));
+
+        $this->assertCount(1, $DB->get_records('user', array('deleted' => 1)));
+    }
+}

@@ -101,6 +101,19 @@
                 echo $OUTPUT->notification($returnurl, get_string('deletednot', '', fullname($user, true)));
             }
         }
+        // Totara - allow full delete of partially deleted users.
+        else if (data_submitted() and $user->deleted) {
+            if ($CFG->authdeleteusers !== 'partial' and !preg_match($preg_emailhash, $user->email)) {
+                // Do the real delete again - discard the username, idnumber and email.
+                $trans = $DB->start_delegated_transaction();
+                $DB->set_field('user', 'deleted', 0, array('id' => $user->id));
+                $user->deleted = 0;
+                delete_user($user);
+                $trans->allow_commit();
+                redirect($returnurl);
+            }
+        }
+        // End of Totara hack.
     } else if ($undelete && confirm_sesskey()) {              // Delete a selected user, after confirmation
 
         if (!has_capability('totara/core:undeleteuser', $sitecontext)) {
@@ -375,12 +388,17 @@
                 }
             }
 
-            // Don't show any buttons, except undelete for deleted users
+            // Don't show any buttons, except undelete for deleted users, unless we do full delete now.
             if ($user->deleted) {
                 $buttons = array();
                 $buttons[] = html_writer::link(new moodle_url($returnurl, array('undelete' => $user->id, 'sesskey' => sesskey())),
                     html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/recycle'), 'alt' => $strundelete, 'class' => 'iconsmall')),
                     array('title' => $strundelete));
+                if ($CFG->authdeleteusers !== 'partial' and !preg_match($preg_emailhash, $user->email)) {
+                    $buttons[] = html_writer::link(new moodle_url($returnurl, array('delete' => $user->id, 'sesskey' => sesskey())),
+                        html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'), 'alt' => $strdelete, 'class' => 'iconsmall')),
+                        array('title' => $strdelete));
+                }
                 $lastcolumn = '';
             }
 

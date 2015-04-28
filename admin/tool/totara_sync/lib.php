@@ -305,38 +305,7 @@ function totara_sync_bulk_insert($table, $datarows) {
         return true;
     }
 
-    $length = 1000;
-    $chunked_datarows = array_chunk($datarows, $length);
-
-    unset($datarows);
-
-    foreach ($chunked_datarows as $key=>$chunk) {
-        $sql = "INSERT INTO {{$table}} ("
-            .implode(',',array_keys($chunk[0]))
-            . ') VALUES ';
-
-        $all_values= array();
-        $sql_rows = array();
-        foreach ($chunk as $row){
-            $sql_rows[]= "(". str_repeat("?,", (count(array_keys($chunk[0])) - 1)) ."?)";
-            $all_values = array_merge($all_values, array_values($row));
-        }
-        unset($row);
-        $sql .= implode(',', $sql_rows);
-        unset ($sql_rows);
-
-        // Execute insert SQL
-        if (!$DB->execute($sql, array_values($all_values))) {
-            return false;
-        }
-        unset ($sql);
-        unset($all_values);
-        unset($chunked_datarows[$key]);
-        unset($chunk);
-    }
-
-    unset($chunked_datarows);
-
+    $DB->insert_records($table, $datarows);
     return true;
 }
 
