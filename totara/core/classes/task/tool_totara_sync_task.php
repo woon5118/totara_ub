@@ -46,7 +46,6 @@ class tool_totara_sync_task extends \core\task\scheduled_task {
     public function execute() {
         global $CFG;
         require_once($CFG->dirroot . '/admin/tool/totara_sync/lib.php');
-
-        tool_totara_sync_cron(true);
+        tool_totara_sync_run();
     }
 }

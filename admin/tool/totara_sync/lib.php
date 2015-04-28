@@ -47,13 +47,13 @@ function latest_runid() {
 }
 
 /**
- * Run the cron for syncing Totara elements with external sources
+ * Sync Totara elements with external sources
  *
  * @param boolean $forcerun force sync to run, ignoring configured schedule
  * @access public
  * @return void
  */
-function tool_totara_sync_cron($forcerun=false) {
+function tool_totara_sync_run($forcerun=false) {
     global $CFG;
 
     if (!$forcerun) {

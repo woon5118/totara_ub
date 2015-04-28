@@ -330,6 +330,7 @@ $string['notifymailto'] = 'Email notifications to';
 $string['notifymailto_help'] = 'A comma-separated list of email addresses so which notifications should be sent.';
 $string['notifytypes'] = 'Send notifications for';
 $string['schedule'] = 'Schedule';
+$string['scheduleserver'] = 'Schedule (server time)';
 $string['csvencoding'] = 'CSV file encoding';
 
 // Event.
