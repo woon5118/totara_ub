@@ -5305,6 +5305,33 @@ class core_dml_testcase extends database_driver_testcase {
         $totaldbqueries = $DB->perf_get_reads() + $DB->perf_get_writes();
         $this->assertEquals($totaldbqueries, $DB->perf_get_queries());
     }
+
+    /**
+     * Test the unique param method.
+     */
+    public function test_unique_param() {
+        $DB = $this->tdb;
+
+        $this->assertSame('uq_unittest_1', $DB->get_unique_param('unittest'));
+        $this->assertSame('uq_unittest_2', $DB->get_unique_param('unittest'));
+        $this->assertSame('uq_unittest_3', $DB->get_unique_param('unittest'));
+
+        $this->assertSame('uq_superman_1', $DB->get_unique_param('superman'));
+        $this->assertSame('uq_superman_2', $DB->get_unique_param('superman'));
+        $this->assertSame('uq_superman_3', $DB->get_unique_param('superman'));
+
+        // We should get a debugging notice here about the length of the prefix.
+        $this->assertDebuggingNotCalled();
+        $this->assertSame('uq_123456789012345678901_1', $DB->get_unique_param('123456789012345678901'));
+        $this->assertDebuggingCalled();
+
+        $params = array();
+        for ($i = 0; $i < 100000; $i++) {
+            $params[$DB->get_unique_param('unittest')] = true;
+        }
+        // Test that the count is as expected. It will differ if a param already exists.
+        $this->assertSame($i, count($params));
+    }
 }
 
 /**
