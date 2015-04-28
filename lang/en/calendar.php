@@ -32,6 +32,7 @@ $string['calendarheading'] = '{$a} Calendar';
 $string['calendarpreferences'] = 'Calendar preferences';
 $string['calendartypes'] = 'Calendar types';
 $string['calendarurl'] = 'Calendar URL: {$a}';
+$string['calendarurldesc'] = 'Notice: This URL allows access direct access to your calendar entries, please keep it private and never give it out.';
 $string['clickhide'] = 'click to hide';
 $string['clickshow'] = 'click to show';
 $string['colcalendar'] = 'Calendar';
