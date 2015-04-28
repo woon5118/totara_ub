@@ -1173,8 +1173,9 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function search_listitem_actions(course_in_list $course) {
+        global $CFG;
         $baseurl = new moodle_url(
-            '/course/managementsearch.php',
+            '/course/management.php',
             array('courseid' => $course->id, 'categoryid' => $course->category, 'sesskey' => sesskey())
         );
         $actions = array();
@@ -1199,18 +1200,23 @@ class core_course_management_renderer extends plugin_renderer_base {
             }
             // Show/Hide.
             if ($course->can_change_visibility()) {
-                    $actions[] = $this->output->action_icon(
-                        new moodle_url($baseurl, array('action' => 'hidecourse')),
-                        new pix_icon('t/hide', get_string('hide')),
-                        null,
-                        array('data-action' => 'hide', 'class' => 'action-hide')
-                    );
-                    $actions[] = $this->output->action_icon(
-                        new moodle_url($baseurl, array('action' => 'showcourse')),
-                        new pix_icon('t/show', get_string('show')),
-                        null,
-                        array('data-action' => 'show', 'class' => 'action-show')
-                    );
+                $hidetooltip = get_string('hide');
+                $showtooltip = get_string('show');
+                if (!empty($CFG->audiencevisibility)) {
+                    $hidetooltip = $showtooltip = get_string('manageaudincevisibility', 'totara_cohort');
+                }
+                $actions[] = $this->output->action_icon(
+                    new moodle_url($baseurl, array('action' => 'hidecourse')),
+                    new pix_icon('t/hide', $hidetooltip),
+                    null,
+                    array('class' => 'action-hide')
+                );
+                $actions[] = $this->output->action_icon(
+                    new moodle_url($baseurl, array('action' => 'showcourse')),
+                    new pix_icon('t/show', $showtooltip),
+                    null,
+                    array('class' => 'action-show')
+                );
             }
         }
         if (empty($actions)) {

@@ -88,6 +88,7 @@ class rb_source_goal_status_history extends rb_base_source {
 
     protected function define_columnoptions() {
         global $DB;
+        $usernamefields = get_all_user_name_fields(false, null, 'usermodified.');
 
         $columnoptions = array(
             new rb_column_option(
@@ -144,11 +145,11 @@ class rb_source_goal_status_history extends rb_base_source {
                 'history',
                 'usermodifiednamelink',
                 get_string('goalusermodifiedcolumn', 'rb_source_goal_status_history'),
-                $DB->sql_fullname('usermodified.firstname', 'usermodified.lastname'),
+                $DB->sql_concat_join("' '", $usernamefields),
                 array('defaultheading' => get_string('goalusermodifiedheading', 'rb_source_goal_status_history'),
                       'joins' => 'usermodified',
-                      'displayfunc' => 'link_user',
-                      'extrafields' => array('user_id' => 'usermodified.id'),
+                      'displayfunc' => 'fullname_link_user',
+                      'extrafields' => array_merge(array('user_id' => 'usermodified.id'), $usernamefields),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             )
@@ -322,6 +323,10 @@ class rb_source_goal_status_history extends rb_base_source {
         return $scopes[$scope];
     }
 
+    function rb_display_fullname_link_user($user, $row, $isexport = false) {
+        $user = fullname($row);
+        return $this->rb_display_link_user($user, $row, $isexport);
+    }
 
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
