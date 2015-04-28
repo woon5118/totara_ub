@@ -714,6 +714,20 @@ function facetoface_update_calendar_entries($session, $facetoface = null){
 function facetoface_update_attendees($session) {
     global $USER, $DB;
 
+    // Check that the session has not started. We do not want to update the attendees list after the session has started.
+    // We check this first to save queries.
+    $timenow = time();
+    if (!empty($session->datetimeknown)) {
+        if (!isset($session->sessiondates)) {
+            // Load the session dates as we haven't already.
+            $session->sessiondates = facetoface_get_session_dates($session->id);
+        }
+        if (facetoface_has_session_started($session, $timenow)) {
+            // The session has started, no updating the attendees list.
+            return $session->id;
+        }
+    }
+
     // Get facetoface
     $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface));
 
@@ -1195,8 +1209,14 @@ function facetoface_notify_under_capacity() {
  */
 function facetoface_has_session_started($session, $timenow) {
 
+    // Check that a date has actually been set.
     if (!$session->datetimeknown) {
-        return false; // no date set
+        return false;
+    }
+
+    if (!isset($session->sessiondates)) {
+        debugging('Please update your call to facetoface_has_session_started to ensure session dates are sent', DEBUG_DEVELOPER);
+        $session->sessiondates = facetoface_get_session_dates($session->id);
     }
 
     foreach ($session->sessiondates as $date) {

@@ -662,9 +662,11 @@ class facetoface_lib_testcase extends advanced_testcase {
             'details' => 'details1',
             'datetimeknown' => 1,
             'sessiondates' => array(
-                'id' => 20,
-                'timestart' => 0,
-                'timefinish' => 0,
+                array(
+                    'id' => 20,
+                    'timestart' => 0,
+                    'timefinish' => 0,
+                )
             ),
             'duration' => 10800,
             'normalcost' => '$100',
@@ -680,9 +682,11 @@ class facetoface_lib_testcase extends advanced_testcase {
             'details' => 'details2',
             'datetimeknown' => 0,
             'sessiondates' => array(
-                'id' => 20,
-                'timestart' => 0,
-                'timefinish' => 0,
+                array(
+                    'id' => 20,
+                    'timestart' => 0,
+                    'timefinish' => 0,
+                )
             ),
             'duration' => 21600,
             'normalcost' => '$100',
@@ -885,24 +889,17 @@ class facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_add_session() {
-        // Test. method - returns false or session id number
-        $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
-
-        //variable for test
+        // Variable for test.
         $session1 = $this->sessions['sess0'];
         $sess0 = $this->array_to_object($session1);
-
-        $sessiondates1 = new stdClass();
+        $sess0->usermodified = time();
 
         // Test.
-        $this->assertEquals(facetoface_add_session($session1, $sessiondates1), 4);
+        $this->assertNotEmpty(facetoface_add_session($sess0, null));
         $this->resetAfterTest(true);
     }
 
     function test_facetoface_update_session() {
-        // test method - returns boolean
-        $this->markTestSkipped('TODO - this test hasn\'t been working since 1.1');
-
         // Test variables.
         $session1 = $this->sessions['sess0'];
         $sess0 = $this->array_to_object($session1);
@@ -914,7 +911,7 @@ class facetoface_lib_testcase extends advanced_testcase {
         $sessiondates->sessionid = 1;
 
         // Test.
-        $this->assertTrue((bool)facetoface_update_session($session1, $sessiondates), $this->msgtrue);
+        $this->assertTrue((bool)facetoface_update_session($sess0, array($sessiondates)), $this->msgtrue);
         $this->resetAfterTest(true);
     }
 
@@ -922,6 +919,7 @@ class facetoface_lib_testcase extends advanced_testcase {
         // Test variables.
         $session1 = $this->sessions['sess0'];
         $sess0 = $this->array_to_object($session1);
+        $sess0->sessiondates[0] = $this->array_to_object($sess0->sessiondates[0]);
 
         $this->assertTrue((bool)facetoface_update_attendees($sess0), $this->msgtrue);
         $this->resetAfterTest(true);
