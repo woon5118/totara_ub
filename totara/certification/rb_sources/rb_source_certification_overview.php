@@ -295,6 +295,36 @@ class rb_source_certification_overview extends rb_source_program_overview {
 
         $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
 
+        $filteroptions[] = new rb_filter_option(
+            'certif_completion',
+            'status',
+            get_string('status', 'rb_source_dp_certification'),
+            'select',
+            array(
+                'selectfunc' => 'certif_completion_status',
+                'attributes' => rb_filter_option::select_width_limiter(),
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'certif_completion',
+            'renewalstatus',
+            get_string('renewalstatus', 'rb_source_dp_certification'),
+            'select',
+            array(
+                'selectfunc' => 'certif_completion_renewalstatus',
+                'attributes' => rb_filter_option::select_width_limiter(),
+            )
+        );
+
+        $filteroptions[] = new rb_filter_option(
+            'certif_completion',
+            'timecompleted',
+            get_string('timecompleted', 'rb_source_dp_certification'),
+            'date'
+        );
+
+
         return $filteroptions;
     }
 
@@ -361,6 +391,34 @@ class rb_source_certification_overview extends rb_source_program_overview {
             $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
         }
         return $strstatus;
+    }
+
+    /**
+     * Certification completion status filter options
+     */
+    function rb_filter_certif_completion_status() {
+        global $CERTIFSTATUS;
+
+        $out = array();
+        foreach ($CERTIFSTATUS as $key => $status) {
+            $out[$key] = get_string($status, 'totara_certification');
+        }
+
+        return $out;
+    }
+
+    /**
+     * Certification renewal status filter options
+     */
+    function rb_filter_certif_completion_renewalstatus() {
+        global $CERTIFRENEWALSTATUS;
+
+        $out = array();
+        foreach ($CERTIFRENEWALSTATUS as $key => $status) {
+            $out[$key] = get_string($status, 'totara_certification');
+        }
+
+        return $out;
     }
 
 }
