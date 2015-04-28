@@ -59,7 +59,7 @@ HASH=`git rev-parse origin/${BRANCHNAME}`
 MOODLEVERSION=`git show $HASH:version.php | grep '$release' | sed "s/^[^']*'\([^ ]*\) .*/\1/g"`
 
 echo "Install Moodle ${MOODLEVERSION}"
-git remote add moodle git://git.moodle.org/moodle.git 2> /dev/null
+git remote add moodle https://github.com/moodle/moodle.git 2> /dev/null
 git fetch moodle # Update the moodle repo for this job.
 git checkout "v${MOODLEVERSION}"
 
