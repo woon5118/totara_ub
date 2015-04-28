@@ -551,6 +551,14 @@ class rb_source_program_overview extends rb_base_source {
             )
         );
 
+        $filteroptions[] = new rb_filter_option(
+            'program_completion',
+            'timedue',
+            get_string('duedate', 'rb_source_program_overview'),
+            'date'
+        );
+
+
         return $filteroptions;
     }
 
