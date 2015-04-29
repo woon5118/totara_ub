@@ -41,6 +41,22 @@ class tool_task_renderer extends plugin_renderer_base {
     public function scheduled_tasks_table($tasks) {
         global $CFG;
 
+        if (!empty($CFG->debugallowscheduledtaskoverride)) {
+            $nextcronallaction = new moodle_url('/admin/tool/task/scheduledtasks.php',
+                array('nextcronall' => 1, 'sesskey' => sesskey()));
+            $nextcronalltitle = get_string('nextcronall', 'tool_task');
+            $nextcronallhtml = html_writer::start_tag('div',
+                array('class' => 'tool-task-next-cron-all-link'));
+            $nextcronallhtml .= html_writer::start_tag('form',
+                array('action' => $nextcronallaction, 'method' => 'post'));
+            $nextcronallhtml .= html_writer::empty_tag('input',
+                array('type' => 'submit', 'name' => 'submit', 'value' => $nextcronalltitle));
+            $nextcronallhtml .= html_writer::end_tag('form');
+            $nextcronallhtml .= html_writer::end_tag('div');
+        } else {
+            $nextcronallhtml = "";
+        }
+
         $table = new html_table();
         $table->head  = array(get_string('name'),
                               get_string('component', 'tool_task'),
@@ -54,6 +70,9 @@ class tool_task_renderer extends plugin_renderer_base {
                               get_string('taskschedulemonth', 'tool_task'),
                               get_string('faildelay', 'tool_task'),
                               get_string('default', 'tool_task'));
+        if (!empty($CFG->debugallowscheduledtaskoverride)) {
+            $table->head[] = get_string('nextcron', 'tool_task');
+        }
         $table->attributes['class'] = 'admintable generaltable';
         $data = array();
         $yes = get_string('yes');
@@ -103,7 +122,7 @@ class tool_task_renderer extends plugin_renderer_base {
                 $nextrun = $asap;
             }
 
-            $row = new html_table_row(array(
+            $rowitems = array(
                         $namecell,
                         $componentcell,
                         new html_table_cell($editlink),
@@ -115,7 +134,17 @@ class tool_task_renderer extends plugin_renderer_base {
                         new html_table_cell($task->get_day_of_week()),
                         new html_table_cell($task->get_month()),
                         new html_table_cell($task->get_fail_delay()),
-                        new html_table_cell($customised)));
+                        new html_table_cell($customised));
+
+            if (!empty($CFG->debugallowscheduledtaskoverride)) {
+                $nextcronurl = new moodle_url('/admin/tool/task/scheduledtasks.php',
+                    array('nextcron' => get_class($task), 'sesskey' => sesskey()));
+                $nextcronlink = $this->action_icon($nextcronurl, new pix_icon('t/reload',
+                    get_string('nextcrontask', 'tool_task', $task->get_name())));
+                $rowitems[] = new html_table_cell($nextcronlink);
+            }
+
+            $row = new html_table_row($rowitems);
 
             if ($disabled) {
                 $row->attributes['class'] = 'disabled';
@@ -123,6 +152,6 @@ class tool_task_renderer extends plugin_renderer_base {
             $data[] = $row;
         }
         $table->data = $data;
-        return html_writer::table($table);
+        return $nextcronallhtml . html_writer::table($table);
     }
 }

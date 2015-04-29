@@ -41,8 +41,34 @@ $renderer = $PAGE->get_renderer('tool_task');
 
 $action = optional_param('action', '', PARAM_ALPHAEXT);
 $taskname = optional_param('task', '', PARAM_RAW);
+$nextcronall = optional_param('nextcronall', false, PARAM_ALPHANUMEXT);
+$nextcron = optional_param('nextcron', false, PARAM_RAW);
 $task = null;
 $mform = null;
+
+if (!empty($CFG->debugallowscheduledtaskoverride) && ($nextcronall || $nextcron) && confirm_sesskey()) {
+    $updatesql = "UPDATE {task_scheduled}
+                     SET nextruntime = 0,
+                         lastruntime = CASE WHEN lastruntime < :now THEN lastruntime ELSE 0 END";
+    $now = time();
+
+    // Set all non-disabled scheduled tasks to run on the next cron run.
+    if ($nextcronall) {
+        $DB->execute($updatesql . " WHERE disabled = 0", array('now' => $now));
+    }
+
+    // Set the specified scheduled task to run on the next cron run.
+    if ($nextcron) {
+        $task = \core\task\manager::get_scheduled_task($nextcron);
+        if (!$task) {
+            print_error('invaliddata');
+        }
+        $DB->execute($updatesql . " WHERE classname = :classname",
+            array('now' => $now, 'classname' => '\\' . get_class($task)));
+    }
+
+    redirect(new moodle_url('/admin/tool/task/scheduledtasks.php'));
+}
 
 if ($taskname) {
     $task = \core\task\manager::get_scheduled_task($taskname);

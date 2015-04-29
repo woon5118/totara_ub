@@ -592,6 +592,10 @@ $CFG->admin = 'admin';
 // Force developer level debug and add debug info to the output of cron
 // $CFG->showcrondebugging = true;
 //
+// TOTARA: Allow tasks to be scheduled to run on the next cron run using the
+// interface, ignoring the schedule.
+// $CFG->debugallowscheduledtaskoverride = true; // NOT FOR PRODUCTION SERVERS!
+//
 //=========================================================================
 // 8. FORCED SETTINGS
 //=========================================================================
