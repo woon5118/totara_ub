@@ -276,7 +276,9 @@ class stored_file {
         $filerecord->filesize = $newfile->get_filesize();
         $filerecord->referencefileid = $newfile->get_referencefileid();
         $filerecord->userid = $newfile->get_userid();
+        $oldcontenthash = $this->get_contenthash();
         $this->update($filerecord);
+        $this->fs->deleted_file_cleanup($oldcontenthash);
     }
 
     /**
