@@ -1434,7 +1434,15 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015021001, 'totara_core');
     }
 
-    if ($oldversion < 2015021100) {
+    if ($oldversion < 2015030203) {
+        // Do not use the Moodle delete in existing upgraded sites.
+        set_config('authdeleteusers', 'partial');
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030203, 'totara_core');
+    }
+
+    if ($oldversion < 2015030204) {
         // Backport MDL-47830 from Moodle 2.9dev.
 
         // Define table user_password_history to be created.
@@ -1463,11 +1471,10 @@ function xmldb_totara_core_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2015021100, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2015030204, 'totara_core');
     }
 
-
-    if ($oldversion < 2015030202) {
+    if ($oldversion < 2015030205) {
         // Backport MDL-49543 from Moodle 2.9dev.
 
         $table = new xmldb_table('badge_criteria');
@@ -1481,15 +1488,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        totara_upgrade_mod_savepoint(true, 2015030202, 'totara_core');
-    }
-
-    if ($oldversion < 2015030203) {
-        // Do not use the Moodle delete in existing upgraded sites.
-        set_config('authdeleteusers', 'partial');
-
-        // Main savepoint reached.
-        totara_upgrade_mod_savepoint(true, 2015030203, 'totara_core');
+        totara_upgrade_mod_savepoint(true, 2015030205, 'totara_core');
     }
 
     return true;
