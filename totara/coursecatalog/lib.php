@@ -102,7 +102,7 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
     // But that's okay as we're only interested in the items inside.
     $contextwhere = array(); $contextparams = array();
     foreach ($contextpaths as $path) {
-        $paramalias = 'ctx_' . uniqid();
+        $paramalias = $DB->get_unique_param('ctx');
         $contextwhere[] = $DB->sql_like('ctx.path', ":{$paramalias}");
         $contextparams[$paramalias] = $path . '/%';
     }

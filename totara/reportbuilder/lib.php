@@ -5685,17 +5685,8 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
  * @return string the unique string
  */
 function rb_unique_param($name) {
-    static $UNIQUE_PARAMS = array();
-
-    $param = $name . uniqid();
-
-    while (in_array($param, $UNIQUE_PARAMS)) {
-        $param = $name . uniqid();
-    }
-
-    $UNIQUE_PARAMS[] = $param;
-
-    return $param;
+    global $DB;
+    return $DB->get_unique_param($name);
 }
 
 /**

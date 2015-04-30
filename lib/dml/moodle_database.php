@@ -134,10 +134,6 @@ abstract class moodle_database {
      * @var int internal temporary variable used to fix params. Its used by {@link _fix_sql_params_dollar_callback()}.
      */
     private $fix_sql_params_i;
-    /**
-     * @var int internal temporary variable used to guarantee unique parameters in each request. Its used by {@link get_in_or_equal()}.
-     */
-    private $inorequaluniqueindex = 1;
 
     /** @var int internal temporary variable used by {@link sql_replace_text()}. */
     protected $replacetextuniqueindex = 1; // guarantees unique parameters in each request
@@ -728,11 +724,11 @@ abstract class moodle_database {
             }
 
             if (!is_array($items)){
-                $param = $prefix.$this->inorequaluniqueindex++;
+                $param = $this->get_unique_param($prefix);
                 $sql = $equal ? "= :$param" : "<> :$param";
                 $params = array($param=>$items);
             } else if (count($items) == 1) {
-                $param = $prefix.$this->inorequaluniqueindex++;
+                $param = $this->get_unique_param($prefix);
                 $sql = $equal ? "= :$param" : "<> :$param";
                 $item = reset($items);
                 $params = array($param=>$item);
@@ -740,7 +736,7 @@ abstract class moodle_database {
                 $params = array();
                 $sql = array();
                 foreach ($items as $item) {
-                    $param = $prefix.$this->inorequaluniqueindex++;
+                    $param = $this->get_unique_param($prefix);
                     $params[$param] = $item;
                     $sql[] = ':'.$param;
                 }
@@ -2697,5 +2693,25 @@ abstract class moodle_database {
      */
     public function perf_get_queries_time() {
         return $this->queriestime;
+    }
+
+    /**
+     * Returns a unique param name.
+     *
+     * @param string $prefix Defaults to param, make it something sensible for the code. Keep it short!
+     * @return string
+     */
+    final public function get_unique_param($prefix = 'param') {
+        static $paramcounts = array();
+        if (debugging('', DEBUG_DEVELOPER) && strlen($prefix) > 20) {
+            // You should keep your param short in order to avoid running close to the limit if it gets used a lot.
+            // Ideally you will make it only a word or two.
+            debugging('Please reduce the length of your prefix to less than 20.', DEBUG_DEVELOPER);
+        }
+        if (!isset($paramcounts[$prefix])) {
+            $paramcounts[$prefix] = 0;
+        }
+        $paramcounts[$prefix]++;
+        return 'uq_'.$prefix.'_'.$paramcounts[$prefix];
     }
 }

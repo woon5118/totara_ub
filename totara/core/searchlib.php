@@ -107,7 +107,6 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
 function search_get_keyword_where_clause_options($field, $keywords, $negate=false, $operator='contains') {
     global $DB;
 
-    $count = 1;
     $presign = '';
     $postsign = '';
     $queries = array();
@@ -136,10 +135,9 @@ function search_get_keyword_where_clause_options($field, $keywords, $negate=fals
     }
 
     foreach ($keywords as $keyword) {
-        $uniqueparam = "{$operator}_{$count}_" . uniqid();
+        $uniqueparam = $DB->get_unique_param($operator);
         $queries[] = $DB->sql_like($field, ":{$uniqueparam}", false, true, $not);
         $params[$uniqueparam] = $presign . $DB->sql_like_escape($keyword) . $postsign;
-        ++$count;
     }
 
     $sql =  implode($token, $queries);

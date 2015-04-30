@@ -478,13 +478,10 @@ function search_get_keyword_where_clause($field, $keywords, $negate=false, $oper
 
     $queries = array();
     $params = array();
-    $count = 1;
     foreach ($keywords as $keyword) {
-        $uniqueparam = rb_unique_param("skww{$operator}_{$count}_");
+        $uniqueparam = $DB->get_unique_param('search');
         $queries[] = $DB->sql_like($field, ":{$uniqueparam}", false, true, $not);
         $params[$uniqueparam] = $presign.$DB->sql_like_escape($keyword).$postsign;
-
-        $count++;
     }
 
     $sql = '(' . implode($token, $queries) . ')';
