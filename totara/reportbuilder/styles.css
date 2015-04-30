@@ -1,6 +1,6 @@
 
 /* Spacing for the multicheck report builder filter */
-div.multicheck-items fieldset.felement span {
+.multicheck-items .felement span {
     display: block;
     float: left;
     width: 30%;
@@ -101,20 +101,17 @@ form[id^="toolbarsearch"].mform .fsubmit {
     padding-left: 10px;
 }
 
-/* Name */
-.rb-sidebar .fitemtitle {
-    width: auto !important;
-    float: none !important;
+.rb-sidebar.mform .fitem .felement {
+    float: none;
+    width: 100%;
+    margin-top: 0;
 }
-
-/* Content */
-.rb-sidebar .fgroup {
-    display: inline-block;
-    width: auto !important;
-    float: left !important;
+.rb-sidebar.mform .fitem fieldset .legend{
+    width: 100%;
 }
-.dir-rtl .rb-sidebar .fgroup {
-    float: right !important;
+.rb-sidebar .multicheck-items .felement span {
+    float: none;
+    width: auto;
 }
 
 /* Simplemode select */
@@ -128,15 +125,9 @@ form[id^="toolbarsearch"].mform .fsubmit {
 }
 
 /* Date */
-.rb-sidebar fieldset.fgroup>span {
-    display: block !important;
-    overflow: visible; /* This is a clearfix thing. */
-    float: none !important;
-    width: auto !important;
-    clear: left;
-}
-.dir-rtl .rb-sidebar fieldset.fgroup>span {
-    clear: right;
+.rb-sidebar .felement > span {
+    clear: both;
+    display: block;
 }
 
 .rb-sidebar.mform .fitem .fstatic {

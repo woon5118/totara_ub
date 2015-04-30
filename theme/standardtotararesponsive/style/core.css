@@ -791,11 +791,28 @@ input[type="checkbox"] {
     margin-bottom:5px;
     border:none;
 }
-.mform .fitem div.fitemtitle {
+.mform .fitem div.fitemtitle,
+.mform .fitem fieldset .legend {
     text-align:left;
     font-weight:bold;
     margin-top:2px;
-    width: auto;
+}
+.mform .fitem fieldset .legend {
+    color: #6b6b6b;
+}
+@media (min-width: 1200px) {
+    .mform .fitem fieldset .felement {
+        margin-top: -35px;
+    }
+    .mform .fitem fieldset .legend,
+    .mform .fitem div.fitemtitle {
+        width: 25%;
+    }
+
+    .dir-rtl .mform .fitem .legend {
+        width: 25%; /* moodle's width for rtl labels is too small */
+        text-align: right;
+    }
 }
 .dir-rtl .mform .fitem div.fitemtitle {
     text-align: right;
@@ -805,7 +822,8 @@ input[type="checkbox"] {
     float: right;
     margin-left: 0;
 }
-.dir-rtl .mform .fitem .felement {
+.dir-rtl .mform .fitem div.felement,
+.dir-rtl .mform fieldset .felement {
     float: left;
     margin-right: 0;
 }

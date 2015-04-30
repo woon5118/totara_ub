@@ -742,6 +742,10 @@ legend {
     padding-bottom:10px;
     text-transform:uppercase;
 }
+
+.fitem .legend {
+    text-transform: initial;
+}
 fieldset.surround legend,
 .mform fieldset.surround legend {
     font-weight:700;
