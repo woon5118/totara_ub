@@ -125,6 +125,7 @@ class tool_totara_sync_user_csv_testcase extends advanced_testcase {
             'allowduplicatedemails' => '0',
             'defaultsyncemail' => '',
             'forcepwchange' => '0',
+            'undeletepwreset' => '0',
             'ignoreexistingpass' => '0',
             'sourceallrecords' => '0',
         );

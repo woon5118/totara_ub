@@ -80,6 +80,8 @@ class totara_sync_element_user extends totara_sync_element {
         $mform->addElement('static', 'ignoreexistingpassdesc', '', get_string('ignoreexistingpassdesc', 'tool_totara_sync'));
         $mform->addElement('selectyesno', 'forcepwchange', get_string('forcepwchange', 'tool_totara_sync'));
         $mform->addElement('static', 'forcepwchangedesc', '', get_string('forcepwchangedesc', 'tool_totara_sync'));
+        $mform->addElement('selectyesno', 'undeletepwreset', get_string('undeletepwreset', 'tool_totara_sync'));
+        $mform->addElement('static', 'undeletepwresetdesc', '', get_string('undeletepwresetdesc', 'tool_totara_sync'));
 
         $mform->addElement('header', 'crudheading', get_string('allowedactions', 'tool_totara_sync'));
         $mform->addElement('checkbox', 'allow_create', get_string('create', 'tool_totara_sync'));
@@ -101,6 +103,7 @@ class totara_sync_element_user extends totara_sync_element {
         $this->set_config('defaultsyncemail', $data->defaultsyncemail);
         $this->set_config('ignoreexistingpass', $data->ignoreexistingpass);
         $this->set_config('forcepwchange', $data->forcepwchange);
+        $this->set_config('undeletepwreset', $data->undeletepwreset);
         $this->set_config('allow_create', !empty($data->allow_create));
         $this->set_config('allow_update', !empty($data->allow_update));
         $this->set_config('allow_delete', $data->allow_delete);
@@ -358,8 +361,8 @@ class totara_sync_element_user extends totara_sync_element {
                     if (undelete_user($user)) {
                         $user->deleted = 0;
 
-                        if (!$updatepassword) {
-                            // If the password wasn't supplied in the sync then tag the revived
+                        if (!$updatepassword && !empty($this->config->undeletepwreset)) {
+                            // If the password wasn't supplied in the sync and reset is enabled then tag the revived
                             // user for new password generation (if applicable).
                             $userauth = get_auth_plugin(strtolower($user->auth));
                             if ($userauth->can_change_password()) {
