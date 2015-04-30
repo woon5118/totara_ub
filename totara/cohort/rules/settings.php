@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/inlist.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/date.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/completion.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/manager.php');
+require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/userstatus.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/sqlhandlers/cohortmember.php');
 require_once($CFG->dirroot . '/totara/cohort/rules/option.php');
 
@@ -149,6 +150,19 @@ function cohort_rules_list(){
                 get_string('separatemultiplebycommas', 'totara_cohort')
             ),
             new cohort_rule_sqlhandler_in_userfield_char('department', COHORT_RULES_TYPE_TEXT)
+        );
+        // User has a suspended status.
+        $rules[] = new cohort_rule_option(
+            'user',
+            'suspendedusers',
+            new cohort_rule_ui_checkbox(
+                get_string('ruledesc-user-suspendedusers', 'totara_cohort'),
+                array(
+                    0 => get_string('no'),
+                    1 => get_string('yes')
+                )
+            ),
+            new cohort_rule_sqlhandler_suspended_user_account()
         );
         // User custom fields
         $usercustomfields = $DB->get_records_sql(
