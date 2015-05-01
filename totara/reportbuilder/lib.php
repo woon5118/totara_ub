@@ -1411,21 +1411,38 @@ class reportbuilder {
 
     /**
      * Return the URL to view the current report
+     * @param bool $params reapply params of report (if any)
      *
      * @return string URL of current report
      */
-    function report_url() {
+    function report_url($params = false) {
         global $CFG;
         if ($this->embeddedurl === null) {
-            return $CFG->wwwroot . '/totara/reportbuilder/report.php?id=' . $this->_id;
+            $url = new moodle_url($CFG->wwwroot . '/totara/reportbuilder/report.php', array('id' => $this->_id));
         } else {
-            return $CFG->wwwroot . $this->embeddedurl;
+            $url = new moodle_url($CFG->wwwroot . $this->embeddedurl);
         }
+        if ($params) {
+            foreach ($this->get_current_url_params() as $filtername => $filtervalue) {
+                if (is_null($url->param($filtername))) {
+                    $url->param($filtername, $filtervalue);
+                }
+            }
+        }
+        return $url->out(false);
     }
 
+    /**
+     * Return array of report params to be applied to URL
+     *
+     * @return array of params
+     */
+    public function get_current_url_params() {
+        return $this->filterurlparams;
+    }
 
     /**
-     * Get the current page url, minus any pagination or sort order elements
+     * Get the current page url maintaining report specific parameters, minus any pagination or sort order elements
      * Good for submitting forms
      *
      * @return string Current URL, minus any spage and ssort parameters
@@ -1441,7 +1458,7 @@ class reportbuilder {
             }
         }
         // Reapply filter url params.
-        foreach ($this->filterurlparams as $filtername => $filtervalue) {
+        foreach ($this->get_current_url_params() as $filtername => $filtervalue) {
             if (is_null($url->param($filtername))) {
                 $url->param($filtername, $filtervalue);
             }
@@ -3568,11 +3585,7 @@ class reportbuilder {
         $id = $this->_id;
         $sid = $this->_sid;
 
-        if ($this->embedded) {
-            $common = new moodle_url($this->get_current_url());
-        } else {
-            $common = new moodle_url('/totara/reportbuilder/report.php', array('id' => $id));
-        }
+        $common = new moodle_url($this->get_current_url());
 
         $savedoptions = $this->get_saved_searches($id, $USER->id);
         if (count($savedoptions) > 0) {

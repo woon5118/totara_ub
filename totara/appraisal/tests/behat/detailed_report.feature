@@ -1,4 +1,4 @@
-@javascript @totara @totara_appraisal
+@javascript @totara @totara_appraisal @totara_reportbuilder
 Feature: Test appraisal detailed report with numeric question
   In order to ensure the appraisals works as expected
   As an admin
@@ -104,3 +104,15 @@ Feature: Test appraisal detailed report with numeric question
     And I click on "Detail report" "link" in the "Behat Test Appraisal" "table_row"
     And I should see "3" in the "User One" "table_row"
     And I should not see "3" in the "User Two" "table_row"
+
+    # Save search test
+    When I press "Save this search"
+    And I set the following fields to these values:
+      | Search Name | My search |
+    And I press "Save changes"
+    Then I should see "Behat Test Appraisal detail report" in the "h2" "css_element"
+
+    # Export parametric report test
+    When I start watching to see if a new page loads
+    And I press "Export"
+    Then a new page should not have loaded since I started watching

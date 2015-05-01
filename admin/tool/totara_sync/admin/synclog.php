@@ -118,7 +118,7 @@ echo $report->display_saved_search_options();
 $report->display_table();
 
 // Export button.
-$renderer->export_select($report->_id, $sid);
+$renderer->export_select($report, $sid);
 
 // Show delete buttons.
 if (has_capability('tool/totara_sync:deletesynclog', $context)) {
@@ -129,5 +129,3 @@ if (has_capability('tool/totara_sync:deletesynclog', $context)) {
 }
 
 echo $OUTPUT->footer();
-
-?>

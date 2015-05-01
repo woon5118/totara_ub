@@ -40,10 +40,7 @@ class report_builder_export_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
 
-        $id = $this->_customdata['id'];
-        $sid = $this->_customdata['sid'];
         $select = reportbuilder_get_export_options();
-        $sitecontext = context_system::instance();
 
         if (count($select) == 0) {
             // No export options - don't show form.

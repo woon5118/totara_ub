@@ -139,7 +139,7 @@ print $output->showhide_button($report->_id, $report->shortname);
 $report->display_table();
 
 // Export button.
-$output->export_select($report->_id, $sid);
+$output->export_select($report, $sid);
 
 echo $OUTPUT->footer();
 

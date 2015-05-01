@@ -68,6 +68,6 @@ echo $report->display_saved_search_options();
 $report->display_table();
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
-$output->export_select($report->_id, $sid);
+$output->export_select($report, $sid);
 
 echo $OUTPUT->footer();

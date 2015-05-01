@@ -312,15 +312,21 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * if ($format != '') { $report->export_data($format);die;}
      * before header is printed
      *
-     * @param integer $id ID of the report to exported
+     * @param integer|reportbuilder $report ID or instance of the report to exported
      * @param integer $sid Saved search ID if a saved search is active (optional)
      * @return No return value but prints export select form
      */
-    public function export_select($id, $sid = 0) {
+    public function export_select($report, $sid = 0) {
         global $CFG;
-
+        if ($report instanceof reportbuilder) {
+            $id = $report->_id;
+            $url = $report->get_current_url();
+        } else {
+            $id = $report;
+            $url = qualified_me();
+        }
         require_once($CFG->dirroot . '/totara/reportbuilder/export_form.php');
-        $export = new report_builder_export_form(qualified_me(), compact('id', 'sid'));
+        $export = new report_builder_export_form($url, compact('id', 'sid'));
         $export->display();
     }
 
@@ -453,7 +459,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         // This is because the user needs to be able to save the search with no filters defined.
         $hasrequiredurlparams = isset($report->src->redirecturl);
         if ($search || $hasrequiredurlparams) {
-            $params = array('id' => $report->_id);
+            $params = $report->get_current_url_params();
+            $params['id'] = $report->_id;
             return $this->output->single_button(new moodle_url('/totara/reportbuilder/save.php', $params),
                     get_string('savesearch', 'totara_reportbuilder'), 'get');
         } else {

@@ -35,16 +35,17 @@ require_login();
 $id = required_param('id', PARAM_INT); // Id for report to save.
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/totara/reportbuilder/save.php', array('id' => $id));
 $PAGE->set_totara_menu_selected('myreports');
 
 $report = new reportbuilder($id);
+$returnurl = $report->report_url(true);
+
+$PAGE->set_url('/totara/reportbuilder/save.php', array_merge($report->get_current_url_params(), array('id' => $id)));
+
 if (isguestuser() or !$report->is_capable($id)) {
     // No saving for guests, sorry.
     print_error('nopermission', 'totara_reportbuilder');
 }
-
-$returnurl = $report->report_url();
 
 $data = new stdClass();
 $data->id = $id;
@@ -52,7 +53,7 @@ $data->sid = 0;
 $data->ispublic = 0;
 $data->action = 'edit';
 
-$mform = new report_builder_save_form(null, array('report' => $report, 'data' => $data));
+$mform = new report_builder_save_form($PAGE->url, array('report' => $report, 'data' => $data));
 
 // form results check
 if ($mform->is_cancelled()) {

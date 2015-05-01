@@ -117,6 +117,6 @@ if ($graph) {
 }
 
 // Export button.
-$output->export_select($report->_id, $sid);
+$output->export_select($report, $sid);
 
 echo $output->footer();
