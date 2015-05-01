@@ -64,6 +64,26 @@ class core_role_view_role_definition_table extends core_role_define_role_table_a
         }
     }
 
+    protected function print_field($name, $caption, $field) {
+        global $OUTPUT;
+        // Attempt to generate HTML like formslib.
+        echo '<div class="fitem">';
+        echo '<div class="fitemtitle">';
+        echo $caption;
+        echo '</div>';
+        if (isset($this->errors[$name])) {
+            $extraclass = ' error';
+        } else {
+            $extraclass = '';
+        }
+        echo '<div class="felement' . $extraclass . '">';
+        echo $field;
+        if (isset($this->errors[$name])) {
+            echo $OUTPUT->error_text($this->errors[$name]);
+        }
+        echo '</div>';
+        echo '</div>';
+    }
 
     protected function print_show_hide_advanced_button() {
         // Do nothing.
