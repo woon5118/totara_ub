@@ -472,6 +472,11 @@ class core_course_external extends external_api {
                         'value' => $value
                     );
                 }
+                // TOTARA changes.
+                $courseinfo['audiencevisible'] = $course->audiencevisible;
+                $courseinfo['coursetype'] = $course->coursetype;
+                $courseinfo['completionprogressonview'] = $course->completionprogressonview;
+                // End TOTARA.
             }
 
             if ($courseadmin or $course->visible
@@ -554,6 +559,22 @@ class core_course_external extends external_api {
                                 )),
                                     'additional options for particular course format', VALUE_OPTIONAL
                              ),
+                            // Start T-14436 specific params.
+                            'audiencevisible' => new external_value(PARAM_INT,
+                                '0: enrolled users only,
+                                 1: enrolled users and members of the selected audiences,
+                                 2: all users,
+                                 3: no users',
+                                VALUE_OPTIONAL),
+                            'coursetype' => new external_value(PARAM_INT,
+                                '0: elearning,
+                                 1: blended,
+                                 2: facetoface',
+                                VALUE_OPTIONAL),
+                            'completionprogressonview' => new external_value(PARAM_INT,
+                                '1: mark as in progress on first view,
+                                 0: does not',
+                                VALUE_OPTIONAL),
                         ), 'course'
                 )
         );
@@ -629,6 +650,23 @@ class core_course_external extends external_api {
                                         'value' => new external_value(PARAM_RAW, 'course format option value')
                                 )),
                                     'additional options for particular course format', VALUE_OPTIONAL),
+                            // Start T-14436 specific params.
+                            'audiencevisible' => new external_value(PARAM_INT,
+                                '0: enrolled users only,
+                                 1: enrolled users and members of the selected audiences,
+                                 2: all users,
+                                 3: no users',
+                                VALUE_OPTIONAL),
+                            'coursetype' => new external_value(PARAM_INT,
+                                '0: elearning,
+                                 1: blended,
+                                 2: facetoface',
+                                VALUE_OPTIONAL),
+                            'completionprogressonview' => new external_value(PARAM_INT,
+                                '1: mark as in progress on first view,
+                                 0: does not',
+                                VALUE_OPTIONAL),
+                            // End TOTARA specific params.
                         )
                     ), 'courses to create'
                 )
@@ -717,6 +755,8 @@ class core_course_external extends external_api {
                 }
             }
 
+            $course = self::totara_course_validate_parameters($course);
+
             //Note: create_course() core function check shortname, idnumber, category
             $course['id'] = create_course((object) $course)->id;
 
@@ -801,6 +841,23 @@ class core_course_external extends external_api {
                                         'value' => new external_value(PARAM_RAW, 'course format option value')
                                 )),
                                     'additional options for particular course format', VALUE_OPTIONAL),
+                            // Start T-14436 specific params.
+                            'audiencevisible' => new external_value(PARAM_INT,
+                                '0: enrolled users only,
+                                 1: enrolled users and members of the selected audiences,
+                                 2: all users,
+                                 3: no users',
+                                VALUE_OPTIONAL),
+                            'coursetype' => new external_value(PARAM_INT,
+                                '0: elearning,
+                                 1: blended,
+                                 2: facetoface',
+                                VALUE_OPTIONAL),
+                            'completionprogressonview' => new external_value(PARAM_INT,
+                                '1: mark as in progress on first view,
+                                 0: does not',
+                                VALUE_OPTIONAL),
+                            // End TOTARA specific params.
                         )
                     ), 'courses to update'
                 )
@@ -908,6 +965,8 @@ class core_course_external extends external_api {
                         }
                     }
                 }
+
+                $course = self::totara_course_validate_parameters($course);
 
                 // Update course if user has all required capabilities.
                 update_course((object) $course);
@@ -2140,6 +2199,39 @@ class core_course_external extends external_api {
         );
     }
 
+    /**
+     * Validates submitted totara parameters, if anything is incorrect
+     * invalid_parameter_exception is thrown.
+     *
+     * @param mixed $course the actual parameters
+     * @param bool $isnewcourse true if course is new otherwise false
+     * @return mixed course params with added defaults for optional items
+     */
+    private static function totara_course_validate_parameters($course) {
+        global $CFG;
+
+        if (isset($course['audiencevisible'])) {
+            require_once($CFG->dirroot . '/totara/cohort/lib.php');
+            global $COHORT_VISIBILITY;
+            if (!array_key_exists($course['audiencevisible'], $COHORT_VISIBILITY)) {
+                throw new invalid_parameter_exception('Invalid value for audiencevisible parameter');
+            }
+        }
+
+        if (isset($course['coursetype'])) {
+            require_once($CFG->dirroot . '/course/lib.php');
+            global $TOTARA_COURSE_TYPES;
+            if (!in_array($course['coursetype'], $TOTARA_COURSE_TYPES)) {
+                throw new invalid_parameter_exception('Invalid value for coursetype parameter');
+            }
+        }
+
+        if (isset($course['completionprogressonview'])) {
+            $course['completionprogressonview'] = $course['completionprogressonview'] == 1 ? 1 : 0;
+        }
+
+        return $course;
+    }
 }
 
 /**
