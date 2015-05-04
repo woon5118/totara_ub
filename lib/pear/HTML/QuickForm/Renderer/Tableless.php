@@ -170,12 +170,6 @@ class HTML_QuickForm_Renderer_Tableless extends HTML_QuickForm_Renderer_Default
             $this->_html .= $this->_closeFieldsetTemplate;
             $this->_fieldsetsOpen--;
         }
-        // if no fieldset was opened, we need to open a hidden one here to get
-        // XHTML validity
-        if ($this->_fieldsetsOpen === 0) {
-            $this->_html .= $this->_openHiddenFieldsetTemplate;
-            $this->_fieldsetsOpen++;
-        }
         if (!$this->_inGroup) {
             $html = $this->_prepareTemplate($element->getName(), $element->getLabel(), $required, $error);
             // the following lines (until the "elseif") were changed / added
