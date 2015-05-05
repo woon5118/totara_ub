@@ -1054,8 +1054,8 @@ class dp_competency_component extends dp_base_component {
                         $dateformat = get_string('strftimedateshortmonth', 'langconfig');
                         $updates .= get_string('duedate', 'totara_plan').' - '.
                             get_string('changedfromxtoy', 'totara_plan', (object)array('before' => empty($oldrecords[$itemid]->duedate) ? '' :
-                                    userdate($oldrecords[$itemid]->duedate, $dateformat, $CFG->timezone, false),
-                                'after' => userdate($record->duedate, $dateformat, $CFG->timezone, false))).html_writer::empty_tag('br');
+                                    userdate($oldrecords[$itemid]->duedate, $dateformat, 99, false),
+                                'after' => userdate($record->duedate, $dateformat, 99, false))).html_writer::empty_tag('br');
                     }
                     if (!empty($record->approved) && $oldrecords[$itemid]->approved != $record->approved) {
                         $approval = new stdClass();

@@ -487,7 +487,7 @@ class development_plan {
     function display_enddate_as_text($enddate) {
         global $CFG;
         if (isset($enddate)) {
-            return userdate($enddate, get_string('strfdateshortmonth', 'langconfig'), $CFG->timezone, false);
+            return userdate($enddate, get_string('strfdateshortmonth', 'langconfig'), 99, false);
         } else {
             return '';
         }
@@ -595,7 +595,7 @@ class development_plan {
         $history = $this->get_history('id DESC');
         $latestmodification = reset($history);
 
-        return ($latestmodification->status != DP_PLAN_STATUS_COMPLETE) ? get_string('notcompleted', 'totara_plan') : userdate($latestmodification->timemodified, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+        return ($latestmodification->status != DP_PLAN_STATUS_COMPLETE) ? get_string('notcompleted', 'totara_plan') : userdate($latestmodification->timemodified, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
     }
 
 

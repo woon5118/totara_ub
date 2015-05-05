@@ -167,6 +167,7 @@ $string['dbname'] = 'Database name';
 $string['dbuser'] = 'Database user';
 $string['dbpass'] = 'Database password';
 $string['dbhost'] = 'Database hostname';
+$string['dbport'] = 'Database port';
 $string['dbtable'] = 'Database table';
 
 $string['databaseconnectfail'] = 'Failed to connect to database';

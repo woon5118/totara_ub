@@ -259,7 +259,7 @@ abstract class prog_message {
                     $completiontime = $DB->get_field('prog_completion', 'timedue', array('programid' => $programid, 'userid' => $userid));
                     $duedate = get_string('duedatenotset', 'totara_program');
                     if ($completiontime && $completiontime != COMPLETION_TIME_NOT_SET) {
-                        $duedate = userdate($completiontime, $formatdate, $recipient->timezone, false);
+                        $duedate = userdate($completiontime, $formatdate, core_date::get_user_timezone($recipient), false);
                     }
                     $this->replacementvars['duedate']   = $duedate;
                     break;
@@ -272,7 +272,7 @@ abstract class prog_message {
                     if ($progassignment->completionevent == COMPLETION_EVENT_NONE) {
                         $ccriteria = get_string('completioncriterianotdefined', 'totara_program');
                         if ($time != COMPLETION_TIME_NOT_SET) {
-                            $formatedtime = trim(userdate($time, $formatdate, $recipient->timezone, false));
+                            $formatedtime = trim(userdate($time, $formatdate, core_date::get_user_timezone($recipient), false));
                             $ccriteria = prog_assignment_category::build_completion_string($formatedtime, $event, $instance);
                         }
                     } else {

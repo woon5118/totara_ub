@@ -143,7 +143,7 @@ class scheduler {
         $this->changed = true;
         $frequency = $this->subject->{$this->map['frequency']};
         $schedule = $this->subject->{$this->map['schedule']};
-        $usertz = totara_get_clean_timezone($this->subject->{$this->map['timezone']});
+        $usertz = core_date::normalise_timezone($this->subject->{$this->map['timezone']});
 
         if (is_null($timestamp)) {
             $datetime = new DateTime('now', new DateTimeZone($usertz));
@@ -336,7 +336,7 @@ class scheduler {
         $data['frequency'] = isset($data['frequency']) ? $data['frequency'] : self::DAILY;
         $data['schedule'] = isset($data['schedule']) ? $data['schedule'] : 0;
         $data['initschedule'] = isset($data['initschedule']) ? $data['initschedule'] : false;
-        $data['timezone'] = isset($data['timezone']) ? $data['timezone'] : $CFG->timezone;
+        $data['timezone'] = isset($data['timezone']) ? $data['timezone'] : core_date::get_user_timezone();
         $this->subject->{$this->map['frequency']} = $data['frequency'];
         $this->subject->{$this->map['schedule']} = $data['schedule'];
         $this->subject->{$this->map['timezone']} = $data['timezone'];

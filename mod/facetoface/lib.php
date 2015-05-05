@@ -1377,7 +1377,7 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             ss.statuscode,
             ss.note AS usernote,
             (
-                SELECT MIN(timecreated)
+                SELECT MAX(timecreated)
                 FROM {facetoface_signups_status} ss2
                 WHERE ss2.signupid = ss.signupid AND ss2.statuscode IN (?, ?)
             ) as timesignedup,
@@ -2645,23 +2645,20 @@ function facetoface_format_session_times($start, $end, $tz) {
     $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
 
     $formattedsession = new stdClass();
-    $tzknown = false;
-    if (!empty($tz)) {
-        $targetTZ = $tz;
-        $tzknown = true;
+    if (empty($tz) or empty($displaytimezones)) {
+        $targetTZ = core_date::get_user_timezone();
     } else {
-        $targetTZ = totara_get_clean_timezone();
+        $targetTZ = core_date::get_user_timezone($tz);
     }
+
     $formattedsession->startdate = userdate($start, get_string('strftimedate', 'langconfig'), $targetTZ);
     $formattedsession->starttime = userdate($start, get_string('strftimetime', 'langconfig'), $targetTZ);
     $formattedsession->enddate = userdate($end, get_string('strftimedate', 'langconfig'), $targetTZ);
     $formattedsession->endtime = userdate($end, get_string('strftimetime', 'langconfig'), $targetTZ);
     if (empty($displaytimezones)) {
         $formattedsession->timezone = '';
-    } else if ($tzknown) {
-        $formattedsession->timezone = get_string(strtolower($targetTZ), 'timezones');
     } else {
-        $formattedsession->timezone = get_string('sessiontimezoneunknown', 'facetoface');
+        $formattedsession->timezone = core_date::get_localised_timezone($targetTZ);
     }
     return $formattedsession;
 }

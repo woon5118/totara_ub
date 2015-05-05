@@ -3172,9 +3172,8 @@ class reportbuilder {
 
         // Output cache information if needed.
         if ($cache) {
-            $usertz = totara_get_clean_timezone();
-            $lastreport = userdate($cache['lastreport'], '', $usertz);
-            $nextreport = userdate($cache['nextreport'], '', $usertz);
+            $lastreport = userdate($cache['lastreport']);
+            $nextreport = userdate($cache['nextreport']);
 
             $html = html_writer::start_tag('div', array('class' => 'noticebox'));
             $html .= get_string('report:cachelast', 'totara_reportbuilder', $lastreport);
@@ -3596,8 +3595,7 @@ class reportbuilder {
 
         // Add report caching data.
         if ($cache) {
-            $usertz = totara_get_clean_timezone();
-            $a = userdate($cache['lastreport'], '', $usertz);
+            $a = userdate($cache['lastreport']);
             $worksheet[0]->write($row, 0, get_string('report:cachelast', 'totara_reportbuilder', $a));
             $row++;
         }
@@ -3692,8 +3690,7 @@ class reportbuilder {
 
         // Add report caching data.
         if ($cache) {
-            $usertz = totara_get_clean_timezone();
-            $a = userdate($cache['lastreport'], '', $usertz);
+            $a = userdate($cache['lastreport']);
             $worksheet[0]->write($row, 0, get_string('report:cachelast', 'totara_reportbuilder', $a));
             $row++;
         }
@@ -3870,8 +3867,7 @@ class reportbuilder {
 
         // Add report caching data.
         if ($cache) {
-            $usertz = totara_get_clean_timezone();
-            $a = userdate($cache['lastreport'], '', $usertz);
+            $a = userdate($cache['lastreport']);
             $lastcache = get_string('report:cachelast', 'totara_reportbuilder', $a);
             $pdf->Write(0, $lastcache, '', 0, 'L', true, 0, false, false, 0);
         }

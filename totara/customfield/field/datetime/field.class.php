@@ -42,7 +42,6 @@ class customfield_datetime extends customfield_base {
             'startyear' => $this->field->param1,
             'stopyear'  => $this->field->param2,
             'timezone'  => 99,
-            'applydst'  => true,
             'optional'  => $optional
         );
 
@@ -53,7 +52,6 @@ class customfield_datetime extends customfield_base {
             $mform->addElement('date_selector', $this->inputname, format_string($this->field->fullname), $attributes);
         }
 
-        $mform->setType($this->inputname, PARAM_INT);
         $mform->setDefault($this->inputname, time());
     }
 

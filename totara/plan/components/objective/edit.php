@@ -113,7 +113,7 @@ $objective = file_prepare_standard_editor($objective, 'description', $TEXTAREA_O
 $mform = $component->objective_form($objectiveid);
 $mform->set_data($objective);
 if (isset($objective->duedate)) {
-    $objective->duedate = userdate($objective->duedate, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+    $objective->duedate = userdate($objective->duedate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
 }
 
 if ($deleteyes) {

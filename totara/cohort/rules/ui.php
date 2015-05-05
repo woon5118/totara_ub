@@ -683,7 +683,7 @@ class cohort_rule_ui_date extends cohort_rule_ui_form {
                 $formdata['beforeaftermenu'] = $this->operator;
                 if (!empty($this->date)) {
                     // todo: make this configurable!
-                    $formdata['beforeafterdate'] = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+                    $formdata['beforeafterdate'] = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
                 }
             } else if (
                     in_array(
@@ -798,7 +798,7 @@ JS;
         switch ($this->operator) {
             case COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE:
             case COHORT_RULE_DATE_OP_AFTER_FIXED_DATE:
-                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
                 break;
             case COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION:
             case COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION:
@@ -1401,7 +1401,7 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
         $radio2prop = $radio1prop = array('type' => 'radio', 'name' => 'fixeddynamic', 'checked' => 'checked', 'class' => $class);
         if (isset($this->operator) && array_key_exists($this->operator, $opmenufix)) {
             array_splice($radio2prop, 2);
-            $htmldate = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+            $htmldate = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
         } else if (isset($this->operator) && array_key_exists($this->operator, $opmenurel)) {
             array_splice($radio1prop, 2);
             $duration = htmlspecialchars($this->date);
@@ -1472,7 +1472,7 @@ class cohort_rule_ui_picker_course_program_date extends cohort_rule_ui_picker_co
         switch ($this->operator) {
             case COHORT_RULE_COMPLETION_OP_DATE_LESSTHAN:
             case COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN:
-                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), $CFG->timezone, false);
+                $a = userdate($this->date, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
                 break;
             case COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION:
             case COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION:

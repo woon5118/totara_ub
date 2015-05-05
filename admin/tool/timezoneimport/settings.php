@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
-    $ADMIN->add('location', new admin_externalpage('tooltimezoneimport', get_string('updatetimezones', 'tool_timezoneimport'), "$CFG->wwwroot/$CFG->admin/tool/timezoneimport/index.php"));
+    $ADMIN->add('location', new admin_externalpage('tooltimezoneimport', get_string('updatetimezones', 'tool_timezoneimport'), "$CFG->wwwroot/$CFG->admin/tool/timezoneimport/index.php",
+        'moodle/site:config', true)); // Totara uses PHP timezones.
 }
 

@@ -733,8 +733,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             }
 
             $duedate = !empty($goalpersonal->targetdate) ? userdate($goalpersonal->targetdate,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'),
-                $CFG->timezone, false) : '';
+                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false) : '';
             $assign = goal::get_assignment_string(goal::SCOPE_PERSONAL, $goalpersonal);
             $nameurl = new moodle_url('/totara/hierarchy/prefix/goal/item/view.php', array('goalpersonalid' => $goalpersonal->id));
             $namelink = html_writer::link($nameurl, format_string($goalpersonal->name));

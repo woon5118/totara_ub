@@ -420,7 +420,7 @@ class backup_course_structure_step extends backup_structure_step {
             'timecreated', 'timemodified',
             'requested', 'restrictmodules',
             'enablecompletion', 'completionstartonenrol', 'completionprogressonview', 'completionnotify',
-            'icon', 'coursetype'));
+            'audiencevisible', 'icon', 'coursetype'));
 
         $category = new backup_nested_element('category', array('id'), array(
             'name', 'description'));
@@ -436,6 +436,9 @@ class backup_course_structure_step extends backup_structure_step {
             'field_name', 'field_type', 'field_data'));
 
         $module = new backup_nested_element('module', array(), array('modulename'));
+
+        $visibleaudiences = new backup_nested_element('visibleaudiences');
+        $visibleaudience = new backup_nested_element('visibleaudience', array('id'), array('cohortid'));
 
         // attach format plugin structure to $course element, only one allowed
         $this->add_plugin_structure('format', $course, false);
@@ -467,6 +470,9 @@ class backup_course_structure_step extends backup_structure_step {
         $course->add_child($tags);
         $tags->add_child($tag);
 
+        $course->add_child($visibleaudiences);
+        $visibleaudiences->add_child($visibleaudience);
+
         $course->add_child($customfields);
         $customfields->add_child($customfield);
 
@@ -494,6 +500,14 @@ class backup_course_structure_step extends backup_structure_step {
                                  AND ti.itemid = ?', array(
                                      backup_helper::is_sqlparam('course'),
                                      backup::VAR_PARENTID));
+
+        $visibleaudience->set_source_sql('SELECT cv.id, cv.cohortid
+                                            FROM {cohort_visibility} cv
+                                           WHERE cv.instanceid = ?
+                                             AND cv.instancetype = ?', array(
+                                                 backup::VAR_COURSEID,
+                                                 backup_helper::is_sqlparam(COHORT_ASSN_ITEMTYPE_COURSE),
+                                     ));
 
         $customfield->set_source_sql('SELECT f.id, f.shortname AS field_name, f.datatype AS field_type, d.data AS field_data
                                         FROM {course_info_field} f

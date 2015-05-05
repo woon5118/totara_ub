@@ -90,6 +90,8 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $mform->setType('database_dbuser', PARAM_ALPHANUMEXT);
         $mform->addElement('password', 'database_dbpass', get_string('dbpass', 'tool_totara_sync'));
         $mform->setType('database_dbpass', PARAM_RAW);
+        $mform->addElement('text', 'database_dbport', get_string('dbport', 'tool_totara_sync'));
+        $mform->setType('database_dbport', PARAM_INT);
 
         // Table name
         $mform->addElement('text', 'database_dbtable', get_string('dbtable', 'tool_totara_sync'));
@@ -116,7 +118,8 @@ class totara_sync_source_user_database extends totara_sync_source_user {
     function config_save($data) {
         //Check database connection when saving
         try {
-            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'}, $data->{'database_dbuser'}, $data->{'database_dbpass'});
+            setup_sync_DB($data->{'database_dbtype'}, $data->{'database_dbhost'}, $data->{'database_dbname'},
+                $data->{'database_dbuser'}, $data->{'database_dbpass'}, array('dbport' => $data->{'database_dbport'}));
         } catch (Exception $e) {
             totara_set_notification(get_string('cannotconnectdbsettings', 'tool_totara_sync'), qualified_me());
         }
@@ -126,6 +129,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $this->set_config('database_dbhost', $data->{'database_dbhost'});
         $this->set_config('database_dbuser', $data->{'database_dbuser'});
         $this->set_config('database_dbpass', $data->{'database_dbpass'});
+        $this->set_config('database_dbport', $data->{'database_dbport'});
         $this->set_config('database_dbtable', $data->{'database_dbtable'});
 
         parent::config_save($data);
@@ -139,10 +143,11 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $dbhost = $this->config->{'database_dbhost'};
         $dbuser = $this->config->{'database_dbuser'};
         $dbpass = $this->config->{'database_dbpass'};
+        $dbport = $this->config->{'database_dbport'};
         $db_table = $this->config->{'database_dbtable'};
 
         try {
-            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass);
+            $database_connection = setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array('dbport' => $dbport));
         } catch (Exception $e) {
             $this->addlog(get_string('databaseconnectfail', 'tool_totara_sync'), 'error', 'importdata');
         }
@@ -222,7 +227,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                 $dbrow['timemodified'] = $now;
             } else {
                 //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow['timemodified']));
+                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow['timemodified']), true);
                 if ($parsed_date) {
                     $dbrow['timemodified'] = $parsed_date;
                 }
@@ -237,7 +242,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                         $dbrow[$datefield] = $now;
                     } else {
                         // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
-                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow[$datefield]));
+                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow[$datefield]), true);
                         if ($parsed_date) {
                             $dbrow[$datefield] = $parsed_date;
                         }
@@ -262,7 +267,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                             switch ($datatype) {
                                 case 'datetime':
                                     //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                                    $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
+                                    $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
                                     if ($parsed_date) {
                                         $value = $parsed_date;
                                     }

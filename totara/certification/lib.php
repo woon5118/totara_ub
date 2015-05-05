@@ -886,11 +886,7 @@ function certif_get_certifications_search($searchterms, $sort='fullname ASC', $p
                 continue;
             }
 
-            if (isset($USER->timezone)) {
-                $now = usertime(time(), $USER->timezone);
-            } else {
-                $now = usertime(time());
-            }
+            $now = time();
 
             // Check if the certificationme isn't accessible yet.
             if ($certification->availablefrom > 0 && $certification->availablefrom > $now) {

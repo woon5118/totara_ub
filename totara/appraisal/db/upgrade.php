@@ -157,7 +157,7 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
             if ($timestring !== '23:59:59') {
                 $datestring = date('Y-m-d', $record->timedue);
                 $datestring .= " 23:59:59";
-                if ($newtimestamp = totara_date_parse_from_format('Y-m-d H:i:s', $datestring)) {
+                if ($newtimestamp = totara_date_parse_from_format('Y-m-d H:i:s', $datestring, true)) {
                     $DB->set_field('appraisal_stage', 'timedue', $newtimestamp, array('id' => $record->id));
                 }
             }

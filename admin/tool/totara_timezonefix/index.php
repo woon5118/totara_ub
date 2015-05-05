@@ -27,7 +27,7 @@ require_once($CFG->libdir.'/adminlib.php');
 
 admin_externalpage_setup('tooltimezonefix');
 $badzones = totara_get_bad_timezone_list();
-$goodzones = totara_get_clean_timezone_list();
+$goodzones = core_date::get_list_of_timezones();
 $errors = array();
 $notifications = array();
 
@@ -68,25 +68,13 @@ foreach ($notifications as $note) {
     echo $OUTPUT->notification($note, 'notifysuccess');
 }
 echo $OUTPUT->notification(get_string('infomessage', 'tool_totara_timezonefix'), 'notifymessage');
-//get system default zone
-if (isset($CFG->forcetimezone)) {
-    $default = $CFG->forcetimezone;
-} else if (isset($CFG->timezone)) {
-    $default = $CFG->timezone;
-}
-if($default == 99) {
-    //both set to server local time so get system tz
-    $default = date_default_timezone_get();
-}
-if (in_array($default, $goodzones)) {
-    $defaultzone = $default;
-} else {
-    $defaultzone = 'Europe/London';
-}
+
+$defaultzone = core_date::get_server_timezone();
+
 //first find really strange stuff that we don't understand at all (may have come from e.g. totara_sync)
 $unknownusercount = 0;
 $unknownzones = array();
-$fullzones = array_merge(array_keys($badzones), array_values($goodzones));
+$fullzones = array_merge(array_keys($badzones), array_keys($goodzones));
 $fullzones[] = 99;
 list($insql, $inparams) = $DB->get_in_or_equal($fullzones, SQL_PARAMS_QM, 'param', false);
 $sql = "SELECT count(id) from {user} WHERE timezone $insql";
@@ -126,7 +114,7 @@ if ($totalbad > 0) {
         $cells[] = $badusers;
         //select pre-set to suggested replacement
         $replace = (isset($badzones[$zone])) ? $badzones[$zone] : $defaultzone;
-        $cells[] = html_writer::select(array_combine(array_values($goodzones), array_values($goodzones)), 'badzone_' . $zone, $replace);
+        $cells[] = html_writer::select($goodzones, 'badzone_' . $zone, $replace);
         $row = new html_table_row($cells);
         $table->data[] = $row;
     }
@@ -137,7 +125,7 @@ if ($totalbad > 0) {
         $unknownusers = $DB->count_records_sql($sql, array($zone));
         $cells[] = $unknownusers;
         //select pre-set to suggested replacement
-        $cells[] = html_writer::select(array_combine(array_values($goodzones), array_values($goodzones)), 'badzone_' . $zone, $defaultzone);
+        $cells[] = html_writer::select($goodzones, 'badzone_' . $zone, $defaultzone);
         $row = new html_table_row($cells);
         $table->data[] = $row;
     }

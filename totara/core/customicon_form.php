@@ -45,16 +45,8 @@ class upload_icon_form extends moodleform {
         $mform->addElement('hidden', 'id', $data->id);
         $mform->setType('id', PARAM_INT);
 
-        $coursegroup = array();
-        $coursegroup[] = $mform->createElement('header', 'course_icon', get_string('courseicon', 'totara_core'));
-        $coursegroup[] = $mform->createElement('filemanager', 'course_filemanager', get_string('courseicon', 'totara_core'), null, $options);
-
-        $programgroup = array();
-        $programgroup[] = $mform->createElement('header', 'prog_icon', get_string('programicon', 'totara_core'));
-        $programgroup[] = $mform->createElement('filemanager', 'program_filemanager', get_string('programicon', 'totara_core'), null, $options);
-
-        $mform->addGroup($coursegroup, 'courseicon_group', '', null, false);
-        $mform->addGroup($programgroup, 'programicon_group', '', null, false);
+        $mform->addElement('filemanager', 'course_filemanager', get_string('courseicon', 'totara_core'), null, $options);
+        $mform->addElement('filemanager', 'program_filemanager', get_string('programicon', 'totara_core'), null, $options);
 
         $this->add_action_buttons();
         $this->set_data($data);

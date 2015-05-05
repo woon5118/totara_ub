@@ -102,8 +102,14 @@ class core_calendar_type_testcase extends advanced_testcase {
      * different calendar types.
      */
     public function test_calendar_type_dateselector_elements() {
+        global $CFG;
+
         // We want to reset the test data after this run.
         $this->resetAfterTest();
+
+        $this->setTimezone('UTC');
+
+        // Note: this test is pretty useless because it does not test current user timezones.
 
         // Check converting dates to Gregorian when submitting a date selector element works. Note: the test
         // calendar is 2 years, 2 months, 2 days, 2 hours and 2 minutes ahead of the Gregorian calendar.
@@ -217,6 +223,9 @@ class core_calendar_type_testcase extends advanced_testcase {
         }
         $el->_createElements();
         $submitvalues = array('dateselector' => $date);
+        if ($element !== 'dateselector') {
+            $submitvalues['dateselector']['timezone'] = 'Etc/GMT';
+        }
 
         if ($element == 'dateselector') {
             $this->assertSame($el->exportValue($submitvalues), array('dateselector' => $date['timestamp']));
@@ -226,7 +235,7 @@ class core_calendar_type_testcase extends advanced_testcase {
             $rawvalue .= ' ' . str_pad($date['hour'], 2, '0', STR_PAD_LEFT)  . ':' . str_pad($date['minute'], 2, '0', STR_PAD_LEFT)  . ':00';
             $exportvalues = $el->exportValue($submitvalues);
             ksort($exportvalues);
-            $expectedvalues = array('dateselector' => $date['timestamp'], 'dateselector_raw' => $rawvalue);
+            $expectedvalues = array('dateselector' => $date['timestamp'], 'dateselector_raw' => $rawvalue, 'dateselector_timezone' => 'Etc/GMT');
             ksort($expectedvalues);
 
             $this->assertSame($exportvalues, $expectedvalues);

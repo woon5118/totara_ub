@@ -717,17 +717,9 @@ function chat_format_message_manually($message, $courseid, $sender, $currentuser
     $output->beep = false;       // by default
     $output->refreshusers = false; // by default
 
-    // Use get_user_timezone() to find the correct timezone for displaying this message:
-    // It's either the current user's timezone or else decided by some Moodle config setting
-    // First, "reset" $USER->timezone (which could have been set by a previous call to here)
-    // because otherwise the value for the previous $currentuser will take precedence over $CFG->timezone
-    $USER->timezone = 99;
-    $tz = get_user_timezone($currentuser->timezone);
+    // Find the correct timezone for displaying this message.
+    $tz = core_date::get_user_timezone($currentuser);
 
-    // Before formatting the message time string, set $USER->timezone to the above.
-    // This will allow dst_offset_on (called by userdate) to work correctly, otherwise the
-    // message times appear off because DST is not taken into account when it should be.
-    $USER->timezone = $tz;
     $message->strtime = userdate($message->timestamp, get_string('strftimemessage', 'chat'), $tz);
 
     $message->picture = $OUTPUT->user_picture($sender, array('size'=>false, 'courseid'=>$courseid, 'link'=>false));
@@ -908,9 +900,8 @@ function chat_format_message_theme ($message, $chatuser, $currentuser, $grouping
         return NULL;
     }
 
-    $USER->timezone = 99;
-    $tz = get_user_timezone($currentuser->timezone);
-    $USER->timezone = $tz;
+    // Find the correct timezone for displaying this message.
+    $tz = core_date::get_user_timezone($currentuser);
 
     if (empty($chatuser->course)) {
         $courseid = $COURSE->id;

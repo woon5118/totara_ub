@@ -92,7 +92,7 @@ abstract class prog_user_assignment {
         global $CFG;
 
         if (isset($mydate)) {
-            return userdate($mydate, get_string('strftimedate', 'langconfig'), $CFG->timezone, false);
+            return userdate($mydate, get_string('strftimedate', 'langconfig'), 99, false);
         } else {
             return '';
         }

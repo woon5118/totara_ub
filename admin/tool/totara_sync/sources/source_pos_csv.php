@@ -312,7 +312,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                 $row['timemodified'] = $now;
             } else {
                 // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($row['timemodified']));
+                $parsed_date = totara_date_parse_from_format($csvdateformat, trim($row['timemodified']), true);
                 if ($parsed_date) {
                     $row['timemodified'] = $parsed_date;
                 }
@@ -331,7 +331,7 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
                         switch ($datatype) {
                             case 'datetime':
                                 // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
-                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value);
+                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true);
                                 if ($parsed_date) {
                                     $value = $parsed_date;
                                 }

@@ -277,28 +277,9 @@ if (!defined('CACHE_DISABLE_STORES')) {
     define('CACHE_DISABLE_STORES', false);
 }
 
-// Totara uses only city based timezones.
-// $CFG->phpinitimezone is used as a default value for the server timezone.
-if (!isset($CFG->phpinitimezone)) {
-    // UTC here means it is not configured properly in PHP.ini file or config.php.
-    $CFG->phpinitimezone = @date_default_timezone_get();
-    if (empty($CFG->phpinitimezone)) {
-        // PHP should always return something, but if it fails use PHP default.
-        $CFG->phpinitimezone = 'UTC';
-    }
-    date_default_timezone_set($CFG->phpinitimezone);
-}
+// Servers should define a default timezone in php.ini, but if they don't then make sure no errors are shown.
+date_default_timezone_set(@date_default_timezone_get());
 
-/*
-// Servers should define a default timezone in php.ini, but if they don't then make sure something is defined.
-// This is a quick hack.  Ideally we should ask the admin for a value.  See MDL-22625 for more on this.
-if (function_exists('date_default_timezone_set') and function_exists('date_default_timezone_get')) {
-    $olddebug = error_reporting(0);
-    date_default_timezone_set(date_default_timezone_get());
-    error_reporting($olddebug);
-    unset($olddebug);
-}
-*/
 // Detect CLI scripts - CLI scripts are executed from command line, do not have session and we do not want HTML in output
 // In your new CLI scripts just add "define('CLI_SCRIPT', true);" before requiring config.php.
 // Please note that one script can not be accessed from both CLI and web interface.
@@ -597,6 +578,9 @@ if (defined('COMPONENT_CLASSLOADER')) {
     spl_autoload_register('core_component::classloader');
 }
 
+// Remember the default PHP timezone, we will need it later.
+core_date::store_default_php_timezone();
+
 // Load up standard libraries
 require_once($CFG->libdir .'/filterlib.php');       // Functions for filtering test as it is output
 require_once($CFG->libdir .'/ajax/ajaxlib.php');    // Functions for managing our use of JavaScript and YUI
@@ -729,14 +713,8 @@ ini_set('arg_separator.output', '&amp;');
 // Work around for a PHP bug   see MDL-11237
 ini_set('pcre.backtrack_limit', 20971520);  // 20 MB
 
-// Set default server timezone for Totara date stuff.
-if (!empty($CFG->timezone) and $CFG->timezone != 99) {
-    @date_default_timezone_set($CFG->timezone);
-    if (date_default_timezone_get() !== $CFG->timezone) {
-        // Not a valid timezone, go back to initial value.
-        date_default_timezone_set($CFG->phpinitimezone);
-    }
-}
+// Set PHP default timezone to server timezone.
+core_date::set_default_server_timezone();
 
 // Location of standard files
 $CFG->wordlist = $CFG->libdir .'/wordlist.txt';
