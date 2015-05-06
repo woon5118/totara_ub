@@ -2128,7 +2128,7 @@ class admin_setting_nothing extends admin_setting {
      * @return string Returns an XHTML string
      */
     public function output_html($data, $query='') {
-        return format_admin_setting($this, $this->visiblename, '', $this->description, true);
+        return format_admin_setting($this, $this->visiblename, '', $this->description, false);
     }
 }
 
@@ -7033,9 +7033,14 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
 
     $str = '
 <div class="form-item clearfix" id="admin-'.$setting->name.'">
-  <div class="form-label">
-    <label '.$labelfor.'>'.highlightfast($query, $title).$override.$warning.'</label>
-    <span class="form-shortname">'.highlightfast($query, $name).'</span>
+  <div class="form-label">';
+    if (!empty($labelfor)) {
+        $str .= '<label ' . $labelfor . '>' . highlightfast($query, $title) . $override . $warning . '</label>';
+    } else {
+        $str .= '<span class="admin-label">' . highlightfast($query, $title) . $override . $warning . '</span>';
+    }
+
+    $str .='    <span class="form-shortname">'.highlightfast($query, $name).'</span>
   </div>
   <div class="form-setting">'.$error.$form.$defaultinfo.'</div>
   <div class="form-description">'.highlight($query, markdown_to_html($description)).'</div>
