@@ -3244,7 +3244,7 @@ class reportbuilder {
         $table->setup();
         $table->initialbars(true);
         $table->pagesize($perpage, $countfiltered);
-        $table->add_toolbar_pagination('right');
+        $table->add_toolbar_pagination('right', 'both');
 
         if ($initiallyhidden) {
             $table->set_no_records_message(get_string('initialdisplay_pending', 'totara_reportbuilder'));

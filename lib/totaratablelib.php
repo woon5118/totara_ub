@@ -70,6 +70,11 @@ class totara_table extends flexible_table {
      * @return boolean If the content could be added or not
      */
     function add_toolbar_content($content, $side = 'left', $position = 'top', $index = 0) {
+        if ($position === 'both') {
+            $outcome = $this->add_toolbar_content($content, $side, 'top', $index);
+            $outcome = $this->add_toolbar_content($content, $side, 'bottom', $index) && $outcome;
+            return $outcome;
+        }
         if (!in_array($position, array('top', 'bottom'))) {
             debugging("print_toolbars: Unknown position '{$position}', should be 'top' or 'bottom'");
             return false;
@@ -117,7 +122,7 @@ class totara_table extends flexible_table {
      * Add pagination to one of the table's toolbars
      *
      * @param string $side Which side pagination should be added. Either 'left' or 'right'
-     * @param string $position Which toolbar to add pagination to. Either 'top' or 'bottom'
+     * @param string $position Which toolbar to add pagination to. Either 'top', 'bottom', or 'both'
      * @param integer $index Which toolbar to add pagination to
      * @return boolean If the content could be added or not
      */
