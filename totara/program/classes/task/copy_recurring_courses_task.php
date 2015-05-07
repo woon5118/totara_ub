@@ -46,7 +46,7 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
      *
      */
     public function execute() {
-        global $DB, $CFG;
+        global $DB, $CFG, $USER;
         require_once($CFG->dirroot . '/totara/program/lib.php');
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
@@ -58,7 +58,7 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
         }
 
         $recurring_programs = prog_get_recurring_programs();
-
+        $now = time();
         foreach ($recurring_programs as $program) {
 
             $content = $program->get_content();
@@ -107,7 +107,7 @@ class copy_recurring_courses_task extends \core\task\scheduled_task {
             }
 
             $bc->execute_plan();
-
+            $debugging = debugging();
             if ($backupfile = $bc->get_results()) {
                 if ($debugging) {
                     mtrace("Course '{$course->fullname}' with id {$course->id} successfully backed up");

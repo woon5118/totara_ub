@@ -60,7 +60,7 @@ class switch_recurring_courses_task extends \core\task\scheduled_task {
         // Function get_archetype_roles returns an array, get the first element of it.
         $studentroles = get_archetype_roles('student');
         $studentrole = array_shift($studentroles);
-
+        $now = time();
         foreach ($recurring_programs as $program) {
 
             $content = $program->get_content();
