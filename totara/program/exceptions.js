@@ -263,7 +263,7 @@ M.totara_programexceptions = M.totara_programexceptions || {
             this.exceptionId = $(this.checkbox).val();
 
             this.select = function() {
-                this.checkbox.attr('checked','checked');
+                this.checkbox.prop('checked','checked');
             }
             this.unselect = function() {
                 this.checkbox.removeAttr('checked');
