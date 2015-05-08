@@ -75,6 +75,7 @@ $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvfile'] = 'CSV file';
 $string['csvimport'] = 'CSV file import';
 $string['csvimport_help'] = 'Entries may be imported via a plain text file with a list of field names as the first line, then the data, with one record per line.';
+$string['csvimportfilestructinfo'] = 'The import requires a CSV file with the following structure:';
 $string['csvwithselecteddelimiter'] = '<acronym title="Comma Separated Values">CSV</acronym> text with selected delimiter:';
 $string['data:addinstance'] = 'Add a new database';
 $string['data:approve'] = 'Approve and undo approved entries';

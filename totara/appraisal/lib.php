@@ -4750,7 +4750,7 @@ class appraisal_message {
                 $eventdata->fullmessage       = $message->content;
                 $eventdata->fullmessageformat = FORMAT_PLAIN;
                 // The content is plain text so make sure we convert linebreaks for the HTML content.
-                $eventdata->fullmessagehtml   = nl2br($message->content);
+                $eventdata->fullmessagehtml   = html_writer::tag('pre', $message->content);
                 $eventdata->smallmessage      = $message->content;
 
                 // Send the message, preventing duplicates. E.g. If someone is a manager and appraiser and there are two

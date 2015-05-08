@@ -17,23 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralms.com>
  * @package totara_reportbuilder
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/totara/reportbuilder/rb_sources/rb_source_course_completion_all.php');
-
-class rb_source_dp_course_completion_history extends rb_source_course_completion_all {
-
-    protected function define_base() {
-        $base = "{course_completion_history}";
-        return $base;
-    }
-
-    protected function define_sourcetitle() {
-        return get_string('sourcetitle', 'rb_source_dp_course_completion_history');
-    }
-}
+$string['grade'] = 'Grade at time of completion';
+$string['iscurrent'] = 'Is current record';
+$string['sourcetitle'] = 'Course Completion Including History';
+$string['timecompleted'] = 'Date completed';
+$string['type_base'] = 'Course Completion';
