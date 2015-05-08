@@ -582,7 +582,7 @@ function completion_start_user_bulk($courseid) {
             CASE
                 WHEN MIN(ue.timestart) <> 0
                 THEN MIN(ue.timestart)
-                ELSE ?
+                ELSE MIN(ue.timecreated)
             END,
             0,
             ?,
@@ -614,7 +614,6 @@ function completion_start_user_bulk($courseid) {
 
     $now = time();
     $params = array(
-        $now,
         $now,
         COMPLETION_STATUS_NOTYETSTARTED,
         $courseid,

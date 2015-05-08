@@ -92,6 +92,51 @@ class totara_core_completion_testcase extends advanced_testcase {
     }
 
     /**
+     * Check that completion records enrolment date comes from the
+     * enrolment record after a reset and not time()
+     */
+    public function test_enrolmentdate_reset() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // Turn on completion starts on enrol for the course.
+        $updatesql = "UPDATE {course} SET completionstartonenrol = 1 where id = ?";
+        $DB->execute($updatesql, array($this->course->id));
+
+        // Get the expected times.
+        $sql = "SELECT userid, MIN(timecreated)
+                  FROM {user_enrolments}
+              GROUP BY userid";
+        $timeenrolled = $DB->get_records_sql($sql);
+
+        // Reset the completions and restart the users.
+        $completion = new completion_info($this->course);
+        $completion->delete_course_completion_data();
+        completion_start_user_bulk($this->course->id);
+
+        // Compare the generated dates with the expected ones.
+        $resetcompletions = $DB->get_records('course_completions', array(), '', 'userid, timeenrolled');
+        $this->assertEquals($timeenrolled[$this->user_man->id]->min, $resetcompletions[$this->user_man->id]->timeenrolled);
+        $this->assertEquals($timeenrolled[$this->user_rpl->id]->min, $resetcompletions[$this->user_rpl->id]->timeenrolled);
+
+        // Now set a start date for the user enrolments (it should use the startdate instead of timecreated).
+        $timestart = "1234567890";
+        $updatesql = "UPDATE {user_enrolments} SET timestart = {$timestart}";
+        $DB->execute($updatesql);
+
+        // Reset the completions again.
+        $completion = new completion_info($this->course);
+        $completion->delete_course_completion_data();
+        completion_start_user_bulk($this->course->id);
+
+        // Compare the generated dates with the expected ones.
+        $resetcompletions = $DB->get_records('course_completions', array(), '', 'userid, timeenrolled');
+        $this->assertEquals($timestart, $resetcompletions[$this->user_man->id]->timeenrolled);
+        $this->assertEquals($timestart, $resetcompletions[$this->user_rpl->id]->timeenrolled);
+    }
+
+    /**
      * This tests maintaining RPL completion data when an activity is reset.
      */
     public function test_modupdate_rpl() {
