@@ -5669,6 +5669,10 @@ function reportbuilder_create_embedded_record($shortname, $embed, &$error) {
     // Note: embedded reports are not expected to have global restrictions for performance reasons.
     $todb->globalrestriction = reportbuilder::GLOBAL_REPORT_RESTRICTIONS_DISABLED;
 
+    if (isset($embed->initialdisplay)) {
+        $todb->initialdisplay = $embed->initialdisplay;
+    }
+
     try {
         $transaction = $DB->start_delegated_transaction();
 
