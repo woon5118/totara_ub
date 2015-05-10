@@ -725,6 +725,7 @@ class program {
      */
     public function unassign_learners($userids) {
         global $DB;
+
         //get the courses in this program
         $sql = "SELECT DISTINCT courseid
                   FROM {prog_courseset_course} csc
@@ -739,16 +740,11 @@ class program {
             foreach ($courses as $courseid) {
                 $instance = $program_plugin->get_instance_for_course($courseid);
                 if ($instance) {
-                    //get all the active enrolments with this plugin for these users
-                    list($in_sql, $in_params) = $DB->get_in_or_equal($userids);
-                    array_push($in_params, $instance->id);
-                    $active_enrolments = $DB->get_fieldset_select('user_enrolments', 'userid', "userid $in_sql AND enrolid = ?", $in_params);
-                    foreach ($active_enrolments as $userid) {
-                        $program_plugin->unenrol_user($instance, $userid);
-                    }
+                    $program_plugin->process_program_unassignments($instance, $userids);
                }
             }
         }
+
         foreach ($userids as $userid) {
             // Un-assign the student role from the user in the program context
             role_unassign($this->studentroleid, $userid, $this->context->id);

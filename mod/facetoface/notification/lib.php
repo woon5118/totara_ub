@@ -491,7 +491,7 @@ class facetoface_notification extends data_object {
     public function send_to_user($user, $sessionid, $sessiondate = null) {
         global $CFG, $USER, $DB;
 
-        // Check notification or system notification is enabled.
+        // Check that the notification is enabled and that all facetoface notifications are not disabled.
         if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
             return;
         }
@@ -684,6 +684,11 @@ class facetoface_notification extends data_object {
     public function send_to_manager($user, $sessionid) {
         global $CFG, $DB;
 
+        // Check that the notification is enabled and that all facetoface notifications are not disabled.
+        if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
+            return;
+        }
+
         $params = array('userid'=>$user->id, 'sessionid'=>$sessionid);
         $positiontype = $DB->get_field('facetoface_signups', 'positiontype', $params);
 
@@ -730,6 +735,13 @@ class facetoface_notification extends data_object {
      * @return  void
      */
     public function send_to_thirdparty($user, $sessionid) {
+        global $CFG;
+
+        // Check that the notification is enabled and that all facetoface notifications are not disabled.
+        if (!$this->status || !empty($CFG->facetoface_notificationdisable)) {
+            return;
+        }
+
         // Third-party notification.
         if (!empty($this->_facetoface->thirdparty) && ($this->_sessions[$sessionid]->datetimeknown || !empty($this->_facetoface->thirdpartywaitlist))) {
             $event = clone $this->_event;

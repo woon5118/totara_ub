@@ -83,10 +83,11 @@ echo $OUTPUT->doctype() ?>
                 </a>
             </div>
             <?php } ?>
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" href='#'>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
+                <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
             <ul class="nav nav-collapse collapse <?php echo $left ? "pull-right" : "pull-left" ?>">
                 <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
