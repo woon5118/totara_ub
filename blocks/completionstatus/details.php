@@ -57,8 +57,21 @@ if (!$info->is_enabled()) {
     print_error('completionnotenabled', 'completion', $returnurl);
 }
 
+// Is course complete?
+$coursecomplete = $info->is_course_complete($user->id);
+
+// Has this user completed any criteria?
+$criteriacomplete = $info->count_course_user_data($user->id);
+
+// Load course completion.
+$params = array(
+    'userid' => $user->id,
+    'course' => $course->id,
+);
+$ccompletion = new completion_completion($params);
+
 // Check this user is enroled.
-if (!$info->is_tracked_user($user->id)) {
+if (!$info->is_tracked_user($user->id) && !$criteriacomplete && !$ccompletion->timestarted) {
     if ($USER->id == $user->id) {
         print_error('notenroled', 'completion', $returnurl);
     } else {
@@ -102,19 +115,6 @@ if ($USER->id != $user->id) {
 echo html_writer::start_tag('tr');
 echo html_writer::start_tag('td', array('colspan' => '2'));
 echo html_writer::tag('b', get_string('status'));
-
-// Is course complete?
-$coursecomplete = $info->is_course_complete($user->id);
-
-// Has this user completed any criteria?
-$criteriacomplete = $info->count_course_user_data($user->id);
-
-// Load course completion.
-$params = array(
-    'userid' => $user->id,
-    'course' => $course->id,
-);
-$ccompletion = new completion_completion($params);
 
 if ($coursecomplete) {
     // Check for RPL
