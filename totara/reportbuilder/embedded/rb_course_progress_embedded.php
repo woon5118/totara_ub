@@ -70,6 +70,7 @@ class rb_course_progress_embedded extends rb_base_embedded {
         $this->embeddedparams = array();
         $this->embeddedparams['userid'] = $USER->id;
         $this->embeddedparams['rolstatus'] = 'active';
+        $this->embeddedparams['enrolled'] = 1;
 
         parent::__construct();
     }

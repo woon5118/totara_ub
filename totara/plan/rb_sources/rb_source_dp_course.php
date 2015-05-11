@@ -195,6 +195,16 @@ class rb_source_dp_course extends rb_base_source {
                     'course_completion_history.userid = base.userid)',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
+        $joinlist[] = new rb_join(
+                'enrolment',
+                'LEFT',
+                '(SELECT DISTINCT ue.userid, enrol.courseid, 1 AS enrolled
+                    FROM {user_enrolments} ue
+                    JOIN {enrol} enrol ON ue.enrolid = enrol.id)',
+                '(enrolment.userid = base.userid AND ' .
+                'enrolment.courseid = base.courseid)',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
 
         $this->add_course_table_to_joinlist($joinlist, 'base', 'courseid', 'INNER');
         $this->add_context_table_to_joinlist($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
@@ -614,6 +624,11 @@ class rb_source_dp_course extends rb_base_source {
                 END)",
                 array('course_completion', 'dp_course'),
                 'string'
+        );
+        $paramoptions[] = new rb_param_option(
+            'enrolled',
+            "enrolment.enrolled",
+            array('enrolment')
         );
         return $paramoptions;
     }
