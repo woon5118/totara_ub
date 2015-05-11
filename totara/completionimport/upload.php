@@ -98,7 +98,7 @@ if (!empty($importname)) {
     // Move the file to the temporary filename.
     if ($filesource == TCI_SOURCE_EXTERNAL) {
         // File should already be uploaded by FTP.
-        if (!move_sourcefile($data->sourcefile)) {
+        if (!move_sourcefile($data->sourcefile, $tempfilename)) {
             echo $OUTPUT->footer();
             unlink($tempfilename);
             exit;
