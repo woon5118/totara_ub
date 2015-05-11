@@ -802,6 +802,51 @@ class backup_filters_structure_step extends backup_structure_step {
 }
 
 /**
+ * Structure step that will generate reminders.xml
+ */
+class backup_reminders_structure_step extends backup_structure_step {
+
+    protected function execute_condition() {
+        // Check that all activities have been included.
+        if ($this->task->is_excluding_activities()) {
+            return false;
+        }
+        return true;
+    }
+
+    protected function define_structure() {
+
+        // Define each element
+        $coursereminders = new backup_nested_element('coursereminders');
+
+        $reminders = new backup_nested_element('reminders');
+
+        $reminder = new backup_nested_element('reminder', array('id'), array(
+            'title', 'type', 'config', 'timecreated', 'timemodified', 'modifierid', 'deleted',
+        ));
+
+        $reminder_messages = new backup_nested_element('reminder_messages');
+
+        $reminder_message = new backup_nested_element('reminder_message', array('id'), array(
+            'type', 'period', 'copyto', 'subject', 'message', 'timemodified', 'deleted'
+        ));
+
+        // Build the tree
+        $coursereminders->add_child($reminders);
+        $reminders->add_child($reminder);
+        $reminder->add_child($reminder_messages);
+        $reminder_messages->add_child($reminder_message);
+
+        // Define sources - the instances are restored using the same sortorder, we do not need to store it in xml and deal with it afterwards.
+        $reminder->set_source_table('reminder', array('courseid' => backup::VAR_COURSEID), 'timecreated ASC');
+
+        $reminder_message->set_source_table('reminder_message', array('reminderid' => backup::VAR_PARENTID));
+
+        return $coursereminders;
+    }
+}
+
+/**
  * structure step in charge of constructing the comments.xml file for all the comments found
  * in a given context
  */

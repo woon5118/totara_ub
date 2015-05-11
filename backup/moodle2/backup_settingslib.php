@@ -111,6 +111,12 @@ class backup_logs_setting extends backup_anonymize_setting {}
 class backup_comments_setting extends backup_anonymize_setting {}
 
 /**
+ * root setting to control if backup will include reminders or not.
+ * depends on @backup_activities_setting
+ */
+class backup_reminders_setting extends backup_generic_setting {}
+
+/**
  * root setting to control if backup will include badges or not,
  * depends on @backup_activities_setting
  */

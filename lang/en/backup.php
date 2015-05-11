@@ -242,6 +242,7 @@ $string['rootsettinggradehistories'] = 'Include grade history';
 $string['rootsettinggroups'] = 'Include groups and groupings';
 $string['rootsettingimscc1'] = 'Convert to IMS Common Cartridge 1.0';
 $string['rootsettingimscc11'] = 'Convert to IMS Common Cartridge 1.1';
+$string['rootsettingreminders'] = 'Include reminders';
 $string['sitecourseformatwarning'] = 'This is a front page backup, note that they can only be restored on the front page';
 $string['storagecourseonly'] = 'Course backup filearea';
 $string['storagecourseandexternal'] = 'Course backup filearea and the specified directory';

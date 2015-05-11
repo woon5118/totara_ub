@@ -100,6 +100,9 @@ class backup_final_task extends backup_task {
             $this->add_step(new backup_badges_structure_step('course_badges', 'badges.xml'));
         }
 
+        // Reminders.
+        $this->add_step(new backup_reminders_structure_step('course_reminders', 'reminders.xml'));
+
         // Generate the scales file with all the (final) annotated scales
         $this->add_step(new backup_final_scales_structure_step('scaleslist', 'scales.xml'));
 

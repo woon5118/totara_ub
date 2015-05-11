@@ -181,6 +181,19 @@ class restore_root_task extends restore_task {
         $this->add_setting($comments);
         $users->add_dependency($comments);
 
+        // Define reminders (dependent of activities).
+        $defaultvalue = false;                      // Safer default.
+        $changeable = false;
+        if (isset($rootsettings['reminders']) && $rootsettings['reminders']) { // Only enabled when available.
+            $defaultvalue = true;
+            $changeable = true;
+        }
+        $reminders = new restore_reminders_setting('reminders', base_setting::IS_BOOLEAN, $defaultvalue);
+        $reminders->set_ui(new backup_setting_ui_checkbox($reminders, get_string('rootsettingreminders', 'backup')));
+        $reminders->get_ui()->set_changeable($changeable);
+        $this->add_setting($reminders);
+        $activities->add_dependency($reminders);
+
         // Define badges (dependent of activities).
         $defaultvalue = false;                      // Safer default.
         $changeable = false;

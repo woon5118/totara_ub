@@ -73,6 +73,12 @@ class restore_activities_setting extends restore_generic_setting {}
 class restore_comments_setting extends restore_role_assignments_setting {}
 
 /**
+ * root setting to control if restore will create reminders or not
+ * depends on @restore_activities_setting
+ */
+class restore_reminders_setting extends restore_generic_setting {}
+
+/**
  * root setting to control if restore will create badges or not,
  * depends on @restore_activities_setting
  */

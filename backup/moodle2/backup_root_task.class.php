@@ -122,6 +122,12 @@ class backup_root_task extends backup_task {
         $this->add_setting($comments);
         $users->add_dependency($comments);
 
+        // Define reminders (dependent of activities).
+        $reminders = new backup_reminders_setting('reminders', base_setting::IS_BOOLEAN, true);
+        $reminders->set_ui(new backup_setting_ui_checkbox($reminders, get_string('rootsettingreminders', 'backup')));
+        $this->add_setting($reminders);
+        $activities->add_dependency($reminders);
+
         // Define badges (dependent of activities).
         $badges = new backup_badges_setting('badges', base_setting::IS_BOOLEAN, true);
         $badges->set_ui(new backup_setting_ui_checkbox($badges, get_string('rootsettingbadges', 'backup')));

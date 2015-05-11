@@ -69,6 +69,9 @@ class restore_final_task extends restore_task {
             $this->add_step(new restore_badges_structure_step('course_badges', 'badges.xml'));
         }
 
+        // Reminders.
+        $this->add_step(new restore_reminders_structure_step('course_reminders', 'reminders.xml'));
+
         // Review all the legacy module_availability records in backup_ids in
         // order to match them with existing modules / grade items and convert
         // into the new system.

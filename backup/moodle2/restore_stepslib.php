@@ -2316,6 +2316,112 @@ class restore_filters_structure_step extends restore_structure_step {
     }
 }
 
+/**
+ * This structure steps restores course reminders and their messages.
+ */
+class restore_reminders_structure_step extends restore_structure_step {
+
+    /**
+     * Conditionally decide if this step should be executed.
+     *
+     * This function checks the following parameters:
+     *
+     *   1. Completion is enabled on the site.
+     *   2. The reminders.xml file exists.
+     *   3. All modules are restorable.
+     *   4. All modules are marked for restore.
+     *
+     * @return bool True is safe to execute, false otherwise
+     */
+    protected function execute_condition() {
+        global $CFG, $DB;
+
+        // First check is completion is enabled.
+        $completion = new completion_info($DB->get_record('course', array('id' => $this->get_courseid())));
+        if (!$completion->is_enabled()) {
+            // Disabled, don't restore course reminders.
+            return false;
+        }
+
+        // Check if reminders.xml is included in the backup.
+        $fullpath = $this->task->get_taskbasepath();
+        $fullpath = rtrim($fullpath, '/') . '/' . $this->filename;
+        if (!file_exists($fullpath)) {
+            // Not found, can't restore course reminders.
+            return false;
+        }
+
+        // Check we are able to restore all backed up modules.
+        if ($this->task->is_missing_modules()) {
+            return false;
+        }
+
+        // Finally check all modules within the backup are being restored.
+        if ($this->task->is_excluding_activities()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function define_structure() {
+
+        $paths = array();
+
+        $paths[] = new restore_path_element('reminder', '/coursereminders/reminders/reminder');
+        $paths[] = new restore_path_element('reminder_message', '/coursereminders/reminders/reminder/reminder_messages/reminder_message');
+
+        return $paths;
+    }
+
+    /**
+     * Create reminder instances.
+     *
+     * @param mixed $data
+     * @return void
+     */
+    public function process_reminder($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $data->courseid = $this->get_courseid();
+        $data->modifierid = $this->get_mappingid('user', $data->modifierid);
+        $data->timecreated = $this->apply_date_offset($data->timecreated);
+        $data->timemodified = $this->apply_date_offset($data->timemodified);
+        // Update config.
+        $config = unserialize($data->config);
+        if (!empty($config['tracking'])) {
+            // We're tracking something other than course completion - get the new course module id.
+            $config['tracking'] = $this->get_mappingid('course_module', $config['tracking']);
+
+        }
+        $config['requirement'] = $this->get_mappingid('course_module', $config['requirement']);
+        $data->config = serialize($config);
+
+        $newid = $DB->insert_record('reminder', $data);
+        $this->set_mapping('reminder', $data->id, $newid);
+    }
+
+    /**
+     * Create reminder messages.
+     *
+     * This has to be called after creation of reminder instances
+     *
+     * @param mixed $data
+     * @return void
+     */
+    public function process_reminder_message($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        // Process only if parent instance have been mapped.
+        if ($reminderid = $this->get_new_parentid('reminder')) {
+            $data->reminderid = $reminderid;
+            $DB->insert_record('reminder_message', $data);
+        }
+    }
+}
 
 /**
  * This structure steps restores the comments
