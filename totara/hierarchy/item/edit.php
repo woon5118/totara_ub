@@ -140,9 +140,12 @@ if ($itemform->is_cancelled()) {
         }
     } else {
         // Update existing item
-        $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
         $transaction = $DB->start_delegated_transaction();
         $updateditem = $hierarchy->update_hierarchy_item($itemnew->id, $itemnew, false, false);
+        // Fix the description field and redirect.
+        $itemnew = file_postupdate_standard_editor($itemnew, 'description', $TEXTAREA_OPTIONS, $TEXTAREA_OPTIONS['context'], 'totara_hierarchy', $shortprefix, $itemnew->id);
+        $DB->set_field($shortprefix, 'description', $itemnew->description, array('id' => $itemnew->id));
+        // Update the items custom fields.
         customfield_save_data($itemnew, $prefix, $shortprefix.'_type');
         $transaction->allow_commit();
 

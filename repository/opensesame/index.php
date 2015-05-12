@@ -64,6 +64,6 @@ $report->display_sidebar_search();
 echo $report->display_saved_search_options();
 
 $report->display_table();
-$output->export_select($report->_id, $sid);
+$output->export_select($report, $sid);
 
 echo $output->footer();

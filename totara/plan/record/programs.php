@@ -174,7 +174,7 @@ echo $report->display_saved_search_options();
 echo $renderer->showhide_button($report->_id, $report->shortname);
 $report->display_table();
 // Export button.
-$renderer->export_select($report->_id, $sid);
+$renderer->export_select($report, $sid);
 
 echo $OUTPUT->container_end();
 echo $OUTPUT->footer();

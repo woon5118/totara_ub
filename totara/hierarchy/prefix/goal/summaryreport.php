@@ -93,6 +93,6 @@ echo $report->display_saved_search_options();
 
 echo $renderer->showhide_button($report->_id, $report->shortname);
 $report->display_table();
-$renderer->export_select($report->_id, $sid);
+$renderer->export_select($report, $sid);
 
 echo $renderer->footer();

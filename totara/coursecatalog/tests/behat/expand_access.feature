@@ -1,4 +1,4 @@
-@totara @totara_coursecatalog @wip
+@totara @totara_coursecatalog
 Feature: Users can expand the course info in course catalog
   In order to expand course info
   As a user

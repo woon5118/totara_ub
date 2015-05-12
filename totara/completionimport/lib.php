@@ -232,9 +232,12 @@ function import_csv($tempfilename, $importname, $importtime) {
     $csvdelimiter = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
     $csvseparator = csv_import_reader::get_delimiter(get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR));
     $csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
+    $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+    $datefieldmap = array('completiondate' => 'completiondateparsed');
 
     // Assume that file checks and column name checks have already been done.
-    $importcsv = new csv_iterator($tempfilename, $csvseparator, $csvdelimiter, $csvencoding, $columnnames, $importtime);
+    $importcsv = new csv_iterator($tempfilename, $csvseparator, $csvdelimiter, $csvencoding, $columnnames, $importtime,
+                                  $csvdateformat, $datefieldmap);
     $DB->insert_records_via_batch($tablename, $importcsv);
 
     // Remove any empty rows at the end of the import file.
@@ -509,7 +512,7 @@ function create_evidence($importname, $importtime) {
     if ($importname == 'course') {
         // Add any missing courses to other training (evidence).
         $shortnameoridnumber = get_shortnameoridnumber('c', 'i', $shortnamefield, $idnumberfield);
-        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield}, i.{$idnumberfield}, i.completiondate, i.grade
+        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield}, i.{$idnumberfield}, i.completiondateparsed, i.grade
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
                 {$sqlwhere}
@@ -519,7 +522,7 @@ function create_evidence($importname, $importtime) {
     } else if ($importname == 'certification') {
         // Add any missing certifications to other training (evidence).
         $shortnameoridnumber = get_shortnameoridnumber('p', 'i', $shortnamefield, $idnumberfield);
-        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield},  i.{$idnumberfield}, i.completiondate
+        $sql = "SELECT i.id as importid, u.id userid, i.{$shortnamefield},  i.{$idnumberfield}, i.completiondateparsed
                 FROM {{$tablename}} i
                 JOIN {user} u ON u.username = i.username
                 LEFT JOIN {prog} p ON {$shortnameoridnumber}
@@ -550,17 +553,18 @@ function create_evidence($importname, $importtime) {
  * @global object $DB
  * @param object $item record object
  * @param int $evidencetype default evidence type
- * @param string $csvdateformat csv date format
+ * @param string $csvdateformat csv date format - obsolete, unused
  * @param string $tablename name of import table
  * @param string $shortnamefield name of short name field, either certificationshortname or courseshortname
  * @param string $idnumberfield name of id number, either certificationidnumber or courseidnumber
+ * @param string $importname 'course' or 'completion'
  * @return object $data record to insert
  */
 function create_evidence_item($item, $evidencetype, $csvdateformat, $tablename, $shortnamefield, $idnumberfield, $importname) {
     global $USER, $DB;
 
     $timecompleted = null;
-    $timestamp = totara_date_parse_from_format($csvdateformat, $item->completiondate);
+    $timestamp = $item->completiondateparsed;
     if (!empty($timestamp)) {
         $timecompleted = $timestamp;
     }
@@ -629,7 +633,6 @@ function import_course($importname, $importtime) {
     $historicalrecordindb = array();
 
     $pluginname = 'totara_completionimport_' . $importname;
-    $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
     $overridecurrentcompletion = get_default_config($pluginname, 'overrideactive' . $importname, false);
 
     list($sqlwhere, $params) = get_importsqlwhere($importtime);
@@ -638,7 +641,7 @@ function import_course($importname, $importtime) {
     $tablename = get_tablename($importname);
     $shortnameoridnumber = get_shortnameoridnumber('c', 'i', 'courseshortname', 'courseidnumber');
     $sql = "SELECT i.id as importid,
-                    i.completiondate,
+                    i.completiondateparsed,
                     i.grade,
                     c.id as courseid,
                     u.id as userid,
@@ -656,7 +659,7 @@ function import_course($importname, $importtime) {
             LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.userid = u.id)
             LEFT JOIN {course_completions} cc ON cc.userid = u.id AND cc.course = c.id
             {$sqlwhere}
-            ORDER BY courseid, userid, completiondate desc, grade desc";
+            ORDER BY courseid, userid, completiondateparsed DESC, grade DESC";
 
     $courses = $DB->get_recordset_sql($sql, $params);
     if ($courses->valid()) {
@@ -733,7 +736,7 @@ function import_course($importname, $importtime) {
             }
 
             $timecompleted = null;
-            $timestamp = totara_date_parse_from_format($csvdateformat, $course->completiondate);
+            $timestamp = $course->completiondateparsed;
             if (!empty($timestamp)) {
                 $timecompleted = $timestamp;
             }
@@ -922,7 +925,6 @@ function import_certification($importname, $importtime) {
     $priorpc = array();
     $priorua = array();
     $pluginname = 'totara_completionimport_' . $importname;
-    $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
     $overrideactivecertification = get_default_config($pluginname, 'overrideactive' . $importname, false);
 
     list($sqlwhere, $stdparams) = get_importsqlwhere($importtime);
@@ -960,7 +962,7 @@ function import_certification($importname, $importtime) {
     // Now get the records to import.
     $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $stdparams);
     $sql = "SELECT DISTINCT i.id as importid,
-                    i.completiondate,
+                    i.completiondateparsed,
                     p.id AS progid,
                     c.id AS certifid,
                     c.recertifydatetype,
@@ -987,7 +989,7 @@ function import_certification($importname, $importtime) {
             AND ((pa.assignmenttype = :assignmenttype AND pa.assignmenttypeid = u.id)
               OR (pfa.userid = u.id AND pfa.assignmentid IS NOT NULL)
               OR (pua.userid = u.id AND pua.assignmentid IS NOT NULL))
-            ORDER BY p.id";
+            ORDER BY progid, userid, completiondateparsed DESC";
 
     $insertcount = 1;
     $programid = 0;
@@ -1064,9 +1066,9 @@ function import_certification($importname, $importtime) {
                     WHERE id = :importid";
 
             // Do recert times.
-            $timecompleted = totara_date_parse_from_format($csvdateformat, $program->completiondate);
+            $timecompleted = $program->completiondateparsed;
             if (!$timecompleted) {
-                $timecompleted = now();
+                $timecompleted = $now;
             }
             // In imports we always use CERTIFRECERT_COMPLETION, instead of the user's value from $program->recertifydatetype.
             // That is because when importing we only have the completion date so "use certification expiry date" doesn't make

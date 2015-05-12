@@ -946,11 +946,12 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     // Those who failed to recertify will be back on the primary certification path.
                     if ($didfirstcompletion) {
                         $this->assertEquals(CERTIFRENEWALSTATUS_EXPIRED, $certifcompletion->renewalstatus); // Expired.
+                        $this->assertEquals(CERTIFSTATUS_EXPIRED, $certifcompletion->status);
                     } else {
                         $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $certifcompletion->renewalstatus); // Not due for renewal.
+                        $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned, as if newly assigned.
                     }
                     $this->assertEquals(CERTIFPATH_CERT, $certifcompletion->certifpath); // Back to primary certification path.
-                    $this->assertEquals(CERTIFSTATUS_ASSIGNED, $certifcompletion->status); // Status assigned, as if newly assigned.
                     $this->assertEquals(0, $certifcompletion->timeexpires); // No expiry.
                     $this->assertEquals(0, $certifcompletion->timewindowopens); // No window.
                     $this->assertEquals(0, $certifcompletion->timecompleted); // Not completed.

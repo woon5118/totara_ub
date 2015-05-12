@@ -141,6 +141,6 @@ if ($countfiltered > 0) {
 echo html_writer::end_tag('form');
 
 // Export button.
-$output->export_select($report->_id, $sid);
+$output->export_select($report, $sid);
 
 echo $output->footer();

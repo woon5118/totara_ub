@@ -120,7 +120,7 @@ echo $report->display_saved_search_options();
 $report->display_table();
 
 // Export button.
-$renderer->export_select($report->_id, $sid);
+$renderer->export_select($report, $sid);
 
 echo $OUTPUT->container_end();
 echo $OUTPUT->footer();

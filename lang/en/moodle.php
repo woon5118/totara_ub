@@ -518,6 +518,7 @@ $string['dndworkinglink'] = 'Drag and drop links onto course sections to upload 
 $string['documentation'] = 'Moodle documentation';
 $string['dontsortcategories'] = 'Don\'t sort categories';
 $string['dontsortcourses'] = 'Don\'t sort courses';
+$string['dowhatwithselectedusers'] = 'Do what with selected users';
 $string['down'] = 'Down';
 $string['download'] = 'Download';
 $string['downloadall'] = 'Download all';
