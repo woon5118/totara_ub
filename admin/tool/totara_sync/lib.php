@@ -278,14 +278,12 @@ function totara_sync_make_dirs($dirpath) {
  * @return array $fields
  */
 function totara_sync_clean_fields($fields, $encoding) {
-    if ($encoding !== 'UTF-8') {
-        foreach ($fields as $key => $value) {
-            $value = core_text::convert(trim($value), $encoding, 'UTF-8');
-            $fields[$key] = clean_param($value, PARAM_TEXT);
+    foreach ($fields as $key => $value) {
+        $format = ($key == 'password') ? PARAM_RAW : PARAM_TEXT;
+        if ($encoding !== 'UTF-8') {
+            $value = core_text::convert($value, $encoding, 'UTF-8');
         }
-    } else {
-        $fields = array_map('trim', $fields);
-        $fields = clean_param_array($fields, PARAM_TEXT);
+        $fields[$key] = clean_param(trim($value), $format);
     }
     return $fields;
 }

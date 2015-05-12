@@ -110,7 +110,7 @@ class rb_source_site_logs extends rb_base_source {
                 'log',
                 'action',
                 get_string('action', 'rb_source_site_logs'),
-                $DB->sql_fullname('base.module', 'base.action'),
+                $DB->sql_concat('base.module', "' '", 'base.action'),
                 array('dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
@@ -118,7 +118,7 @@ class rb_source_site_logs extends rb_base_source {
                 'log',
                 'actionlink',
                 get_string('actionlink', 'rb_source_site_logs'),
-                $DB->sql_fullname('base.module', 'base.action'),
+                $DB->sql_concat('base.module', "' '", 'base.action'),
                 array(
                     'displayfunc' => 'link_action',
                     'defaultheading' => get_string('action', 'rb_source_site_logs'),

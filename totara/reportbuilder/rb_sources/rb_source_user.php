@@ -214,26 +214,21 @@ class rb_source_user extends rb_base_source {
                         )
         );
 
+        $usednamefields = totara_get_all_user_name_fields(false, 'base', null, null, true);
+        $allnamefields = totara_get_all_user_name_fields(false, 'base');
         $columnoptions[] = new rb_column_option(
                         'user',
                         'namewithlinks',
                         get_string('usernamewithlearninglinks', 'rb_source_user'),
-                        $DB->sql_fullname("base.firstname", "base.lastname"),
+                        $DB->sql_concat_join("' '", $usednamefields),
                         array(
                             'displayfunc' => 'user_with_links',
                             'defaultheading' => get_string('user', 'rb_source_user'),
-                            'extrafields' => array(
-                                'user_id' => 'base.id',
-                                'userpic_picture' => 'base.picture',
-                                'userpic_firstname' => 'base.firstname',
-                                'userpic_firstnamephonetic' => 'base.firstnamephonetic',
-                                'userpic_middlename' => 'base.middlename',
-                                'userpic_lastname' => 'base.lastname',
-                                'userpic_lastnamephonetic' => 'base.lastnamephonetic',
-                                'userpic_alternatename' => 'base.alternatename',
-                                'userpic_imagealt' => 'base.imagealt',
-                                'userpic_email' => 'base.email'
-                            ),
+                            'extrafields' => array_merge(array('id' => 'base.id',
+                                                               'picture' => 'base.picture',
+                                                               'imagealt' => 'base.imagealt',
+                                                               'email' => 'base.email'),
+                                                         $allnamefields),
                             'dbdatatype' => 'char',
                             'outputformat' => 'text'
                         )
@@ -397,26 +392,51 @@ class rb_source_user extends rb_base_source {
     }
 
 
+    /**
+     * A rb_column_options->displayfunc helper function for showing a user's links column on the My Team page.
+     * To pass the correct data, first:
+     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     * then your "field" param should be:
+     *      $DB->sql_concat_join("' '", $usednamefields)
+     * to allow sorting and filtering, and finally your extrafields should be:
+     *      array_merge(array('id' => $base . '.id',
+     *                        'picture' => $base . '.picture',
+     *                        'imagealt' => $base . '.imagealt',
+     *                        'email' => $base . '.email'),
+     *                  $allnamefields)
+     *
+     * @param string $user Unused
+     * @param object $row All the data required to display a user's name, icon and link
+     * @param boolean $isexport If the report is being exported or viewed
+     * @return string
+     */
     function rb_display_user_with_links($user, $row, $isexport = false) {
         global $CFG, $OUTPUT, $USER;
-        $userid = $row->user_id;
 
-        if ($isexport) {
-            return $user;
+        // Process obsolete calls to this display function.
+        if (isset($row->userpic_picture)) {
+            $picuser = new stdClass();
+            $picuser->id = $row->user_id;
+            $picuser->picture = $row->userpic_picture;
+            $picuser->imagealt = $row->userpic_imagealt;
+            $picuser->firstname = $row->userpic_firstname;
+            $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
+            $picuser->middlename = $row->userpic_middlename;
+            $picuser->lastname = $row->userpic_lastname;
+            $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
+            $picuser->alternatename = $row->userpic_alternatename;
+            $picuser->email = $row->userpic_email;
+            $row = $picuser;
         }
 
-        $picuser = new stdClass();
-        $picuser->id = $userid;
-        $picuser->picture = $row->userpic_picture;
-        $picuser->imagealt = $row->userpic_imagealt;
-        $picuser->firstname = $row->userpic_firstname;
-        $picuser->firstnamephonetic = $row->userpic_firstnamephonetic;
-        $picuser->middlename = $row->userpic_middlename;
-        $picuser->lastname = $row->userpic_lastname;
-        $picuser->lastnamephonetic = $row->userpic_lastnamephonetic;
-        $picuser->alternatename = $row->userpic_alternatename;
-        $picuser->email = $row->userpic_email;
-        $user_pic = $OUTPUT->user_picture($picuser, array('courseid' => 1));
+        $userid = $row->id;
+
+        if ($isexport) {
+            return $userid;
+        }
+
+        $user_pic = $OUTPUT->user_picture($row, array('courseid' => 1));
 
         $recordstr = get_string('records', 'rb_source_user');
         $requiredstr = get_string('required', 'rb_source_user');
@@ -463,7 +483,8 @@ class rb_source_user extends rb_base_source {
 
         $links .= html_writer::end_tag('ul');
 
-        $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)), $user, array('class' => 'name'));
+        $user_tag = html_writer::link(new moodle_url("/user/profile.php", array('id' => $userid)),
+            fullname($row), array('class' => 'name'));
 
         $return = $user_pic . $user_tag . $links;
 

@@ -646,11 +646,24 @@ class reportbuilder {
 
         // Update the url property for any embedded reports.
         foreach ($reportsclasses as $object) {
+            // We need to track if the embedded report exists or not. If not we need to trigger its creation.
+            $found = false;
             foreach ($reports as $id => $report) {
                 if ($report->shortname === $object->shortname) {
                     $report->url = $object->url;
+                    $found = true;
                     break;
                 }
+            }
+            if (!$found) {
+                // The embedded report did not exist within the database, its new or this is the first time anyone has seen it.
+                // Trigger its creation.
+                $error = null;
+                $embed = reportbuilder_get_embedded_report_object($object->shortname);
+                $id = reportbuilder_create_embedded_record($object->shortname, $embed, $error);
+                $report = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+                $report->url = $object->url;
+                $reports[$id] = $report;
             }
         }
 
@@ -5549,8 +5562,8 @@ function reportbuilder_get_all_embedded_reports() {
                         continue;
                     }
                 $name = $matches[1];
-                $embed = false;
-                if ($embed = reportbuilder_get_embedded_report_object($name)) {
+                $embed = reportbuilder_get_embedded_report_object($name);
+                if ($embed) {
                     $embedded[] = $embed;
                 }
             }

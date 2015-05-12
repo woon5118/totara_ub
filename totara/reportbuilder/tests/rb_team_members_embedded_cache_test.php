@@ -104,7 +104,7 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
-        $useridalias = reportbuilder_get_extrafield_alias('user', 'namewithlinks', 'userpic_email');
+        $useridalias = reportbuilder_get_extrafield_alias('user', 'namewithlinks', 'email');
         $result = $this->get_report_result($this->report_builder_data['shortname'], array(), $usecache);
         $this->assertCount(0, $result);
 

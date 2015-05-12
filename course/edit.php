@@ -255,11 +255,14 @@ if ($editform->is_cancelled()) {
         $currentcohorts = !empty($currentcohorts) ? $currentcohorts : array();
         $newcohorts = !empty($data->cohortsenrolled) ? explode(',', $data->cohortsenrolled) : array();
 
+        $runcohortsync = false;
+
         if ($todelete = array_diff(array_keys($currentcohorts), $newcohorts)) {
             // Delete removed cohorts
             foreach ($todelete as $cohortid) {
                 totara_cohort_delete_association($cohortid, $currentcohorts[$cohortid]->associd, COHORT_ASSN_ITEMTYPE_COURSE);
             }
+            $runcohortsync = true;
         }
 
         if ($newcohorts = array_diff($newcohorts, array_keys($currentcohorts))) {
@@ -267,6 +270,7 @@ if ($editform->is_cancelled()) {
             foreach ($newcohorts as $cohortid) {
                 totara_cohort_add_association($cohortid, $course->id, COHORT_ASSN_ITEMTYPE_COURSE);
             }
+            $runcohortsync = true;
         }
 
         // Visible audiences.
@@ -290,6 +294,11 @@ if ($editform->is_cancelled()) {
             }
          }
         cache_helper::purge_by_event('changesincourse');
+
+        if ($runcohortsync) {
+            require_once("$CFG->dirroot/enrol/cohort/locallib.php");
+            enrol_cohort_sync(new null_progress_trace(), $course->id);
+        }
     }
 
     // Redirect user to newly created/updated course.

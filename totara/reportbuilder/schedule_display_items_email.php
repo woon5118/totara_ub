@@ -54,7 +54,11 @@ switch ($filtername) {
         require_capability('moodle/user:viewdetails', $context);
         if (!empty($ids)) {
             list($insql, $params) = $DB->get_in_or_equal($ids);
-            $items = $DB->get_records_select('user', "id {$insql}", $params, '', 'id, ' . $DB->sql_fullname() . ' AS fullname');
+            $usernamefields = get_all_user_name_fields(true);
+            $items = $DB->get_records_select('user', "id {$insql}", $params, '', 'id, ' . $usernamefields);
+            foreach ($items as $item) {
+                $item->fullname = fullname($item);
+            }
         }
         break;
     case 'externalemails':

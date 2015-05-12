@@ -77,12 +77,20 @@ class email_setting_schedule {
     public static function get_system_users_to_email($scheduleid) {
         global $DB;
 
-        $sql = 'SELECT ses.userid AS id, '. $DB->sql_fullname() . 'AS fullname
+        $usernamefields = get_all_user_name_fields(true, 'u');
+
+        $sql = 'SELECT ses.userid AS id, ' . $usernamefields . '
                   FROM {report_builder_schedule_email_systemuser} ses
              LEFT JOIN {user} u
                     ON ses.userid = u.id
                  WHERE ses.scheduleid = :scheduleid';
-        return $DB->get_records_sql($sql, array('scheduleid' => $scheduleid));
+        $results = $DB->get_records_sql($sql, array('scheduleid' => $scheduleid));
+
+        foreach ($results as $result) {
+            $result->fullname = fullname($result);
+        }
+
+        return $results;
     }
 
     /**

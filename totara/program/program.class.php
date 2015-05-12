@@ -1360,7 +1360,6 @@ class program {
             $out .= $OUTPUT->heading(get_string('programends', 'totara_program'), 2);
             $out .= html_writer::tag('div', $this->endnote, array('class' => 'endnote'));
             $out .= html_writer::end_tag('div');
-            $out .= html_writer::end_tag('div');
         }
 
         return $out;
