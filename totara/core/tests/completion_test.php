@@ -105,7 +105,7 @@ class totara_core_completion_testcase extends advanced_testcase {
         $DB->execute($updatesql, array($this->course->id));
 
         // Get the expected times.
-        $sql = "SELECT userid, MIN(timecreated)
+        $sql = "SELECT userid, MIN(timecreated) AS mindate
                   FROM {user_enrolments}
               GROUP BY userid";
         $timeenrolled = $DB->get_records_sql($sql);
@@ -117,8 +117,8 @@ class totara_core_completion_testcase extends advanced_testcase {
 
         // Compare the generated dates with the expected ones.
         $resetcompletions = $DB->get_records('course_completions', array(), '', 'userid, timeenrolled');
-        $this->assertEquals($timeenrolled[$this->user_man->id]->min, $resetcompletions[$this->user_man->id]->timeenrolled);
-        $this->assertEquals($timeenrolled[$this->user_rpl->id]->min, $resetcompletions[$this->user_rpl->id]->timeenrolled);
+        $this->assertEquals($timeenrolled[$this->user_man->id]->mindate, $resetcompletions[$this->user_man->id]->timeenrolled);
+        $this->assertEquals($timeenrolled[$this->user_rpl->id]->mindate, $resetcompletions[$this->user_rpl->id]->timeenrolled);
 
         // Now set a start date for the user enrolments (it should use the startdate instead of timecreated).
         $timestart = "1234567890";
