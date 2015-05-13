@@ -53,7 +53,8 @@ $THEME->sheets = array(
     'totara',   /** Totara-specific layout **/
     'user',
     'tabs',
-    'filemanager'
+    'filemanager',
+    'group'
 );
 
 $THEME->editor_sheets = array('editor');

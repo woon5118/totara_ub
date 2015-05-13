@@ -130,6 +130,7 @@ img.icon-post, .dir-rtl img.icon-pre { padding-left: 3px; padding-right: 0; }
 .headermain {font-weight:bold;}
 #maincontent {display: block;height: 1px;overflow: hidden;}
 img.uihint {cursor: help;}
+#addmembersform {clear: both}
 #addmembersform table {margin-left: auto;margin-right: auto;}
 .formtable tbody th,
 .generaltable th.header {vertical-align: top;}
