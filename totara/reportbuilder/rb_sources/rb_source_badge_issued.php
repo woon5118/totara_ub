@@ -339,16 +339,7 @@ class rb_source_badge_issued extends rb_base_source {
     }
 
     protected function define_requiredcolumns() {
-        $requiredcolumns = array(
-            new rb_column(
-                'badge',
-                'badgeid',
-                '',
-                'badge.id',
-                array('hidden' => true, 'joins' => 'badge')
-            ),
-        );
-        return $requiredcolumns;
+        return array();
     }
 
     //

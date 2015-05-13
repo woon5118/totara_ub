@@ -175,7 +175,10 @@ class send_messages_task extends \core\task\scheduled_task {
                 WHERE pc.timecompleted = ?
                 AND pc.coursesetid = ?
                 AND pm.messagetype = ?
-                AND pc.timedue > 0 AND (pc.timedue - pm.triggertime) < ?
+                AND pc.timedue > 0
+                AND (pc.timedue - pm.triggertime) < ?
+                AND u.suspended = 0
+                AND u.deleted = 0
                 ORDER BY pc.programid, u.id";
 
         // Get the records.
@@ -231,7 +234,10 @@ class send_messages_task extends \core\task\scheduled_task {
                 WHERE pc.timecompleted = ?
                 AND pc.coursesetid <> ?
                 AND pm.messagetype = ?
-                AND pc.timedue > 0 AND (pc.timedue - pm.triggertime) < ?
+                AND pc.timedue > 0
+                AND (pc.timedue - pm.triggertime) < ?
+                AND u.suspended = 0
+                AND u.deleted = 0
                 ORDER BY pc.programid, u.id";
 
         // Get the records.
@@ -288,7 +294,10 @@ class send_messages_task extends \core\task\scheduled_task {
                 WHERE pc.timecompleted = ?
                 AND pc.coursesetid = ?
                 AND pm.messagetype = ?
-                AND pc.timedue > 0 AND (pc.timedue + pm.triggertime) < ?
+                AND pc.timedue > 0
+                AND (pc.timedue + pm.triggertime) < ?
+                AND u.suspended = 0
+                AND u.deleted = 0
                 ORDER BY pc.programid, u.id";
 
         // Get the records.
@@ -344,7 +353,10 @@ class send_messages_task extends \core\task\scheduled_task {
                 WHERE pc.timecompleted = ?
                 AND pc.coursesetid <> ?
                 AND pm.messagetype = ?
-                AND pc.timedue > 0 AND (pc.timedue + pm.triggertime) < ?
+                AND pc.timedue > 0
+                AND (pc.timedue + pm.triggertime) < ?
+                AND u.suspended = 0
+                AND u.deleted = 0
                 ORDER BY pc.programid, u.id";
 
         // Get the records.
@@ -400,6 +412,8 @@ class send_messages_task extends \core\task\scheduled_task {
                 WHERE pc.status = ?
                 AND pm.messagetype = ?
                 AND (pc.timecompleted + pm.triggertime) < ?
+                AND u.suspended = 0
+                AND u.deleted = 0
                 ORDER BY pc.programid, u.id";
 
         // Get the records.

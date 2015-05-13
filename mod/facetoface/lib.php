@@ -178,11 +178,6 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
         print_error('cannotfindfacetoface');
     }
 
-    // If the module is set to manual completion or completion on view we don't need to do anything.
-    if ($facetoface->completion == COMPLETION_TRACKING_MANUAL || $facetoface->completionview) {
-        return $result;
-    }
-
     // Only check for existence of tracks and return false if completionstatusrequired.
     // This means that if only view is required we don't end up with a false state.
     if ($facetoface->completionstatusrequired) {
@@ -209,20 +204,9 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
             return completion_info::aggregate_completion_states($type, $result, true);
         }
         return completion_info::aggregate_completion_states($type, $result, false);
-    } else {
-        // At least check they have a valid signup.
-        $sql = "SELECT 1
-                  FROM {facetoface_signups} fs
-                  JOIN {facetoface_sessions} fss
-                    ON fs.sessionid = fss.id
-                 WHERE fs.userid = :uid
-                   AND fss.facetoface = :fid
-                   AND archived != 1";
-        $params = array('fid' => $facetoface->id, 'uid' => $userid);
-        $status = $DB->record_exists_sql($sql, $params);
-
-        return completion_info::aggregate_completion_states($type, $result, $status);
     }
+
+    return $result;
 }
 
 /**
