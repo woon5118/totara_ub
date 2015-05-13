@@ -52,18 +52,36 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $unusedperiod = '7 year'; // This period can be used to ensure that a parameter is correctly ignored.
 
         // Certification is using CERTIFRECERT_EXPIRY to calculate the next expiry date.
-        // User is in the recertification stage.
+        // User is in the recertification stage with the window open.
         $activeperiod = '1 year';
         $windowperiod = '1 month';
         $curtimeexpires = strtotime('3-May-2013 08:14');
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, $curtimeexpires, $timecompleted, $unuseddate, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, $curtimeexpires, $timecompleted, $unuseddate,
+            $unusedperiod, $unusedperiod, $windowperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
         $this->assertEquals(strtotime('3-May-2014 08:14'), $newtimeexpires); // One year after previous expiry date.
         $this->assertEquals(strtotime('3-Apr-2014 08:14'), $timewindowopens);
+
+        unset($activeperiod, $windowperiod, $curtimeexpires, $timecompleted);
+
+        // Certification is using CERTIFRECERT_EXPIRY to calculate the next expiry date.
+        // User is in the recertification stage before the window is open (caused by completion upload).
+        $activeperiod = '1 year';
+        $windowperiod = '1 month';
+        $curtimeexpires = strtotime('3-May-2013 08:14');
+        $timecompleted = strtotime('15-February-2013 12:01');
+
+        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, $curtimeexpires, $timecompleted, $unuseddate,
+            $activeperiod, $unusedperiod, $windowperiod);
+        $newtimeexpires = get_timeexpires($base, $activeperiod);
+        $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
+
+        $this->assertEquals(strtotime('3-May-2013 08:14'), $newtimeexpires); // Equal to current expiry date!
+        $this->assertEquals(strtotime('3-Apr-2013 08:14'), $timewindowopens);
 
         unset($activeperiod, $windowperiod, $curtimeexpires, $timecompleted);
 
@@ -74,7 +92,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timedue = strtotime('3-May-2013 08:14');
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, null, $timecompleted, $timedue, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, null, $timecompleted, $timedue,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -89,7 +108,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $windowperiod = '1 month';
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, null, $timecompleted, null, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_EXPIRY, null, $timecompleted, null,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -104,7 +124,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $windowperiod = '1 month';
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $unuseddate, $timecompleted, $unuseddate, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $unuseddate, $timecompleted, $unuseddate,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -119,7 +140,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $windowperiod = '1 month';
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, null, $timecompleted, $unuseddate, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, null, $timecompleted, $unuseddate,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -134,7 +156,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $windowperiod = '1 month';
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, null, $timecompleted, null, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, null, $timecompleted, null,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -150,7 +173,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $curtimeexpires = strtotime('3-May-2013 08:14');
         $timecompleted = strtotime('15-April-2013 12:01');
 
-        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $curtimeexpires, $timecompleted, null, $unusedperiod, $unusedperiod);
+        $base = get_certiftimebase(CERTIFRECERT_COMPLETION, $curtimeexpires, $timecompleted, null,
+            $unusedperiod, $unusedperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -172,7 +196,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
         $curtimeexpires = strtotime('2 week', $timecompleted); // Due in two weeks.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, $curtimeexpires, $timecompleted, $unuseddate, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, $curtimeexpires, $timecompleted, $unuseddate,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -195,7 +220,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
         $timedue = strtotime('8 month', $timecompleted); // Due in eight months, bigger than the minimum active period.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -217,7 +243,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
         $timedue = strtotime('4 month', $timecompleted); // Due in four months, thess than the minimum active period.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -237,7 +264,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $currentday = date("j");
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, null, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, null,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -261,7 +289,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
         $timedue = strtotime('128 month', $timecompleted); // Due in 10 years and 8 months.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
@@ -284,7 +313,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timecompleted = mktime(8, 14, 0, $currentmonth, $currentday, $currentyear); // Today at 8:14am.
         $timedue = strtotime('-119 month', $timecompleted); // Due 9 years and eleven months ago.
 
-        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod);
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 

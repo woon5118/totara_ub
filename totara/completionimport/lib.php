@@ -1076,7 +1076,7 @@ function import_certification($importname, $importtime) {
             $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
             $timedue = totara_date_parse_from_format($csvdateformat, $program->duedate);
             $base = get_certiftimebase($program->recertifydatetype, $program->timeexpires, $timecompleted, $timedue,
-                                       $program->activeperiod, $program->minimumactiveperiod);
+                                       $program->activeperiod, $program->minimumactiveperiod, $program->windowperiod);
             $ccdata->timeexpires = get_timeexpires($base, $program->activeperiod);
             $ccdata->timewindowopens = get_timewindowopens($ccdata->timeexpires, $program->windowperiod);
 

@@ -552,7 +552,8 @@ function write_certif_completion($certificationid, $userid, $certificationpath =
             array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0));
 
         $base = get_certiftimebase($certification->recertifydatetype, $certificationcompletion->timeexpires,
-            $lastcompleted, $timedue, $certification->activeperiod, $certification->minimumactiveperiod);
+            $lastcompleted, $timedue, $certification->activeperiod, $certification->minimumactiveperiod,
+            $certification->windowperiod);
 
         $todb->timeexpires = get_timeexpires($base, $certification->activeperiod);
         $todb->timewindowopens = get_timewindowopens($todb->timeexpires, $certification->windowperiod);
@@ -1352,6 +1353,7 @@ function certif_delete_messagelog($progid, $userid, $messagetype) {
  * - if using CERTIFRECERT_EXPIRY then timeexpires, timedue or timecompleted (the first that is set),
  * - if using CERTIFRECERT_FIXED then based on timeexpires, timedue or timecompleted (the first that is set) and
  *   bumped forward repeatedly by active period until at least minimum active period into the future.
+ * The new time expires will be calculated as one active period after the base.
  *
  * @param integer $recertifydatetype
  * @param integer $timeexpires
@@ -1359,15 +1361,21 @@ function certif_delete_messagelog($progid, $userid, $messagetype) {
  * @param integer $timedue
  * @param string $activeperiod
  * @param string $minimumactiveperiod
+ * @param string $windowperiod
  * @return integer
  */
-function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod) {
+function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted, $timedue, $activeperiod, $minimumactiveperiod,
+                            $windowperiod) {
     if ($recertifydatetype == CERTIFRECERT_COMPLETION) {
         return $timecompleted;
 
     } else if ($recertifydatetype == CERTIFRECERT_EXPIRY) {
         if ($timeexpires > 0 and $timecompleted > $timeexpires) { // Overdue for recertification.
             return $timecompleted;
+
+        } else if ($timeexpires > 0 and get_timewindowopens($timeexpires, $windowperiod) > $timecompleted) {
+            // Recertified before the current window has opened, base is one active period before the time expires.
+            return strtotime('-' . $activeperiod, $timeexpires);
 
         } else if ($timeexpires > 0) { // Recertified on time.
             return $timeexpires;
