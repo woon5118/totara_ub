@@ -44,12 +44,21 @@ if ($program->certifid) {
     check_program_enabled();
 }
 
-admin_externalpage_setup('programmgmt', '', array('id' => $id, 'delete' => $delete), $CFG->wwwroot.'/totara/program/delete.php');
+$categorycontext = context_coursecat::instance($program->category);
+$PAGE->set_url('/totara/program/delete.php', array('id' => $id));
+$PAGE->set_context($categorycontext);
+$PAGE->set_pagelayout('admin');
+navigation_node::override_active_url(new moodle_url('/course/management.php', array('categoryid'=>$program->category)));
 
 $returnurl = "{$CFG->wwwroot}/totara/program/edit.php?id={$program->id}";
 $deleteurl = "{$CFG->wwwroot}/totara/program/delete.php?id={$program->id}&amp;sesskey={$USER->sesskey}&amp;category={$category}&amp;delete=".md5($program->timemodified);
 
 if (!$delete) {
+    $strdeletecheck = get_string("deletecheck", "", $program->shortname);
+    $PAGE->navbar->add($strdeletecheck);
+    $PAGE->set_title("$SITE->shortname: $strdeletecheck");
+    $PAGE->set_heading($SITE->fullname);
+
     echo $OUTPUT->header();
     $strdelete = get_string('checkprogramdelete', 'totara_program');
     $strdelete .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . format_string($program->fullname);

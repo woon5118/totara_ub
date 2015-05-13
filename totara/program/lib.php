@@ -540,11 +540,11 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
 
     global $DB;
 
-    $params = array(CONTEXT_PROGRAM);
+    $params = array('ctx' => CONTEXT_PROGRAM);
     $categoryselect = "";
     if ($categoryid != "all" && is_numeric($categoryid)) {
-        $categoryselect = " AND p.category = ? ";
-        $params[] = $categoryid;
+        $categoryselect = " AND p.category = :cat ";
+        $params['cat'] = $categoryid;
     }
 
     $typesql = '';
@@ -565,11 +565,10 @@ function prog_get_programs_page($categoryid="all", $sort="sortorder ASC",
                           ctx.id AS ctxid, ctx.path AS ctxpath,
                           ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
                    FROM {prog} p
-                   JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = ?)
+                   JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = :ctx)
                    WHERE {$typesql} AND {$visibilitysql}";
 
     $select = $progselect.$categoryselect.' ORDER BY '.$sort;
-
     $rs = $DB->get_recordset_sql($select, $params);
 
     $totalcount = 0;
