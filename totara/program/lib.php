@@ -86,27 +86,34 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
     global $DB;
 
     // Construct sql query.
-    $count = 'SELECT COUNT(*) ';
-    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
     list($insql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED),
-            SQL_PARAMS_QM, 'param', false);
-    $from = "FROM {prog} p
-            INNER JOIN {prog_completion} pc ON p.id = pc.programid AND pc.coursesetid = 0
-            INNER JOIN (SELECT DISTINCT userid, programid FROM {prog_user_assignment}
-            WHERE exceptionstatus {$insql}) pua
-            ON (pc.programid = pua.programid AND pc.userid = pua.userid)";
+            SQL_PARAMS_NAMED, 'param', false);
+    $count = 'SELECT COUNT(*) ';
 
-    $where = "WHERE pc.userid = ?
-            AND pc.status <> ?";
+    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
+
+    $from = "FROM {prog} p
+       INNER JOIN {prog_completion} pc
+               ON p.id = pc.programid AND pc.coursesetid = 0 ";
+
+    $where = "WHERE pc.userid = :uid
+              AND pc.status <> :status
+              AND EXISTS(SELECT id
+                           FROM {prog_user_assignment} pua
+                          WHERE pua.exceptionstatus {$insql}
+                            AND pc.programid = pua.programid
+                            AND pc.userid = pua.userid
+                        ) ";
+
     if ($onlyprograms) {
         $where .= " AND p.certifid IS NULL";
     }
 
-    $params[] = $userid;
-    $params[] = STATUS_PROGRAM_COMPLETE;
+    $params['uid'] = $userid;
+    $params['status'] = STATUS_PROGRAM_COMPLETE;
     if (!$showhidden) {
-        $where .= " AND p.visible = ?";
-        $params[] = 1;
+        $where .= " AND p.visible = :vis";
+        $params['vis'] = 1;
     }
 
     if ($returncount) {
