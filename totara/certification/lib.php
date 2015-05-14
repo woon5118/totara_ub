@@ -1253,29 +1253,30 @@ function certif_delete($learningcomptype, $certifid) {
 function certif_delete_messagelog($progid, $userid, $messagetype) {
     global $DB;
 
-    $userids = array($userid);
-    if ($manager = totara_get_manager($userid)) {
-        $userids[] = $manager->id;
-    }
-
-    list($useridsql, $useridparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'user');
-    $params = array_merge(array('programid' => $progid, 'messagetype' => $messagetype), $useridparams);
-
+    // Get all the messages that match the given params.
+    $params = array(
+        'uid' => $userid,
+        'pid' => $progid,
+        'mtype' => $messagetype,
+    );
     $sql = "SELECT DISTINCT pml.id
             FROM {prog_messagelog} pml
-            JOIN {prog_message} pm ON pm.id = pml.messageid AND pm.programid = :programid AND pm.messagetype = :messagetype
-            WHERE pml.userid {$useridsql}";
-    if ($messages = $DB->get_recordset_sql($sql, $params)) {
-        $todelete = array();
-        foreach ($messages as $message) {
-            $todelete[] = $message->id;
-        }
-        if (!empty($todelete)) {
-            list($deletesql, $deleteparams) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED, 'd', true);
-            $DB->delete_records_select('prog_messagelog', 'id ' . $deletesql, $deleteparams);
-        }
-    }
+            JOIN {prog_message} pm ON pm.id = pml.messageid AND pm.programid = :pid AND pm.messagetype = :mtype
+            WHERE pml.userid = :uid";
+    $messages = $DB->get_recordset_sql($sql, $params);
 
+    // Put them into an array of ids for the sql statement.
+    $todelete = array();
+    foreach ($messages as $message) {
+        $todelete[] = $message->id;
+    }
+    $messages->close();
+
+    // And delete them.
+    if (!empty($todelete)) {
+        list($deletesql, $deleteparams) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED, 'd', true);
+        $DB->delete_records_select('prog_messagelog', 'id ' . $deletesql, $deleteparams);
+    }
 }
 
 /**
