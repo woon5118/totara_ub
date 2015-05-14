@@ -122,6 +122,14 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:update'
     ),
 
+    'moodle/course:managereminders' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     // Manage audience visibility.
     'totara/coursecatalog:manageaudiencevisibility' => array(
         'riskbitmask'  => RISK_CONFIG | RISK_SPAM,

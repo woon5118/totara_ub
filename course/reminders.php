@@ -1,39 +1,42 @@
 <?php
 
-// Edit course reminder settings
+// Edit course reminder settings.
 
 require_once(dirname(__FILE__).'/../config.php');
 require_once($CFG->dirroot.'/course/reminders_form.php');
 require_once($CFG->libdir.'/reminderlib.php');
 require_once($CFG->libdir.'/completionlib.php');
 
+// Reminder we are currently editing.
+$id = optional_param('id', 0, PARAM_INT); // Optional as id doesn't exist until the reminder is created.
+$courseid = required_param('courseid', PARAM_INT);
+$delete = optional_param('delete', 0, PARAM_INT); // Optional until the user deletes a reminder.
 
-// Reminder we are currently editing
-$id = optional_param('id', 0, PARAM_INT);
-$courseid = required_param('courseid', PARAM_INT); // Course id
-$delete = optional_param('delete', 0, PARAM_INT); // Detete
-
-// Basic access control checks
-if ($courseid) { // editing course
+if ($courseid) {
     if($courseid == SITEID){
-        // don't allow editing of  'site course' using this from
+        // Don't allow editing of the site course.
         print_error('noeditsite', 'totara_coursecatalog');
-    }
-    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+    } else if (!$course = $DB->get_record('course', array('id' => $courseid))) {
         print_error('error:courseidincorrect', 'totara_core');
     }
-    require_login($course->id);
+
     $coursecontext = context_course::instance($course->id);
+
+    require_login($course->id);
     require_capability('moodle/course:update', $coursecontext);
-}
-else {
+    require_capability('moodle/course:managereminders', $coursecontext);
+} else {
     require_login();
     print_error('error:courseidorcategory', 'totara_coursecatalog');
 }
 
-$PAGE->set_url('/course/reminders.php');
-$PAGE->set_course($course);
-$PAGE->set_context(context_course::instance($course->id));
+// Build the params for set_url so we can return to the page properly.
+$params = array ('courseid' => $courseid);
+if ($id) $params['id'] = $id;
+if ($delete) $params['delete'] = $delete;
+
+$PAGE->set_url('/course/reminders.php', $params);
+$PAGE->set_context($coursecontext);
 $PAGE->set_pagelayout('admin');
 
 // Get all course reminders
@@ -44,15 +47,12 @@ if ($delete) {
     // Check reminder exists
     if (in_array($id, array_keys($reminders))) {
         $reminder = $reminders[$id];
-    }
-    else {
+    } else {
         redirect($CFG->wwwroot.'/course/reminders.php?courseid='.$course->id);
     }
 
-    // Check sesskey
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
+    // Make sure we have a session key.
+    require_sesskey();
 
     // Delete reminder
     $reminder->deleted = 1;
@@ -69,21 +69,17 @@ if ($delete) {
     exit();
 }
 
-// Get current reminder
-// Specified in get params
 if (in_array($id, array_keys($reminders))) {
+    // Edit a specific reminder.
     $reminder = $reminders[$id];
-}
-// Grab the first one
-else if (count($reminders) && $id === 0) {
+} else if (count($reminders) && $id === 0) {
+    // No reminder selected so use the first one.
     $reminder = reset($reminders);
-}
-// Otherwise we must be creating a new one
-else {
+} else {
+    // Create a new reminder.
     $reminder = new reminder();
     $reminder->courseid = $course->id;
 }
-
 
 // Load all form data
 $formdata = $reminder->get_form_data();
@@ -92,12 +88,10 @@ $formdata = $reminder->get_form_data();
 $reminderform = new reminder_edit_form('reminders.php', compact('course', 'reminder'));
 $reminderform->set_data($formdata);
 
-
 // Process current action
 if ($reminderform->is_cancelled()){
     redirect($CFG->wwwroot.'/course/view.php?id='.$course->id);
-}
-else if ($data = $reminderform->get_data()) {
+} else if ($data = $reminderform->get_data()) {
     $transaction = $DB->start_delegated_transaction();
     $config = array(
         'tracking' => $data->tracking,
@@ -123,10 +117,8 @@ else if ($data = $reminderform->get_data()) {
         if (!$reminder->insert()) {
             print_error('error:createreminder', 'totara_coursecatalog');
         }
-
         \totara_core\event\reminder_created::create_from_reminder($reminder)->trigger();
-    }
-    else {
+    } else {
         if (!$reminder->update()) {
             print_error('error:updatereminder', 'totara_coursecatalog');
         }
@@ -176,8 +168,7 @@ else if ($data = $reminderform->get_data()) {
             if (!$message->insert()) {
                 print_error('errro:createreminder', 'totara_coursecatalog');
             }
-        }
-        else {
+        } else {
             if (!$message->update()) {
                 print_error('error:updatereminder', 'totara_coursecatalog');
             }
@@ -206,7 +197,6 @@ if ($reminder->id > 0) {
     );
 }
 
-
 $streditcoursereminders = get_string('editcoursereminders', 'totara_coursecatalog');
 $title = $streditcoursereminders;
 $fullname = $course->fullname;
@@ -218,9 +208,6 @@ $PAGE->set_heading($fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($streditcoursereminders);
 
-// Check if there are any activites we can use
-$completion = new completion_info($course);
-
 // Show tabs
 $tabs = array();
 foreach ($reminders as $r) {
@@ -229,25 +216,25 @@ foreach ($reminders as $r) {
 
 $tabs[] = new tabobject('new', $CFG->wwwroot.'/course/reminders.php?courseid='.$course->id.'&id=-1', get_string('new', 'totara_coursecatalog'));
 
-if ($reminder->id < 1) {
-    $reminder->id = 'new';
+if (!$reminder->id) {
+    $selected_tab = 'new';
+} else {
+    $selected_tab = $reminder->id;
 }
 
-// If no current reminders or creating a new reminder, and no activites - do not show form
+// Check if there are any activites we can use.
+$completion = new completion_info($course);
+
+// If no current reminders or creating a new reminder, and no activities - do not show form.
 if (!$completion->is_enabled()) {
     echo $OUTPUT->box(get_string('noactivitieswithcompletionenabled', 'totara_coursecatalog'), 'generalbox adminerror boxwidthwide boxaligncenter');
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $course->id)));
-
-}
-else if (!get_coursemodules_in_course('feedback', $course->id)) {
+} else if (!get_coursemodules_in_course('feedback', $course->id)) {
     echo $OUTPUT->notification(get_string('nofeedbackactivities', 'totara_coursecatalog'), 'notifynotice');
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $course->id)));
-}
-else {
-    if (count($tabs)) {
-        print_tabs(array($tabs), $reminder->id);
-    }
-    // Show form
+} else {
+    // Display tabs and show form.
+    echo $OUTPUT->tabtree($tabs, $selected_tab);
     $reminderform->display();
 }
 

@@ -125,16 +125,19 @@
             $countlink = "$count";
         }
 
+        $strhidemodule = get_string("hidemodule", 'moodle', get_string('modulename', $module->name));
+        $strshowmodule = get_string("showmodule", 'moodle', get_string('modulename', $module->name));
+
         if ($missing) {
             $visible = '';
             $class   = '';
         } else if ($module->visible) {
-            $visible = "<a href=\"modules.php?hide=$module->name&amp;sesskey=".sesskey()."\" title=\"$strhide\">".
-                       "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"iconsmall\" alt=\"$strhide\" /></a>";
+            $visible = "<a href=\"modules.php?hide=$module->name&amp;sesskey=".sesskey()."\" title=\"$strhidemodule\">".
+                       "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"iconsmall\" alt=\"$strhidemodule\" /></a>";
             $class   = '';
         } else {
-            $visible = "<a href=\"modules.php?show=$module->name&amp;sesskey=".sesskey()."\" title=\"$strshow\">".
-                       "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"iconsmall\" alt=\"$strshow\" /></a>";
+            $visible = "<a href=\"modules.php?show=$module->name&amp;sesskey=".sesskey()."\" title=\"$strshowmodule\">".
+                       "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"iconsmall\" alt=\"$strshowmodule\" /></a>";
             $class =   'dimmed_text';
         }
         if ($module->name == "forum") {

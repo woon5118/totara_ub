@@ -139,6 +139,7 @@ $string['course:manageactivities'] = 'Manage activities';
 $string['course:managefiles'] = 'Manage files';
 $string['course:managegrades'] = 'Manage grades';
 $string['course:managegroups'] = 'Manage groups';
+$string['course:managereminders'] = 'Manage reminders';
 $string['course:managescales'] = 'Manage scales';
 $string['course:markcomplete'] = 'Mark users as complete in course completion';
 $string['course:movesections'] = 'Move sections';

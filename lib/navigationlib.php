@@ -3807,9 +3807,12 @@ class settings_navigation extends navigation_node {
                 $coursenode->add(get_string('competencies', 'totara_hierarchy'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
             }
 
-            // Add the course reminders link.
-            $url = new moodle_url('/course/reminders.php', array('courseid' => $course->id));
-            $coursenode->add(get_string('remindersmenuitem', 'totara_coursecatalog'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/email', ''));
+
+            if (has_capability('moodle/course:managereminders', $coursecontext)) {
+                // Add the course reminders link.
+                $url = new moodle_url('/course/reminders.php', array('courseid' => $course->id));
+                $coursenode->add(get_string('remindersmenuitem', 'totara_coursecatalog'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/email', ''));
+            }
         }
 
         // add enrol nodes
