@@ -1,5 +1,6 @@
 <?php
 
+$string['dateassigned'] = 'Date assigned';
 $string['sourcetitle'] = 'Program Overview';
 $string['duedate'] = 'Due Date';
 $string['programnameselect'] = 'Program name (select box)';

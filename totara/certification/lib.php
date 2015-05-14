@@ -1174,7 +1174,7 @@ function reset_certifcomponent_completions($certifcompletion, $courses=null) {
     // Set program completion main record first.
     if ($pcp = $DB->get_record('prog_completion', array('programid' => $prog->id, 'userid' => $userid, 'coursesetid' => 0))) {
         $pcp->status = STATUS_PROGRAM_INCOMPLETE;
-        $pcp->timestarted = 0;
+        // Don't set timestarted, as this reflects when the user was first assigned.
         // Don't set timedue, as this was set when the user certified.
         $pcp->timecompleted = 0;
         $DB->update_record('prog_completion', $pcp);

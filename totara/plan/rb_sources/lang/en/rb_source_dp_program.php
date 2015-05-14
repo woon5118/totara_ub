@@ -23,6 +23,7 @@
 
 // lang strings for report builder 'Learning Plan - Program' source
 
+$string['dateassigned'] = 'Date assigned';
 $string['sourcetitle'] = 'Record of Learning: Programs';
 $string['program_completion_history_count'] = 'Count of previous completions';
 $string['program_completion_history_link'] = 'Previous completions';

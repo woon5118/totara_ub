@@ -189,7 +189,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
      * @param stdClass $fromform data needed for enrolment.
      * @param stdClass $course course to enrol on.
      * @param stdClass $returnurl url to redirect to on completion.
-     * @return bool|array true if enroled else error code and messege
+     * @return bool|array true if enrolled else error code and message
      */
     public function enrol_totara_facetoface($instance, $fromform = null, $course, $returnurl) {
         global $DB, $USER;
@@ -202,6 +202,14 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         foreach ($sessions as $session) {
             $f2fids[$session->facetoface] = $session->facetoface;
         }
+
+        if (count($f2fids) === 0) {
+            if ($this->removednomanager) {
+                print_error('managermissingallsessions', 'enrol_totara_facetoface', $returnurl);
+            }
+            print_error('cannotenrolnosessions', 'enrol_totara_facetoface', $returnurl);
+        }
+
         list($idin, $params) = $DB->get_in_or_equal($f2fids);
         $facetofaces = $DB->get_records_select('facetoface', "id $idin", $params);
 
@@ -406,11 +414,11 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
     }
 
     /**
-     * Creates course enrol form, checks if form submitted
-     * and enrols user if necessary. It can also redirect.
+     * Enrols the user in course through the facetoface enrolment instance.
      *
-     * @param $form
-     * @return MoodleQuickForm Instance of the enrolment form if successful, else false.
+     * @param moodleform $form
+     * @param stdClass $instance
+     * @return bool
      */
     public function course_expand_enrol_hook($form, $instance) {
         global $DB;
@@ -519,7 +527,7 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $sessions = $this->get_enrolable_sessions($instance->courseid);
         if (empty($sessions)) {
             if ($this->sessions_require_manager()) {
-                return true;
+                return get_string('cannotenrol', 'enrol_totara_facetoface');
             }
             return get_string('cannotenrolnosessions', 'enrol_totara_facetoface');
         }
