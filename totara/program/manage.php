@@ -477,6 +477,7 @@ if (!empty($searchcriteria)) {
     } else {
         $categorywhere = 'AND cc.visible = 1';
     }
+
     // We're going to preload the context for the subcategory as we know that we
     // need it later on for formatting.
     $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
@@ -488,6 +489,7 @@ if (!empty($searchcriteria)) {
                           $categorywhere
                     ORDER BY cc.sortorder ASC";
     $subcategories = $DB->get_recordset_sql($sql, array('parentid' => $coursecat->id, 'contextlevel' => CONTEXT_COURSECAT));
+
     // Prepare a table to display the sub categories.
     $table = new html_table;
     $table->attributes = array(
@@ -498,6 +500,7 @@ if (!empty($searchcriteria)) {
         );
     $table->head = array(new lang_string('subcategories'));
     $table->data = array();
+
     $baseurl = new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype));
     foreach ($subcategories as $subcategory) {
         // Preload the context we will need it to format the category name shortly.
@@ -507,20 +510,20 @@ if (!empty($searchcriteria)) {
         $attributes = $subcategory->visible ? array() : array('class' => 'dimmed');
         $text = format_string($subcategory->name, true, array('context' => $context));
         // Add the subcategory to the table.
-                        $baseurl->param('categoryid', $subcategory->id);
-                        $table->data[] = array(html_writer::link($baseurl, $text, $attributes));
-}
+        $baseurl->param('categoryid', $subcategory->id);
+        $table->data[] = array(html_writer::link($baseurl, $text, $attributes));
+    }
 
-$subcategorieswereshown = (count($table->data) > 0);
-if ($subcategorieswereshown) {
-echo html_writer::table($table);
-}
+    $subcategorieswereshown = (count($table->data) > 0);
+    if ($subcategorieswereshown) {
+        echo html_writer::table($table);
+    }
 
-$programs = prog_get_programs_page($coursecat->id, 'p.sortorder ASC',
-            'p.id,p.sortorder,p.shortname,p.fullname,p.summary,p.visible,p.audiencevisible',
+    $programs = prog_get_programs_page($coursecat->id, 'p.sortorder ASC',
+                'p.id,p.sortorder,p.shortname,p.fullname,p.summary,p.visible,p.audiencevisible',
                 $totalcount, $page*$perpage, $perpage, $viewtype);
-                $numprograms = count($programs);
-                } else {
+    $numprograms = count($programs);
+} else {
     $subcategorieswereshown = true;
     $programs = array();
     $numprograms = $totalcount = 0;

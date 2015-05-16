@@ -149,7 +149,7 @@ class totara_sync_config_form extends moodleform {
         $mform->addElement('header', 'scheduleheading', get_string('schedule', 'tool_totara_sync'));
         $mform->addElement('advcheckbox', 'cronenable', get_string('enablescheduledsync', 'tool_totara_sync'));
         $mform->setDefault('cronenable', 1);
-        $mform->addElement('scheduler', 'schedulegroup', get_string('schedule', 'tool_totara_sync'));
+        $mform->addElement('scheduler', 'schedulegroup', get_string('scheduleserver', 'tool_totara_sync'));
         $mform->disabledIf('schedulegroup', 'cronenable', 'notchecked');
         $mform->setExpanded('scheduleheading');
 

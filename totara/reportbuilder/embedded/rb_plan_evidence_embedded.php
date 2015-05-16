@@ -49,7 +49,7 @@ class rb_plan_evidence_embedded extends rb_base_embedded {
         );
         $this->columns[] = array(
             'type' => 'evidence',
-            'value' => 'evidencetypeid',
+            'value' => 'evidencetypename',
             'heading' => get_string('evidencetype', 'rb_source_dp_evidence'),
         );
         $this->columns[] = array(
