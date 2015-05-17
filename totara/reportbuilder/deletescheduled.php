@@ -57,6 +57,10 @@ if ($confirm == 1) {
     if (!confirm_sesskey()) {
         print_error('confirmsesskeybad', 'error');
     } else {
+        $select = "scheduleid IN (SELECT s.id FROM {report_builder_schedule} s WHERE s.reportid = ?)";
+        $DB->delete_records_select('report_builder_schedule_email_audience', $select, array($report->id));
+        $DB->delete_records_select('report_builder_schedule_email_systemuser', $select, array($report->id));
+        $DB->delete_records_select('report_builder_schedule_email_external', $select, array($report->id));
         $DB->delete_records('report_builder_schedule', array('id' => $report->id));
         $report = new reportbuilder($id);
         \totara_reportbuilder\event\report_updated::create_from_report($report, 'scheduled')->trigger();
