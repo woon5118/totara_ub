@@ -120,11 +120,12 @@ class feedback360_event_test extends feedback360_testcase {
         $events = $sink->get_events();
         $sink->clear();
 
-        // There should be two events, one is a message sent event.
-        $this->assertEquals(count($events), 2);
+        // There should be three events, one is a message sent event
+        // and one is a task sent event.
+        $this->assertEquals(count($events), 3);
 
         // Check the event data meets request_created expectations.
-        $eventdata = $events[1]->get_data();
+        $eventdata = $events[2]->get_data();
         $this->assertEquals($eventdata['component'], 'totara_feedback360');
         $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\request_created');
         $this->assertEquals($eventdata['action'], 'created');
@@ -140,11 +141,12 @@ class feedback360_event_test extends feedback360_testcase {
         $events = $sink->get_events();
         $sink->clear();
 
-        // There should be two events, one is a message sent event.
-        $this->assertEquals(count($events), 2);
+        // There should be three events, one is a message sent event
+        // and one is an alert sent event.
+        $this->assertEquals(count($events), 3);
 
         // Check the event data meets request_deleted expectations.
-        $eventdata = $events[1]->get_data();
+        $eventdata = $events[2]->get_data();
         $this->assertEquals($eventdata['component'], 'totara_feedback360');
         $this->assertEquals($eventdata['eventname'], '\totara_feedback360\event\request_deleted');
         $this->assertEquals($eventdata['action'], 'deleted');
@@ -210,7 +212,10 @@ class feedback360_event_test extends feedback360_testcase {
         $params = array('action' => 'users', 'userid' => $user_assign->id, 'formid' => $user_assignment->id);
         $oldurl = new moodle_url("/totara/feedback360/request.php", $params);
         $olddata = array(SITEID, 'feedback360', 'delete feedback request', $oldurl);
-        $legacydata = $events[1]->get_legacy_logdata();
+
+        // There should be three events, one is a message sent event
+        // and one is an alert sent event.
+        $legacydata = $events[2]->get_legacy_logdata();
 
         $this->assertEquals($legacydata[0], $olddata[0]);
         $this->assertEquals($legacydata[1], $olddata[1]);

@@ -57,7 +57,11 @@ class message_output_totara_task extends message_output{
         $workid = $DB->insert_record('message_working', $procmessage);
 
         // save the metadata
-        tm_insert_metadata($eventdata, $processorid);
+        $messageid = tm_insert_metadata($eventdata, $processorid);
+
+        if (!empty($messageid)) {
+            \totara_message\event\task_sent::create_from_message_data($eventdata, $messageid)->trigger();
+        }
 
         return true;
     }
