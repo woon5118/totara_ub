@@ -887,41 +887,37 @@ class completion_info {
     public function count_course_user_data($user_id = null, $countrpl = true) {
         global $DB;
 
-        $sql = '
-    SELECT
-        COUNT(1)
-    FROM
-        {course_completion_crit_compl}
-    WHERE
-        course = ?
-        ';
-
-        if ($countrpl == false) {
-            $sql .= ' AND (rpl = \'\' OR rpl IS NULL)';
-        }
+        $params = array('courseid' => $this->course_id);
 
         // When deleting course completion data(delete_course_completion_data) we are ignoring records marked via RPL.
-        // We need to do the same here. This function is evaluated to determine if the completion information should be locked,
-        // or not.
-        $insql = '';
-        $inparams = array();
-        if (empty($user_id)) {
-            if ($countrpl == false) {
-                // Find all RPL completions for this course.
-                $sqlcomp = "SELECT userid FROM {course_completions}
-                        WHERE course = ? AND status = ?";
-                if ($rpl = $DB->get_fieldset_sql($sqlcomp, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
-                    list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
-                    $insql = ' AND userid ' . $insql;
-                }
-            }
-        } else { // Limit data to a single user if an ID is supplied.
-            $insql = ' AND userid = ?';
-            $inparams = array($user_id);
+        // We need to excludes record where the course has been completed via RPL because these courses would not be
+        // affected by completion criteria reset, so they shouldn't prevent it from occurring.
+        $coursecompletionjoinsql = "";
+        $coursecompletionwheresql = "";
+        if (empty($user_id) && !$countrpl) {
+            $coursecompletionjoinsql =
+                "LEFT JOIN {course_completions} cc
+                   ON cc.userid = cccc.userid AND cc.course = cccc.course AND status = :status";
+            $coursecompletionwheresql =
+                "AND cc.id IS NULL";
+            $params['status'] = COMPLETION_STATUS_COMPLETEVIARPL;
         }
 
-        $sql .= " {$insql} ";
-        $params = array_merge(array($this->course_id), $inparams);
+        $sql = "SELECT COUNT(1)
+                  FROM {course_completion_crit_compl} cccc
+                       {$coursecompletionjoinsql}
+                 WHERE cccc.course = :courseid
+                       {$coursecompletionwheresql}";
+
+        if (!$countrpl) {
+            $sql .= " AND (cccc.rpl = '' OR cccc.rpl IS NULL)";
+        }
+
+        // Limit data to a single user if an ID is supplied.
+        if ($user_id) {
+            $sql .= " AND cccc.userid = :userid";
+            $params['userid'] = $user_id;
+        }
 
         return $DB->get_field_sql($sql, $params);
     }
