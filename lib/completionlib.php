@@ -984,41 +984,53 @@ class completion_info {
 
         $transaction = $DB->start_delegated_transaction();
 
+        $criteriasql = // Do not remove RPL activity completion records.
+            "DELETE
+               FROM {course_completion_crit_compl}
+              WHERE course = :courseid
+                AND (rpl = '' OR rpl IS NULL)";
+        $statssql =
+            "DELETE
+               FROM {block_totara_stats}
+              WHERE data2 = :courseid
+                AND eventtype IN (:eventstarted, :eventcomplete)";
+        $coursesql =
+            "DELETE
+               FROM {course_completions}
+              WHERE course = :courseid";
+        $params = array('courseid' => $this->course_id,
+                        'eventstarted' => STATS_EVENT_COURSE_STARTED,
+                        'eventcomplete' => STATS_EVENT_COURSE_COMPLETE);
+
         if (empty($userid)) {
-            // Find all RPL completions for this course.
-            $sql = "SELECT userid FROM {course_completions}
-                     WHERE course = ? AND status = ?";
-            if ($rpl = $DB->get_fieldset_sql($sql, array($this->course_id, COMPLETION_STATUS_COMPLETEVIARPL))) {
-                list($insql, $inparams) = $DB->get_in_or_equal($rpl, SQL_PARAMS_QM, '', false);
-                $insql = ' AND userid ' . $insql;
-            } else {
-                $insql = '';
-                $inparams = array();
-            }
+            // Exclude deleting records for users who have RPL completions for this course.
+            $criteriasql .=
+                " AND NOT EXISTS (SELECT 1
+                                   FROM {course_completions} cc
+                                  WHERE cc.userid = {course_completion_crit_compl}.userid
+                                    AND cc.course = {course_completion_crit_compl}.course
+                                    AND cc.status = :status)";
+            $statssql .=
+                " AND NOT EXISTS (SELECT 1
+                                   FROM {course_completions} cc
+                                  WHERE cc.userid = {block_totara_stats}.userid
+                                    AND cc.course = {block_totara_stats}.data2
+                                    AND cc.status = :status)";
+            $coursesql .= " AND status <> :status";
+            $params['status'] = COMPLETION_STATUS_COMPLETEVIARPL;
         } else {
-            $insql = ' AND userid = ?';
-            $inparams = array($userid);
+            // Just delete the records for the specified user, even if they have a matching course RPL record.
+            $criteriasql .= " AND {course_completion_crit_compl}.userid = :userid";
+            $statssql .= " AND {block_totara_stats}.userid = :userid";
+            $coursesql .= " AND {course_completions}.userid = :userid";
+            $params['userid'] = $userid;
         }
 
-        $params = array_merge(array($this->course_id), $inparams);
-        $DB->delete_records_select('course_completions', "course = ? {$insql}", $params);
-        // Do not remove RPL activity completion records.
-        $DB->delete_records_select('course_completion_crit_compl', "course = ? AND (rpl = '' OR rpl IS NULL) {$insql}", $params);
+        $DB->execute($criteriasql, $params);
+        $DB->execute($statssql, $params);
+        // Do course_completions last, as the other two may depend on these records.
+        $DB->execute($coursesql, $params);
 
-        // Remove stats data.
-        $statparams = array_merge(array(STATS_EVENT_COURSE_STARTED), $params);
-        $DB->delete_records_select(
-            'block_totara_stats',
-            "eventtype = ? AND data2 = ? {$insql}",
-            $statparams
-        );
-
-        $statparams = array_merge(array(STATS_EVENT_COURSE_COMPLETE), $params);
-        $DB->delete_records_select(
-            'block_totara_stats',
-            "eventtype = ? AND data2 = ? {$insql}",
-            $statparams
-        );
         $transaction->allow_commit();
     }
 
