@@ -6,6 +6,8 @@ $capabilities = array(
     'moodle/my:configsyspages',
     'moodle/tag:manage',
     'totara/core:editmainmenu',
+    'totara/core:appearance',
+    'totara/dashboard:manage',
 );
 
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // speedup for non-admins, add all caps used on this page
@@ -181,7 +183,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
 
     // The "media" subpage.
-    $temp = new admin_settingpage('mediasettings', get_string('mediasettings', 'core_media'));
+    $temp = new admin_settingpage('mediasettings', get_string('mediasettings', 'core_media'), array('totara/core:appearance'));
 
     $temp->add(new admin_setting_heading('mediaformats', get_string('mediaformats', 'core_media'),
             format_text(get_string('mediaformats_desc', 'core_media'), FORMAT_MARKDOWN)));
