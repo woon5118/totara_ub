@@ -1,6 +1,205 @@
 <?php
 /*
 
+Totara LMS Changelog
+
+Release 2.7.3 (19th May 2015):
+==================================================
+
+Security issues:
+    MoodleHQ       Security fixes from MoodleHQ http://docs.moodle.org/dev/Moodle_2.7.8_release_notes
+
+
+Improvements:
+
+    TL-2279        Added new global setting to control user deletion behavior
+    TL-5311        Added Course Completion History report builder source
+
+                   This report source contains all records from both the current course
+                   completions table and the course completions history table.
+
+    TL-6165        Refactored timezone handling functions to improve reliability of all timezone-related functionality
+    TL-6197        Added option to suspend course enrolments when users lose access to a Program
+
+                   Previously, when learners were unassigned from a Program or a Program
+                   becomes unavailable, any course enrolments in courses within the program
+                   would be removed. This improvement now changes the default behaviour from
+                   removing enrolments created by the program enrolment plugin, to suspending
+                   enrolments.
+
+                   This also adds a configuration setting in Site Admin -> Plugins ->
+                   Enrolments -> Program so you can change the behaviour back to the old
+                   "unenrol learners from courses" behaviour if you wish.
+
+    TL-6271        Improved Accessibility of scheduled reports in Reportbuilder
+    TL-6278        Removed all uses of deprecated function sql_fullname in Facetoface
+
+                   Full name format setting is now used when displaying the User's name
+
+    TL-6295        Showed expected csv format when importing a "database" course activitiy
+    TL-6304        Changed default request method in dialogs to POST
+    TL-6315        Improved accessibility of admin checkbox lists
+    TL-6327        Added ability to specify database server port for HR Import external database source settings
+    TL-6331        Changed timezone.txt downloads to use Totara servers
+    TL-6334        Renamed Program "start date" to "date assigned"
+
+                   This more accurately reflects the actual information recorded. This patch
+                   also recalculates "date assigned" values for certifications where the
+                   "start date" was removed (before this patch, "start date" had no meaning
+                   for certifications in the recertification phase).
+
+    TL-6348        Removed unneeded code when viewing a Certifications overdue warning
+    TL-6350        Added a help description to Badge description to explain its plain text nature
+    TL-6359        Improved the performance of Reportbuilder management pages
+    TL-6366        Improved  Accessibility of the page title when uninstalling a plugin
+    TL-6367        Added accessible text to the hamburger responsive button
+    TL-6384        Improved Accessibility of filters in Reportbuilder
+    TL-6386        Added hidden label to bulk user actions dropdown
+    TL-6387        Added text to the label for the badge search functionality
+    TL-6389        Added text to hidden label when editing a course topic
+    TL-6391        Improved Accessibility of custom course icons
+    TL-6397        Added text to the page title for the Facetoface interest report for Accessability
+    TL-6398        Added title to browser sessions page
+    TL-6411        Improved display of security information on calendar exports
+    TL-6424        Changed Reportbuilder scheduled task default settings so that scheduled reports are sent when scheduled rather than at most once per day
+
+                   Currently when a new Totara site is installed (or upgrade to 2.7) the
+                   default schedule for scheduled reports is once a day. This means that any
+                   reports scheduled to be sent more frequently do not get sent.
+
+                   This change means that system will check for pending scheduled reports on
+                   every cron run so reports will get sent out on schedule.
+
+    TL-6434        Improved performance when loading Program message managers
+    TL-6489        Updated the default schedules for Program scheduled tasks
+
+                   This change will update the schedules for all sites currently using the
+                   defaults. Site administrators can customise the timing of scheduled tasks
+                   on the "Site Admin > server > scheduled tasks" page, any customisations
+                   will be unaffected.
+
+API changes:
+
+    TL-6442        Fixed query parameter name conflicts by improving parameter name generation
+
+                   This fix introduced a new method moodle_database::get_unique_param that
+                   returns a truly unique param name with very little overhead.
+                   The bug fix involves conversion of areas generating their own "unique"
+                   param names to this new method.
+                   All new code requiring unique generated params should use this method.
+
+Bug fixes:
+
+    TL-5953        Fixed SCORM resizing and title display when using popup "New window" setting
+    TL-5977        Fixed upgrade for Facetoface notifications when upgrading from 2.2
+    TL-6101        Fixed display of enrolment button for Facetoface session enrolment for users with no manager
+    TL-6143        Fixed password import being ignored when undeleting users in HR Import
+
+                   Previously, when undeleting a user, the user's password would always be
+                   reset, regardless of whether or not the password column was enabled and a
+                   password was specified. Now, password reset only occurs if there is no
+                   password specified in the import file.
+
+    TL-6180        Fixed capability checks for category Audiences
+    TL-6191        Fixed permissions when adding visible audiences to a program or course
+
+                   Permissions are now being checked on the correct context level so users
+                   assigned at the category, program or course contexts with permissions are
+                   now able to perform actions. This applies to Audience visibility for
+                   courses, programs and certifications and also Audience enrolment for
+                   courses.
+
+    TL-6236        Fixed preservation of formatting in HTML emails sent by Appraisals
+    TL-6259        Fixed completion import records being processed in the wrong date order
+
+                   This caused a problem if there were multiple completion records for one
+                   user in one course being uploaded and the date format used did not sort the
+                   same chronologically and alphabetically.
+
+    TL-6279        Removed all uses of deprecated function sql_fullname in Appraisals
+    TL-6284        Removed all uses of deprecated sql_fullname() function in Hierarchies
+    TL-6285        Removed all uses of deprecated sql_fullname() function in Learning Plans
+    TL-6287        Removed all uses of deprecated sql_fullname() function in Reportbuilder
+    TL-6305        Fixed Program/Certification alerts and messages to exclude suspended and deleted users
+    TL-6321        Removed window.status Javascript changes that have been deprecated by modern browsers
+    TL-6322        Fixed unassociated label when viewing role definitions to improve Accessibility
+    TL-6326        Fixed inconsistent behaviour of course visibility icons
+    TL-6345        Fixed setting of a Certification completion status to 'expired' when renewal expires
+
+                   Previously, these certifications were set back to status 'assigned'. This
+                   patch makes no change to the behaviour of certifications, it just ensures
+                   that the correct data is recorded in the database.
+
+    TL-6349        Fixed backup and restore of course Audience Visibility settings
+    TL-6351        Fixed display of Graphical Reports Block when the report name contains an ampersand
+    TL-6354        Fixed incorrect inclusion of deleted users when using recurring Programs
+    TL-6361        Fixed immediate synchonrisation of Audience enrolments after modifications in Enrolled learning tab or when editing a course.
+    TL-6365        Fixed page title when editing another users profile to improve Accessibility
+    TL-6373        Fixed Facetoface notification status incorrectly sending manager copy when notification is disabled
+
+                   If a notification is disabled, the manager and third party email addresses
+                   will no longer receive the notification, regardless of the "Manager copy"
+                   setting.
+
+    TL-6376        Fixed invalid HTML when viewing a complete Program with an end note
+    TL-6399        Fixed Javascript error when adding and removing attendees from a Facetoface session
+    TL-6400        Fixed editing of Hierarchy items description field
+    TL-6405        Fixed aggregation for Badges issued report source
+    TL-6408        Fixed the "time signed up" column on the Facetoface session attendees tab
+
+                   The time signed up column now shows the latest time signed up instead of
+                   the first, so if users cancel and signs up again the column will update.
+
+    TL-6409        Fixed progress bar for Programs in Record of Learning
+    TL-6418        Fixed deletion of related scheduling and saved search data in Reportbuilder when a report is deleted
+    TL-6425        Fixed scheduled runs of HR Import
+
+                   HR Import was running every cron run, now it is running according to the
+                   given schedule.
+
+    TL-6437        Fixed usage of complex passwords in HR Import
+    TL-6439        Fixed error message when trying to access the course progress page from Record Of Learning after user is unenrolled from course
+
+                   Previously, if a user was unenrolled from a course, the course progress
+                   page became inaccessible. Now that unenrolled courses with progress are
+                   shown in the Record of Learning, it makes sense to allow users to see what
+                   progress they previously made.
+
+    TL-6445        Fixed changes to Facetoface session attendees after a waitlisted session has started
+    TL-6449        Fixed schema errors on upgrade from Moodle 2.7.7
+    TL-6450        Fixed export of parameteric reports in Reportbuilder
+
+                   Fixed error that blocked export of reports that require specific parameters
+                   to work (like appraisal or audience members).
+
+    TL-6457        Fixed checkbox selection/deselection when Program exception "Select issue type" is changed
+    TL-6471        Fixed the course enrolment date after unlocking completion criteria
+    TL-6472        Fixed Completion History Import if it is using 'Alternatively upload csv files via a directory'
+    TL-6490        Fixed activity completion when using manual grading on a Facetoface activity
+    TL-6510        Fixed the rule for dynamic Audiences based on a positions multi or menu type custom field values
+    TL-6518        Fixed display of the "Evidence Type" column on the Record of Learning
+    TL-6520        Fixed the context checks for program deletion capabilities
+
+                   Program deletion was only working if you had the capability at a site
+                   level, this fixes it for if you have the correct capabilities at category
+                   or program level.
+
+    TL-6543        Fixed query using IN in course completion
+
+                   This was causing a database error due to an oversized query in some
+                   databases with large data sets.
+
+
+Contributions:
+
+    * Andrew Hancox at Synergy - TL-6445
+    * Eugene Venter at Catalyst - TL-6345, TL-6348
+    * Gavin Nelson at Engage in Learning - TL-6472
+    * Jo Jones at Kineo UK - TL-5953, TL-6437
+    * Russell England - TL-6520
+    * Ted van den Brink at Brightalley - TL-6376
+
+
 Release 2.7.2 (21st April 2015):
 ==================================================
 
