@@ -73,6 +73,19 @@ if ($iscertif) {
 }
 
 
+$catcontext = context_coursecat::instance($categoryid, MUST_EXIST);
+if ($categoryid) { // Creating new program in this category.
+    if (!$category = $DB->get_record('course_categories', array('id' => $categoryid))) {
+        print_error('Category ID was incorrect');
+    }
+    if (!$iscertif) {
+        require_capability('totara/program:createprogram', $catcontext);
+    } else {
+        require_capability('totara/certification:createcertification', $catcontext);
+    }
+}
+
+
 //Javascript include
 local_js(array(
     TOTARA_JS_DIALOG,
@@ -101,20 +114,6 @@ if (!empty($CFG->audiencevisibility)) {
     $args = array('args'=>'{"visibleselected":"", "type":"program", "instancetype": "' .
         COHORT_ASSN_ITEMTYPE_CATEGORY . '", "instanceid": "' . $categoryid . '"}');
     $PAGE->requires->js_init_call('M.totara_visiblecohort.init', $args, true, $jsmodule);
-}
-
-if ($categoryid) { // creating new program in this category
-    if (!$category = $DB->get_record('course_categories', array('id' => $categoryid))) {
-        print_error('Category ID was incorrect');
-    }
-    if (!$iscertif) {
-        require_capability('totara/program:createprogram', context_coursecat::instance($category->id));
-    } else {
-        require_capability('totara/certification:createcertification', context_coursecat::instance($category->id));
-    }
-
-} else {
-    print_error('Program category must be specified');
 }
 ///
 /// Data and actions

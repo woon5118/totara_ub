@@ -246,10 +246,15 @@ if ($editform->is_cancelled()) {
         customfield_save_data($data, 'course', 'course');
     }
 
+    // Get context for capability checks.
+    if (!isset($context)) {
+        $context = context_course::instance($course->id, MUST_EXIST);
+    }
+
     ///
     /// Update course cohorts if user has permissions
     ///
-    if (has_capability('moodle/cohort:manage', context_system::instance())) {
+    if (has_capability('moodle/cohort:manage', $context)) {
         // Enrolled audiences.
         $currentcohorts = totara_cohort_get_course_cohorts($course->id, null, 'c.id, e.id AS associd');
         $currentcohorts = !empty($currentcohorts) ? $currentcohorts : array();
@@ -272,25 +277,26 @@ if ($editform->is_cancelled()) {
             }
             $runcohortsync = true;
         }
+        cache_helper::purge_by_event('changesincourse');
+    }
 
-        // Visible audiences.
-        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', context_system::instance())) {
-            $visiblecohorts = totara_cohort_get_visible_learning($course->id);
-            $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
-            $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
-            if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
-                // Delete removed cohorts.
-                foreach ($todelete as $cohortid) {
-                    totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,
-                                                    COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
-                }
+    // Visible audiences.
+    if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+        $visiblecohorts = totara_cohort_get_visible_learning($course->id);
+        $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
+        $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();
+        if ($todelete = array_diff(array_keys($visiblecohorts), $newvisible)) {
+            // Delete removed cohorts.
+            foreach ($todelete as $cohortid) {
+                totara_cohort_delete_association($cohortid, $visiblecohorts[$cohortid]->associd,
+                    COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
             }
+        }
 
-            if ($newvisible = array_diff($newvisible, array_keys($visiblecohorts))) {
-                // Add new cohort associations.
-                foreach ($newvisible as $cohortid) {
-                    totara_cohort_add_association($cohortid, $course->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
-                }
+        if ($newvisible = array_diff($newvisible, array_keys($visiblecohorts))) {
+            // Add new cohort associations.
+            foreach ($newvisible as $cohortid) {
+                totara_cohort_add_association($cohortid, $course->id, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
             }
          }
         cache_helper::purge_by_event('changesincourse');

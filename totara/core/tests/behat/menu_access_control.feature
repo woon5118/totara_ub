@@ -14,6 +14,7 @@ Feature: Test visibility control of menu items
      | Menu title | Test one |
      | Menu default url address | http://totaralms.com |
     When I press "Add new menu item"
+    And I click on "Edit" "link" in the "Test one" "table_row"
     Then I should see "Edit menu item"
     And I should see the "Access" tab is disabled
 

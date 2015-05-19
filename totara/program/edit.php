@@ -41,7 +41,6 @@ $nojs = optional_param('nojs', 0, PARAM_INT);
 
 require_login();
 
-$systemcontext = context_system::instance();
 $program = new program($id);
 $iscertif = $program->certifid ? true : false;
 $programcontext = $program->get_context();
@@ -214,7 +213,7 @@ if ($data = $detailsform->get_data()) {
         $DB->set_field('prog', 'endnote', $data->endnote, array('id' => $data->id));
 
         // Visible audiences.
-        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext)) {
+        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $programcontext)) {
             $visiblecohorts = totara_cohort_get_visible_learning($program->id, $instancetype);
             $visiblecohorts = !empty($visiblecohorts) ? $visiblecohorts : array();
             $newvisible = !empty($data->cohortsvisible) ? explode(',', $data->cohortsvisible) : array();

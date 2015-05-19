@@ -32,17 +32,28 @@ $confirm   = optional_param('confirm', false, PARAM_BOOL);
 $clone     = optional_param('clone', false, PARAM_BOOL);
 $cancelurl = optional_param('cancelurl', false, PARAM_LOCALURL);
 
-$url = new moodle_url('/cohort/view.php', array('id' => $id, 'delete' => $delete,
-    'confirm' => $confirm, 'clone' => $clone, 'cancelurl' => $cancelurl));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
-
-$context = context_system::instance();
-require_capability('moodle/cohort:view', $context);
 
 $cohort = $DB->get_record('cohort', array('id' => $id));
 if (!$cohort) {
     print_error('error:doesnotexist', 'cohort');
 }
+
+$context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+$PAGE->set_context($context);
+
+$url = new moodle_url('/cohort/view.php', array('id' => $id, 'delete' => $delete,
+    'confirm' => $confirm, 'clone' => $clone, 'cancelurl' => $cancelurl));
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
+} else {
+    $PAGE->set_url($url);
+    $PAGE->set_heading($COURSE->fullname);
+}
+
+
+
+require_capability('moodle/cohort:view', $context);
+
 if ($cohort->cohorttype == cohort::TYPE_DYNAMIC) {
     $cohort->rulesetoperator = $DB->get_field('cohort_rule_collections', 'rulesetoperator', array('id' => $cohort->draftcollectionid));
 }
@@ -104,10 +115,15 @@ if ($clone && $cohort->id) {
 }
 
 $strheading = get_string('overview', 'totara_cohort');
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $category = $DB->get_record('course_categories', array('id' => $context->instanceid), '*', MUST_EXIST);
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid' => $cohort->contextid)));
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
 totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+
 echo $OUTPUT->header();
-
-
 echo $OUTPUT->heading(format_string($cohort->name));
 
 echo cohort_print_tabs('view', $cohort->id, $cohort->cohorttype, $cohort);

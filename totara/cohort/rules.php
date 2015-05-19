@@ -39,9 +39,24 @@ $url = new moodle_url('/totara/cohort/rules.php', array('id' => $id));
 if ($debug) {
     $url->param('debug', $debug);
 }
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
 
-$context = context_system::instance();
+$sql = "SELECT c.*, crc.rulesetoperator, crc.status
+    FROM {cohort} c
+    INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
+    WHERE c.id = ?";
+$cohort = $DB->get_record_sql($sql, array($id), '*', MUST_EXIST);
+
+$context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+$PAGE->set_context($context);
+
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
+} else {
+    $PAGE->set_url('/totara/cohort/rules.php', array('id' => $id));
+    $PAGE->set_title(get_string('cohort:assign', 'cohort'));
+    $PAGE->set_heading($COURSE->fullname);
+}
+
 require_capability('totara/cohort:managerules', $context);
 
 $canapproverules = true;  // TODO: maybe another capability check here?
@@ -77,11 +92,6 @@ $PAGE->requires->js_init_call('M.totara_cohortruledelete.init', null, false, $js
 ///
 /// Data
 ///
-$sql = "SELECT c.*, crc.rulesetoperator, crc.status
-    FROM {cohort} c
-    INNER JOIN {cohort_rule_collections} crc ON c.draftcollectionid = crc.id
-    WHERE c.id = ?";
-$cohort = $DB->get_record_sql($sql, array($id), '*', MUST_EXIST);
 
 if (!$cohort->cohorttype == cohort::TYPE_DYNAMIC) {
     print_error('error:notdynamiccohort', 'totara_cohort');

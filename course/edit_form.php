@@ -302,8 +302,8 @@ class course_edit_form extends moodleform {
 //--------------------------------------------------------------------------------
         enrol_course_edit_form($mform, $course, $context);
 
-        //only show the Enrolled Audiences functionality to users with the appropriate permissions
-        if (has_capability('moodle/cohort:manage', $systemcontext)) {
+        // Only show the Enrolled Audiences functionality to users with the appropriate permissions.
+        if (has_capability('moodle/cohort:manage', $context)) {
             $mform->addElement('header','enrolledcohortshdr', get_string('enrolledcohorts', 'totara_cohort'));
 
             if (empty($course->id)) {
@@ -324,7 +324,7 @@ class course_edit_form extends moodleform {
         }
 
         // Only show the Audiences Visibility functionality to users with the appropriate permissions.
-        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext)) {
+        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
             $mform->addElement('header', 'visiblecohortshdr', get_string('audiencevisibility', 'totara_cohort'));
             $mform->addElement('select', 'audiencevisible', get_string('visibility', 'totara_cohort'), $COHORT_VISIBILITY);
             $mform->addHelpButton('audiencevisible', 'visiblelearning', 'totara_cohort');

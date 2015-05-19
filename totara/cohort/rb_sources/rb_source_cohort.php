@@ -156,6 +156,7 @@ class rb_source_cohort extends rb_base_source {
             'base.id',
             array(
                 'displayfunc' => 'cohort_actions',
+                'extrafields' => array('contextid' => 'base.contextid'),
                 'nosort' => true
             )
         );
@@ -337,12 +338,19 @@ class rb_source_cohort extends rb_base_source {
      * @param object $row
      * @return string|string
      */
-    public function rb_display_cohort_actions( $cohortid, $row ) {
+    public function rb_display_cohort_actions($cohortid, $row) {
         global $OUTPUT;
 
         static $canedit = null;
+
+        $contextid = $row->contextid;
+        if ($contextid) {
+            $context = context::instance_by_id($contextid, MUST_EXIST);
+        } else {
+            $context = context_system::instance();
+        }
         if ($canedit === null) {
-            $canedit = has_capability('moodle/cohort:manage', context_system::instance());
+            $canedit = has_capability('moodle/cohort:manage', $context);
         }
 
         if ($canedit) {

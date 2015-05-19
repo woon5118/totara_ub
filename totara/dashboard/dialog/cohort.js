@@ -78,6 +78,8 @@ M.totara_dashboardcohort = M.totara_dashboardcohort || {
                 title: '<h2>' + M.util.get_string('assignedcohorts', 'totara_dashboard') + '</h2>'
             },
             url+'cohort.php?selected=' + this.config.selected
+                    + '&instancetype=0' // These are required by the dialog zero means
+                    + '&instanceid=0'   // that the capability checks are all done at system context.
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
