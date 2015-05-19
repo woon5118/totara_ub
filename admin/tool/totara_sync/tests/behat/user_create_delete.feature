@@ -5,6 +5,10 @@ Feature: An admin can import users through HR import
 
   Background:
     Given I log in as "admin"
+    And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
+    And I set the following fields to these values:
+      | User deletion | Keep username, email and ID number |
+    And I press "Save changes"
     And I navigate to "General settings" node in "Site administration > HR Import"
     And I set the following fields to these values:
         | File Access | Upload Files |
@@ -98,7 +102,7 @@ Feature: An admin can import users through HR import
     And I set the following fields to these values:
       | realname | 003 |
     And I press "Add filter"
-    And I should not see "Import User002"
+    And I should not see "Import User001"
     And I should not see "Import User002"
     And I should see "Import User003"
     And I click on "Delete" "link"
@@ -140,7 +144,7 @@ Feature: An admin can import users through HR import
     And I set the following fields to these values:
       | realname | 003 |
     And I press "Add filter"
-    And I should not see "Import User002"
+    And I should not see "Import User001"
     And I should not see "Import User002"
     And I should see "Import User003"
     And I click on "Delete" "link"
@@ -176,3 +180,66 @@ Feature: An admin can import users through HR import
     And I should see "Import User001"
     And I should see "Import User002"
     And I should not see "Import User003"
+
+  @javascript
+  Scenario: import a deleted user through HR import using full deletion of users
+    Given I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
+    And I set the following fields to these values:
+      | User deletion | Full |
+    And I press "Save changes"
+    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I set the following fields to these values:
+      | realname | 003 |
+    And I press "Add filter"
+    And I should not see "Import User001"
+    And I should not see "Import User002"
+    And I should see "Import User003"
+    And I click on "Delete" "link"
+    And I should see "Are you absolutely sure you want to completely delete 'Import User003'"
+    And I press "Delete"
+    And I press "Remove all filters"
+    And I should see "Import User001"
+    And I should see "Import User002"
+    And I should not see "Import User003"
+    And I navigate to "User" node in "Site administration > HR Import > Elements"
+    And I set the following fields to these values:
+      | Source contains all records | Yes |
+      | allow_create | 0 |
+    And I press "Save changes"
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/users.01.csv" file to "CSV" filemanager
+    And I press "Upload"
+    And I should see "HR Import files uploaded successfully"
+    And I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    And I should see "Running HR Import cron...Done!"
+    Then I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I press "Clear all except latest records"
+    And I press "Continue"
+    And I should not see "user imp003"
+    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "Show more..." "link"
+    And I should see "Import User001"
+    And I should see "Import User002"
+    And I should not see "Import User003"
+
+    When I navigate to "User" node in "Site administration > HR Import > Elements"
+    And I set the following fields to these values:
+      | allow_create | 1 |
+    And I press "Save changes"
+    When I navigate to "Upload HR Import files" node in "Site administration > HR Import > Sources"
+    And I upload "admin/tool/totara_sync/tests/fixtures/users.01.csv" file to "CSV" filemanager
+    And I press "Upload"
+    And I should see "HR Import files uploaded successfully"
+    And I navigate to "Run HR Import" node in "Site administration > HR Import"
+    And I press "Run HR Import"
+    And I should see "Running HR Import cron...Done!"
+    Then I navigate to "HR Import Log" node in "Site administration > HR Import"
+    And I press "Clear all except latest records"
+    And I press "Continue"
+    And I should see "created user imp003"
+    And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
+    And I click on "Show more..." "link"
+    And I should see "Import User001"
+    And I should see "Import User002"
+    And I should see "Import User003"
