@@ -60,7 +60,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
     And I log in as "student1"
     And I follow "Course 1"
-    And I should see "Direct enrolment is not available to you because you are not assigned a manager."
+    And I should see "You can not enrol yourself in this course."
 
   @javascript
   Scenario: A user with a manager can request access, withdraw request and be granted access
