@@ -121,18 +121,10 @@ if ($deleteflag && $deleteconfirmed) {
     $plans = $DB->get_records_sql($sql, array('evidenceid' => $item->id));
     */
 
-    $transaction = $DB->start_delegated_transaction();
-    $item = $DB->get_record('dp_plan_evidence', array('id' => $item->id), '*', MUST_EXIST);
-    $DB->delete_records('dp_plan_evidence', array('id' => $item->id));
-    $DB->delete_records('dp_plan_evidence_relation', array('evidenceid' => $item->id));
-    $fs = get_file_storage();
-    $fs->delete_area_files($TEXTAREA_OPTIONS['context']->id, 'totara_plan', 'attachment', $item->id);
-    $transaction->allow_commit();
-
-    \totara_plan\event\evidence_deleted::create_from_instance($item)->trigger();
+    evidence_delete($item->id);
 
     totara_set_notification(get_string('evidencedeleted', 'totara_plan'),
-            $indexurl, array('class' => 'notifysuccess'));
+        $indexurl, array('class' => 'notifysuccess'));
 }
 
 $item->descriptionformat = FORMAT_HTML;

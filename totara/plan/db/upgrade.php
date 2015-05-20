@@ -422,5 +422,37 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014120400, 'totara', 'plan');
     }
 
+    if ($oldversion < 2015052100) {
+        global $TEXTAREA_OPTIONS;
+
+        // Delete all evidence items linked to deleted / non-existant users.
+        $sql = "SELECT ev.id
+                  FROM {dp_plan_evidence} ev
+             LEFT JOIN {user} u
+                    ON ev.userid = u.id
+                 WHERE u.id IS NULL
+                 OR u.deleted = 1";
+        $evidenceitems = $DB->get_records_sql($sql);
+
+        $transaction = $DB->start_delegated_transaction();
+
+        foreach ($evidenceitems as $evidence) {
+            // Delete the evidence item.
+            $DB->delete_records('dp_plan_evidence', array('id' => $evidence->id));
+
+            // Delete any evidence relations.
+            $DB->delete_records('dp_plan_evidence_relation', array('evidenceid' => $evidence->id));
+
+            // Delete any linked files.
+            $fs = get_file_storage();
+            $fs->delete_area_files($TEXTAREA_OPTIONS['context']->id, 'totara_plan', 'attachment', $evidence->id);
+        }
+
+        $transaction->allow_commit();
+
+        // Plan savepoint reached.
+        upgrade_plugin_savepoint(true, 2015052100, 'totara', 'plan');
+    }
+
     return true;
 }

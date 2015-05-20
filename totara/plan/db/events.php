@@ -17,12 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralms.com>
+ * @author David Curry <david.curry@totaralms.com>
  * @package totara_plan
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * This file should be used for all plan event definitions and handers.
+ */
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
+}
 
-$plugin->version  = 2015052100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051205;       // Requires this Moodle version.
-$plugin->component = 'totara_plan';   // To check on upgrade, that module sits in correct place
+$observers = array(
+    array(
+        'eventname' => '\core\event\user_deleted',
+        'callback' => 'totara_plan_observer::user_deleted',
+    ),
+);

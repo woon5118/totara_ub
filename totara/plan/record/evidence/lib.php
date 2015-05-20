@@ -65,6 +65,45 @@ function evidence_display_attachment($userid, $evidenceid) {
 }
 
 /**
+ * Deletes a selected evidence item.
+ *
+ * @param int $evidenceid - dp_plan_evidence->id
+ * @return boolean
+ */
+function evidence_delete($evidenceid) {
+    global $DB, $TEXTAREA_OPTIONS;
+
+    if (!$evidence = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
+        // Well we can't delete something that isn't there.
+        return false;
+    }
+
+    /** TODO: trigger evidence unlinked events, see T-14190.
+        $sql = "SELECT p.id, p.name
+                  FROM {dp_plan} p
+                  JOIN {dp_plan_evidence_relation} er ON er.planid = p.id
+                 WHERE er.evidenceid = :evidenceid";
+        $plans = $DB->get_records_sql($sql, array('evidenceid' => $item->id));
+    */
+
+    $transaction = $DB->start_delegated_transaction();
+
+    // Delete the evidence item.
+    $DB->delete_records('dp_plan_evidence', array('id' => $evidence->id));
+
+    // Delete any evidence relations.
+    $DB->delete_records('dp_plan_evidence_relation', array('evidenceid' => $evidence->id));
+
+    // Delete any linked files.
+    $fs = get_file_storage();
+    $fs->delete_area_files($TEXTAREA_OPTIONS['context']->id, 'totara_plan', 'attachment', $evidence->id);
+
+    $transaction->allow_commit();
+
+    \totara_plan\event\evidence_deleted::create_from_instance($evidence)->trigger();
+}
+
+/**
  * Returns markup to display an individual evidence relation
  *
  * @global object $USER
