@@ -84,7 +84,17 @@ class rb_source_dp_evidence extends rb_base_source {
         $this->defaultfilters = array();
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_evidence');
+        $this->sourcewhere = $this->define_sourcewhere();
+        $this->sourcejoins = $this->define_sourcejoins();
         parent::__construct();
+    }
+
+    protected function define_sourcejoins() {
+        return array('auser');
+    }
+
+    protected function define_sourcewhere() {
+        return ' (auser.deleted = 0) ';
     }
 
     /**
