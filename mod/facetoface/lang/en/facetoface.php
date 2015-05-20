@@ -1128,7 +1128,7 @@ $string['setting:displaysessiontimezones'] = 'When enabled the timezone of the F
 $string['setting:displaysessiontimezones_caption'] = 'Display session timezones';
 $string['setting:disableicalcancel'] = 'Disable cancellation emails with an iCalendar attachment.';
 $string['setting:disableicalcancel_caption'] = 'Disable iCalendar cancellations:';
-$string['setting:fromaddress'] = 'What will appear in the From field of email reminders sent by this module.';
+$string['setting:fromaddress'] = 'What will appear in the From field of email reminders sent by this module, unless "Always send email from the no-reply address" is set.';
 $string['setting:fromaddress_caption'] = 'Sender address:';
 $string['setting:fromaddressdefault'] = 'totara@example.com';
 $string['setting:lotteryenabled_caption'] = 'Enable waitlist lottery';
@@ -1454,7 +1454,8 @@ $string['usernote_help'] = 'Any specific requirements that the session organiser
 * Disabilities';
 
 //Totara Messaging strings
-$string['requestattendsession'] = 'Request to attend session {$a}';
+$string['requestattendsession_message'] = 'Request to attend session {$a->linkname} {$a->status}';
+$string['requestattendsession_subject'] = 'Request to attend session {$a->name} {$a->status} by {$a->user}';
 $string['requestattendsessionsent'] = 'Request to attend session {$a} sent to manager';
 
 $string['bookedforsession'] = 'Booked for session {$a}';

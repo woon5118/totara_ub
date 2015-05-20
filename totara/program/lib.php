@@ -1177,7 +1177,7 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
                 $messagedata = new stdClass();
                 $messagedata->userto           = $userto;
                 $messagedata->userfrom         = $userfrom;
-                $messagedata->subject          = $stringmanager->get_string('extensiondenied', 'totara_program', null, $userto->lang);
+                $messagedata->subject          = $stringmanager->get_string('extensiondenied', 'totara_program', fullname($USER), $userto->lang);
                 $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                 $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                 $messagedata->fullmessage      = $stringmanager->get_string('extensiondeniedmessage', 'totara_program', $program->fullname, $userto->lang);
@@ -1242,7 +1242,7 @@ function prog_process_extensions($extensionslist, $reasonfordecision = array()) 
                     $messagedata = new stdClass();
                     $messagedata->userto           = $userto;
                     $messagedata->userfrom         = $userfrom;
-                    $messagedata->subject          = $stringmanager->get_string('extensiongranted', 'totara_program', null, $userto->lang);
+                    $messagedata->subject          = $stringmanager->get_string('extensiongranted', 'totara_program', fullname($USER), $userto->lang);
                     $messagedata->contexturl       = $CFG->wwwroot.'/totara/program/required.php?id='.$extension->programid;
                     $messagedata->contexturlname   = $stringmanager->get_string('launchprogram', 'totara_program', null, $userto->lang);
                     $messagedata->fullmessage      = $stringmanager->get_string('extensiongrantedmessage', 'totara_program',

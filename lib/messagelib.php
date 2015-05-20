@@ -56,6 +56,7 @@ require_once(dirname(dirname(__FILE__)) . '/message/lib.php');
  */
 function message_send($eventdata) {
     global $CFG, $DB;
+    require_once($CFG->dirroot . '/totara/core/lib.php');
 
     //new message ID to return
     $messageid = false;
@@ -87,6 +88,9 @@ function message_send($eventdata) {
         debugging('Attempt to send msg from unknown user', DEBUG_NORMAL);
         return false;
     }
+
+    // Use the correct userfrom based on more general settings.
+    $eventdata->userfrom = totara_get_user_from($eventdata->userfrom);
 
     // Verify all necessary data fields are present.
     if (!isset($eventdata->userto->auth) or !isset($eventdata->userto->suspended)

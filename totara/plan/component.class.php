@@ -987,6 +987,7 @@ abstract class dp_base_component {
             // Notify user that someone else did it.
             $userto = $DB->get_record('user', array('id' => $this->plan->userid));
             $event->userto = $userto;
+            $a->user = fullname($USER);
             $event->subject = $stringmanager->get_string('component'.$type.'shortlearner', 'totara_plan', $a, $userto->lang);
             $event->fullmessage = $stringmanager->get_string('component'.$type.'longlearner', 'totara_plan', $a, $userto->lang);
             $event->fullmessagehtml = $stringmanager->get_string('component'.$type.'longlearnerhtml', 'totara_plan', $a, $userto->lang);

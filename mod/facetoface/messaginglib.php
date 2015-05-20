@@ -151,7 +151,7 @@ function facetoface_get_ical_attachment($method, $facetoface, $session, $user) {
         // here. Remember commas need to be escaped too.
         $LOCATION    = str_replace('\n', '\, ', facetoface_ical_escape($locationstring));
 
-        $ORGANISEREMAIL = get_config(NULL, 'facetoface_fromaddress');
+        $ORGANISEREMAIL = $CFG->facetoface_fromaddress;
 
         $ROLE = 'REQ-PARTICIPANT';
         $CANCELSTATUS = '';

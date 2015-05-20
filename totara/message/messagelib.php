@@ -30,9 +30,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/message/lib.php');
-require_once($CFG->dirroot.'/totara/message/lib.php');
-require_once($CFG->libdir.'/eventslib.php');
+require_once($CFG->dirroot . '/message/lib.php');
+require_once($CFG->dirroot . '/totara/message/lib.php');
+require_once($CFG->dirroot . '/totara/core/lib.php');
+require_once($CFG->libdir  . '/eventslib.php');
 
 if (!isset($CFG->message_contacts_refresh)) {  // Refresh the contacts list every 60 seconds
     $CFG->message_contacts_refresh = 60;
@@ -130,6 +131,12 @@ function tm_message_send($eventdata) {
     if (empty($CFG->messaging)) {
         // Messaging currently disabled
         return true;
+    }
+
+    // Use the correct userfrom based on more general settings.
+    $eventdata->userfrom = totara_get_user_from($eventdata->userfrom);
+    if (empty($eventdata->userfrom)) {
+        $eventdata->userfrom      = $eventdata->userto;
     }
 
     if (is_int($eventdata->userto)) {
@@ -294,9 +301,6 @@ function tm_alert_send($eventdata) {
 
     $eventdata->component         = 'totara_message';
     $eventdata->name              = 'alert';
-    if (empty($eventdata->userfrom)) {
-        $eventdata->userfrom      = $eventdata->userto;
-    }
 
     if (empty($eventdata->subject)) {
         $eventdata->subject       = '';
@@ -408,9 +412,6 @@ function tm_task_send($eventdata) {
 
     $eventdata->component         = 'totara_message';
     $eventdata->name              = 'task';
-    if (!isset($eventdata->userfrom) || !$eventdata->userfrom) {
-        $eventdata->userfrom      = $eventdata->userto;
-    }
 
     if (!isset($eventdata->subject)) {
         $eventdata->subject       = '';
@@ -486,9 +487,6 @@ function tm_workflow_send($eventdata) {
 
     $eventdata->component         = 'totara_message';
     $eventdata->name              = 'task';
-    if (!isset($eventdata->userfrom) || !$eventdata->userfrom) {
-        $eventdata->userfrom      = $eventdata->userto;
-    }
 
     if (!isset($eventdata->subject)) {
         $eventdata->subject       = '';

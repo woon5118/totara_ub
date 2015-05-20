@@ -581,6 +581,11 @@ class facetoface_notification extends data_object {
             $fromuser = $USER;
         }
 
+        // If Facetoface from address is set, then all f2f messages should come from there.
+        if (!empty($CFG->facetoface_fromaddress)) {
+            $fromuser = \mod_facetoface\facetoface_user::get_facetoface_user();
+        }
+
         $options = array('context' => context_course::instance($this->_facetoface->course));
         $coursename = format_string($this->_facetoface->coursename, true, $options);
 

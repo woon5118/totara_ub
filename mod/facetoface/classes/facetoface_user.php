@@ -59,10 +59,7 @@ class facetoface_user extends \core_user {
             return self::$facetofaceuser;
         }
 
-        if (!empty($CFG->facetoface_fromuserid)) {
-            // Check to see if we can use an actual system user.
-            self::$facetofaceuser = parent::get_user($CFG->facetoface_fromuserid);
-        } else if (!empty($CFG->facetoface_fromaddress)) {
+        if (!empty($CFG->facetoface_fromaddress)) {
             $fromaddress = get_config(NULL, 'facetoface_fromaddress');
             // Create and cache the dummy object.
             self::$facetofaceuser = parent::get_dummy_user_record();

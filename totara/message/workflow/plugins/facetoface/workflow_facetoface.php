@@ -95,17 +95,21 @@ class totara_message_workflow_facetoface extends totara_message_workflow_plugin_
      * @param string $langkey
      */
     private function acceptreject_notification($userid, $facetoface, $session, $langkey) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
 
         $stringmanager = get_string_manager();
         $newevent = new stdClass();
         $newevent->userfrom    = NULL;
         $user = $DB->get_record('user', array('id' => $userid));
         $newevent->userto      = $user;
-        $approvedstr           = $stringmanager->get_string($langkey, 'facetoface', null, $user->lang);
         $url = new moodle_url('/mod/facetoface/view.php', array('f' => $facetoface->id));
-        $newevent->fullmessage = $stringmanager->get_string('requestattendsession', 'facetoface', html_writer::link($url, $facetoface->name), $user->lang) . ' ' . $approvedstr;
-        $newevent->subject     = $stringmanager->get_string('requestattendsession', 'facetoface', $facetoface->name, $user->lang) . ' ' . $approvedstr;
+        $a = new stdClass();
+        $a->name = $facetoface->name;
+        $a->status = $stringmanager->get_string($langkey, 'facetoface', null, $user->lang);
+        $a->user   = fullname($USER);
+        $a->linkname = html_writer::link($url, $facetoface->name);
+        $newevent->fullmessage = $stringmanager->get_string("requestattendsession_message", 'facetoface', $a, $user->lang);
+        $newevent->subject     = $stringmanager->get_string("requestattendsession_subject", 'facetoface', $a, $user->lang);
         $newevent->urgency     = TOTARA_MSG_URGENCY_NORMAL;
         $newevent->icon        = 'facetoface-regular';
         $newevent->msgtype     = TOTARA_MSG_TYPE_FACE2FACE;

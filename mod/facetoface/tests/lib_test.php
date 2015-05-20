@@ -2393,6 +2393,104 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->assertCount(1, $messages);
         $message = reset($messages);
         $this->assertEquals($user2->id, $message->useridto);
-        $this->assertEquals(-10, $message->useridfrom);
+        $this->assertEquals(\mod_facetoface\facetoface_user::FACETOFACE_USER, $message->useridfrom);
+    }
+
+    /**
+     * Data provider for the facetoface_messages function.
+     *
+     * @return array $data Data to be used by test_facetoface_messages.
+     */
+    public function facetoface_messaging_settings() {
+        $data = array(
+            array(1, 'no-reply@example.com', ''),
+            array(1, 'no-reply@example.com', 'facetofacesender@example.com'),
+            array(1, '', ''),
+            array(0, 'no-reply@example.com', 'facetofacesender@example.com'),
+            array(0, 'no-reply@example.com', ''),
+            array(0, '', ''),
+        );
+        return $data;
+    }
+
+    /**
+     * Test facetoface messaging.
+     *
+     * When emailonlyfromnoreplyaddress is set, all messages should come from noreplyaddress, otherwise
+     * it should use facetoface_fromaddress or default to the appropiate user set if facetoface_fromaddress is empty
+     *
+     * @param int $emailonlyfromnoreplyaddress Setting to use only from no reply address
+     * @param string $noreplyaddress No-reply address
+     * @param string $senderfrom Sender from setting in Face to face
+     * @dataProvider facetoface_messaging_settings
+     */
+    public function test_facetoface_messages($emailonlyfromnoreplyaddress, $noreplyaddress, $senderfrom) {
+        global $UNITTEST;
+        $this->preventResetByRollback();
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        $user1 = $this->getDataGenerator()->create_user(array('email' => 'user1@example.com'));
+        $user2 = $this->getDataGenerator()->create_user(array('email' => 'user2@example.com'));
+        $user3 = $this->getDataGenerator()->create_user(array('email' => 'user3@example.com'));
+
+        $manager1 = $this->getDataGenerator()->create_user(array('email' => 'manager1@example.com'));
+        $manager2 = $this->getDataGenerator()->create_user(array('email' => 'manager2@example.com'));
+
+        // Assign managers to students.
+        $hierarchygenerator->assign_primary_position($user1->id, $manager1->id, null, null);
+        $hierarchygenerator->assign_primary_position($user2->id, $manager2->id, null, null);
+
+        // Function in lib/moodlelib.php email_to_user require this.
+        if (!isset($UNITTEST)) {
+            $UNITTEST = new stdClass();
+            $UNITTEST->running = true;
+        }
+
+        set_config('emailonlyfromnoreplyaddress', $emailonlyfromnoreplyaddress);
+        set_config('noreplyaddress', $noreplyaddress);
+        set_config('facetoface_fromaddress', $senderfrom);
+
+        // Create a facetoface activity and assign it to the course.
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course->id, 'multiplesessions' => 1));
+
+        // Create session with capacity and date in 2 days.
+        $sessiondate = new stdClass();
+        $sessiondate->timestart = time() + (DAYSECS * 2);
+        $sessiondate->timefinish = time() + (DAYSECS * 2 + 60);
+        $sessiondate->sessiontimezone = 'Pacific/Auckland';
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate),
+            'datetimeknown' => '1'
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        facetoface_user_signup($session,
+            $facetoface, $course, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true, $user3);
+        facetoface_user_signup($session,
+            $facetoface, $course, 'discountcode1', MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user2->id, true, $user3);
+
+        // Check emails.
+        $emails = $sink->get_messages();
+        $this->assertCount(4, $emails); // Learners and managers.
+
+        // Set userfrom used for the assertion.
+        $userfrom = (!empty($senderfrom)) ? \mod_facetoface\facetoface_user::get_facetoface_user() : $user3;
+        $userfrom = totara_get_user_from($userfrom);
+        foreach ($emails as $email) {
+            $this->assertEquals($userfrom->id, $email->useridfrom);
+        }
+        $sink->clear();
     }
 }

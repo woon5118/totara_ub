@@ -1602,7 +1602,10 @@ class development_plan {
         $event->userto = $userto;
         $event->icon = 'learningplan-approve';
         $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
-        $event->subject = $stringmanager->get_string('planapproved', 'totara_plan', $this->name, $userto->lang);
+        $a = new stdClass();
+        $a->name = $this->name;
+        $a->user = fullname($USER); // User that approved the plan request.
+        $event->subject = $stringmanager->get_string('planapproved', 'totara_plan', $a, $userto->lang);
         $event->fullmessage = $stringmanager->get_string('approvedplanrequest', 'totara_plan', $this->name, $userto->lang);
 
         if (!empty($reasonfordecision)) {
@@ -1635,7 +1638,10 @@ class development_plan {
         $event->userto = $userto;
         $event->icon = 'learningplan-decline';
         $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
-        $event->subject = format_string($stringmanager->get_string('plandeclined', 'totara_plan', $this->name, $userto->lang));
+        $a = new stdClass();
+        $a->name = $this->name;
+        $a->user = fullname($USER); // User that declined the plan request.
+        $event->subject = format_string($stringmanager->get_string('plandeclined', 'totara_plan', $a, $userto->lang));
         $event->fullmessage = $event->subject;
         $event->fullmessage = $stringmanager->get_string('declinedplanrequest', 'totara_plan', $this->name, $userto->lang);
 

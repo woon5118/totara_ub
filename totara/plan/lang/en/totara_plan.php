@@ -283,7 +283,7 @@ $string['componentapprovelonglearnerhtml'] = '{$a->component} in learning plan "
 $string['componentapprovelongmanager'] = '{$a->component} in learning plan "{$a->plan}" approved:
 {$a->updates}';
 $string['componentapprovelongmanagerhtml'] = '{$a->component} in learning plan "{$a->planhtml}" approved:<br /> {$a->updateshtml}';
-$string['componentapproveshortlearner'] = '{$a->name} approved';
+$string['componentapproveshortlearner'] = '{$a->name} approved by {$a->user}';
 $string['componentapproveshortmanager'] = '{$a->user} approved {$a->component} {$a->name}';
 $string['componentcompletelonglearner'] = '{$a->component} in learning plan "{$a->plan}" completed:
 {$a->updates}';
@@ -825,7 +825,7 @@ $string['plan_instructions_delete'] = 'You can delete this learning plan by clic
 $string['plan_instructions_edit'] = 'You can click the "Edit details" button to ammend the learning plan title, short description or completion date.';
 $string['plan_instructions_learner'] = 'Below is a short summary of your learning plan.';
 $string['plan_instructions_manager'] = 'Below is a short summary of your team member\'s learning plan.';
-$string['planapproved'] = 'Plan "{$a}" has been approved';
+$string['planapproved'] = 'Plan "{$a->name}" has been approved by {$a->user}';
 $string['planactivated'] = 'Plan "{$a}" has been activated';
 $string['planautocompleteddate'] = 'This plan has been automatically completed because the end date for the plan has passed.';
 $string['planautocompleteditems'] = 'This plan has been automatically completed because all the items in it have been completed.';
@@ -835,7 +835,7 @@ $string['plancompletefail'] = 'There was a problem while trying to mark plan "{$
 $string['plancompletesuccess'] = 'Successfully completed plan {$a}';
 $string['plancreatefail'] = 'Plan "{$a}" could not be created';
 $string['plancreatesuccess'] = 'Plan creation successful';
-$string['plandeclined'] = 'Plan "{$a}" has been declined';
+$string['plandeclined'] = 'Plan "{$a->name}" has been declined by {$a->user}';
 $string['plandeclinedtryagain'] = 'This plan has been declined. If desired, you can make changes and request plan approval again.';
 $string['plandeletefail'] = 'Could not delete plan "{$a}"';
 $string['plandeletesuccess'] = 'Successfully deleted plan "{$a}"';
