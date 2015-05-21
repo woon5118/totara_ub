@@ -133,7 +133,6 @@ if (!isset($session)) {
     if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
         $defaulttimezone = core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
     }
-    customfield_load_data($session, 'facetofacesession', 'facetoface_session');
     $sessiondata = new stdClass();
     $sessiondata->id = 0;
     $sessiondata->allowcancellations = $facetoface->allowcancellationsdefault;
@@ -141,6 +140,9 @@ if (!isset($session)) {
     $nbdays = 1;
 
 } else {
+    // Load custom fields data for the session.
+    customfield_load_data($session, 'facetofacesession', 'facetoface_session');
+
     // Set values for the form and unset some values that will be evaluated later.
     $sessiondata = clone($session);
     if (isset($sessiondata->sessiondates)) {
