@@ -73,6 +73,7 @@ $obj = file_prepare_standard_editor($obj, 'description', $TEXTAREA_OPTIONS, $TEX
                                     'totara_plan', 'dp_plan', $obj->id);
 
 $form = new plan_edit_form($currenturl, array('action' => 'add', 'role' => $role, 'can_manage' => true));
+$form->set_data(array('userid' => $userid));
 
 if ($form->is_cancelled()) {
     redirect($allplansurl);
@@ -161,7 +162,6 @@ echo $OUTPUT->heading($heading);
 
 echo html_writer::tag('p', get_string('createplan_instructions', 'totara_plan'));
 
-$form->set_data((object)array('userid' => $userid));
 $form->display();
 
 echo $OUTPUT->container_end();
