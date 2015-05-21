@@ -30,6 +30,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/totara/message/lib.php');
+require_once($CFG->dirroot.'/totara/core/lib.php');
 
 $PAGE->set_context(context_system::instance());
 require_login();
@@ -55,14 +56,9 @@ if ($eventdata && $eventdata->action == 'facetoface') {
     $canbook = facetoface_task_check_capacity($eventdata->data);
 }
 
-if ($msg->useridfrom == 0) {
-    $from = core_user::get_support_user();
-} else {
-    $from = $DB->get_record('user', array('id' => $msg->useridfrom));
-}
+$from     = totara_get_sender_from_user_by_id($msg->useridfrom);
 $fromname = fullname($from) . " ({$from->email})";
-
-$subject = format_string($msg->subject);
+$subject  = format_string($msg->subject);
 
 if ($isfacetoface && !$DB->record_exists('facetoface_sessions', array('id' => $eventdata->data['session']->id))) {
         $subject .= ' (' . html_writer::tag('strong', get_string('f2fsessiondeleted', 'block_totara_tasks')) . ')';
