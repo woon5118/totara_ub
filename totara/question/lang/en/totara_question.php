@@ -65,6 +65,7 @@ $string['delete'] = 'Delete';
 $string['deletedquestion'] = 'Question deleted';
 $string['displaysettings'] = 'Display settings';
 $string['error:aggregatedisplayselect'] = 'You must select one (or both) of the average / median display options';
+$string['error:aggregatequestionselect'] = 'You must select at least one (preferably more) question to aggregate';
 $string['error:allowselectgoals'] = 'You must allow some goals to be added to the question';
 $string['error:invalidfunctioncalledinredisplay'] = 'A call was made to a function in a redisplay question which should never be
 called. This is caused by a programming error. This probably happened because a function in this module loaded a question
