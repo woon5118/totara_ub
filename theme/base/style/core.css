@@ -1428,6 +1428,7 @@ sup {vertical-align: super;}
 .choosercontainer #chooseform .nonoption {
     margin-bottom: 0;
     padding: 0 1.6em 0 1.6em;
+    font-size: 14px;
 }
 
 .choosercontainer #chooseform .moduletypetitle {

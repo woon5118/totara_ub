@@ -276,8 +276,8 @@ class core_course_renderer extends plugin_renderer_base {
     protected function course_modchooser_module($module, $classes = array('option')) {
         $output = '';
         $output .= html_writer::start_tag('div', array('class' => implode(' ', $classes)));
-        $output .= html_writer::start_tag('label', array('for' => 'module_' . $module->name));
         if (!isset($module->types)) {
+            $output .= html_writer::start_tag('label', array('for' => 'module_' . $module->name));
             $output .= html_writer::tag('input', '', array('type' => 'radio',
                     'name' => 'jumplink', 'id' => 'module_' . $module->name, 'value' => $module->link));
         }
@@ -306,7 +306,9 @@ class core_course_renderer extends plugin_renderer_base {
         $options->overflowdiv = false;
         $module->help = format_text($module->help, FORMAT_MARKDOWN, $options);
         $output .= html_writer::tag('span', $module->help, array('class' => 'typesummary'));
-        $output .= html_writer::end_tag('label');
+        if (!isset($module->types)) {
+            $output .= html_writer::end_tag('label');
+        }
         $output .= html_writer::end_tag('div');
 
         return $output;
