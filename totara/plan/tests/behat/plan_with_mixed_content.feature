@@ -7,15 +7,9 @@ Feature: Learner creates learning plan with mixed content
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
       | manager2 | firstname2 | lastname2 | manager2@example.com |
-    And the following "position" frameworks exist:
-      | fullname             | idnumber |
-      | Position Framework 1 | PF1      |
-    And the following "position" hierarchy exists:
-      | framework | idnumber | fullname   |
-      | PF1       | P1       | Position 1 |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | learner1 | P1       | manager2 |
+    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+      | user     | manager  |
+      | learner1 | manager2 |
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
       | Course 1 | Course 1  | 1                |
@@ -34,8 +28,14 @@ Feature: Learner creates learning plan with mixed content
       | Program 1 | P1   |
       | Program 2 | P2   |
       | Program 3 | P3   |
-
-    And I create a basic learning plan called "learner1 Learning Plan" for "learner1"
+    And the following "plans" exist in "totara_plan" plugin:
+      | user     | name                   |
+      | learner1 | learner1 Learning Plan |
+    And the following "objectives" exist in "totara_plan" plugin:
+      | user     | plan                   | name        |
+      | learner1 | learner1 Learning Plan | Objective 1 |
+      | learner1 | learner1 Learning Plan | Objective 2 |
+      | learner1 | learner1 Learning Plan | Objective 3 |
 
   @javascript
   Scenario: Test the learner can add content to their learning plan prior to approval.
@@ -72,19 +72,6 @@ Feature: Learner creates learning plan with mixed content
     Then I should see "Competency 1" in the ".dp-plan-component-items" "css_element"
     And I should see "Competency 2" in the ".dp-plan-component-items" "css_element"
     And I should see "Competency 3" in the ".dp-plan-component-items" "css_element"
-
-      # Add some objectives to the plan.
-    And I click on "Objectives" "link" in the "#dp-plan-content" "css_element"
-
-    # Create a new objective.Scenario:
-    And I create an objective called "Objective 1"
-    And I create an objective called "Objective 2"
-    When I create an objective called "Objective 3"
-
-    # Check the objective names appear in the plan.
-    Then I should see "Objective 1" in the ".dp-plan-component-items" "css_element"
-    And I should see "Objective 2" in the ".dp-plan-component-items" "css_element"
-    And I should see "Objective 3" in the ".dp-plan-component-items" "css_element"
 
     # Add some programs to the plan.
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -171,14 +158,14 @@ Feature: Learner creates learning plan with mixed content
     Then I should see "Course 1" in the "#dp-component-update-table" "css_element"
     And I should see "Course 2" in the "#dp-component-update-table" "css_element"
 
-    # Add some objectives to the plan.
-    When I click on "Objectives" "link" in the "#dp-plan-content" "css_element"
-
-    # Create a new objective.
-    And I create an objective called "Objective 1"
-
-    # Check the objective names appear in the plan.
-    Then I should see "Objective 1" in the ".dp-plan-component-items" "css_element"
+    # Add an objective to the plan (just to test the interface - rather then using a data generator).
+    And I click on "Objectives" "link" in the "#dp-plan-content" "css_element"
+    And I press "Add new objective"
+    And I set the field "Objective Title" to "Objective 4"
+    And I set the field "Objective description" to "Objective 4 description"
+    And I press "Add objective"
+    Then I should see "Objective created"
+    And I should see "Objective 4" in the ".dp-plan-component-items" "css_element"
 
     # Send the plan to the manager for approval.
     When I press "Send approval request"
@@ -202,7 +189,7 @@ Feature: Learner creates learning plan with mixed content
     When I press "Review"
     And I set the field "menuapprove_course1" to "Approve"
     And I set the field "menuapprove_course2" to "Approve"
-    And I set the field "menuapprove_objective1" to "Approve"
+    And I set the field "menuapprove_objective4" to "Approve"
     And I press "Update Settings"
     # Currently there is no response, but I would expect something like the following. Bug raised: T-14320.
     #     Then I should see "Plan \"learner1 Learning Plan\" has been updated"

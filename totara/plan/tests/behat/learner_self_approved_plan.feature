@@ -7,19 +7,16 @@ Feature: Learner self approves plan with updated template.
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
       | manager2 | firstname2 | lastname2 | manager2@example.com |
-    And the following "position" frameworks exist:
-      | fullname             | idnumber |
-      | Position Framework 1 | PF1      |
-    And the following "position" hierarchy exists:
-      | framework | idnumber | fullname   |
-      | PF1       | P1       | Position 1 |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | learner1 | P1       | manager2 |
+    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+      | user     | manager  |
+      | learner1 | manager2 |
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
       | Course 1 | Course 1  | 1                |
       | Course 2 | Course 2  | 1                |
+    And the following "plans" exist in "totara_plan" plugin:
+      | user     | name                   |
+      | learner1 | learner1 Learning Plan |
 
     # As admin select the custom workflow for learning plans.
     And I log in as "admin"
@@ -41,9 +38,6 @@ Feature: Learner self approves plan with updated template.
     When I click on "Save changes" "button"
     Then I should see "Course settings successfully updated"
     And I log out
-
-    # As the learner create a basic plan (with no content).
-    And I create a basic learning plan called "learner1 Learning Plan" for "learner1"
 
   @javascript
   Scenario: Learner activates and completes own plan.

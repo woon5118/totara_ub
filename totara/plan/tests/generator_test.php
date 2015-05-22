@@ -49,15 +49,14 @@ class totara_plan_generator_testcase extends advanced_testcase {
         $this->assertNotEmpty($record->description);
         $this->assertNotEmpty($record->startdate);
         $this->assertNotEmpty($record->enddate);
-        $this->assertEquals(DP_PLAN_STATUS_APPROVED, $record->status);
+        $this->assertEquals(DP_PLAN_STATUS_UNAPPROVED, $record->status);
         $this->assertEquals(1, $record->templateid);
 
         $now = time();
         $this->setAdminUser();
         $record = $plangenerator->create_learning_plan(array(
             'userid' => $user2->id, 'createdby' => $user1->id, 'name' => 'pokus', 'description' => 'lala',
-            'startdate' => $now + 10, 'enddate' => $now + 100, 'status' => DP_PLAN_STATUS_UNAPPROVED,
-            'templateid' => 666,
+            'startdate' => $now + 10, 'enddate' => $now + 100, 'templateid' => 666,
         ));
         $this->assertTrue($DB->record_exists('dp_plan', array('id' => $record->id)));
         $this->assertEquals($user2->id, $record->userid);
@@ -91,7 +90,8 @@ class totara_plan_generator_testcase extends advanced_testcase {
         $sink = $this->redirectMessages();
         $result = $plangenerator->add_learning_plan_competency($plan->id, $competency->id);
         $this->assertTrue($result);
-        $this->assertCount(1, $sink->get_messages());
+        // The plan has not been approved yet so any additions will not generate an message.
+        $this->assertCount(0, $sink->get_messages());
         $sink->close();
 
         $this->assertTrue($DB->record_exists('dp_plan_competency_assign', array('planid' => $plan->id, 'competencyid' => $competency->id)));
