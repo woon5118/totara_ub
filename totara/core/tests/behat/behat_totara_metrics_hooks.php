@@ -23,6 +23,7 @@
  */
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
+require_once(__DIR__ . '/behat_totara_metrics.php');
 
 use Behat\Behat\Event\SuiteEvent as SuiteEvent,
     Behat\Behat\Event\FeatureEvent as FeatureEvent,
