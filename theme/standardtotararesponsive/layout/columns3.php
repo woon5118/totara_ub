@@ -73,11 +73,11 @@ echo $OUTPUT->doctype() ?>
     <nav role="navigation" class="navbar-inner">
         <div class="container-fluid">
             <?php if ($logourl == NULL) { ?>
-                <div id="logo"><a href="<?php echo $CFG->wwwroot; ?>">&nbsp;</a></div>
+                <div id="logo" class="img-responsive"><a href="<?php echo $CFG->wwwroot; ?>">&nbsp;</a></div>
             <?php } else { ?>
-                <div id="logo" class="custom">
+                <div id="logo" class="custom img-responsive">
                     <a href="<?php echo $CFG->wwwroot; ?>">
-                        <img class="logo" src="<?php echo $logourl;?>" alt="<?php echo $logoalt ?>" />
+                        <img class="logo img-responsive" src="<?php echo $logourl;?>" alt="<?php echo $logoalt ?>" />
                     </a>
                 </div>
             <?php } ?>
