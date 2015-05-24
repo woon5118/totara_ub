@@ -47,8 +47,8 @@ class question_aggregate extends question_base{
      */
     public static function available_question_types() {
         $qtypes = array();
-        $qtypes[] = 'Rating (numeric scale)';
-        $qtypes[] = 'Rating (custom scale)';
+        $qtypes[] = 'ratingnumeric';
+        $qtypes[] = 'ratingcustom';
 
         return $qtypes;
     }

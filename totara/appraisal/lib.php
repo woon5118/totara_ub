@@ -1442,8 +1442,7 @@ class appraisal {
                 $questionrecords = appraisal_question::fetch_page($page->id);
                 foreach ($questionrecords as $questionrecord) {
                     $question = new appraisal_question($questionrecord->id);
-                    $info = $question->get_element()->get_info();
-                    if (in_array($info['type'], $aggregatetypes)) {
+                    if (in_array($question->get_element()->datatype, $aggregatetypes)) {
                         $strvar->questionname = $question->name;
                         $list[$question->id] = get_string('aggregateselectordisplay', 'totara_appraisal', $strvar);
                     }
