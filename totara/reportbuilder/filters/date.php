@@ -171,11 +171,11 @@ class rb_filter_date extends rb_filter_type {
         if ($includebetween) {
             if (isset($defaults['daysafter']) && $defaults['daysafter'] != 0) {
                 $mform->setDefault($this->name.'daysafterchkbox', 1);
-                $mform->setDefault($this->name.'daysafter', ceil(abs(($defaults['daysafter'] - time()) / 86400)));
+                $mform->setDefault($this->name.'daysafter', $defaults['daysafter']);
             }
             if (isset($defaults['daysbefore']) && $defaults['daysbefore'] != 0) {
                 $mform->setDefault($this->name.'daysbeforechkbox', 1);
-                $mform->setDefault($this->name.'daysbefore', floor(abs(($defaults['daysbefore'] - time()) / 86400)));
+                $mform->setDefault($this->name.'daysbefore', $defaults['daysbefore']);
             }
         }
 
@@ -211,7 +211,6 @@ class rb_filter_date extends rb_filter_type {
         $daysafterdt = $this->name.'daysafter';
         $daysbeforeck = $this->name.'daysbeforechkbox';
         $daysbeforedt = $this->name.'daysbefore';
-        $durationday = 60 * 60 * 24; // Seconds * Minutes * Hours = Days.
 
         if ((!isset($formdata->$sck) and !isset($formdata->$eck))
                 and (!isset($formdata->$daysafterck) and !isset($formdata->$daysbeforeck))) {
@@ -235,15 +234,13 @@ class rb_filter_date extends rb_filter_type {
         } else {
             $data['before'] = 0;
         }
-        if (isset($formdata->$daysafterck) and !isset($formdata->daysafterdt)) {
-            $data['daysafter'] = ((mktime(0, 0, 0, gmdate('n'), gmdate('j'), gmdate('Y'))
-                + ($formdata->$daysafterdt * $durationday)));
+        if (isset($formdata->$daysafterck) and isset($formdata->$daysafterdt)) {
+            $data['daysafter'] = $formdata->$daysafterdt;
         } else {
             $data['daysafter'] = 0;
         }
-        if (isset($formdata->$daysbeforeck) and !isset($formdata->daysbeforedt)) {
-            $data['daysbefore'] = ((mktime(0, 0, 0, gmdate('n'), gmdate('j'), gmdate('Y'))
-                - ($formdata->$daysbeforedt * $durationday)));
+        if (isset($formdata->$daysbeforeck) and isset($formdata->$daysbeforedt)) {
+            $data['daysbefore'] = $formdata->$daysbeforedt;
         } else {
             $data['daysbefore'] = 0;
         }
@@ -259,9 +256,23 @@ class rb_filter_date extends rb_filter_type {
     function get_sql_filter($data) {
         $after  = $data['after'];
         $before = $data['before'];
-        $daysafter = $data['daysafter'];
-        $daysbefore = $data['daysbefore'];
-        $datetoday = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+        $datetodayobj = new DateTime('now', core_date::get_user_timezone_object());
+        $datetodayobj->setTime(0, 0, 0);
+        $datetoday = $datetodayobj->getTimestamp();
+        if ($data['daysafter']) {
+            $interval = new DateInterval('P' . $data['daysafter'] . 'D');
+            $daysafter = $datetodayobj->add($interval)->getTimestamp();
+            $datetodayobj->sub($interval);
+        } else {
+            $daysafter = 0;
+        }
+        if ($data['daysbefore']) {
+            $interval = new DateInterval('P' . $data['daysbefore'] . 'D');
+            $daysbefore = $datetodayobj->sub($interval)->getTimestamp();
+            $datetodayobj->add($interval);
+        } else {
+            $daysbefore = 0;
+        }
         $query  = $this->get_field();
 
         $params = array();
@@ -289,12 +300,12 @@ class rb_filter_date extends rb_filter_type {
             $params[$uniqueparamdaysafter] = $daysafter;
             $params[$uniqueparamdaysbefore] = $daysbefore;
             return array($result, $params);
-        } else if (!$daysbefore and $daysafter) {
+        } else if ($daysafter) {
             $uniqueparam = rb_unique_param('fdaysafter');
             $resdaysafter .= " AND {$query} <= :{$uniqueparam}";
             $params[$uniqueparam] = $daysafter;
             return array($resdaysafter, $params);
-        } else if (!$daysafter and $daysbefore) {
+        } else if ($daysbefore) {
             $uniqueparam = rb_unique_param('fdaysbefore');
             $resdaysbefore .= " AND {$query} >= :{$uniqueparam}";
             $params[$uniqueparam] = $daysbefore;
@@ -311,8 +322,22 @@ class rb_filter_date extends rb_filter_type {
     function get_label($data) {
         $after  = $data['after'];
         $before = $data['before'];
-        $daysafter = $data['daysafter'];
-        $daysbefore = $data['daysbefore'];
+        $datetodayobj = new DateTime('now', core_date::get_user_timezone_object());
+        $datetodayobj->setTime(0, 0, 0);
+        if ($data['daysafter']) {
+            $interval = new DateInterval('P' . $data['daysafter'] . 'D');
+            $daysafter = $datetodayobj->add($interval)->getTimestamp();
+            $datetodayobj->sub($interval);
+        } else {
+            $daysafter = 0;
+        }
+        if ($data['daysbefore']) {
+            $interval = new DateInterval('P' . $data['daysbefore'] . 'D');
+            $daysbefore = $datetodayobj->sub($interval)->getTimestamp();
+            $datetodayobj->add($interval);
+        } else {
+            $daysbefore = 0;
+        }
         $label  = $this->label;
 
         $a = new stdClass();

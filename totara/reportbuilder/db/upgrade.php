@@ -741,5 +741,69 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015030201, 'totara', 'reportbuilder');
     }
 
+    // T-14365 Convert daysbefore and daysafter filter from dates to days.
+    if ($oldversion < 2015030203) {
+
+        // This could take some time.
+        upgrade_set_timeout(300);
+
+        $select = $DB->sql_like('search', ':before') . " OR " . $DB->sql_like('search', ':after');
+        $params = array('before' => '%' . $DB->sql_like_escape('daysbefore') . '%',
+            'after' => '%' . $DB->sql_like_escape('daysafter') . '%');
+
+        $total = $DB->count_records_select('report_builder_saved', $select, $params);
+
+        if ($total > 0) {
+            $i = 0;
+            $pbar = new progress_bar('copytimeexpirestotimedue', 500, true);
+            $pbar->update($i, $total, "Converting Report Builder date filters from dates to days - {$i}/{$total}.");
+
+            $recordsrs = $DB->get_recordset_select('report_builder_saved', $select, $params, '', 'id, search, timemodified');
+            // The interface actually enforces 9999 max which is about 27 years, but we allow 10x more.
+            // This value is used to protect against converting a number that has already been converted.
+            $maxdays = 100000;
+            foreach ($recordsrs as $record) {
+                $filters = unserialize($record->search);
+                $needsupdate = false;
+                foreach ($filters as $filtername => $filter) {
+                    // Only upgrade this filter if it has the specific set of properties.
+                    // This is the only way (short of loading the whole report object) to identify date filters.
+                    if (!is_array($filter) ||
+                        !isset($filter['after']) ||
+                        !isset($filter['before']) ||
+                        !isset($filter['daysafter']) ||
+                        !isset($filter['daysbefore']) ||
+                        count($filter) > 4) {
+                        continue;
+                    }
+                    // Daysbefore and daysafter were originally a date, calculated using
+                    // mktime(0, 0, 0, gmdate('n'), gmdate('j'), gmdate('Y'))
+                    // so to convert to a number of days, we subtract the time modified (or reverse), divide by the length
+                    // of a day and round up (or down).
+                    if (isset($filter['daysafter']) && $filter['daysafter'] > $maxdays) {
+                        $filters[$filtername]['daysafter'] = ceil(($filter['daysafter'] - $record->timemodified) / DAYSECS);
+                        $needsupdate = true;
+                    }
+                    if (isset($filter['daysbefore']) && $filter['daysbefore'] > $maxdays) {
+                        $filters[$filtername]['daysbefore'] = floor(($record->timemodified - $filter['daysbefore']) / DAYSECS);
+                        $needsupdate = true;
+                    }
+                }
+                $record->search = serialize($filters);
+                if ($needsupdate) {
+                    $DB->update_record('report_builder_saved', $record);
+                }
+                unset($record);
+
+                $i++;
+                $pbar->update($i, $total, "Converting Report Builder date filters from dates to days - {$i}/{$total}.");
+            }
+            $recordsrs->close();
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2015030203, 'totara', 'reportbuilder');
+    }
+
     return true;
 }
