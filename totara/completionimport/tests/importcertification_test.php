@@ -115,7 +115,7 @@ class importcertification_testcase extends reportcache_advanced_testcase {
                 'Record count mismatch for users'); // Guest + Admin + generated users.
 
         // Generate import data - product of user and certif tables.
-        $fields = array('username', 'certificationshortname', 'certificationidnumber', 'completiondate');
+        $fields = array('username', 'certificationshortname', 'certificationidnumber', 'completiondate', 'duedate');
         $csvexport = new csv_export_writer($csvdelimiter, $csvseparator);
         $csvexport->add_data($fields);
 
@@ -123,7 +123,8 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         $sql = "SELECT  {$uniqueid} AS uniqueid,
                         u.username,
                         p.shortname AS certificationshortname,
-                        p.idnumber AS certificationidnumber
+                        p.idnumber AS certificationidnumber,
+                        p.availableuntil AS duedate
                 FROM    {user} u,
                         {prog} p";
         $imports = $DB->get_recordset_sql($sql, null, 0, CERT_HISTORY_IMPORT_CSV_ROWS);
@@ -135,6 +136,7 @@ class importcertification_testcase extends reportcache_advanced_testcase {
                 $data['certificationshortname'] = $import->certificationshortname;
                 $data['certificationidnumber'] = $import->certificationidnumber;
                 $data['completiondate'] = date($csvdateformat, strtotime(date('Y-m-d') . ' -' . rand(1, 365) . ' days'));
+                $data['duedate'] = $import->duedate;
                 $csvexport->add_data($data);
                 $count++;
             }
@@ -234,7 +236,7 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         $this->getDataGenerator()->assign_to_program($program->id, ASSIGNTYPE_INDIVIDUAL, $users[8]->id, $record);
 
         // Generate import data - product of user and certif tables.
-        $fields = array('username', 'certificationshortname', 'certificationidnumber', 'completiondate');
+        $fields = array('username', 'certificationshortname', 'certificationidnumber', 'completiondate', 'duedate');
         $csvexport = new csv_export_writer($csvdelimiter, $csvseparator);
         $csvexport->add_data($fields);
 
@@ -242,7 +244,8 @@ class importcertification_testcase extends reportcache_advanced_testcase {
         $sql = "SELECT  {$uniqueid} AS uniqueid,
                         u.username,
                         p.shortname AS certificationshortname,
-                        p.idnumber AS certificationidnumber
+                        p.idnumber AS certificationidnumber,
+                        p.availableuntil AS duedate
                 FROM    {user} u,
                         {prog} p";
         $imports = $DB->get_recordset_sql($sql, null, 0, CERT_HISTORY_IMPORT_CSV_ROWS);
@@ -254,6 +257,7 @@ class importcertification_testcase extends reportcache_advanced_testcase {
                 $data['certificationshortname'] = $import->certificationshortname;
                 $data['certificationidnumber'] = $import->certificationidnumber;
                 $data['completiondate'] = date($csvdateformat, strtotime(date('Y-m-d') . ' -' . rand(1, 365) . ' days'));
+                $data['duedate'] = $import->duedate;
                 $csvexport->add_data($data);
                 $count++;
             }

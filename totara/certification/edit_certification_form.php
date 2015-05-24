@@ -32,7 +32,6 @@ if (!defined('MOODLE_INTERNAL')) {
 class edit_certification_form extends moodleform {
 
     public function definition() {
-        global $CFG, $USER;
 
         $mform =& $this->_form;
 
@@ -43,6 +42,12 @@ class edit_certification_form extends moodleform {
             $active = array('', 'day');
         } else {
             $active = explode(' ', $certification->activeperiod);
+        }
+
+        if (empty($certification->minimumactiveperiod)) {
+            $minimumactive = array('', 'day');
+        } else {
+            $minimumactive = explode(' ', $certification->minimumactiveperiod);
         }
 
         if (empty($certification->windowperiod)) {
@@ -61,6 +66,23 @@ class edit_certification_form extends moodleform {
         $mform->addElement('html', html_writer::start_tag('p', array('class' => 'instructions')) .
                              get_string('editdetailsdesc', 'totara_certification') . html_writer::end_tag('p'));
 
+        $dateperiodoptions = array(
+            'day' => get_string('days', 'totara_certification'),
+            'week' => get_string('weeks', 'totara_certification'),
+            'month' => get_string('months', 'totara_certification'),
+            'year' => get_string('years', 'totara_certification'),
+        );
+
+        // Recert datetype.
+        $recertoptions = array(
+            CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
+            CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification'),
+            CERTIFRECERT_FIXED => get_string('editdetailsrcfixed', 'totara_certification')
+        );
+        $mform->addElement('select', 'recertifydatetype', get_string('editdetailsrcopt', 'totara_certification'), $recertoptions);
+        $mform->setDefault('recertifydatetype', $recertifydatetype);
+        $mform->addHelpButton('recertifydatetype', 'editdetailsrcopt', 'totara_certification');
+
         // Active period num.
         $mform->addElement('html', html_writer::start_tag('p', array('class' => 'subheader')) .
                              get_string('editdetailsactivep', 'totara_certification') . html_writer::end_tag('p'));
@@ -72,12 +94,6 @@ class edit_certification_form extends moodleform {
         $mform->setdefault('activenum', $active[0]);
 
         // Active period timeselect.
-        $dateperiodoptions = array(
-            'day' => get_string('days', 'totara_certification'),
-            'week' => get_string('weeks', 'totara_certification'),
-            'month' => get_string('months', 'totara_certification'),
-            'year' => get_string('years', 'totara_certification'),
-        );
         $activegrp[] = $mform->createElement('select', 'activeperiod', '', $dateperiodoptions);
         $mform->setDefault('activeperiod', $active[1]);
         $mform->addGroup($activegrp, 'activegrp', get_string('editdetailsactive', 'totara_certification'), ' ', false);
@@ -88,6 +104,31 @@ class edit_certification_form extends moodleform {
                 get_string('error:minimumactiveperiod', 'totara_certification'),
                 'activeperiod_validation',
                 $mform);
+
+        // Minimum active period num.
+        $minimumactivegrp = array();
+        $minimumactivegrp[] =  $mform->createElement('text', 'minimumactivenum', '', array('size' => 4, 'maxlength' => 3));
+        $mform->setType('minimumactivenum', PARAM_INT);
+        $mform->setdefault('minimumactivenum', $minimumactive[0]);
+
+        // Minimum active period timeselect.
+        $minimumactivegrp[] = $mform->createElement('select', 'minimumactiveperiod', '', $dateperiodoptions);
+        $mform->setDefault('minimumactiveperiod', $minimumactive[1]);
+        $mform->addGroup($minimumactivegrp, 'minimumactivegrp', get_string('editdetailsminimumactive', 'totara_certification'), ' ', false);
+        $mform->addHelpButton('minimumactivegrp', 'editdetailsminimumactive', 'totara_certification');
+
+        $mform->registerRule('minimumactiveperiod_windowperiod_validation', 'function', 'minimumactiveperiod_windowperiod_validation');
+        $mform->addRule('minimumactivegrp',
+            get_string('error:minimumactiveperiodwindow', 'totara_certification'),
+            'minimumactiveperiod_windowperiod_validation',
+            $mform);
+        $mform->registerRule('minimumactiveperiod_activeperiod_validation', 'function', 'minimumactiveperiod_activeperiod_validation');
+        $mform->addRule('minimumactivegrp',
+            get_string('error:minimumactiveperiodactive', 'totara_certification'),
+            'minimumactiveperiod_activeperiod_validation',
+            $mform);
+        $mform->disabledIf('minimumactivenum', 'recertifydatetype', 'ne', CERTIFRECERT_FIXED);
+        $mform->disabledIf('minimumactiveperiod', 'recertifydatetype', 'ne', CERTIFRECERT_FIXED);
 
         // Recert window period num.
         $mform->addElement('html', html_writer::start_tag('p', array('class' => 'subheader')) .
@@ -114,15 +155,6 @@ class edit_certification_form extends moodleform {
                     get_string('timeallowance', 'totara_certification', $timeallowance),
                     array('class' => 'timeallowance')));
         }
-
-        // Recert datetype.
-        $recertoptions = array(
-            CERTIFRECERT_COMPLETION => get_string('editdetailsrccmpl', 'totara_certification'),
-            CERTIFRECERT_EXPIRY => get_string('editdetailsrcexp', 'totara_certification')
-        );
-        $mform->addElement('select', 'recertifydatetype', get_string('editdetailsrcopt', 'totara_certification'), $recertoptions);
-        $mform->setDefault('recertifydatetype', $recertifydatetype);
-        $mform->addHelpButton('recertifydatetype', 'editdetailsrcopt', 'totara_certification');
 
         // Buttons.
         $buttonarray = array();
@@ -183,4 +215,42 @@ function activeperiod_validation($element, $value, $mform) {
     $windowgrp = $mform->getElementValue('windowgrp');
     $timewindowperiod = strtotime($windowgrp['windownum'] . ' ' . $windowgrp['windowperiod'][0], 0);
     return ($timewindowperiod && $timeactiveperiod && ($timeactiveperiod >= $timewindowperiod));
+}
+
+/**
+ * Validates that the minimum active period is greater than or equal to the recertification window period
+ *
+ * @param string $element Element name
+ * @param array $value Value of windowgrp
+ * @param object $mform
+ * @return boolean
+ */
+function minimumactiveperiod_activeperiod_validation($element, $value, $mform) {
+    $recertmethodgrp = $mform->getElementValue('recertifydatetype');
+    if ($recertmethodgrp[0] != CERTIFRECERT_FIXED) {
+        return true;
+    }
+    $timeminimumperiod = strtotime($value['minimumactivenum'] . ' ' . $value['minimumactiveperiod'], 0);
+    $activegrp = $mform->getElementValue('activegrp');
+    $timeactiveperiod = strtotime($activegrp['activenum'] . ' ' . $activegrp['activeperiod'][0], 0);
+    return ($timeminimumperiod && $timeactiveperiod && ($timeminimumperiod <= $timeactiveperiod));
+}
+
+/**
+ * Validates that the minimum active period is less than or equal to the active period
+ *
+ * @param string $element Element name
+ * @param array $value Value of windowgrp
+ * @param object $mform
+ * @return boolean
+ */
+function minimumactiveperiod_windowperiod_validation($element, $value, $mform) {
+    $recertmethodgrp = $mform->getElementValue('recertifydatetype');
+    if ($recertmethodgrp[0] != CERTIFRECERT_FIXED) {
+        return true;
+    }
+    $timeminimumperiod = strtotime($value['minimumactivenum'] . ' ' . $value['minimumactiveperiod'], 0);
+    $windowgrp = $mform->getElementValue('windowgrp');
+    $timewindowperiod = strtotime($windowgrp['windownum'] . ' ' . $windowgrp['windowperiod'][0], 0);
+    return ($timewindowperiod && $timeminimumperiod && ($timewindowperiod <= $timeminimumperiod));
 }

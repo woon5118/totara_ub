@@ -28,7 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_testcase.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php');
 
-define('CERTIFICATION_USERS', 10);
+define('CERTIFICATION_USERS', 10); // Assigned to each certification which is tested.
 define('CERTIFICATION_PART_2_USERS', 8);
 define('CERTIFICATION_PART_4_USERS', 6);
 
@@ -44,9 +44,17 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
      * The expiry date is calculated depending on the recertifydatetype property as follows:
      * CERTIFRECERT_EXPIRY
      *      To calculate the next expiry date based on previous expiry date, add the period to the base, where base is the
-     *      the completion date when first completed, otherwise the previous expiry date.
+     *      first available / non-zero value of
+     *      1) previous expiry date
+     *      2) assignment due date (completiontime in prog_assignment)
+     *      3) time completed
+     *      except when the certification is overdue (primary certification is past the due date or recertification has expired),
+     *      in which case the base is just time completed.
      * CERTIFRECERT_COMPLETION
-     *      Just add the period to the completion time.
+     *      Just add the period to the time completed.
+     * CERTIFRECERT_FIXED
+     *      Not tested here, because get_certiftimebase uses time(), and this test involves strange time bending operations.
+     *      The core functionality of this option is tested in recertdates_test.
      */
     public function test_certification_recertification() {
         $this->resetAfterTest(true);
@@ -66,8 +74,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         $this->check_stage_6();
     }
 
-    private $setuptimeminimum, $setuptimemaximum, $certprograms, $userswithcompletiontime, $users, $completiontime,
-            $certprogram1, $certprogram2, $certprogram3, $certprogram4, $courses;
+    private $setuptimeminimum, $setuptimemaximum, $certprograms, $userswithassignmentduedate, $users, $assignmentduedate,
+            $certprogram1, $certprogram2, $certprogram3, $certprogram4, $courses, $coursesforcompletion, $certsforcompletion;
 
     /**
      * Testing part 1 - Initial setup.
@@ -130,21 +138,22 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         );
         $this->certprogram4 = $this->getDataGenerator()->create_certification($cert4data);
         $this->certprograms = array($this->certprogram1, $this->certprogram2, $this->certprogram3, $this->certprogram4);
+        $this->certsforcompletion = array($this->certprogram1, $this->certprogram2);
         $this->assertEquals(4, $DB->count_records('prog'), 'Record count mismatch in program table');
         $this->assertEquals(4, $DB->count_records('certif'), 'Record count mismatch for certif');
 
         // Assign users to the certification as individuals.
-        // Completion time is at the start of the day, 14 days from $now.
-        $this->completiontime = strtotime("14 day", $startoftoday);
-        $this->userswithcompletiontime = array();
+        // Assignment due date is at the start of the day, 14 days from $now.
+        $this->assignmentduedate = strtotime("14 day", $startoftoday);
+        $this->userswithassignmentduedate = array();
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
-                if ($i % 2) { // Half of the users (with odd $i) have a completion time.
-                    $record = array('completiontime' => date('d/m/Y', $this->completiontime),
+                if ($i % 2) { // Half of the users (with odd $i) have an assignment due date.
+                    $record = array('completiontime' => date('d/m/Y', $this->assignmentduedate),
                         'completionevent' => COMPLETION_EVENT_NONE);
                     $this->getDataGenerator()->assign_to_program($certprogram->id,
                         ASSIGNTYPE_INDIVIDUAL, $this->users[$i]->id, $record);
-                    $this->userswithcompletiontime[] = $this->users[$i];
+                    $this->userswithassignmentduedate[] = $this->users[$i];
                 } else {
                     $this->getDataGenerator()->assign_to_program($certprogram->id,
                         ASSIGNTYPE_INDIVIDUAL, $this->users[$i]->id);
@@ -160,6 +169,11 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
             $this->getDataGenerator()->add_courseset_program($certprogram->id, array($course->id), CERTIFPATH_CERT);
             $this->getDataGenerator()->add_courseset_program($certprogram->id, array($course->id), CERTIFPATH_RECERT);
         }
+
+        // Figure out which courses we want to do the completion actions on, in stages 2, 4 and 6.
+        $this->coursesforcompletion =
+            array($this->courses[$this->certprogram1->id],
+                  $this->courses[$this->certprogram2->id]);
 
         sleep(1);
         $this->setuptimemaximum = time();
@@ -177,7 +191,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         $this->firstcompletiontime = time();
         $this->firstcompletiontimeminimum = $this->firstcompletiontime;
         sleep(1);
-        foreach (array($this->courses[$this->certprogram1->id], $this->courses[$this->certprogram2->id]) as $course) {
+        foreach ($this->coursesforcompletion as $course) {
             for ($i = 1; $i <= CERTIFICATION_PART_2_USERS; $i++) {
                 $completion = new completion_completion(array('userid' => $this->users[$i]->id, 'course' => $course->id));
                 $completion->mark_complete($this->firstcompletiontime);
@@ -193,7 +207,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
      * To do this, we're going to move everything back in time. How far? We want to choose a time where the
      * recertification window is open for all users who completed the initial certification stage. Those with
      * CERTIFRECERT_COMPLETION will be open from 9 months to 12 months from $firstcompletiontime (a few seconds
-     * ago). Those with CERTIFRECERT_EXPIRY and no completion time will be the same as above, otherwise they
+     * ago). Those with CERTIFRECERT_EXPIRY and no assignment due date will be the same as above, otherwise they
      * will be open from 9 months to 12 months from $completiontime (= 9m, 2w from now). So they should all be
      * open 11 months (365 - 30 days) from today.
      * Run cron to open the recertification windows.
@@ -249,7 +263,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
             $DB->update_record('prog_user_assignment', $record);
         }
 
-        $this->completiontime = strtotime("-335 day", $this->completiontime);
+        $this->assignmentduedate = strtotime("-335 day", $this->assignmentduedate);
         $this->setuptimeminimum = strtotime("-335 day", $this->setuptimeminimum);
         $this->setuptimemaximum = strtotime("-335 day", $this->setuptimemaximum);
         $this->firstcompletiontime = strtotime("-335 day", $this->firstcompletiontime);
@@ -279,7 +293,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         $this->secondcompletiontime = time();
         $this->secondcompletiontimeminimum = $this->secondcompletiontime;
         sleep(1);
-        foreach (array($this->courses[$this->certprogram1->id], $this->courses[$this->certprogram2->id]) as $course) {
+        foreach ($this->coursesforcompletion as $course) {
             for ($i = 1; $i <= CERTIFICATION_PART_4_USERS; $i++) {
                 $completion = new completion_completion(array('userid' => $this->users[$i]->id, 'course' => $course->id));
                 $completion->mark_complete($this->secondcompletiontime);
@@ -353,7 +367,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
             $DB->update_record('prog_user_assignment', $record);
         }
 
-        $this->completiontime = strtotime("-335 day", $this->completiontime);
+        $this->assignmentduedate = strtotime("-335 day", $this->assignmentduedate);
         $this->setuptimeminimum = strtotime("-335 day", $this->setuptimeminimum);
         $this->setuptimemaximum = strtotime("-335 day", $this->setuptimemaximum);
         $this->firstcompletiontime = strtotime("-335 day", $this->firstcompletiontime);
@@ -384,13 +398,12 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         // Testing part 6 - Third completion / recertification.
         // Mark all users as completion in some courses. It should not matter if they are recertifying for the second time,
         // primary certifying for the first time, or certified, failed to recertify and now did primary certification again.
-        // Check the user data.
 
         // Complete all users in the first two certifications.
         $this->thirdcompletiontime = time();
         $this->thirdcompletiontimeminimum = $this->thirdcompletiontime;
         sleep(1);
-        foreach (array($this->courses[$this->certprogram1->id], $this->courses[$this->certprogram2->id]) as $course) {
+        foreach ($this->coursesforcompletion as $course) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $completion = new completion_completion(array('userid' => $this->users[$i]->id, 'course' => $course->id));
                 $completion->mark_complete($this->thirdcompletiontime);
@@ -408,7 +421,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
 
                 // Program assignment and program user assignment records should exist for all users.
                 // We get all prog_user_assignment records and their matching prog_assignment records.
@@ -424,10 +437,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -447,8 +460,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 // When it was started.
                 $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
                 $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                 } else {
                     $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                 }
@@ -479,17 +492,23 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
-                $didfirstcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_2_USERS);
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
+                $didfirstcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_2_USERS;
                 if ($didfirstcompletion) {
                     if ($certprogram == $this->certprogram1) {
                         /*
                          * CERTIFRECERT_EXPIRY.
                          * At this point, no users have previous expiry date.
                          */
-                        $basetime = $this->firstcompletiontime;
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment.
+                            $basetime = $this->assignmentduedate;
+                        } else {
+                            // These users have no assignment due date (completiontime) in prog_assignment,
+                            // so need to use time completed.
+                            $basetime = $this->firstcompletiontime;
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->firstcompletiontime;
                     }
@@ -515,10 +534,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -545,8 +564,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 if ($didfirstcompletion) {
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
-                    if ($hascompletiontime) {
-                        $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                    if ($hasassignmentduedate) {
+                        $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                     } else {
                         $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                     }
@@ -589,17 +608,23 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
-                $didfirstcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_2_USERS);
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
+                $didfirstcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_2_USERS;
                 if ($didfirstcompletion) {
                     if ($certprogram == $this->certprogram1) {
                         /*
                          * CERTIFRECERT_EXPIRY.
                          * At this point, no users have previous expiry date.
                          */
-                        $basetime = $this->firstcompletiontime;
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment.
+                            $basetime = $this->assignmentduedate;
+                        } else {
+                            // These users have no assignment due date (completiontime) in prog_assignment,
+                            // so need to use time completed.
+                            $basetime = $this->firstcompletiontime;
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->firstcompletiontime;
                     }
@@ -625,10 +650,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -652,8 +677,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
-                    if ($hascompletiontime) {
-                        $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                    if ($hasassignmentduedate) {
+                        $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                     } else {
                         $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                     }
@@ -697,19 +722,25 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
-                $didfirstcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_2_USERS);
-                $didsecondcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_4_USERS);
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
+                $didfirstcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_2_USERS;
+                $didsecondcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_4_USERS;
                 if ($didsecondcompletion) {
                     if ($certprogram == $this->certprogram1) {
                         /*
                          * CERTIFRECERT_EXPIRY.
                          * At this point, these users do have previous expiry date.
                          */
-                        $basetime = strtotime("365 day", $this->firstcompletiontime);
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment, so their previous
+                            // timeexpires was $completiontime + 365 days.
+                            $basetime = strtotime("365 day", $this->assignmentduedate);
+                        } else {
+                            // These users have no assignment due date (completiontime) in prog_assignment, so their previous
+                            // timeexpires was $firstcompletiontime + 365 days.
+                            $basetime = strtotime("365 day", $this->firstcompletiontime);
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->secondcompletiontime;
                     }
@@ -721,10 +752,28 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                          * CERTIFRECERT_EXPIRY.
                          * At this point, these users do have previous expiry date.
                          */
-                        $basetime = $this->firstcompletiontime;
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment.
+                            $basetime = $this->assignmentduedate;
+                        } else {
+                            // These users have no assignment due date (completiontime), so need to use time completed.
+                            $basetime = $this->firstcompletiontime;
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->firstcompletiontime;
+                    } else if ($certprogram == $this->certprogram3) {
+                        /*
+                         * CERTIFRECERT_FIXED.
+                         * At this point, these users do have previous expiry date.
+                         */
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment.
+                            $basetime = $this->assignmentduedate;
+                        } else {
+                            // These users have no assignment due date (completiontime), so need to use time completed.
+                            $basetime = $this->firstcompletiontime;
+                        }
                     }
                     $timeexpires = get_timeexpires($basetime, '365 day');
                     $timewindowopens = get_timewindowopens($timeexpires, '90 day');
@@ -748,10 +797,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -779,7 +828,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
                     if ($i % 2) {
-                        $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                        $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                     } else {
                         $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                     }
@@ -833,19 +882,25 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
-                $didfirstcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_2_USERS);
-                $didsecondcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_4_USERS);
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
+                $didfirstcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_2_USERS;
+                $didsecondcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_4_USERS;
                 if ($didsecondcompletion) {
                     if ($certprogram == $this->certprogram1) {
                         /*
                          * CERTIFRECERT_EXPIRY.
                          * At this point, these users do have previous expiry date.
                          */
-                        $basetime = strtotime("365 day", $this->firstcompletiontime);
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment, so their previous
+                            // timeexpires was $completiontime + 365 days.
+                            $basetime = strtotime("365 day", $this->assignmentduedate);
+                        } else {
+                            // These users have no assignment due date (completiontime) in prog_assignment, so their previous
+                            // timeexpires was $firstcompletiontime + 365 days.
+                            $basetime = strtotime("365 day", $this->firstcompletiontime);
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->secondcompletiontime;
                     }
@@ -857,8 +912,14 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                          * CERTIFRECERT_EXPIRY.
                          * At this point, these users do have previous expiry date.
                          */
-                        $basetime = $this->firstcompletiontime;
-                    } else {
+                        if ($hasassignmentduedate) {
+                            // These users have assignment due date (completiontime) in prog_assignment.
+                            $basetime = $this->assignmentduedate;
+                        } else {
+                            // These users have no assignment due date (completiontime), so need to use time completed.
+                            $basetime = $this->firstcompletiontime;
+                        }
+                    } else if ($certprogram == $this->certprogram2) {
                         // CERTIFRECERT_COMPLETION.
                         $basetime = $this->firstcompletiontime;
                     }
@@ -884,10 +945,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -914,8 +975,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
-                    if ($hascompletiontime) {
-                        $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                    if ($hasassignmentduedate) {
+                        $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                     } else {
                         $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                     }
@@ -971,21 +1032,27 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
         foreach ($this->certprograms as $certprogram) {
             for ($i = 1; $i <= CERTIFICATION_USERS; $i++) {
                 $user = $this->users[$i];
-                $hascompletiontime = in_array($user, $this->userswithcompletiontime);
-                $didfirstcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_2_USERS);
-                $didsecondcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2) &&
-                    ($i <= CERTIFICATION_PART_4_USERS);
-                $didthirdcompletion = ($certprogram == $this->certprogram1 || $certprogram == $this->certprogram2);
-                if ($didthirdcompletion) { // All users in programs 1 and 2.
+                $hasassignmentduedate = in_array($user, $this->userswithassignmentduedate);
+                $didfirstcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_2_USERS;
+                $didsecondcompletion = in_array($certprogram, $this->certsforcompletion) && $i <= CERTIFICATION_PART_4_USERS;
+                $didthirdcompletion = in_array($certprogram, $this->certsforcompletion);
+                if ($didthirdcompletion) { // All users in programs 1, 2 and 3.
                     if ($didsecondcompletion) { // They are recertifying for the second time.
                         if ($certprogram == $this->certprogram1) {
                             /*
                              * CERTIFRECERT_EXPIRY.
                              * At this point, these users do have previous expiry date.
                              */
-                            $basetime = strtotime("730 day", $this->firstcompletiontime);
-                        } else {
+                            if ($hasassignmentduedate) {
+                                // These users have assignment due date (completiontime) in prog_assignment, so their previous
+                                // timeexpires was $completiontime + 365 days + 365 days.
+                                $basetime = strtotime("730 day", $this->assignmentduedate);
+                            } else {
+                                // These users have no assignment due date (completiontime) in prog_assignment, so their previous
+                                // timeexpires was $firstcompletiontime + 365 days + 365 days.
+                                $basetime = strtotime("730 day", $this->firstcompletiontime);
+                            }
+                        } else if ($certprogram == $this->certprogram2) {
                             // CERTIFRECERT_COMPLETION.
                             $basetime = $this->thirdcompletiontime;
                         }
@@ -996,7 +1063,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                              * Since they are overdue, just use the completion date.
                              */
                             $basetime = $this->thirdcompletiontime;
-                        } else {
+                        } else if ($certprogram == $this->certprogram2) {
                             // CERTIFRECERT_COMPLETION.
                             $basetime = $this->thirdcompletiontime;
                         }
@@ -1023,10 +1090,10 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                 $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $progassignment->assignmenttype);
                 $this->assertEquals($user->id, $progassignment->assignmenttypeid);
                 $this->assertEquals(0, $progassignment->includechildren);
-                if ($hascompletiontime) {
-                    $this->assertEquals($this->completiontime, $progassignment->completiontime); // Has completion time.
+                if ($hasassignmentduedate) {
+                    $this->assertEquals($this->assignmentduedate, $progassignment->completiontime); // Has assignment due date.
                 } else {
-                    $this->assertEquals(-1, $progassignment->completiontime); // No completion time.
+                    $this->assertEquals(-1, $progassignment->completiontime); // No assignment due date.
                 }
                 $this->assertEquals(0, $progassignment->completionevent); // No completion event.
                 $this->assertEquals(0, $progassignment->completioninstance); // No completion instance.
@@ -1050,8 +1117,8 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set during window opening.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during setup.
-                    if ($hascompletiontime) {
-                        $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
+                    if ($hasassignmentduedate) {
+                        $this->assertEquals($this->assignmentduedate, $progcompletion->timedue); // Has timedue.
                     } else {
                         $this->assertEquals(-1, $progcompletion->timedue); // No timedue.
                     }
