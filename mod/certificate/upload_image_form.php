@@ -42,26 +42,10 @@ class mod_certificate_upload_image_form extends moodleform {
         $mform->addElement('hidden', 'id', $data->id);
         $mform->setType('id', PARAM_INT);
 
-        $bordergroup = array();
-        $bordergroup[] = $mform->createElement('header', 'cert_borders', get_string('uplborderdesc', 'mod_certificate'));
-        $bordergroup[] = $mform->createElement('filemanager', 'border_filemanager', get_string('border', 'mod_certificate'), null, $options);
-
-        $watergroup = array();
-        $watergroup[] = $mform->createElement('header', 'cert_watermarks', get_string('uplwatermarkdesc', 'mod_certificate'));
-        $watergroup[] = $mform->createElement('filemanager', 'watermark_filemanager', get_string('watermark', 'mod_certificate'), null, $options);
-
-        $sealgroup = array();
-        $sealgroup[] = $mform->createElement('header', 'cert_seals', get_string('uplsealdesc', 'mod_certificate'));
-        $sealgroup[] = $mform->createElement('filemanager', 'seal_filemanager', get_string('seal', 'mod_certificate'), null, $options);
-
-        $signaturegroup = array();
-        $signaturegroup[] = $mform->createElement('header', 'cert_signatures', get_string('uplsignaturedesc', 'mod_certificate'));
-        $signaturegroup[] = $mform->createElement('filemanager', 'signature_filemanager', get_string('signature', 'mod_certificate'), null, $options);
-
-        $mform->addGroup($bordergroup, 'border_group', '', array(' '), false);
-        $mform->addGroup($watergroup, 'water_group', '', array(' '), false);
-        $mform->addGroup($sealgroup, 'seal_group', '', array(' '), false);
-        $mform->addGroup($signaturegroup, 'signature_group', '', array(' '), false);
+        $mform->addElement('filemanager', 'border_filemanager', get_string('border', 'mod_certificate'), null, $options);
+        $mform->addElement('filemanager', 'watermark_filemanager', get_string('watermark', 'mod_certificate'), null, $options);
+        $mform->addElement('filemanager', 'seal_filemanager', get_string('seal', 'mod_certificate'), null, $options);
+        $mform->addElement('filemanager', 'signature_filemanager', get_string('signature', 'mod_certificate'), null, $options);
 
         $this->add_action_buttons();
         $this->set_data($data);
