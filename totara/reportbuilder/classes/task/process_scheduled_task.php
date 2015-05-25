@@ -67,7 +67,13 @@ class process_scheduled_task extends \core\task\scheduled_task {
             $schedule = new \scheduler($report, array('nextevent' => 'nextreport'));
 
             if ($schedule->is_time()) {
-                $schedule->next();
+                $user = $DB->get_record('user', array('id' => $report->userid, 'deleted' => 0));
+                if ($user) {
+                    $tz = \core_date::get_user_timezone($user);
+                } else {
+                    $tz = \core_date::get_server_timezone();
+                }
+                $schedule->next(time(), true, $tz);
 
                 // If exporting to file is turned off at system level, do not save reports.
                 $exportsetting = get_config('reportbuilder', 'exporttofilesystem');

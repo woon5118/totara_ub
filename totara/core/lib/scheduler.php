@@ -75,13 +75,14 @@ class scheduler {
     protected $map = array('frequency' => 'frequency',
                            'schedule' => 'schedule',
                            'nextevent' => 'nextevent',
-                           'timezone' => 'timezone');
+                           // Note timezone is not stored, it has to be specified as parameter of next() instead.
+                          );
 
     protected $time = 0;
     /**
      * Constructor
      *
-     * @param object DB row object
+     * @param stdClass DB row object
      * @param array $alias_map Optional field renaming
      */
     public function __construct(stdClass $row = null, array $alias_map = array()) {
@@ -131,106 +132,93 @@ class scheduler {
     /**
      * Calculate next time of execution
      *
-     * @param int $timestamp Current date
-     * @param bool $is_cron True if the next report is calculated via cron, false otherwise
+     * @param int $timestamp Current date, specify value in unit tests only
+     * @param bool $is_cron False means we are saving new value, true means do not schedule for today for weekly and monthly frequency.
+     * @param string $forcetimezone may be used to override current user timezone, for example for system timezone scheduling
      * @return scheduler $this
      */
-    public function next($timestamp = null, $is_cron = true) {
+    public function next($timestamp = null, $is_cron = true, $forcetimezone = null) {
         if (!isset($this->subject->{$this->map['frequency']})) {
             return $this;
         }
 
+        $this->set_time($timestamp);
+
         $this->changed = true;
         $frequency = $this->subject->{$this->map['frequency']};
         $schedule = $this->subject->{$this->map['schedule']};
-        $usertz = core_date::normalise_timezone($this->subject->{$this->map['timezone']});
 
-        if (is_null($timestamp)) {
-            $datetime = new DateTime('now', new DateTimeZone($usertz));
-            $timestamp = strtotime($datetime->format('Y-m-d H:i:s'));
-        }
-        $this->set_time($timestamp);
-        $timeminute = date('i', $this->time);
-        $timehour = date('H', $this->time);
-        $timeday = date('j', $this->time);
-        $timemonth = date('n', $this->time);
-        $timeyear = date('Y', $this->time);
+        $next = new DateTime('@' . $this->time);
+        $next->setTimezone(core_date::get_user_timezone_object($forcetimezone));
 
         switch ($frequency) {
             case self::MINUTELY:
-                $nexttimeminute = (floor($timeminute / $schedule) + 1) * $schedule;
-                $nextevent = mktime($timehour, $nexttimeminute, 0, $timemonth, $timeday, $timeyear);
+                $timeminute = $next->format('i');
+                $timehour = $next->format('H');
+                $timeminute = (int)(floor($timeminute / $schedule) * $schedule);
+                $next->setTime($timehour, $timeminute, 0);
+                if ($next->getTimestamp() <= $this->time) {
+                    $next->add(new DateInterval('PT' . $schedule . 'M'));
+                }
                 break;
             case self::HOURLY:
-                $nexttimehour = (floor($timehour / $schedule) + 1) * $schedule;
-                $nextevent = mktime($nexttimehour, 0, 0, $timemonth, $timeday, $timeyear);
+                $timehour = $next->format('H');
+                $timehour = (int)(floor($timehour / $schedule) * $schedule);
+                $next->setTime($timehour, 0, 0);
+                if ($next->getTimestamp() <= $this->time) {
+                    $next->add(new DateInterval('PT' . $schedule . 'H'));
+                }
                 break;
             case self::DAILY:
-                // We need to account for DST boundary changes.
-                // A particular hour the next day across the boundary may be 23-25 hours from the last run.
-                $userzoneobject = new DateTimeZone($usertz);
-                // Pad the date components with a leading zero if needed
-                $schedule =  sprintf("%02s", $schedule);
-                $timeday =  sprintf("%02s", $timeday);
-                $timemonth =  sprintf("%02s", $timemonth);
-                // Calculate time strings to build DateTime objects using the actual scheduled time.
-                $datestring = "{$timeyear}-{$timemonth}-{$timeday} ";
-                $nowdatestring = $datestring . date('H', $this->time) . ':00:00';
-                $targetdatestring = $datestring . $schedule . ':00:00';
-                // Create the DateTime objects to compare properly the current time and the scheduled time.
-                $ts1 = DateTime::createFromFormat('Y-m-d H:i:s', $nowdatestring, $userzoneobject);
-                $ts2 = DateTime::createFromFormat('Y-m-d H:i:s', $targetdatestring, $userzoneobject);
-                // If the report is already overdue for today, bump the day for the next run.
-                if ($ts1->getTimestamp() >= $ts2->getTimestamp()) {
-                    $timeday = (int)$timeday + 1;
-                    $timeday =  sprintf("%02s", $timeday);
+                $next->setTime($schedule, 0, 0);
+                if ($next->getTimestamp() <= $this->time) {
+                    $next->add(new DateInterval('P1D'));
                 }
-                // Calculate the next run using the correct day/timezone/DST.
-                $newdatestring = "{$timeyear}-{$timemonth}-{$timeday} {$schedule}:00:00";
-                $newts = DateTime::createFromFormat('Y-m-d H:i:s', $newdatestring, $userzoneobject);
-                $nextevent = $newts->getTimestamp();
                 break;
             case self::WEEKLY:
-                // Calculate the day of the week index.
-                $calendartype = \core_calendar\type_factory::get_calendar_instance();
-                $timeweekday = $calendartype->get_weekday($timeyear, $timemonth, $timeday);
+                $timeweekday = $next->format('w'); // Current day of week, Sunday is 0.
                 if (($schedule == $timeweekday) && (!$is_cron)) {
                     // The scheduled day of the week is the same as the given day of the week, so schedule for this day.
-                    $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
+                    $next->setTime(0, 0, 0);
                 } else {
-                    // The scheduled day of the week is different (or one week future on cron), so schedule for the future.
-                    if ($schedule <= $timeweekday) {
-                        // An earlier or same weekday. Add one week to the schedule index and then find the difference.
-                        $daysinweek = count($calendartype->get_weekdays());
-                        $days = $schedule + $daysinweek - $timeweekday;
-                    } else {
-                        // Just find the difference.
-                        $days = $schedule - $timeweekday;
+                    $diff = $schedule - $timeweekday;
+                    if ($diff <= 0) {
+                        $diff = $diff + 7;
                     }
-                    $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear) + DAYSECS * $days;
+                    $next->setTime(0, 0, 0);
+                    $next->add(new DateInterval('P' . $diff . 'D'));
                 }
                 break;
             case self::MONTHLY:
+                $timeday = $next->format('j');
                 if (($timeday == $schedule) && (!$is_cron)) {
-                    $nextevent = mktime(0, 0, 0, $timemonth, $timeday, $timeyear);
+                    // The scheduled day of the month is the same as the given day of the week, so schedule for this day.
+                    $next->setTime(0, 0, 0);
                 } else {
-                    $offset = ($timeday >= $schedule) ? 1 : 0;
-                    $newmonth = $timemonth + $offset;
-                    if ($newmonth < 13) {
-                        $newyear = $timeyear;
+                    $next->setTime(0, 0, 0);
+                    $timemonth = (int)$next->format('n');
+                    $timeyear = $next->format('Y');
+                    $maxdays = (int)$next->format('t');
+                    if ($maxdays < $schedule) {
+                        $next->setDate($timeyear, $timemonth, $maxdays);
                     } else {
-                        $newyear = $timeyear + 1;
-                        $newmonth = 1;
+                        $next->setDate($timeyear, $timemonth, $schedule);
                     }
-
-                    $daysinmonth = date('t', mktime(0, 0, 0, $newmonth, 3, $newyear));
-                    $newday = ($schedule > $daysinmonth) ? $daysinmonth : $schedule;
-                    $nextevent = mktime(0, 0, 0, $newmonth, $newday, $newyear);
+                    if ($next->getTimestamp() <= $this->time) {
+                        $nextmonth = $timemonth + 1; // This rolls over into next year if necessary.
+                        $next->setDate($timeyear, $nextmonth, 1);
+                        $maxdays = $next->format('t');
+                        if ($maxdays < $schedule) {
+                            $next->setDate($timeyear, $nextmonth, $maxdays);
+                        } else {
+                            $next->setDate($timeyear, $nextmonth, $schedule);
+                        }
+                    }
                 }
                 break;
         }
 
-        $this->subject->{$this->map['nextevent']} = $nextevent;
+        $this->subject->{$this->map['nextevent']} = $next->getTimestamp();
         return $this;
     }
 
@@ -269,44 +257,45 @@ class scheduler {
     /**
      * Given scheduled report frequency and schedule data, output a human readable string.
      *
-     * @param integer Code representing the frequency of reports (one of Schedule::get_options)
-     * @param integer The scheduled date/time (either hour of day, day or week or day of month)
-     * @param object User object belonging to the recipient (optional). Defaults to current user
+     * @param stdClass $user - ignored
      * @return string Human readable string describing the schedule
      */
     public function get_formatted($user = null) {
-        // Use current user if not set.
-        if ($user === null) {
-            global $USER;
-            $user = $USER;
+        // Use a fixed date to prevent problems on days with DST switch and months with < 31 days.
+        $date = new DateTime('2000-01-01T00:00:00+00:00');
+
+        if (!empty($user->lang)) {
+            $lang = $user->lang;
+        } else {
+            $lang = current_language();
         }
-        $calendardays = calendar_get_days();
-        $dateformat = ($user->lang == 'en') ? 'jS' : 'j';
+
+        $calendardays = calendar_get_days(); // This is not localised properly, bad luck.
         $out = '';
         $schedule = $this->subject->{$this->map['schedule']};
 
-        $timemonth = date('n', $this->time);
-        $timeday = date('j', $this->time);
-        $timeyear = date('Y', $this->time);
-
         switch($this->subject->{$this->map['frequency']}) {
             case self::MINUTELY:
-                $out .= get_string('scheduledminutely', 'totara_core', $schedule);
+                $out .= new lang_string('scheduledminutely', 'totara_core', $schedule, $lang);
                 break;
             case self::HOURLY:
-                $out .= get_string('scheduledhourly', 'totara_core', $schedule);
+                $out .= new lang_string('scheduledhourly', 'totara_core', $schedule, $lang);
                 break;
             case self::DAILY:
-                $out .= get_string('scheduleddaily', 'totara_core',
-                    strftime(get_string('strftimetime', 'langconfig'), mktime($schedule, 0, 0, $timemonth, $timeday, $timeyear)));
+                $date->setTime($schedule, 0, 0);
+                date_default_timezone_set('UTC');
+                $out .= new lang_string('scheduleddaily', 'totara_core',
+                    strftime(get_string('strftimetime', 'langconfig'), $date->getTimestamp()), $lang);
+                core_date::set_default_server_timezone();
                 break;
             case self::WEEKLY:
-                $out .= get_string('scheduledweekly', 'totara_core',
-                    $calendardays[$schedule]['fullname']);
+                $out .= new lang_string('scheduledweekly', 'totara_core',  $calendardays[$schedule]['fullname'], $lang);
                 break;
             case self::MONTHLY:
-                $out .= get_string('scheduledmonthly', 'totara_core',
-                    date($dateformat , mktime(0, 0, 0, 0, $schedule, $timeyear)));
+                $dateformat = ($lang === 'en') ? 'jS' : 'j';
+                $date->setTime(0, 0, 0);
+                $date->setDate(2000, 1, $schedule);
+                $out .= new lang_string('scheduledmonthly', 'totara_core', $date->format($dateformat), $lang);
                 break;
         }
 
@@ -336,10 +325,8 @@ class scheduler {
         $data['frequency'] = isset($data['frequency']) ? $data['frequency'] : self::DAILY;
         $data['schedule'] = isset($data['schedule']) ? $data['schedule'] : 0;
         $data['initschedule'] = isset($data['initschedule']) ? $data['initschedule'] : false;
-        $data['timezone'] = isset($data['timezone']) ? $data['timezone'] : core_date::get_user_timezone();
         $this->subject->{$this->map['frequency']} = $data['frequency'];
         $this->subject->{$this->map['schedule']} = $data['schedule'];
-        $this->subject->{$this->map['timezone']} = $data['timezone'];
         // If no need in reinitialize, don't change nextreport value.
         if ($data['initschedule']) {
             $this->subject->{$this->map['nextevent']} = $this->time - 1;
@@ -356,7 +343,6 @@ class scheduler {
         $result = array(
                         'frequency' => $this->subject->{$this->map['frequency']},
                         'schedule' => $this->subject->{$this->map['schedule']},
-                        'timezone' => $this->subject->{$this->map['timezone']},
                         'nextevent' => $this->subject->{$this->map['nextevent']},
                         'initschedule' => ($this->subject->{$this->map['nextevent']} <= $this->time)
         );
@@ -367,7 +353,7 @@ class scheduler {
      * Export scheduler parameters as an object
      *
      * Useful for saving in DB
-     * @param mixed array|string $extrafields primary key name and other fields to export
+     * @param array|string $extrafields primary key name and other fields to export
      * @return stdClass
      */
     public function to_object($extrafields = 'id') {
@@ -379,7 +365,6 @@ class scheduler {
         $obj->{$this->map['nextevent']} = $this->subject->{$this->map['nextevent']};
         $obj->{$this->map['frequency']} = $this->subject->{$this->map['frequency']};
         $obj->{$this->map['schedule']} = $this->subject->{$this->map['schedule']};
-        $obj->{$this->map['timezone']} = $this->subject->{$this->map['timezone']};
         foreach ($extrafields as $field) {
             if (isset($this->subject->$field)) {
                 $obj->$field = $this->subject->$field;

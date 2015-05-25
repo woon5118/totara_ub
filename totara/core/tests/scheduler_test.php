@@ -26,24 +26,20 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 global $CFG;
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
-require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 /**
  * Test report scheduler class
  */
-class scheduler_test extends PHPUnit_Framework_TestCase {
+class totara_core_scheduler_testcase extends advanced_testcase {
     /**
      * Test basic scheduler functionality
      */
     public function test_scheduler_basic() {
-        $tz = date_default_timezone_get();
-        date_default_timezone_set('UTC');
         $row = new stdClass();
         $row->data = 'Some data';
         $row->schedule = 0;
         $row->frequency = scheduler::DAILY;
         $row->nextevent = 100;
-        $row->timezone = 'UTC';
 
         $scheduler = new scheduler($row);
         $timestamp = time();
@@ -59,7 +55,6 @@ class scheduler_test extends PHPUnit_Framework_TestCase {
         $this->assertGreaterThan($timestamp, $scheduler->get_scheduled_time());
         $this->assertTrue($scheduler->is_changed());
         $this->assertFalse($scheduler->is_time());
-        date_default_timezone_set($tz);
     }
 
     /**
@@ -96,20 +91,29 @@ class scheduler_test extends PHPUnit_Framework_TestCase {
      * @dataProvider schedule_plan
      */
     public function test_scheduler_timing($frequency, $schedule, $currentevent, $currenttime, $expectedevent) {
-        $tz = date_default_timezone_get();
-        date_default_timezone_set('UTC');
         $row = new stdClass();
         $row->data = 'Some data';
         $row->schedule = $schedule;
         $row->frequency = $frequency;
         $row->nextevent = $currentevent;
-        $row->timezone = 'UTC';
 
         $scheduler = new scheduler($row);
-        $scheduler->next($currenttime, false);
+        $scheduler->next($currenttime, false, 'UTC');
         $time = $scheduler->get_scheduled_time();
-        $this->assertEquals($expectedevent, $time, "\n".$time.' = '.date('r ', $time)."\n");
-        date_default_timezone_set($tz);
+        $frequencystr = '';
+        switch($frequency) {
+            case scheduler::DAILY : $frequencystr = 'daily'; break;
+            case scheduler::WEEKLY : $frequencystr = 'weekly'; break;
+            case scheduler::MONTHLY : $frequencystr = 'monthly'; break;
+            case scheduler::MINUTELY : $frequencystr = 'minutely'; break;
+            case scheduler::HOURLY : $frequencystr = 'hourly'; break;
+        }
+        $format = "%A, %D %B %Y, %H:%M:%S";
+        $now = userdate($currenttime, $format, core_date::get_server_timezone());
+        $expected = userdate($expectedevent, $format, core_date::get_server_timezone());
+        $result = userdate($time, $format, core_date::get_server_timezone());
+        $message = "\n$frequencystr - $schedule:\nnow:      $now ($currenttime)\nexpected: $expected ($expectedevent)\nresult:   $result ($time)\n";
+        $this->assertEquals($expectedevent, $time, $message);
     }
 
     /**
@@ -120,27 +124,23 @@ class scheduler_test extends PHPUnit_Framework_TestCase {
             'nextevent' => 'test_event',
             'frequency' => 'test_frequency',
             'schedule' => 'test_schedule',
-            'timezone' => 'test_timezone'
         );
         $row = new stdClass();
         $row->data = 'Some data';
         $row->test_schedule = 0;
         $row->test_frequency = 0;
         $row->test_event = 0;
-        $row->test_timezone = 'Pacific/Auckland';
 
         $scheduler = new scheduler($row, $map);
         $scheduler->from_array(array(
             'frequency' => scheduler::DAILY,
             'schedule' => 10,
             'initschedule' => false,
-            'timezone' => 'UTC'
         ));
 
         $this->assertTrue($scheduler->is_changed());
         $this->assertEquals(10, $row->test_schedule);
         $this->assertEquals(scheduler::DAILY, $row->test_frequency);
         $this->assertEquals($scheduler->get_scheduled_time(), $row->test_event);
-        $this->assertEquals('UTC', $row->test_timezone);
     }
 }

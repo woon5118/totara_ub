@@ -38,11 +38,13 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  */
 class scheduled_reports_new_form extends moodleform {
     function definition() {
+        global $DB;
 
         $mform =& $this->_form;
         $id = $this->_customdata['id'];
         $frequency = $this->_customdata['frequency'];
         $schedule = $this->_customdata['schedule'];
+        $ownerid = $this->_customdata['ownerid'];
         $report = $this->_customdata['report'];
         $savedsearches = $this->_customdata['savedsearches'];
         $exporttofilesystem = $this->_customdata['exporttofilesystem'];
@@ -88,7 +90,18 @@ class scheduled_reports_new_form extends moodleform {
             $mform->setType('emailsaveorboth', PARAM_TEXT);
         }
 
-        $mform->addElement('scheduler', 'schedulegroup', get_string('schedule', 'totara_reportbuilder'),
+        $schedulestr = get_string('schedule', 'totara_reportbuilder');
+
+        // A little trick to help with scheduling of reports belonging to other users.
+        $owner = $DB->get_record('user', array('id' => $ownerid, 'deleted' => 0));
+        if ($owner) {
+            $ownertz = core_date::get_user_timezone($owner);
+            if (core_date::get_user_timezone() !== $ownertz) {
+                $schedulestr .= '<br />(' . core_date::get_localised_timezone($ownertz) . ')';
+            }
+        }
+
+        $mform->addElement('scheduler', 'schedulegroup', $schedulestr,
                            array('frequency' => $frequency, 'schedule' => $schedule));
 
         // Email to, setting for the schedule reports.

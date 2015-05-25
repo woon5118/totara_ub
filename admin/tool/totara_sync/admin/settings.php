@@ -55,7 +55,7 @@ if ($data = $form->get_data()) {
         // Reset next sync time.
         $scheduler = new scheduler($data, array('nextevent' => 'nextcron'));
         // Base on server time not user.
-        $scheduler->next(time());
+        $scheduler->next(time(), true, core_date::get_server_timezone());
         set_config('nextcron', $scheduler->get_scheduled_time(), 'totara_sync');
     }
 

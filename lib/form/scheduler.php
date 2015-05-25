@@ -25,6 +25,7 @@
 global $CFG;
 require_once($CFG->libdir . '/form/group.php');
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
 
 /**
  * Class for a group of elements used to input a schedule for events.
@@ -68,7 +69,8 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
      * @access private
      */
     function _createElements() {
-        global $USER;
+        // Use a fixed date to prevent problems on days with DST switch and months with < 31 days.
+        $date = new DateTime('2000-01-01T00:00:00+00:00');
 
         $CALENDARDAYS = calendar_get_days();
 
@@ -91,9 +93,11 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
         }
 
         // Daily selector.
+        $date->setDate(2000, 1, 1);
         $dailyselect = array();
         for ($i = 0; $i < 24; $i++) {
-            $dailyselect[$i] = date('H:i', mktime($i, 0, 0));
+            $date->setTime($i, 0, 0);
+            $dailyselect[$i] = $date->format('H:i');
         }
 
         // Weekly selector.
@@ -103,10 +107,12 @@ class MoodleQuickForm_scheduler extends MoodleQuickForm_group {
         }
 
         // Monthly selector.
+        $date->setTime(12, 0, 0);
         $monthlyselect = array();
-        $dateformat = ($USER->lang == 'en') ? 'jS' : 'j';
+        $dateformat = current_language() === 'en' ? 'jS' : 'j';
         for ($i = 1; $i <= 31; $i++) {
-            $monthlyselect[$i] = date($dateformat, mktime(0, 0, 0, 0, $i));
+            $date->setDate(2000, 1, $i);
+            $monthlyselect[$i] = $date->format($dateformat);
         }
 
         $this->_elements = array();

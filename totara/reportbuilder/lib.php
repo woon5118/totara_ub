@@ -5062,13 +5062,12 @@ function reportbuilder_fix_schedule($reportid) {
 
     $cache = $DB->get_record('report_builder_cache', array('reportid' => $reportid), '*', IGNORE_MISSING);
     if (!$cache) {
-        var_dump("cache not found");
         return false;
     }
 
     $schedule = new scheduler($cache, array('nextevent' => 'nextreport'));
     if ($schedule->get_scheduled_time() < $cache->lastreport) {
-        $schedule->next();
+        $schedule->next(time(), true, core_date::get_server_timezone());
     }
 
     if ($schedule->is_changed()) {

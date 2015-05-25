@@ -125,7 +125,8 @@ $mform = new scheduled_reports_new_form(
         'frequency' => $schedule->frequency,
         'schedule' => $schedule->schedule,
         'savedsearches' => $savedsearches,
-        'exporttofilesystem' => $schedule->exporttofilesystem
+        'exporttofilesystem' => $schedule->exporttofilesystem,
+        'ownerid' => $schedule->userid,
     )
 );
 
@@ -183,7 +184,7 @@ function add_scheduled_report($fromform) {
         $report->schedule = $fromform->schedule;
         $report->frequency = $fromform->frequency;
         $scheduler = new scheduler($report);
-        $nextevent = $scheduler->next(null, false);
+        $nextevent = $scheduler->next(time(), false, core_date::get_user_timezone());
 
         $transaction = $DB->start_delegated_transaction();
         $todb = new stdClass();

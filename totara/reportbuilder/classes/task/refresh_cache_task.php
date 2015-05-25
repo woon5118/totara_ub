@@ -63,7 +63,7 @@ class refresh_cache_task extends \core\task\scheduled_task {
 
             $schedule = new \scheduler($cache, array('nextevent' => 'nextreport'));
             if ($schedule->is_time()) {
-                $schedule->next();
+                $schedule->next(time(), true, \core_date::get_server_timezone());
 
                 mtrace("Caching report '$cache->fullname'...");
                 $track_start = microtime(true);

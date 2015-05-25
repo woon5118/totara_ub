@@ -883,8 +883,15 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
         $sched->exporttofilesystem = get_string($key, 'totara_reportbuilder');
         //schedule column
         if (isset($sched->frequency) && isset($sched->schedule)){
-            $schedule = new scheduler($sched);
+            $schedule = new scheduler($sched, array('nextevent' => 'nextreport'));
             $formatted = $schedule->get_formatted();
+            if ($next = $schedule->get_scheduled_time()) {
+                if ($next < time()) {
+                    // As soon as possible.
+                    $next = time();
+                }
+                $formatted .= '<br />' . userdate($next);
+            }
         } else {
             $formatted = get_string('schedulenotset', 'totara_reportbuilder');
         }
