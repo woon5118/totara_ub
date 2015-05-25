@@ -164,17 +164,11 @@ body.dir-rtl .totaratable .toolbar-right-table {
     background:none;
     display: none;
 }
-@-moz-document url-prefix() {
-    .mozilla div.totara-dialog td.select #search-tab fieldset select {
-        padding-top: 5px;
-    }
-}
 
 /* Dialog buttons */
 div.ui-dialog .ui-dialog-buttonpane button {
     cursor: pointer;
 }
-
 
 /* Misc Dialog parts */
 div.ui-dialog .totara-msgs-action-left {
