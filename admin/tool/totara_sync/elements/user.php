@@ -211,8 +211,25 @@ class totara_sync_element_user extends totara_sync_element {
                     try {
                         // Do not delete the records which have invalid values(e.g. spelling mistake).
                         if (array_search($user->idnumber, $invalidids) === false) {
-                            delete_user($DB->get_record('user', array('id' => $user->id)));
-                            $this->addlog(get_string('deleteduserx', 'tool_totara_sync', $user->idnumber), 'info', 'deleteuser');
+                            $usr = $DB->get_record('user', array('id' => $user->id));
+                            // Check for guest account record.
+                            if ($usr->username === 'guest' || isguestuser($usr)) {
+                                $this->addlog(get_string('cannotdeleteuserguest', 'tool_totara_sync', $user->idnumber), 'warn', 'deleteuser');
+                                $problemswhileapplying = true;
+                                continue;
+                            }
+                            // Check for admin account record.
+                            if ($usr->auth === 'manual' && is_siteadmin($usr)) {
+                                $this->addlog(get_string('cannotdeleteuseradmin', 'tool_totara_sync', $user->idnumber), 'warn', 'deleteuser');
+                                $problemswhileapplying = true;
+                                continue;
+                            }
+                            if (delete_user($usr)) {
+                                $this->addlog(get_string('deleteduserx', 'tool_totara_sync', $user->idnumber), 'info', 'deleteuser');
+                            } else {
+                                $this->addlog(get_string('cannotdeleteuserx', 'tool_totara_sync', $user->idnumber), 'warn', 'deleteuser');
+                                $problemswhileapplying = true;
+                            }
                         }
                     } catch (Exception $e) {
                         $this->addlog(get_string('cannotdeleteuserx', 'tool_totara_sync', $user->idnumber) . ': ' .
