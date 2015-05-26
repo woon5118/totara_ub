@@ -1304,8 +1304,9 @@ class pgsql_native_moodle_database extends moodle_database {
         return '((' . $int1 . ') # (' . $int2 . '))';
     }
 
+    // TOTARA IMPROVEMENT - Changed to use BIGINT.
     public function sql_cast_char2int($fieldname, $text=false) {
-        return ' CAST(' . $fieldname . ' AS INT) ';
+        return ' CAST(' . $fieldname . ' AS BIGINT) ';
     }
 
     public function sql_cast_char2real($fieldname, $text=false) {
