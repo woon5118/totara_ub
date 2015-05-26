@@ -38,34 +38,26 @@ require_once($CFG->libdir . '/formslib.php');
 class question_import_form extends moodleform {
 
     protected function definition() {
-        global $COURSE;
+        global $COURSE, $OUTPUT;
         $mform = $this->_form;
 
         $defaultcategory = $this->_customdata['defaultcategory'];
         $contexts = $this->_customdata['contexts'];
 
         // Choice of import format, with help icons.
-        $mform->addElement('header', 'fileformat', get_string('fileformat', 'question'));
-
         $fileformatnames = get_import_export_formats('import');
         $radioarray = array();
-        $i = 0 ;
         foreach ($fileformatnames as $shortname => $fileformatname) {
-            $currentgrp1 = array();
-            $currentgrp1[] = $mform->createElement('radio', 'format', '', $fileformatname, $shortname);
-            $mform->addGroup($currentgrp1, "formathelp[{$i}]", '', array('<br />'), false);
-
+            $help = '';
             if (get_string_manager()->string_exists('pluginname_help', 'qformat_' . $shortname)) {
-                $mform->addHelpButton("formathelp[{$i}]", 'pluginname', 'qformat_' . $shortname);
+                $help = $OUTPUT->help_icon('pluginname', 'qformat_' . $shortname);
             }
-
-            $i++ ;
+            $radioelement[] = $mform->createElement('radio', 'format', '', $fileformatname . $help, $shortname);
         }
-        $mform->addRule("formathelp[0]", null, 'required', null, 'client');
+        $mform->addGroup($radioelement, "format", get_string('fileformat', 'question'), array('<br />'), false);
+        $mform->addRule("format", null, 'required', null, 'client');
 
         // Import options.
-        $mform->addElement('header','general', get_string('general', 'form'));
-
         $mform->addElement('questioncategory', 'category', get_string('importcategory', 'question'), compact('contexts'));
         $mform->setDefault('category', $defaultcategory);
         $mform->addHelpButton('category', 'importcategory', 'question');
@@ -73,7 +65,7 @@ class question_import_form extends moodleform {
         $categorygroup = array();
         $categorygroup[] = $mform->createElement('checkbox', 'catfromfile', '', get_string('getcategoryfromfile', 'question'));
         $categorygroup[] = $mform->createElement('checkbox', 'contextfromfile', '', get_string('getcontextfromfile', 'question'));
-        $mform->addGroup($categorygroup, 'categorygroup', '', '', false);
+        $mform->addGroup($categorygroup, 'categorygroup', '', '<br/>', false);
         $mform->disabledIf('categorygroup', 'catfromfile', 'notchecked');
         $mform->setDefault('catfromfile', 1);
         $mform->setDefault('contextfromfile', 1);
@@ -90,18 +82,11 @@ class question_import_form extends moodleform {
         $mform->addHelpButton('stoponerror', 'stoponerror', 'question');
 
         // The file to import
-        $mform->addElement('header', 'importfileupload', get_string('importquestions', 'question'));
-
-        $mform->addElement('filepicker', 'newfile', get_string('import'));
+        $mform->addElement('filepicker', 'newfile', get_string('importquestions', 'question'));
         $mform->addRule('newfile', null, 'required', null, 'client');
 
         // Submit button.
         $mform->addElement('submit', 'submitbutton', get_string('import'));
-
-        // Set a template for the format select elements
-        $renderer = $mform->defaultRenderer();
-        $template = "{help} {element}\n";
-        $renderer->setGroupElementTemplate($template, 'format');
     }
 
     /**
