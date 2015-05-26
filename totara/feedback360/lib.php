@@ -1740,6 +1740,7 @@ class request_feedback_current_user_selector extends user_selector_base {
         $this->guestid = $options['guestid'];
         $this->userid = $options['userid'];
         $this->currentusers = $options['currentusers'];
+        $this->completedusers = $options['completedusers'];
     }
 
     /**
@@ -1756,6 +1757,13 @@ class request_feedback_current_user_selector extends user_selector_base {
 
         list($wherecondition, $params) = $this->search_sql($search, 'u');
         list($userssql, $userparams) = $DB->get_in_or_equal($this->currentusers, SQL_PARAMS_NAMED);
+        if (!empty($this->completedusers)) {
+            list($completedsql, $completedparams) = $DB->get_in_or_equal($this->completedusers, SQL_PARAMS_NAMED, 'param', false);
+            $completedsql = ' AND u.id ' . $completedsql;
+        } else {
+            $completedsql = '';
+            $completedparams = array();
+        }
 
         $fields      = 'SELECT ' . $this->required_fields_sql('u');
 
@@ -1764,9 +1772,10 @@ class request_feedback_current_user_selector extends user_selector_base {
                      u.deleted = 0
                  AND u.suspended = 0
                  AND u.id $userssql
+                 $completedsql
                  AND $wherecondition";
 
-        $params = array_merge($userparams, $params);
+        $params = array_merge($userparams, $completedparams, $params);
 
         if (!$this->is_validating()) {
             $potentialmemberscount = $DB->count_records_sql("SELECT COUNT(DISTINCT u.id) $sql", $params);

@@ -125,7 +125,15 @@ if (!$nojs) {
     $PAGE->set_url(new moodle_url('/totara/feedback360/request/find.php',
             array('userid' => $userid, 'selected' => $selected, 'nojs' => 1)));
 
-    $options = array('guestid' => $guest->id, 'userid' => $userid, 'currentusers' => $selectedids);
+    $completedusers = $DB->get_records_sql("SELECT ra.userid
+                                            FROM {feedback360_resp_assignment} ra
+                                            JOIN {feedback360_user_assignment} ua
+                                            ON ra.feedback360userassignmentid = ua.id
+                                            WHERE ra.timecompleted > 0 AND ua.userid = ?",
+                                            array($userid));
+    $completedusers = array_keys($completedusers);
+
+    $options = array('guestid' => $guest->id, 'userid' => $userid, 'currentusers' => $selectedids, 'completedusers' => $completedusers);
 
     $add_user_selector = new request_feedback_potential_user_selector('addrequest', $options);
     $remove_user_selector = new request_feedback_current_user_selector('removeselect', $options);
