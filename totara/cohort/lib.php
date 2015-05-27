@@ -1787,6 +1787,41 @@ function totara_cohort_process_assigned_roles($cohortid, $roles) {
     return $success;
 }
 
+/**
+ * Fix Assign and unassign roles to/from a cohort.
+ *
+ */
+function totara_cohort_process_assig_roles() {
+    global $DB;
+    // Add missing role assignments.
+    $sql = "SELECT cm.userid, cr.roleid, cr.cohortid, cr.contextid
+                  FROM {cohort_members} cm
+                  JOIN {user} u ON (u.id = cm.userid AND u.deleted = 0)
+                  JOIN {cohort_role} cr ON (cr.cohortid = cm.cohortid)
+                  JOIN {cohort} c ON (c.id = cr.cohortid)
+             LEFT JOIN {role_assignments} ra ON (ra.roleid = cr.roleid AND ra.contextid = cr.contextid AND ra.userid = cm.userid
+                                                 AND ra.component = 'totara_cohort' AND ra.itemid = cr.cohortid )
+                 WHERE ra.id IS NULL";
+    $rs = $DB->get_recordset_sql($sql);
+    foreach ($rs as $ra) {
+        role_assign($ra->roleid, $ra->userid, $ra->contextid, 'totara_cohort', $ra->cohortid);
+    }
+    $rs->close();
+
+    // Remove obsolete assignments.
+    $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid
+              FROM {role_assignments} ra
+         LEFT JOIN {cohort} c ON c.id = ra.itemid
+         LEFT JOIN {cohort_role} cr ON (cr.cohortid = c.id AND cr.roleid = ra.roleid AND cr.contextid = ra.contextid)
+         LEFT JOIN {cohort_members} cm ON (cm.cohortid = c.id AND cm.userid = ra.userid)
+             WHERE ra.component = 'totara_cohort' AND cm.id IS NULL";
+    $rs = $DB->get_recordset_sql($sql);
+    foreach ($rs as $ra) {
+        role_unassign($ra->roleid, $ra->userid, $ra->contextid, 'totara_cohort', $ra->itemid);
+    }
+    $rs->close();
+}
+
 /** Check if the current user $USER can see the learning component.
  *
  * @param string $type course or program

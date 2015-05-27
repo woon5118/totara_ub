@@ -89,6 +89,7 @@ $string['choose'] = 'Choose';
 $string['choosecohorts'] = 'Choose audiences';
 $string['chooseitem'] = 'Choose item';
 $string['chooseplantemplate'] = 'Choose template';
+$string['cleanuptask'] = 'Cleanup cohort assign roles';
 $string['clear'] = 'Clear';
 $string['clonecohort'] = 'Clone audience';
 $string['cloneconfirm'] = 'Do you really want to create a copy of the audience \'{$a}\'?';
