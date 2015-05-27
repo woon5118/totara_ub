@@ -217,4 +217,12 @@ class totara_core_observer {
 
         return true;
     }
+
+    /**
+     * Reset Totara menu caches.
+     * \core\event\base
+     */
+    public static function reset_totara_menu(\core\event\base $event) {
+        totara_menu_reset_cache();
+    }
 }

@@ -48,4 +48,47 @@ $observers = array (
         'eventname' => '\core\event\course_completed',
         'callback'  => 'totara_core_observer::course_criteria_review',
     ),
+
+    // Resetting of Totara menu caches.
+    array(
+        'eventname' => '\totara_core\event\menuitem_created',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_deleted',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_setparent',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_sortorder',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_sync',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_updated',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_core\event\menuitem_visibility',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_reportbuilder\event\report_created',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_reportbuilder\event\report_deleted',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+    array(
+        'eventname' => '\totara_reportbuilder\event\report_updated',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
+
 );

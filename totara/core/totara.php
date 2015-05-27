@@ -1691,6 +1691,14 @@ function totara_get_nav_select_classes($navstructure, $primary_selected, $second
 }
 
 /**
+ * Reset Totara menu caching.
+ */
+function totara_menu_reset_cache() {
+    global $SESSION;
+    unset($SESSION->mymenu);
+}
+
+/**
  * Builds Totara menu, returns an array of objects that
  * represent the stucture of the menu
  *
@@ -1700,6 +1708,17 @@ function totara_get_nav_select_classes($navstructure, $primary_selected, $second
  * @return Array of menu item objects
  */
 function totara_build_menu() {
+    global $SESSION, $USER, $CFG;
+
+    if (!empty($CFG->menulifetime) and isset($SESSION->mymenu)) {
+        if ($SESSION->mymenu['id'] == $USER->id) {
+            if ($SESSION->mymenu['c'] + $CFG->menulifetime > time()) {
+                return $SESSION->mymenu['tree'];
+            }
+        }
+    }
+    unset($SESSION->mymenu);
+
     $rs = \totara_core\totara\menu\menu::get_nodes();
     $tree = array();
     foreach ($rs as $id => $item) {
@@ -1733,6 +1752,14 @@ function totara_build_menu() {
             'parent'   => $node->get_parent(),
             'url'      => $node->get_url(),
             'target'   => $node->get_targetattr()
+        );
+    }
+
+    if (!empty($CFG->menulifetime)) {
+        $SESSION->mymenu = array(
+            'id' => $USER->id,
+            'c' => time(),
+            'tree' => $tree,
         );
     }
 

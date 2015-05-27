@@ -193,6 +193,18 @@ $temp->add(new admin_setting_configtext('curlcache', new lang_string('curlcache'
 $temp->add(new admin_setting_configtext('curltimeoutkbitrate', new lang_string('curltimeoutkbitrate', 'admin'),
                                         new lang_string('curltimeoutkbitrate_help', 'admin'), 56, PARAM_INT));
 
+// Totara performance settings.
+$options = array(
+    0 => new lang_string('no'),
+    1800 => new lang_string('numminutes', '', 30),
+    1200 => new lang_string('numminutes', '', 20),
+    600 => new lang_string('numminutes', '', 10),
+    300 => new lang_string('numminutes', '', 5),
+);
+$temp->add(new admin_setting_configselect('menulifetime', new lang_string('menulifetime', 'totara_core'),
+    new lang_string('menulifetime_desc', 'totara_core'), '600',
+    $options));
+
 $ADMIN->add('server', $temp);
 
 
