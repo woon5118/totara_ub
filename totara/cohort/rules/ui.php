@@ -143,6 +143,7 @@ abstract class cohort_rule_ui_form extends cohort_rule_ui {
 
     public $handlertype = 'form';
     public $formclass = 'emptyruleuiform';
+    protected $rule = null;
 
     /**
      *
@@ -183,6 +184,9 @@ abstract class cohort_rule_ui_form extends cohort_rule_ui {
     public function printDialogContent($hidden=array(), $ruleinstanceid=false) {
         global $OUTPUT;
 
+        if (isset($hidden['rule'])) {
+            $this->rule = $hidden['rule'];
+        }
         echo $OUTPUT->heading(get_string('ruledialogdesc', 'totara_cohort', $this->description), '2', 'cohort-rule-dialog-heading');
         echo $OUTPUT->box_start('cohort-rule-dialog-setting');
 
@@ -717,7 +721,6 @@ class cohort_rule_ui_date extends cohort_rule_ui_form {
      * @param MoodleQuickForm $mform
      */
     public function addFormFields(&$mform) {
-        global $CFG;
 
         // Put everything on two rows to make it look cooler.
         $row = array();
@@ -756,20 +759,19 @@ JS;
     </script>
 JS;
         $mform->addElement('html', $datepickerjs);
-
+        $durationmenu = array(
+            COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION =>   get_string('datemenudurationbeforepast', 'totara_cohort'),
+            COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION =>   get_string('datemenudurationwithinpast', 'totara_cohort'),
+            COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => get_string('datemenudurationwithinfuture', 'totara_cohort'),
+            COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION =>  get_string('datemenudurationafterfuture', 'totara_cohort'),
+        );
+        if ($this->rule == 'systemaccess-firstlogin' || $this->rule == 'systemaccess-lastlogin') {
+            // Remove COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION and COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION.
+            unset($durationmenu[COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION], $durationmenu[COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION]);
+        }
         $row = array();
         $row[0] = $mform->createElement('radio', 'fixedordynamic', '', '', 2);
-        $row[1] = $mform->createElement(
-            'select',
-            'durationmenu',
-            '',
-            array(
-                COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION =>   get_string('datemenudurationbeforepast', 'totara_cohort'),
-                COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION =>   get_string('datemenudurationwithinpast', 'totara_cohort'),
-                COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => get_string('datemenudurationwithinfuture', 'totara_cohort'),
-                COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION =>  get_string('datemenudurationafterfuture', 'totara_cohort'),
-            )
-        );
+        $row[1] = $mform->createElement('select', 'durationmenu', '', $durationmenu);
         $row[2] = $mform->createElement('text', 'durationdate', '');
         $row[3] = $mform->createElement('static', '', '', get_string('durationdays', 'totara_cohort'));
         $mform->addGroup($row, 'durationrow', ' ', ' ', false);
