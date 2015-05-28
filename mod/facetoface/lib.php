@@ -2151,7 +2151,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
         // If approved, then no problem
         if ($current_status == MDL_F2F_STATUS_APPROVED) {
             $new_status = $statuscode;
-        } else if ($session->datetimeknown) {
+        } else {
             // If currently on the waitlist they have already been approved, no need to approve them again.
             if ($current_status == MDL_F2F_STATUS_WAITLISTED) {
                 $new_status = $statuscode;
@@ -2159,8 +2159,6 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                 // Otherwise, send manager request.
                 $new_status = MDL_F2F_STATUS_REQUESTED;
             }
-        } else {
-            $new_status = MDL_F2F_STATUS_WAITLISTED;
         }
     }
 
@@ -2559,7 +2557,12 @@ function facetoface_approve_requests($data) {
             case 2:
                 // Check if there is capacity
                 if (facetoface_session_has_capacity($session, $context)) {
-                    $status = MDL_F2F_STATUS_BOOKED;
+                    $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
+                    if (!empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone) {
+                        $status = MDL_F2F_STATUS_WAITLISTED;
+                    } else {
+                        $status = MDL_F2F_STATUS_BOOKED;
+                    }
                 } else {
                     if ($session->allowoverbook) {
                         $status = MDL_F2F_STATUS_WAITLISTED;
