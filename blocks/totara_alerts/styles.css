@@ -13,15 +13,21 @@
 .block_totara_alerts .content li .information {
     float: right;
 }
+.dir-rtl .block_totara_alerts .content li .information {
+    float: left;
+}
 
 .block_totara_alerts .content li :first-child {
     margin-right: 3px;
     float: left;
 }
+.dir-rtl .block_totara_alerts .content li :first-child {
+    margin-left: 3px;
+    float: right;
+}
 
 .block_totara_alerts .content li span,
 .block_totara_alerts .content li > a {
     vertical-align: top;
-    padding-top: 5px;
-    padding-left: 3px;
+    padding: 5px 3px 0;
 }
