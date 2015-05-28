@@ -76,7 +76,7 @@ if ($delete && $cohort->id) {
     $yesurl = new moodle_url('/cohort/view.php', array('id'=>$cohort->id, 'delete'=>1, 'confirm'=>1,'sesskey'=>sesskey()));
 
     $strheading = get_string('delcohort', 'totara_cohort');
-    totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+    totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
     echo $OUTPUT->header();
 
     $buttoncontinue = new single_button($yesurl, get_string('yes'), 'post');
@@ -104,7 +104,7 @@ if ($clone && $cohort->id) {
     $yesurl = new moodle_url($CFG->wwwroot.'/cohort/view.php', array('id'=>$cohort->id, 'clone'=>1, 'confirm'=>1, 'sesskey'=>sesskey()));
 
     $strheading = get_string('clonecohort', 'totara_cohort');
-    totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+    totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
     echo $OUTPUT->header();
 
     $buttoncontinue = new single_button($yesurl, get_string('yes'), 'post');
@@ -121,7 +121,7 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 } else {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
 }
-totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($cohort->name));
@@ -144,11 +144,11 @@ $item .= html_writer::tag('div', ($cohort->cohorttype == cohort::TYPE_DYNAMIC) ?
 $out .= $OUTPUT->container($item, 'fitem required alternate');
 
 $item = html_writer::tag('div', get_string('idnumber', 'totara_cohort'), array('class' => 'fitemtitle'));
-$item .= html_writer::tag('div', $cohort->idnumber, array('class' => 'felement ftext'));
+$item .= html_writer::tag('div', s($cohort->idnumber), array('class' => 'felement ftext'));
 $out .= $OUTPUT->container($item, 'fitem required ');
 
 $item = html_writer::tag('div', get_string('description'), array('class' => 'fitemtitle'));
-$item .= html_writer::tag('div', $cohort->description, array('class' => 'felement ftext'));
+$item .= html_writer::tag('div', format_text($cohort->description, $cohort->descriptionformat), array('class' => 'felement ftext'));
 $out .= $OUTPUT->container($item, 'fitem required alternate');
 
 $item = html_writer::tag('div', get_string('startdate', 'totara_cohort'), array('class' => 'fitemtitle'));
