@@ -1832,15 +1832,21 @@ function role_assign_bulk($roleid, $userids, $contextid, $component = '', $itemi
         $timemodified = time();
     }
 
-    // remove duplicates
-    list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
-    $sql = "SELECT u.id AS userid
-        FROM {user} u
-        LEFT JOIN {role_assignments} ra ON u.id = ra.userid
-            AND ra.roleid = ? AND ra.contextid = ? AND ra.component = ? AND ra.itemid = ?
-        WHERE u.id {$sqlin}
-        AND ra.userid IS NULL";
-    $userids = $DB->get_records_sql($sql, array_merge(array($roleid, $contextid, $component, $itemid), $sqlinparams));
+    // Remove users with existing role assignments.
+    $batches = array_chunk($userids, $DB->get_max_in_params());
+    unset($userids);
+    $userids = array();
+    foreach ($batches as $batch) {
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal($batch);
+        $sql = "SELECT u.id AS userid
+                  FROM {user} u
+                  LEFT JOIN {role_assignments} ra ON u.id = ra.userid
+                   AND ra.roleid = ? AND ra.contextid = ? AND ra.component = ? AND ra.itemid = ?
+                 WHERE u.id {$sqlin}
+                   AND ra.userid IS NULL";
+        $notassigned = $DB->get_records_sql($sql, array_merge(array($roleid, $contextid, $component, $itemid), $sqlinparams));
+        $userids = array_merge($userids, $notassigned);
+    }
 
     $roleassignments = array();
     foreach ($userids as $u) {

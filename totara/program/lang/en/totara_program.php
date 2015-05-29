@@ -332,6 +332,7 @@ $string['eventcreated'] = 'Program created';
 $string['eventdeleted'] = 'Program deleted';
 $string['eventextensiondenied'] = 'Program extension denied';
 $string['eventextensiongranted'] = 'Program extension granted';
+$string['eventfutureassigned'] = 'Program future assigned';
 $string['eventmessagesupdated'] = 'Program messages updated';
 $string['eventunassigned'] = 'Program unassigned';
 $string['eventupdated'] = 'Program updated';

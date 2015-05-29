@@ -145,7 +145,7 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
     /**
      * Set individual assignments in a program.
      */
-    private function set_individual_assignments($program, $users, $completiontime = -1) {
+    private function set_individual_assignments($program, $users, $completiontime = -1, $completionevent = 0) {
         $data = new stdClass();
         $data->id = $program->id;
         $data->item = array(ASSIGNTYPE_INDIVIDUAL => array());
@@ -156,7 +156,7 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
         foreach ($users as $user) {
             $data->item[ASSIGNTYPE_INDIVIDUAL][$user->id] = 1;
             $data->completiontime[ASSIGNTYPE_INDIVIDUAL][$user->id] = $completiontime;
-            $data->completionevent[ASSIGNTYPE_INDIVIDUAL][$user->id] = 0;
+            $data->completionevent[ASSIGNTYPE_INDIVIDUAL][$user->id] = $completionevent;
             $data->completioninstance[ASSIGNTYPE_INDIVIDUAL][$user->id] = 0;
         }
 
@@ -170,7 +170,7 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
     /**
      * Set audience assignment to a program.
      */
-    private function set_audience_assignment($program, $audience, $completiontime = -1) {
+    private function set_audience_assignment($program, $audience, $completiontime = -1, $completionevent = 0) {
         $data = new stdClass();
         $data->id = $program->id;
         $data->item = array(ASSIGNTYPE_COHORT => array());
@@ -180,7 +180,7 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
         // The lines below could be moved into the above arrays.
         $data->item[ASSIGNTYPE_COHORT][$audience->id] = 1;
         $data->completiontime[ASSIGNTYPE_COHORT][$audience->id] = $completiontime;
-        $data->completionevent[ASSIGNTYPE_COHORT][$audience->id] = 0;
+        $data->completionevent[ASSIGNTYPE_COHORT][$audience->id] = $completionevent;
         $data->completioninstance[ASSIGNTYPE_COHORT][$audience->id] = 0;
 
         $category = new cohorts_category();
@@ -1009,11 +1009,11 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
     }
 
     /**
-     * Assign an audience with an assignment due date and then decrease it. The new date should NOT be applied.
+     * Assign an audience with a set assignment due date and then decrease it. The new date should NOT be applied.
      *
-     * Check that assignment due dates are updated for all audience members.
+     * Check that assignment due dates are not updated for all audience members.
      */
-    public function test_decrease_due_date() {
+    public function test_decrease_due_date_set_dates() {
         global $DB;
 
         $timebefore = time();
@@ -1136,6 +1136,273 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
     }
 
     /**
+     * Assign an audience with a relative assignment due date and then decrease it. The new date should NOT be applied.
+     *
+     * Check that assignment due dates are not updated for all audience members.
+     */
+    public function test_decrease_due_date_relative_dates() {
+        global $DB;
+
+        $timebefore = time();
+        $originaldurationstring = "20 " . TIME_SELECTOR_DAYS;
+        $originalduration = DAYSECS * 20;
+        $newdurationstring = "10 " . TIME_SELECTOR_DAYS;
+        $newduration = DAYSECS * 10;
+
+        // Add audience assignment.
+        $audience = $this->audiences[0];
+        $audienceusers = $this->audienceusers[0];
+        $this->set_audience_assignment($this->program, $audience, $originaldurationstring, COMPLETION_EVENT_ENROLLMENT_DATE);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        $timeafter = time();
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment record.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT, 'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($progassignment);
+
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals($originalduration, $progassignment->completiontime); // Original.
+        $this->assertEquals(COMPLETION_EVENT_ENROLLMENT_DATE, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertEquals($progassignment->id, $proguserassignment->assignmentid);
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            // When timedue for event "Enrollment date" is calculated, the prog_user_assignment record doesn't yet exist,
+            // so it uses time() instead of timestarted. Some short time later, prog_user_assignment is created, and
+            // timestarted may have a slightly different value. We know the calculated time must be between when the test
+            // code was started and finished, and should have added the duration.
+            $this->assertGreaterThanOrEqual($timebefore + $originalduration, $progcompletion->timedue); // Original.
+            $this->assertLessThanOrEqual($timeafter + $originalduration, $progcompletion->timedue); // Original.
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+
+        // Change audience assignment's completion time.
+        $this->set_audience_assignment($this->program, $audience, $newdurationstring, COMPLETION_EVENT_ENROLLMENT_DATE);
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment record.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT, 'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($progassignment);
+
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals($newduration, $progassignment->completiontime); // New!
+        $this->assertEquals(COMPLETION_EVENT_ENROLLMENT_DATE, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertEquals($progassignment->id, $proguserassignment->assignmentid);
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            // The timedue shouldn't have been changed, so it is still not based on the actual timestarted.
+            $this->assertGreaterThanOrEqual($timebefore + $originalduration, $progcompletion->timedue); // Still original!!!
+            $this->assertLessThanOrEqual($timeafter + $originalduration, $progcompletion->timedue); // Still original!!!
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+    }
+
+    /**
+     * Assign a due date, complete the program and then increase the due date. The new date should NOT be applied.
+     *
+     * Check that assignment due dates are not updated for completed users.
+     */
+    public function test_increase_due_date_when_complete() {
+        global $DB;
+
+        $timebefore = time();
+        $originalcompletiontime = date('d/m/Y', $timebefore + DAYSECS * 10);
+        $originalduedate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
+            $originalcompletiontime);
+        $newcompletiontime = date('d/m/Y', $timebefore + DAYSECS * 20); // Increased - normally allowed but not when complete.
+        $newduedate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
+            $newcompletiontime);
+
+        // Add audience assignment.
+        $audience = $this->audiences[0];
+        $audienceusers = $this->audienceusers[0];
+        $this->set_audience_assignment($this->program, $audience, $originalcompletiontime);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        $timeafter = time();
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment record.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT, 'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($progassignment);
+
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals($originalduedate, $progassignment->completiontime); // Original.
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertEquals($progassignment->id, $proguserassignment->assignmentid);
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals($originalduedate, $progcompletion->timedue); // Original.
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+
+        // Mark the audience members complete in the program. Just hack the records.
+        $DB->execute("UPDATE {prog_completion}
+                         SET status = :statuscomplete, timecompleted = :timecompleted
+                       WHERE programid = :programid",
+            array('statuscomplete' => STATUS_PROGRAM_COMPLETE,
+                  'timecompleted' => $timebefore,
+                  'programid' => $this->program->id));
+
+        // Change audience assignment's completion time.
+        $this->set_audience_assignment($this->program, $audience, $newcompletiontime);
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check prog_assignment record.
+        $progassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT, 'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($progassignment);
+
+        $this->assertEquals(0, $progassignment->includechildren);
+        $this->assertEquals($newduedate, $progassignment->completiontime); // New!
+        $this->assertEquals(0, $progassignment->completionevent);
+        $this->assertEquals(0, $progassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Check prog_user_assignment records.
+            $proguserassignment = $DB->get_record('prog_user_assignment',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($proguserassignment);
+
+            $this->assertEquals($progassignment->id, $proguserassignment->assignmentid);
+            $this->assertGreaterThanOrEqual($timebefore, $proguserassignment->timeassigned);
+            $this->assertLessThanOrEqual($timeafter, $proguserassignment->timeassigned);
+            $this->assertEquals(0, $proguserassignment->exceptionstatus);
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status); // Hacked to complete.
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals($originalduedate, $progcompletion->timedue); // Still original!!!
+            $this->assertEquals($timebefore, $progcompletion->timecompleted);
+        }
+    }
+
+    /**
      * Assign a user via individual and audience, both with fixed assignment completion dates.
      *
      * Check that the user has the correct due date in their program completion record.
@@ -1213,6 +1480,223 @@ class totara_program_update_learner_assignments_testcase extends advanced_testca
             $this->assertEquals($audienceduedate, $progcompletion->timedue); // Audience due date!
             $this->assertEquals(0, $progcompletion->timecompleted);
         }
+    }
+
+    /**
+     * Assign a user first via individual and later via audience.
+     *
+     * Check that the user has the correct due date in their program completion record.
+     * The correct due date is the later of the two, as seen in $program->make_timedue().
+     */
+    public function test_adding_additional_assignments() {
+        global $DB;
+
+        $timebefore = time();
+        $originalcompletiontime = date('d/m/Y', $timebefore + DAYSECS * 100);
+        $originalduedate = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'),
+            $originalcompletiontime);
+        // Give the audience the smaller date, and we will make sure that it is not being applied.
+        $newdurationstring = "10 " . TIME_SELECTOR_DAYS;
+        $newduration = DAYSECS * 10;
+
+        // Add audience assignment.
+        $audience = $this->audiences[0];
+        $audienceusers = $this->audienceusers[0];
+        $this->set_audience_assignment($this->program, $audience, $originalcompletiontime);
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        $timeafter = time();
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check audience prog_assignment record.
+        $audienceprogassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT,
+                'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($audienceprogassignment);
+
+        $this->assertEquals(0, $audienceprogassignment->includechildren);
+        $this->assertEquals($originalduedate, $audienceprogassignment->completiontime);
+        $this->assertEquals(0, $audienceprogassignment->completionevent);
+        $this->assertEquals(0, $audienceprogassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Skip prog_user_assignment records (they aren't interesting).
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(0, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals($originalduedate, $progcompletion->timedue, // Original due date.
+                'Not relative date: ' . ($newduration + $progcompletion->timestarted));
+            $this->assertEquals(0, $progcompletion->timecompleted);
+        }
+
+        // Mark the audience members complete in the program. Just hack the records.
+        $DB->execute("UPDATE {prog_completion}
+                         SET status = :statuscomplete, timecompleted = :timecompleted
+                       WHERE programid = :programid",
+            array('statuscomplete' => STATUS_PROGRAM_COMPLETE,
+                  'timecompleted' => $timebefore,
+                  'programid' => $this->program->id));
+
+        // Add individual assignment.
+        $user = $this->users[0]; // Also included in audience.
+        $this->set_individual_assignments($this->program, array($user),  $newdurationstring, COMPLETION_EVENT_ENROLLMENT_DATE);
+
+        // Apply assignment changes.
+        $this->program->update_learner_assignments(true);
+
+        // Check that records exist.
+        $this->assertEquals(2, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(11, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(10, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Check audience prog_assignment record.
+        $audienceprogassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_COHORT,
+                'assignmenttypeid' => $audience->id));
+        $this->assertNotEmpty($audienceprogassignment);
+
+        $this->assertEquals(0, $audienceprogassignment->includechildren);
+        $this->assertEquals($originalduedate, $audienceprogassignment->completiontime);
+        $this->assertEquals(0, $audienceprogassignment->completionevent);
+        $this->assertEquals(0, $audienceprogassignment->completioninstance);
+
+        // Check individual prog_assignment record.
+        $individualprogassignment = $DB->get_record('prog_assignment',
+            array('programid' => $this->program->id, 'assignmenttype' => ASSIGNTYPE_INDIVIDUAL,
+                'assignmenttypeid' => $user->id));
+        $this->assertNotEmpty($individualprogassignment);
+
+        $this->assertEquals(0, $individualprogassignment->includechildren);
+        $this->assertEquals($newduration, $individualprogassignment->completiontime);
+        $this->assertEquals(COMPLETION_EVENT_ENROLLMENT_DATE, $individualprogassignment->completionevent);
+        $this->assertEquals(0, $individualprogassignment->completioninstance);
+
+        // All audience members should be assigned.
+        foreach ($audienceusers as $user) {
+            // Skip prog_user_assignment records (they aren't interesting).
+
+            // Check prog_completion records.
+            $progcompletion = $DB->get_record('prog_completion',
+                array('programid' => $this->program->id, 'userid' => $user->id));
+            $this->assertNotEmpty($progcompletion);
+
+            $this->assertEquals(0, $progcompletion->coursesetid);
+            $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status);
+            $this->assertGreaterThanOrEqual($timebefore, $progcompletion->timestarted);
+            $this->assertLessThanOrEqual($timeafter, $progcompletion->timestarted);
+            $this->assertEquals($originalduedate, $progcompletion->timedue, // Still original due date!
+                'Not relative date: ' . ($newduration + $progcompletion->timestarted));
+            $this->assertEquals($timebefore, $progcompletion->timecompleted);
+        }
+    }
+
+    /**
+     * Make sure it doesn't fail with huge data sets.
+     */
+    public function test_bulk_assignment_functions() {
+        global $DB;
+
+        return; // This isn't practical to run every time gerrit is run, as it takes a long time.
+
+        $usercount = 1000; // 50k took 6 minutes and 600MBs of RAM on MySQL.
+
+        // Add audience assignment.
+        $timebefore = time();
+        $audience = $this->getDataGenerator()->create_cohort();
+        for ($i = 0; $i < $usercount; $i++) {
+            $user = $this->getDataGenerator()->create_user(array('fullname' => 'audthree' . $i));
+            cohort_add_member($audience->id, $user->id);
+            unset($user);
+        }
+        $timeafter = time();
+        $duration = $timeafter - $timebefore;
+        echo("\nTotal duration creating {$usercount} users (in seconds): " . $duration);
+
+        $this->set_audience_assignment($this->program, $audience);
+
+        // Apply assignment changes, which will be deferred (pass nothing, defaults to false).
+        $queriesbefore = $DB->perf_get_queries();
+        $timebefore = time();
+        $this->program->update_learner_assignments(true);
+        $timeafter = time();
+        $queriesafter = $DB->perf_get_queries();
+
+        $duration = $timeafter - $timebefore;
+        $queries = $queriesafter - $queriesbefore;
+        echo("\nTotal duration of update_learner_assignments adding {$usercount} users (in seconds): " . $duration);
+        echo("\nTotal queries of update_learner_assignments adding {$usercount} users: " . $queries);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals($usercount, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals($usercount, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Repeat update to test performance - doesn't actually change any users this time.
+        $queriesbefore = $DB->perf_get_queries();
+        $timebefore = time();
+        $this->program->update_learner_assignments(true);
+        $timeafter = time();
+        $queriesafter = $DB->perf_get_queries();
+
+        $duration = $timeafter - $timebefore;
+        $queries = $queriesafter - $queriesbefore;
+        echo("\nTotal duration of update_learner_assignments making no changes (in seconds): " . $duration);
+        echo("\nTotal queries of update_learner_assignments making no changes: " . $queries);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals($usercount, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals($usercount, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
+
+        // Set empty audience, to test bulk removal.
+        $audience = $this->getDataGenerator()->create_cohort();
+        $this->set_audience_assignment($this->program, $audience);
+
+        // Apply assignment changes, which will be deferred (pass nothing, defaults to false).
+        $queriesbefore = $DB->perf_get_queries();
+        $timebefore = time();
+        $this->program->update_learner_assignments(true);
+        $timeafter = time();
+        $queriesafter = $DB->perf_get_queries();
+
+        $duration = $timeafter - $timebefore;
+        $queries = $queriesafter - $queriesbefore;
+        echo("\nTotal duration of update_learner_assignments removing {$usercount} users (in seconds): " . $duration);
+        echo("\nTotal queries of update_learner_assignments removing {$usercount} users: " . $queries);
+
+        // Check that records exist.
+        $this->assertEquals(1, $DB->count_records('prog_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_user_assignment',
+            array('programid' => $this->program->id)));
+        $this->assertEquals(0, $DB->count_records('prog_completion',
+            array('programid' => $this->program->id)));
     }
 
     /*

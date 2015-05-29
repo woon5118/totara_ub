@@ -541,41 +541,43 @@ abstract class prog_assignment_category {
      * @param int $programid Program ID where users are assigned
      * @param int $assignmenttypeid
      * @param array $userids Array of user IDs that we want to remove
-     * @return bool $success
+     * @return bool $success True if the delete statement was successfully executed.
      */
     function remove_outdated_assignments($programid, $assignmenttypeid, $userids) {
         global $DB;
-        $success = false;
 
         // Do nothing if it's not a group assignment or the id of the assignment type is not given or no users are passed.
-        if ($this->id == ASSIGNTYPE_INDIVIDUAL) {
-            return $success;
+        if ($this->id == ASSIGNTYPE_INDIVIDUAL ||
+            empty($programid) ||
+            empty($assignmenttypeid) ||
+            empty($userids)) {
+            return false;
         }
 
-        if (empty($programid)) {
-            return $success;
+        $result = true;
+
+        // Divide the users into batches to prevent sql problems.
+        $batches = array_chunk($userids, $DB->get_max_in_params());
+        unset($userids);
+
+        // Process each batch of user ids.
+        foreach ($batches as $userids) {
+            list($sql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $params['programid'] = $programid;
+            $params['assigntype'] = $this->id;
+            $params['assigntypeid'] = $assignmenttypeid;
+
+            $sql = "DELETE FROM {prog_user_assignment}
+                     WHERE userid {$sql}
+                       AND programid = :programid
+                       AND assignmentid IN (SELECT id
+                                              FROM {prog_assignment}
+                                             WHERE assignmenttype = :assigntype
+                                               AND assignmenttypeid = :assigntypeid)";
+            $result &= $DB->execute($sql, $params);
         }
 
-        if (empty($assignmenttypeid)) {
-            return $success;
-        }
-
-        if (empty($userids)) {
-            return $success;
-        }
-
-        list($sql, $params) = $DB->get_in_or_equal($userids);
-        $params[] = $programid;
-        $params[] = $this->id;
-        $params[] = $assignmenttypeid;
-
-        $sql = "DELETE FROM {prog_user_assignment}
-            WHERE userid {$sql}
-              AND programid = ?
-              AND assignmentid IN (SELECT id FROM {prog_assignment} WHERE assignmenttype = ? AND assignmenttypeid = ?)";
-        $success = $DB->execute($sql, $params);
-
-        return $success;
+        return $result;
     }
 
     /**

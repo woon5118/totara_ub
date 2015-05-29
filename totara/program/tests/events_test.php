@@ -315,7 +315,7 @@ class totara_program_events_testcase extends advanced_testcase {
         $other = array('programid' => $this->program->id, 'assignmentid' => $assign->id);
         $event = \totara_program\event\bulk_future_assignments_started::create_from_data(array('other' => $other));
         $event->trigger();
-        $this->program->create_future_assignments_bulk($this->program->id, $this->user->id, $assign->id);
+        $this->program->create_future_assignments_bulk($this->program->id, array($this->user->id), $assign->id);
         \totara_program\event\bulk_future_assignments_ended::create()->trigger();
 
         $this->assertSame(null, $event->objecttable);

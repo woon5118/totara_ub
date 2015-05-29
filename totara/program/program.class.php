@@ -324,6 +324,7 @@ class program {
      *
      * @param bool $forcerun Force the function to run, otherwise it may decide to delay execution until next cron.
      * @return int PROG_UPDATE_ASSIGNMENTS_XXX
+     * @throws coding_exception
      */
     public function update_learner_assignments($forcerun = false) {
         global $DB, $ASSIGNMENT_CATEGORY_CLASSNAMES;
@@ -334,15 +335,14 @@ class program {
         }
 
         // Get program assignments.
-        $prog_assignments = $this->assignments->get_assignments();
-        if (!$prog_assignments) {
-            $prog_assignments = $DB->get_records('prog_assignment', array('programid' => $this->id));
+        $progassignments = $this->assignments->get_assignments();
+        if (!$progassignments) {
+            $progassignments = $DB->get_records('prog_assignment', array('programid' => $this->id));
         }
 
-        $params = array('programid' => $this->id);
         if (!$forcerun) {
             // If there are too many previous users then defer processing until next cron run.
-            $rawprevioususerassignmentscount = $DB->count_records('prog_user_assignment', $params);
+            $rawprevioususerassignmentscount = $DB->count_records('prog_user_assignment', array('programid' => $this->id));
             if ($rawprevioususerassignmentscount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
                 totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
                     array('class' => 'notifynotice'));
@@ -352,40 +352,57 @@ class program {
             }
         }
 
-        // Get user assignments only if there are assignments for this program.
+        // Get all the raw previous user assignments and proccess them into an array partitioned by the assignment id, so
+        // lookup is efficient.
+        $sql = "SELECT pua.id, pua.userid, pua.assignmentid, pua.timeassigned, pua.exceptionstatus,
+                       pe.id AS programexceptionid, pe.timeraised AS programexceptiontimeraised
+                  FROM {prog_user_assignment} pua
+             LEFT JOIN {prog_exception} pe ON pe.userid = pua.userid AND pe.assignmentid = pua.id
+                 WHERE pua.programid = :programid";
         $params = array('programid' => $this->id);
-        $fields = 'id, userid, assignmentid, timeassigned, exceptionstatus';
-        $rawuserassignments = $DB->get_recordset('prog_user_assignment', $params, '', $fields);
-        $alluserassignments = array();
-
-        foreach ($rawuserassignments as $rawassign) {
-            $alluserassignments[$rawassign->assignmentid][$rawassign->userid] = array(
-                'uaid' => $rawassign->id,
-                'exceptionstatus' => $rawassign->exceptionstatus,
-                'timeassigned' => $rawassign->timeassigned
-            );
+        $rawprevioususerassignments = $DB->get_recordset_sql($sql, $params);
+        $allprevioususerassignments = array();
+        $allprevioususerids = array();
+        foreach ($rawprevioususerassignments as $rawuserassign) {
+            $allprevioususerids[$rawuserassign->userid] = $rawuserassign->userid;
+            $allprevioususerassignments[$rawuserassign->assignmentid][$rawuserassign->userid] = $rawuserassign;
         }
+        $rawprevioususerassignments->close();
 
-        $assigned_user_ids = array();
-        $active_assignments = array();
-        $message_queue = array();
-        $users_with_removed_assignments = array();
+        // Get all previous completion records. We will add to and update $allpreviousprogcompletions as we change
+        // records. This only works because each user can only belong to each prog_assignment just once (but can
+        // be in multiple prog_assignments), and we flush all data to the database after each prog_assignment is
+        // processed, so if the same user is encountered again then it must be the case that the previous
+        // prog_completion record change has already been written to the db.
+        $sql = "SELECT pc.userid, pc.timedue, pc.status, cc.certifpath, cc.status AS certifstatus
+                  FROM {prog_completion} pc
+             LEFT JOIN {certif_completion} cc ON cc.certifid = :certifid AND pc.userid = cc.userid
+                 WHERE pc.programid = :programid AND pc.coursesetid = 0";
+        $params = array('programid' => $this->id, 'certifid' => $this->certifid);
+        $rawprogcompletions = $DB->get_recordset_sql($sql, $params);
+        $allpreviousprogcompletions = array();
+        foreach ($rawprogcompletions as $rawprogcompletion) {
+            $allpreviousprogcompletions[$rawprogcompletion->userid] = $rawprogcompletion;
+        }
+        $rawprogcompletions->close();
 
-        if ($prog_assignments) {
-            // First create and store the set of active users for each program, so that we can decide if we want
+        $allvalidassignuserids = array();
+
+        if ($progassignments) {
+            // First create and store the set of users who should be assigned in each program, so that we can decide if we want
             // to update the user assignments now or later on cron.
-            $cumulativeactiveusercount = 0;
-            foreach ($prog_assignments as $progassignment) {
+            $cumulativeshouldbeusercount = 0;
+            foreach ($progassignments as $progassignment) {
                 // Create instance of assignment type so we can call functions on it.
                 $progassignment->category = new $ASSIGNMENT_CATEGORY_CLASSNAMES[$progassignment->assignmenttype]();
 
                 // Get users who should be in the program due to this program assignment.
-                $progassignment->activeusers = $progassignment->category->get_affected_users_by_assignment($progassignment);
+                $progassignment->shouldbeusers = $progassignment->category->get_affected_users_by_assignment($progassignment);
 
                 if (!$forcerun) {
-                    // If there are too many active users then defer processing until next cron run.
-                    $cumulativeactiveusercount += count($progassignment->activeusers);
-                    if ($cumulativeactiveusercount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
+                    // If too many users should be assigned then defer processing until next cron run.
+                    $cumulativeshouldbeusercount += count($progassignment->shouldbeusers);
+                    if ($cumulativeshouldbeusercount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
                         totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
                             array('class' => 'notifynotice'));
                         $DB->set_field('prog', 'assignmentsdeferred', 1, array('id' => $this->id));
@@ -396,266 +413,248 @@ class program {
             }
 
             // Process each program assignment one at a time.
-            foreach ($prog_assignments as $assign) {
-                $active_assignments[] = $assign->id;
-                $userassignments = isset($alluserassignments[$assign->id]) ? $alluserassignments[$assign->id] : array();
-                $newassignusers = array();
-                $newassigncount = 0;
-                $fassignusers = array();
-                $bulkusersassignments = array();
-                $bulkusersfutureassignments = array();
-                $fassigncount = 0;
+            foreach ($progassignments as $progassignment) {
+                $previoususerassignments = isset($allprevioususerassignments[$progassignment->id]) ?
+                    $allprevioususerassignments[$progassignment->id] : array();
 
-                // Create instance of assignment type so we can call functions on it.
-                $assignment_class = $assign->category;
+                // Remove prog_user_assignment records for users who no longer match this program assignment.
+                // These users might be assigned due to other program assignments, so we don't unassign here.
+                if (!empty($previoususerassignments)) {
+                    $previoususerids = array_keys($previoususerassignments);
 
-                // Get affected users.
-                $affected_users = $assign->activeusers;
-
-                // Delete user assigned that no longer match the category assignment.
-                if (!empty($userassignments)) {
-                    $assigneduserids = array_keys($userassignments);
-
-                    // Transform $affected_users into an array of userids.
-                    $affecteduserids = array();
-                    foreach ($affected_users as $user) {
-                        $affecteduserids[] = $user->id;
+                    // Transform the list of users who should be assigned into an array of userids.
+                    $shouldbeuserids = array();
+                    foreach ($progassignment->shouldbeusers as $user) {
+                        $shouldbeuserids[] = $user->id;
                     }
 
                     // Get users that no longer match the category assignment.
-                    $userstoremove = array_diff($assigneduserids, $affecteduserids);
+                    $useridstoremove = array_diff($previoususerids, $shouldbeuserids);
 
-                    if (!empty($userstoremove)) {
-                        $assignment_class->remove_outdated_assignments($this->id, $assign->assignmenttypeid, $userstoremove);
-                        // Store the user id to check later.
-                        $users_with_removed_assignments = array_merge($users_with_removed_assignments, $userstoremove);
+                    if (!empty($useridstoremove)) {
+                        $progassignment->category->remove_outdated_assignments($this->id,
+                            $progassignment->assignmenttypeid, $useridstoremove);
                     }
                 }
 
-                // Get user assignments for current assignment.
-                foreach ($affected_users as $user) {
-                    $assigned_user_ids[] = $user->id;
+                // Start bulk events for this program assignment.
+                $data = array('other' => array('programid' => $this->id, 'assignmentid' => $progassignment->id));
+                \totara_program\event\bulk_future_assignments_started::create_from_data($data)->trigger();
+                \totara_program\event\bulk_learner_assignments_started::create_from_data($data)->trigger();
 
-                    // Get the timedue from program completion as it may contain an extension date,
-                    // when that extension date is set (approved by the manager), then due date should be that one.
-                    // Make sure coursesetid is zero so we are checking completion on the program.
-                    $params = array ('programid' => $this->id, 'userid' => $user->id, 'coursesetid' => 0);
-                    $progcompl = $DB->get_record('prog_completion', $params);
-                    $originaltimedue = $progcompl ? $progcompl->timedue : false;
-                    $timedue = $this->make_timedue($user->id, $assign, $originaltimedue);
+                // Set up some variables for use inside the foreach.
+                $context = context_program::instance($this->id); // Used for events.
+                $newassignusersbuffer = array(); // Buffer for doing bulk inserts.
+                $futureassignusersbuffer = array(); // Buffer for doing bulk inserts.
 
-                    $user_assign_data = null;
+                // Check each user which should be assigned.
+                foreach ($progassignment->shouldbeusers as $user) {
+                    $allvalidassignuserids[$user->id] = $user->id; // Record this for later.
 
-                    // Check if the user is already assigned.
-                    $userexists = false;
-                    if (isset($userassignments[$user->id])) {
-                        $userexists = true;
+                    // Get the existing prog_completion record, if it exists. This includes corresponding certif_completion.
+                    $progcompletion = isset($allpreviousprogcompletions[$user->id]) ?
+                        $allpreviousprogcompletions[$user->id] : false;
+
+                    // Calculate the new timedue, taking into account the current timedue.
+                    // TODO: If in future we allow reducing timedue, change make_timedue to ignore current timedue.
+                    $timedue = $progcompletion ? $progcompletion->timedue : false;
+                    $timedue = $this->make_timedue($user->id, $progassignment, $timedue);
+
+                    if ($progassignment->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
+                        // This is a future assignment.
+                        // This means that the user hasn't logged in yet.
+                        // Create or update the future assignment so we can assign them when they do login.
+                        $futureassignusersbuffer[$user->id] = $user->id;
+                    } else if (isset($previoususerassignments[$user->id])) {
+                        // The prog_user_assignment record already exists.
                         $sendmessage = false;
-                        $user_assign_data = $userassignments[$user->id];
+                        $userassignment = $previoususerassignments[$user->id];
 
-                        $exception = $DB->get_record('prog_exception', array('userid' => $user->id, 'assignmentid' => $assign->id));
-                        if (!empty($exception) && $exception->timeraised == $user_assign_data['timeassigned']) {
-                            // This exception was raised the first time they were assigned, meaning they haven't received an assignment message yet.
+                        // Make sure we have a current program completion record.
+                        if (!$progcompletion) {
+                            // This shouldn't occur, because there is an existing prog_user_assignment record.
+                            debugging('prog_completion record missing for userid ' . $user->id . ', programid ' . $this->id .
+                                '. If this problem perists then it should be reported to Totara support.');
+                            continue;
+                        }
+
+                        if (!empty($userassignment->programexceptionid) &&
+                            $userassignment->programexceptiontimeraised == $userassignment->timeassigned) {
+                            // This exception was raised the first time they were assigned, meaning they haven't received
+                            // an assignment message yet.
                             $sendmessage = true;
                         }
-                    }
 
-                    if ($userexists) {
-                        // Check if updates need to be made.
-
-                        // Skip completed programs (includes certifications which have are certified and window is closed).
-                        if ($progcompl && $progcompl->status == STATUS_PROGRAM_COMPLETE) {
+                        // Skip completed programs (includes certifications which are certified and window is not yet open).
+                        if ($progcompletion->status == STATUS_PROGRAM_COMPLETE) {
                             continue;
                         }
 
                         // Skip certifications which are on the recert path or are expired.
                         if (!empty($this->certifid)) {
-                            $params = array ('certifid' => $this->certifid, 'userid' => $user->id);
-                            $certcompl = $DB->get_record('certif_completion', $params);
-                            if ($certcompl &&
-                                ($certcompl->certifpath == CERTIFPATH_RECERT || $certcompl->status == CERTIFSTATUS_EXPIRED)) {
+                            if ($progcompletion->certifpath == CERTIFPATH_RECERT ||
+                                $progcompletion->certifstatus == CERTIFSTATUS_EXPIRED) {
                                 continue;
                             }
                         }
 
-                        // Create user assignment object.
-                        $current_assignment = new user_assignment($user->id, $assign->id, $this->id);
-
                         // Make sure that the exceptionstatus property is present (protection against a previous bug).
-                        if (!isset($user_assign_data['exceptionstatus'])) {
+                        if (!isset($userassignment->exceptionstatus)) {
                             throw new coding_exception('The property "exceptionstatus" is missing.');
                         }
 
-                        if (!empty($current_assignment->completion) && $timedue > $current_assignment->completion->timedue) {
+                        if ($timedue > $progcompletion->timedue) {
                             // The timedue has increased, we'll need to update it and check for exceptions.
 
-                            if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
-                                // This means that the user hasn't logged in yet.
-                                // Create a future assignment so we can assign them when they do login.
-                                $fassigncount++;
-                                $fassignusers[$user->id] = $user->id;
-                                if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
-                                    if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
-                                        $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
-                                        $fassigncount = 0;
-                                        $fassignusers = array();
-                                    }
-                                }
-                                continue;
-                            }
-
-                            // If it currently has no timedue then we need to check.
-                            // If there was a previously unresolved exception then we need to check.
-                            $exceptionstatus = $user_assign_data['exceptionstatus'];
-                            if ($originaltimedue <= 0 ||
-                                in_array($exceptionstatus, array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED))) {
-                                if ($this->update_exceptions($user->id, $assign, $timedue)) {
-                                    $exceptionstatus = PROGRAM_EXCEPTION_RAISED;
+                            // If it currently has no timedue then we need to check exceptions.
+                            // If there was a previously unresolved or dismissed exception then we need to recheck.
+                            if ($progcompletion->timedue <= 0 ||
+                                in_array($userassignment->exceptionstatus, array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED))) {
+                                if ($this->update_exceptions($user->id, $progassignment, $timedue)) {
+                                    $userassignment->exceptionstatus = PROGRAM_EXCEPTION_RAISED;
                                 } else {
-                                    $exceptionstatus = PROGRAM_EXCEPTION_NONE;
+                                    $userassignment->exceptionstatus = PROGRAM_EXCEPTION_NONE;
+                                }
+                                if ($userassignment->exceptionstatus == PROGRAM_EXCEPTION_RAISED) {
+                                    // Store raised exception status (was reset by update_exceptions).
+                                    $updateduserassignment = new stdClass();
+                                    $updateduserassignment->id = $userassignment->id;
+                                    $updateduserassignment->exceptionstatus = PROGRAM_EXCEPTION_RAISED;
+                                    $DB->update_record('prog_user_assignment', $updateduserassignment);
                                 }
                             }
 
-                            // Update user assignment and store exception status.
-                            if ($current_assignment->update($timedue)) {
-                                $user_assign_todb = new stdClass();
-                                $user_assign_todb->id = $user_assign_data['uaid'];
-                                $user_assign_todb->exceptionstatus = $exceptionstatus;
+                            // Update user's due date.
+                            $progcompletion->timedue = $timedue; // Updates $allpreviousprogcompletions, for following assignments.
+                            $DB->set_field('prog_completion', 'timedue', $timedue,
+                                array('programid' => $this->id, 'userid' => $user->id));
 
-                                $DB->update_record('prog_user_assignment', $user_assign_todb);
+                            if ($userassignment->exceptionstatus == PROGRAM_EXCEPTION_NONE && $sendmessage) {
+                                // Trigger individual event for observers to deal with resolved exception from first assignment.
+                                // We don't add this to the new assignments buffer because we're not creating a new assignment.
+                                $event = \totara_program\event\program_assigned::create(
+                                    array(
+                                        'objectid' => $this->id,
+                                        'context' => $context,
+                                        'userid' => $user->id,
+                                    )
+                                );
+                                $event->trigger();
                             }
-
-                            if ($exceptionstatus == PROGRAM_EXCEPTION_NONE && $sendmessage) {
-                                // Add the user to the message queue so they'll receive an assignment message.
-                                $eventdata = new stdClass();
-                                $eventdata->programid = $this->id;
-                                $eventdata->userid = $user->id;
-
-                                $queue = array("new:{$user->id}" => $eventdata);
-                                $message_queue = array_merge($message_queue, $queue);
-                            }
-                        }
+                        } // Else no change or decrease, skipped. If we want to allow decrease then it should be added here.
                     } else {
-                        if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
-                            // This means that the user hasn't logged in yet.
-                            // Create a future assignment so we can assign them when they do login.
-                            $fassigncount++;
-                            $fassignusers[$user->id] = $user->id;
-                            if ($fassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
-                                if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
-                                    $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
-                                    $fassigncount = 0;
-                                    $fassignusers = array();
-                                }
-                            }
-                            continue;
-                        }
+                        // This is a new assignment and it's not a future assignment.
 
-                        $exceptions = $this->update_exceptions($user->id, $assign, $timedue);
+                        // No record in prog_user_assignment so we need to make one.
+                        $exceptions = $this->update_exceptions($user->id, $progassignment, $timedue);
+                        $newassignusersbuffer[$user->id] = array('timedue' => $timedue, 'exceptions' => $exceptions);
 
-                        // No record in user_assignment we need to make one.
-                        $newassigncount++;
-                        $newassignusers[$user->id] = array('timedue' => $timedue, 'exceptions' => $exceptions);
-                        if ($newassigncount == BATCH_INSERT_MAX_ROW_COUNT) {
-                            $new_queue = $this->assign_learners_bulk($newassignusers, $assign);
-                            $bulkusersassignments = array_merge($bulkusersassignments, $new_queue);
-                            $newassigncount = 0;
-                            $newassignusers = array();
-                        }
+                        if (empty($progcompletion)) {
+                            // Prog_completion record will be created by assign_learners_bulk.
+                            // Certif_completion record will be created by program_assigned event observer.
+                            $newassignusersbuffer[$user->id]['needscompletionrecord'] = true;
+
+                            // Manually put it into $allpreviousprogcompletions now, so it's available for following assignments.
+                            $allpreviousprogcompletions[$user->id] = (object)array(
+                                'userid' => $user->id,
+                                'timedue' => $timedue,
+                                'status' => STATUS_PROGRAM_INCOMPLETE,
+                                'certpath' => CERTIFPATH_CERT,
+                                'certstatus' => CERTIFSTATUS_ASSIGNED
+                            );
+                        } else if ($timedue > $progcompletion->timedue) {
+                            // Update user's due date.
+                            $progcompletion->timedue = $timedue; // Updates $allpreviousprogcompletions, for following assignments.
+                            $DB->set_field('prog_completion', 'timedue', $timedue,
+                                array('programid' => $this->id, 'userid' => $user->id));
+                        } // Else no change or decrease, skipped. If we want to allow decrease then it should be added here.
                     }
-                }
-                if (!empty($fassignusers)) {
-                    // Bulk assign remaining future users.
-                    if ($this->create_future_assignments_bulk($this->id, $fassignusers, $assign->id)) {
-                        $bulkusersfutureassignments = array_merge($bulkusersfutureassignments, $fassignusers);
-                    }
-                    unset($fassigncount, $fassignusers);
-                }
+                } // End user assignments loop.
 
-                if (!empty($newassignusers)) {
-                    // Bulk assign remaining users.
-                    $new_queue = $this->assign_learners_bulk($newassignusers, $assign);
-                    $bulkusersassignments = array_merge($bulkusersassignments, $new_queue);
-                    unset($newassignusers, $newassigncount);
-                }
+                // Flush future user assignments after program assignment loop finished.
+                if (!empty($futureassignusersbuffer)) {
+                    $this->create_future_assignments_bulk($this->id, $futureassignusersbuffer, $progassignment->id);
 
-                // Trigger bulk future assignments for the current assignment.
-                if (!empty($bulkusersfutureassignments)) {
-                    $other = array('programid' => $this->id, 'assignmentid' => $assign->id, 'userids' => $bulkusersfutureassignments);
-                    \totara_program\event\bulk_future_assignments_started::create_from_data(array('other' => $other))->trigger();
-                    \totara_program\event\bulk_future_assignments_ended::create()->trigger();
-                }
-
-                // Trigger bulk learner assignments for the current assignment.
-                if (!empty($bulkusersassignments)) {
-                    $data = array('other' => array('programid' => $this->id, 'assignmentid' => $assign->id));
-                    \totara_program\event\bulk_learner_assignments_started::create_from_data($data)->trigger();
-                    foreach ($bulkusersassignments as $userid => $eventdata) {
-                        $event = \totara_program\event\program_assigned::create(
+                    // Trigger each individual event.
+                    foreach ($futureassignusersbuffer as $userid) {
+                        $event = \totara_program\event\program_future_assigned::create(
                             array(
-                                'objectid' => $eventdata->programid,
-                                'context' => context_program::instance($eventdata->programid),
-                                'userid' => $eventdata->userid,
+                                'objectid' => $this->id,
+                                'context' => $context,
+                                'userid' => $userid,
                             )
                         );
                         $event->trigger();
                     }
-                    \totara_program\event\bulk_learner_assignments_ended::create()->trigger();
+
+                    unset($futureassignusersbuffer);
                 }
-            }
+
+                // Flush new user assignments after program assignment loop finished.
+                if (!empty($newassignusersbuffer)) {
+                    // We need to do this after every assignment so that the records will exist and be updated in case
+                    // the same user in present in a following assignment.
+                    $this->assign_learners_bulk($newassignusersbuffer, $progassignment);
+
+                    // Trigger each individual event.
+                    // If this is a certification, certification_event_handler creates the certif_completion records.
+                    foreach ($newassignusersbuffer as $userid => $data) {
+                        $event = \totara_program\event\program_assigned::create(
+                            array(
+                                'objectid' => $this->id,
+                                'context' => $context,
+                                'userid' => $userid,
+                            )
+                        );
+                        $event->trigger();
+                    }
+
+                    unset($newassignusersbuffer);
+                }
+
+                // Finish bulk events for this program assignment.
+                \totara_program\event\bulk_future_assignments_ended::create()->trigger();
+                \totara_program\event\bulk_learner_assignments_ended::create()->trigger();
+            } // End program assignments loop.
         }
 
-        if (!empty($message_queue)) {
-            // Send all the queued messages.
-            foreach ($message_queue as $userid => $eventdata) {
-
-                $event = \totara_program\event\program_assigned::create(
-                    array(
-                        'objectid' => $eventdata->programid,
-                        'context' => context_program::instance($eventdata->programid),
-                        'userid' => $eventdata->userid,
-                    )
-                );
-                $event->trigger();
-            }
+        // Unassign all learners who are no longer included in this program by any assignment. Simply find those users who were
+        // assigned at the start but who were not in any of the assignment categories. These may include users whose
+        // prog_assignment record still exists but they no longer meet the criteria of the assignment, e.g. a dynamic audience.
+        $userstounassign = array_diff($allprevioususerids, $allvalidassignuserids);
+        if (!empty($userstounassign)) {
+            $this->unassign_learners($userstounassign);
         }
 
-        // Get an array of user ids, of the users who should be in this program.
-        $users_who_should_be_assigned = $assigned_user_ids;
-
-        // Now we want to find and remove previously-assigned users, who no longer meet the current assignment criteria.
-        $alreadyassigned_sql = '';
-        $unassignparams = array();
-        if (count($users_who_should_be_assigned) > 0) {
-            // Create a NOT IN exclusion clause of the users who meet current criteria and SHOULD currently be assigned.
-            list($usql, $unassignparams) = $DB->get_in_or_equal($users_who_should_be_assigned, SQL_PARAMS_QM, '', false);
-            $alreadyassigned_sql = "userid {$usql} AND";
-        }
-
-        $unassignparams[] = $this->id;
-
-        // Validate user to unassign against the prog_user_assignment table.
-        $users_to_unassign = $DB->get_fieldset_select('prog_user_assignment', 'userid',
-                             "{$alreadyassigned_sql} programid = ?", $unassignparams);
-        // We also need to double-check users who have had assignments removed e.g. have left an audience.
-        // Find users who HAVE had assignments removed and are NOT in the final assigned list.
-        $obsoleteusers = array_diff($users_with_removed_assignments, $users_who_should_be_assigned);
-        $users_to_unassign = array_merge($users_to_unassign, $obsoleteusers);
-        if ($users_to_unassign) {
-            $this->unassign_learners($users_to_unassign);
+        // The main for-loop above was over EXISTING program assignments. This looks for users assigned to the
+        // program where the program assignment record no longer exists (and there is no other program assignment
+        // for the same user).
+        $sql = "SELECT DISTINCT pua.userid
+                  FROM {prog_user_assignment} pua
+                 WHERE programid = :programid
+                   AND NOT EXISTS (SELECT 1
+                                     FROM {prog_assignment} pa
+                                    WHERE pa.id = pua.assignmentid)";
+        $userstounassign = $DB->get_records_sql($sql, array('programid' => $this->id));
+        $userstounassign = array_diff(array_keys($userstounassign), $allvalidassignuserids);
+        if (!empty($userstounassign)) {
+            $this->unassign_learners($userstounassign);
         }
 
         // Users can have multiple assignments to a program.
         // We need this to clean up unnecessary redundant assignments caused when removing an assignment type.
-        if (count($active_assignments) > 0) {
-            list($usql, $params) = $DB->get_in_or_equal($active_assignments, SQL_PARAMS_QM, '', false);
-            $params[] = $this->id;
-
-            $DB->delete_records_select('prog_user_assignment', "assignmentid {$usql} AND programid = ?", $params);
-
-            // Delete any future_user_assignment records too that are related to assignment types that have been deleted too.
-            $DB->delete_records_select('prog_future_user_assignment', "assignmentid {$usql} AND programid = ?", $params);
-        }
+        $DB->execute("DELETE FROM {prog_user_assignment}
+                       WHERE programid = :programid
+                         AND NOT EXISTS (SELECT 1
+                                           FROM {prog_assignment} pa
+                                          WHERE pa.id = {prog_user_assignment}.assignmentid)",
+            array('programid' => $this->id));
+        $DB->execute("DELETE FROM {prog_future_user_assignment}
+                       WHERE programid = :programid
+                         AND NOT EXISTS (SELECT 1
+                                           FROM {prog_assignment} pa
+                                          WHERE pa.id = {prog_future_user_assignment}.assignmentid)",
+            array('programid' => $this->id));
 
         // Change the flag to indicate that the update has occurred.
         $DB->set_field('prog', 'assignmentsdeferred', 0, array('id' => $this->id));
@@ -681,31 +680,36 @@ class program {
     function create_future_assignments_bulk($programid, $userids, $assignmentid) {
         global $DB;
 
-        list($sqlin, $sqlparams) = $DB->get_in_or_equal($userids);
-        $sqlparams[] = $programid;
-        $sqlparams[] = $assignmentid;
-        $sql = "SELECT u.id
-            FROM {user} u
-            WHERE u.id {$sqlin}
-            AND u.id NOT IN (
-                SELECT userid
-                FROM {prog_future_user_assignment}
-                WHERE programid = ?
-                AND assignmentid = ?
-            )";
-        $users = $DB->get_records_sql($sql, $sqlparams);
-        if (empty($users)) {
-            return true;
-        }
-
         $fassignments = array();
-        foreach ($users as $user) {
-            $assignment = new stdClass();
-            $assignment->programid = $programid;
-            $assignment->userid = $user->id;
-            $assignment->assignmentid = $assignmentid;
 
-            $fassignments[] = $assignment;
+        // Divide the users into batches to prevent sql problems.
+        $batches = array_chunk($userids, $DB->get_max_in_params());
+        unset($userids);
+
+        // Process each batch of user ids.
+        foreach ($batches as $userids) {
+            list($sqlin, $sqlparams) = $DB->get_in_or_equal($userids);
+            $sqlparams[] = $programid;
+            $sqlparams[] = $assignmentid;
+            $sql = "SELECT u.id
+                FROM {user} u
+                WHERE u.id {$sqlin}
+                AND u.id NOT IN (
+                    SELECT userid
+                    FROM {prog_future_user_assignment}
+                    WHERE programid = ?
+                    AND assignmentid = ?
+                )";
+            $users = $DB->get_records_sql($sql, $sqlparams);
+
+            foreach ($users as $user) {
+                $assignment = new stdClass();
+                $assignment->programid = $programid;
+                $assignment->userid = $user->id;
+                $assignment->assignmentid = $assignmentid;
+
+                $fassignments[] = $assignment;
+            }
         }
 
         return $DB->insert_records_via_batch('prog_future_user_assignment', $fassignments);
@@ -721,32 +725,26 @@ class program {
      *
      * A 'program_assigned' event is triggered to notify any listening modules.
      *
-     * @global object $CFG
-     * @param int $userid
-     * @param int $timedue The date the the program should be completed by
-     * @param object $assignment_record A record from mdl_prog_assignment
-     * @param bool $exceptions True if there are exceptions for this learner
-     *
-     * @return array list of users to send messages to, empty if insert fails
+     * @param array $users Keys are user ids, values are arrays with timedue and exceptions.
+     * @param object $assignment_record A record from prog_assignment, only id is used.
      */
     public function assign_learners_bulk($users, $assignment_record) {
         global $DB;
 
         if (empty($users)) {
-            return array();
+            return;
         }
 
         $now = time();
 
         // insert a completion record to store the status of the user's progress on the program
         // TO DO: eventually we need to have multiple completion records, linked to the assignment that made them
-
-        // remove any existing records first - the latest assignment completion date should trump previous ones
-        list($insql, $params) = $DB->get_in_or_equal(array_keys($users));
-        $DB->delete_records_select('prog_completion', "userid $insql AND programid = ? AND coursesetid = ?", array_merge($params, array($this->id, 0)));
-
         $prog_completions = array();
         foreach ($users as $userid => $assigndata) {
+            // Only create program completion records if needed.
+            if (empty($assigndata['needscompletionrecord'])) {
+                continue;
+            }
             $pc = new stdClass();
             $pc->programid = $this->id;
             $pc->userid = $userid;
@@ -777,18 +775,6 @@ class program {
         // Assign the student role to the user in the program context
         // This is what identifies the program as required learning.
         role_assign_bulk($this->studentroleid, array_keys($users), $this->context->id);
-
-        $message_queue = array();
-        foreach ($users as $userid => $assigndata) {
-            if (!$assigndata['exceptions']) {
-                $eventdata = new stdClass();
-                $eventdata->programid = $this->id;
-                $eventdata->userid = $userid;
-                $message_queue["new:{$userid}"] = $eventdata; // Key has to be string to avoid duplicates.
-            }
-        }
-
-        return $message_queue;
     }
 
     /**
@@ -822,40 +808,67 @@ class program {
             }
         }
 
-        foreach ($userids as $userid) {
-            // Un-assign the student role from the user in the program context
-            role_unassign($this->studentroleid, $userid, $this->context->id);
+        // Divide the users into batches to prevent sql problems.
+        $batches = array_chunk($userids, $DB->get_max_in_params());
+        unset($userids);
 
-            // delete the users assignment records for this program
-            $DB->delete_records('prog_user_assignment', array('programid' => $this->id, 'userid' => $userid));
+        // Process each batch of user ids.
+        foreach ($batches as $userids) {
 
-            // delete future_user_assignment records too
-            $DB->delete_records('prog_future_user_assignment', array('programid' => $this->id, 'userid' => $userid));
+            // Un-assign the student role from the users in the program context.
+            $params = array('roleid' => $this->studentroleid, 'userids' => $userids, 'contextid' => $this->context->id);
+            role_unassign_all_bulk($params);
 
-            // delete all exceptions
-            $DB->delete_records('prog_exception', array('programid' => $this->id, 'userid' => $userid));
+            // Set up sql and params for the following delete functions.
+            list($userssql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $params['programid'] = $this->id;
 
-            // check if this program is also part of any of the user's learning plans
-            if (!$this->assigned_to_users_non_required_learning($userid)) {
-                // delete the completion record if the program is not complete
-                if (!prog_is_complete($this->id, $userid)) {
-                    $this->delete_completion_record($userid);
+            // Delete the user assignment records for this program.
+            $DB->execute("DELETE FROM {prog_user_assignment} WHERE programid = :programid AND userid " . $userssql,
+                $params);
+
+            // Delete future_user_assignment records too.
+            $DB->execute("DELETE FROM {prog_future_user_assignment} WHERE programid = :programid AND userid " . $userssql,
+                $params);
+
+            // Delete all exceptions.
+            $DB->execute("DELETE FROM {prog_exception} WHERE programid = :programid AND userid " . $userssql,
+                $params);
+
+            $completionstodelete = array();
+            foreach ($userids as $userid) {
+                // Check if this program is also part of any of the user's learning plans.
+                if (!$this->assigned_to_users_non_required_learning($userid)) {
+                    // Delete the completion record if the program is not complete.
+                    if (!prog_is_complete($this->id, $userid)) {
+                        $completionstodelete[] = $userid;
+                    }
                 }
             }
 
-            // trigger this event for any listening handlers to catch
-            $event = \totara_program\event\program_unassigned::create(
-                array(
-                    'objectid' => $this->id,
-                    'context' => context_program::instance($this->id),
-                    'userid' => $userid,
-                )
-            );
-            $event->trigger();
+            // Delete completion records.
+            if (!empty($completionstodelete)) {
+                list($userssql, $params) = $DB->get_in_or_equal($completionstodelete, SQL_PARAMS_NAMED);
+                $params['programid'] = $this->id;
+                $DB->execute("DELETE FROM {prog_completion} WHERE programid = :programid AND userid " . $userssql,
+                    $params);
+            }
+            unset($completionstodelete);
+
+            foreach ($userids as $userid) {
+                // Trigger this event for any listening handlers to catch.
+                $event = \totara_program\event\program_unassigned::create(
+                    array(
+                        'objectid' => $this->id,
+                        'context' => context_program::instance($this->id),
+                        'userid' => $userid,
+                    )
+                );
+                $event->trigger();
+            }
         }
 
         return true;
-
     }
 
     /**
