@@ -95,6 +95,8 @@ $string['assignindividual'] = '{$a->fullname} ({$a->email})';
 $string['assignmentcriterialearner'] = 'You are required to complete this program under the following criteria:';
 $string['assignmentcriteriamanager'] = 'The learner is required to complete this program under the following criteria:';
 $string['assignments'] = 'Assignments';
+$string['assignmentsdeferred'] = 'Program assignment changes have been deferred and will be applied during the next cron run';
+$string['assignmentsdeferredtask'] = 'Deferred program assignments changes';
 $string['assigntoposition'] = 'being assigned position';
 $string['audiencevisibilityconflictmessage'] = '<strong>Important:</strong>
 Users assigned to this program will not necessarily have access to the courses in it. Please review visibility of the courses.';
@@ -656,6 +658,7 @@ $string['program:viewprogram'] = 'View programs';
 $string['program:visibility'] = 'Hide/show programs';
 $string['programadministration'] = 'Program Administration';
 $string['programassignments'] = 'Program assignments';
+$string['programassignmentsdeferred'] = 'Program assignment changes have been saved, but users will not see the changes until after the next cron run';
 $string['programassignmentssaved'] = 'Program assignments saved successfully';
 $string['programavailability'] = 'Program Availability';
 $string['programavailability_help'] = 'This option allows you to "hide" your program completely.

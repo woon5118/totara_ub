@@ -17,29 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ben Lobo <ben.lobo@kineo.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Nathan Lewis <nathan.lewis@totaralms.com>
  * @package totara_program
  */
 
 namespace totara_program\task;
 
 /**
- * Check that program user assignments are correct
+ * Process any user assignment changes that have been deferred until cron.
  */
-class user_assignments_task extends \core\task\scheduled_task {
+class assignments_deferred_task extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
      *
      * @return string
      */
     public function get_name() {
-        return get_string('userassignmentstask', 'totara_program');
+        return get_string('assignmentsdeferredtask', 'totara_program');
     }
 
     /**
-     * Checks that all programs have the correct user assignments and assigns or
-     * unassigns as necessary or raises exceptions if issues are found
+     * Updates the learner assignments for all programs that have had user assignments changes deferred.
      */
     public function execute() {
         global $DB, $CFG;
@@ -53,12 +51,11 @@ class user_assignments_task extends \core\task\scheduled_task {
             return false;
         }
 
-        // Get all programs.
-        $program_records = $DB->get_records('prog');
+        // Get all programs that have the updateassignments flag set.
+        $program_records = $DB->get_records('prog', array('assignmentsdeferred' => 1));
         foreach ($program_records as $program_record) {
             $program = new \program($program_record->id);
             $program->update_learner_assignments(true);
         }
     }
 }
-

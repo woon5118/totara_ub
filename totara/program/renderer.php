@@ -101,6 +101,9 @@ class totara_program_renderer extends plugin_renderer_base {
         if ($data->audiencevisibilitywarning) {
             $coursevisibilityinfo .= get_string('audiencevisibilityconflictmessage', 'totara_program');
         }
+        if ($data->assignmentsdeferred) {
+            $coursevisibilityinfo .= get_string('assignmentsdeferred', 'totara_program');
+        }
         $coursevisibilityinfo .= html_writer::end_tag('span');
 
         $out = $this->output->notification($programstatusstring . $learnerinfo . $coursevisibilityinfo, $programstatusclass);

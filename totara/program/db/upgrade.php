@@ -437,6 +437,21 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2014121900, 'totara_program');
     }
 
+    // TL-6581 Add assignmentsdeferred to prog.
+    if ($oldversion < 2015030202) {
+
+        // Define field and table.
+        $table = new xmldb_table('prog');
+        $field = new xmldb_field('assignmentsdeferred', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Conditionally add field.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030202, 'totara_program');
+    }
 
     return true;
 }

@@ -67,6 +67,13 @@ define('PROGRAM_EXCEPTION_RESOLVED', 3);
 define('PROG_EXTENSION_GRANT', 1);
 define('PROG_EXTENSION_DENY', 2);
 
+define('PROG_UPDATE_ASSIGNMENTS_UNAVAILABLE', 0);
+define('PROG_UPDATE_ASSIGNMENTS_COMPLETE', 1);
+define('PROG_UPDATE_ASSIGNMENTS_DEFERRED', 2);
+
+// The maximum number of user assignments that will be processed while the user waits, otherwise processing is deferred until cron.
+define('PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT', 200);
+
 global $TIMEALLOWANCESTRINGS;
 
 $TIMEALLOWANCESTRINGS = array(
@@ -132,6 +139,7 @@ class program {
         $this->icon = $program->icon;
         $this->audiencevisible = $program->audiencevisible;
         $this->certifid = $program->certifid;
+        $this->assignmentsdeferred = $program->assignmentsdeferred;
 
         $this->content = new prog_content($id);
         $this->assignments = new prog_assignments($id);
@@ -314,19 +322,34 @@ class program {
      * for a student to complete the program) users will not be assigned to the
      * program and exceptions will be raised instead.
      *
-     * @return bool
+     * @param bool $forcerun Force the function to run, otherwise it may decide to delay execution until next cron.
+     * @return int PROG_UPDATE_ASSIGNMENTS_XXX
      */
-    public function update_learner_assignments() {
+    public function update_learner_assignments($forcerun = false) {
         global $DB, $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
         // Check program availability.
         if (!prog_check_availability($this->availablefrom, $this->availableuntil)) {
-            return false;
+            return PROG_UPDATE_ASSIGNMENTS_UNAVAILABLE;
         }
+
         // Get program assignments.
         $prog_assignments = $this->assignments->get_assignments();
         if (!$prog_assignments) {
             $prog_assignments = $DB->get_records('prog_assignment', array('programid' => $this->id));
+        }
+
+        $params = array('programid' => $this->id);
+        if (!$forcerun) {
+            // If there are too many previous users then defer processing until next cron run.
+            $rawprevioususerassignmentscount = $DB->count_records('prog_user_assignment', $params);
+            if ($rawprevioususerassignmentscount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
+                totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
+                    array('class' => 'notifynotice'));
+                $DB->set_field('prog', 'assignmentsdeferred', 1, array('id' => $this->id));
+                $this->assignmentsdeferred = 1;
+                return PROG_UPDATE_ASSIGNMENTS_DEFERRED;
+            }
         }
 
         // Get user assignments only if there are assignments for this program.
@@ -336,9 +359,11 @@ class program {
         $alluserassignments = array();
 
         foreach ($rawuserassignments as $rawassign) {
-            $alluserassignments[$rawassign->assignmentid][$rawassign->userid] = array('uaid' => $rawassign->id,
-                                                                                      'exceptionstatus' => $rawassign->exceptionstatus,
-                                                                                      'timeassigned' => $rawassign->timeassigned);
+            $alluserassignments[$rawassign->assignmentid][$rawassign->userid] = array(
+                'uaid' => $rawassign->id,
+                'exceptionstatus' => $rawassign->exceptionstatus,
+                'timeassigned' => $rawassign->timeassigned
+            );
         }
 
         $assigned_user_ids = array();
@@ -347,6 +372,30 @@ class program {
         $users_with_removed_assignments = array();
 
         if ($prog_assignments) {
+            // First create and store the set of active users for each program, so that we can decide if we want
+            // to update the user assignments now or later on cron.
+            $cumulativeactiveusercount = 0;
+            foreach ($prog_assignments as $progassignment) {
+                // Create instance of assignment type so we can call functions on it.
+                $progassignment->category = new $ASSIGNMENT_CATEGORY_CLASSNAMES[$progassignment->assignmenttype]();
+
+                // Get users who should be in the program due to this program assignment.
+                $progassignment->activeusers = $progassignment->category->get_affected_users_by_assignment($progassignment);
+
+                if (!$forcerun) {
+                    // If there are too many active users then defer processing until next cron run.
+                    $cumulativeactiveusercount += count($progassignment->activeusers);
+                    if ($cumulativeactiveusercount > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
+                        totara_set_notification(get_string('programassignmentsdeferred', 'totara_program'), null,
+                            array('class' => 'notifynotice'));
+                        $DB->set_field('prog', 'assignmentsdeferred', 1, array('id' => $this->id));
+                        $this->assignmentsdeferred = 1;
+                        return PROG_UPDATE_ASSIGNMENTS_DEFERRED;
+                    }
+                }
+            }
+
+            // Process each program assignment one at a time.
             foreach ($prog_assignments as $assign) {
                 $active_assignments[] = $assign->id;
                 $userassignments = isset($alluserassignments[$assign->id]) ? $alluserassignments[$assign->id] : array();
@@ -358,10 +407,10 @@ class program {
                 $fassigncount = 0;
 
                 // Create instance of assignment type so we can call functions on it.
-                $assignment_class = new $ASSIGNMENT_CATEGORY_CLASSNAMES[$assign->assignmenttype]();
+                $assignment_class = $assign->category;
 
                 // Get affected users.
-                $affected_users = $assignment_class->get_affected_users_by_assignment($assign);
+                $affected_users = $assign->activeusers;
 
                 // Delete user assigned that no longer match the category assignment.
                 if (!empty($userassignments)) {
@@ -586,8 +635,13 @@ class program {
             $DB->delete_records_select('prog_future_user_assignment', "assignmentid {$usql} AND programid = ?", $params);
         }
 
-        return true;
+        // Change the flag to indicate that the update has occurred.
+        $DB->set_field('prog', 'assignmentsdeferred', 0, array('id' => $this->id));
+        $this->assignmentsdeferred = 0;
+
+        return PROG_UPDATE_ASSIGNMENTS_COMPLETE;
     }
+
 
     /**
      * Bulk create records in the future assignment table
@@ -597,8 +651,8 @@ class program {
      * first time the user logs in).
      *
      * @param integer $programid ID of the program
-     * @param integer $userids IDs of the user being assigned
-     * @param integer $assignment ID of the assignment (record in prog_assignment table)
+     * @param array(int) $userids IDs of the user being assigned
+     * @param integer $assignmentid ID of the assignment (record in prog_assignment table)
      *
      * @return boolean True if the future assignment is saved successfully or already exists
      */
@@ -1567,6 +1621,7 @@ class program {
         $data->exceptions = $this->assignments->count_user_assignment_exceptions();
         $data->total = $this->assignments->count_total_user_assignments();
         $data->audiencevisibilitywarning = false;
+        $data->assignmentsdeferred = $this->assignmentsdeferred;
 
         if (!empty($CFG->audiencevisibility)) {
             $coursesnovisible = $this->content->get_visibility_coursesets(TOTARA_SEARCH_OP_NOT_EQUAL, COHORT_VISIBLE_ALL);

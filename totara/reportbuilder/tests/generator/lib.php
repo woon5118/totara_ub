@@ -226,7 +226,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $assignmenttoprog = prog_assignments::factory($assignmenttype);
         $assignmenttoprog->update_assignments($data, false);
         $program = new program($programid);
-        $program->update_learner_assignments();
+        $program->update_learner_assignments(true);
     }
 
     /**
@@ -258,7 +258,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
         $program = new program($programid);
         $assignments = $program->get_assignments();
         $assignments->init_assignments($programid);
-        $program->update_learner_assignments();
+        $program->update_learner_assignments(true);
     }
 
     /**

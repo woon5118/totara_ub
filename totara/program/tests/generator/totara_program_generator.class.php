@@ -99,7 +99,7 @@ class totara_program_generator extends component_generator_base {
             $assignments = $program->get_assignments();
             $assignments->init_assignments($prog->id);
             // Update the user assignments
-            $program->update_learner_assignments();
+            $program->update_learner_assignments(true);
             // Randomly resolve some exceptions and assign program anyway.
             if ($exceptions && mt_rand(0,1)) {
                 $exceptions_manager = new prog_exceptions_manager($prog->id);
@@ -358,7 +358,7 @@ class totara_program_generator extends component_generator_base {
         $assignmenttoprog->update_assignments($assign_data, false);
 
         $program = new program($data['programid']);
-        return $program->update_learner_assignments();
+        return $program->update_learner_assignments(true);
     }
 
     /**
@@ -391,7 +391,7 @@ class totara_program_generator extends component_generator_base {
         $program = new program($programid);
         $assignments = $program->get_assignments();
         $assignments->init_assignments($programid);
-        $program->update_learner_assignments();
+        $program->update_learner_assignments(true);
     }
 
     /**
