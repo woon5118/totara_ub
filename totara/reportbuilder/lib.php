@@ -3222,6 +3222,10 @@ class reportbuilder {
      * @return No return but initiates save dialog
      */
     function export_data($format) {
+        // Release session lock and make sure abort is not ignored.
+        \core\session\manager::write_close();
+        ignore_user_abort(false);
+
         $columns = $this->columns;
         $count = $this->get_filtered_count();
         list($sql, $params, $cache) = $this->build_query(false, true);
