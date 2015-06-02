@@ -455,14 +455,6 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
         $this->add_cohort_user_fields_to_columns($columnoptions);
         $this->add_cohort_course_fields_to_columns($columnoptions);
-        // Redirect the display of 'user' columns (to insert 'unassigned' when needed).
-        foreach ($columnoptions as $key => $columnoption) {
-            if (!($columnoption->type == 'user' && $columnoption->value == 'fullname')) {
-                continue;
-            }
-            $columnoptions[$key]->extrafields = array('user_id' => 'auser.id');
-            $columnoptions[$key]->displayfunc = 'user';
-        }
 
         return $columnoptions;
     }
@@ -1050,8 +1042,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     // Override user display function to show 'Reserved' for reserved spaces.
     function rb_display_user($user, $row, $isexport = false) {
-        if ($row->id) {
-            return $user;
+        if (!empty($user)) {
+            return parent::rb_display_user($user, $row, $isexport);
         }
         return get_string('reserved', 'rb_source_facetoface_sessions');
     }
