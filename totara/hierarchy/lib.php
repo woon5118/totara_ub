@@ -33,13 +33,6 @@ require_once(dirname(dirname(__FILE__)) . '/core/utils.php');
 require_once(dirname(dirname(__FILE__)) . '/customfield/fieldlib.php');
 
 /**
- * Toggles the use of shortnames in addition to fullnames in hierarchy
- * forms. When true, hierarchies will include a shortname field in the
- * framework, item and type forms.
- */
-define('HIERARCHY_DISPLAY_SHORTNAMES', false);
-
-/**
  * Export option codes
  *
  * Bitwise flags, so new ones should be double highest value
@@ -1294,6 +1287,9 @@ class hierarchy {
             // Print type, unless unclassified.
             if ($record->typeid !=0 && is_array($types) && array_key_exists($record->typeid, $types)) {
                 $out .= html_writer::tag('div', html_writer::tag('strong', get_string('type', 'totara_hierarchy') . ': ') . format_string($types[$record->typeid]->fullname), array('class' => 'itemtype' . $cssclass));
+                if (!empty($CFG->showhierarchyshortnames)) {
+                    $out .= html_writer::tag('div', html_writer::tag('strong', get_string('shortnametype', 'totara_hierarchy') . ': ') . format_string($types[$record->typeid]->shortname), array('class' => 'itemtype' . $cssclass));
+                }
             }
 
             $out .= $this->display_hierarchy_item_custom_field_data($record, $cfields);

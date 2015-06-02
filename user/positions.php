@@ -12,8 +12,6 @@ $user       = required_param('user', PARAM_INT);               // user id
 $type       = optional_param('type', '', PARAM_ALPHA);      // position type
 $courseid   = optional_param('course', SITEID, PARAM_INT);   // course id
 
-$nojs = optional_param('nojs', 0, PARAM_INT);
-
 // Position types check
 if (!$positionsenabled = get_config('totara_hierarchy', 'positionsenabled')) {
     print_error('error:noposenabled', 'totara_hierarchy');
@@ -157,11 +155,8 @@ $PAGE->requires->js_init_call('M.totara_positionuser.init', $args, false, $jsmod
 
 $PAGE->set_pagelayout('course');
 
-if ($nojs) {
-    $currenturl = "{$CFG->wwwroot}/user/positions.php?user={$user->id}&course={$course->id}&type={$type}&nojs=1";
-} else {
-    $currenturl = "{$CFG->wwwroot}/user/positions.php?user={$user->id}&course={$course->id}&type={$type}";
-}
+$currenturl = "{$CFG->wwwroot}/user/positions.php?user={$user->id}&course={$course->id}&type={$type}";
+
 // Form
 $submitbutton = optional_param('submitbutton', null, PARAM_ALPHANUMEXT);
 $submitted = !empty($submitbutton);
@@ -174,7 +169,7 @@ $position_assignment->descriptionformat = FORMAT_HTML;
 $position_assignment = file_prepare_standard_editor($position_assignment, 'description', $editoroptions, $editoroptions['context'],
     'totara_core', 'pos_assignment', $position_assignment->id);
 $form = new user_position_assignment_form($currenturl, compact('type', 'user', 'position_assignment', 'can_edit',
-        'nojs', 'editoroptions', 'can_edit_tempmanager', 'submitted', 'submittedpositionid', 'submittedorganisationid',
+        'editoroptions', 'can_edit_tempmanager', 'submitted', 'submittedpositionid', 'submittedorganisationid',
         'submittedmanagerid', 'submittedappraiserid', 'submittedtempmanagerid'));
 $form->set_data($position_assignment);
 // Don't show the page if they do not have a position & can't edit positions.

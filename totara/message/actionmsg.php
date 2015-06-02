@@ -29,6 +29,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot.'/message/lib.php');
 require_once($CFG->dirroot.'/totara/message/lib.php');
+require_once($CFG->dirroot.'/totara/core/lib.php');
 
 require_login();
 
@@ -112,11 +113,7 @@ foreach ($ids as $msgid => $msg) {
     $type = $display['icon'];
     $type_alt = $display['text'];
 
-    if ($msg->useridfrom == 0) {
-        $from = core_user::get_support_user();
-    } else {
-        $from = $DB->get_record('user', array('id' => $msg->useridfrom));
-    }
+    $from     = totara_get_sender_from_user_by_id($msg->useridfrom);
     $fromname = fullname($from) . " ({$from->email})";
 
     $icon = $OUTPUT->pix_icon('/msgicons/'.$metadata->icon, format_string($msg->subject), 'totara_core', array('class'=>'msgicon', 'title' => format_string($msg->subject)));

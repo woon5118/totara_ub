@@ -1110,9 +1110,9 @@ class mssql_native_moodle_database extends moodle_database {
 
     public function sql_cast_char2int($fieldname, $text=false) {
         if (!$text) {
-            return ' CAST(' . $fieldname . ' AS INT) ';
+            return ' CAST(' . $fieldname . ' AS BIGINT) ';
         } else {
-            return ' CAST(' . $this->sql_compare_text($fieldname) . ' AS INT) ';
+            return ' CAST(' . $this->sql_compare_text($fieldname) . ' AS BIGINT) ';
         }
     }
 

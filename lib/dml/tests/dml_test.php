@@ -3657,6 +3657,100 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('0200', next($records)->nametext);
     }
 
+    // TOTARA IMPROVEMENT - Changed char2int to use BIGINT.
+    public function test_cast_char2bigint() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table("1");
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('tstsmallint', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tstbigint', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tstvarchar', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('tsttext', XMLDB_TYPE_TEXT, 'small', null, null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $DB->insert_record($tablename, array('tstsmallint'=>1, 'tstbigint'=>1, 'tstvarchar'=>'1', 'tsttext'=>'1'));
+        $DB->insert_record($tablename, array('tstsmallint'=>2, 'tstbigint'=>0000000002, 'tstvarchar'=>'0000000002', 'tsttext'=>'0000000002'));
+        $DB->insert_record($tablename, array('tstsmallint'=>3, 'tstbigint'=>1000000003, 'tstvarchar'=>'1234567891011', 'tsttext'=>'1234567891011'));
+        $DB->insert_record($tablename, array('tstsmallint'=>4, 'tstbigint'=>1000000004, 'tstvarchar'=>'1234567891011', 'tsttext'=>'-1234567891011'));
+        $DB->insert_record($tablename, array('tstsmallint'=>5, 'tstbigint'=>1000000005, 'tstvarchar'=>'-1234567891011', 'tsttext'=>'1234567891011'));
+        $DB->insert_record($tablename, array('tstsmallint'=>6, 'tstbigint'=>1000000006, 'tstvarchar'=>'-1234567891011', 'tsttext'=>'-1234567891011'));
+
+        // Test comparison between smallint and bigint.
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint = t1.tstbigint";
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2));
+
+        // Test comparison between smallint and sql_cast_char2int(varchar).
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint = " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint < " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(3, 4));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint > " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(5, 6));
+
+        // Test comparison between bigint and sql_cast_char2int(varchar).
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint = " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint < " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(3, 4));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint > " . $DB->sql_cast_char2int('t1.tstvarchar', false);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(5, 6));
+
+        // Test comparison between smallint and sql_cast_char2int(text).
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint = " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint < " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(3, 5));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstsmallint > " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(4, 6));
+
+        // Test comparison between bigint and sql_cast_char2int(text).
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint = " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint < " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(3, 5));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE t1.tstbigint > " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(4, 6));
+
+        // Test comparison between sql_cast_char2int(varchar) and sql_cast_char2int(text).
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE " . $DB->sql_cast_char2int('t1.tstvarchar', false) . " = " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(1, 2, 3, 6));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE " . $DB->sql_cast_char2int('t1.tstvarchar', false) . " > " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(4));
+
+        $sql = "SELECT id FROM {{$tablename}} t1 WHERE " . $DB->sql_cast_char2int('t1.tstvarchar', false) . " < " . $DB->sql_cast_char2int('t1.tsttext', true);
+        $matches = $DB->get_fieldset_sql($sql);
+        $this->assertEquals($matches, array(5));
+    }
+
     public function test_cast_char2real() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();

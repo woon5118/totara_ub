@@ -112,12 +112,18 @@ if ($frameworks) {
     $table->attributes['class'] = 'generaltable fullwidth edit'.$prefix;
 
     // Setup column headers.
-    $table->head = array(get_string('name', 'totara_hierarchy'), get_string($prefix.'plural', 'totara_hierarchy'));
+    $headers = array();
+    $headers[] = get_string('name', 'totara_hierarchy');
+    if (!empty($CFG->showhierarchyshortnames)) {
+        $headers[] = get_string('shortnameframework', 'totara_hierarchy');
+    }
+    $headers[] = get_string($prefix.'plural', 'totara_hierarchy');
 
     // Add edit column.
     if ($canupdateframeworks || $candeleteframeworks) {
-        $table->head[] = get_string('actions');
+        $headers[] = get_string('actions');
     }
+    $table->head = $headers;
 
     // Add rows to table.
     $rowcount = 1;
@@ -132,6 +138,9 @@ if ($frameworks) {
             $row[] = $OUTPUT->action_link($link_url, format_string($framework->fullname), null, array('class' => $cssclass));
         } else {
             $row[] = format_string($framework->fullname);
+        }
+        if (!empty($CFG->showhierarchyshortnames)) {
+            $row[] = format_string($framework->shortname);
         }
         $row[] = html_writer::tag('span', $framework->item_count, array('class' => $cssclass));
 

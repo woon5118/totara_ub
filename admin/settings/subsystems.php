@@ -99,6 +99,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
             new lang_string('dynamicappraisals', 'totara_core'),
             new lang_string('configdynamicappraisals', 'totara_core'), 1));
 
+    // Show Hierarchy shortcodes.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('showhierarchyshortnames',
+            new lang_string('showhierarchyshortnames', 'totara_hierarchy'),
+            new lang_string('configshowhierarchyshortnames', 'totara_hierarchy'), 0));
+
     // Totara Settings.
     $featureoptions = array(
         TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),

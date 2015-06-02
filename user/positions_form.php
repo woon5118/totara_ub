@@ -43,7 +43,6 @@ class user_position_assignment_form extends moodleform {
         $editoroptions = $this->_customdata['editoroptions'];
         $can_edit = $this->_customdata['can_edit'];
         $can_edit_tempmanager = empty($this->_customdata['can_edit_tempmanager']) ? 0 : 1;
-        $nojs = $this->_customdata['nojs'];
 
         // Check if a primary position.
         $primary = isset($POSITION_TYPES[POSITION_TYPE_PRIMARY])
@@ -144,10 +143,6 @@ class user_position_assignment_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        if (!$nojs) {
-            $mform->addElement('html', html_writer::tag('noscript', html_writer::tag('p', get_string('formrequiresjs', 'totara_hierarchy') .
-                html_writer::link(new moodle_url(qualified_me(), array('nojs' => '1')), get_string('clickfornonjsform', 'totara_hierarchy')))));
-        }
         $mform->addElement('header', 'general', get_string('type'.$type, 'totara_hierarchy'));
 
         if (!$aspirational) {
@@ -164,48 +159,31 @@ class user_position_assignment_form extends moodleform {
             $mform->addHelpButton('description_editor', 'pos_description', 'totara_core');
         }
 
-        if ($nojs) {
-            $allpositions = $DB->get_records_menu('pos', null, 'frameworkid,sortthread', 'id,fullname');
-            $mform->addElement('select','positionid', get_string('chooseposition','totara_hierarchy'), $allpositions);
-            $mform->addHelpButton('positionid', 'chooseposition','totara_hierarchy');
-        } else {
-            $pos_class = strlen($position_title) ? 'nonempty' : '';
-            $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),
-                html_writer::tag('span', format_string($position_title), array('class' => $pos_class, 'id' => 'positiontitle')).
-                    ($can_edit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_hierarchy'), 'id' => 'show-position-dialog')) : '')
-            );
-            $mform->addElement('hidden', 'positionid');
-            $mform->setType('positionid', PARAM_INT);
-            $mform->setDefault('positionid', 0);
-            if (!$aspirational) {
-                $mform->addHelpButton('positionselector', 'chooseposition', 'totara_hierarchy');
-            } else {
-                $mform->addHelpButton('positionselector', 'useraspirationalposition', 'totara_hierarchy');
-            }
-
-        }
+        $pos_class = strlen($position_title) ? 'nonempty' : '';
+        $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),
+            html_writer::tag('span', format_string($position_title), array('class' => $pos_class, 'id' => 'positiontitle')).
+                ($can_edit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_hierarchy'), 'id' => 'show-position-dialog')) : '')
+        );
+        $mform->addElement('hidden', 'positionid');
+        $mform->setType('positionid', PARAM_INT);
+        $mform->setDefault('positionid', 0);
         if (!$aspirational) {
-            if ($nojs) {
-                $allorgs = $DB->get_records_menu('org', null, 'frameworkid,sortthread', 'id,fullname');
-                if (is_array($allorgs) && !empty($allorgs) ){
-                    $mform->addElement('select','organisationid', get_string('chooseorganisation','totara_hierarchy'),
-                        array(0 => get_string('chooseorganisation','totara_hierarchy')) + $allorgs);
-                } else {
-                    $mform->addElement('static', 'organisationid', get_string('chooseorganisation','totara_hierarchy'), get_string('noorganisation','totara_hierarchy') );
-                }
-                $mform->addHelpButton('organisationid', 'chooseorganisation', 'totara_hierarchy');
-            } else {
-                $org_class = strlen($organisation_title) ? 'nonempty' : '';
-                $mform->addElement('static', 'organisationselector', get_string('organisation', 'totara_hierarchy'),
-                    html_writer::tag('span', format_string($organisation_title), array('class' => $org_class, 'id' => 'organisationtitle')) .
-                    ($can_edit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_hierarchy'), 'id' => 'show-organisation-dialog')) : '')
-                );
+            $mform->addHelpButton('positionselector', 'chooseposition', 'totara_hierarchy');
+        } else {
+            $mform->addHelpButton('positionselector', 'useraspirationalposition', 'totara_hierarchy');
+        }
 
-                $mform->addElement('hidden', 'organisationid');
-                $mform->setType('organisationid', PARAM_INT);
-                $mform->setDefault('organisationid', 0);
-                $mform->addHelpButton('organisationselector', 'chooseorganisation', 'totara_hierarchy');
-            }
+        if (!$aspirational) {
+            $org_class = strlen($organisation_title) ? 'nonempty' : '';
+            $mform->addElement('static', 'organisationselector', get_string('organisation', 'totara_hierarchy'),
+                html_writer::tag('span', format_string($organisation_title), array('class' => $org_class, 'id' => 'organisationtitle')) .
+                ($can_edit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseorganisation', 'totara_hierarchy'), 'id' => 'show-organisation-dialog')) : '')
+            );
+
+            $mform->addElement('hidden', 'organisationid');
+            $mform->setType('organisationid', PARAM_INT);
+            $mform->setDefault('organisationid', 0);
+            $mform->addHelpButton('organisationselector', 'chooseorganisation', 'totara_hierarchy');
 
             $mform->addElement('date_selector', 'timevalidfrom', get_string('startdate', 'totara_hierarchy'), array('optional' => true));
             $mform->addHelpButton('timevalidfrom', 'startdate', 'totara_hierarchy');
@@ -218,95 +196,64 @@ class user_position_assignment_form extends moodleform {
             // Manager details.
             $mform->addElement('header', 'managerheader', get_string('manager', 'totara_hierarchy'));
 
-            if ($nojs) {
-             $allmanagers = $DB->get_records_sql_menu("
-                    SELECT
-                        u.id,
-                        " . $DB->sql_fullname('u.firstname', 'u.lastname') . " AS fullname
-                    FROM
-                        {user} u
-                    ORDER BY
-                        u.firstname,
-                        u.lastname");
-                if ( is_array($allmanagers) && !empty($allmanagers) ){
-                    // Manager.
-                    $mform->addElement('select', 'managerid', get_string('choosemanager','totara_hierarchy'),
-                        array(0 => get_string('choosemanager','totara_hierarchy')) + $allmanagers);
-                    $mform->setType('managerid', PARAM_INT);
-                    $mform->setDefault('managerid', $manager_id);
-
-                    // Appraiser.
-                    $mform->addElement('select', 'appraiserid', get_string('chooseappraiser', 'totara_hierarchy'),
-                            array(0 => get_string('chooseappraiser', 'totara_hierarchy')) + $allmanagers);
-                    $mform->setDefault('appraiserid', $appraiser_id);
-                } else {
-                    $mform->addElement('static', 'managerid', get_string('choosemanager', 'totara_hierarchy'),
-                            get_string('error:dialognotreeitems', 'totara_core'));
-                    $mform->addElement('static', 'appraiserid', get_string('chooseappraiser', 'totara_hierarchy'),
-                            get_string('error:dialognotreeitems', 'appraiser'));
-                }
-                $mform->addHelpButton('managerid', 'choosemanager', 'totara_hierarchy');
-                $mform->addHelpButton('appraiserid', 'chooseappraiser', 'totara_hierarchy');
+            // Show manager
+            // If we can edit, show button. Else show link to manager's profile
+            if ($can_edit) {
+                $manager_class = strlen($manager_title) ? 'nonempty' : '';
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_hierarchy'),
+                    html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
+                    . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
+                );
             } else {
-                // Show manager
-                // If we can edit, show button. Else show link to manager's profile
-                if ($can_edit) {
-                    $manager_class = strlen($manager_title) ? 'nonempty' : '';
-                    $mform->addElement(
-                        'static',
-                        'managerselector',
-                        get_string('manager', 'totara_hierarchy'),
-                        html_writer::tag('span', format_string($manager_title), array('class' => $manager_class, 'id' => 'managertitle'))
-                        . html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('choosemanager', 'totara_hierarchy'), 'id' => 'show-manager-dialog'))
-                    );
-                } else {
-                    $mform->addElement(
-                        'static',
-                        'managerselector',
-                        get_string('manager', 'totara_hierarchy'),
-                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php', array('id' => $manager_id)), format_string($manager_title)), array('id' => 'managertitle'))
-                    );
-                }
-
-                $mform->addElement('hidden', 'managerid');
-                $mform->setType('managerid', PARAM_INT);
-                $mform->setDefault('managerid', $manager_id);
-                $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
-
-                // Show appraiser.
-                // If we can edit, show button. Else show link to appraiser's profile.
-                if ($can_edit) {
-                    $appraiser_class = strlen($appraiser_title) ? 'nonempty' : '';
-                    $mform->addElement(
-                        'static',
-                        'appraiserselector',
-                        get_string('appraiser', 'totara_hierarchy'),
-                        html_writer::tag('span', format_string($appraiser_title),
-                            array('class' => $appraiser_class, 'id' => 'appraisertitle')) .
-                        html_writer::empty_tag('input', array('type' => 'button',
-                            'value' => get_string('chooseappraiser', 'totara_hierarchy'), 'id' => 'show-appraiser-dialog'))
-                    );
-                } else {
-                    $mform->addElement(
-                        'static',
-                        'appraiserselector',
-                        get_string('appraiser', 'totara_hierarchy'),
-                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
-                            array('id' => $appraiser_id)), format_string($appraiser_title)), array('id' => 'appraisertitle'))
-                    );
-                }
-
-                $mform->addElement('hidden', 'appraiserid');
-                $mform->setType('appraiserid', PARAM_INT);
-                $mform->setDefault('appraiserid', $appraiser_id);
-                $mform->addHelpButton('appraiserselector', 'chooseappraiser', 'totara_hierarchy');
+                $mform->addElement(
+                    'static',
+                    'managerselector',
+                    get_string('manager', 'totara_hierarchy'),
+                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php', array('id' => $manager_id)), format_string($manager_title)), array('id' => 'managertitle'))
+                );
             }
+
+            $mform->addElement('hidden', 'managerid');
+            $mform->setType('managerid', PARAM_INT);
+            $mform->setDefault('managerid', $manager_id);
+            $mform->addHelpButton('managerselector', 'choosemanager', 'totara_hierarchy');
+
+            // Show appraiser.
+            // If we can edit, show button. Else show link to appraiser's profile.
+            if ($can_edit) {
+                $appraiser_class = strlen($appraiser_title) ? 'nonempty' : '';
+                $mform->addElement(
+                    'static',
+                    'appraiserselector',
+                    get_string('appraiser', 'totara_hierarchy'),
+                    html_writer::tag('span', format_string($appraiser_title),
+                        array('class' => $appraiser_class, 'id' => 'appraisertitle')) .
+                    html_writer::empty_tag('input', array('type' => 'button',
+                        'value' => get_string('chooseappraiser', 'totara_hierarchy'), 'id' => 'show-appraiser-dialog'))
+                );
+            } else {
+                $mform->addElement(
+                    'static',
+                    'appraiserselector',
+                    get_string('appraiser', 'totara_hierarchy'),
+                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                        array('id' => $appraiser_id)), format_string($appraiser_title)), array('id' => 'appraisertitle'))
+                );
+            }
+
+            $mform->addElement('hidden', 'appraiserid');
+            $mform->setType('appraiserid', PARAM_INT);
+            $mform->setDefault('appraiserid', $appraiser_id);
+            $mform->addHelpButton('appraiserselector', 'chooseappraiser', 'totara_hierarchy');
+
 
             if ($primary && !empty($CFG->enabletempmanagers)) {
                 // Temporary manager.
                 if ($submitted) {
                     $tempmanager = $DB->get_record('user', array('id' => $submittedtempmanagerid));
-
                     $tempmanager_expiry = null;
                 } else {
                     $tempmanager = totara_get_manager($pa->userid, null, false, true);
@@ -315,62 +262,41 @@ class user_position_assignment_form extends moodleform {
 
                 $tempmanager_id = !empty($tempmanager->id) ? $tempmanager->id : 0;
                 $tempmanager_title = !empty($tempmanager) ? fullname($tempmanager) : '';
-                if ($nojs) {
-                    $sql = "SELECT u.id, ".$DB->sql_fullname('u.firstname', 'u.lastname')." AS fullname
-                              FROM {user} u
-                             WHERE u.deleted = 0 ";
-                    $params = array();
-                    if (!empty($CFG->managerscanbetempmanagers)) {
-                        $sql .= "AND u.id IN (SELECT DISTINCT pa.managerid
-                                                      FROM {pos_assignment} pa
-                                                     WHERE pa.type = ?) ";
-                        $params[] = POSITION_TYPE_PRIMARY;
-                    }
-                    $sql .= "ORDER BY u.firstname, u.lastname";
-                    $allmanagers = $DB->get_records_sql_menu($sql, $params);
-
-                    if (!empty($allmanagers)) {
-                        $mform->addElement('select', 'tempmanagerid', get_string('choosetempmanager', 'totara_core'),
-                            array(0 => get_string('choosetempmanager', 'totara_core')) + $allmanagers);
-                        $mform->setDefault('tempmanagerid', $tempmanager_id);
-                    } else {
-                        $mform->addElement('static', 'tempmanagerid', get_string('choosetempmanager', 'totara_core'),
-                                get_string('error:dialognotreeitems', 'totara_core'));
-                    }
-                    $mform->addHelpButton('tempmanagerid', 'choosetempmanager', 'totara_core');
+                // If we can edit, show button, else show link to manager's profile.
+                if ($can_edit_tempmanager) {
+                    $tempmanager_class = strlen($tempmanager_title) ? 'nonempty' : '';
+                    $mform->addElement(
+                        'static',
+                        'tempmanagerselector',
+                        get_string('tempmanager', 'totara_core'),
+                        html_writer::tag('span', format_string($tempmanager_title),
+                                array('class' => $tempmanager_class, 'id' => 'tempmanagertitle')) .
+                        html_writer::empty_tag('input', array('type' => 'button',
+                                'value' => get_string('choosetempmanager', 'totara_core'), 'id' => 'show-tempmanager-dialog'))
+                    );
                 } else {
-                    // If we can edit, show button, else show link to manager's profile.
-                    if ($can_edit_tempmanager) {
-                        $tempmanager_class = strlen($tempmanager_title) ? 'nonempty' : '';
-                        $mform->addElement(
-                            'static',
-                            'tempmanagerselector',
-                            get_string('tempmanager', 'totara_core'),
-                            html_writer::tag('span', format_string($tempmanager_title),
-                                    array('class' => $tempmanager_class, 'id' => 'tempmanagertitle')) .
-                            html_writer::empty_tag('input', array('type' => 'button',
-                                    'value' => get_string('choosetempmanager', 'totara_core'), 'id' => 'show-tempmanager-dialog'))
-                        );
-                    } else {
-                        $mform->addElement(
-                            'static',
-                            'tempmanagerselector',
-                            get_string('tempmanager', 'totara_core'),
-                            html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
-                                    array('id' => $tempmanager_id)), format_string($tempmanager_title)),
-                                    array('id' => 'tempmanagertitle'))
-                        );
-                    }
-
-                    $mform->addElement('hidden', 'tempmanagerid');
-                    $mform->setType('tempmanagerid', PARAM_INT);
-                    $mform->setDefault('tempmanagerid', $tempmanager_id);
-                    $mform->addHelpButton('tempmanagerselector', 'choosetempmanager', 'totara_core');
+                    $mform->addElement(
+                        'static',
+                        'tempmanagerselector',
+                        get_string('tempmanager', 'totara_core'),
+                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                                array('id' => $tempmanager_id)), format_string($tempmanager_title)),
+                                array('id' => 'tempmanagertitle'))
+                    );
                 }
 
+                $mform->addElement('hidden', 'tempmanagerid');
+                $mform->setType('tempmanagerid', PARAM_INT);
+                $mform->setDefault('tempmanagerid', $tempmanager_id);
+                $mform->addHelpButton('tempmanagerselector', 'choosetempmanager', 'totara_core');
+
                 $mform->addElement('date_selector', 'tempmanagerexpiry', get_string('tempmanagerexpiry', 'totara_core'), array('optional' => true));
-                $mform->setDefault('tempmanagerexpiry',
-                    $tempmanager_expiry ? $tempmanager_expiry : strtotime($CFG->tempmanagerexpirydays.' days'));
+                if ($tempmanager_id > 0) {
+                    $tempmanager_expiry ?  $tempmanager_expiry : strtotime($CFG->tempmanagerexpirydays . ' days');
+                } else {
+                    $tempmanager_expiry = 0;
+                }
+                $mform->setDefault('tempmanagerexpiry', $tempmanager_expiry);
                 $mform->addHelpButton('tempmanagerexpiry', 'tempmanagerexpiry', 'totara_core');
             }
         }
@@ -380,9 +306,7 @@ class user_position_assignment_form extends moodleform {
     }
 
     function definition_after_data() {
-        $mform = $this->_form;
         $can_edit = $this->_customdata['can_edit'];
-
         // Freeze the form if appropriate.
         if (!$can_edit) {
             $this->freezeForm();
@@ -393,51 +317,44 @@ class user_position_assignment_form extends moodleform {
         $mform = $this->_form;
         $can_edit_tempmanager = empty($this->_customdata['can_edit_tempmanager']) ? 0 : 1;
 
-        // Freeze values
-        $freezeexclude = array();
+        // Tempmanager - skip some elements.
+        $skipelements = array();
         if ($can_edit_tempmanager) {
             // Freeze the form except for temp manager functionality.
-            $freezeexclude = array('tempmanagerselector', 'tempmanagerexpiry', 'buttonar');
+            $skipelements = array('tempmanagerselector', 'tempmanagerid', 'tempmanagerexpiry', 'buttonar');
         }
-        $mform->hardFreezeAllVisibleExcept($freezeexclude);
+        $mform->hardFreezeAllVisibleExcept($skipelements);
 
+        // Get date format with abstract values to match to date_selector value format.
+        $dateformat = array('day' => date('d'), 'month' => date('n'), 'year' => date('Y'), 'enabled' => true);
         // Hide elements with no values
         foreach (array_keys($mform->_elements) as $key) {
-
             $element =& $mform->_elements[$key];
-
-            // Tempmanager - skip some elements.
-            $skipelements = array('positionheader', 'managerheader');
-            if ($can_edit_tempmanager) {
-                $skipelements = array_merge($skipelements,
-                    array('tempmanagerselector', 'tempmanagerid', 'tempmanagerexpiry_group', 'buttonar'));
-            }
             if (in_array($element->getName(), $skipelements)) {
                 continue;
             }
-
             // Check static elements differently
             if ($element->getType() == 'static') {
                 // Check if it is a js selector
                 if (substr($element->getName(), -8) == 'selector') {
                     // Get id element
                     $elementid = $mform->getElement(substr($element->getName(), 0, -8).'id');
-
                     if (!$elementid || !$elementid->getValue()) {
                         $mform->removeElement($element->getName());
                     }
-
                     continue;
                 }
             }
-
             // Get element value
             $value = $element->getValue();
-
             // Check groups
             // (matches date groups and action buttons)
             if (is_array($value)) {
-
+                $diff = array_diff_key($dateformat, $value);
+                if (empty($diff)) {
+                    // This is a date_selector value which we do not want to remove.
+                    continue;
+                }
                 // If values are strings (e.g. buttons, or date format string), remove
                 foreach ($value as $k => $v) {
                     if (!is_numeric($v)) {

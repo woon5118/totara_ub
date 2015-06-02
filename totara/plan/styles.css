@@ -159,10 +159,16 @@ table.planpermissions select {
     font-weight:bold;
     padding:5px 0;
 }
-span.dp-summary-widget-component-name {
-    background: url([[pix:spacer]]) no-repeat scroll right 5px transparent;
+.dp-summary-widget-component-name {
+    padding-top: 3px;
+}
+.dir-ltr .dp-summary-widget-component-name {
     margin-right: 4px;
-    padding: 3px 4px 0 0;
+    padding-right: 4px;
+}
+.dir-rtl .dp-summary-widget-component-name {
+    margin-left: 4px;
+    padding-left: 4px;
 }
 #dp-component-update {
     margin-top:10px;

@@ -547,3 +547,32 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
         }
     }
 }
+
+/**
+ * Get user that sent the message.
+ *
+ * @param $useridfrom
+ * @return stdClass $userfrom User object.
+ */
+function totara_get_sender_from_user_by_id($useridfrom) {
+    global $DB;
+
+    // Get the user that sent the message.
+    switch ($useridfrom) {
+        case 0:
+        case core_user::SUPPORT_USER:
+            $from = core_user::get_support_user();
+            break;
+        case core_user::NOREPLY_USER:
+            $from = core_user::get_noreply_user();
+            break;
+        case \mod_facetoface\facetoface_user::FACETOFACE_USER:
+            $from = \mod_facetoface\facetoface_user::get_facetoface_user();
+            break;
+        default:
+            $from = $DB->get_record('user', array('id' => $useridfrom));
+            break;
+    }
+
+    return $from;
+}

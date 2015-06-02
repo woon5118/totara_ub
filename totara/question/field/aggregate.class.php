@@ -47,8 +47,8 @@ class question_aggregate extends question_base{
      */
     public static function available_question_types() {
         $qtypes = array();
-        $qtypes[] = 'Rating (numeric scale)';
-        $qtypes[] = 'Rating (custom scale)';
+        $qtypes[] = 'ratingnumeric';
+        $qtypes[] = 'ratingcustom';
 
         return $qtypes;
     }
@@ -127,7 +127,11 @@ class question_aggregate extends question_base{
         $err = array();
 
         if (empty($data->aggregateaverage) && empty($data->aggregatemedian)) {
-            $err[] = get_string('error:aggregatedisplayselect', 'totara_question');
+            $err['aggregateaverage'] = get_string('error:aggregatedisplayselect', 'totara_question');
+        }
+
+        if (empty($data->multiselectfield)) {
+            $err['multiselectfield'] = get_string('error:aggregatequestionselect', 'totara_question');
         }
 
         return $err;
