@@ -25,7 +25,7 @@
  */
 
 require('../config.php');
-require($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 

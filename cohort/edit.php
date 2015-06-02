@@ -24,9 +24,9 @@
 
 require('../config.php');
 require_once($CFG->libdir.'/adminlib.php');
-require($CFG->dirroot.'/course/lib.php');
-require($CFG->dirroot.'/cohort/lib.php');
-require($CFG->dirroot.'/cohort/edit_form.php');
+require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/cohort/edit_form.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 $usetags = (!empty($CFG->usetags));
