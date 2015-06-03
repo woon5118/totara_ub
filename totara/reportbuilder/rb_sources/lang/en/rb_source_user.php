@@ -49,3 +49,4 @@ $string['bookings'] = 'Bookings';
 
 // column types for this source, as strings
 $string['type_statistics'] = 'Statistics';
+$string['type_user'] = 'User';

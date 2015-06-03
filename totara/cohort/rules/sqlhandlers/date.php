@@ -40,8 +40,8 @@ $COHORT_RULE_DATE_OP = array(
     COHORT_RULE_DATE_OP_AFTER_FIXED_DATE => 'after',
     COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION => 'beforepastduration',
     COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION => 'inpastduration',
-    COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => 'inpastduration',
-    COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION => 'beforepastduration',
+    COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION => 'infutureduration',
+    COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION => 'afterfutureduration',
 );
 
 

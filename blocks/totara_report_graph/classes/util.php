@@ -49,7 +49,7 @@ class util {
 
         $order = '';
         if ($report->defaultsortcolumn) {
-            $order = "$report->defaultsortcolumn $report->defaultsortorder";
+            $order = $report->get_report_sort();
         }
         if ($records = $DB->get_recordset_sql($sql.$order, $params, 0, $graph->get_max_records())) {
             foreach ($records as $record) {
