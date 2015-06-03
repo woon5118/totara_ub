@@ -123,7 +123,7 @@ class mod_scorm_archive_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('scorm_scoes_track'));
 
         // Trigger the module completion - set viewed.
-        $this->assertEquals(0, $DB->count_records('course_completions'));
+        $this->assertEquals(1, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_crit_compl'));
         $this->assertEquals(0, $DB->count_records('course_modules_completion'));
         $completioninfo->set_module_viewed($course_module, $user->id);

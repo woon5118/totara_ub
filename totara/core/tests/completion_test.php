@@ -74,6 +74,8 @@ class totara_core_completion_testcase extends advanced_testcase {
 
         // Create completion objects.
         $this->comp_rpl = new stdClass();
+        $this->comp_rpl->id = $DB->get_field('course_completions', 'id',
+            array('userid' => $this->user_rpl->id, 'course' => $this->course->id));
         $this->comp_rpl->userid = $this->user_rpl->id;
         $this->comp_rpl->course = $this->course->id;
         $this->comp_rpl->timeenrolled = $this->now;
@@ -83,6 +85,8 @@ class totara_core_completion_testcase extends advanced_testcase {
         $this->comp_rpl->status = COMPLETION_STATUS_COMPLETEVIARPL;
 
         $this->comp_man = new stdClass();
+        $this->comp_man->id = $DB->get_field('course_completions', 'id',
+            array('userid' => $this->user_man->id, 'course' => $this->course->id));
         $this->comp_man->userid = $this->user_man->id;
         $this->comp_man->course = $this->course->id;
         $this->comp_man->timeenrolled = $this->now;
@@ -144,17 +148,18 @@ class totara_core_completion_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        $DB->insert_record('course_completions', $this->comp_rpl);
+        // Make sure the records were created when the user was enrolled.
+        $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
-        // Make sure the record is there.
-        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $this->course->id)));
+        // Update the record in the db directly.
+        $DB->update_record('course_completions', $this->comp_rpl);
 
         // Trigger completion refresh for course module.
         $mod = $DB->get_record('course_modules', array('id' => $this->mod1->id));
         $completion = new completion_info($this->course);
         $completion->reset_all_state($mod);
 
-        // Make sure the record is still there, creates an empty record for other user.
+        // Make sure the records are still there.
         $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
         // Verify the data is intact.
@@ -172,16 +177,17 @@ class totara_core_completion_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $completion = new completion_info($this->course);
 
-        $DB->insert_record('course_completions', $this->comp_man);
+        // Make sure the records were created when the user was enrolled.
+        $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
-        // Make sure the record is there.
-        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $this->course->id)));
+        // Update the record in the db directly.
+        $DB->update_record('course_completions', $this->comp_man);
 
         // Trigger completion refresh for course module.
         $mod = $DB->get_record('course_modules', array('id' => $this->mod1->id));
         $completion->reset_all_state($mod);
 
-        // Make sure the record is still there, creates an empty record for other user.
+        // Make sure the record is still there.
         $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
         // Verify the data has been reset.
@@ -219,8 +225,8 @@ class totara_core_completion_testcase extends advanced_testcase {
 
         // And they should both be marked as complete and belong to user_man.
 
-        // And one completed course completion for the manual user.
-        $this->assertEquals(1, $DB->count_records('course_completions', array('course' => $this->course->id)));
+        // And two course completion records.
+        $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
         // Reset one of the activity modules.
         $mod = $DB->get_record('course_modules', array('id' => $this->mod1->id));
@@ -235,7 +241,7 @@ class totara_core_completion_testcase extends advanced_testcase {
             $this->assertGreaterThanOrEqual(0, $record->timecompleted);
         }
 
-        // Check there is now 2 course completion records.
+        // Check there is still two course completion records.
         $this->assertEquals(2, $DB->count_records('course_completions', array('course' => $this->course->id)));
 
         // And that user_man has been marked for re-aggregation.
