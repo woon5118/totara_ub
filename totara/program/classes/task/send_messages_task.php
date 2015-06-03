@@ -73,7 +73,7 @@ class send_messages_task extends \core\task\scheduled_task {
         // Send alerts if any course sets are overdue.
         $this->program_cron_coursesets_overdue($programs);
 
-        // Send alerts if any course sets are overdue.
+        // Send follow-up messages to completed users.
         $this->program_cron_learner_followups($programs);
 
         // Send alerts if any programs have outstanding exceptions.
@@ -106,13 +106,22 @@ class send_messages_task extends \core\task\scheduled_task {
         $sql = "SELECT pua.id, pua.userid, pua.programid, pm.id as messageid
                   FROM {prog_user_assignment} pua
             INNER JOIN {prog_message} pm
-                    ON pm.programid = pua.programid AND pm.messagetype = :enroltype
+                    ON pm.programid = pua.programid
+                   AND pm.messagetype = :enroltype
              LEFT JOIN {prog_messagelog} pml
                     ON pml.messageid = pm.id AND pml.userid = pua.userid
                  WHERE pua.timeassigned >= :lastrun
+                   AND pua.exceptionstatus <> :exraise
+                   AND pua.exceptionstatus <> :exdismiss
                    AND pml.id IS NULL
               ORDER BY pua.programid, pua.userid";
-        $params = array('enroltype' => MESSAGETYPE_ENROLMENT, 'lastrun' => $lastrun);
+
+        $params = array(
+            'exraise' => PROGRAM_EXCEPTION_RAISED,
+            'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
+            'enroltype' => MESSAGETYPE_ENROLMENT,
+            'lastrun' => $lastrun
+        );
 
         $enrolments = $DB->get_records_sql($sql, $params);
 
@@ -168,21 +177,36 @@ class send_messages_task extends \core\task\scheduled_task {
         // there are any program due messages defined by the program with trigger
         // times that match the user's due dates.
         $sql = "SELECT u.*, pc.programid, pc.timedue, pm.id AS messageid, pm.triggertime
-                FROM {user} u
-                INNER JOIN {prog_completion} pc ON u.id = pc.userid
-                INNER JOIN {prog_user_assignment} pua ON (pc.userid = pua.userid AND pc.programid = pua.programid)
-                INNER JOIN {prog_message} pm ON pc.programid = pm.programid
-                WHERE pc.timecompleted = ?
-                AND pc.coursesetid = ?
-                AND pm.messagetype = ?
-                AND pc.timedue > 0
-                AND (pc.timedue - pm.triggertime) < ?
-                AND u.suspended = 0
-                AND u.deleted = 0
-                ORDER BY pc.programid, u.id";
+                  FROM {user} u
+            INNER JOIN {prog_completion} pc
+                    ON u.id = pc.userid
+            INNER JOIN {prog_user_assignment} pua
+                    ON (pc.userid = pua.userid
+                   AND pc.programid = pua.programid
+                   AND pua.exceptionstatus <> :exraise
+                   AND pua.exceptionstatus <> :exdismiss)
+            INNER JOIN {prog_message} pm
+                    ON pc.programid = pm.programid
+                 WHERE pc.timecompleted = :timecomp
+                   AND pc.coursesetid = :csid
+                   AND pm.messagetype = :mtype
+                   AND pc.timedue > 0
+                   AND (pc.timedue - pm.triggertime) < :now
+                   AND u.suspended = 0
+                   AND u.deleted = 0
+              ORDER BY pc.programid, u.id";
+
+        $params = array(
+            'exraise' => PROGRAM_EXCEPTION_RAISED,
+            'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
+            'timecomp' => 0,
+            'csid' => 0,
+            'mtype' => MESSAGETYPE_PROGRAM_DUE,
+            'now' => $now,
+        );
 
         // Get the records.
-        $rs = $DB->get_recordset_sql($sql, array(0, 0, MESSAGETYPE_PROGRAM_DUE, $now));
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
             if (isset($programs[$user->programid])) {
@@ -227,21 +251,36 @@ class send_messages_task extends \core\task\scheduled_task {
         // there are any course set due messages defined by the program with trigger
         // times that match the user's due dates.
         $sql = "SELECT u.*, pc.programid, pc.timedue, pm.id AS messageid, pm.triggertime, pc.coursesetid
-                FROM {user} u
-                INNER JOIN {prog_completion} pc ON u.id = pc.userid
-                INNER JOIN {prog_user_assignment} pua ON (pc.userid = pua.userid AND pc.programid = pua.programid)
-                INNER JOIN {prog_message} pm ON pc.programid = pm.programid
-                WHERE pc.timecompleted = ?
-                AND pc.coursesetid <> ?
-                AND pm.messagetype = ?
-                AND pc.timedue > 0
-                AND (pc.timedue - pm.triggertime) < ?
-                AND u.suspended = 0
-                AND u.deleted = 0
-                ORDER BY pc.programid, u.id";
+                  FROM {user} u
+            INNER JOIN {prog_completion} pc
+                    ON u.id = pc.userid
+            INNER JOIN {prog_user_assignment} pua
+                    ON (pc.userid = pua.userid
+                   AND pc.programid = pua.programid
+                   AND pua.exceptionstatus <> :exraise
+                   AND pua.exceptionstatus <> :exdismiss)
+            INNER JOIN {prog_message} pm
+                    ON pc.programid = pm.programid
+                 WHERE pc.timecompleted = :timecomp
+                   AND pc.coursesetid <> :csid
+                   AND pm.messagetype = :mtype
+                   AND pc.timedue > 0
+                   AND (pc.timedue - pm.triggertime) < :now
+                   AND u.suspended = 0
+                   AND u.deleted = 0
+              ORDER BY pc.programid, u.id";
+
+        $params = array(
+            'exraise' => PROGRAM_EXCEPTION_RAISED,
+            'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
+            'timecomp' => 0,
+            'csid' => 0,
+            'mtype' => MESSAGETYPE_COURSESET_DUE,
+            'now' => $now,
+        );
 
         // Get the records.
-        $rs = $DB->get_recordset_sql($sql, array(0, 0, MESSAGETYPE_COURSESET_DUE, $now));
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
 
@@ -287,21 +326,36 @@ class send_messages_task extends \core\task\scheduled_task {
         // based on their program due dates and the trigger dates in any program
         // overdue messages that are defined by the program.
         $sql = "SELECT u.*, pc.programid, pc.timedue, pm.id AS messageid, pm.triggertime
-                FROM {user} u
-                INNER JOIN {prog_completion} pc ON u.id = pc.userid
-                INNER JOIN {prog_user_assignment} pua ON (pc.userid = pua.userid AND pc.programid = pua.programid)
-                INNER JOIN {prog_message} pm ON pc.programid = pm.programid
-                WHERE pc.timecompleted = ?
-                AND pc.coursesetid = ?
-                AND pm.messagetype = ?
-                AND pc.timedue > 0
-                AND (pc.timedue + pm.triggertime) < ?
-                AND u.suspended = 0
-                AND u.deleted = 0
-                ORDER BY pc.programid, u.id";
+                  FROM {user} u
+            INNER JOIN {prog_completion} pc
+                    ON u.id = pc.userid
+            INNER JOIN {prog_user_assignment} pua
+                    ON (pc.userid = pua.userid
+                   AND pc.programid = pua.programid
+                   AND pua.exceptionstatus <> :exraise
+                   AND pua.exceptionstatus <> :exdismiss)
+            INNER JOIN {prog_message} pm
+                    ON pc.programid = pm.programid
+                 WHERE pc.timecompleted = :timecomp
+                   AND pc.coursesetid = :csid
+                   AND pm.messagetype = :mtype
+                   AND pc.timedue > 0
+                   AND (pc.timedue + pm.triggertime) < :now
+                   AND u.suspended = 0
+                   AND u.deleted = 0
+              ORDER BY pc.programid, u.id";
+
+        $params = array(
+            'exraise' => PROGRAM_EXCEPTION_RAISED,
+            'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
+            'timecomp' => 0,
+            'csid' => 0,
+            'mtype' => MESSAGETYPE_PROGRAM_OVERDUE,
+            'now' => $now,
+        );
 
         // Get the records.
-        $rs = $DB->get_recordset_sql($sql, array(0, 0, MESSAGETYPE_PROGRAM_OVERDUE, $now));
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
 
@@ -346,21 +400,36 @@ class send_messages_task extends \core\task\scheduled_task {
         // based on their course set due dates and the trigger dates in any course set
         // overdue messages that are defined by the program.
         $sql = "SELECT u.*, pc.programid, pc.timedue, pm.id AS messageid, pm.triggertime, pc.coursesetid
-                FROM {user} u
-                INNER JOIN {prog_completion} pc ON u.id = pc.userid
-                INNER JOIN {prog_user_assignment} pua ON (pc.userid = pua.userid AND pc.programid = pua.programid)
-                INNER JOIN {prog_message} pm ON pc.programid = pm.programid
-                WHERE pc.timecompleted = ?
-                AND pc.coursesetid <> ?
-                AND pm.messagetype = ?
-                AND pc.timedue > 0
-                AND (pc.timedue + pm.triggertime) < ?
-                AND u.suspended = 0
-                AND u.deleted = 0
-                ORDER BY pc.programid, u.id";
+                  FROM {user} u
+            INNER JOIN {prog_completion} pc
+                    ON u.id = pc.userid
+            INNER JOIN {prog_user_assignment} pua
+                    ON (pc.userid = pua.userid
+                   AND pc.programid = pua.programid
+                   AND pua.exceptionstatus <> :exraise
+                   AND pua.exceptionstatus <> :exdismiss)
+            INNER JOIN {prog_message} pm
+                    ON pc.programid = pm.programid
+                 WHERE pc.timecompleted = :timecomp
+                   AND pc.coursesetid <> :csid
+                   AND pm.messagetype = :mtype
+                   AND pc.timedue > 0
+                   AND (pc.timedue + pm.triggertime) < :now
+                   AND u.suspended = 0
+                   AND u.deleted = 0
+              ORDER BY pc.programid, u.id";
+
+        $params = array(
+            'exraise' => PROGRAM_EXCEPTION_RAISED,
+            'exdismiss' => PROGRAM_EXCEPTION_DISMISSED,
+            'timecomp' => 0,
+            'csid' => 0,
+            'mtype' => MESSAGETYPE_COURSESET_OVERDUE,
+            'now' => $now,
+        );
 
         // Get the records.
-        $rs = $DB->get_recordset_sql($sql, array(0, 0, MESSAGETYPE_COURSESET_OVERDUE, $now));
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
 
@@ -388,7 +457,7 @@ class send_messages_task extends \core\task\scheduled_task {
     }
 
     /**
-     * Checks if any course set overdue messages need to be sent and sends them
+     * Checks if any follow-up messages need to be sent and sends them
      *
      * @param array $programs An array of program objects. This is passed by reference so that it can be populated and re-used
      */
@@ -405,19 +474,29 @@ class send_messages_task extends \core\task\scheduled_task {
         // based on their course completion dates and the trigger dates in any
         // follow-up messages that are defined by the program.
         $sql = "SELECT u.id, pc.programid, pc.timecompleted, pm.id AS messageid, pm.triggertime
-                FROM {user} u
-                INNER JOIN {prog_completion} pc ON u.id = pc.userid
-                INNER JOIN {prog_user_assignment} pua ON (pc.userid = pua.userid AND pc.programid = pua.programid)
-                INNER JOIN {prog_message} pm ON pc.programid = pm.programid
-                WHERE pc.status = ?
-                AND pm.messagetype = ?
-                AND (pc.timecompleted + pm.triggertime) < ?
-                AND u.suspended = 0
-                AND u.deleted = 0
-                ORDER BY pc.programid, u.id";
+                  FROM {user} u
+            INNER JOIN {prog_completion} pc
+                    ON u.id = pc.userid
+            INNER JOIN {prog_user_assignment} pua
+                    ON (pc.userid = pua.userid
+                   AND pc.programid = pua.programid)
+            INNER JOIN {prog_message} pm
+                    ON pc.programid = pm.programid
+                 WHERE pc.status = :compstatus
+                   AND pm.messagetype = :mtype
+                   AND (pc.timecompleted + pm.triggertime) < :now
+                   AND u.suspended = 0
+                   AND u.deleted = 0
+              ORDER BY pc.programid, u.id";
+
+        $params = array(
+            'compstatus' => STATUS_PROGRAM_COMPLETE,
+            'mtype' => MESSAGETYPE_LEARNER_FOLLOWUP,
+            'now' => $now,
+        );
 
         // Get the records.
-        $rs = $DB->get_recordset_sql($sql, array(STATUS_PROGRAM_COMPLETE, MESSAGETYPE_LEARNER_FOLLOWUP, $now));
+        $rs = $DB->get_recordset_sql($sql, $params);
 
         foreach ($rs as $user) {
 
@@ -466,9 +545,9 @@ class send_messages_task extends \core\task\scheduled_task {
                 FROM {prog} p
                 JOIN {prog_exception} pe
                    ON p.id = pe.programid
-                WHERE p.exceptionssent = ?";
+                WHERE p.exceptionssent = :exsent";
 
-        $progsfound = $DB->get_records_sql($sql, array(0));
+        $progsfound = $DB->get_records_sql($sql, array('exsent' => 0));
 
         foreach ($progsfound as $progfound) {
 
