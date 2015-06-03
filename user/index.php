@@ -202,11 +202,7 @@ if (isset($hiddenfields['lastaccess'])) {
 }
 
 // Print settings and things in a table across the top.
-$controlstable = new html_table();
-$controlstable->attributes['class'] = 'controls';
-$controlstable->cellspacing = 0;
-$controlstable->data[] = new html_table_row();
-
+$controls = array();
 // Print my course menus.
 if ($mycourses = enrol_get_my_courses()) {
     $courselist = array();
@@ -221,10 +217,13 @@ if ($mycourses = enrol_get_my_courses()) {
     }
     $select = new single_select($popupurl, 'id', $courselist, $course->id, null, 'courseform');
     $select->set_label(get_string('mycourses'));
-    $controlstable->data[0]->cells[] = $OUTPUT->render($select);
+    $controls[] = $OUTPUT->render($select);
 }
 
-$controlstable->data[0]->cells[] = groups_print_course_menu($course, $baseurl->out(), true);
+$groupsmenu = groups_print_course_menu($course, $baseurl->out(), true);
+if (!empty($groupsmenu)) {
+    $controls[] = $groupsmenu;
+}
 
 if (!isset($hiddenfields['lastaccess'])) {
     // Get minimum lastaccess for this course and display a dropbox to filter by lastaccess going back this far.
@@ -279,7 +278,7 @@ if (!isset($hiddenfields['lastaccess'])) {
     if (count($timeoptions) > 1) {
         $select = new single_select($baseurl, 'accesssince', $timeoptions, $accesssince, null, 'timeoptions');
         $select->set_label(get_string('usersnoaccesssince'));
-        $controlstable->data[0]->cells[] = $OUTPUT->render($select);
+        $controls[] = $OUTPUT->render($select);
     }
 }
 
@@ -287,12 +286,9 @@ $formatmenu = array( '0' => get_string('brief'),
                      '1' => get_string('userdetails'));
 $select = new single_select($baseurl, 'mode', $formatmenu, $mode, null, 'formatmenu');
 $select->set_label(get_string('userlist'));
-$userlistcell = new html_table_cell();
-$userlistcell->attributes['class'] = 'right';
-$userlistcell->text = $OUTPUT->render($select);
-$controlstable->data[0]->cells[] = $userlistcell;
+$controls[] = $OUTPUT->render($select);
 
-echo html_writer::table($controlstable);
+echo html_writer::div(implode($controls), '', array('id' => 'courseparticipantsfilter', 'data-controlscount' => count($controls)));
 
 if ($currentgroup and (!$isseparategroups or has_capability('moodle/site:accessallgroups', $context))) {
     // Display info about the group.

@@ -104,6 +104,49 @@
         }
     }
 }
+
+#courseparticipantsfilter > div {
+    display: inline-block;
+    text-align: center;
+}
+.dir-ltr #courseparticipantsfilter > div:last-child,
+.dir-rtl #courseparticipantsfilter > div:first-child {
+    text-align: right;
+}
+.dir-ltr #courseparticipantsfilter > div:first-child,
+.dir-rtl #courseparticipantsfilter > div:last-child {
+    text-align: left;
+}
+
+#courseparticipantsfilter[data-controlscount="4"] > div {
+    width: 25%;
+}
+@media screen and (max-width: 1199px) {
+    #courseparticipantsfilter[data-controlscount="4"] > div {
+        width: 50%;
+    }
+    .dir-ltr #courseparticipantsfilter[data-controlscount="4"] > div:nth-child(2),
+    .dir-rtl #courseparticipantsfilter[data-controlscount="4"] > div:nth-child(3) {
+        text-align: right;
+    }
+    .dir-ltr #courseparticipantsfilter[data-controlscount="4"] > div:nth-child(3),
+    .dir-rtl #courseparticipantsfilter[data-controlscount="4"] > div:nth-child(2) {
+        text-align: left;
+    }
+}
+#courseparticipantsfilter[data-controlscount="3"] > div {
+    width: 33%;
+}
+#courseparticipantsfilter[data-controlscount="2"] > div {
+    width: 50%;
+}
+#courseparticipantsfilter[data-controlscount="1"] > div {
+    width: 100%;
+}
+#courseparticipantsfilter label {
+    display: block;
+}
+
 .userinfobox {
     width: 100%;
     border: 1px solid;

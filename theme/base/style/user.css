@@ -24,6 +24,12 @@
 .userlist table.controls td.right,
 .userlist table.controls td.left {padding: 4px;}
 .userlist table.controls .right {text-align: right;}
+#courseparticipantsfilter > div {display: inline-block;}
+#courseparticipantsfilter[data-controlscount="4"] > div {width: 25%;}
+#courseparticipantsfilter[data-controlscount="3"] > div {width: 33%;}
+#courseparticipantsfilter[data-controlscount="2"] > div {width: 50%;}
+#courseparticipantsfilter[data-controlscount="1"] > div {width: 100%;}
+#courseparticipantsfilter label {display: block}
 
 .userinfobox {width:100%;border:1px solid;border-collapse: separate;padding:10px;}
 .userinfobox .left,
