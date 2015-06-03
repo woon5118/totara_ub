@@ -735,20 +735,16 @@ class rb_source_dp_certification extends rb_base_source {
             }
 
             $days = '';
-            if ($row->status != CERTIFSTATUS_EXPIRED) {
-                $days_remaining = floor(($time - time()) / 86400);
-                if ($days_remaining == 1) {
-                    $days = get_string('onedayremaining', 'totara_program');
-                } else if ($days_remaining < 10 && $days_remaining > 0) {
-                    $days = get_string('daysremaining', 'totara_program', $days_remaining);
-                } else if ($time < time()) {
-                    $days = get_string('overdue', 'totara_plan');
-                }
-                if ($days != '') {
-                    $out .= html_writer::empty_tag('br') . $OUTPUT->error_text($days);
-                }
-            } else if ($row->status != CERTIFSTATUS_EXPIRED) {
-                $out .= html_writer::empty_tag('br') . $OUTPUT->error_text(get_string('expired'));
+            $days_remaining = floor(($time - time()) / 86400);
+            if ($days_remaining == 1) {
+                $days = get_string('onedayremaining', 'totara_program');
+            } else if ($days_remaining < 10 && $days_remaining > 0) {
+                $days = get_string('daysremaining', 'totara_program', $days_remaining);
+            } else if ($time < time()) {
+                $days = get_string('overdue', 'totara_plan');
+            }
+            if ($days != '') {
+                $out .= html_writer::empty_tag('br') . $OUTPUT->error_text($days);
             }
         }
         return $out;
@@ -770,13 +766,29 @@ class rb_source_dp_certification extends rb_base_source {
      */
     function rb_display_certif_status($status, $row) {
         global $CERTIFSTATUS;
+
+        $strstatus = '';
         if ($status && isset($CERTIFSTATUS[$status])) {
             $unassigned = '';
             if ($row->unassigned) {
                 $unassigned = get_string('unassigned', 'rb_source_dp_certification');
             }
-            return get_string($CERTIFSTATUS[$status], 'totara_certification') .' '. $unassigned;
+            switch ($status) {
+                case CERTIFSTATUS_ASSIGNED:
+                    $strstatus = get_string('notcertified', 'totara_certification') . ' ' . $unassigned;
+                    break;
+                case CERTIFSTATUS_COMPLETED:
+                    $strstatus = get_string('certified', 'totara_certification') . ' ' . $unassigned;
+                    break;
+                case CERTIFSTATUS_INPROGRESS:
+                    // Return empty string.
+                    break;
+                default:
+                    $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification') . ' ' . $unassigned;
+                    break;
+            }
         }
+        return $strstatus;
     }
 
 
