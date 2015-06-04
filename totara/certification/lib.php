@@ -438,6 +438,44 @@ function recertify_expires_stage() {
 }
 
 /**
+ * Triggered by cron, this function should check for missing certif_completion records. If it finds any missing then
+ * they should be created, and missing dependent prog_completion (course set > 0) records should also be created.
+ *
+ * @return int Count of certif_completion records created. Greater than 0 indicates that a problem was discovered and repaired.
+ */
+function certification_fix_missing_certif_completions() {
+    global $DB;
+
+    // Look for prog_completion (course set = 0) records without matching certif_completion records.
+    $sql = "SELECT p.id AS progid, p.certifid, pc.userid
+              FROM {prog_completion} pc
+              JOIN {prog} p ON pc.programid = p.id
+         LEFT JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = pc.userid
+             WHERE pc.coursesetid = 0
+               AND p.certifid IS NOT NULL
+               AND cc.id IS NULL";
+    $missingcertifs = $DB->get_recordset_sql($sql);
+
+    $missingcount = 0;
+    $programs = array();
+    foreach ($missingcertifs as $missingcertif) {
+        $missingcount++;
+
+        // Create the missing certif_completion record.
+        write_certif_completion($missingcertif->certifid, $missingcertif->userid);
+
+        // Create missing prog_completion (course set != 0) records for completed course sets.
+        if (!isset($programs[$missingcertif->progid])) {
+            // Cache the program objects.
+            $programs[$missingcertif->progid] = new program($missingcertif->progid);
+        }
+        prog_update_completion($missingcertif->userid, $programs[$missingcertif->progid]);
+    }
+
+    return $missingcount;
+}
+
+/**
  * Get time of last completed certification course
  *
  * @param integer $certificationid
@@ -723,12 +761,35 @@ function send_certif_message($progid, $userid, $msgtype) {
 function get_certification_path_user($certificationid, $userid) {
     global $DB;
 
+    if (empty($certificationid)) {
+        // This is not a certification.
+        return CERTIFPATH_STD;
+    }
+
     $certifpath = $DB->get_field('certif_completion', 'certifpath', array('certifid' => $certificationid, 'userid' => $userid));
 
     if ($certifpath) {
         return $certifpath;
     } else {
-        return CERTIFPATH_UNSET;
+        // Check if the user has a prog_completion (course set = 0) record.
+        $programid = $DB->get_field('prog', 'id', array('certifid' => $certificationid));
+        if (!$DB->record_exists('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0))) {
+            // There is no prog_completion, so they are not assigned to this certification, thus not on any path.
+            return CERTIFPATH_UNSET;
+        }
+
+        // There is a prog_completion record but no matching certif_completion record, so create it.
+        write_certif_completion($certificationid, $userid);
+
+        // Create missing prog_completion (course set != 0) records for completed course sets.
+        $programid = $DB->get_field('prog', 'id', array('certifid' => $certificationid));
+        $program = new program($programid);
+        prog_update_completion($userid, $program);
+
+        debugging("!WARNING! certif_completion record was missing for user id {$userid}, certification id {$certificationid}.\n" .
+                  "This indicates that a problem occurred during user assignment. The missing record has been created.\n" .
+                  "Contact Totara support staff if this problem persists. !WARNING!");
+        return CERTIFPATH_CERT;
     }
 }
 

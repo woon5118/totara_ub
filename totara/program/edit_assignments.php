@@ -166,9 +166,7 @@ $exceptions = $program->get_exception_count();
 $currenttab = 'assignments';
 require('tabs.php');
 
-$certificationpath = get_certification_path_user($program->certifid, $USER->id);
-
-echo $renderer->display_edit_assignment_form($id, $categories, $certificationpath);
+echo $renderer->display_edit_assignment_form($id, $categories, CERTIFPATH_STD); // Can use STD or CERT, they are the same.
 
 echo $renderer->get_cancel_button(array('id' => $program->id));
 

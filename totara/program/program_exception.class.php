@@ -170,7 +170,6 @@ abstract class prog_exception {
         // Get the total time allowed for the content in the program.
         require_once($CFG->dirroot . '/totara/certification/lib.php');
         $certifpath = get_certification_path_user($program->certifid, $this->userid);
-        $certifpath == CERTIFPATH_UNSET && $certifpath = CERTIFPATH_CERT;
         $total_time_allowed = $program->content->get_total_time_allowance($certifpath);
 
         // Give the user this much time plus one week.

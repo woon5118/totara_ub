@@ -50,6 +50,15 @@ class update_certification_task extends \core\task\scheduled_task {
             return;
         }
 
+        mtrace("Checking for missing certif_completion records");
+        $processed = certification_fix_missing_certif_completions();
+        mtrace("... ".$processed.' processed');
+        if ($processed > 0) {
+            debugging("!WARNING! The number above should have been 0. Greater than 0 indicates that a problem\n" .
+                "occurred during user assignment. The records should now be repaired, but if this\n" .
+                "problem persists then it should be reported to the Totara support staff. !WARNING!");
+        }
+
         mtrace("Doing recertify_window_opens_stage");
         $processed = recertify_window_opens_stage();
         mtrace("... ".$processed.' processed');
@@ -63,4 +72,3 @@ class update_certification_task extends \core\task\scheduled_task {
         mtrace("... ".$processed.' processed');
     }
 }
-

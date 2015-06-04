@@ -1142,7 +1142,6 @@ class program {
         }
 
         $certifpath = get_certification_path_user($this->certifid, $userid);
-        $certifpath == CERTIFPATH_UNSET && $certifpath = CERTIFPATH_CERT;
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
         $courseset_group_count = count($courseset_groups);
         $courseset_group_complete_count = 0;
@@ -1181,7 +1180,6 @@ class program {
         }
 
         $certifpath = get_certification_path_user($this->certifid, $userid);
-        $certifpath == CERTIFPATH_UNSET && $certifpath = CERTIFPATH_CERT;
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
 
         $courseset_group_completed = false;
@@ -1744,9 +1742,6 @@ class program {
 
         if ($timedue != COMPLETION_TIME_NOT_SET) {
             $certifpath = get_certification_path_user($this->certifid, $userid);
-            if ($certifpath == CERTIFPATH_UNSET) {
-                $certifpath = CERTIFPATH_CERT;
-            }
             $total_time_allowed = $this->content->get_total_time_allowance($certifpath);
             $time_until_duedate = $timedue - $now;
 
