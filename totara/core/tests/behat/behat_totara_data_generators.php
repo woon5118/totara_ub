@@ -128,6 +128,32 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'learning_plan_objective_for_behat',
                 'required' => array('user', 'plan', 'name')
             ),
+        ),
+        'totara_appraisal' => array (
+            'appraisals' => array(
+                'datagenerator' => 'appraisal',
+                'required' => array('name'),
+            ),
+            'stages' => array(
+                'datagenerator' => 'stage_for_behat',
+                'required' => array('appraisal', 'name'),
+            ),
+            'pages' => array(
+                'datagenerator' => 'page_for_behat',
+                'required' => array('appraisal', 'stage', 'name'),
+            ),
+            'questions' => array(
+                'datagenerator' => 'question_for_behat',
+                'required' => array('appraisal', 'stage', 'page', 'name'),
+            ),
+            'assignments' => array(
+                'datagenerator' => 'assignment_for_behat',
+                'required' => array('appraisal', 'type', 'id'),
+            ),
+            'messages' => array(
+                'datagenerator' => 'message_for_behat',
+                'required' => array('appraisal', 'recipients'),
+            ),
         )
     );
 
