@@ -510,6 +510,9 @@ function profile_edit_category($id, $redirect) {
  */
 function profile_edit_field($id, $datatype, $redirect) {
     global $CFG, $DB, $OUTPUT, $PAGE;
+    if ($datatype == '') {
+        redirect($redirect);
+    }
 
     if (!$field = $DB->get_record('user_info_field', array('id' => $id))) {
         $field = new stdClass();
