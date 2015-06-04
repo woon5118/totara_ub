@@ -321,37 +321,6 @@ class behat_totara_core extends behat_base {
     }
 
     /**
-     * Not ideal but we need to run the recertification task and
-     * there is no way (currently) to do so through the interface.
-     *
-     * @Then /^I run the recertification task$/
-     */
-    public function i_run_recertification_task() {
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/certification/lib.php');
-        recertify_window_opens_stage();
-        recertify_window_abouttoclose_stage();
-        recertify_expires_stage();
-    }
-
-    /**
-     * Not ideal but we need to run the programs update learner task and
-     * there is no way (currently) to do so through the interface.
-     *
-     * @When /^I run the program assignments task$/
-     */
-    public function i_run_program_assignments_task() {
-        global $DB;
-
-        // Get all programs.
-        $progrecords = $DB->get_records('prog');
-        foreach ($progrecords as $prog) {
-            $program = new \program($prog->id);
-            $program->update_learner_assignments();
-        }
-    }
-
-    /**
      * Run the specified scheduled task.
      * You need to specify the class name, as shown in Site administration -> Server -> Scheduled tasks.
      *
