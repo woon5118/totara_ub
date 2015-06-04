@@ -47,11 +47,8 @@ $roles = appraisal::get_roles();
 
 $appraisalid = required_param('appraisalid', PARAM_INT);
 $spaces = optional_param('spaces', 0, PARAM_INT);
-
-// We expect array of stages.
-$stageschecked = (isset($_REQUEST['stages']) && is_array($_REQUEST['stages'])) ? $_REQUEST['stages'] : array();
-$printstages = array_keys(array_filter($stageschecked));
-$action = optional_param('action', '', PARAM_ACTION);
+$stageschecked = optional_param_array('stages', null, PARAM_BOOL);
+$action = optional_param('action', '', PARAM_ALPHANUMEXT);
 
 $subject = $DB->get_record('user', array('id' => $subjectid));
 if ($action == 'stages') {
@@ -61,10 +58,6 @@ if ($action == 'stages') {
         $usercontext = context_user::instance($subjectid);
         require_capability('totara/appraisal:printstaffappraisals', $usercontext);
     }
-}
-
-if (!is_array($printstages)) {
-    throw new appraisal_exception('error:stagesmustbearray');
 }
 
 $appraisal = new appraisal($appraisalid);
@@ -99,20 +92,18 @@ $renderer = $PAGE->get_renderer('totara_appraisal');
 $heading = get_string('myappraisals', 'totara_appraisal');
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
-$nouserpic = false;
 
 if ($action == 'snapshot') {
     // This may throw various warnings, keep it in error logs only.
     ini_set('display_errors', '0');
     ini_set('log_errors', '1');
 
-    $nouserpic = true;
     require_once($CFG->libdir . '/dompdf/lib.php');
     core_php_time_limit::raise('300');
 
     $out = "";
     $out .= $renderer->snapshot_header();
-    $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
+    $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, true, $stageschecked);
 
     // The renderer must not be used after footer.
     $strsource = new stdClass();
@@ -166,5 +157,5 @@ if ($action == 'snapshot') {
 $PAGE->requires->js_init_code('window.print()', true);
 
 echo $renderer->snapshot_header();
-echo $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
+echo $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, false, $stageschecked);
 echo $renderer->snapshot_footer();

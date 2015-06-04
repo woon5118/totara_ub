@@ -1864,9 +1864,16 @@ class totara_appraisal_renderer extends plugin_renderer_base {
     /**
      * Returns the base markup for a snapshot export.
      *
-     * @return string HTML
+     * @param appraisal $appraisal
+     * @param stdClass $subject user object
+     * @param stdClass $userassignment
+     * @param stdClass $roleassignment
+     * @param int $spaces
+     * @param bool $nouserpic true means no user picture
+     * @param array $stageschecked null means all, array stageid=>tobeprinted
+     * @return string HTML fragment
      */
-    public function display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces = 0) {
+    public function display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, $nouserpic, $stageschecked) {
         global $CFG, $TEXTAREA_OPTIONS;
 
         require_once($CFG->libdir . '/dompdf/lib.php');
@@ -1875,10 +1882,8 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         // Set up.
         $out = "";
         $role = $roleassignment->appraisalrole;
-        $roles = $appraisal::get_roles();
         $assignments = $appraisal->get_all_assignments($subject->id);
         $otherassignments = $assignments;
-        $nouserpic = true;
 
         $out .= $this->display_appraisal_header($appraisal, $userassignment, $assignments);
 
@@ -1892,7 +1897,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $stageslist = appraisal_stage::get_stages($appraisal->id, array($role));
 
         foreach ($stageslist as $stageid => $stagedata) {
-            if (empty($printstages) || in_array($stageid, $printstages)) {
+            if ($stageschecked === null or !empty($stageschecked[$stageid])) {
                 // Print stage.
                 $stage = new appraisal_stage($stageid);
                 $out .= $this->display_stage($appraisal, $stage, $userassignment, $roleassignment, '', false);
