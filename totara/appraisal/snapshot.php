@@ -94,43 +94,77 @@ $PAGE->set_url(new moodle_url('/totara/appraisal/snapshot.php', array('role' => 
 
 $PAGE->set_pagelayout('popup');
 
+/** @var \totara_appraisal_renderer|core_renderer $renderer */
 $renderer = $PAGE->get_renderer('totara_appraisal');
-$PAGE->requires->js_init_code('window.print()', true);
 $heading = get_string('myappraisals', 'totara_appraisal');
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 $nouserpic = false;
 
 if ($action == 'snapshot') {
+    // This may throw various warnings, keep it in error logs only.
+    ini_set('display_errors', '0');
+    ini_set('log_errors', '1');
+
     $nouserpic = true;
     require_once($CFG->libdir . '/dompdf/lib.php');
     core_php_time_limit::raise('300');
-}
 
-$out = "";
-$out .= $renderer->snapshot_header();
-$out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
+    $out = "";
+    $out .= $renderer->snapshot_header();
+    $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
 
-if ($action == 'snapshot') {
+    // The renderer must not be used after footer.
+    $strsource = new stdClass();
+    $strsource->link = $renderer->action_link(new moodle_url('/totara/appraisal/index.php'),
+        get_string('allappraisals', 'totara_appraisal'));
+
+    $out .= $renderer->snapshot_footer();
+
+    $content = null;
+    try {
+        $pdf = new totara_dompdf();
+        $pdf->load_html($out);
+        $pdf->render();
+        $content = $pdf->output();
+    } catch (Exception $e) {
+        // Ignore.
+    }
+    if ($content === null) {
+        try {
+            $out = totara_dompdf::hack_html($out);
+            $pdf = new totara_dompdf();
+            $pdf->load_html($out);
+            $pdf->render();
+            $content = $pdf->output();
+        } catch (Exception $e) {
+            // Ignore.
+        }
+    }
+
+    if (!$content) {
+        echo html_writer::tag('div', get_string('snapshoterror', 'totara_appraisal'),
+            array('class'=>'notifyproblem dialog-nobind'));
+        die;
+    }
+
     $filename = 'appraisal_'.$appraisal->id.'_'.date("Y-m-d_His").'_'.$roles[$role].'.pdf';
-    $pdf = new totara_dompdf();
-    $pdf->load_html($out);
-    $pdf->render();
-
-    file_put_contents($CFG->tempdir.'/'.$filename, $pdf->output());
+    file_put_contents($CFG->tempdir.'/'.clean_filename($filename), $content);
 
     // Save into db.
     $downloadurl = $appraisal->save_snapshot($CFG->tempdir.'/'.$filename, $roleassignment->id);
 
     // Message for dialog.
-    $strsource = new stdClass();
-    $strsource->link = $renderer->action_link(new moodle_url('/totara/appraisal/index.php'),
-            get_string('allappraisals', 'totara_appraisal'));
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'downloadurl', 'id' => 'downloadurl',
             'value' => $downloadurl));
     echo html_writer::tag('div', get_string('snapshotdone', 'totara_appraisal', $strsource),
             array('class'=>'notifysuccess dialog-nobind'));
-} else {
-    echo $out;
-    echo $renderer->snapshot_footer();
+    die;
 }
+
+// Print the html snapshot as the last option.
+$PAGE->requires->js_init_code('window.print()', true);
+
+echo $renderer->snapshot_header();
+echo $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces);
+echo $renderer->snapshot_footer();
