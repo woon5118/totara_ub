@@ -79,7 +79,7 @@ class rb_team_members_embedded extends rb_base_embedded {
         $this->contentsettings = array(
             'user' => array(
                 'enable' => 1,
-                'who' => rb_user_content::USER_DIRECT_REPORTS
+                'who' => rb_user_content::USER_DIRECT_REPORTS + rb_user_content::USER_TEMP_REPORTS,
             )
         );
 
