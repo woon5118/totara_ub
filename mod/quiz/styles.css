@@ -264,14 +264,20 @@ body.jsenabled .questionflagcheckbox {
     float: right;
 }
 
-#page-mod-quiz-mod #id_reviewoptionshdr .fitemtitle {
+#page-mod-quiz-mod #id_reviewoptionshdr fieldset.fgroup legend {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#page-mod-quiz-mod #id_reviewoptionshdr .legend {
     width: 100%;
     font-weight: bold;
     text-align: left;
-    height: 2.5em;
+    height: 2.7em;
     margin-left: 0;
+    display: block;
 }
-#page-mod-quiz-mod.dir-rtl #id_reviewoptionshdr .fitemtitle {
+#page-mod-quiz-mod.dir-rtl #id_reviewoptionshdr .legend {
     text-align: right;
 }
 
@@ -279,12 +285,17 @@ body.jsenabled .questionflagcheckbox {
     clear: left;
     margin: 0 0 1em;
 }
-#page-mod-quiz-mod #id_reviewoptionshdr fieldset.fgroup > span {
+#page-mod-quiz-mod #id_reviewoptionshdr fieldset .felement {
+    margin-top: 0;
+    float: none;
+    width: 100%;
+}
+#page-mod-quiz-mod #id_reviewoptionshdr fieldset .felement > span {
     float: left;
     clear: left;
     line-height: 1.7;
 }
-#page-mod-quiz-mod.dir-rtl #id_reviewoptionshdr fieldset.fgroup > span {
+#page-mod-quiz-mod.dir-rtl #id_reviewoptionshdr fieldset .felement > span {
     float: right;
     clear: right;
 }
