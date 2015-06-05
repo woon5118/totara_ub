@@ -193,7 +193,9 @@ function completion_can_view_data($userid, $course = null) {
     }
 
     // Check capabilities
-    $personalcontext = context_user::instance($userid);
+    if (!$personalcontext = context_user::instance($userid, IGNORE_MISSING)) {
+        return false;
+    }
 
     if (has_capability('moodle/user:viewuseractivitiesreport', $personalcontext)) {
         return true;
