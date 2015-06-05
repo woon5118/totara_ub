@@ -92,7 +92,7 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
                 break;
             case COHORT_RULES_OP_IN_NOTCONTAIN:
                 list($sql, $params) = search_get_keyword_where_clause_options($query, $lov, true);
-                list($sqlhandler->sql, $sqlhandler->params) = array("(({$query}) IS NULL OR {$sql})", $params);
+                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} IS NULL OR {$sql})", $params);
                 break;
             case COHORT_RULES_OP_IN_ISEQUALTO:
                 list($sqlhandler->sql, $sqlhandler->params) = search_get_keyword_where_clause_options($query, $lov, false, 'equal');
@@ -104,10 +104,11 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
                 list($sqlhandler->sql, $sqlhandler->params) = search_get_keyword_where_clause_options($query, $lov, false, 'endswith');
                 break;
             case COHORT_RULES_OP_IN_ISEMPTY:
-                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} = ':empty' OR ({$query}) IS NULL)", array('empty' => '' ));
+                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} = :empty OR ({$query}) IS NULL)", array('empty' => ''));
                 break;
             case COHORT_RULES_OP_IN_NOTEQUALTO:
-                list($sqlhandler->sql, $sqlhandler->params) = search_get_keyword_where_clause_options($query, $lov, true, 'notequal');
+                list($sql, $params) = search_get_keyword_where_clause_options($query, $lov, true, 'notequal');
+                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} IS NULL OR {$sql})", $params);
                 break;
             default:
                 list($sqlhandler->sql, $sqlhandler->params) = array('', array());
@@ -132,6 +133,16 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
  * @author aaronw
  */
 class cohort_rule_sqlhandler_in_userfield extends cohort_rule_sqlhandler_in {
+
+    /**
+     * Returns the SQL snippet for this
+     * @return str
+     */
+    public function get_sql_snippet() {
+
+        return $this->construct_sql_snippet($this->field, ($this->equal ? '' : 'not'), $this->listofvalues);
+    }
+
     protected function construct_sql_snippet($field, $not, $lov) {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/totara/cohort/rules/settings.php');
@@ -178,9 +189,17 @@ class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_i
         parent::__construct($field, true);
     }
 
+    /**
+     * Returns the SQL snippet for this
+     * @return str
+     */
+    public function get_sql_snippet() {
+
+        return $this->construct_sql_snippet($this->field, ($this->equal ? '' : 'not'), $this->listofvalues);
+    }
+
     protected function construct_sql_snippet($field, $not, $lov) {
         global $DB;
-
         // If $field is int comes from a menu.
         if (is_int($field)) {
             list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'icu' . $this->ruleid, ($not != 'not'));
@@ -217,18 +236,20 @@ class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_i
             }
             $sqlhandler->params = $params;
         } else {
+            $name = $DB->sql_compare_text('name', 255) . ' = ?';
+            $fieldid = $DB->get_field_select('user_info_field', 'id', $name, array($field));
+            $uniqueparam = $DB->get_unique_param('fieldid');
             $sql = "EXISTS (
                             SELECT 1
-                            FROM {user_info_data} usinda
-                            INNER JOIN {user_info_field} usinfi
-                              ON usinda.fieldid = usinfi.id
-                            WHERE usinda.userid = u.id
-                              AND {$DB->sql_compare_text('usinfi.name', 255)} = '{$field}'
-                              AND ( ";
-
-            $query = " usinda.data ";
+                            FROM {user} usr
+                            LEFT JOIN {user_info_data} usinda
+                              ON usinda.fieldid = :{$uniqueparam} AND usinda.userid = usr.id
+                            WHERE u.id = usr.id
+                              AND ";
+            $query = 'usinda.data';
             $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
-            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ";
+            $sqlhandler->params[$uniqueparam] = $fieldid;
         }
         return $sqlhandler;
     }
@@ -275,24 +296,29 @@ class cohort_rule_sqlhandler_in_poscustomfield extends cohort_rule_sqlhandler_in
     /**
      * These fields are always char
      */
-    public function __construct($field) {
+    public function __construct($field, $datatype) {
+
+        $this->fielddatatype = $datatype;
         parent::__construct($field, true);
     }
 
     protected function construct_sql_snippet($field, $not, $lov) {
-        global $DB;
 
         $sql = "EXISTS (
-            SELECT 1
-            FROM {pos_assignment} pa
-            INNER JOIN {pos_type_info_data} ptid
-              ON pa.positionid = ptid.positionid
-            WHERE pa.userid = u.id
-            AND pa.type = ".POSITION_TYPE_PRIMARY."
-            AND ptid.fieldid = {$field}
-            AND ( ";
+                        SELECT 1
+                        FROM {pos_assignment} pa
+                        INNER JOIN {pos_type_info_data} ptid
+                          ON pa.positionid = ptid.positionid
+                        WHERE pa.userid = u.id
+                          AND pa.type = " . POSITION_TYPE_PRIMARY . "
+                          AND ptid.fieldid = {$field}
+                          AND ( ";
         $query = " ptid.data";
-        $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
+        $equal = $this->equal;
+        if ($this->fielddatatype == 'menu') {
+            $equal = $this->equal == COHORT_RULES_OP_IN_EQUAL ? COHORT_RULES_OP_IN_ISEQUALTO : COHORT_RULES_OP_IN_NOTEQUALTO;
+        }
+        $sqlhandler = $this->get_query_base_operator($equal, $query, $lov);
         $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
         return $sqlhandler;
     }

@@ -76,4 +76,50 @@ class totara_dompdf extends dompdf {
             return file_get_contents($file);
         }
     }
+
+    /**
+     * Attempt to fix problematic html, use only if normal rendering fails.
+     *
+     * @param string $html
+     * @return string
+     */
+    public static function hack_html($html) {
+        // Large tables are always problematic with DOMPDF, get rid of them.
+        $html = self::replace_tag($html, 'table', 'div');
+        $html = self::replace_tag($html, 'tr', 'div');
+        $html = self::replace_tag($html, 'td');
+        $html = self::replace_tag($html, 'th');
+        $html = self::replace_tag($html, 'thead');
+        $html = self::replace_tag($html, 'tbody');
+        $html = self::replace_tag($html, 'tfoot');
+        $html = self::replace_tag($html, 'caption');
+        $html = self::replace_tag($html, 'colgroup');
+
+        // Do more cleanup if tidy extension installed.
+        if (class_exists('tidy')) {
+            $tidy = new tidy();
+            $html = $tidy->repairString($html);
+        }
+
+        return $html;
+    }
+
+    /**
+     * Replace HTML element.
+     *
+     * @param string $html
+     * @param string $tagname
+     * @param string $replacement
+     * @return string
+     */
+    protected static function replace_tag($html, $tagname, $replacement = '') {
+        if ($replacement === '') {
+            $html = preg_replace('|<' . $tagname . '[^>]*>|i', '', $html);
+            $html = preg_replace('|</' . $tagname. '>|i', '', $html);
+        } else {
+            $html = preg_replace('|<' . $tagname . '[^>]*>|i', '<' . $replacement . '>', $html);
+            $html = preg_replace('|</' . $tagname. '>|i', '</' . $replacement . '>', $html);
+        }
+        return $html;
+    }
 }

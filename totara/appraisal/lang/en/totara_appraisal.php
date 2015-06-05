@@ -381,6 +381,7 @@ $string['appraisal_stage_completion'] = 'Stage completion';
 $string['sectioninclude'] = 'Choose which sections to include';
 $string['snapshotdialogtitle'] = 'Save PDF Snapshot';
 $string['snapshotdone'] = 'A snapshot of your appraisal has been saved. You can view it by going to {$a->link}';
+$string['snapshoterror'] = 'Error generating PDF snapshot';
 $string['snapshotgeneration'] = 'Saving snapshot... Please wait.';
 $string['snapshotname'] = 'Snapshot {$a->time}';
 $string['stagecompleted'] = 'You have completed this stage';

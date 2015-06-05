@@ -255,11 +255,13 @@ if ($silast !== 'all') {
     $where_params['silast'] = $silast.'%';
 }
 
+// Show completion only for active user enrolments?
+$showactiveonly = get_config('report_completion', 'showcompletiononlyactiveenrols');
 // Get user match count
-$total = $completion->get_num_tracked_users(implode(' AND ', $where), $where_params, $group);
+$total = $completion->get_num_tracked_users(implode(' AND ', $where), $where_params, $group, $showactiveonly);
 
 // Total user count
-$grandtotal = $completion->get_num_tracked_users('', array(), $group);
+$grandtotal = $completion->get_num_tracked_users('', array(), $group, $showactiveonly);
 
 // If no users in this course what-so-ever
 if (!$grandtotal) {
@@ -279,7 +281,8 @@ if ($total) {
         $firstnamesort ? 'u.firstname ASC' : 'u.lastname ASC',
         $csv ? 0 : COMPLETION_REPORT_PAGE,
         $csv ? 0 : $start,
-        $context
+        $context,
+        $showactiveonly
     );
 }
 
