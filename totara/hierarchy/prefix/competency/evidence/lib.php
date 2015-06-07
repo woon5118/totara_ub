@@ -82,7 +82,7 @@ function hierarchy_can_add_competency_evidence($plan, $component, $userid, $comp
  * @param   int         $competencyid
  * @param   int         $userid
  * @param   int         $prof
- * @param   object      $component      Full plan component class instance
+ * @param   dp_competency_component|null $component Full plan component class instance or null. This is a hack.
  * @param   object      $details        Object containing the (all optional) params positionid, organisationid, assessorid, assessorname, assessmenttype, manual
  * @param   true|int    $reaggregate (optional) time() if set to true, otherwise timestamp supplied
  * @param   bool        $notify (optional)
@@ -137,20 +137,20 @@ function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $compo
     $count = $DB->count_records('block_totara_stats', array('userid' => $currentuser, 'eventtype' => $event, 'data2' => $data2));
     $isproficient = $DB->get_field('comp_scale_values', 'proficient', array('id' => $prof));
 
-    if ($notify) {
-        // check the proficiency is set to "proficient" and check for duplicate data
-        if ($isproficient && $count == 0) {
-            totara_stats_add_event($time, $currentuser, $event, '', $data2);
-            //Send Alert
+    // Check the proficiency is set to "proficient" and check for duplicate data.
+    if ($isproficient && $count == 0) {
+        totara_stats_add_event($time, $currentuser, $event, '', $data2);
+        if ($notify && $component instanceof dp_competency_component) {
+            //Send Alert.
             $alert_detail = new stdClass();
             $alert_detail->itemname = $DB->get_field('comp', 'fullname', array('id' => $data2));
             $alert_detail->text = get_string('competencycompleted', 'totara_plan');
             $component->send_component_complete_alert($alert_detail);
         }
-        // check record exists for removal and is set to "not proficient"
-        else if ($isproficient == 0 && $count > 0) {
-            totara_stats_remove_event($currentuser, $event, $data2);
-        }
+    }
+    // check record exists for removal and is set to "not proficient"
+    else if ($isproficient == 0 && $count > 0) {
+        totara_stats_remove_event($currentuser, $event, $data2);
     }
 
     return $todb->id;

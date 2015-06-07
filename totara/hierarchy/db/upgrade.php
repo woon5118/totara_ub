@@ -1198,5 +1198,36 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014120400, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2015061800) {
+        // Add missing block_totara_stats records.
+        $sql = "SELECT cr.id, cr.userid, cr.competencyid, cr.reaggregate
+                FROM {comp_record} cr
+                WHERE cr.proficiency IS NOT NULL AND (
+                      NOT EXISTS (
+                          SELECT 1
+                          FROM {block_totara_stats} bts
+                          WHERE bts.userid = cr.userid AND bts.data2 = cr.competencyid)
+                )
+                ORDER BY cr.userid";
+        $comprecords = $DB->get_recordset_sql($sql);
+        $newevents = array();
+        foreach ($comprecords as $record) {
+            $newevent = array();
+            $newevent['timestamp'] = $record->reaggregate;
+            $newevent['userid'] = $record->userid;
+            $newevent['eventtype'] = 4;
+            $newevent['data'] = '';
+            $newevent['data2'] = $record->competencyid;
+            $newevents[] = $newevent;
+        }
+        $comprecords->close();
+        $DB->insert_records('block_totara_stats', $newevents);
+        // Clean up newevents arrays as we don't need them any more.
+        unset($newevents);
+        unset($newevent);
+
+        upgrade_plugin_savepoint(true, 2015061800, 'totara', 'hierarchy');
+    }
+
     return true;
 }

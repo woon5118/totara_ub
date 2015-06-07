@@ -50,6 +50,8 @@ class update_competencies_task extends \core\task\scheduled_task {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
         require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/evidence.php');
+        require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
+        require_once($CFG->dirroot.'/totara/plan/development_plan.class.php');
 
         $this->competency_cron_evidence_items();
 
@@ -364,14 +366,19 @@ class update_competencies_task extends \core\task\scheduled_task {
                         mtrace('Update proficiency to '.$aggregated_status);
                     }
 
-                    $cevidence = new \competency_evidence(
-                        array(
-                            'competencyid'  => $current_competency,
-                            'userid'        => $current_user
-                        )
-                    );
-                    $cevidence->update_proficiency($aggregated_status);
+                    // Update the competency evidence.
+                    $details = new \stdClass();
+                    // Get user's current primary position and organisation (if any).
+                    $posrec = $DB->get_record('pos_assignment', array('userid' => $current_user, 'type' => POSITION_TYPE_PRIMARY), 'id, positionid, organisationid');
+                    if ($posrec) {
+                        $details->positionid = $posrec->positionid;
+                        $details->organisationid = $posrec->organisationid;
+                        unset($posrec);
+                    }
 
+                    // Because we do not want to send the alerts, set $notify to false.
+                    // We also pass null as the component as we don't have that here.
+                    hierarchy_add_competency_evidence($current_competency, $current_user, $aggregated_status, null, $details, true, false);
                     // Hook for plan auto completion.
                     dp_plan_item_updated($current_user, 'competency', $current_competency);
                 }
