@@ -45,7 +45,7 @@ class core_component {
     /** @var array list of ignored directories - watch out for auth/db exception */
     protected static $ignoreddirs = array('CVS'=>true, '_vti_cnf'=>true, 'simpletest'=>true, 'db'=>true, 'yui'=>true, 'tests'=>true, 'classes'=>true, 'fonts'=>true);
     /** @var array list plugin types that support subplugins, do not add more here unless absolutely necessary */
-    protected static $supportsubplugins = array('mod', 'editor', 'tool', 'local');
+    protected static $supportsubplugins = array('mod', 'editor', 'totara', 'tool', 'local');
 
     /** @var array cache of plugin types */
     protected static $plugintypes = null;
@@ -69,6 +69,9 @@ class core_component {
     protected static $filestomap = array('lib.php', 'settings.php');
     /** @var array cache of PSR loadable systems */
     protected static $psrclassmap = null;
+
+    /** @var string Totara build */
+    protected static $totarabuild = null;
 
     /**
      * Class loader for Frankenstyle named classes in standard locations.
@@ -181,6 +184,8 @@ class core_component {
                 } else if ((float) $cache['version'] !== (float) self::fetch_core_version()) {
                     // Outdated cache. We trigger an error log to track an eventual repetitive failure of float comparison.
                     error_log('Resetting core_component cache after core upgrade to version ' . self::fetch_core_version());
+                } else if (!isset($cache['totarabuild']) or $cache['totarabuild'] !== self::fetch_totarabuild()) {
+                    error_log('Resetting core_component cache after totara upgrade to build ' . self::fetch_totarabuild());
                 } else if ($cache['plugintypes']['mod'] !== "$CFG->dirroot/mod") {
                     // $CFG->dirroot was changed.
                 } else {
@@ -282,6 +287,7 @@ class core_component {
             'filemap'           => self::$filemap,
             'version'           => self::$version,
             'psrclassmap'       => self::$psrclassmap,
+            'totarabuild'       => self::$totarabuild,
         );
 
         return '<?php
@@ -307,6 +313,7 @@ $cache = '.var_export($cache, true).';
         self::fill_filemap_cache();
         self::fill_psr_cache();
         self::fetch_core_version();
+        self::fetch_totarabuild();
     }
 
     /**
@@ -324,6 +331,24 @@ $cache = '.var_export($cache, true).';
             self::$version = $version;
         }
         return self::$version;
+    }
+
+    /**
+     * Get the Totara build.
+     *
+     * In order for this to work properly, opcache should be reset beforehand.
+     *
+     * @return string build number
+     */
+    protected static function fetch_totarabuild() {
+        global $CFG;
+        if (self::$totarabuild === null) {
+
+            $TOTARA = new stdClass(); // Prevent IDE complaints.
+            require($CFG->dirroot . '/version.php');
+            self::$totarabuild = $TOTARA->build;
+        }
+        return self::$totarabuild;
     }
 
     /**
@@ -439,6 +464,7 @@ $cache = '.var_export($cache, true).';
             'qbehaviour'    => $CFG->dirroot.'/question/behaviour',
             'qformat'       => $CFG->dirroot.'/question/format',
             'plagiarism'    => $CFG->dirroot.'/plagiarism',
+            'totara'        => $CFG->dirroot.'/totara', // must be before admin tools so totara_sync can add to totara tables
             'tool'          => $CFG->dirroot.'/'.$CFG->admin.'/tool',
             'cachestore'    => $CFG->dirroot.'/cache/stores',
             'cachelock'     => $CFG->dirroot.'/cache/locks',
@@ -895,12 +921,24 @@ $cache = '.var_export($cache, true).';
      * @return string full path to plugin directory; null if not found
      */
     public static function get_plugin_directory($plugintype, $pluginname) {
+        global $CFG;
+
         if (empty($pluginname)) {
             // Invalid plugin name, sorry.
             return null;
         }
 
         self::init();
+
+        // Hack for rb_source language files.
+        if ($plugintype == 'rb_source') {
+            require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+            foreach (reportbuilder::find_source_dirs() as $dir) {
+                if (file_exists($dir.$plugintype.'_'.$pluginname.'.php')) {
+                    return $dir;
+                }
+            }
+        }
 
         if (!isset(self::$plugins[$plugintype][$pluginname])) {
             return null;
@@ -988,7 +1026,9 @@ $cache = '.var_export($cache, true).';
                 $type   = 'mod';
                 $plugin = $component;
             }
-
+        } else if (preg_match('/^rb_source_/', $component)) {
+            $type = 'rb_source';
+            $plugin = str_replace('rb_source_', '', $component);
         } else {
             list($type, $plugin) = explode('_', $component, 2);
             if ($type === 'moodle') {
@@ -1082,6 +1122,7 @@ $cache = '.var_export($cache, true).';
 
         // Main version first.
         $versions['core'] = self::fetch_core_version();
+        $versions['totarabuild'] = self::fetch_totarabuild();
 
         // The problem here is tha the component cache might be stable,
         // we want this to work also on frontpage without resetting the component cache.

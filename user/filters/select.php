@@ -79,7 +79,7 @@ class user_filter_select extends user_filter_type {
         $objs['limiter']->setLabel(get_string('limiterfor', 'filters', $this->_label));
         $objs['country'] = $mform->createElement('select', $this->_name, null, $this->_options);
         $objs['country']->setLabel(get_string('valuefor', 'filters', $this->_label));
-        $grp =& $mform->addElement('group', $this->_name.'_grp', $this->_label, $objs, '', false);
+        $grp =& $mform->addElement('group', $this->_name.'_grp', format_string($this->_label), $objs, '', false);
         $mform->disabledIf($this->_name, $this->_name.'_op', 'eq', 0);
         if (!is_null($this->_default)) {
             $mform->setDefault($this->_name, $this->_default);
@@ -112,14 +112,12 @@ class user_filter_select extends user_filter_type {
      * @return array sql string and $params
      */
     public function get_sql_filter($data) {
-        static $counter = 0;
-        $name = 'ex_select'.$counter++;
 
+        $params = array();
+        $name = user_filter_type::filter_unique_param('ex_select');
         $operator = $data['operator'];
         $value    = $data['value'];
         $field    = $this->_field;
-
-        $params = array();
 
         switch($operator) {
             case 1: // Equal to.

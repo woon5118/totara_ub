@@ -135,7 +135,17 @@ abstract class tool_generator_backend {
         } else {
             echo html_writer::start_tag('li');
         }
-        echo get_string('progress_' . $langstring, 'tool_generator', $a);
+        if (get_string_manager()->string_exists('progress_' . $langstring, 'tool_generator')) {
+            // Is there a type string in the base generator file?
+            $string = get_string('progress_' . $langstring, 'tool_generator', $a);
+        } else if (get_string_manager()->string_exists('progress_' . $langstring, 'totara_generator')) {
+            // How about in totara_generator?
+            $string = get_string('progress_' . $langstring, 'totara_generator', $a);
+        } else {
+            // Make it obvious this string is missing
+            $string = get_string('progress_' . $langstring, 'totara_generator', $a);
+        }
+        echo $string;
         if (!$leaveopen) {
             if (CLI_SCRIPT) {
                 echo "\n";

@@ -34,8 +34,11 @@ class user_bulk_action_form extends moodleform {
         if (has_capability('moodle/cohort:assign', $syscontext)) {
             $actions[8] = get_string('bulkadd', 'core_cohort');
         }
+        if (has_capability('moodle/user:update', $syscontext)) {
+            $actions[9] = get_string('toggletotarasync', 'totara_core');
+        }
         $objs = array();
-        $objs[] =& $mform->createElement('select', 'action', null, $actions);
+        $objs[] =& $mform->createElement('select', 'action', get_string('dowhatwithselectedusers'), $actions);
         $objs[] =& $mform->createElement('submit', 'doaction', get_string('go'));
         $mform->addElement('group', 'actionsgrp', get_string('withselectedusers'), $objs, ' ', false);
     }

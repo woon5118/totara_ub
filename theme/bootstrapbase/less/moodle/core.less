@@ -355,6 +355,9 @@ img.icon-post, .dir-rtl img.icon-pre {
 img.uihint {
     cursor: help;
 }
+#addmembersform {
+    clear: both;
+}
 #addmembersform table {
     margin-left: auto;
     margin-right: auto;
@@ -1714,6 +1717,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 .choosercontainer #chooseform .nonoption {
     margin-bottom: 0;
     padding: 0 1.6em 0 1.6em;
+    font-size: 14px;
 }
 .choosercontainer #chooseform .moduletypetitle {
     text-transform: uppercase;
@@ -2043,6 +2047,17 @@ ul.badges {
 }
 .statusbox.inactive {
     background-color: @warningBackground;
+}
+.statusbox {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+.statusbox .activatebadge {
+    display: inline-block;
+}
+.statusbox .activatebadge input[type=submit]{
+    margin: 3px;
 }
 .statusbox {
     text-align: center;

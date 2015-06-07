@@ -47,9 +47,14 @@ $THEME->sheets = array(
     'grade',
     'message',
     'question',
+    'totara_jquery_treeview',
+    'totara_jquery_datatables',
+    'totara_jquery_ui_dialog',  /** Generated file: see comments **/
+    'totara',   /** Totara-specific layout **/
     'user',
     'tabs',
-    'filemanager'
+    'filemanager',
+    'group'
 );
 
 $THEME->editor_sheets = array('editor');
@@ -65,6 +70,13 @@ $THEME->layouts = array(
         'file' => 'general.php',
         'regions' => array('side-pre', 'side-post'),
         'defaultregion' => 'side-pre',
+    ),
+    // pages that need the full width of the page - no blocks shown at all
+    // this is only used by totara pages
+    'noblocks' => array(
+        'file' => 'general.php',
+        'regions' => array(),
+        'options' => array('noblocks'=>true, 'langmenu'=>true),
     ),
     // Main course page.
     'course' => array(

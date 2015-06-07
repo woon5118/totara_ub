@@ -41,6 +41,12 @@ class completion_criteria_date extends completion_criteria {
     public $criteriatype = COMPLETION_CRITERIA_TYPE_DATE;
 
     /**
+     * Criteria type form value
+     * @var string
+     */
+    const FORM_MAPPING = 'timeend';
+
+    /**
      * Finds and returns a data_object instance based on params.
      *
      * @param array $params associative arrays varname=>value
@@ -58,7 +64,7 @@ class completion_criteria_date extends completion_criteria {
      * @param stdClass $data not used
      */
     public function config_form_display(&$mform, $data = null) {
-        $mform->addElement('checkbox', 'criteria_date', get_string('enable'));
+        $mform->addElement('advcheckbox', 'criteria_date', get_string('enable'));
         $mform->addElement('date_selector', 'criteria_date_value', get_string('completionondatevalue', 'core_completion'));
         $mform->disabledIf('criteria_date_value', 'criteria_date');
 
@@ -68,19 +74,6 @@ class completion_criteria_date extends completion_criteria {
             $mform->setDefault('criteria_date_value', $this->timeend);
         } else {
             $mform->setDefault('criteria_date_value', time() + 3600 * 24);
-        }
-    }
-
-    /**
-     * Update the criteria information stored in the database
-     *
-     * @param stdClass $data Form data
-     */
-    public function update_config(&$data) {
-        if (!empty($data->criteria_date)) {
-            $this->course = $data->id;
-            $this->timeend = $data->criteria_date_value;
-            $this->insert();
         }
     }
 
@@ -118,7 +111,7 @@ class completion_criteria_date extends completion_criteria {
      * @return string
      */
     public function get_title_detailed() {
-        return userdate($this->timeend, '%d-%h-%y');
+        return userdate($this->timeend, get_string('strfdateshortmonth', 'langconfig'));
     }
 
     /**
@@ -138,7 +131,7 @@ class completion_criteria_date extends completion_criteria {
      * @return string
      */
     public function get_status($completion) {
-        return $completion->is_complete() ? get_string('yes') : userdate($this->timeend, '%d-%h-%y');
+        return $completion->is_complete() ? get_string('yes') : userdate($this->timeend, get_string('strfdateshortmonth', 'langconfig'));
     }
 
     /**
@@ -147,31 +140,38 @@ class completion_criteria_date extends completion_criteria {
     public function cron() {
         global $DB;
 
+        // Check to see if this criteria is in use.
+        if (!$this->is_in_use()) {
+            if (debugging()) {
+                mtrace('... skipping as criteria not used');
+            }
+            return;
+        }
+
         // Get all users who match meet this criteria
         $sql = '
             SELECT DISTINCT
                 c.id AS course,
-                cr.timeend AS timeend,
                 cr.id AS criteriaid,
-                ra.userid AS userid
+                cr.timeend AS timeend,
+                ue.userid AS userid
             FROM
-                {course_completion_criteria} cr
+                {user_enrolments} ue
+            INNER JOIN
+                {enrol} e
+             ON e.id = ue.enrolid
             INNER JOIN
                 {course} c
+             ON e.courseid = c.id
+            INNER JOIN
+                {course_completion_criteria} cr
              ON cr.course = c.id
-            INNER JOIN
-                {context} con
-             ON con.instanceid = c.id
-            INNER JOIN
-                {role_assignments} ra
-             ON ra.contextid = con.id
             LEFT JOIN
                 {course_completion_crit_compl} cc
              ON cc.criteriaid = cr.id
-            AND cc.userid = ra.userid
+            AND cc.userid = ue.userid
             WHERE
                 cr.criteriatype = '.COMPLETION_CRITERIA_TYPE_DATE.'
-            AND con.contextlevel = '.CONTEXT_COURSE.'
             AND c.enablecompletion = 1
             AND cc.id IS NULL
             AND cr.timeend < ?

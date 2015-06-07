@@ -324,6 +324,19 @@ class core_formslib_testcase extends advanced_testcase {
         $mform->display();
     }
 
+    public function test_group_class() {
+        $formrender = new MoodleQuickForm_Renderer();
+        $mform = new MoodleQuickForm('mform', 'post', '');
+        $elements = array($mform->createElement('text', 'name', 'value'));
+        $group = $mform->addGroup($elements);
+        $group->updateAttributes(array('class' => 'test'));
+        $formrender->startGroup($group, false, '');
+
+        $xml = new DomDocument();
+        $xml->loadXML($formrender->_groupTemplate);
+        $this->assertSelectCount('div[class="test"]', 1, $xml);
+    }
+
     public function test_settype_debugging_group() {
         $mform = new formslib_settype_debugging_group();
         $this->assertDebuggingCalled("Did you remember to call setType() for 'groupel1'? Defaulting to PARAM_RAW cleaning.");

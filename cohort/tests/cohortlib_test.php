@@ -77,6 +77,8 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
     }
 
     public function test_cohort_add_cohort_event() {
+        global $DB;
+
         $this->resetAfterTest();
 
         // Setup cohort data structure.
@@ -96,6 +98,8 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         // Capture the event.
         $events = $sink->get_events();
         $sink->close();
+
+        $cohort = $DB->get_record('cohort', array('id' => $id));
 
         // Validate the event.
         $this->assertCount(1, $events);
@@ -179,8 +183,8 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $this->assertEquals($updatedcohort->contextid, $event->contextid);
         $url = new moodle_url('/cohort/edit.php', array('id' => $event->objectid));
         $this->assertEquals($url, $event->get_url());
-        $this->assertEquals($cohort, $event->get_record_snapshot('cohort', $id));
-        $this->assertEventLegacyData($cohort, $event);
+        $this->assertEquals($updatedcohort, $event->get_record_snapshot('cohort', $id));
+        $this->assertEventLegacyData($updatedcohort, $event);
         $this->assertEventContextNotUsed($event);
     }
 

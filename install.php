@@ -65,15 +65,15 @@ date_default_timezone_set(@date_default_timezone_get());
 if (version_compare(phpversion(), '5.4.4') < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN not move it after installib
-    echo "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).<br />";
-    echo "Please upgrade your server software or install older Moodle version.";
+    echo "Totara 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).<br />";
+    echo "Please upgrade your server software or install older Totara version.";
     die;
 }
 
 // make sure iconv is available and actually works
 if (!function_exists('iconv')) {
     // this should not happen, this must be very borked install
-    echo 'Moodle requires the iconv PHP extension. Please install or enable the iconv extension.';
+    echo 'Totara requires the iconv PHP extension. Please install or enable the iconv extension.';
     die();
 }
 
@@ -148,7 +148,7 @@ if (!empty($_POST)) {
     $config->dbhost   = empty($distro->dbhost) ? 'localhost' : $distro->dbhost; // let distros set dbhost
     $config->dbuser   = empty($distro->dbuser) ? '' : $distro->dbuser; // let distros set dbuser
     $config->dbpass   = '';
-    $config->dbname   = 'moodle';
+    $config->dbname   = 'totaradb';
     $config->prefix   = 'mdl_';
     $config->dbport   = empty($distro->dbport) ? '' : $distro->dbport;
     $config->dbsocket = empty($distro->dbsocket) ? '' : $distro->dbsocket;
@@ -192,7 +192,7 @@ $memlimit = @ini_get('memory_limit');
 if (!empty($memlimit) and $memlimit != -1) {
     if (get_real_size($memlimit) < get_real_size($minrequiredmemory)) {
         // do NOT localise - lang strings would not work here and we CAN not move it to later place
-        echo "Moodle requires at least {$minrequiredmemory}B of PHP memory.<br />";
+        echo "Totara requires at least {$minrequiredmemory}B of PHP memory.<br />";
         echo "Please contact server administrator to fix PHP.ini memory settings.";
         die;
     }
@@ -213,6 +213,7 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/environmentlib.php');
 require_once($CFG->libdir.'/componentlib.class.php');
 require_once($CFG->dirroot.'/cache/lib.php');
+require_once($CFG->dirroot.'/totara/core/totara.php');
 
 //point pear include path to moodles lib/pear so that includes and requires will search there for files before anywhere else
 //the problem is that we need specific version of quickforms and hacked excel files :-(
@@ -254,7 +255,7 @@ if (isset($_GET['help'])) {
 
 //first time here? find out suitable dataroot
 if (is_null($CFG->dataroot)) {
-    $CFG->dataroot = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'moodledata';
+    $CFG->dataroot = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'sitedata';
 
     $i = 0; //safety check - dirname might return some unexpected results
     while(is_dataroot_insecure()) {
@@ -264,7 +265,7 @@ if (is_null($CFG->dataroot)) {
             $CFG->dataroot = ''; //can not find secure location for dataroot
             break;
         }
-        $CFG->dataroot = dirname($parrent).DIRECTORY_SEPARATOR.'moodledata';
+        $CFG->dataroot = dirname($parrent).DIRECTORY_SEPARATOR.'sitedata';
     }
     $config->dataroot = $CFG->dataroot;
     $config->stage    = INSTALL_WELCOME;
@@ -488,7 +489,7 @@ if ($config->stage == INSTALL_DATABASETYPE) {
     $databases = array('mysqli' => moodle_database::get_driver_instance('mysqli', 'native'),
                        'mariadb'=> moodle_database::get_driver_instance('mariadb', 'native'),
                        'pgsql'  => moodle_database::get_driver_instance('pgsql',  'native'),
-                       'oci'    => moodle_database::get_driver_instance('oci',    'native'),
+                       //'oci'    => moodle_database::get_driver_instance('oci',    'native'), // Totara: no Oracle!
                        'sqlsrv' => moodle_database::get_driver_instance('sqlsrv', 'native'), // MS SQL*Server PHP driver
                        'mssql'  => moodle_database::get_driver_instance('mssql',  'native'), // FreeTDS driver
                       );

@@ -129,6 +129,7 @@ img.icon-post, .dir-rtl img.icon-pre { padding-left: 3px; padding-right: 0; }
 .headermain {font-weight:bold;}
 #maincontent {display: block;height: 1px;overflow: hidden;}
 img.uihint {cursor: help;}
+#addmembersform {clear: both}
 #addmembersform table {margin-left: auto;margin-right: auto;}
 .formtable tbody th,
 .generaltable th.header {vertical-align: top;}
@@ -482,6 +483,8 @@ a.skip:active {position: static;display: block;}
 .dir-rtl .mform .fdescription.required {text-align:left;}
 .mform .fpassword .unmask {display:inline;margin-left:0.5em;}
 .mform .ftextarea #id_alltext {width: 100%;}
+.mform .fitem fieldset.fscheduler { margin: 0px; }
+.mform .fstatic { padding-top: 4px;}
 .mform .fstaticlabel {font-weight:bold;}
 .mform ul.file-list {padding:0;margin:0;list-style:none;}
 .mform label { display: inline-block; }
@@ -1645,6 +1648,7 @@ sup {vertical-align: super;}
 .choosercontainer #chooseform .nonoption {
     margin-bottom: 0;
     padding: 0 1.6em 0 1.6em;
+    font-size: 14px;
 }
 
 .choosercontainer #chooseform .moduletypetitle {
@@ -1899,9 +1903,9 @@ table.collection ul { margin: 0.5em 0.5em 0.5em 2em; }
 table.collection .name { text-align: left; vertical-align: middle; }
 .dir-rtl table.collection .name { text-align: right; vertical-align: middle; }
 #page-badges-view table.collection .criteria { width: 35%; text-align: left; vertical-align: top; }
-#page-badges-view.dir-rtl table.collection .criteria { text-align: right;  }
+#page-badges-view.dir-rtl table.collection .criteria { text-align: right; }
 #page-badges-index table.collection .criteria { width: 40%; text-align: left; vertical-align: top; }
-#page-badges-index.dir-rtl table.collection .criteria { text-align: right;  }
+#page-badges-index.dir-rtl table.collection .criteria { text-align: right; }
 #page-badges-index table.collection .actions { width: 11em; text-align: center; vertical-align: middle; }
 
 a.criteria-action { padding: 0px 3px; float: right; }
@@ -1929,6 +1933,7 @@ div.badge .expireimage { width: 100px; height: 100px; left: 0px; top: 0px; }
 #page-badges-award .recipienttable tr td.actions .actionbutton { margin: 0.3em 0; padding: 0.5em 0; width: 100%; }
 #page-badges-award .recipienttable tr td.existing,
 #page-badges-award .recipienttable tr td.potential { width: 42%; }
+#page-badges-criteria_settings .selectcourse { min-width: 200px; max-width: 600px; }
 
 #issued-badge-table .activatebadge {
     display: inline-block;

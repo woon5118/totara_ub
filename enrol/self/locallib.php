@@ -40,9 +40,12 @@ class enrol_self_enrol_form extends moodleform {
         return $formid;
     }
 
-    public function definition() {
+    public function definition($mform = null) {
         global $USER, $OUTPUT, $CFG;
-        $mform = $this->_form;
+        if ($mform === null) {
+            // Evil hack! Never again!!!!
+            $mform = $this->_form;
+        }
         $instance = $this->_customdata;
         $this->instance = $instance;
         $plugin = enrol_get_plugin('self');

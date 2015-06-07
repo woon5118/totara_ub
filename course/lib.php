@@ -55,6 +55,18 @@ define('FIRSTUSEDEXCELROW', 3);
 define('MOD_CLASS_ACTIVITY', 0);
 define('MOD_CLASS_RESOURCE', 1);
 
+//Course types
+define('TOTARA_COURSE_TYPE_ELEARNING', 0);
+define('TOTARA_COURSE_TYPE_BLENDED', 1);
+define('TOTARA_COURSE_TYPE_FACETOFACE', 2);
+
+global $TOTARA_COURSE_TYPES;
+$TOTARA_COURSE_TYPES = array(
+    'elearning' => TOTARA_COURSE_TYPE_ELEARNING,
+    'blended' => TOTARA_COURSE_TYPE_BLENDED,
+    'facetoface' => TOTARA_COURSE_TYPE_FACETOFACE,
+);
+
 function make_log_url($module, $url) {
     switch ($module) {
         case 'course':
@@ -104,8 +116,36 @@ function make_log_url($module, $url) {
         case 'role':
             $url = '/'.$url;
             break;
+        // Totara specific modules
+        case 'appraisal':
+        case 'certification':
+        case 'feedback360':
+        case 'reportbuilder':
+        case 'hierarchy':
+        case 'customfield':
+        case 'program':
+        case 'plan':
+            $url = '/totara/' . $module . '/' . $url;
+            break;
+        case 'position':
+        case 'organisation':
+        case 'competency':
+        case 'goal':
+            $url = '/totara/hierarchy/' . $url;
+            break;
+        case 'priorityscales':
+        case 'objectivescales':
+            $url = '/totara/plan/' . $module . '/' . $url;
+            break;
+        case 'my':
+            $url = '/my/' . $url;
+            break;
+        // End Totara specific modules
         case 'grade':
             $url = "/grade/$url";
+            break;
+        case 'rbembedded':
+            $url = $url;
             break;
         default:
             $url = "/mod/$module/$url";
@@ -687,8 +727,8 @@ function print_log_xls($course, $user, $date, $order='l.time DESC', $modname,
         return true;
     }
 
-    $formatDate =& $workbook->add_format();
-    $formatDate->set_num_format(get_string('log_excel_date_format'));
+    $formatDate = $workbook->add_format();
+    $formatDate->set_num_format(MoodleExcelWorkbook::NUMBER_FORMAT_STANDARD_DATETIME);
 
     $row = FIRSTUSEDEXCELROW;
     $wsnumber = 1;
@@ -800,9 +840,6 @@ function print_log_ods($course, $user, $date, $order='l.time DESC', $modname,
         $workbook->close();
         return true;
     }
-
-    $formatDate =& $workbook->add_format();
-    $formatDate->set_num_format(get_string('log_excel_date_format'));
 
     $row = FIRSTUSEDEXCELROW;
     $wsnumber = 1;
@@ -1415,8 +1452,12 @@ function print_course_request_buttons($context) {
  */
 function can_edit_in_category($categoryid = 0) {
     $context = get_category_or_system_context($categoryid);
-    return has_any_capability(array('moodle/category:manage', 'moodle/course:create'), $context);
+    return has_any_capability(array('moodle/category:manage', 'moodle/course:create',
+                                    'moodle/course:update', 'totara/program:createprogram', 'totara/program:configuredetails',
+                                    'totara/certification:createcertification', 'totara/certification:configurecertification'),
+                              $context);
 }
+
 
 /// MODULE FUNCTIONS /////////////////////////////////////////////////////////////////
 
@@ -2905,9 +2946,10 @@ class course_request {
             $a = new stdClass;
             $a->link = "$CFG->wwwroot/course/pending.php";
             $a->user = fullname($USER);
-            $subject = get_string('courserequest');
-            $message = get_string('courserequestnotifyemail', 'admin', $a);
+            $strmgr = get_string_manager();
             foreach ($users as $user) {
+                $subject = $strmgr->get_string('courserequest', 'moodle', null, $user->lang);
+                $message = $strmgr->get_string('courserequestnotifyemail', 'admin', $a, $user->lang);
                 $request->notify($user, $USER, 'courserequested', $subject, $message);
             }
         }
@@ -3110,7 +3152,8 @@ class course_request {
         $a = new stdClass();
         $a->name = format_string($course->fullname, true, array('context' => context_course::instance($course->id)));
         $a->url = $CFG->wwwroot.'/course/view.php?id=' . $course->id;
-        $this->notify($user, $USER, 'courserequestapproved', get_string('courseapprovedsubject'), get_string('courseapprovedemail2', 'moodle', $a));
+        $strmgr = get_string_manager();
+        $this->notify($user, $USER, 'courserequestapproved', $strmgr->get_string('courseapprovedsubject', 'moodle', null, $user->lang), $strmgr->get_string('courseapprovedemail2', 'moodle', $a, $user->lang));
 
         return $course->id;
     }
@@ -3126,7 +3169,8 @@ class course_request {
     public function reject($notice) {
         global $USER, $DB;
         $user = $DB->get_record('user', array('id' => $this->properties->requester), '*', MUST_EXIST);
-        $this->notify($user, $USER, 'courserequestrejected', get_string('courserejectsubject'), get_string('courserejectemail', 'moodle', $notice));
+        $strmgr = get_string_manager();
+        $this->notify($user, $USER, 'courserequestrejected', $strmgr->get_string('courserejectsubject', 'moodle', null, $user->lang), $strmgr->get_string('courserejectemail', 'moodle', $notice, $user->lang));
         $this->delete();
     }
 
@@ -3156,7 +3200,7 @@ class course_request {
         $eventdata->subject           = $subject;
         $eventdata->fullmessage       = $message;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
-        $eventdata->fullmessagehtml   = '';
+        $eventdata->fullmessagehtml   = $message;
         $eventdata->smallmessage      = '';
         $eventdata->notification      = 1;
         message_send($eventdata);
@@ -3187,6 +3231,20 @@ function course_page_type_list($pagetype, $parentcontext, $currentcontext) {
         );
     }
     return $pagetypes;
+}
+
+// Totara Functions
+
+function get_course_custom_fields($courseid) {
+    global $DB;
+
+    $sql = "SELECT d.*, f.*
+            FROM {course_info_data} d
+            INNER JOIN {course_info_field} f ON d.fieldid = f.id
+            WHERE d.courseid = ?
+            ORDER BY f.sortorder";
+
+    return $DB->get_records_sql($sql, array($courseid));
 }
 
 /**
@@ -3645,6 +3703,95 @@ function compare_activities_by_time_asc($a, $b) {
 }
 
 /**
+ * Archives activities, with the archive feature, for a specified user and course
+ *
+ * @global moodle_database $DB
+ * @global object $CFG
+ * @param int $userid
+ * @param int $courseid
+ * @param int $windowopens  The time the window opens, so we can act differently for historic uploads
+ */
+function archive_course_activities($userid, $courseid, $windowopens = NULL) {
+    global $DB, $CFG;
+
+    if (!isset($windowopens)) {
+        $windowopens = time();
+    }
+
+    // Get all distinct module names for this course.
+    $sql = "SELECT DISTINCT m.name
+            FROM {modules} m
+            JOIN {course_modules} cm ON cm.module = m.id AND course = :courseid
+            ORDER BY m.name";
+    if ($modules = $DB->get_records_sql($sql, array('courseid' => $courseid))) {
+        // Set up course completion.
+        $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+        $completion = new completion_info($course);
+
+        // Create the reset grade.
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = null;
+
+        foreach ($modules as $mod) {
+            $modfile = $CFG->dirroot . '/mod/' . $mod->name . '/lib.php';
+            // Check if a module instance is attached to the course and the lib file exists.
+            if ($DB->record_exists($mod->name, array('course' => $courseid)) && file_exists($modfile)) {
+                include_once($modfile);
+
+                // Does it have the archive feature?
+                if (plugin_supports('mod', $mod->name, FEATURE_ARCHIVE_COMPLETION, 0)) {
+                    $modfunction = $mod->name.'_archive_completion';
+                    if (!function_exists($modfunction)) {
+                        debugging('feature_archive_completion is supported but is missing the function in the plugin lib file');
+                    } else {
+                        $modfunction($userid, $courseid, $windowopens);
+                    }
+                } else {
+                    // Reset manually.
+                    // Reset grades.
+                    $updateitemfunc = $mod->name . '_grade_item_update';
+                    if (function_exists($updateitemfunc)) {
+                        $sql = "SELECT a.*,
+                                        cm.idnumber as cmidnumber,
+                                        m.name as modname
+                                FROM {" . $mod->name . "} a
+                                JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = :courseid
+                                JOIN {modules} m ON m.id = cm.module AND m.name = :modname";
+                        $params = array('modname' => $mod->name, 'courseid' => $courseid);
+
+                        if ($modinstances = $DB->get_records_sql($sql, $params)) {
+                            foreach ($modinstances as $modinstance) {
+                                $updateitemfunc($modinstance, $grade);
+                            }
+                        }
+                    }
+                }
+
+                $resetview = plugin_supports('mod', $mod->name, FEATURE_COMPLETION_TRACKS_VIEWS, 0);
+                $cms = get_all_instances_in_course($mod->name, $course, $userid);
+                foreach ($cms as $cm) {
+                    // Get all instances doesn't return the completion columns.
+                    $cm = get_coursemodule_from_id($mod->name, $cm->coursemodule, $courseid);
+                    if ($resetview) {
+                        // Reset viewed.
+                        $completion->set_module_viewed_reset($cm, $userid);
+                    }
+
+                    // Reset completion.
+                    $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+
+                    // Reset cache after each activity just in case the user reattempts.
+                    $completion->invalidatecache($courseid, $userid, true);
+                }
+
+            }
+        }
+    }
+    return true;
+}
+
+/*
  * Changes the visibility of a course.
  *
  * @param int $courseid The course to change.
@@ -3661,6 +3808,56 @@ function course_change_visibility($courseid, $show = true) {
 }
 
 /**
+ * Archives course completion
+ *
+ * @global moodle_database $DB
+ * @global object $CFG
+ * @param int $userid
+ * @param int $courseid
+ */
+function archive_course_completion($userid, $courseid) {
+    global $DB, $CFG, $COMPLETION_STATUS;
+
+    require_once($CFG->libdir . '/completionlib.php');
+    require_once($CFG->libdir . '/grade/grade_item.php');
+    require_once($CFG->libdir . '/grade/grade_grade.php');
+    require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+    $status = array(COMPLETION_STATUS_COMPLETE, COMPLETION_STATUS_COMPLETEVIARPL);
+    list($statussql, $statusparams) = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED, 'status');
+    $params = array_merge($statusparams, array('course' => $courseid, 'userid' => $userid));
+    $where = "course = :course AND userid = :userid AND status {$statussql}";
+    if (!$course_completion = $DB->get_record_select('course_completions', $where, $params)) {
+        return false;
+    }
+
+    $history = new StdClass();
+    $history->courseid = $courseid;
+    $history->userid = $userid;
+    $history->timecompleted = $course_completion->timecompleted;
+    $history->grade = 0;
+
+    $cc = new completion_completion(array('userid' => $userid, 'course' => $courseid));
+    $completionstatus = $cc->get_status($course_completion);
+    if ($completionstatus == $COMPLETION_STATUS[COMPLETION_STATUS_COMPLETEVIARPL]) {
+        $history->grade = $cc->rplgrade;
+    } else if ($course_item = grade_item::fetch_course_item($courseid)) {
+        $grade = new grade_grade(array('itemid' => $course_item->id, 'userid' => $userid));
+        $history->grade = $grade->finalgrade;
+    }
+
+    // Copy
+    $DB->insert_record('course_completion_history', $history);
+
+    // Reset course completion.
+    $course = $DB->get_record('course', array('id' => $courseid));
+    $completion = new completion_info($course);
+    $completion->delete_course_completion_data_user($userid);
+    $completion->invalidatecache($courseid, $userid, true);
+    return true;
+}
+
+/*
  * Changes the course sortorder by one, moving it up or down one in respect to sort order.
  *
  * @param stdClass|course_in_list $course

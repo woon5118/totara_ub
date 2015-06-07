@@ -44,6 +44,7 @@ class core_course_editcategory_form extends moodleform {
         $mform = $this->_form;
         $categoryid = $this->_customdata['categoryid'];
         $parent = $this->_customdata['parent'];
+        $type = $this->_customdata['type'];
 
         // Get list of categories to use as parents, with site as the first one.
         $options = array();
@@ -91,6 +92,9 @@ class core_course_editcategory_form extends moodleform {
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $categoryid);
+     
+        $mform->addElement('hidden', 'type', $type);
+        $mform->setType('type', PARAM_TEXT);
 
         $this->add_action_buttons(true, $strsubmit);
     }

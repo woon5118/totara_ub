@@ -24,6 +24,7 @@
 
 require('../config.php');
 require_once("$CFG->libdir/formslib.php");
+require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
 $id = required_param('id', PARAM_INT);
 $returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
@@ -48,7 +49,7 @@ if ($course->id == SITEID) {
     redirect("$CFG->wwwroot/");
 }
 
-if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
+if (!totara_course_is_viewable($course->id)) {
     print_error('coursehidden');
 }
 

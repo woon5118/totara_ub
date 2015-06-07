@@ -223,8 +223,23 @@ class core_calendar_type_testcase extends advanced_testcase {
         }
         $el->_createElements();
         $submitvalues = array('dateselector' => $date);
+        if ($element !== 'dateselector') {
+            $submitvalues['dateselector']['timezone'] = 'Etc/GMT';
+        }
 
-        $this->assertSame($el->exportValue($submitvalues), array('dateselector' => $date['timestamp']));
+        if ($element == 'dateselector') {
+            $this->assertSame($el->exportValue($submitvalues), array('dateselector' => $date['timestamp']));
+        } else {
+            //Totara added the _raw field for the date in ISO format
+            $rawvalue = $date['year'] . '-' . str_pad($date['month'], 2, '0', STR_PAD_LEFT)  . '-' . str_pad($date['day'], 2, '0', STR_PAD_LEFT);
+            $rawvalue .= ' ' . str_pad($date['hour'], 2, '0', STR_PAD_LEFT)  . ':' . str_pad($date['minute'], 2, '0', STR_PAD_LEFT)  . ':00';
+            $exportvalues = $el->exportValue($submitvalues);
+            ksort($exportvalues);
+            $expectedvalues = array('dateselector' => $date['timestamp'], 'dateselector_raw' => $rawvalue, 'dateselector_timezone' => 'Etc/GMT');
+            ksort($expectedvalues);
+
+            $this->assertSame($exportvalues, $expectedvalues);
+        }
     }
 
     /**

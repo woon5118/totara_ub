@@ -9,9 +9,25 @@ require_once($CFG->libdir.'/csvlib.class.php');
 class mod_data_import_form extends moodleform {
 
     function definition() {
-        global $CFG;
+
         $mform =& $this->_form;
-        $cmid = $this->_customdata['id'];
+
+        // Start Totara T-14272 changes.
+        global $DB, $PAGE;
+        $fields = $DB->get_records('data_fields', array('dataid' => $PAGE->activityrecord->id), '', 'name, id, type');
+        $structure = array();
+        foreach ($fields as $field) {
+            $structure[] = '"'.$field->name.'"';
+        }
+        $html  = html_writer::start_tag('div');
+        $html .= html_writer::tag('p', get_string('csvimportfilestructinfo', 'data'), array('class' => "informationbox"));
+        $html .= html_writer::start_tag('pre');
+        $html .= implode(",", $structure);
+        $html .= html_writer::empty_tag('br') . "..." . html_writer::empty_tag('br') . "..." . html_writer::empty_tag('br') . "...";
+        $html .= html_writer::end_tag('pre');
+        $html .= html_writer::end_tag('div');
+        $mform->addElement('static', 'fieldsrequire', '', $html);
+        // End Totara T-14272 changes.
 
         $mform->addElement('filepicker', 'recordsfile', get_string('csvfile', 'data'));
 

@@ -42,11 +42,8 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/registration/lib.php');
 $huburl = required_param('huburl', PARAM_URL);
 $huburl = rtrim($huburl, "/");
 
-if ($huburl == HUB_MOODLEORGHUBURL) { // register to Moodle.org
-    admin_externalpage_setup('registrationmoodleorg');
-} else { //register to a hub
-    admin_externalpage_setup('registrationhub');
-}
+//register to a hub
+admin_externalpage_setup('registrationhubs');
 
 $password = optional_param('password', '', PARAM_TEXT);
 $hubname = optional_param('hubname', '', PARAM_TEXT);
@@ -174,25 +171,6 @@ if (!empty($registeredhub->confirmed)) {
 
 if (!empty($error)) {
     echo $error;
-}
-
-// Some Moodle.org registration explanation.
-if ($huburl == HUB_MOODLEORGHUBURL) {
-    if (!empty($registeredhub->token)) {
-        if ($registeredhub->timemodified == 0) {
-            $registrationmessage = get_string('pleaserefreshregistrationunknown', 'admin');
-        } else {
-            $lastupdated = userdate($registeredhub->timemodified, get_string('strftimedate', 'langconfig'));
-            $registrationmessage = get_string('pleaserefreshregistration', 'admin', $lastupdated);
-        }
-    } else {
-        $registrationmessage = get_string('registrationwarning', 'admin');
-    }
-    echo $OUTPUT->notification($registrationmessage);
-
-    echo $OUTPUT->heading(get_string('registerwithmoodleorg', 'admin'));
-    $renderer = $PAGE->get_renderer('core', 'register');
-    echo $renderer->moodleorg_registration_message();
 }
 
 $siteregistrationform->display();

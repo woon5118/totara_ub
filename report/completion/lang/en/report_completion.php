@@ -24,14 +24,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['activitiescomplete'] = 'Activities complete';
 $string['clicktomarkusercomplete'] = 'Click to mark user complete';
+$string['complete'] = 'Courses completed';
 $string['completion:view'] = 'View course completion report';
 $string['completiondate'] = 'Completion date';
+$string['completions'] = 'Course completions';
+$string['detailedview'] = 'Detail view';
+$string['incomplete'] = 'Incomplete';
+$string['inprogress'] = 'Courses in progress';
+$string['nocompletioncoursesenroled'] = 'User not enrolled or started in any courses with completion enabled';
+$string['nocompletions'] = 'User has enrolled in this course, but has not yet started';
+$string['notyetstarted'] = 'Courses not yet started';
 $string['id'] = 'ID';
 $string['name'] = 'Name';
 $string['page-report-completion-x'] = 'Any completion report';
 $string['page-report-completion-index'] = 'Course completion report';
 $string['page-report-completion-user'] = 'User course completion report';
 $string['pluginname'] = 'Course completion';
+$string['showonlyactiveenrols'] = 'Show only active enrolments';
+$string['showonlyactiveenrols_help'] = 'Normally the course completion report within a course does not show completion information for learners who do not have existing active enrolments, but who may have completed activities in the past when enrolled. Disabling this option will display all completion data in these reports including for those learners with suspended, expired or removed enrolments';
 $string['eventreportviewed'] = 'Completion report viewed';
 $string['eventuserreportviewed'] = 'Completion user report viewed';
+$string['xofy'] = '{$a->completed} of {$a->total}';

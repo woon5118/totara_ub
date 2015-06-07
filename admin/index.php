@@ -33,15 +33,15 @@ if (!file_exists('../config.php')) {
 if (version_compare(phpversion(), '5.4.4') < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN NOT move it to later place
-    echo "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).<br />";
-    echo "Please upgrade your server software or install older Moodle version.";
+    echo "Totara 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).<br />";
+    echo "Please upgrade your server software or install older Totara version.";
     die();
 }
 
 // make sure iconv is available and actually works
 if (!function_exists('iconv')) {
     // this should not happen, this must be very borked install
-    echo 'Moodle requires the iconv PHP extension. Please install or enable the iconv extension.';
+    echo 'Totara requires the iconv PHP extension. Please install or enable the iconv extension.';
     die();
 }
 
@@ -75,6 +75,7 @@ if ((isset($_GET['cache']) and $_GET['cache'] === '0')
 }
 
 require('../config.php');
+require_once($CFG->dirroot . '/totara/core/db/utils.php');
 
 // Invalidate the cache of version.php in any circumstances to help core_component
 // detecting if the version has changed and component cache should be reset.
@@ -93,6 +94,7 @@ $confirmrelease = optional_param('confirmrelease', 0, PARAM_BOOL);
 $confirmplugins = optional_param('confirmplugincheck', 0, PARAM_BOOL);
 $showallplugins = optional_param('showallplugins', 0, PARAM_BOOL);
 $agreelicense   = optional_param('agreelicense', 0, PARAM_BOOL);
+$geterrors = optional_param('geterrors', 0, PARAM_BOOL);
 $fetchupdates   = optional_param('fetchupdates', 0, PARAM_BOOL);
 $newaddonreq    = optional_param('installaddonrequest', null, PARAM_RAW);
 
@@ -154,6 +156,20 @@ if (!$version or !$release) {
     print_error('withoutversion', 'debug'); // without version, stop
 }
 
+// Totara upgrade version checks - only certain upgrade paths are permitted
+// do this early to ensure upgrade hasn't started yet
+//
+// we also need to prevent attempts to downgrade from Moodle release that
+// is later than current totara version (e.g. Moodle 2.3 -> Totara 2.2)
+// This is already handled by the core upgrade code as it would detected a
+// core downgrade and throw and exception
+
+//setup totara version variables
+$totarainfo = totara_version_info($version, $release);
+if (!empty($totarainfo->totaraupgradeerror)){
+    print_error($totarainfo->totaraupgradeerror, 'totara_core', '', $totarainfo);
+}
+
 if (!core_tables_exist()) {
     $PAGE->set_pagelayout('maintenance');
     $PAGE->set_popup_notification_allowed(false);
@@ -170,7 +186,7 @@ if (!core_tables_exist()) {
         $strlicense = get_string('license');
 
         $PAGE->navbar->add($strlicense);
-        $PAGE->set_title($strinstallation.' - Moodle '.$CFG->target_release);
+        $PAGE->set_title($strinstallation.' - Totara '.$TOTARA->release);
         $PAGE->set_heading($strinstallation);
         $PAGE->set_cacheable(false);
 
@@ -186,12 +202,12 @@ if (!core_tables_exist()) {
 
         $PAGE->navbar->add($strcurrentrelease);
         $PAGE->set_title($strinstallation);
-        $PAGE->set_heading($strinstallation . ' - Moodle ' . $CFG->target_release);
+        $PAGE->set_heading($strinstallation . ' - Totara ' . $TOTARA->release);
         $PAGE->set_cacheable(false);
 
         /** @var core_admin_renderer $output */
         $output = $PAGE->get_renderer('core', 'admin');
-        echo $output->install_environment_page($maturity, $envstatus, $environment_results, $release);
+        echo $output->install_environment_page($maturity, $envstatus, $environment_results, $TOTARA->release);
         die();
     }
 
@@ -215,7 +231,7 @@ if (!core_tables_exist()) {
     upgrade_init_javascript();
 
     $PAGE->navbar->add($strdatabasesetup);
-    $PAGE->set_title($strinstallation.' - Moodle '.$CFG->target_release);
+    $PAGE->set_title($strinstallation.' - Totara '.$TOTARA->release);
     $PAGE->set_heading($strinstallation);
     $PAGE->set_cacheable(false);
 
@@ -232,6 +248,13 @@ if (!core_tables_exist()) {
     install_core($version, true);
 }
 
+// Always force autoupdates off in Totara.
+if (empty($CFG->disableupdatenotifications)) {
+    set_config('disableupdatenotifications', '1');
+    set_config('disableupdateautodeploy', '1');
+    set_config('updateminmaturity', MATURITY_STABLE);
+    set_config('updatenotifybuilds', 0);
+}
 
 // Check version of Moodle code on disk compared with database
 // and upgrade if possible.
@@ -256,7 +279,8 @@ if ($CFG->version != $DB->get_field('config', 'value', array('name'=>'version'))
     redirect(new moodle_url('/admin/index.php'), 'Config cache inconsistency detected, resetting caches...');
 }
 
-if (!$cache and $version > $CFG->version) {  // upgrade
+if (!$cache && ($version > $CFG->version
+        || (isset($CFG->totara_build) && version_compare($totarainfo->newtotaraversion, $totarainfo->existingtotaraversion, '>')))) {  // upgrade
 
     // Warning about upgrading a test site.
     $testsite = false;
@@ -285,16 +309,13 @@ if (!$cache and $version > $CFG->version) {  // upgrade
     }
 
     if (empty($confirmupgrade)) {
-        $a = new stdClass();
-        $a->oldversion = "$CFG->release (".sprintf('%.2f', $CFG->version).")";
-        $a->newversion = "$release (".sprintf('%.2f', $version).")";
-        $strdatabasechecking = get_string('databasechecking', '', $a);
+        $strdatabasechecking = get_string('databasechecking', '', $totarainfo);
 
         $PAGE->set_title($stradministration);
         $PAGE->set_heading($strdatabasechecking);
         $PAGE->set_cacheable(false);
 
-        echo $output->upgrade_confirm_page($a->newversion, $maturity, $testsite);
+        echo $output->upgrade_confirm_page($totarainfo, $maturity, $testsite);
         die();
 
     } else if (empty($confirmrelease)){
@@ -307,7 +328,7 @@ if (!$cache and $version > $CFG->version) {  // upgrade
         $PAGE->set_heading($strcurrentrelease);
         $PAGE->set_cacheable(false);
 
-        echo $output->upgrade_environment_page($release, $envstatus, $environment_results);
+        echo $output->upgrade_environment_page($TOTARA->release, $envstatus, $environment_results);
         die();
 
     } else if (empty($confirmplugins)) {
@@ -355,7 +376,8 @@ if (!$cache and $version > $CFG->version) {  // upgrade
             die();
         }
         unset($failed);
-
+        // Launch pre-upgrade checks.
+        totara_preupgrade($totarainfo);
         // Launch main upgrade.
         upgrade_core($version, true);
     }
@@ -367,6 +389,15 @@ if (!$cache and $version > $CFG->version) {  // upgrade
 // Updated human-readable release version if necessary
 if (!$cache and $release <> $CFG->release) {  // Update the release version
     set_config('release', $release);
+}
+
+if ( (!isset($CFG->totara_release) || $CFG->totara_release <> $TOTARA->release)
+    || (!isset($CFG->totara_build) || $CFG->totara_build <> $TOTARA->build)
+    || (!isset($CFG->totara_version) || $CFG->totara_version <> $TOTARA->version)) {
+    // Also set Totara release (human readable version)
+    set_config("totara_release", $TOTARA->release);
+    set_config("totara_build", $TOTARA->build);
+    set_config("totara_version", $TOTARA->version);
 }
 
 if (!$cache and $branch <> $CFG->branch) {  // Update the branch
@@ -520,7 +551,7 @@ $site = get_site();
 if (empty($site->shortname)) {
     // probably new installation - lets return to frontpage after this step
     // remove settings that we want uninitialised
-    unset_config('registerauth');
+    //unset_config('registerauth'); // Not useful for Totara customers.
     unset_config('timezone'); // Force admin to select timezone!
     redirect('upgradesettings.php?return=site');
 }
@@ -547,6 +578,11 @@ if (isset($SESSION->pluginuninstallreturn)) {
 
 // Everything should now be set up, and the user is an admin
 
+// Check to see if we are downloading latest errors
+if ($geterrors) {
+    totara_errors_download();
+    die();
+}
 // Print default admin page with notifications.
 $errorsdisplayed = defined('WARN_DISPLAY_ERRORS_ENABLED');
 
@@ -595,9 +631,24 @@ $cachewarnings = cache_helper::warnings();
 
 admin_externalpage_setup('adminnotifications');
 
+//get Totara specific info
+$oneyearago = time() - 60*60*24*365;
+// See MDL-22481 for why currentlogin is used instead of lastlogin
+$sql = "SELECT COUNT(id)
+          FROM {user}
+         WHERE currentlogin > ?";
+$activeusers = $DB->count_records_sql($sql, array($oneyearago));
+// Check if any errors in log
+$errorrecords = $DB->get_records_sql("SELECT id, timeoccured FROM {errorlog} ORDER BY id DESC", null, 0, 1);
+
+$latesterror = array_shift($errorrecords);
+
+require_once($CFG->dirroot . '/totara/core/lib.php');
+totara_site_version_tracking();
+
 /* @var core_admin_renderer $output */
 $output = $PAGE->get_renderer('core', 'admin');
 
 echo $output->admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed, $cronoverdue, $dbproblems,
                                        $maintenancemode, $availableupdates, $availableupdatesfetch, $buggyiconvnomb,
-                                       $registered, $cachewarnings);
+                                       $registered, $cachewarnings, $latesterror, $activeusers, $TOTARA->release);

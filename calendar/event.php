@@ -87,6 +87,7 @@ if ($courseid != SITEID) {
 
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_totara_menu_selected('calendar');
 
 if ($courseid != SITEID && !empty($courseid)) {
     $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);

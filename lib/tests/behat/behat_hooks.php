@@ -288,7 +288,7 @@ class behat_hooks extends behat_base {
             $this->throw_unknown_exception($e);
         }
 
-
+        raise_memory_limit(MEMORY_EXTRA); // Totara includes very many files.
         // Checking that the root path is a Moodle test site.
         if (self::is_first_scenario()) {
             $notestsiteexception = new Exception('The base URL (' . $CFG->wwwroot . ') is not a behat test site, ' .

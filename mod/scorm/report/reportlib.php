@@ -94,3 +94,40 @@ function get_scorm_question_count($scormid) {
     $rs->close(); // Closing recordset.
     return $count;
 }
+
+/**
+ * Returns The maximum numbers of Questions associated with a SCO
+ *
+ * @param int Scorm ID
+ * @return array An array of integers representing the question count for each SCO
+ */
+function get_scorm_sco_question_count($scormid) {
+    global $DB;
+
+    // Get a list of interactions for the SCORM but exclude the 'objectives' ones.
+    $select = "SELECT id, scoid, element
+                FROM {scorm_scoes_track}
+                WHERE scormid = ?
+                AND " . $DB->sql_like('element', '?', false, true) . "
+                AND " . $DB->sql_like('element', '?', false, true, true);
+    $params = array($scormid, "cmi.interactions\_%.id", "cmi.interactions\_%.objectives\_%.id");
+    $rs = $DB->get_records_sql($select, $params);
+
+    // Store a count of the number of interactions for each SCO.
+    $count = array();
+
+    foreach ($rs as $record) {
+        // The highest interactions number + 1 will give us the number of interactions in each SCO.
+        $interactions_num = intval(trim(str_replace(array('cmi.interactions_', '.id'), '', $record->element))) + 1;
+
+        if (isset($count[$record->scoid])) {
+            if ($interactions_num > $count[$record->scoid]) {
+                $count[$record->scoid] = $interactions_num;
+            }
+        } else {
+            $count[$record->scoid] = $interactions_num;
+        }
+    }
+
+    return $count;
+}

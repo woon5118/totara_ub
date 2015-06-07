@@ -166,6 +166,54 @@ class enrol_guest_plugin extends enrol_plugin {
     }
 
     /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param $form
+     * @return MoodleQuickForm Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_enrol_hook($form, $instance) {
+        global $CFG, $USER;
+        if ($instance->password === '') {
+            return true;
+        }
+
+        if (isset($USER->enrol['tempguest'][$instance->courseid]) and $USER->enrol['tempguest'][$instance->courseid] > time()) {
+            // No need to show the guest access when user can already enter course as guest.
+            return true;
+        }
+
+        if ($data = $form->get_data()) {
+            // Add guest role.
+            $context = context_course::instance($instance->courseid);
+            // This is a hack copied from line 143, ideally we should not add stuff to $USER.
+            $USER->enrol_guest_passwords[$instance->id] = $data->guestpassword;
+            if (isset($USER->enrol['tempguest'][$instance->courseid])) {
+                remove_temp_course_roles($context);
+            }
+            load_temp_course_role($context, $CFG->guestroleid);
+            $USER->enrol['tempguest'][$instance->courseid] = ENROL_MAX_TIMESTAMP;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param stdClass $instance
+     * @return Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_get_form_hook($instance) {
+        global $CFG, $USER;
+        require_once("$CFG->dirroot/enrol/guest/locallib.php");
+        return new enrol_guest_enrol_form(null, $instance);
+    }
+
+    /**
      * Adds enrol instance UI to course edit form
      *
      * @param object $instance enrol instance or null if does not exist yet

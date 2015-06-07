@@ -114,9 +114,9 @@ class mod_forum_generator extends testing_module_generator {
         $record = (object)$record;
 
         // Add the subscription.
-        $record->id = $DB->insert_record('forum_subscriptions', $record);
+        $id = $DB->insert_record('forum_subscriptions', $record);
 
-        return $record;
+        return $DB->get_record('forum_subscriptions', array('id' => $id));
     }
 
     /**
@@ -188,9 +188,9 @@ class mod_forum_generator extends testing_module_generator {
         $record = (object) $record;
 
         // Add the discussion.
-        $record->id = forum_add_discussion($record, null, null, $record->userid);
+        $id = forum_add_discussion($record, null, null, $record->userid);
 
-        return $record;
+        return $DB->get_record('forum_discussions', array('id' => $id));
     }
 
     /**
@@ -270,7 +270,7 @@ class mod_forum_generator extends testing_module_generator {
         // Update the last post.
         forum_discussion_update_last_post($record->discussion);
 
-        return $record;
+        return $DB->get_record('forum_posts', array('id' => $record->id));
     }
 
     public function create_content($instance, $record = array()) {

@@ -31,6 +31,11 @@ require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 
+$usetags = (!empty($CFG->usetags));
+if ($usetags) {
+    require_once($CFG->dirroot.'/tag/lib.php');
+}
+
 $add    = optional_param('add', '', PARAM_ALPHA);     // module name
 $update = optional_param('update', 0, PARAM_INT);
 $return = optional_param('return', 0, PARAM_BOOL);    //return to course/view.php if false or mod/modname/view.php if true
@@ -104,6 +109,11 @@ if (!empty($add)) {
 
     if (!empty($type)) { //TODO: hopefully will be removed in 2.0
         $data->type = $type;
+    }
+
+    if ($usetags) {
+        // adding new module so will have no tags yet
+        $data->otags = array();
     }
 
     $sectionname = get_section_name($course, $cw);
@@ -230,6 +240,11 @@ if (!empty($add)) {
     }
     $navbaraddition = null;
 
+    if ($usetags) {
+        // Retrieve module's official tags
+        $data->otags = array_keys(tag_get_tags_array($module->name, $cm->instance, 'official'));
+    }
+
 } else {
     require_login();
     print_error('invalidaction');
@@ -269,6 +284,14 @@ if ($mform->is_cancelled()) {
         $fromform = add_moduleinfo($fromform, $course, $mform);
     } else {
         print_error('invaliddata');
+    }
+
+    if ($usetags) {
+        if (isset($fromform->otags)) {
+            tag_set($fromform->modulename, $fromform->instance, tag_get_name($fromform->otags));
+        } else {
+            tag_set($fromform->modulename, $fromform->instance, array());
+        }
     }
 
     if (isset($fromform->submitbutton)) {

@@ -66,6 +66,20 @@ function theme_reset_all_caches() {
 }
 
 /**
+ * Invalidate server and client side caches for a specified theme.
+ * @param string $themename the name of the theme to purge cache of
+ *
+ * @return void
+ */
+function theme_reset_specific_cache($themename) {
+    global $CFG;
+    require_once($CFG->libdir . '/filelib.php');
+
+    set_config('themerev', empty($CFG->themerev) ? 1 : $CFG->themerev+1);
+    fulldelete($CFG->cachedir . '/theme/' . $themename);
+}
+
+/**
  * Enable or disable theme designer mode.
  *
  * @param bool $state
@@ -123,7 +137,7 @@ class theme_config {
     /**
      * @var string Default theme, used when requested theme not found.
      */
-    const DEFAULT_THEME = 'clean';
+    const DEFAULT_THEME = 'standardtotararesponsive';
 
     /**
      * @var array You can base your theme on other themes by linking to the other theme as

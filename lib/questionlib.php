@@ -1035,8 +1035,8 @@ function question_make_default_categories($contexts) {
             // Otherwise, we need to make one
             $category = new stdClass();
             $contextname = $context->get_context_name(false, true);
-            $category->name = get_string('defaultfor', 'question', $contextname);
-            $category->info = get_string('defaultinfofor', 'question', $contextname);
+            $category->name = $contextname;
+            $category->info = $contextname;
             $category->contextid = $context->id;
             $category->parent = 0;
             // By default, all categories get this number, and are sorted alphabetically.
@@ -1085,7 +1085,7 @@ function get_categories_for_contexts($contexts, $sortorder = 'parent, sortorder,
  */
 function question_category_options($contexts, $top = false, $currentcat = 0,
         $popupform = false, $nochildrenof = -1) {
-    global $CFG;
+    global $DB, $CFG;
     $pcontexts = array();
     foreach ($contexts as $context) {
         $pcontexts[] = $context->id;
@@ -1095,6 +1095,16 @@ function question_category_options($contexts, $top = false, $currentcat = 0,
     $categories = get_categories_for_contexts($contextslist);
 
     $categories = question_add_context_in_key($categories);
+
+    // TOTARA - We need to put the default for back in front of default categories.
+    $defaultsql = "SELECT min(id) FROM {question_categories} GROUP BY contextid";
+    $defaultids = $DB->get_fieldset_sql($defaultsql);
+    foreach ($categories as $category) {
+        $catid = explode(',', $category->id);
+        if ($category->parent == 0 && in_array($catid[0], $defaultids)) {
+            $category->name = get_string('defaultfor', 'question', trim($category->name));
+        }
+    }
 
     if ($top) {
         $categories = question_add_tops($categories, $pcontexts);

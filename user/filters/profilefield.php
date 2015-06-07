@@ -90,7 +90,7 @@ class user_filter_profilefield extends user_filter_type {
         $objs['field']->setLabel(get_string('profilefilterfield', 'filters'));
         $objs['op']->setLabel(get_string('profilefilterlimiter', 'filters'));
         $objs['value']->setLabel(get_string('valuefor', 'filters', $this->_label));
-        $grp =& $mform->addElement('group', $this->_name.'_grp', $this->_label, $objs, '', false);
+        $grp =& $mform->addElement('group', $this->_name.'_grp', format_string($this->_label), $objs, '', false);
         $mform->setType($this->_name, PARAM_RAW);
         if ($this->_advanced) {
             $mform->setAdvanced($this->_name.'_grp');
@@ -131,12 +131,12 @@ class user_filter_profilefield extends user_filter_type {
      */
     public function get_sql_filter($data) {
         global $CFG, $DB;
-        static $counter = 0;
-        $name = 'ex_profilefield'.$counter++;
 
+        $name = user_filter_type::filter_unique_param('ex_profilefield');
+        $params = array();
         $profilefields = $this->get_profile_fields();
         if (empty($profilefields)) {
-            return '';
+            return array('', $params);
         }
 
         $profile  = $data['profile'];
@@ -145,14 +145,14 @@ class user_filter_profilefield extends user_filter_type {
 
         $params = array();
         if (!array_key_exists($profile, $profilefields)) {
-            return array('', array());
+            return array('', $params);
         }
 
         $where = "";
         $op = " IN ";
 
         if ($operator < 5 and $value === '') {
-            return '';
+            return array('', $params);
         }
 
         switch($operator) {

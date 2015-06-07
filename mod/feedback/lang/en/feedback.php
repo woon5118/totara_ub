@@ -122,6 +122,11 @@ $string['feedback:viewanalysepage'] = 'View the analysis page after submit';
 $string['feedback:viewreports'] = 'View reports';
 $string['file'] = 'File';
 $string['filter_by_course'] = 'Filter by course';
+$string['generategrade'] = 'Generate Grade';
+$string['generategrade_help'] = 'If you want to use this feedback as a prerequisite for a conditional activity -
+requiring that the feedback must be completed before that conditional activity becomes available -
+then you must set Generate Grade to Yes';
+
 $string['handling_error'] = 'Error occurred in feedback module action handling';
 $string['hide_no_select_option'] = 'Hide the "Not selected" option';
 $string['horizontal'] = 'horizontal';
@@ -260,6 +265,8 @@ $string['start'] = 'Start';
 $string['started'] = 'started';
 $string['stop'] = 'End';
 $string['subject'] = 'Subject';
+$string['submission'] = 'Submission';
+$string['submitted'] = 'Submitted';
 $string['switch_group'] = 'Switch group';
 $string['switch_item_to_not_required'] = 'switch to: answer not required';
 $string['switch_item_to_required'] = 'switch to: answer required';
@@ -285,3 +292,21 @@ $string['vertical'] = 'vertical';
 $string['viewcompleted'] = 'completed feedbacks';
 $string['viewcompleted_help'] = 'You may view completed feedback forms, searchable by course and/or by question.
 Feedback responses may be exported to Excel.';
+$string['blank_responses'] = '{$a} blank responses';
+
+// Archives
+$string['error:completedhistorynotfound'] = 'Completed history not found for id : {$a}';
+$string['viewarchive'] = 'Feedback archive';
+$string['timearchived'] = 'Time archived';
+$string['coursename'] = 'Course name';
+$string['feedbackname'] = 'Feedback name';
+$string['timecompleted'] = 'Time completed';
+$string['feedback:viewarchive'] = 'View archive';
+
+// View archive form
+$string['filteroptions'] = 'Filter options';
+$string['coursenamefilter'] = 'Course name contains';
+$string['feedbacknamefilter'] = 'Feedback name contains';
+$string['usernamefilter'] = 'Username contains';
+$string['firstnamefilter'] = 'First name contains';
+$string['lastnamefilter'] = 'Last name contains';

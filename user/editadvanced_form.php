@@ -96,6 +96,11 @@ class user_editadvanced_form extends moodleform {
         $mform->addElement('selectgroups', 'auth', get_string('chooseauthmethod', 'auth'), $authoptions);
         $mform->addHelpButton('auth', 'chooseauthmethod', 'auth');
 
+        if (get_config('totara_sync', 'element_user_enabled')) {
+            $mform->addElement('advcheckbox', 'totarasync', get_string('totarasync', 'tool_totara_sync').'?');
+            $mform->addHelpButton('totarasync', 'totarasync', 'tool_totara_sync');
+        }
+
         $mform->addElement('advcheckbox', 'suspended', get_string('suspended', 'auth'));
         $mform->addHelpButton('suspended', 'suspended', 'auth');
 
@@ -265,6 +270,16 @@ class user_editadvanced_form extends moodleform {
             } else if ($DB->record_exists('user', array('email' => $usernew->email, 'mnethostid' => $CFG->mnet_localhost_id))) {
                 $err['email'] = get_string('emailexists');
             }
+        }
+
+        // Check idnumber uniqueness.
+        if(!empty($usernew->idnumber) && totara_idnumber_exists('user', $usernew->idnumber, $usernew->id)) {
+            $err['idnumber'] = get_string('idnumberexists', 'totara_core');
+        }
+
+        // If idnumber is empty, ensure sync is not turned on.
+        if (empty($usernew->idnumber) && !empty($usernew->totarasync)) {
+            $err['totarasync'] = get_string('error:emptyidnumberwithsync', 'totara_core');
         }
 
         // Next the customisable profile fields.

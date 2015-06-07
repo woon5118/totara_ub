@@ -307,6 +307,8 @@ class helper {
      * @return string
      */
     public static function get_course_listitem_actions(\coursecat $category, \course_in_list $course) {
+        global $CFG;
+
         $baseurl = new \moodle_url(
             '/course/management.php',
             array('courseid' => $course->id, 'categoryid' => $course->category, 'sesskey' => \sesskey())
@@ -330,15 +332,20 @@ class helper {
         }
         // Show/Hide.
         if ($course->can_change_visibility()) {
+            $hidetooltip = \get_string('hide');
+            $showtooltip = \get_string('show');
+            if (!empty($CFG->audiencevisibility)) {
+                $hidetooltip = $showtooltip = get_string('manageaudincevisibility', 'totara_cohort');
+            }
             $actions[] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'hidecourse')),
-                'icon' => new \pix_icon('t/hide', \get_string('hide')),
-                'attributes' => array('data-action' => 'hide', 'class' => 'action-hide')
+                'icon' => new \pix_icon('t/hide', $hidetooltip),
+                'attributes' => array('class' => 'action-hide')
             );
             $actions[] = array(
                 'url' => new \moodle_url($baseurl, array('action' => 'showcourse')),
-                'icon' => new \pix_icon('t/show', \get_string('show')),
-                'attributes' => array('data-action' => 'show', 'class' => 'action-show')
+                'icon' => new \pix_icon('t/show', $showtooltip),
+                'attributes' => array('class' => 'action-show')
             );
         }
         // Move up/down.

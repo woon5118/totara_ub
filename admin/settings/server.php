@@ -31,6 +31,9 @@ if (isloggedin()) {
 $temp->add(new admin_setting_configtext('supportname', new lang_string('supportname', 'admin'), new lang_string('configsupportname', 'admin'), $primaryadminname, PARAM_NOTAGS));
 $temp->add(new admin_setting_configtext('supportemail', new lang_string('supportemail', 'admin'), new lang_string('configsupportemail', 'admin'), $primaryadminemail, PARAM_NOTAGS));
 $temp->add(new admin_setting_configtext('supportpage', new lang_string('supportpage', 'admin'), new lang_string('configsupportpage', 'admin'), '', PARAM_URL));
+$temp->add(new admin_setting_configtext('orgname', new lang_string('orgname', 'admin'), new lang_string('orgnamehelp', 'admin'), '', PARAM_NOTAGS));
+$temp->add(new admin_setting_configtext('techsupportemail', new lang_string('techsupportemail', 'admin'), new lang_string('techsupportemailhelp', 'admin'), '', PARAM_NOTAGS));
+$temp->add(new admin_setting_configtext('techsupportphone', new lang_string('techsupportphone', 'admin'), new lang_string('techsupportphonehelp', 'admin'), '', PARAM_NOTAGS));
 $ADMIN->add('server', $temp);
 
 
@@ -204,10 +207,22 @@ $temp->add(new admin_setting_configtext('curlcache', new lang_string('curlcache'
 $temp->add(new admin_setting_configtext('curltimeoutkbitrate', new lang_string('curltimeoutkbitrate', 'admin'),
                                         new lang_string('curltimeoutkbitrate_help', 'admin'), 56, PARAM_INT));
 
+// Totara performance settings.
+$options = array(
+    0 => new lang_string('no'),
+    1800 => new lang_string('numminutes', '', 30),
+    1200 => new lang_string('numminutes', '', 20),
+    600 => new lang_string('numminutes', '', 10),
+    300 => new lang_string('numminutes', '', 5),
+);
+$temp->add(new admin_setting_configselect('menulifetime', new lang_string('menulifetime', 'totara_core'),
+    new lang_string('menulifetime_desc', 'totara_core'), '600',
+    $options));
+
 $ADMIN->add('server', $temp);
 
 
-$ADMIN->add('server', new admin_externalpage('adminregistration', new lang_string('hubs', 'admin'),
+$ADMIN->add('server', new admin_externalpage('registrationhubs', new lang_string('hubs', 'admin'),
     "$CFG->wwwroot/$CFG->admin/registration/index.php"));
 
 // "update notifications" settingpage

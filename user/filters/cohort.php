@@ -64,7 +64,7 @@ class user_filter_cohort extends user_filter_type {
         $objs['text'] = $mform->createElement('text', $this->_name, null);
         $objs['select']->setLabel(get_string('limiterfor', 'filters', $this->_label));
         $objs['text']->setLabel(get_string('valuefor', 'filters', $this->_label));
-        $grp =& $mform->addElement('group', $this->_name.'_grp', $this->_label, $objs, '', false);
+        $grp =& $mform->addElement('group', $this->_name.'_grp', format_string($this->_label), $objs, '', false);
         $mform->setType($this->_name, PARAM_RAW);
         $mform->disabledIf($this->_name, $this->_name.'_op', 'eq', 5);
         if ($this->_advanced) {
@@ -105,16 +105,15 @@ class user_filter_cohort extends user_filter_type {
      */
     public function get_sql_filter($data) {
         global $DB;
-        static $counter = 0;
-        $name = 'ex_cohort'.$counter++;
 
+        $name = user_filter_type::filter_unique_param('ex_cohort');
         $operator = $data['operator'];
         $value    = $data['value'];
 
         $params = array();
 
         if ($value === '') {
-            return '';
+            return array('', $params);
         }
 
         $not = '';
@@ -146,7 +145,7 @@ class user_filter_cohort extends user_filter_type {
                 $params[$name] = '';
                 break;
             default:
-                return '';
+                return array('', $params);
         }
 
         $sql = "id $not IN (SELECT userid

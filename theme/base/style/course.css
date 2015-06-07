@@ -272,6 +272,7 @@ li.section.hidden span.commands a.editing_show {cursor:default;}
 .coursebox .content .coursefile,
 .coursebox.remotecoursebox .remotecourseinfo {margin:3px 5px;padding:0;}
 
+div.mod-indent p {width: 96%;} /* Wrap the content of activities/resources without link. */
 .dir-rtl .coursebox > .info > .coursename a {padding-left:0;padding-right:21px;background-position: top right;}
 .dir-rtl .coursebox > .info > .coursename,
 .dir-rtl .coursebox .teachers,

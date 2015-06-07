@@ -78,6 +78,14 @@ if ($hassiteconfig) {
     $temp = new admin_settingpage('manageauths', new lang_string('authsettings', 'admin'));
     $temp->add(new admin_setting_manageauths());
     $temp->add(new admin_setting_heading('manageauthscommonheading', new lang_string('commonsettings', 'admin'), ''));
+    // Totara user delete hack.
+    $options = array(
+        'full' => get_string('authdeleteusersfull', 'totara_core'),
+        'partial' => get_string('authdeleteuserspartial', 'totara_core'),
+    );
+    $temp->add(new admin_setting_configselect('authdeleteusers', new lang_string('authdeleteusers', 'totara_core'),
+        new lang_string('authdeleteusers_desc', 'totara_core'), 'full', $options));
+    // End of Totara hack.
     $temp->add(new admin_setting_special_registerauth());
     $temp->add(new admin_setting_configcheckbox('authloginviaemail', new lang_string('authloginviaemail', 'core_auth'), new lang_string('authloginviaemail_desc', 'core_auth'), 0));
     $temp->add(new admin_setting_configcheckbox('authpreventaccountcreation', new lang_string('authpreventaccountcreation', 'admin'), new lang_string('authpreventaccountcreation_help', 'admin'), 0));
@@ -94,6 +102,9 @@ if ($hassiteconfig) {
                                             new lang_string('forgottenpassword', 'auth'), ''));
     $temp->add(new admin_setting_confightmleditor('auth_instructions', new lang_string('instructions', 'auth'),
                                                 new lang_string('authinstructions', 'auth'), ''));
+    // TODO SCANMSG: re-add once force change feature integrated
+    //$temp->add(new admin_setting_confightmleditor('auth_forcedchangeinstructions', new lang_string('forcedchangeinstructions', 'auth'),
+    //                                        new lang_string('authforcedchangeinstructions', 'auth'), ''));
     $temp->add(new admin_setting_configtext('allowemailaddresses', new lang_string('allowemailaddresses', 'admin'), new lang_string('configallowemailaddresses', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configtext('denyemailaddresses', new lang_string('denyemailaddresses', 'admin'), new lang_string('configdenyemailaddresses', 'admin'), '', PARAM_NOTAGS));
     $temp->add(new admin_setting_configcheckbox('verifychangedemail', new lang_string('verifychangedemail', 'admin'), new lang_string('configverifychangedemail', 'admin'), 1));
@@ -473,6 +484,15 @@ if ($hassiteconfig) {
             include($settingspath);
             $ADMIN->add('cachestores', $settings);
         }
+    }
+}
+
+// Add any settings from totara modules.
+foreach (get_plugin_list('totara') as $plugin => $plugindir) {
+    $settings_path = "$plugindir/settings.php";
+    if (file_exists($settings_path)) {
+        include($settings_path);
+        continue;
     }
 }
 

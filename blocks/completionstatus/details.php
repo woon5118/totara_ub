@@ -57,8 +57,21 @@ if (!$info->is_enabled()) {
     print_error('completionnotenabled', 'completion', $returnurl);
 }
 
+// Is course complete?
+$coursecomplete = $info->is_course_complete($user->id);
+
+// Has this user completed any criteria?
+$criteriacomplete = $info->count_course_user_data($user->id);
+
+// Load course completion.
+$params = array(
+    'userid' => $user->id,
+    'course' => $course->id,
+);
+$ccompletion = new completion_completion($params);
+
 // Check this user is enroled.
-if (!$info->is_tracked_user($user->id)) {
+if (!$info->is_tracked_user($user->id) && !$criteriacomplete && !$ccompletion->timestarted) {
     if ($USER->id == $user->id) {
         print_error('notenroled', 'completion', $returnurl);
     } else {
@@ -74,6 +87,8 @@ $PAGE->set_context(context_course::instance($course->id));
 $page = get_string('completionprogressdetails', 'block_completionstatus');
 $title = format_string($course->fullname) . ': ' . $page;
 
+$PAGE->navbar->add(get_string('courses'));
+$PAGE->navbar->add($course->shortname, new moodle_url('/course/view.php', array('id'=>$course->id)));
 $PAGE->navbar->add($page);
 $PAGE->set_pagelayout('report');
 $PAGE->set_url('/blocks/completionstatus/details.php', array('course' => $course->id, 'user' => $user->id));
@@ -101,21 +116,14 @@ echo html_writer::start_tag('tr');
 echo html_writer::start_tag('td', array('colspan' => '2'));
 echo html_writer::tag('b', get_string('status'));
 
-// Is course complete?
-$coursecomplete = $info->is_course_complete($user->id);
-
-// Has this user completed any criteria?
-$criteriacomplete = $info->count_course_user_data($user->id);
-
-// Load course completion.
-$params = array(
-    'userid' => $user->id,
-    'course' => $course->id,
-);
-$ccompletion = new completion_completion($params);
-
 if ($coursecomplete) {
-    echo get_string('complete');
+    // Check for RPL
+    if (strlen($ccompletion->rpl)) {
+        echo get_string('completeviarpl', 'completion');
+    } else {
+        echo get_string('complete');
+    }
+
 } else if (!$criteriacomplete && !$ccompletion->timestarted) {
     echo html_writer::tag('i', get_string('notyetstarted', 'completion'));
 } else {
@@ -125,7 +133,16 @@ if ($coursecomplete) {
 echo html_writer::end_tag('td');
 echo html_writer::end_tag('tr');
 
-// Load criteria to display.
+// Show RPL
+if (isset($ccompletion) && strlen($ccompletion->rpl)) {
+    echo html_writer::start_tag('tr');
+    echo html_writer::start_tag('td', array('colspan' => '2'));
+    echo html_writer::tag('b', get_string('courserpl', 'completion') . ': ' . format_string($ccompletion->rpl));
+    echo html_writer::end_tag('td');
+    echo html_writer::end_tag('tr');
+}
+
+// Load criteria to display
 $completions = $info->get_completions($user->id);
 
 // Check if this course has any criteria.
@@ -173,8 +190,48 @@ if (empty($completions)) {
     // Save row data.
     $rows = array();
 
+    // Organise activity completions according to the course display order.
+    // Obtain the display order of activity modules.
+    $sections = $DB->get_records('course_sections', array('course' => $course->id), 'section ASC', 'id, sequence');
+    $moduleorder = array();
+    foreach ($sections as $section) {
+        if (!empty($section->sequence)) {
+            $moduleorder = array_merge(array_values($moduleorder), array_values(explode(',', $section->sequence)));
+        }
+    }
+
+    $orderedcompletions = array();
+    $modulecriteria = array();
+    $activitycompletions = array();
+    $nonactivitycompletions = array();
+    foreach($completions as $completion) {
+        $criteria = $completion->get_criteria();
+        if ($criteria->criteriatype == COMPLETION_CRITERIA_TYPE_ACTIVITY) {
+            if (!empty($criteria->moduleinstance)) {
+                $modulecriteria[$criteria->moduleinstance] = $completion;
+            }
+        } else {
+            $nonactivitycompletions[] = $completion;
+        }
+    }
+    // Compare to the course module order to put the activities in the same order as on the course view.
+    foreach($moduleorder as $module) {
+        // Some modules may not have completion criteria and can be ignored.
+        if (isset($modulecriteria[$module])) {
+            $activitycompletions[] = $modulecriteria[$module];
+        }
+    }
+
+    // Put the activity completions at the top.
+    foreach ($activitycompletions as $completion) {
+        $orderedcompletions[] = $completion;
+    }
+    foreach ($nonactivitycompletions as $completion) {
+        $orderedcompletions[] = $completion;
+    }
+
     // Loop through course criteria.
-    foreach ($completions as $completion) {
+    foreach ($orderedcompletions as $completion) {
         $criteria = $completion->get_criteria();
 
         $row = array();

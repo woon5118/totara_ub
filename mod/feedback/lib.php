@@ -70,6 +70,7 @@ function feedback_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
+        case FEATURE_ARCHIVE_COMPLETION:      return true;
 
         default: return null;
     }
@@ -504,6 +505,49 @@ function feedback_print_recent_mod_activity($activity, $courseid, $detail, $modn
     echo "</td></tr></table>";
 
     return;
+}
+
+/**
+ * Obtains the specific requirements for completion.
+ *
+ * @param object $cm Course-module
+ * @return array Requirements for completion
+ */
+function feedback_get_completion_requirements($cm) {
+    global $DB;
+
+    $feedback = $DB->get_record('feedback', array('id' => $cm->instance));
+
+    $result = array();
+
+    if ($feedback->completionsubmit) {
+        $result[] = get_string('submission', 'feedback');
+    }
+
+    return $result;
+}
+
+/**
+ * Obtains the completion progress.
+ *
+ * @param object $cm      Course-module
+ * @param int    $userid  User ID
+ * @return string The current status of completion for the user
+ */
+function feedback_get_completion_progress($cm, $userid) {
+    global $DB;
+
+    // Get feedback details.
+    $feedback = $DB->get_record('feedback', array('id' => $cm->instance), '*', MUST_EXIST);
+
+    $result = array();
+
+    if ($feedback->completionsubmit &&
+            $DB->record_exists('feedback_tracking', array('userid' => $userid, 'feedback' => $feedback->id))) {
+        $result[] = get_string('submitted', 'feedback');
+    }
+
+    return $result;
 }
 
 /**
@@ -1478,7 +1522,7 @@ function feedback_create_item($data) {
     $item->name = ($itemname ? $data->itemname : get_string('no_itemname', 'feedback'));
 
     if (!empty($data->itemlabel)) {
-        $item->label = trim($data->itemlabel);
+        $item->label = trim(format_string($data->itemlabel));
     } else {
         $item->label = get_string('no_itemlabel', 'feedback');
     }
@@ -2936,17 +2980,15 @@ function feedback_send_email($cm, $feedback, $course, $userid) {
 
     if ($teachers) {
 
-        $strfeedbacks = get_string('modulenameplural', 'feedback');
-        $strfeedback  = get_string('modulename', 'feedback');
-        $strcompleted  = get_string('completed', 'feedback');
-
-        if ($feedback->anonymous == FEEDBACK_ANONYMOUS_NO) {
-            $printusername = fullname($user);
-        } else {
-            $printusername = get_string('anonymous_user', 'feedback');
-        }
-
+        $strmgr = get_string_manager();
         foreach ($teachers as $teacher) {
+            $strcompleted  = $strmgr->get_string('completed', 'feedback', null, $teacher->lang);
+
+            if ($feedback->anonymous == FEEDBACK_ANONYMOUS_NO) {
+                $printusername = fullname($user);
+            } else {
+                $printusername = $strmgr->get_string('anonymous_user', 'feedback', null, $teacher->lang);
+            }
             $info = new stdClass();
             $info->username = $printusername;
             $info->feedback = format_string($feedback->name, true);
@@ -2956,10 +2998,10 @@ function feedback_send_email($cm, $feedback, $course, $userid) {
                             'do_show=showentries';
 
             $postsubject = $strcompleted.': '.$info->username.' -> '.$feedback->name;
-            $posttext = feedback_send_email_text($info, $course);
+            $posttext = feedback_send_email_text($info, $course, $teacher->lang);
 
             if ($teacher->mailformat == 1) {
-                $posthtml = feedback_send_email_html($info, $course, $cm);
+                $posthtml = feedback_send_email_html($info, $course, $cm, $teacher->lang);
             } else {
                 $posthtml = '';
             }
@@ -3014,22 +3056,20 @@ function feedback_send_email_anonym($cm, $feedback, $course) {
 
     if ($teachers) {
 
-        $strfeedbacks = get_string('modulenameplural', 'feedback');
-        $strfeedback  = get_string('modulename', 'feedback');
-        $strcompleted  = get_string('completed', 'feedback');
-        $printusername = get_string('anonymous_user', 'feedback');
-
+        $strmgr = get_string_manager();
         foreach ($teachers as $teacher) {
+            $printusername = $strmgr->get_string('anonymous_user', 'feedback', null, $teacher->lang);
+            $strcompleted  = $strmgr->get_string('completed', 'feedback', null, $teacher->lang);
             $info = new stdClass();
             $info->username = $printusername;
             $info->feedback = format_string($feedback->name, true);
             $info->url = $CFG->wwwroot.'/mod/feedback/show_entries_anonym.php?id='.$cm->id;
 
             $postsubject = $strcompleted.': '.$info->username.' -> '.$feedback->name;
-            $posttext = feedback_send_email_text($info, $course);
+            $posttext = feedback_send_email_text($info, $course, $teacher->lang);
 
             if ($teacher->mailformat == 1) {
-                $posthtml = feedback_send_email_html($info, $course, $cm);
+                $posthtml = feedback_send_email_html($info, $course, $cm, $teacher->lang);
             } else {
                 $posthtml = '';
             }
@@ -3054,15 +3094,17 @@ function feedback_send_email_anonym($cm, $feedback, $course) {
  *
  * @param object $info includes some infos about the feedback you want to send
  * @param object $course
+ * @param string $lang The recipient's language
  * @return string the text you want to post
  */
-function feedback_send_email_text($info, $course) {
+function feedback_send_email_text($info, $course, $lang) {
+    $strmgr = get_string_manager();
     $coursecontext = context_course::instance($course->id);
     $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
     $posttext  = $courseshortname.' -> '.get_string('modulenameplural', 'feedback').' -> '.
                     $info->feedback."\n";
     $posttext .= '---------------------------------------------------------------------'."\n";
-    $posttext .= get_string("emailteachermail", "feedback", $info)."\n";
+    $posttext .= $strmgr->get_string("emailteachermail", "feedback", $info, $lang)."\n";
     $posttext .= '---------------------------------------------------------------------'."\n";
     return $posttext;
 }
@@ -3074,10 +3116,13 @@ function feedback_send_email_text($info, $course) {
  * @global object
  * @param object $info includes some infos about the feedback you want to send
  * @param object $course
+ * @param object $cm module instance
+ * @param string $lang The recipient's language
  * @return string the text you want to post
  */
-function feedback_send_email_html($info, $course, $cm) {
+function feedback_send_email_html($info, $course, $cm, $lang) {
     global $CFG;
+    $strmgr = get_string_manager();
     $coursecontext = context_course::instance($course->id);
     $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
     $course_url = $CFG->wwwroot.'/course/view.php?id='.$course->id;
@@ -3086,10 +3131,10 @@ function feedback_send_email_html($info, $course, $cm) {
 
     $posthtml = '<p><font face="sans-serif">'.
             '<a href="'.$course_url.'">'.$courseshortname.'</a> ->'.
-            '<a href="'.$feedback_all_url.'">'.get_string('modulenameplural', 'feedback').'</a> ->'.
+            '<a href="'.$feedback_all_url.'">'.$strmgr->get_string('modulenameplural', 'feedback', null, $lang).'</a> ->'.
             '<a href="'.$feedback_url.'">'.$info->feedback.'</a></font></p>';
     $posthtml .= '<hr /><font face="sans-serif">';
-    $posthtml .= '<p>'.get_string('emailteachermailhtml', 'feedback', $info).'</p>';
+    $posthtml .= '<p>'.$strmgr->get_string('emailteachermailhtml', 'feedback', $info, $lang).'</p>';
     $posthtml .= '</font><hr />';
     return $posthtml;
 }
@@ -3166,6 +3211,13 @@ function feedback_extend_settings_navigation(settings_navigation $settings,
                                     array('id' => $PAGE->cm->id,
                                           'do_show' => 'showentries')));
     }
+
+    if (has_capability('mod/feedback:viewarchive', $PAGE->cm->context)) {
+        $feedbacknode->add(get_string('viewarchive', 'feedback'),
+                    new moodle_url('/mod/feedback/viewarchive.php',
+                            array('feedbackid' => $PAGE->cm->instance)));
+    }
+
 }
 
 function feedback_init_feedback_session() {
@@ -3208,4 +3260,208 @@ function feedback_ajax_saveitemorder($itemlist, $feedback) {
                                             array('id'=>$itemid, 'feedback'=>$feedback->id));
     }
     return $result;
+}
+
+/**
+ * Archives user's feedback for a course
+ *
+ * @param int $userid
+ * @param int $courseid
+ */
+function feedback_archive_completion($userid, $courseid, $windowopens = NULL) {
+    global $DB, $CFG;
+
+    require_once($CFG->libdir.'/gradelib.php');
+
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $completion = new completion_info($course);
+
+    $sql = "SELECT fc.*
+            FROM {feedback_completed} fc
+            INNER JOIN {feedback} f ON f.id = fc.feedback AND f.course = :courseid
+            WHERE fc.userid = :userid";
+
+    if ($completeds = $DB->get_records_sql($sql, array('userid' => $userid, 'courseid' => $courseid))) {
+        $now = time();
+        foreach ($completeds as $completed) {
+            $data = clone $completed;
+            $data->timearchived = $now;
+            $data->idarchived = $completed->id; // Not sure if this is needed but might be useful if there is a data issue later on.
+
+            $newid = $DB->insert_record('feedback_completed_history', $data, true);
+
+            if ($newid) {
+                $newvalues = array();
+                $values = $DB->get_records('feedback_value', array('completed' => $completed->id));
+                foreach ($values as $value) {
+                    $newvalue = clone $value;
+                    $newvalue->completed = $newid;
+                    $newvalue->timearchived = time();
+                    // Not sure if this is needed but might be useful if there is a data issue later on
+                    $newvalue->idarchived = $value->id;
+
+                    $newvalues[] = $newvalue;
+                }
+                $DB->insert_records_via_batch('feedback_value_history', $newvalues);
+                unset($newvalues);
+
+                // Then do the necessary
+                feedback_delete_completed($completed->id);
+                $course_module = get_coursemodule_from_instance('feedback', $completed->feedback, $courseid);
+                // Reset viewed
+                $completion->set_module_viewed_reset($course_module, $userid);
+                // And reset completion, in case viewed is not a required condition
+                $completion->update_state($course_module, COMPLETION_INCOMPLETE, $userid);
+            }
+        }
+        $completion->invalidatecache($courseid, $userid, true);
+    }
+
+    return true;
+}
+
+/**
+ * Returns a list of archived feedback
+ *
+ * @global object $DB
+ * @param array $filters
+ * @param int $totalcount
+ * @return array $archives - list of archived feedback
+ */
+function feedback_archive_get_list($filters, &$totalcount) {
+    global $DB;
+
+    $params = array();
+    $wheres = array();
+    $where = '';
+
+    if (isset($filters['courseid']) && $filters['courseid']) {
+        $params['courseid'] = $filters['courseid'];
+        $wheres[] = 'course.id = :courseid';
+    }
+    if (isset($filters['coursename']) && $filters['coursename']) {
+        $params['coursename'] = '%' . $DB->sql_like_escape($filters['coursename']) . '%';
+        $wheres[] = $DB->sql_like('course.fullname', ':coursename', false);
+    }
+    if (isset($filters['feedbackid']) && $filters['feedbackid']) {
+        $params['feedbackid'] = $filters['feedbackid'];
+        $wheres[] = 'f.id = :feedbackid';
+    }
+    if (isset($filters['feedbackname']) && $filters['feedbackname']) {
+        $params['feedbackname'] = '%' . $DB->sql_like_escape($filters['feedbackname']) . '%';
+        $wheres[] = $DB->sql_like('f.name', ':feedbackname', false);
+    }
+    if (isset($filters['username']) && $filters['username']) {
+        $params['username'] = '%' . $DB->sql_like_escape($filters['username']) . '%';
+        $wheres[] = $DB->sql_like('u.username', ':username', false);
+    }
+    if (isset($filters['firstname']) && $filters['firstname']) {
+        $params['firstname'] = '%' . $DB->sql_like_escape($filters['firstname']) . '%';
+        $wheres[] = $DB->sql_like('u.firstname', ':firstname', false);
+    }
+    if (isset($filters['lastname']) && $filters['lastname']) {
+        $params['lastname'] = '%' . $DB->sql_like_escape($filters['lastname']) . '%';
+        $wheres[] = $DB->sql_like('u.lastname', ':lastname', false);
+    }
+    if (!empty($wheres)) {
+        $where = 'WHERE ' . implode(' AND ', $wheres);
+    }
+
+    $sqlbody = "FROM {feedback_completed_history} c
+                INNER JOIN {feedback} f ON f.id = c.feedback
+                INNER JOIN {course} course ON course.id = f.course
+                INNER JOIN {user} u ON u.id = c.userid
+                {$where}";
+
+    $sqlcount = "SELECT COUNT(*) " . $sqlbody;
+    $totalcount = $DB->count_records_sql($sqlcount, $params);
+
+    $offset = $filters['page'] * $filters['perpage'];
+
+    $sql = "SELECT c.id,
+                    u.id userid,
+                    u.username,
+                    u.firstname,
+                    u.lastname,
+                    course.id AS courseid,
+                    course.fullname AS coursename,
+                    f.id AS feedbackid,
+                    f.name AS feedbackname,
+                    c.timemodified AS timecompleted,
+                    c.timearchived
+            {$sqlbody}
+            ORDER BY u.lastname,
+                     u.firstname,
+                     course.fullname,
+                     f.name,
+                     c.timemodified,
+                     c.timearchived";
+    $archives = $DB->get_records_sql($sql, $params, $offset, $filters['perpage']);
+
+    return $archives;
+}
+
+/**
+ * Displays a table of archived feedback
+ *
+ * @param array $archives
+ * @param array $params - contains paging parameters
+ */
+function feedback_archive_display_list($archives, $params) {
+    $table = new flexible_table('view-feedback-archive');
+    $table->define_columns(array(
+        'username',
+        'userfullname',
+        'timecompleted',
+        'timearchived',
+        'options'
+    ));
+    $table->define_headers(array(
+        get_string('username'),
+        get_string('fullnameuser'),
+        get_string('timecompleted', 'feedback'),
+        get_string('timearchived', 'feedback'),
+        get_string('options')
+    ));
+
+    $table->column_class('username', 'username');
+    $table->column_class('userfullname', 'userfullname');
+    $table->column_class('timecompleted', 'timecompleted');
+    $table->column_class('timearchived', 'timearchived');
+
+    $table->define_baseurl(new moodle_url('/mod/feedback/viewarchive.php', $params));
+    $table->sortable(false);
+    $table->collapsible(false);
+
+    $table->set_attribute('cellspacing', '0');
+    $table->set_attribute('id', 'view-feedback-archive');
+    $table->set_attribute('class', 'generaltable');
+    $table->set_attribute('width', '100%');
+    $table->setup();
+
+    $table->initialbars($params['totalcount'] > $params['perpage']);
+    $table->pagesize($params['perpage'], $params['totalcount']);
+
+    if ($archives) {
+        foreach ($archives as $archive) {
+            $options = '';
+
+            $row = array();
+
+            $viewurl = new moodle_url('/mod/feedback/viewarchive.php',
+                    array('historyid' => $archive->id, 'feedbackid' => $archive->feedbackid));
+            $options .= html_writer::link($viewurl, format_string(get_string('view')));
+
+            $userurl = new moodle_url('/user/view.php', array('id' => $archive->userid));
+            $row[] = html_writer::link($userurl, format_string($archive->username));
+            $row[] = html_writer::link($userurl, format_string(fullname($archive)));
+
+            $row[] = userdate($archive->timecompleted);
+            $row[] = userdate($archive->timearchived);
+            $row[] = $options;
+
+            $table->add_data($row);
+        }
+    }
+    $table->print_html();
 }

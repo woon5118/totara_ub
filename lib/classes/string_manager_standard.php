@@ -161,6 +161,9 @@ class core_string_manager_standard implements core_string_manager {
             if ($plugintype === 'mod') {
                 // Bloody mod hack.
                 $file = $pluginname;
+            } else if ($plugintype == 'rb_source') {
+                // Hack for rb_sources.
+                $file = 'rb_source_' . $pluginname;
             } else {
                 $file = $plugintype . '_' . $pluginname;
             }
@@ -183,6 +186,10 @@ class core_string_manager_standard implements core_string_manager {
                 // Legacy location - used by contrib only.
                 if (file_exists("$location/lang/$dep/$file.php")) {
                     include("$location/lang/$dep/$file.php");
+                }
+                // the root lang folder
+                if (file_exists("{$CFG->dirroot}/lang/$dep/$file.php")) {
+                    include("{$CFG->dirroot}/lang/$dep/$file.php");
                 }
                 // The main lang string location.
                 if (file_exists("$this->otherroot/$dep/$file.php")) {

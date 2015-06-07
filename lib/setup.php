@@ -603,6 +603,10 @@ require_once($CFG->libdir .'/messagelib.php');      // Messagelib functions
 require_once($CFG->libdir .'/modinfolib.php');      // Cached information on course-module instances
 require_once($CFG->dirroot.'/cache/lib.php');       // Cache API
 
+/* Requires for Totara */
+require_once($CFG->dirroot .'/totara/core/totara.php');// Standard functions used by Totara
+totara_setup();
+
 // make sure PHP is not severly misconfigured
 setup_validate_php_configuration();
 
@@ -829,7 +833,7 @@ unset($urlthemename);
 
 // Ensure a valid theme is set.
 if (!isset($CFG->theme)) {
-    $CFG->theme = 'clean';
+    $CFG->theme = 'standardtotararesponsive';
 }
 
 // Set language/locale of printed times.  If user has chosen a language that

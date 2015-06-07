@@ -4,6 +4,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->dirroot.'/totara/cohort/lib.php');
 require_once($CFG->libdir. '/coursecatlib.php');
 
 /**
@@ -17,7 +18,7 @@ class course_edit_form extends moodleform {
      * Form definition.
      */
     function definition() {
-        global $CFG, $PAGE;
+        global $USER, $CFG, $DB, $PAGE, $TOTARA_COURSE_TYPES, $COHORT_VISIBILITY;
 
         $mform    = $this->_form;
         $PAGE->requires->yui_module('moodle-course-formatchooser', 'M.course.init_formatchooser',
@@ -28,6 +29,7 @@ class course_edit_form extends moodleform {
         $editoroptions = $this->_customdata['editoroptions'];
         $returnto = $this->_customdata['returnto'];
         $returnurl = $this->_customdata['returnurl'];
+        $nojs = (isset($this->_customdata['nojs'])) ? $this->_customdata['nojs'] : 0 ;
 
         $systemcontext   = context_system::instance();
         $categorycontext = context_coursecat::instance($category->id);
@@ -103,23 +105,31 @@ class course_edit_form extends moodleform {
             }
         }
 
-        $choices = array();
-        $choices['0'] = get_string('hide');
-        $choices['1'] = get_string('show');
-        $mform->addElement('select', 'visible', get_string('visible'), $choices);
-        $mform->addHelpButton('visible', 'visible');
-        $mform->setDefault('visible', $courseconfig->visible);
-        if (!empty($course->id)) {
-            if (!has_capability('moodle/course:visibility', $coursecontext)) {
-                $mform->hardFreeze('visible');
-                $mform->setConstant('visible', $course->visible);
-            }
-        } else {
-            if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
-                $mform->hardFreeze('visible');
-                $mform->setConstant('visible', $courseconfig->visible);
+        if (empty($CFG->audiencevisibility)) {
+            $choices = array();
+            $choices['0'] = get_string('hide');
+            $choices['1'] = get_string('show');
+            $mform->addElement('select', 'visible', get_string('visible'), $choices);
+            $mform->addHelpButton('visible', 'visible');
+            $mform->setDefault('visible', $courseconfig->visible);
+            if (!empty($course->id)) {
+                if (!has_capability('moodle/course:visibility', $coursecontext)) {
+                    $mform->hardFreeze('visible');
+                    $mform->setConstant('visible', $course->visible);
+                }
+            } else {
+                if (!guess_if_creator_will_have_course_capability('moodle/course:visibility', $categorycontext)) {
+                    $mform->hardFreeze('visible');
+                    $mform->setConstant('visible', $courseconfig->visible);
+                }
             }
         }
+        //Course type
+        $coursetypeoptions = array();
+        foreach($TOTARA_COURSE_TYPES as $k => $v) {
+            $coursetypeoptions[$v] = get_string($k, 'totara_core');
+        }
+        $mform->addElement('select', 'coursetype', get_string('coursetype', 'totara_core'), $coursetypeoptions);
 
         $mform->addElement('date_selector', 'startdate', get_string('startdate'));
         $mform->addHelpButton('startdate', 'startdate');
@@ -261,14 +271,90 @@ class course_edit_form extends moodleform {
             $mform->addElement('selectyesno', 'enablecompletion', get_string('enablecompletion', 'completion'));
             $mform->setDefault('enablecompletion', $courseconfig->enablecompletion);
             $mform->addHelpButton('enablecompletion', 'enablecompletion', 'completion');
+
+            $mform->addElement('advcheckbox', 'completionstartonenrol', get_string('completionstartonenrol', 'completion'));
+            $mform->setDefault('completionstartonenrol', $courseconfig->completionstartonenrol);
+            $mform->disabledIf('completionstartonenrol', 'enablecompletion', 'eq', 0);
+
+            $mform->addElement('advcheckbox', 'completionprogressonview', get_string('completionprogressonview', 'completion'));
+            $mform->setDefault('completionprogressonview', $courseconfig->completionprogressonview);
+            $mform->disabledIf('completionprogressonview', 'enablecompletion', 'eq', 0);
+            $mform->addHelpButton('completionprogressonview', 'completionprogressonview', 'completion');
         } else {
             $mform->addElement('hidden', 'enablecompletion');
             $mform->setType('enablecompletion', PARAM_INT);
             $mform->setDefault('enablecompletion', 0);
+
+            $mform->addElement('hidden', 'completionstartonenrol');
+            $mform->setType('completionstartonenrol', PARAM_INT);
+            $mform->setDefault('completionstartonenrol',0);
+
+            $mform->addElement('hidden', 'completionprogressonview');
+            $mform->setType('completionprogressonview', PARAM_INT);
+            $mform->setDefault('completionprogressonview', 0);
         }
 
+        // Course Icons
+        if (empty($course->id)) {
+            $action = 'add';
+        } else {
+            $action = 'edit';
+        }
+        $course->icon = isset($course->icon) ? $course->icon : 'default';
+        totara_add_icon_picker($mform, $action, 'course', $course->icon, $nojs);
+        // END Course Icons
+
+//--------------------------------------------------------------------------------
         enrol_course_edit_form($mform, $course, $context);
 
+        // Only show the Enrolled Audiences functionality to users with the appropriate permissions.
+        if (has_capability('moodle/cohort:manage', $context)) {
+            $mform->addElement('header','enrolledcohortshdr', get_string('enrolledcohorts', 'totara_cohort'));
+
+            if (empty($course->id)) {
+                $cohorts = '';
+            } else {
+                $cohorts = totara_cohort_get_course_cohorts($course->id, null, 'c.id');
+                $cohorts = !empty($cohorts) ? implode(',', array_keys($cohorts)) : '';
+            }
+
+            $mform->addElement('hidden', 'cohortsenrolled', $cohorts);
+            $mform->setType('cohortsenrolled', PARAM_SEQUENCE);
+            $cohortsclass = new totara_cohort_course_cohorts(COHORT_ASSN_VALUE_ENROLLED);
+            $cohortsclass->build_table(!empty($course->id) ? $course->id : 0);
+            $mform->addElement('html', $cohortsclass->display(true));
+
+            $mform->addElement('button', 'cohortsaddenrolled', get_string('cohortsaddenrolled', 'totara_cohort'));
+            $mform->setExpanded('enrolledcohortshdr');
+        }
+
+        // Only show the Audiences Visibility functionality to users with the appropriate permissions.
+        if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+            $mform->addElement('header', 'visiblecohortshdr', get_string('audiencevisibility', 'totara_cohort'));
+            $mform->addElement('select', 'audiencevisible', get_string('visibility', 'totara_cohort'), $COHORT_VISIBILITY);
+            $mform->addHelpButton('audiencevisible', 'visiblelearning', 'totara_cohort');
+
+            if (empty($course->id)) {
+                $mform->setDefault('audiencevisible', $courseconfig->visiblelearning);
+                $cohorts = '';
+            } else {
+                $cohorts = totara_cohort_get_visible_learning($course->id);
+                $cohorts = !empty($cohorts) ? implode(',', array_keys($cohorts)) : '';
+            }
+
+            $mform->addElement('hidden', 'cohortsvisible', $cohorts);
+            $mform->setType('cohortsvisible', PARAM_SEQUENCE);
+            $cohortsclass = new totara_cohort_visible_learning_cohorts();
+            $instanceid = !empty($course->id) ? $course->id : 0;
+            $instancetype = COHORT_ASSN_ITEMTYPE_COURSE;
+            $cohortsclass->build_visible_learning_table($instanceid, $instancetype);
+            $mform->addElement('html', $cohortsclass->display(true, 'visible'));
+
+            $mform->addElement('button', 'cohortsaddvisible', get_string('cohortsaddvisible', 'totara_cohort'));
+            $mform->setExpanded('visiblecohortshdr');
+        }
+
+//--------------------------------------------------------------------------------
         $mform->addElement('header','groups', get_string('groupsettingsheader', 'group'));
 
         $choices = array();
@@ -301,6 +387,26 @@ class course_edit_form extends moodleform {
             }
         }
 
+        //--------------------------------------------------------------------------------
+        if (empty($course->id)) {
+            $course->id = 0;
+        }
+        customfield_definition($mform, $course, 'course', 0, 'course');
+
+        // Display offical Course Tags
+        if (!empty($CFG->usetags) && $DB->count_records('tag', array('tagtype' => 'official')) && (get_config('moodlecourse', 'coursetagging') == 1)) {
+            $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
+
+            $namefield = empty($CFG->keeptagnamecase) ? 'name' : 'rawname';
+            $sql = "SELECT id, {$namefield} FROM {tag} WHERE tagtype = ? ORDER by name ASC";
+            $params = array('official');
+            if ($otags = $DB->get_records_sql_menu($sql, $params)) {
+                $otagsselEl =& $mform->addElement('select', 'otags', get_string('otags', 'tag'), $otags, 'size="5"');
+                $otagsselEl->setMultiple(true);
+                $mform->addHelpButton('otags', 'otags', 'tag');
+            }
+        }
+        
         // When two elements we need a group.
         $buttonarray = array();
         if ($returnto !== 0) {
@@ -337,6 +443,11 @@ class course_edit_form extends moodleform {
             core_collator::asort($options);
             $gr_el =& $mform->getElement('defaultgroupingid');
             $gr_el->load($options);
+        }
+
+        $courseid = $mform->getElementValue('id') ? $mform->getElementValue('id') : 0;
+        if ($course = $DB->get_record('course', array('id' => $courseid))) {
+            customfield_definition_after_data($mform, $course, 'course', 0, 'course');
         }
 
         // add course format options
@@ -379,6 +490,8 @@ class course_edit_form extends moodleform {
                 }
             }
         }
+
+        $errors += customfield_validation((object)$data, 'course', 'course');
 
         $errors = array_merge($errors, enrol_course_edit_validation($data, $this->context));
 

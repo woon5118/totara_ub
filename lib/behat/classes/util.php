@@ -85,6 +85,21 @@ class behat_util extends testing_util {
 
         install_cli_database($options, false);
 
+        // Undo Totara changed defaults to allow upstream testing without hacks.
+        set_config('enablecompletion', 0);
+        set_config('forcelogin', 0);
+        set_config('enablecompletion', 0, 'moodlecourse');
+        set_config('completionstartonenrol', 0, 'moodlecourse');
+        set_config('enrol_plugins_enabled', 'manual,guest,self,cohort');
+        set_config('enhancedcatalog', 0);
+        set_config('preventexecpath', 0);
+        $DB->set_field('role', 'name', 'Manager', array('shortname' => 'manager'));
+        $DB->set_field('role', 'name', 'Teacher', array('shortname' => 'editingteacher'));
+        $DB->set_field('role', 'name', 'Non-editing teacher',array('shortname' => 'teacher'));
+        $DB->set_field('role', 'name', 'Student', array('shortname' => 'student'));
+        $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
+        $DB->set_field('modules', 'visible', 0, array('name'=>'feedback'));
+
         // We need to keep the installed dataroot filedir files.
         // So each time we reset the dataroot before running a test, the default files are still installed.
         self::save_original_data_files();

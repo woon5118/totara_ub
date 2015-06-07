@@ -23,19 +23,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['addcohort'] = 'Add new cohort';
-$string['allcohorts'] = 'All cohorts';
+$string['addcohort'] = 'Add new audience';
+$string['allcohorts'] = 'All audiences';
 $string['anycohort'] = 'Any';
 $string['assign'] = 'Assign';
-$string['assignto'] = 'Cohort \'{$a}\' members';
-$string['backtocohorts'] = 'Back to cohorts';
-$string['bulkadd'] = 'Add to cohort';
-$string['bulknocohort'] = 'No available cohorts found';
+$string['assigncohorts'] = 'Assign audiences to members';
+$string['assignto'] = 'Audience \'{$a}\' members';
+$string['backtocohorts'] = 'Back to audiences';
+$string['bulkadd'] = 'Add to audience';
+$string['bulknocohort'] = 'No available audiences found';
 $string['categorynotfound'] = 'Category <b>{$a}</b> not found or you don\'t have permission to create a cohort there. The default context will be used.';
-$string['cohort'] = 'Cohort';
-$string['cohorts'] = 'Cohorts';
-$string['cohortsin'] = '{$a}: available cohorts';
-$string['assigncohorts'] = 'Assign cohort members';
+$string['cohort'] = 'Audience';
+$string['cohorts'] = 'Audiences';
+$string['cohortsin'] = '{$a}: available audiences';
+$string['cohort:assign'] = 'Assign audience members';
+$string['cohort:manage'] = 'Manage audiences';
+$string['cohort:view'] = 'Use audiences and view members';
 $string['component'] = 'Source';
 $string['contextnotfound'] = 'Context <b>{$a}</b> not found or you don\'t have permission to create a cohort there. The default context will be used.';
 $string['csvcontainserrors'] = 'Errors were found in CSV data. See details below.';
@@ -44,20 +47,20 @@ $string['csvextracolumns'] = 'Column(s) <b>{$a}</b> will be ignored.';
 $string['currentusers'] = 'Current users';
 $string['currentusersmatching'] = 'Current users matching';
 $string['defaultcontext'] = 'Default context';
-$string['delcohort'] = 'Delete cohort';
-$string['delconfirm'] = 'Do you really want to delete cohort \'{$a}\'?';
+$string['delcohort'] = 'Delete audience';
+$string['delconfirm'] = 'Do you really want to delete audience \'{$a}\'?';
 $string['description'] = 'Description';
 $string['displayedrows'] = '{$a->displayed} rows displayed out of {$a->total}.';
-$string['duplicateidnumber'] = 'Cohort with the same ID number already exists';
-$string['editcohort'] = 'Edit cohort';
-$string['eventcohortcreated'] = 'Cohort created';
-$string['eventcohortdeleted'] = 'Cohort deleted';
-$string['eventcohortmemberadded'] = 'User added to a cohort';
-$string['eventcohortmemberremoved'] = 'User removed from a cohort';
-$string['eventcohortupdated'] = 'Cohort updated';
-$string['external'] = 'External cohort';
-$string['idnumber'] = 'Cohort ID';
-$string['memberscount'] = 'Cohort size';
+$string['duplicateidnumber'] = 'Audience with the same ID number already exists';
+$string['editcohort'] = 'Edit audience';
+$string['eventcohortcreated'] = 'Audience created';
+$string['eventcohortdeleted'] = 'Audience deleted';
+$string['eventcohortmemberadded'] = 'User added to a audience';
+$string['eventcohortmemberremoved'] = 'User removed from a audience';
+$string['eventcohortupdated'] = 'Audience updated';
+$string['external'] = 'External audience';
+$string['idnumber'] = 'Audiences ID';
+$string['memberscount'] = 'Audience size';
 $string['name'] = 'Name';
 $string['namecolumnmissing'] = 'There is something wrong with the format of the CSV file. Please check that it includes column names.';
 $string['namefieldempty'] = 'Field name can not be empty';
@@ -65,16 +68,22 @@ $string['nocomponent'] = 'Created manually';
 $string['potusers'] = 'Potential users';
 $string['potusersmatching'] = 'Potential matching users';
 $string['preview'] = 'Preview';
-$string['removeuserwarning'] = 'Removing users from a cohort may result in unenrolling of users from multiple courses which includes deleting of user settings, grades, group membership and other user information from affected courses.';
-$string['selectfromcohort'] = 'Select members from cohort';
-$string['systemcohorts'] = 'System cohorts';
-$string['unknowncohort'] = 'Unknown cohort ({$a})!';
-$string['uploadcohorts'] = 'Upload cohorts';
-$string['uploadedcohorts'] = 'Uploaded {$a} cohorts';
-$string['useradded'] = 'User added to cohort "{$a}"';
+$string['removeuserwarning'] = 'Removing users from a audience may result in unenrolling of users from multiple courses which includes deleting of user settings, grades, group membership and other user information from affected courses.';
+$string['selectfromcohort'] = 'Select members from audience';
+$string['systemcohorts'] = 'System audiences';
+$string['unknowncohort'] = 'Unknown audience ({$a})!';
+$string['uploadcohorts'] = 'Upload audiences';
+$string['uploadedcohorts'] = 'Uploaded {$a} audiences';
+$string['useradded'] = 'User added to audience "{$a}"';
 $string['search'] = 'Search';
-$string['searchcohort'] = 'Search cohort';
-$string['uploadcohorts_help'] = 'Cohorts may be uploaded via text file. The format of the file should be as follows:
+$string['searchcohort'] = 'Search audience';
+
+$string['error:cohortdoesnotexist'] = 'Audience with id {$a} does not exist';
+$string['error:staticcannotsetcriteria'] = 'Cannot set criteria for static audiences';
+$string['error:dynamiccritalreadyapplied'] = 'Dynamic audience \'{$a}\' already has criteria applied';
+$string['error:doesnotexist'] = 'Audiences with this id does not exist';
+$string['searchcohort'] = 'Search audience';
+$string['uploadcohorts_help'] = 'Audiences may be uploaded via text file. The format of the file should be as follows:
 
 * Each line of the file contains one record
 * Each record is a series of data separated by commas (or other delimiters)
@@ -83,5 +92,5 @@ $string['uploadcohorts_help'] = 'Cohorts may be uploaded via text file. The form
 * Optional fieldnames are idnumber, description, descriptionformat, visible, context, category, category_id, category_idnumber, category_path
 ';
 $string['visible'] = 'Visible';
-$string['visible_help'] = "Any cohort can be viewed by users who have 'moodle/cohort:view' capability in the cohort context.<br/>
-Visible cohorts can also be viewed by users in the underlying courses.";
+$string['visible_help'] = "Any audience can be viewed by users who have 'moodle/cohort:view' capability in the audience context.<br/>
+Visible audiences can also be viewed by users in the underlying courses.";

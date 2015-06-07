@@ -102,6 +102,9 @@ class auth_plugin_email extends auth_plugin_base {
         // Save any custom profile field information.
         profile_save_data($user);
 
+        // Totara: We need to update primary position fields here.
+        position_save_data($user);
+
         // Trigger event.
         \core\event\user_created::create_from_userid($user->id)->trigger();
 
@@ -231,6 +234,9 @@ class auth_plugin_email extends auth_plugin_base {
 
         // save settings
         set_config('recaptcha', $config->recaptcha, 'auth/email');
+        set_config('allowsignupposition', $config->allowsignupposition, 'totara_hierarchy');
+        set_config('allowsignuporganisation', $config->allowsignuporganisation, 'totara_hierarchy');
+        set_config('allowsignupmanager', $config->allowsignupmanager, 'totara_hierarchy');
         return true;
     }
 

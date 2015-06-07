@@ -33,6 +33,8 @@ $deletesection = optional_param('delete', 0, PARAM_BOOL);
 
 $PAGE->set_url('/course/editsection.php', array('id'=>$id, 'sr'=> $sectionreturn));
 
+$PAGE->set_pagelayout('standard');
+
 $section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $section->course), '*', MUST_EXIST);
 $sectionnum = $section->section;
@@ -79,7 +81,7 @@ if ($deletesection) {
     }
 }
 
-$editoroptions = array('context'=>$context ,'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes, 'trusttext'=>false, 'noclean'=>true);
+$editoroptions = array('context'=>$context ,'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>(int)$CFG->maxbytes, 'trusttext'=>0, 'noclean'=>true);
 $mform = course_get_format($course->id)->editsection_form($PAGE->url,
         array('cs' => $sectioninfo, 'editoroptions' => $editoroptions));
 // set current value, make an editable copy of section_info object
@@ -140,9 +142,12 @@ $strsummaryof = get_string('summaryof', '', " $sectionname");
 $PAGE->set_title($stredit);
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($stredit);
-echo $OUTPUT->header();
 
+echo $OUTPUT->header();
+echo $OUTPUT->box_start();
 echo $OUTPUT->heading($strsummaryof);
 
 $mform->display();
+
+echo $OUTPUT->box_end();
 echo $OUTPUT->footer();

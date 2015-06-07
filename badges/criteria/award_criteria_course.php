@@ -95,7 +95,7 @@ class award_criteria_course extends award_criteria {
      * @return string
      */
     public function get_details($short = '') {
-        global $DB;
+        global $DB, $OUTPUT;
         $param = reset($this->params);
 
         $course = $DB->get_record('course', array('id' => $param['course']));
@@ -235,5 +235,21 @@ class award_criteria_course extends award_criteria {
         }
 
         return array($join, $where, $params);
+    }
+
+    /**
+     * Checks criteria for any major problems.
+     *
+     * @return array A list containing status and an error message (if any).
+     */
+    public function validate() {
+        global $DB;
+        $param = reset($this->params);
+
+        if (!$DB->record_exists('course', array('id' => $param['course']))) {
+            return array(false, get_string('error:invalidparamcourse', 'badges'));
+        }
+
+        return array(true, '');
     }
 }

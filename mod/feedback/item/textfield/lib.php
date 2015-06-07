@@ -144,15 +144,26 @@ class feedback_item_textfield extends feedback_item_base {
     }
 
     public function print_analysed($item, $itemnr = '', $groupid = false, $courseid = false) {
+        $align = right_to_left() ? 'right' : 'left';
         $values = feedback_get_group_values($item, $groupid, $courseid);
         if ($values) {
-            echo '<tr><th colspan="2" align="left">';
-            echo $itemnr.'&nbsp;('.$item->label.') '.$item->name;
+            echo '<tr><th colspan="2" align="' . $align . '">';
+            echo $itemnr.'&nbsp;('.format_string($item->label).') ' . format_string($item->name);
             echo '</th></tr>';
+            $blank  = 0;
             foreach ($values as $value) {
-                echo '<tr><td colspan="2" valign="top" align="left">';
-                echo '-&nbsp;&nbsp;'.str_replace("\n", '<br />', $value->value);
-                echo '</td></tr>';
+                if (empty($value->value)) {
+                    $blank++;
+                } else {
+                    echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
+                    echo '-&nbsp;&nbsp;'.str_replace("\n", '<br />', $value->value);
+                    echo '</td></tr>';
+                }
+            }
+            if ($blank>0) {
+                    echo '<tr><td colspan="2" valign="top" align="' . $align . '">';
+                    echo '-&nbsp;&nbsp;'.get_string('blank_responses', 'feedback', (string)$blank);
+                    echo '</td></tr>';
             }
         }
     }
@@ -163,8 +174,8 @@ class feedback_item_textfield extends feedback_item_base {
 
         $analysed_item = $this->get_analysed($item, $groupid, $courseid);
 
-        $worksheet->write_string($row_offset, 0, $item->label, $xls_formats->head2);
-        $worksheet->write_string($row_offset, 1, $item->name, $xls_formats->head2);
+        $worksheet->write_string($row_offset, 0, format_string($item->label), $xls_formats->head2);
+        $worksheet->write_string($row_offset, 1, format_string($item->name), $xls_formats->head2);
         $data = $analysed_item->data;
         if (is_array($data)) {
             $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[0], ENT_QUOTES), $xls_formats->value_bold);
@@ -198,12 +209,12 @@ class feedback_item_textfield extends feedback_item_base {
         $inputname = $item->typ . '_' . $item->id;
         echo '<div class="feedback_item_label_'.$align.'">';
         echo '<label for="'. $inputname .'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name.$requiredmark, true, false, false);
         if ($item->dependitem) {
             if ($dependitem = $DB->get_record('feedback_item', array('id'=>$item->dependitem))) {
                 echo ' <span class="feedback_depend">';
-                echo '('.$dependitem->label.'-&gt;'.$item->dependvalue.')';
+                echo '('.format_string($dependitem->label).'-&gt;'.format_string($item->dependvalue).')';
                 echo '</span>';
             }
         }
@@ -285,7 +296,7 @@ class feedback_item_textfield extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.$item->label.') ';
+            echo '('.format_string($item->label).') ';
             echo format_text($item->name . $requiredmark, true, false, false);
         echo '</div>';
         echo $OUTPUT->box_start('generalbox boxalign'.$align);

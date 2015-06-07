@@ -1,10 +1,11 @@
 <?php
 
-//  Display the course home page.
+    // Display the course home page.
 
     require_once('../config.php');
     require_once('lib.php');
     require_once($CFG->libdir.'/completionlib.php');
+    require_once($CFG->dirroot.'/totara/cohort/lib.php');
 
     $id          = optional_param('id', 0, PARAM_INT);
     $name        = optional_param('name', '', PARAM_RAW);
@@ -57,6 +58,11 @@
     }
 
     require_login($course);
+
+    // Check visibility.
+    if (!totara_course_is_viewable($course->id)) {
+        print_error('coursehidden');
+    }
 
     // Switchrole - sanity check in cost-order...
     $reset_user_allowed_editing = false;

@@ -23,9 +23,16 @@
  */
 
 require('../config.php');
-require($CFG->dirroot.'/course/lib.php');
-require($CFG->dirroot.'/cohort/lib.php');
-require($CFG->dirroot.'/cohort/edit_form.php');
+require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/cohort/edit_form.php');
+require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
+
+$usetags = (!empty($CFG->usetags));
+if ($usetags) {
+    require_once($CFG->dirroot.'/tag/lib.php');
+}
 
 $id        = optional_param('id', 0, PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
@@ -40,6 +47,10 @@ require_login();
 $category = null;
 if ($id) {
     $cohort = $DB->get_record('cohort', array('id'=>$id), '*', MUST_EXIST);
+    if ($usetags) {
+        $cohort->otags = array_keys(tag_get_tags_array('cohort', $cohort->id, 'official'));
+    }
+
     $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
 } else {
     $context = context::instance_by_id($contextid, MUST_EXIST);
@@ -51,6 +62,7 @@ if ($id) {
     $cohort->contextid   = $context->id;
     $cohort->name        = '';
     $cohort->description = '';
+    $cohort->cohorttype  = cohort::TYPE_STATIC;
 }
 
 require_capability('moodle/cohort:manage', $context);
@@ -71,6 +83,7 @@ $baseurl = new moodle_url('/cohort/edit.php', array('contextid' => $context->id,
 $PAGE->set_url($baseurl);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
+$PAGE->set_heading($COURSE->fullname);
 
 if ($context->contextlevel == CONTEXT_COURSECAT) {
     $category = $DB->get_record('course_categories', array('id'=>$context->instanceid), '*', MUST_EXIST);
@@ -78,6 +91,9 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 
 } else {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
+if ($id && $cohort->name) {
+    $PAGE->navbar->add(s($cohort->name), $CFG->wwwroot.'/cohort/view.php?id='.$id);
 }
 
 if ($delete and $cohort->id) {
@@ -121,29 +137,60 @@ if ($cohort->id) {
     // Edit existing.
     $cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions, $context);
     $strheading = get_string('editcohort', 'cohort');
-
 } else {
-    // Add new.
     $cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions, $context);
     $strheading = get_string('addcohort', 'cohort');
 }
 
-$PAGE->set_title($strheading);
+$PAGE->set_title($cohort->name . ' : ' . $strheading);
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->navbar->add($strheading);
 
+$cohort->descriptionformat = FORMAT_HTML;
+$cohort = file_prepare_standard_editor($cohort, 'description', $editoroptions, $context, 'cohort', 'cohort', $cohort->id);
 $editform = new cohort_edit_form(null, array('editoroptions'=>$editoroptions, 'data'=>$cohort, 'returnurl'=>$returnurl));
 
 if ($editform->is_cancelled()) {
     redirect($returnurl);
 
 } else if ($data = $editform->get_data()) {
-    $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context);
 
     if ($data->id) {
         cohort_update_cohort($data);
+        if ($usetags) {
+            if (isset($data->otags)) {
+                tag_set('cohort', $cohort->id, tag_get_name($data->otags));
+            } else {
+                tag_set('cohort', $cohort->id, array());
+            }
+        }
+        //update textarea
+        $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context, 'cohort', 'cohort', $data->id);
+        $DB->set_field('cohort', 'description', $data->description, array('id' => $data->id));
+        // Updated
+        $url = new moodle_url('/cohort/view.php', array('id' => $data->id));
+        totara_set_notification(get_string('successfullyupdated','totara_cohort'), $url, array('class' => 'notifysuccess'));
     } else {
-        cohort_add_cohort($data);
+        $cohortid = cohort_add_cohort($data);
+        if ($usetags) {
+            if (isset($data->otags)) {
+                tag_set('cohort', $cohortid, tag_get_name($data->otags));
+            } else {
+                tag_set('cohort', $cohortid, array());
+            }
+        }
+        //update textarea
+        $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $context, 'cohort', 'cohort', $cohortid);
+        $DB->set_field('cohort', 'description', $data->description, array('id' => $cohortid));
+
+        if ($data->cohorttype == cohort::TYPE_STATIC && has_capability('moodle/cohort:assign', $context)) {
+            $url = new moodle_url('/cohort/assign.php', array('id' => $cohortid));
+        } else if (has_capability('totara/cohort:managerules', $context)) {
+            $url = new moodle_url('/totara/cohort/rules.php', array('id' => $cohortid));
+        } else {
+            $url = new moodle_url('/cohort/view.php', array('id' => $cohortid));
+        }
+        redirect($url);
     }
 
     if ($returnurl->get_param('showall') || $returnurl->get_param('contextid') == $data->contextid) {
@@ -156,12 +203,18 @@ if ($editform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($strheading);
+if ($cohort->id != false) {
+    echo $OUTPUT->heading($strheading);
+    echo cohort_print_tabs('edit', $cohort->id, $cohort->cohorttype, $cohort);
+}
+else {
+    echo $OUTPUT->heading($strheading);
+}
 
 if (!$id && ($editcontrols = cohort_edit_controls($context, $baseurl))) {
     echo $OUTPUT->render($editcontrols);
 }
 
 echo $editform->display();
-echo $OUTPUT->footer();
 
+echo $OUTPUT->footer();

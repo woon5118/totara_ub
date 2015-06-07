@@ -26,6 +26,7 @@
 
 require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
+require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 // Try to prevent searching for sites that allow sign-up.
 if (!isset($CFG->additionalhtmlhead)) {
@@ -47,6 +48,7 @@ $PAGE->https_required();
 
 $PAGE->set_url('/login/signup.php');
 $PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('login');
 
 // Override wanted URL, we do not want to end up here again if user clicks "Login".
 $SESSION->wantsurl = $CFG->wwwroot . '/';
@@ -90,6 +92,33 @@ if ($mform_signup->is_cancelled()) {
 // make sure we really are on the https page when https login required
 $PAGE->verify_https_required();
 
+// Setup custom javascript
+local_js(array(
+    TOTARA_JS_DIALOG,
+    TOTARA_JS_TREEVIEW,
+    TOTARA_JS_DATEPICKER,
+    TOTARA_JS_PLACEHOLDER
+));
+$PAGE->requires->strings_for_js(array('chooseposition', 'choosemanager', 'chooseorganisation', 'currentlyselected'), 'totara_hierarchy');
+$PAGE->requires->strings_for_js(array('error:positionnotselected', 'error:organisationnotselected', 'error:managernotselected'), 'totara_core');
+$jsmodule = array(
+    'name' => 'totara_positionuser',
+    'fullpath' => '/totara/core/js/position.user.js',
+    'requires' => array('json'));
+
+$selected_position = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'position'));
+$selected_organisation = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'organisation'));
+$selected_manager = json_encode(dialog_display_currently_selected(get_string('selected', 'totara_hierarchy'), 'manager'));
+$js_can_edit = 'true';
+$user = 0;
+
+$args = array('args'=>'{"userid":' . $user . ',' .
+    '"can_edit":' . $js_can_edit . ','.
+    '"dialog_display_position":' . $selected_position . ',' .
+    '"dialog_display_organisation":' . $selected_organisation . ',' .
+    '"dialog_display_manager":' . $selected_manager . '}');
+
+$PAGE->requires->js_init_call('M.totara_positionuser.init', $args, false, $jsmodule);
 
 $newaccount = get_string('newaccount');
 $login      = get_string('login');

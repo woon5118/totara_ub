@@ -38,6 +38,9 @@ class mod_workshop_generator_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
+        global $DB;
+        $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
+
         $course = $this->getDataGenerator()->create_course();
 
         $this->assertFalse($DB->record_exists('workshop', array('course' => $course->id)));

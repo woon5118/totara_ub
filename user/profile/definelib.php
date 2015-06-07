@@ -329,6 +329,15 @@ function profile_delete_field($id) {
 
     // Reorder the remaining fields in the same category.
     profile_reorder_fields();
+
+    /// Trigger an event to let other parts of the system know
+    $event = \totara_customfield\event\profilefield_deleted::create(
+        array(
+            'objectid' => $id,
+            'context' => context_system::instance(),
+        )
+    );
+    $event->trigger();
 }
 
 /**

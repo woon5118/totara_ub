@@ -400,6 +400,9 @@ function upgrade_stale_php_files_present() {
         // Removed in 2.0.
         '/blocks/admin/block_admin.php',
         '/blocks/admin_tree/block_admin_tree.php',
+
+        // Removed in Totara 2.7.
+        '/admin/bulk-course-restore.php',
     );
 
     foreach ($someexamplesofremovedfiles as $file) {
@@ -541,6 +544,12 @@ function upgrade_plugins($type, $startcallback, $endcallback, $verbose) {
                 $result = $newupgrade_function($installedversion);
             } else {
                 $result = true;
+            }
+
+            if (is_readable($fullplug.'/db/totara_postupgrade.php')) {
+                require_once($fullplug.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_'.$plugin->fullname.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
             }
 
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
@@ -706,6 +715,12 @@ function upgrade_plugins_modules($startcallback, $endcallback, $verbose) {
                 $result = $newupgrade_function($installedversion, $module);
             } else {
                 $result = true;
+            }
+
+            if (is_readable($fullmod.'/db/totara_postupgrade.php')) {
+                require_once($fullmod.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_'.$module->name.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
             }
 
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
@@ -901,6 +916,12 @@ function upgrade_plugins_blocks($startcallback, $endcallback, $verbose) {
                 $result = $newupgrade_function($installedversion, $block);
             } else {
                 $result = true;
+            }
+
+            if (is_readable($fullblock.'/db/totara_postupgrade.php')) {
+                require_once($fullblock.'/db/totara_postupgrade.php');
+                $upgradefunction = 'xmldb_block_'.$blockname.'_totara_postupgrade';
+                $upgradefunction($plugin->version);
             }
 
             $installedversion = $DB->get_field('config_plugins', 'value', array('name'=>'version', 'plugin'=>$component)); // No caching!
@@ -1275,7 +1296,7 @@ function upgrade_log($type, $plugin, $info, $details=null, $backtrace=null) {
  * @global object
  */
 function upgrade_started($preinstall=false) {
-    global $CFG, $DB, $PAGE, $OUTPUT;
+    global $CFG, $DB, $PAGE, $OUTPUT, $TOTARA;
 
     static $started = false;
 
@@ -1291,7 +1312,7 @@ function upgrade_started($preinstall=false) {
             $strupgrade  = get_string('upgradingversion', 'admin');
             $PAGE->set_pagelayout('maintenance');
             upgrade_init_javascript();
-            $PAGE->set_title($strupgrade.' - Moodle '.$CFG->target_release);
+            $PAGE->set_title($strupgrade.' - Totara '.$TOTARA->release);
             $PAGE->set_heading($strupgrade);
             $PAGE->navbar->add($strupgrade);
             $PAGE->set_cacheable(false);
@@ -1546,7 +1567,7 @@ function install_core($version, $verbose) {
  * @return void, may throw exception
  */
 function upgrade_core($version, $verbose) {
-    global $CFG, $SITE, $DB, $COURSE;
+    global $CFG, $SITE, $DB, $COURSE, $TOTARA;
 
     raise_memory_limit(MEMORY_EXTRA);
 
@@ -1618,7 +1639,11 @@ function upgrade_noncore($verbose) {
     global $CFG;
 
     raise_memory_limit(MEMORY_EXTRA);
-
+    // Upgrade internationalisation first.
+    print_upgrade_part_start('Totara', false, $verbose);
+    // Upgrade all language packs if we can.
+    totara_upgrade_installed_languages();
+    print_upgrade_part_end('Totara', false, $verbose);
     // upgrade all plugins types
     try {
         // Reset caches before any output.
@@ -1629,6 +1654,8 @@ function upgrade_noncore($verbose) {
         foreach ($plugintypes as $type=>$location) {
             upgrade_plugins($type, 'print_upgrade_part_start', 'print_upgrade_part_end', $verbose);
         }
+        // Upgrade totara navigation menu.
+        totara_upgrade_menu();
         // Update cache definitions. Involves scanning each plugin for any changes.
         cache_helper::update_definitions();
         // Mark the site as upgraded.

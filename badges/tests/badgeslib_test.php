@@ -159,7 +159,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
                 'description' => 'Overall description',
                 'descriptionformat' => FORMAT_HTML
         ));
-
         $criteriaprofile = award_criteria::build(array('criteriatype' => BADGE_CRITERIA_TYPE_PROFILE, 'badgeid' => $this->badgeid));
         $params = array(
                 'agg' => BADGE_CRITERIA_AGGREGATION_ALL,
@@ -168,7 +167,6 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
                 'descriptionformat' => FORMAT_HTML
         );
         $criteriaprofile->save($params);
-
         $badge = new badge($this->badgeid);
         $this->assertEquals('Overall description', $badge->criteria[BADGE_CRITERIA_TYPE_OVERALL]->description);
         $this->assertEquals('Description', $badge->criteria[BADGE_CRITERIA_TYPE_PROFILE]->description);
@@ -354,6 +352,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         $current = $c->get_data($activities[$this->module->cmid], false, $this->user->id);
         $current->completionstate = COMPLETION_COMPLETE;
         $current->timemodified = time();
+        $current->timecompleted = null;
         $sink = $this->redirectEmails();
         $c->internal_set_data($activities[$this->module->cmid], $current);
         $this->assertCount(1, $sink->get_messages());

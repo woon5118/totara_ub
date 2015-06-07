@@ -96,6 +96,14 @@ if ($editurl = $userauth->edit_profile_url()) {
     redirect($editurl);
 }
 
+if ($user->deleted) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    echo $OUTPUT->notification(get_string('userdeleted'));
+    echo $OUTPUT->footer();
+    die;
+}
+
 if ($course->id == SITEID) {
     $coursecontext = context_system::instance();   // SYSTEM context.
 } else {
@@ -264,8 +272,9 @@ if ($usernew = $userform->get_data()) {
         $a->site = format_string($SITE->fullname, true, array('context' => context_course::instance(SITEID)));
         $a->fullname = fullname($tempuser, true);
 
-        $emailupdatemessage = get_string('emailupdatemessage', 'auth', $a);
-        $emailupdatetitle = get_string('emailupdatetitle', 'auth', $a);
+        $strmgr = get_string_manager();
+        $emailupdatemessage = $strmgr->get_string('emailupdatemessage', 'auth', $a, $user->lang);
+        $emailupdatetitle = $strmgr->get_string('emailupdatetitle', 'auth', $a, $user->lang);
 
         // Email confirmation directly rather than using messaging so they will definitely get an email.
         $supportuser = core_user::get_support_user();

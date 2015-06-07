@@ -105,6 +105,10 @@ switch ($context->contextlevel) {
             $PAGE->set_heading($course->fullname);
         }
         break;
+    case CONTEXT_PROGRAM:
+        $program = $DB->get_record('prog', array('id' => $context->instanceid), '*', MUST_EXIST);
+        $PAGE->set_heading($program->fullname);
+        break;
     case CONTEXT_MODULE:
         $PAGE->set_heading($context->get_context_name(false));
         $PAGE->set_cacheable(false);

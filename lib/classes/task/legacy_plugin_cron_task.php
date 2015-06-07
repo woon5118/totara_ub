@@ -161,6 +161,7 @@ class legacy_plugin_cron_task extends scheduled_task {
         cron_execute_plugin_type('theme', 'themes');
         cron_execute_plugin_type('tool', 'admin tools');
         cron_execute_plugin_type('local', 'local plugins');
+        cron_execute_plugin_type('totara', 'totara plugins');
     }
 
 }

@@ -4,6 +4,8 @@ Feature: Set up contextual data for tests
   As a developer
   I need to fill the database with fixtures
 
+# Totara: audiences are very different from cohorts in upstream.
+
   Scenario: Add a bunch of users
     Given the following "users" exist:
       | username  | password  | firstname | lastname |
@@ -296,18 +298,18 @@ Feature: Set up contextual data for tests
       | student1 | CHSB   |
       | student1 | CHC    |
     When I log in as "admin"
-    And I navigate to "Cohorts" node in "Site administration > Users > Accounts"
-    Then the following should exist in the "cohorts" table:
-      | Name            | Cohort size |
+    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
+    Then the following should exist in the "cohort_admin" table:
+      | Name            | No. of Members |
       | System cohort A | 1           |
       | System cohort B | 2           |
     And I should not see "Cohort in category"
     And I follow "Courses"
     And I follow "Cat 1"
-    And I follow "Cohorts"
+    And I follow "Audiences"
     And I should not see "System cohort"
-    And the following should exist in the "cohorts" table:
-      | Name               | Cohort size |
+    And the following should exist in the "cohort_admin" table:
+      | Name               | No. of Members |
       | Cohort in category | 1           |
       | Empty cohort       | 0           |
 

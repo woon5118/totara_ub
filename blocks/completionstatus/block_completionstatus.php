@@ -138,11 +138,16 @@ class block_completionstatus extends block_base {
 
                     continue;
                 }
-                $row = new html_table_row();
-                $row->cells[0] = new html_table_cell($criteria->get_title());
-                $row->cells[1] = new html_table_cell($completion->get_status());
-                $row->cells[1]->style = 'text-align: right;';
-                $srows[] = $row;
+
+                // Some criteria will return false e.g. role criteria where the role has been deleted
+                $criteria_title = $criteria->get_title();
+                if ($criteria_title) {
+                    $row = new html_table_row();
+                    $row->cells[0] = new html_table_cell($criteria_title);
+                    $row->cells[1] = new html_table_cell($completion->get_status());
+                    $row->cells[1]->style = 'text-align: right;';
+                    $srows[] = $row;
+                }
             }
 
             // Aggregate activities.
@@ -204,6 +209,11 @@ class block_completionstatus extends block_base {
                 $content .= html_writer::tag('i', get_string('inprogress', 'completion'));
             }
 
+            // If RPL
+            if (isset($ccompletion) && strlen($ccompletion->rpl)) {
+                $content .= html_writer::tag('b', get_string('courserpl', 'completion') . ': ' . format_string($ccompletion->rpl));
+            }
+
             $row->cells[0] = new html_table_cell($content);
             $row->cells[0]->colspan = '2';
 
@@ -240,6 +250,7 @@ class block_completionstatus extends block_base {
         } else {
             // If user is not enrolled, show error.
             $this->content->text = get_string('nottracked', 'completion');
+            $this->content->footer = '';
         }
 
         if (has_capability('report/completion:view', $context)) {

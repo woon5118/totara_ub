@@ -53,6 +53,9 @@ class mod_workshop_events_testcase extends advanced_testcase {
         parent::setUp();
         $this->setAdminUser();
 
+        global $DB;
+        $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
+
         // Create a workshop activity.
         $this->course = $this->getDataGenerator()->create_course();
         $this->workshop = $this->getDataGenerator()->create_module('workshop', array('course' => $this->course));

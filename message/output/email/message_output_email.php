@@ -44,6 +44,13 @@ class message_output_email extends message_output {
             return true;
         }
 
+        // totara specific extension to allow system to send alert/task but prevent email
+        // even when users have it enabled
+        require_once($CFG->dirroot.'/totara/message/messagelib.php');
+        if (isset($eventdata->sendemail) && $eventdata->sendemail !== TOTARA_MSG_EMAIL_YES) {
+            return true;
+        }
+
         //the user the email is going to
         $recipient = null;
 
@@ -60,6 +67,10 @@ class message_output_email extends message_output {
         } else {
             $recipient = $eventdata->userto;
         }
+        // append a footer to the emails in the recipient language explaining how to change email preferences
+        $strmgr = get_string_manager();
+        $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+        $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
 
         // Check if we have attachments to send.
         $attachment = '';
@@ -90,7 +101,7 @@ class message_output_email extends message_output {
             }
         }
 
-        $result = email_to_user($recipient, $eventdata->userfrom, $eventdata->subject, $eventdata->fullmessage,
+        $result = email_to_user($recipient, $eventdata->userfrom, $eventdata->subject, $eventdata->fullmessage . "\n" . $footerplain,
                                 $eventdata->fullmessagehtml, $attachment, $attachname, true, $replyto, $replytoname);
 
         // Remove an attachment file if any.

@@ -19,28 +19,29 @@ if (empty($SESSION->bulk_users)) {
 }
 
 if ($format) {
-    $fields = array('id'        => 'id',
-                    'username'  => 'username',
-                    'email'     => 'email',
-                    'firstname' => 'firstname',
-                    'lastname'  => 'lastname',
-                    'idnumber'  => 'idnumber',
-                    'institution' => 'institution',
-                    'department' => 'department',
-                    'phone1'    => 'phone1',
-                    'phone2'    => 'phone2',
-                    'city'      => 'city',
-                    'url'       => 'url',
-                    'icq'       => 'icq',
-                    'skype'     => 'skype',
-                    'aim'       => 'aim',
-                    'yahoo'     => 'yahoo',
-                    'msn'       => 'msn',
-                    'country'   => 'country');
+    $fields = array('id'        => 'Id',
+                    'username'  => get_string('username'),
+                    'email'     => get_string('email'),
+                    'firstname' => get_string('firstname'),
+                    'lastname'  => get_string('lastname'),
+                    'idnumber'  => get_string('idnumber'),
+                    'institution' => get_string('institution'),
+                    'department' => get_string('department'),
+                    'phone1'    => get_string('phone'),
+                    'phone2'    => get_string('phone2'),
+                    'city'      => get_string('city'),
+                    'country'   => get_string('country'),
+                    'url'       => get_string('webpage'),
+                    'icq'       => get_string('icqnumber'),
+                    'skype'     => get_string('skypeid'),
+                    'aim'       => get_string('aimid'),
+                    'yahoo'     => get_string('yahooid'),
+                    'msn'       => get_string('msnid'));
+    ;
 
     if ($extrafields = $DB->get_records('user_info_field')) {
         foreach ($extrafields as $n=>$v){
-            $fields['profile_field_'.$v->shortname] = 'profile_field_'.$v->shortname;
+            $fields['profile_field_'.$v->shortname] = $v->name;
         }
     }
 
@@ -94,7 +95,7 @@ function user_download_ods($fields) {
             continue;
         }
         $col = 0;
-        profile_load_data($user);
+        profile_load_data($user, true);
         foreach ($fields as $field=>$unused) {
             $worksheet[0]->write($row, $col, $user->$field);
             $col++;
@@ -132,7 +133,7 @@ function user_download_xls($fields) {
             continue;
         }
         $col = 0;
-        profile_load_data($user);
+        profile_load_data($user, true);
         foreach ($fields as $field=>$unused) {
             $worksheet[0]->write($row, $col, $user->$field);
             $col++;
@@ -161,18 +162,12 @@ function user_download_csv($fields) {
         if (!$user = $DB->get_record('user', array('id'=>$userid))) {
             continue;
         }
-        profile_load_data($user);
+        profile_load_data($user, true);
         $userprofiledata = array();
         foreach ($fields as $field=>$unused) {
-            // Custom user profile textarea fields come in an array
-            // The first element is the text and the second is the format.
-            // We only take the text.
-            if (is_array($user->$field)) {
-                $userprofiledata[] = reset($user->$field);
-            } else {
-                $userprofiledata[] = $user->$field;
-            }
+            $userprofiledata[] = $user->$field;
         }
+
         $csvexport->add_data($userprofiledata);
     }
     $csvexport->download_file();

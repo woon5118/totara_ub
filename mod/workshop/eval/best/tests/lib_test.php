@@ -47,6 +47,10 @@ class workshopeval_best_evaluation_testcase extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
+
+        global $DB;
+        $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
+
         $course = $this->getDataGenerator()->create_course();
         $workshop = $this->getDataGenerator()->create_module('workshop', array('evaluation' => 'best', 'course' => $course));
         $cm = get_fast_modinfo($course)->instances['workshop'][$workshop->id];

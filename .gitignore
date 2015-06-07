@@ -13,6 +13,7 @@
 /lib/editor/tinymce/extra/tools/temp/
 *~
 *.swp
+*.*.orig
 /tags
 /TAGS
 /cscope.*
@@ -25,10 +26,20 @@ CVS
 /.project
 /.buildpath
 /.cache
+/build/logs/
+/build/docs/
+webrat-*
+webrat.log
+Thumbs.db
+_notes
+diff.log
 phpunit.xml
 # Composer support. Do not ignore composer.json, or composer.lock. These should be shipped by us.
 composer.phar
 /vendor/
+# Private key should never be added to repository
+totara_private.pem
+/local/codechecker/
 /behat.yml
 */yui/build/*/*-coverage.js
 /lib/yuilib/*/build/*/*-coverage.js

@@ -227,6 +227,9 @@ if ($usernew = $userform->get_data()) {
         // Force logout if user just suspended.
         if (isset($usernew->suspended) and $usernew->suspended and !$user->suspended) {
             \core\session\manager::kill_user_sessions($user->id);
+
+            // Totara: Trigger a user suspended event later after the actual update!
+            $triggersuspended = true;
         }
     }
 
@@ -268,6 +271,11 @@ if ($usernew = $userform->get_data()) {
         \core\event\user_created::create_from_userid($usernew->id)->trigger();
     } else {
         \core\event\user_updated::create_from_userid($usernew->id)->trigger();
+
+        // Totara feature, the var is not always initialised to minimise the diff.
+        if (!empty($triggersuspended)) {
+            \totara_core\event\user_suspended::create_from_user($user)->trigger();
+        }
     }
 
     if ($user->id == $USER->id) {

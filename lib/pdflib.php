@@ -250,4 +250,50 @@ class pdf extends TCPDF {
 
         return $families;
     }
+
+    /**
+     * Override Image method to work with images with restricted access
+     */
+    public function Image($file, $x = '', $y = '', $w = 0, $h = 0, $type = '', $link = '', $align = '', $resize = false,
+            $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false,
+            $fitonpage = false, $alt = false, $altimgs = array()) {
+        global $CFG;
+        static $session_cookie_data = '';
+        if ($session_cookie_data == '') {
+            $session_cookie_data = session_name().'='.session_id();
+        }
+
+        if (strpos($file, $CFG->wwwroot.'/pluginfile.php') !== false || strpos($file, $CFG->wwwroot.'/draftfile.php') !== false) {
+            \core\session\manager::write_close();
+
+            $curlhandler = new curl();
+            $logfile = fopen('/tmp/curl.txt', 'w+');
+            $options = array(
+                'CURLOPT_BINARYTRANSFER' => true,
+                'CURLOPT_FAILONERROR' => true,
+                'CURLOPT_RETURNTRANSFER' => true,
+                'CURLOPT_CONNECTTIMEOUT' => 5,
+                'CURLOPT_TIMEOUT' => 3,
+                'CURLOPT_SSL_VERIFYPEER' => false,
+                'CURLOPT_SSL_VERIFYHOST' => false,
+                'CURLOPT_USERAGENT' => 'TCPDF',
+                'CURLOPT_STDERR' => $logfile,
+                'CURLOPT_VERBOSE' => 1,
+                'CURLOPT_COOKIE' => $session_cookie_data);
+            if ((ini_get('open_basedir') == '') && (ini_get('safe_mode') == 'Off')) {
+                $options['CURLOPT_FOLLOWLOCATION'] = true;
+            }
+
+            $imgdata = $curlhandler->get($file, array(), $options);
+            fclose($logfile);
+
+            if (!$imgdata) {
+                return;
+            }
+            $file = '@'.$imgdata;
+        }
+        parent::Image($file, $x, $y, $w, $h, $type, $link, $align, $resize, $dpi, $palign, $ismask, $imgmask, $border,
+                $fitbox, $hidden, $fitonpage, $alt, $altimgs);
+    }
+
 }

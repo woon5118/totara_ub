@@ -35,9 +35,11 @@ class login_signup_form extends moodleform {
         global $USER, $CFG;
 
         $mform = $this->_form;
+        $positionid = $this->_customdata['positionid'];
+        $organisationid = $this->_customdata['organisationid'];
+        $managerid = $this->_customdata['managerid'];
 
         $mform->addElement('header', 'createuserandpass', get_string('createuserandpass'), '');
-
 
         $mform->addElement('text', 'username', get_string('username'), 'maxlength="100" size="12"');
         $mform->setType('username', PARAM_NOTAGS);
@@ -88,11 +90,39 @@ class login_signup_form extends moodleform {
             $mform->setDefault('country', '');
         }
 
-        profile_signup_fields($mform);
-
         if ($this->signup_captcha_enabled()) {
             $mform->addElement('recaptcha', 'recaptcha_element', get_string('security_question', 'auth'), array('https' => $CFG->loginhttps));
             $mform->addHelpButton('recaptcha_element', 'recaptcha', 'auth');
+        }
+
+        profile_signup_fields($mform);
+
+        $requirenojs = false;
+        $nojs = optional_param('nojs', 0, PARAM_BOOL);
+
+        // Manage positions in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignupposition')) {
+            profile_signup_position($mform, $nojs, $positionid);
+            $requirenojs = true;
+        }
+
+        // Manage organisations in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignuporganisation')) {
+            profile_signup_organisation($mform, $nojs, $organisationid);
+            $requirenojs = true;
+        }
+
+        // Manage managers in signup self-registration.
+        if (get_config('totara_hierarchy', 'allowsignupmanager')) {
+            profile_signup_manager($mform, $nojs, $managerid);
+            $requirenojs = true;
+        }
+
+        if ($requirenojs) {
+            if (!$nojs) {
+                $mform->addElement('html', html_writer::tag('noscript', html_writer::tag('p', get_string('formrequiresjs', 'totara_hierarchy') .
+                    html_writer::link(new moodle_url(qualified_me(), array('nojs' => '1')), get_string('clickfornonjsform', 'totara_hierarchy')))));
+            }
         }
 
         if (!empty($CFG->sitepolicy)) {

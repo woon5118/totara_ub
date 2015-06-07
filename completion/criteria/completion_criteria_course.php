@@ -44,6 +44,12 @@ class completion_criteria_course extends completion_criteria {
     public $criteriatype = COMPLETION_CRITERIA_TYPE_COURSE;
 
     /**
+     * Criteria type form value
+     * @var string
+     */
+    const FORM_MAPPING = 'courseinstance';
+
+    /**
      * Finds and returns a data_object instance based on params.
      *
      * @param array $params associative arrays varname=>value
@@ -57,38 +63,38 @@ class completion_criteria_course extends completion_criteria {
     /**
      * Add appropriate form elements to the critieria form
      *
+     * Not used for this criteria, defined in course/completion_form.php
+     *
      * @param moodle_form $mform Moodle forms object
      * @param stdClass $data data used to define default value of the form
      */
     public function config_form_display(&$mform, $data = null) {
-        global $CFG;
-
-        $link = "<a href=\"{$CFG->wwwroot}/course/view.php?id={$data->id}\">".s($data->fullname).'</a>';
-        $mform->addElement('checkbox', 'criteria_course['.$data->id.']', $link);
-
-        if ($this->id) {
-            $mform->setDefault('criteria_course['.$data->id.']', 1);
-        }
+        return;
     }
 
     /**
      * Update the criteria information stored in the database
      *
      * @param array $data Form data
+     * @return  boolean
      */
-    public function update_config(&$data) {
+    public function update_config($data) {
+        // Get new criteria
+        $name = str_replace('completion_', '', get_called_class());
+        $formval = "{$name}_value";
+        $formreset = "{$name}_none";
 
-        if (!empty($data->criteria_course) && is_array($data->criteria_course)) {
-
-            $this->course = $data->id;
-
-            foreach ($data->criteria_course as $course) {
-
-                $this->courseinstance = $course;
-                $this->id = NULL;
-                $this->insert();
+        // Fix select to match expected values for parent::update_config
+        $cleaned = array();
+        if (empty($data->$formreset) && !empty($data->$formval)) {
+            foreach ($data->$formval as $v) {
+                $cleaned[$v] = true;
             }
         }
+
+        $data->$formval = $cleaned;
+
+        return parent::update_config($data);
     }
 
     /**
@@ -150,56 +156,6 @@ class completion_criteria_course extends completion_criteria {
     }
 
     /**
-     * Find user's who have completed this criteria
-     */
-    public function cron() {
-
-        global $DB;
-
-        // Get all users who meet this criteria
-        $sql = "
-            SELECT DISTINCT
-                c.id AS course,
-                cr.id AS criteriaid,
-                ra.userid AS userid,
-                cc.timecompleted AS timecompleted
-            FROM
-                {course_completion_criteria} cr
-            INNER JOIN
-                {course} c
-             ON cr.course = c.id
-            INNER JOIN
-                {context} con
-             ON con.instanceid = c.id
-            INNER JOIN
-                {role_assignments} ra
-              ON ra.contextid = con.id
-            INNER JOIN
-                {course_completions} cc
-             ON cc.course = cr.courseinstance
-            AND cc.userid = ra.userid
-            LEFT JOIN
-                {course_completion_crit_compl} ccc
-             ON ccc.criteriaid = cr.id
-            AND ccc.userid = ra.userid
-            WHERE
-                cr.criteriatype = ".COMPLETION_CRITERIA_TYPE_COURSE."
-            AND con.contextlevel = ".CONTEXT_COURSE."
-            AND c.enablecompletion = 1
-            AND ccc.id IS NULL
-            AND cc.timecompleted IS NOT NULL
-        ";
-
-        // Loop through completions, and mark as complete
-        $rs = $DB->get_recordset_sql($sql);
-        foreach ($rs as $record) {
-            $completion = new completion_criteria_completion((array) $record, DATA_OBJECT_FETCH_BY_KEY);
-            $completion->mark_complete($record->timecompleted);
-        }
-        $rs->close();
-    }
-
-    /**
      * Return criteria progress details for display in reports
      *
      * @param completion_completion $completion The user's completion record
@@ -224,7 +180,7 @@ class completion_criteria_course extends completion_criteria {
         $details['type'] = $this->get_title();
         $details['criteria'] = '<a href="'.$CFG->wwwroot.'/course/view.php?id='.$this->courseinstance.'">'.s($fullname).'</a>';
         $details['requirement'] = get_string('coursecompleted', 'completion');
-        $details['status'] = '<a href="'.$CFG->wwwroot.'/blocks/completionstatus/details.php?course='.$this->courseinstance.'">'.get_string('seedetails', 'completion').'</a>';
+        $details['status'] = '<a href="'.$CFG->wwwroot.'/blocks/completionstatus/details.php?course='.$this->courseinstance.'&amp;user='.$completion->userid.'">'.get_string('seedetails', 'completion').'</a>';
 
         return $details;
     }

@@ -63,7 +63,6 @@ class profile_field_datetime extends profile_field_base {
             $mform->addElement('date_selector', $this->inputname, format_string($this->field->name), $attributes);
         }
 
-        $mform->setType($this->inputname, PARAM_INT);
         $mform->setDefault($this->inputname, time());
     }
 
@@ -108,6 +107,49 @@ class profile_field_datetime extends profile_field_base {
             return get_string('notset', 'profilefield_datetime');
         } else {
             return userdate($this->data, $format);
+        }
+    }
+
+    /**
+     * The Datetime field needs extra logic for saving
+     * so override edit_save_data in the lib file.
+     *
+     * @param   mixed   data coming from the form
+     * @return  mixed   returns data id if success of db insert/update,
+     *                  false on fail, 0 if not permitted
+     */
+    function edit_save_data($usernew) {
+        global $DB;
+
+        $fieldname = $this->inputname;
+
+        // If a datetime is disabled then remove any existing data
+        if (isset($usernew->$fieldname) && empty($usernew->$fieldname)) {
+            $DB->delete_records('user_info_data', array('userid' => $usernew->id, 'fieldid' => $this->field->id));
+            return;
+        }
+
+        parent::edit_save_data($usernew);
+    }
+
+    /**
+     * Loads a user object with data for this field ready for the export, such as a spreadsheet.
+     *
+     * @param   object   a user object
+     */
+    function export_load_user_data($user) {
+        // Check if time was specified.
+        if (!empty($this->field->param3)) {
+            $format = get_string('strftimedaydatetime', 'langconfig');
+        } else {
+            $format = get_string('strftimedate', 'langconfig');
+        }
+
+        // Check if a date has been specified.
+        if (empty($this->data)) {
+            $user->{$this->inputname} = get_string('notset', 'profilefield_datetime');
+        } else {
+            $user->{$this->inputname} = userdate($this->data, $format);
         }
     }
 }

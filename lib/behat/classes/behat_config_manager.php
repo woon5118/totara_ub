@@ -401,6 +401,10 @@ class behat_config_manager {
 
         $config = array(
             'default' => array(
+                // Totara: by default skip @totaraperformance.
+                'filters' => array(
+                    'tags' => '~@totaraperformance',
+                ),
                 'paths' => array(
                     'features' => $basedir . DIRECTORY_SEPARATOR . 'features',
                     'bootstrap' => $basedir . DIRECTORY_SEPARATOR . 'features' . DIRECTORY_SEPARATOR . 'bootstrap',

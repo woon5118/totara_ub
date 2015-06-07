@@ -998,7 +998,12 @@ class database_manager {
                                 } else if ($field->getLength() != $dbfield->max_length or $field->getDecimals() != $dbfield->scale) {
                                     $size = "({$field->getLength()},{$field->getDecimals()})";
                                     $dbsize = "($dbfield->max_length,$dbfield->scale)";
-                                    $errors[$tablename][] = "column '$fieldname' size is $dbsize, expected $size ($dbfield->meta_type)";
+                                    if ($size === '(40,20)' and $dbsize === '(38,20)' and $tablename === 'question_numerical_units'
+                                        and $fieldname === 'multiplier' and $this->mdb->get_dbfamily() === 'mssql') {
+                                        // TODO: Remove this hack after MDL-32113 gets fixed.
+                                    } else {
+                                        $errors[$tablename][] = "column '$fieldname' size is $dbsize, expected $size ($dbfield->meta_type)";
+                                    }
                                 }
 
                             } else if ($dbtype == XMLDB_TYPE_CHAR) {

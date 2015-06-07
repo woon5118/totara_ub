@@ -166,7 +166,7 @@
                 border-spacing: 0;
                 border-collapse: separate;
                 position: relative;
-                padding: 20px 4%;
+                padding: 20px 4px;
                 margin-bottom: 20px;
                 background-color: lighten(@wellBackground, 3%);
                 border: 1px solid darken(@wellBackground, 7%);
@@ -443,4 +443,23 @@
             min-width: 1024px;
         }
     }
+}
+
+.ical-link {
+    font-size: 10px;
+    font-weight: bold;
+    background-color: #f60;
+    padding: 0px 5px;
+    color: #fff;
+    border-top: 1px solid #f93;
+    border-left: 1px solid #f93;
+    border-bottom: 1px solid #013;
+    border-right: 1px solid #013;
+}
+.ical-link:hover,
+.ical-link:active,
+.ical-link:focus,
+.ical-link:visited {
+    color: #fff;
+    text-decoration: none;
 }

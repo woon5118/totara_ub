@@ -53,24 +53,24 @@ function phpunit_bootstrap_error($errorcode, $text = '') {
             $text = "Can not find PHPUnit library, to install use: php composer.phar install --dev";
             break;
         case PHPUNIT_EXITCODE_PHPUNITWRONG:
-            $text = 'Moodle requires PHPUnit 3.6.x, '.$text.' is not compatible';
+            $text = 'Totara requires PHPUnit 3.6.x, '.$text.' is not compatible';
             break;
         case PHPUNIT_EXITCODE_PHPUNITEXTMISSING:
-            $text = 'Moodle can not find required PHPUnit extension '.$text;
+            $text = 'Totara can not find required PHPUnit extension '.$text;
             break;
         case PHPUNIT_EXITCODE_CONFIGERROR:
-            $text = "Moodle PHPUnit environment configuration error:\n".$text;
+            $text = "Totara PHPUnit environment configuration error:\n".$text;
             break;
         case PHPUNIT_EXITCODE_CONFIGWARNING:
-            $text = "Moodle PHPUnit environment configuration warning:\n".$text;
+            $text = "Totara PHPUnit environment configuration warning:\n".$text;
             break;
         case PHPUNIT_EXITCODE_INSTALL:
             $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
-            $text = "Moodle PHPUnit environment is not initialised, please use:\n php $path";
+            $text = "Totara PHPUnit environment is not initialised, please use:\n php $path";
             break;
         case PHPUNIT_EXITCODE_REINSTALL:
             $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
-            $text = "Moodle PHPUnit environment was initialised for different version, please use:\n php $path";
+            $text = "Totara PHPUnit environment was initialised for different version, please use:\n php $path";
             break;
         default:
             $text = empty($text) ? '' : ': '.$text;

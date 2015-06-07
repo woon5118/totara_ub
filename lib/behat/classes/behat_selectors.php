@@ -51,6 +51,10 @@ class behat_selectors {
         'table' => 'table',
         'table_row' => 'table_row',
         'xpath_element' => 'xpath_element',
+
+        // Totara
+        'dialogue' => 'dialogue',
+        'totaradialogue' => 'totaradialogue',
     );
 
     /**
@@ -81,6 +85,10 @@ class behat_selectors {
         'table_row' => 'table_row',
         'text' => 'text',
         'xpath_element' => 'xpath_element'
+
+        // Totara
+        ,'dialogue' => 'dialogue',
+        'totaradialogue' => 'totaradialogue',
     );
 
     /**
@@ -108,6 +116,19 @@ XPATH
         ]) = %locator%] |
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' yui-dialog ') and
     normalize-space(descendant::div[@class='hd']) = %locator%]
+XPATH
+        , 'totaradialogue' => <<<XPATH
+//div[
+  contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog ')
+and
+  contains(concat(' ', normalize-space(@class), ' '), ' totara-dialog ')
+and
+  descendant::div[
+    contains(concat(' ', normalize-space(@class), ' '), ' ui-dialog-titlebar ')
+  ]//*/text()[normalize-space(.)=%locator%]
+|
+  descendant::div[@id=%locator%]
+]
 XPATH
         , 'filemanager' => <<<XPATH
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' ffilemanager ')]

@@ -168,8 +168,8 @@ if (!empty($CFG->customfrontpageinclude)) {
         if ($editing && has_capability('moodle/course:update', $context)) {
             $streditsummary = get_string('editsummary');
             echo "<a title=\"$streditsummary\" ".
-                 " href=\"course/editsection.php?id=$section->id\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" ".
-                 " class=\"iconsmall\" alt=\"$streditsummary\" /></a><br /><br />";
+                " href=\"course/editsection.php?id=$section->id\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" ".
+                " class=\"iconsmall\" alt=\"$streditsummary\" /></a><br /><br />";
         }
 
         $courserenderer = $PAGE->get_renderer('core', 'course');
@@ -236,7 +236,7 @@ foreach (explode(',', $frontpagelayout) as $v) {
 
                 echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipsitenews'));
             }
-        break;
+            break;
 
         case FRONTPAGEENROLLEDCOURSELIST:
             $mycourseshtml = $courserenderer->frontpage_my_courses();
@@ -257,7 +257,7 @@ foreach (explode(',', $frontpagelayout) as $v) {
                 echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipmycourses'));
                 break;
             }
-            // No "break" here. If there are no enrolled courses - continue to 'Available courses'.
+        // No "break" here. If there are no enrolled courses - continue to 'Available courses'.
 
         case FRONTPAGEALLCOURSELIST:
             $availablecourseshtml = $courserenderer->frontpage_available_courses();
@@ -277,7 +277,7 @@ foreach (explode(',', $frontpagelayout) as $v) {
 
                 echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipavailablecourses'));
             }
-        break;
+            break;
 
         case FRONTPAGECATEGORYNAMES:
             echo html_writer::tag('a',
@@ -294,7 +294,7 @@ foreach (explode(',', $frontpagelayout) as $v) {
             echo html_writer::end_tag('div');
 
             echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipcategories'));
-        break;
+            break;
 
         case FRONTPAGECATEGORYCOMBO:
             echo html_writer::tag('a',
@@ -311,11 +311,11 @@ foreach (explode(',', $frontpagelayout) as $v) {
             echo html_writer::end_tag('div');
 
             echo html_writer::tag('span', '', array('class' => 'skip-block-to', 'id' => 'skipcourses'));
-        break;
+            break;
 
         case FRONTPAGECOURSESEARCH:
             echo $OUTPUT->box($courserenderer->course_search_form('', 'short'), 'mdl-align');
-        break;
+            break;
 
     }
     echo '<br />';

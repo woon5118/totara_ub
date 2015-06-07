@@ -48,9 +48,10 @@ class core_test_generator_testcase extends advanced_testcase {
     }
 
     public function test_get_plugin_generator_no_component_dir() {
-        $this->setExpectedException('coding_exception', 'Component core_completion does not support ' .
+        // TODO: upstream instance completion to Moodle
+        $this->setExpectedException('coding_exception', 'Component core_filter does not support ' .
                     'generators yet. Missing tests/generator/lib.php.');
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_completion');
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_filter');
     }
 
     public function test_create_user() {

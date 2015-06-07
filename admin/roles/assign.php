@@ -156,6 +156,10 @@ switch ($context->contextlevel) {
     case CONTEXT_COURSECAT:
         $PAGE->set_heading($SITE->fullname);
         break;
+    case CONTEXT_PROGRAM:
+        $program = $DB->get_record('prog', array('id' => $context->instanceid), '*', MUST_EXIST);
+        $PAGE->set_heading($program->fullname);
+        break;
     case CONTEXT_COURSE:
         if ($isfrontpage) {
             $PAGE->set_heading(get_string('frontpage', 'admin'));

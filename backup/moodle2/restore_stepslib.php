@@ -1544,7 +1544,8 @@ class restore_course_structure_step extends restore_structure_step {
         $course = new restore_path_element('course', '/course');
         $category = new restore_path_element('category', '/course/category');
         $tag = new restore_path_element('tag', '/course/tags/tag');
-        $allowed_module = new restore_path_element('allowed_module', '/course/allowed_modules/module');
+        $visibleaudience = new restore_path_element('visibleaudience', '/course/visibleaudiences/visibleaudience');
+        $custom_field = new restore_path_element('custom_field', '/course/custom_fields/custom_field');
 
         // Apply for 'format' plugins optional paths at course level
         $this->add_plugin_structure('format', $course);
@@ -1564,7 +1565,8 @@ class restore_course_structure_step extends restore_structure_step {
         // Apply for local plugins optional paths at course level
         $this->add_plugin_structure('local', $course);
 
-        return array($course, $category, $tag, $allowed_module);
+        return array($course, $category, $tag, $visibleaudience, $custom_field);
+
     }
 
     /**
@@ -1600,6 +1602,14 @@ class restore_course_structure_step extends restore_structure_step {
             $data->idnumber = '';
         }
 
+        // Restore audience visibility settings.
+        if (empty($data->audiencevisibility)) {
+            // If audience visibility is enabled, set the value to the site default, otherwise leave empty.
+            if ($CFG->audiencevisibility) {
+                $data->audiencevisibility = get_config('moodlecourse', 'visiblelearning');
+            }
+        }
+
         // Any empty value for course->hiddensections will lead to 0 (default, show collapsed).
         // It has been reported that some old 1.9 courses may have it null leading to DB error. MDL-31532
         if (empty($data->hiddensections)) {
@@ -1617,6 +1627,7 @@ class restore_course_structure_step extends restore_structure_step {
         if (empty($CFG->enablecompletion)) {
             $data->enablecompletion = 0;
             $data->completionstartonenrol = 0;
+            $data->completionprogressonview = 0;
             $data->completionnotify = 0;
         }
         $languages = get_string_manager()->get_list_of_translations(); // Get languages for quick search
@@ -1628,6 +1639,15 @@ class restore_course_structure_step extends restore_structure_step {
         if (!array_key_exists($data->theme, $themes) || empty($CFG->allowcoursethemes)) {
             $data->theme = '';
         }
+
+        // This is for when restoring from a moodle version 1 backup
+        if (!isset($data->icon)) {
+            // Restore of non-totara backup.
+            $data->icon = '';
+        }
+        $data->icon = str_replace(' ', '-', $data->icon);
+        $data->icon = str_replace('.png', '', $data->icon);
+        $data->icon = str_replace('.gif', '', $data->icon);
 
         // Check if this is an old SCORM course format.
         if ($data->format == 'scorm') {
@@ -1646,6 +1666,16 @@ class restore_course_structure_step extends restore_structure_step {
 
     public function process_category($data) {
         // Nothing to do with the category. UI sets it before restore starts
+    }
+
+    public function process_visibleaudience($data){
+        global $CFG;
+        $data = (object)$data;
+        // Only restore if audience visibility is enabled and there is real data.
+        if ($CFG->audiencevisibility && !empty($data->cohortid)) {
+            $courseid = $this->get_courseid();
+            totara_cohort_add_association($data->cohortid, $courseid, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
+        }
     }
 
     public function process_tag($data) {
@@ -1678,6 +1708,33 @@ class restore_course_structure_step extends restore_structure_step {
         // course_allowed_modules table.
         if ($this->legacyrestrictmodules) {
             $this->legacyallowedmodules[$data->modulename] = 1;
+        }
+    }
+
+    public function process_custom_field($data) {
+        global $DB;
+
+        $data = (object)$data;
+
+        if ($data->field_data) {
+            if (!$field = $DB->get_record('course_info_field', array('shortname' => $data->field_name))) {
+                debugging("Custom field [{$data->field_name}] cannot be restored because it doesn't exist in the target database");
+            } else if ($field->datatype != $data->field_type) {
+                debugging("Custom field [{$data->field_name}] cannot be restored because there is a data type mismatch" .
+                        " - target type = [{$field->datatype}] <> restore type = [{$data->field_type}]");
+            } else {
+                if ($customfield = $DB->get_record('course_info_data', array('fieldid' => $field->id, 'courseid' => $this->get_courseid()))) {
+                    $customfield->data = $data->field_data;
+                    $DB->update_record('course_info_data', $customfield);
+                } else {
+                    $customfield = new stdClass();
+                    $customfield->id = 0;
+                    $customfield->courseid = $this->get_courseid();
+                    $customfield->fieldid = $field->id;
+                    $customfield->data    = $data->field_data;
+                    $DB->insert_record('course_info_data', $customfield);
+                }
+            }
         }
     }
 
@@ -2179,7 +2236,7 @@ class restore_comments_structure_step extends restore_structure_step {
 }
 
 /**
- * This structure steps restores the badges and their configs
+ * This structure steps restores the badges and their configs.
  */
 class restore_badges_structure_step extends restore_structure_step {
 
@@ -2273,7 +2330,7 @@ class restore_badges_structure_step extends restore_structure_step {
                 'messagesubject' => $data->messagesubject,
                 'attachment'     => $data->attachment,
                 'notification'   => $data->notification,
-                'status'         => BADGE_STATUS_INACTIVE,
+                'status'         => $data->status != BADGE_STATUS_ARCHIVED ? BADGE_STATUS_INACTIVE : BADGE_STATUS_ARCHIVED,
                 'nextcron'       => $this->apply_date_offset($data->nextcron)
         );
 
@@ -2676,6 +2733,8 @@ class restore_course_completion_structure_step extends restore_structure_step {
         $data->course = $this->get_courseid();
         $data->userid = $this->get_mappingid('user', $data->userid);
 
+        // If course is set to start completion on enrol, then users may be already enrolled and completion records may exist already at this point.
+        $startonenrol = $DB->get_field('course', 'completionstartonenrol', array('id' => $data->course));
         if (!empty($data->userid)) {
             $params = array(
                 'userid' => $data->userid,
@@ -3635,6 +3694,7 @@ class restore_userscompletion_structure_step extends restore_structure_step {
         $data->coursemoduleid = $this->task->get_moduleid();
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        $data->timecompleted = $this->apply_date_offset($data->timecompleted);
 
         // Find the existing record
         $existing = $DB->get_record('course_modules_completion', array(

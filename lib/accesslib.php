@@ -144,6 +144,8 @@ define('CONTEXT_SYSTEM', 10);
 define('CONTEXT_USER', 30);
 /** Course category context level - one instance for each category */
 define('CONTEXT_COURSECAT', 40);
+/** Program context level - one instance for each program */
+define('CONTEXT_PROGRAM', 45);
 /** Course context level - one instances for each course */
 define('CONTEXT_COURSE', 50);
 /** Course module context level - one instance for each course module */
@@ -434,7 +436,7 @@ function has_capability($capability, context $context, $user = null, $doanything
     // context path/depth must be valid
     if (empty($context->path) or $context->depth == 0) {
         // this should not happen often, each upgrade tries to rebuild the context paths
-        debugging('Context id '.$context->id.' does not have valid path, please use build_context_path()');
+        debugging('Context id '.$context->id.' does not have valid path, please use context_helper::build_all_paths()');
         if (is_siteadmin($userid)) {
             return true;
         } else {
@@ -1349,9 +1351,11 @@ function get_role_archetypes() {
         'editingteacher' => 'editingteacher',
         'teacher'        => 'teacher',
         'student'        => 'student',
+        'staffmanager'   => 'staffmanager',
         'guest'          => 'guest',
         'user'           => 'user',
-        'frontpage'      => 'frontpage'
+        'frontpage'      => 'frontpage',
+        'assessor'       => 'assessor'
     );
 }
 
@@ -1514,6 +1518,7 @@ function delete_role($roleid) {
     $DB->delete_records('role_allow_override', array('allowoverride'=>$roleid));
     $DB->delete_records('role_names',          array('roleid'=>$roleid));
     $DB->delete_records('role_context_levels', array('roleid'=>$roleid));
+    $DB->delete_records('course_completion_criteria', array('role'=>$roleid));
 
     // Get role record before it's deleted.
     $role = $DB->get_record('role', array('id'=>$roleid));
@@ -1773,6 +1778,101 @@ function role_assign($roleid, $userid, $contextid, $component = '', $itemid = 0,
 }
 
 /**
+ * This function makes bulk role-assignments (a role for users in a particular context)
+ *
+ * @since Totara 2.2
+ *
+ * @param int $roleid the role of the id
+ * @param array $userids containing objects with userids OR just array of userids
+ * @param int|context $contextid id of the context
+ * @param string $component example 'enrol_ldap', defaults to '' which means manual assignment,
+ * @param int $itemid id of enrolment/auth plugin
+ * @param string $timemodified defaults to current time
+ * @return int new/existing id of the assignment
+ */
+function role_assign_bulk($roleid, $userids, $contextid, $component = '', $itemid = 0, $timemodified = '') {
+    global $USER, $DB;
+
+    // now validate all parameters
+    if (empty($roleid)) {
+        throw new coding_exception('Invalid call to role_bulk_assign(), roleid can not be empty');
+    }
+
+    if (empty($userids)) {
+        throw new coding_exception('Invalid call to role_bulk_assign(), userids can not be empty');
+    }
+    $userids = array_map(function($item) {
+        if (is_object($item)) {
+            return $item->userid;
+        } elseif (is_int($item)) {
+            return $item;
+        } else {
+            return 0;
+        }
+    }, $userids);
+
+    if ($itemid) {
+        if (strpos($component, '_') === false) {
+            throw new coding_exception('Invalid call to role_bulk_assign(), component must start with plugin type such as"enrol_" when itemid specified', 'component:'.$component);
+        }
+    } else {
+        $itemid = 0;
+        if ($component !== '' and strpos($component, '_') === false) {
+            throw new coding_exception('Invalid call to role_bulk_assign(), invalid component string', 'component:'.$component);
+        }
+    }
+
+    if ($contextid instanceof context) {
+        $context = $contextid;
+    } else {
+        $context = context::instance_by_id($contextid, MUST_EXIST);
+    }
+
+    if (!$timemodified) {
+        $timemodified = time();
+    }
+
+    // remove duplicates
+    list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+    $sql = "SELECT u.id AS userid
+        FROM {user} u
+        LEFT JOIN {role_assignments} ra ON u.id = ra.userid
+            AND ra.roleid = ? AND ra.contextid = ? AND ra.component = ? AND ra.itemid = ?
+        WHERE u.id {$sqlin}
+        AND ra.userid IS NULL";
+    $userids = $DB->get_records_sql($sql, array_merge(array($roleid, $contextid, $component, $itemid), $sqlinparams));
+
+    $roleassignments = array();
+    foreach ($userids as $u) {
+        $raobj = new stdClass;
+        $raobj->userid = $u->userid;
+        $raobj->roleid = $roleid;
+        $raobj->contextid = $contextid;
+        $raobj->component = $component;
+        $raobj->itemid = $itemid;
+        $raobj->timemodified = $timemodified;
+        $raobj->modifierid = empty($USER->id) ? 0 : $USER->id;
+
+        $roleassignments[] = $raobj;
+    }
+
+    $DB->insert_records_via_batch('role_assignments', $roleassignments);
+    unset($roleassignments);
+
+    // mark context as dirty - again expensive, but needed
+    $context->mark_dirty();
+
+    reload_all_capabilities();
+
+    // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+    \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+    \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
+
+    return true;
+}
+
+
+/**
  * Removes one role assignment
  *
  * @param int $roleid
@@ -1905,6 +2005,118 @@ function role_unassign_all(array $params, $subcontexts = false, $includemanual =
         role_unassign_all($params, $subcontexts, false);
     }
 }
+
+/**
+ * Bulk removes multiple role assignments, parameters may contain:
+ *   'roleid', 'userids', 'contextid'(required), 'component', 'enrolid'.
+ *
+ * @since Totara 2.2
+ *
+ * @param array $params role assignment parameters
+ * @param bool $subcontexts unassign in subcontexts too
+ * @param bool $includemanual include manual role assignments too
+ * @return void
+ */
+function role_unassign_all_bulk(array $params, $subcontexts = false, $includemanual = false) {
+    global $USER, $CFG, $DB;
+
+    if (!$params) {
+        throw new coding_exception('Missing parameters in role_unsassign_all_bulk() call');
+    }
+
+    $allowed = array('roleid', 'userids', 'contextid', 'component', 'itemid');
+    foreach ($params as $key => $value) {
+        if (!in_array($key, $allowed)) {
+            throw new coding_exception('Unknown role_unsassign_all_bulk() parameter key', 'key:'.$key);
+        }
+    }
+
+    if (isset($params['component']) && $params['component'] !== '' && strpos($params['component'], '_') === false) {
+        throw new coding_exception('Invalid component parameter in role_unsassign_all_bulk() call', 'component:'.$params['component']);
+    }
+
+    if ($includemanual) {
+        if (!isset($params['component']) || $params['component'] === '') {
+            throw new coding_exception('include manual parameter requires component parameter in role_unsassign_all_bulk() call');
+        }
+    }
+
+    if (empty($params['contextid'])) {
+        throw new coding_exception('contextid parameter required in role_unsassign_all_bulk() call');
+    }
+
+    /// construct query
+    $sql = "SELECT *
+        FROM {role_assignments} WHERE ";
+    $wheresql = '';
+    $sqlinparams = array();
+    if (!empty($params['userids'])) {
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal($params['userids'], SQL_PARAMS_NAMED);
+        $wheresql .= "userid {$sqlin} AND ";
+        unset($params['userids']);
+    }
+    $wheresql .= implode(' AND ', array_map(function ($iname) { return "{$iname} = :{$iname}"; }, array_keys($params)));
+    $params = array_merge($sqlinparams, $params);
+
+    /// process context
+    $ras = $DB->get_records_sql($sql . $wheresql, $params);
+    if (!empty($ras)) {
+        list($sqlin, $sqlparams) = $DB->get_in_or_equal(array_keys($ras));
+        $DB->delete_records_select('role_assignments', "id {$sqlin}", $sqlparams);
+        if ($context = context::instance_by_id($params['contextid'], IGNORE_MISSING)) {
+            // this is a bit expensive but necessary
+            $context->mark_dirty();
+            // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+            \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+            \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
+        }
+        unset($ras);
+    }
+
+    /// process subcontexts
+    if ($subcontexts && $context = context::instance_by_id($params['contextid'], IGNORE_MISSING)) {
+        if ($params['contextid'] instanceof context) {
+            $context = $params['contextid'];
+        } else {
+            $context = context::instance_by_id($params['contextid'], IGNORE_MISSING);
+        }
+
+        if ($context) {
+            $contexts = $context->get_child_contexts();
+            $sparams = $params;
+            foreach ($contexts as $context) {
+                $sparams['contextid'] = $context->id;
+                $ras = $DB->get_records_sql($sql . $wheresql, $sparams);
+                if (!empty($ras)) {
+                    list($sqlin, $sqlparams) = $DB->get_in_or_equal(array_keys($ras));
+                    $DB->delete_records_select('role_assignments', "id {$sqlin}", $sqlparams);
+                    // this is a bit expensive but necessary
+                    $context->mark_dirty();
+                    // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
+                    \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+                    \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
+                }
+            }
+            unset($sparams);
+        }
+    }
+
+    /// do this once more for all manual role assignments
+    if ($includemanual) {
+        $params['userids'] = array_values($sqlinparams);
+        $params['component'] = '';  // manual
+        foreach ($sqlinparams as $i => $p) {
+            // unset userid prepared param trash
+            unset($params[$i]);
+        }
+        role_unassign_all_bulk($params, $subcontexts, false);
+    }
+
+    /// do full reload of capabilities for current user.
+    reload_all_capabilities();
+}
+
+
 
 /**
  * Determines if a user is currently logged in
@@ -2601,34 +2813,40 @@ function get_default_role_archetype_allows($type, $archetype) {
 
     $defaults = array(
         'assign' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student'),
             'teacher'        => array(),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
         'override' => array(
-            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage'),
+            'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array(),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
         'switch' => array(
-            'manager'        => array('editingteacher', 'teacher', 'student', 'guest'),
+            'manager'        => array('editingteacher', 'teacher', 'student', 'guest', 'staffmanager'),
             'coursecreator'  => array(),
             'editingteacher' => array('teacher', 'student', 'guest'),
             'teacher'        => array('student', 'guest'),
             'student'        => array(),
+            'staffmanager'   => array(),
             'guest'          => array(),
             'user'           => array(),
             'frontpage'      => array(),
+            'assessor'       => array(),
         ),
     );
 
@@ -3015,6 +3233,7 @@ function get_component_string($component, $contextlevel) {
             case CONTEXT_SYSTEM:    return get_string('coresystem');
             case CONTEXT_USER:      return get_string('users');
             case CONTEXT_COURSECAT: return get_string('categories');
+            case CONTEXT_PROGRAM:   return get_string('program', 'totara_program');
             case CONTEXT_COURSE:    return get_string('course');
             case CONTEXT_MODULE:    return get_string('activities');
             case CONTEXT_BLOCK:     return get_string('block');
@@ -3672,6 +3891,8 @@ function get_default_contextlevels($rolearchetype) {
         'editingteacher' => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'teacher'        => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'student'        => array(CONTEXT_COURSE, CONTEXT_MODULE),
+        'staffmanager'   => array(CONTEXT_SYSTEM, CONTEXT_USER),
+        'assessor'       => array(CONTEXT_COURSE, CONTEXT_MODULE),
         'guest'          => array(),
         'user'           => array(),
         'frontpage'      => array());
@@ -4109,7 +4330,7 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
     }
 
     // Prevent wrong function uses.
-    if ((empty($roleid) || is_array($roleid)) && strpos($fields, 'ra.id') !== 0) {
+    if ((empty($roleid) || is_array($roleid)) && (strpos($fields, 'ra.id') !== 0 and $fields != 'u.*')) {
         debugging('get_role_users() without specifying one single roleid needs to be called prefixing ' .
             'role assignments id (ra.id) as unique field, you can use $fields param for it.');
 
@@ -4540,14 +4761,23 @@ function role_get_name(stdClass $role, $context = null, $rolenamedisplay = ROLEN
         // Empty role->name means we want to see localised role name based on shortname,
         // only default roles are supposed to be localised.
         switch ($role->shortname) {
-            case 'manager':         $original = get_string('manager', 'role'); break;
+            case 'manager':         $original = get_string('sitemanager', 'totara_core'); break;
             case 'coursecreator':   $original = get_string('coursecreators'); break;
-            case 'editingteacher':  $original = get_string('defaultcourseteacher'); break;
-            case 'teacher':         $original = get_string('noneditingteacher'); break;
-            case 'student':         $original = get_string('defaultcoursestudent'); break;
+            case 'editingteacher':  $original = get_string('editingtrainer'); break;
+            case 'teacher':         $original = get_string('trainer'); break;
+            case 'student':         $original = get_string('learner'); break;
             case 'guest':           $original = get_string('guest'); break;
             case 'user':            $original = get_string('authenticateduser'); break;
             case 'frontpage':       $original = get_string('frontpageuser', 'role'); break;
+            // totara core roles
+            case 'staffmanager':    $original = get_string('staffmanager'); break;
+            case 'assessor':        $original = get_string('assessor'); break;
+            case 'regionalmanager': $original = get_string('regionalmanager'); break;
+            case 'regionaltrainer': $original = get_string('regionaltrainer'); break;
+            // totara renamed roles
+            case 'editingtrainer':  $original = get_string('editingtrainer'); break;
+            case 'trainer':         $original = get_string('trainer'); break;
+            case 'learner':         $original = get_string('learner'); break;
             // We should not get here, the role UI should require the name for custom roles!
             default:                $original = $role->shortname; break;
         }
@@ -4596,12 +4826,21 @@ function role_get_description(stdClass $role) {
     switch ($role->shortname) {
         case 'manager':         return get_string('managerdescription', 'role');
         case 'coursecreator':   return get_string('coursecreatorsdescription');
-        case 'editingteacher':  return get_string('defaultcourseteacherdescription');
-        case 'teacher':         return get_string('noneditingteacherdescription');
-        case 'student':         return get_string('defaultcoursestudentdescription');
+        case 'editingteacher':  return get_string('editingtrainerdescription');
+        case 'teacher':         return get_string('trainerdescription');
+        case 'student':         return get_string('learnerdescription');
         case 'guest':           return get_string('guestdescription');
         case 'user':            return get_string('authenticateduserdescription');
         case 'frontpage':       return get_string('frontpageuserdescription', 'role');
+        // totara core roles
+        case 'staffmanager':    return get_string('staffmanagerdescription');
+        case 'assessor':        return get_string('assessordescription');
+        case 'regionalmanager': return get_string('regionalmanagerdescription');
+        case 'regionaltrainer': return get_string('regionaltrainerdescription');
+        // totara renamed roles
+        case 'editingtrainer':  return get_string('editingtrainerdescription');
+        case 'trainer':         return get_string('trainerdescription');
+        case 'learner':         return get_string('learnerdescription');
         default:                return '';
     }
 }
@@ -5869,6 +6108,7 @@ class context_helper extends context {
             CONTEXT_SYSTEM    => 'context_system',
             CONTEXT_USER      => 'context_user',
             CONTEXT_COURSECAT => 'context_coursecat',
+            CONTEXT_PROGRAM   => 'context_program',
             CONTEXT_COURSE    => 'context_course',
             CONTEXT_MODULE    => 'context_module',
             CONTEXT_BLOCK     => 'context_block',
@@ -6606,7 +6846,7 @@ class context_coursecat extends context {
         $params = array();
         $sql = "SELECT *
                   FROM {capabilities}
-                 WHERE contextlevel IN (".CONTEXT_COURSECAT.",".CONTEXT_COURSE.",".CONTEXT_MODULE.",".CONTEXT_BLOCK.")";
+                 WHERE contextlevel IN (".CONTEXT_COURSECAT.",".CONTEXT_COURSE.",".CONTEXT_PROGRAM.",".CONTEXT_MODULE.",".CONTEXT_BLOCK.")";
 
         return $DB->get_records_sql($sql.' '.$sort, $params);
     }
@@ -6972,6 +7212,233 @@ class context_course extends context {
                       FROM {context} ctx
                       JOIN {course} c ON (c.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_COURSE." AND c.category <> 0)
                       JOIN {context} pctx ON (pctx.instanceid = c.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
+                     WHERE pctx.path IS NOT NULL AND pctx.depth > 0
+                           $ctxemptyclause";
+            $trans = $DB->start_delegated_transaction();
+            $DB->delete_records('context_temp');
+            $DB->execute($sql);
+            context::merge_context_temp_table();
+            $DB->delete_records('context_temp');
+            $trans->allow_commit();
+        }
+    }
+}
+
+
+/**
+ * Program context class
+ * @author Alastair Munro
+ * @since Totara 2.2
+ */
+class context_program extends context {
+    /**
+     * Please use context_course::instance($courseid) if you need the instance of context.
+     * Alternatively if you know only the context id use context::instance_by_id($contextid)
+     *
+     * @param stdClass $record
+     */
+    protected function __construct(stdClass $record) {
+        parent::__construct($record);
+        if ($record->contextlevel != CONTEXT_PROGRAM) {
+            throw new coding_exception('Invalid $record->contextlevel in context_program constructor.');
+        }
+    }
+
+    /**
+     * Returns human readable context level name.
+     *
+     * @static
+     * @return string the human readable context level name.
+     */
+    public static function get_level_name() {
+        return get_string('program', 'totara_program');
+    }
+
+    /**
+     * Returns human readable context identifier.
+     *
+     * @param boolean $withprefix whether to prefix the name of the context with Program
+     * @param boolean $short whether to use the short name of the thing.
+     * @return string the human readable context name.
+     */
+    public function get_context_name($withprefix = true, $short = false) {
+        global $DB;
+
+        $name = '';
+
+        if ($program = $DB->get_record('prog', array('id' => $this->_instanceid))) {
+            if ($withprefix){
+                $name = get_string('program', 'totara_program').': ';
+            }
+            if ($short){
+                $name .= format_string($program->shortname, true, array('context' => $this));
+            } else {
+                $name .= format_string($program->fullname);
+           }
+        }
+        return $name;
+    }
+
+    /**
+     * Returns the most relevant URL for this context.
+     *
+     * @return moodle_url
+     */
+    public function get_url() {
+        return new moodle_url('/totara/program/view.php', array('id'=>$this->_instanceid));
+    }
+
+    /**
+     * Returns array of relevant context capability records.
+     *
+     * @return array
+     */
+    public function get_capabilities() {
+        global $DB;
+
+        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
+
+        $params = array();
+        $sql = "SELECT *
+                  FROM {capabilities}
+                 WHERE contextlevel IN (".CONTEXT_PROGRAM.",".CONTEXT_MODULE.",".CONTEXT_BLOCK.")";
+
+        return $DB->get_records_sql($sql.' '.$sort, $params);
+    }
+
+    /**
+     * Is this context part of any program? If yes return program context.
+     *
+     * @param bool $strict true means throw exception if not found, false means return false if not found
+     * @return program_context context of the enclosing program, null if not found or exception
+     */
+    public function get_program_context($strict = true) {
+        return $this;
+    }
+
+    /**
+     * Returns program context instance.
+     *
+     * @static
+     * @param int $instanceid
+     * @param int $strictness
+     * @return context_program context instance
+     */
+    public static function instance($instanceid, $strictness = MUST_EXIST) {
+        global $DB;
+
+        if ($context = context::cache_get(CONTEXT_PROGRAM, $instanceid)) {
+            return $context;
+        }
+
+        if (!$record = $DB->get_record('context', array('contextlevel' => CONTEXT_PROGRAM, 'instanceid' => $instanceid))) {
+            if ($program = $DB->get_record('prog', array('id' => $instanceid), 'id, category', $strictness)) {
+                if ($program->category) {
+                    $parentcontext = context_coursecat::instance($program->category);
+                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, $parentcontext->path);
+                } else {
+                    $record = context::insert_context_record(CONTEXT_PROGRAM, $program->id, '/'.SYSCONTEXTID, 0);
+                }
+            }
+        }
+
+        if ($record) {
+            $context = new context_program($record);
+            context::cache_add($context);
+            return $context;
+        }
+
+        return false;
+    }
+
+    /**
+     * Create missing context instances at program context level
+     * @static
+     */
+    protected static function create_level_instances() {
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        // check the program table exists in case this is during an upgrade
+        // to totara and the table hasn't yet been created
+        $table = new xmldb_table('prog');
+        if (!$dbman->table_exists($table)) {
+            return;
+        }
+
+        $sql = "INSERT INTO {context} (contextlevel, instanceid)
+                SELECT ".CONTEXT_PROGRAM.", p.id
+                  FROM {prog} p
+                 WHERE NOT EXISTS (SELECT 'x'
+                                     FROM {context} cx
+                                    WHERE p.id = cx.instanceid AND cx.contextlevel=".CONTEXT_PROGRAM.")";
+        $DB->execute($sql);
+    }
+
+    /**
+     * Returns sql necessary for purging of stale context instances.
+     *
+     * @static
+     * @return string cleanup SQL
+     */
+    protected static function get_cleanup_sql() {
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        // check the program table exists in case this is during an upgrade
+        // to totara and the table hasn't yet been created
+        $table = new xmldb_table('prog');
+        if (!$dbman->table_exists($table)) {
+            return 'SELECT c.*
+                    FROM {context} c
+                   WHERE 1=2';
+        }
+        $sql = "
+                  SELECT c.*
+                    FROM {context} c
+         LEFT OUTER JOIN {prog} p ON c.instanceid = p.id
+                   WHERE p.id IS NULL AND c.contextlevel = ".CONTEXT_PROGRAM."
+               ";
+
+        return $sql;
+    }
+
+    /**
+     * Rebuild context paths and depths at program context level.
+     *
+     * @static
+     * @param $force
+     */
+    protected static function build_paths($force) {
+        global $DB;
+
+        if ($force or $DB->record_exists_select('context', "contextlevel = ".CONTEXT_PROGRAM." AND (depth = 0 OR path IS NULL)")) {
+            if ($force) {
+                $ctxemptyclause = $emptyclause = '';
+            } else {
+                $ctxemptyclause = "AND (ctx.path IS NULL OR ctx.depth = 0)";
+                $emptyclause    = "AND ({context}.path IS NULL OR {context}.depth = 0)";
+            }
+
+            $base = '/'.SYSCONTEXTID;
+
+            // Standard frontpage
+            $sql = "UPDATE {context}
+                       SET depth = 2,
+                           path = ".$DB->sql_concat("'$base/'", 'id')."
+                     WHERE contextlevel = ".CONTEXT_PROGRAM."
+                           AND EXISTS (SELECT 'x'
+                                         FROM {prog} p
+                                        WHERE p.id = {context}.instanceid AND p.category = 0)
+                           $emptyclause";
+            $DB->execute($sql);
+
+            // standard programs
+            $sql = "INSERT INTO {context_temp} (id, path, depth)
+                    SELECT ctx.id, ".$DB->sql_concat('pctx.path', "'/'", 'ctx.id').", pctx.depth+1
+                      FROM {context} ctx
+                      JOIN {prog} p ON (p.id = ctx.instanceid AND ctx.contextlevel = ".CONTEXT_PROGRAM." AND p.category <> 0)
+                      JOIN {context} pctx ON (pctx.instanceid = p.category AND pctx.contextlevel = ".CONTEXT_COURSECAT.")
                      WHERE pctx.path IS NOT NULL AND pctx.depth > 0
                            $ctxemptyclause";
             $trans = $DB->start_delegated_transaction();

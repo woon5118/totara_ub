@@ -256,8 +256,10 @@ switch ($mode) {
                 $a->comment  = format_text($a->comment, $essayinfo->responseformat, $formattextdefoptions);
                 $a->lesson = format_string($lesson->name, true);
 
+                $strmgr = get_string_manager();
+                $userlang = $users[$attempt->userid]->lang;
                 // Fetch message HTML and plain text formats
-                $message  = get_string('essayemailmessage2', 'lesson', $a);
+                $message  = $strmgr->get_string('essayemailmessage2', 'lesson', $a, $userlang);
                 $plaintext = format_text_email($message, FORMAT_HTML);
 
                 // Subject

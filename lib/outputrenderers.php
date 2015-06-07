@@ -921,7 +921,7 @@ class core_renderer extends renderer_base {
      * @return string HTML that you must output this, preferably immediately.
      */
     public function header() {
-        global $USER, $CFG;
+        global $USER, $CFG, $PAGE;
 
         if (\core\session\manager::is_loggedinas()) {
             $this->page->add_body_class('userloggedinas');
@@ -986,7 +986,9 @@ class core_renderer extends renderer_base {
         $this->opencontainers->push('header/footer', $footer);
         $this->page->set_state(moodle_page::STATE_IN_BODY);
 
-        return $header . $this->skip_link_target('maincontent');
+        $totararenderer = $PAGE->get_renderer('totara_core', null);
+        return $header . $this->skip_link_target('maincontent') .
+            $totararenderer->print_totara_notifications();
     }
 
     /**
@@ -3313,9 +3315,13 @@ EOD;
         $separator = get_separator();
         for ($i=0;$i < $itemcount;$i++) {
             $item = $items[$i];
+            $item->last = false;
             $item->hideicon = true;
             if ($i===0) {
                 $content = html_writer::tag('li', $this->render($item));
+            } else if ($i === $itemcount - 1) {
+                $item->last = true;
+                $content = html_writer::tag('li', $separator . $this->render($item));
             } else {
                 $content = html_writer::tag('li', $separator.$this->render($item));
             }
@@ -3358,7 +3364,7 @@ EOD;
                 $link->text = $content;
             }
             $content = $this->render($link);
-        } else if ($item->action instanceof moodle_url) {
+        } else if ($item->action instanceof moodle_url && !(isset($item->last) && $item->last)) {
             $attributes = array();
             if ($title !== '') {
                 $attributes['title'] = $title;
@@ -3584,6 +3590,26 @@ EOD;
         $content .= html_writer::end_tag('div');
 
         return $content;
+    }
+
+    /**
+     * render a simple submit button without a form wrapped
+     * around it
+     * @param string $value the button label
+     * @param array $options the properties for the button
+     * @return string HTML fragment
+     */
+    public function single_submit($value, array $options=null) {
+        $attributes = array('type' => 'submit', 'value' => $value);
+
+        // add extra  attributes
+        $attributes = array_merge($attributes, (array)$options);
+
+        // first the input element
+        $output = html_writer::empty_tag('input', $attributes);
+
+        // then div wrapper for xhtml strictness
+        return html_writer::tag('div', $output);
     }
 
     /**

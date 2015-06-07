@@ -81,6 +81,18 @@ class profile_field_checkbox extends profile_field_base {
         return '<input disabled="disabled" type="checkbox" name="'.$this->inputname.'" '.$checked.' />';
     }
 
+    /**
+     * Loads a user object with data for this field ready for the export, such as a spreadsheet.
+     *
+     * @param object a user object
+     */
+     function export_load_user_data($user) {
+        if ($this->data !== NULL) {
+            $this->data = clean_text($this->data, $this->dataformat);
+            $user->{$this->inputname} = $this->data ? get_string('checked_export_value', 'profilefield_checkbox') : get_string('not_checked_export_value', 'profilefield_checkbox');
+        }
+    }
+
 }
 
 

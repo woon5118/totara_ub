@@ -41,7 +41,7 @@
     }
 
     require_once($CFG->dirroot.'/calendar/lib.php');
-    $timezones = core_date::get_list_of_timezones(null, true);
+    $timezones = core_date::get_list_of_timezones($current, true);
 
     echo '<center><form action="timezone.php" method="post">';
     echo html_writer::label($strusers . ' (' . $strall . '): ', 'menuzone');

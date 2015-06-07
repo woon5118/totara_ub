@@ -66,7 +66,7 @@ class enrol_self_plugin extends enrol_plugin {
             $icons[] = new pix_icon('withoutkey', get_string('pluginname', 'enrol_self'), 'enrol_self');
         }
         if ($key) {
-            $icons[] = new pix_icon('withkey', get_string('pluginname', 'enrol_self'), 'enrol_self');
+            $icons[] = new pix_icon('withkey', get_string('pluginnamewithkey', 'totara_core'), 'enrol_self');
         }
         return $icons;
     }
@@ -218,6 +218,8 @@ class enrol_self_plugin extends enrol_plugin {
         if ($instance->customint4) {
             $this->email_welcome_message($instance, $USER);
         }
+
+        return true;
     }
 
     /**
@@ -252,6 +254,54 @@ class enrol_self_plugin extends enrol_plugin {
             return $OUTPUT->box($enrolstatus);
         }
     }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param $form
+     * @return MoodleQuickForm Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_enrol_hook($form, $instance) {
+        global $CFG, $OUTPUT, $USER;
+
+        require_once("$CFG->dirroot/enrol/self/locallib.php");
+
+        $enrolstatus = $this->can_self_enrol($instance);
+
+        // Don't show enrolment instance form, if user can't enrol using it.
+        if ($enrolstatus === true) {
+            if ($data = $form->get_data()) {
+                $this->enrol_self($instance, $data);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates course enrol form, checks if form submitted
+     * and enrols user if necessary. It can also redirect.
+     *
+     * @param stdClass $instance
+     * @return Instance of the enrolment form if successful, else false.
+     */
+    public function course_expand_get_form_hook($instance) {
+        global $CFG, $OUTPUT, $USER;
+
+        require_once("$CFG->dirroot/enrol/self/locallib.php");
+
+        $enrolstatus = $this->can_self_enrol($instance);
+
+        // Don't show enrolment instance form, if user can't enrol using it.
+        if ($enrolstatus === true) {
+            return new enrol_self_enrol_form(null, $instance);
+        }
+
+        return false;
+    }
+
 
     /**
      * Checks if user can self enrol.
@@ -409,6 +459,7 @@ class enrol_self_plugin extends enrol_plugin {
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, array('context'=>$context));
         $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id&course=$course->id";
+        $strmgr = get_string_manager();
 
         if (trim($instance->customtext1) !== '') {
             $message = $instance->customtext1;
@@ -425,11 +476,12 @@ class enrol_self_plugin extends enrol_plugin {
                 $messagetext = html_to_text($messagehtml);
             }
         } else {
-            $messagetext = get_string('welcometocoursetext', 'enrol_self', $a);
+            $messagetext = $strmgr->get_string('welcometocoursetext', 'enrol_self', $a, $user->lang);
             $messagehtml = text_to_html($messagetext, null, false, true);
         }
 
-        $subject = get_string('welcometocourse', 'enrol_self', format_string($course->fullname, true, array('context'=>$context)));
+        $subject = $strmgr->get_string('welcometocourse', 'enrol_self', format_string($course->fullname, true, array('context'=>$context)), $user->lang);
+        $subject =  str_replace('&amp;', '&', $subject);
 
         $rusers = array();
         if (!empty($CFG->coursecontact)) {

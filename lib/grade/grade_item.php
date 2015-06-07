@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once('grade_object.php');
+require_once('constants.php');
 
 /**
  * Class representing a grade item.
@@ -52,6 +53,12 @@ class grade_item extends grade_object {
                                  'scaleid', 'outcomeid', 'gradepass', 'multfactor', 'plusfactor', 'aggregationcoef',
                                  'aggregationcoef2', 'sortorder', 'display', 'decimals', 'hidden', 'locked', 'locktime',
                                  'needsupdate', 'weightoverride', 'timecreated', 'timemodified');
+
+    /**
+     * Array of text table fields.
+     * @var array $text_fields
+     */
+    public $text_fields = array('iteminfo', 'calculation');
 
     /**
      * The course this grade_item belongs to.
@@ -1003,11 +1010,13 @@ class grade_item extends grade_object {
      * @return grade_item Course level grade item object
      */
     public static function fetch_course_item($courseid) {
+        global $CFG;
         if ($course_item = grade_item::fetch(array('courseid'=>$courseid, 'itemtype'=>'course'))) {
             return $course_item;
         }
 
         // first get category - it creates the associated grade item
+        require_once($CFG->libdir . '/grade/grade_category.php');
         $course_category = grade_category::fetch_course_category($courseid);
         return $course_category->get_grade_item();
     }

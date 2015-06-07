@@ -108,11 +108,13 @@ if ($silast !== 'all') {
     $where_params['silast'] = $silast.'%';
 }
 
+// Show completion only for active user enrolments?
+$showactiveonly = get_config('report_progress', 'showcompletiononlyactiveenrols');
 // Get user match count
-$total = $completion->get_num_tracked_users(implode(' AND ', $where), $where_params, $group);
+$total = $completion->get_num_tracked_users(implode(' AND ', $where), $where_params, $group, $showactiveonly);
 
 // Total user count
-$grandtotal = $completion->get_num_tracked_users('', array(), $group);
+$grandtotal = $completion->get_num_tracked_users('', array(), $group, $showactiveonly);
 
 // Get user data
 $progress = array();
@@ -125,7 +127,8 @@ if ($total) {
         $firstnamesort ? 'u.firstname ASC' : 'u.lastname ASC',
         $csv ? 0 : COMPLETION_REPORT_PAGE,
         $csv ? 0 : $start,
-        $context
+        $context,
+        $showactiveonly
     );
 }
 
@@ -317,19 +320,18 @@ foreach($activities as $activity) {
     }
 
     // Some names (labels) come URL-encoded and can be very long, so shorten them
-    $displayname = format_string($activity->name, true, array('context' => $activity->context));
+    $activity->name = !$csv ? shorten_text($activity->name) : $activity->name;
 
     if ($csv) {
-        print $sep.csv_quote($displayname).$sep.csv_quote($datetext);
+        print $sep.csv_quote(strip_tags($activity->name)).$sep.csv_quote($datetext);
     } else {
-        $shortenedname = shorten_text($displayname);
-        print '<th scope="col" class="'.$datepassedclass.'">'.
-            '<a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
-            '/view.php?id='.$activity->id.'" title="' . s($displayname) . '">'.
-            '<img src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
-            s(get_string('modulename', $activity->modname)).
-                '" /> <span class="completion-activityname">'.
-            $shortenedname.'</span></a>';
+        $formattedactivityname = format_string($activity->name, true, array('context' => $context));
+        print '<th scope="col" class="ie-vertical '.$datepassedclass.'">'.
+            '<div class="ie-vertical"><a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
+            '/view.php?id='.$activity->id.'" title="' . $formattedactivityname . '">'.
+            '<img class="ie-size" src="'.$OUTPUT->pix_url('icon', $activity->modname).'" alt="'.
+            get_string('modulename',$activity->modname).'" /> <span class="completion-activityname">'.
+            $formattedactivityname.'</span></a></div>';
         if ($activity->completionexpected) {
             print '<div class="completion-expected"><span>'.$datetext.'</span></div>';
         }
@@ -337,7 +339,7 @@ foreach($activities as $activity) {
     }
     $formattedactivities[$activity->id] = (object)array(
         'datepassedclass' => $datepassedclass,
-        'displayname' => $displayname,
+        'displayname' => $formattedactivityname,
     );
 }
 
@@ -365,12 +367,17 @@ foreach($progress as $user) {
 
     // Progress for each activity
     foreach($activities as $activity) {
-
         // Get progress information and state
         if (array_key_exists($activity->id,$user->progress)) {
             $thisprogress=$user->progress[$activity->id];
             $state=$thisprogress->completionstate;
-            $date=userdate($thisprogress->timemodified);
+            if (!empty($thisprogress->timecompleted)) {
+                $date = userdate($thisprogress->timecompleted);
+            } else if (!empty($thisprogress->timemodified)) {
+                $date = userdate($thisprogress->timemodified);
+            } else {
+                $date = '';
+            }
         } else {
             $state=COMPLETION_INCOMPLETE;
             $date='';
@@ -388,12 +395,13 @@ foreach($progress as $user) {
             ($activity->completion==COMPLETION_TRACKING_AUTOMATIC ? 'auto' : 'manual').
             '-'.$completiontype;
 
+        $modcontext = context_module::instance($activity->id);
         $describe = get_string('completion-' . $completiontype, 'completion');
         $a=new StdClass;
         $a->state=$describe;
         $a->date=$date;
         $a->user=fullname($user);
-        $a->activity = $formattedactivities[$activity->id]->displayname;
+        $a->activity = format_string($formattedactivities[$activity->id]->displayname, true, array('context' => $modcontext));
         $fulldescribe=get_string('progress-title','completion',$a);
 
         if ($csv) {

@@ -4,14 +4,15 @@
 
 $capabilities = array(
     'moodle/my:configsyspages',
-    'moodle/tag:manage'
+    'moodle/tag:manage',
+    'totara/core:editmainmenu',
 );
 
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) { // speedup for non-admins, add all caps used on this page
 
     $ADMIN->add('appearance', new admin_category('themes', new lang_string('themes')));
     // "themesettings" settingpage
-    $temp = new admin_settingpage('themesettings', new lang_string('themesettings', 'admin'));
+    $temp = new admin_settingpage('themesettings', new lang_string('themesettings', 'admin'),  array('totara/core:appearance'));
     $temp->add(new admin_setting_configtext('themelist', new lang_string('themelist', 'admin'), new lang_string('configthemelist','admin'), '', PARAM_NOTAGS));
     $setting = new admin_setting_configcheckbox('themedesignermode', new lang_string('themedesignermode', 'admin'), new lang_string('configthemedesignermode', 'admin'), 0);
     $setting->set_updatedcallback('theme_reset_all_caches');
@@ -37,13 +38,14 @@ preferences,moodle|/user/preferences.php|preferences',
     $temp->add(new admin_setting_configcheckbox('enabledevicedetection', new lang_string('enabledevicedetection', 'admin'), new lang_string('configenabledevicedetection', 'admin'), 1));
     $temp->add(new admin_setting_devicedetectregex('devicedetectregex', new lang_string('devicedetectregex', 'admin'), new lang_string('devicedetectregex_desc', 'admin'), ''));
     $ADMIN->add('themes', $temp);
-    $ADMIN->add('themes', new admin_externalpage('themeselector', new lang_string('themeselector','admin'), $CFG->wwwroot . '/theme/index.php'));
+    $ADMIN->add('themes', new admin_externalpage('themeselector', new lang_string('themeselector','admin'), $CFG->wwwroot . '/theme/index.php', array('totara/core:appearance')));
+    $ADMIN->add('themes', new admin_externalpage('elementlibrary', new lang_string('elementlibrary','totara_core'), $CFG->wwwroot . '/elementlibrary/index.php', array('totara/core:appearance')));
 
     // settings for each theme
     foreach (core_component::get_plugin_list('theme') as $theme => $themedir) {
         $settings_path = "$themedir/settings.php";
         if (file_exists($settings_path)) {
-            $settings = new admin_settingpage('themesetting'.$theme, new lang_string('pluginname', 'theme_'.$theme));
+            $settings = new admin_settingpage('themesetting'.$theme, new lang_string('pluginname', 'theme_'.$theme), array('totara/core:appearance'));
             include($settings_path);
             if ($settings) {
                 $ADMIN->add('themes', $settings);
@@ -53,7 +55,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
 
     // Calendar settings.
-    $temp = new admin_settingpage('calendar', new lang_string('calendarsettings','admin'));
+    $temp = new admin_settingpage('calendar', new lang_string('calendarsettings','admin'), array('totara/core:appearance'));
 
     $temp->add(new admin_setting_configselect('calendartype', new lang_string('calendartype', 'admin'),
         new lang_string('calendartype_desc', 'admin'), 'gregorian', \core_calendar\type_factory::get_list_of_calendar_types()));
@@ -117,7 +119,7 @@ preferences,moodle|/user/preferences.php|preferences',
     $ADMIN->add('appearance', $temp);
 
     // blog
-    $temp = new admin_settingpage('blog', new lang_string('blog','blog'), 'moodle/site:config', empty($CFG->enableblogs));
+    $temp = new admin_settingpage('blog', new lang_string('blog','blog'), array('totara/core:appearance'), empty($CFG->enableblogs));
     $temp->add(new admin_setting_configcheckbox('useblogassociations', new lang_string('useblogassociations', 'blog'), new lang_string('configuseblogassociations','blog'), 1));
     $temp->add(new admin_setting_bloglevel('bloglevel', new lang_string('bloglevel', 'admin'), new lang_string('configbloglevel', 'admin'), 4, array(BLOG_GLOBAL_LEVEL => new lang_string('worldblogs','blog'),
                                                                                                                                            BLOG_SITE_LEVEL => new lang_string('siteblogs','blog'),
@@ -134,11 +136,12 @@ preferences,moodle|/user/preferences.php|preferences',
     $ADMIN->add('appearance', $temp);
 
     // Navigation settings
-    $temp = new admin_settingpage('navigation', new lang_string('navigation'));
+    $temp = new admin_settingpage('navigation', new lang_string('navigation'), array('totara/core:appearance'));
     $choices = array(
         HOMEPAGE_SITE => new lang_string('site'),
         HOMEPAGE_MY => new lang_string('mymoodle', 'admin'),
-        HOMEPAGE_USER => new lang_string('userpreference', 'admin')
+        HOMEPAGE_USER => new lang_string('userpreference', 'admin'),
+        HOMEPAGE_TOTARA_DASHBOARD => new lang_string('totaradashboard', 'admin')
     );
     $temp->add(new admin_setting_configselect('defaulthomepage', new lang_string('defaulthomepage', 'admin'),
             new lang_string('configdefaulthomepage', 'admin'), HOMEPAGE_MY, $choices));
@@ -164,8 +167,12 @@ preferences,moodle|/user/preferences.php|preferences',
 
     $ADMIN->add('appearance', $temp);
 
+     // Totara navigation.
+    $ADMIN->add('appearance', new admin_externalpage('totaranavigation', new lang_string('totaranavigation', 'totara_core'),
+            new moodle_url('/totara/core/menu/index.php'), array('totara/core:editmainmenu')));
+
     // "htmlsettings" settingpage
-    $temp = new admin_settingpage('htmlsettings', new lang_string('htmlsettings', 'admin'));
+    $temp = new admin_settingpage('htmlsettings', new lang_string('htmlsettings', 'admin'), array('totara/core:appearance'));
     $temp->add(new admin_setting_configcheckbox('formatstringstriptags', new lang_string('stripalltitletags', 'admin'), new lang_string('configstripalltitletags', 'admin'), 1));
     $temp->add(new admin_setting_emoticons());
     $ADMIN->add('appearance', $temp);
@@ -216,7 +223,7 @@ preferences,moodle|/user/preferences.php|preferences',
 
 
     // "documentation" settingpage
-    $temp = new admin_settingpage('documentation', new lang_string('moodledocs'));
+    $temp = new admin_settingpage('documentation', new lang_string('moodledocs'), array('totara/core:appearance'));
     $temp->add(new admin_setting_configtext('docroot', new lang_string('docroot', 'admin'), new lang_string('configdocroot', 'admin'), 'http://docs.moodle.org', PARAM_URL));
     $ltemp = array('' => get_string('forceno'));
     $ltemp += get_string_manager()->get_list_of_translations(true);
@@ -225,20 +232,30 @@ preferences,moodle|/user/preferences.php|preferences',
     $ADMIN->add('appearance', $temp);
 
     $temp = new admin_externalpage('mypage', new lang_string('mypage', 'admin'), $CFG->wwwroot . '/my/indexsys.php',
-            'moodle/my:configsyspages');
+        array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     $temp = new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php',
-            'moodle/my:configsyspages');
+            array('totara/core:appearance'));
+    $ADMIN->add('appearance', $temp);
+
+    $temp = new admin_externalpage('totaradashboard', new lang_string('dashboards', 'totara_dashboard'),
+            $CFG->wwwroot . '/totara/dashboard/manage.php', array('totara/core:appearance'));
     $ADMIN->add('appearance', $temp);
 
     // coursecontact is the person responsible for course - usually manages enrolments, receives notification, etc.
-    $temp = new admin_settingpage('coursecontact', new lang_string('courses'));
+    $temp = new admin_settingpage('coursecontact', new lang_string('courses'), array('totara/core:appearance'));
     $temp->add(new admin_setting_special_coursecontact());
     $temp->add(new admin_setting_configcheckbox('courselistshortnames',
             new lang_string('courselistshortnames', 'admin'),
             new lang_string('courselistshortnames_desc', 'admin'), 0));
-    $temp->add(new admin_setting_configtext('coursesperpage', new lang_string('coursesperpage', 'admin'), new lang_string('configcoursesperpage', 'admin'), 20, PARAM_INT));
+    if (!empty($CFG->enhancedcatalog)) {
+        $temp->add(new admin_setting_nothing('coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpageenhcatenabled', 'admin')));
+    } else {
+        $temp->add(new admin_setting_configtext('coursesperpage', new lang_string('coursesperpage', 'admin'),
+                new lang_string('configcoursesperpage', 'admin'), 20, PARAM_INT));
+    }
     $temp->add(new admin_setting_configtext('courseswithsummarieslimit', new lang_string('courseswithsummarieslimit', 'admin'), new lang_string('configcourseswithsummarieslimit', 'admin'), 10, PARAM_INT));
     $temp->add(new admin_setting_configtext('courseoverviewfileslimit', new lang_string('courseoverviewfileslimit'),
             new lang_string('configcourseoverviewfileslimit', 'admin'), 1, PARAM_INT));
@@ -246,7 +263,7 @@ preferences,moodle|/user/preferences.php|preferences',
             new lang_string('configcourseoverviewfilesext', 'admin'), '.jpg,.gif,.png'));
     $ADMIN->add('appearance', $temp);
 
-    $temp = new admin_settingpage('ajax', new lang_string('ajaxuse'));
+    $temp = new admin_settingpage('ajax', new lang_string('ajaxuse'), array('totara/core:appearance'));
     $temp->add(new admin_setting_configcheckbox('useexternalyui', new lang_string('useexternalyui', 'admin'), new lang_string('configuseexternalyui', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('yuicomboloading', new lang_string('yuicomboloading', 'admin'), new lang_string('configyuicomboloading', 'admin'), 1));
     $setting = new admin_setting_configcheckbox('cachejs', new lang_string('cachejs', 'admin'), new lang_string('cachejs_help', 'admin'), 1);
@@ -258,9 +275,9 @@ preferences,moodle|/user/preferences.php|preferences',
     $ADMIN->add('appearance', $temp);
 
     // link to tag management interface
-    $ADMIN->add('appearance', new admin_externalpage('managetags', new lang_string('managetags', 'tag'), $CFG->wwwroot.'/tag/manage.php', 'moodle/tag:manage'));
+    $ADMIN->add('appearance', new admin_externalpage('managetags', new lang_string('managetags', 'tag'), $CFG->wwwroot.'/tag/manage.php', array('totara/core:appearance')));
 
-    $temp = new admin_settingpage('additionalhtml', new lang_string('additionalhtml', 'admin'));
+    $temp = new admin_settingpage('additionalhtml', new lang_string('additionalhtml', 'admin'), array('totara/core:appearance'));
     $temp->add(new admin_setting_heading('additionalhtml_heading', new lang_string('additionalhtml_heading', 'admin'), new lang_string('additionalhtml_desc', 'admin')));
     $temp->add(new admin_setting_configtextarea('additionalhtmlhead', new lang_string('additionalhtmlhead', 'admin'), new lang_string('additionalhtmlhead_desc', 'admin'), '', PARAM_RAW));
     $temp->add(new admin_setting_configtextarea('additionalhtmltopofbody', new lang_string('additionalhtmltopofbody', 'admin'), new lang_string('additionalhtmltopofbody_desc', 'admin'), '', PARAM_RAW));

@@ -30,7 +30,6 @@ require_once($CFG->dirroot.'/course/lib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->dirroot.'/completion/criteria/completion_criteria_self.php');
 require_once($CFG->dirroot.'/completion/criteria/completion_criteria_date.php');
-require_once($CFG->dirroot.'/completion/criteria/completion_criteria_unenrol.php');
 require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
 require_once($CFG->dirroot.'/completion/criteria/completion_criteria_duration.php');
 require_once($CFG->dirroot.'/completion/criteria/completion_criteria_grade.php');
@@ -49,16 +48,23 @@ if ($id) {
         print_error('cannoteditsiteform');
     }
 
-    if (!$course = $DB->get_record('course', array('id'=>$id))) {
-        print_error('invalidcourseid');
-    }
+    $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
-    require_capability('moodle/course:update', context_course::instance($course->id));
+    $coursecontext = context_course::instance($course->id);
+    require_capability('moodle/course:update', $coursecontext);
 
 } else {
     require_login();
     print_error('needcourseid');
 }
+
+// Form unlocked override
+$unlockdelete = optional_param('unlockdelete', false, PARAM_BOOL);
+$unlockonly = optional_param('unlockonly', false, PARAM_BOOL);
+
+// Load completion object
+$completion = new completion_info($course);
+
 
 // Set up the page.
 $PAGE->set_course($course);
@@ -68,32 +74,62 @@ $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('admin');
 
 // Create the settings form instance.
-$form = new course_completion_form('completion.php?id='.$id, array('course' => $course));
+$form = new course_completion_form('completion.php?id='.$id, compact('course', 'unlockdelete', 'unlockonly'));
 
-if ($form->is_cancelled()){
-    redirect($CFG->wwwroot.'/course/view.php?id='.$course->id);
+/// set data
+$currentdata = array('criteria_course_value' => array());
 
+// grab all course criteria and add to data array
+// as they are a special case
+foreach ($completion->get_criteria(COMPLETION_CRITERIA_TYPE_COURSE) as $criterion) {
+    $currentdata['criteria_course_value'][] = $criterion->courseinstance;
+}
+
+$form->set_data($currentdata);
+
+
+// now override defaults if course already exists
+if ($form->is_cancelled()) {
+    redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
 } else if ($data = $form->get_data()) {
-    $completion = new completion_info($course);
+
 
     // Process criteria unlocking if requested.
-    if (!empty($data->settingsunlock)) {
-        $completion->delete_course_completion_data();
+    if (completion_can_unlock_data($course->id)) {
+        // Check and reload if the user clicked one of the unlock buttons.
+        if (!empty($data->settingsunlockdelete)) {
+            redirect(new moodle_url('/course/completion.php', array('id' => $course->id, 'unlockdelete' => 1)));
+        } else if (!empty($data->settingsunlock)) {
+            redirect(new moodle_url('/course/completion.php', array('id' => $course->id, 'unlockonly' => 1)));
+        }
 
-        // Return to form (now unlocked).
-        redirect($PAGE->url);
+        // Check if the form was submitted while unlocked.
+        if ($unlockdelete) {
+            // The "Unlock and delete" button was clicked, so log and delete the course completion data.
+            \totara_core\event\course_completion_reset::create_from_course($course)->trigger();
+            $completion->delete_course_completion_data();
+        } else if ($unlockonly) {
+            // The "Unlock without deleting" button was clicked, so just log it and continue.
+            \totara_core\event\course_completion_unlocked::create_from_course($course)->trigger();
+        }
+    } else if ($completion->is_course_locked(false)) {
+        // Abort saving changes if the course is locked (and it wasn't unlocked above).
+        print_error('coursecompletionislocked');
     }
 
-    // Delete old criteria.
-    $completion->clear_criteria();
+/// process data if submitted
+    // Loop through each criteria type and run update_config
+    $transaction = $DB->start_delegated_transaction();
 
-    // Loop through each criteria type and run its update_config() method.
     global $COMPLETION_CRITERIA_TYPES;
     foreach ($COMPLETION_CRITERIA_TYPES as $type) {
+
         $class = 'completion_criteria_'.$type;
         $criterion = new $class();
         $criterion->update_config($data);
     }
+
+    $transaction->allow_commit();
 
     // Handle overall aggregation.
     $aggdata = array(
@@ -134,18 +170,31 @@ if ($form->is_cancelled()){
     $aggregation->setMethod($data->role_aggregation);
     $aggregation->save();
 
+    // Update course total passing grade
+    if (!empty($data->criteria_grade)) {
+        if ($grade_item = grade_category::fetch_course_category($course->id)->grade_item) {
+            $grade_item->gradepass = $data->criteria_grade_value;
+            if (method_exists($grade_item, 'update')) {
+                $grade_item->update('course/completion.php');
+            }
+        }
+    }
+
     // Trigger an event for course module completion changed.
     $event = \core\event\course_completion_updated::create(
-            array(
-                'courseid' => $course->id,
-                'context' => context_course::instance($course->id)
-                )
-            );
+        array(
+            'courseid' => $course->id,
+            'context' => context_course::instance($course->id)
+        )
+    );
     $event->trigger();
+
+    // Bulk start users (creates course_completion records for all active participants).
+    completion_start_user_bulk($course->id);
 
     // Redirect to the course main page.
     $url = new moodle_url('/course/view.php', array('id' => $course->id));
-    redirect($url);
+    totara_set_notification(get_string('completioncriteriachanged', 'core_completion'), $url, array('class' => 'notifysuccess'));
 }
 
 // Print the form.

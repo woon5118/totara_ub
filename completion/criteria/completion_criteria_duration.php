@@ -41,6 +41,12 @@ class completion_criteria_duration extends completion_criteria {
     public $criteriatype = COMPLETION_CRITERIA_TYPE_DURATION;
 
     /**
+     * Criteria type form value
+     * @var string
+     */
+    const FORM_MAPPING = 'enrolperiod';
+
+    /**
      * Finds and returns a data_object instance based on params.
      *
      * @param array $params associative arrays varname=>value
@@ -59,7 +65,7 @@ class completion_criteria_duration extends completion_criteria {
      */
     public function config_form_display(&$mform, $data = null) {
 
-        $mform->addElement('checkbox', 'criteria_duration', get_string('enable'));
+        $mform->addElement('advcheckbox', 'criteria_duration', get_string('enable'));
 
         // Populate the duration length drop down.
         $thresholdmenu = array(
@@ -85,25 +91,13 @@ class completion_criteria_duration extends completion_criteria {
         // Append string for 1 year.
         $thresholdmenu[365 * DAYSECS] = get_string('numdays', 'core', 365);
 
-        $mform->addElement('select', 'criteria_duration_days', get_string('enrolmentdurationlength', 'core_completion'), $thresholdmenu);
-        $mform->disabledIf('criteria_duration_days', 'criteria_duration');
+        $mform->addElement('select', 'criteria_duration_value',
+                get_string('enrolmentdurationlength', 'core_completion'), $thresholdmenu);
+        $mform->disabledIf('criteria_duration_value', 'criteria_duration');
 
         if ($this->id) {
             $mform->setDefault('criteria_duration', 1);
-            $mform->setDefault('criteria_duration_days', $this->enrolperiod);
-        }
-    }
-
-    /**
-     * Update the criteria information stored in the database
-     *
-     * @param stdClass $data Form data
-     */
-    public function update_config(&$data) {
-        if (!empty($data->criteria_duration)) {
-            $this->course = $data->id;
-            $this->enrolperiod = $data->criteria_duration_days;
-            $this->insert();
+            $mform->setDefault('criteria_duration_value', $this->enrolperiod);
         }
     }
 
@@ -200,6 +194,14 @@ class completion_criteria_duration extends completion_criteria {
     public function cron() {
         global $DB;
 
+        // Check to see if this criteria is in use.
+        if (!$this->is_in_use()) {
+            if (debugging()) {
+                mtrace('... skipping as criteria not used');
+            }
+            return;
+        }
+
         /*
          * Get all users who match meet this criteria
          *
@@ -212,16 +214,13 @@ class completion_criteria_duration extends completion_criteria {
             SELECT
                 c.id AS course,
                 cr.id AS criteriaid,
-                u.id AS userid,
+                ue.userid AS userid,
                 ue.timestart AS otimestart,
                 (ue.timestart + cr.enrolperiod) AS ctimestart,
                 ue.timecreated AS otimeenrolled,
                 (ue.timecreated + cr.enrolperiod) AS ctimeenrolled
             FROM
-                {user} u
-            INNER JOIN
                 {user_enrolments} ue
-             ON ue.userid = u.id
             INNER JOIN
                 {enrol} e
              ON e.id = ue.enrolid
@@ -234,7 +233,7 @@ class completion_criteria_duration extends completion_criteria {
             LEFT JOIN
                 {course_completion_crit_compl} cc
              ON cc.criteriaid = cr.id
-            AND cc.userid = u.id
+            AND cc.userid = ue.userid
             WHERE
                 cr.criteriatype = '.COMPLETION_CRITERIA_TYPE_DURATION.'
             AND c.enablecompletion = 1

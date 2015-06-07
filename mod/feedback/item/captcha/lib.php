@@ -139,7 +139,7 @@ class feedback_item_captcha extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name.$requiredmark, true, false, false);
         echo '</div>';
 
@@ -192,7 +192,7 @@ class feedback_item_captcha extends feedback_item_base {
 
             //print the question and label
             echo '<div class="feedback_item_label_'.$align.'">';
-            echo '('.$item->label.') ';
+            echo '('.format_string($item->label).') ';
             echo format_text($item->name.$requiredmark, true, false, false);
             $inputname = 'name="'.$item->typ.'_'.$item->id.'"';
             echo '<input type="hidden" value="'.$USER->sesskey.'" '.$inputname.' />';
@@ -277,7 +277,7 @@ class feedback_item_captcha extends feedback_item_base {
 
         //print the question and label
         echo '<div class="feedback_item_label_'.$align.'">';
-        echo '('.$item->label.') ';
+        echo '('.format_string($item->label).') ';
         echo format_text($item->name.$requiredmark, true, false, false);
         echo '</div>';
     }

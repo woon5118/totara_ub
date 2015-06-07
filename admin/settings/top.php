@@ -10,15 +10,9 @@ $hassiteconfig = has_capability('moodle/site:config', $systemcontext);
 
 $ADMIN->add('root', new admin_externalpage('adminnotifications', new lang_string('notifications'), "$CFG->wwwroot/$CFG->admin/index.php"));
 
-$ADMIN->add('root', new admin_externalpage('registrationmoodleorg', new lang_string('registration', 'admin'),
-        "$CFG->wwwroot/$CFG->admin/registration/register.php?huburl=" . HUB_MOODLEORGHUBURL . "&hubname=Moodle.org"));
-$ADMIN->add('root', new admin_externalpage('registrationhub', new lang_string('registerwith', 'hub'),
-        "$CFG->wwwroot/$CFG->admin/registration/register.php", 'moodle/site:config', true));
-$ADMIN->add('root', new admin_externalpage('registrationhubs', new lang_string('hubs', 'admin'),
-        "$CFG->wwwroot/$CFG->admin/registration/index.php", 'moodle/site:config', true));
-$ADMIN->add('root', new admin_externalpage('siteregistrationconfirmed',
-        new lang_string('registrationconfirmed', 'hub'),
-        $CFG->wwwroot."/".$CFG->admin."/registration/confirmregistration.php", 'moodle/site:config', true));
+$ADMIN->add('root', new admin_externalpage('totararegistration', new lang_string('totararegistration', 'totara_core'),
+        "$CFG->wwwroot/$CFG->admin/register.php", 'moodle/site:config', true));
+
  // hidden upgrade script
 $ADMIN->add('root', new admin_externalpage('upgradesettings', new lang_string('upgradesettings', 'admin'), "$CFG->wwwroot/$CFG->admin/upgradesettings.php", 'moodle/site:config', true));
 
@@ -28,6 +22,13 @@ if ($hassiteconfig) {
 }
 
 $ADMIN->add('root', new admin_category('users', new lang_string('users','admin')));
+$ADMIN->add('root', new admin_category('hierarchies', new lang_string('hierarchies','totara_hierarchy')));
+$ADMIN->add('root', new admin_category('totara_plan', new lang_string('learningplans', 'totara_plan'),
+    totara_feature_disabled('learningplans')
+));
+$ADMIN->add('root', new admin_category('appraisals', new lang_string('appraisals', 'totara_appraisal'),
+    (totara_feature_disabled('appraisals') && totara_feature_disabled('feedback360'))
+));
 $ADMIN->add('root', new admin_category('courses', new lang_string('courses','admin')));
 $ADMIN->add('root', new admin_category('grades', new lang_string('grades')));
 $ADMIN->add('root', new admin_category('badges', new lang_string('badges'), empty($CFG->enablebadges)));

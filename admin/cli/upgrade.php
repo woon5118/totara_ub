@@ -43,6 +43,8 @@ require_once($CFG->libdir.'/adminlib.php');       // various admin-only function
 require_once($CFG->libdir.'/upgradelib.php');     // general upgrade/install related functions
 require_once($CFG->libdir.'/clilib.php');         // cli only functions
 require_once($CFG->libdir.'/environmentlib.php');
+require_once($CFG->libdir.'/pluginlib.php');
+require_once($CFG->dirroot.'/totara/core/db/utils.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(
@@ -95,11 +97,17 @@ if ($version < $CFG->version) {
     cli_error(get_string('downgradedcore', 'error'));
 }
 
-$oldversion = "$CFG->release ($CFG->version)";
-$newversion = "$release ($version)";
+//setup totara version variables
+$totarainfo = totara_version_info($version, $release);
+if (!empty($totarainfo->totaraupgradeerror)){
+    print_error($totarainfo->totaraupgradeerror, 'totara_core');
+}
 
-if (!moodle_needs_upgrading()) {
-    cli_error(get_string('cliupgradenoneed', 'core_admin', $newversion), 0);
+//check that neither moodle nor totara need upgrading
+//cli installs and upgrades prior to T-10001 bugfix will not have the totara CFG values set - run the upgrade anyway to get those variables in
+$totara_needs_upgrade = (!isset($CFG->totara_build) || (isset($CFG->totara_build) && $TOTARA->build > $CFG->totara_build));
+if (!moodle_needs_upgrading() && !($version > $CFG->version) && !$totara_needs_upgrade) {
+    cli_error(get_string('cliupgradenoneed', 'core_admin', $totarainfo->newtotaraversion), 0);
 }
 
 // Test environment first.
@@ -122,10 +130,7 @@ if (!core_plugin_manager::instance()->all_plugins_ok($version, $failed)) {
 }
 
 if ($interactive) {
-    $a = new stdClass();
-    $a->oldversion = $oldversion;
-    $a->newversion = $newversion;
-    echo cli_heading(get_string('databasechecking', '', $a)) . PHP_EOL;
+    echo cli_heading(get_string('databasechecking', '', $totarainfo)) . PHP_EOL;
 }
 
 // make sure we are upgrading to a stable release or display a warning
@@ -147,13 +152,15 @@ if (isset($maturity)) {
 }
 
 if ($interactive) {
-    echo html_to_text(get_string('upgradesure', 'admin', $newversion))."\n";
+    echo html_to_text(get_string('upgradesure', 'admin', $totarainfo))."\n";
     $prompt = get_string('cliyesnoprompt', 'admin');
     $input = cli_input($prompt, '', array(get_string('clianswerno', 'admin'), get_string('cliansweryes', 'admin')));
     if ($input == get_string('clianswerno', 'admin')) {
         exit(1);
     }
 }
+// Run any pre-upgrade special fixes that may be required.
+totara_preupgrade($totarainfo);
 
 if ($version > $CFG->version) {
     // We purge all of MUC's caches here.
@@ -167,6 +174,14 @@ if ($version > $CFG->version) {
 set_config('release', $release);
 set_config('branch', $branch);
 
+if (!isset($CFG->totara_release) || $CFG->totara_release <> $TOTARA->release
+    || !isset($CFG->totara_build) || $CFG->totara_build <> $TOTARA->build
+    || !isset($CFG->totara_version) || $CFG->totara_version <> $TOTARA->version) {
+    // Also set Totara release (human readable version)
+    set_config("totara_release", $TOTARA->release);
+    set_config("totara_build", $TOTARA->build);
+    set_config("totara_version", $TOTARA->version);
+}
 // unconditionally upgrade
 upgrade_noncore(true);
 

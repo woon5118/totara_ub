@@ -116,7 +116,10 @@ if ($availablelangs = $controller->availablelangs) {
     $remote = false;
     $availablelangs = array();
     echo $OUTPUT->box_start();
-    print_string('remotelangnotavailable', 'tool_langimport', $CFG->dataroot.'/lang/');
+    $a = new stdClass();
+    $a->totaraversion = totara_major_version();
+    $a->langdir = $CFG->dataroot.'/lang/';
+    print_string('remotetotaralangnotavailable', 'totara_core', $a);
     echo $OUTPUT->box_end();
 }
 

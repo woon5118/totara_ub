@@ -95,7 +95,7 @@ $string['adminhelpmanagedatabase'] = 'Access the database directly (be careful!)
 $string['adminhelpmanagefilters'] = 'Choose text filters and related settings';
 $string['adminhelpmanagemodules'] = 'Manage installed modules and their settings';
 $string['adminhelpmanageroles'] = 'Create and define roles that may be applied to users';
-$string['adminhelpmymoodle'] = 'Configure the My Moodle blocks for users';
+$string['adminhelpmymoodle'] = 'Configure the My Learning blocks for users';
 $string['adminhelpreports'] = 'Site level reports';
 $string['adminhelpsitefiles'] = 'For publishing general files or uploading external backups';
 $string['adminhelpsitesettings'] = 'Define how the front page of the site looks';
@@ -433,6 +433,7 @@ $string['currentlyselectedusers'] = 'Currently selected users';
 $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
+$string['dashboard'] = 'Dashboard';
 $string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';
@@ -465,6 +466,9 @@ $string['deleteallcannotundo'] = 'Delete all - cannot be undone';
 $string['deleteallcomments'] = 'Delete all comments';
 $string['deleteallratings'] = 'Delete all ratings';
 $string['deletecategory'] = 'Delete category: {$a}';
+$string['deletecategoryerrorfinal'] = 'The last category can not be deleted, there must always be atleast one category.';
+$string['deletecategoryerrormisc'] = 'The \'{$a}\' category can not be deleted, it is the default category.';
+$string['deletecategoryunavail'] = 'This category can not be deleted';
 $string['deletecategoryempty'] = 'This category is empty.';
 $string['deletecategorycheck'] = 'Are you absolutely sure you want to completely delete this category <b>\'{$a}\'</b>?<br />This will move all courses into the parent category if there is one, or into Miscellaneous.';
 $string['deletecategorycheck2'] = 'If you delete this category, you need to choose what to do with the courses and subcategories it contains.';
@@ -517,6 +521,7 @@ $string['dndworkinglink'] = 'Drag and drop links onto course sections to upload 
 $string['documentation'] = 'Moodle documentation';
 $string['dontsortcategories'] = 'Don\'t sort categories';
 $string['dontsortcourses'] = 'Don\'t sort courses';
+$string['dowhatwithselectedusers'] = 'Do what with selected users';
 $string['down'] = 'Down';
 $string['download'] = 'Download';
 $string['downloadall'] = 'Download all';
@@ -811,6 +816,8 @@ $string['forgotteninvalidurl'] = 'Invalid password reset URL';
 $string['format'] = 'Format';
 $string['format_help'] = 'The course format determines the layout of the course page.
 
+* Demo format   - A simple format with minimum styling organised into sections
+* SCORM format  - For displaying a SCORM package in the first section of the course page (as an alternative to using the SCORM/AICC module)
 * Single activity format - For displaying a single activity or resource (such as a Quiz or SCORM package) on the course page
 * Social format - A forum is displayed on the course page
 * Topics format - The course page is organised into topic sections
@@ -818,7 +825,7 @@ $string['format_help'] = 'The course format determines the layout of the course 
 $string['formathtml'] = 'HTML format';
 $string['formatmarkdown'] = 'Markdown format';
 $string['formatplain'] = 'Plain text format';
-$string['formattext'] = 'Moodle auto-format';
+$string['formattext'] = 'Totara auto-format';
 $string['formattexttype'] = 'Formatting';
 $string['forumpreferences'] = 'Forum preferences';
 $string['framesetinfo'] = 'This frameset document contains:';
@@ -847,11 +854,12 @@ $string['general'] = 'General';
 $string['geolocation'] = 'latitude - longitude';
 $string['gettheselogs'] = 'Get these logs';
 $string['go'] = 'Go';
-$string['gpl'] = 'Copyright (C) 1999 onwards  Martin Dougiamas  (http://moodle.com)
+$string['gpl'] = 'Copyright (C) 2010 onwards Totara Learning Solutions LTD (http://www.totaralms.com/)
+Copyright (C) 1999 onwards  Martin Dougiamas  (http://moodle.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -861,7 +869,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the Moodle License information page for full details:
 http://docs.moodle.org/dev/License';
 $string['gpllicense'] = 'GPL license';
-$string['gpl3'] = 'Copyright (C) 1999 onwards Martin Dougiamas (http://moodle.com)
+$string['gpl3'] = 'Copyright (C) 2010 onwards Totara Learning Solutions LTD (http://www.totaralms.com/)
+Copyright (C) 1999 onwards Martin Dougiamas (http://moodle.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1092,6 +1101,7 @@ $string['makeafolder'] = 'Create folder';
 $string['makeeditable'] = 'If you make \'{$a}\' editable by the web server process (eg apache) then you could edit this file directly from this page';
 $string['makethismyhome'] = 'Make this my default home page';
 $string['manageblocks'] = 'Blocks';
+$string['managecategories'] = 'Manage categories';
 $string['managecategorythis'] = 'Manage this category';
 $string['managecourses'] = 'Manage courses';
 $string['managedatabase'] = 'Database';
@@ -1179,8 +1189,8 @@ $string['moduleintro'] = 'Description';
 $string['modulesetup'] = 'Setting up module tables';
 $string['modulesuccess'] = '{$a} tables have been set up correctly';
 $string['modulesused'] = 'Modules used';
-$string['moodledocs'] = 'Moodle Docs';
-$string['moodledocslink'] = 'Moodle Docs for this page';
+$string['moodledocs'] = 'Documentation';
+$string['moodledocslink'] = 'Documentation for this page';
 $string['moodleversion'] = 'Moodle version';
 $string['moodlerelease'] = 'Moodle release';
 $string['more'] = 'more';
@@ -1218,8 +1228,8 @@ $string['mycourses'] = 'My courses';
 $string['myfiles'] = 'My private files';
 $string['myfilesmanage'] = 'Manage my private files';
 $string['privatefilesmanage'] = 'Manage private files';
-$string['myhome'] = 'Dashboard';
-$string['mymoodledashboard'] = 'My Moodle dashboard';
+$string['myhome'] = 'My learning';
+$string['mymoodledashboard'] = 'My Learning dashboard';
 $string['myprofile'] = 'My profile';
 $string['name'] = 'Name';
 $string['nameforlink'] = 'What do you want to call this link?';
@@ -1403,6 +1413,7 @@ $string['passwordforgotteninstructions2'] = 'To reset your password, submit your
 $string['passwordchanged'] = 'Password has been changed';
 $string['passwordnohelp'] = 'No help is available to find your lost password. Please contact your Moodle administrator.';
 $string['passwordrecovery'] = 'Yes, help me log in';
+$string['passwordreused'] = 'This password has been used before, and is not permitted to be reused';
 $string['passwordsdiffer'] = 'These passwords do not match';
 $string['passwordsent'] = 'Password has been sent';
 $string['passwordset'] = 'Your password has been set.';
@@ -1608,6 +1619,7 @@ For advanced searching, press the search button without typing anything in the s
 $string['searchagain'] = 'Search again';
 $string['searchbyemail'] = 'Search by email address';
 $string['searchbyusername'] = 'Search by username';
+$string['searchbyusernameoremail'] = 'Search by username or email address';
 $string['searchcourses'] = 'Search courses';
 $string['searchhelp'] = '<p>You can search for multiple words at once and can refine your search as follows:</p>
 <ul>
@@ -1932,6 +1944,7 @@ $string['usernamenotfound'] = 'The username was not found in the database';
 $string['usernameoremail'] = 'Enter either username or email address';
 $string['usernotconfirmed'] = 'Could not confirm {$a}';
 $string['userpic'] = 'User picture';
+$string['userquotautilisation'] = 'You are currently using {$a->usedspace}Mb from your file storage quota of {$a->quota}Mb ({$a->percent}%)';
 $string['users'] = 'Users';
 $string['userselectorautoselectunique'] = 'If only one user matches the search, select them automatically';
 $string['userselectorpreserveselected'] = 'Keep selected users, even if they no longer match the search';
@@ -1975,7 +1988,9 @@ $string['virusfoundsubject'] = '{$a}: Virus found!';
 $string['virusfounduser'] = 'The file you have uploaded, {$a->filename}, has been scanned by a virus checker and found to be infected! Your file upload was NOT successful.';
 $string['virusplaceholder'] = 'This file that has been uploaded was found to contain a virus and has been moved or deleted and the user notified.';
 $string['visible'] = 'Visible';
-$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from teachers and administrators, users are not allowed to enter the course.';
+$string['visible_help'] = 'This setting determines whether the course appears in the list of courses. Apart from users granted the \'viewhiddencourse\' capability (course creators, editing trainers, trainers and managers by default), users are not allowed to enter the course, even if enrolled.
+
+This setting allows a course administrator to setup up a course as hidden and assign the learners to it, without the learners being able to see the course. The course administrator can then confirm that the details of the course and the set of assigned learners are correct before making the course visible to the learners at the appropriate time.';
 $string['visibletostudents'] = 'Visible to {$a}';
 $string['warning'] = 'Warning';
 $string['warningdeleteresource'] = 'Warning: {$a} is referred in a resource. Would you like to update the resource?';
@@ -2040,3 +2055,19 @@ $string['yourself'] = 'yourself';
 $string['yourteacher'] = 'your {$a}';
 $string['yourwordforx'] = 'Your word for \'{$a}\'';
 $string['zippingbackup'] = 'Zipping backup';
+
+// Totara Strings
+$string['staffmanager'] = 'Staff Manager';
+$string['staffmanagerdescription'] = 'User tasked with managing the performance of a learner or team';
+$string['assessor'] = 'Assessor';
+$string['assessordescription'] = 'User tasked with assessing the performance of a learner';
+$string['regionalmanager'] = 'Regional Manager';
+$string['regionalmanagerdescription'] = 'User who is responsible for the performance of a region and has access to regional reports';
+$string['regionaltrainer'] = 'Regional Trainer';
+$string['regionaltrainerdescription'] = 'User who oversees the delivery of training within a region';
+$string['learner'] = 'Learner';
+$string['learnerdescription'] = 'User acquiring knowledge, comprehension, or mastery through learning';
+$string['trainer'] = 'Trainer';
+$string['trainerdescription'] = 'Responsible for delivering training of learners, but may not alter activities.';
+$string['editingtrainer'] = 'Editing Trainer';
+$string['editingtrainerdescription'] = 'Responsible for delivering training of learners, and can alter activities';

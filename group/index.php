@@ -170,6 +170,7 @@ echo '<p><label for="groups"><span id="groupslabel">'.get_string('groups').':</s
 
 $onchange = 'M.core_group.membersCombo.refreshMembers();';
 
+echo '<div class="userselector" id="addselect_wrapper">';
 echo '<select name="groups[]" multiple="multiple" id="groups" size="15" class="select" onchange="'.$onchange.'">'."\n";
 
 $groups = groups_get_all_groups($courseid);
@@ -201,6 +202,7 @@ if ($groups) {
 }
 
 echo '</select>'."\n";
+echo '</div>';
 echo '<p><input type="submit" name="act_updatemembers" id="updatemembers" value="'
         . get_string('showmembersforgroup', 'group') . '" /></p>'."\n";
 echo '<p><input type="submit" '. $showeditgroupsettingsform_disabled . ' name="act_showgroupsettingsform" id="showeditgroupsettingsform" value="'
@@ -224,7 +226,8 @@ echo '<p><label for="members"><span id="memberslabel">'.
     get_string('membersofselectedgroup', 'group').
     ' </span><span id="thegroup">'.$selectedname.'</span></label></p>'."\n";
 //NOTE: the SELECT was, multiple="multiple" name="user[]" - not used and breaks onclick.
-echo '<select name="user" id="members" size="15" class="select"'."\n";
+echo '<div class="userselector" id="addselect_wrapper">';
+echo '<select name="user" id="members" size="15"'."\n";
 echo ' onclick="window.status=this.options[this.selectedIndex].title;" onmouseout="window.status=\'\';">'."\n";
 
 $member_names = array();
@@ -249,6 +252,7 @@ if (!$atleastonemember) {
 }
 
 echo '</select>'."\n";
+echo '</div>';
 
 echo '<p><input type="submit" ' . $showaddmembersform_disabled . ' name="act_showaddmembersform" '
         . 'id="showaddmembersform" value="' . get_string('adduserstogroup', 'group'). '" /></p>'."\n";

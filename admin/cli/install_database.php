@@ -43,15 +43,15 @@ if (function_exists('opcache_reset')) {
 }
 
 $help =
-"Advanced command line Moodle database installer.
+"Advanced command line Totara database installer.
 Please note you must execute this script with the same uid as apache.
 
 Site defaults may be changed via local/defaults.php.
 
 Options:
 --lang=CODE           Installation and default site language. Default is en.
---adminuser=USERNAME  Username for the moodle admin account. Default is admin.
---adminpass=PASSWORD  Password for the moodle admin account.
+--adminuser=USERNAME  Username for the admin account. Default is admin.
+--adminpass=PASSWORD  Password for the admin account.
 --adminemail=STRING   Email address for the moodle admin account.
 --agree-license       Indicates agreement with software license.
 --fullname=STRING     Name of the site
@@ -66,8 +66,8 @@ Example:
 if (version_compare(phpversion(), "5.4.4") < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN NOT move it after installib
-    fwrite(STDERR, "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).\n");
-    fwrite(STDERR, "Please upgrade your server software or install older Moodle version.\n");
+    fwrite(STDERR, "Totara 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).\n");
+    fwrite(STDERR, "Please upgrade your server software or install older Totara version.\n");
     exit(1);
 }
 

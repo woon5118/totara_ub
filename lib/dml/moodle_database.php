@@ -52,6 +52,9 @@ define('SQL_QUERY_STRUCTURE', 4);
 /** SQL_QUERY_AUX - Auxiliary query done by driver, setting connection config, getting table info, etc. */
 define('SQL_QUERY_AUX', 5);
 
+/** Maximum number of rows per bulk insert */
+define('BATCH_INSERT_MAX_ROW_COUNT', 250);
+
 /**
  * Abstract class representing moodle database interface.
  * @link http://docs.moodle.org/dev/DML_functions
@@ -131,10 +134,9 @@ abstract class moodle_database {
      * @var int internal temporary variable used to fix params. Its used by {@link _fix_sql_params_dollar_callback()}.
      */
     private $fix_sql_params_i;
-    /**
-     * @var int internal temporary variable used to guarantee unique parameters in each request. Its used by {@link get_in_or_equal()}.
-     */
-    private $inorequaluniqueindex = 1;
+
+    /** @var int internal temporary variable used by {@link sql_replace_text()}. */
+    protected $replacetextuniqueindex = 1; // guarantees unique parameters in each request
 
     /**
      * Constructor - Instantiates the database, specifying if it's external (connect to other systems) or not (Moodle DB).
@@ -722,11 +724,11 @@ abstract class moodle_database {
             }
 
             if (!is_array($items)){
-                $param = $prefix.$this->inorequaluniqueindex++;
+                $param = $this->get_unique_param($prefix);
                 $sql = $equal ? "= :$param" : "<> :$param";
                 $params = array($param=>$items);
             } else if (count($items) == 1) {
-                $param = $prefix.$this->inorequaluniqueindex++;
+                $param = $this->get_unique_param($prefix);
                 $sql = $equal ? "= :$param" : "<> :$param";
                 $item = reset($items);
                 $params = array($param=>$item);
@@ -734,7 +736,7 @@ abstract class moodle_database {
                 $params = array();
                 $sql = array();
                 foreach ($items as $item) {
-                    $param = $prefix.$this->inorequaluniqueindex++;
+                    $param = $this->get_unique_param($prefix);
                     $params[$param] = $item;
                     $sql[] = ':'.$param;
                 }
@@ -1650,6 +1652,129 @@ abstract class moodle_database {
     }
 
     /**
+     * Insert multiple records into a table using batch insert syntax for speed.
+     *
+     * Currently will not prevent query failing if it exceeds the maximum query size
+     *
+     * @param string $table The database table to be inserted into
+     * @param iterator $iterator An iterable object (such as moodle_recordset)
+     *                           containing values for one or more fields
+     * @param string $processor Name of a function to call on each item prior
+     *                          to processing. The function should receive an
+     *                          object and return a new object. Useful for
+     *                          running PHP code to reformat a moodle_recordset
+     * @param array $pextraparams extra param values to pass into $processor function
+     * @param string $validator validator function name
+     * @param array $vextraparams extra param values to pass into $validator function
+     * @return true
+     * @throws dml_exception if error
+     */
+    public function insert_records_via_batch($table, $iterator, $processor=null, $pextraparams=array(), $validator=null, $vextraparams=array()) {
+        global $CFG;
+        $status = true;
+
+        if (!is_array($iterator) && !$iterator instanceof Traversable) {
+            // Throw exception here
+            throw new dml_exception('batchinsertargnottraversable');
+        }
+
+        $transaction = $this->start_delegated_transaction();
+        $fields = $values = $params = array();
+        $count = 0;
+        foreach ($iterator as $item) {
+            // pre-process item using user defined function
+            if (isset($processor) && is_callable($processor)) {
+                $pparams = $pextraparams;
+                array_unshift($pparams, $item);
+                $item = call_user_func_array($processor, $pparams);
+            }
+
+            // validate the item using a user defined function
+            // If the item is not valid throw an exception
+            if (isset($validator) && is_callable($validator)) {
+                $vparams = $vextraparams;
+                array_unshift($vparams, $item);
+                if (!call_user_func_array($validator, $vparams)) {
+                    if (is_array($validator)) {
+                        $validator = $validator[1];
+                    }
+                    throw new dml_exception('batchinsertitemfailedvalidation', $validator);
+                }
+            }
+
+            if (!$item instanceof stdClass) {
+                throw new dml_exception('batchinsertitemnotanobject');
+            }
+
+            // remove 'id' field if it is set
+            if (!empty($item->id)) {
+                unset($item->id);
+            }
+
+            // generate fields from object keys on first iteration
+            // and append to query
+            if ($count == 0) {
+                $properties = get_object_vars($item);
+                if ($properties) {
+                    $fields = array_keys($properties);
+                } else {
+                    throw new dml_exception('batchinsertitemnotavalidobject');
+                }
+                $numfields = count($fields);
+
+                $insert_sql = "INSERT INTO {{$table}} " .
+                    '(' . implode(',', $fields) . ') VALUES ';
+
+                // generate the placeholder for each set of values
+                $values_array = array_fill(0, $numfields, '?');
+                $values_placeholder = '(' . implode(',', $values_array) . ')';
+            }
+
+            // add values placeholder for this item to the existing ones
+            $new_values = $values;
+            $new_values[] = $values_placeholder;
+
+            // save the parameters in the correct order
+            $new_params = $params;
+            foreach ($fields as $field) {
+                $new_params[] = isset($item->$field) ? $item->$field : null;
+            }
+
+            if ($count > 0 &&
+                ($count > BATCH_INSERT_MAX_ROW_COUNT)) {
+                // if we add this item, the query will contain too many rows
+                // we need to send off all existing data to be inserted,
+                // then take the data from this item and save it for the next
+                // insert
+                $sql = $insert_sql . implode(',', $values);
+                $status = $status && $this->execute($sql, $params);
+
+                // save this iteration's data as the first value in the next
+                // iteration
+                $count = 1;
+                $params = array_slice($new_params, -1 * $numfields);
+                $values = array($values_placeholder);
+                continue;
+            }
+
+            // keep adding to the query, we're not done yet
+            $values = $new_values;
+            $params = $new_params;
+
+            $count++;
+        }
+
+        // handle the remaining items (if any)
+        if (isset($insert_sql) && !empty($values)) {
+            $sql = $insert_sql . implode(',', $values);
+            $status = $status && $this->execute($sql, $params);
+        }
+
+        $transaction->allow_commit();
+        return $status;
+    }
+
+    /**
      * Import a record into a table, id field is required.
      * Safety checks are NOT carried out. Lobs are supported.
      *
@@ -1947,6 +2072,17 @@ abstract class moodle_database {
     }
 
     /**
+     * Returns the sql to round the given value to the specified number of decimal places.
+     *
+     * @param string $fieldname The name of the field to round.
+     * @param int $places The number of decimal places to round to.
+     * @return string The piece of SQL code to be used in your statement.
+     */
+    public function sql_round($fieldname, $places = 0) {
+        return "ROUND({$fieldname}, {$places})";
+    }
+
+    /**
      * Returns the SQL to be used in order to CAST one CHAR column to INTEGER.
      *
      * Be aware that the CHAR column you're trying to cast contains really
@@ -2109,6 +2245,33 @@ abstract class moodle_database {
         } else {
             return "SUBSTR($expr, $start, $length)";
         }
+    }
+
+    /**
+     * Returns the SQL for replacing contents of a column that contains one string with another string.
+     * @param string $column the table column to search
+     * @param string $find the string that will be searched for.
+     * @param string $replace the string $find will be replaced with.
+     * @param int $type bound param type SQL_PARAMS_QM or SQL_PARAMS_NAMED
+     * @param string $prefix named parameter placeholder prefix (unique counter value is appended to each parameter name)
+     * @return array the required $sql and the $params
+     */
+    public function sql_text_replace($column, $find, $replace, $type=SQL_PARAMS_QM, $prefix='param') {
+        if ($type == SQL_PARAMS_QM) {
+            $sql = "$column = REPLACE($column, ?, ?)";
+            $params = array($find, $replace);
+        } else if ($type == SQL_PARAMS_NAMED) {
+            if (empty($prefix)) {
+                $prefix = 'param';
+            }
+            $param1 = $prefix.$this->replacetextuniqueindex++;
+            $param2 = $prefix.$this->replacetextuniqueindex++;
+            $sql = "$column = REPLACE($column, :$param1, :$param2)";
+            $params = array($param1 => $find, $param2 => $replace);
+        } else {
+            throw new dml_exception('typenotimplement');
+        }
+        return array($sql, $params);
     }
 
     /**
@@ -2555,5 +2718,25 @@ abstract class moodle_database {
      */
     public function perf_get_queries_time() {
         return $this->queriestime;
+    }
+
+    /**
+     * Returns a unique param name.
+     *
+     * @param string $prefix Defaults to param, make it something sensible for the code. Keep it short!
+     * @return string
+     */
+    final public function get_unique_param($prefix = 'param') {
+        static $paramcounts = array();
+        if (debugging('', DEBUG_DEVELOPER) && strlen($prefix) > 20) {
+            // You should keep your param short in order to avoid running close to the limit if it gets used a lot.
+            // Ideally you will make it only a word or two.
+            debugging('Please reduce the length of your prefix to less than 20.', DEBUG_DEVELOPER);
+        }
+        if (!isset($paramcounts[$prefix])) {
+            $paramcounts[$prefix] = 0;
+        }
+        $paramcounts[$prefix]++;
+        return 'uq_'.$prefix.'_'.$paramcounts[$prefix];
     }
 }

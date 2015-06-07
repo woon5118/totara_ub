@@ -22,12 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['mymoodle'] = 'Dashboard';
+$string['mymoodle'] = 'My Learning';
 $string['nocourses'] = 'No course information to show.';
-$string['noguest'] = 'The Dashboard page is not available to guest users';
-$string['pinblocks'] = 'Configure pinned blocks for my moodle';
-$string['pinblocksexplan'] = 'Any block settings you configure here will be visible (and non-editable) for any user of moodle on their \'My Moodle\' overview page.';
-$string['defaultpage'] = 'Default My Moodle page';
+$string['noguest'] = 'The \'My Learning\' page is not available to guest users';
+$string['pinblocks'] = 'Configure pinned blocks for My Learning';
+$string['pinblocksexplan'] = 'Any block settings you configure here will be visible (and non-editable) for any user of moodle on their \'My Learning\' overview page.';
+$string['defaultpage'] = 'Default My Learning page';
 $string['defaultprofilepage'] = 'Default profile page';
 $string['addpage'] = 'Add page';
 $string['delpage'] = 'Delete page';

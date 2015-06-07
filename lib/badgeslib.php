@@ -618,6 +618,38 @@ class badge {
     }
 
     /**
+     * Checks if badge criteria are valid.
+     * Looks for major problems like deleted courses, activities, or roles.
+     *
+     * @return array A list containing status and an error message (if any).
+     */
+    public function validate_criteria() {
+        $criteria = $this->get_criteria();
+        $aggregateall = ($criteria[BADGE_CRITERIA_TYPE_OVERALL]->method == BADGE_CRITERIA_AGGREGATION_ALL);
+        $single = (count($criteria) == 2); // Default overall + another criterion.
+        unset($criteria[BADGE_CRITERIA_TYPE_OVERALL]); // Don't need to check overall any more.
+
+        // Set initial validation value.
+        $valid = ($single || $aggregateall) ? true : false;
+        $message = get_string('error:invalidcriteriaparam', 'badges');
+
+        foreach ($criteria as $criterion) {
+            list($criteriavalid, $criteriamessage) = $criterion->validate();
+            // To be consistent with the rest of the validation logic,
+            // Don't fail if aggregation is ANY and at least one of the criteria is valid.
+            if ($single || $aggregateall) {
+                $valid = $valid && $criteriavalid;
+                $message .= $criteriamessage;
+            } else {
+                $valid = $valid || $criteriavalid;
+                $message .= $criteriamessage;
+            }
+        }
+
+        return array($valid, $message);
+    }
+
+    /**
      * Fully deletes the badge or marks it as archived.
      *
      * @param $archive bool Achive a badge without actual deleting of any data.
@@ -654,6 +686,28 @@ class badge {
 
         // Finally, remove badge itself.
         $DB->delete_records('badge', array('id' => $this->id));
+    }
+
+    /**
+     * Use to print badge expiry details to user.
+     *
+     */
+    public function get_expiry_details() {
+        if ($this->can_expire()) {
+            if ($this->expiredate) {
+                return get_string('expiredate', 'badges', userdate($this->expiredate));
+            } else if ($this->expireperiod) {
+                if ($this->expireperiod < 60) {
+                    return get_string('expireperiods', 'badges', round($this->expireperiod, 2));
+                } else if ($this->expireperiod < 60 * 60) {
+                    return get_string('expireperiodm', 'badges', round($this->expireperiod / 60, 2));
+                } else if ($this->expireperiod < 60 * 60 * 24) {
+                    return get_string('expireperiodh', 'badges', round($this->expireperiod / 60 / 60, 2));
+                }
+                return get_string('expireperiod', 'badges', round($this->expireperiod / 60 / 60 / 24, 2));
+            }
+        }
+        return get_string('noexpiry', 'badges');
     }
 }
 
@@ -968,12 +1022,11 @@ function badges_process_badge_image(badge $badge, $iconfile) {
     if (!empty($CFG->gdversion)) {
         process_new_icon($badge->get_context(), 'badges', 'badgeimage', $badge->id, $iconfile, true);
         @unlink($iconfile);
-
-        // Clean up file draft area after badge image has been saved.
-        $context = context_user::instance($USER->id, MUST_EXIST);
-        $fs = get_file_storage();
-        $fs->delete_area_files($context->id, 'user', 'draft');
     }
+    // Clean up file draft area after badge image has been saved.
+    $context = context_user::instance($USER->id, MUST_EXIST);
+    $fs = get_file_storage();
+    $fs->delete_area_files($context->id, 'user', 'draft');
 }
 
 /**

@@ -38,7 +38,7 @@ if (!$showsidepre) {
     $bodyclasses[] = 'content-only';
 }
 if ($hascustommenu) {
-    $bodyclasses[] = 'has_custom_menu';
+    $bodyclasses[] = 'has-custom-menu';
 }
 $courseheader = $coursecontentheader = $coursecontentfooter = $coursefooter = '';
 if (empty($PAGE->layout_options['nocourseheaderfooter'])) {

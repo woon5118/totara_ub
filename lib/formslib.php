@@ -49,6 +49,33 @@ require_once $CFG->libdir.'/filelib.php';
  * EDITOR_UNLIMITED_FILES - hard-coded value for the 'maxfiles' option
  */
 define('EDITOR_UNLIMITED_FILES', -1);
+/**
+* Totara textarea options
+*/
+
+$totara_maxbytes = get_max_upload_file_size();
+$totara_context = context_system::instance();
+global $TEXTAREA_OPTIONS;
+$TEXTAREA_OPTIONS = array(
+        'subdirs' => 0,
+        'maxfiles' => EDITOR_UNLIMITED_FILES,
+        'maxbytes' => $totara_maxbytes,
+        'trusttext' => false,
+        'context' => $totara_context,
+        'collapsed' => true
+);
+
+global $FILEPICKER_OPTIONS;
+$FILEPICKER_OPTIONS = array(
+        'maxbytes' => $totara_maxbytes,
+        'maxfiles' => '1',
+        'subdirs' => 0,
+        'context' => $totara_context
+);
+
+/**
+ * End Totara textarea options
+ */
 
 /**
  * Callback called when PEAR throws an error
@@ -125,7 +152,7 @@ abstract class moodleform {
     protected $_formname;       // form name
 
     /** @var MoodleQuickForm quickform object definition */
-    protected $_form;
+    public $_form; //TOTARA: changed to public var to allow dialogs to use mforms easily.
 
     /** @var array globals workaround */
     protected $_customdata;
@@ -155,8 +182,10 @@ abstract class moodleform {
      *               it if you don't need to as the target attribute is deprecated in xhtml strict.
      * @param mixed $attributes you can pass a string of html attributes here or an array.
      * @param bool $editable
+     * @param string $formidprefix (optional) Prefix for the automatically generated form id. (Passed directly to MoodleQuickForm())
+     * @return object moodleform
      */
-    function moodleform($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true) {
+    function moodleform($action=null, $customdata=null, $method='post', $target='', $attributes=null, $editable=true, $formidprefix='mform') {
         global $CFG, $FULLME;
         // no standard mform in moodle should allow autocomplete with the exception of user signup
         if (empty($attributes)) {
@@ -183,7 +212,7 @@ abstract class moodleform {
         $this->_customdata = $customdata;
         $this->_formname = $this->get_form_identifier();
 
-        $this->_form = new MoodleQuickForm($this->_formname, $method, $action, $target, $attributes);
+        $this->_form = new MoodleQuickForm($this->_formname, $method, $action, $target, $attributes, $formidprefix);
         if (!$editable){
             $this->_form->hardFreeze();
         }
@@ -1420,8 +1449,9 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
      * @param string|moodle_url $action Form's action
      * @param string $target (optional)Form's target defaults to none
      * @param mixed $attributes (optional)Extra attributes for <form> tag
+     * @param string $formidprefix (optional)An optional prefix to the form id. Without this, it defaults to mform (mform1, mform2, etc)
      */
-    function MoodleQuickForm($formName, $method, $action, $target='', $attributes=null){
+    function MoodleQuickForm($formName, $method, $action, $target='', $attributes=null, $formidprefix='mform'){
         global $CFG, $OUTPUT;
 
         static $formcounter = 1;
@@ -1438,7 +1468,7 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         // No 'name' atttribute for form in xhtml strict :
         $attributes = array('action' => $action, 'method' => $method, 'accept-charset' => 'utf-8') + $target;
         if (is_null($this->getAttribute('id'))) {
-            $attributes['id'] = 'mform' . $formcounter;
+            $attributes['id'] = $formidprefix . $formcounter;
         }
         $formcounter++;
         $this->updateAttributes($attributes);
@@ -2699,6 +2729,9 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         }
         $html =str_replace('{id}', 'fgroup_' . $group->getAttribute('id'), $html);
         $html =str_replace('{name}', $group->getName(), $html);
+        if ($cssclass = $group->getAttribute('class')) {
+            $html = str_replace('{type}', '{type} ' . $cssclass, $html);
+        }
         $html =str_replace('{type}', 'fgroup', $html);
         $emptylabel = '';
         if ($group->getLabel() == '') {
@@ -2960,5 +2993,6 @@ MoodleQuickForm::registerElementType('text', "$CFG->libdir/form/text.php", 'Mood
 MoodleQuickForm::registerElementType('textarea', "$CFG->libdir/form/textarea.php", 'MoodleQuickForm_textarea');
 MoodleQuickForm::registerElementType('url', "$CFG->libdir/form/url.php", 'MoodleQuickForm_url');
 MoodleQuickForm::registerElementType('warning', "$CFG->libdir/form/warning.php", 'MoodleQuickForm_warning');
+MoodleQuickForm::registerElementType('scheduler', "$CFG->libdir/form/scheduler.php", 'MoodleQuickForm_scheduler');
 
 MoodleQuickForm::registerRule('required', null, 'MoodleQuickForm_Rule_Required', "$CFG->libdir/formslib.php");

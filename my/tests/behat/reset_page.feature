@@ -17,7 +17,7 @@ Feature: Reset dashboard page to default
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "student1"
-    And I click on "Dashboard" "link" in the "Navigation" "block"
+    And I follow "My learning"
 
   Scenario: Add blocks to page and reset
     When I press "Customise this page"
@@ -25,8 +25,5 @@ Feature: Reset dashboard page to default
     And I add the "Comments" block
     And I press "Reset page to default"
     Then I should not see "Latest news"
-    And I should see "Latest badges"
-    And I should see "Calendar"
-    And I should see "Upcoming events"
-    And I should not see "Comments"
+    And I should not see "My latest badges"
     And I should not see "Reset page to default"

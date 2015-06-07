@@ -181,7 +181,12 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
             die;
         }
 
-    /// Let's get them all set up.
+        // if multiple logins not permitted, clear out any existing sessions for this user
+        if (!empty($CFG->preventmultiplelogins)) {
+            \core\session\manager::kill_user_sessions($user->id);
+        }
+
+        /// Let's get them all set up.
         complete_user_login($user);
 
         \core\session\manager::apply_concurrent_login_limit($user->id, session_id());

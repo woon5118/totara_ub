@@ -43,6 +43,12 @@ class completion_criteria_grade extends completion_criteria {
     public $criteriatype = COMPLETION_CRITERIA_TYPE_GRADE;
 
     /**
+     * Criteria type form value
+     * @var string
+     */
+    const FORM_MAPPING = 'gradepass';
+
+    /**
      * Finds and returns a data_object instance based on params.
      *
      * @param array $params associative array varname => value of various
@@ -61,7 +67,8 @@ class completion_criteria_grade extends completion_criteria {
      * @param stdClass $data containing default values to be set in the form
      */
     public function config_form_display(&$mform, $data = null) {
-        $mform->addElement('checkbox', 'criteria_grade', get_string('enable'));
+        $mform->addElement('advcheckbox', 'criteria_grade', get_string('enable'));
+        $mform->setType('criteria_grade', PARAM_BOOL);
         $mform->addElement('text', 'criteria_grade_value', get_string('graderequired', 'completion'));
         $mform->disabledIf('criteria_grade_value', 'criteria_grade');
         $mform->setType('criteria_grade_value', PARAM_RAW); // Uses unformat_float.
@@ -76,19 +83,13 @@ class completion_criteria_grade extends completion_criteria {
     /**
      * Update the criteria information stored in the database
      *
-     * @param stdClass $data Form data
+     * @param array $data Form data
+     * @return  boolean
      */
-    public function update_config(&$data) {
+    public function update_config($data) {
+        $data->criteria_grade_value = unformat_float($data->criteria_grade_value);
 
-        if (!empty($data->criteria_grade)) {
-            $formatedgrade = unformat_float($data->criteria_grade_value);
-            // TODO validation
-            if (!empty($formatedgrade) && is_numeric($formatedgrade)) {
-                $this->course = $data->id;
-                $this->gradepass = $formatedgrade;
-                $this->insert();
-            }
-        }
+        parent::update_config($data);
     }
 
     /**
@@ -171,60 +172,6 @@ class completion_criteria_grade extends completion_criteria {
         }
 
         return $grade.' ('.$graderequired.')';
-    }
-
-    /**
-     * Find user's who have completed this criteria
-     */
-    public function cron() {
-        global $DB;
-
-        // Get all users who meet this criteria
-        $sql = '
-            SELECT DISTINCT
-                c.id AS course,
-                cr.id AS criteriaid,
-                ra.userid AS userid,
-                gg.finalgrade AS gradefinal,
-                gg.timemodified AS timecompleted
-            FROM
-                {course_completion_criteria} cr
-            INNER JOIN
-                {course} c
-             ON cr.course = c.id
-            INNER JOIN
-                {context} con
-             ON con.instanceid = c.id
-            INNER JOIN
-                {role_assignments} ra
-              ON ra.contextid = con.id
-            INNER JOIN
-                {grade_items} gi
-             ON gi.courseid = c.id
-            AND gi.itemtype = \'course\'
-            INNER JOIN
-                {grade_grades} gg
-             ON gg.itemid = gi.id
-            AND gg.userid = ra.userid
-            LEFT JOIN
-                {course_completion_crit_compl} cc
-             ON cc.criteriaid = cr.id
-            AND cc.userid = ra.userid
-            WHERE
-                cr.criteriatype = '.COMPLETION_CRITERIA_TYPE_GRADE.'
-            AND con.contextlevel = '.CONTEXT_COURSE.'
-            AND c.enablecompletion = 1
-            AND cc.id IS NULL
-            AND gg.finalgrade >= cr.gradepass
-        ';
-
-        // Loop through completions, and mark as complete
-        $rs = $DB->get_recordset_sql($sql);
-        foreach ($rs as $record) {
-            $completion = new completion_criteria_completion((array) $record, DATA_OBJECT_FETCH_BY_KEY);
-            $completion->mark_complete($record->timecompleted);
-        }
-        $rs->close();
     }
 
     /**

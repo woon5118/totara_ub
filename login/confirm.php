@@ -33,6 +33,7 @@ $s = optional_param('s', '', PARAM_RAW);        // Old parameter:  username
 
 $PAGE->set_url('/login/confirm.php');
 $PAGE->set_context(context_system::instance());
+$PAGE->set_pagelayout('login');
 
 if (empty($CFG->registerauth)) {
     print_error('cannotusepage2');

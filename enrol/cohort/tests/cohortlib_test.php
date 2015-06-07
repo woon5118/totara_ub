@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/group/lib.php');
  * @copyright 2015 Adrian Greeve <adrian@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class enrol_cohort_lib_testcase extends advanced_testcase {
+class enrol_cohort_cohortlib_testcase extends advanced_testcase {
 
     /**
      * Test that a new group with the name of the cohort is created.
@@ -56,31 +56,31 @@ class enrol_cohort_lib_testcase extends advanced_testcase {
         // Check the results.
         $group = $DB->get_record('groups', array('id' => $groupid));
         // The group name should match the cohort name.
-        $this->assertEquals($cohort->name . ' cohort', $group->name);
+        $this->assertEquals($cohort->name . ' audience', $group->name);
         // Group course id should match the course id.
         $this->assertEquals($course->id, $group->courseid);
 
         // Create a group that will have the same name as the cohort.
         $groupdata = new stdClass();
         $groupdata->courseid = $course2->id;
-        $groupdata->name = $cohort->name . ' cohort';
+        $groupdata->name = $cohort->name . ' audience';
         groups_create_group($groupdata);
         // Create a group for the cohort in course 2.
         $groupid = enrol_cohort_create_new_group($course2->id, $cohort->id);
         $groupinfo = $DB->get_record('groups', array('id' => $groupid));
         // Check that the group name has been changed.
-        $this->assertEquals($cohort->name . ' cohort (2)', $groupinfo->name);
+        $this->assertEquals($cohort->name . ' audience (2)', $groupinfo->name);
 
         // Create another group that will have the same name as a generated cohort.
         $groupdata = new stdClass();
         $groupdata->courseid = $course2->id;
-        $groupdata->name = $cohort->name . ' cohort (2)';
+        $groupdata->name = $cohort->name . ' audience (2)';
         groups_create_group($groupdata);
         // Create a group for the cohort in course 2.
         $groupid = enrol_cohort_create_new_group($course2->id, $cohort->id);
         $groupinfo = $DB->get_record('groups', array('id' => $groupid));
         // Check that the group name has been changed.
-        $this->assertEquals($cohort->name . ' cohort (3)', $groupinfo->name);
+        $this->assertEquals($cohort->name . ' audience (3)', $groupinfo->name);
 
     }
 }

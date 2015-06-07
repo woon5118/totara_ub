@@ -27,7 +27,10 @@ $capabilities = array(
     'moodle/category:manage',
     'moodle/course:create',
     'moodle/site:approvecourse',
-    'moodle/restore:restorecourse'
+    'moodle/restore:restorecourse',
+    'moodle/course:update',
+    'totara/program:configuredetails',
+    'totara/program:createprogram',
 );
 if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     // Speedup for non-admins, add all caps used on this page.
@@ -50,6 +53,26 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
         )
     );
 
+    $ADMIN->add('courses', new admin_externalpage('programmgmt', new lang_string('manageprograms', 'admin'),
+        $CFG->wwwroot . '/totara/program/manage.php',
+        array('totara/program:createprogram', 'totara/program:configuredetails'),
+        totara_feature_disabled('programs')
+    ));
+
+    $ADMIN->add('courses', new admin_externalpage('managecertifications', new lang_string('managecertifications', 'totara_core'),
+        $CFG->wwwroot . '/totara/program/manage.php?viewtype=certification',
+        array('totara/certification:createcertification', 'totara/certification:configurecertification'),
+        totara_feature_disabled('certifications')
+    ));
+
+    $ADMIN->add('courses', new admin_externalpage('coursecustomfields', new lang_string('customfields', 'totara_customfield'),
+        $CFG->wwwroot . '/totara/customfield/index.php?prefix=course',
+        array('totara/core:createcoursecustomfield', 'totara/core:updatecoursecustomfield', 'totara/core:deletecoursecustomfield')
+    ));
+
+    $ADMIN->add('courses', new admin_externalpage('customicons', new lang_string('customicons', 'totara_core'), $CFG->wwwroot . '/totara/core/manage_customicons.php',
+        array('moodle/site:config')));
+
     // Course Default Settings Page.
     // NOTE: these settings must be applied after all other settings because they depend on them.
 
@@ -62,6 +85,11 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $choices['1'] = new lang_string('show');
     $temp->add(new admin_setting_configselect('moodlecourse/visible', new lang_string('visible'), new lang_string('visible_help'),
         1, $choices));
+
+    // Add audience visibility.
+    require_once($CFG->dirroot . '/cohort/lib.php');
+    global $COHORT_VISIBILITY;
+    $temp->add(new admin_setting_configselect('moodlecourse/visiblelearning', new lang_string('audiencevisibility', 'totara_cohort'), new lang_string('configaudiencevisibility', 'totara_cohort'), 2, $COHORT_VISIBILITY));
 
     // Course format.
     $temp->add(new admin_setting_heading('courseformathdr', new lang_string('type_format', 'plugin'), ''));
@@ -130,7 +158,16 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     // Completion tracking.
     $temp->add(new admin_setting_heading('progress', new lang_string('completion','completion'), ''));
     $temp->add(new admin_setting_configselect('moodlecourse/enablecompletion', new lang_string('completion', 'completion'),
-        new lang_string('enablecompletion_help', 'completion'), 0, array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
+        new lang_string('enablecompletion_help', 'completion'), 1, array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
+
+    $temp->add(new admin_setting_configcheckbox('moodlecourse/completionstartonenrol', new lang_string('completionstartonenrol','completion'),
+        new lang_string('completionstartonenrolhelp', 'completion'), 1));
+
+    $temp->add(new admin_setting_heading('progress', new lang_string('progress','completion'), ''));
+    $temp->add(new admin_setting_configselect('moodlecourse/enablecompletion', new lang_string('completion','completion'), '',
+        1, array(0 => new lang_string('completiondisabled','completion'), 1 => new lang_string('completionenabled','completion'))));
+
+    $temp->add(new admin_setting_configcheckbox('moodlecourse/completionprogressonview', new lang_string('completionprogressonview', 'completion'), new lang_string('completionprogressonviewhelp', 'completion'), 0));
 
     // Groups.
     $temp->add(new admin_setting_heading('groups', new lang_string('groups', 'group'), ''));
@@ -140,6 +177,21 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     $choices[VISIBLEGROUPS] = new lang_string('groupsvisible', 'group');
     $temp->add(new admin_setting_configselect('moodlecourse/groupmode', new lang_string('groupmode'), '', key($choices),$choices));
     $temp->add(new admin_setting_configselect('moodlecourse/groupmodeforce', new lang_string('force'), new lang_string('coursehelpforce'), 0,array(0 => new lang_string('no'), 1 => new lang_string('yes'))));
+
+    $temp->add(new admin_setting_heading('availability', new lang_string('availability'), ''));
+    $choices = array();
+    $choices['0'] = new lang_string('courseavailablenot');
+    $choices['1'] = new lang_string('courseavailable');
+    $temp->add(new admin_setting_configselect('moodlecourse/visible', new lang_string('visible'), '', 1,$choices));
+
+
+    $temp->add(new admin_setting_heading('language', new lang_string('language'), ''));
+    $languages=array();
+    $languages[''] = new lang_string('forceno');
+    $languages += get_string_manager()->get_list_of_translations();
+    $temp->add(new admin_setting_configselect('moodlecourse/lang', new lang_string('forcelanguage'), '',key($languages),$languages));
+
+    $temp->add(new admin_setting_configcheckbox('moodlecourse/coursetagging', new lang_string('coursetagging','tag'), new lang_string('coursetagginghelp','tag'), 0));
 
     $ADMIN->add('courses', $temp);
 
@@ -283,3 +335,6 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
 
     $ADMIN->add('backups', $temp);
 }
+
+// TODO: Find better way to integrate the OpenSesame management.
+require("$CFG->dirroot/repository/opensesame/settings.php");

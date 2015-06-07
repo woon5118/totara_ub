@@ -44,6 +44,7 @@ admin_externalpage_setup('environment', '', $extraurlparams);
 
 // Handle the 'updatecomponent' action
 if ($action == 'updatecomponent' && confirm_sesskey()) {
+    die(); // No updates for Totara, sorry.
     // Create component installer and execute it
     if ($cd = new component_installer('https://download.moodle.org',
                                       'environment',
@@ -74,8 +75,9 @@ if ($action == 'updatecomponent' && confirm_sesskey()) {
     }
 }
 
-// Get current Moodle version
-$current_version = $CFG->release;
+// Get current Totara version
+require($CFG->dirroot.'/version.php');
+$current_version = $TOTARA->release;
 
 // Calculate list of versions
 $versions = array();

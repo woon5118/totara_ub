@@ -140,7 +140,11 @@ function message_send($eventdata) {
         $savemessage->contexturlname = null;
     }
 
-    $savemessage->timecreated = time();
+    if (!isset($eventdata->timecreated)) {
+        $savemessage->timecreated = time();
+    } else {
+        $savemessage->timecreated = $eventdata->timecreated;
+    }
 
     if (PHPUNIT_TEST and class_exists('phpunit_util')) {
         // Add some more tests to make sure the normal code can actually work.

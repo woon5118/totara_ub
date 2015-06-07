@@ -102,10 +102,16 @@ class completion_criteria_completion extends data_object {
      * Mark this criteria complete for the associated user
      *
      * This method creates a course_completion_crit_compl record
+     * @param integer $timecomplete Time completed (optional)
      */
-    public function mark_complete() {
+    public function mark_complete($timecomplete = null) {
+        // Use current time if nothing supplied.
+        if (!$timecomplete) {
+            $timecomplete = time();
+        }
+
         // Create record
-        $this->timecompleted = time();
+        $this->timecompleted = $timecomplete;
 
         // Save record
         if ($this->id) {
@@ -163,4 +169,54 @@ class completion_criteria_completion extends data_object {
     public function get_status() {
         return $this->_criteria->get_status($this);
     }
+}
+
+
+/**
+ * This function review's each other users criteria and marks
+ * complete if necessary.
+ *
+ * @param   integer $courseid
+ * @param   integer $userid
+ * @return  boolean
+ */
+function completion_handle_criteria_recalc($courseid, $userid) {
+    global $DB;
+    if (PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING')) {
+        // TODO: static variables break phpunit execution very very badly, we need to rework the caching here.
+        $courses = array();
+    } else {
+        static $courses = array();
+    }
+
+    // Cached course completion enabled and aggregation method
+    if (!isset($courses[$courseid])) {
+        $c = new stdClass();
+        $c->id = $courseid;
+        $info = new completion_info($c);
+        $courses[$courseid] = new stdClass();
+        $courses[$courseid]->enabled = $info->is_enabled();
+        if ($courses[$courseid]->enabled) {
+            $courses[$courseid]->criteria = $info->get_criteria();
+        }
+    }
+
+    // No need to do this if completion is disabled
+    if (!$courses[$courseid]->enabled) {
+        return false;
+    }
+
+    // Review each of the criteria
+    foreach ($courses[$courseid]->criteria as $criterion) {
+        $params = array(
+            'course'        => $courseid,
+            'userid'        => $userid,
+            'criteriaid'    => $criterion->id
+        );
+
+        $completion = new completion_criteria_completion($params);
+        $criterion->review($completion);
+    }
+
+    return true;
 }

@@ -1029,6 +1029,14 @@ class global_navigation extends navigation_node {
                 'text' => get_string('home'),
                 'action' => new moodle_url('/')
             );
+        } else if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+            // We are using totara dashboard for the root element.
+            $properties = array(
+                'key' => 'mydashboard',
+                'type' => navigation_node::TYPE_SYSTEM,
+                'text' => get_string('dashboard'),
+                'action' => new moodle_url('/totara/dashboard/index.php')
+            );
         } else {
             // We are using the users my moodle for the root element
             $properties = array(
@@ -1098,11 +1106,22 @@ class global_navigation extends navigation_node {
         } else {
             // The home element should be the site because the root node is my moodle
             $this->rootnodes['home'] = $this->add(get_string('sitehome'), new moodle_url('/'), self::TYPE_SETTING, null, 'home');
-            if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY)) {
+            if (!empty($CFG->defaulthomepage) && ($CFG->defaulthomepage == HOMEPAGE_MY ||
+                    $CFG->defaulthomepage == HOMEPAGE_TOTARA_DASHBOARD)) {
                 // We need to stop automatic redirection
                 $this->rootnodes['home']->action->param('redirect', '0');
             }
         }
+        if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+            // Add access to my home as well.
+            $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null,
+                    'myhome');
+        } else {
+            // Dashboards not in the root, so add here.
+            $this->rootnodes['dashboard'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'),
+                    self::TYPE_ROOTNODE, null, 'dashboard');
+        }
+
         $this->rootnodes['site'] = $this->add_course($SITE);
         $this->rootnodes['myprofile'] = $this->add(get_string('profile'), null, self::TYPE_USER, null, 'myprofile');
         $this->rootnodes['currentcourse'] = $this->add(get_string('currentcourse'), null, self::TYPE_ROOTNODE, null, 'currentcourse');
@@ -1312,9 +1331,9 @@ class global_navigation extends navigation_node {
 
         // Remove any empty root nodes
         foreach ($this->rootnodes as $node) {
-            // Dont remove the home node
+            // Dont remove the home node (or any that can be set as home).
             /** @var navigation_node $node */
-            if ($node->key !== 'home' && !$node->has_children() && !$node->isactive) {
+            if (!in_array($node->key, array('home', 'myhome', 'dashboard')) && !$node->has_children() && !$node->isactive) {
                 $node->remove();
             }
         }
@@ -1427,6 +1446,9 @@ class global_navigation extends navigation_node {
         // Will be the return of our efforts
         $coursenodes = array();
 
+        // Take into account the visibility of courses.
+        list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
+
         // Check if we need to show categories.
         if ($this->show_categories()) {
             // Hmmm we need to show categories... this is going to be painful.
@@ -1475,11 +1497,12 @@ class global_navigation extends navigation_node {
                 $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
                 $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
                 $categoryparams['contextlevel'] = CONTEXT_COURSE;
-                $sql = "SELECT c.id, c.sortorder, c.visible, c.fullname, c.shortname, c.category $ccselect
+                $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
                             FROM {course} c
                                 $ccjoin
-                            WHERE c.category {$categoryids}
+                            WHERE c.category {$categoryids} AND {$visibilitysql}
                         ORDER BY c.sortorder ASC";
+                $categoryparams = array_merge($categoryparams, $visibilityparams);
                 $coursesrs = $DB->get_recordset_sql($sql, $categoryparams);
                 foreach ($coursesrs as $course) {
                     if ($course->id == $SITE->id) {
@@ -1495,10 +1518,6 @@ class global_navigation extends navigation_node {
                     if (!$this->can_add_more_courses_to_category($course->category)) {
                         continue;
                     }
-                    context_helper::preload_from_record($course);
-                    if (!$course->visible && !is_role_switched($course->id) && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
-                        continue;
-                    }
                     $coursenodes[$course->id] = $this->add_course($course);
                 }
                 $coursesrs->close();
@@ -1510,12 +1529,13 @@ class global_navigation extends navigation_node {
                 foreach ($partfetch as $categoryid) {
                     $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
                     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
-                    $sql = "SELECT c.id, c.sortorder, c.visible, c.fullname, c.shortname, c.category $ccselect
+                    $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
                                 FROM {course} c
                                     $ccjoin
-                                WHERE c.category = :categoryid
+                                WHERE c.category = :categoryid AND {$visibilitysql}
                             ORDER BY c.sortorder ASC";
                     $courseparams = array('categoryid' => $categoryid, 'contextlevel' => CONTEXT_COURSE);
+                    $courseparams = array_merge($courseparams, $visibilityparams);
                     $coursesrs = $DB->get_recordset_sql($sql, $courseparams, 0, $limit * 5);
                     foreach ($coursesrs as $course) {
                         if ($course->id == $SITE->id) {
@@ -1532,10 +1552,6 @@ class global_navigation extends navigation_node {
                         if (!$this->can_add_more_courses_to_category($course->category)) {
                             break;
                         }
-                        context_helper::preload_from_record($course);
-                        if (!$course->visible && !is_role_switched($course->id) && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
-                            continue;
-                        }
                         $coursenodes[$course->id] = $this->add_course($course);
                     }
                     $coursesrs->close();
@@ -1547,11 +1563,12 @@ class global_navigation extends navigation_node {
             $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
             $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
             $courseparams['contextlevel'] = CONTEXT_COURSE;
-            $sql = "SELECT c.id, c.sortorder, c.visible, c.fullname, c.shortname, c.category $ccselect
+            $sql = "SELECT c.id, c.sortorder, c.visible, c.audiencevisible, c.fullname, c.shortname, c.category $ccselect
                         FROM {course} c
                             $ccjoin
-                        WHERE c.id {$courseids}
+                        WHERE c.id {$courseids} AND {$visibilitysql}
                     ORDER BY c.sortorder ASC";
+            $courseparams = array_merge($courseparams, $visibilityparams);
             $coursesrs = $DB->get_recordset_sql($sql, $courseparams);
             foreach ($coursesrs as $course) {
                 if ($course->id == $SITE->id) {
@@ -1560,10 +1577,6 @@ class global_navigation extends navigation_node {
                 }
                 if ($this->page->course && ($this->page->course->id == $course->id)) {
                     // Don't include the currentcourse in this nodelist - it's displayed in the Current course node
-                    continue;
-                }
-                context_helper::preload_from_record($course);
-                if (!$course->visible && !is_role_switched($course->id) && !has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
                     continue;
                 }
                 $coursenodes[$course->id] = $this->add_course($course);
@@ -1657,11 +1670,14 @@ class global_navigation extends navigation_node {
             // and load this category plus all its parents and subcategories
             $category = $DB->get_record('course_categories', array('id' => $categoryid), 'path', MUST_EXIST);
             $categoriestoload = explode('/', trim($category->path, '/'));
-            list($select, $params) = $DB->get_in_or_equal($categoriestoload);
+            list($select, $params) = $DB->get_in_or_equal($categoriestoload, SQL_PARAMS_NAMED, 'id');
             // We are going to use select twice so double the params
             $params = array_merge($params, $params);
             $basecategorysql = ($showbasecategories)?' OR cc.depth = 1':'';
-            $sqlwhere .= " AND (cc.id {$select} OR cc.parent {$select}{$basecategorysql})";
+            $sqlwhere .= " AND (cc.id {$select}";
+            list($select, $inparams) = $DB->get_in_or_equal($categoriestoload, SQL_PARAMS_NAMED, 'parent');
+            $params = array_merge($params, $inparams);
+            $sqlwhere .= " OR cc.parent {$select}{$basecategorysql})";
         }
 
         $categoriesrs = $DB->get_recordset_sql("$sqlselect $sqlwhere $sqlorder", $params);
@@ -2395,6 +2411,7 @@ class global_navigation extends navigation_node {
      */
     public function add_course(stdClass $course, $forcegeneric = false, $coursetype = self::COURSE_OTHER) {
         global $CFG, $SITE;
+        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
         // We found the course... we can return it now :)
         if (!$forcegeneric && array_key_exists($course->id, $this->addedcourses)) {
@@ -2402,14 +2419,6 @@ class global_navigation extends navigation_node {
         }
 
         $coursecontext = context_course::instance($course->id);
-
-        if ($course->id != $SITE->id && !$course->visible) {
-            if (is_role_switched($course->id)) {
-                // user has to be able to access course in order to switch, let's skip the visibility test here
-            } else if (!has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
-                return false;
-            }
-        }
 
         $issite = ($course->id == $SITE->id);
         $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
@@ -2457,7 +2466,8 @@ class global_navigation extends navigation_node {
         }
 
         $coursenode = $parent->add($coursename, $url, self::TYPE_COURSE, $shortname, $course->id);
-        $coursenode->hidden = (!$course->visible);
+        $dimmed = ($issite) ? '' : totara_get_style_visibility($course);
+        $coursenode->hidden = (empty($dimmed)) ? false : true;
         // We need to decode &amp;'s here as they will have been added by format_string above and attributes will be encoded again
         // later.
         $coursenode->title(str_replace('&amp;', '&', $fullname));
@@ -2951,8 +2961,8 @@ class global_navigation_for_ajax extends global_navigation {
         $sql = "SELECT cc.*, $catcontextsql
                   FROM {course_categories} cc
                   JOIN {context} ctx ON cc.id = ctx.instanceid
-                 WHERE ctx.contextlevel = ".CONTEXT_COURSECAT." AND
-                       (cc.id = :categoryid1 OR cc.parent = :categoryid2)
+                 WHERE ctx.contextlevel = ".CONTEXT_COURSECAT."
+                   AND (cc.id = :categoryid1 OR cc.parent = :categoryid2)
               ORDER BY cc.depth ASC, cc.sortorder ASC, cc.id ASC";
         $params = array('categoryid1' => $categoryid, 'categoryid2' => $categoryid);
         $categories = $DB->get_recordset_sql($sql, $params, 0, $limit);
@@ -3021,7 +3031,19 @@ class global_navigation_for_ajax extends global_navigation {
                     $this->add_category($category, $basecategory, $nodetype);
                 }
             }
-            $courses = $DB->get_recordset('course', array('category' => $categoryid), 'sortorder', '*' , 0, $limit);
+
+            // Take into account the visibility of courses inside this particular category.
+            list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'c.id', 'c.visible', 'c.audiencevisible');
+
+            // Get courses based on the categoryid.
+            $sql = "SELECT c.*
+                      FROM {course} c
+                INNER JOIN {context} ctx
+                        ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)
+                     WHERE c.category = :categoryid  AND {$visibilitysql}
+                  ORDER BY c.sortorder ASC";
+            $categoryparams = array_merge(array('categoryid' => $categoryid, 'contextlevel' => CONTEXT_COURSE), $visibilityparams);
+            $courses = $DB->get_recordset_sql($sql, $categoryparams, 0, $limit);
             foreach ($courses as $course) {
                 $this->add_course($course);
             }
@@ -3455,6 +3477,9 @@ class settings_navigation extends navigation_node {
             case CONTEXT_COURSECAT:
                 $this->load_category_settings();
                 break;
+            case CONTEXT_PROGRAM:
+                totara_load_program_settings($this, $this->page->context, true);
+                break;
             case CONTEXT_COURSE:
                 if ($this->page->course->id != $SITE->id) {
                     $this->load_course_settings(($context->id == $this->context->id));
@@ -3772,6 +3797,14 @@ class settings_navigation extends navigation_node {
                 $url = new moodle_url('/course/completion.php', array('id'=>$course->id));
                 $coursenode->add(get_string('coursecompletion', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
             }
+
+            // Add the course competencies link.
+            $url = new moodle_url('/course/competency.php', array('id' => $course->id));
+            $coursenode->add(get_string('competencies', 'totara_hierarchy'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
+
+            // Add the course reminders link.
+            $url = new moodle_url('/course/reminders.php', array('courseid' => $course->id));
+            $coursenode->add(get_string('remindersmenuitem', 'totara_coursecatalog'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/email', ''));
         }
 
         // add enrol nodes
@@ -4354,6 +4387,10 @@ class settings_navigation extends navigation_node {
             }
             $useraccount->add(get_string("changepassword"), $passwordchangeurl, self::TYPE_SETTING, null, 'changepassword');
         }
+
+        // Add positions links
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+        pos_add_nav_positions_links($course->id, $user->id, $usersetting);
 
         if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
             if ($currentuser && has_capability('moodle/user:editownprofile', $systemcontext) ||

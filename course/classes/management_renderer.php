@@ -609,13 +609,21 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_listitem(coursecat $category, course_in_list $course, $selectedcourse) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $text = $course->get_formatted_name();
+        $visibility = 1;
+        if (empty($CFG->audiencevisibility)) {
+            $visibility = $course->visible;
+        } else if ($course->audiencevisible == COHORT_VISIBLE_NOUSERS) {
+            $visibility = 0;
+        }
         $attributes = array(
             'class' => 'listitem listitem-course',
             'data-id' => $course->id,
             'data-selected' => ($selectedcourse == $course->id) ? '1' : '0',
-            'data-visible' => $course->visible ? '1' : '0'
+            'data-visible' => $visibility
         );
 
         $bulkcourseinput = array(
@@ -1238,8 +1246,9 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function search_listitem_actions(course_in_list $course) {
+        global $CFG;
         $baseurl = new moodle_url(
-            '/course/managementsearch.php',
+            '/course/management.php',
             array('courseid' => $course->id, 'categoryid' => $course->category, 'sesskey' => sesskey())
         );
         $actions = array();
@@ -1264,18 +1273,23 @@ class core_course_management_renderer extends plugin_renderer_base {
             }
             // Show/Hide.
             if ($course->can_change_visibility()) {
-                    $actions[] = $this->output->action_icon(
-                        new moodle_url($baseurl, array('action' => 'hidecourse')),
-                        new pix_icon('t/hide', get_string('hide')),
-                        null,
-                        array('data-action' => 'hide', 'class' => 'action-hide')
-                    );
-                    $actions[] = $this->output->action_icon(
-                        new moodle_url($baseurl, array('action' => 'showcourse')),
-                        new pix_icon('t/show', get_string('show')),
-                        null,
-                        array('data-action' => 'show', 'class' => 'action-show')
-                    );
+                $hidetooltip = get_string('hide');
+                $showtooltip = get_string('show');
+                if (!empty($CFG->audiencevisibility)) {
+                    $hidetooltip = $showtooltip = get_string('manageaudincevisibility', 'totara_cohort');
+                }
+                $actions[] = $this->output->action_icon(
+                    new moodle_url($baseurl, array('action' => 'hidecourse')),
+                    new pix_icon('t/hide', $hidetooltip),
+                    null,
+                    array('class' => 'action-hide')
+                );
+                $actions[] = $this->output->action_icon(
+                    new moodle_url($baseurl, array('action' => 'showcourse')),
+                    new pix_icon('t/show', $showtooltip),
+                    null,
+                    array('class' => 'action-show')
+                );
             }
         }
         if (empty($actions)) {
@@ -1354,6 +1368,48 @@ class core_course_management_renderer extends plugin_renderer_base {
         }
         $html .= html_writer::end_div();
         return $html;
+    }
+
+    /**
+     * Creates buttons to switch to program or certification management
+     *
+     * @param $categoryid
+     * @return string $output container with buttons
+     */
+    public function management_buttons($categoryid) {
+        $output = $this->container_start('buttons');
+        $url = new moodle_url('/course/editcategory.php', array('parent' => $categoryid));
+        $context = context_system::instance();
+        if ($categoryid) {
+            $title = get_string('addsubcategory');
+        } else {
+            $title = get_string('addnewcategory');
+        }
+        $output .= $this->single_button($url, $title, 'get');
+
+        if (totara_feature_visible('programs')) {
+            // Print button for switching to program management.
+            $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $categoryid));
+            $programcaps = array('totara/program:createprogram', 'totara/program:deleteprogram', 'totara/program:configuredetails');
+            if (has_any_capability($programcaps, $context)) {
+                $title = get_string('manageprogramsinthiscat', 'totara_program');
+            }
+            $output .= $this->single_button($url, $title, 'get');
+        }
+        if (totara_feature_visible('certifications')) {
+            // Print button for switching to certification management.
+            $url = new moodle_url('/totara/program/manage.php', array('categoryid' => $categoryid, 'viewtype' => 'certification'));
+            $programcaps = array('totara/certification:createcertification',
+                'totara/certification:deletecertification',
+                'totara/certification:configurecertification');
+            if (has_any_capability($programcaps, $context)) {
+                $title = get_string('managecertifsinthiscat', 'totara_certification');
+            }
+            $output .= $this->single_button($url, $title, 'get');
+        }
+        $output .= $this->container_end();
+
+        return $output;
     }
 
 }

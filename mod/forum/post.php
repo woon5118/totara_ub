@@ -837,6 +837,11 @@ if ($mform_post->is_cancelled()) {
                     'forumtype' => $forum->type,
                 )
             );
+
+            // Totara archiving flags.
+            $discussion->archived = 0;
+            $fromform->archived = 0;
+
             $event = \mod_forum\event\post_created::create($params);
             $event->add_record_snapshot('forum_posts', $fromform);
             $event->add_record_snapshot('forum_discussions', $discussion);

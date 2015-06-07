@@ -767,6 +767,38 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
     if ($events === false) {
         $events = array();
     }
+
+    // Check the visibility of site wide events, T-11534.
+    $events = calendar_events_check_visibility($events);
+
+    return $events;
+}
+
+/**
+ * Totara function added to handle visibility of activities sitewide calendar entries
+ * See T-11534 for more details.
+ *
+ * @param array $events     An array of DB records from the table 'events'
+ */
+function calendar_events_check_visibility($events) {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+
+    foreach ($events as $key => $event) {
+        // Checking the module this way in case we need to add more later.
+        $checkmods = array('facetoface');
+        if ($event->courseid == SITEID && $event->userid == 0 && in_array($event->modulename, $checkmods)) {
+            // Get the course id from the activity.
+            $courseid = $DB->get_field($event->modulename, 'course', array('id' => $event->instance));
+
+            // Check the course is visible for the user.
+            if (!totara_course_is_viewable($courseid)) {
+                unset($events[$key]);
+            }
+        }
+    }
+
     return $events;
 }
 
@@ -1647,6 +1679,30 @@ function calendar_preferences_button(stdClass $course) {
  * @return string $eventtime link/string for event time
  */
 function calendar_format_event_time($event, $now, $linkparams = null, $usecommonwords = true, $showtime = 0) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/mod/facetoface/lib.php');
+    // Display timezone information for F2F sessions.
+    if ($event->modulename == 'facetoface' && $event->eventtype == 'facetofacesession') {
+        $sql = "SELECT fsd.id, fsd.sessiontimezone
+                  FROM {facetoface_sessions_dates} fsd
+            INNER JOIN {facetoface_sessions} fs
+                    ON fsd.sessionid = fs.id
+                   AND fs.id = ?
+                 WHERE fsd.timestart = ?";
+        if ($sessiondata = $DB->get_record_sql($sql, array($event->uuid, $event->timestart))) {
+            $sessionobj = facetoface_format_session_times($event->timestart,
+                                                          $event->timestart + $event->timeduration,
+                                                          $sessiondata->sessiontimezone);
+
+            $displaytimezones = get_config(null, 'facetoface_displaysessiontimezones');
+            if ($displaytimezones) {
+                return get_string('sessiondatetimecourseformat', 'facetoface', $sessionobj);
+            } else {
+                return get_string('sessiondatetimecourseformatwithouttimezone', 'facetoface', $sessionobj);
+            }
+        }
+    }
+
     $starttime = $event->timestart;
     $endtime = $event->timestart + $event->timeduration;
 
@@ -1910,6 +1966,52 @@ function calendar_add_event_allowed($event) {
 
         default:
             return has_capability('moodle/calendar:manageentries', $event->context);
+    }
+}
+
+/**
+ * Check if any module filters are set and pass the events through.
+ * The module filters will go through the relevant events and remove
+ * items from the events array as necessary.
+ *
+ * @param array calendar event records
+ * @return void
+ */
+function calendar_apply_mod_filters(&$events) {
+    global $CFG, $DB;
+
+    $mods = $DB->get_records('modules', array('visible' => '1'));
+    foreach ($mods as $mod) {
+        $functionname = "{$mod->name}_filter_calendar_events";
+        require_once($CFG->dirroot . "/mod/{$mod->name}/lib.php");
+        if (!function_exists($functionname)) {
+            continue;
+        }
+        // call module filter hook
+        $functionname($events);
+    }
+}
+
+/**
+ * Check for calendar module filter POSTs and call relevant module hook
+ * function to set filters in session.
+ *
+ * @return void
+ */
+function calendar_set_mod_filters() {
+    global $CFG, $DB;
+
+    $mods = $DB->get_records('modules', array('visible' => '1'));
+    foreach ($mods as $mod) {
+        if (optional_param("apply{$mod->name}filter", null, PARAM_TEXT)) {
+            $functionname = "{$mod->name}_calendar_set_filter";
+            require_once($CFG->dirroot . "/mod/{$mod->name}/lib.php");
+            if (!function_exists($functionname)) {
+                continue;
+            }
+            // call module hook to set filter
+            $functionname();
+        }
     }
 }
 

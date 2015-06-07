@@ -23,3 +23,5 @@
  */
 
 $string['pluginname'] = 'Checkbox';
+$string['checked_export_value'] = 'Yes';
+$string['not_checked_export_value'] = 'No';

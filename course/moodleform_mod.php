@@ -210,35 +210,58 @@ abstract class moodleform_mod extends moodleform {
                 ? 0
                 : $completion->count_user_data($this->_cm);
 
+            // Check if any users have completed the course. If there are we must not set completionunlocked to 1 as it may cause
+            // unexpected resets.
+            $coursecompletedcount = $completion->count_course_user_data();
+
             $freeze = false;
-            if (!$completedcount) {
+            if ((!$completedcount && !$coursecompletedcount) || !$id) {
                 if ($mform->elementExists('unlockcompletion')) {
                     $mform->removeElement('unlockcompletion');
+                }
+                if ($mform->elementExists('unlockcompletionnoreset')) {
+                    $mform->removeElement('unlockcompletionnoreset');
                 }
                 // Automatically set to unlocked (note: this is necessary
                 // in order to make it recalculate completion once the option
                 // is changed, maybe someone has completed it now)
                 $mform->getElement('completionunlocked')->setValue(1);
             } else {
+
+                $unlockcompletion = $mform->exportValue('unlockcompletion') || $mform->exportValue('completionunlocked');
+                $unlockcompletionnoreset = $mform->exportValue('unlockcompletionnoreset') || $mform->exportValue('completionunlockednoreset');
+
+
                 // Has the element been unlocked, either by the button being pressed
                 // in this request, or the field already being set from a previous one?
-                if ($mform->exportValue('unlockcompletion') ||
-                        $mform->exportValue('completionunlocked')) {
+                if ($unlockcompletion) {
                     // Yes, add in warning text and set the hidden variable
                     $mform->insertElementBefore(
                         $mform->createElement('static', 'completedunlocked',
                             get_string('completedunlocked', 'completion'),
-                            get_string('completedunlockedtext', 'completion')),
+                            get_string('activitycompletionunlockedtext', 'totara_core')),
                         'unlockcompletion');
                     $mform->removeElement('unlockcompletion');
+                    $mform->removeElement('unlockcompletionnoreset');
                     $mform->getElement('completionunlocked')->setValue(1);
+                } else if ($unlockcompletionnoreset) {
+                    // Yes, add in warning text and set the hidden variable.
+                    $mform->insertElementBefore(
+                        $mform->createElement('static', 'completedunlocked',
+                            get_string('completedunlocked', 'completion'),
+                            get_string('activitycompletionunlockednoresettext', 'totara_core')),
+                        'unlockcompletion');
+                    $mform->removeElement('unlockcompletion');
+                    $mform->removeElement('unlockcompletionnoreset');
+                    $mform->getElement('completionunlocked')->setValue(1);
+                    $mform->getElement('completionunlockednoreset')->setValue(1);
                 } else {
                     // No, add in the warning text with the count (now we know
                     // it) before the unlock button
                     $mform->insertElementBefore(
                         $mform->createElement('static', 'completedwarning',
                             get_string('completedwarning', 'completion'),
-                            get_string('completedwarningtext', 'completion', $completedcount)),
+                            get_string('completedwarningtext', 'totara_core')),
                         'unlockcompletion');
                     $freeze = true;
                 }
@@ -488,10 +511,15 @@ abstract class moodleform_mod extends moodleform {
 
             // Unlock button for if people have completed it (will
             // be removed in definition_after_data if they haven't)
-            $mform->addElement('submit', 'unlockcompletion', get_string('unlockcompletion', 'completion'));
+            $mform->addElement('submit', 'unlockcompletion', get_string('unlockcompletion', 'totara_core'));
             $mform->registerNoSubmitButton('unlockcompletion');
             $mform->addElement('hidden', 'completionunlocked', 0);
             $mform->setType('completionunlocked', PARAM_INT);
+
+            $mform->addElement('submit', 'unlockcompletionnoreset', get_string('unlockcompletionnoreset', 'totara_core'));
+            $mform->registerNoSubmitButton('unlockcompletionnoreset');
+            $mform->addElement('hidden', 'completionunlockednoreset', 0);
+            $mform->setType('completionunlockednoreset', PARAM_INT);
 
             $trackingdefault = COMPLETION_TRACKING_NONE;
             // If system and activity default is on, set it.
@@ -548,6 +576,20 @@ abstract class moodleform_mod extends moodleform {
             $mform->addElement('date_selector', 'completionexpected', get_string('completionexpected', 'completion'), array('optional'=>true));
             $mform->addHelpButton('completionexpected', 'completionexpected', 'completion');
             $mform->disabledIf('completionexpected', 'completion', 'eq', COMPLETION_TRACKING_NONE);
+        }
+
+        if (!empty($CFG->usetags) && $DB->count_records('tag', array('tagtype' => 'official'))) {
+            $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
+
+            $namefield = empty($CFG->keeptagnamecase) ? 'name' : 'rawname';
+            $sql = "SELECT id, $namefield FROM {tag} WHERE tagtype = ? ORDER by name ASC";
+            if ($otags = $DB->get_records_sql_menu($sql, array('official'))) {
+                $otagsselEl =& $mform->addElement('select', 'otags', get_string('otags', 'tag'), $otags, 'size="5"');
+                $otagsselEl->setMultiple(true);
+                $otagsselEl->setSelected($this->current->otags);
+                $mform->addHelpButton('otags', 'otags', 'tag');
+            }
+
         }
 
         $this->standard_hidden_coursemodule_elements();

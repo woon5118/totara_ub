@@ -394,11 +394,12 @@ function users_order_by_sql($usertablealias = '', $search = null, context $conte
  * @param string $page The page or records to return
  * @param string $recordsperpage The number of records to return per page
  * @param string $fields A comma separated list of fields to be returned from the chosen table.
+ * @param boolean $excludedeleted if true, don't get deleted users (default moodle behaviour)
  * @return array|int|bool  {@link $USER} records unless get is false in which case the integer count of the records found is returned.
  *                        False is returned if an error is encountered.
  */
 function get_users($get=true, $search='', $confirmed=false, array $exceptions=null, $sort='firstname ASC',
-                   $firstinitial='', $lastinitial='', $page='', $recordsperpage='', $fields='*', $extraselect='', array $extraparams=null) {
+                   $firstinitial='', $lastinitial='', $page='', $recordsperpage='', $fields='*', $extraselect='', array $extraparams=null, $excludedeleted=true) {
     global $DB, $CFG;
 
     if ($get && !$recordsperpage) {
@@ -410,8 +411,18 @@ function get_users($get=true, $search='', $confirmed=false, array $exceptions=nu
 
     $fullname  = $DB->sql_fullname();
 
-    $select = " id <> :guestid AND deleted = 0";
+    $select = " id <> :guestid";
     $params = array('guestid'=>$CFG->siteguest);
+
+    if ($excludedeleted) {
+        // Moodle core default behaviour - if deleted not specified, or 0, exclude deleted users
+        $select .= ' AND deleted = 0';
+    } else {
+        // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email
+        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
+        $params['nolegacyemail'] = '%@%';
+    }
+
 
     if (!empty($search)){
         $search = trim($search);
@@ -467,17 +478,27 @@ function get_users($get=true, $search='', $confirmed=false, array $exceptions=nu
  * @param array $extraparams Additional parameters to use for the above $extraselect
  * @param stdClass $extracontext If specified, will include user 'extra fields'
  *   as appropriate for current user and given context
+ * @param boolean $excludedeleted if true, don't get deleted users (default moodle behaviour)
  * @return array Array of {@link $USER} records
  */
 function get_users_listing($sort='lastaccess', $dir='ASC', $page=0, $recordsperpage=0,
                            $search='', $firstinitial='', $lastinitial='', $extraselect='',
-                           array $extraparams=null, $extracontext = null) {
+                           array $extraparams=null, $extracontext = null, $excludedeleted = true) {
     global $DB, $CFG;
 
     $fullname  = $DB->sql_fullname();
 
-    $select = "deleted <> 1 AND id <> :guestid";
+    $select = " id <> :guestid";
     $params = array('guestid' => $CFG->siteguest);
+
+    if ($excludedeleted) {
+        // Moodle core default behaviour - if deleted not specified, or 0, exclude deleted users.
+        $select .= " AND deleted <> 1";
+    } else {
+        // Get deleted users as well, excluding legacy-deleted ones with md5 hash as email.
+        $select .= ' AND (email = \'\' OR ' . $DB->sql_like('email', ':nolegacyemail', false) . ')';
+        $params['nolegacyemail'] = '%@%';
+    }
 
     if (!empty($search)) {
         $search = trim($search);
@@ -519,7 +540,7 @@ function get_users_listing($sort='lastaccess', $dir='ASC', $page=0, $recordsperp
     $extrafields = "$extrafields, $namefields";
 
     // warning: will return UNCONFIRMED USERS
-    return $DB->get_records_sql("SELECT id, username, email, city, country, lastaccess, confirmed, mnethostid, suspended $extrafields
+    return $DB->get_records_sql("SELECT id, username, email, city, country, lastaccess, confirmed, mnethostid, deleted, suspended $extrafields
                                    FROM {user}
                                   WHERE $select
                                   $sort", $params, $page, $recordsperpage);
@@ -744,7 +765,8 @@ function get_courses_page($categoryid="all", $sort="c.sortorder ASC", $fields="c
  * @return object {@link $COURSE} records
  */
 function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$totalcount) {
-    global $CFG, $DB;
+    global $CFG, $DB, $USER;
+    require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
     if ($DB->sql_regex_supported()) {
         $REGEXP    = $DB->sql_regex(true);
@@ -811,26 +833,23 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
     $limitfrom = $page * $recordsperpage;
     $limitto   = $limitfrom + $recordsperpage;
 
+    // Add audience visibility setting.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+    $visibilitysql = "AND {$visibilitysql}";
+    $params = array_merge($params, $visibilityparams);
+
     $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
     $sql = "SELECT c.* $ccselect
-              FROM {course} c
-           $ccjoin
-             WHERE $searchcond AND c.id <> ".SITEID."
-          ORDER BY $sort";
+            FROM {course} c
+            $ccjoin
+            WHERE $searchcond AND c.id <> ".SITEID." $visibilitysql
+            ORDER BY $sort";
 
     $rs = $DB->get_recordset_sql($sql, $params);
     foreach($rs as $course) {
-        if (!$course->visible) {
-            // preload contexts only for hidden courses or courses we need to return
-            context_helper::preload_from_record($course);
-            $coursecontext = context_course::instance($course->id);
-            if (!has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
-                continue;
-            }
-        }
         // Don't exit this loop till the end
         // we need to count all the visible courses
         // to update $totalcount

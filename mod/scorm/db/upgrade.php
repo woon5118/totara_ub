@@ -62,6 +62,66 @@ function xmldb_scorm_upgrade($oldversion) {
     // Moodle v2.3.0 release upgrade line
     // Put any upgrade step following this
 
+
+    // Adding completion fields to scorm table
+    if ($oldversion < 2011041402) {
+        $table = new xmldb_table('scorm');
+        $field = new xmldb_field('completionstatusrequired', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, null, null, null, null, null, 'timemodified');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('completionscorerequired', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, null, null, null, null, null, 'completionstatusrequired');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2011041402, 'scorm');
+    }
+
+    if ($oldversion < 2011073100) {
+        // change field type of objectiveid
+        $table = new xmldb_table('scorm_seq_objective');
+        $field = new xmldb_field('objectiveid', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'primaryobj');
+        $dbman->change_field_type($table, $field);
+        upgrade_mod_savepoint(true, 2011073100, 'scorm');
+    }
+
+
+    if ($oldversion < 2011112902) {
+        require_once($CFG->libdir . '/completionlib.php');
+        // a bug in scorm activity completion means that there may be users who have
+        // met the criteria but are not marked as complete. This upgrade finds any
+        // incomplete scorm activities and reruns the activity completion check to
+        // fix the records
+
+        // get activity completion details for all incomplete scorm activities
+        $sql = "SELECT cmc.id, cmc.userid, cmc.coursemoduleid, cm.course as courseid
+            FROM {course_modules_completion} cmc
+            JOIN {course_modules} cm ON cmc.coursemoduleid = cm.id
+            WHERE cmc.completionstate = ?
+            AND cm.module = (SELECT id FROM {modules} WHERE name = ?)";
+        $incomplete_scorm_records = $DB->get_recordset_sql($sql, array(COMPLETION_INCOMPLETE, 'scorm'));
+        $cms = array();
+        $courses = array();
+        foreach ($incomplete_scorm_records as $incomplete_scorm) {
+            $cmid = $incomplete_scorm->coursemoduleid;
+            $courseid = $incomplete_scorm->courseid;
+            // cache course module records for speed
+            if (!array_key_exists($cmid, $cms)) {
+                $cms[$cmid] = $DB->get_record('course_modules', array('id' => $cmid));
+            }
+            // cache course records for speed
+            if (!array_key_exists($courseid, $courses)) {
+                $courses[$courseid] = $DB->get_record('course', array('id' => $courseid));
+            }
+
+            // recheck the completion record for each user
+            $completion = new completion_info($courses[$courseid]);
+            $completion->update_state($cms[$cmid], COMPLETION_UNKNOWN, $incomplete_scorm->userid);
+        }
+        $incomplete_scorm_records->close();
+
+    }
+
     //rename config var from maxattempts to maxattempt
     if ($oldversion < 2012061701) {
         $maxattempts = get_config('scorm', 'maxattempts');

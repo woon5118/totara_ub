@@ -21,6 +21,14 @@
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+$string['popup_simple'] = 'New window (simple)';
+$string['popup_simple_notice'] = '<p>Your content is playing in another window.</p><p><strong>Do not close this page until the content is finished playing.</strong></p>';
+$string['popup_simple_closenotice'] = 'A content window is open.\\\nThat window will also be closed.';
+$string['popup_simple_popupblockednotice'] = '<p><strong>Your content did not launch.</strong></p><p>Make sure popups are enabled for this site and try again.</p>';
+$string['popup_simple_popupmanuallaunch'] = 'Click to Launch Manually';
+$string['popup_simple_redirectingnotice'] = 'Progress is being saved. Redirecting to course page...';
+
 $string['toc'] = 'TOC';
 $string['navigation'] = 'Navigation';
 $string['aicchacptimeout'] = 'AICC HACP timeout';
@@ -73,10 +81,15 @@ $string['browsemode'] = 'Preview mode';
 $string['browserepository'] = 'Browse repository';
 $string['calculatedweight'] = 'Calculated weight';
 $string['cannotfindsco'] = 'Could not find SCO';
+$string['cannotfindscorm'] = 'Could not find SCORM';
 $string['collapsetocwinsize'] = 'Collapse TOC when window size below';
 $string['collapsetocwinsizedesc'] = 'This setting lets you specify the window size below which the TOC should automatically collapse.';
 $string['compatibilitysettings'] = 'Compatibility settings';
 $string['completed'] = 'Completed';
+$string['completionstatus_failed'] = 'Failed';
+$string['completionstatus_passed'] = 'Passed';
+$string['completionstatus'] = 'Completion Status';
+$string['completionstatus_help'] = 'Require status';
 $string['completionscorerequired'] = 'Require minimum score';
 $string['completionscorerequired_help'] = 'Enabling this setting will require a user to have at least the minimum score entered to be marked complete in this SCORM activity, as well as any other Activity Completion requirements.';
 $string['completionstatus_passed'] = 'Passed';
@@ -327,6 +340,8 @@ $string['scorm12standarddesc'] = 'Disabling this setting allows Moodle to store 
 If your SCORM packages allow users to enter large amounts of text or if your package tries to store large amounts of data in the suspend_data field disable this.';
 $string['scoes'] = 'Learning objects';
 $string['score'] = 'Score';
+$string['scoreachieved'] = 'Scored {$a}';
+$string['scorerequired'] = 'Score {$a}';
 $string['scorm:addinstance'] = 'Add a new SCORM package';
 $string['scormclose'] = 'Available to';
 $string['scormcourse'] = 'Learning course';

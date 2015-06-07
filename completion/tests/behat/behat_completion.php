@@ -106,6 +106,26 @@ class behat_completion extends behat_base {
     }
 
     /**
+     * Toggles site-wide completion tracking
+     *
+     * @When /^completion tracking is "(?P<completion_status_string>([Ee]nabled|[Dd]isabled)*)" site\-wide$/
+     * @param string $completionstatus
+     */
+    public function completion_is_toggled_sitewide($completionstatus) {
+
+        $toggle = strtolower($completionstatus) == 'enabled' ? 'check' : 'uncheck';
+
+        return array(
+            new Given('I log in as "admin"'),
+            new Given('I am on homepage'),
+            new Given('I follow "Advanced features"'),
+            new Given('I '.$toggle.' "Enable completion tracking"'),
+            new Given('I press "Save changes"'),
+            new Given('I log out')
+        );
+    }
+
+    /**
      * Toggles completion tracking for course being in the course page.
      *
      * @When /^completion tracking is "(?P<completion_status_string>Enabled|Disabled)" in current course$/

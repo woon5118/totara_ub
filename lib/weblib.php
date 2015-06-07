@@ -1730,7 +1730,15 @@ function purify_html($text, $options = array()) {
             'teamspeak' => true,
             'gopher' => true,
             'mms' => true,
-            'mailto' => true
+            'mailto' => true,
+            'skype'=>true,
+            'ymsgr'=>true,
+            'meet'=>true,
+            'sip'=>true,
+            'xmpp'=>true,
+            'aim'=>true,
+            'myim'=>true,
+            'msnim'=>true
         ));
         $config->set('Attr.AllowedFrameTargets', array('_blank'));
 

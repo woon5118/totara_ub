@@ -1277,7 +1277,7 @@ class mod_forum_lib_testcase extends advanced_testcase {
 
         $events = $sink->get_events();
         // 2 additional events thanks to completion.
-        $this->assertCount(3, $events);
+        $this->assertCount(4, $events);
         $event = array_pop($events);
 
         // Checking that the event contains the expected values.

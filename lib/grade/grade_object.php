@@ -201,7 +201,7 @@ abstract class grade_object {
             } else {
                 if ($columns[$var]->meta_type === 'X') {
                     // We have a text/clob column, use the cross-db method for its comparison.
-                    $wheresql[] = ' ' . $DB->sql_compare_text($var) . ' = ' . $DB->sql_compare_text('?') . ' ';
+                    $wheresql[] = ' ' . $DB->sql_compare_text($var, 255) . ' = ' . $DB->sql_compare_text('?', 255) . ' ';
                 } else {
                     // Other columns (varchar, integers...).
                     $wheresql[] = " $var = ? ";

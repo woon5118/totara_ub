@@ -97,6 +97,7 @@ if ($course !== NULL) {
     $url->param('course', $course->id);
 }
 $PAGE->set_url($url);
+$PAGE->set_totara_menu_selected('calendar');
 
 $calendar = new calendar_information(0, 0, 0, $time);
 $calendar->prepare_for_view($course, $courses);
@@ -151,7 +152,10 @@ if ($data = $exportform->get_data()) {
     $link = new moodle_url('/calendar/export_execute.php', $params);
     if (!empty($data->generateurl)) {
         $urlclasses = array('class' => 'generalbox calendarurl');
-        $calendarurl = html_writer::tag( 'div', get_string('calendarurl', 'calendar', $link->out()), $urlclasses);
+        $calendarurl = html_writer::start_tag('div', $urlclasses);
+        $calendarurl .= $OUTPUT->notification(get_string('calendarurldesc', 'calendar'));
+        $calendarurl .= html_writer::tag('p', get_string('calendarurl', 'calendar', $link->out()));
+        $calendarurl .= html_writer::end_tag('div');
     }
 
     if (!empty($data->export)) {

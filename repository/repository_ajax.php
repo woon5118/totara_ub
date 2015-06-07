@@ -59,7 +59,7 @@ $PAGE->set_context($context);
 echo $OUTPUT->header(); // send headers
 
 // If uploaded file is larger than post_max_size (php.ini) setting, $_POST content will be empty.
-if (empty($_POST) && !empty($action)) {
+if (empty($_POST) && isset($action)) {
     $err->error = get_string('errorpostmaxsize', 'repository');
     die(json_encode($err));
 }

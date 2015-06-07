@@ -1325,7 +1325,7 @@ function redirect_if_major_upgrade_required() {
     global $CFG;
     $lastmajordbchanges = 2014093001.00;
     if (empty($CFG->version) or (float)$CFG->version < $lastmajordbchanges or
-            during_initial_install() or !empty($CFG->adminsetuppending)) {
+            during_initial_install() or !empty($CFG->adminsetuppending) or !isset($CFG->totara_version)) {
         try {
             @\core\session\manager::terminate_current();
         } catch (Exception $e) {

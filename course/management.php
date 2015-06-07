@@ -190,9 +190,19 @@ if ($action !== false && confirm_sesskey()) {
             \core_course\management\helper::action_category_resort_courses($category, $sort);
             break;
         case 'showcourse' :
+            if (!empty($CFG->audiencevisibility)) {
+                $url = new moodle_url('/course/edit.php', array('id' => $course->id));
+                $url->set_anchor('id_visiblecohortshdr');
+                redirect($url);
+            }
             $redirectback = \core_course\management\helper::action_course_show($course);
             break;
         case 'hidecourse' :
+            if (!empty($CFG->audiencevisibility)) {
+                $url = new moodle_url('/course/edit.php', array('id' => $course->id));
+                $url->set_anchor('id_visiblecohortshdr');
+                redirect($url);
+            }
             $redirectback = \core_course\management\helper::action_course_hide($course);
             break;
         case 'movecourseup' :
@@ -251,9 +261,11 @@ if ($action !== false && confirm_sesskey()) {
                         $continueurl->param('categoryid', $category->parent);
                     }
                     $notification = get_string('coursecategorydeleted', '', $category->get_formatted_name());
-                    $deletedcourses = $category->delete_full(true);
+                    list($deletedcourses, $deletedprograms) = $category->delete_full(true);
                     foreach ($deletedcourses as $course) {
-                        echo $renderer->notification(get_string('coursedeleted', '', $course->shortname), 'notifysuccess');
+                        if (!empty($course)) {
+                            echo $renderer->notification(get_string('coursedeleted', '', $course->shortname), 'notifysuccess');
+                        }
                     }
                     echo $renderer->notification($notification, 'notifysuccess');
                     echo $renderer->continue_button($continueurl);
@@ -512,6 +524,12 @@ echo $renderer->grid_end();
 
 // End of the management form.
 echo $renderer->management_form_end();
+
+if ($search === '') {
+    // Show the Totara management icons only when not searching because we need current category.
+    echo $renderer->management_buttons($categoryid);
+}
+
 echo $renderer->course_search_form($search);
 
 echo $renderer->footer();

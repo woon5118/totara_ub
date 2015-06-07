@@ -43,6 +43,12 @@ class completion_criteria_activity extends completion_criteria {
     public $criteriatype = COMPLETION_CRITERIA_TYPE_ACTIVITY;
 
     /**
+     * Criteria type form value
+     * @var string
+     */
+    const FORM_MAPPING = 'moduleinstance';
+
+    /**
      * Finds and returns a data_object instance based on params.
      *
      * @param array $params associative arrays varname=>value
@@ -67,31 +73,26 @@ class completion_criteria_activity extends completion_criteria {
                 format_string($data->name));
 
         if ($this->id) {
-            $mform->setDefault('criteria_activity['.$data->id.']', 1);
+            $mform->setDefault('criteria_activity_value['.$data->id.']', 1);
         }
     }
 
     /**
-     * Update the criteria information stored in the database
-     *
-     * @param stdClass $data Form data
+     * Records this object in the database, sets its id to the returned value, and returns that value.
+     * If successful this function also fetches the new object data from database and stores it
+     * in object properties.
+     * @return int PK ID if successful, false otherwise
      */
-    public function update_config(&$data) {
+    public function insert() {
         global $DB;
 
-        if (!empty($data->criteria_activity) && is_array($data->criteria_activity)) {
-
-            $this->course = $data->id;
-
-            foreach (array_keys($data->criteria_activity) as $activity) {
-
-                $module = $DB->get_record('course_modules', array('id' => $activity));
+        if (empty($this->module)) {
+            if ($module = $DB->get_record('course_modules', array('id' => $this->moduleinstance))) {
                 $this->module = self::get_mod_name($module->module);
-                $this->moduleinstance = $activity;
-                $this->id = NULL;
-                $this->insert();
             }
         }
+
+        return parent::insert();
     }
 
     /**
@@ -137,7 +138,7 @@ class completion_criteria_activity extends completion_criteria {
     /**
      * Review this criteria and decide if the user has completed
      *
-     * @param completion_completion $completion     The user's completion record
+     * @param completion_criteria_completion $completion The user's completion record
      * @param bool $mark Optionally set false to not save changes to database
      * @return bool
      */
@@ -151,9 +152,20 @@ class completion_criteria_activity extends completion_criteria {
         $data = $info->get_data($cm, false, $completion->userid);
 
         // If the activity is complete
-        if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
+        if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
             if ($mark) {
-                $completion->mark_complete();
+                if (isset($data->timecompleted)) {
+                    // If course module indicated it's completion time, this time will be used.
+                    // Face-to-face uses this to set time of completion to session end date.
+                    $timecompleted = $data->timecompleted;
+                } else if (isset($data->timemodified)) {
+                    // Otherwise use the last modified time in the course_modules_completion record.
+                    $timecompleted = $data->timemodified;
+                } else {
+                    // Otherwise current time will set.
+                    $timecompleted = null;
+                }
+                $completion->mark_complete($timecompleted);
             }
 
             return true;
@@ -195,59 +207,6 @@ class completion_criteria_activity extends completion_criteria {
     }
 
     /**
-     * Find users who have completed this criteria and mark them accordingly
-     */
-    public function cron() {
-        global $DB;
-
-        // Get all users who meet this criteria
-        $sql = '
-            SELECT DISTINCT
-                c.id AS course,
-                cr.id AS criteriaid,
-                ra.userid AS userid,
-                mc.timemodified AS timecompleted
-            FROM
-                {course_completion_criteria} cr
-            INNER JOIN
-                {course} c
-             ON cr.course = c.id
-            INNER JOIN
-                {context} con
-             ON con.instanceid = c.id
-            INNER JOIN
-                {role_assignments} ra
-              ON ra.contextid = con.id
-            INNER JOIN
-                {course_modules_completion} mc
-             ON mc.coursemoduleid = cr.moduleinstance
-            AND mc.userid = ra.userid
-            LEFT JOIN
-                {course_completion_crit_compl} cc
-             ON cc.criteriaid = cr.id
-            AND cc.userid = ra.userid
-            WHERE
-                cr.criteriatype = '.COMPLETION_CRITERIA_TYPE_ACTIVITY.'
-            AND con.contextlevel = '.CONTEXT_COURSE.'
-            AND c.enablecompletion = 1
-            AND cc.id IS NULL
-            AND (
-                mc.completionstate = '.COMPLETION_COMPLETE.'
-             OR mc.completionstate = '.COMPLETION_COMPLETE_PASS.'
-             OR mc.completionstate = '.COMPLETION_COMPLETE_FAIL.'
-                )
-        ';
-
-        // Loop through completions, and mark as complete
-        $rs = $DB->get_recordset_sql($sql);
-        foreach ($rs as $record) {
-            $completion = new completion_criteria_completion((array) $record, DATA_OBJECT_FETCH_BY_KEY);
-            $completion->mark_complete($record->timecompleted);
-        }
-        $rs->close();
-    }
-
-    /**
      * Return criteria progress details for display in reports
      *
      * @param completion_completion $completion The user's completion record
@@ -255,6 +214,8 @@ class completion_criteria_activity extends completion_criteria {
      *     type, criteria, requirement, status
      */
     public function get_details($completion) {
+        global $DB, $CFG;
+
         // Get completion info
         $modinfo = get_fast_modinfo($completion->course);
         $cm = $modinfo->get_cm($this->moduleinstance);
@@ -282,9 +243,45 @@ class completion_criteria_activity extends completion_criteria {
             }
         }
 
+        $libfile = $CFG->dirroot . "/mod/" . $this->module . "/lib.php";
+        if (file_exists($libfile)) {
+            require_once($libfile);
+
+            $completion_requirements = $this->module . "_get_completion_requirements";
+            if (function_exists($completion_requirements)) {
+                $details['requirement'] = array_merge($details['requirement'], $completion_requirements($cm));
+            }
+        }
+
         $details['requirement'] = implode($details['requirement'], ', ');
 
-        $details['status'] = '';
+        // Build status.
+        $details['status'] = array();
+
+        if ($completion->is_complete()) {
+            $details['status'][] = get_string('completion-y', 'completion');
+        } else {
+            if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
+                if ($cm->completionview) {
+                    $details['status'][] = get_string('viewedactivity', 'completion', $this->module);
+                }
+
+                if (!is_null($cm->completiongradeitemnumber)) {
+                    $details['status'][] = get_string('achievedgrade', 'completion');
+                }
+            }
+
+            $completion_progress = $this->module . "_get_completion_progress";
+            if (function_exists($completion_progress)) {
+                $details['status'] = array_merge($details['status'],
+                        $completion_progress($cm, $completion->userid));
+            }
+        }
+
+        $details['status'] = implode($details['status'], ', ');
+        if (!$details['status']) {
+            $details['status'] = get_string('completion-n', 'completion');
+        }
 
         return $details;
     }

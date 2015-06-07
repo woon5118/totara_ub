@@ -99,6 +99,44 @@ function choice_user_complete($course, $user, $mod, $choice) {
 }
 
 /**
+ * Archives user's assignments for a course
+ *
+ * @param int $userid
+ * @param int $courseid
+ */
+function choice_archive_completion($userid, $courseid, $windowopens = NULL) {
+    global $DB;
+
+    $sql = "SELECT ca.id AS answerid,
+                    c.id AS choiceid
+            FROM {choice_answers} ca
+            JOIN {choice} c ON c.id = ca.choiceid AND c.course = :courseid
+            WHERE ca.userid = :userid";
+    $params = array('userid' => $userid, 'courseid' => $courseid);
+
+    if ($submissions = $DB->get_records_sql($sql, $params)) {
+        $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+        // Answers to be deleted.
+        $deleteanswers = array();
+        // Create the course completion info.
+        $completion = new completion_info($course);
+
+        foreach ($submissions as $submission) {
+            $cm = get_coursemodule_from_instance('choice', $submission->choiceid, $course->id);
+            $deleteanswers[] = $submission->answerid;
+            // Reset viewed.
+            $completion->set_module_viewed_reset($cm, $userid);
+            // And reset completion, in case viewed is not a required condition.
+            $completion->update_state($cm, COMPLETION_INCOMPLETE, $userid);
+        }
+        $DB->delete_records_list('choice_answers', 'id', $deleteanswers);
+        $completion->invalidatecache($courseid, $userid, true);
+    }
+
+    return true;
+}
+
+/**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
@@ -772,7 +810,7 @@ function choice_supports($feature) {
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_BACKUP_MOODLE2:          return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
-
+        case FEATURE_ARCHIVE_COMPLETION:      return true;
         default: return null;
     }
 }
@@ -809,6 +847,48 @@ function choice_extend_settings_navigation(settings_navigation $settings, naviga
         }
         $choicenode->add(get_string("viewallresponses", "choice", $responsecount), new moodle_url('/mod/choice/report.php', array('id'=>$PAGE->cm->id)));
     }
+}
+
+/**
+ * Obtains the specific requirements for completion.
+ *
+ * @param object $cm Course-module
+ * @return array Requirements for completion
+ */
+function choice_get_completion_requirements($cm) {
+    global $DB;
+
+    $choice = $DB->get_record('choice', array('id' => $cm->instance));
+
+    $result = array();
+
+    if ($choice->completionsubmit) {
+        $result[] = get_string('answered', 'choice');
+    }
+
+    return $result;
+}
+
+/**
+ * Obtains the completion progress.
+ *
+ * @param object $cm      Course-module
+ * @param int    $userid  User ID
+ * @return string The current status of completion for the user
+ */
+function choice_get_completion_progress($cm, $userid) {
+    global $DB;
+
+    // Get choice details.
+    $choice = $DB->get_record('choice', array('id' => $cm->instance), '*', MUST_EXIST);
+
+    $result = array();
+
+    if ($choice->completionsubmit && $DB->record_exists('choice_answers', array('choiceid' => $choice->id, 'userid' => $userid))) {
+        $result[] = get_string('answered', 'choice');
+    }
+
+    return $result;
 }
 
 /**

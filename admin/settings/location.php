@@ -6,6 +6,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $temp = new admin_settingpage('locationsettings', new lang_string('locationsettings', 'admin'));
     $temp->add(new admin_setting_servertimezone());
     $temp->add(new admin_setting_forcetimezone());
+
+    // Totara feature.
+    $temp->add(new admin_setting_configtext('csvdateformat', new lang_string('csvdateformat', 'totara_core'), new lang_string('csvdateformatconfig', 'totara_core'), new lang_string('csvdateformatdefault', 'totara_core')));
+
     $temp->add(new admin_settings_country_select('country', new lang_string('country', 'admin'), new lang_string('configcountry', 'admin'), 0));
     $temp->add(new admin_setting_configtext('defaultcity', new lang_string('defaultcity', 'admin'), new lang_string('defaultcity_help', 'admin'), ''));
 

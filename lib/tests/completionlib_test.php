@@ -40,7 +40,15 @@ class core_completionlib_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // NOTE: this mocking is totally idiotic and explodes like crazy!
+        $CFG->loglifetime = -1; // No legacy events.
+        $CFG->rolesactive = 0; // No normal events.
+
+        $dbman = $DB->get_manager();
         $DB = $this->getMock(get_class($DB));
+        $DB->expects($this->any())
+            ->method('get_manager')
+            ->will($this->returnValue($dbman));
         $CFG->enablecompletion = COMPLETION_ENABLED;
         $USER = (object)array('id' =>314159);
     }
@@ -133,6 +141,7 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_update_state() {
+        global $DB;
         $this->mock_setup();
 
         $c = $this->getMock('completion_info', array('is_enabled', 'get_data', 'internal_get_state', 'internal_set_data'), array((object)array('id'=>42)));
@@ -200,8 +209,8 @@ class core_completionlib_testcase extends advanced_testcase {
             ->with($cm, $changed);
         $c->update_state($cm, COMPLETION_INCOMPLETE);
 
-        // Auto, change state.
-        $cm = (object)array('id'=>13, 'course'=>42, 'completion'=>COMPLETION_TRACKING_AUTOMATIC);
+        // Auto, change state
+        $cm = (object)array('id' => 13, 'course' => 42, 'module' => 1, 'completion' => COMPLETION_TRACKING_AUTOMATIC);
         $current = (object)array('completionstate'=>COMPLETION_COMPLETE);
         $c->expects($this->at(0))
             ->method('is_enabled')
@@ -220,6 +229,10 @@ class core_completionlib_testcase extends advanced_testcase {
         $c->expects($this->at(3))
             ->method('internal_set_data')
             ->with($cm, $changed);
+        $DB->expects($this->once())
+            ->method('get_field')
+            ->with('modules', 'name', $this->anything())
+            ->will($this->returnValue('assign'));
         $c->update_state($cm, COMPLETION_COMPLETE_PASS);
     }
 
@@ -325,7 +338,7 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_delete_all_state() {
-        global $DB;
+        global $DB, $SESSION;
         $this->mock_setup();
 
         $course = (object)array('id'=>13);
@@ -339,6 +352,21 @@ class core_completionlib_testcase extends advanced_testcase {
             ->with('course_modules_completion', array('coursemoduleid'=>42))
             ->will($this->returnValue(true));
         $c->delete_all_state($cm);
+
+        // Build up a session to check it deletes the right bits from it
+        // (and not other bits).
+        $SESSION->completioncache = array();
+        $SESSION->completioncache[13] = array();
+        $SESSION->completioncache[13][42] = 'foo';
+        $SESSION->completioncache[13][43] = 'foo';
+        $SESSION->completioncache[14] = array();
+        $SESSION->completioncache[14][42] = 'foo';
+        $DB->expects($this->at(0))
+            ->method('delete_records')
+            ->with('course_modules_completion', array('coursemoduleid'=>42))
+            ->will($this->returnValue(true));
+        $c->delete_all_state($cm);
+        $this->assertEquals(array(13=>array(43=>'foo'), 14=>array(42=>'foo')), $SESSION->completioncache);
     }
 
     public function test_reset_all_state() {
@@ -364,8 +392,8 @@ class core_completionlib_testcase extends advanced_testcase {
         $c->expects($this->at(1))
             ->method('get_tracked_users')
             ->will($this->returnValue(array(
-            (object)array('id'=>100, 'firstname'=>'Woot', 'lastname'=>'Plugh'),
-            (object)array('id'=>201, 'firstname'=>'Vroom', 'lastname'=>'Xyzzy'))));
+                (object)array('id'=>100, 'firstname'=>'Woot', 'lastname'=>'Plugh'),
+                (object)array('id'=>201, 'firstname'=>'Vroom', 'lastname'=>'Xyzzy'))));
 
         $c->expects($this->at(2))
             ->method('update_state')
@@ -381,12 +409,10 @@ class core_completionlib_testcase extends advanced_testcase {
     }
 
     public function test_get_data() {
-        global $DB;
+        global $DB, $SESSION;
         $this->mock_setup();
 
-        $cache = cache::make('core', 'completion');
-
-        $c = new completion_info((object)array('id'=>42, 'cacherev'=>1));
+        $c = new completion_info((object)array('id'=>42));
         $cm = (object)array('id'=>13, 'course'=>42);
 
         // 1. Not current user, record exists.
@@ -399,41 +425,86 @@ class core_completionlib_testcase extends advanced_testcase {
             ->will($this->returnValue($sillyrecord));
         $result = $c->get_data($cm, false, 123);
         $this->assertEquals($sillyrecord, $result);
-        $this->assertEquals(false, $cache->get('123_42')); // Not current user is not cached.
+        $this->assertFalse(isset($SESSION->completioncache));
 
-        // 2. Not current user, default record, whole course.
-        $cache->purge();
+        // 2. Not current user, default record, whole course (ignored).
         $DB->expects($this->at(0))
-            ->method('get_records_sql')
-            ->will($this->returnValue(array()));
-        $modinfo = new stdClass();
-        $modinfo->cms = array((object)array('id'=>13));
-        $result=$c->get_data($cm, true, 123, $modinfo);
+            ->method('get_record')
+            ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>123))
+            ->will($this->returnValue(false));
+        $result=$c->get_data($cm, true, 123);
         $this->assertEquals((object)array(
             'id'=>'0', 'coursemoduleid'=>13, 'userid'=>123, 'completionstate'=>0,
-            'viewed'=>0, 'timemodified'=>0), $result);
-        $this->assertEquals(false, $cache->get('123_42')); // Not current user is not cached.
+            'viewed'=>0, 'timemodified'=>0, 'timecompleted'=>null), $result);
+        $this->assertFalse(isset($SESSION->completioncache));
 
         // 3. Current user, single record, not from cache.
         $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(1))
             ->method('get_record')
             ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>314159))
             ->will($this->returnValue($sillyrecord));
         $result = $c->get_data($cm);
         $this->assertEquals($sillyrecord, $result);
-        $cachevalue = $cache->get('314159_42');
-        $this->assertEquals($sillyrecord, $cachevalue[13]);
+        $this->assertEquals($sillyrecord, $SESSION->completioncache[42][13]);
+        // When checking time(), allow for second overlaps.
+        $this->assertTrue(time()-$SESSION->completioncache[42]['updated']<2);
 
-        // 4. Current user, 'whole course', but from cache.
+        // 4. Current user, 'whole course', but from cache
+        $DB->expects($this->at(0))
+            ->method('record_exists')
+            ->with('course_completions', array('course' => 42, 'userid' => 314159, 'invalidatecache' => 0))
+            ->will($this->returnValue(true));
         $result = $c->get_data($cm, true);
         $this->assertEquals($sillyrecord, $result);
 
-        // 5. Current user, 'whole course' and record not in cache.
-        $cache->purge();
-
-        // Scenario: Completion data exists for one CMid.
-        $basicrecord = (object)array('coursemoduleid'=>13);
+        // 5. Current user, single record, cache expired
+        $SESSION->completioncache[42]['updated']=37; // Quite a long time ago.
+        $now = time();
+        $SESSION->completioncache[17]['updated']=$now;
+        $SESSION->completioncache[39]['updated']=72; // Also a long time ago.
         $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(1))
+            ->method('record_exists')
+            ->with('course_completions', array('course' => 17, 'userid' => 314159, 'invalidatecache' => 0))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(2))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 39, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(3))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $DB->expects($this->at(4))
+            ->method('get_record')
+            ->with('course_modules_completion', array('coursemoduleid'=>13, 'userid'=>314159))
+            ->will($this->returnValue($sillyrecord));
+        $result = $c->get_data($cm, false);
+        $this->assertEquals($sillyrecord, $result);
+
+        // Check that updated value is right, then fudge it to make next compare work.
+        $this->assertTrue(time()-$SESSION->completioncache[42]['updated']<2);
+        $SESSION->completioncache[42]['updated']=$now;
+        // Check things got expired from cache.
+        $this->assertEquals(array(42=>array(13=>$sillyrecord, 'updated'=>$now), 17=>array('updated'=>$now)), $SESSION->completioncache);
+
+        // 6. Current user, 'whole course' and record not in cache.
+        unset($SESSION->completioncache);
+
+        // Scenario: Completion data exists for one CMid
+        $DB->expects($this->at(0))
+            ->method('set_field')
+            ->with('course_completions', 'invalidatecache', false, array('course' => 42, 'userid' => 314159))
+            ->will($this->returnValue(true));
+        $basicrecord = (object)array('coursemoduleid'=>13);
+        $DB->expects($this->at(1))
             ->method('get_records_sql')
             ->will($this->returnValue(array('1'=>$basicrecord)));
 
@@ -446,15 +517,15 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->assertEquals($basicrecord, $result);
 
         // Check the cache contents.
-        $cachevalue = $cache->get('314159_42');
-        $this->assertEquals($basicrecord, $cachevalue[13]);
-        $this->assertEquals((object)array('id'=>'0', 'coursemoduleid'=>14,
-            'userid'=>314159, 'completionstate'=>0, 'viewed'=>0, 'timemodified'=>0),
-            $cachevalue[14]);
+        $this->assertTrue(time()-$SESSION->completioncache[42]['updated']<2);
+        $SESSION->completioncache[42]['updated'] = $now;
+        $this->assertEquals(array(42 => array(13 => $basicrecord, 14 => (object)array(
+            'id' => 0, 'coursemoduleid' => 14, 'userid' => 314159, 'completionstate' => 0,
+            'viewed' => 0, 'timemodified' => 0, 'timecompleted' => null), 'updated' => $now)), $SESSION->completioncache);
     }
 
     public function test_internal_set_data() {
-        global $DB;
+        global $DB, $SESSION;
         $this->setup_data();
 
         $this->setUser($this->user);
@@ -471,16 +542,15 @@ class core_completionlib_testcase extends advanced_testcase {
         $data->completionstate = COMPLETION_COMPLETE;
         $data->timemodified = time();
         $data->viewed = COMPLETION_NOT_VIEWED;
+        $data->timecompleted = null;
 
         $c->internal_set_data($cm, $data);
         $d1 = $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id));
         $this->assertEquals($d1, $data->id);
-        $cache = cache::make('core', 'completion');
-        // Cache was not set for another user.
-        $this->assertEquals(array('cacherev' => $this->course->cacherev, $cm->id => $data),
-            $cache->get($data->userid . '_' . $cm->course));
+        $this->assertEquals(array($this->course->id => array($cm->id => $data)), $SESSION->completioncache);
 
-        // 2) Test with existing data and for different user.
+        // 2) Test with existing data and for different user (not cached).
+        unset($SESSION->completioncache);
         $forum2 = $this->getDataGenerator()->create_module('forum', array('course' => $this->course->id), $completionauto);
         $cm2 = get_coursemodule_from_instance('forum', $forum2->id);
         $newuser = $this->getDataGenerator()->create_user();
@@ -492,12 +562,9 @@ class core_completionlib_testcase extends advanced_testcase {
         $d2->completionstate = COMPLETION_COMPLETE;
         $d2->timemodified = time();
         $d2->viewed = COMPLETION_NOT_VIEWED;
+        $d2->timecompleted = null;
         $c->internal_set_data($cm2, $d2);
-        // Cache for current user returns the data.
-        $cachevalue = $cache->get($data->userid . '_' . $cm->course);
-        $this->assertEquals($data, $cachevalue[$cm->id]);
-        // Cache for another user is not filled.
-        $this->assertEquals(false, $cache->get($d2->userid . '_' . $cm2->course));
+        $this->assertFalse(isset($SESSION->completioncache));
 
         // 3) Test where it THINKS the data is new (from cache) but actually
         //    in the database it has been set since.
@@ -542,11 +609,11 @@ class core_completionlib_testcase extends advanced_testcase {
             ->will($this->returnValue(new core_completionlib_fake_recordset(array($progress1, $progress2))));
 
         $this->assertEquals(array(
-                100 => (object)array('id'=>100, 'firstname'=>'Woot', 'lastname'=>'Plugh',
-                    'progress'=>array(13=>$progress1)),
-                201 => (object)array('id'=>201, 'firstname'=>'Vroom', 'lastname'=>'Xyzzy',
-                    'progress'=>array(14=>$progress2)),
-            ), $c->get_progress_all(false));
+            100 => (object)array('id'=>100, 'firstname'=>'Woot', 'lastname'=>'Plugh',
+                'progress'=>array(13=>$progress1)),
+            201 => (object)array('id'=>201, 'firstname'=>'Vroom', 'lastname'=>'Xyzzy',
+                'progress'=>array(14=>$progress2)),
+        ), $c->get_progress_all(false));
 
         // 2) With more than 1, 000 results.
         $tracked = array();
@@ -784,6 +851,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $current = $c->get_data($activities[$forum->cmid], false, $this->user->id);
         $current->completionstate = COMPLETION_COMPLETE;
         $current->timemodified = time();
+        $current->timecompleted = null;
         $sink = $this->redirectEvents();
         $c->internal_set_data($activities[$forum->cmid], $current);
         $events = $sink->get_events();
@@ -834,11 +902,11 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->setup_data();
         $coursecontext = context_course::instance($this->course->id);
         $coursecompletionevent = \core\event\course_completion_updated::create(
-                array(
-                    'courseid' => $this->course->id,
-                    'context' => $coursecontext
-                    )
-                );
+            array(
+                'courseid' => $this->course->id,
+                'context' => $coursecontext
+            )
+        );
 
         // Mark course as complete and get triggered event.
         $sink = $this->redirectEvents();

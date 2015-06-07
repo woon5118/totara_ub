@@ -562,7 +562,7 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
 
     // Now that module is fully updated, also update completion data if required.
     // (this will wipe all user completion data and recalculate it)
-    if ($completion->is_enabled() && !empty($moduleinfo->completionunlocked)) {
+    if ($completion->is_enabled() && !empty($moduleinfo->completionunlocked) && empty($moduleinfo->completionunlockednoreset)) {
         $completion->reset_all_state($cm);
     }
     $cm->name = $moduleinfo->name;

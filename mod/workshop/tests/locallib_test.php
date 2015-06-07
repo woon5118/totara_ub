@@ -42,6 +42,10 @@ class mod_workshop_internal_api_testcase extends advanced_testcase {
     protected function setUp() {
         parent::setUp();
         $this->setAdminUser();
+
+        global $DB;
+        $DB->set_field('modules', 'visible', 1, array('name'=>'workshop'));
+
         $course = $this->getDataGenerator()->create_course();
         $workshop = $this->getDataGenerator()->create_module('workshop', array('course' => $course));
         $cm = get_coursemodule_from_instance('workshop', $workshop->id, $course->id, false, MUST_EXIST);

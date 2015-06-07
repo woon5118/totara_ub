@@ -60,19 +60,22 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 } else {
     navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
 }
-$PAGE->navbar->add(get_string('assign', 'cohort'));
+totara_cohort_navlinks($cohort->id, $cohort->name, get_string('assign', 'cohort'));
 
 $PAGE->set_title(get_string('assigncohorts', 'cohort'));
 $PAGE->set_heading($COURSE->fullname);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('assignto', 'cohort', format_string($cohort->name)));
-
+echo cohort_print_tabs('editmembers', $cohort->id, $cohort->cohorttype, $cohort);
 echo $OUTPUT->notification(get_string('removeuserwarning', 'core_cohort'));
 
 // Get the user_selector we will need.
 $potentialuserselector = new cohort_candidate_selector('addselect', array('cohortid'=>$cohort->id, 'accesscontext'=>$context));
 $existinguserselector = new cohort_existing_selector('removeselect', array('cohortid'=>$cohort->id, 'accesscontext'=>$context));
+
+// Get current roles assigned to this cohort.
+$currentcohortroles = totara_get_cohort_roles($cohort->id);
 
 // Process incoming user assignments to the cohort
 
@@ -80,9 +83,15 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoassign = $potentialuserselector->get_selected_users();
     if (!empty($userstoassign)) {
 
+        $newids = array();
         foreach ($userstoassign as $adduser) {
             cohort_add_member($cohort->id, $adduser->id);
+            $newids[$adduser->id] = $adduser->id;
         }
+        // Assign roles to new users.
+        totara_set_role_assignments_cohort($currentcohortroles, $cohort->id, array_keys($newids));
+        // Notify users.
+        totara_cohort_notify_add_users($cohort->id, $newids);
 
         $potentialuserselector->invalidate_selected_users();
         $existinguserselector->invalidate_selected_users();
@@ -93,9 +102,16 @@ if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
 if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoremove = $existinguserselector->get_selected_users();
     if (!empty($userstoremove)) {
+        $delids = array();
         foreach ($userstoremove as $removeuser) {
             cohort_remove_member($cohort->id, $removeuser->id);
+            $delids[$removeuser->id] = $removeuser->id;
         }
+        // Unassign roles to users deleted.
+        totara_unset_role_assignments_cohort($currentcohortroles, $cohort->id, array_keys($delids));
+        // Notify users.
+        totara_cohort_notify_del_users($cohort->id, $delids);
+
         $potentialuserselector->invalidate_selected_users();
         $existinguserselector->invalidate_selected_users();
     }

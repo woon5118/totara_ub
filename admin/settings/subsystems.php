@@ -34,7 +34,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     // Conditional activities: completion and availability
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablecompletion',
         new lang_string('enablecompletion','completion'),
-        new lang_string('configenablecompletion','completion'), 0));
+        new lang_string('configenablecompletion','completion'), 1));
 
     $options = array(
         1 => get_string('completionactivitydefault', 'completion'),
@@ -48,7 +48,99 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
             new lang_string('enableavailability_desc', 'availability'), 0));
     $checkbox->set_affects_modinfo(true);
 
+    // Course RPL
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enablecourserpl', new lang_string('enablecourserpl', 'completion'), new lang_string('configenablecourserpl', 'completion'), 1));
+
+    // Module RPLs
+    // Get module list
+    if ($modules = $DB->get_records("modules")) {
+        // Default to all
+        $defaultmodules = array();
+
+        foreach ($modules as $module) {
+            $strmodulename = new lang_string("modulename", "$module->name");
+            // Deal with modules which are lacking the language string
+            if ($strmodulename == '[[modulename]]') {
+                $strmodulename = $module->name;
+            }
+            $modulebyname[$module->id] = $strmodulename;
+            $defaultmodules[$module->id] = 1;
+        }
+        asort($modulebyname, SORT_LOCALE_STRING);
+
+        $optionalsubsystems->add(new admin_setting_configmulticheckbox(
+                        'enablemodulerpl',
+                        new lang_string('enablemodulerpl', 'completion'),
+                        new lang_string('configenablemodulerpl', 'completion'),
+                        $defaultmodules,
+                        $modulebyname
+        ));
+    }
+
     $optionalsubsystems->add(new admin_setting_configcheckbox('enableplagiarism', new lang_string('enableplagiarism','plagiarism'), new lang_string('configenableplagiarism','plagiarism'), 0));
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablebadges', new lang_string('enablebadges', 'badges'), new lang_string('configenablebadges', 'badges'), 1));
+
+    // Report caching
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enablereportcaching', new lang_string('enablereportcaching','totara_reportbuilder'), new lang_string('configenablereportcaching','totara_reportbuilder'), 0));
+
+    // Audience visibility.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('audiencevisibility', new lang_string('enableaudiencevisibility', 'totara_cohort'), new lang_string('configenableaudiencevisibility', 'totara_cohort'), 0));
+
+    // Enchanced catalog.
+    // Was upgrade - old catalog by default, otherwise - new catalog.
+    $defaultenhanced = (isset($CFG->upgradetofaceted) && $CFG->upgradetofaceted == 1) ? 0 : 1;
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enhancedcatalog',
+            new lang_string('enhancedcatalog', 'totara_core'),
+            new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced));
+
+    // Dynamic Appraisals.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisals',
+            new lang_string('dynamicappraisals', 'totara_core'),
+            new lang_string('configdynamicappraisals', 'totara_core'), 1));
+
+    // Show Hierarchy shortcodes.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('showhierarchyshortnames',
+            new lang_string('showhierarchyshortnames', 'totara_hierarchy'),
+            new lang_string('configshowhierarchyshortnames', 'totara_hierarchy'), 0));
+
+    // Totara Settings.
+    $featureoptions = array(
+        TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
+        TOTARA_HIDEFEATURE => new lang_string('hidefeature', 'totara_core'),
+        TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
+    );
+
+    // If adding or removing the settings below, be sure to update the array in
+    // totara_advanced_features_list() in totara/core/totara.php.
+
+    $optionalsubsystems->add(new admin_setting_configselect('enablegoals',
+        new lang_string('enablegoals', 'totara_hierarchy'),
+        new lang_string('configenablegoals', 'totara_hierarchy'),
+        TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enableappraisals',
+        new lang_string('enableappraisals', 'totara_appraisal'),
+        new lang_string('configenableappraisals', 'totara_appraisal'),
+        TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enablefeedback360',
+        new lang_string('enablefeedback360', 'totara_feedback360'),
+        new lang_string('configenablefeedback360', 'totara_feedback360'),
+        TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enablelearningplans',
+        new lang_string('enablelearningplans', 'totara_plan'),
+        new lang_string('configenablelearningplans', 'totara_plan'),
+        TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enableprograms',
+        new lang_string('enableprograms', 'totara_program'),
+        new lang_string('configenableprograms', 'totara_program'),
+        TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enablecertifications',
+        new lang_string('enablecertifications', 'totara_program'),
+        new lang_string('configenablecertifications', 'totara_program'),
+        TOTARA_SHOWFEATURE, $featureoptions));
 }

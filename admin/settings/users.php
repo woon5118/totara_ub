@@ -64,7 +64,7 @@ if ($hassiteconfig
 
     $ADMIN->add('accounts', new admin_externalpage('profilefields', new lang_string('profilefields','admin'), "$CFG->wwwroot/user/profile/index.php", 'moodle/site:config'));
     $ADMIN->add('accounts', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'), $CFG->wwwroot . '/cohort/index.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
-
+    $ADMIN->add('accounts', new admin_externalpage('cohortglobalsettings', new lang_string('cohortglobalsettings', 'totara_cohort'), $CFG->wwwroot . '/totara/cohort/globalsettings.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
 
     // stuff under the "roles" subcategory
 
@@ -78,10 +78,17 @@ if ($hassiteconfig
             $guestroles      = array();
             $userroles       = array();
             $creatornewroles = array();
+            //Totara role groups
+            $learnerroles      = array();
+            $staffmanagerroles = array();
+            $editorroles       = array();
 
             $defaultteacherid = null;
             $defaultuserid    = null;
             $defaultguestid   = null;
+            //Totara id defaults
+            $defaultlearnerid  = null;
+            $defaultmanagerid  = null;
 
             $roles = role_fix_names(get_all_roles(), null, ROLENAME_ORIGINALANDSHORT);
             foreach ($roles as $role) {
@@ -91,15 +98,24 @@ if ($hassiteconfig
                         $creatornewroles[$role->id] = $rolename;
                         break;
                     case 'coursecreator':
+                        $editorroles[$role->id] = $rolename;
                         break;
                     case 'editingteacher':
                         $defaultteacherid = isset($defaultteacherid) ? $defaultteacherid : $role->id;
                         $creatornewroles[$role->id] = $rolename;
+                        $editorroles[$role->id] = $rolename;
                         break;
                     case 'teacher':
                         $creatornewroles[$role->id] = $rolename;
+                        $editorroles[$role->id] = $rolename;
                         break;
                     case 'student':
+                        $defaultlearnerid = isset($defaultlearnerid) ? $defaultlearnerid : $role->id;
+                        $learnerroles[$role->id] = $rolename;
+                        break;
+                    case 'staffmanager':
+                        $defaultmanagerid = isset($defaultmanagerid) ? $defaultmanagerid : $role->id;
+                        $staffmanagerroles[$role->id] = $rolename;
                         break;
                     case 'guest':
                         $defaultguestid = isset($defaultguestid) ? $defaultguestid : $role->id;
@@ -135,6 +151,14 @@ if ($hassiteconfig
                           new lang_string('confignotloggedinroleid', 'admin'), $defaultguestid, ($guestroles + $otherroles)));
             $temp->add(new admin_setting_configselect('guestroleid', new lang_string('guestroleid', 'admin'),
                           new lang_string('guestroleid_help', 'admin'), $defaultguestid, ($guestroles + $otherroles)));
+            // Totara specific options
+            $temp->add(new admin_setting_configselect('learnerroleid', new lang_string('learnerroleid', 'admin'),
+                          new lang_string('learnerroleid_help', 'admin'), $defaultlearnerid, ($learnerroles + $otherroles + $userroles)));
+            $temp->add(new admin_setting_configselect('managerroleid', new lang_string('managerroleid', 'admin'),
+                           new lang_string('managerroleid_help', 'admin'), $defaultmanagerid, ($editorroles + $staffmanagerroles + $learnerroles + $otherroles)));
+            $temp->add(new admin_setting_configselect('assessorroleid', new lang_string('assessorroleid', 'admin'),
+                          new lang_string('assessorroleid_help', 'admin'), $defaultteacherid, ($editorroles + $staffmanagerroles + $learnerroles + $otherroles)));
+            // End Totara options
             $temp->add(new admin_setting_configselect('defaultuserroleid', new lang_string('defaultuserroleid', 'admin'),
                           new lang_string('configdefaultuserroleid', 'admin'), $defaultuserid, ($userroles + $otherroles)));
             $temp->add(new admin_setting_configselect('creatornewroleid', new lang_string('creatornewroleid', 'admin'),
@@ -148,6 +172,10 @@ if ($hassiteconfig
             unset($userroles);
             unset($creatornewroles);
             unset($restorersnewrole);
+            // Totara arrays
+            unset($editorroles);
+            unset($learnerroles);
+            unset($staffmanagerroles);
         }
 
         $temp->add(new admin_setting_configcheckbox('autologinguests', new lang_string('autologinguests', 'admin'), new lang_string('configautologinguests', 'admin'), 0));
@@ -199,6 +227,27 @@ if ($hassiteconfig
         $temp->add(new admin_setting_configtext('gravatardefaulturl', new lang_string('gravatardefaulturl', 'admin'), new lang_string('gravatardefaulturl_help', 'admin'), 'mm'));
     }
 
+    // Temporary managers.
+    $temp->add(new admin_setting_heading('tempmanagers',
+            new lang_string('tempmanagers', 'totara_core'), ''));
+
+    $temp->add(new admin_setting_configcheckbox('enabletempmanagers',
+            new lang_string('enabletempmanagers', 'totara_core'),
+            new lang_string('enabletempmanagersdesc', 'totara_core'),
+            1));
+
+    $temp->add(new admin_setting_configselect('tempmanagerrestrictselection',
+            new lang_string('tempmanagerrestrictselection', 'totara_core'),
+            new lang_string('tempmanagerrestrictselectiondesc', 'totara_core'),
+            0,
+            array(0 => get_string('tempmanagerselectionallusers', 'totara_core'),
+                  1 => get_string('tempmanagerselectiononlymanagers', 'totara_core'))));
+
+    $temp->add(new admin_setting_configtext('tempmanagerexpirydays',
+            new lang_string('tempmanagerexpirydays', 'totara_core'),
+            new lang_string('tempmanagerexpirydaysdesc', 'totara_core'),
+            '30', PARAM_INT));
+
     $ADMIN->add('roles', $temp);
 
     if (is_siteadmin()) {
@@ -207,5 +256,6 @@ if ($hassiteconfig
     $ADMIN->add('roles', new admin_externalpage('defineroles', new lang_string('defineroles', 'role'), "$CFG->wwwroot/$CFG->admin/roles/manage.php", 'moodle/role:manage'));
     $ADMIN->add('roles', new admin_externalpage('assignroles', new lang_string('assignglobalroles', 'role'), "$CFG->wwwroot/$CFG->admin/roles/assign.php?contextid=".$systemcontext->id, 'moodle/role:assign'));
     $ADMIN->add('roles', new admin_externalpage('checkpermissions', new lang_string('checkglobalpermissions', 'role'), "$CFG->wwwroot/$CFG->admin/roles/check.php?contextid=".$systemcontext->id, array('moodle/role:assign', 'moodle/role:safeoverride', 'moodle/role:override', 'moodle/role:manage')));
+    $ADMIN->add('roles', new admin_externalpage('roledefaults', new lang_string('roledefaults', 'totara_core'), "$CFG->wwwroot/$CFG->admin/roles/roledefaults.php", 'moodle/role:manage'));
 
 } // end of speedup

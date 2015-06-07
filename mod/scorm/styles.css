@@ -231,6 +231,17 @@
     margin-left:20%;
 }
 
+/* Puts scorm content-level scroll bars on desktop popup. */
+#page-mod-scorm-player.pagelayout-popup { overflow: hidden; }
+
+/* Mobile. */
+.ui-mobile-viewport { overflow: scroll !important; }
+/* Yes, hard-coded is bad, but it is better than always cropping to screen size. Change these value if you want. */
+.ui-mobile-viewport #scorm_object { width: 1200px; height: 1500px; }
+.ui-mobile-viewport .mymobilecontent { overflow-x: visible; }
+.ui-mobile-viewport #toctree { overflow-x: visible !important; overflow-y: visible !important; }
+.ui-mobile-viewport .yui-layout-doc { overflow: visible; }
+
 #page-mod-scorm-player #scormpage span.yui3-treeview-icon {
     display: none;
 }
@@ -271,6 +282,10 @@
 #page-mod-scorm-player #scormpage div.yui3-g-r {
     *letter-spacing: normal;
     *word-spacing: -0.43em;
+}
+
+#region-main #scorm_layout {
+    margin-bottom: 50px;
 }
 
 /**

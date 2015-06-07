@@ -482,27 +482,23 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
                 $plugin = $plugins[$instance->enrol];
                 if ($unenrollink = $plugin->get_unenrolself_link($instance)) {
                     $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                    $coursenode->add(get_string('unenrolme', 'core_enrol', $shortname), $unenrollink, navigation_node::TYPE_SETTING, null, 'unenrolself', new pix_icon('i/user', ''));
+                    $coursenode->add(get_string('unenrolme', 'core_enrol', $shortname), $unenrollink, navigation_node::TYPE_SETTING, null, 'unenrolself', new pix_icon('i/userdel', ''));
                     break;
                     //TODO. deal with multiple unenrol links - not likely case, but still...
                 }
             }
         } else {
             // enrol link if possible
-            if (is_viewing($coursecontext)) {
-                // better not show any enrol link, this is intended for managers and inspectors
-            } else {
-                foreach ($instances as $instance) {
-                    if (!isset($plugins[$instance->enrol])) {
-                        continue;
-                    }
-                    $plugin = $plugins[$instance->enrol];
-                    if ($plugin->show_enrolme_link($instance)) {
-                        $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
-                        $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-                        $coursenode->add(get_string('enrolme', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/user', ''));
-                        break;
-                    }
+            foreach ($instances as $instance) {
+                if (!isset($plugins[$instance->enrol])) {
+                    continue;
+                }
+                $plugin = $plugins[$instance->enrol];
+                if ($plugin->show_enrolme_link($instance)) {
+                    $url = new moodle_url('/enrol/index.php', array('id'=>$course->id));
+                    $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
+                    $coursenode->add(get_string('enrolmentoptions', 'core_enrol', $shortname), $url, navigation_node::TYPE_SETTING, null, 'enrolself', new pix_icon('i/useradd', ''));
+                    break;
                 }
             }
         }
@@ -522,7 +518,8 @@ function enrol_add_course_navigation(navigation_node $coursenode, $course) {
  * @return array
  */
 function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder ASC', $limit = 0) {
-    global $DB, $USER;
+    global $DB, $USER, $CFG;
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser() or !isloggedin()) {
@@ -581,6 +578,11 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['contextlevel'] = CONTEXT_COURSE;
     $wheres = implode(" AND ", $wheres);
 
+    // Get visibility sql for the courses the user can view.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id, 'c.id', 'c.visible', 'c.audiencevisible');
+    $wheres .= " AND {$visibilitysql} ";
+    $params = array_merge($params, $visibilityparams);
+
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
               FROM {course} c
@@ -599,22 +601,6 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     $params['now2']    = $params['now1'];
 
     $courses = $DB->get_records_sql($sql, $params, 0, $limit);
-
-    // preload contexts and check visibility
-    foreach ($courses as $id=>$course) {
-        context_helper::preload_from_record($course);
-        if (!$course->visible) {
-            if (!$context = context_course::instance($id, IGNORE_MISSING)) {
-                unset($courses[$id]);
-                continue;
-            }
-            if (!has_capability('moodle/course:viewhiddencourses', $context)) {
-                unset($courses[$id]);
-                continue;
-            }
-        }
-        $courses[$id] = $course;
-    }
 
     //wow! Is that really all? :-D
 
@@ -691,29 +677,7 @@ function enrol_get_course_description_texts($course) {
  * @return array
  */
 function enrol_get_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
-
-    $courses = enrol_get_all_users_courses($userid, $onlyactive, $fields, $sort);
-
-    // preload contexts and check visibility
-    if ($onlyactive) {
-        foreach ($courses as $id=>$course) {
-            context_helper::preload_from_record($course);
-            if (!$course->visible) {
-                if (!$context = context_course::instance($id)) {
-                    unset($courses[$id]);
-                    continue;
-                }
-                if (!has_capability('moodle/course:viewhiddencourses', $context, $userid)) {
-                    unset($courses[$id]);
-                    continue;
-                }
-            }
-        }
-    }
-
-    return $courses;
-
+    return enrol_get_all_users_courses($userid, $onlyactive, $fields, $sort);
 }
 
 /**
@@ -752,15 +716,9 @@ function enrol_user_sees_own_courses($user = null) {
 
     // Now the slow way.
     $courses = enrol_get_all_users_courses($userid, true);
-    foreach($courses as $course) {
-        if ($course->visible) {
-            return true;
-        }
-        context_helper::preload_from_record($course);
-        $context = context_course::instance($course->id);
-        if (has_capability('moodle/course:viewhiddencourses', $context, $user)) {
-            return true;
-        }
+
+    if (!empty($courses)) {
+        return true;
     }
 
     return false;
@@ -779,7 +737,8 @@ function enrol_user_sees_own_courses($user = null) {
  * @return array
  */
 function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NULL, $sort = 'visible DESC,sortorder ASC') {
-    global $DB;
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 
     // Guest account does not have any courses
     if (isguestuser($userid) or empty($userid)) {
@@ -840,6 +799,14 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
+    $visibilitysql = '';
+    $visibilityparams = array();
+    if ($onlyactive) {
+    // Take into account the visibility of the courses.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
+        $visibilitysql = "AND {$visibilitysql}";
+    }
+
     //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
               FROM {course} c
@@ -849,9 +816,10 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
                  $subwhere
                    ) en ON (en.courseid = c.id)
            $ccjoin
-             WHERE c.id <> :siteid
+             WHERE c.id <> :siteid $visibilitysql
           $orderby";
     $params['userid']  = $userid;
+    $params = array_merge($params, $visibilityparams);
 
     $courses = $DB->get_records_sql($sql, $params);
 
@@ -1329,6 +1297,8 @@ abstract class enrol_plugin {
                         'other' => array('enrol' => $name)
                         )
                     );
+            $event->add_record_snapshot('enrol', $instance); // TODO: Upstream to Moodle.
+            $event->add_record_snapshot('user_enrolments', $ue); // TODO: Upstream to Moodle.
             $event->trigger();
         }
 
@@ -1356,6 +1326,85 @@ abstract class enrol_plugin {
                 unset($USER->enrol['tempguest'][$courseid]);
                 remove_temp_course_roles($context);
             }
+        }
+    }
+
+    /**
+     * Bulk enrol users into a course
+     *
+     * @since Totara 2.2
+     *
+     * @param stdClass $instance an enrol instance to use
+     * @param array $userids containing objects of userids
+     * @param int $roleid optional role id
+     * @param int $timestart 0 means unknown
+     * @param int $timeend 0 means forever
+     * @param int $status default to ENROL_USER_ACTIVE for new enrolments, no change by default in updates
+     * @return void
+     */
+    public function enrol_user_bulk(stdClass $instance, $userids, $roleid = NULL, $timestart = 0, $timeend = 0, $status = NULL) {
+        global $DB, $USER, $CFG; // CFG necessary!!!
+
+        if ($instance->courseid == SITEID) {
+            throw new coding_exception('invalid attempt to enrol into frontpage course!');
+        }
+
+        $name = $this->get_name();
+        $courseid = $instance->courseid;
+
+        if ($instance->enrol !== $name) {
+            throw new coding_exception('invalid enrol instance!');
+        }
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
+
+        // Remove duplicates
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal(array_map(function($item) { return $item->userid; },
+            $userids));
+        $sql = "SELECT u.id AS userid
+            FROM {user} u
+            LEFT JOIN {user_enrolments} ue ON u.id = ue.userid AND ue.enrolid = {$instance->id}
+            WHERE u.id {$sqlin}
+            AND ue.id IS NULL";
+        $userids = $DB->get_records_sql($sql, $sqlinparams);
+
+        $timenow = time();
+        $newenrolments = array();
+        foreach ($userids as $u) {
+            $enrolobj = new stdClass;
+            $enrolobj->userid           = $u->userid;
+            $enrolobj->enrolid          = $instance->id;
+            $enrolobj->status       = is_null($status) ? ENROL_USER_ACTIVE : $status;
+            $enrolobj->timestart    = $timestart;
+            $enrolobj->timeend      = $timeend;
+            $enrolobj->modifierid   = $USER->id;
+            $enrolobj->timecreated  = $timenow;
+            $enrolobj->timemodified = $timenow;
+
+            $newenrolments[] = $enrolobj;
+        }
+
+        $DB->insert_records_via_batch('user_enrolments', $newenrolments);
+        unset($newenrolments);
+
+        \totara_core\event\bulk_enrolments_started::create_from_instance($instance)->trigger();
+        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
+
+        if ($roleid) {
+            // this must be done after the enrolment event so that the role_assigned event is triggered afterwards
+            if ($this->roles_protected()) {
+                role_assign_bulk($roleid, $userids, $context->id, 'enrol_'.$name, $instance->id);
+            } else {
+                role_assign_bulk($roleid, $userids, $context->id);
+            }
+        }
+
+        // reset current user enrolment caching
+        if (isset($USER->enrol['enrolled'][$courseid])) {
+            unset($USER->enrol['enrolled'][$courseid]);
+        }
+        if (isset($USER->enrol['tempguest'][$courseid])) {
+            unset($USER->enrol['tempguest'][$courseid]);
+            remove_temp_course_roles($context);
         }
     }
 
@@ -1419,6 +1468,8 @@ abstract class enrol_plugin {
                     'other' => array('enrol' => $name)
                     )
                 );
+        $event->add_record_snapshot('enrol', $instance); // TODO: upstream to Moodle
+        $event->add_record_snapshot('user_enrolments', $ue); // TODO: upstream to Moodle
         $event->trigger();
     }
 
@@ -1512,6 +1563,83 @@ abstract class enrol_plugin {
             }
         }
     }
+
+    /**
+     * Unenrol users from course in a bulk way,
+     * the last unenrolment removes all remaining roles.
+     *
+     * @since Totara 2.2
+     *
+     * @param stdClass $instance enrol instance
+     * @param array $userids
+     * @return void
+     */
+    public function unenrol_user_bulk(stdClass $instance, $userids) {
+        global $CFG, $USER, $DB;
+
+        $name = $this->get_name();
+        $courseid = $instance->courseid;
+
+        if ($instance->enrol !== $name) {
+            throw new coding_exception('invalid enrol instance!');
+        }
+        if (empty($userids)) {
+            return;
+        }
+        $context = context_course::instance($instance->courseid, MUST_EXIST);
+
+        list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+        $sql = "SELECT *
+            FROM {user_enrolments}
+            WHERE enrolid = {$instance->id}
+            AND userid {$sqlin}";
+
+        $ue = $DB->get_records_sql($sql, $sqlinparams);
+        if (empty($ue)) {
+            // weird, users not enrolled
+            return;
+        }
+
+        // TODO perform in batches of 1000
+        role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id,
+            'component' => 'enrol_' . $name, 'itemid' => $instance->id));
+        $DB->delete_records_list('user_enrolments', 'id', array_keys($ue));
+
+        \totara_core\event\bulk_enrolments_started::create_from_instance($instance)->trigger();
+        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
+
+        $sql = "SELECT ue.*
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON (e.id = ue.enrolid)
+                  WHERE e.courseid = ?
+                  AND ue.userid {$sqlin}";
+        $uenotlast = $DB->get_records_sql($sql, array_merge(array($courseid), $sqlinparams));
+
+        if (empty($uenotlast)) {
+            // users' last enrolment intance in course - do big cleanup
+
+            require_once("$CFG->dirroot/group/lib.php");
+            require_once("$CFG->libdir/gradelib.php");
+
+            // remove all remaining roles
+            role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id), true, false);
+
+            //clean up ALL invisible user data from course if this is the last enrolment - groups, grades, etc.
+            groups_delete_group_members_bulk($courseid, $userids);
+
+            foreach ($userids as $userid) {
+                // TODO create bulk function for moar speed at some point
+                grade_user_unenrol($courseid, $userid);
+            }
+
+            list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+            $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}", array_merge(array($courseid), $sqlinparams));
+        }
+
+        // reset all enrol caches
+        $context->mark_dirty();
+    }
+
 
     /**
      * Forces synchronisation of user enrolments.
@@ -1747,11 +1875,25 @@ abstract class enrol_plugin {
             throw new coding_exception('invalid enrol instance!');
         }
 
-        //first unenrol all users
+        //unenrol all users in batches of BATCH_INSERT_MAX_ROW_COUNT
         $participants = $DB->get_recordset('user_enrolments', array('enrolid'=>$instance->id));
+        $pcount = 0;
+        $puids = array();
         foreach ($participants as $participant) {
-            $this->unenrol_user($instance, $participant->userid);
+            $puids[] = $participant->userid;
+            $pcount++;
+            if ($pcount == BATCH_INSERT_MAX_ROW_COUNT) {
+                $this->unenrol_user_bulk($instance, $puids);
+                // reset
+                $pcount = 0;
+                $puids = array();
+            }
         }
+        //handle any remainder
+        if (!empty($puids)) {
+            $this->unenrol_user_bulk($instance, $puids);
+        }
+        unset($pcount, $puids);
         $participants->close();
 
         // now clean up all remainders that were not removed correctly

@@ -600,19 +600,19 @@ class core_coursecatlib_testcase extends advanced_testcase {
 
         // Assert:
         //     -- course21 (user2 is enrolled as manager) | Manager: F2 L2
-        $this->assertSame('Manager: F2 L2', $contacts[2][1]);
-        //     -- course22 (user2 is enrolled as student) | Teacher: F2 L2
-        $this->assertSame('Teacher: F2 L2', $contacts[2][2]);
-        //       -- course41 (user4 is enrolled as teacher, user5 is enrolled as manager) | Manager: F5 L5, Teacher: F4 L4
-        $this->assertSame('Manager: F5 L5, Teacher: F4 L4', $contacts[4][1]);
+        $this->assertSame('Site Manager: F2 L2', $contacts[2][1]);
+        //     -- course22 (user2 is enrolled as student) | Editing Trainer: F2 L2
+        $this->assertSame('Editing Trainer: F2 L2', $contacts[2][2]);
+        //       -- course41 (user4 is enrolled as editing trainer, user5 is enrolled as manager) | Manager: F5 L5, Editing Trainer: F4 L4
+        $this->assertSame('Site Manager: F5 L5, Editing Trainer: F4 L4', $contacts[4][1]);
         //       -- course42 (user2 is enrolled as teacher) | [Expected] Manager: F2 L2
-        $this->assertSame('Manager: F2 L2', $contacts[4][2]);
+        $this->assertSame('Site Manager: F2 L2', $contacts[4][2]);
         //     -- course31 (user3 is enrolled as student) | Manager: F3 L3
-        $this->assertSame('Manager: F3 L3', $contacts[3][1]);
+        $this->assertSame('Site Manager: F3 L3', $contacts[3][1]);
         //     -- course32                                |
         $this->assertSame('', $contacts[3][2]);
-        //   -- course11 (user1 is enrolled as teacher)   | Teacher: F1 L1
-        $this->assertSame('Teacher: F1 L1', $contacts[1][1]);
+        //   -- course11 (user1 is enrolled as editing trainer)   | Editing Trainer: F1 L1
+        $this->assertSame('Editing Trainer: F1 L1', $contacts[1][1]);
         //   -- course12 (user1 has teacher role)         |
         $this->assertSame('', $contacts[1][2]);
 

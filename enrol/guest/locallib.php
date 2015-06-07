@@ -29,8 +29,10 @@ require_once("$CFG->libdir/formslib.php");
 class enrol_guest_enrol_form extends moodleform {
     protected $instance;
 
-    public function definition() {
-        $mform = $this->_form;
+    public function definition($mform = null) {
+        if ($mform === null) {
+            $mform = $this->_form;
+        }
         $instance = $this->_customdata;
         $this->instance = $instance;
         $plugin = enrol_get_plugin('guest');
@@ -38,7 +40,9 @@ class enrol_guest_enrol_form extends moodleform {
         $heading = $plugin->get_instance_name($instance);
         $mform->addElement('header', 'guestheader', $heading);
 
-        $mform->addElement('passwordunmask', 'guestpassword', get_string('password', 'enrol_guest'));
+        if ($instance->password != '') {
+            $mform->addElement('passwordunmask', 'guestpassword', get_string('password', 'enrol_guest'));
+        }
 
         $this->add_action_buttons(false, get_string('submit'));
 

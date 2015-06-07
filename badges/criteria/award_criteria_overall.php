@@ -206,4 +206,14 @@ class award_criteria_overall extends award_criteria {
             $DB->insert_record('badge_criteria', $fordb);
         }
     }
+
+    /**
+     * Checks criteria for any major problems.
+     *
+     * @return array A list containing status and an error message (if any).
+     */
+    public function validate() {
+        // Overall criterion doesn't require validation.
+        return array(true, '');
+    }
 }

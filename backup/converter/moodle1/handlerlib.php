@@ -681,6 +681,7 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
                         'restrictmodules'        => 0,
                         'enablecompletion'       => 0,
                         'completionstartonenrol' => 0,
+                        'completionprogressonview' => 0,
                         'completionnotify'       => 0,
                         'tags'                   => array(),
                         'allowed_modules'        => array(),

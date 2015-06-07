@@ -2089,6 +2089,58 @@ class admin_setting_heading extends admin_setting {
 
 
 /**
+ * A setting element that just shows the setting name and description.
+ * Can be used when a setting is disabled by another setting.
+ */
+class admin_setting_nothing extends admin_setting {
+
+    /**
+     * @param string $name unique ascii name, either 'mysetting' for settings that in config,
+     *                     or 'myplugin/mysetting' for ones in config_plugins.
+     * @param string $visiblename localised
+     * @param string $description long localised info
+     */
+    public function __construct($name, $visiblename, $description) {
+        $this->nosave = true;
+        parent::__construct($name, $visiblename, $description, '');
+    }
+
+    /**
+     * Always returns true.
+     * @return bool Always returns true
+     */
+    public function get_setting() {
+        return true;
+    }
+
+    /**
+     * Always returns true.
+     * @return bool Always returns true
+     */
+    public function get_defaultsetting() {
+        return true;
+    }
+
+    /**
+     * Never write settings.
+     * @return string Always returns an empty string
+     */
+    public function write_setting($data) {
+        // Do not write any setting.
+        return '';
+    }
+
+    /**
+     * Return an XHTML string for the setting.
+     * @return string Returns an XHTML string
+     */
+    public function output_html($data, $query='') {
+        return format_admin_setting($this, $this->visiblename, '', $this->description, false);
+    }
+}
+
+
+/**
  * The most flexibly setting, user is typing text
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -2854,7 +2906,7 @@ class admin_setting_configmulticheckbox extends admin_setting {
         }
         $return .= '</div>';
 
-        return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $defaultinfo, $query);
+        return format_admin_setting($this, $this->visiblename, $return, $this->description, $this->get_id().'_'.array_keys($this->choices)[0], '', $defaultinfo, $query);
 
     }
 }
@@ -6455,7 +6507,11 @@ class admin_setting_managelicenses extends admin_setting {
         $table->data  = array();
 
         foreach ($licenses as $value) {
-            $displayname = html_writer::link($value->source, get_string($value->shortname, 'license'), array('target'=>'_blank'));
+            if (!empty($value->source)) {
+                $displayname = html_writer::link($value->source, get_string($value->shortname, 'license'), array('target'=>'_blank'));
+            } else {
+                $displayname = get_string($value->shortname, 'license');
+            }
 
             if ($value->enabled == 1) {
                 $hideshow = html_writer::link($url.'&action=disable&license='.$value->shortname,
@@ -7032,7 +7088,8 @@ function admin_search_settings_html($query) {
  * @return array
  */
 function admin_output_new_settings_by_page($node) {
-    global $OUTPUT;
+    global $OUTPUT, $CFG;
+    $totaracoreinstall = isset($CFG->totaracoreinstallation) ? $CFG->totaracoreinstallation : 0;
     $return = array();
 
     if ($node instanceof admin_category) {
@@ -7044,6 +7101,11 @@ function admin_output_new_settings_by_page($node) {
     } else if ($node instanceof admin_settingpage) {
             $newsettings = array();
             foreach ($node->settings as $setting) {
+                // Always show enablecompletion after a Totara install.
+                if($totaracoreinstall && $setting->name == 'enablecompletion') {
+                    $newsettings[] = $setting;
+                }
+
                 if (is_null($setting->get_setting())) {
                     $newsettings[] = $setting;
                 }
@@ -7142,9 +7204,14 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
 
     $str = '
 <div class="form-item clearfix" id="admin-'.$setting->name.'">
-  <div class="form-label">
-    <label '.$labelfor.'>'.highlightfast($query, $title).$override.$warning.'</label>
-    <span class="form-shortname">'.highlightfast($query, $name).'</span>
+  <div class="form-label">';
+    if (!empty($labelfor)) {
+        $str .= '<label ' . $labelfor . '>' . highlightfast($query, $title) . $override . $warning . '</label>';
+    } else {
+        $str .= '<span class="admin-label">' . highlightfast($query, $title) . $override . $warning . '</span>';
+    }
+
+    $str .='    <span class="form-shortname">'.highlightfast($query, $name).'</span>
   </div>
   <div class="form-setting">'.$error.$form.$defaultinfo.'</div>
   <div class="form-description">'.highlight($query, markdown_to_html($description)).'</div>
@@ -9033,6 +9100,145 @@ class admin_setting_configmultiselect_modules extends admin_setting_configmultis
 }
 
 /**
+ * Admin settings - file picker
+ * an enhancement on admin_setting_configfile that lets you use a filepicker
+ * to select and upload a file using the moodle file manager.
+ *
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class admin_setting_configfilepicker extends admin_setting {
+    private $fp_acceptedTypes;
+    private $fp_options;
+    private $filepicker;
+    private $filecontext;
+    private $filearea;
+    private $component;
+
+    /**
+     * Calls parent::__construct with specific args and sets up a file picker
+     *
+     * @param string $name unique ascii name, formatted as 'myplugin/mysetting' as it is used for $component/$filearea
+     * @param string $visiblename localised name
+     * @param string $description localised long description
+     * @param string $defaultsetting the default for this admin_setting, either an empty string '' or a valid url/filepath
+     * @param array $fp_acceptedTypes - sets the types of files the filepicker will accept, defaults to array('*')
+     * @param array $fp_options - overrides the default options for the filepicker
+     *      defaults options are array('maxfiles' => 1, 'subdirs' => 0, 'context' => system_context)
+     */
+    public function __construct($name, $visiblename, $description, $defaultsetting, $fp_acceptedTypes = array('*'), $fp_options = array()) {
+
+        parent::__construct($name, $visiblename, $description, $defaultsetting);
+        $this->fp_acceptedTypes = $fp_acceptedTypes;
+        $this->fp_options = $fp_options;
+        $this->filecontext = context_system::instance();
+
+        $full_name_args = explode('_',$this->get_full_name());
+        $this->component = $full_name_args[1];
+        $this->filearea = $full_name_args[2];
+    }
+
+    /**
+     * Return the setting
+     *
+     * @return mixed returns config if successful else null
+     */
+    public function get_setting() {
+        return $this->config_read($this->name);
+    }
+
+
+    /**
+     * Saves the setting
+     *
+     * @param string $data
+     * @return bool
+     */
+    public function write_setting($data) {
+        global $CFG, $DB, $USER;
+
+        if (!isloggedin()) {
+            return '';
+        }
+
+        $fs = get_file_storage();
+        $draft_context = context_user::instance($USER->id);
+        $contextid = $this->filecontext->id;
+        $hasFile = $fs->file_exists($draft_context->id, 'user', 'draft', $data, '/', '');
+        $setting = $this->get_setting();
+        if ($hasFile) {
+            $fileid = $data;
+
+            // create the file from draft and save into the correct area.
+            file_save_draft_area_files($data, $contextid, $this->component, $this->filearea, $fileid, array('subdirs' => true));
+
+            // fetch the actual file and create the url for it
+            $files = $fs->get_area_files($contextid, $this->component, $this->filearea, $fileid, 'id DESC', false);
+            $file = reset($files);
+            $link = moodle_url::make_file_url("{$CFG->wwwroot}/pluginfile.php", "/{$contextid}/{$this->component}/{$this->filearea}/{$fileid}/{$file->get_filename()}");
+
+            return ($this->config_write($this->name, $link->out()) ? '' : get_string('errorsetting', 'admin'));
+        } else if (empty($setting)) {
+            return ($this->config_write($this->name, $this->defaultsetting) ? '' : get_string('errorsetting', 'admin'));
+        } else {
+            // setting not actually changed, just ignore it and carry on.
+            return '';
+        }
+    }
+
+    public function output_html($data, $query='') {
+        global $CFG, $USER, $OUTPUT;
+        require_once($CFG->libdir . '/form/filepicker.php');
+
+        $fp_attributes = array('id' => ('fp_' . $this->name), 'name' => $this->get_full_name());
+        $fp_defaultOptions = array('maxfiles' => 1, 'subdirs' => 0, 'context' => $this->filecontext, 'accepted_types' => $this->fp_acceptedTypes);
+        foreach ($fp_defaultOptions as $key => $value) {
+            if (!isset($this->fp_options[$key])) {
+                $this->fp_options[$key] = $value;
+            }
+        }
+
+        $this->filepicker = new MoodleQuickForm_filepicker($this->get_full_name(), $this->name, $fp_attributes, $this->fp_options);
+        $fs = get_file_storage();
+
+        $setting = $this->get_setting();
+        $setting = str_replace($CFG->wwwroot, '', $setting, $replaced);
+        if (isloggedin() && $replaced && !empty($setting)) {
+            $itemidargs = explode('/', $setting);
+            $itemid = isset($itemidargs[5]) ? $itemidargs[5] : 0;
+            $itemname = isset($itemidargs[6]) ? $itemidargs[6] : 0;
+            $draftid = 0;
+
+            $user_context = context_user::instance($USER->id);
+            $file = $fs->get_area_files($user_context->id, 'user', 'draft', $itemid);
+            if ($file) {
+                // Use existing draft file
+                $draftid = $itemid;
+            } else {
+                // Create new draft file
+                file_prepare_draft_area($draftid, $this->filecontext->id, $this->component, $this->filearea, null, $this->fp_options);
+
+                $file_record = array('contextid' => $user_context->id, 'component' => 'user', 'filearea' => 'draft', 'itemid' => $draftid);
+                $current_file = $fs->get_area_files($this->filecontext->id, $this->component, $this->filearea, $itemid);
+                foreach ($current_file as $file) {
+                    if ($file->is_directory() || $file->get_filename() != $itemname) {
+                        continue;
+                    }
+                    $fs->create_file_from_storedfile($file_record, $file);
+                }
+            }
+            $this->filepicker->setValue($draftid);
+        }
+
+        $return = $OUTPUT->container_start("form-setting form-filepicker", "id_{$this->get_full_name()}");
+        if (isset($this->filepicker)) {
+            $return .= $this->filepicker->toHtml();
+        }
+        $return .= $OUTPUT->container_end();
+
+        return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $this->defaultsetting, $query);
+    }
+}
+/*
  * Admin setting to show if a php extension is enabled or not.
  *
  * @copyright 2013 Damyon Wiese

@@ -52,4 +52,23 @@ $observers = array(
         'eventname'   => '\core\event\course_deleted',
         'callback'    => 'enrol_meta_observer::course_deleted',
     ),
+
+    // Totara performance tricks.
+
+    array(
+        'eventname'   => '\totara_core\event\bulk_enrolments_started',
+        'callback'    => 'enrol_meta_observer::bulk_started',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_enrolments_ended',
+        'callback'    => 'enrol_meta_observer::bulk_finished',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_role_assignments_started',
+        'callback'    => 'enrol_meta_observer::bulk_started',
+    ),
+    array(
+        'eventname'   => '\totara_core\event\bulk_role_assignments_ended',
+        'callback'    => 'enrol_meta_observer::bulk_finished',
+    ),
 );

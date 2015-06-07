@@ -37,6 +37,7 @@ $string['forcedefaultmaxcoursesdesc'] = 'If set then user will not be able to ch
 $string['fullpath'] = 'All categories and subcategories';
 $string['hiddencoursecount'] = 'You have {$a} hidden course';
 $string['hiddencoursecountplural'] = 'You have {$a} hidden courses';
+$string['showingxofycourses'] = 'Currently showing {$a->showing} of {$a->total} assigned courses. See the rest <a href="{$a->url}">here</a>.';
 $string['hiddencoursecountwithshowall'] = 'You have {$a->coursecount} hidden course ({$a->showalllink})';
 $string['hiddencoursecountwithshowallplural'] = 'You have {$a->coursecount} hidden courses ({$a->showalllink})';
 $string['message'] = 'message';

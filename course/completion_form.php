@@ -42,19 +42,37 @@ class course_completion_form extends moodleform {
         global $USER, $CFG, $DB;
 
         $courseconfig = get_config('moodlecourse');
-        $mform = $this->_form;
-        $course = $this->_customdata['course'];
+        $mform    =& $this->_form;
+
+        $unlockdelete = $this->_customdata['unlockdelete'];
+        $unlockonly = $this->_customdata['unlockonly'];
+        $unlocked = $unlockdelete || $unlockonly;
+        $course   = $this->_customdata['course'];
         $completion = new completion_info($course);
 
         $params = array(
             'course'  => $course->id
         );
 
-        // Check if there are existing criteria completions.
-        if ($completion->is_course_locked()) {
-            $mform->addElement('header', 'completionsettingslocked', get_string('completionsettingslocked', 'completion'));
-            $mform->addElement('static', '', '', get_string('err_settingslocked', 'completion'));
-            $mform->addElement('submit', 'settingsunlock', get_string('unlockcompletiondelete', 'completion'));
+
+/// form definition
+//--------------------------------------------------------------------------------
+
+        // Check if there are existing non-RPL criteria completions.
+        if ($completion->is_course_locked(false) && !$unlocked) {
+            $mform->addElement('header', '', get_string('completionsettingslocked', 'completion'));
+
+            if (completion_can_unlock_data($course->id)) {
+                $mform->addElement('static', '', '', get_string('err_settingsunlockable', 'completion'));
+
+                $buttonarray = array();
+                $buttonarray[] = &$mform->createElement('submit', 'settingsunlockdelete', get_string('unlockcompletiondelete', 'completion'));
+                $buttonarray[] = &$mform->createElement('submit', 'settingsunlock', get_string('unlockcompletionwithoutdelete', 'completion'));
+                $mform->addGroup($buttonarray, 'settingsunlockgroup', '', array(' '), false);
+
+            } else {
+                $mform->addElement('static', '', '', get_string('err_settingslocked', 'completion'));
+            }
         }
 
         // Get array of all available aggregation methods.
@@ -126,12 +144,13 @@ class course_completion_form extends moodleform {
 
         // Get applicable courses (prerequisites).
         $courses = $DB->get_records_sql("
-                SELECT DISTINCT c.id, c.category, c.fullname, cc.id AS selected
+                SELECT DISTINCT c.id, c.category, c.sortorder, c.fullname, cc.id AS selected
                   FROM {course} c
              LEFT JOIN {course_completion_criteria} cc ON cc.courseinstance = c.id AND cc.course = {$course->id}
             INNER JOIN {course_completion_criteria} ccc ON ccc.course = c.id
                  WHERE c.enablecompletion = ".COMPLETION_ENABLED."
-                       AND c.id <> {$course->id}");
+                       AND c.id <> {$course->id}
+              ORDER BY c.sortorder");
 
         if (!empty($courses)) {
             // Get category list.
@@ -152,14 +171,20 @@ class course_completion_form extends moodleform {
             }
 
             // Show multiselect box.
-            $mform->addElement('select', 'criteria_course', get_string('coursesavailable', 'completion'), $selectbox,
-                array('multiple' => 'multiple', 'size' => 6));
-
+            $mform->addElement('select', 'criteria_course_value', get_string('coursesavailable', 'completion'), $selectbox,
+                    array('multiple' => 'multiple', 'size' => 6));
+            $mform->disabledIf('criteria_course_value', 'criteria_course_none', 'eq', 1);
             // Select current criteria.
-            $mform->setDefault('criteria_course', $selected);
+            if (isset($selected)) {
+                $mform->setDefault('criteria_course', $selected);
+            }
 
             // Explain list.
             $mform->addElement('static', 'criteria_courses_explaination', '', get_string('coursesavailableexplaination', 'completion'));
+
+            // Show select none checkbox
+            $mform->addElement('checkbox', 'criteria_course_none', get_string('selectnone', 'completion'));
+            $mform->setType('checkbox', PARAM_BOOL);
 
             if (count($courses) > 1) {
                 // Map aggregation methods to context-sensitive human readable dropdown menu.
@@ -201,17 +226,6 @@ class course_completion_form extends moodleform {
             $mform->setExpanded('duration');
         }
         $criteria = new completion_criteria_duration($params);
-        $criteria->config_form_display($mform);
-
-        // Completion on unenrolment
-        $label = get_string('coursecompletioncondition', 'core_completion', get_string('unenrolment', 'core_completion'));
-        $mform->addElement('header', 'unenrolment', $label);
-        // Expand the condition section if it is currently enabled.
-        $current = $completion->get_criteria(COMPLETION_CRITERIA_TYPE_UNENROL);
-        if (!empty($current)) {
-            $mform->setExpanded('unenrolment');
-        }
-        $criteria = new completion_criteria_unenrol($params);
         $criteria->config_form_display($mform);
 
         // Completion on course grade
@@ -276,16 +290,26 @@ class course_completion_form extends moodleform {
             $mform->addElement('static', 'noroles', '', get_string('err_noroles', 'completion'));
         }
 
+        if ($unlockdelete) {
+            $mform->addElement('header', 'warningunlocked', get_string('completionsettingsunlocked', 'completion'));
+            $mform->setExpanded('warningunlocked', true, true);
+            $mform->addElement('static', '', '', get_string('completedunlockedtext', 'completion'));
+        }
+
         // Add common action buttons.
         $this->add_action_buttons();
 
         // Add hidden fields.
         $mform->addElement('hidden', 'id', $course->id);
+        $mform->addElement('hidden', 'unlockdelete', $unlockdelete);
+        $mform->addElement('hidden', 'unlockonly', $unlockonly);
         $mform->setType('id', PARAM_INT);
+        $mform->setType('unlockdelete', PARAM_INT);
+        $mform->setType('unlockonly', PARAM_INT);
 
         // If the criteria are locked, freeze values and submit button.
-        if ($completion->is_course_locked()) {
-            $except = array('settingsunlock');
+        if ($completion->is_course_locked(false) && !$unlocked) {
+            $except = array('settingsunlockgroup');
             $mform->hardFreezeAllVisibleExcept($except);
             $mform->addElement('cancel');
         }

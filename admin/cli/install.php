@@ -43,7 +43,7 @@ if (function_exists('opcache_reset')) {
 }
 
 $help =
-"Command line Moodle installer, creates config.php and initializes database.
+"Command line Totara installer, creates config.php and initializes database.
 Please note you must execute this script with the same uid as apache
 or use chmod/chown after installation.
 
@@ -54,14 +54,14 @@ Options:
                       Default is 2777. You may want to change it to 2770
                       or 2750 or 750. See chmod man page for details.
 --lang=CODE           Installation and default site language.
---wwwroot=URL         Web address for the Moodle site,
+--wwwroot=URL         Web address for the Totara site,
                       required in non-interactive mode.
---dataroot=DIR        Location of the moodle data folder,
-                      must not be web accessible. Default is moodledata
+--dataroot=DIR        Location of the data folder,
+                      must not be web accessible. Default is sitedata
                       in the parent directory.
 --dbtype=TYPE         Database type. Default is mysqli
 --dbhost=HOST         Database host. Default is localhost
---dbname=NAME         Database name. Default is moodle
+--dbname=NAME         Database name. Default is totaradb
 --dbuser=USERNAME     Database user. Default is root
 --dbpass=PASSWORD     Database password. Default is blank
 --dbport=NUMBER       Use database port.
@@ -70,8 +70,8 @@ Options:
 --fullname=STRING     The fullname of the site
 --shortname=STRING    The shortname of the site
 --summary=STRING      The summary to be displayed on the front page
---adminuser=USERNAME  Username for the moodle admin account. Default is admin
---adminpass=PASSWORD  Password for the moodle admin account,
+--adminuser=USERNAME  Username for the admin account. Default is admin
+--adminpass=PASSWORD  Password for the admin account,
                       required in non-interactive mode.
 --adminemail=STRING   Email address for the moodle admin account.
 --non-interactive     No interactive questions, installation fails if any
@@ -148,8 +148,8 @@ define('IGNORE_COMPONENT_CACHE', true);
 if (version_compare(phpversion(), "5.4.4") < 0) {
     $phpversion = phpversion();
     // do NOT localise - lang strings would not work here and we CAN NOT move it after installib
-    fwrite(STDERR, "Moodle 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).\n");
-    fwrite(STDERR, "Please upgrade your server software or install older Moodle version.\n");
+    fwrite(STDERR, "Totara 2.7 or later requires at least PHP 5.4.4 (currently using version $phpversion).\n");
+    fwrite(STDERR, "Please upgrade your server software or install older Totara version.\n");
     exit(1);
 }
 
@@ -220,7 +220,7 @@ define('SITEID', 1);
 $databases = array('mysqli' => moodle_database::get_driver_instance('mysqli', 'native'),
                    'mariadb'=> moodle_database::get_driver_instance('mariadb', 'native'),
                    'pgsql'  => moodle_database::get_driver_instance('pgsql',  'native'),
-                   'oci'    => moodle_database::get_driver_instance('oci',    'native'),
+                   // 'oci'    => moodle_database::get_driver_instance('oci',    'native'), // Totara: no Oracle!
                    'sqlsrv' => moodle_database::get_driver_instance('sqlsrv', 'native'), // MS SQL*Server PHP driver
                    'mssql'  => moodle_database::get_driver_instance('mssql',  'native'), // FreeTDS driver
                   );
@@ -242,10 +242,10 @@ list($options, $unrecognized) = cli_get_params(
         'chmod'             => isset($distro->directorypermissions) ? sprintf('%04o',$distro->directorypermissions) : '2777', // let distros set dir permissions
         'lang'              => $CFG->lang,
         'wwwroot'           => '',
-        'dataroot'          => empty($distro->dataroot) ? str_replace('\\', '/', dirname(dirname(dirname(dirname(__FILE__)))).'/moodledata'): $distro->dataroot, // initialised later after including libs or by distro
+        'dataroot'          => empty($distro->dataroot) ? str_replace('\\', '/', dirname(dirname(dirname(dirname(__FILE__)))).'/sitedata'): $distro->dataroot, // initialised later after including libs or by distro
         'dbtype'            => empty($distro->dbtype) ? $defaultdb : $distro->dbtype, // let distro skip dbtype selection
         'dbhost'            => empty($distro->dbhost) ? 'localhost' : $distro->dbhost, // let distros set dbhost
-        'dbname'            => 'moodle',
+        'dbname'            => 'totaradb',
         'dbuser'            => empty($distro->dbuser) ? 'root' : $distro->dbuser, // let distros set dbuser
         'dbpass'            => '',
         'dbport'            => '',
@@ -286,7 +286,7 @@ if ($options['help']) {
 }
 
 //Print header
-echo get_string('cliinstallheader', 'install', $CFG->target_release)."\n";
+echo get_string('cliinstallheader', 'install', $TOTARA->release)."\n";
 
 //Fist select language
 if ($interactive) {
@@ -392,7 +392,7 @@ if ($interactive) {
             $CFG->dataroot = ''; //can not find secure location for dataroot
             break;
         }
-        $CFG->dataroot = dirname($parrent).'/moodledata';
+        $CFG->dataroot = dirname($parrent).'/sitedata';
     }
     cli_heading(get_string('dataroot', 'install'));
     $error = '';

@@ -55,7 +55,7 @@ abstract class feedback_item_form extends moodleform {
         }
 
         $mform->setType('dependitem', PARAM_INT);
-        $mform->setType('dependvalue', PARAM_RAW);
+        $mform->setType('dependvalue', PARAM_TEXT);
 
         $position_select = $mform->addElement('select',
                                             'position',
@@ -75,8 +75,8 @@ abstract class feedback_item_form extends moodleform {
         $mform->addElement('hidden', 'template', 0);
         $mform->setType('template', PARAM_INT);
 
-        $mform->setType('name', PARAM_RAW);
-        $mform->setType('label', PARAM_ALPHANUM);
+        $mform->setType('name', PARAM_TEXT);
+        $mform->setType('label', PARAM_TEXT);
 
         $mform->addElement('hidden', 'typ', $this->type);
         $mform->setType('typ', PARAM_ALPHA);

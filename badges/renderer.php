@@ -524,7 +524,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $paging = new paging_bar($badges->totalcount, $badges->page, $badges->perpage, $this->page->url, 'page');
         $htmlpagingbar = $this->render($paging);
         $table = new html_table();
-        $table->attributes['class'] = 'collection';
+        $table->attributes['class'] = 'collection boxaligncenter boxwidthwide';
 
         $sortbyname = $this->helper_sortable_heading(get_string('name'),
                 'name', $badges->sort, $badges->dir);
@@ -542,7 +542,7 @@ class core_badges_renderer extends plugin_renderer_base {
         foreach ($badges->badges as $badge) {
             $badgeimage = print_badge_image($badge, $this->page->context, 'large');
             $name = $badge->name;
-            $description = $badge->description;
+            $description = nl2br($badge->description);
             $criteria = self::print_badge_criteria($badge);
             if ($badge->dateissued) {
                 $icon = new pix_icon('i/valid',
@@ -619,7 +619,7 @@ class core_badges_renderer extends plugin_renderer_base {
     public function print_badge_tabs($badgeid, $context, $current = 'overview') {
         global $DB;
 
-        $row = array();
+        $tabs = $row = array();
 
         $row[] = new tabobject('overview',
                     new moodle_url('/badges/overview.php', array('id' => $badgeid)),
@@ -657,13 +657,15 @@ class core_badges_renderer extends plugin_renderer_base {
                     );
         }
 
-        echo $this->tabtree($row, $current);
+        $tabs[] = $row;
+
+        print_tabs($tabs, $current);
     }
 
-    /**
-     * Prints badge status box.
-     * @return Either the status box html as a string or null
-     */
+   /**
+    * Prints badge status box.
+    * @return Either the status box html as a string or null
+    */
     public function print_badge_status_box(badge $badge) {
         if (has_capability('moodle/badges:configurecriteria', $badge->get_context())) {
 
@@ -800,7 +802,7 @@ class core_badges_renderer extends plugin_renderer_base {
                 }
                 $actions[] = get_string('addbadgecriteria', 'badges');
                 $actions[] = $this->output->single_select(new moodle_url('/badges/criteria_settings.php',
-                        array('badgeid' => $badge->id, 'add' => true)), 'type', $select);
+                        array('badgeid' => $badge->id)), 'type', $select);
             } else {
                 $actions[] = $this->output->box(get_string('nothingtoadd', 'badges'), 'clearfix');
             }
@@ -816,7 +818,7 @@ class core_badges_renderer extends plugin_renderer_base {
         $paging = new paging_bar($recipients->totalcount, $recipients->page, $recipients->perpage, $this->page->url, 'page');
         $htmlpagingbar = $this->render($paging);
         $table = new html_table();
-        $table->attributes['class'] = 'generaltable boxaligncenter boxwidthwide';
+        $table->attributes['class'] = 'generaltable generalbox boxaligncenter boxwidthwide';
 
         $sortbyfirstname = $this->helper_sortable_heading(get_string('firstname'),
                 'firstname', $recipients->sort, $recipients->dir);
@@ -920,11 +922,12 @@ class core_badges_renderer extends plugin_renderer_base {
 
         $mform->addElement('hidden', 'sesskey', sesskey());
 
-        $el[] = $mform->createElement('text', 'search', get_string('search'), array('size' => 20));
+        $el[] = $mform->createElement('text', 'search', get_string('searchbadgesfor', 'badges'), array('size' => 20));
+        $mform->setType('search', PARAM_TEXT);
         $mform->setDefault('search', $search);
-        $el[] = $mform->createElement('submit', 'submitsearch', get_string('search'));
+        $el[] = $mform->createElement('submit', 'submitsearch', get_string('searchname', 'badges'));
         $el[] = $mform->createElement('submit', 'clearsearch', get_string('clear'));
-        $mform->addGroup($el, 'searchgroup', get_string('searchname', 'badges'), ' ', false);
+        $mform->addGroup($el, 'searchgroup', '', ' ', false);
 
         ob_start();
         $mform->display();

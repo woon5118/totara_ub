@@ -46,8 +46,8 @@ class core_admin_renderer extends plugin_renderer_base {
         $continue = new single_button(new moodle_url('/admin/index.php', array('lang'=>$CFG->lang, 'agreelicense'=>1)), get_string('continue'), 'get');
 
         $output .= $this->header();
-        $output .= $this->heading('<a href="http://moodle.org">Moodle</a> - Modular Object-Oriented Dynamic Learning Environment');
-        $output .= $this->heading(get_string('copyrightnotice'));
+        $output .= $this->heading('<a href="http://www.totaralms.com/">Totara</a> - Totara Learning Management System', 2, 'centered');
+        $output .= $this->heading(get_string('copyrightnotice'), 2, 'centered');
         $output .= $this->box($copyrightnotice, 'copyrightnotice');
         $output .= html_writer::empty_tag('br');
         $output .= $this->confirm(get_string('doyouagree'), $continue, "http://docs.moodle.org/dev/License");
@@ -85,12 +85,12 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     public function install_environment_page($maturity, $envstatus, $environment_results, $release) {
-        global $CFG;
+        global $CFG, $TOTARA;
         $output = '';
 
         $output .= $this->header();
         $output .= $this->maturity_warning($maturity);
-        $output .= $this->heading("Moodle $release");
+        $output .= $this->heading("Totara {$TOTARA->release} : Based on Moodle {$CFG->target_release}");
         $output .= $this->release_notes_link();
 
         $output .= $this->environment_check_table($envstatus, $environment_results);
@@ -161,11 +161,11 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     public function upgrade_environment_page($release, $envstatus, $environment_results) {
-        global $CFG;
+        global $CFG, $TOTARA;
         $output = '';
 
         $output .= $this->header();
-        $output .= $this->heading("Moodle $release");
+        $output .= $this->heading("Totara {$TOTARA->release} : Based on Moodle {$CFG->target_release}");
         $output .= $this->release_notes_link();
         $output .= $this->environment_check_table($envstatus, $environment_results);
 
@@ -309,9 +309,10 @@ class core_admin_renderer extends plugin_renderer_base {
      */
     public function admin_notifications_page($maturity, $insecuredataroot, $errorsdisplayed,
             $cronoverdue, $dbproblems, $maintenancemode, $availableupdates, $availableupdatesfetch,
-            $buggyiconvnomb, $registered, array $cachewarnings = array()) {
-        global $CFG;
+            $buggyiconvnomb, $registered, array $cachewarnings = array(), $latesterror, $activeusers, $totara_release) {
+        global $CFG, $PAGE;
         $output = '';
+        $totara_renderer = $PAGE->get_renderer('totara_core');
 
         $output .= $this->header();
         $output .= $this->maturity_info($maturity);
@@ -323,8 +324,15 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->db_problems($dbproblems);
         $output .= $this->maintenance_mode_warning($maintenancemode);
         $output .= $this->cache_warnings($cachewarnings);
-        $output .= $this->registration_warning($registered);
+        $output .= $totara_renderer->is_registered();
 
+        if ($latesterror) {
+            $output .= $totara_renderer->totara_print_errorlog_link($latesterror);
+        }
+        // list count of active users
+        $output .= $totara_renderer->totara_print_active_users($activeusers);
+        /// Display Totara version information
+        $output .= $totara_renderer->totara_print_copyright($totara_release);
         //////////////////////////////////////////////////////////////////////////////////////////////////
         ////  IT IS ILLEGAL AND A VIOLATION OF THE GPL TO HIDE, REMOVE OR MODIFY THIS COPYRIGHT NOTICE ///
         $output .= $this->moodle_copyright();
@@ -480,10 +488,11 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->header();
 
         // Print the component download link
+        /* No env updates in Totara yet
         $output .= html_writer::tag('div', html_writer::link(
                     new moodle_url('/admin/environment.php', array('action' => 'updatecomponent', 'sesskey' => sesskey())),
                     get_string('updatecomponent', 'admin')),
-                array('class' => 'reportlink'));
+                array('class' => 'reportlink'));*/
 
         // Heading.
         $output .= $this->heading(get_string('environment', 'admin'));
@@ -492,7 +501,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->box_start();
         $output .= html_writer::tag('div', get_string('adminhelpenvironment'));
         $select = new single_select(new moodle_url('/admin/environment.php'), 'version', $versions, $version, null);
-        $select->label = get_string('moodleversion');
+        $select->label = get_string('totaraversion', 'totara_core');
         $output .= $this->render($select);
         $output .= $this->box_end();
 
@@ -822,7 +831,8 @@ class core_admin_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     protected function release_notes_link() {
-        $releasenoteslink = get_string('releasenoteslink', 'admin', 'http://docs.moodle.org/dev/Releases');
+        global $CFG;
+        $releasenoteslink = get_string('releasenoteslink', 'admin', 'http://community.totaralms.com/mod/forum/view.php?id=1834');
         $releasenoteslink = str_replace('target="_blank"', 'onclick="this.target=\'_blank\'"', $releasenoteslink); // extremely ugly validation hack
         return $this->box($releasenoteslink, 'generalbox releasenoteslink');
     }

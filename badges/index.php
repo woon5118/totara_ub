@@ -36,7 +36,7 @@ $sorthow    = optional_param('dir', 'ASC', PARAM_ALPHA);
 $confirm    = optional_param('confirm', false, PARAM_BOOL);
 $delete     = optional_param('delete', 0, PARAM_INT);
 $archive    = optional_param('archive', 0, PARAM_INT);
-$msg        = optional_param('msg', '', PARAM_TEXT);
+$msg        = optional_param('msg', '', PARAM_STRINGID);
 
 if (!in_array($sortby, array('name', 'status'))) {
     $sortby = 'name';
@@ -96,6 +96,7 @@ if (!has_any_capability(array(
         'moodle/badges:viewawarded',
         'moodle/badges:createbadge',
         'moodle/badges:awardbadge',
+        'moodle/badges:configurecriteria',
         'moodle/badges:configuremessages',
         'moodle/badges:configuredetails',
         'moodle/badges:deletebadge'), $PAGE->context)) {

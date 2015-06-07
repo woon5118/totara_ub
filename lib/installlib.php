@@ -229,7 +229,7 @@ function install_db_validate($database, $dbhost, $dbuser, $dbpass, $dbname, $pre
  * @return string
  */
 function install_generate_configphp($database, $cfg) {
-    $configphp = '<?php  // Moodle configuration file' . PHP_EOL . PHP_EOL;
+    $configphp = '<?php  // Totara configuration file' . PHP_EOL . PHP_EOL;
 
     $configphp .= 'unset($CFG);' . PHP_EOL;
     $configphp .= 'global $CFG;' . PHP_EOL;
@@ -284,7 +284,7 @@ function install_print_help_page($help) {
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
     echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'">
           <head>
-          <link rel="shortcut icon" href="theme/clean/pix/favicon.ico" />
+          <link rel="shortcut icon" href="theme/standardtotararesponsive/pix/favicon.ico" />
           <link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/install/css.php" />
           <title>'.get_string('installation','install').'</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -316,7 +316,7 @@ function install_print_help_page($help) {
  * @return void
  */
 function install_print_header($config, $stagename, $heading, $stagetext, $stageclass = "alert-info") {
-    global $CFG;
+    global $CFG, $TOTARA;
 
     @header('Content-Type: text/html; charset=UTF-8');
     @header('X-UA-Compatible: IE=edge');
@@ -329,10 +329,10 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
     echo '<html dir="'.(right_to_left() ? 'rtl' : 'ltr').'">
           <head>
-          <link rel="shortcut icon" href="theme/clean/pix/favicon.ico" />';
+          <link rel="shortcut icon" href="theme/standardtotararesponsive/pix/favicon.ico" />';
 
     echo '<link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/install/css.php" />
-          <title>'.get_string('installation','install').' - Moodle '.$CFG->target_release.'</title>
+          <title>'.get_string('installation','install').' - Totara '.$TOTARA->release.'</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           <meta http-equiv="pragma" content="no-cache" />
           <meta http-equiv="expires" content="0" />';
@@ -377,7 +377,7 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
  * @return void
  */
 function install_print_footer($config, $reload=false) {
-    global $CFG;
+    global $CFG, $TOTARA;
 
     if ($config->stage > INSTALL_WELCOME) {
         $first = '<input type="submit" id="previousbutton" name="previous" value="&laquo; '.s(get_string('previous')).'" />';
@@ -401,8 +401,8 @@ function install_print_footer($config, $reload=false) {
     echo '</fieldset><fieldset id="nav_buttons">'.$first.$next.'</fieldset>';
 
     $homelink  = '<div class="sitelink">'.
-       '<a title="Moodle '. $CFG->target_release .'" href="http://docs.moodle.org/en/Administrator_documentation" onclick="this.target=\'_blank\'">'.
-       '<img src="pix/moodlelogo.png" alt="moodlelogo" /></a></div>';
+       '<a title="Totara '. $TOTARA->release .'" href="https://help.totaralms.com/Getting_Started_for_Administrators.htm" onclick="this.target=\'_blank\'">'.
+       '<img src="theme/standardtotararesponsive/pix/logo.png" alt="totaralogo" /></a></div>';
 
     echo '</form></div>';
     echo '<div id="page-footer">'.$homelink.'</div>';
@@ -476,6 +476,15 @@ function install_cli_database(array $options, $interactive) {
     install_core($version, true);
     set_config('release', $release);
     set_config('branch', $branch);
+    //set up totara config variables
+    if (!isset($CFG->totara_release) || $CFG->totara_release <> $TOTARA->release
+        || !isset($CFG->totara_build) || $CFG->totara_build <> $TOTARA->build
+        || !isset($CFG->totara_version) || $CFG->totara_version <> $TOTARA->version) {
+        // Also set Totara release (human readable version)
+        set_config("totara_release", $TOTARA->release);
+        set_config("totara_build", $TOTARA->build);
+        set_config("totara_version", $TOTARA->version);
+    }
 
     if (PHPUNIT_TEST) {
         // mark as test database as soon as possible

@@ -1175,9 +1175,9 @@ class sqlsrv_native_moodle_database extends moodle_database {
 
     public function sql_cast_char2int($fieldname, $text = false) {
         if (!$text) {
-            return ' CAST(' . $fieldname . ' AS INT) ';
+            return ' CAST(' . $fieldname . ' AS BIGINT) ';
         } else {
-            return ' CAST(' . $this->sql_compare_text($fieldname) . ' AS INT) ';
+            return ' CAST(' . $this->sql_compare_text($fieldname) . ' AS BIGINT) ';
         }
     }
 
@@ -1191,6 +1191,14 @@ class sqlsrv_native_moodle_database extends moodle_database {
 
     public function sql_ceil($fieldname) {
         return ' CEILING('.$fieldname.')';
+    }
+
+    public function sql_round($fieldname, $places = 0) {
+        if ($places >= 0) {
+            return "CAST(ROUND({$fieldname}, {$places}) AS DECIMAL(20, {$places}))";
+        } else {
+            return "ROUND(CAST({$fieldname} AS DECIMAL(20, 0)), {$places})";
+        }
     }
 
     protected function get_collation() {

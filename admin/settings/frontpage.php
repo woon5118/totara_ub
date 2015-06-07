@@ -24,6 +24,7 @@ if (!during_initial_install()) { //do not use during installation
         $temp->add(new admin_setting_sitesettext('fullname', new lang_string('fullsitename'), '', NULL)); // no default
         $temp->add(new admin_setting_sitesettext('shortname', new lang_string('shortsitename'), '', NULL)); // no default
         $temp->add(new admin_setting_special_frontpagedesc());
+        $temp->add(new admin_setting_configcheckbox('courseprogress', new lang_string('courseprogress','totara_core'), new lang_string('courseprogresshelp','totara_core'), 0));
         $temp->add(new admin_setting_courselist_frontpage(false)); // non-loggedin version of the setting (that's what the parameter is for :) )
         $temp->add(new admin_setting_courselist_frontpage(true)); // loggedin version of the setting
 

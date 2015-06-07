@@ -2004,25 +2004,6 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2013040201.00);
     }
 
-    if ($oldversion < 2013040300.01) {
-
-        // Define field completionstartonenrol to be dropped from course.
-        $table = new xmldb_table('course');
-        $field = new xmldb_field('completionstartonenrol');
-
-        // Conditionally launch drop field completionstartonenrol.
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        // Since structure of 'course' table has changed we need to re-read $SITE from DB.
-        $SITE = $DB->get_record('course', array('id' => $SITE->id));
-        $COURSE = clone($SITE);
-
-        // Main savepoint reached.
-        upgrade_main_savepoint(true, 2013040300.01);
-    }
-
     if ($oldversion < 2013041200.00) {
         // MDL-29877 Some bad restores created grade items with no category information.
         $sql = "UPDATE {grade_items}
@@ -2115,15 +2096,6 @@ function xmldb_main_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // Perform user data migration.
-        $usercollections = $DB->get_records('badge_backpack');
-        foreach ($usercollections as $usercollection) {
-            $collection = new stdClass();
-            $collection->backpackid = $usercollection->id;
-            $collection->collectionid = $usercollection->backpackgid;
-            $DB->insert_record('badge_external', $collection);
-        }
-
         // Finally, drop the column.
         // Define field backpackgid to be dropped from 'badge_backpack'.
         $table = new xmldb_table('badge_backpack');
@@ -2131,6 +2103,15 @@ function xmldb_main_upgrade($oldversion) {
 
         // Conditionally launch drop field backpackgid.
         if ($dbman->field_exists($table, $field)) {
+            // Perform user data migration.
+            $usercollections = $DB->get_records('badge_backpack');
+            foreach ($usercollections as $usercollection) {
+                $collection = new stdClass();
+                $collection->backpackid = $usercollection->id;
+                $collection->collectionid = $usercollection->backpackgid;
+                $DB->insert_record('badge_external', $collection);
+            }
+
             $dbman->drop_field($table, $field);
         }
 
