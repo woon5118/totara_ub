@@ -1683,6 +1683,28 @@ class core_cache_testcase extends advanced_testcase {
         $this->assertArrayHasKey('cache_is_searchable', $cache->phpunit_get_store_implements());
     }
 
+    /**
+     * Totara test!
+     *
+     * This test covers the situation where the site is sharing the config and dbmeta cache with sites of the same allversionshash.
+     * This was problematic as the config and dbmeta cache are required to know the allversionshash.
+     */
+    public function test_sharing_with_version_on_dbmeta_and_config() {
+        global $CFG, $DB;
+        /* @var cache_config_phpunittest $instance */
+        $instance = cache_config_phpunittest::instance();
+        $instance->set_definition_sharing('core/databasemeta', cache_definition::SHARING_SITEID + cache_definition::SHARING_VERSION);
+        $instance->set_definition_sharing('core/config', cache_definition::SHARING_SITEID + cache_definition::SHARING_VERSION);
+        cache_helper::purge_all();
+        $this->assertSame(null, cache_helper::$allversionshash);
+        $oldversionhash = $CFG->allversionshash;
+        unset($CFG->allversionshash);
+        $this->assertSame($oldversionhash, get_config('core', 'allversionshash'));
+        $this->assertCount(3, $DB->get_columns('config'));
+        cache_helper::$allversionshash = null;
+        $this->resetAfterTest();
+    }
+
     public function test_static_acceleration() {
         $instance = cache_config_testing::instance();
         $instance->phpunit_add_definition('phpunit/accelerated', array(

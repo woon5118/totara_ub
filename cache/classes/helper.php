@@ -55,6 +55,12 @@ class cache_helper {
     protected static $instance;
 
     /**
+     * The cached all version hash of this installation.
+     * @var string
+     */
+    public static $allversionshash;
+
+    /**
      * The site identifier used by the cache.
      * Set the first time get_site_identifier is called.
      * @var string
@@ -652,8 +658,23 @@ class cache_helper {
      * @return string
      */
     public static function get_site_version() {
-        global $CFG;
-        return (string)$CFG->version;
+        global $CFG, $DB;
+        if (self::$allversionshash === null) {
+            if (isset($CFG->allversionshash)) {
+                // This should be 99.99% of cases.
+                self::$allversionshash = (string)$CFG->allversionshash;
+            } else {
+                // In some cases CFG has not been established yet.
+                // This only happens when loading the configuration and the database meta cache is using version as part of its sharing
+                // selection. This leads to the following chain of events:
+                //   1. get_config cache is initialised.
+                //   2. database meta cache is initialised.
+                //   3. version not loaded because we are currently loading configuration.
+                // If we encounter this issue we must manually load the field value.
+                self::$allversionshash = (string)$DB->get_field('config', 'value', array('name' => 'allversionshash'));
+            }
+        }
+        return self::$allversionshash;
     }
 
     /**
