@@ -119,6 +119,16 @@ class behat_totara_data_generators extends behat_base {
                 ),
             ),
         ),
+        'totara_plan' => array (
+            'plans' => array(
+                'datagenerator' => 'learning_plan',
+                'required' => array('user', 'name')
+            ),
+            'objectives' => array(
+                'datagenerator' => 'learning_plan_objective_for_behat',
+                'required' => array('user', 'plan', 'name')
+            ),
+        )
     );
 
     /**
@@ -143,7 +153,7 @@ class behat_totara_data_generators extends behat_base {
 
         $helper = new totara_core_behat_helper_generator();
         $componentgenerator = testing_util::get_data_generator()->get_plugin_generator($component);
-
+        
         $elementdatagenerator = self::$componentelements[$component][$elementname]['datagenerator'];
         $requiredfields = self::$componentelements[$component][$elementname]['required'];
         if (!empty(self::$componentelements[$component][$elementname]['switchids'])) {

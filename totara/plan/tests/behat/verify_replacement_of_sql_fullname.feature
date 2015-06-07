@@ -7,21 +7,18 @@ Feature: Verify replacement of sql_fullname
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
       | manager2 | firstname2 | lastname2 | manager2@example.com |
-    Given the following "position" frameworks exist:
-      | fullname             | idnumber |
-      | Position Framework 1 | PF1      |
-    And the following "position" hierarchy exists:
-      | framework | idnumber | fullname   |
-      | PF1       | P1       | Position 1 |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | learner1 | P1       | manager2 |
+    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+      | user     | manager  |
+      | learner1 | manager2 |
     And the following "competency" frameworks exist:
       | fullname               | idnumber | description           |
       | Competency Framework 1 | CF1      | Framework description |
     And the following "competency" hierarchy exists:
       | framework | fullname     | idnumber | description            |
       | CF1       | Competency 1 | C1       | Competency description |
+    And the following "plans" exist in "totara_plan" plugin:
+      | user     | name                   |
+      | learner1 | learner1 Learning Plan |
 
     # As admin select the custom workflow for learning plans.
     And I log in as "admin"
@@ -40,8 +37,6 @@ Feature: Verify replacement of sql_fullname
     When I click on "Save changes" "button"
     Then I should see "Competency settings successfully updated"
     And I log out
-
-    And I create a basic learning plan called "learner1 Learning Plan" for "learner1"
 
   @javascript
   Scenario: Learner creates plan and add competency evidence.

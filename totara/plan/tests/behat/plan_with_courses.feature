@@ -7,22 +7,17 @@ Background:
     | username | firstname  | lastname  | email                |
     | learner1 | firstname1 | lastname1 | learner1@example.com |
     | manager2 | firstname2 | lastname2 | manager2@example.com |
-  And the following "position" frameworks exist:
-    | fullname             | idnumber |
-    | Position Framework 1 | PF1      |
-  And the following "position" hierarchy exists:
-    | framework | idnumber | fullname   |
-    | PF1       | P1       | Position 1 |
-  And the following position assignments exist:
-    | user     | position | manager  |
-    | learner1 | P1       | manager2 |
+  And the following "manager assignments" exist in "totara_hierarchy" plugin:
+    | user     | manager  |
+    | learner1 | manager2 |
   And the following "courses" exist:
     | fullname | shortname | enablecompletion |
     | Course 1 | Course 1  | 1                |
     | Course 2 | Course 2  | 1                |
     | Course 3 | Course 3  | 1                |
-
-  And I create a basic learning plan called "learner1 Learning Plan" for "learner1"
+  And the following "plans" exist in "totara_plan" plugin:
+    | user     | name                   |
+    | learner1 | learner1 Learning Plan |
 
   @javascript
   Scenario: Test the learner can add and remove courses from their learning plan prior to approval.

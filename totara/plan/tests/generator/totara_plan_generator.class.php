@@ -85,6 +85,12 @@ class totara_plan_generator extends component_generator_base {
             $record['templateid'] = 1;
         }
 
+        // Allow Behat tests to reference the user name.
+        if (isset($record['user'])) {
+            $record['userid'] = $DB->get_field('user', 'id', array('username' => $record['user']), MUST_EXIST);
+            unset ($record['user']);
+        }
+
         if (!isset($record['userid'])) {
             $record['userid'] = $USER->id;
         }
@@ -106,7 +112,13 @@ class totara_plan_generator extends component_generator_base {
         }
 
         if (!isset($record['status'])) {
-            $record['status'] = DP_PLAN_STATUS_APPROVED;
+            $record['status'] = 0;
+        }
+
+        // Allow Behat tests to reference a user name for the creator.
+        if (isset($record['createdbyuser'])) {
+            $record['createdby'] = $DB->get_field('user', 'id', array('username' => $record['createdbyuser']), MUST_EXIST);
+            unset ($record['createdbyuser']);
         }
 
         if (!isset($record['createdby'])) {
@@ -122,6 +134,10 @@ class totara_plan_generator extends component_generator_base {
         } else {
             $id = $DB->insert_record('dp_plan', $record);
         }
+
+        // Make sure the plan status is set correctly.
+        $plan = new development_plan($id);
+        $plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_CREATE);
 
         return $DB->get_record('dp_plan', array('id' => $id));
     }
@@ -188,7 +204,7 @@ class totara_plan_generator extends component_generator_base {
      * @param  int $planid
      * @param  int $viewas
      * @param  array    $record Optional record data.
-     * @return stdClass Created learning plan instance.
+     * @return stdClass Created learning plan objective instance.
      */
     public function create_learning_plan_objective($planid, $viewas, $record=null) {
         global $DB, $CFG;
@@ -228,6 +244,30 @@ class totara_plan_generator extends component_generator_base {
 
         return $DB->get_record('dp_plan_objective', array('id' => $id));
     }
+
+
+    /**
+     * Create learning plan objective for Behat.
+     *
+     * @param  array    $record Optional record data.
+     * @return stdClass Created learning plan objective instance.
+     */
+    public function create_learning_plan_objective_for_behat($record = null) {
+        global $DB, $USER;
+
+        // Look up the learning plan id from the user and plan names.
+        $userid = $DB->get_field('user', 'id', array('username' => $record['user']), MUST_EXIST);
+        $planid = $DB->get_field('dp_plan', 'id', array('userid' => $userid, 'name' => $record['plan']), MUST_EXIST);
+
+        // Set the data up correctly for objective creation and remove the data we no longer need.
+        $record['fullname'] = $record['name'];
+        unset($record['user']);
+        unset($record['plan']);
+        unset($record['name']);
+
+        return $this->create_learning_plan_objective ($planid, $USER->id, $record);
+    }
+
 
     /**
      * Create evidence type

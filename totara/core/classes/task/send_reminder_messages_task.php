@@ -47,6 +47,8 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
     public function execute() {
         global $DB, $CFG;
         require_once($CFG->libdir.'/reminderlib.php');
+        require_once($CFG->libdir.'/completionlib.php');
+        require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
         // Get reminders.
         $reminders = \reminder::fetch_all(
@@ -162,7 +164,7 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                         // Check if any users found.
                         $rs = $DB->get_recordset_sql($sql, $params);
                         if (!$rs->valid()) {
-                            mtrace("WARNING: no users to send reminder message to (message id {$message->id})... SKIPPING");
+                            mtrace("WARNING: no users to send {$message->type} message to (message id {$message->id})... SKIPPING");
                             continue;
                         }
 
@@ -215,8 +217,6 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
 
                             // Prepare message object.
                             $eventdata = new \stdClass();
-                            $eventdata->component         = 'moodle';
-                            $eventdata->name              = 'instantmessage';
                             $eventdata->userfrom          = $contact;
                             $eventdata->userto            = $user;
                             $eventdata->subject           = $subject;
@@ -224,9 +224,10 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                             $eventdata->fullmessageformat = FORMAT_PLAIN;
                             $eventdata->fullmessagehtml   = text_to_html($content, null, false, true);
                             $eventdata->smallmessage      = '';
+                            $eventdata->sendmail          = TOTARA_MSG_EMAIL_YES;
 
                             // Send user email.
-                            if (message_send($eventdata)) {
+                            if (tm_alert_send($eventdata)) {
                                 $sent = new \stdClass();
                                 $sent->reminderid = $reminder->id;
                                 $sent->messageid = $message->id;

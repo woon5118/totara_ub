@@ -7,17 +7,25 @@ Feature: Learner creates basic learning plan
       | username | firstname  | lastname  | email                |
       | learner1 | firstname1 | lastname1 | learner1@example.com |
       | manager2 | firstname2 | lastname2 | manager2@example.com |
-    And the following "position" frameworks exist:
-      | fullname             | idnumber |
-      | Position Framework 1 | PF1      |
-    And the following "position" hierarchy exists:
-      | framework | idnumber | fullname   |
-      | PF1       | P1       | Position 1 |
-    And the following position assignments exist:
-      | user     | position | manager  |
-      | learner1 | P1       | manager2 |
+    And the following "manager assignments" exist in "totara_hierarchy" plugin:
+      | user     | manager  |
+      | learner1 | manager2 |
+    And the following "plans" exist in "totara_plan" plugin:
+      | user     | name                   |
+      | learner1 | learner1 Learning Plan |
 
-    And I create a basic learning plan called "learner1 Learning Plan" for "learner1"
+  @javascript
+  Scenario: Learner creates empty learning plan.
+
+    Given I log in as "learner1"
+    And I focus on "My Learning" "link"
+    And I follow "Learning Plans"
+    And I press "Create new learning plan"
+    And I set the field "Plan name" to "My Learning Plan"
+    And I set the field "Plan description" to "A short and accurate description of My Learning Plan: Not a lot."
+    When I press "Create plan"
+    Then I should see "Plan creation successful"
+    And I log out
 
   @javascript
   Scenario: Learner creates empty learning plan which is approved by manager.
