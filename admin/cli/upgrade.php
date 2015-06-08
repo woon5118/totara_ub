@@ -43,7 +43,6 @@ require_once($CFG->libdir.'/adminlib.php');       // various admin-only function
 require_once($CFG->libdir.'/upgradelib.php');     // general upgrade/install related functions
 require_once($CFG->libdir.'/clilib.php');         // cli only functions
 require_once($CFG->libdir.'/environmentlib.php');
-require_once($CFG->libdir.'/pluginlib.php');
 require_once($CFG->dirroot.'/totara/core/db/utils.php');
 
 // now get cli options
