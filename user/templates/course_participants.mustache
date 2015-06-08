@@ -1,0 +1,55 @@
+{{!
+ This file is part of Totara LMS
+
+ Copyright (C) 2010 onwards Totara Learning Solutions LTD
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ @author Brian Barnes <brian.barnes@totaralms.com
+ @package user
+
+}}
+{{!
+    @template user/course_participants
+
+    Moodle notification template.
+
+    The purpose of this template is to render a problem notification.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * message A cleaned string (use clean_text()) to display.
+
+    Example context (json):
+    { "message": "Your pants are on fire!" }
+}}
+
+<h4 class="username">{{name}}</h4>
+<input type="checkbox" class="usercheckbox" name="user{{id}}" id="user{{id}}" />
+{{#bulkoperations}}
+<label for="user{{id}}" class="accesshide">{{bulklabel}}</label>
+{{/bulkoperations}}
+{{{image}}}
+<div class="info">{{{info}}}</div>
+<ul class="userlinks">
+    {{#links}}
+    <li>{{{.}}}</li>
+    {{/links}}
+</ul>
+
