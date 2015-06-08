@@ -751,13 +751,6 @@ input#id_submitbutton2:hover {
     background-color: #005aa8;
 }
 
-input[type="checkbox"] {
-    margin: 0 5px 0 0;
-}
-.dir-rtl input[type="checkbox"],
-.dir-rtl input[type="radio "] {
-    margin: 0 0 0 5px;
-}
 .mform fieldset {
     padding:5px 0;
     border:none;
@@ -795,7 +788,7 @@ input[type="checkbox"] {
 .mform .fitem fieldset .legend {
     text-align:left;
     font-weight:bold;
-    margin-top:2px;
+    width: auto;
 }
 .mform .fitem fieldset .legend {
     color: #6b6b6b;
