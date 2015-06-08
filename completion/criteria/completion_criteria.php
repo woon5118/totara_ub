@@ -84,6 +84,8 @@ $COMPLETION_CRITERIA_TYPES = array(
     COMPLETION_CRITERIA_TYPE_COURSE     => 'course',
 );
 
+// TOTARA performance improvement.
+define('MAXIMUM_CACHE_RECORDS', 1000);
 
 /**
  * Completion criteria abstract definition

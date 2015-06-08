@@ -535,6 +535,13 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
 
     $DB->update_record('course_modules', $cm);
 
+    // TOTARA performance improvement - invalidate static caching of course information.
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+    completion_criteria_activity::invalidatecache();
+    completion_criteria_course::invalidatecache();
+
     $modcontext = context_module::instance($moduleinfo->coursemodule);
 
     // Update embedded links and save files.

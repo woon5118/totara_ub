@@ -142,7 +142,7 @@ Feature: Users assignments to a program
     And I click on "Edit members" "link"
     And I click on "fn_002 ln_002 (user002@example.com)" "option" in the "#removeselect" "css_element"
     And I click on "remove" "button"
-    And I run the program assignments task
+    And I run the "\totara_program\task\user_assignments_task" task
 
     When I log out
     And I log in as "user002"
@@ -206,7 +206,7 @@ Feature: Users assignments to a program
       | user001 | pos2     |
       | user002 | pos1     |
       | user003 | pos1     |
-    And I run the program assignments task
+    And I run the "\totara_program\task\user_assignments_task" task
 
     When I log out
     And I log in as "user001"
@@ -270,7 +270,7 @@ Feature: Users assignments to a program
       | user001 | org2         |
       | user002 | org1         |
       | user003 | org1         |
-    And I run the program assignments task
+    And I run the "\totara_program\task\user_assignments_task" task
 
     When I log out
     And I log in as "user001"
@@ -337,7 +337,7 @@ Feature: Users assignments to a program
       | user003 | user001 |
       | user004 | user001 |
       | user005 | user002 |
-    And I run the program assignments task
+    And I run the "\totara_program\task\user_assignments_task" task
 
     When I log out
     And I log in as "user002"

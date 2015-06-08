@@ -180,6 +180,10 @@ if ($form->is_cancelled()) {
         }
     }
 
+    // TOTARA performance improvement - invalidate static caching of course information.
+    completion_criteria_activity::invalidatecache();
+    completion_criteria_course::invalidatecache();
+
     // Trigger an event for course module completion changed.
     $event = \core\event\course_completion_updated::create(
         array(

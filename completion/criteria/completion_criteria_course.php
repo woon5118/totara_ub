@@ -97,6 +97,15 @@ class completion_criteria_course extends completion_criteria {
         return parent::update_config($data);
     }
 
+    // TOTARA performance improvement - Static cache of courses to speed up loadtimes in review() & get_details().
+    private static $courseinfocache = array();
+    private static $courseinfocount = 0;
+
+    public static function invalidatecache() {
+        self::$courseinfocache = array();
+        self::$courseinfocount = 0;
+    }
+
     /**
      * Review this criteria and decide if the user has completed
      *
@@ -107,8 +116,18 @@ class completion_criteria_course extends completion_criteria {
     public function review($completion, $mark = true) {
         global $DB;
 
-        $course = $DB->get_record('course', array('id' => $this->courseinstance));
-        $info = new completion_info($course);
+        // TOTARA performance improvement - Get cached completion info.
+        if (!isset(self::$courseinfocache[$this->courseinstance])) {
+            if (self::$courseinfocount == MAXIMUM_CACHE_RECORDS) {
+                self::invalidatecache();
+            }
+
+            $course = new stdClass();
+            $course->id = $this->courseinstance;
+            self::$courseinfocache[$this->courseinstance] = new completion_info($course);
+            self::$courseinfocount++;
+        }
+        $info = self::$courseinfocache[$this->courseinstance];
 
         // If the course is complete
         if ($info->is_course_complete($completion->userid)) {
@@ -165,10 +184,18 @@ class completion_criteria_course extends completion_criteria {
     public function get_details($completion) {
         global $CFG, $DB;
 
-        // Get completion info
-        $course = new stdClass();
-        $course->id = $completion->course;
-        $info = new completion_info($course);
+        // TOTARA performance improvement - Get cached completion info.
+        if (!isset(self::$courseinfocache[$completion->course])) {
+            if (self::$courseinfocount == MAXIMUM_CACHE_RECORDS) {
+                self::invalidatecache();
+            }
+
+            $course = new stdClass();
+            $course->id = $completion->course;
+            self::$courseinfocache[$completion->course] = new completion_info($course);
+            self::$courseinfocount++;
+        }
+        $info = self::$courseinfocache[$completion->course];
 
         $prereq = $DB->get_record('course', array('id' => $this->courseinstance));
         $coursecontext = context_course::instance($prereq->id, MUST_EXIST);

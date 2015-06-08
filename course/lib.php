@@ -2770,6 +2770,14 @@ function update_course($data, $editoroptions = NULL) {
     // update enrol settings
     enrol_course_updated(false, $course, $data);
 
+    // TOTARA performance improvement - invalidate static caching of course information.
+    global $CFG;
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria.php');
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
+    require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+    completion_criteria_activity::invalidatecache();
+    completion_criteria_course::invalidatecache();
+
     // Trigger a course updated event.
     $event = \core\event\course_updated::create(array(
         'objectid' => $course->id,

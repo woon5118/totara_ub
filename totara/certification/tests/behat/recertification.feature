@@ -74,7 +74,7 @@ Feature: User recertification and expiry of certification
     And I should see "Not due for renewal"
 
     When I wind back certification dates by 5 months
-    And I run the recertification task
+    And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Completed"
@@ -100,7 +100,7 @@ Feature: User recertification and expiry of certification
     And I should see "Not due for renewal"
 
     When I wind back certification dates by 5 months
-    And I run the recertification task
+    And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Completed"
@@ -126,7 +126,7 @@ Feature: User recertification and expiry of certification
     And I should see "Not due for renewal"
 
     When I wind back certification dates by 7 months
-    And I run the recertification task
+    And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Assigned"
@@ -154,7 +154,7 @@ Feature: User recertification and expiry of certification
     And I should see "Not due for renewal"
 
     When I wind back certification dates by 5 months
-    And I run the recertification task
+    And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Complete"
