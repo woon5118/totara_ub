@@ -69,6 +69,14 @@ if (!$cancelurl) {
 
 if ($delete && $cohort->id) {
     if ($confirm and confirm_sesskey()) {
+        // Get current roles assigned to this cohort.
+        $roles = totara_get_cohort_roles($cohort->id);
+        // Get members of the cohort.
+        $members = totara_get_members_cohort($cohort->id);
+        $memberids = array_keys($members);
+        // Unassign members from roles.
+        totara_unset_role_assignments_cohort($roles, $cohort->id, $memberids);
+
         $result = cohort_delete_cohort($cohort);
         totara_set_notification(get_string('successfullydeleted', 'totara_cohort'), $returnurl->out(), array('class' => 'notifysuccess'));
     }

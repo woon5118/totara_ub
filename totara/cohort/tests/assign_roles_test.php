@@ -42,6 +42,7 @@ class totara_cohort_assign_roles_testcase extends advanced_testcase {
     private $context = null;
     private $assignableroles = array();
     private $cohort_generator = null;
+    private $usrs = null;
     const TEST_ROLES_COUNT_USERS = 8;
 
     public function setUp() {
@@ -61,6 +62,7 @@ class totara_cohort_assign_roles_testcase extends advanced_testcase {
             $this->{'user'.$i} = $this->getDataGenerator()->create_user();
             $users[] = $this->{'user'.$i}->id;
         }
+        $this->usrs = $users;
         // Check users were created. It should match TEST_ROLES_COUNT_USERS + 2 users(admin + guest).
         $this->assertEquals(self::TEST_ROLES_COUNT_USERS + 2, $DB->count_records('user'));
 
@@ -143,5 +145,66 @@ class totara_cohort_assign_roles_testcase extends advanced_testcase {
         // Make sure members are still in the cohort.
         $members = totara_get_members_cohort($this->cohort->id);
         $this->assertEquals(self::TEST_ROLES_COUNT_USERS, count($members));
+    }
+
+    public function test_unassign_roles_to_cohort() {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        // Create the cohorts.
+        $cohort1 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_STATIC));
+        $this->assertTrue($DB->record_exists('cohort', array('id' => $cohort1->id)));
+        $cohort2 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_STATIC));
+        $this->assertTrue($DB->record_exists('cohort', array('id' => $cohort2->id)));
+        $cohort3 = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_STATIC));
+        $this->assertTrue($DB->record_exists('cohort', array('id' => $cohort3->id)));
+
+        // Assign users to the cohorts.
+        $this->cohort_generator->cohort_assign_users($cohort1->id, $this->usrs);
+        $this->cohort_generator->cohort_assign_users($cohort2->id, $this->usrs);
+        $this->cohort_generator->cohort_assign_users($cohort3->id, $this->usrs);
+
+        // Make an array of key => values (roles => context) needed to process the assignment.
+        $roles = array();
+        foreach ($this->assignableroles as $key => $value) {
+            $roles[$key] = $this->context->id;
+        }
+        // Assign roles to the cohorts and verify it was successful.
+        $this->assertTrue(totara_cohort_process_assigned_roles($cohort1->id, $roles));
+        $this->assertTrue(totara_cohort_process_assigned_roles($cohort2->id, $roles));
+        $this->assertTrue(totara_cohort_process_assigned_roles($cohort3->id, $roles));
+
+        // Do something nasty.
+        // Remove cohort 1.
+        cohort_delete_cohort($cohort1);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $cohort1->id)));
+        $this->assertEquals(0, $DB->count_records('cohort', array('id' => $cohort1->id)));
+        // Unassign all roles assigned.
+        totara_cohort_process_assig_roles();
+        // Check there are no records in role_assignments.
+        $this->assertEquals(0, $DB->count_records('role_assignments', array('itemid' => $cohort1->id)));
+        $recordsleft = count($roles)*count($this->usrs);
+        $this->assertEquals($recordsleft, $DB->count_records('role_assignments', array('itemid' => $cohort2->id)));
+        $this->assertEquals($recordsleft, $DB->count_records('role_assignments', array('itemid' => $cohort3->id)));
+
+        // Remove cohort 2.
+        cohort_delete_cohort($cohort2);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $cohort2->id)));
+        $this->assertEquals(0, $DB->count_records('cohort', array('id' => $cohort2->id)));
+        // Unassign all roles assigned.
+        totara_cohort_process_assig_roles();
+        // Check there are no records in role_assignments.
+        $this->assertEquals(0, $DB->count_records('role_assignments', array('itemid' => $cohort2->id)));
+        $this->assertEquals($recordsleft, $DB->count_records('role_assignments', array('itemid' => $cohort3->id)));
+
+        // Remove cohort 3.
+        cohort_delete_cohort($cohort3);
+        $this->assertEquals(0, $DB->count_records('cohort_members', array('cohortid' => $cohort3->id)));
+        $this->assertEquals(0, $DB->count_records('cohort', array('id' => $cohort3->id)));
+        // Unassign all roles assigned.
+        totara_cohort_process_assig_roles();
+        // Check there are no records in role_assignments.
+        $this->assertEquals(0, $DB->count_records('role_assignments', array('itemid' => $cohort3->id)));
     }
 }
