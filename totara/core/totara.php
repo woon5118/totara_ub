@@ -1710,8 +1710,9 @@ function totara_menu_reset_cache() {
 function totara_build_menu() {
     global $SESSION, $USER, $CFG;
 
-    if (!empty($CFG->menulifetime) and isset($SESSION->mymenu)) {
-        if ($SESSION->mymenu['id'] == $USER->id) {
+    $lang = current_language();
+    if (!empty($CFG->menulifetime) and !empty($SESSION->mymenu['lang'])) {
+        if ($SESSION->mymenu['id'] == $USER->id and $SESSION->mymenu['lang'] === $lang) {
             if ($SESSION->mymenu['c'] + $CFG->menulifetime > time()) {
                 return $SESSION->mymenu['tree'];
             }
@@ -1758,6 +1759,7 @@ function totara_build_menu() {
     if (!empty($CFG->menulifetime)) {
         $SESSION->mymenu = array(
             'id' => $USER->id,
+            'lang' => $lang,
             'c' => time(),
             'tree' => $tree,
         );
