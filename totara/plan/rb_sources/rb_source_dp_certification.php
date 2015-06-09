@@ -684,12 +684,16 @@ class rb_source_dp_certification extends rb_base_source {
     }
 
 
-    function rb_display_timewindowopens($time, $row) {
+    function rb_display_timewindowopens($time, $row, $isexport = false) {
         global $OUTPUT;
         $out = '';
 
         if (!empty($time)) {
             $out = userdate($time, get_string('strfdateshortmonth', 'langconfig'));
+
+            if ($isexport) {
+                return $out;
+            }
 
             $extra = '';
             if ($time < time()) {
@@ -718,13 +722,17 @@ class rb_source_dp_certification extends rb_base_source {
     }
 
 
-    function rb_display_timeexpires($time, $row) {
+    function rb_display_timeexpires($time, $row, $isexport = false) {
         global $OUTPUT;
 
         $out = '';
 
         if (!empty($time)) {
             $out = userdate($time, get_string('strfdateshortmonth', 'langconfig'));
+
+            if ($isexport) {
+                return $out;
+            }
 
             $days = '';
             if ($row->status != CERTIFSTATUS_EXPIRED) {

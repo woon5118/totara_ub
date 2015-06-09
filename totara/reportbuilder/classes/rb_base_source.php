@@ -1482,7 +1482,7 @@ abstract class rb_base_source {
      * @param record $row   The whole row, including some required fields
      * @return html
      */
-    public function rb_display_program_duedate($time, $row) {
+    public function rb_display_program_duedate($time, $row, $isexport = false) {
         // Get the necessary fields out of the row.
         $duedate = $time;
         $userid = $row->userid;
@@ -1491,7 +1491,7 @@ abstract class rb_base_source {
         $certifpath = isset($row->certifpath) ? $row->certifpath : null;
         $certifstatus = isset($row->certifstatus) ? $row->certifstatus : null;
 
-        return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status);
+        return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status, $isexport);
     }
 
     /**

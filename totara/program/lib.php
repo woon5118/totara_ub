@@ -2027,9 +2027,10 @@ function prog_display_summary_widget($program, $userid = null) {
  * @param int $certifpath   Optional param telling us the path of the certification
  * @param int $certstatus   Optional param telling us the status of the certification
  * @param int $compstatus Whether the user has completed the program.
+ * @param boolean $isexport Whether the output needs to be formatted for export.
  * @return string
  */
-function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $certstatus = null, $compstatus = null) {
+function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $certstatus = null, $compstatus = null, $isexport = false) {
     global $CFG, $PAGE;
 
     $renderer = $PAGE->get_renderer('totara_program');
@@ -2055,7 +2056,7 @@ function prog_display_duedate($duedate, $progid, $userid, $certifpath = null, $c
     }
 
     $completed = isset($completion) ? $completion == STATUS_PROGRAM_COMPLETE : prog_is_complete($progid, $userid);
-    if (!$completed) {
+    if (!$completed && !$isexport) {
         $out .= $renderer->display_duedate_highlight_info($duedate);
     }
 
