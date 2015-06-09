@@ -1012,7 +1012,6 @@ class appraisal {
 
     /**
      * Return array of roles involved in current appraisal
-     * array(appraisalrole => appraisalrole)
      *
      * @param int $rights count only roles that have certain rights
      * @return array of appraisalrole
@@ -1043,6 +1042,7 @@ class appraisal {
         foreach ($rolesrecords as $rolerecord) {
             $out[$rolerecord->appraisalrole] = 1;
         }
+
         return array_keys($out);
     }
 

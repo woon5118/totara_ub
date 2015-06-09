@@ -675,9 +675,10 @@ class totara_appraisal_renderer extends plugin_renderer_base {
 
             $stageobj = new appraisal_stage($stage->id);
             $allviewers = $stageobj->get_roles_involved(appraisal::ACCESS_CANVIEWOTHER);
-            $viewers = array_diff_key($allviewers, $stage->roles);
+            $viewers = array_diff($allviewers, array_keys($stage->roles));
+
             if (!empty($viewers)) {
-                $row->cells[] = '<span class="appraisal-rolescanview">' . $this->display_roles($viewers) .'</span>';
+                $row->cells[] = '<span class="appraisal-rolescanview">' . $this->display_roles(array_flip($viewers)) .'</span>';
             } else {
                 $row->cells[] = '<span class="appraisal-rolescanview">' . get_string('none', 'totara_appraisal') .'</span>';
             }

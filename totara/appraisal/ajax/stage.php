@@ -73,8 +73,8 @@ switch ($action) {
             $stage = new appraisal_stage($stagerecord->id);
             $rolestring = html_writer::tag('div', $output->display_roles($stagerecord->roles), array('class' => 'cananswer'));
             $allviewers = $stage->get_roles_involved(appraisal::ACCESS_CANVIEWOTHER);
-            $viewers = array_diff_key($allviewers, $stagerecord->roles);
-            $rolestring .= html_writer::tag('div', $output->display_roles($viewers), array('class' => 'canview'));
+            $viewers = array_diff($allviewers, array_keys($stagerecord->roles));
+            $rolestring .= html_writer::tag('div', $output->display_roles(array_flip($viewers)), array('class' => 'canview'));
             echo html_writer::tag('div', $rolestring, array('id' => $stage->id, 'class' => 'stageroles'));
         }
         break;
