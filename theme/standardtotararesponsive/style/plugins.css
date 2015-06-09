@@ -22,18 +22,29 @@
         width: 100%;
     }
 
+    .stagetitle {
+        width: 24%;
+    }
+    .stageinfo {
+        width: 74%;
+    }
+    .dir-ltr .stageinfo {
+        margin: 0 2% 0 0;
+    }
+    .dir-rtl .stageinfo {
+        margin: 0 0 0 2%;
+    }
+
+    .stageactions {
+        width: 100%;
+    }
+
+    .stageactions .link-as-button {
+        margin: 0 0 0 5px;
+    }
+
     .dir-ltr div.appraisal-page-pane, .dir-rtl div.appraisal-page-pane {
         float: none;
-    }
-
-    .stagetitle,
-    .stageactions {
-        position: static;
-        width: auto;
-    }
-
-    .stageinfo {
-        margin: 0;
     }
 
     #appraisal-questions {
@@ -59,6 +70,11 @@
     #appraisalanswers1 div.fcontainer > a {
         height: auto;
         left: 0 !important;
+    }
+
+    .appraisal-stage > div {
+        width: 100%;
+        margin: 0;
     }
 }
 

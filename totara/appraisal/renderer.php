@@ -1635,7 +1635,6 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $stagesstr = get_string('backtoappraisal', 'totara_appraisal');
         $stagesurl = new moodle_url('/totara/appraisal/myappraisal.php', array_merge($urlparams, array('action' => 'stages')));
         $actions .= $this->action_link($stagesurl, $stagesstr, null, array('class' => 'link-as-button'));
-        $actions .= html_writer::empty_tag('br');
 
         // Save progress button.
         $saveprogressurl = new moodle_url('/totara/appraisal/myappraisal.php', $urlparams);

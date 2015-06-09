@@ -206,13 +206,9 @@ li.yui3-dd-draggable {
     background: none;
 }
 
-.appraisal-stage-completed,
-.appraisal-stage-inprogress,
-.appraisal-stage-overdue,
-.appraisal-stage-locked {
+.appraisal-stage {
     width:auto;
     margin:1em 0;
-    text-align:left !important;
     border:1px solid #444444;
     padding:10px;
     -moz-border-radius:4px 4px 4px 4px;
@@ -223,11 +219,9 @@ li.yui3-dd-draggable {
     position: relative;
     min-height: 100px;
 }
-.dir-rtl .appraisal-stage-completed,
-.dir-rtl .appraisal-stage-inprogress,
-.dir-rtl .appraisal-stage-overdue,
-.dir-rtl .appraisal-stage-locked {
-    text-align:right !important;
+.appraisal-stage > div {
+    display: inline-block;
+    vertical-align: top;
 }
 
 .appraisal-stage-completed {
@@ -266,27 +260,17 @@ li.yui3-dd-draggable {
 }
 
 .stagelist {
-    clear: left;
+    clear: both;
     margin: 15px 0;
-}
-.dir-rtl .stagelist {
-    clear: right;
 }
 
 .stagetitle {
-    position: absolute;
-    top: 10px;
-    width: 200px;
-}
-.dir-ltr .stagetitle {
-    left: 10px;
-}
-.dir-rtl .stagetitle {
-    right: 10px;
+    width: 19%;
 }
 
 .stageinfo {
-    margin: 0 200px;
+    width: 65%;
+    margin: 0 1%;
 }
 
 .stageinfo p {
@@ -298,17 +282,13 @@ li.yui3-dd-draggable {
 }
 
 .stageactions {
-    position: absolute;
-    top: 10px;
-    width: 200px;
+    width: 14%;
 }
-.dir-ltr .stageactions {
-    right: 10px;
-    text-align: right;
+.dir-ltr .stageactions > * {
+    float: right;
 }
-.dir-rtl .stageactions {
-    left: 10px;
-    text-align: left;
+.dir-rtl .stageactions > * {
+    float: left;
 }
 
 .stageactions .link-as-button {
