@@ -355,7 +355,7 @@ class totara_core_renderer extends plugin_renderer_base {
         static $menuinited = false;
 
         if (!$menuinited) {
-            $PAGE->requires->jquery();
+            // jQuery is loaded on each page since 8.0.
             $PAGE->requires->yui_module('moodle-totara_core-totaramenu', 'M.coremenu.setfocus.init');
             $menuinited = true;
         }

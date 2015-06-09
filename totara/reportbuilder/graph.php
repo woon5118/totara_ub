@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$PAGE->requires->jquery();
+// jQuery is loaded on each page since 8.0.
 $PAGE->requires->yui_module('moodle-totara_reportbuilder-graphicalreporting', 'M.reportbuilder.graphicalreport.init');
 
 $id = required_param('reportid', PARAM_INT);

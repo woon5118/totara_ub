@@ -47,7 +47,8 @@ function local_js($options = array()) {
     // Include required javascript libraries
     // jQuery component and UI bundle found here: http://jqueryui.com/download
     // Core, Widget, Position, Dialog, Tabs, Datepicker, Effects Core, Effects "Fade"
-    $PAGE->requires->jquery();
+
+    // jQuery is loaded on each page since 8.0.
 
     // If UI
     if (in_array(TOTARA_JS_UI, $options)) {
