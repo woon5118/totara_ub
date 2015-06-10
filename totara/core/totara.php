@@ -843,7 +843,7 @@ function totara_print_report_manager() {
 
 */
 function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $sqlclause=array()) {
-    global $CFG, $DB, $USER, $PAGE, $REPORT_BUILDER_EXPORT_OPTIONS, $REPORT_BUILDER_EXPORT_FILESYSTEM_OPTIONS;
+    global $CFG, $DB, $USER, $PAGE, $REPORT_BUILDER_EXPORT_FILESYSTEM_OPTIONS;
 
     require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
     require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
@@ -875,9 +875,15 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
         else {
             $sched->data = get_string('alldata', 'totara_reportbuilder');
         }
-        //format column
-        $key = array_search($sched->format, $REPORT_BUILDER_EXPORT_OPTIONS);
-        $sched->format = get_string($key . 'format','totara_reportbuilder');
+        // Format column.
+        $format = \totara_core\tabexport_writer::normalise_format($sched->format);
+        $allformats = \totara_core\tabexport_writer::get_export_classes();
+        if (isset($allformats[$format])) {
+            $classname = $allformats[$format];
+            $sched->format = $classname::get_export_option_name();
+        } else {
+            $sched->format = get_string('error');
+        }
         // Export column.
         $key = array_search($sched->exporttofilesystem, $REPORT_BUILDER_EXPORT_FILESYSTEM_OPTIONS);
         $sched->exporttofilesystem = get_string($key, 'totara_reportbuilder');

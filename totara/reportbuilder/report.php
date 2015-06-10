@@ -30,7 +30,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$format    = optional_param('format', '', PARAM_TEXT);
+$format    = optional_param('format', '', PARAM_ALPHANUM);
 $id = required_param('id', PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $debug = optional_param('debug', 0, PARAM_INT);

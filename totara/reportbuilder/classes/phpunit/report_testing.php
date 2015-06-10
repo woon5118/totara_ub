@@ -225,8 +225,12 @@ trait report_testing {
         $todb->hidden = 0;
         $todb->recordsperpage = 40;
         $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
-        $todb->accessmode = REPORT_BUILDER_ACCESS_MODE_ANY;
         $todb->embedded = 0;
-        return $DB->insert_record('report_builder', $todb);
+        $todb->id = $DB->insert_record('report_builder', $todb);
+
+        // Set up access permissions.
+        reportbuilder_set_default_access($todb->id);
+
+        return $todb->id;
     }
 }

@@ -1,4 +1,4 @@
-@totara @totara_reportbuilder
+@totara @totara_reportbuilder @tabexport
 Feature: Test that report builder reports can be scheduled
   Create a report
   Go to My Reports
@@ -87,3 +87,32 @@ Feature: Test that report builder reports can be scheduled
     And I set the field "schedulegroup[minutely]" to "15"
     When I press "Save changes"
     Then I should see "Every 15 minute(s) from the start of the hour"
+
+  @javascript
+  Scenario: Report builder reports can be exported in different formats
+    When I click on "My Reports" in the totara menu
+    And I press "Add scheduled report"
+    Then I should see "Schedulable Report"
+    When I set the field "Export" to "CSV"
+    And I press "Save changes"
+    Then I should see "CSV" in the "Schedulable Report" "table_row"
+
+    When I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    And I set the field "Export" to "Excel"
+    And I press "Save changes"
+    Then I should see "Excel" in the "Schedulable Report" "table_row"
+
+    When I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    And I set the field "Export" to "ODS"
+    And I press "Save changes"
+    Then I should see "ODS" in the "Schedulable Report" "table_row"
+
+    When I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    And I set the field "Export" to "PDF (Landscape)"
+    And I press "Save changes"
+    Then I should see "PDF (Landscape)" in the "Schedulable Report" "table_row"
+
+    When I click on "Edit" "link" in the "Schedulable Report" "table_row"
+    And I set the field "Export" to "PDF (Portrait)"
+    And I press "Save changes"
+    Then I should see "PDF (Portrait)" in the "Schedulable Report" "table_row"

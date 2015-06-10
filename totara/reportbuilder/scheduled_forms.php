@@ -44,6 +44,7 @@ class scheduled_reports_new_form extends moodleform {
         $id = $this->_customdata['id'];
         $frequency = $this->_customdata['frequency'];
         $schedule = $this->_customdata['schedule'];
+        $format = $this->_customdata['format'];
         $ownerid = $this->_customdata['ownerid'];
         $report = $this->_customdata['report'];
         $savedsearches = $this->_customdata['savedsearches'];
@@ -55,7 +56,7 @@ class scheduled_reports_new_form extends moodleform {
         $mform->setType('reportid', PARAM_INT);
 
         // Export type options.
-        $exportformatselect = reportbuilder_get_export_options();
+        $exportformatselect = reportbuilder_get_export_options($format, false);
 
         $exporttofilesystemenabled = false;
         if (get_config('reportbuilder', 'exporttofilesystem') == 1) {

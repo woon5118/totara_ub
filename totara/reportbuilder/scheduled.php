@@ -53,6 +53,7 @@ if ($id == 0) {
     $schedule->reportid = $reportid;
     $schedule->frequency = null;
     $schedule->schedule = null;
+    $schedule->format = null;
     $schedule->exporttofilesystem = null;
     $schedule->userid = $USER->id;
 } else {
@@ -124,6 +125,7 @@ $mform = new scheduled_reports_new_form(
         'report' => $report,
         'frequency' => $schedule->frequency,
         'schedule' => $schedule->schedule,
+        'format' => $schedule->format,
         'savedsearches' => $savedsearches,
         'exporttofilesystem' => $schedule->exporttofilesystem,
         'ownerid' => $schedule->userid,

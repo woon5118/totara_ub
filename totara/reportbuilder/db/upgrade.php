@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
  * @return  boolean $result
  */
 function xmldb_totara_reportbuilder_upgrade($oldversion) {
-    global $CFG, $DB, $REPORT_BUILDER_EXPORT_OPTIONS;
+    global $CFG, $DB;
     $dbman = $DB->get_manager(); // loads ddl manager and xmldb classes
 
     if ($oldversion < 2012071300) {
@@ -226,7 +226,7 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         // Add pdf to the default export options.
         $currentexportoptions = get_config('reportbuilder', 'exportoptions');
         $currentexportoptions = is_null($currentexportoptions) ? 0 : $currentexportoptions;
-        $newexportoptions = ($currentexportoptions | REPORT_BUILDER_EXPORT_PDF_PORTRAIT | REPORT_BUILDER_EXPORT_PDF_LANDSCAPE);
+        $newexportoptions = ($currentexportoptions | 16 | 32); // PDF landscape and portrait.
         set_config('exportoptions', $newexportoptions, 'reportbuilder');
         totara_upgrade_mod_savepoint(true, 2013092400, 'totara_reportbuilder');
     }
@@ -299,7 +299,16 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
 
         if (!is_null($tempconfig)) {
             $selected = array();
-            foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
+            $options = array(
+                'xls'           => 1,
+                'csv'           => 2,
+                'ods'           => 4,
+                'fusion'        => 8,
+                'pdf_portrait'  => 16,
+                'pdf_landscape' => 32,
+            );
+
+            foreach ($options as $option => $code) {
                 // Bitwise operator to see if option bit is set.
                 if (($tempconfig & $code) == $code) {
                     $selected[] = $code;
@@ -307,6 +316,8 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
             }
             $selected = implode(',', $selected);
             set_config('exportoptions', $selected, 'reportbuilder');
+            unset($options);
+            unset($option);
         }
         // Report builder savepoint reached.
         totara_upgrade_mod_savepoint(true, 2014021100, 'totara_reportbuilder');
@@ -803,6 +814,56 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
 
         // Reportbuilder savepoint reached.
         upgrade_plugin_savepoint(true, 2015030203, 'totara', 'reportbuilder');
+    }
+
+    if ($oldversion < 2015061503) {
+        // Switch to new settings format - instead of constants use plugin names.
+        // Change numbers to new plugin names.
+        $formats = array(
+            '1' => 'excel',
+            '2' => 'csv',
+            '4' => 'ods',
+            '8' => 'fusion',
+            '16' => 'pdfportrait',
+            '32' => 'pdflandscape',
+        );
+
+        $exportoptions = get_config('reportbuilder', 'exportoptions');
+        if ($exportoptions) {
+            $exportoptions = explode(',', $exportoptions);
+            foreach ($exportoptions as $k => $v) {
+                if (isset($formats[$v])) {
+                    $exportoptions[$k] = $formats[$v];
+                }
+            }
+            $exportoptions = implode(',', $exportoptions);
+            set_config('exportoptions', $exportoptions, 'reportbuilder');
+        }
+
+        // Changing type of field format on table report_builder_schedule to char.
+        $table = new xmldb_table('report_builder_schedule');
+        $field = new xmldb_field('format', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, 'savedsearchid');
+
+        // Launch change of type for field format.
+        $dbman->change_field_type($table, $field);
+
+        foreach ($formats as $old => $new) {
+            $DB->set_field('report_builder_schedule', 'format', $new, array('format' => $old));
+        }
+
+        unset($exportoptions);
+        unset($formats);
+
+        // Migrate settings.
+        $oldvalue = get_config('reportbuilder', 'pdffont');
+        if ($oldvalue !== false) {
+            set_config('pdffont', $oldvalue, 'tabexport_pdflandscape');
+            set_config('pdffont', $oldvalue, 'tabexport_pdfportrait');
+            unset_config('pdffont', 'reportbuilder');
+        }
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2015061503, 'totara', 'reportbuilder');
     }
 
     return true;

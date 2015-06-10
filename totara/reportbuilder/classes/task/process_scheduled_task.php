@@ -60,26 +60,24 @@ class process_scheduled_task extends \core\task\scheduled_task {
 
         mtrace('Processing ' . count($scheduledreports) . ' scheduled reports');
 
-        foreach ($scheduledreports as $report) {
-            $reportname = $report->fullname;
+        // If exporting to file is turned off at system level, do not save reports.
+        $exportsetting = get_config('reportbuilder', 'exporttofilesystem');
 
+        foreach ($scheduledreports as $report) {
             // Set the next report time if its not yet set.
             $schedule = new \scheduler($report, array('nextevent' => 'nextreport'));
 
             if ($schedule->is_time()) {
                 $user = $DB->get_record('user', array('id' => $report->userid, 'deleted' => 0));
-                if ($user) {
-                    $tz = \core_date::get_user_timezone($user);
-                } else {
-                    $tz = \core_date::get_server_timezone();
+                if (!$user) {
+                    mtrace('ReportID:(' . $report->id . ') invalid user id.');
+                    continue;
                 }
+
+                $tz = \core_date::get_user_timezone($user);
                 $schedule->next(time(), true, $tz);
 
-                // If exporting to file is turned off at system level, do not save reports.
-                $exportsetting = get_config('reportbuilder', 'exporttofilesystem');
-                $exporttofilesystem = $origexportsetting = $report->exporttofilesystem;
-
-                switch ($exporttofilesystem) {
+                switch ($report->exporttofilesystem) {
                     case REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE:
                         if ($exportsetting == 0) {
                             // Export turned off, email only.
@@ -102,27 +100,25 @@ class process_scheduled_task extends \core\task\scheduled_task {
                         mtrace('ReportID:(' . $report->id . ') Option: Email scheduled report.');
                 }
 
+                // Hack $USER - includes current language change, $PAGE init, etc.
+                cron_setup_user($user);
+
                 // Send email.
                 if (reportbuilder_send_scheduled_report($report)) {
                     mtrace('Sent email for report ' . $report->id);
-                } else if ($exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE) {
+                } else if ($report->exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE) {
                     mtrace('No scheduled report email has been send');
                 } else {
                     mtrace('Failed to send email for report ' . $report->id);
                 }
 
-                // Unset $SESSION->reportbuilder to ensure that scheduled reports don't have the incorrect
-                // filters applied to them. This is because filters are set in the session which means they
-                // get applied to all scheduled reports that are based on the same report.
-                unset($SESSION->reportbuilder);
+                // Reset $USER and $SESSION. (This replaces previous reset of $SESSION->reportbuilder.)
+                cron_setup_user('reset');
 
-                // Restore original export setting if we have changed it because file export is disabled.
-                if ($report->exporttofilesystem != $origexportsetting) {
-                    $report->exporttofilesystem = $origexportsetting;
-                }
-                if (!$DB->update_record('report_builder_schedule', $report)) {
-                    mtrace('Failed to update next report field for scheduled report id:' . $report->id);
-                }
+                // Ignore changed export setting.
+                unset($report->exporttofilesystem);
+                $DB->update_record('report_builder_schedule', $report);
+
             } else if ($schedule->is_changed()) {
                 $DB->update_record('report_builder_schedule', $schedule->to_object());
             }

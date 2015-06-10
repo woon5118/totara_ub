@@ -1088,12 +1088,6 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     // saved_menu()
     // edit_button()
 
-    // skipping tests for the following as they output files
-    // download_ods()
-    // download_csv()
-    // download_xls()
-
-
     function test_reportbuilder_get_content_options() {
         $rb = $this->rb;
         $contentoptions = $rb->get_content_options();
@@ -1223,46 +1217,50 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    function test_reportbuilder_create_attachment() {
-        global $CFG;
+    public function test_reportbuilder_create_attachment() {
+        $this->resetAfterTest(true);
+
+        $admin = get_admin();
+        $this->setAdminUser();
 
         $sched = new stdClass();
         $sched->id = 1;
-        $sched->reportid = 1;
-        $sched->format = 1;
-        $sched->exporttofilesystem = 0;
+        $sched->reportid = $this->rb->_id;
+        $sched->format = 'excel';
+        $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $sched->savedsearchid = 0;
+        $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched, 2);
-        $this->assertTrue((bool)file_exists($CFG->dataroot . DIRECTORY_SEPARATOR . $filename));
-        unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $filename);
+        $filename = reportbuilder_create_attachment($sched);
+        $this->assertFileExists($filename);
+        unlink($filename);
         unset($sched);
 
         $sched = new stdClass();
         $sched->id = 2;
-        $sched->reportid = 1;
-        $sched->format = 2;
-        $sched->exporttofilesystem = 0;
+        $sched->reportid = $this->rb->_id;
+        $sched->format = 'csv';
+        $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $sched->savedsearchid = 0;
+        $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched, 2); // format 2
-        $this->assertTrue((bool)file_exists($CFG->dataroot . DIRECTORY_SEPARATOR . $filename));
-        unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $filename);
+        $filename = reportbuilder_create_attachment($sched);
+        $this->assertFileExists($filename);
+        unlink($filename);
         unset($sched);
 
         $sched = new stdClass();
         $sched->id = 3;
-        $sched->reportid = 1;
-        $sched->format = 4;
-        $sched->exporttofilesystem = 0;
+        $sched->reportid = $this->rb->_id;
+        $sched->format = 'ods';
+        $sched->exporttofilesystem = REPORT_BUILDER_EXPORT_EMAIL;
         $sched->savedsearchid = 0;
+        $sched->userid = $admin->id;
 
-        $filename = reportbuilder_create_attachment($sched, 2); // format 4
-        $this->assertTrue((bool)file_exists($CFG->dataroot . DIRECTORY_SEPARATOR . $filename));
-        unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $filename);
+        $filename = reportbuilder_create_attachment($sched);
+        $this->assertFileExists($filename);
+        unlink($filename);
         unset($sched);
-
-        $this->resetAfterTest(true);
     }
 
     public function test_get_search_columns() {

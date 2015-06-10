@@ -408,17 +408,20 @@ class graph {
         return $data;
     }
 
-    public function fetch_pdf_svg($portrait) {
+    /**
+     * Get SVG image markup.
+     *
+     * @param int $w width of the SVG
+     * @param int $h height of SVG
+     * @return string
+     */
+    public function fetch_export_svg($w, $h) {
         $this->init_svggraph();
         if (!$this->svggraphtype) {
             // Nothing to do.
             return null;
         }
-        if ($portrait) {
-            $svggraph = new \SVGGraph(800, 400, $this->get_final_settings());
-        } else {
-            $svggraph = new \SVGGraph(1200, 400, $this->get_final_settings());
-        }
+        $svggraph = new \SVGGraph($w, $h, $this->get_final_settings());
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->values);
         return $svggraph->Fetch($this->svggraphtype, false, false);

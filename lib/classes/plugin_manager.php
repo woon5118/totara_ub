@@ -1185,6 +1185,9 @@ class core_plugin_manager {
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator',
             ),
+            'tabexport' => array(
+                'csv', 'excel', 'ods', 'pdflandscape', 'pdfportrait',
+            ),
 
             'webservice' => array(
                 'amf', 'rest', 'soap', 'xmlrpc'

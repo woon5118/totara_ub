@@ -192,13 +192,13 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
 
         $report = new reportbuilder($rid);
 
-        $event = \totara_reportbuilder\event\report_exported::create_from_report($report, REPORT_BUILDER_EXPORT_PDF_LANDSCAPE);
+        $event = \totara_reportbuilder\event\report_exported::create_from_report($report, 'pdflandscape');
         $event->trigger();
         $data = $event->get_data();
         $this->assertSame($report, $event->get_report());
         $this->assertSame($report->_id, $event->objectid);
         $this->assertSame('r', $data['crud']);
-        $this->assertSame(REPORT_BUILDER_EXPORT_PDF_LANDSCAPE, $data['other']['format']);
+        $this->assertSame('pdflandscape', $data['other']['format']);
 
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'export report', 'report.php?id=1', 'Test user report'), $event);

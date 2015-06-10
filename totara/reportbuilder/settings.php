@@ -25,8 +25,6 @@
 /**
  * Add reportbuilder administration menu settings
  */
-require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-global $REPORT_BUILDER_EXPORT_OPTIONS;
 
 $ADMIN->add('reports', new admin_category('totara_reportbuilder', get_string('reportbuilder','totara_reportbuilder')), 'comments');
 
@@ -35,37 +33,18 @@ $rb = new admin_settingpage('rbsettings',
                             new lang_string('globalsettings','totara_reportbuilder'),
                             array('totara/reportbuilder:managereports'));
 
-// We want the following exports options to be default.
-$defaultoptions = array(
-    'xls',
-    'csv',
-    'ods',
-    'pdf_portrait',
-    'pdf_landscape'
-);
-$defaultformats = array();
-$formatbyname = array();
-foreach ($REPORT_BUILDER_EXPORT_OPTIONS as $option => $code) {
-    $formatbyname[$code] = new lang_string('export' . $option, 'totara_reportbuilder');
-    if (in_array($option, $defaultoptions)) {
-        $defaultformats[$code] = 1;
-    }
+if ($ADMIN->fulltree) {
+    $rb->add(new totara_reportbuilder_admin_setting_configexportoptions());
+
+    $rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),
+        new lang_string('reportbuilderexporttofilesystem_help', 'totara_reportbuilder'), false));
+
+    $rb->add(new admin_setting_configdirectory('reportbuilder/exporttofilesystempath', new lang_string('exportfilesystempath', 'totara_reportbuilder'),
+        new lang_string('exportfilesystempath_help', 'totara_reportbuilder'), ''));
+
+    $rb->add(new totara_reportbuilder_admin_setting_configdaymonthpicker('reportbuilder/financialyear', new lang_string('financialyear', 'totara_reportbuilder'),
+        new lang_string('reportbuilderfinancialyear_help', 'totara_reportbuilder'), array('d' => 1, 'm' => 7)));
 }
-
-$rb->add(new admin_setting_configmulticheckbox('reportbuilder/exportoptions', new lang_string('exportoptions', 'totara_reportbuilder'),
-         new lang_string('reportbuilderexportoptions_help', 'totara_reportbuilder'), $defaultformats, $formatbyname));
-
-$rb->add(new admin_setting_configcheckbox('reportbuilder/exporttofilesystem', new lang_string('exporttofilesystem', 'totara_reportbuilder'),
-         new lang_string('reportbuilderexporttofilesystem_help', 'totara_reportbuilder'), false));
-
-$rb->add(new admin_setting_configdirectory('reportbuilder/exporttofilesystempath', new lang_string('exportfilesystempath', 'totara_reportbuilder'),
-         new lang_string('exportfilesystempath_help', 'totara_reportbuilder'), ''));
-
-$rb->add(new admin_setting_configdaymonthpicker('reportbuilder/financialyear', new lang_string('financialyear', 'totara_reportbuilder'),
-         new lang_string('reportbuilderfinancialyear_help', 'totara_reportbuilder'), array('d'=> 1, 'm'=>7)));
-
-$rb->add(new totara_core_admin_setting_font('reportbuilder/pdffont', new lang_string('pdffont', 'totara_reportbuilder'),
-    new lang_string('pdffont_help', 'totara_reportbuilder'), ''));
 
 // Add all above settings to the report builder settings node.
 $ADMIN->add('totara_reportbuilder', $rb);

@@ -40,7 +40,7 @@ class report_builder_export_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
 
-        $select = reportbuilder_get_export_options();
+        $select = reportbuilder_get_export_options(null, true);
 
         if (count($select) == 0) {
             // No export options - don't show form.

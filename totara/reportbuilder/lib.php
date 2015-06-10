@@ -67,18 +67,6 @@ define('REPORT_BUILDER_ACCESS_MODE_NONE', 0);
 define('REPORT_BUILDER_ACCESS_MODE_ANY', 1);
 define('REPORT_BUILDER_ACCESS_MODE_ALL', 2);
 
-/**
- * Export option codes
- *
- * Bitwise flags, so new ones should be double highest value
- */
-define('REPORT_BUILDER_EXPORT_EXCEL', 1);
-define('REPORT_BUILDER_EXPORT_CSV', 2);
-define('REPORT_BUILDER_EXPORT_ODS', 4);
-define('REPORT_BUILDER_EXPORT_FUSION', 8);
-define('REPORT_BUILDER_EXPORT_PDF_PORTRAIT', 16);
-define('REPORT_BUILDER_EXPORT_PDF_LANDSCAPE', 32);
-
 /*
  * Initial Display Options
  */
@@ -93,16 +81,6 @@ define('RB_CACHE_FLAG_OK', 0);      // Everything ready.
 define('RB_CACHE_FLAG_CHANGED', 1); // Cache table needs to be rebuilt.
 define('RB_CACHE_FLAG_FAIL', 2);    // Cache table creation failed.
 define('RB_CACHE_FLAG_GEN', 3);     // Cache table is being generated.
-
-global $REPORT_BUILDER_EXPORT_OPTIONS;
-$REPORT_BUILDER_EXPORT_OPTIONS = array(
-    'xls'           => REPORT_BUILDER_EXPORT_EXCEL,
-    'csv'           => REPORT_BUILDER_EXPORT_CSV,
-    'ods'           => REPORT_BUILDER_EXPORT_ODS,
-    'fusion'        => REPORT_BUILDER_EXPORT_FUSION,
-    'pdf_portrait'  => REPORT_BUILDER_EXPORT_PDF_PORTRAIT,
-    'pdf_landscape' => REPORT_BUILDER_EXPORT_PDF_LANDSCAPE,
-);
 
 /**
  *  Export to file system constants.
@@ -131,10 +109,6 @@ define('REPORT_BUILDER_PDF_FONT_SIZE_RECORD', 14);
 define('REPORT_BUILDER_PDF_FONT_SIZE_TITLE', 20);
 define('REPORT_BUILDER_PDF_MARGIN_FOOTER', 10);
 define('REPORT_BUILDER_PDF_MARGIN_BOTTOM', 20);
-/**
- * PDF export memory limit (in MBs).
- */
-define('REPORT_BUILDER_EXPORT_PDF_MEMORY_LIMIT', 1024);
 
 /**
  * Main report builder object class definition
@@ -3219,48 +3193,39 @@ class reportbuilder {
      * sort order and active filters but removing pagination
      *
      * @param string $format Format for the export ods/csv/xls
-     * @return No return but initiates save dialog
+     * @return void No return but initiates save dialog
      */
     function export_data($format) {
         // Release session lock and make sure abort is not ignored.
         \core\session\manager::write_close();
         ignore_user_abort(false);
 
-        $columns = $this->columns;
-        $count = $this->get_filtered_count();
-        list($sql, $params, $cache) = $this->build_query(false, true);
-        $order = $this->get_report_sort();
-
-
-        // array of filters that have been applied
-        // for including in report where possible
-        $restrictions = $this->get_restriction_descriptions();
-
-        $headings = array();
-        foreach ($columns as $column) {
-            // check that column should be included
-            if ($column->display_column(true)) {
-                $headings[] = $column;
-            }
+        $format = \totara_core\tabexport_writer::normalise_format($format);
+        if ($format === 'fusion') {
+            $this->download_fusion(); // Redirect.
+            die;
         }
+
+        $formats = \totara_core\tabexport_writer::get_export_classes();
+        if (!isset($formats[$format])) {
+            // Unfortunately there is really nothing we can do here. A download is expected, but we
+            // can't provide one.
+            throw new coding_exception('Invalid format '.$format);
+        }
+        $writerclass = $formats[$format];
+
+        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
+        $filename = clean_filename($fullname . '_report');
+
+        $source = new \totara_reportbuilder\tabexport_source($this);
+
+        /** @var \totara_core\tabexport_writer $writer */
+        $writer = new $writerclass($source);
 
         // Log export event.
         \totara_reportbuilder\event\report_exported::create_from_report($this, $format)->trigger();
 
-        switch($format) {
-            case REPORT_BUILDER_EXPORT_ODS:
-                $this->download_ods($headings, $sql . $order, $params, $count, $restrictions, null, $cache);
-            case REPORT_BUILDER_EXPORT_EXCEL:
-                $this->download_xls($headings, $sql . $order, $params, $count, $restrictions, null, $cache);
-            case REPORT_BUILDER_EXPORT_CSV:
-                $this->download_csv($headings, $sql . $order, $params, $count);
-            case REPORT_BUILDER_EXPORT_FUSION:
-                $this->download_fusion();
-            case REPORT_BUILDER_EXPORT_PDF_PORTRAIT:
-                $this->download_pdf($headings, $sql . $order, $params, $count, $restrictions, true, null, $cache);
-            case REPORT_BUILDER_EXPORT_PDF_LANDSCAPE:
-                $this->download_pdf($headings, $sql . $order, $params, $count, $restrictions, false, null, $cache);
-        }
+        $writer->send_file($filename);
         die;
     }
 
@@ -3679,414 +3644,6 @@ class reportbuilder {
         } else {
             return '';
         }
-    }
-
-
-    /** Download current table in ODS format
-     * @param array $fields Array of column headings
-     * @param string $query SQL query to run to get results
-     * @param array $params SQL query params
-     * @param integer $count Number of filtered records in query
-     * @param array $restrictions Array of strings containing info
-     *                            about the content of the report
-     * @param string $file path to the directory where the file will be saved
-     * @param array $cache report cache information
-     * @return Returns the ODS file
-     */
-    function download_ods($fields, $query, $params, $count, $restrictions = array(), $file = null, $cache = array()) {
-        global $CFG, $DB;
-
-        require_once("$CFG->libdir/odslib.class.php");
-
-        // Increasing the execution time to no limit.
-        core_php_time_limit::raise(0);
-        raise_memory_limit(MEMORY_HUGE);
-
-        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
-        $filename = clean_filename($fullname . '_report.ods');
-
-        if (!$file) {
-            header("Content-Type: application/download\n");
-            header("Content-Disposition: attachment; filename=$filename");
-            header("Expires: 0");
-            header("Cache-Control: must-revalidate,post-check=0,pre-check=0");
-            header("Pragma: public");
-
-            $workbook = new MoodleODSWorkbook($filename);
-        } else {
-            $workbook = new MoodleODSWorkbook($file, true);
-        }
-
-        $worksheet = array();
-
-        $worksheet[0] = $workbook->add_worksheet('');
-        $row = 0;
-        $col = 0;
-
-        if (is_array($restrictions) && count($restrictions) > 0) {
-            $worksheet[0]->write($row, 0, get_string('reportcontents', 'totara_reportbuilder'));
-            $row++;
-            foreach ($restrictions as $restriction) {
-                $worksheet[0]->write($row, 0, $restriction);
-                $row++;
-            }
-        }
-
-        // Add report caching data.
-        if ($cache) {
-            $a = userdate($cache['lastreport']);
-            $worksheet[0]->write($row, 0, get_string('report:cachelast', 'totara_reportbuilder', $a));
-            $row++;
-        }
-
-        // Leave an empty row between any initial info and the header row.
-        if ($row != 0) {
-            $row++;
-        }
-
-        foreach ($fields as $field) {
-            $worksheet[0]->write($row, $col, $this->format_column_heading($field, true));
-            $col++;
-        }
-        $row++;
-
-        $numfields = count($fields);
-
-        // Use recordset so we can manage very large datasets.
-        if ($records = $DB->get_recordset_sql($query, $params)) {
-            foreach ($records as $record) {
-                $record_data = $this->src->process_data_row($record, 'ods', $this);
-                $col = 0;
-                foreach ($record_data as $value) {
-                    if (is_array($value)) {
-                        if (method_exists($worksheet[0], 'write_' . $value[0])) {
-                            $worksheet[0]->{'write_' . $value[0]}($row, $col++, $value[1], $value[2]);
-                        } else {
-                            $worksheet[0]->write($row, $col++, $value[1]);
-                        }
-                    } else {
-                        $worksheet[0]->write($row, $col++, $value);
-                    }
-                }
-                $row++;
-            }
-            $records->close();
-        } else {
-            // This indicates a failed query, not just 0 results.
-            return false;
-        }
-
-        $workbook->close();
-        if (!$file) {
-            die;
-        }
-        @chmod($file, (fileperms(dirname($file)) & 0666));
-    }
-
-    /** Download current table in XLS format
-     * @param rb_column[] $fields Array of column headings
-     * @param string $query SQL query to run to get results
-     * @param array $params SQL query params
-     * @param integer $count Number of filtered records in query
-     * @param array $restrictions Array of strings containing info
-     *                            about the content of the report
-     * @param string $file path to the directory where the file will be saved
-     * @param array $cache Report cache information
-     * @return Returns the Excel file
-     */
-    function download_xls($fields, $query, $params, $count, $restrictions = array(), $file = null, $cache = array()) {
-        global $CFG, $DB;
-
-        require_once("$CFG->libdir/excellib.class.php");
-
-        // Increasing the execution time to no limit.
-        core_php_time_limit::raise(0);
-        raise_memory_limit(MEMORY_HUGE);
-
-        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
-        $filename = clean_filename($fullname . '_report.xls');
-
-        if (!$file) {
-            $workbook = new MoodleExcelWorkbook($filename);
-        } else {
-            $workbook = new MoodleExcelWorkbook($file, 'Excel2007', true);
-        }
-
-        $worksheet = array();
-
-        $worksheet[0] = $workbook->add_worksheet('');
-        $row = 0;
-        $col = 0;
-
-        if (is_array($restrictions) && count($restrictions) > 0) {
-            $worksheet[0]->write($row, 0, get_string('reportcontents', 'totara_reportbuilder'));
-            $row++;
-            foreach ($restrictions as $restriction) {
-                $worksheet[0]->write($row, 0, $restriction);
-                $row++;
-            }
-        }
-
-        // Add report caching data.
-        if ($cache) {
-            $a = userdate($cache['lastreport']);
-            $worksheet[0]->write($row, 0, get_string('report:cachelast', 'totara_reportbuilder', $a));
-            $row++;
-        }
-
-        // Leave an empty row between any initial info and the header row.
-        if ($row != 0) {
-            $row++;
-        }
-
-        foreach ($fields as $field) {
-            $worksheet[0]->write($row, $col, $this->format_column_heading($field, true));
-            $col++;
-        }
-        $row++;
-
-        // User recordset so we can handle large datasets.
-        if ($records = $DB->get_recordset_sql($query, $params)) {
-            foreach ($records as $record) {
-                $record_data = $this->src->process_data_row($record, 'excel', $this);
-                $col = 0;
-                foreach ($record_data as $value) {
-                    if (is_array($value)) {
-                        if (method_exists($worksheet[0], 'write_' . $value[0])) {
-                            $worksheet[0]->{'write_' . $value[0]}($row, $col++, $value[1], $value[2]);
-                        } else {
-                            $worksheet[0]->write($row, $col++, $value[1]);
-                        }
-                    } else {
-                        $worksheet[0]->write($row, $col++, $value);
-                    }
-                }
-                $row++;
-            }
-            $records->close();
-        } else {
-            // This indicates a failed query, not just 0 results.
-            return false;
-        }
-
-        $workbook->close();
-        if (!$file) {
-            die;
-        }
-        @chmod($file, (fileperms(dirname($file)) & 0666));
-    }
-
-     /** Download current table in CSV format
-     * @param array $fields Array of column headings
-     * @param string $query SQL query to run to get results
-     * @param array $params SQL query params
-     * @param integer $count Number of filtered records in query
-     * @return Returns the CSV file
-     */
-    function download_csv($fields, $query, $params, $count, $file=null) {
-        global $DB, $CFG;
-
-        require_once("{$CFG->libdir}/csvlib.class.php");
-
-        // Increasing the execution time to no limit.
-        core_php_time_limit::raise(0);
-        raise_memory_limit(MEMORY_HUGE);
-
-        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
-        $filename = clean_filename($fullname . '_report.csv');
-
-        $export = new csv_export_writer();
-        $export->filename = $filename;
-
-        $row = array();
-        foreach ($fields as $field) {
-            $row[] =  $this->format_column_heading($field, true);
-        }
-
-        $export->add_data($row);
-
-        if ($records = $DB->get_recordset_sql($query, $params)) {
-            foreach ($records as $record) {
-                $row = $this->src->process_data_row($record, 'csv', $this);
-                $export->add_data($row);
-            }
-            $records->close();
-        } else {
-            // this indicates a failed query, not just 0 results
-            return false;
-        }
-
-        if ($file) {
-            $fp = fopen($file, "w");
-            fwrite($fp, $export->print_csv_data(true));
-            fclose($fp);
-            @chmod($file, (fileperms(dirname($file)) & 0666));
-        } else {
-            $export->download_file();
-        }
-    }
-
-    /**
-     * Download current table in a Pdf format
-     * @param array $fields Array of column headings
-     * @param string $query SQL query to run to get results
-     * @param array $params SQL query params
-     * @param integer $count Number of filtered records in query
-     * @param array $restrictions Array of strings containing info
-     *                            about the content of the report
-     * @param boolean $portrait A boolean representing the print layout
-     * @param string a path where to save file
-     * @param array $cache Report cache information
-     * @return Returns the PDF file
-     */
-    function download_pdf($fields, $query, $params, $count, $restrictions = array(), $portrait = true, $file = null, $cache = array()) {
-        global $DB, $CFG;
-
-        require_once $CFG->libdir . '/pdflib.php';
-
-        // Increasing the execution time to no limit.
-        core_php_time_limit::raise(0);
-
-        $fullname = strtolower(preg_replace(array('/[^a-zA-Z\d\s-_]/', '/[\s-]/'), array('', '_'), $this->fullname));
-        $filename = clean_filename($fullname . '_report.pdf');
-
-        // Table.
-        $html = '';
-        $numfields = count($fields);
-
-        if (!$records = $DB->get_recordset_sql($query, $params)) {
-            return false;
-        }
-
-        $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->_id));
-        if (!empty($graphrecord->type)) {
-            $graph = new \totara_reportbuilder\local\graph($graphrecord, $this, false);
-        } else {
-            $graph = null;
-        }
-
-        // Layout options.
-        if ($portrait) {
-            $pdf = new PDF('P', 'mm', 'A4', true, 'UTF-8');
-        } else {
-            $pdf = new PDF('L', 'mm', 'A4', true, 'UTF-8');
-        }
-
-        $pdf->setTitle($filename);
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(true);
-        $pdf->SetFooterMargin(REPORT_BUILDER_PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(true, REPORT_BUILDER_PDF_MARGIN_BOTTOM);
-        $pdf->AddPage();
-
-        // Get current language to set the font properly.
-        $language = current_language();
-        $font = $this->get_font($language);
-        // Check if language is RTL.
-        if (right_to_left()) {
-            $pdf->setRTL(true);
-        }
-
-        $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_TITLE);
-        $pdf->Write(0, format_string($this->fullname), '', 0, 'L', true, 0, false, false, 0);
-
-        $resultstr = $count == 1 ? 'record' : 'records';
-        $recordscount = get_string('x' . $resultstr, 'totara_reportbuilder', $count);
-        $pdf->SetFont($font, 'B', REPORT_BUILDER_PDF_FONT_SIZE_RECORD);
-        $pdf->Write(0, $recordscount, '', 0, 'L', true, 0, false, false, 0);
-
-        $pdf->SetFont($font, '', REPORT_BUILDER_PDF_FONT_SIZE_DATA);
-
-        if (is_array($restrictions) && count($restrictions) > 0) {
-            $pdf->Write(0, get_string('reportcontents', 'totara_reportbuilder'), '', 0, 'L', true, 0, false, false, 0);
-            foreach ($restrictions as $restriction) {
-                $pdf->Write(0, $restriction, '', 0, 'L', true, 0, false, false, 0);
-            }
-        }
-
-        // Add report caching data.
-        if ($cache) {
-            $a = userdate($cache['lastreport']);
-            $lastcache = get_string('report:cachelast', 'totara_reportbuilder', $a);
-            $pdf->Write(0, $lastcache, '', 0, 'L', true, 0, false, false, 0);
-        }
-
-        $html .= '<table border="1" cellpadding="2" cellspacing="0">
-                        <thead>
-                            <tr style="background-color: #CCC;">';
-        foreach ($fields as $field) {
-            $html .= '<th>' . s($this->format_column_heading($field, true)) . '</th>';
-        }
-        $html .= '</tr></thead><tbody>';
-
-        foreach ($records as $record) {
-            if ($graph) {
-                $graph->add_record($record);
-            }
-
-            $record_data = $this->src->process_data_row($record, 'pdf', $this);
-            $html .= '<tr>';
-            foreach($record_data as $value) {
-                $html .= '<td>' . str_replace("\n", '<br />', s($value)) . '</td>';
-            }
-            $html .= '</tr>';
-
-            // Check memory limit.
-            $mramuse = ceil(((memory_get_usage(true)/1024)/1024));
-            if (REPORT_BUILDER_EXPORT_PDF_MEMORY_LIMIT <= $mramuse) {
-                // Releasing resources.
-                $records->close();
-                // Notice message.
-                print_error('exportpdf_mramlimitexceeded', 'totara_reportbuilder', '', REPORT_BUILDER_EXPORT_PDF_MEMORY_LIMIT);
-            }
-        }
-        $html .= '</tbody></table>';
-
-        if ($graph) {
-            $svgdata = $graph->fetch_pdf_svg($portrait);
-            if ($svgdata) {
-                if ($portrait) {
-                    $pdf->ImageSVG('@' . $svgdata, 5, 30, 196, 100);
-                } else {
-                    $pdf->ImageSVG('@' . $svgdata, 5, 30, 282, 100);
-                }
-                $pdf->SetY(130);
-            }
-        }
-
-        // Closing the pdf.
-        $pdf->WriteHTML($html, true, false, false, false, '');
-
-        // Releasing recordset resources.
-        $records->close();
-
-        // Returning the complete pdf.
-        if (!$file) {
-            $pdf->Output($filename, 'D');
-        } else {
-            $pdf->Output($file, 'F');
-            @chmod($file, (fileperms(dirname($file)) & 0666));
-        }
-    }
-
-    /**
-     * Returns the font that must be used based on the language
-     *
-     * @param string $language Language that is being used
-     * @return string The appropriate font based on the language
-     */
-    function get_font($language) {
-        $setting = get_config('reportbuilder', 'pdffont');
-        if (empty($setting)) {
-            // If the setting is empty we will select an appropriate default font.
-            if (in_array($language, array('zh_cn', 'ja'))) {
-                return 'droidsansfallback';
-            } else if ($language == 'th') {
-                return 'cordiaupc';
-            }
-            return 'freeserif';
-        }
-        return $setting;
     }
 
     /* Download current table to Google Fusion
@@ -5251,14 +4808,14 @@ function reportbuilder_generate_cache($reportid) {
  *  @return boolean True if email was successfully sent
  */
 function reportbuilder_send_scheduled_report($sched) {
-    global $CFG, $DB, $REPORT_BUILDER_EXPORT_OPTIONS;
+    global $CFG, $DB, $USER;
     require_once($CFG->dirroot . '/totara/reportbuilder/email_setting_schedule.php');
 
-    $export_codes = array_flip($REPORT_BUILDER_EXPORT_OPTIONS);
-
-    if (!$user = $DB->get_record('user', array('id' => $sched->userid))) {
-        error_log(get_string('error:invaliduserid', 'totara_reportbuilder'));
-        return false;
+    if ($sched->userid == $USER->id) {
+        $user = $USER;
+    } else {
+        debugging('reportbuilder_send_scheduled_report() expects $USER->id to be the same as sched->userid');
+        $user = $DB->get_record('user', array('id' => $sched->userid), '*', MUST_EXIST);
     }
 
     if (!$report = $DB->get_record('report_builder', array('id' => $sched->reportid))) {
@@ -5266,58 +4823,54 @@ function reportbuilder_send_scheduled_report($sched) {
         return false;
     }
 
-    // don't send the report if the user doesn't have permission
-    // to view it
+    // Don't send/store the report if the user doesn't have permission to view it.
     if (!reportbuilder::is_capable($sched->reportid, $sched->userid)) {
         error_log(get_string('error:nopermissionsforscheduledreport', 'totara_reportbuilder', $sched));
         return false;
     }
 
-    $attachment = reportbuilder_create_attachment($sched, $user->id);
-
-    switch($sched->format) {
-        case REPORT_BUILDER_EXPORT_EXCEL:
-            $attachmentfilename = 'report.xlsx';
-            break;
-        case REPORT_BUILDER_EXPORT_CSV:
-            $attachmentfilename = 'report.csv';
-            break;
-        case REPORT_BUILDER_EXPORT_ODS:
-            $attachmentfilename = 'report.ods';
-            break;
-        case REPORT_BUILDER_EXPORT_PDF_LANDSCAPE:
-        case REPORT_BUILDER_EXPORT_PDF_PORTRAIT:
-            $attachmentfilename = 'report.pdf';
-            break;
+    $format = \totara_core\tabexport_writer::normalise_format($sched->format);
+    $options = reportbuilder_get_export_options(null, false);
+    $formats = \totara_core\tabexport_writer::get_export_classes();
+    if (!isset($formats[$format]) or !isset($options[$format])) {
+        error_log('Unknown or disabled report export format - ' . $sched->format);
+        return false;
     }
+    $writerclassname = $formats[$format];
+
+    $tempfile = reportbuilder_create_attachment($sched);
+    if (!$tempfile) {
+        error_log('Error exporting report');
+        return false;
+    }
+    $attachmentfilename = 'report.' . $writerclassname::get_file_extension();
 
     $reporturl = reportbuilder_get_report_url($report);
     if ($sched->savedsearchid != 0) {
         $reporturl .= '&sid=' . $sched->savedsearchid;
     }
-    $strmgr = get_string_manager();
     $messagedetails = new stdClass();
     $messagedetails->reportname = $report->fullname;
-    $messagedetails->exporttype = $strmgr->get_string($export_codes[$sched->format] . 'format', 'totara_reportbuilder', null, $user->lang);
+    $messagedetails->exporttype = $writerclassname::get_export_option_name();
     $messagedetails->reporturl = $reporturl;
     $messagedetails->scheduledreportsindex = $CFG->wwwroot . '/my/reports.php#scheduled';
 
     $schedule = new scheduler($sched, array('nextevent' => 'nextreport'));
     $messagedetails->schedule = $schedule->get_formatted($user);
 
-    $subject = $report->fullname . ' ' . $strmgr->get_string('report', 'totara_reportbuilder', null, $user->lang);
+    $subject = $report->fullname . ' ' . get_string('report', 'totara_reportbuilder');
 
     if ($sched->savedsearchid != 0) {
         if (!$savename = $DB->get_field('report_builder_saved', 'name', array('id' => $sched->savedsearchid))) {
             mtrace(get_string('error:invalidsavedsearchid', 'totara_reportbuilder'));
         } else {
-            $messagedetails->savedtext = $strmgr->get_string('savedsearchmessage', 'totara_reportbuilder', $savename, $user->lang);
+            $messagedetails->savedtext = get_string('savedsearchmessage', 'totara_reportbuilder', $savename);
         }
     } else {
         $messagedetails->savedtext = '';
     }
 
-    $message = $strmgr->get_string('scheduledreportmessage', 'totara_reportbuilder', $messagedetails, $user->lang);
+    $message = get_string('scheduledreportmessage', 'totara_reportbuilder', $messagedetails);
 
     $fromaddress = core_user::get_noreply_user();
     $emailed = false;
@@ -5330,19 +4883,17 @@ function reportbuilder_send_scheduled_report($sched) {
 
         // Sending email to all system users.
         foreach ($systemusers as $user) {
-            $emailed = email_to_user($user, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
+            $emailed = email_to_user($user, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
         }
 
         // Sending email to external users.
         foreach ($externalusers as $email) {
             $userto = \totara_core\totara_user::get_external_user($email);
-            $emailed = email_to_user($userto, $fromaddress, $subject, $message, '', $attachment, $attachmentfilename);
+            $emailed = email_to_user($userto, $fromaddress, $subject, $message, '', $tempfile, $attachmentfilename);
         }
     }
 
-    if (!unlink($CFG->dataroot . DIRECTORY_SEPARATOR . $attachment)) {
-        mtrace(get_string('error:failedtoremovetempfile', 'totara_reportbuilder'));
-    }
+    @unlink($tempfile);
 
     return $emailed;
 }
@@ -5352,89 +4903,67 @@ function reportbuilder_send_scheduled_report($sched) {
  * for adding to email as attachment
  *
  * @param stdClass $sched schedule record
- * @param integer $userid ID of the user the report is for
  *
  * @return string Filename of the created attachment
  */
-function reportbuilder_create_attachment($sched, $userid) {
-    global $CFG;
+function reportbuilder_create_attachment(stdClass $sched) {
+    global $USER;
 
     $reportid = $sched->reportid;
     $format = $sched->format;
     $exporttofilesystem = $sched->exporttofilesystem;
     $sid = $sched->savedsearchid;
     $scheduleid = $sched->id;
+    $userid = $sched->userid;
+
+    if ($userid != $USER->id) {
+        debugging('reportbuilder_create_attachment() expects $USER->id to be the same as sched->userid');
+    }
+
+    $format = \totara_core\tabexport_writer::normalise_format($format);
+    $formats = \totara_core\tabexport_writer::get_export_classes();
+    if (!isset($formats[$format])) {
+        // Somebody most likely uninstalled the export format.
+        return null;
+    }
+    $writerclass = $formats[$format];
 
     $report = new reportbuilder($reportid, null, false, $sid, $userid, false, array('userid' => $userid));
-    $columns = $report->columns;
-    $count = $report->get_filtered_count();
-    list($sql, $params) = $report->build_query(false, true);
 
-    // array of filters that have been applied
-    // for including in report where possible
-    $restrictions = $report->get_restriction_descriptions();
+    $source = new \totara_reportbuilder\tabexport_source($report);
 
-    $headings = array();
-    foreach ($columns as $column) {
-        // check that column should be included
-        if ($column->display_column(true)) {
-            $headings[] = $column;
-        }
-    }
-    $tempfilename = md5(time());
-    $tempfilepathname = $CFG->dataroot . DIRECTORY_SEPARATOR . $tempfilename;
+    /** @var \totara_core\tabexport_writer $writer */
+    $writer = new $writerclass($source);
 
-    switch ($format) {
-        case REPORT_BUILDER_EXPORT_ODS:
-            $filename = $report->download_ods($headings, $sql, $params, $count, $restrictions, $tempfilepathname);
-            if ($exporttofilesystem != REPORT_BUILDER_EXPORT_EMAIL) {
-                $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.ods';
-                $filename = $report->download_ods($headings, $sql, $params, $count, $restrictions, $reportfilepathname);
-            }
-            break;
-        case REPORT_BUILDER_EXPORT_EXCEL:
-            $filename = $report->download_xls($headings, $sql, $params, $count, $restrictions, $tempfilepathname);
-            if ($exporttofilesystem != REPORT_BUILDER_EXPORT_EMAIL) {
-                $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.xlsx';
-                $filename = $report->download_xls($headings, $sql, $params, $count, $restrictions, $reportfilepathname);
-            }
-            break;
-        case REPORT_BUILDER_EXPORT_CSV:
-            $filename = $report->download_csv($headings, $sql, $params, $count, $tempfilepathname);
-            if ($exporttofilesystem != REPORT_BUILDER_EXPORT_EMAIL) {
-                $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.csv';
-                $filename = $report->download_csv($headings, $sql, $params, $count, $reportfilepathname);
-            }
-            break;
-        case REPORT_BUILDER_EXPORT_PDF_PORTRAIT:
-            $filename = $report->download_pdf($headings, $sql, $params, $count, $restrictions, true, $tempfilepathname);
-            if ($exporttofilesystem != REPORT_BUILDER_EXPORT_EMAIL) {
-                $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.pdf';
-                $filename = $report->download_pdf($headings, $sql, $params, $count, $restrictions, true, $reportfilepathname);
-            }
-            break;
-        case REPORT_BUILDER_EXPORT_PDF_LANDSCAPE:
-            $filename = $report->download_pdf($headings, $sql, $params, $count, $restrictions, false, $tempfilepathname);
-            if ($exporttofilesystem != REPORT_BUILDER_EXPORT_EMAIL) {
-                $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.pdf';
-                $filename = $report->download_pdf($headings, $sql, $params, $count, $restrictions, false, $reportfilepathname);
-            }
-            break;
+    // TODO: TL-6751 move this to a request dir, but first make sure the email attachments support it
+    do {
+        $tempfilepathname = make_temp_directory('reportbuilderexport') . '/'
+            . md5(uniqid($userid, true)) . '.' . $writer::get_file_extension();
+    } while (file_exists($tempfilepathname));
+
+    $writer->save_file($tempfilepathname);
+
+    if ($exporttofilesystem == REPORT_BUILDER_EXPORT_EMAIL_AND_SAVE or $exporttofilesystem == REPORT_BUILDER_EXPORT_SAVE) {
+        $reportfilepathname = reportbuilder_get_export_filename($report, $userid, $scheduleid) . '.' . $writer::get_file_extension();
+        // Do not crete the file again, just copy it.
+        copy($tempfilepathname, $reportfilepathname);
+        @chmod($reportfilepathname, (fileperms(dirname($reportfilepathname)) & 0666));
     }
 
-    return $tempfilename;
+    return $tempfilepathname;
 }
 
 /**
  * Checks if username directory under given path exists
  * If it does not it creates it and returns fullpath with filename
  * userdir + report fullname + time created + schedule id
+ * without the actual file extension.
  *
- * @param record $report
+ * @param stdClass|reportbuilder $report
  * @param int $userid
  * @param int $scheduleid
  *
- * @return string reportfullpathname
+ * @return string full path name to export file (without extension)
  */
 function reportbuilder_get_export_filename($report, $userid, $scheduleid) {
     global $DB;
@@ -5878,18 +5407,42 @@ function reportbuilder_rename_data($table, $source, $oldtype, $oldvalue, $newtyp
 /**
  * Returns available export options for reportbuilder.
  *
- * @return array (option => string name)
+ * @param string $currentoption optional option that is displayed even if not enabled in settings
+ * @param bool $includefusion
+ * @return array (export format => localised name of export option)
  */
-function reportbuilder_get_export_options() {
-    global $REPORT_BUILDER_EXPORT_OPTIONS;
+function reportbuilder_get_export_options($currentoption = null, $includefusion = false) {
     $exportoptions = get_config('reportbuilder', 'exportoptions');
-    $options = !empty($exportoptions) ? explode(',', $exportoptions) : array();
+    $exportoptions = !empty($exportoptions) ? explode(',', $exportoptions) : array();
 
-    $alloptions = array_flip($REPORT_BUILDER_EXPORT_OPTIONS);
+    $enabled = array();
+    foreach ($exportoptions as $option) {
+        $option = \totara_core\tabexport_writer::normalise_format($option);
+        if ($option) {
+            $enabled[$option] = true;
+        }
+    }
 
     $select = array();
-    foreach ($options as $key => $value) {
-        $select[$value] = get_string('export' . $alloptions[$value], 'totara_reportbuilder');
+    $alloptions = \totara_core\tabexport_writer::get_export_options();
+    foreach ($alloptions as $type => $name) {
+        if (!isset($enabled[$type])) {
+            continue;
+        }
+        $select[$type] = $name;
+    }
+
+    // Fusion is not a real plugin yet.
+    if ($includefusion and isset($enabled['fusion'])) {
+        $select['fusion'] = get_string('exportfusion', 'totara_reportbuilder');
+    }
+
+    // Add current option,
+    // this allows existing scheduled reports to work even if export options change.
+    if ($currentoption) {
+        if (isset($alloptions[$currentoption]) and !isset($select[$currentoption])) {
+            $select[$currentoption] = $alloptions[$currentoption];
+        }
     }
 
     return $select;
@@ -6089,99 +5642,5 @@ function reportbuilder_clone_report(reportbuilder $report, $clonename) {
     $transaction->allow_commit();
 
     return $cloneid;
-}
-
-/**
- * Day/month picker admin setting for report builder settings.
- *
- */
-class admin_setting_configdaymonthpicker extends admin_setting {
-    /**
-     * Constructor
-     * @param string $name unique ascii name, either 'mysetting' for settings that in config,
-     *                     or 'myplugin/mysetting' for ones in config_plugins.
-     * @param string $visiblename localised name
-     * @param string $description localised long description
-     * @param mixed $defaultsetting string or array depending on implementation
-     */
-    public function __construct($name, $visiblename, $description, $defaultsetting) {
-        parent::__construct($name, $visiblename, $description, $defaultsetting);
-    }
-
-    /**
-     * Gets the current settings as an array
-     *
-     * @return mixed Null if none, else array of settings
-     */
-    public function get_setting() {
-        $result = $this->config_read($this->name);
-        if (is_null($result)) {
-            return null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Store the data as ddmm string.
-     *
-     * @param string $data
-     * @return bool true if success, false if not
-     */
-    public function write_setting($data) {
-        if (!is_array($data)) {
-            return '';
-        }
-        $result = $this->config_write($this->name, date("dm", mktime(0, 0, 0, $data['m'], $data['d'], 0)));
-
-        return ($result ? '' : get_string('errorsetting', 'admin'));
-    }
-
-    /**
-     * Returns day/month select+select fields.
-     *
-     * @param string $data
-     * @param string $query
-     * @return string html select+select fields and wrapping div(s)
-     */
-    public function output_html($data, $query='') {
-        // Default settings.
-        $default = $this->get_defaultsetting();
-
-        if (is_array($default)) {
-            $defaultday = $default['d'];
-            $defaultmonth = $default['m'];
-            $defaultinfo = date('j F', mktime(0, 0, 0, $defaultmonth, $defaultday, 0));
-        } else {
-            $defaultinfo = null;
-        }
-
-        // Saved settings - needs to parse the default array as well for upgrades.
-        if (is_array($data)) {
-            $day = $data['d'];
-            $month = $data['m'];
-        } else {
-            $day = substr($data, 0, 2);
-            $month = substr($data, 2, 2);
-        }
-
-        $days = array_combine(range(1,31), range(1,31));
-        $months = array();
-        for ($i = 1; $i <= 12; $i++) {
-            $mname = date("F", mktime(0, 0, 0, $i, 10));
-            $months[$i] = $mname;
-        }
-
-        $return = html_writer::start_tag('div', array('class' => 'form-daymonth defaultsnext'));
-        $return .= html_writer::tag('label', get_string('financialyeardaystart', 'totara_reportbuilder', $this->visiblename),
-            array('for' => $this->get_full_name() . '[d]', 'class' => 'accesshide'));
-        $return .= html_writer::select($days, $this->get_full_name() . '[d]' , (int)$day);
-        $return .= html_writer::tag('label', get_string('financialyearmonthstart', 'totara_reportbuilder', $this->visiblename),
-            array('for' => $this->get_full_name() . '[m]', 'class' => 'accesshide'));
-        $return .= html_writer::select($months, $this->get_full_name() . '[m]', (int)$month);
-        $return .= html_writer::end_tag('div');
-
-        return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', $defaultinfo, $query);
-    }
 }
 
