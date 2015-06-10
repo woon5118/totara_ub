@@ -24,7 +24,8 @@
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-if ($hassiteconfig) {
+$hasmodconfig = has_capability('totara/core:modconfig', $systemcontext);
+if ($hassiteconfig || $hasmodconfig) {
     /* @var admin_root $ADMIN */
     $ADMIN->locate('modules')->set_sorting(true);
 
@@ -42,7 +43,7 @@ if ($hassiteconfig) {
     $ADMIN->add('modsettings', new admin_page_managemods());
     foreach (core_plugin_manager::instance()->get_plugins_of_type('mod') as $plugin) {
         /** @var \core\plugininfo\mod $plugin */
-        $plugin->load_settings($ADMIN, 'modsettings', $hassiteconfig);
+        $plugin->load_settings($ADMIN, 'modsettings', $hassiteconfig || $hasmodconfig);
     }
 
     // course formats

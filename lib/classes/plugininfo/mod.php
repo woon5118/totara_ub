@@ -85,7 +85,7 @@ class mod extends base {
 
         $section = $this->get_settings_section_name();
 
-        $settings = new admin_settingpage($section, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
+        $settings = new admin_settingpage($section, $this->displayname, 'totara/core:modconfig', $this->is_enabled() === false);
         include($this->full_path('settings.php')); // This may also set $settings to null.
 
         if ($settings) {

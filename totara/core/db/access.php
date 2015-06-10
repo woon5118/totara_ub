@@ -179,4 +179,12 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         ),
     ),
+    // Allows for the user to configure activity module settings. No one gets this by default.
+    'totara/core:modconfig' => array(
+        'riskbitmask' => RISK_CONFIG,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_SYSTEM,
+        'archetypes'    => array(
+        ),
+    ),
 );
