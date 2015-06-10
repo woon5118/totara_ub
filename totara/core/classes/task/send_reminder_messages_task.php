@@ -112,7 +112,7 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                         $module = $DB->get_field('modules', 'name', array('id' => $cm->module));
 
                         $tsql = "
-                            INNER JOIN {course_completion}_criteria cr
+                            INNER JOIN {course_completion_criteria} cr
                                     ON cr.course = ?
                                    AND cr.criteriatype = ?
                                    AND cr.module = ?
