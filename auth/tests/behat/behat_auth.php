@@ -98,21 +98,8 @@ class behat_auth extends behat_base {
     public function i_log_out() {
 
         $steps = array(new When('I follow "' . get_string('logout') . '"'));
-
-        // No need to check anything else if we run without JS.
-        if (!$this->running_javascript()) {
-            return $steps;
-        }
-
-        // There is no longer any need to worry about whether the navigation
-        // bar needs to be expanded; user_menu now lives outside the
-        // hamburger.
-
-        // However, the user menu *always* needs to be expanded.
-        $xpath = "//div[@class='usermenu']//a[contains(concat(' ', @class, ' '), ' toggle-display ')]";
-        array_unshift($steps, new When('I click on "'.$xpath.'" "xpath_element"'));
-
         return $steps;
+
     }
 
     /**

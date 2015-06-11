@@ -19,7 +19,8 @@ Feature: Test appraisal detailed report with numeric question
     # Set manager for User One
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "User One" "link"
-    And I navigate to "Primary position" node in "Profile settings for User One > Positions"
+    And I click on "Preferences" "link"
+    And I click on "Primary position" "link"
     And I press "Choose manager"
     And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
     And I click on "OK" "button" in the "Choose manager" "totaradialogue"
@@ -28,7 +29,8 @@ Feature: Test appraisal detailed report with numeric question
     # Set manager for User Two
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "User Two" "link"
-    And I navigate to "Primary position" node in "Profile settings for User Two > Positions"
+    And I click on "Preferences" "link"
+    And I click on "Primary position" "link"
     And I press "Choose manager"
     And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
     And I click on "OK" "button" in the "Choose manager" "totaradialogue"
@@ -71,7 +73,6 @@ Feature: Test appraisal detailed report with numeric question
       | id_roles_2_1 | 1                |
     # Display settings doesn't visually change to "Text input field" radio. So nail it.
     And I click on "#id_list_2" "css_element"
-
     And I click on "//button[text()='Save changes']" "xpath_element" in the "div.moodle-dialogue-focused div.moodle-dialogue-ft" "css_element"
     And I click on "Assignments" "link"
     And I set the field "menugroupselector" to "Audience"

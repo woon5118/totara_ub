@@ -43,7 +43,7 @@ class mod_facetoface_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true);
+        $this->standard_intro_elements();
 
         if (empty($CFG->facetoface_notificationdisable)) {
             $mform->addElement('text', 'thirdparty', get_string('thirdpartyemailaddress', 'facetoface'), array('size' => '64'));

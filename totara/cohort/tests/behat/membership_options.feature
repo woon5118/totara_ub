@@ -1,4 +1,4 @@
-@totara_cohort @totara @wip
+@totara_cohort @totara
 Feature: Verify membership options work correctly.
 
   Background:
