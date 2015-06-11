@@ -1760,3 +1760,42 @@ function check_learningplan_enabled() {
         print_error('learningplansdisabled', 'totara_plan');
     }
 }
+
+/**
+ * Display Totara My Learning links in the user profile.
+ *
+ * @param \core_user\output\myprofile\tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser is the user viewing profile, current user ?
+ * @param stdClass $course course object
+ */
+function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
+    global $USER;
+
+    $currentuser = ($user->id == $USER->id);
+    $usercontext = context_user::instance($user->id);
+
+    // Add category. This node should appear after 'contact' so that administration block appears towards the end. Refer MDL-49928.
+    $category = new core_user\output\myprofile\category('mylearning', get_string($currentuser ? 'mylearning' : 'learning' , 'totara_core'), 'contact');
+    $tree->add_category($category);
+
+    // Record of learning.
+    if ($currentuser || totara_is_manager($user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
+        $title = get_string('recordoflearning', 'totara_core');
+        $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
+        $content =  html_writer::link($url, $title);
+
+        $localnode = new core_user\output\myprofile\node('mylearning', 'recordoflearning', $title, null, $url);
+        $tree->add_node($localnode);
+    }
+
+    // Learning plans.
+    if (totara_feature_visible('learningplans') && dp_can_view_users_plans($user->id)) {
+        $title = get_string('learningplans', 'totara_plan');
+        $url = new moodle_url('/totara/plan/index.php', array('userid' => $user->id));
+        $content =  html_writer::link($url, $title);
+
+        $localnode = new core_user\output\myprofile\node('mylearning', 'learningplans', $title, null, $url);
+        $tree->add_node($localnode);
+    }
+}
