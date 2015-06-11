@@ -161,6 +161,15 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                         ";
                         $params = array_merge($tparams, array($reminder->id, $message->id, $requirementid, $periodsecs,
                             $reminder->timecreated, $periodsecs, $now));
+
+                        // If this is an escalation and we have a timestamp of when escalations were enabled/disabled then
+                        // we need to limit returned users to those who completed since this was last changed otherwise
+                        // people who completed in the past may receive the notification.
+                        if ($message->type === 'escalation' && isset($config['escalationmodified'])) {
+                            $sql .= " AND cc.timecompleted >= ?";
+                            $params = array_merge($params, array($config['escalationmodified']));
+                        }
+
                         // Check if any users found.
                         $rs = $DB->get_recordset_sql($sql, $params);
                         if (!$rs->valid()) {

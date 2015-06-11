@@ -103,6 +103,12 @@ else if ($data = $reminderform->get_data()) {
         'tracking' => $data->tracking,
         'requirement' => $data->requirement
     );
+    // A special case hack for escalations to ensure we record when the escalation dontsend value is changed.
+    if (!empty($reminder->id) && isset($formdata->escalationdontsend) !== isset($data->escalationdontsend)) {
+        // The escalation setting has changed, record the time this changed.
+        // We'll need this when sending escalation reminders.
+        $config['escalationmodified'] = time();
+    }
 
     // Create the reminder object
     $reminder->timemodified = time();
