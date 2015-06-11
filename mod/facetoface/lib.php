@@ -934,6 +934,15 @@ function facetoface_delete_session($session) {
     $DB->delete_records('facetoface_notification_sent', array('sessionid' => $session->id));
     $DB->delete_records('facetoface_notification_hist', array('sessionid' => $session->id));
 
+    // Check that nothing else is using the room.
+    $params = array('rid' => $session->roomid, 'sid' => $session->id);
+    $inuse = $DB->count_records_select('facetoface_sessions', 'roomid = :rid AND id <> :sid', $params);
+
+    if (!$inuse) {
+        // Purge the orphaned custom room.
+        $DB->delete_records('facetoface_room', array('custom' => 1, 'id' => $session->roomid));
+    }
+
     $DB->delete_records('facetoface_sessions', array('id' => $session->id));
 
     $transaction->allow_commit();
@@ -4381,8 +4390,14 @@ function facetoface_save_session_room($sessionid, $data) {
     }
 
     if (empty($data->customroom)) {
-        // Purge potentially orphaned custom room
-        $DB->delete_records('facetoface_room', array('custom' => 1, 'id' => $session->roomid));
+        // Check that nothing else is using the room.
+        $params = array('rid' => $session->roomid, 'sid' => $session->id);
+        $inuse = $DB->count_records_select('facetoface_sessions', 'roomid = :rid AND id <> :sid', $params);
+
+        if (!$inuse) {
+            // Purge the orphaned custom room.
+            $DB->delete_records('facetoface_room', array('custom' => 1, 'id' => $session->roomid));
+        }
     }
     return true;
 }

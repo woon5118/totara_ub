@@ -2894,5 +2894,50 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2014110711, 'facetoface');
     }
 
+    if ($oldversion < 2015061700) {
+
+        // Reset the room for all f2f sessions linked to a deleted room.
+        $sql = "UPDATE {facetoface_sessions}
+                   SET roomid = 0
+                 WHERE roomid NOT IN (SELECT id
+                                        FROM {facetoface_room}
+                                     )";
+        $DB->execute($sql);
+
+        // Duplicate custom rooms for duplicate sessions.
+        $sql = "SELECT fs1.*
+                  FROM {facetoface_sessions} fs1
+                  JOIN {facetoface_room} fr
+                    ON fs1.roomid = fr.id
+                 WHERE fr.custom = 1
+                   AND EXISTS (SELECT id
+                                  FROM {facetoface_sessions} fs2
+                                 WHERE fs2.id <> fs1.id
+                                   AND fs2.roomid = fs1.roomid
+                               )";
+        $sessions = $DB->get_records_sql($sql);
+
+        foreach ($sessions as $session) {
+            // Duplicate the room.
+            $room = $DB->get_record('facetoface_room', array('id' => $session->roomid));
+            unset($room->id);
+            $newroomid = $DB->insert_record('facetoface_room', $room);
+
+            // Update the session.
+            $session->roomid = $newroomid;
+            $DB->update_record('facetoface_sessions', $session);
+        }
+
+        // Clear any orphaned custom rooms.
+        $sql = "DELETE FROM {facetoface_room}
+                 WHERE custom = 1
+                   AND id NOT IN (SELECT DISTINCT roomid
+                                    FROM {facetoface_sessions}
+                                 )";
+        $DB->execute($sql);
+
+        upgrade_mod_savepoint(true, 2015061700, 'facetoface');
+    }
+
     return $result;
 }

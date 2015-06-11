@@ -305,6 +305,12 @@ if ($fromform = $mform->get_data()) { // Form submitted
             print_error('error:couldnotupdatesession', 'facetoface', $returnurl);
         }
     } else {
+        // If we are duplicating a session with a custom room, clear the roomid.
+        if ($c && !empty($fromform->customroom)) {
+            $todb->roomid = 0;
+        }
+
+        // Create or Duplicate the session.
         if (!$sessionid = facetoface_add_session($todb, $sessiondates)) {
             print_error('error:couldnotaddsession', 'facetoface', $returnurl);
         }
