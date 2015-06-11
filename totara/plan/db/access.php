@@ -141,7 +141,6 @@ $capabilities = array(
 
     // Ability to edit site-level evidence for oneself
     'totara/plan:editownsiteevidence' => array(
-        'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
