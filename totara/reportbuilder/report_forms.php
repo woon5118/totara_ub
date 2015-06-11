@@ -510,6 +510,7 @@ class report_builder_edit_columns_form extends moodleform {
 
             $columnsselect = $report->get_columns_select();
             $columnoptions = array();
+            $defaultoptions = array('' => get_string('noneselected', 'totara_reportbuilder'));
 
             $rawcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC');
             $badcolumns = array();
@@ -534,6 +535,13 @@ class report_builder_edit_columns_form extends moodleform {
                 $i = 1;
                 foreach ($goodcolumns as $cid => $column) {
                     $columnoptions["{$column->type}_{$column->value}"] = $column->heading;
+                    if ($column->heading and $column->customheading) {
+                        $defaultoptions["{$column->type}_{$column->value}"] = $column->heading;
+                    } else if (isset($report->columnoptions["{$column->type}-{$column->value}"])) {
+                        $defaultoptions["{$column->type}_{$column->value}"] = $report->columnoptions["{$column->type}-{$column->value}"]->name;
+                    } else {
+                        $defaultoptions[$key] = $key;
+                    }
                     if (!isset($column->required) || !$column->required) {
                         $field = "{$column->type}-{$column->value}";
                         $mform->addElement('html', html_writer::start_tag('tr', array('colid' => $cid)) .
@@ -694,9 +702,7 @@ class report_builder_edit_columns_form extends moodleform {
             $mform->addElement('header', 'sorting', get_string('sorting', 'totara_reportbuilder'));
             $mform->addHelpButton('sorting', 'reportbuildersorting', 'totara_reportbuilder');
 
-            $pick = array('' => get_string('noneselected', 'totara_reportbuilder'));
-            $select = array_merge($pick, $columnoptions);
-            $mform->addElement('select', 'defaultsortcolumn', get_string('defaultsortcolumn', 'totara_reportbuilder'), $select);
+            $mform->addElement('select', 'defaultsortcolumn', get_string('defaultsortcolumn', 'totara_reportbuilder'), $defaultoptions);
             $mform->setDefault('defaultsortcolumn', $report->defaultsortcolumn);
 
 

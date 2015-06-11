@@ -91,6 +91,8 @@ switch ($action) {
                 $result->error = get_string('noemptycols', 'totara_reportbuilder');
                 $result->noreload = true;
             }
+        } else {
+            $heading = null;
         }
 
         /// Prevent duplicates

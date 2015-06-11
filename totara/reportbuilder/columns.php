@@ -190,9 +190,9 @@ function totara_reportbuilder_build_columns($fromform, reportbuilder $report, $a
         $colvalue = $parts[1];
 
         if ($fromform->$customheadingname) {
-            $heading = $fromform->$customheadingname;
-        } else {
             $heading = $fromform->$headingname;
+        } else {
+            $heading = null;
         }
 
         if (in_array($fromform->$columnname, $grouped)) {
