@@ -292,7 +292,7 @@ if (!empty($forum)) {      // User is starting a new discussion in a forum
 }else if (!empty($delete)) {  // User is deleting a post
 
     if (! $post = forum_get_post_full($delete)) {
-        print_error('invalidpostid', 'forum');
+        print_error('invalidpostid', 'forum', '', $delete);
     }
     if (! $discussion = $DB->get_record("forum_discussions", array("id" => $post->discussion))) {
         print_error('notpartofdiscussion', 'forum');
