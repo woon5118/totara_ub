@@ -781,10 +781,14 @@ class appraisal {
                 $staffids = array_merge($staffids, $ids);
             }
 
-            // Get data from DB for staff names.
-            $userfieldssql = get_all_user_name_fields(true);
-            list($staffsql, $staffparams) = $DB->get_in_or_equal($staffids);
-            $staff = $DB->get_records_sql("SELECT id, {$userfieldssql} FROM {user} WHERE id {$staffsql}", $staffparams);
+            if ($staffids) {
+                // Get data from DB for staff names.
+                $userfieldssql = get_all_user_name_fields(true);
+                list($staffsql, $staffparams) = $DB->get_in_or_equal($staffids);
+                $staff = $DB->get_records_sql("SELECT id, {$userfieldssql} FROM {user} WHERE id {$staffsql}", $staffparams);
+            } else {
+                $staff = array();
+            }
 
             unset($staffids);
 
