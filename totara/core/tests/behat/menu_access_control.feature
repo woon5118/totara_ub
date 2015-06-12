@@ -1,4 +1,4 @@
-@totara @totara_core
+@totara @totara_core @totara_core_menu
 Feature: Test visibility control of menu items
   In order to test the visiblity controls for menu items
   I must log in as admin and configure an advanced menu
@@ -33,12 +33,12 @@ Feature: Test visibility control of menu items
     And I click on "Access" "link"
     And I expand all fieldsets
     And I set the following fields to these values:
-    | role_enable | 1 |
-    | role_activeroles[8] | 1 |
+      | Restrict access by role | 1   |
+      | Role aggregation        | Any |
+      | Context                 | site |
+      | Authenticated user      | 1 |
     When I press "Save changes"
-    Then I should not see "Test one" in the totara menu
-    And I click on "Home" in the totara menu
-    And I should see "Test one" in the totara menu
+    Then I should see "Test one" in the totara menu
 
   @javascript
   Scenario: role aggregation works as expected for menu item visibility
@@ -55,13 +55,12 @@ Feature: Test visibility control of menu items
     And I click on "Access" "link"
     And I expand all fieldsets
     And I set the following fields to these values:
-      | Restrict access by role | 1 |
-      | Authenticated user | 1 |
-      | Authenticated user on frontpage | 1 |
-      | role_aggregation    | All |
+      | Restrict access by role         | 1   |
+      | Role aggregation                | All |
+      | Authenticated user              | 1   |
+      | Authenticated user on frontpage | 1   |
+      | Context                         | any |
     When I press "Save changes"
-    Then I should not see "Test one" in the totara menu
-    And I click on "Home" in the totara menu
     And I should see "Test one" in the totara menu
 
   @javascript

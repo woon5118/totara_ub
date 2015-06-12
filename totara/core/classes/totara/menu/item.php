@@ -433,56 +433,54 @@ class item {
      * @return bool $result True if the item is visible.
      */
     private function get_visibility_by_role($rule, $aggregation, $contextsetting) {
-        global $DB, $USER, $CFG, $PAGE;
+        global $DB, $USER, $CFG;
+
+        if (!$rule->value) {
+            return false;
+        }
 
         $userroles = array();
         $allowedroles = explode('|', $rule->value);
 
-        // First get all system roles the user has been assigned.
-        $data = get_user_roles_with_special(\context_system::instance(), $USER->id);
-        foreach ($data as $item) {
-            $userroles[] = $item->roleid;
-        }
+        if (!isloggedin()) {
+            // Not logged in users cannot have any real roles.
+            if (!empty($CFG->notloggedinroleid)) {
+                $userroles[$CFG->notloggedinroleid] = $CFG->notloggedinroleid;
+            }
 
-        // We need to check for the front page role id using the current page context. Its a special case.
-        // We've got special roles against the system context but authenticated user on frontpage is against the course context
-        // and we don't want to include front page roles as the setting
-        $defaultfrontpageroleid = isset($CFG->defaultfrontpageroleid) ? $CFG->defaultfrontpageroleid : 0;
-        $isfrontpage = ($PAGE->context->contextlevel == CONTEXT_COURSE && $PAGE->context->instanceid == SITEID) ||
-            is_inside_frontpage($PAGE->context);
-        if ($defaultfrontpageroleid && $isfrontpage) {
-            // The user is on the frontpage and is authenticated.
-            $userroles[] = $defaultfrontpageroleid;
-        }
-
-        // We need to add the guest role if the user is the guest.
-        // This can be potentially painful depending upon the state of the site.
-        // We would hope that if the menu has been configured this stuff should already be set up and there should be a nice
-        // CFG var with the guest role id in it.
-        if (isguestuser()) {
+        } else if (isguestuser()) {
+            // Guests should not have any role assigned, UI prevents it.
+            // For perf reasons do not look for any other roles.
             if (!empty($CFG->guestroleid)) {
-                $userroles[] = $CFG->guestroleid;
-            } else {
-                $guestrole = get_guest_role();
-                $userroles[] = $guestrole->id;
+                $userroles[$CFG->guestroleid] = $CFG->guestroleid;
+            }
+
+        } else {
+            // This is a real user.
+            // First get all system roles the user has been assigned.
+            $ras = get_user_roles_with_special(\context_system::instance(), $USER->id);
+            foreach ($ras as $ra) {
+                $userroles[$ra->roleid] = $ra->roleid;
+            }
+
+            // Add roles in all other contexts if specified.
+            if ($contextsetting === 'any') {
+                // First the frontpage.
+                if (!empty($CFG->defaultfrontpageroleid)) {
+                    $userroles[$CFG->defaultfrontpageroleid] = $CFG->defaultfrontpageroleid;
+                }
+                // Then all other contexts.
+                $allroles = $DB->get_fieldset_sql(
+                    "SELECT DISTINCT roleid
+                       FROM {role_assignments}
+                      WHERE userid = ?", array($USER->id));
+                foreach ($allroles as $role) {
+                    $userroles[$role] = $role;
+                }
             }
         }
 
-        // Final nasty wee hack here, sorry this is just nasty. Messing with roles is nobodies idea of fun.
-        // We add any roles the user has been assigned in any other contexts.
-        // This can't be considered accurate as there is no relational checking of roles against the contexts that they belong
-        // within nor access controls on those things.
-        // The only thing that should be looking at the roles table is the roles API.
-        if ($contextsetting == 'any') {
-            // Find roles the user has in any context.
-            $allroles = $DB->get_fieldset_sql('SELECT DISTINCT roleid
-                FROM {role_assignments}
-                WHERE userid = ?', array($USER->id));
-            foreach ($allroles as $role) {
-                $userroles[] = $role;
-            }
-        }
-        $userroles = array_unique($userroles);
+        $userroles = array_values($userroles);
         if ($aggregation == menu::AGGREGATION_ANY) {
             return (count(array_intersect($allowedroles, $userroles)) != 0);
         } else if ($aggregation == menu::AGGREGATION_ALL) {
