@@ -38,7 +38,8 @@ class feedback_edit_add_question_form extends moodleform {
         // visible elements
         $feedback_names_options = feedback_load_feedback_items_options();
 
-        $attributes = 'onChange="M.core_formchangechecker.set_form_submitted(); this.form.submit()"';
+        $attributes = 'onChange="this.form.submit()"';
+
         $mform->addElement('select', 'typ', '', $feedback_names_options, $attributes);
 
         // hidden elements
@@ -113,7 +114,11 @@ class feedback_edit_use_template_form extends moodleform {
                 $options[get_string('public', 'feedback')] = $publicoptions;
             }
 
-            $attributes = 'onChange="M.core_formchangechecker.set_form_submitted(); this.form.submit()"';
+            if ($mform->is_form_change_checker_enabled()) {
+                $attributes = 'onChange="M.core_formchangechecker.set_form_submitted(); this.form.submit()"';
+            } else {
+                $attributes = 'onChange="this.form.submit()"';
+            }
             $elementgroup[] = $mform->createElement('selectgroups',
                                                      'templateid',
                                                      '',
