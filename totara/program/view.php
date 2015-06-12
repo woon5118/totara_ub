@@ -38,6 +38,7 @@ $viewtype = optional_param('viewtype', 'program', PARAM_TEXT); // Type of a page
 if (!$program = new program($id)) {
     print_error('error:programid', 'totara_program');
 }
+$programcontext = $program->get_context();
 
 if (!$program->is_viewable()) {
     print_error('error:inaccessible', 'totara_program');
@@ -48,10 +49,12 @@ if ($program->certifid) {
     check_certification_enabled();
     $identifier = 'editcertif';
     $component = 'totara_certification';
+    $canedit = has_capability('totara/certification:configuredetails', $programcontext);
 } else {
     check_program_enabled();
     $identifier = 'editprogramdetails';
     $component = 'totara_program';
+    $canedit = has_capability('totara/program:configuredetails', $programcontext);
 }
 
 $PAGE->set_context(context_program::instance($program->id));
@@ -107,7 +110,7 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
 echo $OUTPUT->header();
 
-if ($isadmin) {
+if ($canedit) {
     echo $OUTPUT->single_button(new moodle_url('/totara/program/edit.php', array('id' => $program->id)),
         get_string($identifier, $component), 'GET', array('class' => 'navbutton'));
 }

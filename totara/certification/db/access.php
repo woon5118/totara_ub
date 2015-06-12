@@ -40,7 +40,7 @@ $capabilities = array(
     'totara/certification:createcertification' => array(
         'riskbitmask' => RISK_XSS | RISK_CONFIG,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_PROGRAM,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
             'manager' => CAP_ALLOW,
         )
