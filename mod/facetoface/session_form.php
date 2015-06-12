@@ -368,6 +368,7 @@ class mod_facetoface_session_form extends moodleform {
             $date = new stdClass();
             $date->timestart = $starttime;
             $date->timefinish = $endtime;
+            $dates[] = $date;
         }
 
         $datefound = false;
