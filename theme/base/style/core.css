@@ -1882,6 +1882,9 @@ body.jsenabled .formlisting {
 #badge-details dt {
     padding: 3px 0;
 }
+#addbadgecriteria label {
+    display: inline;
+}
 
 #page-badges-view .collection { width: 90%; margin: 1em auto; }
 #page-badges-index .collection { width: 85%; margin: 1em auto; }
