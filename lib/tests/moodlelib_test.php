@@ -609,6 +609,11 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame($httpsroot . '/with/something?else=true',
             clean_param($httpsroot . '/with/something?else=true', PARAM_LOCALURL));
         $CFG->loginhttps = $initialloginhttps;
+
+        // Totara fixes.
+        $this->resetAfterTest();
+        $CFG->wwwroot = 'http://www.totarasite.com';
+        $this->assertSame('', clean_param('http://www.totarasite.com.evil.net/hack.php', PARAM_LOCALURL));
     }
 
     public function test_clean_param_file() {
