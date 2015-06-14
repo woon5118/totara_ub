@@ -49,6 +49,7 @@ function report_security_get_issue_list() {
         'report_security_check_passwordpolicy',
         'report_security_check_emailchangeconfirmation',
         'report_security_check_usernameenumeration',
+        'report_security_check_https',
         'report_security_check_cookiesecure',
         'report_security_check_configrw',
         'report_security_check_riskxss',
@@ -418,9 +419,7 @@ function report_security_check_emailchangeconfirmation($detailed=false) {
 function report_security_check_cookiesecure($detailed=false) {
     global $CFG;
 
-    if (!is_https()) {
-        return null;
-    }
+    // Totara: show this always, not just on HTTPS sites.
 
     $result = new stdClass();
     $result->issue   = 'report_security_check_cookiesecure';
@@ -513,6 +512,11 @@ function report_security_check_riskxss($detailed=false) {
     $count = $DB->count_records_sql("SELECT COUNT(DISTINCT u.id) $sqlfrom", $params);
 
     $result->info = get_string('check_riskxss_warning', 'report_security', $count);
+
+    if ($count === 0) {
+        // Totara: no users means no warning, this is good for new installs.
+        $result->status = REPORT_SECURITY_OK;
+    }
 
     if ($detailed) {
         $userfields = user_picture::fields('u');
@@ -897,6 +901,34 @@ function report_security_check_webcron($detailed = false) {
 
     if ($detailed) {
         $result->details = get_string('check_webcron_details', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies if https used in Totara.
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_https($detailed = false) {
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_https';
+    $result->name    = get_string('check_https_name', 'report_security');
+    $result->details = null;
+    $result->link    = '';
+
+    if (!is_https()) {
+        $result->status = REPORT_SECURITY_SERIOUS;
+        $result->info   = get_string('check_https_warning', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info   = get_string('check_https_ok', 'report_security');
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_https_details', 'report_security');
     }
 
     return $result;
