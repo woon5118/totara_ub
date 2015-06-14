@@ -32,7 +32,7 @@ Feature: Instant completion
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name                | Test quiz name                                    |
       | Description         | Test quiz description                             |
@@ -56,7 +56,7 @@ Feature: Instant completion
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Quiz" to section "1" and I fill the form with:
       | Name                | Test quiz name2                                   |
       | Description         | Test quiz description2                            |
@@ -73,7 +73,7 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name2   | 1 |
       | id_criteria_course_value | Miscellaneous / Course 1 |
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
 
   @javascript

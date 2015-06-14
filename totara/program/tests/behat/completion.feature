@@ -25,7 +25,9 @@ Feature: Users completion of programs and coursesets
       | comptest | user002 |
       | comptest | user003 |
     And I log in as "admin"
-    And I navigate to "Turn editing on" node in "Front page settings"
+    And I click on "Customise this page" "button"
+    And I set the following administration settings values:
+      | menulifetime | 0 |
     And I set self completion for "Course 1" in the "Miscellaneous" category
     And I set self completion for "Course 2" in the "Miscellaneous" category
     And I set self completion for "Course 3" in the "Miscellaneous" category
@@ -70,7 +72,7 @@ Feature: Users completion of programs and coursesets
     And I focus on "My Learning" "link"
     And I follow "Required Learning"
     Then I should see "0%" program progress
-    And I should see "Complete" in the ".r0 .coursecompletionstatus .completion-complete" "css_element"
+    And I should see "Complete" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
@@ -78,8 +80,8 @@ Feature: Users completion of programs and coursesets
     And I focus on "My Learning" "link"
     And I follow "Required Learning"
     Then I should see "50%" program progress
-    And I should see "Complete" in the ".r0 .coursecompletionstatus .completion-complete" "css_element"
-    And I should see "Complete" in the ".r1 .coursecompletionstatus .completion-complete" "css_element"
+    And I should see "Complete" in the "Course 1" "table_row"
+    And I should see "Complete" in the "Course 2" "table_row"
 
     When I click on "Course 3" "link"
     And I click on "Complete course" "link"

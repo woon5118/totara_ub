@@ -57,6 +57,8 @@ Feature: Behat generators for hierarchies work
 
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "fn_001 ln_001" "link"
+    And I click on "Preferences" "link"
+    And I click on "Primary position" "link"
     Then I should see "Position One" in the ".descriptionbox" "css_element"
     And I should see "Organisation One" in the ".descriptionbox" "css_element"
     And I should see "Admin User" in the ".descriptionbox" "css_element"
@@ -121,7 +123,8 @@ Feature: Behat generators for hierarchies work
 
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "fn_001 ln_001" "link"
-    And I navigate to "Primary position" node in "Profile settings for fn_001 ln_001 > Positions"
+    And I click on "Preferences" "link"
+    And I click on "Primary position" "link"
     And I click on "Choose position" "button"
     And I click on "Position One" "link" in the "position" "totaradialogue"
     And I click on "OK" "button" in the "position" "totaradialogue"
@@ -140,7 +143,8 @@ Feature: Behat generators for hierarchies work
 
     When I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "fn_002 ln_002" "link"
-    And I navigate to "Primary position" node in "Profile settings for fn_002 ln_002 > Positions"
+    And I click on "Preferences" "link"
+    And I click on "Primary position" "link"
     And I click on "Choose position" "button"
     And I click on "Position Two" "link" in the "position" "totaradialogue"
     And I click on "OK" "button" in the "position" "totaradialogue"

@@ -14,7 +14,9 @@ Feature: User recertification and expiry of certification
       | Certify Course   | CC1       | topics | 1                | 1                      |
       | Recertify Course | RC1       | topics | 1                | 1                      |
     And I log in as "admin"
-    And I navigate to "Turn editing on" node in "Front page settings"
+    And I click on "Customise this page" "button"
+    And I set the following administration settings values:
+      | menulifetime | 0 |
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
     And I focus on "Find Learning" "link"
