@@ -49,8 +49,7 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name | 1 |
     And I press "Save changes"
-    And I focus on "Find Learning" "link"
-    And I follow "Courses"
+    And I follow "Find Learning"
     And I click on "Course 2" "link"
     And completion tracking is "Enabled" in current course
     And I click on "Edit settings" "link" in the "Administration" "block"
@@ -73,7 +72,7 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name2   | 1 |
       | id_criteria_course_value | Miscellaneous / Course 1 |
-    And I press "Save and display"
+    And I press "Save changes"
     And I log out
 
   @javascript
