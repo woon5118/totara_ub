@@ -13,8 +13,8 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I log out
     Given the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@asd.com |
-      | student1 | Student | 1 | student1@asd.com |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | student1 | Student | 1 | student1@example.com |
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
@@ -33,7 +33,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
   Scenario: Allow guest access through the course catalog without password
     Given I set the following fields to these values:
       | Allow guest access | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
     And I log in as "student1"
     And I follow "Find Learning"
@@ -48,7 +48,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     Given I set the following fields to these values:
       | Allow guest access | Yes |
       | Password | moodle_rules |
-    And I press "Save changes"
+    And I press "Save and display"
     And I log out
     And I log in as "student1"
     And I follow "Find Learning"
