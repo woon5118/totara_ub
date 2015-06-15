@@ -83,7 +83,7 @@ $dialog->selected_title = 'itemstoadd';
 if ($search == 1) {
     $dialog->load_courses_from_competency($competencyid);
 } else {
-    $dialog->load_courses($planid);
+    $dialog->load_courses_from_plan($planid);
 }
 
 // Set selected items

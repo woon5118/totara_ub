@@ -76,7 +76,7 @@ $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
 $dialog->selected_title = 'itemstoadd';
 
 // Add data
-$dialog->load_courses($planid);
+$dialog->load_courses_from_plan($planid);
 
 // Set selected items
 $dialog->selected_items = $selected;
