@@ -454,5 +454,14 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015052100, 'totara', 'plan');
     }
 
+    if ($oldversion < 2015061600) {
+        // Update the default sort column for RoL: Certifications embedded reports.
+
+        $params = array('embedded' => 1, 'shortname' => 'plan_certifications', 'defaultsortcolumn' => 'certification_fullnamelink');
+        $DB->set_field('report_builder', 'defaultsortcolumn', 'base_fullnamelink', $params);
+
+        upgrade_plugin_savepoint(true, 2015061600, 'totara', 'plan');
+    }
+
     return true;
 }

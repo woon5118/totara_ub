@@ -35,7 +35,7 @@ class rb_plan_certifications_embedded extends rb_base_embedded {
 
         $this->url = '/totara/plan/record/certifications.php';
         $this->source = 'dp_certification'; // Source report not database table
-        $this->defaultsortcolumn = 'certification_fullnamelink';
+        $this->defaultsortcolumn = 'base_fullnamelink';
         $this->shortname = 'plan_certifications';
         $this->fullname = get_string('recordoflearningcertifications', 'totara_plan');
         $this->columns = array(
