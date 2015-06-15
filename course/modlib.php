@@ -499,6 +499,11 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
             $cm->completion = $moduleinfo->completion;
             $cm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
             $cm->completionview = $moduleinfo->completionview;
+
+            if (!empty($moduleinfo->completionunlockednoreset)) {
+                // TOTARA - Trigger module_completion_unlocked event here.
+                \totara_core\event\module_completion_unlocked::create_from_module($moduleinfo)->trigger();
+            }
         }
         // The expected date does not affect users who have completed the activity,
         // so it is safe to update it regardless of the lock status.
@@ -571,6 +576,9 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
     // (this will wipe all user completion data and recalculate it)
     if ($completion->is_enabled() && !empty($moduleinfo->completionunlocked) && empty($moduleinfo->completionunlockednoreset)) {
         $completion->reset_all_state($cm);
+
+        // TOTARA - Trigger module_completion_reset event here.
+        \totara_core\event\module_completion_reset::create_from_module($moduleinfo)->trigger();
     }
     $cm->name = $moduleinfo->name;
     \core\event\course_module_updated::create_from_cm($cm, $modcontext)->trigger();
