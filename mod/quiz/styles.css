@@ -801,6 +801,9 @@ table.quizreviewsummary td.cell {
   font-weight: bold;
     color: #555;
 }
+#page-mod-quiz-edit.dir-rtl ul.slots li.activity div.activityinstance .questionname {
+    float: right;
+}
 #page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {
     color: #555;
 }

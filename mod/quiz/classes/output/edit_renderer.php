@@ -875,7 +875,7 @@ class edit_renderer extends \plugin_renderer_base {
         $icon = $this->pix_icon('icon', $namestr, $qtype->plugin_name(), array('title' => $namestr,
                 'class' => 'icon activityicon', 'alt' => ' ', 'role' => 'presentation'));
 
-        $editicon = $this->pix_icon('t/edit', $configuretitle, 'moodle', array('title' => ''));
+        $editicon = $this->pix_icon('t/edit', $configuretitle, 'moodle', array('title' => '', 'class' => 'activityicon'));
 
         // If this is a random question, display a link to show the questions
         // selected from in the question bank.
