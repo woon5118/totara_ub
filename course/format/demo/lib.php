@@ -55,7 +55,8 @@ class format_demo extends format_base {
                     array('context' => context_course::instance($this->courseid)));
         } else if ($section->section == 0) {
             $course = $this->get_course();
-            return $section->name == '' ? $course->fullname : $section->name;
+            return format_string($section->name == '' ? $course->fullname : $section->name, true,
+                array('context' => context_course::instance($this->courseid)));
         } else {
             return get_string('demo', 'format_demo') .' '. $section->section;
         }
