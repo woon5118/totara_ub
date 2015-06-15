@@ -5818,7 +5818,7 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
     }
 
     $ret = (object)array('potential' => array(), 'current' => array(), 'othersession' => array(), 'cannotunallocate' => array());
-    if (!$staff = totara_get_staff($managerid)) {
+    if (!$staff = totara_get_staff($managerid, null, true)) {
         return $ret;
     }
 
@@ -5841,7 +5841,8 @@ function facetoface_get_staff_to_allocate($facetoface, $session, $managerid = nu
                    WHERE s.facetoface = :facetofaceid AND sus.statuscode > :status
               ) su ON su.userid = u.id
               LEFT JOIN {user} b ON b.id = su.bookedby
-             WHERE u.id ' . $usql;
+             WHERE u.id ' . $usql . '
+          ORDER BY u.lastname ASC, u.firstname ASC';
 
     $params['facetofaceid'] = $facetoface->id;
     // Statuses greater than declined to handle cases where people change their mind.

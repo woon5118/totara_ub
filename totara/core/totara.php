@@ -970,34 +970,51 @@ function totara_is_manager($userid, $managerid=null, $postype=null) {
 /**
  * Returns the staff of the specified user
  *
- * @param int $userid ID of a user to get the staff of
+ * @param int $userid ID of a user to get the staff of, If $userid is not set, returns staff of current user
  * @param mixed $postype Type of the position to check (POSITION_TYPE_* constant). Defaults to primary position (optional)
+ * @param bool $sort optional ordering by lastname, firstname
  * @return array Array of userids of staff who are managed by user $userid , or false if none
- *
- * If $userid is not set, returns staff of current user
-**/
-function totara_get_staff($userid=null, $postype=null) {
+ **/
+function totara_get_staff($userid=null, $postype=null, $sort = false) {
     global $CFG, $DB, $USER;
 
     require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
     $postype = ($postype === null) ? POSITION_TYPE_PRIMARY : (int) $postype;
     $now = time();
-
     $userid = !empty($userid) ? (int) $userid : $USER->id;
-    // this works because:
-    // - old pos_assignment records are deleted when a user is deleted by {@link delete_user()}
-    //   so no need to check if the record is for a real user
-    // - there is a unique key on (type, userid) on pos_assignment so no need to use
-    //   DISTINCT on the userid
-    $staff = $DB->get_fieldset_select('pos_assignment', 'userid', "type = ? AND managerid = ?", array($postype, $userid));
 
-    // Get temporary staff.
+    $orderby = '';
+    $select = 'u.id';
+    if ($sort) {
+        $orderby = "ORDER BY u.lastname ASC, u.firstname ASC";
+        $select = "u.id, u.lastname, u.firstname";
+    }
+
     if (!empty($CFG->enabletempmanagers) && $postype == POSITION_TYPE_PRIMARY) {
-        $tempstaff = $DB->get_fieldset_select('temporary_manager', 'userid', 'tempmanagerid = ? AND expirytime > ?',
-            array($userid, $now));
+        // Include temporary staff.
+        $sql = "SELECT DISTINCT $select
+                  FROM {user} u
+             LEFT JOIN {pos_assignment} pa ON (pa.userid = u.id AND pa.type = :type AND pa.managerid = :managerid)
+             LEFT JOIN {temporary_manager} tm ON (tm.userid = u.id AND tm.tempmanagerid = :managerid2 AND tm.expirytime > :expiry)
+                 WHERE u.deleted = 0 AND (pa.id IS NOT NULL OR tm.id IS NOT NULL)
+              $orderby";
+        $params = array('type' => $postype, 'managerid' => $userid, 'managerid2' => $userid, 'expiry' => $now);
+        $staff = $DB->get_fieldset_sql($sql, $params);
 
-        $staff = array_unique(array_merge($staff, $tempstaff));
+    } else {
+        // This works because:
+        // - old pos_assignment records are deleted when a user is deleted by {@link delete_user()}
+        //   so no need to check if the record is for a real user
+        // - there is a unique key on (type, userid) on pos_assignment so no need to use
+        //   DISTINCT on the userid
+        $sql = "SELECT $select
+                  FROM {user} u
+                  JOIN {pos_assignment} pa ON (pa.userid = u.id AND pa.type = :type AND pa.managerid = :managerid)
+                 WHERE u.deleted = 0
+              $orderby";
+        $params = array('type' => $postype, 'managerid' => $userid);
+        $staff = $DB->get_fieldset_sql($sql, $params);
     }
 
     return (empty($staff)) ? false : $staff;
