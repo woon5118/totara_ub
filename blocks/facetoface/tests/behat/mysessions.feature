@@ -18,6 +18,7 @@ Feature: Confirm Sessions show up in my face to face sessions
       | teacher1 | C1 | editingteacher |
       | learner1 | C1 | student |
     And I log in as "admin"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -94,11 +95,9 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Details                 | 2 some more details |
     And I click on "Save changes" "button"
     And I follow "My Learning"
-    And I click on "Customise this page" "button"
     And I add the "Face-to-face" block
     And I click on "Stop customising this page" "button"
 
-  #@javascript
   Scenario: Test filters
     Given I follow "Upcoming sessions"
     And I set the following fields to these values:

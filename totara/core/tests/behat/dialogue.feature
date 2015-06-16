@@ -16,6 +16,7 @@ Feature: Test Totara dialogue operation
       | Cohort 1 | CH1 |
       | Cohort 2 | CH2 |
     And I log in as "admin"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I click on "Edit settings" "link" in the "Administration" "block"
     When I press "Add enrolled audiences"
@@ -35,6 +36,7 @@ Feature: Test Totara dialogue operation
       | Cohort 1 | CH1 |
       | Cohort 2 | CH2 |
     And I log in as "admin"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I click on "Edit settings" "link" in the "Administration" "block"
     When I press "Add enrolled audiences"
@@ -53,6 +55,7 @@ Feature: Test Totara dialogue operation
       | Cohort 1 | CH1 |
       | Cohort 2 | CH2 |
     And I log in as "admin"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I click on "Edit settings" "link" in the "Administration" "block"
     When I press "Add enrolled audiences"

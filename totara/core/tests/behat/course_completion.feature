@@ -21,6 +21,7 @@ Feature: Users completion of courses
       | user002 | C1     | student |
     And I log in as "admin"
     And I click on "Customise this page" "button"
+    And I follow "Find Learning"
     And I click on "Course 1" "link"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity One                                      |
@@ -43,8 +44,6 @@ Feature: Users completion of courses
     And I click on "Choice - Activity One" "checkbox"
     And I click on "Choice - Activity Two" "checkbox"
     And I press "Save changes"
-    And I click on "Home" in the totara menu
-    And I click on "Course 2" "link"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity Three                                    |
       | Description          | The final activity                                |
@@ -64,6 +63,7 @@ Feature: Users completion of courses
   @javascript
   Scenario: Test instant and re-aggregation of course completion using activity completion
     When I log in as "user001"
+    And I follow "Find Learning"
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
@@ -92,6 +92,7 @@ Feature: Users completion of courses
 
     When I log out
     And I log in as "user002"
+    And I follow "Find Learning"
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
@@ -103,6 +104,7 @@ Feature: Users completion of courses
     # Thats the instant functionality done, now unlock and reaggregate to test cron functionality.
     When I log out
     And I log in as "admin"
+    And I follow "Find Learning"
     And I click on "Course 1" "link"
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria and delete existing completion data"
