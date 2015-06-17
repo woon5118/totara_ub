@@ -96,7 +96,9 @@ Feature: Instant completion
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 2" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
+    And I wait "1" seconds
     And I click on "Save changes" "button"
+    And I wait "1" seconds
     And I click on "Save all changes" "button"
     And I log out
 
@@ -125,8 +127,8 @@ Feature: Instant completion
 
     And I focus on "My Learning" "link"
     And I follow "Record of Learning"
-    Then I should see "Complete" in the ".r0 .coursecompletionstatus .completion-complete" "css_element"
-    And  I should see "Complete" in the ".r1 .coursecompletionstatus .completion-complete" "css_element"
+    Then I should see "Complete" in the "Course 1" "table_row"
+    And  I should see "Complete" in the "Course 2" "table_row"
 #    And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
 #    And I click on "Program1" "link"
 #    Then I should see "100%" program progress
