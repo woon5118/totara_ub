@@ -48,6 +48,7 @@ function report_security_get_issue_list() {
         'report_security_check_google',
         'report_security_check_passwordpolicy',
         'report_security_check_emailchangeconfirmation',
+        'report_security_check_usernameenumeration',
         'report_security_check_cookiesecure',
         'report_security_check_configrw',
         'report_security_check_riskxss',
@@ -134,6 +135,41 @@ function report_security_check_passwordpolicy($detailed=false) {
 
     if ($detailed) {
         $result->details = get_string('check_passwordpolicy_details', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Test if registerauth has been enabled or if protect usernames has been turned off and warn about possible user enumeration.
+ *
+ * @param bool $detailed
+ * @return stdClass
+ */
+function report_security_check_usernameenumeration($detailed = false) {
+    global $CFG;
+
+    $result = new stdClass();
+    $result->issue   = __FUNCTION__;
+    $result->name    = get_string('check_usernameenumeration_name', 'report_security');
+    $result->info    = null;
+    $result->details = null;
+    $result->status  = null;
+    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/settings.php?section=manageauths\">".get_string('authsettings', 'admin').'</a>';
+
+    // We only check registerauth, we don't check that if its set the plugin actually facilitates it.
+    // This is because the plugin may have hidden logic, really if registerauth is set we can presume that "someone" can signup.
+    // We also check $CFG->protectusernames because that allows username enumeration as well.
+    if (empty($CFG->registerauth) && !empty($CFG->protectusernames)) {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info   = get_string('check_usernameenumeration_ok', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_WARNING;
+        $result->info   = get_string('check_usernameenumeration_warning', 'report_security');
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_usernameenumeration_details', 'report_security');
     }
 
     return $result;

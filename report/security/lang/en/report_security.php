@@ -116,6 +116,12 @@ $string['check_unsecuredataroot_error'] = 'Your dataroot directory <code>{$a}</c
 $string['check_unsecuredataroot_name'] = 'Insecure dataroot';
 $string['check_unsecuredataroot_ok'] = 'Dataroot directory must not be accessible via the web.';
 $string['check_unsecuredataroot_warning'] = 'Your dataroot directory <code>{$a}</code> is in the wrong location and might be exposed to the web.';
+$string['check_usernameenumeration_details'] = '<p>When a user\'s credentials are incorrect Totara is careful to be vague about the reason why so as to not let the user know whether the username or the password is incorrect. This means would be attackers must guess both the username and the password.</p>
+<p>With Self registration turned on would be attackers can use the signup form to enumerate usernames and work out which are valid. Once a valid username has been identified they only need to guess the password.<br />To prevent this turn off Self registration.</p>
+<p>With Protect usernames turned off would be attackers can use the forgotten password form to enumerate usernames and work out which are valid. Once a valid username has been identified they only need to guess the password.<br />To prevent this turn on Protect usernames.</p>';
+$string['check_usernameenumeration_name'] = 'Username enumeration';
+$string['check_usernameenumeration_ok'] = 'Protect usernames is enabled and Self registration is not enabled';
+$string['check_usernameenumeration_warning'] = 'With Self registration turned on or Protect usernames turned off unauthenticated users may be able to guess existing usernames';
 $string['check_webcron_details'] = '<p>Running the cron from a web browser can expose privileged information to anonymous users. It is recommended to only run the cron from the command line or set a cron password for remote access.</p>';
 $string['check_webcron_warning'] = 'Anonymous users can access cron.';
 $string['check_webcron_name'] = 'Web cron';
