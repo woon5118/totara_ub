@@ -235,14 +235,6 @@ switch ($action) {
         $questions = appraisal_question::get_list_with_redisplay($page->id);
 }
 
-// String required for "roles involved" help button when dynamically reloaded.
-$PAGE->requires->string_for_js('close', 'form');
-$PAGE->requires->string_for_js('ok', 'moodle');
-$PAGE->requires->string_for_js('yes', 'moodle');
-$PAGE->requires->string_for_js('no', 'moodle');
-$PAGE->requires->string_for_js('confirmdeleteitem', 'totara_appraisal');
-$PAGE->requires->string_for_js('confirmdeleteitemwithredisplay', 'totara_appraisal');
-$PAGE->requires->string_for_js('error:cannotdelete', 'totara_appraisal');
 $output = $PAGE->get_renderer('totara_appraisal');
 if (!is_ajax_request($_SERVER)) {
     admin_externalpage_setup('manageappraisals');
@@ -265,6 +257,4 @@ switch($action) {
 
 if (!is_ajax_request($_SERVER)) {
     echo $output->footer();
-} else {
-    echo $PAGE->requires->get_end_code();
 }
