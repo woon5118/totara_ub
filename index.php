@@ -188,6 +188,11 @@ if (isloggedin() and !isguestuser() and isset($CFG->frontpageloggedin)) {
     $frontpagelayout = $CFG->frontpage;
 }
 
+// Totara specific feature.
+if (isloggedin() and !isguestuser() and isset($CFG->courseprogress) and $CFG->courseprogress) {
+    totara_print_my_courses();
+}
+
 foreach (explode(',', $frontpagelayout) as $v) {
     switch ($v) {
         // Display the main part of the front page.
