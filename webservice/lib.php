@@ -1162,16 +1162,6 @@ abstract class webservice_zend_server extends webservice_server {
         // tell server what functions are available
         $this->zend_server->setClass($this->service_class);
 
-        // Log the web service request.
-        $params = array(
-            'other' => array(
-                'function' => 'unknown'
-            )
-        );
-        $event = \core\event\webservice_function_called::create($params);
-        $event->set_legacy_logdata(array(SITEID, 'webservice', '', '', $this->zend_class.' '.getremoteaddr(), 0, $this->userid));
-        $event->trigger();
-
         //send headers
         $this->send_headers();
 
@@ -1435,10 +1425,16 @@ class '.$classname.' {
 
         $descriptionmethod = $function->methodname.'_returns()';
         $callforreturnvaluedesc = $function->classname.'::'.$descriptionmethod;
+        $legacylogdata = "array(SITEID, 'webservice', '', '', '{$function->name} ' . getremoteaddr(), 0, 0)";
         return $castingcode . '    if ('.$callforreturnvaluedesc.' == null)  {'.
                         $function->classname.'::'.$function->methodname.'('.$params.');
                         return null;
                     }
+
+                    $event = \core\event\webservice_function_called::create_from_data('.$function->methodname.');
+                    $event->set_legacy_logdata('.$legacylogdata.');
+                    $event->trigger();
+
                     return external_api::clean_returnvalue('.$callforreturnvaluedesc.', '.$function->classname.'::'.$function->methodname.'('.$params.'));';
     }
 
@@ -1637,7 +1633,7 @@ abstract class webservice_base_server extends webservice_server {
             )
         );
         $event = \core\event\webservice_function_called::create($params);
-        $event->set_legacy_logdata(array(SITEID, 'webservice', $this->functionname, '' , getremoteaddr() , 0, $this->userid));
+        $event->set_legacy_logdata(array(SITEID, 'webservice', $this->functionname . ' ' . getremoteaddr() , 0, $this->userid));
         $event->trigger();
 
         // finally, execute the function - any errors are catched by the default exception handler

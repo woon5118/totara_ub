@@ -42,9 +42,29 @@ defined('MOODLE_INTERNAL') || die();
 class webservice_function_called extends base {
 
     /**
+     * Flag for prevention of direct create() call.
+     * @var bool
+     */
+    protected static $preventcreatecall = true;
+
+    /**
      * Legacy log data.
      */
     protected $legacylogdata;
+
+    public static function create_from_data($function) {
+        $data = array(
+            'other' => array(
+                'function' => $function,
+            ),
+        );
+
+        self::$preventcreatecall = false;
+        $event = self::create($data);
+        self::$preventcreatecall = true;
+
+        return $event;
+    }
 
     /**
      * Returns description of what happened.
