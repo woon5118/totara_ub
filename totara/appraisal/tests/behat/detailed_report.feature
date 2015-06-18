@@ -74,10 +74,13 @@ Feature: Test appraisal detailed report with numeric question
     # Display settings doesn't visually change to "Text input field" radio. So nail it.
     And I click on "#id_list_2" "css_element"
     And I click on "//button[text()='Save changes']" "xpath_element" in the "div.moodle-dialogue-focused div.moodle-dialogue-ft" "css_element"
+    And I wait "1" seconds
     And I click on "Assignments" "link"
     And I set the field "menugroupselector" to "Audience"
+    And I wait "1" seconds
     And I click on "Cohort 1" "link" in the "Assign Learner Group To Appraisal" "totaradialogue"
     And I click on "Save" "button" in the "Assign Learner Group To Appraisal" "totaradialogue"
+    And I wait "1" seconds
     And I click on "Activate now" "link"
     And I press "Activate"
 
