@@ -45,4 +45,4 @@ NS.init = function() {
 
 };
 
-}, '@VERSION@');
+}, '@VERSION@', {"requires": []});

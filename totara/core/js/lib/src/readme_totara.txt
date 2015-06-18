@@ -1,3 +1,5 @@
+Please place all non minified versions of javascript files in here, then run grunt to minify all files
+
 Jquery DataTables
 ------------------
 Current version 1.10.7 and includes SetfilteringDelay (from

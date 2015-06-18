@@ -50,6 +50,9 @@ function local_js($options = array()) {
 
     // jQuery is loaded on each page since 8.0.
 
+    $directory = $CFG->cachejs ? 'build' : 'src';
+    $min = $CFG->cachejs ? '.min' : '';
+
     // If UI
     if (in_array(TOTARA_JS_UI, $options)) {
 
@@ -80,7 +83,7 @@ function local_js($options = array()) {
         // object of the init method.
         $jsmodule = array(
                 'name' => 'totara_dialog',
-                'fullpath' => '/totara/core/js/lib/totara_dialog.js',
+                'fullpath' => '/totara/core/js/lib/' . $directory . '/totara_dialog' . $min . '.js',
                 'requires' => array('json'));
         $PAGE->requires->js_init_call('M.totara_dialog.init', null, false, $jsmodule);
     }
@@ -88,7 +91,7 @@ function local_js($options = array()) {
     // If treeview enabled
     if (in_array(TOTARA_JS_TREEVIEW, $options)) {
 
-        $PAGE->requires->js('/totara/core/js/lib/jquery.treeview.min.js');
+        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/jquery.treeview' . $min . '.js');
 
     }
 
@@ -113,8 +116,8 @@ function local_js($options = array()) {
 
     // if placeholder enabled
     if (in_array(TOTARA_JS_PLACEHOLDER, $options)) {
-        $PAGE->requires->js('/totara/core/js/lib/jquery.placeholder.min.js');
-        $PAGE->requires->js('/totara/core/js/lib/load.placeholder.js');
+        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/jquery.placeholder' . $min . '.js');
+        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/load.placeholder' . $min . '.js');
 
     }
 
@@ -126,7 +129,7 @@ function local_js($options = array()) {
     }
 
     if (in_array(TOTARA_JS_DATATABLES, $options)) {
-        $PAGE->requires->js('/totara/core/js/lib/jquery.dataTables.min.js');
+        $PAGE->requires->js('/totara/core/js/lib/' . $directory . '/jquery.dataTables' . $min . '.js');
     }
 }
 
