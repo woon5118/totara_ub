@@ -570,8 +570,8 @@ class dp_course_component extends dp_base_component {
         $table->set_attribute('class', 'logtable generalbox dp-plan-component-items');
         $table->setup();
 
-        $sql = $select.$from.$where.$sort;
-        if ($records = $DB->get_recordset_sql($sql, $params)) {
+        $sql = $select.$from.$where;
+        if ($records = $DB->get_recordset_sql($sql.$sort, $params)) {
             $numberrows = $DB->count_records_sql('SELECT COUNT(*) FROM (' . $sql . ') t', $params);
             $rownumber = 0;
             // get the scale values used for competencies in this plan
