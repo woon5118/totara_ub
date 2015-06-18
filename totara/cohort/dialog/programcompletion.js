@@ -255,7 +255,7 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
         totaraDialogs['completion'] = new totaraDialog_completion();
         $(document).on('click', '.completionlink', function(event){
             event.preventDefault();
-            var td = $(this).parent('td');
+            var div = $(this).parent('div');
 
             var dialog = totaraDialogs['completion'];
 
@@ -272,12 +272,12 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             }
 
             dialog.cohortid = M.totara_cohortprogramcompletion.config.cohortid;
-            dialog.programid = $('input[name^="programid"]', td).val();
+            dialog.programid = $(this).siblings('.completetionprogramid').val();
 
-            dialog.completiontime = $('input[name^="completiontime"]', td);
-            dialog.completionevent = $('input[name^="completionevent"]', td);
-            dialog.completioninstance = $('input[name^="completioninstance"]', td);
-            dialog.completionlink = td;
+            dialog.completiontime = $('input[name^="completiontime"]', div);
+            dialog.completionevent = $('input[name^="completionevent"]', div);
+            dialog.completioninstance = $('input[name^="completioninstance"]', div);
+            dialog.completionlink = div;
 
             dialog.default_url = M.cfg.wwwroot + '/totara/program/assignment/set_completion.php';
             totaraDialogs['completion'].open();
@@ -287,13 +287,13 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             event.preventDefault();
             var dialog = totaraDialogs['completion'];
 
-            var td = $(this).parent('td');
-            dialog.programid = $('input[name^="programid"]', td).val();
+            var div = $(this).parent('div');
+            dialog.programid = $(this).siblings('.completetionprogramid').val();
             dialog.cohortid = M.totara_cohortprogramcompletion.config.cohortid;
-            dialog.completiontime = $('input[name^="completiontime"]', td);
-            dialog.completionevent = $('input[name^="completionevent"]', td);
-            dialog.completioninstance = $('input[name^="completioninstance"]', td);
-            dialog.completionlink = td;
+            dialog.completiontime = $('input[name^="completiontime"]', div);
+            dialog.completionevent = $('input[name^="completionevent"]', div);
+            dialog.completioninstance = $('input[name^="completioninstance"]', div);
+            dialog.completionlink = div;
 
             dialog.update_completiontime('', 0, 0);
         });

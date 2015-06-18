@@ -601,7 +601,7 @@ abstract class prog_assignment_category {
      */
     abstract function get_includechildren($data, $object);
 
-    function get_completion($item) {
+    function get_completion($item, $programid = null) {
         global $CFG, $OUTPUT;
         $completion_string = get_string('setcompletion', 'totara_program');
 
@@ -649,6 +649,7 @@ abstract class prog_assignment_category {
                 'name' => 'completioninstance['.$this->id.']['.$item->id.']', 'value' => $item->completioninstance));
         }
         $html .= html_writer::link('#', $completion_string, array('class' => 'completionlink'));
+        $html .= html_writer::empty_tag('input', array('type' => 'hidden', 'class' => 'completetionprogramid', 'value' => $programid));
         if ($show_deletecompletionlink) {
             $html .= $OUTPUT->action_icon('#', new pix_icon('t/delete', get_string('removecompletiondate', 'totara_program')), null, array('class' => 'deletecompletiondatelink'));
         }
@@ -669,7 +670,6 @@ abstract class prog_assignment_category {
 
     public static function build_completion_string($completiontime, $completionevent, $completioninstance) {
         global $COMPLETION_EVENTS_CLASSNAMES, $TIMEALLOWANCESTRINGS;
-
         if (isset($COMPLETION_EVENTS_CLASSNAMES[$completionevent])) {
             $eventobject = new $COMPLETION_EVENTS_CLASSNAMES[$completionevent];
 

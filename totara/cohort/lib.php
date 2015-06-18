@@ -1423,8 +1423,7 @@ function totara_cohort_program_completion_link($cohortid, $programid){
     if (!$item) {
         $item = $cat->get_item($cohortid);
     }
-    $html = $cat->get_completion($item);
-    $html = '<input type="hidden" name="programid" value="'. $programid .'" />' . $html;
+    $html = $cat->get_completion($item, $programid);
     return $html;
 }
 
