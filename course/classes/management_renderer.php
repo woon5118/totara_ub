@@ -1379,13 +1379,16 @@ class core_course_management_renderer extends plugin_renderer_base {
     public function management_buttons($categoryid) {
         $output = $this->container_start('buttons');
         $url = new moodle_url('/course/editcategory.php', array('parent' => $categoryid));
-        $context = context_system::instance();
+        $context = get_category_or_system_context($categoryid);
         if ($categoryid) {
             $title = get_string('addsubcategory');
         } else {
             $title = get_string('addnewcategory');
         }
-        $output .= $this->single_button($url, $title, 'get');
+
+        if (has_capability('moodle/category:manage', $context)) {
+            $output .= $this->single_button($url, $title, 'get');
+        }
 
         if (totara_feature_visible('programs')) {
             // Print button for switching to program management.
@@ -1393,8 +1396,8 @@ class core_course_management_renderer extends plugin_renderer_base {
             $programcaps = array('totara/program:createprogram', 'totara/program:deleteprogram', 'totara/program:configuredetails');
             if (has_any_capability($programcaps, $context)) {
                 $title = get_string('manageprogramsinthiscat', 'totara_program');
+                $output .= $this->single_button($url, $title, 'get');
             }
-            $output .= $this->single_button($url, $title, 'get');
         }
         if (totara_feature_visible('certifications')) {
             // Print button for switching to certification management.
@@ -1404,8 +1407,8 @@ class core_course_management_renderer extends plugin_renderer_base {
                 'totara/certification:configurecertification');
             if (has_any_capability($programcaps, $context)) {
                 $title = get_string('managecertifsinthiscat', 'totara_certification');
+                $output .= $this->single_button($url, $title, 'get');
             }
-            $output .= $this->single_button($url, $title, 'get');
         }
         $output .= $this->container_end();
 
