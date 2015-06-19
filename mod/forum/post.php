@@ -910,6 +910,10 @@ if ($mform_post->is_cancelled()) {
                         'forumid' => $forum->id,
                     )
                 );
+
+                // Totara archiving flag.
+                $discussion->archived = '0';
+
                 $event = \mod_forum\event\discussion_created::create($params);
                 $event->add_record_snapshot('forum_discussions', $discussion);
                 $event->trigger();
