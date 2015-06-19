@@ -362,4 +362,324 @@ class core_enrollib_testcase extends advanced_testcase {
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
+
+    /**
+     * Gets the user enrolment records that match the given criteria.
+     *
+     * @param $userid
+     * @param $courseid
+     * @param $method
+     * @return array
+     */
+    private function get_user_enrolments($userid, $courseid, $method) {
+        global $DB;
+
+        $sql = "SELECT ue.*
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} enrol ON ue.enrolid = enrol.id
+                 WHERE ue.userid = :userid AND enrol.courseid = :courseid AND enrol.enrol = :method";
+
+        return $DB->get_records_sql($sql, array('userid' => $userid, 'courseid' => $courseid, 'method' => $method));
+    }
+
+    /**
+     * Test unenrol_user.
+     *
+     * To make sure that other users, courses and enrolment plugins are not affected, we will set up:
+     * - user1 is enrolled manually in course1 and course2
+     * - user2 is enrolled manually in course2
+     * - user1 and user2 are enrolled via self in course1
+     * Then we will remove user1's manual course1 enrolment and check:
+     * - user1 is still enrolled in course1 via self and course2 manually
+     * - user2 is still enrolled in course1 via self and course2 manually
+     * Then we will remove user2's manual course2 enrolment and check:
+     * - user1 is still enrolled in course1 via self and course2 manually
+     * - user2 is still enrolled in course1 via self but not course2
+     *
+     * To run:
+     * vendor/bin/phpunit --filter test_unenrol_user --verbose core_enrollib_testcase enrol/tests/enrollib_test.php
+     */
+    public function test_unenrol_user() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        // Set up the objects for the test.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        // Check the user enrolments table for user1 and user2 before we start.
+        $userenrolmentsstart = $DB->get_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id})");
+        $this->assertEmpty($userenrolmentsstart);
+
+        // Enrolment plugins.
+        $manualplugin = enrol_get_plugin('manual');
+        $selfplugin = enrol_get_plugin('self');
+        $student = $DB->get_record('role', array('shortname' => 'student'));
+
+        // Enrol users in courses with various methods.
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($enrol, $user2->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user2->id, $student->id);
+
+        // Verify the data.
+        $this->assertEquals(5, $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course2->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course1->id, 'self')));
+
+        // Unenrol user1 from course1.
+        $sink = $this->redirectEvents();
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->unenrol_user($enrol, $user1->id);
+        $events = $sink->get_events();
+        $sink->close();
+
+        // Check the events.
+        $this->assertEquals(1, count($events)); // Just the user_enrolment_deleted event.
+        $event = reset($events);
+        $this->assertInstanceOf('core\event\user_enrolment_deleted', $event);
+        // Lastenrol must be false because this user is still enrolled via self.
+        $eventdata = $event->get_data();
+        $this->assertEquals(false, $eventdata['other']['userenrolment']['lastenrol']);
+
+        // Verify the data.
+        $this->assertEquals(4, $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course2->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course1->id, 'self')));
+
+        // Unenrol user2 from course2.
+        $sink = $this->redirectEvents();
+        $enrol = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->unenrol_user($enrol, $user2->id);
+        $events = $sink->get_events();
+        $sink->close();
+
+        // Check the events.
+        $this->assertEquals(2, count($events)); // User_enrolment_deleted and role_unassigned.
+        if (get_class($events[0]) == 'core\event\role_unassigned') { // Figure out which one is which.
+            $roleevent = $events[0];
+            $unassignedevent = $events[1];
+        } else {
+            $roleevent = $events[1];
+            $unassignedevent = $events[0];
+        }
+        $this->assertInstanceOf('core\event\role_unassigned', $roleevent);
+        $this->assertInstanceOf('core\event\user_enrolment_deleted', $unassignedevent);
+        // Lastenrol must be true because this user is no longer enroled at all.
+        $unassignedeventdata = $unassignedevent->get_data();
+        $this->assertEquals(true, $unassignedeventdata['other']['userenrolment']['lastenrol']);
+
+        // Verify the data.
+        $this->assertEquals(3, $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course1->id, 'self')));
+    }
+
+    /**
+     * Test unenrol_user_bulk.
+     *
+     * To make sure that other users, courses and enrolment plugins are not affected, we will set up:
+     * - user1 is enrolled manually in course1
+     * - user1 and user2 are enrolled via self in course1
+     * - user1 and user2 are enrolled via self in course2
+     * - user3 is enrolled via self in course1
+     * Then we will remove user1 and user2 from course1 and check:
+     * - user1 is still enrolled in course1 manually and course2 via self
+     * - user2 is still enrolled in course2 via self
+     * - user3 is still enrolled in course1 via self
+     * Then we will remove user3 from course1 and check:
+     * - user1 is still enrolled in course1 manually and course2 via self
+     * - user2 is still enrolled in course2 via self
+     * - user3 is not enrolled in any course
+     *
+     * To run:
+     * vendor/bin/phpunit --filter test_unenrol_user_bulk --verbose core_enrollib_testcase enrol/tests/enrollib_test.php
+     */
+    public function test_unenrol_user_bulk() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        // Set up the objects for the test.
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        // Check the user enrolments table for user1, user2 and user3 before we start.
+        $userenrolmentsstart = $DB->get_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id}, {$user3->id})");
+        $this->assertEmpty($userenrolmentsstart);
+
+        // Enrolment plugins.
+        $manualplugin = enrol_get_plugin('manual');
+        $selfplugin = enrol_get_plugin('self');
+        $student = $DB->get_record('role', array('shortname' => 'student'));
+
+        // Enrol users in courses with various methods.
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user2->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user1->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user2->id, $student->id);
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->enrol_user($enrol, $user3->id, $student->id);
+
+        // Verify the data.
+        $this->assertEquals(6,
+            $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id}, {$user3->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course1->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course2->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user3->id, $course1->id, 'self')));
+
+        // Unenrol user1 and user2 from course1 via self.
+        $sink = $this->redirectEvents();
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->unenrol_user_bulk($enrol, array($user1->id, $user2->id));
+        $events = $sink->get_events();
+        $sink->close();
+
+        // Check the events.
+        $this->assertEquals(7, count($events)); // Four bulk, two assignment deleted, one role unassigned.
+        $eventbulkenrolmentsstarted = null;
+        $eventbulkenrolmentsended = null;
+        $eventbulkroleassignmentsstarted = null;
+        $eventbulkroleassignmentsended = null;
+        $userenrolmentdeleteduser1 = null;
+        $userenrolmentdeleteduser2 = null;
+        $roleunassigneduser2 = null;
+        foreach ($events as $event) {
+            switch (get_class($event)) {
+                case 'totara_core\event\bulk_enrolments_started':
+                    $eventbulkenrolmentsstarted = $event;
+                    break;
+                case 'totara_core\event\bulk_enrolments_ended':
+                    $eventbulkenrolmentsended = $event;
+                    break;
+                case 'totara_core\event\bulk_role_assignments_started':
+                    $eventbulkroleassignmentsstarted = $event;
+                    break;
+                case 'totara_core\event\bulk_role_assignments_ended':
+                    $eventbulkroleassignmentsended = $event;
+                    break;
+                case 'core\event\user_enrolment_deleted':
+                    $data = $event->get_data();
+                    if ($data['relateduserid'] == $user1->id && $data['courseid'] == $course1->id) {
+                        $userenrolmentdeleteduser1 = $event;
+                    } else if ($data['relateduserid'] == $user2->id && $data['courseid'] == $course1->id) {
+                        $userenrolmentdeleteduser2 = $event;
+                    }
+                    break;
+                case 'core\event\role_unassigned':
+                    $data = $event->get_data();
+                    if ($data['relateduserid'] == $user2->id && $data['courseid'] == $course1->id) { // CHECK THIS VARIABLE!
+                        $roleunassigneduser2 = $event;
+                    }
+                    break;
+            }
+        }
+        $this->assertInstanceOf('totara_core\event\bulk_enrolments_started', $eventbulkenrolmentsstarted);
+        $this->assertInstanceOf('totara_core\event\bulk_enrolments_ended', $eventbulkenrolmentsended);
+        $this->assertInstanceOf('totara_core\event\bulk_role_assignments_started', $eventbulkroleassignmentsstarted);
+        $this->assertInstanceOf('totara_core\event\bulk_role_assignments_ended', $eventbulkroleassignmentsended);
+        $this->assertInstanceOf('core\event\user_enrolment_deleted', $userenrolmentdeleteduser1);
+        $this->assertInstanceOf('core\event\user_enrolment_deleted', $userenrolmentdeleteduser2);
+        $this->assertInstanceOf('core\event\role_unassigned', $roleunassigneduser2);
+        // Lastenrol must be true because this user is no longer enroled at all.
+        $unassignedeventdata = $userenrolmentdeleteduser1->get_data();
+        $this->assertEquals(false, $unassignedeventdata['other']['userenrolment']['lastenrol']);
+        $unassignedeventdata = $userenrolmentdeleteduser2->get_data();
+        $this->assertEquals(true, $unassignedeventdata['other']['userenrolment']['lastenrol']);
+
+        // Verify the data.
+        $this->assertEquals(4,
+            $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id}, {$user3->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course2->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user3->id, $course1->id, 'self')));
+
+        // Unenrol user3 from course1.
+        $sink = $this->redirectEvents();
+        $enrol = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'self'), '*', MUST_EXIST);
+        $selfplugin->unenrol_user_bulk($enrol, array($user3->id));
+        $events = $sink->get_events();
+        $sink->close();
+
+        // Check the events.
+        $this->assertEquals(6, count($events)); // Four bulk, one assignment deleted, one role unassigned = 6.
+        $eventbulkenrolmentsstarted = null;
+        $eventbulkenrolmentsended = null;
+        $eventbulkroleassignmentsstarted = null;
+        $eventbulkroleassignmentsended = null;
+        $userenrolmentdeleteduser = null;
+        $roleunassigneduser = null;
+        foreach ($events as $event) {
+            switch (get_class($event)) {
+                case 'totara_core\event\bulk_enrolments_started':
+                    $eventbulkenrolmentsstarted = $event;
+                    break;
+                case 'totara_core\event\bulk_enrolments_ended':
+                    $eventbulkenrolmentsended = $event;
+                    break;
+                case 'totara_core\event\bulk_role_assignments_started':
+                    $eventbulkroleassignmentsstarted = $event;
+                    break;
+                case 'totara_core\event\bulk_role_assignments_ended':
+                    $eventbulkroleassignmentsended = $event;
+                    break;
+                case 'core\event\user_enrolment_deleted':
+                    $data = $event->get_data();
+                    if ($data['relateduserid'] == $user3->id) {
+                        $userenrolmentdeleteduser = $event;
+                    }
+                    break;
+                case 'core\event\role_unassigned':
+                    $data = $event->get_data();
+                    if ($data['relateduserid'] == $user3->id) { // CHECK THIS VARIABLE!
+                        $roleunassigneduser = $event;
+                    }
+                    break;
+            }
+        }
+        $this->assertInstanceOf('totara_core\event\bulk_enrolments_started', $eventbulkenrolmentsstarted);
+        $this->assertInstanceOf('totara_core\event\bulk_enrolments_ended', $eventbulkenrolmentsended);
+        $this->assertInstanceOf('totara_core\event\bulk_role_assignments_started', $eventbulkroleassignmentsstarted);
+        $this->assertInstanceOf('totara_core\event\bulk_role_assignments_ended', $eventbulkroleassignmentsended);
+        $this->assertInstanceOf('core\event\user_enrolment_deleted', $userenrolmentdeleteduser);
+        $this->assertInstanceOf('core\event\role_unassigned', $roleunassigneduser);
+        // Lastenrol must be true because this user is no longer enroled at all.
+        $unassignedeventdata = $userenrolmentdeleteduser->get_data();
+        $this->assertEquals(true, $unassignedeventdata['other']['userenrolment']['lastenrol']);
+
+        // Verify the data.
+        $this->assertEquals(3,
+            $DB->count_records_select('user_enrolments', "userid IN ({$user1->id}, {$user2->id}, {$user3->id})"));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course1->id, 'manual')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user1->id, $course2->id, 'self')));
+        $this->assertEquals(1, count($this->get_user_enrolments($user2->id, $course2->id, 'self')));
+    }
 }

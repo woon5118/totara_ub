@@ -4192,9 +4192,15 @@ class facetoface_event_handler {
      * when there is limited capacity
      *
      * @param \core\event\user_enrolment_deleted $event
+     * @return true if no errors were encountered
      */
     public static function user_unenrolled(\core\event\user_enrolment_deleted $event) {
         global $DB;
+
+        if (!$event->other['userenrolment']['lastenrol']) {
+            // The user has another enrolment record for this course, so don't remove the f2f session.
+            return true;
+        }
 
         $uid = $event->relateduserid;
         $cid = $event->courseid;

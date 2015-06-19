@@ -37,4 +37,16 @@ $observers = array (
         'callback'  => 'enrol_category_observer::role_unassigned',
     ),
 
+    // Totara performance tricks.
+
+    array (
+        'eventname' => '\totara_core\event\bulk_role_assignments_started',
+        'callback'  => 'enrol_category_observer::bulk_started',
+    ),
+
+    array (
+        'eventname' => '\totara_core\event\bulk_role_assignments_ended',
+        'callback'  => 'enrol_category_observer::bulk_finished',
+    ),
+
 );

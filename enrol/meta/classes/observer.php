@@ -51,6 +51,7 @@ class enrol_meta_observer extends enrol_meta_handler {
      */
     public static function bulk_finished(\core\event\base $event) {
         self::$bulkinprogress = false;
+        // Don't do anything now - it will be done on the next cron run, as part of the '\core\task\legacy_plugin_cron_task' task.
     }
 
     /**

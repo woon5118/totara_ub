@@ -1575,7 +1575,7 @@ abstract class enrol_plugin {
      * @return void
      */
     public function unenrol_user_bulk(stdClass $instance, $userids) {
-        global $CFG, $USER, $DB;
+        global $CFG, $DB;
 
         $name = $this->get_name();
         $courseid = $instance->courseid;
@@ -1588,55 +1588,90 @@ abstract class enrol_plugin {
         }
         $context = context_course::instance($instance->courseid, MUST_EXIST);
 
-        list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
-        $sql = "SELECT *
-            FROM {user_enrolments}
-            WHERE enrolid = {$instance->id}
-            AND userid {$sqlin}";
-
-        $ue = $DB->get_records_sql($sql, $sqlinparams);
-        if (empty($ue)) {
-            // weird, users not enrolled
-            return;
-        }
-
-        // TODO perform in batches of 1000
-        role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id,
-            'component' => 'enrol_' . $name, 'itemid' => $instance->id));
-        $DB->delete_records_list('user_enrolments', 'id', array_keys($ue));
-
+        // Start the bulk event.
         \totara_core\event\bulk_enrolments_started::create_from_instance($instance)->trigger();
-        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
 
-        $sql = "SELECT ue.*
-                  FROM {user_enrolments} ue
-                  JOIN {enrol} e ON (e.id = ue.enrolid)
-                  WHERE e.courseid = ?
-                  AND ue.userid {$sqlin}";
-        $uenotlast = $DB->get_records_sql($sql, array_merge(array($courseid), $sqlinparams));
+        // Divide the users into batches to prevent sql problems.
+        $batches = array_chunk($userids, BATCH_INSERT_MAX_ROW_COUNT);
+        unset($userids);
 
-        if (empty($uenotlast)) {
-            // users' last enrolment intance in course - do big cleanup
-
-            require_once("$CFG->dirroot/group/lib.php");
-            require_once("$CFG->libdir/gradelib.php");
-
-            // remove all remaining roles
-            role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id), true, false);
-
-            //clean up ALL invisible user data from course if this is the last enrolment - groups, grades, etc.
-            groups_delete_group_members_bulk($courseid, $userids);
-
-            foreach ($userids as $userid) {
-                // TODO create bulk function for moar speed at some point
-                grade_user_unenrol($courseid, $userid);
+        // Process each batch of user ids.
+        foreach ($batches as $userids) {
+            // Find all the user enrolment records.
+            list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
+            $sql = "SELECT *
+                      FROM {user_enrolments}
+                     WHERE enrolid = {$instance->id}
+                       AND userid {$sqlin}";
+            $userenrolments = $DB->get_records_sql($sql, $sqlinparams);
+            if (empty($userenrolments)) {
+                // Weird, users not enrolled.
+                continue;
             }
 
-            list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userids);
-            $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}", array_merge(array($courseid), $sqlinparams));
+            // Unassign the batch then delete the user enrolment records.
+            role_unassign_all_bulk(array('userids' => $userids, 'contextid' => $context->id,
+                'component' => 'enrol_' . $name, 'itemid' => $instance->id));
+            $DB->delete_records_list('user_enrolments', 'id', array_keys($userenrolments));
+
+            // Find the users who still have user enrolment records for this course.
+            $sql = "SELECT DISTINCT ue.userid
+                      FROM {user_enrolments} ue
+                      JOIN {enrol} e ON (e.id = ue.enrolid)
+                     WHERE e.courseid = ?
+                       AND ue.userid {$sqlin}";
+            $userenrolmentsnotlast = $DB->get_fieldset_sql($sql, array_merge(array($courseid), $sqlinparams));
+
+            // These users don't have any user enrolment records remaining.
+            $userswithoutuserenrolments = array_diff($userids, $userenrolmentsnotlast);
+
+            if (!empty($userswithoutuserenrolments)) {
+                // Users' last enrolment intance in course - do big cleanup.
+
+                require_once("$CFG->dirroot/group/lib.php");
+                require_once("$CFG->libdir/gradelib.php");
+
+                // Remove all remaining roles.
+                role_unassign_all_bulk(array('userids' => $userswithoutuserenrolments, 'contextid' => $context->id), true, false);
+
+                // Clean up ALL invisible user data from course if this is the last enrolment - groups, grades, etc.
+                groups_delete_group_members_bulk($courseid, $userswithoutuserenrolments);
+
+                foreach ($userswithoutuserenrolments as $userid) {
+                    // TODO create bulk function for more speed at some point.
+                    grade_user_unenrol($courseid, $userid);
+                }
+
+                list($sqlin, $sqlinparams) = $DB->get_in_or_equal($userswithoutuserenrolments);
+                $DB->delete_records_select('user_lastaccess', "courseid = ? AND userid {$sqlin}",
+                    array_merge(array($courseid), $sqlinparams));
+            }
+
+            // Trigger event.
+            foreach ($userenrolments as $userenrolment) {
+                $userenrolment->courseid  = $courseid;
+                $userenrolment->enrol     = $name;
+                $userenrolment->lastenrol = in_array($userenrolment->userid, $userswithoutuserenrolments);
+                $event = \core\event\user_enrolment_deleted::create(
+                    array(
+                        'courseid' => $courseid,
+                        'context' => $context,
+                        'relateduserid' => $userenrolment->userid,
+                        'objectid' => $userenrolment->id,
+                        'other' => array(
+                            'userenrolment' => (array)$userenrolment,
+                            'enrol' => $name
+                        )
+                    )
+                );
+                $event->trigger();
+            }
         }
 
-        // reset all enrol caches
+        // End the bulk event.
+        \totara_core\event\bulk_enrolments_ended::create_from_instance($instance)->trigger();
+
+        // Reset all enrol caches.
         $context->mark_dirty();
     }
 

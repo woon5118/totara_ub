@@ -2066,8 +2066,21 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
         if ($context = context::instance_by_id($params['contextid'], IGNORE_MISSING)) {
             // this is a bit expensive but necessary
             $context->mark_dirty();
-            // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
             \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+            foreach ($ras as $ra) {
+                $event = \core\event\role_unassigned::create(array(
+                    'context' => $context,
+                    'objectid' => $ra->roleid,
+                    'relateduserid' => $ra->userid,
+                    'other' => array(
+                        'id' => $ra->id,
+                        'component' => $ra->component,
+                        'itemid' => $ra->itemid
+                    )
+                ));
+                $event->add_record_snapshot('role_assignments', $ra);
+                $event->trigger();
+            }
             \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
         }
         unset($ras);
@@ -2092,8 +2105,21 @@ function role_unassign_all_bulk(array $params, $subcontexts = false, $includeman
                     $DB->delete_records_select('role_assignments', "id {$sqlin}", $sqlparams);
                     // this is a bit expensive but necessary
                     $context->mark_dirty();
-                    // Note: we never triggered individual events here for performance reasons - see cohort enrol for better way.
                     \totara_core\event\bulk_role_assignments_started::create_from_context($context)->trigger();
+                    foreach ($ras as $ra) {
+                        $event = \core\event\role_unassigned::create(array(
+                            'context' => $context,
+                            'objectid' => $ra->roleid,
+                            'relateduserid' => $ra->userid,
+                            'other' => array(
+                                'id' => $ra->id,
+                                'component' => $ra->component,
+                                'itemid' => $ra->itemid
+                            )
+                        ));
+                        $event->add_record_snapshot('role_assignments', $ra);
+                        $event->trigger();
+                    }
                     \totara_core\event\bulk_role_assignments_ended::create_from_context($context)->trigger();
                 }
             }

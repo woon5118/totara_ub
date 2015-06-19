@@ -32,6 +32,26 @@ defined('MOODLE_INTERNAL') || die();
  * it may fail sometimes, so we always do a full sync in cron too.
  */
 class enrol_category_observer {
+    /** @var bool $bulkinprogress bulk indicator */
+    static protected $bulkinprogress = false;
+
+    /**
+     * Start of bulk processing.
+     * @param \core\event\base $event
+     */
+    public static function bulk_started(\core\event\base $event) {
+        self::$bulkinprogress = true;
+    }
+
+    /**
+     * End of bulk processing.
+     * @param \core\event\base $event
+     */
+    public static function bulk_finished(\core\event\base $event) {
+        self::$bulkinprogress = false;
+        // Don't do anything now - it will be done on the next cron run, as part of the '\core\task\legacy_plugin_cron_task' task.
+    }
+
     /**
      * Triggered when user is assigned a new role.
      *
@@ -39,6 +59,11 @@ class enrol_category_observer {
      */
     public static function role_assigned(\core\event\role_assigned $event) {
         global $DB;
+
+        if (self::$bulkinprogress) {
+            // Wait till bulk finished event, which will then do nothing, and assignments will be processed on cron.
+            return true;
+        }
 
         if (!enrol_is_enabled('category')) {
             return;
@@ -98,6 +123,11 @@ class enrol_category_observer {
      */
     public static function role_unassigned(\core\event\role_unassigned $event) {
         global $DB;
+
+        if (self::$bulkinprogress) {
+            // Wait till bulk finished event, which will then do nothing, and assignments will be processed on cron.
+            return true;
+        }
 
         if (!enrol_is_enabled('category')) {
             return;
