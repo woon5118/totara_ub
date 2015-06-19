@@ -76,6 +76,18 @@ class rb_base_embedded {
     }
 
     /**
+     * Is this embedded report usable?
+     *
+     * If true returned the report is not displayed in the list of all embedded reports.
+     * If source is ignored then this method is irrelevant.
+     *
+     * @return bool
+     */
+    public function is_ignored() {
+        return false;
+    }
+
+    /**
      * Look up the embedded name for a heading for a particular embedded report
      *
      * @param string $type The type of the column

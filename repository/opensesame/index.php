@@ -24,6 +24,7 @@
 require(__DIR__ . '/../../config.php');
 require_once("$CFG->dirroot/lib/adminlib.php");
 require_once("$CFG->dirroot/repository/lib.php");
+require_once("$CFG->dirroot/totara/reportbuilder/lib.php");
 
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_ALPHANUMEXT);

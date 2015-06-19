@@ -161,6 +161,18 @@ abstract class rb_base_source {
         }
     }
 
+    /**
+     * Is this report source usable?
+     *
+     * Override and return true if the source should be hidden
+     * in all user interfaces. For example when the source
+     * requires some subsystem to be enabled.
+     *
+     * @return bool
+     */
+    public function is_ignored() {
+        return false;
+    }
 
     /**
      * Set redirect url and (optionally) message for use in default pre_display_actions function.

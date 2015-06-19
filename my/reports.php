@@ -74,7 +74,7 @@ echo $OUTPUT->container_start(null, 'myreports_section');
 echo totara_print_report_manager();
 echo $OUTPUT->container_end();
 
-if (reportbuilder_get_reports()){
+if (reportbuilder::get_user_permitted_reports()){
     echo $OUTPUT->container_start(null, 'scheduledreports_section');
     echo $OUTPUT->container_start(null, 'scheduledreports_section_inner');
     echo html_writer::empty_tag('br');

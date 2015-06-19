@@ -566,6 +566,9 @@ class reportbuilder {
 
     protected static $reportrecordcache = null;
 
+    protected static $cache_userpermittedreports = null;
+    protected static $cache_userpermittedreports_userid = null;
+
     /**
      * Retreives or creates a cached array of data objects for reports,
      * and returns the specified types of report, defaulting to all reports.
@@ -596,6 +599,50 @@ class reportbuilder {
     }
 
     /**
+     * Reset static and session caches.
+     */
+    public static function reset_caches() {
+        global $SESSION;
+
+        unset($SESSION->reportbuilder);
+
+        self::$reportrecordcache = null;
+        self::$cache_userpermittedreports = null;
+        self::$cache_userpermittedreports_userid = null;
+    }
+
+    /**
+     * Returns reports that the current user can view.
+     *
+     * @return array Array of report records
+     */
+    public static function get_user_permitted_reports() {
+        global $USER;
+
+        if (isset(self::$cache_userpermittedreports) and $USER->id == self::$cache_userpermittedreports_userid) {
+            return self::$cache_userpermittedreports;
+        }
+
+        self::$cache_userpermittedreports_userid = $USER->id;
+        $alluserreports = reportbuilder::get_user_generated_reports();
+
+        if (!$alluserreports) {
+            self::$cache_userpermittedreports = array();
+            return self::$cache_userpermittedreports;
+        }
+
+        self::$cache_userpermittedreports = reportbuilder::get_permitted_reports($USER->id, false);
+        foreach (self::$cache_userpermittedreports as $id => $unused) {
+            if (!isset($alluserreports[$id])) {
+                unset(self::$cache_userpermittedreports[$id]);
+            }
+        }
+
+        return self::$cache_userpermittedreports;
+
+    }
+
+    /**
      * @return array()  Of normalised database objects for user generated reports.
      */
     public static function get_user_generated_reports() {
@@ -606,7 +653,17 @@ class reportbuilder {
      * @return array()  Of normalised database objects for embedded reports.
      */
     public static function get_embedded_reports() {
-        return self::get_report_records(true, false);
+        $reports = self::get_report_records(true, false);
+
+        // NOTE: luckily this is not called often, let's filter out
+        //       the ignored embedded reports here to improve the performance.
+        foreach ($reports as $i => $report) {
+            $embed = reportbuilder_get_embedded_report_object($report->shortname);
+            if (!$embed or $embed->is_ignored()) {
+                unset($reports[$i]);
+            }
+        }
+        return $reports;
     }
 
     /**
@@ -658,12 +715,17 @@ class reportbuilder {
 
             // Add extra sourcetitle property to the report object to avoid loading later.
             $src = self::get_source_object($report->source, true, false);
-            if ($src) {
-                $report->sourcetitle = $src->sourcetitle;
-            } else {
+            if (!$src) {
                 // If you can't find the reports source, toss it.
                 unset($reports[$report->id]);
+                continue;
             }
+            if ($src->is_ignored()) {
+                // This source is ignored, do not show it anywhere.
+                unset($reports[$report->id]);
+                continue;
+            }
+            $report->sourcetitle = $src->sourcetitle;
         }
         return $reports;
     }
@@ -689,6 +751,9 @@ class reportbuilder {
                     }
                     $source = $matches[1];
                     $src = reportbuilder::get_source_object($source);
+                    if ($src->is_ignored()) {
+                        continue;
+                    }
                     $sourcename = $src->sourcetitle;
                     $preproc = $src->preproc;
 
@@ -4645,6 +4710,8 @@ function reportbuilder_fix_schedule($reportid) {
  *
  * @param boolean showhidden If true include hidden reports
  *
+ * @deprecated since Totara 2.9 - use reportbuilde::get_user_permitted_reports() instead
+ *
  * @return array Array of report records
  */
 function reportbuilder_get_reports($showhidden=false) {
@@ -4826,6 +4893,13 @@ function reportbuilder_send_scheduled_report($sched) {
     }
 
     if (!$report = $DB->get_record('report_builder', array('id' => $sched->reportid))) {
+        error_log(get_string('error:invalidreportid', 'totara_reportbuilder'));
+        return false;
+    }
+
+    // Make sure the source exists and is not ignored.
+    $alluserreports = reportbuilder::get_user_generated_reports();
+    if (!isset($alluserreports[$sched->reportid])) {
         error_log(get_string('error:invalidreportid', 'totara_reportbuilder'));
         return false;
     }

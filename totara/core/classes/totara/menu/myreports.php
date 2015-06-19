@@ -46,7 +46,7 @@ class myreports extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
-        global $CFG, $reportbuilder_permittedreports;
+        global $CFG;
 
         static $cache = null;
         if (isset($cache)) {
@@ -54,9 +54,7 @@ class myreports extends \totara_core\totara\menu\item {
         }
 
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-        if (!isset($reportbuilder_permittedreports) || !is_array($reportbuilder_permittedreports)) {
-            $reportbuilder_permittedreports = \reportbuilder::get_permitted_reports();
-        }
+        $reportbuilder_permittedreports = \reportbuilder::get_user_permitted_reports();
         $hasreports = (is_array($reportbuilder_permittedreports) && (count($reportbuilder_permittedreports) > 0));
         if ($hasreports) {
             $cache = menu::SHOW_ALWAYS;

@@ -796,12 +796,10 @@ function totara_print_my_team_nav() {
 * print out the table of visible reports
 */
 function totara_print_report_manager() {
-    global $CFG, $USER, $PAGE, $reportbuilder_permittedreports;
+    global $CFG, $USER, $PAGE;
     require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
-    if (!isset($reportbuilder_permittedreports) || !is_array($reportbuilder_permittedreports)) {
-        $reportbuilder_permittedreports = reportbuilder::get_permitted_reports();
-    }
+    $reportbuilder_permittedreports = reportbuilder::get_user_permitted_reports();
 
     $context = context_system::instance();
     $canedit = has_capability('totara/reportbuilder:managereports',$context);
@@ -850,6 +848,7 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
     require_once($CFG->dirroot . '/calendar/lib.php');
     require_once($CFG->dirroot . '/totara/reportbuilder/scheduled_forms.php');
 
+    $myreports = reportbuilder::get_user_permitted_reports();
 
     $sql = "SELECT rbs.*, rb.fullname
             FROM {report_builder_schedule} rbs
@@ -868,6 +867,11 @@ function totara_print_scheduled_reports($showoptions=true, $showaddform=true, $s
     $scheduledreports = $DB->get_records_sql($sql, $parameters);
     //pre-process before sending to renderer
     foreach ($scheduledreports as $sched) {
+        if (!isset($myreports[$sched->reportid])) {
+            // Cannot access this report.
+            unset($scheduledreports[$sched->id]);
+            continue;
+        }
         //data column
         if ($sched->savedsearchid != 0){
             $sched->data = $DB->get_field('report_builder_saved', 'name', array('id' => $sched->savedsearchid));

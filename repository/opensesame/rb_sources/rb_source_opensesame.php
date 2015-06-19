@@ -44,6 +44,15 @@ class rb_source_opensesame extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Hide this source if site not registered.
+     * @return bool
+     */
+    public function is_ignored() {
+        $key = get_config('repository_opensesame', 'tenantkey');
+        return empty($key);
+    }
+
     protected function define_joinlist() {
         $joinlist = array();
 
