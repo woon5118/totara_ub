@@ -277,6 +277,16 @@ class enrol_totara_program_plugin extends enrol_plugin {
         role_assign($roleid, $userid, $contextid, 'enrol_'.$this->get_name(), $instance->id);
     }
 
+    /**
+     * Can current user disable program enrolments in a course?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('moodle/course:enrolconfig', $context);
+    }
 }
 
 /**
