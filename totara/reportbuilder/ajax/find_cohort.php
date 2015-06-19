@@ -26,6 +26,7 @@ require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content.class.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
 
 require_login();
+require_sesskey();
 $context = context_system::instance();
 
 // Get program id and check capabilities

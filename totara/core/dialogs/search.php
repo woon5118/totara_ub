@@ -43,7 +43,8 @@ $data = array(
     'search'        => true,
     'query'         => $query,
     'searchtype'    => $searchtype,
-    'page'          => $page
+    'page'          => $page,
+    'sesskey'       => sesskey()
 );
 $thisurl = new moodle_url(strip_querystring(qualified_me()), array_merge($data, $this->urlparams));
 
