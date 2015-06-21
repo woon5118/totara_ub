@@ -146,9 +146,28 @@ function xmldb_totara_certification_upgrade($oldversion) {
             SET status = ?
             WHERE renewalstatus = ?";
         $DB->execute($sql, array(CERTIFSTATUS_EXPIRED, CERTIFRENEWALSTATUS_EXPIRED));
-
         // Certification savepoint reached.
         totara_upgrade_mod_savepoint(true, 2015030202, 'totara_certification');
+    }
+
+    // T-14315 Copy earliest timestarted from prog_user_assignment to prog_completion for empty values.
+    if ($oldversion < 2015030203) {
+
+        $sql = "UPDATE {prog_completion}
+                   SET timestarted =
+                       COALESCE ((SELECT MIN(pua.timeassigned)
+                                    FROM {prog_user_assignment} pua
+                                   WHERE pua.programid = {prog_completion}.programid
+                                     AND pua.userid = {prog_completion}.userid
+                                     AND pua.timeassigned > 0),
+                                 0)
+                 WHERE timestarted = 0
+                   AND coursesetid = 0";
+
+        $DB->execute($sql);
+
+        // Certification savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015030203, 'totara_certification');
     }
 
     return true;

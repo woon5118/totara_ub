@@ -1299,7 +1299,7 @@ class program {
             if ($prog_completion) {
                 $startdatestr = ($prog_completion->timestarted != 0
                                 ? $this->display_date_as_text($prog_completion->timestarted)
-                                : get_string('nostartdate', 'totara_program'));
+                                : get_string('unknown', 'totara_program'));
                 if ($iscertif) {
                     $duedatestr = prog_display_duedate($timedue, $this->id, $prog_completion->userid, $certifcompletion->certifpath, $certifcompletion->status);
                 } else {
@@ -1308,7 +1308,7 @@ class program {
                 $duedatestr .= $request;
 
                 $out .= html_writer::start_tag('div', array('id' => 'progressbar', 'class' => 'programprogress'));
-                $out .= html_writer::tag('div', get_string('startdate', 'totara_program') . ': '
+                $out .= html_writer::tag('div', get_string('dateassigned', 'totara_program') . ': '
                                 . $startdatestr, array('class' => 'item'));
                 $out .= html_writer::tag('div', get_string('duedate', 'totara_program').': '
                                 . $duedatestr, array('class' => 'item'));

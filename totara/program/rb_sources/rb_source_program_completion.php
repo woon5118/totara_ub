@@ -125,7 +125,7 @@ class rb_source_program_completion extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'progcompletion',
             'starteddate',
-            get_string('starteddate', 'rb_source_program_completion'),
+            get_string('dateassigned', 'rb_source_program_completion'),
             'base.timestarted',
             array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
         );
@@ -276,7 +276,7 @@ class rb_source_program_completion extends rb_base_source {
         $filteroptions[] = new rb_filter_option(
             'progcompletion',
             'starteddate',
-            get_string('starteddate', 'rb_source_program_completion'),
+            get_string('dateassigned', 'rb_source_program_completion'),
             'date'
         );
 

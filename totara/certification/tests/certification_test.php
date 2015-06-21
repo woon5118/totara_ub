@@ -644,15 +644,14 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                         'coursesetid' => 0));
                 $this->assertCount(1, $progcompletions); // Just one.
                 $progcompletion = reset($progcompletions);
+                // When it was started.
+                $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
+                $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                 if ($didfirstcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during window opening.
-                    $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
-                    // When it was started.
-                    $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
-                    $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                     if ($hascompletiontime) {
                         $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
                     } else {
@@ -768,19 +767,17 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                         'coursesetid' => 0));
                 $this->assertCount(1, $progcompletions); // Just one.
                 $progcompletion = reset($progcompletions);
+                // When it was started.
+                $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
+                $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                 if ($didsecondcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status); // Set when completed.
-                    $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else if ($didfirstcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during window opening.
-                    $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
-                    // When it was started.
-                    $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
-                    $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                     if ($i % 2) {
                         $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
                     } else {
@@ -906,19 +903,17 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                         'coursesetid' => 0));
                 $this->assertCount(1, $progcompletions); // Just one.
                 $progcompletion = reset($progcompletions);
+                // When it was started.
+                $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
+                $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                 if ($didsecondcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during window opening.
-                    $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else if ($didfirstcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during window opening.
-                    $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set when certified.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Status is incomplete.
-                    // When it was started.
-                    $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
-                    $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                     if ($hascompletiontime) {
                         $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
                     } else {
@@ -1047,21 +1042,14 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
                         'coursesetid' => 0));
                 $this->assertCount(1, $progcompletions); // Just one.
                 $progcompletion = reset($progcompletions);
+                // When it was started (these users have never had a window open).
+                $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
+                $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                 if ($didthirdcompletion) {
                     $this->assertEquals(STATUS_PROGRAM_COMPLETE, $progcompletion->status); // Set when completed.
-                    if ($didfirstcompletion) {
-                        $this->assertEquals(0, $progcompletion->timestarted); // Reset to 0 during window opening.
-                    } else {
-                        // When it was started (these users have never had a window open).
-                        $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
-                        $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
-                    }
                     $this->assertEquals($timeexpires, $progcompletion->timedue); // Set during window opening.
                 } else {
                     $this->assertEquals(STATUS_PROGRAM_INCOMPLETE, $progcompletion->status); // Set during setup.
-                    // When it was started.
-                    $this->assertGreaterThan($this->setuptimeminimum, $progcompletion->timestarted);
-                    $this->assertLessThan($this->setuptimemaximum, $progcompletion->timestarted);
                     if ($hascompletiontime) {
                         $this->assertEquals($this->completiontime, $progcompletion->timedue); // Has timedue.
                     } else {

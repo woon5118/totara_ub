@@ -226,7 +226,7 @@ class rb_source_program_overview extends rb_base_source {
         $columnoptions[] = new rb_column_option(
             'program_completion',
             'timestarted',
-            get_string('timestart', 'rb_source_program_overview'),
+            get_string('dateassigned', 'rb_source_program_overview'),
             'base.timestarted',
             array(
                 'joins' => 'base',
