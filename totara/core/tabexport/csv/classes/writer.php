@@ -32,38 +32,80 @@ use \totara_core\tabexport_writer;
  * @package tabexport_csv
  */
 class writer extends tabexport_writer {
+    /** @var string */
+    protected $delimiter;
+
+    /** @var string */
+    protected $enclosure;
+
     /**
      * Constructor.
      *
      * @param tabexport_source $source
      */
     public function __construct(tabexport_source $source) {
-        $source->set_format('text');
+        $source->set_format('csv');
         parent::__construct($source);
 
-        // Increasing the execution time and available memory.
+        // For now there are no settings for these.
+        $this->delimiter = ',';
+        $this->enclosure = '"';
+
+        // Increasing the execution time, no need for more memory any more.
         \core_php_time_limit::raise(60 * 60 * 2);
-        raise_memory_limit(MEMORY_HUGE);
+    }
+
+    protected function add_row($handle, $row) {
+        fputcsv($handle, $row, $this->delimiter, $this->enclosure);
     }
 
     /**
      * Add all data to export.
      *
-     * @param \csv_export_writer $export
+     * @param resource $handle
      */
-    protected function add_all_data(\csv_export_writer $export) {
-        $row = array();
+    protected function add_all_data($handle) {
         foreach ($this->source->get_headings() as $heading) {
             $row[] = $heading;
         }
-
-        $export->add_data($row);
+        $this->add_row($handle, $row);
 
         foreach ($this->source as $row) {
-            $export->add_data($row);
+            $this->add_row($handle, $row);
         }
 
+        fclose($handle);
         $this->source->close();
+    }
+
+    /**
+     * Output file headers to initialise the download of the file.
+     * @param string $filename wiithout extension
+     */
+    protected function send_headers($filename) {
+        $filename = $filename . '.' . self::get_file_extension();
+
+        // Always force download here.
+        if (is_https()) { // HTTPS sites - watch out for IE! KB812935 and KB316431.
+            header('Cache-Control: private, max-age=10, no-transform');
+            header('Pragma: ');
+        } else { //normal http - prevent caching at all cost
+            header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0, no-transform');
+            header('Pragma: no-cache');
+        }
+        header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
+        header('X-Content-Type-Options: nosniff');
+
+        if (defined('BEHAT_SITE_RUNNING')) {
+            // Behat cannot deal with force-downloaded files,
+            // let's open the file in browser instead so that behat may assert the contents.
+            header('Content-Type: text/plain');
+            header('Content-Disposition: inline; filename="'.$filename.'"');
+            return;
+        }
+
+        header('Content-Type: application/x-forcedownload');
+        header('Content-Disposition: attachment; filename="'.$filename.'"');
     }
 
     /**
@@ -73,14 +115,24 @@ class writer extends tabexport_writer {
      * @return void serves the file and exits.
      */
     public function send_file($filename) {
-        global $CFG;
-        require_once("{$CFG->libdir}/csvlib.class.php");
+        // Send errors to log file!
+        @ini_set('display_errors', '0');
+        @ini_set('log_errors', '1');
 
-        $export = new \csv_export_writer();
-        $export->filename = $filename . '.' . self::get_file_extension();
-        $this->add_all_data($export);
+        $this->send_headers($filename);
 
-        $export->download_file();
+        // Make sure there is no other buffering or compression active.
+        disable_output_buffering();
+        ob_implicit_flush(false);
+
+        // Buffer the output and compress if possible.
+        if (!ob_start("ob_gzhandler", 1)) {
+            ob_start(null, 1);
+        }
+
+        $handle = fopen('php://output', 'w');
+        $this->add_all_data($handle);
+
         die;
     }
 
@@ -91,19 +143,9 @@ class writer extends tabexport_writer {
      * @return bool success
      */
     public function save_file($file) {
-        global $CFG;
-        require_once("{$CFG->libdir}/csvlib.class.php");
-
         @unlink($file);
-
-        $export = new \csv_export_writer();
-
-        $export->filename = 'export.csv';
-        $this->add_all_data($export);
-
-        $fp = fopen($file, "w");
-        fwrite($fp, $export->print_csv_data(true));
-        fclose($fp);
+        $handle = fopen($file, "w");
+        $this->add_all_data($handle);
 
         @chmod($file, (fileperms(dirname($file)) & 0666));
         return file_exists($file);
