@@ -4297,9 +4297,8 @@ function sort_by_roleassignment_authority($users, context $context, $roles = arr
  * The caller function is responsible for including all the
  * $sort fields in $fields param.
  *
- * If $roleid is an array or is empty (all roles) you need to set $fields
- * (and $sort by extension) params according to it, as the first field
- * returned by the database should be unique (ra.id is the best candidate).
+ * If $roleid contains no role or if there are more roles in array
+ * you should specify r.sortorder in $sort parameter.
  *
  * @param int $roleid (can also be an array of ints!)
  * @param context $context
@@ -4329,22 +4328,7 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
                   'r.shortname AS roleshortname, rn.name AS rolecoursealias';
     }
 
-    // Prevent wrong function uses.
-    if ((empty($roleid) || is_array($roleid)) && (strpos($fields, 'ra.id') !== 0 and $fields != 'u.*')) {
-        debugging('get_role_users() without specifying one single roleid needs to be called prefixing ' .
-            'role assignments id (ra.id) as unique field, you can use $fields param for it.');
-
-        if (!empty($roleid)) {
-            // Solving partially the issue when specifying multiple roles.
-            $users = array();
-            foreach ($roleid as $id) {
-                // Ignoring duplicated keys keeping the first user appearance.
-                $users = $users + get_role_users($id, $context, $parent, $fields, $sort, $all, $group,
-                    $limitfrom, $limitnum, $extrawheretest, $whereorsortparams);
-            }
-            return $users;
-        }
-    }
+    // Totara: Moodle had some weird code dealing with multiple roles introduced by MDL-22309 - let's use recordsets instead!
 
     $parentcontexts = '';
     if ($parent) {
@@ -4406,7 +4390,7 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
         $ejoin = "";
     }
 
-    $sql = "SELECT DISTINCT $fields, ra.roleid
+    $sql = "SELECT $fields, ra.roleid
               FROM {role_assignments} ra
               JOIN {user} u ON u.id = ra.userid
               JOIN {role} r ON ra.roleid = r.id
@@ -4419,7 +4403,16 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
                    $extrawheretest
           ORDER BY $sort";                  // join now so that we can just use fullname() later
 
-    return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
+    $rs = $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+
+    $users = array();
+    // We do not want duplicates here - each user returned only once.
+    foreach ($rs as $user) {
+        $arr = (array)$user;
+        $first = reset($arr);
+        $users[$first] = $user;
+    }
+    return $users;
 }
 
 /**

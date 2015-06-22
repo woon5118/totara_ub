@@ -661,7 +661,8 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         if (!empty($CFG->coursecontact)) {
             $croles = explode(',', $CFG->coursecontact);
             list($sort, $sortparams) = users_order_by_sql('u');
-            $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null, '', '', '', '', $sortparams);
+            // Totara: we only use the first user - ignore hacks from MDL-22309.
+            $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null, '', 0, 1, '', $sortparams);
         }
         if ($rusers) {
             $contact = reset($rusers);

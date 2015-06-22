@@ -206,8 +206,9 @@ class send_reminder_messages_task extends \core\task\scheduled_task {
                                 $context = \context_course::instance($course->id);
                                 $croles = explode(',', $CFG->coursecontact);
                                 list($sort, $sortparams) = users_order_by_sql('u');
+                                // Totara: we only use the first user - ignore hacks from MDL-22309.
                                 $rusers = get_role_users($croles, $context, true, '', 'r.sortorder ASC, ' . $sort, null,
-                                        '', '', '', '', $sortparams);
+                                        '', 0, 1, '', $sortparams);
                             }
                             if ($rusers) {
                                 $contact = reset($rusers);

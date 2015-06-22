@@ -1437,18 +1437,28 @@ class core_accesslib_testcase extends advanced_testcase {
         $this->assertCount(1, $users);
         $this->assertArrayHasKey($user1->id, $users);
 
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'ra.id', 'ra.id');
+        // Totara: no debugging from MDL-22309 expected here!
+
+        $users = get_role_users(array($teacherrole->id), $coursecontext, false, 'u.id, u.email, u.idnumber', 'u.idnumber', null, $group->id);
         $this->assertDebuggingNotCalled();
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'ra.userid', 'ra.userid');
-        $this->assertDebuggingCalled('get_role_users() without specifying one single roleid needs to be called prefixing ' .
-            'role assignments id (ra.id) as unique field, you can use $fields param for it.');
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false);
-        $this->assertDebuggingCalled('get_role_users() without specifying one single roleid needs to be called prefixing ' .
-            'role assignments id (ra.id) as unique field, you can use $fields param for it.');
-        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext,
-            false, 'u.id, u.firstname', 'u.id, u.firstname');
-        $this->assertDebuggingCalled('get_role_users() without specifying one single roleid needs to be called prefixing ' .
-            'role assignments id (ra.id) as unique field, you can use $fields param for it.');
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($user3->id, $users);
+
+        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, ra.roleid', 'r.sortorder ASC');
+        $this->assertDebuggingNotCalled();
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($user4->id, $users);
+        $user = $users[$user4->id];
+        $this->assertEquals($studentrole->id, $user->roleid);
+        $this->assertEquals($user4->id, $user->id);
+
+        $users = get_role_users(array($noeditteacherrole->id, $studentrole->id), $coursecontext, false, 'u.id, u.username, ra.roleid', 'r.sortorder DESC');
+        $this->assertDebuggingNotCalled();
+        $this->assertCount(1, $users);
+        $this->assertArrayHasKey($user4->id, $users);
+        $user = $users[$user4->id];
+        $this->assertEquals($noeditteacherrole->id, $user->roleid);
+        $this->assertEquals($user4->id, $user->id);
     }
 
     /**
