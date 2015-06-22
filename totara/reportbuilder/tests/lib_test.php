@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_base_content.php'
 require_once($CFG->dirroot . '/totara/core/lib/scheduler.php');
 
 class totara_reportbuilder_lib_testcase extends advanced_testcase {
+    use totara_reportbuilder\phpunit\report_testing;
     /** @var reportbuilder */
     public $rb;
 
@@ -1444,5 +1445,46 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('report_builder', array('id' => $rb->_id)));
         reportbuilder_delete_report($rb->_id);
         $this->assertFalse($DB->record_exists('report_builder', array('id' => $rb->_id)));
+    }
+
+    /**
+     * Test that sql concatention used in file names are working correctly
+     */
+    public function test_fullname_join_sql() {
+        global $DB, $CFG;
+        $user = $this->getDataGenerator()->create_user(array('username' => 'test', 'firstname'=>'first', 'lastname'=>'last'));
+
+        // Force set middlename field to null, because generator will add some randome string there.
+        $DB->execute('UPDATE {user} SET middlename = NULL WHERE id = ?', array($user->id));
+
+        // Set fullname setting.
+        $origfullnamedisplay = $CFG->fullnamedisplay;
+        $CFG->fullnamedisplay = 'firstname middlename lastname';
+
+        // Create report.
+        $rid = $this->create_report('user', 'Test user report 1');
+
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        $this->add_column($report, 'user', 'namelinkicon', null, null, '', 0);
+        $this->add_column($report, 'user', 'username', null, null, '', 0);
+
+        // Get report.
+        $report = new reportbuilder($rid, null, false, null, null, true);
+        list($sql, $params, $cache) = $report->build_query(false, false, false);
+        $records = $DB->get_recordset_sql($sql, $params);
+
+        // Assert.
+        $found = false;
+        foreach ($records as $record) {
+            if ($record->id == $user->id) {
+                $found = true;
+                $this->assertEquals('first  last', $record->user_namelinkicon);
+                break;
+            }
+        }
+        $this->assertTrue($found);
+
+        // Revert CFG changes.
+        $CFG->fullnamedisplay = $origfullnamedisplay;
     }
 }

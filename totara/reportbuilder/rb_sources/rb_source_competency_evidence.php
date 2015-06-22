@@ -104,8 +104,8 @@ class rb_source_competency_evidence extends rb_base_source {
     protected function define_columnoptions() {
         global $DB;
 
-        $usednamefields = totara_get_all_user_name_fields(false, 'assessor', null, null, true);
-        $allnamefields = totara_get_all_user_name_fields(false, 'assessor');
+        $usednamefields = totara_get_all_user_name_fields_join('assessor', null, true);
+        $allnamefields = totara_get_all_user_name_fields_join('assessor');
 
         $columnoptions = array(
             new rb_column_option(

@@ -214,8 +214,8 @@ class rb_source_user extends rb_base_source {
                         )
         );
 
-        $usednamefields = totara_get_all_user_name_fields(false, 'base', null, null, true);
-        $allnamefields = totara_get_all_user_name_fields(false, 'base');
+        $usednamefields = totara_get_all_user_name_fields_join('base', null, true);
+        $allnamefields = totara_get_all_user_name_fields_join('base');
         $columnoptions[] = new rb_column_option(
                         'user',
                         'namewithlinks',
@@ -395,8 +395,8 @@ class rb_source_user extends rb_base_source {
     /**
      * A rb_column_options->displayfunc helper function for showing a user's links column on the My Team page.
      * To pass the correct data, first:
-     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
-     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     *      $usednamefields = totara_get_all_user_name_fields_join($base, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields_join($base);
      * then your "field" param should be:
      *      $DB->sql_concat_join("' '", $usednamefields)
      * to allow sorting and filtering, and finally your extrafields should be:

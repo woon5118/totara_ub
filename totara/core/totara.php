@@ -2346,3 +2346,20 @@ function totara_get_all_user_name_fields($returnsql = false, $tableprefix = null
         return $prefixedfields;
     }
 }
+
+/**
+ * SQL concat ready option of totara_get_all_user_name_fields function
+ * This function return null-safe field names for concatentation into one field using $DB->sql_concat_join()
+ *
+ * @param string $tableprefix table query prefix to use in front of each field.
+ * @param string $prefix prefix added to the name fields e.g. authorfirstname.
+ * @param bool $onlyused true to only return the fields used by fullname() (and sorted as they appear)
+ * @return array|string All name fields.
+ */
+function totara_get_all_user_name_fields_join($tableprefix = null, $prefix = null, $onlyused = false) {
+    $fields = totara_get_all_user_name_fields(false, $tableprefix, $prefix, null, $onlyused);
+    foreach($fields as $key => $field) {
+        $fields[$key] = "COALESCE($field,'')";
+    }
+    return $fields;
+}

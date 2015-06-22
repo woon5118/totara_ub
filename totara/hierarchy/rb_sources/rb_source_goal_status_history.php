@@ -88,7 +88,7 @@ class rb_source_goal_status_history extends rb_base_source {
 
     protected function define_columnoptions() {
         global $DB;
-        $usernamefields = get_all_user_name_fields(false, null, 'usermodified.');
+        $usernamefields = totara_get_all_user_name_fields_join('usermodified');
 
         $columnoptions = array(
             new rb_column_option(

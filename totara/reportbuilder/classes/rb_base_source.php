@@ -598,8 +598,8 @@ abstract class rb_base_source {
     /**
      * A rb_column_options->displayfunc helper function for showing a user's name and links to their profile.
      * To pass the correct data, first:
-     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
-     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     *      $usednamefields = totara_get_all_user_name_fields_join($base, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields_join($base);
      * then your "field" param should be:
      *      $DB->sql_concat_join("' '", $usednamefields)
      * to allow sorting and filtering, and finally your extrafields should be:
@@ -633,8 +633,8 @@ abstract class rb_base_source {
     /**
      * A rb_column_options->displayfunc helper function for showing a user's profile picture, name and links to their profile.
      * To pass the correct data, first:
-     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
-     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     *      $usednamefields = totara_get_all_user_name_fields_join($base, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields_join($base);
      * then your "field" param should be:
      *      $DB->sql_concat_join("' '", $usednamefields)
      * to allow sorting and filtering, and finally your extrafields should be:
@@ -685,7 +685,8 @@ abstract class rb_base_source {
     /**
      * A rb_column_options->displayfunc helper function for showing a user's profile picture.
      * To pass the correct data, first:
-     *      $usernamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
+     *      $usernamefields = totara_get_all_user_name_fields_join($base, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields_join($base);
      * then your "field" param should be:
      *      $DB->sql_concat_join("' '", $usednamefields)
      * to allow sorting and filtering, and finally your extrafields should be:
@@ -731,8 +732,8 @@ abstract class rb_base_source {
     /**
      * A rb_column_options->displayfunc helper function for showing a user's name.
      * To pass the correct data, first:
-     *      $usednamefields = totara_get_all_user_name_fields(false, $base, null, null, true);
-     *      $allnamefields = totara_get_all_user_name_fields(false, $base);
+     *      $usednamefields = totara_get_all_user_name_fields_join($base, null, true);
+     *      $allnamefields = totara_get_all_user_name_fields_join($base);
      * then your "field" param should be:
      *      $DB->sql_concat_join("' '", $usednamefields)
      * to allow sorting and filtering, and finally your extrafields should be:
@@ -1868,8 +1869,8 @@ abstract class rb_base_source {
         $join='auser', $groupname = 'user') {
         global $DB, $CFG;
 
-        $usednamefields = totara_get_all_user_name_fields(false, $join, null, null, true);
-        $allnamefields = totara_get_all_user_name_fields(false, $join);
+        $usednamefields = totara_get_all_user_name_fields_join($join, null, true);
+        $allnamefields = totara_get_all_user_name_fields_join($join);
 
         $columnoptions[] = new rb_column_option(
             $groupname,
@@ -3926,8 +3927,8 @@ abstract class rb_base_source {
         $manager='manager') {
         global $DB;
 
-        $usednamefields = totara_get_all_user_name_fields(false, $manager, null, null, true);
-        $allnamefields = totara_get_all_user_name_fields(false, $manager);
+        $usednamefields = totara_get_all_user_name_fields_join($manager, null, true);
+        $allnamefields = totara_get_all_user_name_fields_join($manager);
 
         $columnoptions[] = new rb_column_option(
             'user',

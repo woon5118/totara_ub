@@ -77,7 +77,7 @@ $selected = optional_param('selected', null, PARAM_SEQUENCE);
 if (!empty($selected)) {
     $selectedids = explode(',', $selected);
     $disable = array();
-    $fullname = $DB->sql_concat_join("' '", get_all_user_name_fields());
+    $fullname = $DB->sql_concat_join("' '", totara_get_all_user_name_fields_join());
     foreach ($selectedids as $selectedid) {
         $disable[$selectedid] = $DB->get_record('user', array('id' => $selectedid), 'id, '. $fullname . 'AS fullname');
     }

@@ -77,7 +77,7 @@ class rb_column_option {
      *
      * or even:
      *
-     * <code>$DB->sql_concat_join("' '", totara_get_all_user_name_fields())</code>
+     * <code>$DB->sql_concat_join("' '", totara_get_all_user_name_fields_join())</code>
      *
      * @access public
      * @var string

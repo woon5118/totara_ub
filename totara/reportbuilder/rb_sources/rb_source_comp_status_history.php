@@ -93,8 +93,8 @@ class rb_source_comp_status_history extends rb_base_source {
     protected function define_columnoptions() {
         global $DB;
 
-        $usednamefields = totara_get_all_user_name_fields(false, 'usermodified', null, null, true);
-        $allnamefields = totara_get_all_user_name_fields(false, 'usermodified');
+        $usednamefields = totara_get_all_user_name_fields_join('usermodified', null, true);
+        $allnamefields = totara_get_all_user_name_fields_join('usermodified');
 
         $columnoptions = array(
             new rb_column_option(

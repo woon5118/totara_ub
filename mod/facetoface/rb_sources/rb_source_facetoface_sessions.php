@@ -172,8 +172,8 @@ class rb_source_facetoface_sessions extends rb_base_source {
 
     protected function define_columnoptions() {
         global $DB;
-        $usernamefieldscreator = get_all_user_name_fields(false, null, 'creator.');
-        $usernamefieldsbooked  = get_all_user_name_fields(false, null, 'bookedby.');
+        $usernamefieldscreator = totara_get_all_user_name_fields_join('creator');
+        $usernamefieldsbooked  = totara_get_all_user_name_fields_join('bookedby');
         $columnoptions = array(
             new rb_column_option(
                 'session',                  // Type.
@@ -896,7 +896,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
             $name = $sessionrole->name;
             $key = "session_role_$field";
             $userkey = "session_role_user_$field";
-            $usernamefields = get_all_user_name_fields(false, null, "$userkey.");
+            $usernamefields = totara_get_all_user_name_fields_join($userkey);
             $columnoptions[] = new rb_column_option(
                 'role',
                 $field . '_name',
