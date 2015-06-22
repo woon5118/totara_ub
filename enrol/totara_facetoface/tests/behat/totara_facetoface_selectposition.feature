@@ -89,6 +89,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Automatically sign users up to face to face sessions | 0 |
     And I log out
     And I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I set the following fields to these values:
       | sid | Yes |
@@ -104,5 +105,6 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Automatically sign users up to face to face sessions | 0 |
     And I log out
     And I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 2"
     Then I should see "You must have a suitable position assigned to sign up for this facetoface activity."

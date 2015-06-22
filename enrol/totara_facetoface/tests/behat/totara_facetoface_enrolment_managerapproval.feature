@@ -59,6 +59,7 @@ Feature: Users are forced to get manager approval where required
       | Custom instance name | Test student enrolment |
     And I log out
     And I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I should see "You can not enrol yourself in this course."
 
@@ -75,6 +76,7 @@ Feature: Users are forced to get manager approval where required
       | student1 | POS001   | primary   | teacher1 |
 
     When I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I press "Sign-up"
@@ -90,6 +92,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     Then I should see "It is not possible to sign up for these sessions (manager request already pending)."
     And I follow "Withdraw pending request"
@@ -106,6 +109,7 @@ Feature: Users are forced to get manager approval where required
     And I log out
 
     When I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     And I click on "[name$='sid']" "css_element" in the "1 January 2020" "table_row"
     And I press "Sign-up"
@@ -120,5 +124,6 @@ Feature: Users are forced to get manager approval where required
     And I press "Update requests"
     And I log out
     And I log in as "student1"
+    And I follow "Find Learning"
     And I follow "Course 1"
     Then I should see "Topic 1"
