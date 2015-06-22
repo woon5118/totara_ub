@@ -999,6 +999,17 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
     public function sessions_require_manager() {
         return $this->removednomanager;
     }
+
+    /**
+     * Can current user disable face to face enrolments in a course?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('moodle/course:enrolconfig', $context);
+    }
 }
 
 /*
