@@ -458,7 +458,7 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
             // Bad node, don't display.
             return;
         }
-        $dimmed = ($item->visibility ? '' : ' dimmed');
+        $dimmed = ($item->visibility && $node->get_visibility() ? '' : ' dimmed');
         $url = '/totara/core/menu/index.php';
         $itemurl = new moodle_url($node->get_url());
         $itemurl = html_writer::link($itemurl, $node->get_url(false), array('class' => $dimmed));

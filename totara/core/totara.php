@@ -1756,20 +1756,52 @@ function totara_build_menu() {
 
     $rs = \totara_core\totara\menu\menu::get_nodes();
     $tree = array();
+    $parentree = array();
     foreach ($rs as $id => $item) {
-        // If parent exists and parent visibility is always hide then hide all children.
-        if (!is_null($item->parentvisibility) && $item->parentvisibility == \totara_core\totara\menu\menu::HIDE_ALWAYS) {
-            continue;
-        // Otherwise, if parent is show when required, check if it is currently visible.
-        } else if ($item->parentvisibility == \totara_core\totara\menu\menu::SHOW_WHEN_REQUIRED) {
-            $classname = $item->parent;
-            if (!is_null($classname) && class_exists($classname)) {
-                $parentnode = new $classname(array());
-                if ($parentnode->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
-                    continue;
-                }
+
+        if (!isset($parentree[$item->parentid])) {
+            $node = \totara_core\totara\menu\menu::get($item->parentid);
+            // Silently ignore bad nodes - they might have been removed
+            // from the code but not purged from the DB yet.
+            if ($node === false) {
+                continue;
             }
+            $parentree[$item->parentid] = $node;
         }
+        $node = $parentree[$item->parentid];
+
+        switch ((int)$item->parentvisibility) {
+            case \totara_core\totara\menu\menu::HIDE_ALWAYS:
+                if (!is_null($item->parentvisibility)) {
+                    continue 2;
+                }
+                break;
+            case \totara_core\totara\menu\menu::SHOW_WHEN_REQUIRED:
+                $classname = $item->parent;
+                if (!is_null($classname) && class_exists($classname)) {
+                    $parentnode = new $classname($node);
+                    if ($parentnode->get_visibility() != \totara_core\totara\menu\menu::SHOW_ALWAYS) {
+                        continue 2;
+                    }
+                }
+                break;
+            case \totara_core\totara\menu\menu::SHOW_ALWAYS:
+                break;
+            case \totara_core\totara\menu\menu::SHOW_CUSTOM:
+                $classname = $item->parent;
+                if (!is_null($classname) && class_exists($classname)) {
+                    $parentnode = new $classname($node);
+                    if (!$parentnode->get_visibility()) {
+                        continue 2;
+                    }
+                }
+                break;
+            default:
+                // Silently ignore bad nodes - they might have been removed
+                // from the code but not purged from the DB yet.
+                continue 2;
+        }
+
         $node = \totara_core\totara\menu\menu::node_instance($item);
         // Silently ignore bad nodes - they might have been removed
         // from the code but not purged from the DB yet.
