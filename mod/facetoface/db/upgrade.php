@@ -2779,6 +2779,7 @@ function xmldb_facetoface_upgrade($oldversion=0) {
             }
             else {
                 $infofield->datatype = 'multiselect';
+                $infofield->defaultdata = null;
                 $values = explode(CUSTOMFIELD_DELIMITER, $item->possiblevalues);
                 $defaulvalue = $item->defaultvalue;
                 $options = array();

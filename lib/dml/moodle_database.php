@@ -1657,7 +1657,7 @@ abstract class moodle_database {
      * Currently will not prevent query failing if it exceeds the maximum query size
      *
      * @param string $table The database table to be inserted into
-     * @param iterator $iterator An iterable object (such as moodle_recordset)
+     * @param array|iterator $iterator An iterable object (such as moodle_recordset)
      *                           containing values for one or more fields
      * @param string $processor Name of a function to call on each item prior
      *                          to processing. The function should receive an
@@ -1670,16 +1670,21 @@ abstract class moodle_database {
      * @throws dml_exception if error
      */
     public function insert_records_via_batch($table, $iterator, $processor=null, $pextraparams=array(), $validator=null, $vextraparams=array()) {
-        global $CFG;
-        $status = true;
-
         if (!is_array($iterator) && !$iterator instanceof Traversable) {
             // Throw exception here
             throw new dml_exception('batchinsertargnottraversable');
         }
 
+        if (isset($processor) && !is_callable($processor)) {
+            debugging('Invalid callable $processor parameter for insert_records_via_batch()', DEBUG_DEVELOPER);
+        }
+        if (isset($validator) && !is_callable($validator)) {
+            debugging('Invalid callable $validator parameter for insert_records_via_batch()', DEBUG_DEVELOPER);
+        }
+
         $transaction = $this->start_delegated_transaction();
-        $fields = $values = $params = array();
+        $fields = null;
+        $values = array();
         $count = 0;
         foreach ($iterator as $item) {
             // pre-process item using user defined function
@@ -1706,72 +1711,45 @@ abstract class moodle_database {
                 throw new dml_exception('batchinsertitemnotanobject');
             }
 
-            // remove 'id' field if it is set
-            if (!empty($item->id)) {
-                unset($item->id);
-            }
+            $item = get_object_vars($item);
+            unset($item['id']);
 
-            // generate fields from object keys on first iteration
-            // and append to query
-            if ($count == 0) {
-                $properties = get_object_vars($item);
-                if ($properties) {
-                    $fields = array_keys($properties);
-                } else {
-                    throw new dml_exception('batchinsertitemnotavalidobject');
+            if (isset($fields)) {
+                if (array_keys($item) !== $fields) {
+                    debugging('All items passed to insert_records_via_batch() must have the same structure!', DEBUG_DEVELOPER);
+                    $wrongitem = $item;
+                    $item = array();
+                    foreach ($fields as $field) {
+                        if (array_key_exists($field, $wrongitem)) {
+                            $item[$field] = $wrongitem[$field];
+                        } else {
+                            $item[$field] = null;
+                        }
+                    }
+                    unset($wrongitem);
                 }
-                $numfields = count($fields);
-
-                $insert_sql = "INSERT INTO {{$table}} " .
-                    '(' . implode(',', $fields) . ') VALUES ';
-
-                // generate the placeholder for each set of values
-                $values_array = array_fill(0, $numfields, '?');
-                $values_placeholder = '(' . implode(',', $values_array) . ')';
+            } else {
+                $fields = array_keys($item);
             }
 
-            // add values placeholder for this item to the existing ones
-            $new_values = $values;
-            $new_values[] = $values_placeholder;
+            $values[] = $item;
+            $count++;
 
-            // save the parameters in the correct order
-            $new_params = $params;
-            foreach ($fields as $field) {
-                $new_params[] = isset($item->$field) ? $item->$field : null;
-            }
-
-            if ($count > 0 &&
-                ($count > BATCH_INSERT_MAX_ROW_COUNT)) {
-                // if we add this item, the query will contain too many rows
-                // we need to send off all existing data to be inserted,
-                // then take the data from this item and save it for the next
-                // insert
-                $sql = $insert_sql . implode(',', $values);
-                $status = $status && $this->execute($sql, $params);
-
-                // save this iteration's data as the first value in the next
-                // iteration
-                $count = 1;
-                $params = array_slice($new_params, -1 * $numfields);
-                $values = array($values_placeholder);
+            if ($count > 0 && ($count >= BATCH_INSERT_MAX_ROW_COUNT)) {
+                $this->insert_records($table, $values);
+                $values = array();
+                $count = 0;
                 continue;
             }
-
-            // keep adding to the query, we're not done yet
-            $values = $new_values;
-            $params = $new_params;
-
-            $count++;
         }
 
-        // handle the remaining items (if any)
-        if (isset($insert_sql) && !empty($values)) {
-            $sql = $insert_sql . implode(',', $values);
-            $status = $status && $this->execute($sql, $params);
+        // Handle the remaining items (if any).
+        if ($count) {
+            $this->insert_records($table, $values);
         }
 
         $transaction->allow_commit();
-        return $status;
+        return true;
     }
 
     /**

@@ -132,7 +132,19 @@ class csv_iterator extends SplFileObject
         $values = $this->clean_fields($fields);
         $this->rowcount++;
 
-        $data = new stdClass();
+        // Create a fake empty record so that all records have the same structure - even those with errors!
+        $data = array();
+        foreach ($this->importfields as $field => $include) {
+            if ($include) {
+                $data[$field] = null;
+                if (!empty($this->datefieldmap[$field])) {
+                    $mapto = $this->datefieldmap[$field];
+                    $data[$mapto] = null;
+                }
+            }
+        }
+
+        $data = (object)$data;
         $data->timecreated = $this->importtime;
         $data->timeupdated = 0;
         $data->importuserid = $this->userid;

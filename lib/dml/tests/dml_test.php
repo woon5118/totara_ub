@@ -5537,6 +5537,178 @@ class core_dml_testcase extends database_driver_testcase {
             $dbman->drop_table($table);
         }
     }
+
+    /**
+     * Totara specific bulk insert.
+     */
+    public function test_insert_records_via_batch() {
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('oneint', XMLDB_TYPE_INTEGER, '10', null, null, null, 100);
+        $table->add_field('onebit', XMLDB_TYPE_INTEGER, '1', null, null, null, 0);
+        $table->add_field('onenum', XMLDB_TYPE_NUMBER, '10,2', null, null, null, 200);
+        $table->add_field('onechar', XMLDB_TYPE_CHAR, '100', null, null, null, 'onestring');
+        $table->add_field('onetext', XMLDB_TYPE_TEXT, 'big', null, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $this->assertCount(0, $DB->get_records($tablename));
+
+        $record = new stdClass();
+        $record->id = '1';
+        $record->course = '1';
+        $record->oneint = null;
+        $record->onebit = null;
+        $record->onenum = '1.00';
+        $record->onechar = 'a';
+        $record->onetext = 'aaa';
+
+        $expected = array();
+        $records = array();
+        for ($i = 1; $i <= 2000; $i++) { // This may take a while, it should be higher than defaults in DML drivers.
+            $rec = clone($record);
+            $rec->id = (string)$i;
+            $rec->oneint = (string)$i;
+            $rec->onebit = (string)($i % 2);
+            $expected[$i] = $rec;
+            $rec = clone($rec);
+            unset($rec->id);
+            $records[$i] = $rec;
+        }
+
+        $DB->insert_records_via_batch($tablename, $records);
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected, $stored);
+
+        $DB->delete_records($tablename, array());
+        $dbman->reset_sequence($table);
+
+        // Test iterator works the same.
+        $DB->insert_records_via_batch($tablename, new ArrayIterator($records));
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected, $stored);
+
+        $DB->delete_records($tablename, array());
+        $dbman->reset_sequence($table);
+
+        // Test processor and validator.
+        $expected = array();
+        $records = array();
+        for ($i = 1; $i <= 2; $i++) {
+            $rec = clone($record);
+            $rec->id = $i;
+            $rec->oneint = $i;
+            $rec->onetext = 'xxxx';
+            $expected[$i] = $rec;
+            $rec = clone($rec);
+            unset($rec->id);
+            $rec->onetext = 'xx';
+            $records[$i] = $rec;
+        }
+        $process = function($item, $a) {
+            foreach ($item as $k => $v) {
+                if ($k === $a) {
+                    $item->$k = $v . $v;
+                }
+            }
+            return $item;
+        };
+        $validate = function($item, $p) {
+            return (($item instanceof stdClass) and $p === 'param');
+        };
+        $DB->insert_records_via_batch($tablename, $records, $process, array('onetext'), $validate, array('param'));
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected, $stored);
+
+        $DB->insert_records_via_batch($tablename, $records, 'ccc c cc c');
+        $this->assertDebuggingCalled('Invalid callable $processor parameter for insert_records_via_batch()');
+
+        $DB->insert_records_via_batch($tablename, $records, null, array(), 'xzxcx cxx c', array());
+        $this->assertDebuggingCalled('Invalid callable $validator parameter for insert_records_via_batch()');
+
+        $DB->delete_records($tablename, array());
+        $dbman->reset_sequence($table);
+
+        // Test properties not present if first record are nulled.
+        $expected = array();
+        $records = array();
+
+        $rec = clone($record);
+        $rec->oneint = '666';
+        $records[] = clone($rec);
+        $rec->id = 1;
+        $expected[$rec->id] = $rec;
+
+        $rec = clone($record);
+        unset($rec->oneint);
+        $records[] = clone($rec);
+        $rec->id = 2;
+        $rec->oneint = null;
+        $expected[$rec->id] = $rec;
+
+        $DB->insert_records_via_batch($tablename, $records);
+        $this->assertDebuggingCalled('All items passed to insert_records_via_batch() must have the same structure!');
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected , $stored);
+
+        $DB->delete_records($tablename, array());
+        $dbman->reset_sequence($table);
+
+        // Test bools are normalised properly.
+        $expected = array();
+        $records = array();
+
+        $rec = clone($record);
+        $rec->onebit = false;
+        $records[] = clone($rec);
+        $rec->id = '1';
+        $rec->onebit = 0;
+        $expected[$rec->id] = $rec;
+
+        $rec = clone($record);
+        $rec->onebit = true;
+        $records[] = clone($rec);
+        $rec->id = '2';
+        $rec->onebit = 1;
+        $expected[$rec->id] = $rec;
+
+        $DB->insert_records_via_batch($tablename, $records);
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected , $stored);
+
+        $DB->delete_records($tablename, array());
+        $dbman->reset_sequence($table);
+
+        // Test there can be some extra properties including id.
+        $expected = array();
+        $records = array();
+
+        $rec = clone($record);
+        $rec->id = '10';
+        $rec->xxx = 1;
+        $records[] = clone($rec);
+        unset($rec->xxx);
+        $rec->id = 1;
+        $expected[$rec->id] = $rec;
+
+        $rec = clone($record);
+        $rec->id = '4';
+        $rec->xxx = 112;
+        $records[] = clone($rec);
+        unset($rec->xxx);
+        $rec->id = 2;
+        $expected[$rec->id] = $rec;
+
+        $DB->insert_records_via_batch($tablename, $records);
+        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $this->assertEquals($expected , $stored);
+    }
 }
 
 /**
