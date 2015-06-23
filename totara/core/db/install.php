@@ -48,11 +48,9 @@ function xmldb_totara_core_install() {
 
     // Create totara roles.
     $staffmanagerrole    = create_role('', 'staffmanager', '', 'staffmanager');
-    $assessorrole        = create_role('', 'assessor', '', 'assessor');
-    $regionalmanagerrole = create_role('', 'regionalmanager', '');
-    $regionaltrainerrole = create_role('', 'regionaltrainer', '');
+    // Following roles are not created any more since Totara 8.0 - assessor, regionalmanager, regionaltrainer.
 
-    $newroles = array($staffmanagerrole, $assessorrole, $regionalmanagerrole, $regionaltrainerrole);
+    $newroles = array($staffmanagerrole);
 
     foreach ($DB->get_records('role') as $role) {
         // Add allow* defaults related to all new roles.
@@ -93,11 +91,6 @@ function xmldb_totara_core_install() {
             $DB->update_record('role', $new_role);
         }
     }
-
-    // Extra capability tweaks for new roles without archetypes,
-    // these cannot be reset to defaults because they do not have archetype.
-    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionalmanagerrole, $systemcontext->id);
-    assign_capability('moodle/user:editownprofile', CAP_ALLOW, $regionaltrainerrole, $systemcontext->id);
 
     $systemcontext->mark_dirty();
 

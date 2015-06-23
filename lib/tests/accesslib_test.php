@@ -719,7 +719,7 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $allroles = get_all_roles();
         $this->assertInternalType('array', $allroles);
-        $this->assertCount(12, $allroles); // there are 12 roles in standard totara install
+        $this->assertCount(9, $allroles); // there are 9 roles in standard totara install
 
         $role = reset($allroles);
         $role = (array)$role;
@@ -742,7 +742,7 @@ class core_accesslib_testcase extends advanced_testcase {
 
         $allroles = get_all_roles($coursecontext);
         $this->assertInternalType('array', $allroles);
-        $this->assertCount(13, $allroles);
+        $this->assertCount(10, $allroles);
         $role = reset($allroles);
         $role = (array)$role;
 
@@ -779,6 +779,11 @@ class core_accesslib_testcase extends advanced_testcase {
         $archetypes = get_role_archetypes();
         foreach ($archetypes as $archetype) {
             $roles = get_archetype_roles($archetype);
+            if ($archetype === 'assessor') {
+                // Totara: Not installed by default any more.
+                $this->assertCount(0, $roles);
+                continue;
+            }
             $this->assertCount(1, $roles);
             $role = reset($roles);
             $this->assertSame($archetype, $role->archetype);
