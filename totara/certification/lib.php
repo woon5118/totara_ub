@@ -447,9 +447,10 @@ function certification_fix_missing_certif_completions() {
     global $DB;
 
     // Look for prog_completion (course set = 0) records without matching certif_completion records.
-    $sql = "SELECT p.id AS progid, p.certifid, pc.userid
+    $sql = "SELECT DISTINCT p.id AS progid, p.certifid, pc.userid
               FROM {prog_completion} pc
               JOIN {prog} p ON pc.programid = p.id
+              JOIN {prog_user_assignment} pua ON pua.programid = p.id AND pua.userid = pc.userid
          LEFT JOIN {certif_completion} cc ON cc.certifid = p.certifid AND cc.userid = pc.userid
              WHERE pc.coursesetid = 0
                AND p.certifid IS NOT NULL
@@ -773,7 +774,12 @@ function get_certification_path_user($certificationid, $userid) {
     } else {
         // Check if the user has a prog_completion (course set = 0) record.
         $programid = $DB->get_field('prog', 'id', array('certifid' => $certificationid));
-        if (!$DB->record_exists('prog_completion', array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0))) {
+        $sql = "SELECT pc.id
+                  FROM {prog_completion} pc
+                  JOIN {prog_user_assignment} pua
+                    ON pua.userid = pc.userid AND pua.programid = pc.programid
+                 WHERE pc.programid = :programid AND pc.userid = :userid AND pc.coursesetid = :coursesetid";
+        if (!$DB->record_exists_sql($sql, array('programid' => $programid, 'userid' => $userid, 'coursesetid' => 0))) {
             // There is no prog_completion, so they are not assigned to this certification, thus not on any path.
             return CERTIFPATH_UNSET;
         }
