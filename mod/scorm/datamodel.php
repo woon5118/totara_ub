@@ -14,8 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// Totara: no random error output here, instead problems are written into error log,
+// this normalises behaviour of production sites incorrectly configured to display errors.
+define('NO_DEBUG_DISPLAY', true);
+
 require_once('../../config.php');
 require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+
+// Totara: Make sure users cannot abort this page request in the middle,
+// unfortunately crazy IIS with FastCGI ignores this completely.
+ignore_user_abort(true);
+set_time_limit(60 * 5);
 
 $id = optional_param('id', '', PARAM_INT);       // Course Module ID, or
 $a = optional_param('a', '', PARAM_INT);         // scorm ID
@@ -48,7 +57,7 @@ if (!empty($id)) {
 
 $PAGE->set_url('/mod/scorm/datamodel.php', array('scoid' => $scoid, 'attempt' => $attempt, 'id' => $cm->id));
 
-require_login($course, false, $cm);
+require_login($course, false, $cm, false, true); // Totara: no redirects here.
 
 if (confirm_sesskey() && (!empty($scoid))) {
     $result = true;

@@ -634,6 +634,20 @@ function scorm_update_grades($scorm, $userid=0, $nullifnone=true) {
     } else {
         scorm_grade_item_update($scorm);
     }
+
+    // Totara: invalidate conditional and completion caches just in case something failed somewhere.
+    if ($userid) {
+        if (!empty($CFG->enableavailability)) {
+            \availability_grade\callbacks::grade_changed($userid);
+        }
+        if (completion_info::is_enabled_for_site()) {
+            $course = get_course($scorm->course, false);
+            $completion = new completion_info($course);
+            if ($completion->is_enabled()) {
+                $completion->invalidatecache($course->id, $userid, true);
+            }
+        }
+    }
 }
 
 /**
