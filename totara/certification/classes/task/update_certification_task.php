@@ -41,34 +41,63 @@ class update_certification_task extends \core\task\scheduled_task {
     /**
      * Do the job.
      * Throw exceptions on errors (the job will be retried).
+     *
+     * @param boolean   $quiet  Whether or not we hide the mtraces.
      */
     public function execute() {
         global $CFG;
         require_once($CFG->dirroot.'/totara/certification/lib.php');
 
+        // Suppress output during tests.
+        $quiet = PHPUNIT_TEST || defined('BEHAT_SITE_RUNNING');
+
         if (totara_feature_disabled('certifications')) {
             return;
         }
 
-        mtrace("Checking for missing certif_completion records");
-        $processed = certification_fix_missing_certif_completions();
-        mtrace("... ".$processed.' processed');
-        if ($processed > 0) {
-            debugging("!WARNING! The number above should have been 0. Greater than 0 indicates that a problem\n" .
-                "occurred during user assignment. The records should now be repaired, but if this\n" .
-                "problem persists then it should be reported to the Totara support staff. !WARNING!");
+        if (!$quiet) {
+            mtrace("Checking for missing certif_completion records");
         }
 
-        mtrace("Doing recertify_window_opens_stage");
+        $processed = certification_fix_missing_certif_completions();
+
+        if (!$quiet) {
+            mtrace("... ".$processed.' processed');
+            if ($processed > 0) {
+                debugging("!WARNING! The number above should have been 0. Greater than 0 indicates that a problem\n" .
+                    "occurred during user assignment. The records should now be repaired, but if this\n" .
+                    "problem persists then it should be reported to the Totara support staff. !WARNING!");
+            }
+        }
+
+        if (!$quiet) {
+            mtrace("Doing recertify_window_opens_stage");
+        }
+
         $processed = recertify_window_opens_stage();
-        mtrace("... ".$processed.' processed');
 
-        mtrace("Doing recertify_window_abouttoclose_stage");
+        if (!$quiet) {
+            mtrace("... ".$processed.' processed');
+        }
+
+        if (!$quiet) {
+            mtrace("Doing recertify_window_abouttoclose_stage");
+        }
+
         $processed = recertify_window_abouttoclose_stage();
-        mtrace("... ".$processed.' processed');
 
-        mtrace("Doing recertify_expires_stage");
+        if (!$quiet) {
+            mtrace("... ".$processed.' processed');
+        }
+
+        if (!$quiet) {
+            mtrace("Doing recertify_expires_stage");
+        }
+
         $processed = recertify_expires_stage();
-        mtrace("... ".$processed.' processed');
+
+        if (!$quiet) {
+            mtrace("... ".$processed.' processed');
+        }
     }
 }

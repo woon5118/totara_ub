@@ -244,5 +244,22 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015111600, 'totara_certification');
     }
 
+    if ($oldversion < 2016030900) {
+        // Reset unassigned flag for all currently assigned learners.
+        $sql = "UPDATE {certif_completion_history}
+                   SET unassigned = 0
+                   WHERE EXISTS (SELECT 1
+                                   FROM {prog_user_assignment} pua
+                             INNER JOIN {prog} p
+                                     ON pua.programid = p.id
+                                  WHERE pua.userid = {certif_completion_history}.userid
+                                    AND p.certifid = {certif_completion_history}.certifid
+                               )";
+        $DB->execute($sql);
+
+        // Savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2016030900, 'totara_certification');
+    }
+
     return true;
 }

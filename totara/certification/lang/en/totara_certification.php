@@ -170,9 +170,11 @@ $string['editdetailsrcwin'] = 'Recertification Window';
 $string['editdetailsvalid'] = 'Define how long the certification should be valid once complete';
 $string['editdetailswindow'] = 'Period window opens before expiration';
 $string['editdetailswindow_help'] = 'The period before certification expires that a learner can start recertifying. When the window opens, all course and activity completion data will be reset, including courses and activities completed by RPL.';
+$string['error:cannotcreatecompletion'] = 'Failure attempting to insert the certification completion record into the database';
 $string['error:categoryidwasincorrect'] = 'Category ID was incorrect';
 $string['error:categorymustbespecified'] = 'Category must be specified';
 $string['error:certifsnotmoved'] = 'Error, certifications not moved from {$a}!';
+$string['error:complalreadyexists'] = 'Attempting to create certification completion record that already exists for certifid={$a->certifid} userid={$a->userid}';
 $string['error:completionhistoryexpirynotunique'] = 'Expiry date must be unique for this user and certification. Only one history record can have no expiry date.';
 $string['error:completionstatusunset'] = 'Completion status should never be \'Unset\'.';
 $string['error:info_fixcertifiedprogincomplete'] = 'There are two known possible causes for this problem.<br>
@@ -189,12 +191,15 @@ $string['error:histalreadyexists'] = 'Certification history already exists certi
 $string['error:incorrectcertifid'] = 'Incorrect certification ID certifid={$a}';
 $string['error:incorrectid'] = 'Incorrect certification completion ID or user ID';
 $string['error:invalidaction'] = 'Invalid action: {$a}';
+$string['error:invalidunassignedhist'] = 'Only one historical record can be marked as unassigned, and only if there is no current assignment';
 $string['error:cannotloadcompletionrecords'] = 'Tried to load certif_completion and prog_completion records which don\'t exist for programid: $a->program, userid: $a->userid';
 $string['error:minimumactiveperiod'] = 'Active period must be greater than the recertification window period';
 $string['error:minimumactiveperiodactive'] = 'Minimum active period cannot be greater than the active period';
 $string['error:minimumactiveperiodwindow'] = 'Minimum active period cannot be less than the recertification window period';
 $string['error:minimumwindowperiod'] = 'Recertification window period must be at least {$a}';
+$string['error:missingcertifid'] = 'Attempting to create certification completion record for non-certification program.';
 $string['error:missingprogcompletion'] = 'Missing program completion record for certifid={$a->certifid} userid={$a->userid}';
+$string['error:multipleunassignedhistoryrecords'] = 'There is already an unassigned history record for certifid={$a->certifid} userid={$a->userid}';
 $string['error:mustbepositive'] = 'Number must be positive';
 $string['error:nullactiveperiod'] = 'Recertification active period is not set';
 $string['error:nullwindowperiod'] = 'Recertification window period is not set';
@@ -242,6 +247,7 @@ $string['error:statewindowopen-timewindowopenstimecompletednotordered'] = 'Windo
 $string['error:timeexpiresbeforetimecompleted'] = 'Expiry date must be after completion date';
 $string['error:updatinginvalidcompletionrecords'] = 'Call to certif_update_completion with completion records that do not match each other or the existing records';
 $string['error:useralreadyassigned'] = 'user already assigned for certifid={$a->certifid} userid={$a->userid}';
+$string['error:validationfailureassign'] = 'user assignment validation failure(s) while attemping to assign userid={$a->userid} to certifid={$a->certifid}';
 $string['eventcompletionhistoryadded'] = 'Certification completion history added';
 $string['eventcompletionhistorydeleted'] = 'Certification completion history deleted';
 $string['eventcompletionhistoryedited'] = 'Certification completion history edited';

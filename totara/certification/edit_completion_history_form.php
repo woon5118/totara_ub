@@ -39,6 +39,7 @@ class certif_edit_completion_history_form extends moodleform {
         $showinitialstateinvalid = $this->_customdata['showinitialstateinvalid'];
         $certification = $this->_customdata['certification'];
         $chid = $this->_customdata['chid'];
+        $currentlyassigned = $this->_customdata['assigned'];
 
         $mform->addElement('hidden', 'id', $id);
         $mform->setType('id', PARAM_INT);
@@ -50,6 +51,8 @@ class certif_edit_completion_history_form extends moodleform {
         $mform->setType('recertifydatetype', PARAM_INT);
         $mform->addElement('hidden', 'showinitialstateinvalid', $showinitialstateinvalid);
         $mform->setType('showinitialstateinvalid', PARAM_INT);
+        $mform->addElement('hidden', 'currentlyassigned', $currentlyassigned);
+        $mform->setType('currentlyassigned', PARAM_INT);
 
         // Current completion.
         $mform->addElement('header', 'currentcompletionrecord', get_string('historycompletionrecord', 'totara_program'));
@@ -165,6 +168,7 @@ class certif_edit_completion_history_form extends moodleform {
         $mform->setType('unassigned', PARAM_INT);
         $mform->addHelpButton('unassigned', 'completionunassigned', 'totara_certification');
         $mform->disabledIf('unassigned', 'state', 'eq', CERTIFCOMPLETIONSTATE_INVALID);
+        $mform->disabledIf('unassigned', 'currentlyassigned', 'eq', 1);
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'savechanges', get_string('savechanges'));
@@ -182,6 +186,8 @@ class certif_edit_completion_history_form extends moodleform {
      *         or an empty array if everything is OK (true allowed for backwards compatibility too).
      */
     public function validation($data, $files) {
+        global $DB;
+
         $errors = parent::validation($data, $files);
 
         $certcompletion = certif_process_submitted_edit_completion_history((object)$data);

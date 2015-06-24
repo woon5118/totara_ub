@@ -44,6 +44,7 @@ require_login();
 $program = new program($id);
 $programcontext = $program->get_context();
 $certification = $DB->get_record('certif', array('id' => $program->certifid));
+$currentcompl = $DB->get_record('certif_completion', array('certifid' => $program->certifid, 'userid' => $userid));
 
 if (!has_capability('totara/program:editcompletion', $programcontext)) {
     print_error('error:nopermissions', 'totara_program');
@@ -110,13 +111,16 @@ $PAGE->navigation->override_active_url(new moodle_url('/totara/program/completio
 // Add an item to the navbar to make it unique.
 $PAGE->navbar->add(get_string('completionaddhistory', 'totara_program'));
 
+$currentlyassigned = !empty($currentcompl) ? 1 : 0;
 $editformcustomdata = array(
     'id' => $id,
     'userid' => $userid,
     'showinitialstateinvalid' => (($currentformdata->state == CERTIFCOMPLETIONSTATE_INVALID) || !empty($errors)),
     'certification' => $certification,
     'originalstate' => $currentformdata->state,
-    'chid' => $chid);
+    'chid' => $chid,
+    'assigned' => $currentlyassigned
+);
 $editform = new certif_edit_completion_history_form($thisurl, $editformcustomdata, 'post', '',
     array('id' => 'form_certif_completion'));
 

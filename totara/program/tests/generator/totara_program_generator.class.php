@@ -24,6 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
+require_once($CFG->dirroot . '/totara/reportbuilder/tests/generator/lib.php');
+
 /**
  * Program generator.
  *
@@ -140,6 +144,7 @@ class totara_program_generator extends component_generator_base {
      */
     public function create_certification($data = array()) {
         global $CFG;
+
         require_once($CFG->dirroot . '/totara/certification/lib.php');
 
         $activeperiod = isset($data['activeperiod']) ? $data['activeperiod'] : '1 year';
@@ -324,6 +329,19 @@ class totara_program_generator extends component_generator_base {
         $programcontent->save_content();
     }
 
+    private function complete_course($courseid, $userid) {
+        $comp_man = new stdClass();
+        $comp_man->id = $DB->get_field('course_completions', 'id',
+            array('userid' => $this->user_man->id, 'course' => $this->course->id));
+        $comp_man->userid = $this->user_man->id;
+        $comp_man->course = $this->course->id;
+        $comp_man->timeenrolled = $this->now;
+        $comp_man->timestarted = $this->now;
+        $comp_man->timecompleted = $this->now;
+        $comp_man->status = COMPLETION_STATUS_COMPLETE;
+
+    }
+
     /**
      * Get empty program assignment
      *
@@ -350,11 +368,13 @@ class totara_program_generator extends component_generator_base {
         global $CFG;
         require_once($CFG->dirroot . '/totara/program/lib.php');
 
+        $completiontime = isset($data['completiontime']) ? $data['completiontime'] : 0;
+
         // Create data.
         $assign_data = new stdClass();
         $assign_data->id = $data['programid'];
         $assign_data->item = array(ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => 1));
-        $assign_data->completiontime = array(ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => 0));
+        $assign_data->completiontime = array(ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => $completiontime));
         $assign_data->completionevent = array(ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => 0));
         $assign_data->completioninstance = array(ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => null));
         $assign_data->includechildren = array (ASSIGNTYPE_INDIVIDUAL => array($data['userid'] => 0));

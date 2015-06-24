@@ -1085,6 +1085,261 @@ class totara_certification_certification_completion_testcase extends reportcache
     }
 
     /**
+     * Test certif_get_completion_state with cert compl history records (no prog completion).
+     * This test checks the unique expiry date constraint, which requires other existing records to test fully.
+     */
+    public function test_certif_get_completion_errors_for_history_expiry() {
+        global $DB;
+
+        // Set up some normal completion records.
+        $now = time();
+        $this->setup_completions();
+        $this->shift_completions_to_certified($now);
+
+        // Check that all records are ok.
+        $certcompletions = $DB->get_records('certif_completion');
+        foreach ($certcompletions as $certcompletion) {
+            $sql = "SELECT pc.*
+                      FROM {prog_completion} pc
+                      JOIN {prog} prog ON prog.id = pc.programid
+                     WHERE prog.certifid = :certifid AND pc.userid = :userid AND pc.coursesetid = 0";
+            $params = array('certifid' => $certcompletion->certifid, 'userid' => $certcompletion->userid);
+            $progcompletion = $DB->get_record_sql($sql, $params);
+            $errors = certif_get_completion_errors($certcompletion, $progcompletion);
+            $this->assertEquals(array(), $errors);
+        }
+        $this->assertEquals($this->numtestusers * $this->numtestcerts, count($certcompletions));
+
+        $certwithhistory = $this->certifications[4];
+        $certwithouthistory = $this->certifications[2];
+        $user = $this->users[5];
+
+        // Copy some current completion records into history.
+        $certcompletions = $DB->get_records('certif_completion', array('certifid' => $certwithhistory->certifid));
+        foreach ($certcompletions as $certcompletion) {
+            copy_certif_completion_to_hist($certcompletion->certifid, $certcompletion->userid);
+        }
+
+        // Check that all history records are valid.
+        $histcompletions = $DB->get_records('certif_completion_history');
+        foreach ($histcompletions as $histcompletion) {
+            $errors = certif_get_completion_errors($histcompletion, null);
+            $this->assertEquals(array(), $errors);
+        }
+        $this->assertEquals($this->numtestusers, count($histcompletions));
+
+        // Test 1 - New history record, no existing history record - no error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certwithouthistory->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003);
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 2 - New history record, existing record has different expiry - no error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certwithhistory->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003); // Not the same.
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 3 - New history record, existing record has same expiry - error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certwithhistory->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => $now,
+            'timewindowopens' => $now + 1000,
+            'timeexpires' => $now + 2000); // As set in shift_completions_to_certified.
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array('error:completionhistoryexpirynotunique' => 'timeexpiresnotapplicable'), $errors);
+
+        // Test 4 - Update history record, change expiry - no error.
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistory->certifid, 'userid' => $user->id));
+        $completionhistory->timeexpires = $completionhistory->timeexpires + 12345;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 5 - Update history record, don't change expiry (so same expiry) - no error (ignores the record being updated).
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistory->certifid, 'userid' => $user->id));
+        $completionhistory->timecompleted = $completionhistory->timecompleted - 1;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 6 - Update history record, other record has same expiry - error.
+        // First create a second history record with a different expiry date.
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistory->certifid, 'userid' => $user->id));
+        $originaltimeexpires = $completionhistory->timeexpires;
+        $completionhistory->id = 0; // Force new.
+        $completionhistory->timeexpires = $completionhistory->timeexpires + 12345;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+        certif_write_completion_history($completionhistory);
+        // Then update the second record, changing the expiry date to that of the first record.
+        $completionhistory->timeexpires = $originaltimeexpires;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array('error:completionhistoryexpirynotunique' => 'timeexpiresnotapplicable'), $errors);
+    }
+
+    /**
+     * Test certif_get_completion_state with cert compl history records (no prog completion).
+     * This test checks the unique unassigned constraint, which requires other existing records to test fully.
+     */
+    public function test_certif_get_completion_errors_for_history_unassigned() {
+        global $DB;
+
+        // Set up some normal completion records.
+        $now = time();
+        $this->setup_completions();
+        $this->shift_completions_to_certified($now);
+
+        // Check that all records are ok.
+        $certcompletions = $DB->get_records('certif_completion');
+        foreach ($certcompletions as $certcompletion) {
+            $sql = "SELECT pc.*
+                      FROM {prog_completion} pc
+                      JOIN {prog} prog ON prog.id = pc.programid
+                     WHERE prog.certifid = :certifid AND pc.userid = :userid AND pc.coursesetid = 0";
+            $params = array('certifid' => $certcompletion->certifid, 'userid' => $certcompletion->userid);
+            $progcompletion = $DB->get_record_sql($sql, $params);
+            $errors = certif_get_completion_errors($certcompletion, $progcompletion);
+            $this->assertEquals(array(), $errors);
+        }
+        $this->assertEquals($this->numtestusers * $this->numtestcerts, count($certcompletions));
+
+        $certwithhistorycurrent = $this->certifications[4];
+        $certwithhistorynocurrent = $this->certifications[5];
+        $certnohistorycurrent = $this->certifications[2];
+        $certnohistorynocurrent = $this->certifications[7];
+        $user = $this->users[5];
+
+        // Copy some current completion records into history.
+        $certcompletions = $DB->get_records('certif_completion', array('certifid' => $certwithhistorycurrent->certifid));
+        foreach ($certcompletions as $certcompletion) {
+            copy_certif_completion_to_hist($certcompletion->certifid, $certcompletion->userid);
+        }
+        $certcompletions = $DB->get_records('certif_completion', array('certifid' => $certwithhistorynocurrent->certifid));
+        foreach ($certcompletions as $certcompletion) {
+            copy_certif_completion_to_hist($certcompletion->certifid, $certcompletion->userid);
+        }
+
+        // Check that all history records are valid.
+        $histcompletions = $DB->get_records('certif_completion_history');
+        foreach ($histcompletions as $histcompletion) {
+            $errors = certif_get_completion_errors($histcompletion, null);
+            $this->assertEquals(array(), $errors);
+        }
+        $this->assertEquals($this->numtestusers * 2, count($histcompletions));
+
+        // Delete some current completion records (like unassigning).
+        $DB->delete_records('certif_completion', array('certifid' => $certwithhistorynocurrent->certifid));
+        $DB->delete_records('certif_completion', array('certifid' => $certnohistorynocurrent->certifid));
+
+        // Test 1 - New unassigned record, no existing history record, no current completion record - no error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certnohistorynocurrent->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'unassigned' => 1);
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 2 - New unassigned record, no existing history record, with current completion record - error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certnohistorycurrent->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'unassigned' => 1);
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array('error:invalidunassignedhist' => 'unassigned'), $errors);
+
+        // Test 3 - New unassigned record, with existing history record (not unassigned), no current completion record - no error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certwithhistorynocurrent->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'unassigned' => 1);
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 4 - Update existing record to unassigned - no error.
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistorynocurrent->certifid, 'userid' => $user->id));
+        $completionhistory->unassigned = 1;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Save the change in test 4, to be used in test 5.
+        certif_write_completion_history($completionhistory);
+
+        // Test 5 - New unassigned record, with existing unassigned history record - error.
+        $completionhistory = array(
+            'id' => 0,
+            'certifid' => $certwithhistorynocurrent->certifid,
+            'userid' => $user->id,
+            'status' => CERTIFSTATUS_COMPLETED,
+            'renewalstatus' => CERTIFRENEWALSTATUS_DUE,
+            'certifpath' => CERTIFPATH_RECERT,
+            'timecompleted' => 1001,
+            'timewindowopens' => 1002,
+            'timeexpires' => 1003,
+            'unassigned' => 1);
+        $errors = certif_get_completion_errors((object)$completionhistory, null);
+        $this->assertEquals(array('error:invalidunassignedhist' => 'unassigned'), $errors);
+
+        // Test 6 - Update existing record (from test 4), still unassigned (some other change) - no error.
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistorynocurrent->certifid, 'userid' => $user->id));
+        $completionhistory->timeexpires += 32123;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+
+        // Test 6 - Update existing record (from test 4), remove unassigned - no error.
+        $completionhistory = $DB->get_record('certif_completion_history',
+            array('certifid' => $certwithhistorynocurrent->certifid, 'userid' => $user->id));
+        $completionhistory->unassigned = 0;
+        $errors = certif_get_completion_errors($completionhistory, null);
+        $this->assertEquals(array(), $errors);
+    }
+
+    /**
      * Test certif_get_completion_form_errors. Quick and simple, just to make sure it switches the data around correctly.
      */
     public function test_certif_get_completion_form_errors() {
@@ -2030,7 +2285,7 @@ class totara_certification_certification_completion_testcase extends reportcache
         $historycompletion = clone($historycompletioncertifiedtemplate);
         $historycompletion->certifid = $prog->certifid;
         $historycompletion->userid = $user->id;
-        $historycompletion->unassigned = 1;
+        $historycompletion->unassigned = 0;
 
         $errors = certif_get_completion_errors($historycompletion, null);
         $this->assertEquals(array(), $errors);
@@ -2055,7 +2310,7 @@ class totara_certification_certification_completion_testcase extends reportcache
                 $this->assertEquals(1002, $historycompletion->timewindowopens);
                 $this->assertEquals(1003, $historycompletion->timeexpires);
                 $this->assertEquals($now, $historycompletion->timemodified);
-                $this->assertEquals(1, $historycompletion->unassigned);
+                $this->assertEquals(0, $historycompletion->unassigned);
             } else {
                 $this->assertEquals(CERTIFSTATUS_ASSIGNED, $historycompletion->status);
                 $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $historycompletion->renewalstatus);
