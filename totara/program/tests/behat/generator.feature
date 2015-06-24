@@ -46,6 +46,7 @@ Feature: Behat generators for programs work
     And I click on "user001" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "user002" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"

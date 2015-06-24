@@ -50,10 +50,12 @@ Feature: Users completion of programs and coursesets
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 2" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
+    And I wait "1" seconds
     And I click on "addcontent_ce" "button" in the "#edit-program-content" "css_element"
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 3" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I click on "Save all changes" "button"
 
@@ -117,7 +119,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 3" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
-    And I click on "or" "option" in the ".nextsetoperator-then" "css_element"
+    And I click on "or" "option" in the ".nextsetoperator-and select" "css_element"
     And I press "Save changes"
     And I click on "Save all changes" "button"
 
@@ -196,6 +198,7 @@ Feature: Users completion of programs and coursesets
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
     And I click on "Some courses" "option" in the ".completiontype" "css_element"
     And I set "Minimum courses completed" for courseset "Untitled set" to "2"
+    And I wait "1" seconds
     And I press "Save changes"
     And I click on "Save all changes" "button"
 

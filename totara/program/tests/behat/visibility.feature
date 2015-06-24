@@ -299,6 +299,7 @@ Feature: Users visibility of programs can be toggled
     And I click on "Add visible audiences" "button"
     And I click on "Audience1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
     And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I log out
 

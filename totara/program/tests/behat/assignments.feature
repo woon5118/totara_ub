@@ -71,6 +71,7 @@ Feature: Users assignments to a program
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
@@ -108,6 +109,7 @@ Feature: Users assignments to a program
     And I click on "Add audiences to program" "button"
     And I click on "Audience1" "link" in the "add-assignment-dialog-3" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-3" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
@@ -177,6 +179,7 @@ Feature: Users assignments to a program
     And I click on "Add position to program" "button"
     And I click on "Position One" "link" in the "add-assignment-dialog-2" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-2" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
@@ -241,6 +244,7 @@ Feature: Users assignments to a program
     And I click on "Add organisations to program" "button"
     And I click on "Organisation One" "link" in the "add-assignment-dialog-1" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-1" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
@@ -306,6 +310,7 @@ Feature: Users assignments to a program
     And I click on ".lastExpandable-hitarea" "css_element" in the "add-assignment-dialog-4" "totaradialogue"
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-4" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-4" "totaradialogue"
+    And I wait "1" seconds
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
