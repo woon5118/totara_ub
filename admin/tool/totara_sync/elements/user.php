@@ -843,16 +843,21 @@ class totara_sync_element_user extends totara_sync_element {
                 $invalidids = array_merge($invalidids, $badids);
             }
 
-            if (count($invalidids)) {
-                list($badids, $params) = $DB->get_in_or_equal($invalidids);
-                // Collect idnumber for records which are invalid.
-                $rs = $DB->get_records_sql("SELECT id, idnumber FROM {{$synctable}} WHERE id $badids", $params);
-                foreach ($rs as $id => $record) {
-                    $issane[] = $record->idnumber;
+            if ($invalidids) {
+                // Split $invalidids array into chunks as there are varying limits on the amount of parameters.
+                $invalidids_multi = array_chunk($invalidids, $DB->get_max_in_params());
+                foreach ($invalidids_multi as $invalidids) {
+                    list($badids, $params) = $DB->get_in_or_equal($invalidids);
+                    // Collect idnumber for records which are invalid.
+                    $rs = $DB->get_records_sql("SELECT id, idnumber FROM {{$synctable}} WHERE id $badids", $params);
+                    foreach ($rs as $id => $record) {
+                        $issane[] = $record->idnumber;
+                    }
+                    $DB->delete_records_select($synctable, "id $badids", $params);
+                    $DB->delete_records_select($synctable_clone, "id $badids", $params);
+                    $invalidids = array();
                 }
-                $DB->delete_records_select($synctable, "id $badids", $params);
-                $DB->delete_records_select($synctable_clone, "id $badids", $params);
-                $invalidids = array();
+                unset($invalidids_multi);
             } else {
                 break;
             }

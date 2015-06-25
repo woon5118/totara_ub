@@ -678,6 +678,19 @@ abstract class moodle_database {
     }
 
     /**
+     * TOTARA - For retrieving the maximum number of items that should be used in an SQL IN clause.
+     * This value can be used for chunking queries into batches, and should be used in combination
+     * with get_in_or_equal.
+     * NOTE: This value is only meant as a guide. The limit should work for integer parameters, but
+     *       using strings or multiple IN clauses in a single query could cause other problems such
+     *       as query maximum string lengths, depending on database, platform, configuration etc.
+     * @return int The maximum number of items that should be used in an SQL IN statement.
+     */
+    public function get_max_in_params() {
+        return 30000;
+    }
+
+    /**
      * Constructs 'IN()' or '=' sql fragment
      * @param mixed $items A single value or array of values for the expression.
      * @param int $type Parameter bounding type : SQL_PARAMS_QM or SQL_PARAMS_NAMED.
