@@ -53,15 +53,3 @@ Feature: Test restricting Totara custom menu access by roles
     And I log out
     When I log in as "testuser"
     Then I should see "test item" in the "#totaramenu" "css_element"
-
-  Scenario: Check visibility of menu item for authenticated user on home page
-    Given I click on "Restrict access by role" "text" in the "#fitem_id_role_enable" "css_element"
-    And I click on "Authenticated user on frontpage" "text" in the "#fgroup_id_roles" "css_element"
-    And I set the following fields to these values:
-      | Context | Users must have role in the system context |
-    And I click on "Save changes" "button"
-    And I log out
-    When I log in as "testuser"
-    Then I should see "test item" in the "#totaramenu" "css_element"
-    When I follow "My Learning"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
