@@ -44,6 +44,8 @@ Feature: Users completion of courses
     And I click on "Choice - Activity One" "checkbox"
     And I click on "Choice - Activity Two" "checkbox"
     And I press "Save changes"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Course 2" "link"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity Three                                    |
       | Description          | The final activity                                |
@@ -53,9 +55,8 @@ Feature: Users completion of courses
       | Completion tracking  | Show activity as complete when conditions are met |
       | id_completionsubmit  | 1                                                 |
     And I navigate to "Course completion" node in "Course administration"
-    And I click on "Condition: Activity completion" "link"
+    And I expand all fieldsets
     And I click on "Choice - Activity Three" "checkbox"
-    And I click on "Condition: Completion of other courses" "link"
     And I click on "Miscellaneous / Course 1" "option" in the "#id_criteria_course_value" "css_element"
     And I press "Save changes"
     And I log out
