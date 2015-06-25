@@ -231,6 +231,13 @@ class rb_source_completionimport_course extends rb_base_source {
         );
 
         $filteroptions[] = new rb_filter_option(
+                'base',
+                'importerrormsg',
+                get_string('columnbaseimporterrormsg', 'rb_source_completionimport_course'),
+                'text'
+        );
+
+        $filteroptions[] = new rb_filter_option(
                 'importuser',
                 'userfullname',
                  get_string('columnbaseimportuserfullname', 'rb_source_completionimport_course'),
