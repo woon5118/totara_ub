@@ -172,7 +172,7 @@ M.totara_cohortprogramcompletion = M.totara_cohortprogramcompletion || {
             $('.completiontime').datepicker({
                 dateFormat: M.util.get_string('datepickerlongyeardisplayformat', 'totara_core'),
                 showOn: 'both',
-                buttonImage: M.util.image_url('t/calendar', 'theme'),
+                buttonImage: M.util.image_url('t/calendar', 'totara_core'),
                 buttonImageOnly: true,
                 beforeShow: function() { $('#ui-datepicker-div').css('z-index',1600); },
                 constrainInput: true
