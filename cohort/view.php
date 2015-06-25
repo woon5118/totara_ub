@@ -50,9 +50,8 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     $PAGE->set_heading($COURSE->fullname);
 }
 
-
-
 require_capability('moodle/cohort:view', $context);
+$canedit = has_capability('moodle/cohort:manage', $context);
 
 if ($cohort->cohorttype == cohort::TYPE_DYNAMIC) {
     $cohort->rulesetoperator = $DB->get_field('cohort_rule_collections', 'rulesetoperator', array('id' => $cohort->draftcollectionid));
@@ -67,7 +66,7 @@ if (!$cancelurl) {
     $nourl = new moodle_url($cancelurl);
 }
 
-if ($delete && $cohort->id) {
+if ($delete && $cohort->id && $canedit) {
     if ($confirm and confirm_sesskey()) {
         // Get current roles assigned to this cohort.
         $roles = totara_get_cohort_roles($cohort->id);
@@ -95,7 +94,7 @@ if ($delete && $cohort->id) {
     die();
 }
 
-if ($clone && $cohort->id) {
+if ($clone && $cohort->id && $canedit) {
     if ($confirm && confirm_sesskey()) {
         $result = totara_cohort_clone_cohort($cohort->id);
         if ($result) {
@@ -244,8 +243,10 @@ if ($cohort->cohorttype == cohort::TYPE_DYNAMIC) {
 } // End if cohort type is dynamic.
 
 echo $out;
-$cloneurl = new moodle_url("/cohort/view.php", array('id'=>$cohort->id, 'clone'=>1));
-$delurl = new moodle_url("/cohort/view.php", array('id'=>$cohort->id, 'delete'=>1));
-echo $OUTPUT->single_button($cloneurl, get_string('clonethiscohort', 'totara_cohort'));
-echo $OUTPUT->single_button($delurl, get_string('deletethiscohort', 'totara_cohort'));
+if ($canedit) {
+    $cloneurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'clone' => 1));
+    $delurl = new moodle_url("/cohort/view.php", array('id' => $cohort->id, 'delete' => 1));
+    echo $OUTPUT->single_button($cloneurl, get_string('clonethiscohort', 'totara_cohort'));
+    echo $OUTPUT->single_button($delurl, get_string('deletethiscohort', 'totara_cohort'));
+}
 echo $OUTPUT->footer();
