@@ -10,8 +10,8 @@ Feature: Unlocking without deleting course completion data
       | Course 1 | C1 | 0 |
     And the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | Frist | teacher1@asd.com |
-      | student1 | Student | First | student1@asd.com |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -29,7 +29,7 @@ Feature: Unlocking without deleting course completion data
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Label" to section "1" and I fill the form with:
       | Label text | Test label |
     And I add a "Forum" to section "1" and I fill the form with:
@@ -79,8 +79,8 @@ Feature: Unlocking without deleting course completion data
       | Course 1 | C1 | 0 |
     And the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | Frist | teacher1@asd.com |
-      | student1 | Student | First | student1@asd.com |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -98,7 +98,7 @@ Feature: Unlocking without deleting course completion data
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Label" to section "1" and I fill the form with:
       | Label text | Test label |
     And I add a "Forum" to section "1" and I fill the form with:
@@ -135,7 +135,7 @@ Feature: Unlocking without deleting course completion data
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria without deleting"
     And I set the following fields to these values:
-      | Assign - Test assignment name | 1 |
+      | Assignment - Test assignment name | 1 |
     And I press "Save changes"
     And I trigger cron
     And I am on homepage
@@ -154,8 +154,8 @@ Feature: Unlocking without deleting course completion data
       | Course 1 | C1 | 0 |
     And the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | Frist | teacher1@asd.com |
-      | student1 | Student | First | student1@asd.com |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -173,7 +173,7 @@ Feature: Unlocking without deleting course completion data
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Label" to section "1" and I fill the form with:
       | Label text | Test label |
     And I add a "Forum" to section "1" and I fill the form with:
@@ -210,7 +210,7 @@ Feature: Unlocking without deleting course completion data
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria without deleting"
     And I set the following fields to these values:
-      | Assign - Test assignment name | 1 |
+      | Assignment - Test assignment name | 1 |
     And I press "Save changes"
     And I trigger cron
     And I am on homepage
@@ -247,9 +247,9 @@ Feature: Unlocking without deleting course completion data
       | Course 1 | C1 | 0 |
     And the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | Frist | teacher1@asd.com |
-      | student1 | Student | First | student1@asd.com |
-      | student2 | Student | Second | student2@asd.com |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
+      | student2 | Student | Second | student2@example.com |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -268,7 +268,7 @@ Feature: Unlocking without deleting course completion data
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
@@ -330,9 +330,9 @@ Feature: Unlocking without deleting course completion data
       | Course 1 | C1 | 0 |
     And the following "users" exist:
       | username | firstname | lastname | email |
-      | teacher1 | Teacher | Frist | teacher1@asd.com |
-      | student1 | Student | First | student1@asd.com |
-      | student2 | Student | Second | student2@asd.com |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
+      | student2 | Student | Second | student2@example.com |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -351,7 +351,7 @@ Feature: Unlocking without deleting course completion data
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
       | Enable completion tracking | Yes |
-    And I press "Save changes"
+    And I press "Save and display"
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name | Test forum name |
       | Description | Test forum description |
