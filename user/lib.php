@@ -897,6 +897,23 @@ function user_get_user_navigation_info($user, $page) {
         $returnobject->navitems[] = $item;
     }
 
+    // Load languages
+    $langs = get_string_manager()->get_list_of_translations();
+
+    if (count($langs) > 1) {
+        $divider = new stdClass();
+        $divider->itemtype = 'divider';
+        $returnobject->navitems[] = $divider;
+
+        foreach ($langs as $lang_code => $lang_text) {
+            $lang_menuoption = new stdClass();
+            $lang_menuoption->itemtype = 'link';
+            $lang_menuoption->url = new moodle_url($page->url, array('lang' => $lang_code) );
+            $lang_menuoption->title = s($lang_text);
+            $returnobject->navitems[] = $lang_menuoption;
+        }
+    }
+
     // Add the last item to the list.
     if (!is_null($lastobj)) {
         $returnobject->navitems[] = $lastobj;

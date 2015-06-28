@@ -47,7 +47,21 @@ $hascustommenu = !empty($custommenu);
 $haslogininfo = empty($PAGE->layout_options['nologininfo']);
 $showmenu = empty($PAGE->layout_options['nocustommenu']);
 $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
-$left = (!right_to_left());
+
+// Set default (LTR) layout mark-up for a three column page.
+$regionmainbox = 'span9';
+$regionmain = 'span8 pull-right';
+$sidepre = 'span4 desktop-first-column';
+$sidepost = 'span3 pull-right';
+$left = true;
+// Reset layout mark-up for RTL languages.
+if (right_to_left()) {
+    $regionmainbox = 'span9 pull-right';
+    $regionmain = 'span8';
+    $sidepre = 'span4 pull-right';
+    $sidepost = 'span3 desktop-first-column';
+    $left = false;
+}
 
 if ($showmenu && !$hascustommenu) {
     // load totara menu
@@ -87,15 +101,7 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
-            <ul class="nav nav-collapse collapse <?php echo $left ? "pull-right" : "pull-left" ?>">
-                <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
-                <?php if ($haslogininfo) { ?>
-                    <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
-                <?php }
-                if ($haslangmenu) { ?>
-                    <li><?php echo $OUTPUT->lang_menu(); ?></li>
-                <?php } ?>
-            </ul>
+            <?php echo $OUTPUT->user_menu(); ?>
             <?php echo $OUTPUT->page_heading(); ?>
             <?php if ($showmenu) { ?>
                 <?php if ($hascustommenu) { ?>
@@ -109,30 +115,22 @@ echo $OUTPUT->doctype() ?>
 </header>
 
 <div id="page" class="container-fluid">
-    <header id="page-header" class="clearfix">
-        <div id="page-navbar" class="clearfix">
-            <div class="breadcrumb-nav"><?php echo $OUTPUT->navbar(); ?></div>
-            <nav class="breadcrumb-button"><?php echo $OUTPUT->page_heading_button(); ?></nav>
-        </div>
-        <div id="course-header">
-            <?php echo $OUTPUT->course_header(); ?>
-        </div>
-    </header>
+    <?php echo $OUTPUT->full_header(); ?>
 
     <div id="page-content" class="row-fluid">
-        <div id="region-bs-main-and-pre" class="span9 <?php echo $left ? "pull-left" : "pull-right" ?>">
+        <div id="region-main-box" class="<?php echo $regionmainbox ?>">
             <div class="row-fluid">
-                <section id="region-main" class="span8 <?php echo $left ? "pull-right" : "pull-left" ?>">
+                <section id="region-main" class="span8 <?php echo $regionmain ?>">
                     <?php
                     echo $OUTPUT->course_content_header();
                     echo $OUTPUT->main_content();
                     echo $OUTPUT->course_content_footer();
                     ?>
                 </section>
-                <?php echo $OUTPUT->blocks('side-pre', 'span4' . ($left ? ' desktop-first-column' : '')); ?>
+                <?php echo $OUTPUT->blocks('side-pre', $sidepre); ?>
             </div>
         </div>
-        <?php echo $OUTPUT->blocks('side-post', 'span3' . (!$left ? ' desktop-first-column pull-left' : '')); ?>
+        <?php echo $OUTPUT->blocks('side-post', $sidepost); ?>
     </div>
 
 </div>

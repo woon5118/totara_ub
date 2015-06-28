@@ -30,8 +30,6 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
         global $OUTPUT, $PAGE, $CFG, $SITE;
         $output = '';
         $output .= html_writer::start_tag('header');
-        $output .= html_writer::tag('div', $OUTPUT->login_info(), array('id' => 'login-info'));
-
         $output .= html_writer::start_tag('div', array('id' => 'main-menu'));
 
         // Small responsive button.
@@ -72,11 +70,9 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
             }
         }
 
-        // Language Menu.
-        $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
-        if ($haslangmenu) {
-            $output .= $OUTPUT->lang_menu();
-        }
+        // Profile Menu.
+        $output.= $OUTPUT->user_menu();
+
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('header');

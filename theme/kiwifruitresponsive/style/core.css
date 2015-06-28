@@ -420,8 +420,7 @@ p.errormessage {
     background:transparent;
 }
 #page-header {
-    width:100%;
-    margin:0;
+    margin:0 1%;
     border-bottom:0;
     background:transparent;
 }

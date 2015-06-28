@@ -89,15 +89,7 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
-            <ul class="nav nav-collapse collapse <?php echo $left ? "pull-right" : "pull-left" ?>">
-                <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
-                <?php if ($haslogininfo) { ?>
-                    <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
-                <?php }
-                if ($haslangmenu) { ?>
-                    <li><?php echo $OUTPUT->lang_menu(); ?></li>
-                <?php } ?>
-            </ul>
+            <?php echo $OUTPUT->user_menu(); ?>
             <?php echo $OUTPUT->page_heading(); ?>
             <?php if ($showmenu) { ?>
                 <?php if ($hascustommenu) { ?>
@@ -111,15 +103,7 @@ echo $OUTPUT->doctype() ?>
 </header>
 
 <div id="page" class="container-fluid">
-    <header id="page-header" class="clearfix">
-        <div id="page-navbar" class="clearfix">
-            <div class="breadcrumb-nav"><?php echo $OUTPUT->navbar(); ?></div>
-            <nav class="breadcrumb-button"><?php echo $OUTPUT->page_heading_button(); ?></nav>
-        </div>
-        <div id="course-header">
-            <?php echo $OUTPUT->course_header(); ?>
-        </div>
-    </header>
+    <?php echo $OUTPUT->full_header(); ?>
 
     <div id="page-content" class="row-fluid">
         <section id="region-main" class="span12">

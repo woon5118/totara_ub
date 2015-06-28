@@ -55,7 +55,16 @@ if ($showmenu && !$hascustommenu) {
     $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
 }
 
-$left = (!right_to_left());  // To know if to add 'pull-right' and 'desktop-first-column' classes in the layout for LTR.
+$regionmain = 'span9 pull-right';
+$sidepre = 'span3 desktop-first-column';
+$left = true;
+// Reset layout mark-up for RTL languages.
+if (right_to_left()) {
+    $regionmain = 'span9';
+    $sidepre = 'span3 pull-right';
+    $left = false;
+}
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -87,15 +96,7 @@ echo $OUTPUT->doctype() ?>
                 <span class="icon-bar"></span>
                 <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
-            <ul class="nav nav-collapse collapse <?php echo $left ? "pull-right" : "pull-left" ?>">
-                <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
-                <?php if ($haslogininfo) { ?>
-                    <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>
-                <?php }
-                if ($haslangmenu) { ?>
-                    <li><?php echo $OUTPUT->lang_menu(); ?></li>
-                <?php } ?>
-            </ul>
+            <?php echo $OUTPUT->user_menu(); ?>
             <?php echo $OUTPUT->page_heading(); ?>
             <?php if ($showmenu) { ?>
                 <?php if ($hascustommenu) { ?>
@@ -109,31 +110,17 @@ echo $OUTPUT->doctype() ?>
 </header>
 
 <div id="page" class="container-fluid">
-    <header id="page-header" class="clearfix">
-        <div id="page-navbar" class="clearfix">
-            <div class="breadcrumb-nav"><?php echo $OUTPUT->navbar(); ?></div>
-            <nav class="breadcrumb-button"><?php echo $OUTPUT->page_heading_button(); ?></nav>
-        </div>
-        <div id="course-header">
-            <?php echo $OUTPUT->course_header(); ?>
-        </div>
-    </header>
+    <?php echo $OUTPUT->full_header(); ?>
 
     <div id="page-content" class="row-fluid">
-        <section id="region-main" class="span9 <?php echo $left ? "pull-right" : "pull-left" ?>">
+        <section id="region-main" class="<?php echo $regionmain ?>">
             <?php
             echo $OUTPUT->course_content_header();
             echo $OUTPUT->main_content();
             echo $OUTPUT->course_content_footer();
             ?>
         </section>
-        <?php
-        $classextra = '';
-        if ($left) {
-            $classextra = ' desktop-first-column';
-        }
-        echo $OUTPUT->blocks('side-pre', 'span3'.$classextra);
-        ?>
+        <?php echo $OUTPUT->blocks('side-pre', $sidepre); ?>
     </div>
 
 </div>

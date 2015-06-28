@@ -920,14 +920,6 @@ input#id_submitbutton2:hover {
 .navbar .nav {
     clear: none;
 }
-.navbar .nav li {
-    float: right;
-    clear: right;
-}
-.dir-rtl .navbar .nav li {
-    float: left;
-    clear: left;
-}
 .navbar .nav li label {
     display: none;
 }
