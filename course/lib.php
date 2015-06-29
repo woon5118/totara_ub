@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->dirroot.'/course/format/lib.php');
+require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 
 define('COURSE_MAX_LOGS_PER_PAGE', 1000);       // Records.
 define('COURSE_MAX_RECENT_PERIOD', 172800);     // Two days, in seconds.
@@ -2664,6 +2665,10 @@ function create_course($data, $editoroptions = NULL) {
     // set up enrolments
     enrol_course_updated(true, $course, $data);
 
+    // Save the custom fields.
+    $data->id = $course->id;
+    customfield_save_data($data, 'course', 'course');
+
     // Trigger a course created event.
     $event = \core\event\course_created::create(array(
         'objectid' => $course->id,
@@ -2773,6 +2778,9 @@ function update_course($data, $editoroptions = NULL) {
 
     // update enrol settings
     enrol_course_updated(false, $course, $data);
+
+    // Update the custom fields.
+    customfield_save_data($data, 'course', 'course');
 
     // TOTARA performance improvement - invalidate static caching of course information.
     global $CFG;

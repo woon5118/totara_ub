@@ -232,9 +232,6 @@ if ($editform->is_cancelled()) {
             }
         }
 
-        $data->id = $course->id;
-        customfield_save_data($data, 'course', 'course');
-
         // Get the context of the newly created course.
         $context = context_course::instance($course->id, MUST_EXIST);
 
@@ -276,7 +273,6 @@ if ($editform->is_cancelled()) {
                 tag_set('course', $course->id, array());
             }
         }
-        customfield_save_data($data, 'course', 'course');
     }
 
     // Get context for capability checks.
