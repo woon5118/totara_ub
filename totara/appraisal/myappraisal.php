@@ -53,7 +53,7 @@ $action = optional_param('action', 'stages', PARAM_ACTION);
 // Check that the subject/role are valid in the given appraisal.
 $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $subjectid, $USER->id, $role, $preview);
 if (!$appraisal->can_access($roleassignment)) {
-    throw new moodle_exception('error:cannotaccessappraisal');
+    throw new appraisal_exception(get_string('error:cannotaccessappraisal', 'totara_appraisal'));
 }
 
 // Set system context.

@@ -1743,7 +1743,7 @@ class appraisal {
         $results = $DB->get_records_sql($sql, array($subjectid));
 
         if (!$results) {
-            throw new moodle_exception('error:subjecthasnoappraisals');
+            throw new appraisal_exception(get_string('error:subjecthasnoappraisals', 'totara_appraisal'));
         }
         return new appraisal(reset($results)->appraisalid);
     }

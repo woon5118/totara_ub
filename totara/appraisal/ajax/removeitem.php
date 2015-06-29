@@ -43,7 +43,7 @@ $appraisal = new appraisal($stage->appraisalid);
 $roleassignment = new appraisal_role_assignment($reviewdata->appraisalroleassignmentid);
 
 if (!$appraisal->can_access($roleassignment)) {
-    throw new moodle_exception('error:cannotaccessappraisal');
+    throw new appraisal_exception(get_string('error:cannotaccessappraisal', 'totara_appraisal'));
 }
 
 // Check if other roles have already provided answers, preventing the deletion.

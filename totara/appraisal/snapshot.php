@@ -75,7 +75,7 @@ if ($action == 'stages') {
 $roleassignment = appraisal_role_assignment::get_role($appraisal->id, $subjectid, $USER->id, $role);
 $userassignment = $roleassignment->get_user_assignment();
 if (!$appraisal->can_access($roleassignment)) {
-    throw new appraisal_exception('error:cannotaccessappraisal');
+    throw new appraisal_exception(get_string('error:cannotaccessappraisal', 'totara_appraisal'));
 }
 $assignments = $appraisal->get_all_assignments($subjectid);
 $otherassignments = $assignments;
