@@ -226,7 +226,13 @@ class message {
         if (in_array($prop, $this->properties)) {
             return isset($this->$prop);
         }
-        throw new \coding_exception("Invalid property $prop specified");
+        if ($prop === 'timecreated') {
+            // Totara allows hacking of timecreated in message_send().
+            return false;
+        }
+        // Totara: Moodle has coding exception here that makes little sense!
+        debugging("Invalid property $prop specified", DEBUG_DEVELOPER);
+        return false;
     }
 
     /**
