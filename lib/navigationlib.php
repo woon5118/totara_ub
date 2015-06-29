@@ -4388,10 +4388,6 @@ class settings_navigation extends navigation_node {
             $useraccount->add(get_string("changepassword"), $passwordchangeurl, self::TYPE_SETTING, null, 'changepassword');
         }
 
-        // Add positions links
-        require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
-        pos_add_nav_positions_links($course->id, $user->id, $usersetting);
-
         if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
             if ($currentuser && has_capability('moodle/user:editownprofile', $systemcontext) ||
                     has_capability('moodle/user:editprofile', $usercontext)) {

@@ -1274,6 +1274,7 @@ $string['updatescalevaluesuccess'] = 'Scale value updated';
 $string['useraspirationalposition'] = 'Aspirational Position';
 $string['useraspirationalposition_help'] = 'This is the target position the user will be progressing towards. Click **Choose position** to select the user\'s aspirational position from position framework(s) set up.';
 $string['useresourcelevelevidence'] = 'Use resource-level evidence';
+$string['userpositiondetails'] = 'User position details';
 $string['weight'] = 'Weight';
 $string['xandychild'] = '{$a->item} (and {$a->num} child)';
 $string['xandychildren'] = '{$a->item} (and {$a->num} children)';

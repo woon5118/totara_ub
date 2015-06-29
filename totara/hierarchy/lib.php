@@ -115,6 +115,82 @@ function totara_hierarchy_install_default_comp_scale() {
     return true;
 }
 
+/**
+ * Display Totara Position information in the user's profile.
+ *
+ * @param \core_user\output\myprofile\tree $tree Tree object
+ * @param stdClass $user user object
+ * @param bool $iscurrentuser is the user viewing profile, current user ?
+ * @param stdClass $course course object
+ *
+ * @return bool
+ */
+function totara_hierarchy_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
+    global $USER, $DB;
+
+    $sql = "SELECT p.fullname as pos, o.fullname as org, u.id as manid, " . get_all_user_name_fields(true, 'u') . "
+                FROM {pos_assignment} pa
+                    LEFT JOIN {pos} p ON pa.positionid = p.id
+                    LEFT JOIN {org} o ON pa.organisationid = o.id
+                    LEFT JOIN {user} u ON u.id = pa.managerid
+                WHERE pa.userid = ? AND pa.type = 1 ";
+
+    $record = $DB->get_record_sql($sql, array($user->id), IGNORE_MULTIPLE);
+
+    if (!$record) {
+        // Position info not found.
+        return false;
+    }
+
+    // Check if the user can view the user's position details.
+    $systemcontext   = context_system::instance();
+    $usercontext = context_user::instance($user->id);
+    $canview = false;
+
+    if (!empty($USER->id) && ($user->id == $USER->id) && has_capability('totara/hierarchy:viewposition', $systemcontext)) {
+        // Can view own profile.
+        $canview = true;
+    } else if (!empty($course) && has_capability('moodle/user:viewdetails', context_course::instance($course->id))) {
+        $canview = true;
+    } else if (has_capability('moodle/user:viewdetails', $usercontext)) {
+        $canview = true;
+    }
+
+    if (!$canview) {
+        // User not allowed to see user details.
+        return false;
+    }
+
+    // Add category. This node should appear after 'contact' so that administration block appears towards the end. Refer MDL-49928.
+    $category = new core_user\output\myprofile\category('position', get_string('userpositiondetails', 'totara_hierarchy'), 'contact');
+    $tree->add_category($category);
+
+    // Position.
+    if (isset($record->pos)) {
+        $title = get_string('position', 'totara_hierarchy');
+        $node = new core_user\output\myprofile\node('position', 'pos', $title, null, null, $record->pos);
+        $tree->add_node($node);
+    }
+
+    // Organisation.
+    if (isset($record->org)) {
+        $title = get_string('organisation', 'totara_hierarchy');
+        $node = new core_user\output\myprofile\node('position', 'org', $title, null, null, $record->org);
+        $tree->add_node($node);
+    }
+
+    // Manager.
+    if (isset($record->manid)) {
+        $title = get_string('manager', 'totara_hierarchy');
+        $manurl = html_writer::link(new moodle_url('/user/profile.php', array("id" => $record->manid)), fullname($record));
+
+        $localnode = new core_user\output\myprofile\node('position', 'manager', $title, null, null, $manurl);
+        $tree->add_node($localnode);
+    }
+
+    return true;
+}
+
 class hierarchy_event_handler {
 
     /**

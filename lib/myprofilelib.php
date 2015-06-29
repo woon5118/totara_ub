@@ -101,8 +101,8 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         }
     }
 
-    // Preference page. Only visible by administrators.
-    if (!$iscurrentuser && is_siteadmin()) {
+    // Preference page. Show it to the current user, administrators and people with the right capabilities.
+    if ($iscurrentuser || has_capability('moodle/user:update', $usercontext)) {
         $url = new moodle_url('/user/preferences.php', array('userid' => $user->id));
         $title = get_string('preferences', 'moodle');
         $node = new core_user\output\myprofile\node('administration', 'preferences', $title, null, $url);
@@ -118,6 +118,9 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
         $tree->add_node($node);
     }
+
+    // Position links.
+    pos_add_node_positions_links($course, $user, $tree);
 
     // Contact details.
     if (has_capability('moodle/user:viewhiddendetails', $usercontext)) {
@@ -166,6 +169,12 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
     if (!isset($hiddenfields['city']) && $user->city) {
         $node = new core_user\output\myprofile\node('contact', 'city', get_string('city'), null, null, $user->city);
+        $tree->add_node($node);
+    }
+
+    if (!isset($hiddenfields['timezone']) && $user->timezone) {
+        $timezone = core_date::get_localised_timezone(core_date::get_user_timezone($user));
+        $node = new core_user\output\myprofile\node('contact', 'timezone', get_string('timezone'), null, null, $timezone);
         $tree->add_node($node);
     }
 

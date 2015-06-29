@@ -690,35 +690,23 @@ class position_assignment extends data_object {
 }
 
 /**
- * Setup Position links in navigation - called from navigationlib.php generate_user_settings()
+ * Setup Position links in the user's profile page - called from myprofilelib.php
  *
- * @param $courseid id of current course to obtain course context
- * @param $userid the id of the user - may be the current user or an admin viewing the profile of another user
- * @param $usersetting the navigation node we add the Positions links to
+ * @param stdClass $course Course object
+ * @param stdClass $user User object - The user who profile are we watching.
+ * @param core_user\output\myprofile\tree $tree the tree navigation where we want to add the Positions links node.
  * @return void
  */
-function pos_add_nav_positions_links($courseid, $userid, $usersetting) {
-    global $CFG, $USER, $POSITION_CODES, $POSITION_TYPES;
+function pos_add_node_positions_links($course, $user, $tree) {
+    global $POSITION_CODES, $POSITION_TYPES;
 
-    $systemcontext   = context_system::instance();
-    $usercontext = context_user::instance($userid);
-    $coursecontext = context_course::instance($courseid);
-
-    $canview = false;
-    if (!empty($USER->id) && ($userid == $USER->id) && has_capability('totara/hierarchy:viewposition', $systemcontext)) {
-        // Can view own profile.
-        $canview = true;
-    } else if (has_capability('moodle/user:viewdetails', $coursecontext)) {
-        $canview = true;
-    } else if (has_capability('moodle/user:viewdetails', $usercontext)) {
-        $canview = true;
-    }
-
+    $userid = $user->id;
+    $canedit = pos_can_edit_position_assignment($userid);
     $positionsenabled = get_config('totara_hierarchy', 'positionsenabled');
-    if ($canview && $positionsenabled) {
+    if ($canedit && $positionsenabled) {
         $posbaseargs['user'] = $userid;
-
         $enabled_positions = explode(',', $positionsenabled);
+
         // Get default enabled position type.
         foreach ($POSITION_CODES as $ptype => $poscode) {
             if (in_array($poscode, $enabled_positions)) {
@@ -728,13 +716,12 @@ function pos_add_nav_positions_links($courseid, $userid, $usersetting) {
         }
         $url = new moodle_url('/user/positions.php', array_merge($posbaseargs, array('type' => $dtype)));
 
-        // Link to users Positions page.
-        $positions = $usersetting->add(get_string('positions', 'totara_hierarchy'), null, navigation_node::TYPE_CONTAINER);
-
         foreach ($POSITION_TYPES as $pcode => $ptype) {
             if (in_array($pcode, $enabled_positions)) {
                 $url = new moodle_url('/user/positions.php', array_merge($posbaseargs, array('type' => $ptype)));
-                $positions->add(get_string('type' . $ptype, 'totara_hierarchy'), $url, navigation_node::TYPE_USER);
+                $title = get_string('type' . $ptype, 'totara_hierarchy');
+                $node = new core_user\output\myprofile\node('administration', $ptype, $title, null, $url);
+                $tree->add_node($node);
             }
         }
     }
