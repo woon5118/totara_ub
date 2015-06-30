@@ -157,6 +157,7 @@ $table->head = array(
     get_string('role') . ' ' . $OUTPUT->help_icon('roles', 'core_role'),
     get_string('description'),
     get_string('roleshortname', 'core_role'),
+    get_string('roleassignmentsnum', 'totara_core'), // Totara: show number of role assignments.
     get_string('edit')
 );
 
@@ -201,6 +202,10 @@ foreach ($roles as $role) {
         $row[3] .= get_action_icon($baseurl . '?action=delete&amp;roleid=' . $role->id,
               'delete', $strdelete, get_string('deletexrole', 'core_role', $role->localname));
     }
+
+    // Totara: show number of users.
+    $row[4] = $row[3];
+    $row[3] = $DB->count_records('role_assignments', array('roleid' => $role->id));
 
     $table->data[] = $row;
 }

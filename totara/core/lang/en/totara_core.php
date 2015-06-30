@@ -455,6 +455,7 @@ $string['report'] = 'Report';
 $string['reportedat'] = 'Reported at';
 $string['requiresjs'] = 'This {$a} requires Javascript to be enabled.';
 $string['returntocourse'] = 'Return to the course';
+$string['roleassignmentsnum'] = 'Assignments';
 $string['roledefaults'] = 'Default role settings';
 $string['roledefaultsnochanges'] = 'No role changes detected';
 $string['save'] = 'Save';
