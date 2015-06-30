@@ -1,4 +1,4 @@
-@core @core_user
+@core @core_user @javascript
 Feature: Add blocks to my profile page
   In order to add more functionality to my profile page
   As a user
@@ -17,7 +17,7 @@ Feature: Add blocks to my profile page
       | student1 | C1 | student |
       | student2 | C1 | student |
     And I log in as "admin"
-    And I follow "View profile"
+    And I follow "Profile" in the user menu
 
   Scenario: Add blocks to page
     When I press "Customise this page"
