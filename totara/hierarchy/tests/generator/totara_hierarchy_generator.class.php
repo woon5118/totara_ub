@@ -193,6 +193,146 @@ class totara_hierarchy_generator extends component_generator_base {
     }
 
     /**
+     * Create hierarchy type.
+     */
+    public function create_pos_type($data = array()) {
+        return $this->create_hierarchy_type('position', $data);
+    }
+
+    public function create_org_type($data = array()) {
+        return $this->create_hierarchy_type('organisation', $data);
+    }
+
+    public function create_comp_type($data = array()) {
+        return $this->create_hierarchy_type('competency', $data);
+    }
+
+    public function create_goal_type($data = array()) {
+        return $this->create_hierarchy_type('goal', $data);
+    }
+
+    public function create_hierarchy_type($prefix, $data = array()) {
+        global $USER, $DB;
+
+        $shortprefix = $this->hierarchy_type_prefix[$prefix];
+
+        $type = new \stdClass();
+        $type->idnumber = (isset($data['idnumber']) ? $data['idnumber'] : $prefix.$USER->id);
+        $type->fullname = (isset($data['fullname']) ? $data['fullname'] : 'Hierarchy '.ucfirst($prefix).' type');
+        $type->description  = '';
+        $type->timemodified = time();
+        $type->usermodified = $USER->id;
+        $type->timecreated  = time();
+        $id = $DB->insert_record($shortprefix.'_type', $type);
+        if (!$typeid = $DB->get_field($shortprefix.'_type', 'id', array('idnumber' => $type->idnumber))) {
+            throw new coding_exception('Unknown hierarchy type idnumber '.$type->idnumber.' in hierarchy definition');
+        }
+        return $id;
+    }
+
+    public function create_hierarchy_type_menu($data) {
+        $customfield = $data;
+        $customfield['field']  = 'menu';
+        $customfield['param1'] = "1234"."\n"."2345"."\n"."3456"."\n"."4567";
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
+    public function create_hierarchy_type_text($data) {
+        $customfield = $data;
+        $customfield['field']  = 'text';
+        $customfield['param1'] = 30;
+        $customfield['param2'] = 2048;
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
+    public function create_hierarchy_type_datetime($data) {
+        $customfield = $data;
+        $customfield['field']  = 'datetime';
+        $customfield['param1'] = date("Y")-1; // Start year.
+        $customfield['param2'] = date("Y")+5; // End year.
+        //$customfield['param3'] = 1; // Include time. 0 for exclude.
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
+    public function create_hierarchy_type_checkbox($data) {
+        $customfield = $data;
+        $customfield['field']  = 'checkbox';
+        $this->create_hierarchy_type_customfield($customfield);
+    }
+
+    private function create_hierarchy_type_customfield($customfield) {
+        global $CFG, $DB;
+
+        $datatype = $customfield['field'];
+        $shortprefix = $this->hierarchy_type_prefix[$customfield['hierarchy']];
+        $tableprefix = $shortprefix.'_type';
+        if (!$typeid = $DB->get_field($tableprefix, 'id', array('idnumber' => $customfield['typeidnumber']))) {
+            throw new coding_exception('Unknown hierarchy type idnumber '.$customfield['typeidnumber'].' in hierarchy definition');
+        }
+
+        $data = new \stdClass();
+        $data->id = 0;
+        $data->shortname = $datatype . $typeid;
+        $data->typeid = $typeid;
+        $data->datatype = $datatype;
+        $data->description_editor = array('text' => '', 'format' => '1', 'itemid' => time());
+        $data->hidden   = 0;
+        $data->locked   = 0;
+        $data->required = 0;
+        $data->forceunique = 0;
+        $data->defaultdata = $customfield['value'];
+        if (isset($customfield['param1'])) {
+            $data->param1 = $customfield['param1'];
+        }
+        if (isset($customfield['param2'])) {
+            $data->param2 = $customfield['param2'];
+        }
+        if (isset($customfield['param3'])) {
+            $data->param3 = $customfield['param3'];
+        }
+        if (isset($customfield['param4'])) {
+            $data->param4 = $customfield['param4'];
+        }
+        if (isset($customfield['param5'])) {
+            $data->param5 = $customfield['param5'];
+        }
+        $data->fullname  = ucfirst($customfield['hierarchy']).' type '.$datatype;
+
+        require_once($CFG->dirroot.'/totara/customfield/field/'.$datatype.'/define.class.php');
+        $customfieldclass = 'customfield_define_'.$datatype;
+        $field = new $customfieldclass();
+        $field->define_save($data, $tableprefix);
+    }
+
+    /**
+     * Assign the requested hierarchy type to hierarchy
+     *
+     * @param array $data of prefix, hierarchy type custom field, hierarchy type id number, hierarchy id number, the value of custom field
+     * @throws coding_exception
+     */
+    public function create_hierarchy_type_assign($data) {
+        global $DB;
+
+        // Pre-process any fields that require transforming.
+        $shortprefix = hierarchy::get_short_prefix($data['hierarchy']);
+        if (!$typeid = $DB->get_field($shortprefix.'_type', 'id', array('idnumber' => $data['typeidnumber']))) {
+            throw new coding_exception('Unknown hierarchy type idnumber '.$data['typeidnumber'].' in hierarchy definition');
+        }
+        $DB->set_field($shortprefix, 'typeid', $typeid, array('idnumber' => $data['idnumber']));
+        if (!$hierarchyid = $DB->get_field($shortprefix, 'id', array('idnumber' => $data['idnumber']))) {
+            throw new coding_exception('Unknown hierarchy idnumber '.$data['idnumber'].' in hierarchy definition');
+        }
+        $field = $data['field'];
+        $input = "customfield_{$field}{$typeid}";
+
+        $item = new \stdClass();
+        $item->id = $hierarchyid;
+        $item->typeid = $typeid;
+        $item->{$input} = $data['value'];
+        customfield_save_data($item, $data['hierarchy'], $shortprefix.'_type');
+    }
+
+    /**
      * Create a hierarchy based on the shortprefix and assign it to a framework.
      *
      * @param $frameworkid

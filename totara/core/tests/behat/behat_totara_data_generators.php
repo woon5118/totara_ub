@@ -83,6 +83,10 @@ class behat_totara_data_generators extends behat_base {
                     'pos_framework' => 'frameworkid',
                 ),
             ),
+            'position type' => array(
+                'datagenerator' => 'pos_type',
+                'required' => array('fullname', 'idnumber'),
+            ),
             'position assignments' => array(
                 'datagenerator' => 'pos_assign',
                 'required' => array('user', 'position'),
@@ -102,6 +106,10 @@ class behat_totara_data_generators extends behat_base {
                     'org_framework' => 'frameworkid',
                 ),
             ),
+            'organisation type' => array(
+                'datagenerator' => 'org_type',
+                'required' => array('fullname', 'idnumber'),
+            ),
             'organisation assignments' => array(
                 'datagenerator' => 'org_assign',
                 'required' => array('user', 'organisation'),
@@ -109,6 +117,48 @@ class behat_totara_data_generators extends behat_base {
                     'user' => 'userid',
                     'organisation' => 'organisationid',
                 ),
+            ),
+            'competency frameworks' => array(
+                'datagenerator' => 'comp_frame',
+                'required' => array('idnumber'),
+            ),
+            'competencies' => array(
+                'datagenerator' => 'comp',
+                'required' => array('fullname', 'idnumber', 'comp_framework'),
+                'switchids' => array(
+                    'comp_framework' => 'frameworkid',
+                ),
+            ),
+            'competency type' => array(
+                'datagenerator' => 'comp_type',
+                'required' => array('fullname', 'idnumber'),
+            ),
+            'goal frameworks' => array(
+                'datagenerator' => 'goal_frame',
+                'required' => array('idnumber'),
+            ),
+            'goals' => array(
+                'datagenerator' => 'goal',
+                'required' => array('fullname', 'idnumber', 'goal_framework'),
+                'switchids' => array(
+                    'goal_framework' => 'frameworkid',
+                ),
+            ),
+            'goal type' => array(
+                'datagenerator' => 'goal_type',
+                'required' => array('fullname', 'idnumber'),
+            ),
+            'hierarchy type assignments' => array(
+                'datagenerator' => 'hierarchy_type_assign',
+                'required' => array('hierarchy', 'field', 'typeidnumber', 'idnumber', 'value'),
+            ),
+            'checkbox field for hierarchy type' => array(
+                'datagenerator' => 'hierarchy_type_checkbox',
+                'required' => array('hierarchy', 'typeidnumber', 'value'),
+            ),
+            'textinput field for hierarchy type' => array(
+                'datagenerator' => 'hierarchy_type_text',
+                'required' => array('hierarchy', 'typeidnumber', 'value'),
             ),
             'manager assignments' => array(
                 'datagenerator' => 'man_assign',
@@ -299,6 +349,16 @@ class behat_totara_data_generators extends behat_base {
     public function get_position_id($idnumber) {
         global $DB;
         return $DB->get_field('pos', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_comp_framework_id($idnumber) {
+        global $DB;
+        return $DB->get_field('comp_framework', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_competency_id($idnumber) {
+        global $DB;
+        return $DB->get_field('comp', 'id', array('idnumber' => $idnumber));
     }
 
     public function get_goal_framework_id($idnumber) {
