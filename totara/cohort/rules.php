@@ -137,7 +137,7 @@ if (($data = data_submitted()) && confirm_sesskey()) {
 
         // The changes in cohort enrolments are not triggered automatically via events, let's hardcode it here for now.
         require_once("$CFG->dirroot/enrol/cohort/locallib.php");
-        enrol_cohort_sync(new null_progress_trace(), null);
+        enrol_cohort_sync(new null_progress_trace(), null, $cohort->id);
 
         // Set notification.
         totara_set_notification(get_string('rulesapprovesuccess', 'totara_cohort'), $url->out(), array('class' => 'notifysuccess'));
