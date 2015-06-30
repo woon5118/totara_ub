@@ -198,6 +198,9 @@ class dml_missing_record_exception extends dml_exception {
         $this->sql       = $sql;
         $this->params    = $params;
 
+        // Totara: no table hints, enable debug mode to find out the cause of problems on production sites.
+        $tablename = null;
+
         switch ($tablename) {
             case null:
                 $errcode = 'invalidrecordunknown';

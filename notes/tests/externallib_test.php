@@ -448,7 +448,8 @@ class core_notes_externallib_testcase extends externallib_advanced_testcase {
             core_notes_external::view_notes($course->id, $student->id + 100);
             $this->fail('Exception expected due to invalid user id.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('invaliduser', $e->errorcode);
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
     }
 }

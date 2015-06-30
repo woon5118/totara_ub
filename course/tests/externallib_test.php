@@ -1196,8 +1196,9 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         try {
             core_course_external::delete_modules(array('1337'));
             $this->fail('Exception expected due to missing course module.');
-        } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invalidcoursemodule', $e->errorcode);
+        } catch (moodle_exception $e) {
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
 
         // Create two modules.

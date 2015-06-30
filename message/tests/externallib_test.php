@@ -567,7 +567,8 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
             $messages = core_message_external::get_messages(2500, 0, 'conversations', true, true, 0, 0);
             $this->fail('Exception expected due invalid users.');
         } catch (moodle_exception $e) {
-            $this->assertEquals('invaliduser', $e->errorcode);
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
 
         // Invalid users (permissions).
@@ -664,8 +665,9 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
         try {
             $messageid = core_message_external::mark_message_read($messageids[0]['messageid'] * 2, time());
             $this->fail('Exception expected due invalid messageid.');
-        } catch (dml_missing_record_exception $e) {
-            $this->assertEquals('invalidrecord', $e->errorcode);
+        } catch (moodle_exception $e) {
+            // Totara: do not show any table hints.
+            $this->assertInstanceOf('dml_missing_record_exception', $e);
         }
 
         // A message to a different user.
