@@ -26,6 +26,7 @@ div#custommenu  {
     margin: 0;
     padding: 0;
     z-index:1;
+    border-top: none;
 }
 div#totaramenu ul,
 div#custommenu ul  {
@@ -143,7 +144,6 @@ div#totaramenu ul li.selected li a,
 div#custommenu ul li.selected li a {
     color: #888;
     background: #FFF;
-    border: none;
     border-bottom: 1px solid #DDD;
 }
 /* secondary nav - not selected child of selected parent - hover */
