@@ -96,7 +96,7 @@ $string['fileisinuse'] = 'File is currently being used elsewhere : {$a}';
 $string['sourcefile'] = 'Source file name';
 $string['sourcefile_help'] = 'Please enter the file name and full path name to a file on the server.
 
-eg: /var/moodledata/csvimport/course.csv
+eg: /var/sitedata/csvimport/course.csv
 
 This option allows you to upload a file externally via FTP rather than using a form via HTTP
 

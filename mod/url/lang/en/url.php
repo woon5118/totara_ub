@@ -57,7 +57,7 @@ $string['modulenameplural'] = 'URLs';
 $string['page-mod-url-x'] = 'Any URL module page';
 $string['parameterinfo'] = '&amp;parameter=variable';
 $string['parametersheader'] = 'URL variables';
-$string['parametersheader_help'] = 'Some internal Moodle variables may be automatically appended to the URL. Type your name for the parameter into each text box(es) and then select the required matching variable.';
+$string['parametersheader_help'] = 'Some internal Totara variables may be automatically appended to the URL. Type your name for the parameter into each text box(es) and then select the required matching variable.';
 $string['pluginadministration'] = 'URL module administration';
 $string['pluginname'] = 'URL';
 $string['popupheight'] = 'Pop-up height (in pixels)';

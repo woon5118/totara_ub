@@ -33,5 +33,5 @@ $string['pathdvips'] = 'Path of <i>dvips</i> binary';
 $string['pathdvisvgm'] = 'Path of <i>dvisvgm</i> binary';
 $string['pathlatex'] = 'Path of <i>latex</i> binary';
 $string['pathmimetex'] = 'Path of <i>mimetex</i> binary';
-$string['pathmimetexdesc'] = 'Moodle will use its own mimetex binary unless another valid path is specified.';
+$string['pathmimetexdesc'] = 'Totara will use its own mimetex binary unless another valid path is specified.';
 $string['source'] = 'TeX source';

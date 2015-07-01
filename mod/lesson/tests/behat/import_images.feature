@@ -25,7 +25,7 @@ Feature: In a lesson activity, teacher can import embedded images in questions a
       | Description | Test lesson description |
     And I follow "Test lesson name"
     And I follow "Import questions"
-    And I set the field "File format" to "Moodle XML format"
+    And I set the field "File format" to "Totara XML format"
     And I upload "mod/lesson/tests/fixtures/multichoice.xml" file to "Upload" filemanager
     And I press "Import"
     Then I should see "Importing 1 questions"

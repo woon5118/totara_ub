@@ -55,12 +55,12 @@ $string['groups_help'] = 'Optional list of file type groups that this type belon
 $string['icon'] = 'File icon';
 $string['icon_help'] = 'Icon filename.
 
-The list of icons is taken from the /pix/f directory inside your Moodle installation. You can add custom icons to this folder if required.';
+The list of icons is taken from the /pix/f directory inside your Totara installation. You can add custom icons to this folder if required.';
 $string['mimetype'] = 'MIME type';
 $string['mimetype_help'] = 'MIME type associated with this file type, e.g. &lsquo;application/x-mobipocket-ebook&rsquo;';
 $string['pluginname'] = 'File types';
-$string['revert'] = 'Restore {$a} to Moodle defaults';
-$string['revert_confirmation'] = 'Are you sure you want to restore <strong>.{$a}</strong> to Moodle defaults, discarding your changes?';
+$string['revert'] = 'Restore {$a} to defaults';
+$string['revert_confirmation'] = 'Are you sure you want to restore <strong>.{$a}</strong> to defaults, discarding your changes?';
 $string['revertfiletype'] = 'Restore a file type';
 $string['source'] = 'Type';
 $string['source_custom'] = 'Custom';

@@ -40,4 +40,4 @@ $string['programs'] = 'Programs';
 $string['shownotassigned'] = 'Show not assigned';
 $string['shownotassigned_help'] = 'Show configured programs, even if the user is not assigned';
 $string['totara_program_completion:addinstance'] = 'Add a new Program completions block';
-$string['totara_program_completion:myaddinstance'] = 'Add a new Program completions block to the My Moodle page';
+$string['totara_program_completion:myaddinstance'] = 'Add a new Program completions block to the My Learning page';

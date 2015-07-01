@@ -670,7 +670,7 @@ Even if students try to access the program URL directly, they will not be allowe
 If you set the \'Available from\' and \'Available until\' dates, students will be able to find and enter the program during the period specified by the dates but will be prevented from accessing the program outside of those dates.';
 $string['programcategories'] = 'Program Categories';
 $string['programcategory'] = 'Program Category';
-$string['programcategory_help'] = 'Your Moodle administrator may have set up several program/course categories.
+$string['programcategory_help'] = 'Your Totara administrator may have set up several program/course categories.
 
 For example, "Science", "Humanities", "Public Health" etc
 
@@ -700,7 +700,7 @@ $string['programicon'] = 'Program icon';
 $string['programid'] = 'Program ID';
 $string['programidnotfound'] = 'Program does not exist for ID : {$a}';
 $string['programidnumber'] = 'Program ID number';
-$string['programidnumber_help'] = 'The ID number of a program is only used when matching this course against external systems - it is never displayed within Moodle. If you have an official code name for this program then use it here ... otherwise you can leave it blank.';
+$string['programidnumber_help'] = 'The ID number of a program is only used when matching this course against external systems - it is never displayed within Totara. If you have an official code name for this program then use it here ... otherwise you can leave it blank.';
 $string['programlive'] = 'Caution: Program is live - there are students who will see or be affected by changes you make';
 $string['programmandatory'] = 'Program mandatory';
 $string['programmessages'] = 'Program messages';

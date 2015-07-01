@@ -42,8 +42,8 @@ $string['caution'] = 'Caution';
 $string['cliadminemail'] = 'New admin user email address';
 $string['cliadminpassword'] = 'New admin user password';
 $string['cliadminusername'] = 'Admin account username';
-$string['clialreadyconfigured'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to install Moodle for this site.';
-$string['clialreadyinstalled'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to upgrade Moodle for this site.';
+$string['clialreadyconfigured'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to install Totara for this site.';
+$string['clialreadyinstalled'] = 'The configuration file config.php already exists. Please use admin/cli/install_database.php to upgrade Totara for this site.';
 $string['cliinstallfinished'] = 'Installation completed successfully.';
 $string['cliinstallheader'] = 'Totara {$a} command line installation program';
 $string['climustagreelicense'] = 'In non interactive mode you must agree to license by specifying --agree-license option';
@@ -241,7 +241,7 @@ $string['welcomep20'] = 'You are seeing this page because you have successfully 
     launched the <strong>{$a->packname} {$a->packversion}</strong> package in your computer. Congratulations!';
 $string['welcomep30'] = 'This release of the <strong>{$a->installername}</strong> includes the applications 
     to create an environment in which <strong>Totara</strong> will operate, namely:';
-$string['welcomep40'] = 'The package also includes <strong>Moodle {$a->moodlerelease} ({$a->moodleversion})</strong>.';
+$string['welcomep40'] = 'The package also includes <strong>Totara {$a->moodlerelease} ({$a->moodleversion})</strong>.';
 $string['welcomep50'] = 'The use of all the applications in this package is governed by their respective 
     licences. The complete <strong>{$a->installername}</strong> package is 
     <a href="http://www.opensource.org/docs/definition_plain.html">open source</a> and is distributed 

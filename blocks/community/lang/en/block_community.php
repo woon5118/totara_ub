@@ -32,7 +32,7 @@ $string['additionalcoursedesc'] = '{$a->lang} Creator: {$a->creatorname} - Publi
     - Audience: {$a->audience} - Educational level: {$a->educationallevel} - License: {$a->license}';
 $string['addcourse'] = 'Search';
 $string['audience'] = 'Designed for';
-$string['audience_help'] = 'What kind of course are you looking for?  As well as traditional courses intended for students, you might search for communities of Educators or Moodle Administrators';
+$string['audience_help'] = 'What kind of course are you looking for?  As well as traditional courses intended for students, you might search for communities of Educators or Totara Administrators';
 $string['blocks'] = 'Blocks';
 $string['cannotselecttopsubject'] = 'Cannot select a top subject level';
 $string['comments'] = 'Comments ({$a})';
@@ -61,16 +61,16 @@ $string['educationallevel_help'] = 'What educational level are you searching for
 $string['enroldownload'] = 'Find';
 $string['enroldownload_help'] = 'Some courses listed in the selected hub are being advertised so that people can come and participate in them on the original site.
 
-Others are course templates provided for you to download and use on your own Moodle site.';
+Others are course templates provided for you to download and use on your own Totara site.';
 $string['enrollable'] = 'courses I can enrol in';
 $string['enrollablecourses'] = 'Enrollable courses';
 $string['errorcourselisting'] = 'An error occurred when retrieving the course listing from the selected hub, please try again later. ({$a})';
-$string['errorhublisting'] = 'An error occurred when retrieving the hub listing from Moodle.org, please try again later. ({$a})';
+$string['errorhublisting'] = 'An error occurred when retrieving the hub listing from Totara.org, please try again later. ({$a})';
 $string['fileinfo'] = 'Language: {$a->lang} - License: {$a->license} -  Time updated: {$a->timeupdated}';
 $string['hideall'] = 'Hide hubs';
 $string['hub'] = 'hub';
 $string['hubnottrusted'] = 'Not trusted';
-$string['hubtrusted'] = 'This hub is trusted by Moodle.org';
+$string['hubtrusted'] = 'This hub is trusted by Totara.org';
 $string['install'] = 'Install';
 $string['keywords'] = 'Keywords';
 $string['keywords_help'] = 'You can search for courses containing specific text in the name, description and other fields of the database.';

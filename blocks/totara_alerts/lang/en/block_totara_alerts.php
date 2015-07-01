@@ -26,5 +26,5 @@ $string['showempty_help'] = 'When enabled if there are no alerts to display the 
 To enable this option the global setting will have to be enabled in the alerts block settings.';
 $string['showemptyconfig'] = 'Show empty block';
 $string['totara_alerts:addinstance'] = 'Add a new alerts block';
-$string['totara_alerts:myaddinstance'] = 'Add a new alerts block to the My Moodle page';
+$string['totara_alerts:myaddinstance'] = 'Add a new alerts block to the My Learning page';
 

@@ -38,6 +38,6 @@ $string['targetdatabase'] = 'Target database';
 $string['targetdatabasenotempty'] = 'Target database must not contain any tables with given prefix!';
 $string['transferdata'] = 'Transfer data';
 $string['transferdbintro'] = 'This script will transfer the entire contents of this database to another database server. It is often used for migration of data to different database type.';
-$string['transferdbtoserver'] = 'Transfer this Moodle database to another server';
+$string['transferdbtoserver'] = 'Transfer this Totara database to another server';
 $string['transferringdbto'] = 'Transferring this {$a->dbtypefrom} database to {$a->dbtype} database "{$a->dbname}" on "{$a->dbhost}"';
 

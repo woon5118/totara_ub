@@ -37,7 +37,7 @@
 
 $string['application/msword'] = 'Word document';
 $string['application/pdf'] = 'PDF document';
-$string['application/vnd.moodle.backup'] = 'Moodle backup';
+$string['application/vnd.moodle.backup'] = 'Totara backup';
 $string['application/vnd.ms-excel'] = 'Excel spreadsheet';
 $string['application/vnd.ms-powerpoint'] = 'Powerpoint presentation';
 $string['application/vnd.openxmlformats-officedocument.presentationml.presentation'] = 'Powerpoint presentation';

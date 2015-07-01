@@ -90,7 +90,7 @@ Feature: Add customised file types
     And I navigate to "File types" node in "Site administration > Server"
     When I click on "Delete 7z" "link"
     And I press "Yes"
-    And I follow "Restore 7z to Moodle defaults"
+    And I follow "Restore 7z to defaults"
     And I press "Yes"
     Then I should not see "Deleted" in the "7z" "table_row"
 
@@ -101,7 +101,7 @@ Feature: Add customised file types
     And I set the following fields to these values:
       | File icon | document |
     And I press "Save changes"
-    When I follow "Restore 7z to Moodle defaults"
+    When I follow "Restore 7z to defaults"
     And I press "Yes"
     Then "//img[contains(@src, 'archive')]" "xpath_element" should exist in the "7z" "table_row"
 

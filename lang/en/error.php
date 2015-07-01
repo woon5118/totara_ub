@@ -23,9 +23,9 @@
  */
 
 $string['authnotexisting'] = 'The autorization plugin doesn\'t exist';
-$string['backupcontainexternal'] = 'This backup file contains external Moodle Network Hosts that are not configured locally';
+$string['backupcontainexternal'] = 'This backup file contains external Totara Network Hosts that are not configured locally';
 $string['backuptablefail'] = 'Backup tables could NOT be set up successfully!';
-$string['batchinsertargnottraverable'] = 'The second argument is not an array, moodle_recordset or other iterable type';
+$string['batchinsertargnottraverable'] = 'The second argument is not an array, recordset or other iterable type';
 $string['batchinsertinvalidparamcount'] = 'The number of parameters does not match the field count';
 $string['batchinsertitemfailedvalidation'] = 'An item provided by the iterator failed validation by function "{$a}"';
 $string['batchinsertitemnotanobject'] = 'The item provided by the iterator is not an object';
@@ -74,7 +74,7 @@ $string['cannotdeleterolewithid'] = 'Could not delete role with ID {$a}';
 $string['cannotdeletethisrole'] = 'You cannot delete this role because it is used by the system, or because it is the last role with administrator capabilities.';
 $string['cannotdisableformat'] = 'You can not disable the default format';
 $string['cannotdownloadcomponents'] = 'Cannot download components';
-$string['cannotdownloadlanguageupdatelist'] = 'Cannot download list of language updates from download.moodle.org';
+//$string['cannotdownloadlanguageupdatelist'] = 'Cannot download list of language updates from download.totaralms.com'; // Not used in Totara.
 $string['cannotdownloadzipfile'] = 'Cannot download ZIP file';
 $string['cannoteditcomment'] = 'This comment is not yours to edit!';
 $string['cannoteditcommentexpired'] = 'You can\'t edit this. The time has expired!';
@@ -375,7 +375,7 @@ $string['loginasonecourse'] = 'You cannot enter this course.<br /> You have to t
 $string['maxbytes'] = 'The file is larger than the maximum size allowed.';
 $string['maxareabytes'] = 'The file is larger than the space remaining in this area.';
 $string['messagingdisable'] = 'Messaging is disabled on this site';
-$string['mimetexisnotexist'] = 'Your system is not configured to run mimeTeX. You need to download the appropriate executable for you PHP_OS platform from <a href="http://moodle.org/download/mimetex/">http://moodle.org/download/mimetex/</a>, or obtain the C source from <a href="http://www.forkosh.com/mimetex.zip"> http://www.forkosh.com/mimetex.zip</a>, compile it and put the executable into your moodle/filter/tex/ directory.';
+$string['mimetexisnotexist'] = 'Your system is not configured to run mimeTeX. You need to download the appropriate executable for you PHP_OS platform from <a href="http://moodle.org/download/mimetex/">http://moodle.org/download/mimetex/</a>, or obtain the C source from <a href="http://www.forkosh.com/mimetex.zip"> http://www.forkosh.com/mimetex.zip</a>, compile it and put the executable into your filter/tex/ directory.';
 $string['mimetexnotexecutable'] = 'Custom mimetex is not executable!';
 $string['missingfield'] = 'Field "{$a}" is missing';
 $string['missingkeyinsql'] = 'ERROR: missing param "{$a}" in query';
@@ -452,7 +452,7 @@ $string['orderidnotfound'] = 'Order ID {$a} not found';
 $string['pagenotexist'] = 'An unusual error occurred (tried to reach a page that does not exist)';
 $string['pathdoesnotstartslash'] = 'No valid arguments supplied, path does not start with slash!';
 $string['pleasereport'] = 'If you have time, please let us know what you were trying to do when the error occurred:';
-$string['pluginrequirementsnotmet'] = 'Plugin "{$a->pluginname}" ({$a->pluginversion}) could not be installed.  It requires a newer version of Moodle (currently you are using {$a->currentmoodle}, you need {$a->requiremoodle}).';
+$string['pluginrequirementsnotmet'] = 'Plugin "{$a->pluginname}" ({$a->pluginversion}) could not be installed.  It requires a newer version of Totara (currently you are using {$a->currentmoodle}, you need {$a->requiremoodle}).';
 $string['prefixcannotbeempty'] = '<p>Error: database table prefix cannot be empty ({$a})</p>
 <p>The site administrator must fix this problem.</p>';
 $string['prefixtoolong'] = '<p>Error: database table prefix is too long ({$a->dbfamily})</p>
@@ -511,7 +511,7 @@ $string['TODO'] = 'TODO';
 $string['tokengenerationfailed'] = 'Cannot generate a new token.';
 $string['transactionvoid'] = 'Transaction cannot be voided because it has already been voided';
 $string['unenrolerror'] = 'An error occurred while trying to unenrol that person';
-$string['unicodeupgradeerror'] = 'Sorry, but your database is not already in Unicode, and this version of Moodle is not able to migrate your database to Unicode.  Please upgrade to Moodle 1.7.x first and perform the Unicode migration from the Admin page.  After that is done you should be able to migrate to Moodle {$a}';
+$string['unicodeupgradeerror'] = 'Sorry, but your database is not already in Unicode, and this version of Totara is not able to migrate your database to Unicode.  Please upgrade to Totara 1.7.x first and perform the Unicode migration from the Admin page.  After that is done you should be able to migrate to Totara {$a}';
 $string['unknowaction'] = 'Unknown action!';
 $string['unknowcategory'] = 'Category not known!';
 $string['unknowcontext'] = 'This is an unknown context ({$a}) in get_child_contexts!';
@@ -541,7 +541,7 @@ $string['unspecifycourseid'] = 'Must specify course id, short name or idnumber';
 $string['unsupportedevent'] = 'Unsupported event type';
 $string['unsupportedstate'] = 'Unsupported completion state';
 $string['unsupportedwebserver'] = 'Web server software ({$a}) is not supported, sorry.';
-$string['upgraderequires19'] = 'Error: New Moodle version was installed on server, unfortunately upgrade from the previous version is not supported.<br />Please upgrade first to latest 1.9.x release. You can also return to previous version by reinstalling original files.';
+$string['upgraderequires19'] = 'Error: New Totara version was installed on server, unfortunately upgrade from the previous version is not supported.<br />Please upgrade first to latest 1.9.x release. You can also return to previous version by reinstalling original files.';
 $string['upgraderunning'] = 'Site is being upgraded, please retry later.';
 $string['urlnotdefinerss'] = 'URL not defined for RSS feed';
 $string['useradmineditadmin'] = 'Only administrators are allowed to modify other administrator accounts';

@@ -27,7 +27,7 @@ $string['cohortnonmemberinfo'] = 'Only members of audience \'{$a}\' can self-enr
 $string['cohortonly'] = 'Only audience members';
 $string['cohortonly_help'] = 'Self enrolment may be restricted to members of a specified audience only. Note that changing this setting has no effect on existing enrolments.';
 $string['customwelcomemessage'] = 'Custom welcome message';
-$string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Moodle-auto format, including HTML tags and multi-lang tags.
+$string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Totara-auto format, including HTML tags and multi-lang tags.
 
 The following placeholders may be included in the message:
 

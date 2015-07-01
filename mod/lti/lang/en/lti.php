@@ -54,11 +54,11 @@ $string['accept_grades'] = 'Accept grades from the tool';
 $string['accept_grades_admin'] = 'Accept grades from the tool';
 $string['accept_grades_admin_help'] = 'Specify whether the tool provider can add, update, read, and delete grades associated with instances of this tool type.
 
-Some tool providers support reporting grades back to Moodle based on actions taken within the tool, creating a more integrated
+Some tool providers support reporting grades back to Totara based on actions taken within the tool, creating a more integrated
 experience.';
 $string['accept_grades_help'] = 'Specify whether the tool provider can add, update, read, and delete grades associated only with this external tool instance.
 
-Some tool providers support reporting grades back to Moodle based on actions taken within the tool, creating a more integrated experience.
+Some tool providers support reporting grades back to Totara based on actions taken within the tool, creating a more integrated experience.
 
 Note that this setting may be overridden in the tool configuration.';
 $string['action'] = 'Action';
@@ -69,7 +69,7 @@ $string['addserver'] = 'Add new trusted server';
 $string['addtype'] = 'Add external tool configuration';
 $string['allow'] = 'Allow';
 $string['allowinstructorcustom'] = 'Allow teachers to add custom parameters';
-$string['allowsetting'] = 'Allow tool to store 8K of settings in Moodle';
+$string['allowsetting'] = 'Allow tool to store 8K of settings in Totara';
 $string['always'] = 'Always';
 $string['automatic'] = 'Automatic, based on launch URL';
 $string['baseurl'] = 'Base URL/tool registration name';
@@ -117,11 +117,11 @@ $string['debuglaunchon'] = 'Debug launch';
 $string['default'] = 'Default';
 $string['default_launch_container'] = 'Default launch container';
 $string['default_launch_container_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
-real estate to the tool, and others provide a more integrated feel with the Moodle environment.
+real estate to the tool, and others provide a more integrated feel with the Totara environment.
 
 * **Default** - Use the launch container specified by the tool configuration.
-* **Embed** - The tool is displayed within the existing Moodle window, in a manner similar to most other Activity types.
-* **Embed, without blocks** - The tool is displayed within the existing Moodle window, with just the navigation controls
+* **Embed** - The tool is displayed within the existing Totara window, in a manner similar to most other Activity types.
+* **Embed, without blocks** - The tool is displayed within the existing Totara window, with just the navigation controls
         at the top of the page.
 * **New window** - The tool opens in a new window, occupying all the available space.
         Depending on the browser, it will open in a new tab or a popup window.
@@ -153,18 +153,18 @@ $string['embed'] = 'Embed';
 $string['embed_no_blocks'] = 'Embed, without blocks';
 $string['enableemailnotification'] = 'Send notification emails';
 $string['enableemailnotification_help'] = 'If enabled, students will receive email notification when their tool submissions are graded.';
-$string['errormisconfig'] = 'Misconfigured tool. Please ask your Moodle administrator to fix the configuration of the tool.';
+$string['errormisconfig'] = 'Misconfigured tool. Please ask your Totara administrator to fix the configuration of the tool.';
 $string['existing_window'] = 'Existing window';
 $string['extensions'] = 'LTI extension services';
 $string['external_tool_type'] = 'External tool type';
-$string['external_tool_type_help'] = 'The main purpose of a tool configuration is to set up a secure communication channel between Moodle and the tool provider.
+$string['external_tool_type_help'] = 'The main purpose of a tool configuration is to set up a secure communication channel between Totara and the tool provider.
 It also provides an opportunity for configuration defaults and setting up additional services provided by the tool.
 
-* **Automatic, based on Launch URL** - This setting should be used in almost all cases. Moodle will select the most appropriate tool configuration
+* **Automatic, based on Launch URL** - This setting should be used in almost all cases. Totara will select the most appropriate tool configuration
        based on the Launch URL. Tools configured by both an administrator or within this course will be used.
-       When the Launch URL is specified, Moodle will provide feedback on whether it recognizes it or not. If Moodle does not recognize the Launch URL,
+       When the Launch URL is specified, Totara will provide feedback on whether it recognizes it or not. If Totara does not recognize the Launch URL,
        you may need to enter the tool configuration details manually.
-* **A specific tool type** - By selecting a specific tool type, you can force Moodle to use that tool configuration when communicating with the
+* **A specific tool type** - By selecting a specific tool type, you can force Totara to use that tool configuration when communicating with the
        external tool provider. If the Launch URL does not appear to belong to the tool provider, a warning will appear. In some cases, it is not necessary
        to enter a Launch URL when providing a specific tool type (if not launching to a particular resource within the tool provider).
 * **Custom configuration** - To setup custom tool configuration on just this instance, show Advanced options, and enter the consumer key and
@@ -179,7 +179,7 @@ Three icons are available after the External tool type dropdown list:
 * **Edit** - Select a course level tool type from the dropdown, then click this icon. The details of the tool configuration may be edited.
 * **Delete** - Remove the selected course level tool type.';
 $string['external_tool_types'] = 'External tool types';
-$string['failedtoconnect'] = 'Moodle was unable to communicate with the "{$a}" system';
+$string['failedtoconnect'] = 'Totara was unable to communicate with the "{$a}" system';
 $string['filter_basiclti_configlink'] = 'Configure your preferred sites and their passwords';
 $string['filter_basiclti_password'] = 'Password is mandatory';
 $string['filterconfig'] = 'LTI administration';
@@ -194,7 +194,7 @@ $string['force_ssl_help'] = 'Selecting this option forces all launches to this t
 
 In addition, all web service requests from the tool provider will use SSL.
 
-If using this option, confirm that this Moodle site and the tool provider support SSL.';
+If using this option, confirm that this Totara site and the tool provider support SSL.';
 $string['generaltool'] = 'General tool';
 $string['global_tool_types'] = 'Global tool types';
 $string['grading'] = 'Grade routing';
@@ -203,7 +203,7 @@ $string['icon_url_help'] = 'The icon URL allows the icon that shows up in the co
 LTI icon, an icon which conveys the type of activity may be specified.';
 $string['id'] = 'id';
 $string['invalidid'] = 'LTI ID was incorrect';
-$string['launch_in_moodle'] = 'Launch tool in moodle';
+$string['launch_in_moodle'] = 'Launch tool in Totara';
 $string['launch_in_popup'] = 'Launch tool in a pop-up';
 $string['launch_url'] = 'Launch URL';
 $string['launch_url_help'] = 'The Launch URL indicates the web address of the External Tool, and may contain additional information, such as the resource to show.
@@ -213,11 +213,11 @@ If you have selected a specific tool type, you may not need to enter a Launch UR
 into the tool provider\'s system, and not go to a specific resource, this will likely be the case.';
 $string['launchinpopup'] = 'Launch container';
 $string['launchinpopup_help'] = 'The launch container affects the display of the tool when launched from the course. Some launch containers provide more screen
-real estate to the tool, and others provide a more integrated feel with the Moodle environment.
+real estate to the tool, and others provide a more integrated feel with the Totara environment.
 
 * **Default** - Use the launch container specified by the tool configuration.
-* **Embed** - The tool is displayed within the existing Moodle window, in a manner similar to most other Activity types.
-* **Embed, without blocks** - The tool is displayed within the existing Moodle window, with just the navigation controls
+* **Embed** - The tool is displayed within the existing Totara window, in a manner similar to most other Activity types.
+* **Embed, without blocks** - The tool is displayed within the existing Totara window, with just the navigation controls
         at the top of the page.
 * **New window** - The tool opens in a new window, occupying all the available space.
         Depending on the browser, it will open in a new tab or a popup window.
@@ -244,25 +244,25 @@ $string['lti_tool_request_added'] = 'Tool configuration request successfully sub
 $string['lti_tool_request_existing'] = 'A tool configuration for the tool domain has already been submitted.';
 $string['ltiunknownserviceapicall'] = 'LTI unknown service API call.';
 $string['main_admin'] = 'General help';
-$string['main_admin_help'] = 'External tools allow Moodle users to seamlessly interact with learning resources hosted remotely. Through a special
+$string['main_admin_help'] = 'External tools allow Totara users to seamlessly interact with learning resources hosted remotely. Through a special
 launch protocol, the remote tool will have access to some general information about the launching user. For example,
 the institution name, course id, user id, and other information such as the user\'s name or e-mail address.
 
 Tool types listed on this page are separated into three categories:
 
 * **Active** - These tool providers have been approved and configured by an administrator. They can be used from within any
-        course on this Moodle instance. If a consumer key and shared secret are entered, a trust relationship is established
-        between this Moodle instance and the remote tool, providing a secure communication channel.
+        course on this Totara instance. If a consumer key and shared secret are entered, a trust relationship is established
+        between this Totara instance and the remote tool, providing a secure communication channel.
 * **Pending** - These tool providers came in through a package import, but have not been configured by an administrator.
         Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.
 * **Rejected** - These tools providers are flagged as ones which an administrator has no intention of making available to the entire
-        Moodle instance. Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.';
+        Totara instance. Teachers may still use tools from these providers if they have a consumer key and shared secret, or if none is required.';
 $string['manage_tools'] = 'Manage external tool types';
 $string['manage_tool_proxies'] = 'Manage external tool registrations';
 $string['miscellaneous'] = 'Miscellaneous';
 $string['misconfiguredtools'] = 'Misconfigured tool instances were detected';
 $string['missingparameterserror'] = 'The page is misconfigured: "{$a}"';
-$string['module_class_type'] = 'Moodle module type';
+$string['module_class_type'] = 'Totara module type';
 $string['modulename'] = 'External tool';
 $string['modulename_help'] = 'The external tool activity module enables students to interact with learning resources and activities on other web sites. For example, an external tool could provide access to a new activity type or learning materials from a publisher.
 
@@ -291,17 +291,17 @@ $string['noattempts'] = 'No attempts have been made on this tool instance';
 $string['noltis'] = 'There are no external tool instances';
 $string['noprofileservice'] = 'Profile service not found';
 $string['noservers'] = 'No servers found';
-$string['notypes'] = 'There are currently no LTI tools set up in Moodle. Click the Install link above to add some.';
+$string['notypes'] = 'There are currently no LTI tools set up in Totara. Click the Install link above to add some.';
 $string['noviewusers'] = 'No users were found with permissions to use this tool';
 $string['optionalsettings'] = 'Optional settings';
 $string['organization'] = 'Organization details';
 $string['organizationdescr'] = 'Organization description';
 $string['organizationid'] = 'Organization ID';
-$string['organizationid_help'] = 'A unique identifier for this Moodle instance. Typically, the DNS name of the organization is used.
+$string['organizationid_help'] = 'A unique identifier for this Totara instance. Typically, the DNS name of the organization is used.
 
-If this field is left blank, the host name of this Moodle site will be used as the default value.';
+If this field is left blank, the host name of this Totara site will be used as the default value.';
 $string['organizationurl'] = 'Organization URL';
-$string['organizationurl_help'] = 'The base URL of this Moodle instance.
+$string['organizationurl_help'] = 'The base URL of this Totara instance.
 
 If this field is left blank, a default value will be used based on the site configuration.';
 $string['pagesize'] = 'Submissions shown per page';
@@ -312,7 +312,7 @@ $string['password_admin'] = 'Shared secret';
 $string['password_admin_help'] = 'The shared secret can be thought of as a password used to authenticate access to the tool. It should be provided
 along with the consumer key from the tool provider.
 
-Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
+Tools which do not require secure communication from Totara and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['password_help'] = 'For pre-configured tools, it is not necessary to enter a shared secret here, as the shared secret will be
 provided as part of the configuration process.
@@ -323,7 +323,7 @@ If the tool provider is to be used more than once in this course, adding a cours
 The shared secret can be thought of as a password used to authenticate access to the tool. It should be provided
 along with the consumer key from the tool provider.
 
-Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
+Tools which do not require secure communication from Totara and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
 $string['pluginadministration'] = 'LTI administration';
@@ -350,12 +350,12 @@ $string['resource'] = 'Resource';
 $string['resourcekey'] = 'Consumer key';
 $string['resourcekey_admin'] = 'Consumer key';
 $string['resourcekey_admin_help'] = 'The consumer key can be thought of as a username used to authenticate access to the tool.
-It can be used by the tool provider to uniquely identify the Moodle site from which users launch into the tool.
+It can be used by the tool provider to uniquely identify the Totara site from which users launch into the tool.
 
 The consumer key must be provided by the tool provider. The method of obtaining a consumer key varies between
 tool providers. It may be an automated process, or it may require a dialogue with the tool provider.
 
-Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
+Tools which do not require secure communication from Totara and do not provide additional services (such as grade reporting)
 may not require a resource key.';
 $string['resourcekey_help'] = 'For pre-configured tools, it is not necessary to enter a resource key here, as the consumer key will be
 provided as part of the configuration process.
@@ -364,22 +364,22 @@ This field should be entered if creating a link to a tool provider which is not 
 If the tool provider is to be used more than once in this course, adding a course tool configuration is a good idea.
 
 The consumer key can be thought of as a username used to authenticate access to the tool.
-It can be used by the tool provider to uniquely identify the Moodle site from which users launch into the tool.
+It can be used by the tool provider to uniquely identify the Totara site from which users launch into the tool.
 
 The consumer key must be provided by the tool provider. The method of obtaining a consumer key varies between
 tool providers. It may be an automated process, or it may require a dialogue with the tool provider.
 
-Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
+Tools which do not require secure communication from Totara and do not provide additional services (such as grade reporting)
 may not require a resource key.';
 $string['resourceurl'] = 'Resource URL';
 $string['return_to_course'] = 'Click <a href="{$a->link}" target="_top">here</a> to return to the course.';
 $string['saveallfeedback'] = 'Save all my feedback';
 $string['secure_icon_url'] = 'Secure icon URL';
-$string['secure_icon_url_help'] = 'Similar to the icon URL, but used if the user accessing Moodle securely through SSL. The main purpose for this field is to prevent
+$string['secure_icon_url_help'] = 'Similar to the icon URL, but used if the user accessing Totara securely through SSL. The main purpose for this field is to prevent
 the browser from warning the user if the underlying page was accessed over SSL, but requesting to show an unsecure image.';
 $string['secure_launch_url'] = 'Secure launch URL';
-$string['secure_launch_url_help'] = 'Similar to Launch URL, but used instead of the launch url if high security is required. Moodle will use the
-secure launch URL instead of the launch URL if the Moodle site is accessed through SSL, or if the tool configuration
+$string['secure_launch_url_help'] = 'Similar to Launch URL, but used instead of the launch url if high security is required. Totara will use the
+secure launch URL instead of the launch URL if the Totara site is accessed through SSL, or if the tool configuration
 is set to always launch through SSL.
 
 The Launch URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
@@ -435,7 +435,7 @@ $string['toggle_debug_data'] = 'Toggle debug data';
 $string['tool_config_not_found'] = 'Tool configuration not found for this URL.';
 $string['tool_settings'] = 'Tool settings';
 $string['toolproxy'] = 'External tool registrations';
-$string['toolproxy_help'] = 'External tool registrations allow Moodle site administrators to configure external tools from a tool proxy obtained from a tool provider supporting LTI 2.0. A registration URL provided by the tool provider is all that is required to initiate the process. The capabilities and services offered to the tool provider are selected when configuring a new registration.
+$string['toolproxy_help'] = 'External tool registrations allow Totara site administrators to configure external tools from a tool proxy obtained from a tool provider supporting LTI 2.0. A registration URL provided by the tool provider is all that is required to initiate the process. The capabilities and services offered to the tool provider are selected when configuring a new registration.
 
 Tool registrations listed on this page are separated into four categories:
 
@@ -474,7 +474,7 @@ A base URL of *quiz.tool.com* would match the following:
 
 If two different tool configurations are for the same domain, the most specific match will be used.';
 $string['typename'] = 'Tool name';
-$string['typename_help'] = 'The tool name is used to identify the tool provider within Moodle. The name entered will be visible
+$string['typename_help'] = 'The tool name is used to identify the tool provider within Totara. The name entered will be visible
 to teachers when adding external tools within courses.';
 $string['types'] = 'Types';
 $string['update'] = 'Update';

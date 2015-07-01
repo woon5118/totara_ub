@@ -24,7 +24,7 @@
  */
 
 $string['apikey'] = 'API key';
-$string['apiv1migration_message_content'] = 'As part of the recent Moodle upgrade (2.6, 2.5.3, 2.4.7), the Box repository plugin has been disabled. To re-enable it, you need to re-configure it as described in the documentation {$a->docsurl}.';
+$string['apiv1migration_message_content'] = 'As part of the recent Totara upgrade, the Box repository plugin has been disabled. To re-enable it, you need to re-configure it as described in the documentation {$a->docsurl}.';
 $string['apiv1migration_message_small'] = 'This plugin has been disabled, as it requires configuration as described in the documentation Box APIv1 migration.';
 $string['apiv1migration_message_subject'] = 'Important information regarding Box repository plugin';
 $string['boxnet:view'] = 'View Box repository';
@@ -33,7 +33,7 @@ $string['clientid'] = 'Client ID';
 $string['clientsecret'] = 'Client secret';
 $string['configplugin'] = 'Box configuration';
 $string['filesourceinfo'] = 'Box ({$a->fullname}): {$a->filename}';
-$string['information'] = 'Get a client ID and secret from the <a href="https://app.box.com/developers/services">Box developer page</a> for your Moodle site.';
+$string['information'] = 'Get a client ID and secret from the <a href="https://app.box.com/developers/services">Box developer page</a> for your Totara site.';
 $string['invalidpassword'] = 'Invalid password';
 $string['migrationadvised'] = 'It appears that you were using Box with the API version 1, have you run the <a href="{$a}">migration tool</a> to convert the old references?';
 $string['migrationinfo'] = '<p>As part of the migration to the new API provided by Box, your file references have to be migrated. Unfortunately the reference system is not compatible with the API v2, so we are going to download them and convert them to real files.</p>

@@ -36,7 +36,7 @@ $string['aicchacptimeout_desc'] = 'Length of time in minutes that an external AI
 $string['aicchacpkeepsessiondata'] = 'AICC HACP session data';
 $string['aicchacpkeepsessiondata_desc'] = 'Length of time in days to keep the external AICC HACP session data (a high setting will fill up the table with old data but may be useful when debugging)';
 $string['aiccuserid'] = 'AICC pass numeric user id';
-$string['aiccuserid_desc'] = 'The AICC standard for usernames is very restrictive compared with Moodle, and allows for alphanumeric characters, dash and underscore only. Periods, spaces and the @ symbol are not permitted. If enabled, user ID numbers are passed to the AICC package instead of usernames.';
+$string['aiccuserid_desc'] = 'The AICC standard for usernames is very restrictive compared with Totara, and allows for alphanumeric characters, dash and underscore only. Periods, spaces and the @ symbol are not permitted. If enabled, user ID numbers are passed to the AICC package instead of usernames.';
 $string['activation'] = 'Activation';
 $string['activityloading'] = 'You will be automatically redirected to the activity in';
 $string['activityoverview'] = 'You have SCORM packages that need attention';
@@ -336,7 +336,7 @@ $string['review'] = 'Review';
 $string['reviewmode'] = 'Review mode';
 $string['rightanswer'] = 'Right answer';
 $string['scorm12standard'] = 'Enable SCORM 1.2 standard mode';
-$string['scorm12standarddesc'] = 'Disabling this setting allows Moodle to store more data than the SCORM 1.2 specification allows.
+$string['scorm12standarddesc'] = 'Disabling this setting allows Totara to store more data than the SCORM 1.2 specification allows.
 If your SCORM packages allow users to enter large amounts of text or if your package tries to store large amounts of data in the suspend_data field disable this.';
 $string['scoes'] = 'Learning objects';
 $string['score'] = 'Score';

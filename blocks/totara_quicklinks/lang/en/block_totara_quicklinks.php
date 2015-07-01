@@ -2,7 +2,7 @@
 $string['managelinks'] = 'Manage links';
 $string['pluginname'] = 'Quick Links';
 $string['totara_quicklinks:addinstance'] = 'Add a new quicklinks block';
-$string['totara_quicklinks:myaddinstance'] = 'Add a new quicklinks block to My Moodle page';
+$string['totara_quicklinks:myaddinstance'] = 'Add a new quicklinks block to My Learning page';
 $string['totara_quicklinks:manageownlinks'] = 'Manage own links';
 $string['title'] = 'Quick Links';
 $string['maintitle'] = 'Main title';

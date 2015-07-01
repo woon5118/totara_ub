@@ -666,7 +666,7 @@ You can select one or multiple roles from the list.
 When **Restrict access** is set to **All users can view this report** these options will be disabled.';
 $string['reportbuildershortname'] = 'Report Builder: Unique name';
 $string['reportbuildershortname_help'] = '
-The shortname is used by moodle to keep track of this report. No two reports can be given the same shortname, even if they are based on the same source. Avoid using special characters in this field (text, numbers and underscores are okay).';
+The shortname is used by Totara to keep track of this report. No two reports can be given the same shortname, even if they are based on the same source. Avoid using special characters in this field (text, numbers and underscores are okay).';
 $string['reportbuildersorting'] = 'Sorting';
 $string['reportbuildersorting_help'] = '
 **Sorting** allows you to set a default column and sort order on a report.

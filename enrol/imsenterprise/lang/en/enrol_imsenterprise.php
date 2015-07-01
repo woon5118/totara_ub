@@ -27,28 +27,28 @@ $string['allowunenrol'] = 'Allow the IMS data to <strong>unenrol</strong> studen
 $string['allowunenrol_desc'] = 'If enabled, course enrolments will be removed when specified in the Enterprise data.';
 $string['basicsettings'] = 'Basic settings';
 $string['coursesettings'] = 'Course data options';
-$string['createnewcategories'] = 'Create new (hidden) course categories if not found in Moodle';
+$string['createnewcategories'] = 'Create new (hidden) course categories if not found in Totara';
 $string['createnewcategories_desc'] = 'If the <org><orgunit> element is present in a course\'s incoming data, its content will be used to specify a category if the course is to be created from scratch. The plugin will NOT re-categorise existing courses.
 
 If no category exists with the desired name, then a hidden category will be created.';
-$string['createnewcourses'] = 'Create new (hidden) courses if not found in Moodle';
-$string['createnewcourses_desc'] = 'If enabled, the IMS Enterprise enrolment plugin can create new courses for any it finds in the IMS data but not in Moodle\'s database. Any newly-created courses are initially hidden.';
-$string['createnewusers'] = 'Create user accounts for users not yet registered in Moodle';
-$string['createnewusers_desc'] = 'IMS Enterprise enrolment data typically describes a set of users. If enabled, accounts can be created for any users not found in Moodle\'s database.
+$string['createnewcourses'] = 'Create new (hidden) courses if not found in Totara';
+$string['createnewcourses_desc'] = 'If enabled, the IMS Enterprise enrolment plugin can create new courses for any it finds in the IMS data but not in Totara\'s database. Any newly-created courses are initially hidden.';
+$string['createnewusers'] = 'Create user accounts for users not yet registered in Totara';
+$string['createnewusers_desc'] = 'IMS Enterprise enrolment data typically describes a set of users. If enabled, accounts can be created for any users not found in Totara\'s database.
 
-Users are searched for first by their "idnumber", and second by their Moodle username. Passwords are not imported by the IMS Enterprise plugin. The use of an authentication plugin is recommended for authenticating users.';
+Users are searched for first by their "idnumber", and second by their Totara username. Passwords are not imported by the IMS Enterprise plugin. The use of an authentication plugin is recommended for authenticating users.';
 $string['cronfrequency'] = 'Frequency of processing';
 $string['deleteusers'] = 'Delete user accounts when specified in IMS data';
-$string['deleteusers_desc'] = 'If enabled, IMS Enterprise enrolment data can specify the deletion of user accounts (if the "recstatus" flag is set to 3, which represents deletion of an account). As is standard in Moodle, the user record isn\'t actually deleted from Moodle\'s database, but a flag is set to mark the account as deleted.';
+$string['deleteusers_desc'] = 'If enabled, IMS Enterprise enrolment data can specify the deletion of user accounts (if the "recstatus" flag is set to 3, which represents deletion of an account). As is standard in Totara, the user record isn\'t actually deleted from Totara\'s database, but a flag is set to mark the account as deleted.';
 $string['doitnow'] = 'perform an IMS Enterprise import right now';
 $string['emptyattribute'] = 'Leave it empty';
-$string['filelockedmail'] = 'The text file you are using for IMS-file-based enrolments ({$a}) can not be deleted by the cron process.  This usually means the permissions are wrong on it.  Please fix the permissions so that Moodle can delete the file, otherwise it might be processed repeatedly.';
+$string['filelockedmail'] = 'The text file you are using for IMS-file-based enrolments ({$a}) can not be deleted by the cron process.  This usually means the permissions are wrong on it.  Please fix the permissions so that Totara can delete the file, otherwise it might be processed repeatedly.';
 $string['filelockedmailsubject'] = 'Important error: Enrolment file';
 $string['fixcasepersonalnames'] = 'Change personal names to Title Case';
 $string['fixcaseusernames'] = 'Change usernames to lower case';
 $string['imsenterprisecrontask'] = 'Enrolment file processing';
 $string['imsenterprise:config'] = 'Configure IMS Enterprise enrol instances';
-$string['imsrolesdescription'] = 'The IMS Enterprise specification includes 8 distinct role types. Please choose how you want them to be assigned in Moodle, including whether any of them should be ignored.';
+$string['imsrolesdescription'] = 'The IMS Enterprise specification includes 8 distinct role types. Please choose how you want them to be assigned in Totara, including whether any of them should be ignored.';
 $string['location'] = 'File location';
 $string['logtolocation'] = 'Log file output location (blank for no logging)';
 $string['mailadmins'] = 'Notify admin by email';
@@ -62,7 +62,7 @@ $string['processphotowarning'] = 'Warning: Image processing is likely to add a s
 $string['restricttarget'] = 'Only process data if the following target is specified';
 $string['restricttarget_desc'] = 'An IMS Enterprise data file could be intended for multiple "targets" - different LMSes, or different systems within a school/university. It\'s possible to specify in the Enterprise file that the data is intended for one or more named target systems, by naming them in <target> tags contained within the <properties> tag.
 
-In general you don\'t need to worry about this. Leave the setting blank and Moodle will always process the data file, no matter whether a target is specified or not. Otherwise, fill in the exact name that will be output inside the <target> tag.';
+In general you don\'t need to worry about this. Leave the setting blank and Totara will always process the data file, no matter whether a target is specified or not. Otherwise, fill in the exact name that will be output inside the <target> tag.';
 $string['settingfullname'] = 'IMS description tag for the course full name';
 $string['settingfullnamedescription'] = 'The full name is a required course field so you have to define the selected description tag in your IMS Enterprise file';
 $string['settingshortname'] = 'IMS description tag for the course short name';
@@ -72,7 +72,7 @@ $string['settingsummarydescription'] = 'Is an optional field, select \'Leave it 
 $string['sourcedidfallback'] = 'Use the &quot;sourcedid&quot; for a person\'s userid if the &quot;userid&quot; field is not found';
 $string['sourcedidfallback_desc'] = 'In IMS data, the <sourcedid> field represents the persistent ID code for a person as used in the source system. The <userid> field is a separate field which should contain the ID code used by the user when logging in. In many cases these two codes may be the same - but not always.
 
-Some student information systems fail to output the <userid> field. If this is the case, you should enable this setting to allow for using the <sourcedid> as the Moodle user ID. Otherwise, leave this setting disabled.';
+Some student information systems fail to output the <userid> field. If this is the case, you should enable this setting to allow for using the <sourcedid> as the Totara user ID. Otherwise, leave this setting disabled.';
 $string['truncatecoursecodes'] = 'Truncate course codes to this length';
 $string['truncatecoursecodes_desc'] = 'In some situations you may have course codes which you wish to truncate to a specified length before processing. If so, enter the number of characters in this box. Otherwise, leave the box blank and no truncation will occur.';
 $string['usecapitafix'] = 'Tick this box if using &quot;Capita&quot; (their XML format is slightly wrong)';

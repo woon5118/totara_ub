@@ -99,7 +99,7 @@ $string['adminhelpmymoodle'] = 'Configure the My Learning blocks for users';
 $string['adminhelpreports'] = 'Site level reports';
 $string['adminhelpsitefiles'] = 'For publishing general files or uploading external backups';
 $string['adminhelpsitesettings'] = 'Define how the front page of the site looks';
-$string['adminhelpstickyblocks'] = 'Configure Moodle-wide sticky blocks';
+$string['adminhelpstickyblocks'] = 'Configure Totara-wide sticky blocks';
 $string['adminhelpthemes'] = 'Choose how the site looks (colours, fonts etc)';
 $string['adminhelpuploadusers'] = 'Import new user accounts from a text file';
 $string['adminhelpusers'] = 'Define your users and set up authentication';
@@ -243,8 +243,8 @@ $string['clamdeletedfile'] = 'The file has been deleted';
 $string['clamdeletedfilefailed'] = 'The file could not be deleted';
 $string['clamemailsubject'] = '{$a} :: Clam AV notification';
 $string['clamfailed'] = 'Clam AV has failed to run.  The return error message was {$a}. Here is the output from Clam:';
-$string['clamlost'] = 'Moodle is configured to run clam on file upload, but the path supplied to Clam AV, {$a},  is invalid.';
-$string['clamlostandactinglikevirus'] = 'In addition, Moodle is configured so that if clam fails to run, files are treated like viruses.  This essentially means that no student can upload a file successfully until you fix this.';
+$string['clamlost'] = 'Totara is configured to run clam on file upload, but the path supplied to Clam AV, {$a},  is invalid.';
+$string['clamlostandactinglikevirus'] = 'In addition, Totara is configured so that if clam fails to run, files are treated like viruses.  This essentially means that no student can upload a file successfully until you fix this.';
 $string['clammovedfile'] = 'The file has been moved to your specified quarantine directory, the new location is {$a}';
 $string['clammovedfilebasic'] = 'The file has been moved to a quarantine directory.';
 $string['clamquarantinedirfailed'] = 'Could not move the file into your specified quarantine directory, {$a}. You need to fix this as files are being deleted if they\'re found to be infected.';
@@ -282,9 +282,9 @@ $string['convertingwikitomarkdown'] = 'Converting wiki to Markdown';
 $string['cookiesenabled'] = 'Cookies must be enabled in your browser';
 $string['cookiesenabled_help'] = 'Two cookies are used by this site:
 
-The essential one is the session cookie, usually called MoodleSession. You must allow this cookie into your browser to provide continuity and maintain your login from page to page. When you log out or close the browser this cookie is destroyed (in your browser and on the server).
+The essential one is the session cookie, usually called TotaraSession. You must allow this cookie into your browser to provide continuity and maintain your login from page to page. When you log out or close the browser this cookie is destroyed (in your browser and on the server).
 
-The other cookie is purely for convenience, usually called something like MOODLEID. It just remembers your username within the browser. This means when you return to this site the username field on the login page will be already filled out for you. It is safe to refuse this cookie - you will just have to retype your username every time you log in.';
+The other cookie is purely for convenience, usually called something like TOTARAID. It just remembers your username within the browser. This means when you return to this site the username field on the login page will be already filled out for you. It is safe to refuse this cookie - you will just have to retype your username every time you log in.';
 $string['cookiesnotenabled'] = 'Unfortunately, cookies are currently not enabled in your browser';
 $string['copy'] = 'copy';
 $string['copyasnoun'] = 'copy';
@@ -327,7 +327,7 @@ $string['courseextendednamedisplay'] = '{$a->shortname} {$a->fullname}';
 $string['coursefiles'] = 'Legacy course files';
 $string['coursefilesedit'] = 'Edit legacy course files';
 $string['coursefileswarning'] = 'Course files are deprecated';
-$string['coursefileswarning_help'] = 'Course files are deprecated since Moodle 2.0, please use external repositories instead as much as possible.';
+$string['coursefileswarning_help'] = 'Course files are deprecated since Totara 2.0, please use external repositories instead as much as possible.';
 $string['courseformatdata'] = 'Course format data';
 $string['courseformats'] = 'Course formats';
 $string['courseformatoptions'] = 'Formatting options for {$a}';
@@ -351,7 +351,7 @@ $string['courseinfo'] = 'Course info';
 $string['coursemessage'] = 'Message course users';
 $string['coursenotaccessible'] = 'This course does not allow public access';
 $string['courselegacyfiles'] = 'Legacy course files';
-$string['courselegacyfiles_help'] = 'The course files area provides some backward compatibility with Moodle 1.9 and earlier.  All files in this area are always accessible to all participants in the course (whether you link to them or not) and there is no way to know where any of these files are being used in Moodle.
+$string['courselegacyfiles_help'] = 'The course files area provides some backward compatibility with Totara 1.1 and earlier.  All files in this area are always accessible to all participants in the course (whether you link to them or not) and there is no way to know where any of these files are being used in Totara.
 
 If you use this area to store course files, you can expose yourself to a number of privacy and security issues, as well as experiencing missing files in backups, course imports and any time content is shared or re-used.  It is therefore recommended that you do not use this area unless you really know what you are doing.';
 $string['courselegacyfiles_link'] = 'coursefiles2';
@@ -434,7 +434,7 @@ $string['currentpicture'] = 'Current picture';
 $string['currentrelease'] = 'Current release information';
 $string['currentversion'] = 'Current version';
 $string['dashboard'] = 'Dashboard';
-$string['databasechecking'] = 'Upgrading Moodle database from version {$a->oldversion} to {$a->newversion}';
+$string['databasechecking'] = 'Upgrading Totara database from version {$a->oldversion} to {$a->newversion}';
 $string['databaseperformance'] = 'Database performance';
 $string['databasesetup'] = 'Setting up database';
 $string['databasesuccess'] = 'Database was successfully upgraded';
@@ -518,7 +518,7 @@ $string['dndworkingfile'] = 'Drag and drop files onto course sections to upload 
 $string['dndworkingtextlink'] = 'Drag and drop text or links onto course sections to upload them';
 $string['dndworkingtext'] = 'Drag and drop text onto course sections to upload it';
 $string['dndworkinglink'] = 'Drag and drop links onto course sections to upload them';
-$string['documentation'] = 'Moodle documentation';
+$string['documentation'] = 'Totara documentation';
 $string['dontsortcategories'] = 'Don\'t sort categories';
 $string['dontsortcourses'] = 'Don\'t sort courses';
 $string['dowhatwithselectedusers'] = 'Do what with selected users';
@@ -885,7 +885,7 @@ See the Moodle License information page for full details:
 http://docs.moodle.org/dev/License';
 $string['grade'] = 'Grade';
 $string['grades'] = 'Grades';
-$string['gravatarenabled'] = '<a href="http://www.gravatar.com/">Gravatar</a> has been enabled for this site. If you don\'t upload a profile picture Moodle will attempt to load a profile picture for you from Gravatar.';
+$string['gravatarenabled'] = '<a href="http://www.gravatar.com/">Gravatar</a> has been enabled for this site. If you don\'t upload a profile picture Totara will attempt to load a profile picture for you from Gravatar.';
 $string['group'] = 'Group';
 $string['groupadd'] = 'Add new group';
 $string['groupaddusers'] = 'Add selected to group';
@@ -1035,7 +1035,7 @@ $string['lastname'] = 'Surname';
 $string['lastnamephonetic'] = 'Surname - phonetic';
 $string['lastsiteaccess'] = 'Last access to site';
 $string['lastyear'] = 'Last year';
-$string['latestlanguagepack'] = 'Check for latest language pack on moodle.org';
+$string['latestlanguagepack'] = 'Check for latest language pack on totaralms.com';
 $string['layouttable'] = 'Layout table';
 $string['leavetokeep'] = 'Leave blank to keep current password';
 $string['legacythemeinuse'] = 'This site is being displayed to you in compatibility mode because your browser is too old.';
@@ -1351,7 +1351,7 @@ $string['noteuserschangednonetocourse'] = '<strong>Note:</strong> Course users n
 $string['nothingnew'] = 'No recent activity';
 $string['nothingtodisplay'] = 'Nothing to display';
 $string['notice'] = 'Notice';
-$string['noticenewerbackup'] = 'This backup file has been created with Moodle {$a->backuprelease} ({$a->backupversion}) and it\'s newer than your currently installed Moodle {$a->serverrelease} ({$a->serverversion}). This could cause some inconsistencies because backwards compatibility of backup files cannot be guaranteed.';
+$string['noticenewerbackup'] = 'This backup file has been created with Totara {$a->backuprelease} ({$a->backupversion}) and it\'s newer than your currently installed Totara {$a->serverrelease} ({$a->serverversion}). This could cause some inconsistencies because backwards compatibility of backup files cannot be guaranteed.';
 $string['notifications'] = 'Notifications';
 $string['notifyloginfailuresmessage'] = '{$a->time}, IP: {$a->ip}, User: {$a->info}';
 $string['notifyloginfailuresmessageend'] = 'You can view these logs at {$a}';
@@ -1407,12 +1407,12 @@ $string['participationratio'] = 'Participation ratio';
 $string['participationreport'] = 'Participation report';
 $string['password'] = 'Password';
 $string['passwordconfirmchange'] = 'Confirm password change';
-$string['passwordextlink'] = 'The following link has been provided to recover your lost password. This will take you out of Moodle.';
+$string['passwordextlink'] = 'The following link has been provided to recover your lost password. This will take you out of Totara.';
 $string['passwordforgotten'] = 'Forgotten password';
 $string['passwordforgotteninstructions'] = 'Your details must first be found in the user database. Please enter <strong>either</strong> your username or your registered email address in the appropriate box. There is no need to enter both.';
 $string['passwordforgotteninstructions2'] = 'To reset your password, submit your username or your email address below. If we can find you in the database, an email will be sent to your email address, with instructions how to get access again.';
 $string['passwordchanged'] = 'Password has been changed';
-$string['passwordnohelp'] = 'No help is available to find your lost password. Please contact your Moodle administrator.';
+$string['passwordnohelp'] = 'No help is available to find your lost password. Please contact your Totara administrator.';
 $string['passwordrecovery'] = 'Yes, help me log in';
 $string['passwordreused'] = 'This password has been used before, and is not permitted to be reused';
 $string['passwordsdiffer'] = 'These passwords do not match';
@@ -1496,10 +1496,10 @@ $string['redirect'] = 'Redirect';
 $string['reducesections'] = 'Reduce the number of sections';
 $string['refresh'] = 'Refresh';
 $string['refreshingevents'] = 'Refreshing events';
-$string['registration'] = 'Moodle registration';
+$string['registration'] = 'Totara registration';
 $string['registrationcontact'] = 'Contact from the public';
 $string['registrationcontactno'] = 'No, I do not want a contact form in the site listing';
-$string['registrationcontactyes'] = 'Yes, provide a form for prospective Moodlers to contact me';
+$string['registrationcontactyes'] = 'Yes, provide a form for prospective Totara to contact me';
 $string['registrationemail'] = 'Email notifications';
 $string['registrationinfo'] = '<p>This page allows you to register your Moodle site with moodle.org.  Registration is free.
 The main benefit of registering is that you will be added to a low-volume mailing list
@@ -1980,7 +1980,7 @@ $string['virusfoundlateradmin'] = 'Attention administrator! A file that was uplo
 {$a->action}
 
 The user has also been notified.';
-$string['virusfoundlateradminnolog'] = 'Attention administrator! A file that was uploaded with the filename {$a->filename} has since been found to contain a virus. Moodle was unable to resolve this file back to the user that originally uploaded it.
+$string['virusfoundlateradminnolog'] = 'Attention administrator! A file that was uploaded with the filename {$a->filename} has since been found to contain a virus. Totara was unable to resolve this file back to the user that originally uploaded it.
 
 Here is a summary of what has happened to the file:
 

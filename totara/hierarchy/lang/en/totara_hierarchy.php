@@ -213,7 +213,7 @@ $string['competencyevidenceassessmenttype_help'] = 'The assessment type field is
 $string['competencyevidenceassessor'] = 'Evidence Assessor';
 $string['competencyevidenceassessor_help'] = 'You can select an assessor, which is a user who assessed that the current user proficient in the current competency. Assessor is an optional field so leave the pulldown on the \'Select an assessor...\' option if you do not want to assign an assessor.
 
-The pulldown lists all moodle users who are in the assessor role. If the user you wish to add is missing or no options are shown then you will need to ask an administrator to add that user to the assessor role.';
+The pulldown lists all Totara users who are in the assessor role. If the user you wish to add is missing or no options are shown then you will need to ask an administrator to add that user to the assessor role.';
 $string['competencyevidenceassessorname'] = 'Evidence Assessor Name';
 $string['competencyevidenceassessorname_help'] = 'The Assessor Name field refers to the name of the organisation that did the assessment of the user for this competency. It is an optional field so can be left blank.';
 $string['competencyevidencecompetency'] = 'Evidence Competency';
@@ -594,7 +594,7 @@ $string['goalevidenceassessmenttype_help'] = 'The assessment type field is a fre
 $string['goalevidenceassessor'] = 'Evidence Assessor';
 $string['goalevidenceassessor_help'] = 'You can select an assessor, which is a user who assessed that the current user completed the current goal. Assessor is an optional field so leave the pulldown on the \'Select an assessor...\' option if you do not want to assign an assessor.
 
-The pulldown lists all moodle users who are in the assessor role. If the user you wish to add is missing or no options are shown then you will need to ask an administrator to add that user to the assessor role.';
+The pulldown lists all Totara users who are in the assessor role. If the user you wish to add is missing or no options are shown then you will need to ask an administrator to add that user to the assessor role.';
 $string['goalevidenceassessorname'] = 'Evidence Assessor Name';
 $string['goalevidenceassessorname_help'] = 'The Assessor Name field refers to the name of the organisation that did the assessment of the user for this goal. It is an optional field so can be left blank.';
 $string['goalevidencegoal'] = 'Evidence Goal';
