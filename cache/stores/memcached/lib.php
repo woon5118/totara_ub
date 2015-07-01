@@ -100,7 +100,7 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
 
     /**
      * The an array of memcache connections for the set servers, once established.
-     * @var array
+     * @var Memcached[]
      */
     protected $setconnections = array();
 
@@ -146,6 +146,11 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
             $this->servers[] = $server;
         }
 
+        if (!$this->servers) {
+            // Totara: this should not happen.
+            return;
+        }
+
         $this->clustered = array_key_exists('clustered', $configuration) ? (bool)$configuration['clustered'] : false;
 
         if ($this->clustered) {
@@ -165,8 +170,15 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
                 if (!array_key_exists(1, $server)) {
                     $server[1] = 11211;
                 }
+                // Totara: one of the set servers should always match the read server,
+                //         they should share the same persistent connection.
+                if ($server[0] === $this->servers[0][0] and $server[1] == $this->servers[0][1]) {
+                    $server = $this->servers[0];
+                }
                 $this->setservers[] = $server;
             }
+            // Totara: buffering mey get everything out of sync really quick.
+            $bufferwrites = false;
         }
 
         $this->options[Memcached::OPT_COMPRESSION] = $compression;
@@ -175,7 +187,10 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
         $this->options[Memcached::OPT_HASH] = $hashmethod;
         $this->options[Memcached::OPT_BUFFER_WRITES] = $bufferwrites;
 
-        $this->connection = new Memcached(crc32($this->name));
+        // Totara: make sure if any settings change the connection is not reused.
+        $persistenthash = sha1(serialize($this->options) . serialize($this->servers) . $this->name);
+
+        $this->connection = new Memcached($persistenthash);
         $servers = $this->connection->getServerList();
         if (empty($servers)) {
             foreach ($this->options as $key => $value) {
@@ -186,12 +201,16 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
 
         if ($this->clustered) {
             foreach ($this->setservers as $setserver) {
-                // Since we will have a number of them with the same name, append server and port.
-                $connection = new Memcached(crc32($this->name.$setserver[0].$setserver[1]));
-                foreach ($this->options as $key => $value) {
-                    $connection->setOption($key, $value);
+                // Totara: make sure the persistent connection is shared with the reading server.
+                $persistenthash = sha1(serialize($this->options) . serialize(array($setserver)) . $this->name);
+                $connection = new Memcached($persistenthash);
+                $servers = $connection->getServerList();
+                if (empty($servers)) {
+                    foreach ($this->options as $key => $value) {
+                        $connection->setOption($key, $value);
+                    }
+                    $connection->addServers(array($setserver));
                 }
-                $connection->addServer($setserver[0], $setserver[1]);
                 $this->setconnections[] = $connection;
             }
         }
@@ -392,11 +411,16 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
     public function delete_many(array $keys) {
         if ($this->clustered) {
             // Get the minimum deleted from any of the connections.
-            $count = count($keys);
+            // Totara: count($keys) is expensive in PHP!
+            $count = null;
             foreach ($this->setconnections as $connection) {
-                $count = min($this->delete_many_connection($connection, $keys), $count);
+                if (isset($count)) {
+                    $count = min($this->delete_many_connection($connection, $keys), $count);
+                } else {
+                    $count = $this->delete_many_connection($connection, $keys);
+                }
             }
-            return $count;
+            return (isset($count) ? $count : 0);
         }
 
         return $this->delete_many_connection($this->connection, $keys);
@@ -576,7 +600,13 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
         if ($this->connection) {
             $connection = $this->connection;
         } else {
-            $connection = new Memcached(crc32($this->name));
+            // Totara: first make sure servers are actually configured.
+            if (!$this->servers or !$this->options) {
+                return;
+            }
+            // Totara: use consistent hash.
+            $persistenthash = sha1(serialize($this->options) . serialize($this->servers) . $this->name);
+            $connection = new Memcached($persistenthash);
             $servers = $connection->getServerList();
             if (empty($servers)) {
                 foreach ($this->options as $key => $value) {
@@ -587,7 +617,8 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
         }
         @$connection->flush();
         unset($connection);
-        unset($this->connection);
+        // Totara: never unset standard object properties, use NULL instead.
+        $this->connection = null;
     }
 
     /**
