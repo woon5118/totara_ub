@@ -3062,10 +3062,8 @@ class curl {
         }
 
         // Limit the protocols to HTTP and HTTPS.
-        if (defined('CURLOPT_PROTOCOLS')) {
-            $this->options['CURLOPT_PROTOCOLS'] = (CURLPROTO_HTTP | CURLPROTO_HTTPS);
-            $this->options['CURLOPT_REDIR_PROTOCOLS'] = (CURLPROTO_HTTP | CURLPROTO_HTTPS);
-        }
+        $this->options['CURLOPT_PROTOCOLS'] = (CURLPROTO_HTTP | CURLPROTO_HTTPS);
+        $this->options['CURLOPT_REDIR_PROTOCOLS'] = (CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
         // Set options.
         foreach($this->options as $name => $val) {
