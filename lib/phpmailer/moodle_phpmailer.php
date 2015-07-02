@@ -50,7 +50,7 @@ class moodle_phpmailer extends PHPMailer {
      */
     public function __construct(){
         global $CFG;
-        $this->Version   = 'Moodle '.$CFG->version;         // mailer version
+        $this->Version   = 'Totara '.$CFG->version;         // mailer version
         $this->CharSet   = 'UTF-8';
 
         // Some MTAs may do double conversion of LF if CRLF used, CRLF is required line ending in RFC 822bis.
