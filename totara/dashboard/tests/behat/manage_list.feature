@@ -19,7 +19,7 @@ Feature: Perform basic dashboard administration
       | Published | 1 |
     And I press "Create dashboard"
     Then I should see "Behat Test Dashboard" in the ".generaltable" "css_element"
-    And I should see "Dashboard saved" in the ".notifysuccess" "css_element"
+    And I should see "Dashboard saved" in the ".alert-success" "css_element"
 
   Scenario: Edit dashboard
     Given I log in as "admin"
@@ -32,7 +32,7 @@ Feature: Perform basic dashboard administration
       | Locked | 0 |
     And I press "id_submitbutton"
     Then I should see "Edited Behat Test Dashboard" in the ".generaltable" "css_element"
-    And I should see "Dashboard saved" in the ".notifysuccess" "css_element"
+    And I should see "Dashboard saved" in the ".alert-success" "css_element"
 
   @javascript
   Scenario: Assign audience to dashboard

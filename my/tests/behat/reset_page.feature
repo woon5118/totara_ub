@@ -1,8 +1,8 @@
 @core @core_my
-Feature: Reset dashboard page to default
-  In order to remove customisations from dashboard page
+Feature: Reset My learning page to default
+  In order to remove customisations from My learning page
   As a user
-  I need to reset dashboard page
+  I need to reset My learning page
 
   Background:
     Given the following "users" exist:

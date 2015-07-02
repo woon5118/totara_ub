@@ -1,5 +1,5 @@
 @core @core_my
-Feature: Restrict which blocks can be added to Dashboard
+Feature: Restrict which blocks can be added to My learning
   In order to restrict which blocks can be added
   As a student I need to ensure I can add the blocks
   As an admin I need to remove the capability to add a blocks
@@ -16,7 +16,7 @@ Feature: Restrict which blocks can be added to Dashboard
       | user | course | role |
       | student1 | C1 | student |
 
-  Scenario: The comments block can be added to My Learning by default
+  Scenario: The comments block can be added to My learning by default
     And I log in as "student1"
     And I click on "My Learning" in the totara menu
     And I press "Customise this page"
@@ -26,7 +26,7 @@ Feature: Restrict which blocks can be added to Dashboard
     And the "Add a block" select box should contain "Tags"
 
   @javascript
-  Scenario: Remove the ability to add the comments block to My Learning
+  Scenario: Remove the ability to add the comments block to My learning
     When I log in as "admin"
     And I set the following system permissions of "Authenticated user" role:
       | block/comments:myaddinstance | Prohibit |

@@ -1,8 +1,8 @@
 @core @core_my
-Feature: Add blocks to dashboard page
-  In order to add more functionality to dashboard page
+Feature: Add blocks to My learning page
+  In order to add more functionality to My learning page
   As a user
-  I need to add blocks to dashboard page
+  I need to add blocks to My learning page
 
   Background:
     Given the following "users" exist:

@@ -2,7 +2,6 @@
 Feature: test default home page feature with dashboards
   In order to test the dashboard setting on the default home page
   I must log in as an admin and set the defaulthomepage setting
-  As a student I log in
 
   Background:
     Given I am on a totara site
@@ -13,13 +12,17 @@ Feature: test default home page feature with dashboards
       | name | idnumber |
       | Cohort 1 | CH1 |
     And I log in as "admin"
-    And I follow "Turn editing on"
-    And I add a "label" to section "1"
-    And I should see "Adding a new Label"
+    And I navigate to "Front page settings" node in "Site administration > Front page"
+    # Behat does not recognize field name in this case "Front page summary"
     And I set the following fields to these values:
-      | Label text | I'm a label on the frontpage |
-    And I press "Save and return to course"
-    And I should see "I'm a label on the frontpage"
+      | summary | I'm a label on the frontpage |
+    And I press "Save changes"
+
+    # Totara 2.9 sets "My learning" as home page while upgrade from Totara 2.7 sets site front page.
+    # For testing make site fornt page as a home page.
+    And I set the following administration settings values:
+      | defaulthomepage | Site |
+
     And I add "Student One (student.one@local.host)" user to "CH1" cohort members
     And I log out
 

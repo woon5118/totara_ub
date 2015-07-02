@@ -31,7 +31,6 @@ Feature: Perform basic dashboard user changes
     And I add "learner2" user to "CH1" cohort members
     And I log out
     And I log in as "learner1"
-    And I follow "Home"
     And I follow "Dashboard unlocked published"
 
     # Add block.
@@ -59,13 +58,11 @@ Feature: Perform basic dashboard user changes
 
   Scenario: Cannot change locked dashboard
     When I log in as "learner1"
-    And I follow "Home"
     And I follow "Dashboard locked published"
     Then "Customize dashboard" "button" should not exist
 
   Scenario: Cannot see dashboard that is unpublished/unassigned
-    And I log in as "learner1"
-    When I follow "Home"
+    When I log in as "learner1"
     Then I should not see "Dashboard unassigned"
     And I should not see "Dashboard unpublished"
     And I should see "Dashboard locked published"
