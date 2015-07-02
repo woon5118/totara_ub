@@ -1023,6 +1023,30 @@ $functions = array(
         'type'        => 'read'
     ),
 
+    // Completion related functions.
+    'core_completion_update_activity_completion_status_manually' => array(
+        'classname'   => 'core_completion_external',
+        'methodname'  => 'update_activity_completion_status_manually',
+        'description' => 'Update completion status for the current user in an activity, only for activities with manual tracking.',
+        'type'        => 'write',
+    ),
+
+    'core_completion_get_activities_completion_status' => array(
+        'classname'     => 'core_completion_external',
+        'methodname'    => 'get_activities_completion_status',
+        'description'   => 'Return the activities completion status for a user in a course.',
+        'type'          => 'read',
+        'capabilities'  => '',
+    ),
+
+    'core_completion_get_course_completion_status' => array(
+        'classname'    => 'core_completion_external',
+        'methodname'   => 'get_course_completion_status',
+        'description'  => 'Returns course completion status.',
+        'type'         => 'read',
+        'capabilities' => 'report/completion:view',
+    ),
+
     // Rating functions.
     'core_rating_get_item_ratings' => array(
         'classname'     => 'core_rating_external',

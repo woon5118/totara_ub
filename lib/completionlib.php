@@ -1383,31 +1383,24 @@ class completion_info {
      *
      * @param array $modinfo For unit testing only, supply the value
      *   here. Otherwise the method calls get_fast_modinfo
-     * @return array Array from $cmid => $cm of all activities with completion enabled,
+     * @return cm_info[] Array from $cmid => $cm of all activities with completion enabled,
      *   empty array if none
      */
     public function get_activities($modinfo = null) {
-        global $DB;
 
-        // Obtain those activities which have completion turned on.
-        $withcompletion = $DB->get_records_select('course_modules', 'course='.$this->course->id.
-          ' AND completion<>'.COMPLETION_TRACKING_NONE);
-        if (!$withcompletion) {
-            return array();
-        }
-
-        // Use modinfo to get section order and also add in names.
-        if (empty($modinfo)) {
+        if ($modinfo === null) {
             $modinfo = get_fast_modinfo($this->course);
+        } else {
+            if (!PHPUNIT_TEST) {
+                $modinfo = get_fast_modinfo($this->course);
+                debugging('get_activities() parameter $modinfo can be used in unit tests only!');
+            }
         }
+
         $result = array();
-        foreach ($modinfo->sections as $sectioncms) {
-            foreach ($sectioncms as $cmid) {
-                if (array_key_exists($cmid, $withcompletion)) {
-                    $result[$cmid] = $withcompletion[$cmid];
-                    $result[$cmid]->modname = $modinfo->cms[$cmid]->modname;
-                    $result[$cmid]->name    = $modinfo->cms[$cmid]->name;
-                }
+        foreach ($modinfo->get_cms() as $cm) {
+            if ($cm->completion != COMPLETION_TRACKING_NONE) {
+                $result[$cm->id] = $cm;
             }
         }
 
