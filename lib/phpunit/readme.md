@@ -1,10 +1,10 @@
-PHPUnit testing support in Moodle
+PHPUnit testing support in Totara
 ==================================
 
 
 Documentation
 -------------
-* [Moodle PHPUnit integration](http://docs.moodle.org/dev/PHPUnit)
+* [PHPUnit integration](http://docs.moodle.org/dev/PHPUnit)
 * [PHPUnit online documentation](http://www.phpunit.de/manual/current/en/)
 * [Composer dependency manager](http://getcomposer.org/)
 
@@ -12,10 +12,10 @@ Documentation
 Composer installation
 ---------------------
 Composer is a dependency manager for PHP projects.
-It installs PHP libraries into /vendor/ subdirectory inside your moodle dirroot.
+It installs PHP libraries into /vendor/ subdirectory inside your dirroot.
 
 1. install Composer - [http://getcomposer.org/doc/00-intro.md](http://getcomposer.org/doc/00-intro.md)
-2. install PHUnit and dependencies - go to your Moodle dirroot and execute `php composer.phar install --dev`
+2. install PHUnit and dependencies - go to your dirroot and execute `php composer.phar install --dev`
 
 
 Configure your server

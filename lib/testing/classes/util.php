@@ -774,7 +774,7 @@ abstract class testing_util {
      * @return string The site info
      */
     public static function get_site_info() {
-        global $CFG;
+        global $CFG, $TOTARA;
 
         $output = '';
 
@@ -783,7 +783,7 @@ abstract class testing_util {
         $release = null;
         require("$CFG->dirroot/version.php");
 
-        $output .= "Moodle $release, $CFG->dbtype";
+        $output .= "Totara $TOTARA->release, $CFG->dbtype";
         if ($hash = self::get_git_hash()) {
             $output .= ", $hash";
         }

@@ -38,7 +38,7 @@ require_once(__DIR__.'/../../../../lib/clilib.php');
 require_once(__DIR__.'/../../../../lib/phpunit/bootstraplib.php');
 require_once(__DIR__.'/../../../../lib/testing/lib.php');
 
-echo "Initialising Moodle PHPUnit test environment...\n";
+echo "Initialising Totara PHPUnit test environment...\n";
 testing_update_composer_dependencies();
 
 $output = null;

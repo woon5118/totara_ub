@@ -83,7 +83,7 @@ Options:
 
 -h, --help     Print out this help
 
-Example from Moodle root directory:
+Example from Totara root directory:
 \$ php admin/tool/behat/cli/util.php --enable --parallel=4
 
 More info in http://docs.moodle.org/dev/Acceptance_testing#Running_tests

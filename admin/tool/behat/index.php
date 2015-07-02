@@ -49,7 +49,7 @@ $components = behat_config_manager::get_components_steps_definitions();
 if ($components) {
     foreach ($components as $component => $filepath) {
         // TODO Use a class static attribute instead of the class name.
-        $componentswithsteps[$component] = 'Moodle ' . substr($component, 6);
+        $componentswithsteps[$component] = 'Totara ' . substr($component, 6);
     }
 }
 $form = new steps_definitions_form(null, array('components' => $componentswithsteps));

@@ -74,7 +74,7 @@ Options:
 
 -h, --help Print out this help
 
-Example from Moodle root directory:
+Example from Totara root directory:
 \$ php admin/tool/behat/cli/util_single_run.php --enable
 
 More info in http://docs.moodle.org/dev/Acceptance_testing#Running_tests

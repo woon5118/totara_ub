@@ -79,7 +79,7 @@ Options:
 
 -h, --help         Print out this help
 
-Example from Moodle root directory:
+Example from Totara root directory:
 \$ php admin/tool/behat/cli/run.php --tags=\"@javascript\"
 
 More info in http://docs.moodle.org/dev/Acceptance_testing#Running_tests
@@ -386,7 +386,7 @@ function print_each_process_info($processes, $verbose = false) {
             $op = explode(PHP_EOL, $process->getOutput());
             foreach ($op as $line) {
                 // Don't print progress .
-                if (trim($line) && (strpos($line, '.') !== 0) && (strpos($line, 'Moodle ') !== 0) &&
+                if (trim($line) && (strpos($line, '.') !== 0) && (strpos($line, 'Totara ') !== 0) &&
                     (strpos($line, 'Server OS ') !== 0) && (strpos($line, 'Started at ') !== 0) &&
                     (strpos($line, 'Browser specific fixes ') !== 0)) {
                     echo $line . PHP_EOL;
