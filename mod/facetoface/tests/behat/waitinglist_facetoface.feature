@@ -36,7 +36,7 @@ Feature: Manager approval
   @javascript
   Scenario: The second student to sign up to the session should go on waiting list
     Given I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -63,7 +63,7 @@ Feature: Manager approval
     And I log out
 
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Sign-up"
     And I press "Sign-up"
@@ -71,7 +71,7 @@ Feature: Manager approval
     And I log out
 
     When I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
@@ -80,7 +80,7 @@ Feature: Manager approval
     And I log out
 
     When I log in as "student3"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Join waitlist"
     Then I should see "This session is currently full. By clicking the \"Join waitlist\" button, you will be placed on the sessions's wait-list."
@@ -89,7 +89,7 @@ Feature: Manager approval
     And I log out
 
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"

@@ -18,8 +18,7 @@ Feature: Learner creates basic learning plan
   Scenario: Learner creates empty learning plan.
 
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
     And I set the field "Plan description" to "A short and accurate description of My Learning Plan: Not a lot."
@@ -32,8 +31,7 @@ Feature: Learner creates basic learning plan
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I follow "learner1 Learning Plan"
 
     # Send the plan to the manager for approval.
@@ -89,8 +87,7 @@ Feature: Learner creates basic learning plan
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Send the plan to the manager for approval.
@@ -118,8 +115,7 @@ Feature: Learner creates basic learning plan
 
     # Login as the learner, access the plan and verify it's not been approved.
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     When I click on "learner1 Learning Plan" "link"
     Then I should see "This plan has not yet been approved"
 

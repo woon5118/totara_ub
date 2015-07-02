@@ -99,7 +99,7 @@ Feature: Add a face to face
   Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then
   sign in as user with two positions and check attendee list reflects this and the selected position can be updated
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I set the following fields to these values:
       | sid               | Yes       |

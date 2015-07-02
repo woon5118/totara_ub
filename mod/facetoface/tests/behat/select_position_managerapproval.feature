@@ -35,7 +35,7 @@ Feature: Manager approval
     And I log out
 
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -76,7 +76,7 @@ Feature: Manager approval
   @javascript
   Scenario: Student signs up with two managers assigned
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -87,14 +87,14 @@ Feature: Manager approval
     And I should see "Your booking has been completed but requires approval from your manager."
     And I log out
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"
     And I should not see "Approval required"
     And I log out
     And I log in as "teacher2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test facetoface name"
     And I follow "Attendees"

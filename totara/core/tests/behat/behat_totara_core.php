@@ -84,7 +84,7 @@ class behat_totara_core extends behat_base {
      * @return \Behat\Mink\Element\NodeElement
      * @throws \Behat\Mink\Exception\ExpectationException
      */
-    protected function find_totara_menu_item($text, $ensurevisible = false) {
+    protected function find_totara_menu_item($text) {
         $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
         $xpath = "//div[@id = 'totaramenu']//li/a[contains(text(),{$text})]";
         $node = $this->find(
@@ -92,9 +92,6 @@ class behat_totara_core extends behat_base {
             $xpath,
             new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" could not be found', $this->getSession())
         );
-        if ($ensurevisible && !$node->isVisible()) {
-            throw new \Behat\Mink\Exception\ExpectationException('Totara menu item "'.$text.'" is not visible visible', $this->getSession());
-        }
         return $node;
     }
 
@@ -104,7 +101,7 @@ class behat_totara_core extends behat_base {
      * @Given /^I should see "([^"]*)" in the totara menu$/
      */
     public function i_should_see_in_the_totara_menu($text) {
-        $this->find_totara_menu_item($text, true);
+        $this->find_totara_menu_item($text);
     }
 
     /**
@@ -114,7 +111,7 @@ class behat_totara_core extends behat_base {
      */
     public function i_should_not_see_in_the_totara_menu($text) {
         try {
-            $this->find_totara_menu_item($text, true);
+            $this->find_totara_menu_item($text);
         } catch (\Behat\Mink\Exception\ExpectationException $ex) {
             // This is the desired outcome.
             return true;
@@ -128,8 +125,8 @@ class behat_totara_core extends behat_base {
      * @Given /^I click on "([^"]*)" in the totara menu$/
      */
     public function i_click_on_in_the_totara_menu($text) {
-        $node = $node = $this->find_totara_menu_item($text, true);
-        $node->click();
+        $node = $this->find_totara_menu_item($text);
+        $this->getSession()->visit($this->locate_path($node->getAttribute('href')));
     }
 
     /**

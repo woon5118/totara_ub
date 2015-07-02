@@ -19,11 +19,13 @@ Feature: Generation of certification assignment exceptions
       | fullname                       | shortname |
       | Certification Filler           | filtest   |
       | Certification Exception Tests  | exctest   |
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | menulifetime | 0 |
 
   @javascript
   Scenario: Assigned to course via multiple certifications exceptions are generated and dismissed
-    Given I log in as "admin"
-    And I navigate to "Manage certifications" node in "Site administration > Courses"
+    Given I navigate to "Manage certifications" node in "Site administration > Courses"
     And I click on "Miscellaneous" "link"
     And I click on "Certification Filler" "link"
     And I click on "Edit certification details" "button"
@@ -83,15 +85,13 @@ Feature: Generation of certification assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Certification Filler" in the "#program-content" "css_element"
     And I should not see "Certification Exception Tests" in the "#program-content" "css_element"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Certification Exception Tests" in the "#program-content" "css_element"
 
     When I log out

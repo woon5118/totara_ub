@@ -44,8 +44,7 @@ Feature: Learner self approves plan with updated template.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Activate the plan.
@@ -64,8 +63,7 @@ Feature: Learner self approves plan with updated template.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Activate the plan.

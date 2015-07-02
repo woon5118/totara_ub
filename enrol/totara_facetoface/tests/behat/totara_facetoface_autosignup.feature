@@ -77,7 +77,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
       | Automatically sign users up to face to face sessions | 1 |
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I press "Sign-up"
     Then I should see "Your booking has been completed and you have been enrolled on 2 session(s)."

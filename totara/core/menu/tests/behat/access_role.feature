@@ -32,15 +32,14 @@ Feature: Test restricting Totara custom menu access by roles
       | user     | role            |
       | testuser | <roleshortname> |
     When I log in as "testuser"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     When I log out
     And I log in as "testfailure"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu
 
   Examples:
     | role          | roleshortname |
     | Site Manager  | manager       |
-    | Assessor      | assessor      |
     | Learner       | student       |
     | Guest         | guest         |
 
@@ -52,4 +51,4 @@ Feature: Test restricting Totara custom menu access by roles
     And I click on "Save changes" "button"
     And I log out
     When I log in as "testuser"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu

@@ -41,13 +41,13 @@ Feature: Test restricting Totara custom menu access with rule aggregation
       | user1 | manager |
     And I log out
     When I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     When I log out
     And I log in as "admin"
     And I add "user 1 (user1@example.com)" user to "aud1" cohort members
     And I log out
     And I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
 
   Scenario: Test menu access with multiple rules and using all for aggregation
     Given I click on "Users matching all of the criteria below can view this menu item." "text" in the "#fgroup_id_item_visibility" "css_element"
@@ -57,10 +57,10 @@ Feature: Test restricting Totara custom menu access with rule aggregation
       | user1 | manager |
     And I log out
     When I log in as "user1"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu
     When I log out
     And I log in as "admin"
     And I add "user 1 (user1@example.com)" user to "aud1" cohort members
     And I log out
     And I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu

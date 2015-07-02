@@ -40,11 +40,11 @@ Feature: Test restricting Totara custom menu access by audience
     # Test user 1 can see the menu item.
     When I log out
     And I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     # Test user 2 can not see the menu item.
     When I log out
     And I log in as "user2"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu
 
   Scenario: Test menu access with multiple audiences and using any as the aggregation
     Given I add "user 1 (user1@example.com)" user to "aud1" cohort members
@@ -71,15 +71,15 @@ Feature: Test restricting Totara custom menu access by audience
     # Test user 1 can see the menu item.
     When I log out
     And I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     # Test user 2 can not see the menu item.
     When I log out
     And I log in as "user2"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu
     # Test user 3 can see the menu item.
     When I log out
     And I log in as "user3"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
 
   Scenario: Test menu access with multiple audiences and using all as the aggregation
     Given I add "user 1 (user1@example.com)" user to "aud1" cohort members
@@ -107,8 +107,8 @@ Feature: Test restricting Totara custom menu access by audience
     # Test user 1 can see the menu item.
     When I log out
     And I log in as "user1"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     # Test user 2 can see the menu item.
     When I log out
     And I log in as "user2"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu

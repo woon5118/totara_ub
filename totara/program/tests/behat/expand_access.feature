@@ -22,8 +22,7 @@ Feature: Users can expand the program info
     Given I set the following administration settings values:
       | forcelogin | 0 |
     And I log out
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"
 
@@ -32,8 +31,7 @@ Feature: Users can expand the program info
     Given I log in as "admin"
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"
 
@@ -43,7 +41,6 @@ Feature: Users can expand the program info
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I log in as "student1"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "View program"

@@ -84,7 +84,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
   @javascript
   Scenario: Self-enrolment through course catalog requiring a group enrolment key
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I set the following fields to these values:
       | Enrolment key | Test-groupenrolkey1 |
@@ -95,7 +95,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I log out
 
     When I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
     And I set the following fields to these values:

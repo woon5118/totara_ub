@@ -78,22 +78,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
   @javascript
@@ -116,22 +113,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user004"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When I log out
@@ -148,22 +142,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user004"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
   @javascript
@@ -186,22 +177,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When the following "position assignments" exist in "totara_hierarchy" plugin:
@@ -213,22 +201,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
   @javascript
@@ -251,22 +236,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     And the following "organisation assignments" exist in "totara_hierarchy" plugin:
@@ -278,22 +260,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
   @javascript
@@ -317,22 +296,19 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user004"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When the following "manager assignments" exist in "totara_hierarchy" plugin:
@@ -346,20 +322,17 @@ Feature: Users assignments to a program
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Assignment Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"
 
     When I log out
     And I log in as "user004"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Assignment Program Tests"

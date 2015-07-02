@@ -42,8 +42,7 @@ Feature: Learner creates learning plan with mixed content
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -114,8 +113,7 @@ Feature: Learner creates learning plan with mixed content
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Send the plan to the manager for approval.
@@ -142,8 +140,7 @@ Feature: Learner creates learning plan with mixed content
     And I log out
 
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -196,8 +193,7 @@ Feature: Learner creates learning plan with mixed content
     And I log out
 
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add a programs to the plan before the manager approves it.

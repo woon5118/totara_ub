@@ -24,8 +24,7 @@ Background:
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -75,8 +74,7 @@ Background:
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -138,7 +136,6 @@ Background:
 
     # As the user, Verify the plan is marked as complete.
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
     Then I should see "This plan has been marked as complete"

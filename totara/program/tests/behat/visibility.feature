@@ -30,20 +30,17 @@ Feature: Users visibility of programs can be toggled
   @javascript
   Scenario: A user can view programs on the catalog with old visibility (show).
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     Given I log out
@@ -54,20 +51,17 @@ Feature: Users visibility of programs can be toggled
 
     When I log out
     And I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
   @javascript
@@ -83,20 +77,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     Given I log out
@@ -107,20 +98,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
   @javascript
@@ -132,20 +120,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     Given I log out
@@ -156,20 +141,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
   @javascript
@@ -188,20 +170,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     Given I log out
@@ -212,20 +191,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
   @javascript
@@ -244,20 +220,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     Given I log out
@@ -268,20 +241,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
   @javascript
@@ -304,20 +274,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     Given I log out
@@ -328,20 +295,17 @@ Feature: Users visibility of programs can be toggled
     And I log out
 
     When I log in as "user001"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Visibility Program Tests"
 
     When I log out
     And I log in as "user003"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should not see "Visibility Program Tests"
 
     # TODO - programs availability.

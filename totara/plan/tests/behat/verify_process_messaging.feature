@@ -53,8 +53,7 @@ Feature: Verify user prompts to progress plan are correct
 
     # Login as the learner and navigate to the learning plan.
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Activate the plan.

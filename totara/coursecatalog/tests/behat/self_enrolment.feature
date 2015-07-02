@@ -39,7 +39,7 @@ Feature: Users can auto-enrol themself via course catalog in courses where self 
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     And I press "Enrol"
     Then I should see "Incorrect enrolment key, please try again"

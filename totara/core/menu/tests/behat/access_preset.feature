@@ -27,7 +27,7 @@ Feature: Test restricting Totara custom menu access by preset rules
     Given I click on "User is logged in" "text" in the "#fgroup_id_preset" "css_element"
     When I log out
     And I log in as "testuser"
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
 
   Scenario: Check visibility of menu for logged out user
     Given I click on "User is not logged in" "text" in the "#fgroup_id_preset" "css_element"
@@ -35,6 +35,6 @@ Feature: Test restricting Totara custom menu access by preset rules
     And I set the following administration settings values:
       | forcelogin | 0 |
     When I log out
-    Then I should see "test item" in the "#totaramenu" "css_element"
+    Then I should see "test item" in the totara menu
     When I log in as "testuser"
-    Then I should not see "test item" in the "#totaramenu" "css_element"
+    Then I should not see "test item" in the totara menu

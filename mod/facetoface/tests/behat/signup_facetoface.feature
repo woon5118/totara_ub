@@ -20,7 +20,7 @@ Feature: Sign up to a face to face
       | student1 | C1     | student        |
       | student2 | C1     | student        |
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -47,7 +47,7 @@ Feature: Sign up to a face to face
   @javascript
   Scenario: Sign up to a session and unable to sign up to a full session
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should see "Sign-up"
     And I follow "Sign-up"
@@ -55,6 +55,6 @@ Feature: Sign up to a face to face
     And I should see "Your booking has been completed."
     And I log out
     And I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Sign-up"

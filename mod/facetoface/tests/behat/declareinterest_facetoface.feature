@@ -23,7 +23,7 @@ Feature: Manager approval
   @javascript
   Scenario: Student cannot declare interest where not enabled
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -31,14 +31,14 @@ Feature: Manager approval
       | Description       | Test facetoface description |
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
 
   @javascript
   Scenario: Student can declare and withdraw interest where enabled
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -63,7 +63,7 @@ Feature: Manager approval
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should see "Declare interest"
     And I follow "Declare interest"
@@ -78,7 +78,7 @@ Feature: Manager approval
   @javascript
   Scenario: Student cannot declare interest until all sessions are fully booked if setting enabled.
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -104,7 +104,7 @@ Feature: Manager approval
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
     And I follow "Sign-up"
@@ -112,14 +112,14 @@ Feature: Manager approval
     And I should see "Your booking has been completed."
     And I log out
     And I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should see "Declare interest"
 
   @javascript
   Scenario: Student cannot declare interest if overbooking is enabled.
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -146,7 +146,7 @@ Feature: Manager approval
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
     And I follow "Sign-up"
@@ -154,14 +154,14 @@ Feature: Manager approval
     And I should see "Your booking has been completed."
     And I log out
     And I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I should not see "Declare interest"
 
   @javascript
   Scenario: Staff can view who has expressed interest
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -205,7 +205,7 @@ Feature: Manager approval
     And I press "Save changes"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Declare interest" "link" in the "Test f2f 1" activity
     And I set the following fields to these values:
@@ -217,7 +217,7 @@ Feature: Manager approval
     And I press "Confirm"
     And I log out
     And I log in as "student2"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "Declare interest" "link" in the "Test f2f 1" activity
     And I set the following fields to these values:
@@ -225,7 +225,7 @@ Feature: Manager approval
     And I press "Confirm"
     And I log out
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Test f2f 1"
     And I follow "Declared interest report"

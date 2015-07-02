@@ -31,7 +31,7 @@ Feature: Add a face to face
   @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for but not mandated then sign up as user with no pos
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -56,7 +56,7 @@ Feature: Add a face to face
     And I should see "1 January 2020"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Sign-up"
@@ -78,7 +78,7 @@ Feature: Add a face to face
       | student1 | POS001   | primary   |
       | student1 | POS002   | secondary |
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -103,7 +103,7 @@ Feature: Add a face to face
     And I should see "1 January 2020"
     And I log out
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Sign-up"
@@ -112,14 +112,14 @@ Feature: Add a face to face
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Attendees"
     And I should see "Position2"
     And I log out
     And I log in as "admin"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Attendees"
@@ -133,7 +133,7 @@ Feature: Add a face to face
   @javascript
   Scenario: Add and configure a facetoface activity with a single session and position asked for and mandated then try to sign up as user with no pos
     When I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -159,7 +159,7 @@ Feature: Add a face to face
     And I should see "1 January 2020"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Sign-up"
@@ -179,7 +179,7 @@ Feature: Add a face to face
       | student1 | POS001   | primary   |
       | student1 | POS002   | secondary |
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -204,7 +204,7 @@ Feature: Add a face to face
     And I should see "1 January 2020"
     And I log out
     When I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Sign-up"
@@ -213,7 +213,7 @@ Feature: Add a face to face
     And I press "Sign-up"
     And I log out
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "View all sessions"
     And I follow "Attendees"

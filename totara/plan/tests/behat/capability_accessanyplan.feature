@@ -36,8 +36,7 @@ Feature: Verify capability accessanyplan.
 
     # Log in as the learner and create some evidence.
     When I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     And I press "Add evidence"
     And I set the following fields to these values:
       | Evidence name        | Website 1                  |
@@ -53,8 +52,7 @@ Feature: Verify capability accessanyplan.
     Then I should see "Evidence created"
 
     # Navigate to the learners plan
-    When I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
 
     # Add some courses to the plan.
@@ -89,8 +87,7 @@ Feature: Verify capability accessanyplan.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    When I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    When I click on "Learning Plans" in the totara menu
     And I click on "learner1 Learning Plan" "link"
     # Send the plan to the manager for approval.
     And I press "Send approval request"

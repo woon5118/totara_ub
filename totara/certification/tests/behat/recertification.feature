@@ -19,8 +19,7 @@ Feature: User recertification and expiry of certification
       | menulifetime | 0 |
     And I set self completion for "Certify Course" in the "Miscellaneous" category
     And I set self completion for "Recertify Course" in the "Miscellaneous" category
-    And I focus on "Find Learning" "link"
-    And I follow "Certifications"
+    And I click on "Certifications" in the totara menu
     And I press "Create Certification"
     And I set the following fields to these values:
         | Full name  | Test Certification |
@@ -56,8 +55,7 @@ Feature: User recertification and expiry of certification
   @javascript
   Scenario: A user can recertify multiple times
     Given I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Test Certification"
     And I should see "Certify Course"
     And I should not see "Recertify Course"
@@ -65,11 +63,9 @@ Feature: User recertification and expiry of certification
     When I click on "Certify Course" "link" in the ".display-program" "css_element"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Test Certification"
     And I should see "Completed"
@@ -82,8 +78,7 @@ Feature: User recertification and expiry of certification
     Then I should see "Completed"
     And I should see "Due for renewal"
 
-    When I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    When I click on "Required Learning" in the totara menu
     Then I should see "Test Certification"
     And I should see "Recertify Course"
     And I should not see "Certify Course"
@@ -91,11 +86,9 @@ Feature: User recertification and expiry of certification
     When I click on "Recertify Course" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Test Certification"
     And I should see "Completed"
@@ -108,8 +101,7 @@ Feature: User recertification and expiry of certification
     Then I should see "Completed"
     And I should see "Due for renewal"
 
-    When I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    When I click on "Required Learning" in the totara menu
     Then I should see "Test Certification"
     And I should see "Recertify Course"
     And I should not see "Certify Course"
@@ -117,11 +109,9 @@ Feature: User recertification and expiry of certification
     When I click on "Recertify Course" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Test Certification"
     And I should see "Complete"
@@ -134,8 +124,7 @@ Feature: User recertification and expiry of certification
     Then I should see "Assigned"
     And I should see "Renewal expired"
 
-    When I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    When I click on "Required Learning" in the totara menu
     Then I should see "Test Certification"
     And I should see "Overdue"
     And I should see "Test Certification"
@@ -145,11 +134,9 @@ Feature: User recertification and expiry of certification
     When I click on "Certify Course" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Test Certification"
     And I should see "Complete"
@@ -162,8 +149,7 @@ Feature: User recertification and expiry of certification
     Then I should see "Complete"
     And I should see "Due for renewal"
 
-    When I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    When I click on "Required Learning" in the totara menu
     Then I should see "Test Certification"
     And I should see "Recertify Course"
     And I should not see "Certify Course"
@@ -171,11 +157,9 @@ Feature: User recertification and expiry of certification
     When I click on "Recertify Course" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Test Certification"
     And I should see "Complete"

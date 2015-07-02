@@ -28,7 +28,7 @@ Feature: Take attendance for Face to face sessions
       | Enable conditional access  | 1 |
     And I log out
     And I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -81,7 +81,7 @@ Feature: Take attendance for Face to face sessions
   @javascript
   Scenario: Set attendance for individual users
     Given I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "View all sessions" "link"
     And I click on "Attendees" "link"
@@ -100,7 +100,7 @@ Feature: Take attendance for Face to face sessions
   @javascript
   Scenario: Set attendance in bulk
     Given I log in as "teacher1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I click on "View all sessions" "link"
     And I click on "Attendees" "link"

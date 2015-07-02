@@ -22,8 +22,7 @@ Feature: Behat generators for programs work
       |  gentest | user001 |
       |  gentest | user002 |
     When I log in as "admin"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I should see "Generator Program Tests"
     And I click on "Generator Program Tests" "link"
     And I press "Edit program details"
@@ -32,8 +31,7 @@ Feature: Behat generators for programs work
   @javascript
   Scenario: Verify the user interface works the same as program generators
     Given I log in as "admin"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I press "Create Program"
     And I set the following fields to these values:
         | fullname  | Generator Program Tests |
@@ -50,6 +48,5 @@ Feature: Behat generators for programs work
     And I press "Save changes"
     And I press "Save all changes"
     Then I should see "2 learner(s) assigned. 2 learner(s) are active, 0 with exception(s)"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     Then I should see "Generator Program Tests"

@@ -36,7 +36,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I press "Save and display"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
     And I press "Enrol"
@@ -51,7 +51,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I press "Save and display"
     And I log out
     And I log in as "student1"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on ".rb-display-expand" "css_element"
     Then I should see "Guest access"
     And I set the following fields to these values:

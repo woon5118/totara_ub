@@ -62,16 +62,14 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Program Exception Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
     And I should see "Course 1" in the "#program-content" "css_element"
 
@@ -109,8 +107,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
     And I should see "Course 1" in the "#program-content" "css_element"
 
@@ -152,16 +149,14 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Program Exception Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
 
     When I log out
@@ -192,8 +187,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
 
   @javascript
@@ -234,16 +228,14 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Program Exception Tests"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
 
     When I log out
@@ -274,8 +266,7 @@ Feature: Generation of program assignment exceptions
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     Then I should not see "Program Exception Tests"

@@ -21,7 +21,7 @@ Feature: Users completion of courses
       | user002 | C1     | student |
     And I log in as "admin"
     And I click on "Customise this page" "button"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity One                                      |
@@ -64,21 +64,19 @@ Feature: Users completion of courses
   @javascript
   Scenario: Test instant and re-aggregation of course completion using activity completion
     When I log in as "user001"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
     And I press "Save my choice"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "In progress"
 
     When I click on "Course 1" "link"
     And I click on "Activity Two" "link"
     And I click on "Option 2" "radio"
     And I press "Save my choice"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I should see "In progress"
 
@@ -86,26 +84,24 @@ Feature: Users completion of courses
     And I click on "Activity Three" "link"
     And I click on "Option 3" "radio"
     And I press "Save my choice"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I should not see "In progress"
 
     When I log out
     And I log in as "user002"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
     And I click on "Activity One" "link"
     And I click on "Option 1" "radio"
     And I press "Save my choice"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "In progress"
 
     # Thats the instant functionality done, now unlock and reaggregate to test cron functionality.
     When I log out
     And I log in as "admin"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
     And I navigate to "Course completion" node in "Course administration"
     And I press "Unlock criteria and delete existing completion data"
@@ -115,14 +111,12 @@ Feature: Users completion of courses
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I should not see "In progress"
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I should not see "In progress"

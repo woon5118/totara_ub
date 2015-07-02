@@ -17,7 +17,7 @@ Feature: Add - Remove Face to face attendees
   @javascript
   Scenario: Add and remove users to a face to face session with dates
     Given I log in as "admin"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:
@@ -52,7 +52,7 @@ Feature: Add - Remove Face to face attendees
   @javascript
   Scenario: Add and remove users to a face to face session without dates (waitlist)
     Given I log in as "admin"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I turn editing mode on
     And I add a "Face-to-face" to section "1" and I fill the form with:

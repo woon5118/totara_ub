@@ -50,7 +50,7 @@ Feature: Assign enrolled learning to cohort
   @javascript
   Scenario: Edit course visibility for a particular course
     Given I am on homepage
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Edit settings"
     And I click on "Add enrolled audiences" "button"

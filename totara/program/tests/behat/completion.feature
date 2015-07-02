@@ -61,8 +61,7 @@ Feature: Users completion of programs and coursesets
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
     And I should see "Course 1"
     And I should see "Course 2"
@@ -71,16 +70,14 @@ Feature: Users completion of programs and coursesets
     When I click on "Course 1" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "0%" program progress
     And I should see "Complete" in the "Course 1" "table_row"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "50%" program progress
     And I should see "Complete" in the "Course 1" "table_row"
     And I should see "Complete" in the "Course 2" "table_row"
@@ -88,11 +85,9 @@ Feature: Users completion of programs and coursesets
     When I click on "Course 3" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress
@@ -125,8 +120,7 @@ Feature: Users completion of programs and coursesets
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
     And I should see "Course 1"
     And I should see "Course 2"
@@ -135,47 +129,39 @@ Feature: Users completion of programs and coursesets
     When I click on "Course 1" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress
 
     When I log out
     And I log in as "user002"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress
 
     When I log out
     And I log in as "user003"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
 
     When I click on "Course 3" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress
@@ -204,8 +190,7 @@ Feature: Users completion of programs and coursesets
 
     When I log out
     And I log in as "user001"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
     And I should see "Course 1"
     And I should see "Course 2"
@@ -214,19 +199,16 @@ Feature: Users completion of programs and coursesets
     When I click on "Course 1" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     Then I should see "Completion Program Tests"
     And I should see "0%" program progress
 
     When I click on "Course 2" "link"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
-    And I focus on "My Learning" "link"
-    Then I should not see "Required Learning"
+    Then I should not see "Required Learning" in the totara menu
 
-    When I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    When I click on "Record of Learning" in the totara menu
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
     And I click on "Completion Program Tests" "link"
     Then I should see "100%" program progress

@@ -49,7 +49,7 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name | 1 |
     And I press "Save changes"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I click on "Course 2" "link"
     And completion tracking is "Enabled" in current course
     And I click on "Edit settings" "link" in the "Administration" "block"
@@ -84,8 +84,7 @@ Feature: Instant completion
       | user     | program  |
       | student1 | program1 |
     And I log in as "admin"
-    And I focus on "Find Learning" "link"
-    And I follow "Programs"
+    And I click on "Programs" in the totara menu
     And I click on "Program1" "link"
     And I press "Edit program details"
     And I click on "Content" "link"
@@ -103,8 +102,7 @@ Feature: Instant completion
     And I log out
 
     When I log in as "student1"
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     And I click on "Course 2" "link"
     And I follow "Test quiz name2"
     And I press "Attempt quiz now"
@@ -114,8 +112,7 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    And I focus on "My Learning" "link"
-    And I follow "Required Learning"
+    And I click on "Required Learning" in the totara menu
     And I click on "Course 1" "link"
     And I follow "Test quiz name"
     And I press "Attempt quiz now"
@@ -125,8 +122,7 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    And I focus on "My Learning" "link"
-    And I follow "Record of Learning"
+    And I click on "Record of Learning" in the totara menu
     Then I should see "Complete" in the "Course 1" "table_row"
     And  I should see "Complete" in the "Course 2" "table_row"
 #    And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
