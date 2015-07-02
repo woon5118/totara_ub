@@ -753,7 +753,7 @@ Cache-Control: private, max-age=15, no-transform
 ETag: "4d69af5d8ba873ea9192c489e151bd7b"
 Content-Type: text/html
 Date: Thu, 08 Dec 2011 14:44:53 GMT
-Set-Cookie: BBC-UID=c4de2e109c8df6a51de627cee11b214bd4fb6054a030222488317afb31b343360MoodleBot/1.0; expires=Mon, 07-Dec-15 14:44:53 GMT; path=/; domain=bbc.co.uk
+Set-Cookie: BBC-UID=c4de2e109c8df6a51de627cee11b214bd4fb6054a030222488317afb31b343360TotaraBot/1.0; expires=Mon, 07-Dec-15 14:44:53 GMT; path=/; domain=bbc.co.uk
 X-Cache-Action: MISS
 X-Cache-Age: 0
 Vary: Cookie,X-Country,X-Ip-is-uk-combined,X-Ip-is-advertise-combined,X-Ip_is_uk_combined,X-Ip_is_advertise_combined, X-GeoIP
@@ -769,7 +769,7 @@ Cache-Control: private, max-age=15, no-transform
 ETag: "4d69af5d8ba873ea9192c489e151bd7b"
 Content-Type: text/html
 Date: Thu, 08 Dec 2011 14:44:53 GMT
-Set-Cookie: BBC-UID=c4de2e109c8df6a51de627cee11b214bd4fb6054a030222488317afb31b343360MoodleBot/1.0; expires=Mon, 07-Dec-15 14:44:53 GMT; path=/; domain=bbc.co.uk
+Set-Cookie: BBC-UID=c4de2e109c8df6a51de627cee11b214bd4fb6054a030222488317afb31b343360TotaraBot/1.0; expires=Mon, 07-Dec-15 14:44:53 GMT; path=/; domain=bbc.co.uk
 X-Cache-Action: MISS
 X-Cache-Age: 0
 Vary: Cookie,X-Country,X-Ip-is-uk-combined,X-Ip-is-advertise-combined,X-Ip_is_uk_combined,X-Ip_is_advertise_combined, X-GeoIP
@@ -888,13 +888,13 @@ EOF;
         $this->assertNotEmpty($options);
 
         $curl->call_apply_opt($options);
-        $this->assertTrue(in_array('User-Agent: MoodleBot/1.0', $curl->header));
+        $this->assertTrue(in_array('User-Agent: TotaraBot/1.0', $curl->header));
         $this->assertFalse(in_array('User-Agent: Test/1.0', $curl->header));
 
         $options['CURLOPT_USERAGENT'] = 'Test/1.0';
         $curl->call_apply_opt($options);
         $this->assertTrue(in_array('User-Agent: Test/1.0', $curl->header));
-        $this->assertFalse(in_array('User-Agent: MoodleBot/1.0', $curl->header));
+        $this->assertFalse(in_array('User-Agent: TotaraBot/1.0', $curl->header));
 
         $curl->set_option('CURLOPT_USERAGENT', 'AnotherUserAgent/1.0');
         $curl->call_apply_opt();
@@ -909,7 +909,7 @@ EOF;
 
         $curl->unset_option('CURLOPT_USERAGENT');
         $curl->call_apply_opt();
-        $this->assertTrue(in_array('User-Agent: MoodleBot/1.0', $curl->header));
+        $this->assertTrue(in_array('User-Agent: TotaraBot/1.0', $curl->header));
 
         // Finally, test it via exttests, to ensure the agent is sent properly.
         // Matching.
