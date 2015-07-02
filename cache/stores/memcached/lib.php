@@ -129,9 +129,17 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
         } else {
             $serialiser = Memcached::SERIALIZER_PHP;
         }
-        $prefix = (!empty($configuration['prefix'])) ? (string)$configuration['prefix'] : crc32($name);
         $hashmethod = (array_key_exists('hash', $configuration)) ? (int)$configuration['hash'] : Memcached::HASH_DEFAULT;
         $bufferwrites = array_key_exists('bufferwrites', $configuration) ? (bool)$configuration['bufferwrites'] : false;
+
+        if (!empty($configuration['prefix'])) {
+            // Totara: Hopefully this is clusters sharing caches only.
+            $prefix = (string)$configuration['prefix'];
+        } else {
+            // Totara: Make sure prefix is different if the way of storing data in memcached server changes.
+            $comptype = @ini_get('memcached.compression_type');
+            $prefix = sha1($name . '_' . $comptype . '_' . (int)$compression . '_' . $serialiser . '_' . $hashmethod);
+        }
 
         foreach ($configuration['servers'] as $server) {
             if (!is_array($server)) {
