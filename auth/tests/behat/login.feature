@@ -8,12 +8,12 @@ Feature: Authentication
 
   Scenario: Log in with the predefined admin user with Javascript disabled
     Given I log in as "admin"
-    Then I should see "You are logged in as Admin User" in the ".logininfo" "css_element"
+    Then I should see "Admin User" in the ".usermenu .usertext" "css_element"
 
   @javascript
   Scenario: Log in with the predefined admin user with Javascript enabled
     Given I log in as "admin"
-    Then I should see "You are logged in as Admin User" in the ".logininfo" "css_element"
+    Then I should see "Admin User" in the ".usermenu .usertext" "css_element"
 
   Scenario: Log in as an existing admin user filling the form
     Given the following "users" exist:
@@ -24,7 +24,7 @@ Feature: Authentication
     And I set the field "Username" to "testuser"
     And I set the field "Password" to "testuser"
     And I press "Log in"
-    Then I should see "You are logged in as" in the ".logininfo" "css_element"
+    Then I should see "Test User" in the ".usermenu .usertext" "css_element"
 
   Scenario: Log in as an unexisting user filling the form
     Given the following "users" exist:
@@ -40,4 +40,4 @@ Feature: Authentication
   Scenario: Log out
     Given I log in as "admin"
     When I log out
-    Then I should see "You are not logged in" in the ".logininfo" "css_element"
+    Then I should see "You are not logged in" in the ".login" "css_element"
