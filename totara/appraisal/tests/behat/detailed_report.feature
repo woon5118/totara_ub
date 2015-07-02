@@ -19,7 +19,6 @@ Feature: Test appraisal detailed report with numeric question
     # Set manager for User One
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "User One" "link"
-    And I click on "Preferences" "link"
     And I click on "Primary position" "link"
     And I press "Choose manager"
     And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"
@@ -29,7 +28,6 @@ Feature: Test appraisal detailed report with numeric question
     # Set manager for User Two
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "User Two" "link"
-    And I click on "Preferences" "link"
     And I click on "Primary position" "link"
     And I press "Choose manager"
     And I click on "Admin User" "link" in the "Choose manager" "totaradialogue"

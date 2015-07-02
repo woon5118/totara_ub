@@ -60,7 +60,6 @@ Feature: Test the ability to set your own
     And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
     And I click on "Confirm" "link" in the "Gregory Nickleson" "table_row"
     And I click on "Gregory Nickleson" "link"
-    And I follow "Preferences"
     And I follow "Primary position"
     Then I should see "Position One"
     And I should see "Organisation One"

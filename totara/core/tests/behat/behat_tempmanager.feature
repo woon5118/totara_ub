@@ -14,7 +14,6 @@ Feature: Test temporary managers
         And I log in as "admin"
         And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
         And I follow "user 2"
-        And I click on "Preferences" "link"
         And I click on "Primary position" "link"
         And I click on "Choose manager" "button"
         And I click on "temp manager" "link"
@@ -27,7 +26,6 @@ Feature: Test temporary managers
             | tempmanagerrestrictselection | 0 |
         And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
         And I follow "user 1"
-        And I click on "Preferences" "link"
         And I click on "Primary position" "link"
         And I click on "Choose temporary manager" "button"
         And I should see "user 2"
@@ -39,7 +37,6 @@ Feature: Test temporary managers
             | tempmanagerrestrictselection | 1 |
         And I navigate to "Browse list of users" node in "Site administration > Users > Accounts"
         And I follow "user 1"
-        And I click on "Preferences" "link"
         And I click on "Primary position" "link"
         And I click on "Choose temporary manager" "button"
         And I should not see "user 2"
