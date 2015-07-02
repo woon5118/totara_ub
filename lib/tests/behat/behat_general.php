@@ -1216,8 +1216,8 @@ class behat_general extends behat_base {
         }
 
         // Download the URL and check the size.
-        $session = $this->getSession()->getCookie('MoodleSession');
-        return download_file_content($url, array('Cookie' => 'MoodleSession=' . $session));
+        $session = $this->getSession()->getCookie('TotaraSession');
+        return download_file_content($url, array('Cookie' => 'TotaraSession=' . $session));
     }
 
     /**

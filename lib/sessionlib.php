@@ -109,7 +109,7 @@ function set_moodle_cookie($username) {
         return;
     }
 
-    $cookiename = 'MOODLEID1_'.$CFG->sessioncookie;
+    $cookiename = 'TOTARAID_'.$CFG->sessioncookie;
 
     // delete old cookie
     setcookie($cookiename, '', time() - HOURSECS, $CFG->sessioncookiepath, $CFG->sessioncookiedomain, $CFG->cookiesecure, $CFG->cookiehttponly);
@@ -136,7 +136,7 @@ function get_moodle_cookie() {
         return '';
     }
 
-    $cookiename = 'MOODLEID1_'.$CFG->sessioncookie;
+    $cookiename = 'TOTARAID_'.$CFG->sessioncookie;
 
     if (empty($_COOKIE[$cookiename])) {
         return '';

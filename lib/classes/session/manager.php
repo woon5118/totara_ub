@@ -192,7 +192,7 @@ class manager {
         if (!isset($CFG->sessioncookie)) {
             $CFG->sessioncookie = '';
         }
-        $sessionname = 'MoodleSession'.$CFG->sessioncookie;
+        $sessionname = 'TotaraSession'.$CFG->sessioncookie;
 
         // Make sure cookie domain makes sense for this wwwroot.
         if (!isset($CFG->sessioncookiedomain)) {
