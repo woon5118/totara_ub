@@ -290,7 +290,7 @@ class totara_dialog_content_hierarchy_multi extends totara_dialog_content_hierar
         $this->skip_access_checks = $skipaccesschecks;
 
         // Run parent constructor
-        parent::__construct($prefix, $frameworkid, $showhidden);
+        parent::__construct($prefix, $frameworkid, $showhidden, $skipaccesschecks);
 
         // Set to type multi
         $this->type = self::TYPE_CHOICE_MULTI;
