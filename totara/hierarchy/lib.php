@@ -1502,7 +1502,14 @@ class hierarchy {
      *
      * The $items_to_add array must contain a set of objects that are suitable for
      * inserting into the hierarchy items table. Hierarchy related data (such as
-     * depthlevel, parentid and path) will be added when the record is created
+     * depthlevel, parentid and path) will be added when the record is created.
+     *
+     * Note that {@link hierarchy::construct_items_to_add()} will
+     * pass items with tempitemid and tempparentid properties.
+     * These provide the parent/child relations between the items
+     * but must be replaced with actual IDs as the items are
+     * inserted into the database. A tempitemid of 0 indicates
+     * a top level item that should be made a child of $parentid.
      *
      * @param integer $parentid ID of the item to append the new children to
      * @param array $items_to_add Array of objects suitable for inserting
@@ -1532,21 +1539,48 @@ class hierarchy {
         $transaction = $DB->start_delegated_transaction();
 
         $new_ids = array();
+        // Build up a map of tempid => realid so we can
+        // reallocate tempparentids to the real items.
+        $tempidsmap = array();
         foreach ($items_to_add as $item) {
+
             if (!isset($item->visible)) {
                 // default to visible if not set
                 $item->visible = 1;
             }
+
+            // Determine parentid to use for this item.
+            if (empty($item->tempparentid)) {
+                $itemparentid = $parentid;
+            } else {
+                if (isset($tempidsmap[$item->tempparentid])) {
+                    $itemparentid = $tempidsmap[$item->tempparentid];
+                } else {
+                    // We can't do this if the tempparentid
+                    // given doesn't match a real item.
+                    debugging(
+                        "Could not find a real parent id for item '{$item->fullname}' with tempparentid of '{$item->tempparentid}'.",
+                        DEBUG_DEVELOPER);
+                    $transaction->rollback();
+                    return false;
+                }
+            }
+            unset($item->tempparentid);
 
             // Format any fields unique to this type of hierarchy.
             $item = $this->process_additional_item_form_fields($item);
 
             $item->timemodified = $now;
             $item->usermodified = $USER->id;
-            if ($newitem = $this->add_hierarchy_item($item, $parentid, $frameworkid, false, $triggerevent)) {
+            $tempitemid = isset($item->tempitemid) ? $item->tempitemid : 0;
+            unset($item->tempitemid);
+            if ($newitem = $this->add_hierarchy_item($item, $itemparentid, $frameworkid, false, $triggerevent)) {
+                $tempidsmap[$tempitemid] = $newitem->id;
                 $new_ids[] = $newitem->id;
             } else {
-                // fail if any new items fail to be added
+                // Fail if any new items fail to be added.
+                debugging("Failure while creating item '{$item->fullname}'.", DEBUG_DEVELOPER);
+                $transaction->rollback();
                 return false;
             }
         }
@@ -2940,4 +2974,98 @@ class hierarchy {
             }
         }
     }
+
+    /**
+     * Create an array of hierarchy item objects based on the data from the bulkadd form.
+     *
+     * Given the formdata from the bulkadd form, this function builds a set of skeleton objects that will
+     * go into the database. They are still missing all the additional metadata such as hierarchy path,
+     * depth, etc and timestamps. That data is added later by {@link hierarchy->add_multiple_hierarchy_items()}.
+     *
+     * This function assigns temporary properties tempitemid and tempparentid so that the
+     * parent/child relationship between the items is known. Since the actual ids of the
+     * items are not known at this point, these temporary values must be replaced with the
+     * real values in {@link hierarchy->add_multiple_hierarchy_items()}.
+     *
+     * @param object $formdata Form data from bulkadd form
+     * @param string $error Any error generated when attempting to construct items. Passed by reference.
+     *
+     * @return array|bool Array of objects describing the new items or false on failure.
+     */
+    public static function construct_items_to_add($formdata, &$error) {
+        // Get list of names then remove from the form object.
+        $items = explode("\n", rtrim($formdata->itemnames));
+        unset($formdata->itemnames);
+
+        $items_to_add = array();
+        // Array to record the current item to use for an
+        // item at a particular level. Top level (level = 0)
+        // items have no parent (ID = 0).
+        $levelparent = array(0 => 0);
+        $itemid = 1;
+        foreach ($items as $item) {
+            if (strlen(trim($item)) == 0) {
+                // Don't include empty lines.
+                continue;
+            }
+
+            // Copy the form object.
+            $new = clone $formdata;
+
+            // Set the item name.
+            $name = trim($item);
+            $new->fullname = substr($name, 0, 1024);
+
+            // Store the temporary ID used by tempparentid.
+            // This will be replaced later with a real ID in
+            // {@link add_multiple_hierarchy_items()}.
+            $new->tempitemid = $itemid;
+
+            // Figure out how deep this item is.
+            // Starting from zero, add 1 for every two spaces
+            // at start of string (odd number of spaces are
+            // rounded down).
+            $level = floor(strspn($item, ' ') / 2);
+
+            // Assign this item to its parent.
+            if (isset($levelparent[$level])) {
+                $new->tempparentid = $levelparent[$level];
+            } else {
+                $error = get_string('bulkaddparenterror', 'totara_hierarchy', $name);
+                return false;
+            }
+
+            // Make this item the new default parent for items
+            // at the next level down.
+            $levelparent[$level+1] = $itemid;
+
+            // Remove any levelparents higher than current level.
+            // This is to avoid "detached children" such as E
+            // in this example:
+            // A
+            //   B
+            //     C
+            // D
+            //     E
+            // In this example E should have been placed beneath C.
+            foreach ($levelparent as $lvl => $id) {
+                if ($lvl > $level+1) {
+                    unset($levelparent[$lvl]);
+                }
+            }
+
+            $items_to_add[] = $new;
+            $itemid++;
+
+        }
+
+        // Variable $itemnames was empty.
+        if (count($items_to_add) == 0) {
+            $error = get_string('bulkaddnoitems', 'totara_hierarchy');
+            return false;
+        }
+
+        return $items_to_add;
+    }
+
 }

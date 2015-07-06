@@ -70,9 +70,10 @@ if ($mform->is_cancelled()) {
 // Update data
 } else if ($formdata = $mform->get_data()) {
 
-    $items_to_add = hierarchy_construct_items_to_add($formdata);
+    $error = '';
+    $items_to_add = hierarchy::construct_items_to_add($formdata, $error);
     if (!$items_to_add) {
-        totara_set_notification(get_string('bulkaddfailed', 'totara_hierarchy'), "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$frameworkid}&amp;page={$page}");
+        totara_set_notification(get_string('bulkaddfailed', 'totara_hierarchy', $error), "{$CFG->wwwroot}/totara/hierarchy/index.php?prefix=$prefix&amp;frameworkid={$frameworkid}&amp;page={$page}");
     }
 
     if ($new_ids = $hierarchy->add_multiple_hierarchy_items($formdata->parentid, $items_to_add, $frameworkid)) {
@@ -96,42 +97,3 @@ $mform->display();
 
 echo $OUTPUT->footer();
 
-
-/**
- * Create an array of hierarchy item objects based on the data from the bulkadd form
- *
- * Given the formdata from the bulkadd form, this function builds a set of skeleton objects that will
- * go into the database. They are still missing all the additional metadata such as hierarchy path,
- * depth, etc and timestamps. That data is added later by {@link hierarchy->add_multiple_hierarchy_items()}.
- *
- * @param object $formdata Form data from bulkadd form
- *
- * @return array Array of objects describing the new items
- */
-function hierarchy_construct_items_to_add($formdata) {
-    // get list of names then remove from the form object
-    $items = explode("\n", trim($formdata->itemnames));
-    unset($formdata->itemnames);
-
-    $items_to_add = array();
-    foreach ($items as $item) {
-        if (strlen(trim($item)) == 0) {
-            // don't include empty lines
-            continue;
-        }
-
-        // copy the form object and set the item name
-        $new = clone $formdata;
-        $new->fullname = substr(trim($item), 0, 1024);
-
-        $items_to_add[] = $new;
-
-    }
-
-    // $itemnames was empty
-    if (count($items_to_add) == 0) {
-        return false;
-    }
-
-    return $items_to_add;
-}

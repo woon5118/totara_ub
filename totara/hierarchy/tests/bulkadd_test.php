@@ -467,4 +467,148 @@ class bulkaddhierarchyitems_test extends advanced_testcase {
 
         $this->resetAfterTest(true);
     }
+
+    /**
+     * Test the bulk add hierarchy tree functionality.
+     */
+    public function test_add_multiple_hierarchy_items_at_once() {
+        global $DB;
+
+        // Simulate data from the bulk add form.
+        $formdata = new stdClass();
+        $formdata->prefix = 'organisation';
+        $formdata->frameworkid = 1;
+        $formdata->typeid = 0;
+        $formdata->parentid = 0; // Top level.
+        $formdata->itemnames = <<<EOD
+Item 1
+Item 2
+  Item 2a
+  Item 2b
+    Item 2bi
+  Item 2c
+Item 3
+  Item 3a
+Item 4
+  Item 4a
+    Item 4ai
+       Item 4ai1
+EOD;
+        $error = '';
+        $items = hierarchy::construct_items_to_add($formdata, $error);
+        // Should be constructed without issues.
+        $this->assertTrue((bool)$items);
+        $this->assertEmpty($error);
+
+        $before = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
+        $hierarchy = hierarchy::load_hierarchy('organisation');
+        $newids = $hierarchy->add_multiple_hierarchy_items(0, $items, 1);
+        $after = $DB->get_records_menu('org', null, 'sortthread', 'id,sortthread');
+
+        // Should be 12 new orgs.
+        $this->assertEquals(12, (count($after)-count($before)));
+        // Should be 12 ids.
+        $this->assertCount(12, $newids);
+
+        $item2 = $DB->get_record('org', array('fullname' => 'Item 2'));
+        // Item 2 should be top level.
+        $this->assertEquals(0, $item2->parentid);
+        // Item 2b should be child of item 2.
+        $item2b = $DB->get_record('org', array('fullname' => 'Item 2b'));
+        $this->assertEquals($item2->id, $item2b->parentid);
+
+        $this->resetAfterTest(true);
+    }
+
+    /*
+     * Data provider for method below.
+     */
+    public function multiple_hierarchy_data_provider() {
+        return array(
+            // Item with no parent should give an error.
+            array(
+                '  Bad item',
+                false,
+                get_string('bulkaddparenterror', 'totara_hierarchy', 'Bad item')
+            ),
+            // Two items with blank line between should be okay.
+            array(
+                'Item 1
+
+Item 2',
+                true,
+                ''
+            ),
+            // Complex but valid tree should be okay.
+            array(
+                'Item 1
+
+  Item 2
+    Item 2a
+    Item 2b
+      Item 2bi
+    Item 2c
+  Item 3
+    Item 3a
+      Item 3ai
+        Item x
+    Item 3b
+
+Item 4
+                ',
+                true,
+                ''
+            ),
+            // Incorrect structure when parent level did exist should still fail.
+            array(
+                'Item 1
+  Item 2
+    Item 3
+      Item 4
+Item 5
+      Bad item',
+                false,
+                get_string('bulkaddparenterror', 'totara_hierarchy', 'Bad item')
+            ),
+            // Another invalid structure which should fail.
+            array(
+                'Item 1
+  Item 2
+    Item 3
+        Item 4',
+                false,
+                get_string('bulkaddparenterror', 'totara_hierarchy', 'Item 4')
+            ),
+            // Empty items string should give an error.
+            array(
+                '',
+                false,
+                get_string('bulkaddnoitems', 'totara_hierarchy')
+            )
+        );
+    }
+
+    /**
+     * Test a range of inputs to ensure validation behaves as expected.
+     *
+     * @dataProvider multiple_hierarchy_data_provider
+     */
+    public function test_add_multiple_hierarchy_items_validation($itemnames, $expectedreturn, $expectederror) {
+        global $DB;
+
+        // Simulate data from the bulk add form.
+        $formdata = new stdClass();
+        $formdata->prefix = 'organisation';
+        $formdata->frameworkid = 1;
+        $formdata->typeid = 0;
+        $formdata->parentid = 0; // Top level.
+        $formdata->itemnames = $itemnames;
+        $error = '';
+        $items = hierarchy::construct_items_to_add($formdata, $error);
+        // Should be constructed without issues.
+        $this->assertEquals($expectedreturn, (bool)$items);
+        $this->assertEquals($expectederror, $error);
+
+        $this->resetAfterTest(true);
+    }
 }

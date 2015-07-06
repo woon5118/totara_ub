@@ -104,4 +104,29 @@ class item_bulkadd_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Validation for itemnames text area.
+     *
+     * Ensure the format and structure of the items to
+     * add is correct.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array the errors that were found
+     */
+    public function validation($data, $files) {
+
+        // Try constructing the items to add to see if the
+        // structure is valid.
+        $dataasobject = (object)$data;
+        $error = '';
+        $items = hierarchy::construct_items_to_add($dataasobject, $error);
+        if ($items) {
+            // No errors.
+            return array();
+        } else {
+            return array('itemnames' => $error);
+        }
+    }
+
 }

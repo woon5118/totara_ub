@@ -120,10 +120,17 @@ $string['assignrelatedgoals'] = 'Assign related goals';
 $string['availablex'] = 'Available {$a}';
 $string['bulkactions'] = 'Bulk actions';
 $string['bulkadditemnames'] = 'Bulk Add Items';
-$string['bulkadditemnames_help'] = 'This bulk add functionality is mostly for use if you only wish to create simple items, in the same location in the framework, with the same type, and with no additional information such as ID Numbers and Shortnames.
+$string['bulkadditemnames_help'] = 'Provide a list of names (one per line) to create multiple items at the same time. You can use spaces before the item names to indicate the parent-child relationships - every 2 spaces you include before the name indicates one level in the hierarchy.
+
+You must ensure that the structure you create is valid, which means every item must either be at the top level (no indentation) or be below an existing item at the level above. Example: You cannot create a level 3 item unless there is already a level 2 item above it.
+
+*Note*: This bulk add functionality is for use if you want to create simple items, in the same framework, with the same type, and with no additional information such as ID Numbers and Shortnames.
 
 If you wish to have more control over defining the value of fields such as shortname or idnumber, set individual item types etc. you should use the HR Import tool instead.';
-$string['bulkaddfailed'] = 'There was a problem adding those items to the hierarchy';
+$string['bulkaddfailed'] = '<p>There was a problem adding those items to the hierarchy:</p>
+<p>{$a}</p>';
+$string['bulkaddnoitems'] = 'No items found';
+$string['bulkaddparenterror'] = 'Could not locate parent for item \'{$a}\'. Please check the number of spaces before your item names and ensure the structure is correct - click the help icon for more details on the format.';
 $string['bulkaddsuccess'] = '{$a} items were successfully added to the hierarchy';
 $string['bulkdeletecompetency'] = 'Bulk delete competencies';
 $string['bulkdeletegoal'] = 'Bulk delete goals';
