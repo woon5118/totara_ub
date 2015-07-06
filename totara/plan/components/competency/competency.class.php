@@ -125,6 +125,10 @@ class dp_competency_component extends dp_base_component {
             $params['planuserid'] = $this->plan->userid;
         }
 
+        $params['contextlevel'] = CONTEXT_COURSE;
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid, 'c2.id', 'c2.visible', 'c2.audiencevisible', 'c2', 'course');
+        $params = array_merge($params, $visibilityparams);
+
         return  $DB->get_records_sql(
             "
             SELECT
@@ -149,10 +153,14 @@ class dp_competency_component extends dp_base_component {
                 ON c.id = a.competencyid
             LEFT JOIN
                 (SELECT itemid1 AS assignid,
-                    COUNT(id) AS count
-                    FROM {dp_plan_component_relation}
+                    COUNT(cr.id) AS count
+                    FROM {dp_plan_component_relation} cr JOIN {dp_plan_course_assign} cpa ON cpa.id = cr.itemid2 JOIN {course} c2 ON c2.id = cpa.courseid
+                      INNER JOIN
+                        {context} ctx
+                      ON c2.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
                     WHERE component1 = 'competency'
                     AND component2 = 'course'
+                    AND {$visibilitysql}
                     GROUP BY itemid1) linkedcourses
                 ON linkedcourses.assignid = a.id
             LEFT JOIN
@@ -171,7 +179,6 @@ class dp_competency_component extends dp_base_component {
             $limitfrom,
             $limitnum
         );
-
     }
 
     /**
@@ -468,7 +475,9 @@ class dp_competency_component extends dp_base_component {
             return array();
         }
 
-        list($insql, $inparams) = $DB->get_in_or_equal($competencies);
+        list($insql, $inparams) = $DB->get_in_or_equal($competencies, SQL_PARAMS_NAMED);
+        list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid, 'c.id', 'c.visible', 'c.audiencevisible', 'c', 'course');
+
         $sql = "
             SELECT
                 cc.id,
@@ -480,13 +489,21 @@ class dp_competency_component extends dp_base_component {
                 {comp_criteria} cc
             LEFT JOIN
                 {course} c
-             ON cc.iteminstance = c.id
+            ON cc.iteminstance = c.id
+            INNER JOIN
+               {context} ctx
+            ON c.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
             WHERE
-                cc.itemtype = ?
+                cc.itemtype = :itemtype
             AND cc.competencyid $insql
+            AND {$visibilitysql}
         ";
-        $params = array(COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION);
-        $params = array_merge($params, $inparams);
+
+        $params = array(
+            'itemtype' => COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION,
+            'contextlevel' => CONTEXT_COURSE
+        );
+        $params = array_merge($params, $inparams, $visibilityparams);
         $rs = $DB->get_recordset_sql($sql, $params);
         $out = totara_group_records($rs, 'competencyid');
         $rs->close();
