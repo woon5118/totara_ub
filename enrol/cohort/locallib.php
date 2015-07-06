@@ -156,9 +156,10 @@ class enrol_cohort_handler {
  * Sync all cohort course links.
  * @param progress_trace $trace
  * @param int $courseid one course, empty mean all
+ * @param int $cohortid ID of the cohort being synced
  * @return int 0 means ok, 1 means error, 2 means plugin disabled
  */
-function enrol_cohort_sync(progress_trace $trace, $courseid = NULL) {
+function enrol_cohort_sync(progress_trace $trace, $courseid = NULL, $cohortid = NULL) {
     global $CFG, $DB, $USER;
     require_once("$CFG->dirroot/group/lib.php");
 
@@ -174,7 +175,7 @@ function enrol_cohort_sync(progress_trace $trace, $courseid = NULL) {
     raise_memory_limit(MEMORY_HUGE);
 
     // Ensure dynamic cohorts are up to date before starting.
-    totara_cohort_check_and_update_dynamic_cohort_members($courseid, $trace);
+    totara_cohort_check_and_update_dynamic_cohort_members($courseid, $trace, $cohortid);
 
     $trace->output('Starting user enrolment synchronisation...');
 

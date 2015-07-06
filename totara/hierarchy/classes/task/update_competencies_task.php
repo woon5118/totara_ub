@@ -140,7 +140,9 @@ class update_competencies_task extends \core\task\scheduled_task {
      * @return  void
      */
     protected function competency_cron_aggregate_evidence($timestarted, $depth) {
-        global $DB, $COMP_AGGREGATION;
+        global $DB, $CFG, $COMP_AGGREGATION;
+
+        require_once($CFG->dirroot.'/totara/plan/lib.php');
 
         if (debugging()) {
             mtrace('Aggregating competency evidence for depth level '.$depth->depthlevel. ' and frameworkid '. $depth->frameworkid);

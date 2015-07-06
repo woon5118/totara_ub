@@ -1004,9 +1004,10 @@ function totara_cohort_send_queued_notifications(){
  *
  * @param int $courseid one course, empty means all
  * @param progress_trace $trace
+ * @param int $cohortid ID of cohort being updated
  * @return void
  */
-function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progress_trace $trace) {
+function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progress_trace $trace, $cohortid = NULL) {
     global $DB;
 
     $trace->output('removing user memberships of deleted users...');
@@ -1014,7 +1015,11 @@ function totara_cohort_check_and_update_dynamic_cohort_members($courseid, progre
 
     // first make sure dynamic cohort members are up to date
     if (empty($courseid)) {
-        $dcohorts = $DB->get_records('cohort', array('cohorttype' => cohort::TYPE_DYNAMIC), 'idnumber');
+        if (empty($cohortid)) {
+            $dcohorts = $DB->get_records('cohort', array('cohorttype' => cohort::TYPE_DYNAMIC), 'idnumber');
+        } else {
+            $dcohorts = $DB->get_records('cohort', array('id' => $cohortid), 'idnumber');
+        }
     } else {
         // only update members of cohorts that is associated with this course
         $dcohorts = totara_cohort_get_course_cohorts($courseid, cohort::TYPE_DYNAMIC);
