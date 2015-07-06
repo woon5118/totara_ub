@@ -79,3 +79,44 @@ index bba9d07..561b701 100644
      $cb = $frame->get_containing_block();
      list($x, $y, $w, $h) = $frame->get_border_box();
 
+diff --git a/lib/dompdf/lib/res/html.css b/lib/dompdf/lib/res/html.css
+index 2105f86..ca0179a 100644
+--- a/lib/dompdf/lib/res/html.css
++++ b/lib/dompdf/lib/res/html.css
+@@ -450,27 +450,6 @@ select option {
+ select option[selected] {
+   display: inline;
+ }
+-
+-fieldset {
+-  display: block;
+-  margin: 0.6em 2px 2px;
+-  padding: 0.75em;
+-  border: 1pt groove #666;
+-  position: relative;
+-}
+-
+-fieldset > legend {
+-  position: absolute;
+-  top: -0.6em;
+-  left: 0.75em;
+-  padding: 0 0.3em;
+-  background: white;
+-}
+-
+-legend {
+-  display: inline-block;
+-}
+-
+ /* leafs */
+
+ hr {
+@@ -494,6 +473,8 @@ br {
+
+ img, img_generated {
+   display: -dompdf-image;
++  max-width: 100%;
++  height: auto;
+ }
+
+ dompdf_generated {
