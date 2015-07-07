@@ -191,4 +191,41 @@ class rules_form extends moodleform {
 
         $this->add_action_buttons();
     }
+
+    /**
+     * Check for invalid rules.
+     *
+     * If there are errors return array of errors ("fieldname"=>"error message"),
+     * otherwise true if ok.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK (true allowed for backwards compatibility too).
+     */
+    public function validation($data, $files) {
+        $errors = array();
+
+        // Check if any of the restriction types are enabled.
+        if (!isset($data['role_enable']) && !isset($data['audience_enable']) && !isset($data['preset_enable'])) {
+            $errors[] = totara_set_notification(get_string('error:menuitemrulerequired', 'totara_core'));
+        }
+
+        // Check if a role is selected.
+        if (isset($data['role_enable']) && $data['role_enable'] === 1 && !in_array('1', $data['role_activeroles'], TRUE)) {
+            $errors['role_enable'] = get_string('error:menuitemrulerolerequired', 'totara_core');
+        }
+
+        // Check if an audience is selected.
+        if (isset($data['audience_enable']) && $data['audience_enable'] === 1 && empty($data['cohortsvisible'])) {
+            $errors['audience_enable'] = get_string('error:menuitemruleaudiencerequired', 'totara_core');
+        }
+
+        // Check if a preset is selected.
+        if (isset($data['preset_enable']) && $data['preset_enable'] === 1 && !in_array('1', $data['preset_active_presets'], TRUE)) {
+            $errors['preset_enable'] = get_string('error:menuitemrulepresetrequired', 'totara_core');
+        }
+
+        return $errors;
+    }
 }
