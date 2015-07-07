@@ -26,10 +26,17 @@
  * User Paginator server-side processing
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
+
+require_login();
+require_sesskey();
+require_capability('totara/appraisal:viewassignedusers', context_system::instance());
+
 $module = required_param('module', PARAM_TEXT);
 $itemid = required_param('itemid', PARAM_INT);
 

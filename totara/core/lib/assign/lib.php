@@ -1067,6 +1067,7 @@ function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notic
                     "fnServerParams": function ( aoData ) {
                             aoData.push( { "name": "module", "value": "'.$module.'" } );
                             aoData.push( { "name": "itemid", "value": "'.$itemid.'" } );
+                            aoData.push( { "name": "sesskey", "value": M.cfg.sesskey } );
                     },
                     "oLanguage" : {
                         "sEmptyTable":     "'.addslashes_js(get_string('datatable:sEmptyTable', 'totara_core')).'",

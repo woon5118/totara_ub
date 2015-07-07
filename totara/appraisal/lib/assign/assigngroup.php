@@ -31,6 +31,10 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/appraisal/lib/assign/lib.php');
 
+require_login();
+require_sesskey();
+require_capability('totara/appraisal:assignappraisaltogroup', context_system::instance());
+
 $module = required_param('module', PARAM_ALPHAEXT);
 $grouptype = required_param('grouptype', PARAM_ALPHA);
 $itemid = required_param('itemid', PARAM_INT);
@@ -58,9 +62,6 @@ $grouptypeobj = $assignclass->load_grouptype($grouptype);
 
 // Handle new assignments.
 if ($add) {
-    if (!confirm_sesskey()) {
-        print_error('confirmsesskeybad', 'error');
-    }
     $out = '';
     // Is there any valid data?
     $listofvalues = required_param('selected', PARAM_SEQUENCE);

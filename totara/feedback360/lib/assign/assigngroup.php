@@ -31,6 +31,10 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/feedback360/lib/assign/lib.php');
 
+require_login();
+require_sesskey();
+require_capability('totara/feedback360:assignfeedback360togroup', context_system::instance());
+
 $module = required_param('module', PARAM_ALPHANUMEXT);
 $grouptype = required_param('grouptype', PARAM_ALPHA);
 $itemid = required_param('itemid', PARAM_INT);
