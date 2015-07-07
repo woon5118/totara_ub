@@ -2161,13 +2161,23 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
 
         $status = $DB->get_record_sql($sql, array($signupid));
         facetoface_set_completion($status, $status->userid, COMPLETION_UNKNOWN);
-        $signup = $DB->get_record('facetoface_signups', array('id' => $signupid), '*', MUST_EXIST);
-        $session = $DB->get_record('facetoface_sessions', array('id' => $signup->sessionid), '*', MUST_EXIST);
-        $facetoface = $DB->get_record('facetoface', array('id' => $session->facetoface), '*', MUST_EXIST);
-        $moduleid = $DB->get_field('modules', 'id', array('name' => 'facetoface'), MUST_EXIST);
-        $cm = $DB->get_record('course_modules', array('module' => $moduleid, 'instance' => $facetoface->id), '*', MUST_EXIST);
-        $context = context_module::instance($cm->id);
+
+        // Get course module so we can get context for event.
+        $signupsql = "SELECT f2fsignup.*, cm.id as cmid
+            FROM {facetoface_signups} f2fsignup
+            JOIN {facetoface_sessions} f2fsess
+                ON f2fsignup.sessionid = f2fsess.id
+            JOIN {course_modules} cm
+                ON cm.instance = f2fsess.facetoface
+            JOIN {modules} m
+                ON m.id = cm.module AND m.name = 'facetoface'
+            WHERE f2fsignup.id = :signupid";
+
+        $signup = $DB->get_record_sql($signupsql, array('signupid' => $signupid));
+        $context = context_module::instance($signup->cmid);
         $signupstatus->id = $statusid;
+
+        unset($signup->cmid);
 
         \mod_facetoface\event\signup_status_updated::create_from_signup($signupstatus, $context, $signup)->trigger();
 
