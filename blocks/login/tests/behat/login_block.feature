@@ -24,5 +24,5 @@ Feature: Login from a block
     When I set the field "Username" to "testuser"
     And I set the field "Password" to "testpass"
     And I click on "Log in" "button" in the "Login" "block"
-    Then I should see "You are logged in as Test User"
+    Then I should see "Test User" in the ".usermenu .usertext" "css_element"
     And "Login" "block" should not exist
