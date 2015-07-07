@@ -87,6 +87,7 @@ $string['core:deletecoursecustomfield'] = 'Delete a course custom field';
 $string['core:deleteprogramcustomfield'] = 'Delete a program custom field';
 $string['core:editmainmenu'] = 'Edit the main menu';
 $string['core:langconfig'] = 'Edit language settings';
+$string['core:manageprofilefields'] = 'Manage profile fields';
 $string['core:modconfig'] = 'Configure activity modules';
 $string['core:seedeletedusers'] = 'See deleted users';
 $string['core:undeleteuser'] = 'Undelete user';

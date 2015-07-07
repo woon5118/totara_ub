@@ -62,7 +62,7 @@ if ($hassiteconfig
     }
     $ADMIN->add('accounts', $temp);
 
-    $ADMIN->add('accounts', new admin_externalpage('profilefields', new lang_string('profilefields','admin'), "$CFG->wwwroot/user/profile/index.php", 'moodle/site:config'));
+    $ADMIN->add('accounts', new admin_externalpage('profilefields', new lang_string('profilefields','admin'), "$CFG->wwwroot/user/profile/index.php", array('moodle/site:config', 'totara/core:manageprofilefields')));
     $ADMIN->add('accounts', new admin_externalpage('cohorts', new lang_string('cohorts', 'cohort'), $CFG->wwwroot . '/cohort/index.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
     $ADMIN->add('accounts', new admin_externalpage('cohortglobalsettings', new lang_string('cohortglobalsettings', 'totara_cohort'), $CFG->wwwroot . '/totara/cohort/globalsettings.php', array('moodle/cohort:manage', 'moodle/cohort:view')));
 
