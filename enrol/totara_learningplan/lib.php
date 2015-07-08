@@ -134,19 +134,23 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
 
         require_once("{$CFG->dirroot}/totara/plan/lib.php");
 
-        $sql = "SELECT dpp.id, dpp.status AS planstatus, dppca.approved AS courseapproval
+        $sql = "SELECT dpp.id
             FROM {dp_plan} dpp
             INNER JOIN {dp_plan_course_assign} dppca
             ON dppca.planid = dpp.id
-            WHERE dppca.courseid = ?
-            AND dpp.userid = ?";
+            WHERE dppca.courseid = :courseid
+            AND dpp.userid = :userid
+            AND dppca.approved = :approved
+            AND dpp.status = :status
+            ";
+        $params = array(
+            'courseid' => $courseid,
+            'userid' => $USER->id,
+            'approved' => DP_APPROVAL_APPROVED,
+            'status' => DP_PLAN_STATUS_APPROVED
+        );
 
-        $plan = $DB->get_record_sql($sql, array($courseid, $USER->id));
-
-        $planapproved = !empty($plan->planstatus) && ($plan->planstatus == DP_PLAN_STATUS_APPROVED);
-        $courseapproved = !empty($plan->courseapproval) && ($plan->courseapproval == DP_APPROVAL_APPROVED);
-
-        if ($planapproved && $courseapproved) {
+        if ($DB->record_exists_sql($sql, $params)) {
             return true;
         }
     }
