@@ -48,7 +48,7 @@ Feature: Expand the courses nodes within the navigation block
 
   @javascript
   Scenario: As an anonymous user I expand the courses node to see courses.
-    When I should see "You are not logged in." in the ".logininfo" "css_element"
+    When I should see "You are not logged in." in the ".login" "css_element"
     And I should see "Home" in the "Navigation" "block"
     And I should see "Courses" in the "Navigation" "block"
     And I expand "Courses" node
