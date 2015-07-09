@@ -182,7 +182,7 @@ table.planpermissions select {
 
 .ie7 #dp-plans-description {padding-bottom: 60px;}
 
-.jsenabled .fstatic .visibleifjs {
+.jsenabled .fstatic .visibleifjs img {
     display: none;
 }
 
