@@ -378,6 +378,18 @@ function xmldb_scorm_upgrade($oldversion) {
     // Moodle v2.9.0 release upgrade line.
     // Put any upgrade step following this.
 
+    // TL-6829 Add mastery override option.
+    if ($oldversion < 2015051102) {
+        $table = new xmldb_table('scorm');
+
+        $field = new xmldb_field('masteryoverride', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'lastattemptlock');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2015051102, 'scorm');
+    }
+
     return true;
 }
 
