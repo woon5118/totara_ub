@@ -162,7 +162,7 @@ Feature: Set up contextual data for tests
     And I should see "Turn editing on"
     And I log out
     And I log in as "user5"
-    And I should see "You are logged in as"
+    And I should see "User 5" in the ".usermenu .usertext" "css_element"
     And I am on site homepage
     And I follow "Course 1"
     And I should see "You can not enrol yourself in this course."
