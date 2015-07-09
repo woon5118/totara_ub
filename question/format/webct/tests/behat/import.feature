@@ -21,7 +21,7 @@ Feature: Test importing questions from WebCT format.
   Scenario: import some WebCT questions
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_webct" to "1"
-    And I upload "question/format/webct/tests/fixtures/sample_webct.txt" file to "Import" filemanager
+    And I upload "question/format/webct/tests/fixtures/sample_webct.txt" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 6 questions from file"

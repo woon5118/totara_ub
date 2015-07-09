@@ -21,7 +21,7 @@ Feature: Test importing questions from GIFT format.
   Scenario: import some GIFT questions
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_gift" to "1"
-    And I upload "question/format/gift/tests/fixtures/questions.gift.txt" file to "Import" filemanager
+    And I upload "question/format/gift/tests/fixtures/questions.gift.txt" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 9 questions from file"

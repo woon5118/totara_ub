@@ -21,7 +21,7 @@ Feature: Test importing questions from Moodle XML format.
   Scenario: import some true/false questions from Moodle XML format
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_xml" to "1"
-    And I upload "question/format/xml/tests/fixtures/truefalse.xml" file to "Import" filemanager
+    And I upload "question/format/xml/tests/fixtures/truefalse.xml" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 2 questions from file"
@@ -41,7 +41,7 @@ Feature: Test importing questions from Moodle XML format.
   Scenario: import some multiple choice questions from Moodle XML format
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_xml" to "1"
-    And I upload "question/format/xml/tests/fixtures/multichoice.xml" file to "Import" filemanager
+    And I upload "question/format/xml/tests/fixtures/multichoice.xml" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 1 questions from file"
@@ -53,7 +53,7 @@ Feature: Test importing questions from Moodle XML format.
   Scenario: import some multi-answer questions from Moodle XML format
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_xml" to "1"
-    And I upload "question/format/xml/tests/fixtures/multianswer.xml" file to "Import" filemanager
+    And I upload "question/format/xml/tests/fixtures/multianswer.xml" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 1 questions from file"
@@ -65,7 +65,7 @@ Feature: Test importing questions from Moodle XML format.
   Scenario: import some questions with legacy-style images from Moodle XML format
     When I navigate to "Import" node in "Course administration > Question bank"
     And I set the field "id_format_xml" to "1"
-    And I upload "question/format/xml/tests/fixtures/sample_questions_with_old_image_tag.xml" file to "Import" filemanager
+    And I upload "question/format/xml/tests/fixtures/sample_questions_with_old_image_tag.xml" file to "Import questions from file" filemanager
     And I press "id_submitbutton"
     Then I should see "Parsing questions from import file."
     And I should see "Importing 2 questions from file"
