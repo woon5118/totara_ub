@@ -358,7 +358,7 @@ $string['extensionrejecttext'] = 'Extension Denied';
 $string['extensionrequest'] = 'Request for program extension by {$a}';
 $string['extensionrequestfailed'] = 'The extension request failed. Please try again.';
 $string['extensionrequestfailed:nomanager'] = 'Extension request was not sent. Manager could not be found';
-$string['extensionrequestmessage'] = '<p>A user has requested an extension for program <em>{$a->programfullname}</em>. The details of the request are:</p><ul><li>Date: {$a->extensiondatestr}</li><li>Reason: {$a->extensionreason}</li></ul>';
+$string['extensionrequestmessage'] = '<p>A user has requested an extension for program <em>{$a->programfullname}</em>. The details of the request are:</p><ul><li>Date: {$a->extensiondatestr}</li><li>Reason: {$a->extensionreason}</li></ul><p><a href=\'{$a->manageurl}\'>Click here to manage extensions</a></p>';
 $string['extensionrequestmessage_help'] = 'This message will be sent to the student\'s manager whenever a program extension request is made.';
 $string['extensionrequestnotsent'] = 'The extension request could NOT be sent. Please try again.';
 $string['extensionrequestsent'] = 'Request for program extension sent to manager';

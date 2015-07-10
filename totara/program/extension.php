@@ -61,11 +61,13 @@ $month = $timearray[1];
 $year = $timearray[2];
 $extensiontime = mktime(0, 0, 0, $month, $day, $year);
 
+$manageurl = new moodle_url('/totara/program/manageextensions.php');
 $extensiondata = array(
     'extensiondate'         => $extensiontime,
     'extensiondatestr'      => $extensiondate,
     'extensionreason'       => $extensionreason,
-    'programfullname'       => format_string($program->fullname)
+    'programfullname'       => format_string($program->fullname),
+    'manageurl'             => $manageurl->out()
 );
 
 $extensiondate_timestamp = totara_date_parse_from_format(get_string('datepickerlongyearparseformat', 'totara_core'), $extensiondate);  // convert to timestamp
