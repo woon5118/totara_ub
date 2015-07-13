@@ -64,7 +64,6 @@ YUI().use('yui2-dom', function(Y) {
   {
     var el=elements[i];
     el.parentNode.style.verticalAlign='bottom';
-    el.parentNode.style.width='20px';
 
     textrotate_make_svg(el);
   }
