@@ -205,7 +205,12 @@ EOD;
         }
 
         if (isset($record['password'])) {
-            $record['password'] = hash_internal_user_password($record['password']);
+            // Totara: use the same salt for all users, generating passwords is extremely slow by design.
+            static $pwcache = array();
+            if (!isset($pwcache[$record['password']])) {
+                $pwcache[$record['password']] = hash_internal_user_password($record['password']);
+            }
+            $record['password'] = $pwcache[$record['password']];
         } else {
             // The auth plugin may not fully support this,
             // but it is still better/faster than hashing random stuff.
@@ -264,6 +269,11 @@ EOD;
             $record['email']    = md5($record['username']);
             $record['username'] = $delname;
             $record['picture']  = 0;
+        }
+
+        // Totara: we want to do bulk inserts.
+        if (!empty($options['noinsert'])) {
+            return $record;
         }
 
         $userid = $DB->insert_record('user', $record);

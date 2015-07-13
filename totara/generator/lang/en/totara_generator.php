@@ -1,5 +1,5 @@
 <?php
-$string['cachedef_stringlog'] = 'Spider string cache';
+
 $string['pluginname'] = 'Totara Data Generator';
 $string['progress_assigncoursecompetencies'] = 'Randomly assigning courses to competencies';
 $string['progress_assigncompetenciestohierarchy'] = 'Randomly assigning competencies to {$a}';

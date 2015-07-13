@@ -91,22 +91,28 @@ class totara_generator_site_backend extends tool_generator_site_backend {
      */
     private static $paramaudience = array(1, 2, 2, 2, 4, 4);
 
+    /** @var testing_data_generator */
+    protected $generator;
+
     /**
-     * @var cohort_generator Data generator for hierarchy
+     * @var totara_cohort_generator Data generator for hierarchy
      */
     protected $cohort_generator;
 
     /**
-     * @var hierarchy_generator Data generator for hierarchy
+     * @var totara_hierarchy_generator Data generator for hierarchy
      */
     protected $hierarchy_generator;
 
     /**
-     * @var program_generator Data generator for program
+     * @var totara_program_generator Data generator for program
      */
     protected $program_generator;
 
-        /**
+    /** @var core_completion_generator */
+    protected $completion_generator;
+
+    /**
      * @var array Array of program ids
      */
     private $programids = array();
@@ -168,7 +174,6 @@ class totara_generator_site_backend extends tool_generator_site_backend {
      * @param bool $fixeddataset To use fixed or random data
      * @param int|bool $filesizelimit The max number of bytes for a generated file
      * @param bool $progress True if progress information should be displayed
-     * @return int Course id
      */
     public function __construct($size, $bypasscheck, $fixeddataset = false, $filesizelimit = false, $progress = true) {
 

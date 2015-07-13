@@ -26,6 +26,9 @@
 define('CLI_SCRIPT', true);
 define('NO_OUTPUT_BUFFERING', true);
 
+// No logging.
+define('LOG_MANAGER_CLASS', '\core\log\dummy_manager');
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir. '/clilib.php');
 
@@ -82,12 +85,12 @@ $sizename = $options['size'];
 $fixeddataset = $options['fixeddataset'];
 $filesizelimit = $options['filesizelimit'];
 
-// Check size.
-$size = totara_generator_course_backend::size_for_name($sizename);
-
 // Switch to admin user account.
 $admin = get_admin();
 \core\session\manager::set_user($admin);
+
+// Check size.
+$size = totara_generator_course_backend::size_for_name($sizename);
 
 // Do backend code to generate course.
 $backend = new totara_generator_course_backend($name, $size, $fixeddataset, $filesizelimit, empty($options['quiet']));

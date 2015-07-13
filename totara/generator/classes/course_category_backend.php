@@ -36,9 +36,12 @@ class totara_generator_course_category_backend extends tool_generator_backend {
     protected $size;
 
     /**
-     * @var generator For general generator
+     * @var testing_data_generator For general generator
      */
     protected $generator;
+
+    /** @var coursecat $course_category*/
+    protected $course_category;
 
     /**
      * @var generator For course category generator data
@@ -67,6 +70,8 @@ class totara_generator_course_category_backend extends tool_generator_backend {
 
     /**
      * Runs the 'make' process for course categories.
+     *
+     * @return int category id
      */
     public function make() {
         global $DB, $CFG;
@@ -98,13 +103,15 @@ class totara_generator_course_category_backend extends tool_generator_backend {
 
         // Commit transaction and finish.
         $transaction->allow_commit();
+
+        return $this->course_category->id;
     }
 
 
     /**
      * Create a course category,
      *
-     * @return The course category created.
+     * @return coursecat The course category created.
      */
     protected function create_course_category() {
         // If we've received a name over thc command line thenb

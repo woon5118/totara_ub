@@ -232,7 +232,7 @@ class totara_generator_hierarchy_backend extends tool_generator_backend {
         $log_details->name = $default_name;
         $log_details->number = $this->hierarchy_size_quantities[$this->size];
         $this->log('creatinghierarchy', $log_details);
-        // Create the hierachies.
+        // Create the hierarchies.
         $hierarchy_ids = $this->totara_hierarchy_generator->create_hierarchies($framework_id,
                                                                                 $this->type,
                                                                                 $this->hierarchy_size_quantities[$this->size],
@@ -243,7 +243,7 @@ class totara_generator_hierarchy_backend extends tool_generator_backend {
         $log_details->number = $this->hierarchy_size_quantities[$this->size];
         $this->log('creatinghierarchychildren', $log_details);
 
-        // Create a second level of hierachies with the ones created above as parents..
+        // Create a second level of hierarchies with the ones created above as parents..
         foreach ($hierarchy_ids as $hierarchy_id) {
             $hierarchy_children_ids = $this->totara_hierarchy_generator->create_hierarchies($framework_id,
                                                                                         $this->type,

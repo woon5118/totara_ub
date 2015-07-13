@@ -48,9 +48,12 @@ class totara_program_generator extends component_generator_base {
 
         // Add 1-$size programs
         // Randomly make some certifications
-        $certstocreate = mt_rand(1, $size-1);
         for ($p=0; $p < $size; $p++) {
-            $certstocreate = mt_rand(1, $size-1);
+            if ($size < 2) {
+                $certstocreate = 0;
+            } else {
+                $certstocreate = mt_rand(1, $size-1);
+            }
             $default_name = ($this->certificationcount < $certstocreate) ? self::DEFAULT_CERTIFICATION_NAME : self::DEFAULT_PROGRAM_NAME;
             $id = totara_generator_util::get_next_record_number('prog', 'fullname', $default_name);
             $fullname = "{$default_name} {$id}";

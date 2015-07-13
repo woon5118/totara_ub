@@ -26,6 +26,9 @@
 define('CLI_SCRIPT', true);
 define('NO_OUTPUT_BUFFERING', true);
 
+// No logging.
+define('LOG_MANAGER_CLASS', '\core\log\dummy_manager');
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir. '/clilib.php');
 
@@ -95,12 +98,12 @@ if ($coursecount > 1) {
     cli_error("TODO: this script works for new empty sites only, sorry.\n", 1);
 }
 
-// Check size.
-$size = totara_generator_site_backend::size_for_name($sizename);
-
 // Switch to admin user account.
 $admin = get_admin();
 \core\session\manager::set_user($admin);
+
+// Check size.
+$size = totara_generator_site_backend::size_for_name($sizename);
 
 // Do backend code to generate site.
 $backend = new totara_generator_site_backend($size, $options['bypasscheck'], $fixeddataset, $filesizelimit, empty($options['quiet']));

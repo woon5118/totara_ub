@@ -258,6 +258,7 @@ class totara_generator_course_backend extends tool_generator_course_backend {
         $this->log('createactivities', $number, true);
         for ($i = 1; $i <= $number; $i++) {
             $mod = 'mod_' . self::$activities[rand(0, $activitiescount)];
+            /** @var testing_module_generator $modgenerator */
             $modgenerator = $this->generator->get_plugin_generator($mod);
             $record = array('course' => $this->course->id);
             $options = array(

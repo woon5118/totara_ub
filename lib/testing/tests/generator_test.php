@@ -78,6 +78,8 @@ class core_test_generator_testcase extends advanced_testcase {
         $this->assertTimeCurrent($user->timecreated);
         $this->assertSame($user->timecreated, $user->timemodified);
         $this->assertSame('0.0.0.0', $user->lastip);
+        $this->assertNull($user->description);
+        $this->assertEquals(FORMAT_HTML, $user->descriptionformat);
 
         $record = array(
             'auth' => 'email',
@@ -101,6 +103,8 @@ class core_test_generator_testcase extends advanced_testcase {
             'trackforums' => '0',
             'deleted' => '0',
             'timecreated' => '666',
+            'description' => 'haha',
+            'descriptionformat' => (string)FORMAT_HTML,
         );
         $user = $generator->create_user($record);
         $this->assertEquals($count + 2, $DB->count_records('user'));
@@ -125,6 +129,19 @@ class core_test_generator_testcase extends advanced_testcase {
         $this->assertSame('', $user->idnumber);
         $this->assertSame(md5($record['username']), $user->email);
         $this->assertFalse(context_user::instance($user->id, IGNORE_MISSING));
+
+        // Totara: test bulk creation.
+        $prevcount = $DB->count_records('user');
+        $record = $generator->create_user(array('username' => 'bloodyhack666'), array('noinsert' => true));
+        $postcount = $DB->count_records('user');
+        $this->assertSame($prevcount, $postcount);
+        $this->assertInternalType('array', $record);
+        $this->assertFalse(isset($record['id']));
+        $this->assertSame('bloodyhack666', $record['username']);
+
+        $DB->insert_records('user', array($record));
+        $postcount = $DB->count_records('user');
+        $this->assertSame($prevcount + 1, $postcount);
     }
 
     public function test_create() {

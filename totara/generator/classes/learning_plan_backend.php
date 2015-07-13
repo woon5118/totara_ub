@@ -36,12 +36,12 @@ class totara_generator_learning_plan_backend extends tool_generator_backend {
     protected $size;
 
     /**
-     * @var Moodle original data generator.
+     * @var testing_data_generator Moodle original data generator.
      */
     protected $generator;
 
     /**
-     * @var Learning plan data generator.
+     * @var totara_plan_generator Learning plan data generator.
      */
     protected $learning_plan_generator;
 
@@ -144,7 +144,7 @@ class totara_generator_learning_plan_backend extends tool_generator_backend {
         // Create the name we want to use.
         $default_name = trim($default_name) . ' ' . totara_generator_util::get_size_name($this->size);
         $default_name = $default_name . ' ' . totara_generator_util::get_next_record_number('dp_plan', 'name', $default_name);
-        // Outputthe name to the log.
+        // Output the name to the log.
         $this->log('creatinglearningplan', $default_name);
         // Create the learning plan.
         $record = array();
