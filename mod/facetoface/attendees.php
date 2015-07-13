@@ -59,7 +59,12 @@ if (!$cm = get_coursemodule_from_instance('facetoface', $facetoface->id, $course
 }
 $context = context_module::instance($cm->id);
 
-require_login($course, false, $cm);
+if ($action == 'approvalrequired') {
+    // Allow managers to be able to approve staff without being enrolled in the course.
+    require_login();
+} else {
+    require_login($course, false, $cm);
+}
 
 // Setup urls
 $baseurl = new moodle_url('/mod/facetoface/attendees.php', array('s' => $session->id));
