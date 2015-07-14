@@ -7210,13 +7210,14 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     $form .= $setting->output_setting_flags();
 
     $override = '';
+    $errorstr = (empty($CFG->cloudconfigoverride)) ? get_string('configoverride', 'admin') : get_string('cloudconfigoverride', 'totara_core');
     if (empty($setting->plugin)) {
         if (array_key_exists($setting->name, $CFG->config_php_settings)) {
-            $override = '<div class="form-overridden">'.get_string('configoverride', 'admin').'</div>';
+            $override = '<div class="form-overridden">'.$errorstr.'</div>';
         }
     } else {
         if (array_key_exists($setting->plugin, $CFG->forced_plugin_settings) and array_key_exists($setting->name, $CFG->forced_plugin_settings[$setting->plugin])) {
-            $override = '<div class="form-overridden">'.get_string('configoverride', 'admin').'</div>';
+            $override = '<div class="form-overridden">'.$errorstr.'</div>';
         }
     }
 

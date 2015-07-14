@@ -59,6 +59,7 @@ $string['choosetempmanager_help'] = 'A temporary manager can be assigned. The as
 Click **Choose temporary manager** to select a temporary manager.
 
 If the name you are looking for does not appear in the list, it might be that the user does not have the necessary rights to act as a temporary manager.';
+$string['cloudconfigoverride'] = 'This setting is not available on Totara cloud.';
 $string['column'] = 'Column';
 $string['competency_typeicon'] = 'Competency type icon';
 $string['completed'] = 'Completed';
