@@ -341,6 +341,7 @@ class rb_column_option {
             'graphable' => null,
             'transform' => null,
             'aggregate' => null,
+            'addtypetoheading' => false
         );
         $options = array_merge($defaults, $options);
 

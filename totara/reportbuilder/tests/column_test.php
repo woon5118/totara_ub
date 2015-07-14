@@ -285,7 +285,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $message_data = array(
-        'id' => 1, 'useridfrom' => 1, 'useridto' => 3, 'subject' => 'subject', 'fullmessage' => 'message', 'fullmessageformat' => 1,
+        'id' => 1, 'useridfrom' => 1, 'useridto' => 2, 'subject' => 'subject', 'fullmessage' => 'message', 'fullmessageformat' => 1,
         'fullmessagehtml' => 'message', 'smallmessage' => 'msg', 'notification' => 1, 'contexturl' => '', 'contexturlname' => '', 'timecreated' => 0,
     );
 

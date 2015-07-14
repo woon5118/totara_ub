@@ -49,14 +49,36 @@ $PAGE->set_context(context_user::instance($USER->id));
 $filterheadings = array();
 foreach ($report->src->filteroptions as $option) {
     $key = $option->type . '-' . $option->value;
-    $filterheadings[$key] = format_string($option->label);
+
+    // There may be more than one type of data (for exmaple, users), for example columns,
+    // so add the type to the heading to differentiate the types - if required.
+    if (isset($option->filteroptions['addtypetoheading']) && $option->filteroptions['addtypetoheading']) {
+        $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
+        $text = (object) array ('column' => $option->label, 'type' => $type);
+        $heading = get_string ('headingformat', 'totara_reportbuilder', $text);
+    } else {
+        $heading = $option->label;
+    }
+
+    $filterheadings[$key] = ($heading);
 }
 
 $searchcolumnheadings = array();
 foreach ($report->columnoptions as $option) {
     if ($option->is_searchable()) {
         $key = $option->type . '-' . $option->value;
-        $searchcolumnheadings[$key] = format_string($option->name);
+
+        // There may be more than one type of data (for exmaple, users), for example columns,
+        // so add the type to the heading to differentiate the types - if required.
+        if (isset($option->addtypetoheading) && $option->addtypetoheading) {
+            $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
+            $text = (object) array ('column' => $option->name, 'type' => $type);
+            $heading = get_string ('headingformat', 'totara_reportbuilder', $text);
+        } else {
+            $heading = $option->name;
+        }
+
+        $searchcolumnheadings[$key] = ($heading);
     }
 }
 

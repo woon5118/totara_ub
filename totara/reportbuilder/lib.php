@@ -1420,7 +1420,15 @@ class reportbuilder {
                 }
             }
 
-            $out[$key] = $defaultheading;
+            // There may be more than one type of data (for exmaple, users), for example columns,
+            // so add the type to the heading to differentiate the types - if required.
+            if (isset($option->addtypetoheading) && $option->addtypetoheading) {
+                $type = get_string ('type_' . $option->type, 'totara_reportbuilder');
+                $text = (object) array ('column' => $defaultheading, 'type' => $type);
+                $defaultheading = get_string ('headingformat', 'totara_reportbuilder', $text);
+            }
+
+            $out[$key] = format_string($defaultheading);
         }
         return $out;
     }

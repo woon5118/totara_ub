@@ -1849,14 +1849,14 @@ abstract class rb_base_source {
      * @param string $field Name of user id field to join on
      * @return boolean True
      */
-    protected function add_user_table_to_joinlist(&$joinlist, $join, $field) {
+    protected function add_user_table_to_joinlist(&$joinlist, $join, $field, $alias = 'auser') {
 
         // join uses 'auser' as name because 'user' is a reserved keyword
         $joinlist[] = new rb_join(
-            'auser',
+            $alias,
             'LEFT',
             '{user}',
-            "auser.id = $join.$field",
+            "{$alias}.id = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
@@ -1874,11 +1874,13 @@ abstract class rb_base_source {
      *                          a custom group name, you must define a language
      *                          string with the key "type_{$groupname}" in your
      *                          report source language file.
+     * @param boolean $$addtypetoheading Add the column type to the column heading
+     *                          to differentiate between fields with the same name.
      *
      * @return True
      */
     protected function add_user_fields_to_columns(&$columnoptions,
-        $join='auser', $groupname = 'user') {
+        $join='auser', $groupname = 'user', $addtypetoheading = false) {
         global $DB, $CFG;
 
         $usednamefields = totara_get_all_user_name_fields_join($join, null, true);
@@ -1893,7 +1895,9 @@ abstract class rb_base_source {
                   'dbdatatype' => 'char',
                   'outputformat' => 'text',
                   'extrafields' => $allnamefields,
-                  'displayfunc' => 'user')
+                  'displayfunc' => 'user',
+                  'addtypetoheading' => $addtypetoheading
+            )
         );
         $columnoptions[] = new rb_column_option(
             $groupname,
@@ -1904,8 +1908,8 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'link_user',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
-                'extrafields' => array_merge(array('id' => "$join.id"),
-                                             $allnamefields),
+                'extrafields' => array_merge(array('id' => "$join.id"), $allnamefields),
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1923,6 +1927,7 @@ abstract class rb_base_source {
                                                    'email' => "$join.email"),
                                              $allnamefields),
                 'style' => array('white-space' => 'nowrap'),
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1940,7 +1945,8 @@ abstract class rb_base_source {
                     'maildisplay' => "$join.maildisplay",
                 ),
                 'dbdatatype' => 'char',
-                'outputformat' => 'text'
+                'outputformat' => 'text',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         // Only include this column if email is among fields allowed
@@ -1959,7 +1965,8 @@ abstract class rb_base_source {
                     // unobscured email address.
                     'capability' => 'moodle/site:viewuseridentity',
                     'dbdatatype' => 'char',
-                    'outputformat' => 'text'
+                    'outputformat' => 'text',
+                    'addtypetoheading' => $addtypetoheading
                 )
             );
         }
@@ -1973,6 +1980,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'nice_date',
                 'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1984,6 +1992,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
                 'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -1994,6 +2003,7 @@ abstract class rb_base_source {
             array(
                 'joins' => $join,
                 'displayfunc' => 'language_code',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         // auto-generate columns for user fields
@@ -2020,7 +2030,9 @@ abstract class rb_base_source {
                 "$join.$field",
                 array('joins' => $join,
                       'dbdatatype' => 'char',
-                      'outputformat' => 'text')
+                      'outputformat' => 'text',
+                      'addtypetoheading' => $addtypetoheading
+                )
             );
         }
         $columnoptions[] = new rb_column_option(
@@ -2028,7 +2040,9 @@ abstract class rb_base_source {
             'id',
             get_string('userid', 'totara_reportbuilder'),
             "$join.id",
-            array('joins' => $join)
+            array('joins' => $join,
+                  'addtypetoheading' => $addtypetoheading
+            )
         );
 
         // add country option
@@ -2039,7 +2053,8 @@ abstract class rb_base_source {
             "$join.country",
             array(
                 'joins' => $join,
-                'displayfunc' => 'country_code'
+                'displayfunc' => 'country_code',
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2051,7 +2066,8 @@ abstract class rb_base_source {
             "CASE WHEN $join.deleted = 0 and $join.suspended = 1 THEN 2 ELSE $join.deleted END",
             array(
                 'joins' => $join,
-                'displayfunc' => 'deleted_status'
+                'displayfunc' => 'deleted_status',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2063,6 +2079,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
                 'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $columnoptions[] = new rb_column_option(
@@ -2074,6 +2091,7 @@ abstract class rb_base_source {
                 'joins' => $join,
                 'displayfunc' => 'nice_datetime',
                 'dbdatatype' => 'timestamp',
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2093,7 +2111,7 @@ abstract class rb_base_source {
      *                          report source language file.
      * @return True
      */
-    protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user') {
+    protected function add_user_fields_to_filters(&$filteroptions, $groupname = 'user', $addtypetoheading = false) {
         global $CFG;
         // auto-generate filters for user fields
         $fields = array(
@@ -2124,7 +2142,8 @@ abstract class rb_base_source {
                 $groupname,
                 $field,
                 $name,
-                'text'
+                'text',
+                array('addtypetoheading' => $addtypetoheading)
             );
         }
 
@@ -2139,6 +2158,7 @@ abstract class rb_base_source {
                 'selectchoices' => get_string_manager()->get_list_of_countries(),
                 'attributes' => $select_width_options,
                 'simplemode' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
         $filteroptions[] = new rb_filter_option(
@@ -2152,6 +2172,7 @@ abstract class rb_base_source {
                                          2 => get_string('suspendedonly', 'totara_reportbuilder')),
                 'attributes' => $select_width_options,
                 'simplemode' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2161,7 +2182,8 @@ abstract class rb_base_source {
             get_string('userlastlogin', 'totara_reportbuilder'),
             'date',
             array(
-                'includetime' => true
+                'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2171,7 +2193,8 @@ abstract class rb_base_source {
             get_string('userfirstaccess', 'totara_reportbuilder'),
             'date',
             array(
-                'includetime' => true
+                'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2181,7 +2204,8 @@ abstract class rb_base_source {
             get_string('usertimecreated', 'totara_reportbuilder'),
             'date',
             array(
-                'includetime' => true
+                'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
 
@@ -2191,7 +2215,8 @@ abstract class rb_base_source {
             get_string('usertimemodified', 'totara_reportbuilder'),
             'date',
             array(
-                'includetime' => true
+                'includetime' => true,
+                'addtypetoheading' => $addtypetoheading
             )
         );
 

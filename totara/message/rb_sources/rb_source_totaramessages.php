@@ -83,7 +83,10 @@ class rb_source_totaramessages extends rb_base_source {
             ),
         );
 
-        // include some standard joins
+        // Include a join for the user that the message was sent to.
+        $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridto', 'userto');
+
+        // Include some standard joins. Including the user the message was sent from.
         $this->add_user_table_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_position_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
         $this->add_cohort_user_tables_to_joinlist($joinlist, 'msg', 'useridfrom');
@@ -197,8 +200,11 @@ class rb_source_totaramessages extends rb_base_source {
             ),
         );
 
-        // include some standard columns
-        $this->add_user_fields_to_columns($columnoptions);
+        // Add columns for the user the message was sent to.
+        $this->add_user_fields_to_columns($columnoptions, 'userto', 'userto', true);
+
+        // Include some standard columns. Including the user that the message was sent from.
+        $this->add_user_fields_to_columns($columnoptions, 'auser', 'user', true);
         $this->add_position_fields_to_columns($columnoptions);
         $this->add_cohort_user_fields_to_columns($columnoptions);
 
@@ -240,8 +246,12 @@ class rb_source_totaramessages extends rb_base_source {
                 )
             ),
         );
-        // include some standard filters
-        $this->add_user_fields_to_filters($filteroptions);
+
+        // Add filters for the user the message was sent to.
+        $this->add_user_fields_to_filters($filteroptions, 'userto', true);
+
+        // Include some standard filters. Including the user that the message was sent from.
+        $this->add_user_fields_to_filters($filteroptions, 'user', true);
         $this->add_position_fields_to_filters($filteroptions);
         $this->add_cohort_user_fields_to_filters($filteroptions);
 
@@ -288,6 +298,10 @@ class rb_source_totaramessages extends rb_base_source {
         $defaultcolumns = array(
             array(
                 'type' => 'user',
+                'value' => 'fullname'
+            ),
+            array(
+                'type' => 'userto',
                 'value' => 'fullname'
             ),
             array(
