@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/program/rb_sources/rb_source_program_completion.php');
+require_once($CFG->dirroot . '/totara/certification/lib.php');
 
 class rb_source_certification_completion extends rb_source_program_completion {
 
@@ -62,7 +63,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
             '{certif_completion}',
             "certif_completion.userid = base.userid AND certif_completion.certifid = program.certifid",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            'base'
+            array('base', 'program')
         );
 
         $joinlist[] = new rb_join(
@@ -71,7 +72,7 @@ class rb_source_certification_completion extends rb_source_program_completion {
             '{certif_completion}',
             "certif_completion.userid = base.userid AND certif_completion.certifid = program.certifid",
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
-            'base'
+            array('base', 'program')
         );
 
         return $joinlist;
@@ -82,6 +83,74 @@ class rb_source_certification_completion extends rb_source_program_completion {
 
         $this->add_certification_fields_to_columns($columnoptions, 'certif', 'totara_certification');
 
+        // Remove the columns that we are going to replace with certification versions.
+        foreach ($columnoptions as $key => $columnoption) {
+            if ($columnoption->type == 'progcompletion' &&
+                in_array($columnoption->value, array('status', 'iscomplete', 'isnotcomplete', 'isinprogress', 'isnotstarted'))) {
+                unset($columnoptions[$key]);
+            }
+        }
+
+        // Add back the columns that were just removed, but suitable for certifications.
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'status',
+            get_string('status', 'rb_source_dp_certification'),
+            'certif_completion.status',
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'certif_status',
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'iscertified',
+            get_string('iscertified', 'rb_source_certification_completion'),
+            'CASE WHEN certif_completion.certifpath = ' . CERTIFPATH_RECERT . ' THEN 1 ELSE 0 END',
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('iscertified', 'rb_source_certification_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'isnotcertified',
+            get_string('isnotcertified', 'rb_source_certification_completion'),
+            'CASE WHEN certif_completion.certifpath <> ' . CERTIFPATH_RECERT . ' THEN 1 ELSE 0 END',
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isnotcertified', 'rb_source_certification_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'isinprogress',
+            get_string('isinprogress', 'rb_source_program_completion'),
+            'CASE WHEN certif_completion.status = ' . CERTIFSTATUS_INPROGRESS . ' THEN 1 ELSE 0 END',
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isinprogress', 'rb_source_program_completion'),
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'certcompletion',
+            'isnotstarted',
+            get_string('isnotstarted', 'rb_source_program_completion'),
+            'CASE WHEN certif_completion.status = ' . CERTIFSTATUS_ASSIGNED . ' THEN 1 ELSE 0 END',
+            array(
+                'joins' => 'certif_completion',
+                'displayfunc' => 'yes_or_no',
+                'dbdatatype' => 'boolean',
+                'defaultheading' => get_string('isnotstarted', 'rb_source_program_completion'),
+            )
+        );
+
         return $columnoptions;
     }
 
@@ -90,6 +159,136 @@ class rb_source_certification_completion extends rb_source_program_completion {
 
         $this->add_certification_fields_to_filters($filteroptions, 'totara_certification');
 
+        // Remove the filters that we are going to replace with certification versions.
+        foreach ($filteroptions as $key => $filteroption) {
+            if ($filteroption->type == 'progcompletion' &&
+                in_array($filteroption->value, array('status', 'iscomplete', 'isnotcomplete', 'isinprogress', 'isnotstarted'))) {
+                unset($filteroptions[$key]);
+            }
+        }
+
+        // Add back the filters that were just removed, but suitable for certifications.
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'status',
+            get_string('status', 'rb_source_dp_certification'),
+            'select',
+            array(
+                'selectfunc' => 'status',
+                'attributes' => rb_filter_option::select_width_limiter(),
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'iscertified',
+            get_string('iscertified', 'rb_source_certification_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'isnotcertified',
+            get_string('isnotcertified', 'rb_source_certification_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'isinprogress',
+            get_string('isinprogress', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+        $filteroptions[] = new rb_filter_option(
+            'certcompletion',
+            'isnotstarted',
+            get_string('isnotstarted', 'rb_source_program_completion'),
+            'select',
+            array(
+                'selectfunc' => 'yesno_list',
+                'simplemode' => true,
+            )
+        );
+
         return $filteroptions;
+    }
+
+    protected function define_defaultcolumns() {
+        $defaultcolumns = array(
+            array(
+                'type' => 'user',
+                'value' => 'namelink',
+            ),
+            array(
+                'type' => 'prog',
+                'value' => 'proglinkicon',
+            ),
+            array(
+                'type' => 'certcompletion',
+                'value' => 'status',
+            ),
+            array(
+                'type' => 'progcompletion',
+                'value' => 'duedate',
+            ),
+        );
+        return $defaultcolumns;
+    }
+
+    protected function define_defaultfilters() {
+        $defaultfilters = array(
+            array(
+                'type' => 'prog',
+                'value' => 'fullname',
+                'advanced' => 0,
+            ),
+            array(
+                'type' => 'user',
+                'value' => 'fullname',
+                'advanced' => 0,
+            ),
+            array(
+                'type' => 'certcompletion',
+                'value' => 'status',
+                'advanced' => 0,
+            ),
+        );
+        return $defaultfilters;
+    }
+
+    public function rb_filter_status() {
+        global $CERTIFSTATUS;
+
+        $out = array();
+        foreach ($CERTIFSTATUS as $code => $statusstring) {
+            $out[$code] = get_string($statusstring, 'totara_certification');
+        }
+        return $out;
+    }
+
+    /**
+     * Certification display the certification status as string.
+     *
+     * @param string $status    CERTIFSTATUS_X constant to describe the status of the certification.
+     * @param array $row        The record used to generate the table row
+     * @return string
+     */
+    public function rb_display_certif_status($status, $row) {
+        global $CERTIFSTATUS;
+
+        $strstatus = '';
+        if ($status && isset($CERTIFSTATUS[$status])) {
+            $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
+        }
+        return $strstatus;
     }
 }

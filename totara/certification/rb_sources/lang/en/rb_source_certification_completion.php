@@ -22,8 +22,10 @@
  * @subpackage certification
  */
 
+$string['iscertified'] = 'Is certified';
+$string['isnotcertified'] = 'Is not certified';
 $string['sourcetitle'] = 'Certification Completion';
 $string['type_certif'] = 'Certification';
-$string['type_certif_completion'] = 'Certification Completion';
+$string['type_certcompletion'] = 'Certification Completion';
 $string['type_prog'] = 'Certification';
 $string['type_progcompletion'] = 'Certification Completion';

@@ -186,5 +186,38 @@ function xmldb_totara_certification_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015030204, 'totara_certification');
     }
 
+    // TL-6645 Change certification completion report columns to use certification status column instead of program status.
+    if ($oldversion < 2015080500) {
+
+        // Rename any existing records.
+        reportbuilder_rename_data('columns',
+            'certification_completion', 'progcompletion', 'status', 'certcompletion', 'status');
+        reportbuilder_rename_data('filters',
+            'certification_completion', 'progcompletion', 'status', 'certcompletion', 'status');
+
+        reportbuilder_rename_data('columns',
+            'certification_completion', 'progcompletion', 'iscomplete', 'certcompletion', 'iscertified');
+        reportbuilder_rename_data('filters',
+            'certification_completion', 'progcompletion', 'iscomplete', 'certcompletion', 'iscertified');
+
+        reportbuilder_rename_data('columns',
+            'certification_completion', 'progcompletion', 'isnotcomplete', 'certcompletion', 'isnotcertified');
+        reportbuilder_rename_data('filters',
+            'certification_completion', 'progcompletion', 'isnotcomplete', 'certcompletion', 'isnotcertified');
+
+        reportbuilder_rename_data('columns',
+            'certification_completion', 'progcompletion', 'isinprogress', 'certcompletion', 'isinprogress');
+        reportbuilder_rename_data('filters',
+            'certification_completion', 'progcompletion', 'isinprogress', 'certcompletion', 'isinprogress');
+
+        reportbuilder_rename_data('columns',
+            'certification_completion', 'progcompletion', 'isnotstarted', 'certcompletion', 'isnotstarted');
+        reportbuilder_rename_data('filters',
+            'certification_completion', 'progcompletion', 'isnotstarted', 'certcompletion', 'isnotstarted');
+
+        // Certification savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015080500, 'totara_certification');
+    }
+
     return true;
 }
