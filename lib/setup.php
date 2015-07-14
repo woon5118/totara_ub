@@ -415,6 +415,15 @@ if (!empty($CFG->earlyprofilingenabled)) {
     profiling_start();
 }
 
+// Totara: force-disable some settings that are not functional in Totara.
+// Always force autoupdates off in Totara.
+$CFG->disableupdatenotifications = '1';
+$CFG->disableupdateautodeploy = '1';
+$CFG->updateautodeploy = '0';
+$CFG->updateautocheck = '0';
+$CFG->updatenotifybuilds = '0';
+$CFG->updateminmaturity = (string)MATURITY_STABLE;
+
 /**
  * Database connection. Used for all access to the database.
  * @global moodle_database $DB
@@ -685,9 +694,15 @@ if (function_exists('gc_enable')) {
     gc_enable();
 }
 
-// detect unsupported upgrade jump as soon as possible - do not change anything, do not use system functions
-if (!empty($CFG->version) and $CFG->version < 2007101509) {
-    print_error('upgraderequires19', 'error');
+// Detect unsupported upgrade jump as soon as possible - do not change anything, do not use system functions.
+if (!empty($CFG->version) and $CFG->version < 2011120507) {
+    if (empty($CFG->totara_release)) {
+        // We cannot upgrade from Moodle older than v2.2.7.
+        print_error('error:cannotupgradefrommoodle', 'totara_core');
+    } else {
+        // We cannot upgrade from Totara older than v2.2.13.
+        print_error('error:cannotupgradefromtotara', 'totara_core');
+    }
     die;
 }
 

@@ -48,7 +48,7 @@ if (!function_exists('iconv')) {
 // Make sure php5-json is available.
 if (!function_exists('json_encode') || !function_exists('json_decode')) {
     // This also shouldn't happen.
-    echo 'Moodle requires the json PHP extension. Please install or enable the json extension.';
+    echo 'Totara requires the json PHP extension. Please install or enable the json extension.';
     die();
 }
 
@@ -149,6 +149,7 @@ if (!isset($CFG->branch)) {
 $version = null;
 $release = null;
 $branch = null;
+$TOTARA = new stdClass(); // Prevent IDE complaints.
 require("$CFG->dirroot/version.php");       // defines $version, $release, $branch and $maturity
 $CFG->target_release = $release;            // used during installation and upgrades
 
@@ -156,18 +157,13 @@ if (!$version or !$release) {
     print_error('withoutversion', 'debug'); // without version, stop
 }
 
-// Totara upgrade version checks - only certain upgrade paths are permitted
-// do this early to ensure upgrade hasn't started yet
-//
-// we also need to prevent attempts to downgrade from Moodle release that
-// is later than current totara version (e.g. Moodle 2.3 -> Totara 2.2)
-// This is already handled by the core upgrade code as it would detected a
-// core downgrade and throw and exception
-
-//setup totara version variables
-$totarainfo = totara_version_info($version, $release);
+// Setup totara version variables and verify upgrade is possible,
+// note that lib/setup.php does upgrade checks for 1.x/2.2.x upgrade path.
+$totarainfo = totara_version_info();
 if (!empty($totarainfo->totaraupgradeerror)){
-    print_error($totarainfo->totaraupgradeerror, 'totara_core', '', $totarainfo);
+    $PAGE->set_pagelayout('maintenance');
+    $PAGE->set_popup_notification_allowed(false);
+    print_error($totarainfo->totaraupgradeerror, 'totara_core', new moodle_url('/admin/'), $totarainfo);
 }
 
 if (!core_tables_exist()) {
@@ -248,14 +244,6 @@ if (!core_tables_exist()) {
     install_core($version, true);
 }
 
-// Always force autoupdates off in Totara.
-if (empty($CFG->disableupdatenotifications)) {
-    set_config('disableupdatenotifications', '1');
-    set_config('disableupdateautodeploy', '1');
-    set_config('updateminmaturity', MATURITY_STABLE);
-    set_config('updatenotifybuilds', 0);
-}
-
 // Check version of Moodle code on disk compared with database
 // and upgrade if possible.
 
@@ -279,8 +267,7 @@ if ($CFG->version != $DB->get_field('config', 'value', array('name'=>'version'))
     redirect(new moodle_url('/admin/index.php'), 'Config cache inconsistency detected, resetting caches...');
 }
 
-if (!$cache && ($version > $CFG->version
-        || (isset($CFG->totara_build) && version_compare($totarainfo->newtotaraversion, $totarainfo->existingtotaraversion, '>')))) {  // upgrade
+if (!$cache && $totarainfo->upgradecore) {
 
     // Warning about upgrading a test site.
     $testsite = false;
@@ -381,27 +368,6 @@ if (!$cache && ($version > $CFG->version
         // Launch main upgrade.
         upgrade_core($version, true);
     }
-} else if ($version < $CFG->version) {
-    // better stop here, we can not continue with plugin upgrades or anything else
-    throw new moodle_exception('downgradedcore', 'error', new moodle_url('/admin/'));
-}
-
-// Updated human-readable release version if necessary
-if (!$cache and $release <> $CFG->release) {  // Update the release version
-    set_config('release', $release);
-}
-
-if ( (!isset($CFG->totara_release) || $CFG->totara_release <> $TOTARA->release)
-    || (!isset($CFG->totara_build) || $CFG->totara_build <> $TOTARA->build)
-    || (!isset($CFG->totara_version) || $CFG->totara_version <> $TOTARA->version)) {
-    // Also set Totara release (human readable version)
-    set_config("totara_release", $TOTARA->release);
-    set_config("totara_build", $TOTARA->build);
-    set_config("totara_version", $TOTARA->version);
-}
-
-if (!$cache and $branch <> $CFG->branch) {  // Update the branch
-    set_config('branch', $branch);
 }
 
 if (!$cache and moodle_needs_upgrading()) {

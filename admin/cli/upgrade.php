@@ -66,7 +66,7 @@ if ($unrecognized) {
 
 if ($options['help']) {
     $help =
-"Command line Moodle upgrade.
+"Command line Totara upgrade.
 Please note you must execute this script with the same uid as apache!
 
 Site defaults may be changed via local/defaults.php.
@@ -89,24 +89,22 @@ if (empty($CFG->version)) {
     cli_error(get_string('missingconfigversion', 'debug'));
 }
 
+$version = null;
+$release = null;
+$branch = null;
 require("$CFG->dirroot/version.php");       // defines $version, $release, $branch and $maturity
 $CFG->target_release = $release;            // used during installation and upgrades
 
-if ($version < $CFG->version) {
-    cli_error(get_string('downgradedcore', 'error'));
-}
-
-//setup totara version variables
-$totarainfo = totara_version_info($version, $release);
+// Setup totara version variables and verify upgrade is possible,
+// note that lib/setup.php does upgrade checks for 1.x/2.2.x upgrade path.
+$totarainfo = totara_version_info();
 if (!empty($totarainfo->totaraupgradeerror)){
-    print_error($totarainfo->totaraupgradeerror, 'totara_core');
+    cli_error(get_string($totarainfo->totaraupgradeerror, 'totara_core', $totarainfo), 1);
 }
 
-//check that neither moodle nor totara need upgrading
-//cli installs and upgrades prior to T-10001 bugfix will not have the totara CFG values set - run the upgrade anyway to get those variables in
-$totara_needs_upgrade = (!isset($CFG->totara_build) || (isset($CFG->totara_build) && $TOTARA->build > $CFG->totara_build));
-if (!moodle_needs_upgrading() && !($version > $CFG->version) && !$totara_needs_upgrade) {
-    cli_error(get_string('cliupgradenoneed', 'core_admin', $totarainfo->newtotaraversion), 0);
+// Totara: moodle_needs_upgrading() now checks for Totara upgrade too.
+if (!moodle_needs_upgrading()) {
+    cli_error(get_string('cliupgradenoneed', 'core_admin', $totarainfo->newversion), 0);
 }
 
 // Test environment first.
@@ -141,7 +139,6 @@ if (isset($maturity)) {
             cli_separator();
             cli_heading(get_string('notice'));
             echo get_string('maturitycorewarning', 'admin', $maturitylevel) . PHP_EOL;
-            echo get_string('morehelp') . ': ' . get_docs_url('admin/versions') . PHP_EOL;
             cli_separator();
         } else {
             cli_problem(get_string('maturitycorewarning', 'admin', $maturitylevel));
@@ -161,7 +158,7 @@ if ($interactive) {
 // Run any pre-upgrade special fixes that may be required.
 totara_preupgrade($totarainfo);
 
-if ($version > $CFG->version) {
+if ($totarainfo->upgradecore) {
     // We purge all of MUC's caches here.
     // Caches are disabled for upgrade by CACHE_DISABLE_ALL so we must set the first arg to true.
     // This ensures a real config object is loaded and the stores will be purged.
@@ -170,17 +167,7 @@ if ($version > $CFG->version) {
     cache_helper::purge_all(true);
     upgrade_core($version, true);
 }
-set_config('release', $release);
-set_config('branch', $branch);
 
-if (!isset($CFG->totara_release) || $CFG->totara_release <> $TOTARA->release
-    || !isset($CFG->totara_build) || $CFG->totara_build <> $TOTARA->build
-    || !isset($CFG->totara_version) || $CFG->totara_version <> $TOTARA->version) {
-    // Also set Totara release (human readable version)
-    set_config("totara_release", $TOTARA->release);
-    set_config("totara_build", $TOTARA->build);
-    set_config("totara_version", $TOTARA->version);
-}
 // unconditionally upgrade
 upgrade_noncore(true);
 

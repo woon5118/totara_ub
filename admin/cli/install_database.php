@@ -120,6 +120,10 @@ if ($options['help']) {
     die;
 }
 
+// Print header.
+require($CFG->dirroot.'/version.php');
+echo get_string('cliinstallheader', 'install', $TOTARA->release)."\n";
+
 if (!$options['agree-license']) {
     cli_error('You have to agree to the license. --help prints out the help'); // TODO: localize
 }

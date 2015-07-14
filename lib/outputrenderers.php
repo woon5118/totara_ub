@@ -475,7 +475,7 @@ class core_renderer extends renderer_base {
 
         $output = '';
         $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
-        $output .= '<meta name="keywords" content="moodle, ' . $this->page->title . '" />' . "\n";
+        $output .= '<meta name="keywords" content="Totara, ' . $this->page->title . '" />' . "\n";
         // This is only set by the {@link redirect()} method
         $output .= $this->metarefreshtag;
 

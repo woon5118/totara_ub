@@ -431,7 +431,7 @@ function totara_cohort_is_rule_fixable($brokenrule) {
 /**
  * Function call before upgrade.
  *
- * @param $totarainfo Info obtained from totara_version_info function.
+ * @param stdClass $totarainfo Info obtained from totara_version_info function.
  * @return void.
  */
 function totara_preupgrade($totarainfo) {

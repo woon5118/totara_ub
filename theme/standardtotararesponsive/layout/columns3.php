@@ -138,7 +138,7 @@ echo $OUTPUT->doctype() ?>
 <footer id="page-footer">
     <div class="container-fluid">
         <div id="course-footer"><?php echo $OUTPUT->course_footer(); ?></div>
-        <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">TotaraLMS</a></div>
+        <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">Totara LMS</a></div>
         <?php
         echo $OUTPUT->standard_footer_html();
         ?>

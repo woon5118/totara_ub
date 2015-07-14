@@ -46,11 +46,11 @@ class core_admin_renderer extends plugin_renderer_base {
         $continue = new single_button(new moodle_url('/admin/index.php', array('lang'=>$CFG->lang, 'agreelicense'=>1)), get_string('continue'), 'get');
 
         $output .= $this->header();
-        $output .= $this->heading('<a href="http://www.totaralms.com/">Totara</a> - Totara Learning Management System', 2, 'centered');
+        $output .= $this->heading('<a href="http://www.totaralms.com/">Totara LMS</a> - Totara Learning Management System', 2, 'centered');
         $output .= $this->heading(get_string('copyrightnotice'), 2, 'centered');
         $output .= $this->box($copyrightnotice, 'copyrightnotice');
         $output .= html_writer::empty_tag('br');
-        $output .= $this->confirm(get_string('doyouagree'), $continue, "http://docs.moodle.org/dev/License");
+        $output .= $this->confirm(get_string('doyouagree'), $continue, "http://www.gnu.org/licenses/gpl-3.0.html");
         $output .= $this->footer();
 
         return $output;
@@ -90,7 +90,7 @@ class core_admin_renderer extends plugin_renderer_base {
 
         $output .= $this->header();
         $output .= $this->maturity_warning($maturity);
-        $output .= $this->heading("Totara {$TOTARA->release} : Based on Moodle {$CFG->target_release}");
+        $output .= $this->heading("Totara {$TOTARA->release}");
         $output .= $this->release_notes_link();
 
         $output .= $this->environment_check_table($envstatus, $environment_results);
@@ -132,7 +132,7 @@ class core_admin_renderer extends plugin_renderer_base {
     /**
      * Display the 'You are about to upgrade Moodle' page. The first page
      * during upgrade.
-     * @param string $strnewversion
+     * @param stdClass $strnewversion
      * @param int $maturity
      * @param string $testsite
      * @return string HTML to output.
@@ -165,7 +165,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output = '';
 
         $output .= $this->header();
-        $output .= $this->heading("Totara {$TOTARA->release} : Based on Moodle {$CFG->target_release}");
+        $output .= $this->heading("Totara {$TOTARA->release}");
         $output .= $this->release_notes_link();
         $output .= $this->environment_check_table($envstatus, $environment_results);
 
@@ -333,10 +333,16 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $totara_renderer->totara_print_active_users($activeusers);
         /// Display Totara version information
         $output .= $totara_renderer->totara_print_copyright($totara_release);
+
+        // skodak: Martin likes to threaten people, so just style his copyright notice the standard way.
+        $output .= $this->output->box_start('generalbox adminwarning moodle-copyright');
+
         //////////////////////////////////////////////////////////////////////////////////////////////////
         ////  IT IS ILLEGAL AND A VIOLATION OF THE GPL TO HIDE, REMOVE OR MODIFY THIS COPYRIGHT NOTICE ///
         $output .= $this->moodle_copyright();
         //////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $output .= $this->output->box_end();
 
         $output .= $this->footer();
 

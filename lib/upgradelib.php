@@ -1512,6 +1512,13 @@ function upgrade_language_pack($lang = null) {
 function install_core($version, $verbose) {
     global $CFG, $DB;
 
+    // Totara: Make sure we have the correct versions, ignore the sloppy param.
+    $version = null;
+    $release = null;
+    $branch = null;
+    $TOTARA = new stdClass();
+    require("$CFG->dirroot/version.php");
+
     // We can not call purge_all_caches() yet, make sure the temp and cache dirs exist and are empty.
     remove_dir($CFG->cachedir.'', true);
     make_cache_directory('', true);
@@ -1550,6 +1557,13 @@ function install_core($version, $verbose) {
         // Write default settings unconditionally
         admin_apply_default_settings(NULL, true);
 
+        // Totara: update all version info consistently.
+        set_config('release', $release);
+        set_config('branch', $branch);
+        set_config('totara_release', $TOTARA->release);
+        set_config('totara_build', $TOTARA->build);
+        set_config('totara_version', $TOTARA->version);
+
         print_upgrade_part_end(null, true, $verbose);
 
         // Purge all caches. They're disabled but this ensures that we don't have any persistent data just in case something
@@ -1568,6 +1582,13 @@ function install_core($version, $verbose) {
  */
 function upgrade_core($version, $verbose) {
     global $CFG, $SITE, $DB, $COURSE, $TOTARA;
+
+    // Totara: Make sure we have the correct versions, ignore the sloppy param.
+    $version = null;
+    $release = null;
+    $branch = null;
+    $TOTARA = new stdClass();
+    require("$CFG->dirroot/version.php");
 
     raise_memory_limit(MEMORY_EXTRA);
 
@@ -1623,6 +1644,13 @@ function upgrade_core($version, $verbose) {
         context_helper::build_all_paths(false);
         $syscontext = context_system::instance();
         $syscontext->mark_dirty();
+
+        // Totara: update all version info consistently.
+        set_config('release', $release);
+        set_config('branch', $branch);
+        set_config('totara_release', $TOTARA->release);
+        set_config('totara_build', $TOTARA->build);
+        set_config('totara_version', $TOTARA->version);
 
         print_upgrade_part_end('moodle', false, $verbose);
     } catch (Exception $ex) {

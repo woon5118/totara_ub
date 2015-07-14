@@ -73,7 +73,7 @@ Options:
 --adminuser=USERNAME  Username for the admin account. Default is admin
 --adminpass=PASSWORD  Password for the admin account,
                       required in non-interactive mode.
---adminemail=STRING   Email address for the moodle admin account.
+--adminemail=STRING   Email address for the Totara admin account.
 --non-interactive     No interactive questions, installation fails if any
                       problem encountered.
 --agree-license       Indicates agreement with software license,
@@ -467,7 +467,6 @@ if (isset($maturity)) {
             cli_separator();
             cli_heading(get_string('notice'));
             echo get_string('maturitycorewarning', 'admin', $maturitylevel) . PHP_EOL;
-            echo get_string('morehelp') . ': ' . get_docs_url('admin/versions') . PHP_EOL;
             echo get_string('continue') . PHP_EOL;
             $prompt = get_string('cliyesnoprompt', 'admin');
             $input = cli_input($prompt, '', array(get_string('clianswerno', 'admin'), get_string('cliansweryes', 'admin')));
@@ -715,7 +714,7 @@ if ($interactive) {
     if (!$options['agree-license']) {
         cli_separator();
         cli_heading(get_string('copyrightnotice'));
-        echo "Moodle  - Modular Object-Oriented Dynamic Learning Environment\n";
+        echo "Totara LMS - Totara Learning Management System\n\n";
         echo get_string('gpl3')."\n\n";
         echo get_string('doyouagree')."\n";
         $prompt = get_string('cliyesnoprompt', 'admin');

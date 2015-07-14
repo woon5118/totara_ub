@@ -144,68 +144,64 @@ function totara_major_version() {
  * Moodle and Totara version numbers consist of three numbers (four for emergency releases)separated by a dot,
  * for example 1.9.11 or 2.0.2. The first two numbers, like 1.9 or 2.0, represent so
  * called major version. This function extracts the Moodle and Totara version info for use in checks and messages
- * @param $version the moodle version number from the root version.php
- * @param $release the moodle release string from the root version.php
- * @return object containing moodle and totara version info
+ * @return stdClass containing moodle and totara version info
  */
-function totara_version_info($version, $release) {
-    global $CFG, $TOTARA;
+function totara_version_info() {
+    global $CFG;
+
+    // Fetch version infos.
+    $version = null;
+    $release = null;
+    $branch = null;
+    $TOTARA = new stdClass();
+    require("$CFG->dirroot/version.php");
 
     $a = new stdClass();
     $a->existingtotaraversion = false;
     $a->newtotaraversion = $TOTARA->version;
-    $a->newversion = '';
+    $a->upgradecore = false;
+    $a->newversion = "Totara {$TOTARA->release}";
     $a->oldversion = '';
+
+    if (empty($CFG->version)) {
+        // New install.
+        return $a;
+    }
+
     if (!empty($CFG->totara_release)) {
-        $a->canupgrade = true;
-        if (isset($CFG->totara_version)) {
-            //on at least Totara 2.2, check it is 2.2.13 or greater
-            $parts = explode(" ", $CFG->totara_release);
-            $a->existingtotaraversion = trim($parts[0]);
-            $a->canupgrade = version_compare($a->existingtotaraversion, '2.2.13', '>=');
+        // Existing Totara install.
+        $a->oldversion = "Totara {$CFG->totara_release}";
+    } else if (!empty($CFG->release)) {
+        // Must be upgrade from Moodle.
+        // Do not mention Moodle unless we are upgrading from it!
+        $a->oldversion = "Moodle {$CFG->release}";
+    }
+
+    // Detect core downgrades.
+    if ($version < $CFG->version) {
+        if (!empty($CFG->totara_release)) {
+            // Somebody is trying to downgrade Totara.
+            $a->totaraupgradeerror = 'error:cannotupgradefromnewertotara';
+            return $a;
+
         } else {
-            //$CFG->totara_version was not set in 1.1 or early 2.2 releases
-            $a->canupgrade = false;
-        }
-        // if upgrading from totara, require v2.2.13 or greater
-        if (!$a->canupgrade) {
-            $a->totaraupgradeerror = 'error:cannotupgradefromtotara';
+            // The original Moodle install is newer than Totara.
+            // Hack oldversion because the lang string cannot be changed easily.
+            $a->oldversion = $CFG->version;
+            $a->totaraupgradeerror = 'error:cannotupgradefromnewermoodle';
             return $a;
         }
-    } else if (empty($CFG->local_postinst_hasrun) &&
-            !empty($CFG->version) && $CFG->version < 2011120507) {
-        //upgrading from moodle, require at least v2.2.7
-        $a->totaraupgradeerror = 'error:cannotupgradefrommoodle';
-        return $a;
-    } else if ($version < $CFG->version) {
-        // The original Moodle install is newer than Totara.
-        $a->oldversion = $CFG->version;
-        $a->newversion = $version;
-        $a->totaraupgradeerror = 'error:cannotupgradefromnewermoodle';
-        return $a;
     }
 
-    // If a Moodle core upgrade:
+    // Find out if we should upgrade the core.
     if ($version > $CFG->version) {
-        $moodleprefix = get_string('moodlecore', 'totara_core').':';
-        $a->oldversion .= "{$moodleprefix}<br />{$CFG->release}";
-        $a->newversion .= "{$moodleprefix}<br />{$release}";
+        // Moodle core version upgrade.
+        $a->upgradecore = true;
+    } else if ($a->newversion !== $a->oldversion) {
+        // Different Totara release - build or version changed.
+        $a->upgradecore = true;
     }
 
-    // If a Totara core upgrade
-    if (!isset($CFG->totara_build) || (isset($CFG->totara_build) && version_compare($a->newtotaraversion, $a->existingtotaraversion, '>'))) {
-        $totaraprefix = get_string('totaracore','totara_core').':';
-        $moodlespacing = ($version > $CFG->version) ? '<br /><br />' : '';
-        // If a Moodle and a Totara upgrade, tidy up the markup
-        if (!isset($CFG->totara_build)) {
-            //upgrading from versions prior to M2.2.3 or T2.2.13 is no longer possible
-            //so if totara_build is not set this must be an upgrade from vanilla Moodle
-            $a->newversion .= "{$moodlespacing}{$totaraprefix}<br />{$TOTARA->release}";
-        } else {
-            $a->oldversion .= "{$moodlespacing}{$totaraprefix}<br />{$CFG->totara_release}";
-            $a->newversion .= "{$moodlespacing}{$totaraprefix}<br />{$TOTARA->release}";
-        }
-    }
     return $a;
 }
 

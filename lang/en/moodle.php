@@ -854,8 +854,8 @@ $string['general'] = 'General';
 $string['geolocation'] = 'latitude - longitude';
 $string['gettheselogs'] = 'Get these logs';
 $string['go'] = 'Go';
-$string['gpl'] = 'Copyright (C) 2010 onwards Totara Learning Solutions LTD (http://www.totaralms.com/)
-Copyright (C) 1999 onwards  Martin Dougiamas  (http://moodle.com)
+$string['gpl'] = 'Copyright (C) 2010 onwards Totara Learning Solutions Limited (http://www.totaralms.com/)
+Copyright (C) 1999 onwards  Martin Dougiamas (http://moodle.com) and other contributors (https://moodle.org/dev/)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -866,11 +866,10 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-See the Moodle License information page for full details:
-http://docs.moodle.org/dev/License';
+See http://www.gnu.org/licenses/gpl-3.0.html for full details.';
 $string['gpllicense'] = 'GPL license';
-$string['gpl3'] = 'Copyright (C) 2010 onwards Totara Learning Solutions LTD (http://www.totaralms.com/)
-Copyright (C) 1999 onwards Martin Dougiamas (http://moodle.com)
+$string['gpl3'] = 'Copyright (C) 2010 onwards Totara Learning Solutions Limited (http://www.totaralms.com/)
+Copyright (C) 1999 onwards Martin Dougiamas (http://moodle.com) and other contributors (https://moodle.org/dev/)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -881,8 +880,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-See the Moodle License information page for full details:
-http://docs.moodle.org/dev/License';
+See http://www.gnu.org/licenses/gpl-3.0.html for full details.';
 $string['grade'] = 'Grade';
 $string['grades'] = 'Grades';
 $string['gravatarenabled'] = '<a href="http://www.gravatar.com/">Gravatar</a> has been enabled for this site. If you don\'t upload a profile picture Totara will attempt to load a profile picture for you from Gravatar.';

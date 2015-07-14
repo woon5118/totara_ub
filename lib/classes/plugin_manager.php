@@ -918,7 +918,7 @@ class core_plugin_manager {
                 'formfactor', 'fusion', 'leatherbound', 'magazine', 'nimble', 'nonzero', 'overlay', 'serenity', 'sky_high',
                 'splash', 'standard', 'standardold'
                 // Totara uninstalled themes.
-                , 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara',
+                , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara',
             ),
         );
 
