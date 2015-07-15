@@ -23,7 +23,7 @@ Feature: Role assignments can be made at the category level
       | Teacher | Assignable |
     And I log out
     And I log in as "manager"
-    And I follow "Courses"
+    And I click on "Courses" "link" in the ".block_navigation" "css_element"
     When I follow "Cat 1"
     Then I should see "Assign roles"
 
@@ -37,6 +37,6 @@ Feature: Role assignments can be made at the category level
       | Student             | Not assignable |
     And I log out
     And I log in as "manager"
-    And I follow "Courses"
+    And I click on "Courses" "link" in the ".block_navigation" "css_element"
     When I follow "Cat 1"
     Then I should not see "Assign roles"
