@@ -796,7 +796,10 @@ class lang_installer {
         $status = $installer->install();
 
         if ($status == COMPONENT_ERROR) {
-            echo $OUTPUT->notification(get_string($installer->get_error(), 'error', $langcode), 'notifyproblem');
+            if ($OUTPUT) {
+                // Totara: $OUTPUT is not available in the installer.
+                echo $OUTPUT->notification(get_string($installer->get_error(), 'error', $langcode), 'notifyproblem');
+            }
             return self::RESULT_DOWNLOADERROR;
         } else if ($status == COMPONENT_UPTODATE) {
             return self::RESULT_UPTODATE;

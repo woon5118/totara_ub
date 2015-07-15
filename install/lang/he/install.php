@@ -39,16 +39,16 @@ admin/cli/install_database.php
 אם ברצונך להתקין את אתר זה.';
 $string['clialreadyinstalled'] = 'קובץ ה-config.php קיים כבר, אנא השתמש ב- admin/cli/upgrade.php
 אם ברצונך לשדרג את האתר שלך.';
-$string['cliinstallheader'] = 'תוכנית התקנת Moodle {$a} בשורת הפקודה';
+$string['cliinstallheader'] = 'תוכנית התקנת Totara {$a} בשורת הפקודה';
 $string['databasehost'] = 'מסד הנתונים המארח (host)';
 $string['databasename'] = 'שם מסד הנתונים';
 $string['databasetypehead'] = 'בחר התקן מסד הנתונים';
 $string['dataroot'] = 'ספריית הנתונים';
 $string['datarootpermission'] = 'הרשאות תיקיות bתונים (data)';
 $string['dbprefix'] = 'Tables prefix';
-$string['dirroot'] = 'ספריית ה-Moodle';
+$string['dirroot'] = 'ספריית ה-Totara';
 $string['environmenthead'] = 'בודק את הסביבה שלך...';
-$string['environmentsub2'] = 'לכל התקנת Moodle יש דרישות מינימליות לגרסת ה-PHP ומספר הרחבות הכרחי של ה-PHP.
+$string['environmentsub2'] = 'לכל התקנת Totara יש דרישות מינימליות לגרסת ה-PHP ומספר הרחבות הכרחי של ה-PHP.
 בדיקת הסביבה הושלמה לפני התקנת כל אחד ושדרוגו.אם הינך מתקשה, אנא פנה למנהל המערכת בכדי להתקין גרסת PHP חדשה או לאפשר הרחבות PHP.';
 $string['errorsinenvironment'] = 'בדיקת הסביבה נכשלה!';
 $string['installation'] = 'התקנה';
@@ -63,11 +63,11 @@ $string['memorylimithelp'] = '<p>
 <ol>
 <il>
 אם תוכל להדר את PHP שוב עם <i> -- enable-memory-limit </i>
-דבר זה יאפשר ל-Moodle להגדיר את גבול הזיכרון לבד. </i>
+דבר זה יאפשר ל-Totara להגדיר את גבול הזיכרון לבד. </i>
 <i> אם יש לך גישה לקובץ ה-php.ini, תוכל לשנות את משתנה ה- <b> memory_limit </b>
 שנה שם את הערך למשל ל-40M. אם אין לך גישה לקובץ זה תוכל לבקש ממנהל המערכת שלך שיעשה זאת עבורך.
 </i>
-<i> בכמה שרתי PHP תוכל ליצור קובץ  .htaccess בספריית  ה-Moodle שלך בצירוף שורה זו:
+<i> בכמה שרתי PHP תוכל ליצור קובץ  .htaccess בספריית  ה-Totara שלך בצירוף שורה זו:
 <p><blockquote>php_value memory_limit 40M</blockquote></p>
 <p> בכל אופן, בכמה שרתים דבר זה ימנע <b>מכל </b> הדפים לעבוד ( אם תראה שגיאות כאשר תיכנס לדפים) תדע כי הינך צריך להסיר את הקובץ  .htaccess.
 </p>
@@ -81,7 +81,7 @@ $string['pathshead'] = 'נתיבים מאושרים';
 $string['pathsrodataroot'] = 'ספריית המידע (Data Directory) לא ניתנת לכתיבה.';
 $string['pathsroparentdataroot'] = 'ספריית האב - ({$a->parent}) לא ניתנת לכתיבה.
 ספריית המידע (Data Directory) - ({$a->dataroot}) לא יכולה להיווצר על-ידי המתקין.';
-$string['pathssubdirroot'] = 'הנתיב המלא לספריית ההתקנה של Moodle';
+$string['pathssubdirroot'] = 'הנתיב המלא לספריית ההתקנה של Totara';
 $string['pathsunsecuredataroot'] = 'ספריית המידע (Data Directory) לא מאובטחת';
 $string['pathswrongadmindir'] = 'ספריית ה-admin לא קיימת';
 $string['phpextension'] = 'הרחבת PHP {$a}';
@@ -94,17 +94,17 @@ $string['phpversionhelp'] = '<p>גרסת PHP חייבת להיות לפחות 4.
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
 $string['welcomep20'] = 'הינך רואה את עמוד זה מפני שהתקנת והפעלת בהלכה את <strong>{$a->packname} {$a->packversion}</strong>
 חבילה במחשבך. ברכותינו!';
-$string['welcomep30'] = 'גירסת <strong>{$a->installername}</strong> כוללת את היישומים ליצור סביבה אשר בה <strong> Moodle </strong>
+$string['welcomep30'] = 'גירסת <strong>{$a->installername}</strong> כוללת את היישומים ליצור סביבה אשר בה <strong> Totara </strong>
 יפעל דהיינו:';
 $string['welcomep40'] = 'החבילה כוללת בנוסף
-<strong>Moodle {$a->moodlerelease} ({$a->moodleversion})</strong>.';
+<strong>Totara {$a->moodlerelease} ({$a->moodleversion})</strong>.';
 $string['welcomep50'] = 'השימוש בכל היישומים בחבילה זו מפוקח ע"י הרשיונות המתאימים להם. החבילה
 <strong>{$a->installername}</strong>
 השלמה היא
 <a href="http://www.opensource.org/docs/definition_plain.html">קוד פתוח</a>
 והיא מופצת תחת רשיון
 <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>';
-$string['welcomep60'] = 'העמודים הבאים יובילו אותך בצורה פשוטה דרך כמה צעדים לעיצוב הגדרות <strong>Moodle</strong> במחשבך.
+$string['welcomep60'] = 'העמודים הבאים יובילו אותך בצורה פשוטה דרך כמה צעדים לעיצוב הגדרות <strong>Totara</strong> במחשבך.
 תוכל לאשר את הגדרות  ברירת המחדל או, באפשרותך, לשנותם לפי צרכיך.';
-$string['welcomep70'] = 'הקש על לחצן ה"המשך" למטה כדי להמשיך עם הגדרת ה-<strong>Moodle</strong>';
+$string['welcomep70'] = 'הקש על לחצן ה"המשך" למטה כדי להמשיך עם הגדרת ה-<strong>Totara</strong>';
 $string['wwwroot'] = 'כתובת האתר';

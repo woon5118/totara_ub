@@ -387,7 +387,9 @@ if ($config->stage == INSTALL_DOWNLOADLANG) {
 
     // download and install required lang packs, the lang dir has already been created in install_init_dataroot
     $installer = new lang_installer($CFG->lang);
+    $CFG->debug = 0; // Totara: We cannot print debugging messages yet.
     $results = $installer->run();
+    $CFG->debug = (E_ALL | E_STRICT);
     foreach ($results as $langcode => $langstatus) {
         if ($langstatus === lang_installer::RESULT_DOWNLOADERROR) {
             $a       = new stdClass();
