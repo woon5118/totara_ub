@@ -467,6 +467,7 @@ class grade_report_grader extends grade_report {
                               AND ra.contextid $relatedctxsql
                        ) rainner ON rainner.userid = u.id
                    AND u.deleted = 0
+                   $this->useractivesql
                    $this->userwheresql
                    $this->groupwheresql
               ORDER BY $sort";
@@ -1402,6 +1403,7 @@ class grade_report_grader extends grade_report {
                       $groupsql
                      WHERE gi.courseid = :courseid
                        AND u.deleted = 0
+                       $this->useractivesql
                        AND g.finalgrade IS NOT NULL
                        $groupwheresql
                      GROUP BY g.itemid";
@@ -1428,6 +1430,7 @@ class grade_report_grader extends grade_report {
                            AND ra.roleid $gradebookrolessql
                            AND ra.contextid $relatedctxsql
                            AND u.deleted = 0
+                           $this->useractivesql
                            AND g.id IS NULL
                            $groupwheresql
                   GROUP BY gi.id";

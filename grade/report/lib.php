@@ -154,6 +154,12 @@ abstract class grade_report {
     protected $userwheresql_params = array();
 
     /**
+     * An SQL constraint to append to the queries used by this object to build the report.
+     * @var string $useractivesql
+     */
+    protected $useractivesql;
+
+    /**
      * Constructor. Sets local copies of user preferences and initialises grade_tree.
      * @param int $courseid
      * @param object $gpr grade plugin return tracking object
@@ -326,6 +332,7 @@ abstract class grade_report {
                        $groupsql
                       WHERE ra.roleid $gradebookrolessql
                             AND u.deleted = 0
+                            $this->useractivesql
                             $userwheresql
                             $groupwheresql
                             AND ra.contextid $relatedctxsql";
@@ -398,6 +405,11 @@ abstract class grade_report {
         if (isset($SESSION->gradereport['filtersurname']) && !empty($SESSION->gradereport['filtersurname'])) {
             $this->userwheresql .= ' AND '.$DB->sql_like('u.lastname', ':lastname', false, false);
             $this->userwheresql_params['lastname'] = $SESSION->gradereport['filtersurname'].'%';
+        }
+
+        $this->useractivesql = "";
+        if (get_user_preferences('grade_report_showonlyactiveenrol', 1) == 1) {
+            $this->useractivesql = ' AND u.suspended = 0';
         }
     }
 
