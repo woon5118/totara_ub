@@ -504,7 +504,12 @@ if ($config->stage == INSTALL_DATABASETYPE) {
             $disabled[$type] = $database;
             continue;
         }
-        echo '<option value="'.s($type).'">'.$database->get_name().'</option>';
+        // Totara: make pgsql default if available, it is considered to be the best option.
+        $selected = '';
+        if ($type === 'pgsql') {
+            $selected = 'selected="selected"';
+        }
+        echo '<option value="'.s($type).'" ' . $selected . ' >'.$database->get_name().'</option>';
     }
     if ($disabled) {
         echo '<optgroup label="'.s(get_string('notavailable')).'">';

@@ -232,8 +232,13 @@ foreach ($databases as $type=>$database) {
 if (empty($databases)) {
     $defaultdb = '';
 } else {
-    reset($databases);
-    $defaultdb = key($databases);
+    // Totara: make pgsql default if available, it is considered to be the best option.
+    if (isset($databases['pgsql'])) {
+        $defaultdb = 'pgsql';
+    } else {
+        reset($databases);
+        $defaultdb = key($databases);
+    }
 }
 
 // now get cli options
