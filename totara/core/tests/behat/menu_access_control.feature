@@ -81,16 +81,16 @@ Feature: Test visibility control of menu items
       | user3 | C1 | manager |
     When I log in as "admin"
     And I create the following totara menu items:
-      | Menu title          | Visibility              | Menu default url address | Restrict access by role | Context                            | Learner | Editing Trainer | Site Manager | Assessor  | Guest |
-      | Students only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 |              |           |       |
-      | Teachers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         | 1               |              |           |       |
-      | Managers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 | 1            |           |       |
-      | Students + Teachers | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       | 1               |              |           |       |
-      | Teachers + Managers | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         | 1               | 1            |           |       |
-      | Managers + Students | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 | 1            |           |       |
-      | Guest only          | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 |              |           | 1     |
-      | Everyone            | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       | 1               | 1            | 1         | 1     |
-      | No one              | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 |              | 1         |       |
+      | Menu title          | Visibility              | Menu default url address | Restrict access by role | Context                            | Learner | Editing Trainer | Site Manager | Guest |
+      | Students only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 |              |       |
+      | Teachers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         | 1               |              |       |
+      | Managers only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 | 1            |       |
+      | Students + Teachers | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       | 1               |              |       |
+      | Teachers + Managers | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         | 1               | 1            |       |
+      | Managers + Students | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 | 1            |       |
+      | Guest only          | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 |              | 1     |
+      | Everyone            | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       | 1               | 1            | 1     |
+      | No one              | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context |         |                 |              |       |
     And I log out
     # User 1 - the learner.
     Then I log in as "user1"
