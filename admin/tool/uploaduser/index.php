@@ -242,6 +242,15 @@ if ($formdata = $mform2->is_cancelled()) {
                                 $value = $parsed_date;
                             }
                             break;
+                        case 'date':
+                            // try and parse using $CFG->csvdateformat if set, or default if not set
+                            $csvdateformat = (isset($CFG->csvdateformat)) ? $CFG->csvdateformat : get_string('csvdateformatdefault', 'totara_core');
+                            // if date can't be parsed, assume it is a unix timestamp and leave unchanged
+                            $parsed_date = totara_date_parse_from_format($csvdateformat, trim($value), true, 'UTC');
+                            if ($parsed_date) {
+                                $value = $parsed_date;
+                            }
+                            break;
                         default:
                             break;
                     }

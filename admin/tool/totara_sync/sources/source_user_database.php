@@ -272,6 +272,13 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                                         $value = $parsed_date;
                                     }
                                     break;
+                                case 'date':
+                                    //try to parse the contents - if parse fails assume a unix timestamp and leave unchanged
+                                    $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true, 'UTC');
+                                    if ($parsed_date) {
+                                        $value = $parsed_date;
+                                    }
+                                    break;
                                 default:
                                     break;
                             }

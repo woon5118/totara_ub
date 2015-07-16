@@ -109,6 +109,14 @@ class totara_core_date_legacy_testcase extends advanced_testcase {
                 }
             }
         }
+
+        // Test ignoring of integers.
+        $result = totara_date_parse_from_format('j. n. Y', '158803200', true);
+        $this->assertEmpty(0, $result);
+
+        // Test timezone forcing.
+        $result = totara_date_parse_from_format('j. n. Y', '13. 1. 1975', true, 'UTC');
+        $this->assertSame(158803200, $result);
     }
 
     public function test_totara_get_clean_timezone_list() {

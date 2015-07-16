@@ -380,6 +380,16 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                                     continue 2;
                                 }
                                 break;
+                            case 'date':
+                                // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
+                                $parsed_date = totara_date_parse_from_format($csvdateformat, $value, true, 'UTC');
+                                if ($parsed_date) {
+                                    $value = $parsed_date;
+                                } else {
+                                    // Don't try to put a value if the field has been left empty.
+                                    continue 2;
+                                }
+                                break;
                             default:
                                 break;
                         }

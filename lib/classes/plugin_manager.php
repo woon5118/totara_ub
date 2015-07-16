@@ -1105,6 +1105,8 @@ class core_plugin_manager {
 
             'profilefield' => array(
                 'checkbox', 'datetime', 'menu', 'text', 'textarea'
+                // Totara extras:
+                , 'date',
             ),
 
             'qbehaviour' => array(

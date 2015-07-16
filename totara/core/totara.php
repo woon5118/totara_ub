@@ -1328,9 +1328,10 @@ function totara_get_appraiser($userid, $postype=null) {
  * @param string $format e.g. "d/m/Y" - see date_parse_from_format for supported formats
  * @param string $date a date to be converted e.g. "12/06/12"
  * @param bool $servertimezone
+ * @param string $forcetimezone force one specific timezone, $servertimezone is ignored if specified
  * @return int unix timestamp (0 if fails to parse)
  */
-function totara_date_parse_from_format($format, $date, $servertimezone = false) {
+function totara_date_parse_from_format($format, $date, $servertimezone = false, $forcetimezone = null) {
     $dateArray = date_parse_from_format($format, $date);
     if (!is_array($dateArray) or !empty($dateArray['error_count'])) {
         return 0;
@@ -1340,7 +1341,9 @@ function totara_date_parse_from_format($format, $date, $servertimezone = false) 
         return 0;
     }
 
-    if ($servertimezone) {
+    if (!is_null($forcetimezone)) {
+        $tzobj = new DateTimeZone(core_date::normalise_timezone($forcetimezone));
+    } else if ($servertimezone) {
         $tzobj = core_date::get_server_timezone_object();
     } else {
         $tzobj = core_date::get_user_timezone_object();
