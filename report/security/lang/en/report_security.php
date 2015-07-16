@@ -93,6 +93,10 @@ Do not make the requirements too strict though, as this can result in users not 
 $string['check_passwordpolicy_error'] = 'Password policy not set.';
 $string['check_passwordpolicy_name'] = 'Password policy';
 $string['check_passwordpolicy_ok'] = 'Password policy enabled.';
+$string['check_repositoryurl_details'] = '<p>Enabling the URL downloader can allow external users to access URLs within your internal network. You should not enable this feature if you have users who are allowed to access your LMS but not allowed to access other resources within your internal network that are accessible from the LMS server.</p>';
+$string['check_repositoryurl_warning'] = 'URL downloader repository is enabled.';
+$string['check_repositoryurl_name'] = 'URL downloader repository';
+$string['check_repositoryurl_ok'] = 'URL downloader repository is disabled.';
 $string['check_riskadmin_detailsok'] = '<p>Please verify the following list of system administrators:</p>{$a}';
 $string['check_riskadmin_detailswarning'] = '<p>Please verify the following list of system administrators:</p>{$a->admins}
 <p>It is recommended to assign administrator role in the system context only. The following users have (unsupported) admin role assignments in other contexts:</p>{$a->unsupported}';

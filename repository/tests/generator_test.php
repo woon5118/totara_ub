@@ -41,8 +41,13 @@ class core_repository_generator_testcase extends advanced_testcase {
      * @return void
      */
     public function test_create_type() {
-        global $DB;
+        global $DB, $CFG;
         $this->resetAfterTest(true);
+
+        require_once("$CFG->dirroot/repository/lib.php");
+        // Totara disables this in new installs.
+        $urlplugin = new repository_type('url', array(), true);
+        $urlplugin->create(true);
 
         // All the repository types.
         $all = array('alfresco', 'boxnet', 'coursefiles', 'dropbox', 'equella', 'filesystem', 'flickr',

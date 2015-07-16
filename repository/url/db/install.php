@@ -29,6 +29,10 @@
  */
 function xmldb_repository_url_install() {
     global $CFG;
+
+    // Totara: do not enable by default, not everybody has server in DMZ.
+    return true;
+
     $result = true;
     require_once($CFG->dirroot.'/repository/lib.php');
     $urlplugin = new repository_type('url', array(), true);

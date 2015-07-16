@@ -42,6 +42,10 @@ class repository_url_lib_testcase extends advanced_testcase {
     public function test_escape_url() {
         $this->resetAfterTest();
 
+        // Totara disables this in new installs.
+        $urlplugin = new repository_type('url', array(), true);
+        $urlplugin->create(true);
+
         $repoid = $this->getDataGenerator()->create_repository('url')->id;
 
         $conversions = array(

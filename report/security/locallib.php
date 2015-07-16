@@ -59,7 +59,7 @@ function report_security_get_issue_list() {
         'report_security_check_guestrole',
         'report_security_check_frontpagerole',
         'report_security_check_webcron',
-
+        'report_security_check_repositoryurl',
     );
 }
 
@@ -929,6 +929,40 @@ function report_security_check_https($detailed = false) {
 
     if ($detailed) {
         $result->details = get_string('check_https_details', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies if URL downloader repository enabled in Totara.
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_repositoryurl($detailed = false) {
+    global $CFG;
+    require_once($CFG->dirroot .'/repository/lib.php');
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_repositoryurl';
+    $result->name    = get_string('check_repositoryurl_name', 'report_security');
+    $result->details = null;
+    $result->link    = '';
+
+
+    $repositorytype = repository::get_type_by_typename('url');
+
+    if ($repositorytype) {
+        $result->status = REPORT_SECURITY_WARNING;
+        $result->info   = get_string('check_repositoryurl_warning', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info   = get_string('check_repositoryurl_ok', 'report_security');
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_repositoryurl_details', 'report_security');
     }
 
     return $result;
