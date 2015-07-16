@@ -46,7 +46,8 @@ abstract class tabexport_writer {
      * @param tabexport_source $source
      */
     public function __construct(tabexport_source $source) {
-        if (empty($source->get_format())) {
+        $format = $source->get_format();
+        if (empty($format)) {
             throw new \coding_exception('tabexport_source does not have format');
         }
         $this->source = $source;
