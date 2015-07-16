@@ -635,9 +635,16 @@ class reportbuilder {
                 $error = null;
                 $embed = reportbuilder_get_embedded_report_object($object->shortname);
                 $id = reportbuilder_create_embedded_record($object->shortname, $embed, $error);
-                $report = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
-                $report->url = $object->url;
-                $reports[$id] = $report;
+                // If $id is false then the report could not be generated.
+                // There is no warning for this currently unfortunately.
+                if ($id) {
+                    $report = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+                    $report->url = $object->url;
+                    $reports[$id] = $report;
+                } else {
+                    // This is horrible but it is how the report builder_create_embedded_record was designed :(
+                    debugging('Embedded report generation failed with the error: '.$error, DEBUG_DEVELOPER);
+                }
             }
         }
 
@@ -5182,7 +5189,7 @@ function reportbuilder_sortbyfullname($a, $b) {
  * @param string $shortname The shortname you need the ID of
  * @param array $embedded_ids Array of embedded report IDs and shortnames
  *
- * @return integer ID of the requested embedded report
+ * @return int|false ID of the requested embedded report, or false if it could not be generated
  */
 function reportbuilder_get_embedded_id_from_shortname($shortname, $embedded_ids) {
     // return existing ID if a database record exists already
