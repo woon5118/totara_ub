@@ -11,5 +11,6 @@ Description of SVGGraph import
 
 5. Update version in totara/core/thirdpartylibs.xml
 
+6. reapply and test RTL hack in Graph::DrawLegend() from TL-6573
 
 Petr Skoda

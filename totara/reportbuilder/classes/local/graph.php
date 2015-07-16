@@ -368,7 +368,31 @@ class graph {
             }
         }
 
+        if (right_to_left()) {
+            if (!isset($settings['legend_text_side'])) {
+                $settings['legend_text_side'] = 'left';
+            }
+        }
+
         return $settings;
+    }
+
+    /**
+     * Try to fix the SVG data somehow to make it work with RTL languages.
+     *
+     * @param string $data
+     * @return string
+     */
+    protected function fix_svg_rtl($data) {
+        if (!right_to_left()) {
+            return $data;
+        }
+        $data = str_replace('<svg ', '<svg direction="rtl" ', $data);
+        $data = str_replace('text-anchor="end"', 'text-anchor="xxx"', $data);
+        $data = str_replace('text-anchor="start"', 'text-anchor="end"', $data);
+        $data = str_replace('text-anchor="xxx"', 'text-anchor="start"', $data);
+
+        return $data;
     }
 
     public function fetch_svg() {
@@ -381,6 +405,7 @@ class graph {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->values);
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
+        $data = $this->fix_svg_rtl($data);
         return $data;
     }
 
@@ -405,6 +430,7 @@ class graph {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->values);
         $data = $svggraph->Fetch($this->svggraphtype, false, false);
+        $data = $this->fix_svg_rtl($data);
         return $data;
     }
 
@@ -424,6 +450,8 @@ class graph {
         $svggraph = new \SVGGraph($w, $h, $this->get_final_settings());
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->values);
-        return $svggraph->Fetch($this->svggraphtype, false, false);
+        $data = $svggraph->Fetch($this->svggraphtype, false, false);
+        $data = $this->fix_svg_rtl($data);
+        return $data;
     }
 }

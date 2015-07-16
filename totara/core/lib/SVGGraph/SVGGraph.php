@@ -494,6 +494,8 @@ abstract class Graph {
     $text_group = array('transform' => "translate($text_x_offset,0)");
     if($this->legend_text_side == 'left')
       $text_group['text-anchor'] = 'end';
+    else
+      $text_group['text-anchor'] = 'start';
     $entries_group = array('transform' => "translate($entries_x_offset,0)");
 
     $parts = '';
