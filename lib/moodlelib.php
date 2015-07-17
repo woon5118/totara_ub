@@ -7563,14 +7563,16 @@ function count_letters($string) {
  * @param int $length The length of the string to be created.
  * @return string
  */
-function random_string ($length=15) {
+function random_string($length=15) {
+    $randombytes = totara_random_bytes($length);
     $pool  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $pool .= 'abcdefghijklmnopqrstuvwxyz';
     $pool .= '0123456789';
     $poollen = strlen($pool);
     $string = '';
     for ($i = 0; $i < $length; $i++) {
-        $string .= substr($pool, (mt_rand()%($poollen)), 1);
+        $rand = ord($randombytes[$i]);
+        $string .= substr($pool, ($rand%($poollen)), 1);
     }
     return $string;
 }
@@ -7591,11 +7593,49 @@ function complex_random_string($length=null) {
     if ($length===null) {
         $length = floor(rand(24, 32));
     }
+    $randombytes = totara_random_bytes($length);
     $string = '';
     for ($i = 0; $i < $length; $i++) {
-        $string .= $pool[(mt_rand()%$poollen)];
+        $rand = ord($randombytes[$i]);
+        $string .= $pool[($rand%$poollen)];
     }
     return $string;
+}
+
+/**
+ * Try to generates cryptographically secure pseudo-random bytes.
+ *
+ * @param int $length
+ * @return string binary data
+ */
+function totara_random_bytes($length) {
+    global $CFG;
+    if ($length <= 0) {
+        debugging('Invalid random bytes length', DEBUG_DEVELOPER);
+        return '';
+    }
+    if (function_exists('random_bytes')) {
+        // Use PHP 7 goodness.
+        $hash = random_bytes($length);
+        if ($hash !== false) {
+            return $hash;
+        }
+    }
+    if (function_exists('openssl_random_pseudo_bytes')) {
+        // For PHP 5.3 with openssl extension.
+        $hash = openssl_random_pseudo_bytes($length);
+        if ($hash !== false) {
+            return $hash;
+        }
+    }
+
+    // Bad luck, there is no reliable random generator, let's just hash some unique stuff that is hard to guess.
+    $hash = sha1(serialize($CFG) . serialize($_SERVER) . microtime(true) . uniqid('', true), true);
+    // NOTE: the last param in sha1() is true, this means we are getting 20 bytes, not 40 chars as usual.
+    if ($length <= 20) {
+        return substr($hash, 0, $length);
+    }
+    return $hash . totara_random_bytes($length - 20);
 }
 
 /**
