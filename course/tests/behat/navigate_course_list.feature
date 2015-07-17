@@ -64,6 +64,6 @@ Feature: Browse course list and return back from enrolment page
     And I follow "Sample course"
     And I follow "Test choice"
     And I should see "Sorry, only enrolled users are allowed to make choices."
-    And I press "Enrol me in this course"
+    And I press "Enrolment options"
     And I press "Continue"
     Then I should see "Test choice" in the ".breadcrumb-nav" "css_element"
