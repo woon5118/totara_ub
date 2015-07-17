@@ -88,7 +88,7 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
     // Construct sql query.
     list($insql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED),
             SQL_PARAMS_NAMED, 'param', false);
-    $count = 'SELECT COUNT(*) ';
+    $count = 'SELECT p.id ';
 
     $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
 
@@ -111,15 +111,27 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
 
     $params['uid'] = $userid;
     $params['status'] = STATUS_PROGRAM_COMPLETE;
+
+    if ($returncount) {
+        $programs = $DB->get_records_sql($count.$from.$where, $params);
+    } else {
+        $programs = $DB->get_records_sql($select.$from.$where.$sort, $params, $limitfrom, $limitnum);
+    }
+
     if (!$showhidden) {
-        $where .= " AND p.visible = :vis";
-        $params['vis'] = 1;
+        $user = $DB->get_record('user', array('id' => $userid));
+        foreach ($programs as $key => $progrecord) {
+            $program = new program($progrecord->id);
+            if (!$program->is_viewable($user)) {
+                unset($programs[$key]);
+            }
+        }
     }
 
     if ($returncount) {
-        return $DB->count_records_sql($count.$from.$where, $params);
+        return count($programs);
     } else {
-        return $DB->get_records_sql($select.$from.$where.$sort, $params, $limitfrom, $limitnum);
+        return $programs;
     }
 }
 
