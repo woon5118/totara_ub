@@ -39,7 +39,7 @@ Feature: Edit completion settings of an activity
     Given I follow "TestPage"
     When I follow "Edit settings"
     And I expand all fieldsets
-    And I press "Unlock completion options"
+    And I press "Unlock completion and delete completion data"
     Then I should see "Completion options unlocked"
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
     And I press "Save and display"
