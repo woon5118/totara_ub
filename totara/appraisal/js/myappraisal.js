@@ -93,7 +93,8 @@ M.totara_appraisal_myappraisal = M.totara_appraisal_myappraisal || {
             appraisalid: args.appraisalid,
             role: args.role,
             subjectid: args.subjectid,
-            action: 'snapshot'
+            action: 'snapshot',
+            sesskey: M.cfg.sesskey
         }
         var urlparamstr = $.param(urlparam);
 

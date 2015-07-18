@@ -94,36 +94,44 @@ $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 
 if ($action == 'snapshot') {
-    // This may throw various warnings, keep it in error logs only.
-    ini_set('display_errors', '0');
-    ini_set('log_errors', '1');
-
-    require_once($CFG->libdir . '/dompdf/lib.php');
-    core_php_time_limit::raise('300');
-
-    $out = "";
-    $out .= $renderer->snapshot_header();
-    $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, true, $stageschecked);
-
+    require_sesskey();
     // The renderer must not be used after footer.
     $strsource = new stdClass();
     $strsource->link = $renderer->action_link(new moodle_url('/totara/appraisal/index.php'),
         get_string('allappraisals', 'totara_appraisal'));
 
-    $out .= $renderer->snapshot_footer();
+    $file = make_request_directory() . '/appraisal_'.$appraisal->id.'_'.date("Y-m-d_His").'_'.$roles[$role].'.pdf';
 
-    $content = null;
-    try {
-        $pdf = new totara_dompdf();
-        $pdf->load_html($out);
-        $pdf->render();
-        $content = $pdf->output();
-    } catch (Exception $e) {
-        // Ignore.
-    }
-    if ($content === null) {
+    core_php_time_limit::raise('300');
+    \core\session\manager::write_close();
+
+    if (!empty($CFG->pathtowkhtmltopdf) and file_exists($CFG->pathtowkhtmltopdf) and is_executable($CFG->pathtowkhtmltopdf)) {
+        $wkhtmltopdf = escapeshellarg($CFG->pathtowkhtmltopdf); // Do not use escapeshellcmd() here.
+        $sessioname = escapeshellarg(session_name());
+        $sessioncookie = escapeshellarg(session_id());
+        $pageurl = new moodle_url($PAGE->url, array('action' => 'generatepdf'));
+        $pageurl = escapeshellarg($pageurl->out(false));
+        $escapedfile = escapeshellarg($file);
+
+        // Note: let's hope executables may access it's own web server directly.
+        $command = "$wkhtmltopdf --cookie $sessioname $sessioncookie $pageurl $escapedfile";
+
+        exec($command);
+
+    } else {
+        // This may throw various warnings, keep it in error logs only.
+        ini_set('display_errors', '0');
+        ini_set('log_errors', '1');
+
+        require_once($CFG->libdir . '/dompdf/lib.php');
+
+        $out = "";
+        $out .= $renderer->snapshot_header();
+        $out .= $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, true, $stageschecked);
+        $out .= $renderer->snapshot_footer();
+
+        $content = null;
         try {
-            $out = totara_dompdf::hack_html($out);
             $pdf = new totara_dompdf();
             $pdf->load_html($out);
             $pdf->render();
@@ -131,19 +139,31 @@ if ($action == 'snapshot') {
         } catch (Exception $e) {
             // Ignore.
         }
+        if ($content === null) {
+            try {
+                $out = totara_dompdf::hack_html($out);
+                $pdf = new totara_dompdf();
+                $pdf->load_html($out);
+                $pdf->render();
+                $content = $pdf->output();
+            } catch (Exception $e) {
+                // Ignore.
+            }
+        }
+
+        if ($content) {
+            file_put_contents($file, $content);
+        }
     }
 
-    if (!$content) {
+    if (!file_exists($file)) {
         echo html_writer::tag('div', get_string('snapshoterror', 'totara_appraisal'),
             array('class'=>'notifyproblem dialog-nobind'));
         die;
     }
 
-    $filename = 'appraisal_'.$appraisal->id.'_'.date("Y-m-d_His").'_'.$roles[$role].'.pdf';
-    file_put_contents($CFG->tempdir.'/'.clean_filename($filename), $content);
-
     // Save into db.
-    $downloadurl = $appraisal->save_snapshot($CFG->tempdir.'/'.$filename, $roleassignment->id);
+    $downloadurl = $appraisal->save_snapshot($file, $roleassignment->id);
 
     // Message for dialog.
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'downloadurl', 'id' => 'downloadurl',
@@ -154,7 +174,9 @@ if ($action == 'snapshot') {
 }
 
 // Print the html snapshot as the last option.
-$PAGE->requires->js_init_code('window.print()', true);
+if ($action !== 'generatepdf') {
+    $PAGE->requires->js_init_code('window.print()', true);
+}
 
 echo $renderer->snapshot_header();
 echo $renderer->display_snapshot($appraisal, $subject, $userassignment, $roleassignment, $spaces, false, $stageschecked);
