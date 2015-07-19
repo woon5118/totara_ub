@@ -50,6 +50,9 @@ class totara_reportbuilder_tabexport_source_testcase extends advanced_testcase {
         $this->add_column($report, 'user', 'id', null, null, null, 0);
         $this->add_column($report, 'user', 'firstname', null, null, null, 0);
         $this->add_column($report, 'user', 'lastname', null, null, null, 0);
+        // Sort the columns in predictable way - PostgreSQL may return random order otherwise.
+        $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $report->_id));
+        $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $report->_id));
 
         $report = new reportbuilder($rid);
 
