@@ -70,9 +70,9 @@ Feature: A teacher can put questions in categories in the question bank
     And I set the field "Question category" to "Subcategory"
     And I press "Move to >>"
     Then I should see "Test question to be moved"
-    And the field "Select a category" matches value "Default for Subcategory (1)"
-    And the "Select a category" select box should contain "Default for Used category"
-    And the "Select a category" select box should not contain "Default for Used category (1)"
+    And the field "Select a category" matches value "Subcategory (1)"
+    And the "Select a category" select box should contain "Used category"
+    And the "Select a category" select box should not contain "Used category (1)"
 
   @javascript
   Scenario: Move a question between categories via the question settings page
@@ -83,6 +83,6 @@ Feature: A teacher can put questions in categories in the question bank
     And I set the field "Save in category" to "Subcategory"
     And I press "id_submitbutton"
     Then I should see "Test question to be moved"
-    And the field "Select a category" matches value "Default for Subcategory (1)"
-    And the "Select a category" select box should contain "Default for Used category"
-    And the "Select a category" select box should not contain "Default for Used category (1)"
+    And the field "Select a category" matches value "Subcategory (1)"
+    And the "Select a category" select box should contain "Used category"
+    And the "Select a category" select box should not contain "Used category (1)"
