@@ -713,6 +713,8 @@ function totara_cohort_get_dynamic_cohort_whereclause($cohortid) {
                 if (!empty($snippet->sql)) {
                     $whereclause->sql .= "        " . strtoupper($COHORT_RULES_OP[$ruleset->operator]) . " {$snippet->sql} \n";
                     $whereclause->params = array_merge($whereclause->params, $snippet->params);
+                } else {
+                    // TODO TL-7094 - show developer debugging message if snippet not present, string is expected here!
                 }
             }
         }

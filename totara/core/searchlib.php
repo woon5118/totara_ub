@@ -101,10 +101,11 @@ function totara_search_get_keyword_where_clause($keywords, $fields, $type=SQL_PA
  * @param array $keywords Array of strings to search for
  * @param boolean $negate negate the conditions
  * @param string $operator can be 'contains', 'equal', 'startswith', 'endswith'
+ * @param bool $fieldisvalue the $field contains the actual value - use with care!
  *
  * @return array containing SQL clause and params
  */
-function search_get_keyword_where_clause_options($field, $keywords, $negate=false, $operator='contains') {
+function search_get_keyword_where_clause_options($field, $keywords, $negate=false, $operator='contains', $fieldisvalue=false) {
     global $DB;
 
     $presign = '';
@@ -136,7 +137,14 @@ function search_get_keyword_where_clause_options($field, $keywords, $negate=fals
 
     foreach ($keywords as $keyword) {
         $uniqueparam = $DB->get_unique_param($operator);
-        $queries[] = $DB->sql_like($field, ":{$uniqueparam}", false, true, $not);
+        if (!$fieldisvalue) {
+            $queries[] = $DB->sql_like($field, ":{$uniqueparam}", false, true, $not);
+        } else {
+            // Sometimes we want to pass value in instead of used db field.
+            $fieldparam = $DB->get_unique_param('fieldval');
+            $queries[] = $DB->sql_like(':' . $fieldparam, ":{$uniqueparam}", false, true, $not);
+            $params[$fieldparam] = $field;
+        }
         $params[$uniqueparam] = $presign . $DB->sql_like_escape($keyword) . $postsign;
     }
 

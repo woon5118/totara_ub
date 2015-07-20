@@ -393,6 +393,7 @@ class cohort_rule_ui_menu extends cohort_rule_ui_form {
             'equal',
             '',
             array(
+                // TODO TL-7096 - use COHORT_RULES_OP_IN_ISEQUALTO and COHORT_RULES_OP_IN_NOTEQUALTO, it will require db upgrade.
                 COHORT_RULES_OP_IN_EQUAL    => get_string('equalto','totara_cohort'),
                 COHORT_RULES_OP_IN_NOTEQUAL => get_string('notequalto', 'totara_cohort')
             )
@@ -470,6 +471,7 @@ JS;
      */
     public function getRuleDescription($ruleid, $static=true) {
         global $COHORT_RULES_OP_IN;
+        // TODO TL-7096 - use COHORT_RULES_OP_IN_ISEQUALTO and COHORT_RULES_OP_IN_NOTEQUALTO, it will require db upgrade.
 
         if (!isset($this->equal) || !isset($this->listofvalues)) {
             return get_string('error:rulemissingparams', 'totara_cohort');

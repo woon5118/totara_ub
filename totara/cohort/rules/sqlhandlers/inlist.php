@@ -61,13 +61,14 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
 
     /**
      * Returns the SQL snippet for this
-     * @return str
+     * @return stdClass
      */
     public function get_sql_snippet() {
 
-        // If the list of values is empty, then this rule can't match, no matter what.
-        if (count($this->listofvalues) == 0) {
-            // todo: error message?
+        // If the list of values is empty and we are not interested in empty fields,
+        // then this rule surprisingly returns all users because any string is interpreted later as no restriction.
+        if ($this->equal != COHORT_RULES_OP_IN_ISEMPTY and count($this->listofvalues) == 0) {
+            // TODO TL-7094 This needs to use sql snippet stdClass instead, for now this string means all users.
             return '1=0';
         }
 
@@ -76,9 +77,13 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
 
     /**
      * Returns the SQL snippet and params base on the operator
+     * @param int $operator one of the COHORT_RULES_OP_IN_ constants
+     * @param string $query the field passed to search_get_keyword_where_clause_options
+     * @param array $lov list of values
+     * @param string $defaultdata optional default value
      * @return stdClass
      */
-    public function get_query_base_operator($operator, $query, $lov) {
+    public function get_query_base_operator($operator, $query, $lov, $defaultdata = null) {
         global $CFG;
         require_once($CFG->dirroot.'/totara/core/searchlib.php');
 
@@ -91,8 +96,14 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
                 list($sqlhandler->sql, $sqlhandler->params) = search_get_keyword_where_clause_options($query, $lov);
                 break;
             case COHORT_RULES_OP_IN_NOTCONTAIN:
-                list($sql, $params) = search_get_keyword_where_clause_options($query, $lov, true);
-                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} IS NULL OR {$sql})", $params);
+                list($sql, $params) = search_get_keyword_where_clause_options($query, $lov, true, 'contains');
+                if (isset($defaultdata)) {
+                    list($defaultsql, $defaultparams) = search_get_keyword_where_clause_options($defaultdata, $lov, true, 'contains', true);
+                    $sqlhandler->sql = "( (({$query}) IS NULL AND ($defaultsql)) OR (({$query}) IS NOT NULL AND ({$sql})) )";
+                    $sqlhandler->params = array_merge($params, $defaultparams);
+                } else {
+                    list($sqlhandler->sql, $sqlhandler->params) = array("(({$query}) IS NULL OR ({$sql}))", $params);
+                }
                 break;
             case COHORT_RULES_OP_IN_ISEQUALTO:
                 list($sqlhandler->sql, $sqlhandler->params) = search_get_keyword_where_clause_options($query, $lov, false, 'equal');
@@ -108,7 +119,13 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
                 break;
             case COHORT_RULES_OP_IN_NOTEQUALTO:
                 list($sql, $params) = search_get_keyword_where_clause_options($query, $lov, true, 'notequal');
-                list($sqlhandler->sql, $sqlhandler->params) = array("({$query} IS NULL OR {$sql})", $params);
+                if (isset($defaultdata)) {
+                    list($defaultsql, $defaultparams) = search_get_keyword_where_clause_options($defaultdata, $lov, true, 'notequal', true);
+                    $sqlhandler->sql = "( (({$query}) IS NULL AND ($defaultsql)) OR (({$query}) IS NOT NULL AND ({$sql})) )";
+                    $sqlhandler->params = array_merge($params, $defaultparams);
+                } else {
+                    list($sqlhandler->sql, $sqlhandler->params) = array("(({$query}) IS NULL OR ({$sql}))", $params);
+                }
                 break;
             default:
                 list($sqlhandler->sql, $sqlhandler->params) = array('', array());
@@ -133,16 +150,6 @@ abstract class cohort_rule_sqlhandler_in extends cohort_rule_sqlhandler {
  * @author aaronw
  */
 class cohort_rule_sqlhandler_in_userfield extends cohort_rule_sqlhandler_in {
-
-    /**
-     * Returns the SQL snippet for this
-     * @return str
-     */
-    public function get_sql_snippet() {
-
-        return $this->construct_sql_snippet($this->field, ($this->equal ? '' : 'not'), $this->listofvalues);
-    }
-
     protected function construct_sql_snippet($field, $not, $lov) {
         global $DB, $CFG;
         require_once($CFG->dirroot.'/totara/cohort/rules/settings.php');
@@ -189,19 +196,11 @@ class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_i
         parent::__construct($field, true);
     }
 
-    /**
-     * Returns the SQL snippet for this
-     * @return str
-     */
-    public function get_sql_snippet() {
-
-        return $this->construct_sql_snippet($this->field, ($this->equal ? '' : 'not'), $this->listofvalues);
-    }
-
     protected function construct_sql_snippet($field, $not, $lov) {
         global $DB;
         // If $field is int comes from a menu.
         if (is_int($field)) {
+            // TODO TL-7096 this should be possible to simplify this for menu fields.
             list($sqlin, $params) = $DB->get_in_or_equal($lov, SQL_PARAMS_NAMED, 'icu' . $this->ruleid, ($not != 'not'));
             $sqlhandler = new stdClass();
             $sqlhandler->sql = "EXISTS (
@@ -237,7 +236,7 @@ class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_i
             $sqlhandler->params = $params;
         } else {
             $name = $DB->sql_compare_text('name', 255) . ' = ?';
-            $fieldid = $DB->get_field_select('user_info_field', 'id', $name, array($field));
+            $fieldrecord = $DB->get_record_select('user_info_field', $name, array($field), 'id,defaultdata');
             $uniqueparam = $DB->get_unique_param('fieldid');
             $sql = "EXISTS (
                             SELECT 1
@@ -245,11 +244,11 @@ class cohort_rule_sqlhandler_in_usercustomfield extends cohort_rule_sqlhandler_i
                             LEFT JOIN {user_info_data} usinda
                               ON usinda.fieldid = :{$uniqueparam} AND usinda.userid = usr.id
                             WHERE u.id = usr.id
-                              AND ";
+                              AND (";
             $query = 'usinda.data';
-            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov);
-            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ";
-            $sqlhandler->params[$uniqueparam] = $fieldid;
+            $sqlhandler = $this->get_query_base_operator($this->equal, $query, $lov, $fieldrecord->defaultdata);
+            $sqlhandler->sql = $sql . $sqlhandler->sql . " ) ) ";
+            $sqlhandler->params[$uniqueparam] = $fieldrecord->id;
         }
         return $sqlhandler;
     }

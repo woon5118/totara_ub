@@ -68,7 +68,7 @@ abstract class cohort_rule_sqlhandler_completion_list extends cohort_rule_sqlhan
     public function get_sql_snippet() {
 
         if (count($this->listofids) == 0){
-            // todo: error message?
+            // TODO TL-7094 This needs to use sql snippet stdClass instead, for now this string means all users.
             return '1=0';
         }
 
@@ -162,7 +162,7 @@ abstract class cohort_rule_sqlhandler_completion_date extends cohort_rule_sqlhan
     public function get_sql_snippet() {
 
         if (count($this->listofids) == 0){
-            // todo: error message?
+            // TODO TL-7094 This needs to use sql snippet stdClass instead, for now this string means all users.
             return '1=0';
         }
 

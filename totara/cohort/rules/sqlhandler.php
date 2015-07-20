@@ -63,7 +63,7 @@ abstract class cohort_rule_sqlhandler {
     /**
      * Returns the SQL snippet that can be added to a where clause to include this rule.
      * The "mdl_user" table will have the alias "u" in this query.
-     * @return str
+     * @return stdClass
      */
     public abstract function get_sql_snippet();
 
