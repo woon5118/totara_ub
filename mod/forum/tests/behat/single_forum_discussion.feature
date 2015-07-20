@@ -35,9 +35,14 @@ Feature: Single simple forum discussion type
     Given I log out
     And I log in as "student1"
     And I follow "Course 1"
-    When I reply "Single discussion forum name" post from "Single discussion forum name" forum with:
+    # Replaced test here as it passed due to the link in the breadcrumbs in Moodle
+    And I follow "Single discussion forum name"
+    And I follow "Reply"
+    And I set the following fields to these values:
       | Subject | Reply to single discussion subject |
       | Message | Reply to single discussion message |
+    And I press "Post to forum"
+    And I wait to be redirected
     Then I should not see "Add a new discussion topic"
     And I should see "Reply" in the "div.firstpost.starter" "css_element"
     And I should see "Reply to single discussion message"
