@@ -54,6 +54,7 @@ class tabexport_source extends \totara_core\tabexport_source {
 
         list($sql, $params, $cache) = $this->report->build_query(false, true, true);
         $this->cache = $cache;
+        $order = $report->get_report_sort();
 
         $this->headings = array();
         foreach ($this->report->columns as $column) {
@@ -63,7 +64,7 @@ class tabexport_source extends \totara_core\tabexport_source {
             }
         }
 
-        $this->rs = $DB->get_recordset_sql($sql, $params);
+        $this->rs = $DB->get_recordset_sql($sql . $order, $params);
     }
 
     /**
