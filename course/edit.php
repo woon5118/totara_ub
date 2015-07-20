@@ -287,13 +287,12 @@ if ($editform->is_cancelled()) {
     ///
     /// Update course cohorts if user has permissions
     ///
+    $runcohortsync = false;
     if (has_capability('moodle/cohort:manage', $context)) {
         // Enrolled audiences.
         $currentcohorts = totara_cohort_get_course_cohorts($course->id, null, 'c.id, e.id AS associd');
         $currentcohorts = !empty($currentcohorts) ? $currentcohorts : array();
         $newcohorts = !empty($data->cohortsenrolled) ? explode(',', $data->cohortsenrolled) : array();
-
-        $runcohortsync = false;
 
         if ($todelete = array_diff(array_keys($currentcohorts), $newcohorts)) {
             // Delete removed cohorts
