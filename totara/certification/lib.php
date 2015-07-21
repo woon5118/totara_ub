@@ -295,7 +295,8 @@ function recertify_window_opens_stage() {
             WHERE cfc.timewindowopens < ?
                   AND cfc.status = ?
                   AND cfc.renewalstatus = ?
-                  AND u.deleted = 0";
+                  AND u.deleted = 0
+                  AND u.suspended = 0";
 
     $results = $DB->get_records_sql($sql, array(time(), CERTIFSTATUS_COMPLETED, CERTIFRENEWALSTATUS_NOTDUE));
 
@@ -362,7 +363,8 @@ function recertify_window_abouttoclose_stage() {
                   AND ? > (cfc.timeexpires - pm.triggertime)
                   AND ? < cfc.timeexpires
                   AND pm.messagetype = ?
-                  AND u.deleted = 0";
+                  AND u.deleted = 0
+                  AND u.suspended = 0";
 
     $now = time();
     $params = array_merge($statusparams, array(CERTIFRENEWALSTATUS_DUE, $now, $now, MESSAGETYPE_RECERT_WINDOWDUECLOSE));
@@ -401,8 +403,9 @@ function recertify_expires_stage() {
             JOIN {user} u ON u.id = cfc.userid
             WHERE ? > cfc.timeexpires
                 AND cfc.renewalstatus = ?
+                AND cfc.status {$statussql}
                 AND u.deleted = 0
-                AND cfc.status {$statussql}";
+                AND u.suspended = 0";
 
     $params = array_merge(array(time(), CERTIFRENEWALSTATUS_DUE), $statusparams);
     $results = $DB->get_records_sql($sql, $params);
