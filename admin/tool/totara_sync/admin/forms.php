@@ -135,9 +135,10 @@ class totara_sync_config_form extends moodleform {
 
         // Notifications.
         $mform->addElement('header', 'notificationheading', get_string('notifications', 'tool_totara_sync'));
-        $mform->addElement('checkbox', 'notifytypes[error]', get_string('notifytypes', 'tool_totara_sync'),
-                get_string('errorplural', 'tool_totara_sync'));
-        $mform->addElement('checkbox', 'notifytypes[warn]', '', get_string('warnplural', 'tool_totara_sync'));
+        $notifytypes = array();
+        $notifytypes[] = $mform->createElement('checkbox', 'notifytypes[error]', '', get_string('errorplural', 'tool_totara_sync'));
+        $notifytypes[] = $mform->createElement('checkbox', 'notifytypes[warn]', '', get_string('warnplural', 'tool_totara_sync'));
+        $mform->addGroup($notifytypes, 'notifytypes', get_string('notifytypes', 'tool_totara_sync'), '<br/>', false);
 
         $mform->addElement('text', 'notifymailto', get_string('notifymailto', 'tool_totara_sync'));
         $mform->setType('notifymailto', PARAM_TEXT);
