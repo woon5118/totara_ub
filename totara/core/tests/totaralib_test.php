@@ -27,6 +27,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/position/lib.php');
+require_once($CFG->dirroot . '/totara/core/lib.php');
 
 class totaralib_test extends advanced_testcase {
     protected $user, $manager, $teamleader, $appraiser, $invaliduserid = 9999;
@@ -162,5 +163,27 @@ class totaralib_test extends advanced_testcase {
         $this->assertArrayHasKey('currenticon_tst', $picker);
         $this->assertCount(1, $picker);
         $this->assertInstanceOf('MoodleQuickForm_static', $picker['currenticon_tst']);
+    }
+
+    public function test_totara_get_sender_from_user_by_id(){
+        $this->resetAfterTest();
+
+        $this->assertEquals('admin', totara_get_sender_from_user_by_id(core_user::SUPPORT_USER)->username);
+        $this->assertEquals('admin', totara_get_sender_from_user_by_id(0)->username);
+
+        // Below return value not expected. Assertion added for awareness of potential issue.
+        $this->assertEquals('admin', totara_get_sender_from_user_by_id('')->username);
+
+        $this->assertEquals('noreply', totara_get_sender_from_user_by_id(core_user::NOREPLY_USER)->username);
+        $this->assertEquals('facetoface', totara_get_sender_from_user_by_id(\mod_facetoface\facetoface_user::FACETOFACE_USER)->username);
+
+        $user1 = $this->getDataGenerator()->create_user(array('username' => 'testuser1'));
+        $user2 = $this->getDataGenerator()->create_user(array('email' => 'testuser2@test.com'));
+        $this->assertEquals('testuser1', totara_get_sender_from_user_by_id($user1->id)->username);
+        $this->assertEquals('testuser2@test.com', totara_get_sender_from_user_by_id($user2->id)->email);
+
+        // user id -46 can't exist
+        $this->assertNotInstanceOf('stdClass', totara_get_sender_from_user_by_id(-46));
+        $this->assertFalse(totara_get_sender_from_user_by_id(-46));
     }
 }
