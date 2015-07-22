@@ -35,22 +35,7 @@
 $capabilities = array(
 
     // Managing course custom fields
-    'totara/core:createcoursecustomfield' => array(
-        'captype'       => 'write',
-        'contextlevel'  => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        ),
-    ),
-    'totara/core:updatecoursecustomfield' => array(
-        'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-        'captype'       => 'write',
-        'contextlevel'  => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        ),
-    ),
-    'totara/core:deletecoursecustomfield' => array(
+    'totara/core:coursemanagecustomfield' => array(
         'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_SYSTEM,
@@ -59,31 +44,13 @@ $capabilities = array(
         ),
     ),
     // Managing program custom fields.
-    'totara/core:createprogramcustomfield' => array(
-        'captype'       => 'write',
-        'contextlevel'  => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        ),
-        'clonepermissionsfrom' => 'totara/core:createcoursecustomfield'
-    ),
-    'totara/core:updateprogramcustomfield' => array(
+    'totara/core:programmanagecustomfield' => array(
         'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
         'captype'       => 'write',
         'contextlevel'  => CONTEXT_SYSTEM,
         'archetypes' => array(
             'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' => 'totara/core:updatecoursecustomfield'
-    ),
-    'totara/core:deleteprogramcustomfield' => array(
-        'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-        'captype'       => 'write',
-        'contextlevel'  => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        ),
-        'clonepermissionsfrom' => 'totara/core:deletecoursecustomfield'
     ),
     'totara/core:undeleteuser' => array(
         'riskbitmask'   => RISK_CONFIG,

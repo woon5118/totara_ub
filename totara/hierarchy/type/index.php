@@ -45,7 +45,7 @@ $hierarchy = hierarchy::load_hierarchy($prefix);
 $can_add = has_capability('totara/hierarchy:create'.$prefix.'type', $sitecontext);
 $can_edit = has_capability('totara/hierarchy:update'.$prefix.'type', $sitecontext);
 $can_delete = has_capability('totara/hierarchy:delete'.$prefix.'type', $sitecontext);
-$can_edit_custom_fields = has_any_capability(array('totara/hierarchy:update'.$prefix.'customfield', 'totara/hierarchy:create'.$prefix.'customfield', 'totara/hierarchy:delete'.$prefix.'customfield'), $sitecontext);
+$can_edit_custom_fields = has_capability('totara/hierarchy:'.$prefix.'managecustomfield', $sitecontext);
 
 // Setup page and check permissions.
 admin_externalpage_setup($prefix.'typemanage', null, array('prefix' => $prefix));

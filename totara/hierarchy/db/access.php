@@ -128,30 +128,7 @@ $capabilities = array(
                     'manager' => CAP_ALLOW
                     ),
                 ),
-        'totara/hierarchy:deletecompetencytemplate' => array(
-                'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:createcompetencycustomfield' => array(
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:updatecompetencycustomfield' => array(
-                'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:deletecompetencycustomfield' => array(
+        'totara/hierarchy:competencymanagecustomfield' => array(
                 'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
                 'captype'       => 'write',
                 'contextlevel'  => CONTEXT_SYSTEM,
@@ -275,22 +252,7 @@ $capabilities = array(
                     'manager' => CAP_ALLOW
                     ),
                 ),
-        'totara/hierarchy:createpositioncustomfield' => array(
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:updatepositioncustomfield' => array(
-                'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:deletepositioncustomfield' => array(
+        'totara/hierarchy:positionmanagecustomfield' => array(
                 'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
                 'captype'       => 'write',
                 'contextlevel'  => CONTEXT_SYSTEM,
@@ -379,22 +341,7 @@ $capabilities = array(
                     'manager' => CAP_ALLOW
                     ),
                 ),
-        'totara/hierarchy:createorganisationcustomfield' => array(
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:updateorganisationcustomfield' => array(
-                'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-                ),
-        'totara/hierarchy:deleteorganisationcustomfield' => array(
+        'totara/hierarchy:organisationmanagecustomfield' => array(
                 'riskbitmask'   => RISK_PERSONAL | RISK_DATALOSS,
                 'captype'       => 'write',
                 'contextlevel'  => CONTEXT_SYSTEM,
@@ -511,32 +458,13 @@ $capabilities = array(
                     ),
             'clonepermissionsfrom' => 'totara/hierarchy:deletecompetencyframeworks'
                 ),
-        'totara/hierarchy:creategoalcustomfield' => array(
-            'riskbitmask' => RISK_SPAM,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-            'clonepermissionsfrom' => 'totara/hierarchy:createcompetencycustomfield'
-                ),
-        'totara/hierarchy:updategoalcustomfield' => array(
+        'totara/hierarchy:goalmanagecustomfield' => array(
                 'riskbitmask'   => RISK_DATALOSS,
                 'captype'       => 'write',
                 'contextlevel'  => CONTEXT_SYSTEM,
                 'archetypes' => array(
                     'manager' => CAP_ALLOW
                     ),
-            'clonepermissionsfrom' => 'totara/hierarchy:updatecompetencycustomfield'
-                ),
-        'totara/hierarchy:deletegoalcustomfield' => array(
-                'riskbitmask'   => RISK_DATALOSS,
-                'captype'       => 'write',
-                'contextlevel'  => CONTEXT_SYSTEM,
-                'archetypes' => array(
-                    'manager' => CAP_ALLOW
-                    ),
-            'clonepermissionsfrom' => 'totara/hierarchy:deletecompetencycustomfield'
                 ),
         'totara/hierarchy:viewgoalscale' => array(
                 'captype'       => 'read',

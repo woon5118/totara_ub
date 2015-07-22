@@ -26,19 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class organisation_type extends hierarchy_type {
 
-    public function get_capability_movefield() {
-        return 'totara/hierarchy:updateorganisationcustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'totara/hierarchy:updateorganisationcustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'totara/hierarchy:createorganisationcustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'totara/hierarchy:deleteorganisationcustomfield';
+    public function get_capability_managefield() {
+        return 'totara/hierarchy:organisationmanagecustomfield';
     }
 }

@@ -78,4 +78,86 @@ if (isset($CFG->totara_release)){
             $dbman->add_field($table, $field);
         }
     }
+    if (version_compare($oldversion, '2.9', '<')) {
+        // Reduce 3 capabilities into 1:
+        // Template: [target cap] => array('old cap1', 'old cap2', ...).
+        $changecaps = array(
+            'mod/facetoface:managecustomfield' => array(
+                'mod/facetoface:updatefacetofacecustomfield',
+                'mod/facetoface:createfacetofacecustomfield',
+                'mod/facetoface:deletefacetofacecustomfield'),
+            'totara/core:coursemanagecustomfield' => array(
+                'totara/core:updatecoursecustomfield',
+                'totara/core:createcoursecustomfield',
+                'totara/core:deletecoursecustomfield'),
+            'totara/core:programmanagecustomfield' => array(
+                'totara/core:updateprogramcustomfield',
+                'totara/core:createprogramcustomfield',
+                'totara/core:deleteprogramcustomfield'),
+            'totara/hierarchy:competencymanagecustomfield' => array(
+                'totara/hierarchy:updatecompetencycustomfield',
+                'totara/hierarchy:createcompetencycustomfield',
+                'totara/hierarchy:deletecompetencycustomfield'),
+            'totara/hierarchy:goalmanagecustomfield' => array(
+                'totara/hierarchy:updategoalcustomfield',
+                'totara/hierarchy:creategoalcustomfield',
+                'totara/hierarchy:deletegoalcustomfield'),
+            'totara/hierarchy:organisationmanagecustomfield' => array(
+                'totara/hierarchy:updateorganisationcustomfield',
+                'totara/hierarchy:createorganisationcustomfield',
+                'totara/hierarchy:deleteorganisationcustomfield'),
+            'totara/hierarchy:positionmanagecustomfield' => array(
+                'totara/hierarchy:updatepositioncustomfield',
+                'totara/hierarchy:createpositioncustomfield',
+                'totara/hierarchy:deletepositioncustomfield'),
+            );
+        $componentmap = array(
+            'mod/facetoface:managecustomfield' => 'mod_facetoface',
+            'totara/core:coursemanagecustomfield' => 'totara_core',
+            'totara/core:programmanagecustomfield' => 'totara_core',
+            'totara/hierarchy:competencymanagecustomfield' => 'totara_hierarchy',
+            'totara/hierarchy:goalmanagecustomfield' => 'totara_hierarchy',
+            'totara/hierarchy:organisationmanagecustomfield' => 'totara_hierarchy',
+            'totara/hierarchy:positionmanagecustomfield' => 'totara_hierarchy',
+        );
+        // Capabilities need to be re-mapped. Old capabilities will be removed afterwards by upgrade script.
+        // New capabilities we need to create now, because at the moment when they will be created, old will
+        // be already removed.
+        $newcapkeys = array_keys($changecaps);
+        $newcapdefs = array();
+
+        // Go through affected components to take their capdefs.
+        foreach(array('totara_core', 'mod_facetoface', 'totara_hierarchy') as $component) {
+            $allcaps = load_capability_def($component);
+            // Leave only required.
+            $filtered = array_intersect_key($allcaps, $changecaps);
+            $newcapdefs = array_merge($newcapdefs, $filtered);
+        }
+
+        foreach ($newcapdefs as $capname => $capdef) {
+            $capability = new stdClass();
+            $capability->name         = $capname;
+            $capability->captype      = $capdef['captype'];
+            $capability->contextlevel = $capdef['contextlevel'];
+            $capability->component    = $componentmap[$capname];
+            $capability->riskbitmask  = $capdef['riskbitmask'];
+
+            if (!$DB->get_record('capabilities', array('name' => $capname))) {
+                $DB->insert_record('capabilities', $capability, false);
+            }
+        }
+        // All these permissions must be in system context.
+        $systemcontext = context_system::instance();
+
+        foreach ($changecaps as $target => $toremove) {
+            foreach ($toremove as $old) {
+                // Take all roles with $old cap.
+                list($roleids) = get_roles_with_cap_in_context($systemcontext, $old);
+                foreach ($roleids as $roleid) {
+                    // Assign new role with $target cap.
+                    assign_capability($target, CAP_ALLOW, $roleid, $systemcontext->id, true);
+                }
+            }
+        }
+    }
 }

@@ -30,19 +30,7 @@ class course_type extends type_base {
         parent::__construct($prefix, 'course', 'course', $context, $extrainfo);
     }
 
-    public function get_capability_movefield() {
-        return 'totara/core:updateprogramcustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'totara/core:updateprogramcustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'totara/core:createprogramcustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'totara/core:deleteprogramcustomfield';
+    public function get_capability_managefield() {
+        return 'totara/core:coursemanagecustomfield';
     }
 }

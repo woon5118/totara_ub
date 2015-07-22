@@ -34,19 +34,7 @@ class position_type extends hierarchy_type {
         return totara_feature_enabled('positions');
     }
 
-    public function get_capability_movefield() {
-        return 'totara/hierarchy:updatepositioncustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'totara/hierarchy:updatepositioncustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'totara/hierarchy:createpositioncustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'totara/hierarchy:deletepositioncustomfield';
+    public function get_capability_managefield() {
+        return 'totara/hierarchy:positionmanagecustomfield';
     }
 }

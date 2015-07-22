@@ -30,19 +30,7 @@ class facetofacesession_type extends type_base {
         parent::__construct($prefix, 'facetoface_session', 'facetofacesession', $context, $extrainfo);
     }
 
-    public function get_capability_movefield() {
-        return 'mod/facetoface:updatefacetofacecustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'mod/facetoface:updatefacetofacecustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'mod/facetoface:createfacetofacecustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'mod/facetoface:deletefacetofacecustomfield';
+    public function get_capability_managefield() {
+        return 'mod/facetoface:managecustomfield';
     }
 }

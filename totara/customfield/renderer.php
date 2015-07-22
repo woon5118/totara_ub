@@ -35,19 +35,17 @@ class totara_customfield_renderer extends plugin_renderer_base {
     * Display table with customfields and options to create a new one.
     *
     * @param array $fields the customfield object.
-    * @param bool  $can_edit the customfield object.
-    * @param bool  $can_delete the customfield object.
-    * @param bool  $can_create the customfield object.
+    * @param bool  $can_manage the customfield object.
     * @param array $options Options of custom field types that can be created.
     * @param string $urlbase The url that manage all the actions.
     * @param array $paramsurlbase The url params base used to create the urls.
     * @return string HTML to output.
     */
-    public function totara_customfield_print_list($fields, $can_edit, $can_delete, $can_create, $options, $urlbase, $paramsurlbase) {
+    public function totara_customfield_print_list($fields, $can_manage, $options, $urlbase, $paramsurlbase) {
         $table = new \html_table();
         $table->head  = array(get_string('customfield', 'totara_customfield'), get_string('type', 'totara_hierarchy'));
 
-        if ($can_edit || $can_delete) {
+        if ($can_manage) {
             $table->head[] = get_string('edit');
         }
         $table->id = 'customfields_program';
@@ -56,8 +54,8 @@ class totara_customfield_renderer extends plugin_renderer_base {
         $fieldcount = count($fields);
         foreach ($fields as $field) {
             $row = array(format_string($field->fullname), get_string('customfieldtype'.$field->datatype, 'totara_customfield'));
-            if ($can_edit || $can_delete) {
-                $row[] = $this->customfield_edit_icons($field, $fieldcount, $urlbase, $paramsurlbase, $can_edit, $can_delete);
+            if ($can_manage) {
+                $row[] = $this->customfield_edit_icons($field, $fieldcount, $urlbase, $paramsurlbase, $can_manage);
             }
             $table->data[] = $row;
         }
@@ -70,7 +68,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
         }
         $output .= html_writer::empty_tag('br');
 
-        if ($can_create) {
+        if ($can_manage) {
             $paramsurlbase['id'] = 0;
             $paramsurlbase['action'] = 'editfield';
             $urlbase =  new moodle_url($urlbase, $paramsurlbase);
@@ -292,11 +290,10 @@ class totara_customfield_renderer extends plugin_renderer_base {
      * @param   int      $fieldcount the fieldcount.
      * @param   string   $urlbase Url where all the actions should be pointing at.
      * @param   array    $paramsurlbase Url params.
-     * @param   bool     $can_edit Can the user edit custom fields.
-     * @param   bool     $can_delete Can the user delete custom fields.
+     * @param   bool     $can_manage Can the user edit custom fields.
      * @return  string   the icon string
      */
-    public function customfield_edit_icons($field, $fieldcount, $urlbase, $paramsurlbase, $can_edit, $can_delete) {
+    public function customfield_edit_icons($field, $fieldcount, $urlbase, $paramsurlbase, $can_manage) {
         global $OUTPUT;
 
         if (empty($str)) {
@@ -314,21 +311,19 @@ class totara_customfield_renderer extends plugin_renderer_base {
         // Set id in the urlbase for all the actions.
         $paramsurlbase['id'] = $field->id;
 
-        if ($can_edit) {
+        if ($can_manage) {
             $params = $paramsurlbase;
             $params['action'] = 'editfield';
             $editstr = $OUTPUT->action_icon(new moodle_url($urlbase, $params),
                 new pix_icon('t/edit', $stredit), null, array('title' => $stredit));
-        }
 
-        if ($can_delete) {
             $params = $paramsurlbase;
             $params['action'] = 'deletefield';
             $deletestr = $OUTPUT->action_icon(new moodle_url($urlbase, $params),
                 new pix_icon('t/delete', $strdelete), null, array('title' => $strdelete));
         }
 
-        if ($field->sortorder > 1 && $can_edit) {
+        if ($field->sortorder > 1 && $can_manage) {
             $params = $paramsurlbase;
             $params['action'] = 'movefield';
             $params['dir'] = 'up';
@@ -337,7 +332,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
                 new pix_icon('t/up', $strmoveup), null, array('title' => $strmoveup));
         }
 
-        if ($field->sortorder < $fieldcount && $can_edit) {
+        if ($field->sortorder < $fieldcount && $can_manage) {
             $params = $paramsurlbase;
             $params['action'] = 'movefield';
             $params['dir'] = 'down';

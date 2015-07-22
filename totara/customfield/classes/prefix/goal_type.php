@@ -30,19 +30,7 @@ class goal_type extends hierarchy_type {
         return totara_feature_disabled('goals');
     }
 
-    public function get_capability_movefield() {
-        return 'totara/hierarchy:updategoalcustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'totara/hierarchy:updategoalcustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'totara/hierarchy:creategoalcustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'totara/hierarchy:deletegoalcustomfield';
+    public function get_capability_managefield() {
+        return 'totara/hierarchy:goalmanagecustomfield';
     }
 }

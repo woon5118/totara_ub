@@ -59,15 +59,13 @@ switch ($action) {
         echo $OUTPUT->heading(get_string('customfieldsheading', 'facetoface'));
 
         $options = customfield_list_datatypes();
-        $cancreate = has_capability($customfieldtype->get_capability_createfield(), $contextsystem);
-        $canedit = has_capability($customfieldtype->get_capability_editfield(), $contextsystem);
-        $candelete = has_capability($customfieldtype->get_capability_deletefield(), $contextsystem);
+        $canmanage = has_capability($customfieldtype->get_capability_managefield(), $contextsystem);
         $fields = $customfieldtype->get_defined_fields($customfieldtype->get_fields_sql_where());
 
-        echo $renderer->totara_customfield_print_list($fields, $canedit, $candelete, $cancreate, $options, $redirectpage, $redirectoptions);
+        echo $renderer->totara_customfield_print_list($fields, $canmanage, $options, $redirectpage, $redirectoptions);
         break;
     case 'movefield':
-        require_capability($customfieldtype->get_capability_movefield(), $contextsystem);
+        require_capability($customfieldtype->get_capability_managefield(), $contextsystem);
         $id  = required_param('id', PARAM_INT);
         $dir = required_param('dir', PARAM_ALPHA);
 
@@ -77,7 +75,7 @@ switch ($action) {
         }
         break;
     case 'deletefield':
-        require_capability($customfieldtype->get_capability_deletefield(), $contextsystem);
+        require_capability($customfieldtype->get_capability_managefield(), $contextsystem);
         $id      = required_param('id', PARAM_INT);
         $confirm = optional_param('confirm', 0, PARAM_BOOL);
 
@@ -100,11 +98,10 @@ switch ($action) {
         $datatype = optional_param('datatype', '', PARAM_ALPHA);
 
         $heading = $datatype;
-        $capability = $customfieldtype->get_capability_editfield();
+        $capability = $customfieldtype->get_capability_managefield();
         $tableprefix = $customfieldtype->get_table_prefix();
         if ($id === 0) {
             $datatypes = customfield_list_datatypes();
-            $capability = $customfieldtype->get_capability_createfield();
             $heading = $datatypes[$datatype];
         }
 

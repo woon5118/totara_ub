@@ -47,13 +47,7 @@ abstract class type_base {
     }
 
     // Define capabilities required in the customfield type.
-    abstract function get_capability_movefield();
-
-    abstract function get_capability_editfield();
-
-    abstract function get_capability_createfield();
-
-    abstract function get_capability_deletefield();
+    abstract function get_capability_managefield();
 
     /**
      * Is feature type disabled?

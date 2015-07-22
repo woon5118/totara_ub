@@ -30,19 +30,7 @@ class competency_type extends hierarchy_type {
         return totara_feature_disabled('competencies');
     }
 
-    public function get_capability_movefield() {
-        return 'totara/hierarchy:updatecompetencycustomfield';
-    }
-
-    public function get_capability_editfield() {
-        return 'totara/hierarchy:updatecompetencycustomfield';
-    }
-
-    public function get_capability_createfield() {
-        return 'totara/hierarchy:createcompetencycustomfield';
-    }
-
-    public function get_capability_deletefield() {
-        return 'totara/hierarchy:deletecompetencycustomfield';
+    public function get_capability_managefield() {
+        return 'totara/hierarchy:competencymanagecustomfield';
     }
 }
