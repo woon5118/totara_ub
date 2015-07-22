@@ -128,46 +128,87 @@ if ($canmanage) {
 
 $PAGE->navbar->add(format_string($framework->fullname));
 echo $OUTPUT->header();
-// Build query now as we need the count for flexible tables.
-$select = "SELECT hierarchy.*";
-$count = "SELECT COUNT(hierarchy.id)";
-$from   = " FROM {{$shortprefix}} hierarchy";
-$where  = " WHERE frameworkid = ?";
-$params = array($frameworkid);
-$order  = " ORDER BY sortthread";
-// If a search is happening, or custom fields are being displayed, also join to get custom field data.
-if ($searchactive || !$displaymode) {
-    $custom_fields = $DB->get_records($shortprefix.'_type_info_field');
-    foreach ($custom_fields as $custom_field) {
-        // Add one join per custom field.
-        $fieldid = $custom_field->id;
-        $select .= ", cf_{$fieldid}.id AS cf_{$fieldid}_itemid, cf_{$fieldid}.data AS cf_{$fieldid}";
-        $from .= " LEFT JOIN {{$shortprefix}_type_info_data} cf_{$fieldid}
-            ON hierarchy.id = cf_{$fieldid}.{$prefix}id AND cf_{$fieldid}.fieldid = {$fieldid}";
-    }
-}
-
-$matchcount = $DB->count_records_sql($count.$from.$where, $params);
-
-// Include search terms if any set.
-if ($searchactive) {
-    // Extract quoted strings from query.
-    $keywords = totara_search_parse_keywords($search);
-    // Match search terms against the following fields.
-    $dbfields = array('fullname', 'shortname', 'description', 'idnumber');
-    if (is_array($custom_fields)) {
-        foreach ($custom_fields as $cf) {
-            $dbfields[] = "cf_{$cf->id}.data";
-        }
-    }
-    list($searchsql, $searchparams) = totara_search_get_keyword_where_clause($keywords, $dbfields);
-    $where .= ' AND (' . $searchsql . ')';
-    $params = array_merge($params, $searchparams);
-}
-$filteredcount = $DB->count_records_sql($count.$from.$where, $params);
 
 $table = new totara_table($prefix.'-framework-index-'.$frameworkid);
-$table->define_baseurl(new moodle_url('index.php', array('prefix' => $prefix, 'frameworkid' => $frameworkid)));
+$table->define_baseurl(new moodle_url('/totara/hierarchy/index.php', array('prefix' => $prefix, 'frameworkid' => $frameworkid)));
+
+// Some common/base sql snippets.
+$from = "FROM {{$shortprefix}} hier";
+$where = "WHERE hier.frameworkid = :frameworkid";
+$params = array('frameworkid' => $frameworkid);
+$orderby  = "ORDER BY sortthread";
+
+// Get the total number of records.
+$sql = "SELECT COUNT(hier.id)
+          {$from}
+         {$where}";
+$matchcount = $DB->count_records_sql($sql, array('frameworkid' => $frameworkid));
+$filteredcount = $matchcount; // Set filteredcount to the same as matchcount, and replace later if filtering.
+
+$customfieldrss = array();
+
+// If a search is happening, or custom fields are being displayed, also join to custom fields.
+if ($searchactive || !$displaymode) {
+
+    $allcustomfields = $DB->get_records($shortprefix.'_type_info_field');
+
+    // Add the search criteria to the where.
+    if ($searchactive) {
+        // Extract quoted strings from query.
+        $keywords = totara_search_parse_keywords($search);
+
+        // Construct the sql that will search for the given keywords.
+        $searchfields = array('hier.fullname', 'hier.shortname', 'hier.description', 'hier.idnumber', 'cf.data');
+        list($searchsql, $searchparams) =
+            totara_search_get_keyword_where_clause($keywords, $searchfields, SQL_PARAMS_NAMED, 'search');
+
+        // Construct the full WHERE clause and add any params needed.
+        $rows = "SELECT DISTINCT hier.id
+                   {$from}
+                   LEFT JOIN {{$shortprefix}_type_info_data} cf
+                     ON hier.id = cf.{$prefix}id
+                  {$where}
+                    AND ($searchsql)";
+        $where = "WHERE hier.id IN ($rows)";
+        $params = array_merge($params, $searchparams);
+
+        // Count how many records there are (includes search criteria, if any).
+        $sql = "SELECT COUNT(hier.id)
+                  {$from}
+                 {$where}";
+        $filteredcount = $DB->count_records_sql($sql, $params);
+    }
+
+    // Chunk the custom fields for SELECT, in case there are lots of them (MySQL has maximum 61 JOINs).
+    $customfieldsbatches = array_chunk($allcustomfields, 50);
+
+    // Get each batch of custom fields in a separate records set. They will be combined when used.
+    foreach ($customfieldsbatches as $customfields) {
+        $select = "SELECT hier.id";
+        $joins = "";
+        foreach ($customfields as $customfield) {
+            // Add one join per custom field.
+            $fieldid = $customfield->id;
+            $select .= ", cf_{$fieldid}.id AS cf_{$fieldid}_itemid, cf_{$fieldid}.data AS cf_{$fieldid}";
+            $joins .= " LEFT JOIN {{$shortprefix}_type_info_data} cf_{$fieldid}
+                          ON hier.id = cf_{$fieldid}.{$prefix}id AND cf_{$fieldid}.fieldid = {$fieldid}";
+        }
+
+        $sql = "{$select}
+                 {$from}
+                 {$joins}
+                 {$where}
+                 {$orderby}";
+        $customfieldrss[] = $DB->get_recordset_sql($sql, $params, $table->get_page_start(), $table->get_page_size());
+    }
+}
+
+// Get the base set of columns.
+$sql = "SELECT hier.*
+             {$from}
+             {$where}
+             {$orderby}";
+$records = $DB->get_recordset_sql($sql, $params, $table->get_page_start(), $table->get_page_size());
 
 $headerdata = array();
 
@@ -214,9 +255,6 @@ $table->define_baseurl($baseurl);
 $table->set_attribute('class', 'hierarchy-index fullwidth');
 $table->setup();
 $table->pagesize($perpage, $filteredcount);
-
-$records = $DB->get_recordset_sql($select.$from.$where.$order, $params, $table->get_page_start(), $table->get_page_size());
-
 
 echo $OUTPUT->container($OUTPUT->action_link(
     new moodle_url('/totara/hierarchy/framework/index.php', array('prefix' => $prefix)), '&laquo; ' .
@@ -277,6 +315,24 @@ if ($matchcount > 0) {
         // Figure out which custom fields are used by which types.
         $cfields = $DB->get_records($shortprefix.'_type_info_field');
         foreach ($records as $record) {
+
+            // Process any custom fields - add them into the $record object.
+            foreach ($customfieldrss as $customfieldrs) {
+                // Manually get the next record from this recordset.
+                $customfieldrecord = $customfieldrs->current();
+
+                // It should have the same id as the main record.
+                if ($customfieldrecord->id != $record->id) {
+                    throw new exception('Hierarchy custom field record ids do not match');
+                }
+
+                // Merge the properties of the two objects.
+                $record = (object) array_merge((array) $record, (array) $customfieldrecord);
+
+                // Step to the next custom field record.
+                $customfieldrs->next();
+            }
+
             $row = array();
             // Don't display items indented by depth if it's a search.
             $showdepth = !$searchactive;
@@ -302,6 +358,9 @@ if ($matchcount > 0) {
 $table->finish_html();
 
 $records->close();
+foreach ($customfieldrss as $customfieldrs) {
+    $customfieldrs->close();
+}
 
 if ($num_on_page > 0) {
     $hierarchy->export_select($baseurl);
