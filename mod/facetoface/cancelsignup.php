@@ -81,11 +81,11 @@ if (!facetoface_allow_user_cancellation($session)) {
     print_error('notallowedtocancel', 'facetoface', $returnurl);
 }
 
-$attendee_note = facetoface_get_attendee($s, $USER->id);
-$attendee_note->id = $attendee_note->statusid;
-customfield_load_data($attendee_note, 'facetofacecancellation', 'facetoface_cancellation');
+$cancellation_note = facetoface_get_attendee($s, $USER->id);
+$cancellation_note->id = $cancellation_note->submissionid;
+customfield_load_data($cancellation_note, 'facetofacecancellation', 'facetoface_cancellation');
 
-$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'attendee_note', 'userisinwaitlist'));
+$mform = new mod_facetoface_cancelsignup_form(null, compact('s', 'backtoallsessions', 'cancellation_note', 'userisinwaitlist'));
 if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
@@ -105,8 +105,8 @@ if ($fromform = $mform->get_data()) { // Form submitted.
 
     $errorstr = '';
     if (facetoface_user_cancel($session, false, $forcecancel, $errorstr, '')) {
-        $cancellationrecord = facetoface_get_user_current_status($session->id, $USER->id);
-        $fromform->id = $cancellationrecord->id;
+        $signup = facetoface_get_attendee($session->id, $USER->id);
+        $fromform->id = $signup->submissionid;
         customfield_save_data($fromform, 'facetofacecancellation', 'facetoface_cancellation');
 
         $strmessage = $userisinwaitlist ? 'waitlistcancelled' : 'bookingcancelled';

@@ -188,8 +188,8 @@ if ($fromform = $mform->get_data()) { // Form submitted
     $result = facetoface_user_import($course, $facetoface, $session, $USER->id, $params);
     if ($result['result'] === true) {
         if ($enableattendeenote) {
-            $signupstatus = facetoface_get_attendee($session->id, $USER->id);
-            $fromform->id = $signupstatus->statusid;
+            $signup = facetoface_get_attendee($session->id, $USER->id);
+            $fromform->id = $signup->submissionid;
             customfield_save_data($fromform, 'facetofacesignup', 'facetoface_signup');
         }
 

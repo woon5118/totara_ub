@@ -58,7 +58,7 @@ $renderer = $PAGE->get_renderer('mod_facetoface');
 
 // Get custom field values of the cancellation.
 $cancellationnote = facetoface_get_attendee($sessionid, $userid);
-$cancellationnote->id = $cancellationnote->statusid;
+$cancellationnote->id = $cancellationnote->submissionid;
 $customfields = customfield_get_data($cancellationnote, 'facetoface_cancellation', 'facetofacecancellation');
 
 // Prepare output.

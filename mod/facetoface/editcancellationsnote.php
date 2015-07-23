@@ -53,7 +53,7 @@ require_capability('mod/facetoface:manageattendeesnote', $context);
 
 $attendeenote = facetoface_get_attendee($sessionid, $userid);
 $attendeenote->userid = $attendeenote->id;
-$attendeenote->id = $attendeenote->statusid;
+$attendeenote->id = $attendeenote->submissionid;
 $attendeenote->sessionid = $sessionid;
 customfield_load_data($attendeenote, 'facetofacecancellation', 'facetoface_cancellation');
 

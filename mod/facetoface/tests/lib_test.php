@@ -1346,7 +1346,6 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             $user1->id,
             true,
             null,
-            '',
             $posasssec
         );
 
@@ -1454,7 +1453,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $signup = $DB->get_record('facetoface_signups', $params);
         // Test for valid case.
         $sink = $this->redirectMessages();
-        $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id, 'testnote'), 8);
+        $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id), 8);
         $sink->close();
 
         // Test for invalid case.
@@ -2393,8 +2392,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             MDL_F2F_STATUS_BOOKED,
             $user1->id,
             true,
-            null,
-            ''
+            null
         );
 
         // Sign the user up user 1.
@@ -2407,8 +2405,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             MDL_F2F_STATUS_WAITLISTED,
             $user2->id,
             true,
-            null,
-            ''
+            null
         );
         $messages = $sink->get_messages();
         // User 1 and 2 should have received confirmation messages.

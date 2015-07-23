@@ -36,7 +36,7 @@ class attendee_note_form extends moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $attendeenote->statusid);
+        $mform->setDefault('id', $attendeenote->submissionid);
 
         $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
         $mform->setType('userid', PARAM_INT);
@@ -45,7 +45,7 @@ class attendee_note_form extends moodleform {
         $mform->setType('s', PARAM_INT);
 
         $signup = new stdClass();
-        $signup->id = $attendeenote->statusid;
+        $signup->id = $attendeenote->submissionid;
         customfield_definition($mform, $signup, 'facetofacesignup', 0, 'facetoface_signup');
         $mform->removeElement('customfields');
 

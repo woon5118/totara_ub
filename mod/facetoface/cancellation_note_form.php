@@ -35,7 +35,7 @@ class cancellation_note_form extends moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $attendeenote->statusid);
+        $mform->setDefault('id', $attendeenote->submissionid);
 
         $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
         $mform->setType('userid', PARAM_INT);
@@ -44,7 +44,7 @@ class cancellation_note_form extends moodleform {
         $mform->setType('s', PARAM_INT);
 
         $cancellation = new stdClass();
-        $cancellation->id = $attendeenote->statusid;
+        $cancellation->id = $attendeenote->submissionid;
         customfield_definition($mform, $cancellation, 'facetofacecancellation', 0, 'facetoface_cancellation');
         $mform->removeElement('customfields');
 

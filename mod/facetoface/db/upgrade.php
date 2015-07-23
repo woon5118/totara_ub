@@ -4062,5 +4062,94 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2016031100, 'facetoface');
     }
 
+    if ($oldversion < 2016031101) {
+
+        require_once("$CFG->dirroot/mod/facetoface/db/upgradelib.php");
+
+        // Remove note field.
+        $table = new xmldb_table('facetoface_signups_status');
+        $field = new xmldb_field('note');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // We only ever want to do this once, do it more than once and you're going to have data loss.
+        // Thus we will only perform the migration if a special config variable does not already exist.
+        // We do not use get config as this has caching.
+        $configparams = array(
+            'plugin' => 'facetoface',
+            'name' => 'upgrade_customfieldmigration_signup',
+        );
+        if (!$DB->record_exists('config_plugins', $configparams)) {
+
+            // Migrate the customfield data for signups and cancellations.
+            //
+            // TL-6962 found that signup and cancellation custom field data was being stored against the
+            // signup status id. This meant that every time the signup status changed the data was essentially lost.
+            // While it was still in the system it was no longer displayed.
+            // After much discussion it was decided that signup and cancellation custom field data should be saved against
+            // the signup itself rather than the signup status.
+            // This meant that we needed to migrate the signup and cancellation custom field data updating reference table id.
+            // Because the new ids may exist in the data records already the only safe way to do this is to move the data
+            // out of the table and then copy it back in fixing it along the way.
+            // The process to do this is:
+            //
+            //  1. Rename the facetoface_signup_info_data table to facetoface_signup_info_temp
+            //  2. Create a new facetoface_signup_info_data table
+            //  3. Copy data from facetoface_signup_info_temp to facetoface_signup_info_data fixing it along the way.
+            //  4. Delete facetoface_signup_info_temp
+            //
+            // This essentially only takes the data we want and drops the redundant data from the system as we no longer
+            // want to keep it.
+            //
+
+            // Define table facetoface_signup_info_data to be created.
+            $datatable = new xmldb_table('facetoface_signup_info_data');
+            // Adding fields to table facetoface_signup_info_data.
+            $datatable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $datatable->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $datatable->add_field('fieldid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            $datatable->add_field('facetofacesignupid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            // Adding keys to table facetoface_signup_info_data.
+            $datatable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $datatable->add_key('signupinfodata_fielid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_signup_info_field', array('id'));
+            $datatable->add_key('signupinfodata_signupid_fk', XMLDB_KEY_FOREIGN, array('facetofacesignupid'), 'facetoface_signups_status', array('id'));
+
+            // Statuscode 10 = MDL_F2F_STATUS_USER_CANCELLED.
+            mod_facetoface_migrate_session_signup_customdata($DB, $dbman, $datatable, 'facetoface_signup_info_temp', 'facetofacesignupid', 'statuscode != 10');
+
+            $configparams['value'] = 'done';
+            $DB->insert_record('config_plugins', $configparams);
+        }
+
+        // Now that we have done signup data we must also do cancellation data.
+        $configparams = array(
+            'plugin' => 'facetoface',
+            'name' => 'upgrade_customfieldmigration_cancellation',
+        );
+        if (!$DB->record_exists('config_plugins', $configparams)) {
+
+            // Define table facetoface_cancellation_info_data to be created.
+            $datatable = new xmldb_table('facetoface_cancellation_info_data');
+            // Adding fields to table facetoface_cancellation_info_data.
+            $datatable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $datatable->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $datatable->add_field('fieldid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            $datatable->add_field('facetofacecancellationid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+            // Adding keys to table facetoface_cancellation_info_data.
+            $datatable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $datatable->add_key('cancellationinfodata_fieldid_fk', XMLDB_KEY_FOREIGN, array('fieldid'), 'facetoface_cancellation_info_field', array('id'));
+            $datatable->add_key('cancellationinfodata_cancellationid_fk', XMLDB_KEY_FOREIGN, array('facetofacecancellationid'), 'facetoface_signups_status', array('id'));
+
+            mod_facetoface_migrate_session_signup_customdata($DB, $dbman, $datatable, 'facetoface_cancellation_info_temp', 'facetofacecancellationid', 'statuscode = 10');
+
+            unset($datatable);
+            $configparams['value'] = 'done';
+            $DB->insert_record('config_plugins', $configparams);
+        }
+
+        upgrade_mod_savepoint(true, 2016031101, 'facetoface');
+    }
+
     return $result;
 }

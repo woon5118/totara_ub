@@ -1042,17 +1042,14 @@ if ($show_table) {
                 $url = new moodle_url('/mod/facetoface/cancellation_note.php',
                     array('s' => $session->id, 'userid' => $attendee->id, 'sesskey' => sesskey()));
                 $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-cancellation-note pull-right'));
-                $customfields = facetoface_get_cancellation_customfields();
-                $datanote = '';
-                if (count($customfields) === 1) {
-                    $customfield = reset($customfields);
-                    if ($customfield->datatype == 'text') {
-                        $attendeeinsession = facetoface_get_attendee($session->id, $attendee->id);
-                        $datanote = $DB->get_field('facetoface_cancellation_info_data', 'data',
-                            array('fieldid' => $customfield->id, 'facetofacecancellationid' => $attendeeinsession->statusid));
-                    }
-                }
-                $note = html_writer::span($datanote, 'cancellationnote' . $attendee->id, array('id' => 'cancellationnote' . $attendee->id));
+
+                $cancelstatus = new stdClass();
+                $cancelstatus->id = $attendee->signupid;
+                $cancellationnote = customfield_get_data($cancelstatus, 'facetoface_cancellation', 'facetofacecancellation', false);
+
+                $cancellationnotetext = empty($cancellationnote) ? '' : $cancellationnote['cancellationnote'];
+
+                $note = html_writer::span($cancellationnotetext, 'cancellationnote' . $attendee->id, array('id' => 'cancellationnote' . $attendee->id));
                 $data[] = ($download) ? $datanote : $icon . $note;
             } else {
                 // To get the right approver & approval time we will need to get the approved status record.
@@ -1095,18 +1092,14 @@ if ($show_table) {
                         $icon = $OUTPUT->action_icon($url, $showpix, null, array('class' => 'action-icon attendee-add-note pull-right'));
                     }
                     if ($includeattendeesnote) {
-                        // Get signup note. Only show the note if there is only one field and it's text.
-                        $datanote = '';
-                        $customfields = facetoface_get_signup_customfields();
-                        if (count($customfields) === 1) {
-                            $customfield = reset($customfields);
-                            if ($customfield->datatype == 'text') {
-                                $attendeeinsession = facetoface_get_attendee($session->id, $attendee->id);
-                                $datanote = $DB->get_field('facetoface_signup_info_data', 'data',
-                                    array('fieldid' => $customfield->id, 'facetofacesignupid' => $attendeeinsession->statusid));
-                            }
-                        }
-                        $note = html_writer::span($datanote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                        // Get signup note.
+                        $signupstatus = new stdClass();
+                        $signupstatus->id = $attendee->submissionid;
+                        $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
+
+                        $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+
+                        $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
                         $data[] = ($download) ? $datanote : $icon . $note;
                     }
                 }
@@ -1267,18 +1260,14 @@ if ($action == 'approvalrequired') {
                 $icon = $OUTPUT->action_icon($url, $pix, null, array('class' => 'action-icon attendee-add-note pull-right'));
             }
             if ($includeattendeesnote) {
-                // Get signup note. Only show the note if there is only one field and it's text.
-                $datanote = '';
-                $customfields = facetoface_get_signup_customfields();
-                if (count($customfields) === 1) {
-                    $customfield = reset($customfields);
-                    if ($customfield->datatype == 'text') {
-                        $attendeeinsession = facetoface_get_attendee($session->id, $attendee->id);
-                        $datanote = $DB->get_field('facetoface_signup_info_data', 'data',
-                            array('fieldid' => $customfield->id, 'facetofacesignupid' => $attendeeinsession->statusid));
-                    }
-                }
-                $note = html_writer::span($datanote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
+                // Get signup note.
+                $signupstatus = new stdClass();
+                $signupstatus->id = $attendee->signupid;
+                $signupnote = customfield_get_data($signupstatus, 'facetoface_signup', 'facetofacesignup', false);
+
+                $signupnotetext = empty($signupnote) ? '' : $signupnote['signupnote'];
+
+                $note = html_writer::span($signupnotetext, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
                 $data[] = $icon . $note;
             }
         }

@@ -128,7 +128,7 @@ if ($fromform = $mform->get_data()) {
             if ($enableattendeenote) {
                 $signupstatus = facetoface_get_attendee($session->id, $attendee->id);
                 $customdata = $list->has_user_data() ? (object)$list->get_user_data($attendee->id) : $fromform;
-                $customdata->id = $signupstatus->statusid;
+                $customdata->id = $signupstatus->submissionid;
                 customfield_save_data($customdata, 'facetofacesignup', 'facetoface_signup');
             }
         }

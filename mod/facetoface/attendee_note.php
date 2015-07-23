@@ -58,7 +58,7 @@ $renderer = $PAGE->get_renderer('mod_facetoface');
 
 $attendee_note = facetoface_get_attendee($sessionid, $userid);
 $attendee_note->userid = $attendee_note->id;
-$attendee_note->id = $attendee_note->statusid;
+$attendee_note->id = $attendee_note->submissionid;
 $attendee_note->sessionid = $sessionid;
 $customfields = customfield_get_data($attendee_note, 'facetoface_signup', 'facetofacesignup');
 

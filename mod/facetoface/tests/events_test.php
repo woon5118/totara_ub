@@ -151,7 +151,7 @@ class facetoface_events_testcase extends advanced_testcase {
         facetoface_user_signup($this->session, $this->facetoface, $this->course, '', MDL_F2F_NONE, MDL_F2F_STATUS_BOOKED, $user1->id);
         $attendee_note = facetoface_get_attendee($this->session->id, $user1->id);
         $attendee_note->userid = $attendee_note->id;
-        $attendee_note->id = $attendee_note->statusid;
+        $attendee_note->id = $attendee_note->submissionid;
         $attendee_note->sessionid = $this->session->id;
 
         $event = \mod_facetoface\event\attendee_note_updated::create_from_instance($attendee_note, $this->context);

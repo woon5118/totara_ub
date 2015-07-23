@@ -433,7 +433,7 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                                         $statuscode = MDL_F2F_STATUS_WAITLISTED;
                                         $iswaitlisted = 1;
                                     }
-                                    if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, '', $attendee->grade)) {
+                                    if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, $attendee->grade)) {
                                         $booked++;
                                         // Don't send confirmation notice if the session is in the past.
                                         if (!facetoface_has_session_started($session, $now)) {
@@ -460,7 +460,7 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                                     $statuscode = MDL_F2F_STATUS_WAITLISTED;
                                     $iswaitlisted = 1;
                                 }
-                                if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, '', $attendee->grade)) {
+                                if (facetoface_update_signup_status($attendee->submissionid, $statuscode, $USER->id, $attendee->grade)) {
                                     $booked++;
                                     // Don't send confirmation notice if the session is in the past.
                                     if (!facetoface_has_session_started($session, $now)) {
@@ -736,7 +736,7 @@ function facetoface_update_attendees($session) {
                     if (!$user->id) {
                         // Cope with reserved spaces.
                         facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_WAITLISTED, $USER->id);
-                    } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id, true, null, $user->usernote)) {
+                    } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_WAITLISTED, $user->id, true, null)) {
                         // rollback_sql();
                         return false;
                     }
@@ -773,7 +773,7 @@ function facetoface_update_attendees($session) {
                         if (!$user->id) {
                             // Cope with reserved spaces.
                             facetoface_update_signup_status($user->signupid, MDL_F2F_STATUS_BOOKED, $USER->id);
-                        } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id, true, $fromuser, $user->usernote)) {
+                        } else if (!facetoface_user_signup($session, $facetoface, $course, $user->discountcode, $user->notificationtype, MDL_F2F_STATUS_BOOKED, $user->id, true, $fromuser)) {
                             // rollback_sql();
                             return false;
                         }
@@ -1577,7 +1577,6 @@ function facetoface_get_attendees($sessionid, $status = array(MDL_F2F_STATUS_BOO
             f.course,
             ss.grade,
             ss.statuscode,
-            ss.note AS usernote,
             (
                 SELECT MAX(timecreated)
                 FROM {facetoface_signups_status} ss2
@@ -1643,10 +1642,8 @@ function facetoface_get_attendee($sessionid, $userid) {
             su.notificationtype,
             f.id AS facetofaceid,
             f.course,
-            ss.id AS statusid,
             ss.grade,
-            ss.statuscode,
-            ss.note AS usernote
+            ss.statuscode
         FROM
             {facetoface} f
         JOIN
@@ -2246,13 +2243,12 @@ function facetoface_get_user_customfields($userid, $fieldstoinclude=null) {
  * @param integer $userid user to signup
  * @param bool $notifyuser whether or not to send an email confirmation
  * @param object $fromuser User object describing who the email is from.
- * @param string $usernote
- * @param class $positionassignment object containing information on selected position (positionid, type, assignmentid)
+ * @param class $positionassignment object containing information on selected position (positionid, type, assignmnetid)
  * @param int   $managerid          The id of the user selected as the session manager when managerselect is enabled.
  */
 function facetoface_user_signup($session, $facetoface, $course, $discountcode,
                                 $notificationtype, $statuscode, $userid = false,
-                                $notifyuser = true, $fromuser = null, $usernote = '',
+                                $notifyuser = true, $fromuser = null,
                                 $positionassignment = null, $managerid = null) {
 
     global $DB, $USER;
@@ -2370,7 +2366,7 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
     }
 
     // Update status.
-    if (!facetoface_update_signup_status($usersignup->id, $new_status, $USER->id, $usernote)) {
+    if (!facetoface_update_signup_status($usersignup->id, $new_status, $USER->id)) {
         print_error('error:f2ffailedupdatestatus', 'facetoface');
     }
 
@@ -2457,14 +2453,13 @@ function facetoface_user_signup($session, $facetoface, $course, $discountcode,
  * @param integer $signupid ID of the signup to be updated
  * @param integer $statuscode Status code to be updated to
  * @param integer $createdby User ID of the user causing the status update
- * @param string $note Cancellation reason or other notes
  * @param int $grade Grade
  * @param bool $usetransaction Set to true if database transactions are to be used
  *
  * @returns integer ID of newly created signup status, or false
  *
  */
-function facetoface_update_signup_status($signupid, $statuscode, $createdby, $note='', $grade=NULL) {
+function facetoface_update_signup_status($signupid, $statuscode, $createdby, $grade=NULL) {
     global $DB;
     $timenow = time();
 
@@ -2473,7 +2468,6 @@ function facetoface_update_signup_status($signupid, $statuscode, $createdby, $no
     $signupstatus->statuscode = $statuscode;
     $signupstatus->createdby = $createdby;
     $signupstatus->timecreated = $timenow;
-    $signupstatus->note = $note;
     $signupstatus->grade = $grade;
     $signupstatus->superceded = 0;
     $signupstatus->mailed = 0;
@@ -2648,7 +2642,7 @@ function facetoface_take_attendance($data) {
                     continue 2;
             }
 
-            facetoface_update_signup_status($submissionid, $value, $USER->id, '', $grade);
+            facetoface_update_signup_status($submissionid, $value, $USER->id, $grade);
 
             if (!facetoface_take_individual_attendance($submissionid, $grade)) {
                 error_log("F2F: could not mark '$submissionid' as ".$value);
@@ -2724,6 +2718,7 @@ function facetoface_approve_requests($data) {
             continue;
         }
 
+        // Double-check request exists and not already approved or declined.
         $params = array(
             'signupid' => $attendee->submissionid,
             'superceded' => 0
@@ -2807,8 +2802,7 @@ function facetoface_approve_requests($data) {
                             $status,
                             $attendee->id,
                             true,
-                            null,
-                            $attendee->usernote
+                            null
                         )) {
                         continue;
                     }
@@ -3260,21 +3254,22 @@ function facetoface_user_cancel_submission($sessionid, $userid, $cancelreason=''
         return true; // not signed up, nothing to do
     }
 
-    $result = facetoface_update_signup_status($signup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id, $cancelreason);
+    // Result is the signupstatusid or false.
+    $result = facetoface_update_signup_status($signup->id, MDL_F2F_STATUS_USER_CANCELLED, $USER->id);
 
     if ($result) {
         // Save cancellation note if cancellation note exists to keep the function working as before.
         if (!empty($cancelreason)) {
             $params = array('shortname' => 'cancellationnote', 'datatype' => 'text');
             if ($cancelfieldid = $DB->get_field('facetoface_cancellation_info_field', 'id', $params)) {
-                $canceldataparams = array('fieldid' => $cancelfieldid, 'facetofacecancellationid' => $result);
+                $canceldataparams = array('fieldid' => $cancelfieldid, 'facetofacecancellationid' => $signup->id);
                 if ($DB->record_exists('facetoface_cancellation_info_data', $canceldataparams)) {
                     $DB->set_field('facetoface_cancellation_info_data', 'data', $cancelreason, $canceldataparams);
                 } else {
                     $todb = new stdClass();
                     $todb->data = $cancelreason;
                     $todb->fieldid = $cancelfieldid;
-                    $todb->facetofacecancellationid = $result;
+                    $todb->facetofacecancellationid = $signup->id;
                     $DB->insert_record('facetoface_cancellation_info_data', $todb);
                 }
             }
@@ -3670,10 +3665,6 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     if (!empty($session->discountcost)) {
         $output .= html_writer::tag('dt', get_string('discountcost', 'facetoface'));
         $output .= html_writer::tag('dd', format_string($session->discountcost));
-    }
-    if (!empty($session->usernote)) {
-        $output .= html_writer::tag('dt', get_string('usernote', 'facetoface'));
-        $output .= html_writer::tag('dd', format_string($session->usernote));
     }
 
     // Display trainers.
@@ -4150,7 +4141,6 @@ function facetoface_get_cancellations($sessionid) {
                 pa.type as positiontype,
                 MAX(ss.timecreated) AS timesignedup,
                 c.timecreated AS timecancelled,
-                " . $DB->sql_compare_text('c.note', 255) . " AS cancelreason,
                 c.statuscode
             FROM
                 {facetoface_signups} su
@@ -4180,11 +4170,11 @@ function facetoface_get_cancellations($sessionid) {
                 u.id,
                 {$usernamefields},
                 c.timecreated,
-                " . $DB->sql_compare_text('c.note', 255) . ",
                 p.fullname,
                 pa.type,
                 pa.fullname,
-                c.statuscode
+                c.statuscode,
+                c.id
             ORDER BY
                 {$usernamefields},
                 c.timecreated
@@ -4205,7 +4195,7 @@ function facetoface_get_cancellations($sessionid) {
 function facetoface_get_requests($sessionid) {
     $usernamefields = get_all_user_name_fields(true, 'u');
 
-    $select = "u.id, su.id AS signupid, ss.note as usernote, {$usernamefields}, u.email,
+    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
         ss.statuscode, ss.timecreated AS timerequested";
 
     return facetoface_get_users_by_status($sessionid, MDL_F2F_STATUS_REQUESTED, $select);
@@ -4223,7 +4213,7 @@ function facetoface_get_requests($sessionid) {
 function facetoface_get_adminrequests($sessionid) {
     $usernamefields = get_all_user_name_fields(true, 'u');
 
-    $select = "u.id, su.id AS signupid, ss.note as usernote, {$usernamefields}, u.email,
+    $select = "u.id, su.id AS signupid, {$usernamefields}, u.email,
         ss.statuscode, ss.timecreated AS timerequested";
 
     $status = array(MDL_F2F_STATUS_REQUESTED, MDL_F2F_STATUS_REQUESTEDADMIN);
@@ -4815,7 +4805,6 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
     $bulkaddsource    = (isset($params['bulkaddsource'])    ? $params['bulkaddsource']    : 'bulkaddsourceuserid');
     $discountcode     = (isset($params['discountcode'])     ? $params['discountcode']     : '');
     $notificationtype = (isset($params['notificationtype']) ? $params['notificationtype'] : MDL_F2F_BOTH);
-    $usernote         = (isset($params['usernote'])         ? $params['usernote']         : '');
     $autoenrol        = (isset($params['autoenrol'])        ? $params['autoenrol']        : true);
 
     if (isset($params['approvalreqd'])) {
@@ -4974,7 +4963,6 @@ function facetoface_user_import($course, $facetoface, $session, $userid, $params
         $user->id,
         !$suppressemail,
         null,
-        $usernote,
         $positionassignment,
         $managerid)) {
             $result['result'] = get_string('error:addattendee', 'facetoface', fullname($user));

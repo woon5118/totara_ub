@@ -76,7 +76,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->box_start();
 
 // Get signups from the DB
-$bookings = $DB->get_records_sql("SELECT ss.timecreated, ss.statuscode, ss.grade, ss.note,
+$bookings = $DB->get_records_sql("SELECT ss.timecreated, ss.statuscode, ss.grade,
                                    c.id as courseid, c.fullname AS coursename,
                                    f.name, f.id as facetofaceid, s.id as sessionid,
                                    d.id, d.timestart, d.timefinish, d.sessiontimezone
