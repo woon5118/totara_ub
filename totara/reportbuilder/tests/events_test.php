@@ -48,7 +48,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $this->assertEventContextNotUsed($event);
         $this->assertEventLegacyLogData(array(SITEID, 'reportbuilder', 'new report', 'report.php?id=1', 'Test user report (ID='.$report->_id.')'), $event);
 
-        // Let's created embedded report, we should get an event there.
+        // Let's created embedded report, we should not get any event since 2.75.
 
         $sink = $this->redirectEvents();
         $emreport = new reportbuilder(null, 'cohort_members');
@@ -56,11 +56,7 @@ class totara_reportbuilder_events_testcase extends advanced_testcase {
         $events = $sink->get_events();
         $sink->close();
 
-        $this->assertCount(1, $events);
-        $event = reset($events);
-        $this->assertInstanceOf('totara_reportbuilder\event\report_created', $event);
-        $data = $event->get_data();
-        $this->assertTrue($data['other']['embedded']);
+        $this->assertCount(0, $events);
     }
 
     public function test_report_updated_event() {

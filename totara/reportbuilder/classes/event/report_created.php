@@ -28,11 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The report created event class.
  *
+ * Note: this event is not triggered for embedded reports since Totara 2.7.6
+ *
  * @property-read array $other {
  *      Extra information about the event.
  *
  *      - string shortname: Short name of report.
- *      - bool $embedded: true if automatically created embedded report
+ *      - bool $embedded: true if automatically created embedded report (deprecated since 2.7.6)
  * }
  *
  * @author Petr Skoda <petr.skoda@totaralms.com>
@@ -52,10 +54,10 @@ class report_created extends \core\event\base {
      * Create instance of event.
      *
      * @param \reportbuilder $report
-     * @param bool $embedded true when embedded report created, false for manually created
+     * @param bool $embedded true when embedded report created, false for manually created (deprecated since 2.7.6)
      * @return report_created
      */
-    public static function create_from_report(\reportbuilder $report, $embedded) {
+    public static function create_from_report(\reportbuilder $report, $embedded = false) {
         $data = array(
             'context' => \context_system::instance(),
             'objectid' => $report->_id,
