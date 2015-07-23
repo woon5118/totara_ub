@@ -38,13 +38,13 @@ class totara_reportbuilder_tabexport_source_testcase extends advanced_testcase {
 
         $expected = array();
         $expected[] = array('User ID', 'User First Name', 'User Last Name');
-        $expected[] = array($guest->id, $guest->firstname, $guest->lastname);
-        $expected[] = array($admin->id, $admin->firstname, $admin->lastname);
         $expected[] = array($user->id, $user->firstname, $user->lastname);
+        $expected[] = array($admin->id, $admin->firstname, $admin->lastname);
+        $expected[] = array($guest->id, $guest->firstname, $guest->lastname);
 
         $rid = $this->create_report('user', 'Test user report 1');
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $rid));
-        $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $rid));
+        $DB->set_field('report_builder', 'defaultsortorder', SORT_DESC, array('id' => $rid));
 
         $report = new reportbuilder($rid, null, false, null, null, true);
         $this->add_column($report, 'user', 'id', null, null, null, 0);
@@ -52,7 +52,7 @@ class totara_reportbuilder_tabexport_source_testcase extends advanced_testcase {
         $this->add_column($report, 'user', 'lastname', null, null, null, 0);
         // Sort the columns in predictable way - PostgreSQL may return random order otherwise.
         $DB->set_field('report_builder', 'defaultsortcolumn', 'user_id', array('id' => $report->_id));
-        $DB->set_field('report_builder', 'defaultsortorder', SORT_ASC, array('id' => $report->_id));
+        $DB->set_field('report_builder', 'defaultsortorder', SORT_DESC, array('id' => $report->_id));
 
         $report = new reportbuilder($rid);
 

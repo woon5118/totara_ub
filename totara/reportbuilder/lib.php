@@ -2914,6 +2914,23 @@ class reportbuilder {
             $sort = trim($table->get_sql_sort());
         }
 
+        if ($sort === '' and $this->defaultsortcolumn) {
+            // Use default sort if no valid sort found in user session or preferences.
+            $exists = false;
+            foreach ($this->columns as $col) {
+                if ($col->type . '_' . $col->value === $this->defaultsortcolumn) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if ($exists) {
+                $sort = $this->defaultsortcolumn;
+                if ($this->defaultsortorder == SORT_DESC) {
+                    $sort .= ' DESC';
+                }
+            }
+        }
+
         // always include the base id as a last resort to ensure order is
         // predetermined for pagination
         $baseid = $this->grouped ? 'min(base.id)' : 'base.id';
