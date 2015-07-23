@@ -102,7 +102,7 @@ class rb_content_option {
         // If only one field provided, convert to an array.
         // This provides backward compatibility in the case of a single field.
         if (!is_array($fields)) {
-            $fields = array('field' => $fields);
+            $fields = array($classname => $fields);
         }
         $this->fields = $fields;
         $this->joins = $joins;

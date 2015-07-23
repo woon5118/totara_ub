@@ -106,9 +106,9 @@ class rb_source_program extends rb_base_source {
                 'prog_availability',
                 get_string('availablecontent', 'rb_source_program'),
                 array(
-                    'base.available',
-                    'base.availablefrom',
-                    'base.availableuntil',
+                    'available' => 'base.available',
+                    'availfrom' => 'base.availablefrom',
+                    'availuntil' => 'base.availableuntil',
                 )
             ),
         );

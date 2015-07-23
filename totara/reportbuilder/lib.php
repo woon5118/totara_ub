@@ -1947,12 +1947,12 @@ class reportbuilder {
                         $fields[$key] = $field;
                     }
                 }
+
                 // Collapse array to string if it consists of only one element
-                // with a specific key.
                 // This provides backward compatibility in case fields is just
                 // a string instead of an array.
-                if (count($fields) == 1 && isset($fields['field'])) {
-                    $fields = $fields['field'];
+                if (count($fields) === 1) {
+                    $fields = array_shift($fields);
                 }
 
                 if (class_exists($classname)) {
