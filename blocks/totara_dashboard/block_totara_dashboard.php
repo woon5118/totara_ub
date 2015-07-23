@@ -37,6 +37,10 @@ class block_totara_dashboard extends block_base {
     public function get_content() {
         global $USER;
 
+        if (!totara_feature_visible('totaradashboard')) {
+            return '';
+        }
+
         if ($this->content !== null) {
             return $this->content;
         }

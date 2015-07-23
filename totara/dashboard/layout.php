@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
 require_login();
 
+// Check Totara Dashboard is enable.
+totara_dashboard::check_feature_enabled();
+
 $systemcontext = context_system::instance();
 require_capability('totara/dashboard:manage', $systemcontext);
 

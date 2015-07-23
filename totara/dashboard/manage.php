@@ -28,6 +28,10 @@ require_once($CFG->libdir.'/adminlib.php');
 $action = optional_param('action', '', PARAM_ACTION);
 
 admin_externalpage_setup('totaradashboard');
+
+// Check Totara Dashboard is enable.
+totara_dashboard::check_feature_enabled();
+
 $systemcontext = context_system::instance();
 require_capability('totara/dashboard:manage', $systemcontext);
 

@@ -25,6 +25,12 @@
 
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
+$string['configenabletotaradashboard'] = 'This option will let you: Enable(show)/Hide/Disable Totara Dashboard feature on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to Totara Dashboard will be accessible.
+* If Hide is chosen, all links and tabs related to Totara Dashboard will be hidden.
+* If Disable is chosen, Totara Dashboard will disappear from any menu on the site and will not be accessible.
+';
 $string['createdashboard'] = 'Create dashboard';
 $string['dashboard'] = 'Dashboard';
 $string['dashboard:manage'] = 'Manage dashboard';
@@ -37,6 +43,7 @@ $string['delete'] = 'Delete';
 $string['deletedashboardconfirm'] = 'Do you really want to remove dashboard {$a}?';
 $string['editdashboard'] = 'Edit dashboard';
 $string['editdashboardsettings'] = 'Edit dashboard settings';
+$string['enabletotaradashboard'] = 'Enable Totara Dashboard';
 $string['error:unknownbuttonclicked'] = 'Error: unknown button clicked.';
 $string['locked'] = 'Locked';
 $string['locked_help'] = 'When locked, users will not be able to change dashboard layout. Their previous changes will be hidden but not removed. After unlock users changes to their dashboard will reappear.';
@@ -53,6 +60,7 @@ $string['resetalldashboard'] = 'Reset dashboard for all users';
 $string['resetdashboard'] = 'Reset dashboard to default';
 $string['resetdashboardconfirm'] = 'Do you really want to reset dashboard {$a} layout for all assigned users?';
 $string['savechanges'] = 'Save changes';
+$string['totaradashboarddisabled'] = 'Totara Dashboard is not enabled on this site';
 $string['unpublish'] = 'Unpublish';
 $string['updatelayoutoff'] = 'Stop customizing this dashboard';
 $string['updatelayouton'] = 'Customize dashboard';

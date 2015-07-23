@@ -24,6 +24,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 require_once($CFG->dirroot . '/totara/dashboard/dashboard_forms.php');
+require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
@@ -34,6 +35,10 @@ if ($action != 'new') {
 }
 
 admin_externalpage_setup('totaradashboard');
+
+// Check Totara Dashboard is enable.
+totara_dashboard::check_feature_enabled();
+
 $systemcontext = context_system::instance();
 require_capability('totara/dashboard:manage', $systemcontext);
 

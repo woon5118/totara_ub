@@ -527,4 +527,13 @@ class totara_dashboard {
             }
         }
     }
+
+    /**
+    * Prints an error if Totara Dashboard is not enabled.
+    */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('totaradashboard')) {
+            print_error('totaradashboarddisabled', 'totara_dashboard');
+        }
+    }
 }

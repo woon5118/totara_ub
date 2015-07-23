@@ -1029,7 +1029,7 @@ class global_navigation extends navigation_node {
                 'text' => get_string('home'),
                 'action' => new moodle_url('/')
             );
-        } else if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
+        } else if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD && totara_feature_visible('totaradashboard')) {
             // We are using totara dashboard for the root element.
             $properties = array(
                 'key' => 'mydashboard',
@@ -1116,7 +1116,7 @@ class global_navigation extends navigation_node {
             // Add access to my home as well.
             $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null,
                     'myhome');
-        } else {
+        } else if (totara_feature_visible('totaradashboard')) {
             // Dashboards not in the root, so add here.
             $this->rootnodes['dashboard'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'),
                     self::TYPE_ROOTNODE, null, 'dashboard');

@@ -309,7 +309,7 @@ function core_login_get_return_url() {
             }
         }
         // Go to totara dashboard page instead of site homepage if defaulthomepage set to homepage_totara_dashboard.
-        if ($homepage == HOMEPAGE_TOTARA_DASHBOARD && !is_siteadmin() && !isguestuser()) {
+        if ($homepage == HOMEPAGE_TOTARA_DASHBOARD && !is_siteadmin() && !isguestuser() && totara_feature_visible('totaradashboard')) {
             if ($urltogo == $CFG->wwwroot or $urltogo == $CFG->wwwroot.'/' or $urltogo == $CFG->wwwroot.'/index.php') {
                 $urltogo = $CFG->wwwroot.'/totara/dashboard/';
             }
