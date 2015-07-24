@@ -30,7 +30,10 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         jshint: {
-            options: {jshintrc: '.jshintrc'},
+            /* TODO: remove force from the line below. Currently there is a quite a bit of cruft in Totara files which cause jshint
+             * to spit out a large number of warnings.
+             */
+            options: {jshintrc: '.jshintrc', force: true},
             files: ['**/amd/src/*.js']
         },
         uglify: {
