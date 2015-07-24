@@ -2690,6 +2690,9 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
                 $PAGE->requires->strings_for_js(array('collapseall', 'expandall'), 'moodle');
             }
             $PAGE->requires->yui_module('moodle-form-shortforms', 'M.form.shortforms', array(array('formid' => $formid)));
+        } else {
+            // Totara: hack alert - shortforms contains form error event which is necessary for client error validation.
+            $PAGE->requires->yui_module('moodle-form-shortforms', 'M.form.shortforms', array(array('formid' => $formid)));
         }
         if (!empty($this->_advancedElements)){
             $PAGE->requires->strings_for_js(array('showmore', 'showless'), 'form');
