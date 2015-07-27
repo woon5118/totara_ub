@@ -358,6 +358,26 @@ class graph {
         }
     }
 
+    /**
+     * Apply user specified colours.
+     *
+     * @param array $settings the parsed settings
+     * @return array settings with removed 'colours' option
+     */
+    protected function apply_custom_colours($settings) {
+        if (!empty($settings['colours'])) {
+            if (is_array($settings['colours'])) {
+                $colours = array_values($settings['colours']);
+            } else {
+                $colours = explode(',', $settings['colours']);
+            }
+            $colours = array_map('trim', $colours);
+            $this->svggraphcolours = $colours;
+        }
+        unset($settings['colours']);
+        return $settings;
+    }
+
     protected function get_final_settings() {
         $settings = $this->svggraphsettings;
 
@@ -374,7 +394,7 @@ class graph {
             }
         }
 
-        return $settings;
+        return $this->apply_custom_colours($settings);
     }
 
     /**
