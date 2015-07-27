@@ -25,6 +25,7 @@
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once('lib.php');
 
 
@@ -40,6 +41,9 @@ $delete = optional_param('delete', '', PARAM_ALPHANUM);
 
 // Cache user capabilities.
 $sitecontext = context_system::instance();
+
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 // Permissions.
 require_capability('totara/hierarchy:deletecompetencyscale', $sitecontext);

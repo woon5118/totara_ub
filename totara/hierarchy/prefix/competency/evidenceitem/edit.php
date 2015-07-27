@@ -26,6 +26,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir . '/coursecatlib.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_courses.class.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
 ///
@@ -41,6 +42,12 @@ $category = optional_param('category', 0, PARAM_INT);
 $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 $s = optional_param('s', '', PARAM_TEXT);
+
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
 
 // Check perms
 admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/item/edit.php');

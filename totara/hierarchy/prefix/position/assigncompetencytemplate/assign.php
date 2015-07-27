@@ -53,6 +53,9 @@ $s = optional_param('s', '', PARAM_TEXT);
 // Setup page
 admin_externalpage_setup('positionmanage');
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Check permissions
 $sitecontext = context_system::instance();
 require_capability('totara/hierarchy:updateposition', $sitecontext);

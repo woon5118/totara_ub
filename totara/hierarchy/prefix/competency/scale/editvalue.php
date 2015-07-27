@@ -26,6 +26,7 @@ require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/
 require_once($CFG->libdir.'/adminlib.php');
 require_once('editvalue_form.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/scale/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
 
@@ -41,6 +42,9 @@ $scaleid = optional_param('scaleid', 0, PARAM_INT);
 
 // Cache user capabilities.
 $sitecontext = context_system::instance();
+
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 // Set up the page.
 admin_externalpage_setup($prefix.'manage');

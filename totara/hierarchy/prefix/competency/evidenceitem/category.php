@@ -34,6 +34,9 @@ require_once($CFG->dirroot.'/course/lib.php');
 // category id
 $id = required_param('id', PARAM_INT);
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Check perms
 admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/item/edit.php');
 

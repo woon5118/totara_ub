@@ -505,7 +505,7 @@ function dp_get_rol_tabs_visible($userid) {
     }
 
     $assigned_comps = $DB->count_records('comp_record', array('userid' => $userid));
-    if ($assigned_comps > 0 || $show_competency_tab) {
+    if (totara_feature_visible('competencies') && ($assigned_comps > 0 || $show_competency_tab)) {
         $visible[] = 'competencies';
     }
 

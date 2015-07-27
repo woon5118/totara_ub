@@ -26,6 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 class competency_type extends hierarchy_type {
 
+    public function is_feature_type_disabled() {
+        return totara_feature_disabled('competencies');
+    }
+
     public function get_capability_movefield() {
         return 'totara/hierarchy:updatecompetencycustomfield';
     }

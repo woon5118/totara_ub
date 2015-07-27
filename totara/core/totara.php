@@ -2271,6 +2271,7 @@ function totara_idnumber_exists($table, $idnumber, $itemid = 0) {
 function totara_advanced_features_list() {
     return array(
         'goals',
+        'competencies',
         'appraisals',
         'feedback360',
         'learningplans',

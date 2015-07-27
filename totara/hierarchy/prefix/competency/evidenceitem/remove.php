@@ -41,6 +41,9 @@ $delete = optional_param('delete', '', PARAM_ALPHANUM);
 // Course id (if coming from the course view)
 $course = optional_param('course', 0, PARAM_INT);
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Load data
 $hierarchy         = new competency();
 $item              = competency_evidence_type::factory($id);

@@ -50,6 +50,12 @@ $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 // should we show hidden frameworks?
 $showhidden = optional_param('showhidden', false, PARAM_BOOL);
 
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
+
 // check they have permissions on hidden frameworks in case parameter is changed manually
 $context = context_system::instance();
 if ($showhidden && !has_capability('totara/hierarchy:updatecompetencyframeworks', $context)) {

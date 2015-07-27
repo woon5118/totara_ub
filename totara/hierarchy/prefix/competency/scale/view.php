@@ -25,6 +25,7 @@
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once('lib.php');
 
 ///
@@ -39,6 +40,9 @@ $movedown = optional_param('movedown', 0, PARAM_INT);
 // Set default value
 $default = optional_param('default', 0, PARAM_INT);
 $prefix = required_param ('prefix', PARAM_ALPHA);
+
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 $sitecontext = context_system::instance();
 $hierarchy = hierarchy::load_hierarchy($prefix);

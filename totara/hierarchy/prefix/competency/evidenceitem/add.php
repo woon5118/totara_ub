@@ -46,6 +46,12 @@ $s = optional_param('s', '', PARAM_TEXT);
 // Indicates whether current related items, not in $relidlist, should be deleted
 $deleteexisting = optional_param('deleteexisting', 0, PARAM_BOOL);
 
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
+
 if (empty($CFG->competencyuseresourcelevelevidence)) {
 
     // Updated course lists

@@ -43,6 +43,12 @@ $parentid = optional_param('parentid', 0, PARAM_INT);
 // Only return generated tree html
 $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
+
 require_capability('totara/program:configurecontent', program_get_context($id));
 
 ///

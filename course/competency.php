@@ -38,6 +38,9 @@ if (!$id) {
     print_error('needcourseid');
 }
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Courses only
 if($id == SITEID){
     // don't allow editing of 'site course' using this from

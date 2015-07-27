@@ -99,6 +99,11 @@ M.totara_plan_competency_find = M.totara_plan_competency_find || {
                 var elements = $('.selected > div > span', this._container);
                 var selected_str = this._get_ids(elements).join(',');
 
+                if (!selected_str) {
+                    alert(M.util.get_string('error:nocompetency', 'totara_program'));
+                    return false;
+                }
+
                 // Add to url
                 url = url + selected_str;
 

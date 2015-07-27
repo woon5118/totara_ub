@@ -986,16 +986,14 @@ class prog_content {
             // Add the add content drop down
             if ($updateform) {
 
-                if ($iscertif) {
-                    // only allow coursesets not recurring or competencies
-                    $contentoptions = array(
-                        CONTENTTYPE_MULTICOURSE => get_string('setofcourses', 'totara_program'),
-                    );
-                } else {
-                    $contentoptions = array(
-                        CONTENTTYPE_MULTICOURSE => get_string('setofcourses', 'totara_program'),
-                        CONTENTTYPE_COMPETENCY => get_string('competency', 'totara_program')
-                    );
+                // Only allow coursesets (not recurring or competencies) for certifications.
+                $contentoptions = array(
+                    CONTENTTYPE_MULTICOURSE => get_string('setofcourses', 'totara_program'),
+                );
+                if (!$iscertif) {
+                    if (totara_feature_visible('competencies')) {
+                        $contentoptions[CONTENTTYPE_COMPETENCY] = get_string('competency', 'totara_program');
+                    }
                     if ($numcoursesets == 0) { // don't allow recurring course to be added if the program already has other content
                         $contentoptions[CONTENTTYPE_RECURRING] = get_string('recurringcourse', 'totara_program');
                     }

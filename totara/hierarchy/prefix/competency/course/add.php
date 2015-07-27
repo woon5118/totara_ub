@@ -54,6 +54,9 @@ if ($showhidden && !has_capability('totara/hierarchy:updatecompetencyframeworks'
     print_error('nopermviewhiddenframeworks', 'totara_hierarchy');
 }
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // No javascript parameters
 $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);

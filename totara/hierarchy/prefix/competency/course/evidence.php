@@ -41,6 +41,9 @@ $nojs = optional_param('nojs', false, PARAM_BOOL);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 $s = optional_param('s', '', PARAM_TEXT);
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // string of params needed in non-js url strings
 $nojsparams = 'nojs='.$nojs.'&amp;returnurl='.urlencode($returnurl).'&amp;s='.$s;
 

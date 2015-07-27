@@ -150,29 +150,33 @@ class organisation extends hierarchy {
         $sitecontext = context_system::instance();
         $can_edit = has_capability('totara/hierarchy:updateorganisation', $sitecontext);
         $comptype = optional_param('comptype', 'competencies', PARAM_TEXT);
-
-        // Spacing.
-        echo html_writer::empty_tag('br');
-
-        echo html_writer::start_tag('div', array('class' => "list-assignedcompetencies"));
-        echo $OUTPUT->heading(get_string('assignedcompetencies', 'totara_hierarchy'));
-
-        echo $this->print_comp_framework_picker($item->id, $frameworkid);
-
-        if ($comptype == 'competencies') {
-            // Display assigned competencies.
-            $items = $this->get_assigned_competencies($item, $frameworkid);
-            $addurl = new moodle_url('/totara/hierarchy/prefix/organisation/assigncompetency/find.php', array('assignto' => $item->id));
-            $displaytitle = 'assignedcompetencies';
-        } else if ($comptype == 'comptemplates') {
-            // Display assigned competencies.
-            $items = $this->get_assigned_competency_templates($item, $frameworkid);
-            $addurl = new moodle_url('/totara/hierarchy/prefix/organisation/assigncompetencytemplate/find.php', array('assignto' => $item->id));
-            $displaytitle = 'assignedcompetencytemplates';
-        }
         $renderer = $PAGE->get_renderer('totara_hierarchy');
-        echo $renderer->print_hierarchy_items($frameworkid, $this->prefix, $this->shortprefix, $displaytitle, $addurl, $item->id, $items, $can_edit);
-        echo html_writer::end_tag('div');
+
+        if (totara_feature_visible('competencies')) {
+            // Spacing.
+            echo html_writer::empty_tag('br');
+
+            echo html_writer::start_tag('div', array('class' => "list-assignedcompetencies"));
+            echo $OUTPUT->heading(get_string('assignedcompetencies', 'totara_hierarchy'));
+
+            echo $this->print_comp_framework_picker($item->id, $frameworkid);
+
+            if ($comptype == 'competencies') {
+                // Display assigned competencies.
+                $items = $this->get_assigned_competencies($item, $frameworkid);
+                $addurl = new moodle_url('/totara/hierarchy/prefix/organisation/assigncompetency/find.php', array('assignto' => $item->id));
+                $displaytitle = 'assignedcompetencies';
+            } else {
+                if ($comptype == 'comptemplates') {
+                    // Display assigned competencies.
+                    $items = $this->get_assigned_competency_templates($item, $frameworkid);
+                    $addurl = new moodle_url('/totara/hierarchy/prefix/organisation/assigncompetencytemplate/find.php', array('assignto' => $item->id));
+                    $displaytitle = 'assignedcompetencytemplates';
+                }
+            }
+            echo $renderer->print_hierarchy_items($frameworkid, $this->prefix, $this->shortprefix, $displaytitle, $addurl, $item->id, $items, $can_edit);
+            echo html_writer::end_tag('div');
+        }
 
         // Spacing.
         echo html_writer::empty_tag('br');

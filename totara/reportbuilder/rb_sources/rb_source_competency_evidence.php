@@ -61,6 +61,10 @@ class rb_source_competency_evidence extends rb_base_source {
         return true;
     }
 
+    public function is_ignored() {
+        return !totara_feature_visible('competencies');
+    }
+
     //
     //
     // Methods for defining contents of source

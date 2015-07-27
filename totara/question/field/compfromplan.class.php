@@ -37,9 +37,22 @@ class question_compfromplan extends reviewrating {
     }
 
     public function __construct($storage, $subjectid = 0, $answerid = 0) {
+
         $this->buttonlabel = get_string('choosecompfromplanreview', 'totara_question');
 
         parent::__construct($storage, $subjectid, $answerid);
+    }
+
+    /**
+     * Check that competencies and learning plans are enabled.
+     */
+    public static function check_enabled() {
+
+        if (totara_feature_visible('competencies')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

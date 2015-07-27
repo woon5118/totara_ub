@@ -346,6 +346,7 @@ class dp_competency_component extends dp_base_component {
             $PAGE->requires->string_for_js('cancel', 'moodle');
             $PAGE->requires->string_for_js('continue', 'moodle');
             $PAGE->requires->string_for_js('addcompetencys', 'totara_plan');
+            $PAGE->requires->string_for_js('error:nocompetency', 'totara_program');
 
             $jsmodule = array(
                 'name' => 'totara_plan_competency_find',

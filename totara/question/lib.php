@@ -107,7 +107,7 @@ class question_manager {
                 throw new exception('Custom field element file cannot have two dots \'..\' sequentially');
             }
             require_once($file);
-            if (class_exists($classname)) {
+            if (class_exists($classname) && $classname::check_enabled()) {
                 $info[$element] = $classname::get_info();
                 $info[$element]['classname'] = $classname;
             }
@@ -332,6 +332,14 @@ abstract class question_base {
 
     public function __clone() {
         $this->storage = clone($this->storage);
+    }
+
+    /**
+     * Function to check availability of question types.
+     * Override in specific questions, see compfromplan for an example.
+     */
+    public static function check_enabled() {
+        return true;
     }
 
     /**

@@ -164,6 +164,7 @@ $string['companygoal'] = 'Company Goal';
 $string['companygoaldetails'] = 'View Goal Frameworks';
 $string['companygoals'] = 'Company Goals';
 $string['competencies'] = 'Competencies';
+$string['competenciesdisabled'] = 'Competencies are not enabled on this site';
 $string['competenciesusedincourse'] = 'Competencies used in course';
 $string['competency'] = 'Competency';
 $string['competencyaddedframework'] = 'The competency framework "{$a}" has been added';
@@ -421,6 +422,13 @@ $string['editposition'] = 'Edit position';
 $string['editscalevalue'] = 'Edit scale value';
 $string['edittype'] = 'Edit type';
 $string['edittypelevel'] = 'Edit type';
+$string['enablecompetencies'] = 'Enable Competencies';
+$string['enablecompetencies_desc'] = 'This option will let you: Enable(show)/Hide/Disable Competency feature on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to competencies will be accessible.
+* If Hide is chosen, all links and tabs related to competencies will be hidden.
+* If Disable is chosen, competencies will disappear from any menu on the site and will not be accessible.
+';
 $string['enablegoals'] = 'Enable Goals';
 $string['enablepositions'] = 'Enable Positions';
 $string['enablepositions_desc'] = 'This option will let you: enable (show) or disable Positions features on this site.

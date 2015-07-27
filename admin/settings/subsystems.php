@@ -129,6 +129,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $setting->set_updatedcallback('totara_menu_reset_cache');
     $optionalsubsystems->add($setting);
 
+    $setting = new admin_setting_configselect('enablecompetencies',
+        new lang_string('enablecompetencies', 'totara_hierarchy'),
+        new lang_string('enablecompetencies_desc', 'totara_hierarchy'),
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $optionalsubsystems->add($setting);
+
     $setting = new admin_setting_configselect('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
         new lang_string('configenableappraisals', 'totara_appraisal'),

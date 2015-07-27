@@ -833,6 +833,6 @@ from
      * @return boolean If the report should be ignored of not.
      */
     public function is_ignored() {
-        return !totara_feature_visible('recordoflearning');
+        return (!totara_feature_visible('recordoflearning') or !totara_feature_visible('competencies'));
     }
 }

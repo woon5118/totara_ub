@@ -43,6 +43,9 @@ $frameworkid = optional_param('framework', 0, PARAM_INT);
 // Delete confirmation hash
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 require_capability('totara/hierarchy:updateposition', $sitecontext);
 
 // Setup page and check permissions

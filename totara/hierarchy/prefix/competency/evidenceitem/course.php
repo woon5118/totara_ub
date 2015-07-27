@@ -43,6 +43,9 @@ $s = optional_param('s', '', PARAM_TEXT);
 // string of params needed in non-js url strings
 $urlparams = 'nojs='.$nojs.'&amp;returnurl='.urlencode($returnurl).'&amp;s='.$s;
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Check perms
 admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/item/edit.php');
 

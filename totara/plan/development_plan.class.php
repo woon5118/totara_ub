@@ -241,6 +241,10 @@ class development_plan {
         if (totara_feature_disabled('programs')) {
             $active_components = totara_search_for_value($active_components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
         }
+        if (totara_feature_disabled('competencies')) {
+            $active_components = totara_search_for_value($active_components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
+        }
+
         foreach ($active_components as $component) {
             $componentname = "component_{$component->component}";
             $components[$component->component] = $this->$componentname;
@@ -416,6 +420,10 @@ class development_plan {
 
         if (!totara_feature_visible('programs')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
+        }
+
+        if (!totara_feature_visible('competencies')) {
+            $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
         }
 
         foreach ($components as $c) {
@@ -1755,6 +1763,10 @@ class development_plan {
 
         if (!totara_feature_visible('programs')) {
             $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'program');
+        }
+
+        if (!totara_feature_visible('competencies')) {
+            $components = totara_search_for_value($components, 'component', TOTARA_SEARCH_OP_NOT_EQUAL, 'competency');
         }
 
         if ($components) {

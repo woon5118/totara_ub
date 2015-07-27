@@ -25,10 +25,16 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
+require_login();
+
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
 
-require_login();
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
 
 ///
 /// Setup / loading data

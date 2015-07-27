@@ -56,17 +56,23 @@
 
 
     // Competencies.
-    $ADMIN->add('hierarchies', new admin_category('competencies', get_string('competencies', 'totara_hierarchy')));
+    $ADMIN->add('hierarchies', new admin_category('competencies', get_string('competencies', 'totara_hierarchy'),
+        totara_feature_disabled('competencies')
+    ));
 
     $ADMIN->add('competencies', new admin_externalpage('competencymanage', get_string('competencymanage', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency",
-            array('totara/hierarchy:createcompetencyframeworks', 'totara/hierarchy:updatecompetencyframeworks', 'totara/hierarchy:deletecompetencyframeworks',
-                  'totara/hierarchy:createcompetency', 'totara/hierarchy:updatecompetency', 'totara/hierarchy:deletecompetency',
-                  'totara/hierarchy:createcompetencyscale', 'totara/hierarchy:updatecompetencyscale', 'totara/hierarchy:deletecompetencyscale')));
+        "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency",
+        array('totara/hierarchy:createcompetencyframeworks', 'totara/hierarchy:updatecompetencyframeworks', 'totara/hierarchy:deletecompetencyframeworks',
+              'totara/hierarchy:createcompetency', 'totara/hierarchy:updatecompetency', 'totara/hierarchy:deletecompetency',
+              'totara/hierarchy:createcompetencyscale', 'totara/hierarchy:updatecompetencyscale', 'totara/hierarchy:deletecompetencyscale'),
+        totara_feature_disabled('competencies')
+    ));
 
     $ADMIN->add('competencies', new admin_externalpage('competencytypemanage', get_string('managecompetencytypes', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=competency",
-            array('totara/hierarchy:createcompetencytype', 'totara/hierarchy:updatecompetencytype', 'totara/hierarchy:deletecompetencytype')));
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=competency",
+        array('totara/hierarchy:createcompetencytype', 'totara/hierarchy:updatecompetencytype', 'totara/hierarchy:deletecompetencytype'),
+        totara_feature_disabled('competencies')
+    ));
 
 //    $ADMIN->add('competencies', new admin_externalpage('competencyglobalsettings', get_string('globalsettings', 'competency'), "$CFG->wwwroot/hierarchy/prefix/competency/adminsettings.php",
 //            array('totara/hierarchy:updatecompetency')));

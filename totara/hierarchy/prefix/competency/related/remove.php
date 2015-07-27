@@ -62,6 +62,9 @@ if (!$rcompetency = $DB->get_record('comp', array('id' => $related))) {
     print_error('incorrectcompetencyid', 'totara_hierarchy');
 }
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Check capabilities.
 require_capability('totara/hierarchy:update'.$hierarchy->prefix, $sitecontext);
 

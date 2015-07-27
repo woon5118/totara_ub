@@ -955,4 +955,15 @@ class competency extends hierarchy {
         return $updateditem;
     }
 
+    /**
+     * Check if competency feature is disabled
+     *
+     * @return Nothing but print an error if competencies are not enabled
+     */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('competencies')) {
+            print_error('competenciesdisabled', 'totara_hierarchy');
+        }
+    }
+
 }  // class

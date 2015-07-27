@@ -28,6 +28,9 @@ require_once($CFG->dirroot . '/totara/plan/lib.php');
 
 require_login();
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 $userid = optional_param('userid', null, PARAM_INT);
 $compid = optional_param('competencyid', null, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);

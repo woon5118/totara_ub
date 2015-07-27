@@ -25,6 +25,7 @@
 require_once dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php';
 require_once $CFG->libdir.'/adminlib.php';
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once 'edit_form.php';
 
 
@@ -39,6 +40,9 @@ $prefix = required_param('prefix', PARAM_ALPHA);
 
 // Cache user capabilities.
 $sitecontext = context_system::instance();
+
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 // Set up the page.
 admin_externalpage_setup($prefix.'manage');

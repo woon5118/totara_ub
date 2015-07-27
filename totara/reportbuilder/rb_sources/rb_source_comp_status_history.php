@@ -60,6 +60,10 @@ class rb_source_comp_status_history extends rb_base_source {
         return true;
     }
 
+    public function is_ignored() {
+        return !totara_feature_visible('competencies');
+    }
+
     protected function define_joinlist() {
         $joinlist = array(
             new rb_join(

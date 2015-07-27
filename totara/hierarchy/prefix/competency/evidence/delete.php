@@ -39,6 +39,9 @@ if ($s != sesskey()) {
     $returnurl = $CFG->wwwroot;
 }
 
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
+
 // Check perms
 $sitecontext = context_system::instance();
 require_capability('totara/hierarchy:updatecompetency', $sitecontext);

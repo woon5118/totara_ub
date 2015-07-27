@@ -26,11 +26,15 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/plan/components/evidence/evidence.class.php');
+require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
+
+require_login();
 
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
 
-require_login();
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 $id = required_param('id', PARAM_INT); // plan id
 $caid = required_param('itemid', PARAM_INT); // competency assignment id

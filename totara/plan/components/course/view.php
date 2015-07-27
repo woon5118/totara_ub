@@ -67,7 +67,7 @@ $currenturl = new moodle_url('/totara/plan/components/course/view.php', array('i
 
 $evidence = new dp_evidence_relation($id, $componentname, $caid);
 
-$competenciesenabled = $plan->get_component('competency')->get_setting('enabled');
+$competenciesenabled = totara_feature_visible('competencies') && $plan->get_component('competency')->get_setting('enabled');
 $competencyname = get_string('competencyplural', 'totara_plan');
 $objectivesenabled = $plan->get_component('objective')->get_setting('enabled');
 $objectivename = get_string('objectiveplural', 'totara_plan');

@@ -29,6 +29,7 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/plan/lib.php');
 
 require_login();
@@ -36,6 +37,9 @@ require_login();
 if (totara_feature_disabled('recordoflearning')) {
     print_error('error:recordoflearningdisabled', 'totara_plan');
 }
+
+// Check if Competencies are enabled.
+competency::check_feature_enabled();
 
 global $USER;
 

@@ -50,8 +50,13 @@ $treeonly = optional_param('treeonly', false, PARAM_BOOL);
 ///
 
 require_login();
-
 $PAGE->set_context(context_system::instance());
+
+// Check if Competencies are enabled.
+if (totara_feature_disabled('competencies')) {
+    echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
+    die();
+}
 
 ///
 /// Display page
