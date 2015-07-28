@@ -108,3 +108,31 @@ div.mod-indent form.togglecompletion input[type="image"] {
 .f2f dt {
     word-wrap: break-word;
 }
+
+.path-mod-facetoface .mform .fcontainer .f2f-roomselect {
+    float: none;
+}
+
+@media screen and (min-width: 1200px) {
+    .dir-ltr .mform .fcontainer .f2f-roomselect {
+        margin-left: 26%;
+    }
+
+    .dir-rtl .mform .fcontainer .f2f-roomselect {
+        margin-right: 26%;
+    }
+}
+@media screen and (min-width: 640px) {
+    .f2f-roomselect div {
+        width: 24.4%;
+        display: inline-block;
+    }
+    .path-mod-facetoface .mform .f2f-roomselect .fitem .fitemtitle {
+        width: 100%;
+    }
+    .path-mod-facetoface .mform .f2f-roomselect .fitem .felement {
+        width: auto;
+        max-width: 100%;
+        float: none;
+    }
+}

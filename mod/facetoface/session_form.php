@@ -178,31 +178,20 @@ class mod_facetoface_session_form extends moodleform {
         $mform->addElement('checkbox', 'customroom', '', get_string('otherroom', 'facetoface'));
         $mform->setType('customroom', PARAM_INT);
 
-        $mform->addElement('html', '<div class="fitem"><div class="fitemtitle"></div><table><tr><td>');
-        $mform->addElement('static', '', '', get_string('roomname', 'facetoface'));
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('static', '', '', get_string('building', 'facetoface'));
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('static', '', '', get_string('address', 'facetoface'));
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('static', '', '', get_string('capacity', 'facetoface'));
-        $mform->addElement('html', '</td></tr><td>');
-        $mform->addElement('text', 'croomname', array(), array('class' => 'cellwidth', 'maxlength' => '90'));
+        $mform->addElement('html', '<div class="fitem f2f-roomselect felement">');
+        $mform->addElement('text', 'croomname', get_string('roomname', 'facetoface'), array('class' => 'cellwidth', 'maxlength' => '90'));
         $mform->setType('croomname', PARAM_TEXT);
         $mform->disabledIf('croomname', 'customroom', 'notchecked');
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('text', 'croombuilding', array(), array('class' => 'cellwidth', 'maxlength' => '90'));
+        $mform->addElement('text', 'croombuilding', get_string('building', 'facetoface'), array('class' => 'cellwidth', 'maxlength' => '90'));
         $mform->setType('croombuilding', PARAM_TEXT);
         $mform->disabledIf('croombuilding', 'customroom', 'notchecked');
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('text', 'croomaddress', array(), array('class' => 'cellwidth', 'maxlength' => '230'));
+        $mform->addElement('text', 'croomaddress', get_string('address', 'facetoface'), array('class' => 'cellwidth', 'maxlength' => '230'));
         $mform->setType('croomaddress', PARAM_TEXT);
         $mform->disabledIf('croomaddress', 'customroom', 'notchecked');
-        $mform->addElement('html', '</td><td>');
-        $mform->addElement('text', 'croomcapacity', array(), array('class' => 'cellwidth', 'maxlength' => '10'));
+        $mform->addElement('text', 'croomcapacity', get_string('capacity', 'facetoface'), array('class' => 'cellwidth', 'maxlength' => '10'));
         $mform->disabledIf('croomcapacity', 'customroom', 'notchecked');
         $mform->setType('croomcapacity', PARAM_INT);
-        $mform->addElement('html', '</td><tr></table></div>');
+        $mform->addElement('html', '</div>');
 
         $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'), 'size="5"');
         $mform->addRule('capacity', null, 'required', null, 'client');
