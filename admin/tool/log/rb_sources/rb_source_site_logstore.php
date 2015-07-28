@@ -110,7 +110,7 @@ class rb_source_site_logstore extends rb_base_source {
                 'logstore_standard_log',
                 'targetaction',
                 get_string('targetaction', 'rb_source_site_logstore'),
-                $DB->sql_fullname('base.target', 'base.action'),
+                $DB->sql_concat('base.target', "' '", 'base.action'),
                 array('dbdatatype' => 'char',
                       'outputformat' => 'text')
             ),
