@@ -1636,6 +1636,142 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    function test_facetoface_message_substitutions(){
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course1->id, 'multiplesessions' => 1));
+
+        //create multiple session dates. Out of order to test that placeholders do pull earliest date and not first date entered.
+        $sessiondate1 = new stdClass();
+        $sessiondate1->timestart = time() + (DAYSECS * 4) + (HOURSECS);
+        $sessiondate1->timefinish = time() + (DAYSECS * 5) + (HOURSECS * 4);
+        $sessiondate1->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate2 = new stdClass();
+        $sessiondate2->timestart = time() + (HOURSECS);
+        $sessiondate2->timefinish = time() + (HOURSECS * 2);
+        $sessiondate2->sessiontimezone = 'Pacific/Auckland';
+        $sessiondate3 = new stdClass();
+        $sessiondate3->timestart = time() + (DAYSECS) + (HOURSECS * 3);
+        $sessiondate3->timefinish = time() + (DAYSECS) + (HOURSECS * 6);
+        $sessiondate3->sessiontimezone = 'Pacific/Auckland';
+
+        $sessiondata = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 3,
+            'allowoverbook' => 1,
+            'sessiondates' => array($sessiondate1, $sessiondate2, $sessiondate3),
+            'datetimeknown' => '1',
+            // arbitrary duration as this is a setting that is not automatically adjusted by generator when adding session dates
+            'duration' => 97200
+        );
+        $sessionid = $facetofacegenerator->add_session($sessiondata);
+        $session = facetoface_get_session($sessionid);
+
+        // set up a notification that uses all current placeholders
+        $fields = array('coursename', 'facetofacename', 'firstname', 'lastname', 'cost', 'alldates', 'sessiondate',
+            'startdate', 'finishdate', 'starttime', 'finishtime', 'lateststartdate', 'latestfinishdate', 'lateststarttime',
+            'latestfinishtime', 'duration');
+        $noticebody = '';
+        foreach ($fields as $field) {
+            // adding name of field in front of placeholder so that tests for starttime etc. don't simply pick
+            // up those times within alldates.
+            $noticebody .= $field.' '.get_string('placeholder:'.$field, 'facetoface') . ' ';
+        }
+
+        $notification = new facetoface_notification();
+        $notification->courseid = $course1->id;
+        $notification->facetofaceid = $facetoface->id;
+        $notification->ccmanager = 0;
+        $notification->status = 1;
+        $notification->title = 'Confirmation';
+        $notification->body = $noticebody;
+        $notification->managerprefix = '';
+        $notification->type = MDL_F2F_NOTIFICATION_MANUAL;
+        $notification->save();
+
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        facetoface_user_signup($session, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true);
+
+        $notification->send_to_users($sessionid);
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Plain text message has been formatted to include new lines at every ~75 characters - removing these as they complicate testing.
+        $fullmessage = str_replace("\n", " ", end($messages)->fullmessage);
+        $fullmessagehtml = end($messages)->fullmessagehtml;
+
+        // Assertions for values that are already strings
+        $this->assertContains('coursename '.$course1->fullname, $fullmessage);
+        $this->assertContains('coursename '.$course1->fullname, $fullmessagehtml);
+        $this->assertContains('facetofacename '.$facetoface->name, $fullmessage);
+        $this->assertContains('facetofacename '.$facetoface->name, $fullmessagehtml);
+        $this->assertContains('firstname '.$user1->firstname, $fullmessage);
+        $this->assertContains('firstname '.$user1->firstname, $fullmessagehtml);
+        $this->assertContains('lastname '.$user1->lastname, $fullmessage);
+        $this->assertContains('lastname '.$user1->lastname, $fullmessagehtml);
+        $this->assertContains('cost '.$session->normalcost, $fullmessage);
+        $this->assertContains('cost '.$session->normalcost, $fullmessagehtml);
+
+        date_default_timezone_set('Pacific/Auckland');
+
+        $alldates = '';
+        $alldateshtml = '';
+        foreach($session->sessiondates as $sessiondate) {
+            $alldates_segment = ltrim(strftime("%e %B %Y", $sessiondate->timestart));
+            if (strftime("%e %B %Y", $sessiondate->timestart) !== strftime("%e %B %Y", $sessiondate->timefinish)){
+                $alldates_segment .= ' - '.ltrim(strftime("%e %B %Y", $sessiondate->timefinish));
+            }
+            $alldates_segment .= ', '.ltrim(strftime("%l:%M %p", $sessiondate->timestart)).' - ';
+            $alldates_segment .= ltrim(strftime("%l:%M %p", $sessiondate->timefinish)).' Pacific/Auckland';
+            $alldates .= $alldates_segment.' ';
+            $alldateshtml .= $alldates_segment;
+            if ($sessiondate !== end($session->sessiondates)){
+                $alldateshtml .= "<br />\n";
+            }
+        }
+        $this->assertContains('alldates '.$alldates, $fullmessage);
+        $this->assertContains('alldates '.$alldateshtml, $fullmessagehtml);
+
+        // sessiondate2 is the earliest of the three session dates.
+        $firstsessiondate = ltrim(strftime("%e %B %Y", $sessiondate2->timestart));
+        if (strftime("%e %B %Y", $sessiondate2->timestart) !== strftime("%e %B %Y", $sessiondate2->timefinish)){
+            $firstsessiondate .= ' - '.ltrim(strftime("%e %B %Y", $sessiondate2->timestart));
+        }
+        $this->assertContains('sessiondate '.$firstsessiondate, $fullmessage);
+        $this->assertContains('sessiondate '.$firstsessiondate, $fullmessagehtml);
+
+        $this->assertContains('startdate '.ltrim(strftime("%e %B %Y", $sessiondate2->timestart)), $fullmessage);
+        $this->assertContains('startdate '.ltrim(strftime("%e %B %Y", $sessiondate2->timestart)), $fullmessagehtml);
+        $this->assertContains('finishdate '.ltrim(strftime("%e %B %Y", $sessiondate2->timefinish)), $fullmessage);
+        $this->assertContains('finishdate '.ltrim(strftime("%e %B %Y", $sessiondate2->timefinish)), $fullmessagehtml);
+        $this->assertContains('starttime '.ltrim(strftime("%l:%M %p", $sessiondate2->timestart)), $fullmessage);
+        $this->assertContains('starttime '.ltrim(strftime("%l:%M %p", $sessiondate2->timestart)), $fullmessagehtml);
+        $this->assertContains('finishtime '.ltrim(strftime("%l:%M %p", $sessiondate2->timefinish)), $fullmessage);
+        $this->assertContains('finishtime '.ltrim(strftime("%l:%M %p", $sessiondate2->timefinish)), $fullmessagehtml);
+
+        // sessiondate1 is the latest of the three session dates.
+        $this->assertContains('lateststartdate '.ltrim(strftime("%e %B %Y", $sessiondate1->timestart)), $fullmessage);
+        $this->assertContains('lateststartdate '.ltrim(strftime("%e %B %Y", $sessiondate1->timestart)), $fullmessagehtml);
+        $this->assertContains('latestfinishdate '.ltrim(strftime("%e %B %Y", $sessiondate1->timefinish)), $fullmessage);
+        $this->assertContains('latestfinishdate '.ltrim(strftime("%e %B %Y", $sessiondate1->timefinish)), $fullmessagehtml);
+        $this->assertContains('lateststarttime '.ltrim(strftime("%l:%M %p", $sessiondate1->timestart)), $fullmessage);
+        $this->assertContains('lateststarttime '.ltrim(strftime("%l:%M %p", $sessiondate1->timestart)), $fullmessagehtml);
+        $this->assertContains('latestfinishtime '.ltrim(strftime("%l:%M %p", $sessiondate1->timefinish)), $fullmessage);
+        $this->assertContains('latestfinishtime '.ltrim(strftime("%l:%M %p", $sessiondate1->timefinish)), $fullmessagehtml);
+
+        // As per duration setting in $sessiondata, durations is a setting that is not currently automatically adjusted
+        // by generator when known session dates are added, so duration is not expected to equal difference between starttime
+        // and finishtime in this case.
+        $this->assertContains('duration 1 day 3 hours', $fullmessage);
+        $this->assertContains('duration 1 day 3 hours', $fullmessagehtml);
+    }
+
     function test_facetoface_get_manageremailformat() {
         //TODO how to run negative test?
         // Define test variables.

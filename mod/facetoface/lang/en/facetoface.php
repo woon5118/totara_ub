@@ -107,6 +107,10 @@ Available Face to Face placholders:
 * [session:location] - Location of the session
 * [session:venue] - Venue the session is being held in
 * [session:room] - Room the session is being held in
+* [lateststarttime] - Start time of the session. If there are multiple session dates it will use the last one.
+* [lateststartdate] - Date at the start of the session. If there are multiple session dates it will use the last one.
+* [latestfinishtime] - Finish time of the session. If there are multiple session dates it will use the last one.
+* [latestfinishdate] - Date at the end of the session. If there are multiple session dates it will use the last one.
 
 There are also placeholders available for session custom fields and they follow the format [session:shortname]. Where "shortname" is the shortname of the Face to face custom field.
 
@@ -680,6 +684,10 @@ $string['placeholder:attendeeslink'] = '[attendeeslink]';
 $string['placeholder:location'] = '[session:location]';
 $string['placeholder:venue'] = '[session:venue]';
 $string['placeholder:room'] = '[session:room]';
+$string['placeholder:lateststarttime'] = '[lateststarttime]';
+$string['placeholder:lateststartdate'] = '[lateststartdate]';
+$string['placeholder:latestfinishtime'] = '[latestfinishtime]';
+$string['placeholder:latestfinishdate'] = '[latestfinishdate]';
 $string['pluginadministration'] = 'Facetoface administration';
 $string['pluginname'] = 'Face-to-face';
 $string['points'] = 'Points';
