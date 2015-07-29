@@ -441,8 +441,8 @@ class program {
                     // Make sure coursesetid is zero so we are checking completion on the program.
                     $params = array ('programid' => $this->id, 'userid' => $user->id, 'coursesetid' => 0);
                     $progcompl = $DB->get_record('prog_completion', $params);
-                    $timedue = $progcompl ? $progcompl->timedue : false;
-                    $timedue = $this->make_timedue($user->id, $assign, $timedue);
+                    $originaltimedue = $progcompl ? $progcompl->timedue : false;
+                    $timedue = $this->make_timedue($user->id, $assign, $originaltimedue);
 
                     $user_assign_data = null;
 
@@ -481,18 +481,13 @@ class program {
                         // Create user assignment object.
                         $current_assignment = new user_assignment($user->id, $assign->id, $this->id);
 
-                        // Skip resolved and dismissed exceptions to allow users to override group duedates.
-                        $skipstatus = array(PROGRAM_EXCEPTION_RESOLVED, PROGRAM_EXCEPTION_DISMISSED);
+                        // Make sure that the exceptionstatus property is present (protection against a previous bug).
                         if (!isset($user_assign_data['exceptionstatus'])) {
                             throw new coding_exception('The property "exceptionstatus" is missing.');
                         }
 
-                        if (in_array($user_assign_data['exceptionstatus'], $skipstatus)) {
-                            continue;
-                        }
-
-                        if (!empty($current_assignment->completion) && $timedue != $current_assignment->completion->timedue) {
-                            // The timedue has changed, we'll need to update it and check for exceptions.
+                        if (!empty($current_assignment->completion) && $timedue > $current_assignment->completion->timedue) {
+                            // The timedue has increased, we'll need to update it and check for exceptions.
 
                             if ($assign->completionevent == COMPLETION_EVENT_FIRST_LOGIN && $timedue === false) {
                                 // This means that the user hasn't logged in yet.
@@ -509,17 +504,28 @@ class program {
                                 continue;
                             }
 
-                            $exceptions = $this->update_exceptions($user->id, $assign, $timedue);
-                            // Update user assignment including checking for exceptions.
+                            // If it currently has no timedue then we need to check.
+                            // If there was a previously unresolved exception then we need to check.
+                            $exceptionstatus = $user_assign_data['exceptionstatus'];
+                            if ($originaltimedue <= 0 ||
+                                in_array($exceptionstatus, array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED))) {
+                                if ($this->update_exceptions($user->id, $assign, $timedue)) {
+                                    $exceptionstatus = PROGRAM_EXCEPTION_RAISED;
+                                } else {
+                                    $exceptionstatus = PROGRAM_EXCEPTION_NONE;
+                                }
+                            }
+
+                            // Update user assignment and store exception status.
                             if ($current_assignment->update($timedue)) {
                                 $user_assign_todb = new stdClass();
                                 $user_assign_todb->id = $user_assign_data['uaid'];
-                                $user_assign_todb->exceptionstatus = $exceptions ? PROGRAM_EXCEPTION_RAISED : PROGRAM_EXCEPTION_NONE;
+                                $user_assign_todb->exceptionstatus = $exceptionstatus;
 
                                 $DB->update_record('prog_user_assignment', $user_assign_todb);
                             }
 
-                            if (empty($exceptions) && $sendmessage) {
+                            if ($exceptionstatus == PROGRAM_EXCEPTION_NONE && $sendmessage) {
                                 // Add the user to the message queue so they'll receive an assignment message.
                                 $eventdata = new stdClass();
                                 $eventdata->programid = $this->id;
