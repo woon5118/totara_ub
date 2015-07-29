@@ -171,6 +171,8 @@ $string['dbpass'] = 'Database password';
 $string['dbhost'] = 'Database hostname';
 $string['dbport'] = 'Database port';
 $string['dbtable'] = 'Database table';
+$string['dbdateformat'] = 'Date format';
+$string['dbdateformat_help'] = 'Used to specify the date format for the database table columns that contain dates.';
 
 $string['databaseconnectfail'] = 'Failed to connect to database';
 $string['cannotconnectdbsettings'] = 'Cannot connect to database, please check settings';

@@ -163,5 +163,16 @@ function xmldb_tool_totara_sync_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013101500, 'tool', 'totara_sync');
     }
 
+    if ($oldversion < 2015080500) {
+        if (get_config('totara_sync_source_user_database', 'database_dateformat') == false) {
+            // Set external database source settings, new date format setting from
+            // value of Location settings, CSV import date format.
+            $database_dateformat = get_config('', 'csvdateformat');
+            set_config('database_dateformat', $database_dateformat, 'totara_sync_source_user_database');
+        }
+
+        upgrade_plugin_savepoint(true, 2015080500, 'tool', 'totara_sync');
+    }
+
     return true;
 }

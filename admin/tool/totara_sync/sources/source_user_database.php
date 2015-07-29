@@ -98,6 +98,12 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $mform->addRule('database_dbtable', get_string('err_required', 'form'), 'required');
         $mform->setType('database_dbtable', PARAM_ALPHANUMEXT);
 
+        // Date format.
+        $dateformats = $this->get_dateformats();
+        $mform->addElement('select', 'database_dateformat', get_string('dbdateformat', 'tool_totara_sync'), $dateformats);
+        $mform->setType('database_dateformat', PARAM_TEXT);
+        $mform->addHelpButton('database_dateformat', 'dbdateformat', 'tool_totara_sync');
+
         $mform->addElement('button', 'database_dbtest', get_string('dbtestconnection', 'tool_totara_sync'));
 
         // Javascript include
@@ -131,6 +137,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         $this->set_config('database_dbpass', $data->{'database_dbpass'});
         $this->set_config('database_dbport', $data->{'database_dbport'});
         $this->set_config('database_dbtable', $data->{'database_dbtable'});
+        $this->set_config('database_dateformat', $data->{'database_dateformat'});
 
         parent::config_save($data);
     }
@@ -235,6 +242,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
 
             // Optional date fields.
             $datefields = array('posstartdate', 'posenddate');
+            $database_dateformat = get_config('totara_sync_source_user_database', 'database_dateformat');
 
             foreach ($datefields as $datefield) {
                 if (isset($extdbrow[$datefield])) {
@@ -242,7 +250,7 @@ class totara_sync_source_user_database extends totara_sync_source_user {
                         $dbrow[$datefield] = $now;
                     } else {
                         // Try to parse the contents - if parse fails assume a unix timestamp and leave unchanged.
-                        $parsed_date = totara_date_parse_from_format($csvdateformat, trim($extdbrow[$datefield]), true);
+                        $parsed_date = totara_date_parse_from_format($database_dateformat, trim($extdbrow[$datefield]), true);
                         if ($parsed_date) {
                             $dbrow[$datefield] = $parsed_date;
                         }
@@ -317,5 +325,32 @@ class totara_sync_source_user_database extends totara_sync_source_user {
         }
 
         return true;
+    }
+
+    /**
+     * Returns a list of possible date formats
+     * Based on the list at http://en.wikipedia.org/wiki/Date_format_by_country
+     *
+     * @return array
+     */
+    public function get_dateformats() {
+        $separators = array('-', '/', '.', ' ');
+        $endians = array('yyyy~mm~dd', 'yy~mm~dd', 'dd~mm~yyyy', 'dd~mm~yy', 'mm~dd~yyyy', 'mm~dd~yy');
+        $formats = array();
+
+        // Standard datetime format.
+        $formats['Y-m-d H:i:s'] = 'yyyy-mm-dd hh:mm:ss';
+
+        foreach ($endians as $endian) {
+            foreach ($separators as $separator) {
+                $display = str_replace( '~', $separator, $endian);
+                $format = str_replace('yyyy', 'Y', $display);
+                $format = str_replace('yy', 'y', $format); // Don't think 2 digit years should be allowed.
+                $format = str_replace('mm', 'm', $format);
+                $format = str_replace('dd', 'd', $format);
+                $formats[$format] = $display;
+            }
+        }
+        return $formats;
     }
 }
