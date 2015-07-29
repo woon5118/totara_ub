@@ -446,6 +446,7 @@ abstract class Graph {
         $entry = $this->DrawLegendEntry($key, $x, $y, $w, $entry_height);
         if(!empty($entry)) {
           $text['y'] = $y + $text_y_offset;
+          $value = htmlspecialchars($value, ENT_COMPAT, $this->encoding);
           if(isset($text_columns[$column]))
             $text_columns[$column] .= $this->Element('text', $text, NULL, $value);
           else

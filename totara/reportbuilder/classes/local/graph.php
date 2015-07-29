@@ -160,7 +160,7 @@ class graph {
             $this->series[] = $this->processedcount;
             foreach ($recorddata as $k => $val) {
                 if (isset($this->legendcolumn) and $k === $this->legendcolumn) {
-                    $this->svggraphsettings['legend_entries'][] = htmlspecialchars((string)$val, ENT_COMPAT, 'UTF-8', false);
+                    $this->svggraphsettings['legend_entries'][] = (string)$val;
                     continue;
                 }
                 if (!isset($this->values[$k])) {
