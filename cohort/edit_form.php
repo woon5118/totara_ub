@@ -64,10 +64,10 @@ class cohort_edit_form extends moodleform {
         $mform->setType('description_editor', PARAM_RAW);
 
         $mform->addElement('date_selector', 'startdate', get_string('startdate', 'totara_cohort'), array('optional' => true));
-        $mform->addHelpButton('startdate', 'startdate', 'totara_cohort');
+        $mform->addHelpButton('startdate', 'startdatelimited', 'totara_cohort');
 
         $mform->addElement('date_selector', 'enddate', get_string('enddate', 'totara_cohort'), array('optional' => true));
-        $mform->addHelpButton('enddate', 'enddate', 'totara_cohort');
+        $mform->addHelpButton('enddate', 'enddatelimited', 'totara_cohort');
 
         // alert options
         $alertoptions = get_config('cohort', 'alertoptions');

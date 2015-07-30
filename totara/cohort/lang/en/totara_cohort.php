@@ -142,6 +142,8 @@ $string['cohortmembers'] = 'Audience members';
 $string['cohortmembersselect'] = 'To view audience members, first <a href="{$a}">select an audience</a> then click the "View Members" tab.';
 $string['cohortmsgalreadyended'] = 'This audience is inactive, because its <strong>end date</strong> is in the past: <strong>{$a}</strong>. No users will be enrolled in any learning items while this audience is inactive, and any existing enrolments due to this audience will be unenrolled.';
 $string['cohortmsgnotyetstarted'] = 'This audience is inactive, because its <strong>start date</strong> is in the future: <strong>{$a}</strong>. No users will be enrolled in any learning items while this audience is inactive, and any existing enrolments due to this audience will be unenrolled.';
+$string['cohortmsgalreadyendedlimited'] = 'This audience is inactive, because its <strong>end date</strong> is in the past: <strong>{$a}</strong>. This means that dashboards granted access by this audience will be unavailable, and if this is a dynamic audience, it will not be automatically updated.';
+$string['cohortmsgnotyetstartedlimited'] = 'This audience is inactive, because its <strong>start date</strong> is in the future: <strong>{$a}</strong>. This means that dashboards granted access by this audience will be unavailable, and if this is a dynamic audience, it will not be automatically updated.';
 $string['cohortname'] = 'Audience name';
 $string['cohortoperatorandlabel'] = 'AND (members are in every rule set)';
 $string['cohortoperatorlabel'] = 'Membership setting between every rule set';
@@ -235,7 +237,14 @@ $string['editrule'] = 'Edit rule';
 $string['editrules'] = 'Rule sets';
 $string['enableaudiencevisibility'] = 'Enable audience-based visibility';
 $string['enddate'] = 'End date';
-$string['enddate_help'] = 'If an end date is provided, the audience will be treated as empty after the end date.';
+$string['enddate_help'] = 'If an end date is provided, the audience will be treated as empty after the end date.'; // Unused.
+$string['enddatelimited'] = 'End date';
+$string['enddatelimited_help'] = 'If an end date is provided:
+
+* access to dashboards granted by this audience will not be available after this date
+* if this is a dynamic audience, audience members will not be automatically updated after this date
+
+';
 $string['endswith'] = 'ends with';
 $string['enrolledcohorts'] = 'Enrolled audiences';
 $string['enrolledlearning'] = 'Enrolled learning';
@@ -479,7 +488,14 @@ $string['separatemultiplebycommas'] = 'Separate multiple values by commas';
 $string['set'] = 'Set';
 $string['setcompletion'] = 'Set completion';
 $string['startdate'] = 'Start date';
-$string['startdate_help'] = 'If a start date is provided, the audience will be treated as empty until the start date.';
+$string['startdate_help'] = 'If a start date is provided, the audience will be treated as empty until the start date.'; // Unused.
+$string['startdatelimited'] = 'Start date';
+$string['startdatelimited_help'] = 'If a start date is provided:
+
+* access to dashboards granted by this audience will not be available until this date
+* if this is a dynamic audience, audience members will not be automatically updated until this date
+
+';
 $string['startswith'] = 'starts with';
 $string['status'] = 'Status';
 $string['successfullyaddedcohort'] = 'Successfully added audience';

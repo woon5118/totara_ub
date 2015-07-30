@@ -603,10 +603,12 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
         print html_writer::tag('div', '', array('class' => 'plan_box', 'style' => 'display:none;'));
     } else {
         if ($cohort->startdate && $cohort->startdate > time()) {
-            $message = get_string('cohortmsgnotyetstarted', 'totara_cohort', userdate($cohort->startdate, get_string('strfdateshortmonth', 'langconfig')));
+            $message = get_string('cohortmsgnotyetstartedlimited', 'totara_cohort',
+                userdate($cohort->startdate, get_string('strfdateshortmonth', 'langconfig')));
         }
         if ($cohort->enddate && $cohort->enddate < time()) {
-            $message = get_string('cohortmsgalreadyended', 'totara_cohort', userdate($cohort->enddate, get_string('strfdateshortmonth', 'langconfig')));
+            $message = get_string('cohortmsgalreadyendedlimited', 'totara_cohort',
+                userdate($cohort->enddate, get_string('strfdateshortmonth', 'langconfig')));
         }
         print html_writer::tag('div', html_writer::tag('p', $message), array('class' => 'plan_box notifymessage clearfix'));
     }
