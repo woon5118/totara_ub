@@ -28,6 +28,7 @@ require_once($CFG->libdir . '/ddllib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/totara/program/program.class.php');
 require_once($CFG->dirroot . '/totara/certification/lib.php'); // For the constants
+require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
 /**
  * Can logged in user view user's required learning
