@@ -31,7 +31,10 @@ require_once($CFG->dirroot . '/repository/lib.php');
 require_login();
 
 $context = context_system::instance();
-require_capability('moodle/site:config', $context);
+
+if (!has_any_capability(array('moodle/site:config', 'totara/core:modconfig'), $context)){
+    throw new required_capability_exception($context, 'totara/core:modconfig', 'nopermissions', '');
+}
 
 $struploadimage = get_string('uploadimage', 'certificate');
 
