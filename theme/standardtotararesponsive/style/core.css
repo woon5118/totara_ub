@@ -807,6 +807,10 @@ input#id_submitbutton2:hover {
         text-align: right;
     }
 }
+
+.mform .fitem.femptylabel fieldset .felement {
+    margin-top: 0;
+}
 .dir-rtl .mform .fitem div.fitemtitle {
     text-align: right;
 }

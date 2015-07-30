@@ -2625,11 +2625,13 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         // switch next two lines for ol li containers for form items.
         //        $this->_elementTemplates=array('default'=>"\n\t\t".'<li class="fitem"><label>{label}{help}<!-- BEGIN required -->{req}<!-- END required --></label><div class="qfelement<!-- BEGIN error --> error<!-- END error --> {type}"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></li>');
         $this->_elementTemplates = array(
-        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}" {aria-live}><div class="fitemtitle"><label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>{help}</div><div class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}" {aria-live}><div class="fitemtitle">{labeltemplate}{help}</div><div class="felement {type}<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'labeltemplate' => '<label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>',
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{type}"><div class="felement {type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type}<!-- BEGIN error --> error<!-- END error -->"><legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error --><div class="felement">{element}</div></fieldset></div>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{type} {emptylabel}"><fieldset class="{type}<!-- BEGIN error --> error<!-- END error -->">{legendtemplate}<!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error --><div class="felement">{element}</div></fieldset></div>',
+        'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
 
         'static'=>"\n\t\t".'<div class="fitem {advanced} {emptylabel}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></div>',
 
@@ -2722,6 +2724,12 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
 
         }
 
+        if ($group->getLabel() != '') {
+            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
+        } else {
+            $html = str_replace('{legendtemplate}', '', $html);
+        }
+
         if (isset($this->_advancedElements[$group->getName()])){
             $html =str_replace(' {advanced}', ' advanced', $html);
             $html =str_replace('{advancedimg}', $this->_advancedHTML, $html);
@@ -2781,6 +2789,16 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         }else{
             $html = $this->_elementTemplates['default'];
         }
+
+        if ($element->getLabel() != '') {
+            $labeltemplate = '<label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>';
+            $html = str_replace('{labeltemplate}', $this->_elementTemplates['labeltemplate'], $html);
+            $html = str_replace('{legendtemplate}', $this->_elementTemplates['legendtemplate'], $html);
+        } else {
+            $html = str_replace('{labeltemplate}', '', $html);
+            $html = str_replace('{legendtemplate}', '', $html);
+        }
+
         if (isset($this->_advancedElements[$element->getName()])){
             $html = str_replace(' {advanced}', ' advanced', $html);
             $html = str_replace(' {aria-live}', ' aria-live="polite"', $html);
