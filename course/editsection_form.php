@@ -48,6 +48,8 @@ class editsection_form extends moodleform {
         if (!empty($formatoptions)) {
             $elements = $courseformat->create_edit_form_elements($mform, true);
         }
+
+        $this->add_action_buttons();
     }
 
     public function definition_after_data() {
@@ -70,8 +72,6 @@ class editsection_form extends moodleform {
             \core_availability\frontend::include_all_javascript($course, null,
                     $this->_customdata['cs']);
         }
-
-        $this->add_action_buttons();
     }
 
     /**
