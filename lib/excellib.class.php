@@ -196,7 +196,10 @@ class MoodleExcelWorksheet {
 
         $this->worksheet = new PHPExcel_Worksheet($workbook, $name);
         $this->worksheet->setPrintGridlines(false);
-
+        // Check if language is RTL.
+        if (right_to_left()) {
+            $this->worksheet->setRightToLeft(true);
+        }
         $workbook->addSheet($this->worksheet);
     }
 
