@@ -356,6 +356,9 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
    if ($return = $DB->update_record('facetoface', $facetoface)) {
         facetoface_grade_item_update($facetoface);
 
+        //Get time.
+        $now = time();
+
         // Update any calendar entries
         if ($sessions = facetoface_get_sessions($facetoface->id)) {
             foreach ($sessions as $session) {
@@ -368,15 +371,17 @@ function facetoface_update_instance($facetoface, $instanceflag = true) {
                         // Update user status code from MDL_F2F_STATUS_REQUESTED to MDL_F2F_STATUS_BOOKED, otherwise these users will be hidden
                         foreach ($attendees as $i => $attendee) {
                             if (facetoface_update_signup_status($attendee->submissionid, MDL_F2F_STATUS_BOOKED, $USER->id, '', $attendee->grade)) {
-                                // Send confirmation email that an user is booked and cc to user's manager if exists
-                                facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                // Don't send confirmation notice if the session is in the past.
+                                if (!facetoface_has_session_started($session, $now)) {
+                                    // Send confirmation email that an user is booked and cc to user's manager if exists.
+                                    facetoface_send_confirmation_notice($facetoface, $session, $attendee->id, 0, 0);
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
     }
     return $return;
 }
