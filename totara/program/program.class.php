@@ -1742,6 +1742,9 @@ class program {
 
         if ($timedue != COMPLETION_TIME_NOT_SET) {
             $certifpath = get_certification_path_user($this->certifid, $userid);
+            if ($certifpath == CERTIFPATH_UNSET) {
+                $certifpath = CERTIFPATH_CERT;
+            }
             $total_time_allowed = $this->content->get_total_time_allowance($certifpath);
             $time_until_duedate = $timedue - $now;
 
