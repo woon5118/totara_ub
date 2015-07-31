@@ -1580,16 +1580,22 @@ class moodle_page {
             }
         }
 
+        $devicetheme = core_useragent::get_device_type_theme($this->devicetypeinuse);
+
+        // The user is using another device than default, and we have a theme for that, we should use it.
+        $hascustomdevicetheme = core_useragent::DEVICETYPE_DEFAULT != $this->devicetypeinuse && !empty($devicetheme);
+
         foreach ($themeorder as $themetype) {
+
             switch ($themetype) {
                 case 'course':
-                    if (!empty($CFG->allowcoursethemes) && !empty($this->_course->theme)) {
+                    if (!empty($CFG->allowcoursethemes) && !empty($this->_course->theme) && !$hascustomdevicetheme) {
                         return $this->_course->theme;
                     }
                 break;
 
                 case 'category':
-                    if (!empty($CFG->allowcategorythemes)) {
+                    if (!empty($CFG->allowcategorythemes) && !$hascustomdevicetheme) {
                         $categories = $this->categories;
                         foreach ($categories as $category) {
                             if (!empty($category->theme)) {
@@ -1600,7 +1606,7 @@ class moodle_page {
                 break;
 
                 case 'totarapdf':
-                    // Enforce standardtotararesponsive theme in PDF outputs - standardtotara is not available any more.
+                    // Totara: Enforce standardtotararesponsive theme in PDF outputs - standardtotara is not available any more.
                     return 'standardtotararesponsive';
                 break;
 
@@ -1611,7 +1617,7 @@ class moodle_page {
                 break;
 
                 case 'user':
-                    if (!empty($CFG->allowuserthemes) && !empty($USER->theme)) {
+                    if (!empty($CFG->allowuserthemes) && !empty($USER->theme) && !$hascustomdevicetheme) {
                         if ($mnetpeertheme) {
                             return $mnetpeertheme;
                         } else {
@@ -1621,12 +1627,12 @@ class moodle_page {
                 break;
 
                 case 'default':
-                    // System default theme (ignore any configuration).
+                    // Totara: allow forcing of system default theme (ignore any configuration).
                     return theme_config::DEFAULT_THEME;
                 break;
 
                 case 'device':
-                    $devicetheme = core_useragent::get_device_type_theme($this->devicetypeinuse);
+                    // Totara: allow forcing of device theme.
                     if (!empty($devicetheme)) {
                         return $devicetheme;
                     }
@@ -1637,12 +1643,11 @@ class moodle_page {
                         return $mnetpeertheme;
                     }
                     // First try for the device the user is using.
-                    $devicetheme = core_useragent::get_device_type_theme($this->devicetypeinuse);
                     if (!empty($devicetheme)) {
                         return $devicetheme;
                     }
                     // Next try for the default device (as a fallback).
-                    $devicetheme = core_useragent::get_device_type_theme('default');
+                    $devicetheme = core_useragent::get_device_type_theme(core_useragent::DEVICETYPE_DEFAULT);
                     if (!empty($devicetheme)) {
                         return $devicetheme;
                     }
