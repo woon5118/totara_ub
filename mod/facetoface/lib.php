@@ -5368,7 +5368,10 @@ function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) 
                             WHERE s.id = {facetoface_signups}.sessionid
                             AND s.facetoface = :facetofaceid
                             GROUP BY s.id
-                            HAVING MAX(sd.timefinish) < :windowopens)";
+                            HAVING MAX(sd.timefinish) <= :windowopens)";
+        // NOTE: Timefinish can be, at most, the date/time that the course/cert was completed. In the windowopens check, we
+        // do <= rather than < because windowopens may be equal to timefinish when the cert active period is equal to the window
+        // period. Luckily, window period cannot be more than the active period, so the window cannot open before timefinish.
         $DB->execute($sql, $params);
 
         // Reset the grades.
