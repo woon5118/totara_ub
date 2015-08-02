@@ -93,13 +93,12 @@ class rb_catalogcertifications_embedded extends rb_base_embedded {
     }
 
     public function get_extrabuttons() {
-        global $OUTPUT, $CFG;
+        global $OUTPUT;
 
-        $defaultcat = $CFG->defaultrequestcategory;
-        $catcontext = context_coursecat::instance($defaultcat);
+        $categoryid = totara_get_categoryid_with_capability('totara/certification:createcertification');
 
-        if (has_capability('totara/certification:createcertification', $catcontext)) {
-            $createurl = new moodle_url("/totara/program/add.php", array('category' => $defaultcat, 'iscertif' => 1));
+        if ($categoryid !== false) {
+            $createurl = new moodle_url("/totara/program/add.php", array('category' => $categoryid, 'iscertif' => 1));
             $createbutton = new single_button($createurl, get_string('addcertification', 'totara_coursecatalog'), 'get');
             return $OUTPUT->render($createbutton);
         }

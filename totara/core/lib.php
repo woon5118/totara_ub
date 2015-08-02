@@ -576,3 +576,38 @@ function totara_get_sender_from_user_by_id($useridfrom) {
 
     return $from;
 }
+
+/**
+ * This checks if the user has a given capability within the course category context
+ * and returns the first category ID it finds where this is the case.
+ *
+ * @param string $capability The capability we are checking.
+ * @return string Category id or bool False.
+ */
+
+function totara_get_categoryid_with_capability($capability) {
+    global $DB;
+
+    $recordid = false;
+
+    $fields = context_helper::get_preload_record_columns_sql('ctx');
+    $sql = "SELECT cc.id, cc.sortorder, cc.depth, cc.visible, $fields
+                  FROM {course_categories} cc
+                  JOIN {context} ctx ON cc.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
+              ORDER BY depth ASC, sortorder ASC";
+    $recordset = $DB->get_recordset_sql($sql, array('contextlevel' => CONTEXT_COURSECAT));
+    foreach ($recordset as $record) {
+        context_helper::preload_from_record($record);
+        $context = context_coursecat::instance($record->id);
+        if (!$record->visible && !has_capability('moodle/category:viewhiddencategories', $context)) {
+            continue;
+        }
+        if (has_capability($capability, $context)) {
+            $recordid = $record->id;
+            break;
+        }
+    }
+    $recordset->close();
+
+    return $recordid;
+}

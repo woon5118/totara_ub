@@ -107,10 +107,9 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
     }
 
     public function get_extrabuttons() {
-        global $OUTPUT, $CFG;
+        global $OUTPUT;
 
-        $defaultcat = $CFG->defaultrequestcategory;
-        $catcontext = context_coursecat::instance($defaultcat);
+        $categoryid = totara_get_categoryid_with_capability('moodle/course:create');
 
         $buttons = "";
 
@@ -120,8 +119,8 @@ class rb_catalogcourses_embedded extends rb_base_embedded {
         $buttons .= ob_get_contents();
         ob_end_clean();
 
-        if (has_capability('moodle/course:create', $catcontext)) {
-            $createurl = new moodle_url("/course/edit.php", array('category' => $defaultcat));
+        if ($categoryid !== false) {
+            $createurl = new moodle_url("/course/edit.php", array('category' => $categoryid));
             $createbutton = new single_button($createurl, get_string('addcourse', 'totara_coursecatalog'), 'get');
             $buttons .= $OUTPUT->render($createbutton);
         }
