@@ -61,10 +61,13 @@ Feature: Take attendance for Face to face sessions
     And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
+    And I wait "1" seconds
     And I click on "Sam2 Student2, student2@example.com" "option"
     And I press "Add"
+    And I wait "1" seconds
     And I click on "Sam3 Student3, student3@example.com" "option"
     And I press "Add"
+    And I wait "1" seconds
     And I click on "Sam4 Student4, student4@example.com" "option"
     And I press "Add"
     # We must wait here, because the refresh may not happen before the save button is clicked otherwise.
@@ -76,6 +79,7 @@ Feature: Take attendance for Face to face sessions
     And I should see "Sam2 Student2"
     And I should see "Sam3 Student3"
     And I should see "Sam4 Student4"
+    And I wait "1" seconds
     And I log out
 
   @javascript

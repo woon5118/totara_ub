@@ -44,6 +44,7 @@ Feature: Add - Remove Face to face attendees
     And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
+    And I wait "1" seconds
     And I press "Save"
     Then I wait until "Sam1 Student1" "text" exists
     And I wait until the page is ready
@@ -69,6 +70,7 @@ Feature: Add - Remove Face to face attendees
     And I click on "Add/remove attendees" "option" in the "#menuf2f-actions" "css_element"
     And I click on "Sam1 Student1, student1@example.com" "option"
     And I press "Add"
+    And I wait "1" seconds
     And I press "Save"
     Then I wait until "Sam1 Student1" "text" exists
     And I wait until the page is ready
