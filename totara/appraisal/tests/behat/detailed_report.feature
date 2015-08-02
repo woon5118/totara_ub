@@ -115,6 +115,5 @@ Feature: Test appraisal detailed report with numeric question
     Then I should see "Behat Test Appraisal detail report" in the "h2" "css_element"
 
     # Export parametric report test
-    When I start watching to see if a new page loads
     And I press "Export"
-    Then a new page should not have loaded since I started watching
+    And I should see "On Target"
