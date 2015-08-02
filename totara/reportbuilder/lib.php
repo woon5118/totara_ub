@@ -1517,7 +1517,7 @@ class reportbuilder {
                 $url->param($filtername, $filtervalue);
             }
         }
-        return html_entity_decode($url->out());
+        return $url->out(false);
     }
 
 

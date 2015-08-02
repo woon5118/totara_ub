@@ -28,12 +28,12 @@ Feature: View cohort list
       | user2 | manager | Category     | CAT1      |
 
   @javascript
-  Scenario: Admin can see system cohorts and all cohorts
+  Scenario: Admin can see System audiences and All audiences
     When I log in as "admin"
-    And I navigate to "Cohorts" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     Then I should see "System cohort"
     And I should not see "Cohort in category"
-    And I follow "All cohorts"
+    And I follow "All audiences"
     And I should see "System cohort"
     And I should see "Cohort in category 1"
     And I should see "Cohort in category 2"
@@ -41,12 +41,12 @@ Feature: View cohort list
     And I log out
 
   @javascript
-  Scenario: Manager can see system cohorts and all cohorts
+  Scenario: Manager can see System audiences and All audiences
     When I log in as "user1"
-    And I navigate to "Cohorts" node in "Site administration > Users > Accounts"
+    And I navigate to "Audiences" node in "Site administration > Users > Accounts"
     Then I should see "System cohort"
     And I should not see "Cohort in category"
-    And I follow "All cohorts"
+    And I follow "All audiences"
     And I should see "System cohort"
     And I should see "Cohort in category 1"
     And I should see "Cohort in category 2"
@@ -56,10 +56,10 @@ Feature: View cohort list
   @javascript
   Scenario: Manager in category can see cohorts in the category
     When I log in as "user2"
-    And I follow "Courses"
+    And I click on "Courses" "link" in the "Navigation" "block"
     And I follow "Cat 1"
-    And I follow "Cohorts"
-    And I should not see "All cohorts"
+    And I follow "Audiences"
+    And I should not see "All audiences"
     And I should not see "System cohort"
     And I should see "Cohort in category 1"
     And I should not see "Cohort in category 2"

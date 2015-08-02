@@ -37,7 +37,7 @@ Feature: Limit an audience based on user profile fields
     And I set the field "test" to "3"
     And I press "Update profile"
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
-    And I press "Add new audience"
+    And I follow "Add new audience"
     And I set the following fields to these values:
       | Name | Test    |
       | Type | Dynamic |

@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS', 1); // Specify parameters via reportbuidler constructor!
+
 require('../config.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -32,6 +34,7 @@ require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 $contextid = optional_param('contextid', 0, PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
+$showall = optional_param('showall', 0, PARAM_BOOL);
 $format = optional_param('format', '', PARAM_TEXT); //export format
 $debug = optional_param('debug', false, PARAM_BOOL); //report debug
 
@@ -55,16 +58,22 @@ $strcohorts = get_string('cohorts', 'cohort');
 $PAGE->set_context($context);
 
 if ($category) {
+    $showall = 0;
     $PAGE->set_pagelayout('report');
     $PAGE->set_context($context);
     $PAGE->set_url('/cohort/index.php', array('contextid' => $context->id));
     $PAGE->set_title($strcohorts);
     $PAGE->set_heading($COURSE->fullname);
 } else {
-    admin_externalpage_setup('cohorts', '', null, '', array('pagelayout'=>'report'));
+    $params = array('contextid' => $context->id, 'showall' => $showall);
+    admin_externalpage_setup('cohorts', '', $params, '', array('pagelayout'=>'report'));
 }
 
-$data = array('contextid' => $context->id);
+if ($showall) {
+    $data = array('contextid' => null);
+} else {
+    $data = array('contextid' => $context->id);
+}
 
 $report = reportbuilder_get_embedded_report('cohort_admin', $data, false, $sid);
 if (!empty($format)) {
@@ -83,11 +92,18 @@ $count = ($fullcount != $filteredcount) ? " ($filteredcount/$fullcount)" : " ($f
 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
-echo $OUTPUT->heading(get_string('cohortsin', 'cohort', $context->get_context_name()).$count);
-
-if ($manager) {
-    echo $OUTPUT->single_button(new moodle_url('/cohort/edit.php', array('contextid'=>$context->id)), get_string('addcohort', 'cohort'));
+if ($showall) {
+    $heading = get_string('cohortsin', 'cohort', get_string('allcohorts' , 'core_cohort')) . $count;
+} else {
+    $heading = get_string('cohortsin', 'cohort', $context->get_context_name()) . $count;
 }
+echo $OUTPUT->heading($heading);
+
+$baseurl = new moodle_url('/cohort/index.php', array('contextid' => $context->id, 'showall' => $showall));
+if ($editcontrols = cohort_edit_controls($context, $baseurl)) {
+    echo $OUTPUT->render($editcontrols);
+}
+
 // check if report is cached and warn user
 if ($report->is_cached()) {
     $cohorts = cohort_get_cohorts($context->id);

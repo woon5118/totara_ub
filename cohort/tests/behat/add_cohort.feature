@@ -15,7 +15,7 @@ Feature: Add cohorts of users
       | user4 | Forth | User | forth@example.com |
     And I log in as "admin"
     And I navigate to "Audiences" node in "Site administration > Users > Accounts"
-    And I press "Add new audience"
+    And I follow "Add new audience"
     And I set the following fields to these values:
       | Name | Test cohort name |
       | Context | System |

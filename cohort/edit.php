@@ -119,7 +119,8 @@ if ($delete and $cohort->id) {
 if ($show && $cohort->id && confirm_sesskey()) {
     if (!$cohort->visible) {
         $record = (object)array('id' => $cohort->id, 'visible' => 1, 'contextid' => $cohort->contextid);
-        cohort_update_cohort($record);
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        //cohort_update_cohort($record);
     }
     redirect($returnurl);
 }
@@ -127,7 +128,8 @@ if ($show && $cohort->id && confirm_sesskey()) {
 if ($hide && $cohort->id && confirm_sesskey()) {
     if ($cohort->visible) {
         $record = (object)array('id' => $cohort->id, 'visible' => 0, 'contextid' => $cohort->contextid);
-        cohort_update_cohort($record);
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        //cohort_update_cohort($record);
     }
     redirect($returnurl);
 }

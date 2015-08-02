@@ -81,6 +81,7 @@ $string['backtocohorts'] = 'Back to audiences';
 $string['cancel'] = 'Cancel';
 $string['cancelchanges'] = 'Cancel changes';
 $string['cannoteditcohort'] = 'This audience can not be edited once created';
+$string['categorycohorts'] = 'Category audiences';
 $string['ccdatedescafter'] = 'User completed this list of courses after {$a}:';
 $string['ccdatedescbefore'] = 'User completed this list of courses before {$a}:';
 $string['ccdescall'] = 'User has completed all of the courses in this list:';

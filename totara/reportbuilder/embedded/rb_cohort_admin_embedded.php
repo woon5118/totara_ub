@@ -72,6 +72,11 @@ class rb_cohort_admin_embedded extends rb_base_embedded {
                 'heading' => get_string('status', 'totara_cohort')
             ),
             array(
+                'type' => 'course_category',
+                'value' => 'namelink',
+                'heading' => get_string('category', 'totara_reportbuilder')
+            ),
+            array(
                 'type' => 'cohort',
                 'value' => 'actions',
                 'heading' => get_string('actions', 'totara_cohort')
@@ -100,10 +105,8 @@ class rb_cohort_admin_embedded extends rb_base_embedded {
         // No restrictions.
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
-        // Set the context.
-        if (isset($contextid)) {
-            $this->embeddedparams['contextid'] = $contextid;
-        }
+        // Set the context - null means show all audiences from any category and system.
+        $this->embeddedparams['contextid'] = $contextid;
 
         parent::__construct();
     }

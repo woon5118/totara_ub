@@ -57,6 +57,7 @@ function cohort_add_cohort($cohort, $addcollections=true) {
     if (!isset($cohort->descriptionformat)) {
         $cohort->descriptionformat = FORMAT_HTML;
     }
+    // Totora: ignore Moodle visibility hacks TL-7124.
     if (!isset($cohort->visible)) {
         $cohort->visible = 1;
     }
@@ -305,7 +306,9 @@ function cohort_get_available_cohorts($currentcontext, $withmembers = 0, $offset
     // Since this method is normally called for the current course all parent contexts are already preloaded.
     $contextsany = array_filter($currentcontext->get_parent_context_ids(),
         create_function('$a', 'return has_capability("moodle/cohort:view", context::instance_by_id($a));'));
-    $contextsvisible = array_diff($currentcontext->get_parent_context_ids(), $contextsany);
+    // Totora: ignore Moodle visibility hacks TL-7124.
+    //$contextsvisible = array_diff($currentcontext->get_parent_context_ids(), $contextsany);
+    $contextsvisible = array();
     if (empty($contextsany) && empty($contextsvisible)) {
         // User does not have any permissions to view cohorts.
         return array();
@@ -380,9 +383,12 @@ function cohort_can_view_cohort($cohortorid, $currentcontext) {
     }
 
     if ($cohort && in_array($cohort->contextid, $currentcontext->get_parent_context_ids())) {
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        /*
         if ($cohort->visible) {
             return true;
         }
+        */
         $cohortcontext = context::instance_by_id($cohort->contextid);
         if (has_capability('moodle/cohort:view', $cohortcontext)) {
             return true;
@@ -556,20 +562,36 @@ function cohort_get_invisible_contexts() {
  * @return null|renderable
  */
 function cohort_edit_controls(context $context, moodle_url $currenturl) {
+    global $DB;
+
     $tabs = array();
     $currenttab = 'view';
     $viewurl = new moodle_url('/cohort/index.php', array('contextid' => $context->id));
     if (($searchquery = $currenturl->get_param('search'))) {
         $viewurl->param('search', $searchquery);
     }
-    if ($context->contextlevel == CONTEXT_SYSTEM) {
-        $tabs[] = new tabobject('view', new moodle_url($viewurl, array('showall' => 0)), get_string('systemcohorts', 'cohort'));
+
+    // Totara: improve the tabs logic.
+    $syscontext = context_system::instance();
+    $sysurl = new moodle_url('/cohort/index.php', array('contextid' => $syscontext->id));
+
+    if ($syscontext->id == $context->id) {
         $tabs[] = new tabobject('viewall', new moodle_url($viewurl, array('showall' => 1)), get_string('allcohorts', 'cohort'));
+        $tabs[] = new tabobject('view', new moodle_url($viewurl, array('showall' => 0)), get_string('systemcohorts', 'cohort'));
         if ($currenturl->get_param('showall')) {
             $currenttab = 'viewall';
         }
     } else {
-        $tabs[] = new tabobject('view', $viewurl, get_string('cohorts', 'cohort'));
+        if (has_any_capability(array('moodle/cohort:manage', 'moodle/cohort:view'), $syscontext)) {
+            $tabs[] = new tabobject('sysviewall', new moodle_url($sysurl, array('showall' => 1)), get_string('allcohorts', 'cohort'));
+            $tabs[] = new tabobject('sysview', new moodle_url($sysurl, array('showall' => 0)), get_string('systemcohorts', 'cohort'));
+        }
+        if ($context->contextlevel == CONTEXT_COURSECAT) {
+            $strcohorts = get_string('categorycohorts', 'totara_cohort');
+        } else {
+            $strcohorts = get_string('cohorts', 'cohort');
+        }
+        $tabs[] = new tabobject('view', $viewurl, $strcohorts);
     }
     if (has_capability('moodle/cohort:manage', $context)) {
         $addurl = new moodle_url('/cohort/edit.php', array('contextid' => $context->id));

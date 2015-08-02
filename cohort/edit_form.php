@@ -51,9 +51,12 @@ class cohort_edit_form extends moodleform {
         $mform->setType('idnumber', PARAM_TEXT);
         $mform->setDefault('idnumber', totara_cohort_next_automatic_id());
 
+        // Totora: ignore Moodle visibility hacks TL-7124.
+        /*
         $mform->addElement('advcheckbox', 'visible', get_string('visible', 'cohort'));
         $mform->setDefault('visible', 1);
         $mform->addHelpButton('visible', 'visible', 'cohort');
+        */
 
         if (!$cohort->id) {
             $mform->addElement('select', 'cohorttype', get_string('type', 'totara_cohort'), cohort::getCohortTypes());

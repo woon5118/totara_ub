@@ -84,6 +84,21 @@ class rb_source_cohort extends rb_base_source {
                             'base.id = membercount.cohortid', // How it is joined.
                             REPORT_BUILDER_RELATION_ONE_TO_ONE
                         ),
+                        new rb_join(
+                            'context',
+                            'INNER',
+                            '{context}',
+                            "context.id = base.contextid",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE
+                        ),
+                        new rb_join(
+                            'course_category',
+                            'LEFT',
+                            '{course_categories}',
+                            "(course_category.id = context.instanceid AND context.contextlevel = ". CONTEXT_COURSECAT . ")",
+                            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                            'context'
+                        )
         );
 
         $this->add_user_table_to_joinlist($joinlist, 'members', 'userid');
@@ -193,6 +208,34 @@ class rb_source_cohort extends rb_base_source {
                 )
             )
         );
+        $columnoptions[] = new rb_column_option(
+            'course_category',
+            'name',
+            get_string('coursecategory', 'totara_reportbuilder'),
+            "course_category.name",
+            array('joins' => 'course_category',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text')
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_category',
+            'namelink',
+            get_string('coursecategorylinked', 'totara_reportbuilder'),
+            "course_category.name",
+            array(
+                'joins' => 'course_category',
+                'displayfunc' => 'link_cohort_category',
+                'defaultheading' => get_string('category', 'totara_reportbuilder'),
+                'extrafields' => array('context_id' => 'base.contextid')
+            )
+        );
+        $columnoptions[] = new rb_column_option(
+            'course_category',
+            'id',
+            get_string('coursecategoryid', 'totara_reportbuilder'),
+            "course_category.id",
+            array('joins' => 'course_category')
+        );
 
         $this->add_user_fields_to_columns($columnoptions);
         $this->add_position_fields_to_columns($columnoptions);
@@ -301,6 +344,33 @@ class rb_source_cohort extends rb_base_source {
         );
         return $paramoptions;
     }
+
+    function rb_display_link_cohort_category($categoryname, $row, $isexport = false) {
+        $categoryname = format_string($categoryname);
+
+        $contextid = $row->context_id;
+        $context = context::instance_by_id($contextid, IGNORE_MISSING);
+
+        if (!$context) {
+            return $categoryname;
+        }
+
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            $categoryname = context_system::get_level_name();
+        }
+
+        if ($isexport) {
+            return $categoryname;
+        }
+
+        if (!has_any_capability(array('moodle/cohort:manage', 'moodle/cohort:view'), $context)) {
+            return $categoryname;
+        }
+
+        $url = new moodle_url('/cohort/index.php', array('contextid' => $context->id));
+        return html_writer::link($url, $categoryname);
+    }
+
     /**
      * RB helper function to show the name of the cohort with a link to the cohort's details page
      * @param int $cohortid

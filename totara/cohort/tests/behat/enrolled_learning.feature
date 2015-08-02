@@ -37,15 +37,9 @@ Feature: Assign enrolled learning to cohort
     And I click on "Search" "link" in the "ul.ui-tabs-nav" "css_element"
     And I set the field "id_query" to "Course 2"
     And I click on "Search" "button" in the "#learningitemcourses" "css_element"
-    # @todo T-13751
-    # This is a workaround to avoid matching the search term field.
-    # Ideally we would make the selectors below specific to the treeview element but for some
-    # reason behat can't find that element (presumably related to the fact that its created
-    # dynamically when the search button is pressed).
-    And I set the field "id_query" to "something else"
-    Then I should see "Course 2" in the "div[aria-describedby='learningitemcourses']" "css_element"
-    And I should not see "No results found" in the "div[aria-describedby='learningitemcourses']" "css_element"
-    And I should not see "Course 1" in the "div[aria-describedby='learningitemcourses']" "css_element"
+    And I should see "Course 2" in the "Add Courses to Enrolled Learning" "totaradialogue"
+    And I should not see "No results found" in the "Add Courses to Enrolled Learning" "totaradialogue"
+    And I should not see "Course 1" in the "Add Courses to Enrolled Learning" "totaradialogue"
 
   @javascript
   Scenario: Edit course visibility for a particular course

@@ -724,7 +724,8 @@ $capabilities = array(
         )
     ),
 
-    // View visible and hidden cohorts defined in the current context.
+    // Totara: Moodle started to use different visibility logic, we are using the original one.
+    // This capability can be granted in the parent of the cohort only, not in the course context.
     'moodle/cohort:view' => array(
 
         'captype' => 'read',

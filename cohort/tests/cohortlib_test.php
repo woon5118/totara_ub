@@ -633,19 +633,19 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $this->setUser($user1);
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_ALL, 0, 0, '');
-        $this->assertEquals(array($cohort1->id, $cohort4->id), array_keys($result));
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_ALL, 0, 1, '');
-        $this->assertEquals(array($cohort1->id), array_keys($result));
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_ALL, 1, 1, '');
-        $this->assertEquals(array($cohort4->id), array_keys($result));
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_ALL, 0, 100, 'yyy');
-        $this->assertEquals(array($cohort1->id), array_keys($result));
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
 
         $result = cohort_get_available_cohorts($course2ctx, COHORT_ALL, 0, 0, '');
-        $this->assertEquals(array($cohort3->id, $cohort4->id), array_keys($result));
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_WITH_MEMBERS_ONLY);
         $this->assertEmpty($result);
@@ -684,13 +684,13 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         $this->setUser($user1);
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_WITH_MEMBERS_ONLY, 0, 0, '');
-        $this->assertEquals(array($cohort4->id), array_keys($result));
-        $this->assertEquals(3, $result[$cohort4->id]->memberscnt);
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
+        //$this->assertEquals(3, $result[$cohort4->id]->memberscnt);
 
         $result = cohort_get_available_cohorts($course2ctx, COHORT_WITH_MEMBERS_ONLY, 0, 0, '');
-        $this->assertEquals(array($cohort3->id, $cohort4->id), array_keys($result));
-        $this->assertEquals(2, $result[$cohort3->id]->memberscnt);
-        $this->assertEquals(3, $result[$cohort4->id]->memberscnt);
+        $this->assertEquals(array(), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
+        //$this->assertEquals(2, $result[$cohort3->id]->memberscnt);
+        //$this->assertEquals(3, $result[$cohort4->id]->memberscnt);
 
         $result = cohort_get_available_cohorts($course1ctx, COHORT_WITH_MEMBERS_ONLY, 0, 0, 'yyy');
         $this->assertEmpty($result);
@@ -739,6 +739,6 @@ class core_cohort_cohortlib_testcase extends advanced_testcase {
         role_assign($managerrole->id, $user1->id, context_coursecat::instance($category1->id));
         $this->setUser($user1);
         $result = cohort_get_available_cohorts($course1ctx, COHORT_ALL, 0, 0, '');
-        $this->assertEquals(array($cohort1->id, $cohort2->id, $cohort4->id), array_keys($result));
+        $this->assertEquals(array($cohort1->id, $cohort2->id), array_keys($result)); // Totara: ignore Moodle visibility hacks TL-7124.
     }
 }

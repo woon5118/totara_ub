@@ -32,7 +32,7 @@ $string['assignto'] = 'Audience \'{$a}\' members';
 $string['backtocohorts'] = 'Back to audiences';
 $string['bulkadd'] = 'Add to audience';
 $string['bulknocohort'] = 'No available audiences found';
-$string['categorynotfound'] = 'Category <b>{$a}</b> not found or you don\'t have permission to create a cohort there. The default context will be used.';
+$string['categorynotfound'] = 'Category <b>{$a}</b> not found or you don\'t have permission to create an audience there. The default context will be used.';
 $string['cohort'] = 'Audience';
 $string['cohorts'] = 'Audiences';
 $string['cohortsin'] = '{$a}: available audiences';
@@ -40,7 +40,7 @@ $string['cohort:assign'] = 'Assign audience members';
 $string['cohort:manage'] = 'Manage audiences';
 $string['cohort:view'] = 'Use audiences and view members';
 $string['component'] = 'Source';
-$string['contextnotfound'] = 'Context <b>{$a}</b> not found or you don\'t have permission to create a cohort there. The default context will be used.';
+$string['contextnotfound'] = 'Context <b>{$a}</b> not found or you don\'t have permission to create an audience there. The default context will be used.';
 $string['csvcontainserrors'] = 'Errors were found in CSV data. See details below.';
 $string['csvcontainswarnings'] = 'Warnings were found in CSV data. See details below.';
 $string['csvextracolumns'] = 'Column(s) <b>{$a}</b> will be ignored.';
@@ -89,7 +89,7 @@ $string['uploadcohorts_help'] = 'Audiences may be uploaded via text file. The fo
 * Each record is a series of data separated by commas (or other delimiters)
 * The first record contains a list of fieldnames defining the format of the rest of the file
 * Required fieldname is name
-* Optional fieldnames are idnumber, description, descriptionformat, visible, context, category, category_id, category_idnumber, category_path
+* Optional fieldnames are idnumber, description, descriptionformat, context, category, category_id, category_idnumber, category_path
 ';
 $string['visible'] = 'Visible';
 $string['visible_help'] = "Any audience can be viewed by users who have 'moodle/cohort:view' capability in the audience context.<br/>

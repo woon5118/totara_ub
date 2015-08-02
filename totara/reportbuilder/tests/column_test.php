@@ -736,8 +736,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 // The answer here depends on if the column we are testing is grouped or not.
                 if ($sourcecheck) {
                     $this->assertEquals('2', $rb->get_full_count(), $message);
-                } else if ($sourcename === 'certification_overview'
-                    and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress')) {
+                } else if (
+                        ($sourcename === 'certification_overview' and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress'))
+                        or ($sourcename === 'cohort' and strpos("{$col->type}_{$col->value}", 'course_category_') === 0)
+                ) {
                     // TODO: Add more test data.
                     $this->assertEquals(0, $rb->get_full_count(), $message);
                 } else {
@@ -761,8 +763,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 // The answer here depends on if the column we are testing is grouped or not.
                 if ($sourcecheck) {
                     $this->assertEquals('2', $rb->get_full_count(), $message);
-                } else if ($sourcename === 'certification_overview'
-                    and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress')) {
+                } else if (
+                        ($sourcename === 'certification_overview' and ($col->type === 'course' or "{$col->type}_{$col->value}" === 'certif_completion_progress'))
+                        or ($sourcename === 'cohort' and strpos("{$col->type}_{$col->value}", 'course_category_') === 0)
+                ) {
                     // TODO: Add more test data.
                     $this->assertEquals(0, $rb->get_full_count(), $message);
                 } else {
