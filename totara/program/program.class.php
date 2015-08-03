@@ -440,7 +440,8 @@ class program {
                     // when that extension date is set (approved by the manager), then due date should be that one.
                     // Make sure coursesetid is zero so we are checking completion on the program.
                     $params = array ('programid' => $this->id, 'userid' => $user->id, 'coursesetid' => 0);
-                    $timedue = $DB->get_field('prog_completion', 'timedue', $params);
+                    $progcompl = $DB->get_record('prog_completion', $params);
+                    $timedue = $progcompl ? $progcompl->timedue : false;
                     $timedue = $this->make_timedue($user->id, $assign, $timedue);
 
                     $user_assign_data = null;
@@ -461,6 +462,21 @@ class program {
 
                     if ($userexists) {
                         // Check if updates need to be made.
+
+                        // Skip completed programs (includes certifications which have are certified and window is closed).
+                        if ($progcompl && $progcompl->status == STATUS_PROGRAM_COMPLETE) {
+                            continue;
+                        }
+
+                        // Skip certifications which are on the recert path or are expired.
+                        if (!empty($this->certifid)) {
+                            $params = array ('certifid' => $this->certifid, 'userid' => $user->id);
+                            $certcompl = $DB->get_record('certif_completion', $params);
+                            if ($certcompl &&
+                                ($certcompl->certifpath == CERTIFPATH_RECERT || $certcompl->status == CERTIFSTATUS_EXPIRED)) {
+                                continue;
+                            }
+                        }
 
                         // Create user assignment object.
                         $current_assignment = new user_assignment($user->id, $assign->id, $this->id);
@@ -873,7 +889,7 @@ class program {
             // Fixed time or Not Set?
             if ($assignment_record->completiontime == COMPLETION_TIME_UNKNOWN) {
                 return COMPLETION_TIME_NOT_SET;
-            } else if ($timedue > $assignment_record->completiontime) {
+            } else if (is_numeric($timedue) && $timedue > $assignment_record->completiontime) {
                 return $timedue;
             } else {
                 return $assignment_record->completiontime;
