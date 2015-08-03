@@ -136,6 +136,9 @@ class totara_program_generator extends component_generator_base {
      * @return int        Program->id
      */
     public function create_certification($data = array()) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/certification/lib.php');
+
         $activeperiod = isset($data['activeperiod']) ? $data['activeperiod'] : '1 year';
         $windowperiod = isset($data['windowperiod']) ? $data['windowperiod'] : '1 month';
         $recertifydatetype  = isset($data['recertifydatetype']) ? $data['recertifydatetype'] : CERTIFRECERT_EXPIRY;
