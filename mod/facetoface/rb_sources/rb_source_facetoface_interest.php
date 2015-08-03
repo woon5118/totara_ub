@@ -72,6 +72,21 @@ class rb_source_facetoface_interest extends rb_base_source {
         // Joinlist for this source.
         $joinlist = array(
             new rb_join(
+                'sessions',
+                'LEFT',
+                '{facetoface_sessions}',
+                'sessions.facetoface = facetoface.id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'sessiondate',
+                'LEFT',
+                '{facetoface_sessions_dates}',
+                '(sessiondate.sessionid = sessions.id AND sessions.datetimeknown = 1)',
+                REPORT_BUILDER_RELATION_ONE_TO_MANY,
+                'sessions'
+            ),
+            new rb_join(
                 'facetoface',
                 'INNER',
                 '{facetoface}',
@@ -84,6 +99,7 @@ class rb_source_facetoface_interest extends rb_base_source {
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_course_table_to_joinlist($joinlist, 'facetoface', 'course');
         $this->add_course_category_table_to_joinlist($joinlist, 'course', 'category');
+        $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
 
         return $joinlist;
     }
@@ -177,6 +193,41 @@ class rb_source_facetoface_interest extends rb_base_source {
         $this->add_course_category_fields_to_filters($filteroptions);
 
         return $filteroptions;
+    }
+
+    protected function define_contentoptions() {
+        $contentoptions = array(
+            new rb_content_option(
+                'current_pos',
+                get_string('currentpos', 'totara_reportbuilder'),
+                'position.path',
+                'position'
+            ),
+            new rb_content_option(
+                'current_org',
+                get_string('currentorg', 'totara_reportbuilder'),
+                'organisation.path',
+                'organisation'
+            ),
+            new rb_content_option(
+                'user',
+                get_string('user', 'rb_source_facetoface_sessions'),
+                array(
+                    'userid' => 'base.userid',
+                    'managerid' => 'position_assignment.managerid',
+                    'managerpath' => 'position_assignment.managerpath',
+                    'postype' => 'position_assignment.type',
+                ),
+                'position_assignment'
+            ),
+            new rb_content_option(
+                'date',
+                get_string('thedate', 'rb_source_facetoface_interest'),
+                'sessiondate.timestart',
+                'sessiondate'
+            ),
+        );
+        return $contentoptions;
     }
 
     protected function define_paramoptions() {
