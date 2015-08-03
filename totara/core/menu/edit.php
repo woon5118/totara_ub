@@ -50,13 +50,22 @@ if ($mform->is_cancelled()) {
 if ($data = $mform->get_data()) {
     try {
         $redirect = new moodle_url('/totara/core/menu/index.php', array());
+
         if ((int)$id > 0) {
+            // Get the old visiblity before updating.
+            $oldvisibility = $item->__get('visibility');
+
             $item->update($data);
+
+            // Only redirect if a user turned on custom access rules.
+            if ($oldvisibility != $data->visibility &&
+                $data->visibility == \totara_core\totara\menu\menu::SHOW_CUSTOM) {
+                    $redirect = new moodle_url('/totara/core/menu/rules.php', array('id' => $item->id));
+            }
         } else {
             $item = $item->create($data);
-
+            // Redirect to the visibility settings page so they can set the visibility rules.
             if ($data->visibility == \totara_core\totara\menu\menu::SHOW_CUSTOM) {
-                // Redirect to the visibility settings page so they can set the visibility rules.
                 $redirect = new moodle_url('/totara/core/menu/rules.php', array('id' => $item->id));
             }
         }
