@@ -948,7 +948,7 @@ if ($action == 'approvalrequired') {
     $table = new html_table();
     $table->summary = get_string('requeststablesummary', 'facetoface');
     $table->head = $headings;
-    $table->align = array('left', 'center', 'center', 'center', 'center');
+    $table->align = array('left', 'center', 'center', 'center', 'center', 'center');
 
     foreach ($requests as $attendee) {
         $data = array();
@@ -977,6 +977,8 @@ if ($action == 'approvalrequired') {
                 $note = html_writer::span($datanote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
                 $data[] = $icon . $note;
             }
+        } else {
+            $data[] = "";
         }
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
         $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
