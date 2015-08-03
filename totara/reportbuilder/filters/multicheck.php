@@ -192,6 +192,8 @@ class rb_filter_multicheck extends rb_filter_type {
      * @return array of (array of strings, string, array of strings, array of strings, array of strings)
      */
     public function get_counts_sql($otherfilters) {
+        global $DB;
+
         $countscolumns = array();
         $filterscolumns = array();
         $optionsfound = array();
@@ -211,25 +213,24 @@ class rb_filter_multicheck extends rb_filter_type {
                 if ($otherfilter != $this) {
                     $otheruniquename = $otherfilter->options['showcounts']['dataalias'];
                     $otherfxt = "total_{$otheruniquename}";
-                    $inactivename = "i_{$filteruniquename}_" . md5("{$otheruniquename}_{$option}");
-                    $shorterinactivename = strtolower(substr($inactivename, 0, 30));
-                    $otherfiltercondition .= "            * ({$otherfxt} + :{$shorterinactivename})\n";
+                    $inactiveuniqueparam = $DB->get_unique_param('filter');
+                    $otherfiltercondition .= "            * ({$otherfxt} + :{$inactiveuniqueparam})\n";
 
                     // Set up the filter parameters.
                     if ($otherfilter->has_data()) {
-                        $sqlparams[$shorterinactivename] = 0;
+                        $sqlparams[$inactiveuniqueparam] = 0;
                     } else {
-                        $sqlparams[$shorterinactivename] = 1;
+                        $sqlparams[$inactiveuniqueparam] = 1;
                     }
                 }
             }
             $countscolumns[] = "   SUM( CASE WHEN ({$fxvy}\n{$otherfiltercondition}" .
                                "        ) > 0 THEN 1 ELSE 0 END ) AS mcc_{$fxvy}";
 
-            $shortercheckedname = substr("c_{$fxvy}", 0, 30);
+            $filtercountuniqueparam = $DB->get_unique_param('filter_count');
 
             // Set up the option parameters.
-            $sqlparams[$shortercheckedname] = $this->is_option_set($option);
+            $sqlparams[$filtercountuniqueparam] = $this->is_option_set($option);
 
             // Set up filterscolumns.
             if ($iscached || $isgrouped) {
@@ -243,7 +244,7 @@ class rb_filter_multicheck extends rb_filter_type {
             }
 
             // Set up optionsfound for filtersplustotalscolumns.
-            $optionsfound[] = "      (:{$shortercheckedname} * {$fxvy})";
+            $optionsfound[] = "      (:{$filtercountuniqueparam} * {$fxvy})";
         }
 
         // Set up filtersplustotalscolumns.
