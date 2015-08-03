@@ -450,7 +450,9 @@ class appraisal_quest_edit_form extends question_base_form {
         if ($readonly) {
             $mform->freeze();
         } else {
-            $this->add_action_buttons();
+            if (!is_ajax_request($_SERVER)) {
+                $this->add_action_buttons();
+            }
         }
     }
 
