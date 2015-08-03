@@ -98,6 +98,7 @@ Feature: We can change the grading type and maximum grade point values
     And I navigate to "General settings" node in "Site administration > Grades"
     And I set the following fields to these values:
       | Grade point maximum | 100 |
+      | Grade point default | 50  |
     And I press "Save changes"
     And I am on site homepage
     And I follow "Course 1"
