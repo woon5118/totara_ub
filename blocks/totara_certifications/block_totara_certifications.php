@@ -38,6 +38,10 @@ class block_totara_certifications extends block_base {
     public function get_content() {
         global $USER, $DB;
 
+        if (!totara_feature_visible('certifications')) {
+            return '';
+        }
+
         if ($this->content !== null) {
             return $this->content;
         }
