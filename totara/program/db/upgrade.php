@@ -496,5 +496,55 @@ function xmldb_totara_program_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015062600, 'totara_program');
     }
 
+    if ($oldversion < 2015082500) {
+        $now = time();
+        $warnings = array();
+        $problems = array();
+
+        $programs = $DB->get_records('prog');
+        foreach ($programs as $program) {
+            // All unavailable programs.
+            if ($program->available == 0) {
+                $availdate = userdate($program->availablefrom, get_string('strfdateshortmonth', 'langconfig'));
+                $info = "(pid: {$program->id})";
+
+                if ($program->availablefrom <= $now && $program->availableuntil >= $now) {
+                    // Program was unavailable and will become available on the next cron run, switch it now.
+                    $program->available = 1;
+                    $DB->update_record('prog', $program);
+
+                    // Now log and output the action.
+                    $type = 'Program Availablility Notification ' . $info;
+                    $message = "Program \"{$program->fullname}\" became available on {$availdate}, it has been set to available.
+                        If this does not sound correct please review the settings for the program.";
+                    upgrade_log(UPGRADE_LOG_NOTICE, 'totara_program', $type, $message);
+                    echo html_writer::tag('div', $message, array('class' => 'alert notifynotice'));
+                } else if ($program->availablefrom > $now) {
+                    // Program will become available in the future,
+                    // nothing to do but output a notification and log.
+                    $type = 'Program Availablility Notification ' . $info;
+                    $message = "Program \"{$program->fullname}\" will automatically become available on {$availdate}.
+                        If this does not sound correct please review the settings for the program.";
+                    upgrade_log(UPGRADE_LOG_NOTICE, 'totara_program', $type, $message);
+                    echo html_writer::tag('div', $message, array('class' => 'alert notifynotice'));
+                } else if ($program->availablefrom == 0 && $program->availableuntil == 0) {
+                    // Stuck, these are unavailable with no dates set.
+                    $program->available = 1;
+                    $DB->update_record('prog', $program);
+
+                    // Now log and output the action.
+                    $type = 'Program Availablility Problem ' . $info;
+                    $message = "Program \"{$program->fullname}\" was marked as unavailable with no availability dates, it has been set to available.
+                        If this does not sound correct please review the settings for the program";
+                    upgrade_log(UPGRADE_LOG_NOTICE, 'totara_program', $type, $message);
+                    echo html_writer::tag('div', $message, array('class' => 'alert notifyproblem'));
+                }
+            }
+        }
+
+        // Main savepoint reached.
+        totara_upgrade_mod_savepoint(true, 2015082500, 'totara_program');
+    }
+
     return true;
 }
