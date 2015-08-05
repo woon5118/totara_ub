@@ -1484,3 +1484,9 @@ div.criteria-description {
 #groupinfo .grouppicture {
     margin: 5px 0;
 }
+.table-no-entries {
+    font-size: 1.5em;
+    line-height: 1em;
+    margin: 5px 0 15px;
+    color: #444444;
+}

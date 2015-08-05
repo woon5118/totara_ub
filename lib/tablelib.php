@@ -973,7 +973,7 @@ class flexible_table {
         global $OUTPUT;
         $this->print_initials_bar();
 
-        echo $OUTPUT->heading(get_string('nothingtodisplay'));
+        echo html_writer::div(get_string('nothingtodisplay'), 'table-no-entries');
     }
 
     /**

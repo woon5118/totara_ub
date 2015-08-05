@@ -2339,3 +2339,9 @@ body.lockscroll {
 .ie10 .yui3-calendar-header-label {
     display: inline-block;
 }
+
+.table-no-entries {
+    margin: 1em 0;
+    font-size: 123.1%;
+    font-weight: bold;
+}
