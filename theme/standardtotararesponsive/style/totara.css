@@ -48,12 +48,12 @@
  * Totara toolbar - used by lib/totaratablelib.php
  */
 .totaratable .toolbar {
-    background-color: #f3f3f3 !important;
+    background-color: #f3f3f3;
     padding: 0px 0px;
 }
 .totaratable .toolbar-left-table,
 .totaratable .toolbar-right-table {
-    margin: 0px;
+    margin: 1px;
 }
 .totaratable .toolbar-cell {
     border: none;
