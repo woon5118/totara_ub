@@ -45,5 +45,7 @@ $string['pluginname'] = 'Course completion';
 $string['showonlyactiveenrols'] = 'Show only active enrolments';
 $string['showonlyactiveenrols_help'] = 'Normally the course completion report within a course does not show completion information for learners who do not have existing active enrolments, but who may have completed activities in the past when enrolled. Disabling this option will display all completion data in these reports including for those learners with suspended, expired or removed enrolments';
 $string['eventreportviewed'] = 'Completion report viewed';
+$string['eventrplcreated'] = 'RPL added';
+$string['eventrpldeleted'] = 'RPL deleted';
 $string['eventuserreportviewed'] = 'Completion user report viewed';
 $string['xofy'] = '{$a->completed} of {$a->total}';

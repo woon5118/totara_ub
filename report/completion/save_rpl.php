@@ -101,17 +101,22 @@ if (!empty($cmid)) {
     $data->coursemoduleid = $cmid;
     $data->completionstate = strlen($rpl) ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     $data->timemodified = time();
-    $cm = get_coursemodule_from_id(null, $cmid, null, false, MUST_EXIST);
+    $cm = get_coursemodule_from_id(null, $cmid, $course->id, false, MUST_EXIST);
     $info->internal_set_data($cm, $data);
+} else {
+    $cmid = null;
 }
 
-// Complete
 if (strlen($rpl)) {
+    // Complete.
     $completion->rpl = $rpl;
     $completion->mark_complete();
-// If no RPL, uncomplete user, and let aggregation do its thing
+    \report_completion\event\rpl_created::create_from_rpl($user->id, $course->id, $cmid, $type)->trigger();
+
 } else {
+    // If no RPL, uncomplete user, and let aggregation do its thing.
     $completion->delete();
+    \report_completion\event\rpl_deleted::create_from_rpl($user->id, $course->id, $cmid, $type)->trigger();
 }
 
 // Redirect, if requested (not an ajax request)
