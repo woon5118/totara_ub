@@ -37,7 +37,7 @@ function theme_customtotararesponsive_process_css($css, $theme) {
         'linkcolor' => '#087BB1',
         'linkvisitedcolor' => '#087BB1',
         'headerbgc' => '#F5F5F5',
-        'buttoncolor' => '#E6E6E6',
+        'buttoncolor' => '#E6E6E6'
     );
     $css = totara_theme_generate_autocolors($css, $theme, $substitutions);
 
@@ -48,6 +48,18 @@ function theme_customtotararesponsive_process_css($css, $theme) {
         $customcss = null;
     }
     $css = theme_customtotararesponsive_set_customcss($css, $customcss);
+
+    // Do some post-processing for the background images.
+    $backgroundsubstitutions = array(
+        '[[setting:contentbackground]]' => isset($theme->settings->contentbackground) ? $theme->settings->contentbackground : '#FFFFFF',
+        '[[setting:bodybackground]]' => isset($theme->settings->bodybackground) ? $theme->settings->bodybackground : '#FFFFFF',
+        '[[setting:backgroundrepeat]]' => isset($theme->settings->backgroundrepeat) ? $theme->settings->backgroundrepeat : 'none',
+        '[[setting:backgroundposition]]' => isset($theme->settings->backgroundposition) ? str_replace('_', ' ', $theme->settings->backgroundposition) : '0 0',
+        '[[setting:backgroundimage]]' => isset($theme->settings->backgroundimage) ? 'url(' . $theme->setting_file_url('backgroundimage', 'backgroundimage') . ')' : 'none',
+        '[[setting:backgroundfixed]]' => isset($theme->settings->backgroundfixed) && $theme->settings->backgroundfixed ? 'fixed' : 'initial',
+        '[[setting:textcolor]]' => isset($theme->settings->textcolor) ? $theme->settings->textcolor : '#333366'
+    );
+    $css = str_replace(array_keys($backgroundsubstitutions), $backgroundsubstitutions, $css);
 
     return $css;
 }
@@ -82,7 +94,7 @@ function theme_customtotararesponsive_set_customcss($css, $customcss) {
  * @return bool
  */
 function theme_customtotararesponsive_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'logo' || $filearea === 'favicon')) {
+    if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'logo' || $filearea === 'favicon' || $filearea === 'backgroundimage')) {
         $theme = theme_config::load('customtotararesponsive');
         return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
     } else {

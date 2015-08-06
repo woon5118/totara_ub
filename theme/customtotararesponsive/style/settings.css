@@ -74,6 +74,10 @@ input[type="reset"][disabled] {
 #page-footer, .block, .navbar-inner, .block > .header {
     background-color: [[setting:headerbgc]];
 }
+.ie8 .navbar-inner,
+.ie9 .navbar-inner {
+    filter: none;
+}
 th.header,
 td.header,
 div.header h1,
@@ -107,6 +111,24 @@ div.header h6
 }
 #page-footer .footer-powered {
     color: [[setting:text-on-headerbgc]];
+}
+
+body {
+    background-color: [[setting:bodybackground]];
+    background-image: [[setting:backgroundimage]];
+    background-repeat: [[setting:backgroundrepeat]];
+    background-position: [[setting:backgroundposition]];
+    background-attachment: [[setting:backgroundfixed]];
+}
+
+#region-main {
+    background-color: [[setting:contentbackground]];
+    border-radius: 4px;
+    padding: 20px;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, input, textarea {
+    color: [[setting:textcolor]];
 }
 
 /** Custom CSS defined via theme settings **/

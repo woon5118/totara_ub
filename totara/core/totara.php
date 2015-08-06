@@ -2111,28 +2111,30 @@ function totara_theme_generate_autocolors($css, $theme, $substitutions) {
     $replace = array();
     foreach ($substitutions as $setting => $defaultcolor) {
         $value = isset($theme->settings->$setting) ? $theme->settings->$setting : $defaultcolor;
-        $find[] = "[[setting:{$setting}]]";
-        $replace[] = $value;
+        if (substr($value, 0, 1) == '#') {
+            $find[] = "[[setting:{$setting}]]";
+            $replace[] = $value;
 
-        foreach ($autosettings as $suffix => $modification) {
-            if (!is_array($modification) || count($modification) < 1) {
-                continue;
+            foreach ($autosettings as $suffix => $modification) {
+                if (!is_array($modification) || count($modification) < 1) {
+                    continue;
+                }
+                $function_name = 'totara_' . array_shift($modification);
+                $function_args = $modification;
+                array_unshift($function_args, $value);
+
+                $find[] = "[[setting:{$setting}-$suffix]]";
+                $replace[] = call_user_func_array($function_name, $function_args);
             }
-            $function_name = 'totara_' . array_shift($modification);
-            $function_args = $modification;
-            array_unshift($function_args, $value);
-
-            $find[] = "[[setting:{$setting}-$suffix]]";
-            $replace[] = call_user_func_array($function_name, $function_args);
         }
 
-        if ($setting == 'headerbgc') {
-            $find[] = "[[setting:heading-on-headerbgc]]";
-            $replace[] = (totara_readable_text($value) == '#000000' ? '#444444' : '#b3b3b3');
+    }
+    if (isset($substitutions->headerbgc)) {
+        $find[] = "[[setting:heading-on-headerbgc]]";
+        $replace[] = (totara_readable_text($substitutions->headerbgc) == '#000000' ? '#444444' : '#b3b3b3');
 
-            $find[] = "[[setting:text-on-headerbgc]]";
-            $replace[] = (totara_readable_text($value) == '#000000' ? '#444444' : '#cccccc');
-        }
+        $find[] = "[[setting:text-on-headerbgc]]";
+        $replace[] = (totara_readable_text($substitutions->headerbgc) == '#000000' ? '#444444' : '#cccccc');
     }
     return str_replace($find, $replace, $css);
 }

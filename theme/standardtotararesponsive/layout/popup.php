@@ -98,10 +98,12 @@ if ($devicetype !== 'mobile' and $devicetype !== 'tablet') {
     <?php if ($hasfooter) { ?>
         <footer id="page-footer">
             <div class="container-fluid">
-                <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">Totara LMS</a></div>
                 <?php
-                echo $OUTPUT->standard_footer_html();
-                ?>
+                if (!empty($PAGE->theme->settings->footnote)) {
+                    echo '<div class="footnote text-center">'.format_text($PAGE->theme->settings->footnote).'</div>';
+                } ?>
+                <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">TotaraLMS</a></div>
+                <?php echo $OUTPUT->standard_footer_html(); ?>
             </div>
         </footer>
     <?php } ?>
