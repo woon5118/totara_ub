@@ -112,11 +112,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
 
             // Room.
             if (isset($session->room)) {
-                $roomhtml = '';
-                $roomhtml .= isset($session->room->name) ? format_string($session->room->name) . html_writer::empty_tag('br') : '';
-                $roomhtml .= isset($session->room->building) ? format_string($session->room->building) . html_writer::empty_tag('br') : '';
-                $roomhtml .= isset($session->room->address) ? format_string($session->room->address) . html_writer::empty_tag('br') : '';
-                $sessionrow[] = $roomhtml;
+                $sessionrow[] = facetoface_room_html($session->room);
             } else {
                 $sessionrow[] = '';
             }

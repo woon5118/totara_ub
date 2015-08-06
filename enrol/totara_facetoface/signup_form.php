@@ -222,12 +222,12 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             $mform->addElement('html', html_writer::tag('td', $allsessiondates));
 
             // Room.
-            $roomhtml = '';
             if (isset($session->room)) {
-                $roomhtml .= isset($session->room->name) ? html_writer::span(format_string($session->room->name), 'room room_name') : '';
-                $roomhtml .= isset($session->room->building) ? html_writer::span(format_string($session->room->building), 'room room_building') : '';
-                $roomhtml .= isset($session->room->address) ? html_writer::span(format_string($session->room->address), 'room room_address') : '';
+                $roomhtml = facetoface_room_html($session->room);
+            } else {
+                $roomhtml = '';
             }
+
             $mform->addElement('html', html_writer::tag('td', $roomhtml));
 
             // Signup information.

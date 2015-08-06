@@ -2778,14 +2778,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     $cancellink = html_writer::link($cancel_url, $strcancelbooking, array('class' => 'f2fsessionlinks f2fviewallsessions', 'title' => $strcancelbooking));
                 }
 
-                // Get room data.
-                $roomtext = '';
                 $roomdata = $DB->get_record('facetoface_room', array('id' => $session->roomid));
-                if (!empty($roomdata)) {
-                    $roomtext  = isset($roomdata->name)     ? format_string($roomdata->name)    .', '.html_writer::empty_tag('br') : '';
-                    $roomtext .= isset($roomdata->building) ? format_string($roomdata->building).', '.html_writer::empty_tag('br') : '';
-                    $roomtext .= isset($roomdata->address)  ? format_string($roomdata->address) .', '.html_writer::empty_tag('br') : '';
-                }
+                $roomtext = facetoface_room_html($roomdata);
 
                 // Don't include the link to view attendees if user is lacking capability.
                 $attendeeslink = '';
@@ -2856,25 +2850,8 @@ function facetoface_cm_info_view(cm_info $coursemodule) {
                     $sessiondate = get_string('wait-listed', 'facetoface');
                 }
 
-                $locationstring = '';
                 $roomdata = $DB->get_record('facetoface_room', array('id' => $session->roomid));
-                if (!empty($roomdata)) {
-                    $location = array ();
-
-                    if (!empty($roomdata->name)) {
-                        $location[] = format_string($roomdata->name);
-                    }
-                    if (!empty($roomdata->building)) {
-                        $location[] = format_string($roomdata->building);
-                    }
-                    if (!empty($roomdata->address)) {
-                        $location[] = format_string($roomdata->address);
-                    }
-
-                    if ($location) {
-                        $locationstring = implode ($location, ',' . html_writer::empty_tag('br')) . html_writer::empty_tag('br');
-                    }
-                }
+                $locationstring = facetoface_room_html($roomdata);
 
                 $sessionobject = new stdClass();
                 $sessionobject->location = $locationstring;
@@ -3559,10 +3536,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
     // Display room information
     $session->room = $DB->get_record('facetoface_room', array('id' => $session->roomid));
     if (!empty($session->room)) {
-        $roomstring = '';
-        $roomstring = isset($session->room->name) ? format_string($session->room->name) . ', '. html_writer::empty_tag('br') : '';
-        $roomstring .= isset($session->room->building) ? format_string($session->room->building) . ', ' . html_writer::empty_tag('br') : '';
-        $roomstring .= isset($session->room->address) ? format_string($session->room->address) . html_writer::empty_tag('br') : '';
+        $roomstring = facetoface_room_html($session->room);
 
         $systemcontext = context_system::instance();
         $editoroptions = array(
@@ -6060,6 +6034,27 @@ function facetoface_get_rooms($facetofaceid) {
         WHERE s.facetoface = ?";
 
     return $DB->get_records_sql($sql, array($facetofaceid));
+}
+
+/**
+ * Formats HTML for room details..
+ *
+ * @param object $room        DB record of a facetoface room.
+ *
+ * @return string containing room details with relevant html tags.
+ */
+
+function facetoface_room_html($room){
+
+    $roomhtml = '';
+
+    if (!empty($room)){
+        $roomhtml .= !empty($room->name) ? html_writer::span(format_string($room->name), 'room room_name') : '';
+        $roomhtml .= !empty($room->building) ? html_writer::span(format_string($room->building), 'room room_building') : '';
+        $roomhtml .= !empty($room->address) ? html_writer::span(format_string($room->address), 'room room_address') : '';
+    }
+
+    return $roomhtml;
 }
 
 /**

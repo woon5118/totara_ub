@@ -127,12 +127,18 @@ div.mod-indent form.togglecompletion input[type="image"] {
         width: 24.4%;
         display: inline-block;
     }
+
     .path-mod-facetoface .mform .f2f-roomselect .fitem .fitemtitle {
         width: 100%;
     }
+
     .path-mod-facetoface .mform .f2f-roomselect .fitem .felement {
         width: auto;
         max-width: 100%;
         float: none;
     }
+}
+
+.room {
+    display: block;
 }
