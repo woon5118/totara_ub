@@ -43,6 +43,7 @@ $string['certificate'] = 'Verification for certificate code:';
 $string['certificate:addinstance'] = 'Add a certificate instance';
 $string['certificate:manage'] = 'Manage a certificate instance';
 $string['certificate:printteacher'] = 'Be listed as a teacher on the certificate if the print teacher setting is on';
+$string['certificate:receivenotification'] = 'Receive notifications when users are awarded a certificate';
 $string['certificate:student'] = 'Retrieve a certificate';
 $string['certificate:view'] = 'View a certificate';
 $string['certificatename'] = 'Certificate Name';
@@ -84,11 +85,11 @@ After a user receives their certificate, if they click on the certificate link f
 $string['designoptions'] = 'Design Options';
 $string['download'] = 'Force download';
 $string['emailcertificate'] = 'Email';
-$string['emailothers'] = 'Email Others';
+$string['emailothers'] = 'Notify Others';
 $string['emailothers_help'] = 'Enter the email addresses here, separated by a comma, of those who should be alerted with an email whenever students receive a certificate.';
 $string['emailstudenttext'] = 'Attached is your certificate for {$a->course}.';
-$string['emailteachers'] = 'Email Teachers';
-$string['emailteachers_help'] = 'If enabled, then teachers are alerted with an email whenever students receive a certificate.';
+$string['emailteachers'] = 'Send Notifications';
+$string['emailteachers_help'] = 'If enabled then all users with the mod/certificate:receivenotifications capability in this modules context will receive a notification whenever students are awarded the certificate.';
 $string['emailteachermail'] = '
 {$a->student} has received their certificate: \'{$a->certificate}\'
 for {$a->course}.
