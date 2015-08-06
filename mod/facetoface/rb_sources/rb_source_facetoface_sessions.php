@@ -817,7 +817,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
         global $CFG, $DB;
         // add joins for the following roles as "session_role_X" and
         // "session_role_user_X"
-        $allowedroles = get_config(null, 'facetoface_sessionroles');
+        $allowedroles = get_config(null, 'facetoface_session_roles');
         if (!isset($allowedroles) || $allowedroles == '') {
             return false;
         }
@@ -876,7 +876,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
     function add_facetoface_session_roles_to_columns(&$columnoptions) {
         global $CFG, $DB;
 
-        $allowedroles = get_config(null, 'facetoface_sessionroles');
+        $allowedroles = get_config(null, 'facetoface_session_roles');
         if (!isset($allowedroles) || $allowedroles == '') {
             return false;
         }
@@ -894,13 +894,16 @@ class rb_source_facetoface_sessions extends rb_base_source {
         foreach ($sessionroles as $sessionrole) {
             $field = $sessionrole->shortname;
             $name = $sessionrole->name;
+            if (empty($name)) {
+                $name = $field;
+            }
             $key = "session_role_$field";
             $userkey = "session_role_user_$field";
             $usernamefields = totara_get_all_user_name_fields_join($userkey);
             $columnoptions[] = new rb_column_option(
                 'role',
                 $field . '_name',
-                'Session '.$name . ' Name',
+                get_string('sessionrole', 'rb_source_facetoface_sessions', $name),
                 $DB->sql_concat_join("' '", $usernamefields),
                 array(
                     'joins' => $userkey,
@@ -930,7 +933,7 @@ class rb_source_facetoface_sessions extends rb_base_source {
     protected function add_facetoface_session_role_fields_to_filters(&$filteroptions) {
         // auto-generate filters for session roles fields
         global $CFG, $DB;
-        $allowedroles = get_config(null, 'facetoface_sessionroles');
+        $allowedroles = get_config(null, 'facetoface_session_roles');
         if (!isset($allowedroles) || $allowedroles == '') {
             return false;
         }
@@ -948,12 +951,15 @@ class rb_source_facetoface_sessions extends rb_base_source {
         foreach ($sessionroles as $sessionrole) {
             $field = $sessionrole->shortname;
             $name = $sessionrole->name;
+            if (empty($name)) {
+                $name = $field;
+            }
             $key = "session_role_$field";
             $userkey = "session_role_user_$field";
             $filteroptions[] = new rb_filter_option(
                 'role',
                 $field . '_name',
-                'Session ' . $name,
+                get_string('sessionrole', 'rb_source_facetoface_sessions', $name),
                 'text'
             );
         }

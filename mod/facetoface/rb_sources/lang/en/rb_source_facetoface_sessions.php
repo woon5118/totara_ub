@@ -49,6 +49,7 @@ $string['sessdatelink'] = 'Session Start Date (linked to actvity)';
 $string['sessname'] = 'Session Name';
 $string['sessstart'] = 'Session Start Time';
 $string['sessfinish'] = 'Session Finish Time';
+$string['sessionrole'] = 'Session {$a}';
 $string['sessionx'] = 'Session {$a}';
 $string['starttime'] = 'Start Time';
 $string['cancellationdate'] = 'Cancellation date';
