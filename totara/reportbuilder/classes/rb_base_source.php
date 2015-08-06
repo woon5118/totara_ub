@@ -1545,22 +1545,35 @@ abstract class rb_base_source {
     }
 
     /**
-     * Generates the HTML to display the due/expiry date of a program/certification.
+     * Generates the HTML to display the due/expiry date of a certification.
      *
      * @param int $time     The duedate of the program
      * @param record $row   The whole row, including some required fields
      * @return html
      */
-    public function rb_display_program_duedate($time, $row, $isexport = false) {
-        // Get the necessary fields out of the row.
-        $duedate = $time;
-        $userid = $row->userid;
-        $progid = $row->programid;
-        $status = $row->status;
-        $certifpath = isset($row->certifpath) ? $row->certifpath : null;
-        $certifstatus = isset($row->certifstatus) ? $row->certifstatus : null;
+    public function rb_display_certification_duedate($time, $row) {
+        global $OUTPUT, $CFG;
 
-        return prog_display_duedate($duedate, $progid, $userid, $certifpath, $certifstatus, $status, $isexport);
+        if (empty($row->timeexpires)) {
+            if (empty($row->timedue) || $row->timedue == COMPLETION_TIME_NOT_SET) {
+                // There is no time due set.
+                return get_string('duedatenotset', 'totara_program');
+            } else if ($row->timedue > time() && $row->certifpath == CERTIFPATH_CERT) {
+                // User is still in the first stage of certification, not overdue yet.
+                return $this->rb_display_program_duedate($time, $row);
+            } else {
+                // Looks like the certification has expired, overdue!
+                $out = '';
+                $out .= userdate($row->timedue, get_string('strfdateshortmonth', 'langconfig'), 99, false);
+                $out .= html_writer::empty_tag('br');
+                $out .= $OUTPUT->error_text(get_string('overdue', 'totara_program'));
+                return $out;
+            }
+        } else {
+            return $this->rb_display_program_duedate($time, $row);
+        }
+
+        return '';
     }
 
     // Display grade along with passing grade if it is known.

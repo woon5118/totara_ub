@@ -58,6 +58,7 @@ class rb_source_dp_program extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program');
         $this->sourcewhere = 'base.certifid IS NULL';
+        $this->usedcomponents[] = 'totara_program';
         parent::__construct();
     }
 
@@ -210,7 +211,7 @@ class rb_source_dp_program extends rb_base_source {
             array(
                 'joins' => 'program_completion',
                 'dbdatatype' => 'timestamp',
-                'displayfunc' => 'program_duedate',
+                'displayfunc' => 'programduedate',
                 'extrafields' => array(
                     'programid' => 'base.id',
                     'userid' => 'program_completion.userid',
