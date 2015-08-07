@@ -218,8 +218,9 @@ abstract class moodleform {
         }
 
         // HACK to prevent browsers from automatically inserting the user's password into the wrong fields.
-        $element = $this->_form->addElement('hidden');
-        $element->setType('password');
+        // Totara: do not mess with elements MDL-45772! Hack the lib/pear/HTML/QuickForm/Renderer/Default.php instead!!!
+        //$element = $this->_form->addElement('hidden');
+        //$element->setType('password');
 
         $this->definition();
 
