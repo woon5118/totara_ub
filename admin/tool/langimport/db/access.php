@@ -17,12 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aaron Barnes <aaron.barnes@totaralms.com>
- * @package totara_core
+ * @author Brendan Cox <brendan.cox@totaralms.com>
+ * @package tool_langimport
  */
 
-defined('MOODLE_INTERNAL') || die();
+/*
+ * The capabilities are loaded into the database table when the module is
+ * installed or updated. Whenever the capability definitions are updated,
+ * the module version number should be bumped up.
+ *
+ * The system has four possible values for a capability:
+ * CAP_ALLOW, CAP_PREVENT, CAP_PROHIBIT, and inherit (not set).
+*/
 
-$plugin->version  = 2015080702;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051205;       // Requires this Moodle version.
-$plugin->component = 'totara_core';   // To check on upgrade, that module sits in correct place
+$capabilities = array(
+    // Allows the user to install and uninstall languages for the site.
+    'tool/langimport:managelanguages' => array(
+        'riskbitmask' => RISK_CONFIG | RISK_XSS,
+        'captype'     => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+        ),
+    ),
+);

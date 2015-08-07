@@ -187,4 +187,12 @@ $capabilities = array(
         'archetypes'    => array(
         ),
     ),
+    // Allows the user to install and uninstall languages for the site.
+    'totara/core:langconfig' => array(
+        'riskbitmask' => RISK_CONFIG,
+        'captype'     => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+        ),
+    ),
 );

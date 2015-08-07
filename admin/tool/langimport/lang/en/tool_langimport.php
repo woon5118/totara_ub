@@ -26,6 +26,7 @@
 $string['install'] = 'Install selected language pack(s)';
 $string['installedlangs'] = 'Installed language packs';
 $string['langimport'] = 'Language import utility';
+$string['langimport:managelanguages'] = 'Install and uninstall languages';
 $string['langimportdisabled'] = 'Language import feature has been disabled. You have to update your language packs manually at the file-system level. Do not forget to purge string caches after you do so.';
 $string['langpackinstalled'] = 'Language pack \'{$a}\' was successfully installed';
 $string['langpackinstalledevent'] = 'Language pack installed';
