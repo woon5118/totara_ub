@@ -205,7 +205,7 @@ $jsmodule = array(
     'requires' => array('json'));
 $PAGE->requires->strings_for_js(array('printnow', 'printyourappraisal', 'snapshotgeneration', 'downloadnow',
     'snapshotdialogtitle'), 'totara_appraisal');
-$PAGE->requires->js_init_call('M.totara_appraisal_myappraisal.init',  array('args' => json_encode(array(
+$PAGE->requires->js_call_amd('totara_appraisal/myappraisal', 'init', array('args' => json_encode(array(
     'appraisalid' => $appraisal->id, 'role' => $role, 'subjectid' => $subjectid,
     'keepalivetime' => ($CFG->sessiontimeout / 2)))), false, $jsmodule);
 
