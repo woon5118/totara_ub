@@ -140,6 +140,8 @@ Feature: Test visibility control of menu items
       And I click on "Main menu" "link"
       And I edit "CH1 members only" totara menu item
       And I click on "Access" "link"
+      And I expand all fieldsets
+      And I click on "Restrict access by audience" "checkbox"
       And I press "Add audiences"
       And I click on "Cohort 1" "link"
       And I press "OK"
@@ -148,6 +150,8 @@ Feature: Test visibility control of menu items
       And I navigate to "Main menu" node in "Site administration > Appearance"
       And I edit "CH2 members only" totara menu item
       And I click on "Access" "link"
+      And I expand all fieldsets
+      And I click on "Restrict access by audience" "checkbox"
       And I press "Add audiences"
       And I click on "Cohort 2" "link"
       And I press "OK"
