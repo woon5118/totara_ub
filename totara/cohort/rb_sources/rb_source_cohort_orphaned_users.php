@@ -42,12 +42,19 @@ class rb_source_cohort_orphaned_users extends rb_source_user {
 
     /**
      * Constructor
-     * @global object $CFG
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $CFG;
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Global Report Restrictions applied in rb_source_user are also reflect on orphaned user report.
+
         require_once($CFG->dirroot.'/cohort/lib.php');
-        parent::__construct();
+        parent::__construct($groupid, $globalrestrictionset);
         $this->base = "(
             select *
             from {user} u
@@ -69,4 +76,11 @@ class rb_source_cohort_orphaned_users extends rb_source_user {
 
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
 }

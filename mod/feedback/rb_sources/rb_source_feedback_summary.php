@@ -19,8 +19,16 @@ class rb_source_feedback_summary extends rb_base_source {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $sourcetitle;
 
-    function __construct($groupid=null) {
-        global $CFG;
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $this->add_global_report_restriction_join('base', 'userid', 'auser');
+
         $this->base = '{feedback_completed}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -32,6 +40,14 @@ class rb_source_feedback_summary extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_feedback_summary');
 
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //
@@ -145,14 +161,14 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_column_option(
                 'responses',
                 'timecompleted',
-                get_string('timecompleted', 'rb_source_feedback_questions'),
+                get_string('timecompleted', 'rb_source_feedback_summary'),
                 'base.timemodified',
                 array('displayfunc' => 'nice_datetime', 'dbdatatype' => 'timestamp')
             ),
             new rb_column_option(
                 'feedback',
                 'name',
-                get_string('feedbackactivity', 'rb_source_feedback_questions'),
+                get_string('feedbackactivity', 'rb_source_feedback_summary'),
                 'feedback.name',
                 array('joins' => 'feedback',
                       'dbdatatype' => 'char',
@@ -161,14 +177,14 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_column_option(
                 'trainer',
                 'id',
-                get_string('trainerid', 'rb_source_feedback_questions'),
+                get_string('trainerid', 'rb_source_feedback_summary'),
                 'sessiontrainer.userid',
                 array('joins' => 'sessiontrainer')
             ),
             new rb_column_option(
                 'trainer',
                 'fullname',
-                get_string('trainerfullname', 'rb_source_feedback_questions'),
+                get_string('trainerfullname', 'rb_source_feedback_summary'),
                 $DB->sql_fullname('trainer.firstname', 'trainer.lastname'),
                 array('joins' => 'trainer',
                       'dbdatatype' => 'char',
@@ -177,14 +193,14 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_column_option(
                 'trainer',
                 'organisationid',
-                get_string('trainerorgid', 'rb_source_feedback_questions'),
+                get_string('trainerorgid', 'rb_source_feedback_summary'),
                 'trainer_position_assignment.organisationid',
                 array('joins' => 'trainer_position_assignment')
             ),
             new rb_column_option(
                 'trainer',
                 'organisation',
-                get_string('trainerorg', 'rb_source_feedback_questions'),
+                get_string('trainerorg', 'rb_source_feedback_summary'),
                 'trainer_organisation.fullname',
                 array('joins' => 'trainer_organisation',
                       'dbdatatype' => 'char',
@@ -193,14 +209,14 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_column_option(
                 'trainer',
                 'positionid',
-                get_string('trainerposid', 'rb_source_feedback_questions'),
+                get_string('trainerposid', 'rb_source_feedback_summary'),
                 'trainer_position_assignment.positionid',
                 array('joins' => 'trainer_position_assignment')
             ),
             new rb_column_option(
                 'trainer',
                 'position',
-                get_string('trainerpos', 'rb_source_feedback_questions'),
+                get_string('trainerpos', 'rb_source_feedback_summary'),
                 'trainer_position.fullname',
                 array('joins' => 'trainer_position',
                       'dbdatatype' => 'char',
@@ -224,25 +240,25 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_filter_option(
                 'feedback',
                 'name',
-                get_string('feedbackname', 'rb_source_feedback_questions'),
+                get_string('feedbackname', 'rb_source_feedback_summary'),
                 'text'
             ),
             new rb_filter_option(
                 'responses',
                 'timecompleted',
-                get_string('timecompleted', 'rb_source_feedback_questions'),
+                get_string('timecompleted', 'rb_source_feedback_summary'),
                 'date'
             ),
             new rb_filter_option(
                 'trainer',
                 'fullname',
-                get_string('trainerfullname', 'rb_source_feedback_questions'),
+                get_string('trainerfullname', 'rb_source_feedback_summary'),
                 'text'
             ),
             new rb_filter_option(
                 'trainer',
                 'organisationid',
-                get_string('trainerorg', 'rb_source_feedback_questions'),
+                get_string('trainerorg', 'rb_source_feedback_summary'),
                 'select',
                 array(
                     'selectfunc' => 'organisations_list',
@@ -252,7 +268,7 @@ class rb_source_feedback_summary extends rb_base_source {
             new rb_filter_option(
                 'trainer',
                 'positionid',
-                get_string('trainerpos', 'rb_source_feedback_questions'),
+                get_string('trainerpos', 'rb_source_feedback_summary'),
                 'select',
                 array(
                     'selectfunc' => 'positions_list',
@@ -277,7 +293,7 @@ class rb_source_feedback_summary extends rb_base_source {
         $contentoptions = array(
             new rb_content_option(
                 'user',
-                get_string('user', 'rb_source_feedback_questions'),
+                get_string('user', 'rb_source_feedback_summary'),
                 array(
                     'userid' => 'base.userid',
                     'managerid' => 'position_assignment.managerid',
@@ -300,13 +316,13 @@ class rb_source_feedback_summary extends rb_base_source {
             ),
             new rb_content_option(
                 'tag',
-                get_string('course', 'rb_source_feedback_questions'),
+                get_string('course', 'rb_source_feedback_summary'),
                 'tagids.idlist',
                 'tagids'
             ),
             new rb_content_option(
                 'date',
-                get_string('responsetime', 'rb_source_feedback_questions'),
+                get_string('responsetime', 'rb_source_feedback_summary'),
                 'base.timemodified'
             ),
         );
@@ -334,12 +350,12 @@ class rb_source_feedback_summary extends rb_base_source {
             array(
                 'type' => 'user',
                 'value' => 'namelink',
-                'heading' => get_string('user', 'rb_source_feedback_questions'),
+                'heading' => get_string('user', 'rb_source_feedback_summary'),
             ),
             array(
                 'type' => 'course',
                 'value' => 'courselink',
-                'heading' => get_string('coursename', 'rb_source_feedback_questions'),
+                'heading' => get_string('coursename', 'rb_source_feedback_summary'),
             ),
             array(
                 'type' => 'feedback',

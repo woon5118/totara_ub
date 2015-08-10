@@ -26,6 +26,7 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 global $CFG;
 require_once($CFG->dirroot.'/cohort/lib.php');
+
 /**
  * A report builder source for the "cohorts" table.
  */
@@ -39,7 +40,15 @@ class rb_source_cohort extends rb_base_source {
      * Constructor
      * @global object $CFG
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Global restrictions are applied in define_joinlist() method.
+
         $this->base = '{cohort}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -52,6 +61,14 @@ class rb_source_cohort extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort');
 
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //
@@ -67,20 +84,22 @@ class rb_source_cohort extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
-        global $CFG;
+        // Apply global user restrictions.
+        $global_restriction_join_cm = $this->get_global_report_restriction_join('cm', 'userid');
+        $global_restriction_join_cm2 = $this->get_global_report_restriction_join('cm2', 'userid');
 
         $joinlist = array(
                         new rb_join(
                             'members', // Table alias?
                             'LEFT', // Type of join.
-                            '{cohort_members}',
+                            "(SELECT cm.cohortid, cm.userid FROM {cohort_members} cm {$global_restriction_join_cm})",
                             'base.id = members.cohortid', // How it is joined.
                             REPORT_BUILDER_RELATION_ONE_TO_MANY
                         ),
                         new rb_join(
                             'membercount',
                             'LEFT', // Type of join.
-                            '(SELECT cohortid, count(id) AS count FROM {cohort_members} GROUP BY cohortid)',
+                            "(SELECT cohortid, count(cm2.id) AS count FROM {cohort_members} cm2 {$global_restriction_join_cm2} GROUP BY cohortid)",
                             'base.id = membercount.cohortid', // How it is joined.
                             REPORT_BUILDER_RELATION_ONE_TO_ONE
                         ),

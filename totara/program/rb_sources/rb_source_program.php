@@ -37,8 +37,7 @@ class rb_source_program extends rb_base_source {
 
     protected $instancetype = 'program';
 
-    function __construct() {
-        global $CFG;
+    public function __construct() {
         $this->base = '{prog}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -51,6 +50,14 @@ class rb_source_program extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_program');
         $this->sourcewhere = $this->define_sourcewhere();
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return false;
     }
 
     //

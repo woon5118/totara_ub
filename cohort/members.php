@@ -62,7 +62,12 @@ if (!$id) {
     }
 }
 
-$report = reportbuilder_get_embedded_report('cohort_members', array('cohortid' => $id), false, $sid);
+// Verify global restrictions.
+$shortname = 'cohort_members';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+$report = reportbuilder_get_embedded_report($shortname, array('cohortid' => $id), false, $sid, $globalrestrictionset);
 
 if ($format != '') {
     $report->export_data($format);
@@ -78,6 +83,7 @@ if ($context->contextlevel == CONTEXT_COURSECAT) {
 }
 $strheading = get_string('viewmembers', 'totara_cohort');
 totara_cohort_navlinks($cohort->id, $cohort->name, $strheading);
+
 echo $OUTPUT->header();
 if ($debug) {
     $report->debug($debug);
@@ -86,6 +92,8 @@ if (isset($id)) {
     echo $OUTPUT->heading(format_string($cohort->name));
     echo cohort_print_tabs('viewmembers', $cohort->id, $cohort->cohorttype, $cohort);
 }
+
+$report->display_restrictions();
 
 $report->display_search();
 $report->display_sidebar_search();

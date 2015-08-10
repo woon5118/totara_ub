@@ -40,27 +40,39 @@ class rb_source_dp_certification_history extends rb_base_source {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $DB;
-        $activeunique = $DB->sql_concat("'active'", 'id');
-        $historyunique = $DB->sql_concat("'history'", 'id');
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
+        $global_restriction_join_cch = $this->get_global_report_restriction_join('cch', 'userid');
+
+        $activeunique = $DB->sql_concat("'active'", 'cc.id');
+        $historyunique = $DB->sql_concat("'history'", 'cch.id');
         $sql = '(SELECT ' . $activeunique . ' AS id,
                 1 AS active,
-                id AS completionid,
+                cc.id AS completionid,
                 certifid,
                 userid,
                 timecompleted,
                 timeexpires
-                FROM {certif_completion}
+                FROM {certif_completion} cc
+                ' . $global_restriction_join_cc . '
                 UNION
                 SELECT ' . $historyunique . ' AS id,
                 0 AS active,
-                id AS completionid,
+                cch.id AS completionid,
                 certifid,
                 userid,
                 timecompleted,
                 timeexpires
-                FROM {certif_completion_history}
+                FROM {certif_completion_history} cch
+                ' . $global_restriction_join_cch . '
                 WHERE unassigned = 0)';
         $this->base = $sql;
         $this->joinlist = $this->define_joinlist();
@@ -75,6 +87,13 @@ class rb_source_dp_certification_history extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
 
     //
     //

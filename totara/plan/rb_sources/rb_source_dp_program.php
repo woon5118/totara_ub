@@ -36,7 +36,16 @@ class rb_source_dp_program extends rb_base_source {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle, $instancetype;
 
-    function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $this->add_global_report_restriction_join('program_completion', 'userid');
+
         $this->base = '{prog}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -50,6 +59,14 @@ class rb_source_dp_program extends rb_base_source {
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_program');
         $this->sourcewhere = 'base.certifid IS NULL';
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //

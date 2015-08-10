@@ -36,7 +36,12 @@ $sid = optional_param('sid', '0', PARAM_INT);
 require_login();
 $context = context_system::instance();
 
-$report = new reportbuilder($id, null, false, $sid);
+$reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+
+// Verify global restrictions.
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+$report = new reportbuilder($id, null, false, $sid, null, false, array(), $globalrestrictionset);
 if (!$report->is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }

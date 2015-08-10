@@ -100,6 +100,8 @@ echo $OUTPUT->header();
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
 
+$report->display_restrictions();
+
 $heading = $strheading . ': ' . $renderer->print_result_count_string($countfiltered, $countall);
 echo $OUTPUT->heading($heading);
 

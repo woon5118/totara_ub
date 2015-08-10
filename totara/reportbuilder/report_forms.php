@@ -932,8 +932,9 @@ class report_builder_edit_graph_form extends moodleform {
  */
 class report_builder_edit_content_form extends moodleform {
     function definition() {
-        global $DB;
+        global $DB, $CFG;
         $mform =& $this->_form;
+        /** @var reportbuilder $report */
         $report = $this->_customdata['report'];
         $id = $this->_customdata['id'];
 
@@ -943,18 +944,38 @@ class report_builder_edit_content_form extends moodleform {
 
         $mform->addElement('header', 'contentheader', get_string('contentcontrols', 'totara_reportbuilder'));
 
-        if (count($contentoptions)) {
+        // Add Global restriction setting.
+        $globalrestrictionsopts = false;
+        if (!empty($CFG->enableglobalrestrictions)) {
+            // Add option if src supports GRR or Embedded report support GRR
+            // or option is already enabled (to allow disable it).
+            if ($report->src->global_restrictions_supported() &&
+                    (is_null($report->embedobj) || $report->embedobj->embedded_global_restrictions_supported()) ||
+                    $report->globalrestriction) {
+                $mform->addElement('advcheckbox', 'globalrestriction', get_string('globalrestriction', 'totara_reportbuilder'));
+                $mform->addHelpButton('globalrestriction', 'globalrestriction', 'totara_reportbuilder');
+                $mform->setDefault("globalrestriction", $report->globalrestriction);
+                $globalrestrictionsopts = true;
+            } else {
+                $mform->addElement('static', 'staticglobalrestriction', get_string('globalrestriction', 'totara_reportbuilder'),
+                        get_string('globalrestrictionnotsupported', 'totara_reportbuilder'));
+            }
+        }
+
+        if (count($contentoptions) || $globalrestrictionsopts) {
             if ($report->embeddedurl !== null) {
                 $mform->addElement('html', html_writer::tag('p', get_string('embeddedcontentnotes', 'totara_reportbuilder')));
             }
 
-            $radiogroup = array();
-            $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('nocontentrestriction', 'totara_reportbuilder'), 0);
-            $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('withcontentrestrictionany', 'totara_reportbuilder'), 1);
-            $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('withcontentrestrictionall', 'totara_reportbuilder'), 2);
-            $mform->addGroup($radiogroup, 'radiogroup', get_string('restrictcontent', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
-            $mform->addHelpButton('radiogroup', 'reportbuildercontentmode', 'totara_reportbuilder');
-            $mform->setDefault('contentenabled', $DB->get_field('report_builder', 'contentmode', array('id' => $id)));
+            if (count($contentoptions)) {
+                $radiogroup = array();
+                $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('nocontentrestriction', 'totara_reportbuilder'), 0);
+                $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('withcontentrestrictionany', 'totara_reportbuilder'), 1);
+                $radiogroup[] =& $mform->createElement('radio', 'contentenabled', '', get_string('withcontentrestrictionall', 'totara_reportbuilder'), 2);
+                $mform->addGroup($radiogroup, 'radiogroup', get_string('restrictcontent', 'totara_reportbuilder'), html_writer::empty_tag('br'), false);
+                $mform->addHelpButton('radiogroup', 'reportbuildercontentmode', 'totara_reportbuilder');
+                $mform->setDefault('contentenabled', $DB->get_field('report_builder', 'contentmode', array('id' => $id)));
+            }
 
             // display any content restriction form sections that are enabled for
             // this source
@@ -1393,5 +1414,54 @@ class report_builder_program_expand_form extends moodleform {
         $url = new moodle_url('/totara/program/view.php', array('id' => $prog['id']));
         $mform->addElement('static', 'view', '', html_writer::link($url, get_string('view' . $type, 'totara_' . $type),
             array('class' => 'link-as-button')));
+    }
+}
+
+class report_builder_restrictions_edit_general_form extends moodleform {
+    public function definition() {
+        $mform = $this->_form;
+        $data = $this->_customdata;
+
+        $mform->addElement('text', 'name', get_string('name', 'totara_reportbuilder'));
+        $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', null, 'required');
+        $mform->addHelpButton('name', 'name', 'totara_reportbuilder');
+
+        $mform->addElement('editor', 'description_editor', get_string('description'));
+        $mform->setType('text', PARAM_RAW); // Always use format_text() when displaying to user.
+
+        $mform->addElement('advcheckbox', 'active', get_string('activeglobalrestriction', 'totara_reportbuilder'));
+        $mform->addHelpButton('active', 'activeglobalrestriction', 'totara_reportbuilder');
+
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
+
+        $this->add_action_buttons();
+
+        $this->set_data($data);
+    }
+}
+
+/**
+ * Choose one ore more Global Report Restrictions to apply
+ */
+class report_builder_choose_restriction_form extends moodleform {
+    public function definition() {
+        $data = $this->_customdata;
+        $restrictions = $data['restrictions'];
+        $selected = $data['selected'];
+
+        $mform =& $this->_form;
+
+        foreach ($restrictions as $restriction) {
+            $elem = $mform->addElement('advcheckbox', "restriction[{$restriction->id}]", '', $restriction->name, null,
+                    $restriction->id);
+            if (array_search($restriction->id, $selected) !== false) {
+                $elem->setChecked(true);
+                $first = false;
+            }
+        }
+
+        // This is dialog form, so no submit button required.
     }
 }

@@ -30,7 +30,6 @@ class rb_source_totara_sync_log extends rb_base_source {
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
     function __construct() {
-        global $CFG;
         $this->base = '{totara_sync_log}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -42,6 +41,14 @@ class rb_source_totara_sync_log extends rb_base_source {
         $this->requiredcolumns = $this->define_requiredcolumns();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_totara_sync_log');
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return false;
     }
 
     //

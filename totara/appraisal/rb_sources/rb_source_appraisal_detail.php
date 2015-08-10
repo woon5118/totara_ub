@@ -41,8 +41,8 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
     private $appraisalid;
 
 
-    public function __construct() {
-        parent::__construct();
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        parent::__construct($groupid, $globalrestrictionset);
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_appraisal_detail');
         $this->shortname = 'appraisal_detail';

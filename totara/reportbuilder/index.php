@@ -114,6 +114,13 @@ if ($fromform = $mform->get_data()) {
     $todb->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
     $todb->accessmode = REPORT_BUILDER_ACCESS_MODE_ANY; // default to limited access
     $todb->embedded = 0;
+    if (isset($fromform->globalrestriction)) {
+        // In case somebody adds it to the UI in the future.
+        $todb->globalrestriction = $fromform->globalrestriction;
+    } else {
+        // Always use the default even if GUR not active at the moment.
+        $todb->globalrestriction = get_config('reportbuilder', 'globalrestrictiondefault');
+    }
     $todb->timemodified = time();
 
     try {
@@ -190,7 +197,14 @@ if ($fromform = $mform->get_data()) {
 }
 
 $custom = reportbuilder::get_user_generated_reports();
+usort($custom, function($a, $b) {
+    return strcmp($a->fullname, $b->fullname);
+});
+
 $embedded = reportbuilder::get_embedded_reports();
+usort($embedded, function($a, $b) {
+    return strcmp($a->fullname, $b->fullname);
+});
 
 /** @var totara_reportbuilder_renderer $output */
 echo $output->header();

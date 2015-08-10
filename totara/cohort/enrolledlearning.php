@@ -131,6 +131,8 @@ if ($debug) {
     $report->debug($debug);
 }
 
+$report->display_restrictions();
+
 echo $OUTPUT->heading(format_string($cohort->name));
 echo cohort_print_tabs('enrolledlearning', $cohort->id, $cohort->cohorttype, $cohort);
 

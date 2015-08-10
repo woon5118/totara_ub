@@ -44,10 +44,31 @@ if ($ADMIN->fulltree) {
 
     $rb->add(new totara_reportbuilder_admin_setting_configdaymonthpicker('reportbuilder/financialyear', new lang_string('financialyear', 'totara_reportbuilder'),
         new lang_string('reportbuilderfinancialyear_help', 'totara_reportbuilder'), array('d' => 1, 'm' => 7)));
+
+    // NOTE: for performance reasons do not use constants here.
+    $options = array(
+        0 => get_string('noactiverestrictionsbehaviournone', 'totara_reportbuilder'), // == rb_global_restriction_set::NO_ACTIVE_NONE
+        1 => get_string('noactiverestrictionsbehaviourall', 'totara_reportbuilder'),  // == rb_global_restriction_set::NO_ACTIVE_ALL
+    );
+    $rb->add(new admin_setting_configselect('reportbuilder/noactiverestrictionsbehaviour',
+        new lang_string('noactiverestrictionsbehaviour', 'totara_reportbuilder'),
+        new lang_string('noactiverestrictionsbehaviour_desc', 'totara_reportbuilder'),
+        1, $options));
+
+    // NOTE: do not use constants here for performance reasons.
+    //  0 == reportbuilder::GLOBAL_REPORT_RESTRICTIONS_DISABLED
+    //  1 == reportbuilder::GLOBAL_REPORT_RESTRICTIONS_ENABLED
+    $rb->add(new admin_setting_configcheckbox('reportbuilder/globalrestrictiondefault',
+        new lang_string('globalrestrictiondefault', 'totara_reportbuilder'),
+        new lang_string('globalrestrictiondefault_desc', 'totara_reportbuilder'), 1));
 }
 
 // Add all above settings to the report builder settings node.
 $ADMIN->add('totara_reportbuilder', $rb);
+
+// Add links to Global Reports Restrictions.
+$ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanageglobalrestrictions', new lang_string('manageglobalrestrictions','totara_reportbuilder'),
+    new moodle_url('/totara/reportbuilder/restrictions/index.php'), array('totara/reportbuilder:managereports'), empty($CFG->enableglobalrestrictions)));
 
 // Add links to report builder reports.
 $ADMIN->add('totara_reportbuilder', new admin_externalpage('rbmanagereports', new lang_string('managereports','totara_reportbuilder'),

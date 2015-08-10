@@ -36,7 +36,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
     // The dialog class.
     protected $pickerclass = 'totara_assign_ui_picker_cohort';
     // The module name and moduleinstanceid of the base assignment object.
-    protected $module, $moduleinstanceid;
+    protected $module, $moduleinstanceid, $suffix;
     // The table assignments will be stored in - usually of the form $module_grp_$grouptype.
     protected $tablename;
     protected $params = array(
@@ -50,7 +50,11 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
         parent::__construct($assignobject);
         $this->module = $this->assignment->get_assign_module();
         $this->moduleinstanceid = $this->assignment->get_assign_moduleinstanceid();
-        $this->tablename = "{$this->module}_grp_{$this->grouptype}";
+
+        $this->suffix = $assignobject->get_assign_suffix();
+        $suffixstr = strlen($this->suffix) ? '_' . $this->suffix : '';
+
+        $this->tablename = "{$this->module}_grp_{$this->grouptype}{$suffixstr}";
     }
 
     /**
@@ -124,7 +128,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
         if ($this->assignment->is_locked()) {
             print_error('error:assignmentmoduleinstancelocked', 'totara_core');
         }
-        $modulekeyfield = "{$this->module}id";
+        $modulekeyfield = "{$this->module}{$this->suffix}id";
         $grouptypekeyfield = "{$this->grouptype}id";
         // Add only the new records.
         $existingassignedgroups = $DB->get_fieldset_select($this->tablename, $grouptypekeyfield,
@@ -134,6 +138,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
                 $todb = new stdClass();
                 $todb->$modulekeyfield = $this->moduleinstanceid;
                 $todb->$grouptypekeyfield = $assignedgroupid;
+                $todb->timecreated = time();
                 $DB->insert_record($this->tablename, $todb);
             }
         }
@@ -160,7 +165,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
      */
     public function get_current_assigned_groups() {
         global $DB;
-        $modulekeyfield = "{$this->module}id";
+        $modulekeyfield = "{$this->module}{$this->suffix}id";
         $assignedgroups = $DB->get_records($this->tablename, array($modulekeyfield => $this->moduleinstanceid));
         return $assignedgroups;
     }
@@ -203,7 +208,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
                         source.name AS sourcefullname
                    FROM {{$this->tablename}} assignedgroups
              INNER JOIN {{$this->grouptype}} source ON source.id = assignedgroups.{$this->grouptype}id
-                  WHERE assignedgroups.{$this->module}id = $itemid";
+                  WHERE assignedgroups.{$this->module}{$this->suffix}id = $itemid";
     }
 
     /**
@@ -243,7 +248,7 @@ class totara_assign_core_grouptype_cohort extends totara_assign_core_grouptype {
     public function duplicate($assignedgroup, $newassign) {
         global $DB;
 
-        $sql = "INSERT INTO {{$this->tablename}} ({$this->module}id, {$this->grouptype}id)
+        $sql = "INSERT INTO {{$this->tablename}} ({$this->module}{$this->suffix}id, {$this->grouptype}id)
                        (SELECT {$newassign->get_assign_moduleinstanceid()}, {$this->grouptype}id
                           FROM {{$this->tablename}}
                          WHERE id = {$assignedgroup->assignedgroupid})";

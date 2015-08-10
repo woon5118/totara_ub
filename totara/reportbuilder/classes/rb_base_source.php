@@ -45,16 +45,24 @@ abstract class rb_base_source {
     /** @var rb_column[] */
     public $requiredcolumns;
 
-/**
- * Class constructor
- *
- * Call from the constructor of all child classes with:
- *
- *  parent::__construct()
- *
- * to ensure child class has implemented everything necessary to work.
- *
- */
+    /** @var rb_global_restriction_set with active restrictions, ignore if null */
+    protected $globalrestrictionset = null;
+
+    /** @var rb_join[] list of global report restriction joins  */
+    public $globalrestrictionjoins = array();
+
+    /** @var array named query params used in global restriction joins */
+    public $globalrestrictionparams = array();
+
+    /**
+     * Class constructor
+     *
+     * Call from the constructor of all child classes with:
+     *
+     *  parent::__construct()
+     *
+     * to ensure child class has implemented everything necessary to work.
+     */
     public function __construct() {
         // Extending classes should add own component to this array before calling parent constructor,
         // this allows us to lookup display classes at more locations.
@@ -172,6 +180,21 @@ abstract class rb_base_source {
      */
     public function is_ignored() {
         return false;
+    }
+
+    /**
+     * Are the global report restrictions implemented in the source?
+     *
+     * Return values mean:
+     *   - true: this report source supports global report restrictions.
+     *   - false: this report source does NOT support global report restrictions.
+     *   - null: this report source has not been converted to use global report restrictions yet.
+     *
+     * @return null|bool
+     */
+    public function global_restrictions_supported() {
+        // Null means not converted yet, override in sources with true or false.
+        return null;
     }
 
     /**
@@ -1063,7 +1086,7 @@ abstract class rb_base_source {
         global $CFG;
         require_once($CFG->dirroot.'/totara/plan/rb_sources/rb_source_dp_course.php');
         // Use base query from rb_source_dp_course, and column/joins of statusandapproval.
-        $base_sql = rb_source_dp_course::get_base_sql();
+        $base_sql = $this->get_dp_status_base_sql();
         $sql = "SELECT CASE WHEN dp_course.planstatus = " . DP_PLAN_STATUS_COMPLETE . "
                             THEN dp_course.completionstatus
                             ELSE course_completion.status
@@ -1082,6 +1105,39 @@ abstract class rb_base_source {
                 WHERE base.userid = ? AND base.courseid = ?";
         return array($sql, array($userid, $courseid));
     }
+
+    /**
+     * Get base sql for course record of learning.
+     * @return string
+     */
+    public function get_dp_status_base_sql() {
+        global $DB;
+
+        // Apply global user restrictions.
+        $global_restriction_join_ue = $this->get_global_report_restriction_join('ue', 'userid');
+        $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
+        $global_restriction_join_p1 = $this->get_global_report_restriction_join('p1', 'userid');
+
+        $uniqueid = $DB->sql_concat_join("','", array(sql_cast2char('userid'), sql_cast2char('courseid')));
+        return  "(SELECT " . $uniqueid . " AS id, userid, courseid
+                    FROM (SELECT ue.userid AS userid, e.courseid AS courseid
+                           FROM {user_enrolments} ue
+                           JOIN {enrol} e ON ue.enrolid = e.id
+                           {$global_restriction_join_ue}
+                          UNION
+                         SELECT cc.userid AS userid, cc.course AS courseid
+                           FROM {course_completions} cc
+                           {$global_restriction_join_cc}
+                          WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
+                          UNION
+                         SELECT p1.userid AS userid, pca1.courseid AS courseid
+                           FROM {dp_plan_course_assign} pca1
+                           JOIN {dp_plan} p1 ON pca1.planid = p1.id
+                           {$global_restriction_join_p1}
+                    )
+                basesub)";
+    }
+
     // convert a course name into a link to that course
     function rb_display_link_course($course, $row, $isexport = false) {
         global $CFG;
@@ -1806,6 +1862,108 @@ abstract class rb_base_source {
     }
 
     /**
+     * Returns true if global report restrictions can be used with this source.
+     *
+     * @return bool
+     */
+    protected function can_global_report_restrictions_be_used() {
+        global $CFG;
+        return (!empty($CFG->enableglobalrestrictions) && $this->global_restrictions_supported()
+                && $this->globalrestrictionset);
+    }
+
+    /**
+     * Returns global restriction SQL fragment that can be used in complex joins for example.
+     *
+     * @return string SQL fragment
+     */
+    protected function get_global_report_restriction_query() {
+        // First ensure that global report restrictions can be used with this source.
+        if (!$this->can_global_report_restrictions_be_used()) {
+            return '';
+        }
+
+        list($query, $parameters) = $this->globalrestrictionset->get_join_query();
+
+        if ($parameters) {
+            $this->globalrestrictionparams = array_merge($this->globalrestrictionparams, $parameters);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Adds global restriction join to the report.
+     *
+     * @param string $join Name of the join that provides the 'user id' field
+     * @param string $field Name of user id field to join on
+     * @param mixed $dependencies join dependencies
+     * @return bool
+     */
+    protected function add_global_report_restriction_join($join, $field, $dependencies = 'base') {
+        // First ensure that global report restrictions can be used with this source.
+        if (!$this->can_global_report_restrictions_be_used()) {
+            return false;
+        }
+
+        list($query, $parameters) = $this->globalrestrictionset->get_join_query();
+
+        if ($query === '') {
+            return false;
+        }
+
+        static $counter = 0;
+        $counter++;
+        $joinname = 'globalrestrjoin_' . $counter;
+
+        $this->globalrestrictionjoins[] = new rb_join(
+            $joinname,
+            'INNER',
+            "($query)",
+            "$joinname.id = $join.$field",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            $dependencies
+        );
+
+        if ($parameters) {
+            $this->globalrestrictionparams = array_merge($this->globalrestrictionparams, $parameters);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get global restriction join SQL to the report. All parameters will be inline.
+     *
+     * @param string $join Name of the join that provides the 'user id' field
+     * @param string $field Name of user id field to join on
+     * @return string
+     */
+    protected function get_global_report_restriction_join($join, $field) {
+        // First ensure that global report restrictions can be used with this source.
+        if (!$this->can_global_report_restrictions_be_used()) {
+            return  '';
+        }
+
+        list($query, $parameters) = $this->globalrestrictionset->get_join_query();
+
+        if (empty($query)) {
+            return '';
+        }
+
+        if ($parameters) {
+            $this->globalrestrictionparams = array_merge($this->globalrestrictionparams, $parameters);
+        }
+
+        static $counter = 0;
+        $counter++;
+        $joinname = 'globalinlinerestrjoin_' . $counter;
+
+        $joinsql = " INNER JOIN ($query) $joinname ON ($joinname.id = $join.$field) ";
+        return $joinsql;
+    }
+
+    /**
      * Adds the user table to the $joinlist array
      *
      * @param array &$joinlist Array of current join options
@@ -1814,10 +1972,10 @@ abstract class rb_base_source {
      * @param string $join Name of the join that provides the
      *                     'user id' field
      * @param string $field Name of user id field to join on
+     * @param string $alias Use custom user table alias
      * @return boolean True
      */
     protected function add_user_table_to_joinlist(&$joinlist, $join, $field, $alias = 'auser') {
-
         // join uses 'auser' as name because 'user' is a reserved keyword
         $joinlist[] = new rb_join(
             $alias,
@@ -1827,6 +1985,8 @@ abstract class rb_base_source {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
         );
+
+        return true;
     }
 
 

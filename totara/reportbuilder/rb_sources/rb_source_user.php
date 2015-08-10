@@ -42,9 +42,19 @@ class rb_source_user extends rb_base_source {
 
     /**
      * Constructor
+     *
+     * @param int $groupid (ignored)
+     * @param rb_global_restriction_set $globalrestrictionset
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $DB;
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
         $this->base = '{user}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -57,7 +67,18 @@ class rb_source_user extends rb_base_source {
         $this->staff_f2f = $DB->get_field('report_builder', 'id', array('shortname' => 'staff_facetoface_sessions'));
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_user');
 
+        // Apply global report restrictions.
+        $this->add_global_report_restriction_join('base', 'id', 'base');
+
         parent::__construct();
+    }
+
+    /**
+     * Are the global report restrictions implemented in the source?
+     * @return null|bool
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //

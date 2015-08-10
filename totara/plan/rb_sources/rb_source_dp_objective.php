@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/plan/lib.php');
+require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join_nonpruneable.php');
 
 /**
  * A report builder source for DP objectives
@@ -39,7 +40,16 @@ class rb_source_dp_objective extends rb_base_source {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $this->add_global_report_restriction_join('dp', 'userid');
+
         $this->base = '{dp_plan_objective}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -51,6 +61,14 @@ class rb_source_dp_objective extends rb_base_source {
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_dp_objective');
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //
@@ -72,7 +90,7 @@ class rb_source_dp_objective extends rb_base_source {
         // to get access to position type constants
         require_once($CFG->dirroot . '/totara/reportbuilder/classes/rb_join.php');
 
-        $joinlist[] = new rb_join(
+        $joinlist[] = new rb_join_nonpruneable(
                 'dp',
                 'LEFT',
                 '{dp_plan}',

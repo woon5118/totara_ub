@@ -45,6 +45,14 @@ class rb_source_opensesame extends rb_base_source {
     }
 
     /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return false;
+    }
+
+    /**
      * Hide this source if site not registered.
      * @return bool
      */

@@ -64,6 +64,8 @@ if ($debug) {
     $report->debug($debug);
 }
 
+$report->display_restrictions();
+
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
 

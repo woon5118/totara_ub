@@ -42,6 +42,15 @@ class rb_goal_summary_embedded extends rb_base_embedded {
     }
 
     /**
+     * Clarify if current embedded report support global report restrictions.
+     * Override to true for reports that support GRR
+     * @return boolean
+     */
+    public function embedded_global_restrictions_supported() {
+        return true;
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting report params
      * some other way so that the embedded report will be compatible with the scheduler (in the future).

@@ -100,6 +100,7 @@ M.totara_assigngroupdialog = M.totara_assigngroupdialog || {
 
             var id = select.attr('itemid');
             var module = M.totara_assigngroupdialog.config.module;
+            var suffix = M.totara_assigngroupdialog.config.suffix;
             var sesskey = M.totara_assigngroupdialog.config.sesskey;
 
             var dialog = totaraDialogs['assigngrouptreeview'];
@@ -109,7 +110,12 @@ M.totara_assigngroupdialog = M.totara_assigngroupdialog || {
             handler.responsetype = 'newgroup';
             handler.responsegoeshere = $('#assignedgroups');
 
-            dialog.default_url = url + '?module=' + module + '&grouptype=' + grouptype + '&itemid=' + id + '&sesskey=' + sesskey;
+            var suffixparam = '';
+            if (suffix !== '') {
+                suffixparam = '&suffix=' + suffix;
+            }
+            dialog.default_url = url + '?module=' + module + suffixparam + '&grouptype=' + grouptype + '&itemid=' + id +
+                                '&sesskey=' + sesskey;
             dialog.saveurl = dialog.default_url + '&add=1';
             dialog.open();
 

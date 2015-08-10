@@ -6,6 +6,41 @@
     width: 30%;
 }
 
+div.globalrestrictionsnotice {
+    display: inline-block;
+    margin: 0 auto;
+    max-width: 80%;
+}
+
+div.globalrestrictionscontainer {
+    text-align: center;
+}
+
+body.path-admin-totara-reportbuilder-restrictions .header.c3.lastcol {
+    min-width: 120px;
+}
+
+.error-required {
+    display:none;
+}
+
+#chooserestriction .selectallnone {
+    margin: 10px 10%;
+    font-size: 1.1em;
+}
+
+#chooserestriction form.chooserestriction.mform {
+    margin-top: 10px;
+}
+
+#chooserestriction form.chooserestriction.mform div.fitemtitle {
+    width: 10%;
+}
+
+#chooserestriction form.chooserestriction.mform div.felement {
+    width: 89%;
+}
+
 /* show/hide button alignment */
 .dir-ltr .rb-showhide {
     clear: right;

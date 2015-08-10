@@ -39,7 +39,15 @@ class rb_source_completionimport_course extends rb_base_source {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Restrictions applied in joinlist with additional required join.
+
         $this->base = '{totara_compl_import_course}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -51,6 +59,14 @@ class rb_source_completionimport_course extends rb_base_source {
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_completionimport_course');
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //
@@ -67,6 +83,21 @@ class rb_source_completionimport_course extends rb_base_source {
      */
     protected function define_joinlist() {
         global $DB;
+
+        // Add support for user restrictions.
+        // This will show only existing allowed users if their username is not changed.
+        if ($this->can_global_report_restrictions_be_used()) {
+            $this->globalrestrictionjoins[] = new rb_join(
+                "realuser",
+                "INNER",
+                "{user}",
+                "base.username = realuser.username",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            );
+
+            // Apply global user restrictions.
+            $this->add_global_report_restriction_join('realuser', 'id');
+        }
 
         $joinlist = array();
 

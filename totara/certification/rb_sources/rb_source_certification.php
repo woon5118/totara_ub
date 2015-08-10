@@ -40,6 +40,14 @@ class rb_source_certification extends rb_source_program {
         $this->sourcewhere = $this->define_sourcewhere();
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return false;
+    }
+
     protected function define_columnoptions() {
 
         // Include some standard columns, override parent so they say certification.

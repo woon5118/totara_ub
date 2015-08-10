@@ -866,5 +866,161 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015061503, 'totara', 'reportbuilder');
     }
 
+    if ($oldversion < 2015072800) {
+        // Global report restrictions.
+
+        $table = new xmldb_table('report_builder');
+        $field = new xmldb_field('globalrestriction', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'toolbarsearch');
+
+        // Conditionally launch add field globalrestriction.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Table report_builder_global_restriction.
+        $table = new xmldb_table('report_builder_global_restriction');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('active', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('allrecords', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('allusers', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        if (!$dbman->table_exists('report_builder_global_restriction')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_records_grp_cohort.
+        $table = new xmldb_table('reportbuilder_grp_cohort_record');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderrecordid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderrecordid', XMLDB_KEY_FOREIGN, array('reportbuilderrecordid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('cohortid', XMLDB_KEY_FOREIGN, array('cohortid'), 'cohort', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_cohort_record')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_records_grp_org.
+        $table = new xmldb_table('reportbuilder_grp_org_record');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderrecordid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('orgid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('includechildren', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderrecordid', XMLDB_KEY_FOREIGN, array('reportbuilderrecordid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('orgid', XMLDB_KEY_FOREIGN, array('orgid'), 'org', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_org_record')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_records_grp_pos.
+        $table = new xmldb_table('reportbuilder_grp_pos_record');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderrecordid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('posid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('includechildren', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderrecordid', XMLDB_KEY_FOREIGN, array('reportbuilderrecordid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('posid', XMLDB_KEY_FOREIGN, array('posid'), 'pos', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_pos_record')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_records_grp_user.
+        $table = new xmldb_table('reportbuilder_grp_user_record');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderrecordid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderrecordid', XMLDB_KEY_FOREIGN, array('reportbuilderrecordid'), 'reportbuilderrecordid', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_user_record')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_users_grp_cohort.
+        $table = new xmldb_table('reportbuilder_grp_cohort_user');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderuserid', XMLDB_KEY_FOREIGN, array('reportbuilderuserid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('cohortid', XMLDB_KEY_FOREIGN, array('cohortid'), 'cohort', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_cohort_user')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_users_grp_org.
+        $table = new xmldb_table('reportbuilder_grp_org_user');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('orgid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('includechildren', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderuserid', XMLDB_KEY_FOREIGN, array('reportbuilderuserid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('orgid', XMLDB_KEY_FOREIGN, array('orgid'), 'org', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_org_user')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_users_grp_pos.
+        $table = new xmldb_table('reportbuilder_grp_pos_user');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('posid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('includechildren', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderuserid', XMLDB_KEY_FOREIGN, array('reportbuilderuserid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('posid', XMLDB_KEY_FOREIGN, array('posid'), 'pos', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_pos_user')) {
+            $dbman->create_table($table);
+        }
+
+        // Table rb_restricted_users_grp_user.
+        $table = new xmldb_table('reportbuilder_grp_user_user');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('reportbuilderuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('reportbuilderuserid', XMLDB_KEY_FOREIGN, array('reportbuilderuserid'), 'report_builder_global_restriction', array('id'));
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+
+        if (!$dbman->table_exists('reportbuilder_grp_user_user')) {
+            $dbman->create_table($table);
+        }
+
+        totara_upgrade_mod_savepoint(true, 2015072800, 'totara_reportbuilder');
+    }
+
     return true;
 }

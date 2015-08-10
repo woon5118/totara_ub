@@ -29,29 +29,44 @@
 
 class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptype {
 
-    // The dialog class.
+    /** @var string The dialog class. */
     protected $pickerclass = 'totara_assign_ui_picker_hierarchy';
-    // The module name and moduleinstanceid of the base assignment object.
-    protected $module, $moduleinstanceid;
-    // The table assignments will be stored in - usually of the form $module_grp_$grouptype.
+
+    /** @var string The module name of the base assignment object. */
+    protected $module;
+
+    /** @var string The module instance id of the base assignment object. */
+    protected $moduleinstanceid;
+
+    /** @var string The table assignments will be stored in - usually of the form $module_grp_$grouptype. */
     protected $tablename;
+
+    /** @var array Array of params */
     protected $params = array(
         'equal' => 1,
         'includechildren' => 0,
         'listofvalues' => 1,
     );
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $assignobject
+     */
     public function __construct($assignobject) {
         // Store the whole assignment object from totara_assign or child class of totara_assign.
         parent::__construct($assignobject);
         $this->module = $this->assignment->get_assign_module();
         $this->moduleinstanceid = $this->assignment->get_assign_moduleinstanceid();
-        $this->tablename = "{$this->module}_grp_{$this->grouptype}";
+
+        $this->suffix = $assignobject->get_assign_suffix();
+        $suffixstr = strlen($this->suffix) ? '_' . $this->suffix : '';
+
+        $this->tablename = "{$this->module}_grp_{$this->grouptype}{$suffixstr}";
     }
 
     /**
      * Get displayname for assigned groups of this type.
-     * @access  public
      * @return  string e.g. 'Position','Organisation', 'Audience'
      */
     public function get_grouptype_displayname() {
@@ -78,10 +93,9 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Instantiate and display the dialog class content
-     * @access public
-     * @param $urlparams array Parameters to be passed to the code handling the dialog submission
-     * @param $selectedids array Ids of the items already selected
-     * @return void
+     *
+     * @param array $urlparams array Parameters to be passed to the code handling the dialog submission
+     * @param array $selectedids array Ids of the items already selected
      */
     public function generate_item_selector($urlparams = array(), $selectedids = array()) {
         // Code to generate hierarchy picker dialog.
@@ -96,7 +110,6 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Code to validate data from generate_item_selector().
-     * @access public
      * @return bool
      */
     public function validate_item_selector() {
@@ -105,8 +118,8 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Code to accept and process dialog data from generate_item_selector().
-     * @access public
-     * @param $data associative array of dialog form submission values
+     *
+     * @param array $data associative array of dialog form submission values
      * @return bool
      */
     public function handle_item_selector($data) {
@@ -120,7 +133,7 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
         if ($this->assignment->is_locked()) {
             print_error('error:assignmentmoduleinstancelocked', 'totara_core');
         }
-        $modulekeyfield = "{$this->module}id";
+        $modulekeyfield = "{$this->module}{$this->suffix}id";
         $grouptypekeyfield = "{$this->grouptype}id";
         // Add only the new records.
         $existingassignedgroups = $DB->get_fieldset_select($this->tablename, $grouptypekeyfield,
@@ -131,6 +144,7 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
                 $todb->$modulekeyfield = $this->moduleinstanceid;
                 $todb->$grouptypekeyfield = $assignedgroupid;
                 $todb->includechildren = $data['includechildren'];
+                $todb->timecreated = time();
                 $DB->insert_record($this->tablename, $todb);
             }
         }
@@ -139,8 +153,8 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Delete an assignment by $id
-     * @access public
-     * @param $id int ID of assignment record in $tablename
+     *
+     * @param int $id ID of assignment record in $tablename
      * @return bool
      */
     public function delete($id) {
@@ -152,20 +166,20 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Gets array of all assignment records from $tablename
-     * @access public
-     * @return array of db objects
+     *
+     * @return stdClass[] Array of db objects
      */
     public function get_current_assigned_groups() {
         global $DB;
-        $modulekeyfield = "{$this->module}id";
+        $modulekeyfield = "{$this->module}{$this->suffix}id";
         $assignedgroups = $DB->get_records($this->tablename, array($modulekeyfield => $this->moduleinstanceid));
         return $assignedgroups;
     }
 
     /**
      * Get count of the associated users for an assignment
-     * @access public
-     * @param $groupids array All group ids associated with the assignment -
+     *
+     * @param int[] $groupids All group ids associated with the assignment -
      *                  For a cohort just the base assignment but Hierarchy assignments may also have a series of child groups
      * @return int User count
      */
@@ -184,8 +198,8 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Get SQL snippet to return information on current assigned groups
-     * @access public
-     * @param $itemid int The object these groups are assigned to
+     *
+     * @param int $itemid The object these groups are assigned to
      * @return string SQL statement
      */
     public function get_current_assigned_groups_sql($itemid) {
@@ -200,14 +214,14 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
                         source.fullname AS sourcefullname
                    FROM {{$this->tablename}} assignedgroups
              INNER JOIN {{$this->grouptype}} source ON source.id = assignedgroups.{$this->grouptype}id
-                  WHERE assignedgroups.{$this->module}id = $itemid";
+                  WHERE assignedgroups.{$this->module}{$this->suffix}id = $itemid";
     }
 
     /**
      * Get SQL to find all users linked via this assignment.
      *
-     * @access public
-     * @param $assignedgroup object Object containing data about a group as generated by {@link get_current_assigned_groups()}
+     * @param stdClass $assignedgroup object Object containing data about a group
+     *                  as generated by {@link get_current_assigned_groups()}
      * @return array(sql,params) Snippet of SQL and parameters need for this assignment.
      */
     public function get_current_assigned_users_sql($assignedgroup) {
@@ -234,10 +248,11 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Get array of the groups linked to this assignment
+     *
      * This is simple in cohorts because cohorts are not hierarchical (yet!).
      * Hierarchy types are more complex as we may have 'includechildren' so we need to find all indicated groups
-     * @access public
-     * @param $assignedgroup object Object containing data about a group as generated by {@link get_current_assigned_groups()}
+     *
+     * @param stdClass $assignedgroup Object containing data about a group as generated by {@link get_current_assigned_groups()}
      * @return array of ids
      */
     public function get_groupassignment_ids($assignedgroup) {
@@ -261,11 +276,14 @@ class totara_assign_core_grouptype_hierarchy extends totara_assign_core_grouptyp
 
     /**
      * Stub function to be implemented by children.
+     *
+     * @param stdClass $assignedgroup
+     * @param mixed $newassign
      */
     public function duplicate($assignedgroup, $newassign) {
         global $DB;
 
-        $sql = "INSERT INTO {{$this->tablename}} ({$this->module}id, {$this->grouptype}id, includechildren)
+        $sql = "INSERT INTO {{$this->tablename}} ({$this->module}{$this->suffix}id, {$this->grouptype}id, includechildren)
                        (SELECT {$newassign->get_assign_moduleinstanceid()}, {$this->grouptype}id, includechildren
                           FROM {{$this->tablename}}
                          WHERE id = {$assignedgroup->assignedgroupid})";

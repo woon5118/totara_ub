@@ -37,7 +37,13 @@ $debug  = optional_param('debug', false, PARAM_BOOL);
 
 $PAGE->set_context($context);
 
-$report = reportbuilder_get_embedded_report('cohort_orphaned_users', null, false, $sid);
+// Verify global restrictions.
+$shortname = 'cohort_orphaned_users';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+$report = reportbuilder_get_embedded_report($shortname, null, false, $sid, $globalrestrictionset);
+
 // Handle a request for export
 if($format!='') {
     $report->export_data($format);
@@ -56,6 +62,9 @@ echo $OUTPUT->header();
 if($debug) {
     $report->debug($debug);
 }
+
+$report->display_restrictions();
+
 echo $OUTPUT->heading(get_string('orphanedusers', 'totara_cohort'));
 echo $OUTPUT->container(get_string('orphanhelptext', 'totara_cohort'));
 

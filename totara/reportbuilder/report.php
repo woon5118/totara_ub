@@ -42,17 +42,22 @@ $PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
 $PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
 
+$reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+
+// Embedded reports can only be viewed through their embedded url.
+if ($reportrecord->embedded) {
+    print_error('cannotviewembedded', 'totara_reportbuilder');
+}
+
+// Verify global restrictions.
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
 // New report object.
-$report = new reportbuilder($id, null, false, $sid);
+$report = new reportbuilder($id, null, false, $sid, null, false, array(), $globalrestrictionset);
 if (!$report->is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 $report->handle_pre_display_actions();
-
-// Embedded reports can only be viewed through their embedded url.
-if ($report->embedded) {
-    print_error('cannotviewembedded', 'totara_reportbuilder');
-}
 
 if ($format != '') {
     $report->export_data($format);
@@ -85,6 +90,8 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 echo $output->header();
 
 $report->display_redirect_link();
+
+$report->display_restrictions();
 
 // Display heading including filtering stats.
 if ($graph) {

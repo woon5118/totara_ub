@@ -33,7 +33,13 @@ class rb_source_course_completion_all extends rb_base_source {
     public $contentoptions, $paramoptions, $defaultcolumns;
     public $defaultfilters, $requiredcolumns, $sourcetitle;
 
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
         $this->base = $this->define_base();
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -47,6 +53,14 @@ class rb_source_course_completion_all extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
+
     protected function define_sourcetitle() {
         return get_string('sourcetitle', 'rb_source_course_completion_all');
     }
@@ -54,12 +68,16 @@ class rb_source_course_completion_all extends rb_base_source {
     protected function define_base() {
         global $DB;
 
+        $global_restriction_join_cc = $this->get_global_report_restriction_join('cc', 'userid');
+        $global_restriction_join_cch = $this->get_global_report_restriction_join('cch', 'userid');
+
         $ccuniqueid = $DB->sql_concat_join("'CC'", array(sql_cast2char('cc.id')));
-        $cchuniqueid = $DB->sql_concat_join("'CCH'", array(sql_cast2char('id')));
+        $cchuniqueid = $DB->sql_concat_join("'CCH'", array(sql_cast2char('cch.id')));
         $grade = "CASE WHEN cc.status = " . COMPLETION_STATUS_COMPLETEVIARPL . " THEN cc.rplgrade ELSE gg.finalgrade END";
         $base = "(SELECT " . $ccuniqueid . " AS id, cc.userid, cc.course AS courseid,
                          cc.timecompleted, " . $grade . " AS grade, 1 AS iscurrent
                 FROM {course_completions} cc
+                {$global_restriction_join_cc}
                 LEFT JOIN {grade_items} gi
                   ON cc.course = gi.courseid
                  AND gi.itemtype = 'course'
@@ -69,7 +87,9 @@ class rb_source_course_completion_all extends rb_base_source {
                WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
                UNION ALL
               SELECT " . $cchuniqueid . " AS id, userid, courseid, timecompleted, grade, 0 AS iscurrent
-                FROM {course_completion_history})";
+                FROM {course_completion_history} cch
+                {$global_restriction_join_cch}
+              )";
         return $base;
     }
 

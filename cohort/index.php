@@ -75,7 +75,12 @@ if ($showall) {
     $data = array('contextid' => $context->id);
 }
 
-$report = reportbuilder_get_embedded_report('cohort_admin', $data, false, $sid);
+// Verify global restrictions.
+$shortname = 'cohort_admin';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid, $globalrestrictionset);
 if (!empty($format)) {
     $report->export_data($format);
     die;
@@ -85,6 +90,8 @@ echo $OUTPUT->header();
 if ($debug) {
     $report->debug($debug);
 }
+
+$report->display_restrictions();
 
 $fullcount = $report->get_full_count();
 $filteredcount = $report->get_filtered_count();

@@ -35,11 +35,21 @@ class rb_source_certification_overview extends rb_source_program_overview {
      */
     protected $instancetype = 'certification';
 
-    public function __construct() {
-        parent::__construct();
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        parent::__construct($groupid, $globalrestrictionset);
+
+        // Global Report Restrictions are applied in rb_source_program_overview and work for rb_source_certification_overview
+        // as well.
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_certification_overview');
         $this->sourcewhere = $this->define_sourcewhere();
+    }
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     protected function define_sourcewhere() {

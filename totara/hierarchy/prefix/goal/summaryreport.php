@@ -40,7 +40,12 @@ admin_externalpage_setup('goalreport', '', null, $url);
 $context = context_system::instance();
 $canedit = has_capability('totara/hierarchy:editgoalreport', $context);
 
-if (!$report = reportbuilder_get_embedded_report('goal_summary', null, false, $sid)) {
+// Verify global restrictions.
+$shortname = 'goal_summary';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report($shortname, null, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -71,6 +76,8 @@ echo $renderer->header();
 if ($debug) {
     $report->debug($debug);
 }
+
+$report->display_restrictions();
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();

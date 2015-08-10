@@ -54,7 +54,12 @@ $shortname = 'alerts';
 $data = array(
     'userid' => $userid,
 );
-if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
+
+// Verify global restrictions.
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -91,6 +96,8 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 echo $output->header();
 echo $output->heading($strheading);
 echo html_writer::tag('p', html_writer::link("{$CFG->wwwroot}/my/", "<< " . get_string('mylearning', 'totara_core')));
+
+$report->display_restrictions();
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();

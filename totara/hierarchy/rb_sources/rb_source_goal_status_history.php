@@ -32,8 +32,16 @@ class rb_source_goal_status_history extends rb_base_source {
     public $sourcetitle, $shortname;
 
 
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         global $DB;
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $this->add_global_report_restriction_join('base', 'userid');
 
         $this->base = '(SELECT gih.id, gih.scope, goal.id AS itemid, goal.fullname, gr.userid, gih.scalevalueid,
                                gih.timemodified, gih.usermodified,
@@ -59,6 +67,13 @@ class rb_source_goal_status_history extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
 
     protected function define_joinlist() {
         $joinlist = array(
@@ -149,7 +164,7 @@ class rb_source_goal_status_history extends rb_base_source {
                 array('defaultheading' => get_string('goalusermodifiedheading', 'rb_source_goal_status_history'),
                       'joins' => 'usermodified',
                       'displayfunc' => 'fullname_link_user',
-                      'extrafields' => array_merge(array('user_id' => 'usermodified.id'), $usernamefields),
+                      'extrafields' => array_merge(array('id' => 'usermodified.id'), $usernamefields),
                       'dbdatatype' => 'char',
                       'outputformat' => 'text')
             )

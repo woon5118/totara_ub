@@ -45,7 +45,16 @@ class rb_source_dp_evidence extends rb_base_source {
      * Constructor
      * @global object $CFG
      */
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Apply global user restrictions.
+        $global_restriction_join_e = $this->get_global_report_restriction_join('e', 'userid');
+
         $sql="
             (SELECT
                 e.id,
@@ -67,6 +76,7 @@ class rb_source_dp_evidence extends rb_base_source {
                     ELSE linkedevidence.count
                 END AS evidenceinuse
             FROM {dp_plan_evidence} e
+            {$global_restriction_join_e}
             LEFT JOIN {dp_evidence_type} et ON et.id = e.evidencetypeid
             LEFT JOIN
                 (SELECT er.evidenceid,
@@ -87,6 +97,14 @@ class rb_source_dp_evidence extends rb_base_source {
         $this->sourcewhere = $this->define_sourcewhere();
         $this->sourcejoins = $this->define_sourcejoins();
         parent::__construct();
+    }
+
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
     }
 
     protected function define_sourcejoins() {

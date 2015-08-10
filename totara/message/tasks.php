@@ -90,6 +90,8 @@ echo $output->header();
 echo $output->heading($strheading, 2);
 echo html_writer::tag('p', html_writer::link("{$CFG->wwwroot}/my/", "<< " . get_string('mylearning', 'totara_core')));
 
+$report->display_restrictions();
+
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
 

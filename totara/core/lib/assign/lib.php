@@ -18,8 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @package totara
- * @subpackage core
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @package totara_core
  */
 
 /**
@@ -40,6 +40,12 @@ class totara_assign_core {
      * @var     string
      */
     protected static $module = 'core';
+
+    /**
+     * Component suffix
+     * @var string
+     */
+    protected static $suffix = '';
 
     /**
      * Id of the module instance - appraisalid, programid, planid etc.
@@ -65,12 +71,22 @@ class totara_assign_core {
      */
     protected $basepath;
 
-    public function __construct($module, $moduleinstance) {
+    /**
+     * Prepare instance
+     *
+     * @param string $module Totara component name (subfolder in /totara)
+     * @param stdClass $moduleinstance Component instance (or instance that represent component) must have $id property
+     * @param string $suffix String Optional component suffix used when more then one assignment type per component needed
+     */
+    public function __construct($module, $moduleinstance, $suffix = '') {
         global $CFG;
         $this->moduleinstanceid = $moduleinstance->id;
         $this->moduleinstance = $moduleinstance;
-        self::$module = $module;
-        $this->basepath = $CFG->dirroot . "/totara/{$module}/lib/assign/";
+        static::$module = $module;
+        static::$suffix = $suffix;
+
+        $suffixstr = strlen(static::$suffix) ? '/' . static::$suffix : '';
+        $this->basepath = $CFG->dirroot . "/totara/{$module}/lib/assign{$suffixstr}/";
     }
 
     /**
@@ -81,8 +97,9 @@ class totara_assign_core {
      * @return appropriate assignment grouptype object
      */
     public function load_grouptype($grouptype) {
-        $module = self::$module;
-        $classname = "totara_assign_{$module}_grouptype_{$grouptype}";
+        $module = static::$module;
+        $suffixstr = strlen(static::$suffix) ? '_' . static::$suffix : '';
+        $classname = "totara_assign_{$module}_grouptype_{$grouptype}{$suffixstr}";
         $classfile = $this->basepath . "groups/{$grouptype}.class.php";
 
         // Check class file exists.
@@ -118,9 +135,10 @@ class totara_assign_core {
         }
 
         // Loop through code folder to find grouptype classes.
-        $module = self::$module;
+        $module = static::$module;
+        $suffixstr = strlen(static::$suffix) ? '/' . static::$suffix : '';
         // Loop through code folder to find group classes.
-        $basepath = $CFG->dirroot . "/totara/{$module}/lib/assign/";
+        $basepath = $CFG->dirroot . "/totara/{$module}/lib/assign{$suffixstr}/";
         if (is_dir($basepath . 'groups')) {
             $classfiles = glob($basepath . 'groups/*.class.php');
             if (is_array($classfiles)) {
@@ -215,9 +233,10 @@ class totara_assign_core {
             print_error('error:assignmentmoduleinstancelocked', 'totara_core');
         }
 
+        $suffixstr = strlen(static::$suffix) ? '_' . static::$suffix : '';
         // Clear module user assign table.
-        $tablename = self::$module . "_user_assignment";
-        $modulekey = self::$module . "id";
+        $tablename = static::$module . "_user_assignment$suffixstr";
+        $modulekey = static::$module . static::$suffix . "id";
         $moduleinstanceid = $this->moduleinstanceid;
         $DB->delete_records($tablename, array($modulekey => $moduleinstanceid));
     }
@@ -230,6 +249,9 @@ class totara_assign_core {
     public function get_current_assigned_groups() {
         global $DB;
 
+        if (empty($this->moduleinstanceid)) {
+            throw new coding_exception("Cannot get assigned groups when module instance id is not set");
+        }
         $sqlallassignedgroups = '';
         foreach ($this->get_assignable_grouptypes() as $grouptype) {
             // Instantiate a group object.
@@ -259,11 +281,26 @@ class totara_assign_core {
      * @param $search string A search string to limit the results by (matches user firstname or lastname).
      * @param $limitfrom int
      * @param $limitnum int
-     * @param $active boolean A flag that makes the function return only the active users.
+     * @param $forcegroup boolean A flag that makes the function return only the active users.
      * @return recordset Containing basic information about users.
      */
     public function get_current_users($search=null, $limitfrom=null, $limitnum=null, $forcegroup=false) {
         global $DB;
+
+        list($sql, $params) = $this->get_current_users_sql($search, $forcegroup);
+        return $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+    }
+
+    /**
+     * Get SQL query for fetching assigned users
+     *
+     * @param string $search A search string to limit the results by (matches user firstname or lastname).
+     * @param boolean $forcegroup A flag that makes the function return only the active users.
+     * @param array $where Additional restrictions array(0 => sql clause, 1 => params).
+     *                     Use "u" as "user" table alias. Params marks are "?" (unnamed).
+     * @return array(0 => string SQL, 1 => array of params)
+     */
+    public function get_current_users_sql($search = null, $forcegroup=false, array $where = array()) {
         // How the current user list is calculated depends of the status.
         // It could be static (from a table) or dynamic (calculated).
         $liveassignments = $this->assignments_are_stored() && !$forcegroup;
@@ -285,15 +322,19 @@ class totara_assign_core {
         $wheresql = "WHERE {$searchsql} AND {$extrasql}";
         $whereparams = array_merge($searchparams, $extraparams);
 
+        // Additional restrictions.
+        if (!empty($where)) {
+            $wheresql .= "\n AND {$where[0]}";
+            $whereparams = array_merge($whereparams, $where[1]);
+        }
+
         $usernamefields = get_all_user_name_fields(true, 'u');
         $sql = "SELECT u.id, {$usernamefields} FROM {user} u {$joinsql} {$wheresql}";
         $params = array_merge($params, $whereparams);
 
         $sql .= " ORDER BY u.firstname, u.lastname";
-
-        return $DB->get_recordset_sql($sql, $params, $limitfrom, $limitnum);
+        return array($sql, $params);
     }
-
 
     /**
      * Get the number of users currently assigned, either from the user assignemt table (if saved)
@@ -409,7 +450,9 @@ class totara_assign_core {
      * @return array  An array containing an SQL snippet, parameters to restrict the users and the table alias.
      */
     public function get_users_from_assignments_sql($table, $field) {
-        $module = self::$module;
+        $module = static::$module;
+        $suffix = static::$suffix;
+        $suffixstr = strlen($suffix) ? '_' . $suffix : '';
 
         // Use a random string for the user_assignment alias to minimise risk of collision when joined.
         $uaalias = 'ua_' . random_string(15);
@@ -419,9 +462,9 @@ class totara_assign_core {
         $field = clean_param($field, PARAM_ALPHANUMEXT);
 
         // Just get a list of userids from the user_assignment table.
-        $sql =  " JOIN {{$module}_user_assignment} {$uaalias}
+        $sql =  " JOIN {{$module}_user_assignment{$suffixstr}} {$uaalias}
             ON ({$table}.{$field} = {$uaalias}.userid
-            AND {$uaalias}.{$module}id = ?)";
+            AND {$uaalias}.{$module}{$suffix}id = ?)";
 
         $params = array($this->moduleinstanceid);
 
@@ -445,14 +488,13 @@ class totara_assign_core {
      * $sql = "SELECT u.firstname,u.lastname FROM {user} u $assignsql";
      * $users = $DB->get_records_sql($sql, $assignparams);
      *
-     * @param $table  string The alias of the table you want to join to.
-     *                       You MUST use a table alias, not just the table's name.
-     * @param $field  string The name of the field containing user ids in the table you are joining to.
+     * @param string $table The alias of the table you want to join to.
+     *                      You MUST use a table alias, not just the table's name.
+     * @param string $field The name of the field containing user ids in the table you are joining to.
      *
      * @return array  An array containing an SQL snippeti, parameters to restrict the users and table alias.
      */
     public function get_users_from_groups_sql($table, $field) {
-        $module = self::$module;
         $assignedgroups = $this->get_current_assigned_groups();
 
         // Use a random string for the subquery alias to minimise risk of collision when joined.
@@ -491,7 +533,6 @@ class totara_assign_core {
             ON {$sqalias}.userid = {$table}.{$field}";
         return array($sql, $params, $sqalias);
     }
-
 
     /**
      * Given a set of userids, return information on how they were assigned.
@@ -585,10 +626,12 @@ class totara_assign_core {
     public function store_user_assignments($newusers = null, $processor = null) {
         global $DB;
 
-        $module = self::$module;
+        $module = static::$module;
         $modulekey = "{$module}id";
         $moduleinstanceid = $this->moduleinstanceid;
-        $tablename = "{$module}_user_assignment";
+        $suffixstr = strlen(static::$suffix) ? '_' . static::$suffix : '';
+
+        $tablename = "{$module}_user_assignment{$suffixstr}";
 
         $transaction = $DB->start_delegated_transaction();
 
@@ -629,7 +672,7 @@ class totara_assign_core {
 
     /**
      * Duplicate the assign onto the new moduleinstance.
-     * @param $newmoduleinstance object The module instance to assign the new assign to.
+     * @param $targetmoduleinstance object The module instance to assign the new assign to.
      */
     public function duplicate($targetmoduleinstance) {
         // Find the class of this instance (may be subclassed).
@@ -641,7 +684,7 @@ class totara_assign_core {
         // Create a new instance of the same class, calling the subclass's contructor (if defined).
         /* Note: If the subclass has a constructor that requires more parameters than just a module
          * type and an assign instance then the subclass must also subclass duplicate. */
-        $newassign = new $mymoduleinstanceclass(self::$module, $targetmoduleinstance);
+        $newassign = new $mymoduleinstanceclass(static::$module, $targetmoduleinstance, static::$suffix);
 
         // Iterate over each group.
         $assignedgroups = $this->get_current_assigned_groups();
@@ -657,7 +700,7 @@ class totara_assign_core {
      * @return mixed
      */
     public function get_assign_module() {
-        return self::$module;
+        return static::$module;
     }
 
     public function get_assign_moduleinstanceid() {
@@ -666,6 +709,14 @@ class totara_assign_core {
 
     public function get_assign_moduleinstance() {
         return $this->moduleinstance;
+    }
+
+    /**
+     * Get optional suffix used for multiple assignment types in components
+     * @return string
+     */
+    public function get_assign_suffix() {
+        return static::$suffix;
     }
 
     /**
@@ -719,7 +770,12 @@ abstract class totara_assign_core_grouptype {
      * @return object child class
      */
     public static function load_grouptype($assignobject) {
-        $classname = "totara_assign_{$assignobject->module}_group_{$assignobject->grouptype}";
+        $suffixstr = '';
+        if (isset($assignobject->suffix) && strlen($assignobject->suffix)) {
+            $suffixstr = '_' . $assignobject->suffix;
+        }
+
+        $classname = "totara_assign_{$assignobject->module}_group_{$assignobject->grouptype}{$suffixstr}";
         // Check group class file exists.
         $classfile = $assignobject->basepath . "groups/{$assignobject->grouptype}.class.php";
         if (!file_exists($classfile)) {
@@ -832,17 +888,6 @@ class totara_assign_ui_picker_cohort extends totara_dialog_content {
         foreach ($newparams as $key => $val) {
             $this->params[$key] = $val;
         }
-    }
-
-    /**
-     * Returns markup to be used in the selected pane of a multi-select dialog
-     *
-     * @param   $elements    array elements to be created in the pane
-     * @return  $html
-     */
-    public function populate_selected_items_pane($elements) {
-        $html = '';
-        return $html .= parent::populate_selected_items_pane($elements);
     }
 
     /**
@@ -1026,15 +1071,98 @@ class totara_assign_ui_picker_hierarchy extends totara_dialog_content_hierarchy_
     }
 }
 
+class totara_assign_ui_picker_user extends totara_dialog_content {
+    public $handlertype = 'treeview';
+    public $params = array(
+        'equal' => 1,
+        'listofvalues' => 1,
+        'includechildren' => 0
+    );
+
+    /**
+     * Helper function to override the parameter defaults
+     * @param   $newparams    array parameters to be overridden
+     * @return  void
+     */
+    public function set_parameters($newparams = array()) {
+        if (!is_array($newparams)) {
+            print_error('error:assignmentbadparameters', 'totara_core', null, null);
+            die();
+        }
+        foreach ($newparams as $key => $val) {
+            $this->params[$key] = $val;
+        }
+    }
+
+    /**
+     * Generates the content of the dialog
+     * @param   $hidden array of extra hidden parameters
+     * @param   $selectedids Items that have already been selected to be grayed out in the picker
+     * @return  void
+     */
+    public function generate_item_selector($hidden = array(), $selectedids = array()) {
+        global $DB;
+        $fullname = $DB->sql_concat_join("' '", totara_get_all_user_name_fields_join('u'));
+        // Get users.
+        $sql = "SELECT u.id, $fullname AS fullname
+            FROM {user} u
+            ORDER BY fullname";
+        $items = $DB->get_records_sql($sql, array());
+
+        // Set up dialog.
+        $dialog = $this;
+        if (!empty($hidden)) {
+            $this->set_parameters($hidden);
+        }
+        $dialog->type = totara_dialog_content::TYPE_CHOICE_MULTI;
+        $dialog->items = $items;
+        $dialog->selected_title = 'assigneduser';
+        $dialog->searchtype = 'user';
+
+        $alreadyselected = array();
+        if (!empty($selectedids)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($selectedids);
+            $sql = "SELECT u.id, $fullname AS fullname
+                    FROM {user} u
+                    WHERE u.id $insql";
+            $alreadyselected = $DB->get_records_sql($sql, $inparams);
+        }
+
+        $dialog->disabled_items = $alreadyselected;
+        $dialog->selected_items = $alreadyselected;
+        $dialog->unremovable_items = $alreadyselected;
+        $dialog->urlparams = $this->params;
+
+        // Display.
+        $markup = $dialog->generate_markup();
+        echo $markup;
+    }
+
+    /**
+     * Duplicate the group onto the new assign.
+     */
+    public function duplicate($newassign) {
+        // Find the class of this instance (may be subclassed).
+        $mygroupclass = get_class($this);
+
+        // Create a new instance of the same class, calling the subclass's contructor (if defined).
+        /* If the subclass has a constructor that requires more parameters than just an assign
+         * instance then the subclass must also subclass duplicate. */
+        new $mygroupclass($newassign);
+    }
+
+}
+
 /**
  * Initialises Javascript for dialogs and (optionally) a paginated datatable
- * @param   $module string The Totara module
- * @param   $itemid int id of the object the dialogs will be assigning groups to
- * @param   $datatable boolean Whether to start up the Javascript for a datatable
- * @param   $notice string The html output of a notice to display on change
- * @return  void
+ * @param string $module The Totara module
+ * @param int $itemid id of the object the dialogs will be assigning groups to
+ * @param bool $datatable Whether to start up the Javascript for a datatable
+ * @param string $notice  The html output of a notice to display on change
+ * @param string $suffix Optional suffix for multiple assignments types in one component
+ * @return void
  */
-function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notice = "") {
+function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notice = "", $suffix = '') {
     global $CFG, $PAGE;
     // Setup custom javascript.
     $jselements = array(
@@ -1047,12 +1175,14 @@ function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notic
     local_js(
         $jselements
     );
+
     $PAGE->requires->strings_for_js(array('assigngroup'), 'totara_' . $module);
     $jsmodule = array(
         'name' => 'totara_assigngroups',
         'fullpath' => '/totara/core/lib/assign/assigngroup_dialog.js',
         'requires' => array('json'));
-    $args = array('args' => '{"module":"'.$module.'","sesskey":"'.sesskey().'","notice":"'.addslashes_js($notice).'"}');
+    $args = array('args' => '{"module":"'.$module.'", "suffix": "'.$suffix.'", "sesskey":"'.sesskey() .
+                            '","notice":"'.addslashes_js($notice).'"}');
 
     $PAGE->requires->js_init_call('M.totara_assigngroupdialog.init', $args, false, $jsmodule);
 
@@ -1063,9 +1193,10 @@ function totara_setup_assigndialogs($module, $itemid, $datatable = false, $notic
                     "bProcessing": true,
                     "bServerSide": true,
                     "sPaginationType": "full_numbers",
-                    "sAjaxSource": "'.$CFG->wwwroot.'/totara/'.$module.'/lib/assign/ajax.php",
+                    "sAjaxSource": "' . $CFG->wwwroot . '/totara/' . $module . '/lib/assign/ajax.php",
                     "fnServerParams": function ( aoData ) {
                             aoData.push( { "name": "module", "value": "'.$module.'" } );
+                            aoData.push( { "name": "suffix", "value": "'.$suffix.'" } );
                             aoData.push( { "name": "itemid", "value": "'.$itemid.'" } );
                             aoData.push( { "name": "sesskey", "value": M.cfg.sesskey } );
                     },

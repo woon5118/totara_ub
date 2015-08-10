@@ -101,6 +101,8 @@ echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
 dp_print_rol_tabs($rolstatus, 'evidence', $userid);
 
+$report->display_restrictions();
+
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
 

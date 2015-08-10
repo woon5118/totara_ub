@@ -46,13 +46,19 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         }
 
         $tableheader = array(get_string('name', 'totara_reportbuilder'),
-                             get_string('source', 'totara_reportbuilder'),
-                             get_string('options', 'totara_reportbuilder'));
+                             get_string('source', 'totara_reportbuilder'));
+        if (!empty($CFG->enableglobalrestrictions)) {
+            $tableheader[] = get_string('globalrestriction', 'totara_reportbuilder');
+        }
+        $tableheader[] = get_string('options', 'totara_reportbuilder');
+
         $data = array();
 
         $strsettings = get_string('settings', 'totara_reportbuilder');
         $strclone = get_string('clonereport', 'totara_reportbuilder');
         $strdelete = get_string('delete', 'totara_reportbuilder');
+        $stryes = get_string('yes');
+        $strno = get_string('no');
 
         foreach ($reports as $report) {
             try {
@@ -66,6 +72,22 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                     html_writer::link($viewurl, get_string('view')) . ')';
 
                 $row[] = $report->sourcetitle;
+
+                if (!empty($CFG->enableglobalrestrictions)) {
+                    $grstatus = ''; // Report does not support GUR - do not show anything.
+                    if ($report->sourceobject) {
+                        if ($report->sourceobject->global_restrictions_supported()) {
+                            if ($report->globalrestriction) {
+                                $grstatus = $stryes;
+                            } else {
+                                $grstatus = $strno;
+                            }
+                        }
+                    } else {
+                        debugging('Missing $report->sourceobject!', DEBUG_DEVELOPER);
+                    }
+                    $row[] = $grstatus;
+                }
 
                 $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'), null,
                     array('title' => $strsettings));
@@ -117,8 +139,12 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         }
 
         $tableheader = array(get_string('name', 'totara_reportbuilder'),
-                             get_string('source', 'totara_reportbuilder'),
-                             get_string('options', 'totara_reportbuilder'));
+                             get_string('source', 'totara_reportbuilder'));
+        if (!empty($CFG->enableglobalrestrictions)) {
+            $tableheader[] = get_string('globalrestriction', 'totara_reportbuilder');
+        }
+        $tableheader[] = get_string('options', 'totara_reportbuilder');
+
         $strsettings = get_string('settings', 'totara_reportbuilder');
         $strreload = get_string('restoredefaults', 'totara_reportbuilder');
         $strclone = get_string('clonereport', 'totara_reportbuilder');
@@ -128,6 +154,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $embeddedreportstable->head = $tableheader;
         $embeddedreportstable->data = array();
 
+        $stryes = get_string('yes');
+        $strno = get_string('no');
         $data = array();
         foreach ($reports as $report) {
             $fullname = format_string($report->fullname);
@@ -141,6 +169,22 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
                 html_writer::link($viewurl, get_string('view')) . ')';
 
             $row[] = $report->sourcetitle;
+
+            if (!empty($CFG->enableglobalrestrictions)) {
+                $grstatus = ''; // Report does not support GUR - do not show anything.
+                if ($report->sourceobject) {
+                    if ($report->sourceobject->global_restrictions_supported()) {
+                        if ($report->globalrestriction) {
+                            $grstatus = $stryes;
+                        } else if (!isset($report->embedobj) || $report->embedobj->embedded_global_restrictions_supported()) {
+                            $grstatus = $strno;
+                        }
+                    }
+                } else {
+                    debugging('Missing $report->sourceobject!', DEBUG_DEVELOPER);
+                }
+                $row[] = $grstatus;
+            }
 
             $settings = $this->output->action_icon($editurl, new pix_icon('/t/edit', $strsettings, 'moodle'), null,
                     array('title' => $strsettings));
@@ -159,6 +203,139 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         $embeddedreportstable->data = $data;
 
         return html_writer::table($embeddedreportstable);
+    }
+
+    /**
+     * Format records to view or restricted users.
+     *
+     * @param stdClass $records Records with group properties (cohorts, pos, org, users)
+     * @return string $output Formatted records
+     */
+    public function format_records_to_view($records) {
+        $output = '';
+
+        foreach ($records as $group => $entries) {
+            $str = new stdClass();
+            $str->group = $group;
+            $str->entries = implode(', ', $entries);
+            if (strlen($str->entries) > 128) {
+                $str->entries = strtok(wordwrap($str->entries, 128, "...\n"), "\n");
+            }
+            $output .= get_string('groupassignlist', 'totara_reportbuilder', $str);
+            $output .= html_writer::empty_tag('br');
+        }
+
+        return $output;
+    }
+
+    /**
+     * Renders a table containing global restrictions data
+     *
+     * @param array $globalrestrictions array of global restrictions objects
+     * @return string HTML table
+     */
+    public function global_restrictions_table($globalrestrictions = array()) {
+
+        if (empty($globalrestrictions)) {
+            return get_string('noglobalrestrictionsfound', 'totara_reportbuilder');
+        }
+
+        $tableheader = array(get_string('name', 'totara_reportbuilder'),
+            get_string('recordstoview', 'totara_reportbuilder'),
+            get_string('restrictedusers', 'totara_reportbuilder'),
+            get_string('options', 'totara_reportbuilder'));
+
+        $stredit = get_string('edit');
+        $strdelete = get_string('delete');
+        $strmoveup = get_string('up');
+        $strmovedown = get_string('down');
+
+        $table = new html_table();
+        $table->summary = '';
+        $table->head = $tableheader;
+        $table->data = array();
+        $firstid = $lastid = 0;
+
+        // Get the first and last record id from the records so we can manage the sort icons.
+        if (count($globalrestrictions) > 1) {
+            $globalrestrictionscopy = $globalrestrictions;
+            $temp = array_shift($globalrestrictionscopy);
+            $firstid = $temp->id;
+            if ($globalrestrictionscopy) {
+                $temp = array_pop($globalrestrictionscopy);
+                $lastid = $temp->id;
+            }
+        }
+
+        $data = array();
+        $rowclasses = array();
+        foreach ($globalrestrictions as $restriction) {
+            $fullname = format_string($restriction->name);
+            $baseurl = '/totara/reportbuilder/restrictions/index.php';
+            $viewurl = new moodle_url($baseurl, array('id' => $restriction->id, 'action' => 'view', 'sesskey' => sesskey()));
+            $editurl = new moodle_url('/totara/reportbuilder/restrictions/edit_general.php',
+                    array('id' => $restriction->id, 'action' => 'edit'));
+            $deleteurl = new moodle_url($baseurl, array('id' => $restriction->id, 'action' => 'delete', 'sesskey' => sesskey()));
+
+            $row = array();
+            $row[] = $fullname;
+
+            if ($restriction->allrecords) {
+                $row[] = get_string('restrictionallrecords', 'totara_reportbuilder');
+            } else {
+                $row[] = $this->format_records_to_view($restriction->recordstoview);
+            }
+            if ($restriction->allusers) {
+                $row[] = get_string('restrictionallusers', 'totara_reportbuilder');
+            } else {
+                $row[] = $this->format_records_to_view($restriction->restrictedusers);
+            }
+
+            $editaction = $this->output->action_icon($editurl, new pix_icon('/t/edit', $stredit, 'moodle'), null,
+                array('title' => $stredit));
+            $deleteaction = $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $strdelete, 'moodle'), null,
+                array('title' => $strdelete));
+
+            // Activate or deactivate actions.
+            if ($restriction->active) {
+                $tooltip = get_string('deactivateglobalrestriction', 'totara_reportbuilder');
+                $icon = 't/hide';
+                $params = array('id' => $restriction->id, 'action' => 'deactivate', 'sesskey' => sesskey());
+                $rowclass = '';
+            } else {
+                $tooltip = get_string('activateglobalrestriction', 'totara_reportbuilder');
+                $icon = 't/show';
+                $params = array('id' => $restriction->id, 'action' => 'activate', 'sesskey' => sesskey());
+                $rowclass = 'dimmed_text';
+            }
+            $activatedeactivateurl = new moodle_url($baseurl, $params);
+            $disableaction = $this->output->action_icon($activatedeactivateurl, new pix_icon($icon, $tooltip, 'moodle'), null,
+                array('title' => $tooltip));
+
+            // Sort action.
+            $upaction = '';
+            $downaction = '';
+            if ($restriction->id != $firstid && $firstid) {
+                $params = array('id' => $restriction->id, 'action' => 'up', 'sesskey' => sesskey());
+                $upaction = $this->output->action_icon(new moodle_url($baseurl, $params),
+                    new pix_icon('t/up', $strmoveup), null, array('title' => $strmoveup));
+            }
+
+            if ($restriction->id != $lastid && $lastid) {
+                $params = array('id' => $restriction->id, 'action' => 'down', 'sesskey' => sesskey());
+                $downaction = $this->output->action_icon(new moodle_url($baseurl, $params),
+                    new pix_icon('t/down', $strmovedown), null, array('title' => $strmovedown));
+            }
+
+            $row[] = "{$editaction}{$deleteaction}{$disableaction}{$upaction}{$downaction}";
+
+            $data[] = $row;
+            $rowclasses[] = $rowclass;
+        }
+        $table->data = $data;
+        $table->rowclasses = $rowclasses;
+
+        return html_writer::table($table);
     }
 
     /**
@@ -617,7 +794,6 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
      * @return HTML
      */
     public function print_description($description, $reportid) {
-
         $sitecontext = context_system::instance();
         $description = file_rewrite_pluginfile_urls($description, 'pluginfile.php', $sitecontext->id, 'totara_reportbuilder', 'report_builder', $reportid);
 
@@ -718,4 +894,146 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         return $out;
     }
 
+    /**
+     * Returns a table showing the currently assigned groups of users
+     *
+     * @param array $assignments group assignment info
+     * @param int $itemid the id of the restriction object users are assigned to
+     * @param string $suffix type of restriction (record or user)
+     * @return string HTML
+     */
+    public function display_assigned_groups($assignments, $itemid, $suffix) {
+        $tableheader = array(get_string('assigngrouptype', 'totara_core'),
+                             get_string('assignsourcename', 'totara_core'),
+                             get_string('assignincludechildrengroups', 'totara_core'),
+                             get_string('assignnumusers', 'totara_core'),
+                             get_string('actions'));
+        if ($suffix === 'record') {
+            $deleteurl = new moodle_url('/totara/reportbuilder/restrictions/edit_recordstoview.php',
+                    array('id' => $itemid, 'sesskey' => sesskey()));
+        } else if ($suffix === 'user') {
+            $deleteurl = new moodle_url('/totara/reportbuilder/restrictions/edit_restrictedusers.php',
+                    array('id' => $itemid, 'sesskey' => sesskey()));
+        } else {
+            $deleteurl = null;
+        }
+
+        $table = new html_table();
+        $table->attributes['class'] = 'fullwidth generaltable';
+        $table->summary = '';
+        $table->head = $tableheader;
+        $table->data = array();
+        if (empty($assignments)) {
+            $table->data[] = array(get_string('nogroupassignments', 'totara_core'));
+        } else {
+            foreach ($assignments as $assign) {
+                $includechildren = ($assign->includechildren == 1) ? get_string('yes') : get_string('no');
+                $row = array();
+                $row[] = new html_table_cell($assign->grouptypename);
+                $row[] = new html_table_cell($assign->sourcefullname);
+                $row[] = new html_table_cell($includechildren);
+                $row[] = new html_table_cell($assign->groupusers);
+
+                if ($deleteurl) {
+                    $delete = $this->output->action_icon(
+                        new moodle_url($deleteurl, array('deleteid' => $assign->id)),
+                        new pix_icon('t/delete', get_string('delete')));
+                    $row[] = new html_table_cell($delete);
+                } else {
+                    $row[] = '';
+                }
+
+                $table->data[] = $row;
+            }
+        }
+        $out = $this->output->container(html_writer::table($table), 'clearfix', 'assignedgroups');
+        return $out;
+    }
+
+    /**
+     * Returns the base markup for a paginated user table widget
+     *
+     * @return string HTML
+     */
+    public function display_user_datatable() {
+        $table = new html_table();
+        $table->id = 'datatable';
+        $table->attributes['class'] = 'clearfix';
+        $table->head = array(get_string('learner'), get_string('assignedvia', 'totara_core'));
+        $out = $this->output->container(html_writer::table($table), 'clearfix', 'assignedusers');
+        return $out;
+    }
+
+    /**
+     * Renders the edit restictions header.
+     *
+     * @param rb_global_restriction $restriction
+     * @param string $currenttab
+     * @return string
+     */
+    public function edit_restriction_header(rb_global_restriction $restriction, $currenttab) {
+
+        $html = $this->output->header();
+
+        $url = new moodle_url('/totara/reportbuilder/restrictions/index.php');
+        $html .= $this->output->container_start('reportbuilder-navlinks');
+        $html .= html_writer::link($url, get_string('allrestrictions', 'totara_reportbuilder'));
+        $html .= $this->output->container_end();
+
+        if ($restriction->id) {
+            $html .= $this->output->heading(get_string('editrestriction', 'totara_reportbuilder', $restriction->name));
+        } else {
+            $html .= $this->output->heading(get_string('newrestriction', 'totara_reportbuilder'));
+        }
+
+        $html .= $this->edit_restriction_tabs($restriction, $currenttab);
+        return $html;
+    }
+
+    /**
+     * Renders editing restriction tabs.
+     *
+     * @param rb_global_restriction $restriction
+     * @param string $currenttab
+     * @return string
+     */
+    public function edit_restriction_tabs(rb_global_restriction $restriction, $currenttab) {
+        // Prepare the tabs.
+        $tabgeneral = new tabobject(
+            'general',
+            new moodle_url('/totara/reportbuilder/restrictions/edit_general.php', array('id' => $restriction->id)),
+            get_string('general')
+        );
+        $tabrecordstoview = new tabobject(
+            'recordstoview',
+            new moodle_url('/totara/reportbuilder/restrictions/edit_recordstoview.php', array('id' => $restriction->id)),
+            get_string('recordstoview', 'totara_reportbuilder')
+        );
+        $tabrestrictedusers = new tabobject(
+            'restrictedusers',
+            new moodle_url('/totara/reportbuilder/restrictions/edit_restrictedusers.php', array('id' => $restriction->id)),
+            get_string('restrictedusers', 'totara_reportbuilder')
+        );
+
+        // Set up the active and inactive tabs.
+        if (!$restriction->id) {
+            $tabgeneral->activated = true;
+            $tabrecordstoview->inactive = true;
+            $tabrestrictedusers->inactive = true;
+        }
+
+        $row = array(
+            $tabgeneral,
+            $tabrecordstoview,
+            $tabrestrictedusers,
+        );
+        // Ensure the current tab is selected and activated.
+        foreach ($row as $tab) {
+            if ($tab->id === $currenttab) {
+                $tab->activated = true;
+                $tab->selected = true;
+            }
+        }
+        return $this->output->tabtree($row);
+    }
 }

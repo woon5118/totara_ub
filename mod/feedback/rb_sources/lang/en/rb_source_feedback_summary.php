@@ -13,6 +13,7 @@ $string['trainerpos'] = 'Trainer Position';
 $string['user'] = 'User';
 $string['coursename'] = 'Course Name';
 // filters
+$string['feedbackactivity'] = 'Feedback Activity';
 $string['feedbackname'] = 'Feedback Name';
 // content
 $string['theuser'] = 'The user';

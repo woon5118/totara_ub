@@ -39,7 +39,11 @@ admin_externalpage_setup('reportappraisals', '', null, $url);
 
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
-if (!$report = reportbuilder_get_embedded_report('appraisal_detail', null, false, $sid)) {
+// Verify global restrictions.
+$reportrecord = $DB->get_record('report_builder', array('shortname' => 'appraisal_detail'), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report('appraisal_detail', null, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -66,6 +70,8 @@ echo $renderer->header();
 if ($debug) {
     $report->debug($debug);
 }
+
+$report->display_restrictions();
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();

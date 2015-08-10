@@ -90,7 +90,7 @@ class util {
 
         if ($reportorsavedid > 0) {
             $sql = "SELECT r.id, r.fullname, r.timemodified AS rtimemodified, g.type,
-                           NULL AS savedid, NULL AS userid, 0 AS gtimemodified
+                           NULL AS savedid, NULL AS userid, 0 AS gtimemodified, r.globalrestriction
                      FROM {report_builder} r
                      JOIN {report_builder_graph} g ON g.reportid = r.id
                     WHERE r.id = :reportid";
@@ -98,7 +98,7 @@ class util {
 
         } else if ($reportorsavedid < 0) {
             $sql = "SELECT r.id, s.name AS fullname, r.timemodified AS rtimemodified, g.type,
-                           s.id AS savedid, s.userid, g.timemodified AS gtimemodified
+                           s.id AS savedid, s.userid, g.timemodified AS gtimemodified, r.globalrestriction
                       FROM {report_builder} r
                       JOIN {report_builder_graph} g ON g.reportid = r.id
                       JOIN {report_builder_saved} s ON s.reportid = r.id
@@ -155,7 +155,11 @@ class util {
         try {
             unset($SESSION->reportbuilder[$rawreport->id]); // Not persistent - we closed session already.
             $reportfor = $config->reportfor ? $config->reportfor : null;
-            $report = new \reportbuilder($rawreport->id, null, false, $rawreport->savedid, $reportfor);
+            // TODO TL-7315: global report restrictions are not implemented here, it is all or nothing based on
+            // 'noactiverestrictionsbehaviour' setting.
+            $globalrestrictionset = \rb_global_restriction_set::create_from_ids($rawreport, null);
+            $report = new \reportbuilder($rawreport->id, null, false, $rawreport->savedid, $reportfor, false, array(),
+                    $globalrestrictionset);
             $svgdata = self::get_svg($report);
 
             if (!$svgdata) {

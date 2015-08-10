@@ -38,7 +38,15 @@ class rb_source_goal_summary extends rb_base_source {
     private $goalframeworkid;
 
 
-    public function __construct() {
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
+        // Global Report Restrictions are applied in define_joinlist() and post_params() methods.
+
         $this->base = '{goal}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -54,16 +62,26 @@ class rb_source_goal_summary extends rb_base_source {
         parent::__construct();
     }
 
+    /**
+     * Global report restrictions are implemented in this source.
+     * @return boolean
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
 
     protected function define_joinlist() {
+        $global_restriction_join_gr = $this->get_global_report_restriction_join('gr', 'userid');
+
         $joinlist = array(
             new rb_join(
                 'numberassigned',
                 'LEFT',
-                '(SELECT goalid, COUNT(id) c
-                        FROM {goal_record}
+                "(SELECT goalid, COUNT(gr.id) c
+                        FROM {goal_record} gr
+                        {$global_restriction_join_gr}
                        WHERE deleted = 0
-                       GROUP BY goalid)',
+                       GROUP BY goalid)",
                 'numberassigned.goalid = base.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
@@ -152,12 +170,15 @@ class rb_source_goal_summary extends rb_base_source {
         $scalevalues = $DB->get_records('goal_scale_values', array('scaleid' => $scaleassignment->scaleid));
 
         foreach ($scalevalues as $scalevalue) {
+            $alias = "gr{$scalevalue->id}";
+            $global_restriction_join_grx = $this->get_global_report_restriction_join($alias, 'userid');
             $this->joinlist[] =
                 new rb_join(
                     "goalrecord" . $scalevalue->id,
                     "LEFT",
-                    "(SELECT goalid, COUNT(id) c
-                        FROM {goal_record}
+                    "(SELECT goalid, COUNT({$alias}.id) c
+                        FROM {goal_record} {$alias}
+                        {$global_restriction_join_grx}
                        WHERE scalevalueid = {$scalevalue->id}
                          AND deleted = 0
                        GROUP BY goalid)",

@@ -54,7 +54,13 @@ $url = new moodle_url('/mod/facetoface/interestreport.php', array('facetofaceid'
 $PAGE->set_url($url);
 require_login();
 
-if (!$report = reportbuilder_get_embedded_report('facetoface_interest', array('facetofaceid' => $facetofaceid), false, 0)) {
+// Verify global restrictions.
+$shortname = 'facetoface_interest';
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report($shortname, array('facetofaceid' => $facetofaceid), false, 0,
+        $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -86,6 +92,9 @@ $PAGE->set_button($report->edit_button());
 $PAGE->set_heading($strheading);
 
 echo $OUTPUT->header();
+
+$report->display_restrictions();
+
 echo $OUTPUT->heading($strheading);
 echo $renderer->print_description($report->description, $report->_id);
 

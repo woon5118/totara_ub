@@ -29,6 +29,9 @@ require_once($CFG->dirroot . '/totara/reportbuilder/rb_sources/rb_source_course_
 class rb_source_dp_course_completion_history extends rb_source_course_completion_all {
 
     protected function define_base() {
+        // Apply global user restrictions.
+        $this->add_global_report_restriction_join('base', 'userid');
+
         $base = "{course_completion_history}";
         return $base;
     }

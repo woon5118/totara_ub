@@ -59,7 +59,12 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 
 $shortname = 'completionimport_' . $importname;
-if (!$report = reportbuilder_get_embedded_report($shortname, $pageparams, false, $sid)) {
+
+// Verify global restrictions.
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report($shortname, $pageparams, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -84,6 +89,8 @@ echo $OUTPUT->header();
 
 // Standard report stuff.
 echo $OUTPUT->container_start('', 'completion_import');
+
+$report->display_restrictions();
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();

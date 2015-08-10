@@ -26,7 +26,159 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->libdir  . '/testing/generator/data_generator.php');
+
+/**
+ * Report builder generator.
+ *
+ * Usage:
+ *    $reportgenerator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
+ */
+class totara_reportbuilder_generator extends component_generator_base {
+    protected $globalrestrictioncount = 0;
+
+    /**
+     * To be called from data reset code only,
+     * do not use in tests.
+     * @return void
+     */
+    public function reset() {
+        parent::reset();
+
+        $this->globalrestrictioncount = 0;
+    }
+
+    /**
+     * Create a test restriction.
+     *
+     * @param array|stdClass $record
+     * @return rb_global_restriction
+     */
+    public function create_global_restriction($record = null) {
+        global $CFG;
+        require_once("$CFG->dirroot/totara/reportbuilder/classes/rb_global_restriction.php");
+
+        $this->globalrestrictioncount++;
+        $i = $this->globalrestrictioncount;
+
+        $record = (object)(array)$record;
+
+        if (!isset($record->name)) {
+            $record->name = 'Global report restriction '.$i;
+        }
+
+        $rest = new rb_global_restriction();
+        $rest->insert($record);
+
+        return $rest;
+    }
+
+    /**
+     * Add user related data to restriction.
+     *
+     * Records of this cohort, org, pos or user are visible
+     * in report with the restriction.
+     *
+     * @param stdClass|array $item - must contain prefix, restrictionid, itemid and optionally includechildren
+     * @return stdClass the created record
+     */
+    public function assign_global_restriction_record($item) {
+        global $DB;
+
+        $item = (array)$item;
+
+        if (empty($item['restrictionid'])) {
+            throw new coding_exception('generator requires $item->restrictionid');
+        }
+        if (empty($item['prefix'])) {
+            throw new coding_exception('generator requires valid $item->prefix');
+        }
+        if (empty($item['itemid'])) {
+            throw new coding_exception('generator requires $item->itemid');
+        }
+
+        $tables = array(
+            'cohort' => 'reportbuilder_grp_cohort_record',
+            'org' => 'reportbuilder_grp_org_record',
+            'pos' => 'reportbuilder_grp_pos_record',
+            'user' => 'reportbuilder_grp_user_record',
+        );
+
+        $prefix = $item['prefix'];
+        if ($prefix === 'position') {
+            $prefix = 'pos';
+        }
+        if ($prefix === 'organisation') {
+            $prefix = 'org';
+        }
+        if (!isset($tables[$prefix])) {
+            throw new coding_exception('generator requires valid $item->prefix');
+        }
+
+        $record = new stdClass();
+        $record->reportbuilderrecordid = $item['restrictionid'];
+        $record->{$prefix . 'id'} = $item['itemid'];
+        $record->timecreated = time();
+        if (isset($item['includechildren'])) {
+            $record->includechildren = $item['includechildren'];
+        }
+
+        $id = $DB->insert_record($tables[$prefix], $record);
+        return $DB->get_record($tables[$prefix], array('id' => $id));
+    }
+
+    /**
+     * Add user who is allowed to select restriction.
+     *
+     * @param stdClass|array $item - must contain prefix, restrictionid, itemid and optionally includechildren
+     * @return stdClass the created record
+     */
+    public function assign_global_restriction_user($item) {
+        global $DB;
+
+        $item = (array)$item;
+
+        if (empty($item['restrictionid'])) {
+            throw new coding_exception('generator requires $item->restrictionid');
+        }
+        if (empty($item['prefix'])) {
+            throw new coding_exception('generator requires valid $item->prefix');
+        }
+        if (empty($item['itemid'])) {
+            throw new coding_exception('generator requires $item->itemid');
+        }
+
+        $tables = array(
+            'cohort' => 'reportbuilder_grp_cohort_user',
+            'org' => 'reportbuilder_grp_org_user',
+            'pos' => 'reportbuilder_grp_pos_user',
+            'user' => 'reportbuilder_grp_user_user',
+        );
+
+        $prefix = $item['prefix'];
+        if ($prefix === 'position') {
+            $prefix = 'pos';
+        }
+        if ($prefix === 'organisation') {
+            $prefix = 'org';
+        }
+        if (!isset($tables[$prefix])) {
+            throw new coding_exception('generator requires valid $item->prefix');
+        }
+
+        $record = new stdClass();
+        $record->reportbuilderuserid = $item['restrictionid'];
+        $record->{$prefix . 'id'} = $item['itemid'];
+        $record->timecreated = time();
+        if (isset($item['includechildren'])) {
+            $record->includechildren = $item['includechildren'];
+        }
+
+        $id = $DB->insert_record($tables[$prefix], $record);
+        return $DB->get_record($tables[$prefix], array('id' => $id));
+    }
+}
 
 /**
  * This class intended to generate different mock entities

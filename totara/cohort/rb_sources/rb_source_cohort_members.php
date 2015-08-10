@@ -41,8 +41,17 @@ class rb_source_cohort_members extends rb_base_source {
     /**
      * Constructor
      * @global object $CFG
+     * @param int $groupid (ignored)
+     * @param rb_global_restriction_set $globalrestrictionset
      */
-    public function __construct() {
+    public function  __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
+
         $this->base = '{cohort_members}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -54,6 +63,9 @@ class rb_source_cohort_members extends rb_base_source {
         $this->requiredcolumns = array();
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_cohort_members');
 
+        // Apply global report restrictions.
+        $this->add_global_report_restriction_join('base', 'userid');
+
         parent::__construct();
     }
 
@@ -62,6 +74,14 @@ class rb_source_cohort_members extends rb_base_source {
     // Methods for defining contents of source
     //
     //
+
+    /**
+     * Are the global report restrictions implemented in the source?
+     * @return null|bool
+     */
+    public function global_restrictions_supported() {
+        return true;
+    }
 
     /**
      * Creates the array of rb_join objects required for this->joinlist

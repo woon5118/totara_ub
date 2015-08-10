@@ -43,10 +43,15 @@ class rb_source_dp_course extends rb_base_source {
     /**
      * Constructor
      */
-    public function __construct() {
-        global $DB;
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        if ($groupid instanceof rb_global_restriction_set) {
+            throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
+        }
+        // Remember the active global restriction set.
+        $this->globalrestrictionset = $globalrestrictionset;
 
-        $this->base = self::get_base_sql();
+        $this->base = $this->get_dp_status_base_sql();
+
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
@@ -60,23 +65,11 @@ class rb_source_dp_course extends rb_base_source {
     }
 
     /**
-     * Get base sql for course record of learning.
+     * Global report restrictions are implemented in this source.
+     * @return boolean
      */
-    public static function get_base_sql() {
-        global $DB;
-        $uniqueid = $DB->sql_concat_join("','", array(sql_cast2char('userid'), sql_cast2char('courseid')));
-        return "(SELECT " . $uniqueid . " AS id, userid, courseid
-                   FROM (SELECT ue.userid AS userid, e.courseid AS courseid
-                           FROM {user_enrolments} ue
-                           JOIN {enrol} e ON ue.enrolid = e.id
-                          UNION
-                         SELECT cc.userid AS userid, cc.course AS courseid
-                           FROM {course_completions} cc
-                          WHERE cc.status > " . COMPLETION_STATUS_NOTYETSTARTED . "
-                          UNION
-                         SELECT p1.userid AS userid, pca1.courseid AS courseid
-                           FROM {dp_plan_course_assign} pca1
-                           JOIN {dp_plan} p1 ON pca1.planid = p1.id) basesub)";
+    public function global_restrictions_supported() {
+        return true;
     }
 
     //

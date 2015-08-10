@@ -49,7 +49,7 @@ if ($fromform = $mform->get_data()) {
         totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_reportbuilder'), $returnurl);
         exit;
     }
-    update_content($id, $report, $fromform);
+    reportbuilder_update_content($id, $report, $fromform);
     reportbuilder_set_status($id);
     $report = new reportbuilder($id);
     \totara_reportbuilder\event\report_updated::create_from_report($report, 'content')->trigger();
@@ -88,7 +88,7 @@ echo $output->footer();
  *
  * @return boolean True if the content settings could be updated successfully
  */
-function update_content($id, $report, $fromform) {
+function reportbuilder_update_content($id, $report, $fromform) {
     global $DB;
     $transaction = $DB->start_delegated_transaction();
 
@@ -100,6 +100,9 @@ function update_content($id, $report, $fromform) {
     $todb->id = $id;
     $todb->contentmode = $contentenabled;
     $todb->timemodified = time();
+    if (isset($fromform->globalrestriction)) {
+        $todb->globalrestriction = $fromform->globalrestriction;
+    }
     $DB->update_record('report_builder', $todb);
 
     $contentoptions = isset($report->contentoptions) ?

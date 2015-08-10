@@ -49,7 +49,12 @@ $debug  = optional_param('debug', 0, PARAM_INT);
 $strheading = get_string('teammembers', 'totara_core');
 
 $shortname = 'team_members';
-if (!$report = reportbuilder_get_embedded_report($shortname, null, false, $sid)) {
+
+// Verify global restrictions.
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
+
+if (!$report = reportbuilder_get_embedded_report($shortname, null, false, $sid, $globalrestrictionset)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
 
@@ -100,6 +105,8 @@ echo $OUTPUT->header();
 
 // Plan page content.
 echo $OUTPUT->container_start('', 'my-teammembers-content');
+
+$report->display_restrictions();
 
 $countfiltered = $report->get_filtered_count();
 $countall = $report->get_full_count();
