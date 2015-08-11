@@ -217,17 +217,20 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
      * @return  void
      */
     this.error = function(dialog, response, url) {
-        // Hide loading animation
-        dialog.hideLoading();
-
-        var html_message = '';
         if (response) {
-            html_message = response;
+            // Hide loading animation.
+            dialog.hideLoading();
+            dialog.dialog.html(response);
         } else {
             // Print a generic error message
-            html_message = '<div class="box errorbox errorboxcontent">An error has occured</div>';
+            require(['core/str'], function (mdlstring) {
+                mdlstring.get_string('error:dialoggenericerror', 'totara_core').done(function (genericerror) {
+                    // Hide loading animation.
+                    dialog.hideLoading();
+                    dialog.dialog.html('<div class="box errorbox errorboxcontent">' + genericerror + '</div>');
+                })
+            ;})
         }
-        dialog.dialog.html(html_message);
     }
 
 

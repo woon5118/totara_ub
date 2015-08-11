@@ -197,6 +197,7 @@ $string['error:courseidincorrect'] = 'Course id is incorrect.';
 $string['error:dashboardnotfound'] = 'Cannot fully initialize page - could not retrieve dashboard details';
 $string['error:datenotinfuture'] = 'The date needs to be in the future';
 $string['error:dialognotreeitems'] = 'No items available';
+$string['error:dialoggenericerror'] = 'An error has occurred';
 $string['error:duplicaterecordsdeleted'] = 'Duplicate {$a} record deleted: ';
 $string['error:duplicaterecordsfound'] = '{$a->count} duplicate record(s) found in the {$a->tablename} table...fixing (see error log for details)';
 $string['error:emptyidnumberwithsync'] = 'HR Import is enabled but the ID number field is empty. Either disable HR Import for this user or provide a valid ID number.';
