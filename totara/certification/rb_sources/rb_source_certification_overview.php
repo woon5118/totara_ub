@@ -322,20 +322,7 @@ class rb_source_certification_overview extends rb_source_program_overview {
 
         $strstatus = '';
         if ($status && isset($CERTIFSTATUS[$status])) {
-            switch ($status) {
-                case CERTIFSTATUS_ASSIGNED:
-                    $strstatus = get_string('notcertified', 'totara_certification');
-                    break;
-                case CERTIFSTATUS_COMPLETED:
-                    $strstatus = get_string('certified', 'totara_certification');
-                    break;
-                case CERTIFSTATUS_INPROGRESS:
-                    // Return empty string.
-                    break;
-                default:
-                    $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
-                    break;
-            }
+            $strstatus = get_string($CERTIFSTATUS[$status], 'totara_certification');
         }
         return $strstatus;
     }

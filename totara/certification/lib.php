@@ -50,9 +50,9 @@ define('CERTIFSTATUS_EXPIRED', 4);
 global $CERTIFSTATUS;
 $CERTIFSTATUS = array(
     CERTIFSTATUS_UNSET => 'status_unset',
-    CERTIFSTATUS_ASSIGNED => 'status_assigned',
+    CERTIFSTATUS_ASSIGNED => 'status_notcertified',
     CERTIFSTATUS_INPROGRESS => 'status_inprogress',
-    CERTIFSTATUS_COMPLETED => 'status_completed',
+    CERTIFSTATUS_COMPLETED => 'status_certified',
     CERTIFSTATUS_EXPIRED => 'status_expired',
 );
 
