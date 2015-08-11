@@ -101,15 +101,13 @@ echo $OUTPUT->box(html_writer::tag('h2',  get_string('participants'), array('cla
 echo $OUTPUT->box('', '', 'chat-options');
 echo $OUTPUT->box(html_writer::tag('h2',  get_string('messages', 'chat'), array('class' => 'accesshide')) .
         '<ul id="messages-list"></ul>', '', 'chat-messages');
-$table = new html_table();
-$table->data = array(
-    array('<label class="accesshide" for="input-message">'.get_string('entermessage', 'chat').' </label>'.
+$send = '<label class="accesshide" for="input-message">'.get_string('entermessage', 'chat').' </label>'.
           '<input type="text" disabled="true" id="input-message" value="Loading..." /> '.
           '<input type="button" id="button-send" value="'.get_string('send', 'chat').'" /> <a id="choosetheme" href="###">'.
           get_string('themes').
-          ' &raquo; </a>')
-);
+          ' &raquo; </a>';
+
 echo $OUTPUT->box(html_writer::tag('h2',  get_string('composemessage', 'chat'), array('class' => 'accesshide')) .
-        html_writer::table($table), '', 'chat-input-area');
+        html_writer::div($send), '', 'chat-input-area');
 echo $OUTPUT->box('', '', 'chat-notify');
 echo $OUTPUT->footer();

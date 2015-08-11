@@ -49,7 +49,7 @@
 .mdl-chat-my-entry .chat-message .text{
     background: #F1F3CB;
 }
-#chat-input-area ,#chat-input-area table.generaltable, #chat-input-area table.generaltable td.cell {
+#chat-input-area {
     background: #92B3E8;
     border: 0;
     margin: 0;

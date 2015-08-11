@@ -27,10 +27,7 @@
 .dir-rtl .chat-message .right,
 .dir-rtl .chat-message .left  {direction:ltr;}
 
-#chat-input-area,
-#chat-input-area table.generaltable,
-#chat-input-area table.generaltable td.cell {background: #92B3E8;border: 0; height:100%;}
-#chat-input-area table.generaltable td.cell {padding-top:4px;}
+#chat-input-area {background: #92B3E8;border: 0; height:100%;}
 #chat-userlist {background: #E3E8F0;height: 100%;}
 
 /**
