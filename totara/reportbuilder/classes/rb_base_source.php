@@ -823,7 +823,7 @@ abstract class rb_base_source {
         if ($renewalstatus && isset($CERTIFRENEWALSTATUS[$renewalstatus])) {
             return get_string($CERTIFRENEWALSTATUS[$renewalstatus], 'totara_certification');
         } else {
-            return '';
+            return get_string($CERTIFRENEWALSTATUS[CERTIFRENEWALSTATUS_NOTDUE], 'totara_certification');
         }
     }
 
