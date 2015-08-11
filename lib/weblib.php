@@ -3605,5 +3605,6 @@ function get_formatted_help_string($identifier, $component, $ajax = false, $a = 
  * @return string HTML to prevent password autofill
  */
 function prevent_form_autofill_password() {
-    return '<div class="hide"><input type="password" /></div>';
+    // Totara: inline style is much safer here than general class.
+    return '<div style="display: none;"><input type="password" /></div>';
 }

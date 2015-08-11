@@ -170,7 +170,7 @@ class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer
     {
         $this->_html = '';
         // Totara: Prevent password completion in forms, this hack should be more reliable than extra forms element from MDL-45772.
-        $this->_hiddenHtml = '<div style="display: none;"><input type="password" value=""></div>';
+        $this->_hiddenHtml = prevent_form_autofill_password();
     } // end func startForm
 
    /**
