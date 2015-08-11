@@ -196,10 +196,7 @@ class rb_source_dp_program extends rb_base_source {
                 'displayfunc' => 'link_program_icon',
                 'defaultheading' => get_string('programname', 'totara_program'),
                 'extrafields' => array(
-                    'program_id' => "base.id",
-                    'program_icon' => "base.icon",
-                    'program_visible' => 'base.visible',
-                    'program_audiencevisible' => 'base.audiencevisible',
+                    'programid' => "base.id",
                     'userid' => "program_completion.userid"
                 )
             )
@@ -363,7 +360,7 @@ class rb_source_dp_program extends rb_base_source {
     }
 
     function rb_display_link_program_icon($programname, $row) {
-        return prog_display_link_icon($row->program_id, $row->userid);
+        return prog_display_link_icon($row->programid, $row->userid);
     }
 
     public function rb_display_program_previous_completion($name, $row) {

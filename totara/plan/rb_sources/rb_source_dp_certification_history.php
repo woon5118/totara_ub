@@ -186,9 +186,6 @@ class rb_source_dp_certification_history extends rb_base_source {
                     'displayfunc' => 'link_program_icon',
                     'extrafields' => array(
                         'programid' => 'prog.id',
-                        'program_icon' => "prog.icon",
-                        'program_visible' => 'prog.visible',
-                        'program_audiencevisible' => 'prog.audiencevisible',
                         'userid' => 'base.userid',
                     ),
                 )

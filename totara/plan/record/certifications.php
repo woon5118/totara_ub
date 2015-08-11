@@ -21,6 +21,7 @@
  * @package totara
  * @subpackage totara_plan
  */
+
 /**
  * Displays certifications for the current user
  *
@@ -43,32 +44,38 @@ check_certification_enabled();
 $sid = optional_param('sid', '0', PARAM_INT);
 $certifid = optional_param('certifid', null, PARAM_INT);
 $history = optional_param('history', null, PARAM_BOOL);
-$userid = optional_param('userid', $USER->id, PARAM_INT);
-$format = optional_param('format', '', PARAM_TEXT);
+$userid = optional_param('userid', $USER->id, PARAM_INT); // Which user to show.
+$format = optional_param('format', '', PARAM_TEXT); // Export format.
 $rolstatus = optional_param('status', 'all', PARAM_ALPHANUM);
 $debug  = optional_param('debug', 0, PARAM_INT);
+// Set status.
 if (!in_array($rolstatus, array('active', 'completed','all'))) {
     $rolstatus = 'all';
 }
-
-$pageparams = array(
-    'certifid' => $certifid,
-    'history' => $history,
-    'userid' => $userid,
-    'format' => $format,
-    'status' => $rolstatus
-);
-
+// Set user.
 if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
 }
-
+// Set certification.
 if (!empty($certifid) && (!$certification = $DB->get_record('prog', array('certifid' => $certifid), 'fullname'))) {
     print_error(get_string('error:incorrectcertifid', 'totara_certification', null, $certifid));
 }
 
 $context = context_system::instance();
 
+$pageparams = array(
+    'userid' => $userid,
+    'status' => $rolstatus
+);
+if ($certifid) {
+    $pageparams['certifid'] = $certifid;
+}
+if ($history) {
+    $pageparams['history'] = $history;
+}
+if ($format) {
+    $pageparams['format'] = $format;
+}
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/record/certifications.php', $pageparams));
 $PAGE->set_pagelayout('report');
@@ -77,37 +84,29 @@ $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
     $strheading = get_string('recordoflearningfor', 'totara_core') . fullname($user, true);
-    if (totara_feature_visible('myteam')) {
-        $menuitem = 'myteam';
-        $url = new moodle_url('/my/teammembers.php');
-    } else {
-        $menuitem = null;
-        $url = null;
-    }
 } else {
     $strheading = get_string('recordoflearning', 'totara_core');
-    $menuitem = 'mylearning';
-    $url = new moodle_url('/my/');
 }
 // Get subheading name for display.
+$strsubheading = get_string($rolstatus.'certificationssubhead', 'totara_plan');
+
+$shortname = 'plan_certifications';
 $data = array(
     'userid' => $userid,
 );
+if ($rolstatus !== 'all') {
+    $data['rolstatus'] = $rolstatus;
+}
 if ($history) {
+    $shortname = 'plan_certifications_history';
     if (!empty($certifid)) {
+        $data['certifid'] = $certifid;
         $strsubheading = get_string('certificationshistoryforsubhead', 'totara_plan', $certification->fullname);
     } else {
         $strsubheading = get_string('certificationshistorysubhead', 'totara_plan');
     }
-    $shortname = 'plan_certifications_history';
-    $data['certifid'] = $certifid;
-} else {
-    $strsubheading = get_string($rolstatus.'certificationssubhead', 'totara_plan');
-    $shortname = 'plan_certifications';
 }
-if ($rolstatus !== 'all') {
-    $data['rolstatus'] = $rolstatus;
-}
+// Set report.
 if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
@@ -123,6 +122,20 @@ if ($format != '') {
 $report->include_js();
 
 // Display the page.
+$ownplan = $USER->id == $userid;
+$usertype = ($ownplan) ? 'learner' : 'manager';
+if ($usertype == 'manager') {
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $url = null;
+    }
+} else {
+    $menuitem = 'mylearning';
+    $url = new moodle_url('/my/');
+}
 if ($url) {
     $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
 }
@@ -132,12 +145,10 @@ $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
 $PAGE->set_heading(format_string($SITE->fullname));
 
-$ownplan = $USER->id == $userid;
-
-$usertype = ($ownplan) ? 'learner' : 'manager';
 $menuitem = ($ownplan) ? 'recordoflearning' : 'myteam';
 $PAGE->set_totara_menu_selected($menuitem);
 dp_display_plans_menu($userid, 0, $usertype, 'certifications', $rolstatus);
+
 echo $OUTPUT->header();
 
 if ($debug) {
@@ -145,7 +156,6 @@ if ($debug) {
 }
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
-
 echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
 $currenttab = 'certifications';
@@ -158,7 +168,6 @@ $countall = $report->get_full_count();
 
 $heading = $renderer->print_result_count_string($countfiltered, $countall);
 echo $OUTPUT->heading($heading);
-
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
@@ -166,14 +175,11 @@ $report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();
-
 echo $renderer->showhide_button($report->_id, $report->shortname);
 
 $report->display_table();
-
 // Export button.
 $renderer->export_select($report, $sid);
 
 echo $OUTPUT->container_end();
-
 echo $OUTPUT->footer();

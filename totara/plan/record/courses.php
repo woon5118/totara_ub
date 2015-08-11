@@ -38,8 +38,6 @@ if (totara_feature_disabled('recordoflearning')) {
     print_error('error:recordoflearningdisabled', 'totara_plan');
 }
 
-global $USER;
-
 $courseid = optional_param('courseid', null, PARAM_INT);
 $history = optional_param('history', false, PARAM_BOOL);
 $userid = optional_param('userid', $USER->id, PARAM_INT); // Which user to show.
@@ -47,29 +45,34 @@ $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format','', PARAM_TEXT); // Export format.
 $rolstatus = optional_param('status', 'all', PARAM_ALPHANUM);
 $debug  = optional_param('debug', 0, PARAM_INT);
-
+// Set status.
 if (!in_array($rolstatus, array('active','completed','all'))) {
     $rolstatus = 'all';
 }
-
-$pageparams = array(
-    'courseid' => $courseid,
-    'history' => $history,
-    'userid' => $userid,
-    'format' => $format,
-    'status' => $rolstatus
-);
-
+// Set user.
 if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
 }
-
+// Set course.
 if (!empty($courseid) && (!$course = $DB->get_record('course', array('id' => $courseid), 'fullname'))) {
     print_error(get_string('coursenotfound', 'totara_plan'));
 }
 
 $context = context_system::instance();
 
+$pageparams = array(
+    'userid' => $userid,
+    'status' => $rolstatus
+);
+if (!empty($courseid)) {
+    $pageparams['courseid'] = $courseid;
+}
+if ($history) {
+    $pageparams['history'] = $history;
+}
+if ($format) {
+    $pageparams['format'] = $format;
+}
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/totara/plan/record/courses.php', $pageparams));
 $PAGE->set_pagelayout('report');
@@ -93,14 +96,14 @@ if ($rolstatus !== 'all') {
 }
 if ($history) {
     $shortname = 'plan_courses_completion_history';
-    $data['courseid'] = $courseid;
     if (!empty($courseid)) {
+        $data['courseid'] = $courseid;
         $strsubheading = get_string('coursescompletionhistoryforsubhead', 'totara_plan', $course->fullname);
     } else {
         $strsubheading = get_string('coursescompletionhistorysubhead', 'totara_plan');
     }
 }
-
+// Set report.
 if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
     print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
 }
@@ -115,9 +118,7 @@ if ($format != '') {
 
 $report->include_js();
 
-///
-/// Display the page
-///
+// Display the page.
 $ownplan = $USER->id == $userid;
 $usertype = ($ownplan) ? 'learner' : 'manager';
 if ($usertype == 'manager') {
@@ -152,11 +153,9 @@ if ($debug) {
 }
 
 echo $OUTPUT->container_start('', 'dp-plan-content');
-
 echo $OUTPUT->heading($strheading.' : '.$strsubheading);
 
 $currenttab = 'courses';
-
 dp_print_rol_tabs($rolstatus, $currenttab, $userid);
 
 $report->display_restrictions();
@@ -166,7 +165,6 @@ $countall = $report->get_full_count();
 
 $heading = $renderer->print_result_count_string($countfiltered, $countall);
 echo $OUTPUT->heading($heading, 3);
-
 echo $renderer->print_description($report->description, $report->_id);
 
 $report->display_search();
@@ -174,14 +172,11 @@ $report->display_sidebar_search();
 
 // Print saved search buttons if appropriate.
 echo $report->display_saved_search_options();
-
 echo $renderer->showhide_button($report->_id, $report->shortname);
 
 $report->display_table();
-
 // Export button.
 $renderer->export_select($report, $sid);
 
 echo $OUTPUT->container_end();
-
 echo $OUTPUT->footer();

@@ -220,9 +220,6 @@ class rb_source_dp_certification extends rb_base_source {
                     'displayfunc' => 'link_program_icon',
                     'extrafields' => array(
                         'programid' => 'base.id',
-                        'program_icon' => "base.icon",
-                        'program_visible' => 'base.visible',
-                        'program_audiencevisible' => 'base.audiencevisible',
                         'userid' => 'certif_completion.userid'
                     ),
                 )

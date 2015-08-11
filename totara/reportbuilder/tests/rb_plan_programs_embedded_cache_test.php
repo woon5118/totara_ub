@@ -162,7 +162,7 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
-        $programidalias = reportbuilder_get_extrafield_alias('program', 'proglinkicon', 'program_id');
+        $programidalias = reportbuilder_get_extrafield_alias('program', 'proglinkicon', 'programid');
         $result = $this->get_report_result($this->report_builder_data['shortname'], array('userid' => $this->user1->id,), $usecache);
         $this->assertCount(2, $result);
         $was = array();
