@@ -45,3 +45,11 @@
     margin-left: 4%;
     width: 40%;
 }
+
+#chat-userlist li {
+    clear: both;
+    min-height: 40px;
+}
+#page-mod-chat-gui_ajax-index .userpicture {
+    float: left;
+}

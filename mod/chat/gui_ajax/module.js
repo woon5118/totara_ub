@@ -238,16 +238,16 @@ M.mod_chat_ajax.init = function(Y, cfg) {
             var list = Y.one('#users-list');
             list.get('children').remove();
             for (var i in users) {
-                var li = Y.Node.create('<li><table><tr><td>' + users[i].picture + '</td><td></td></tr></table></li>');
+                var li = Y.Node.create('<li>' + users[i].picture + '<div class="chat-userinfo"></div></li>');
                 if (users[i].id == this.cfg.userid) {
-                    li.all('td').item(1).append(Y.Node.create('<strong><a target="_blank" href="' + users[i].url + '">' + users[i].name + '</a></strong>'));
+                    li.all('.chat-userinfo').append(Y.Node.create('<strong><a target="_blank" href="' + users[i].url + '">' + users[i].name + '</a></strong>'));
                 } else {
-                    li.all('td').item(1).append(Y.Node.create('<div><a target="_blank" href="' + users[i].url + '">' + users[i].name + '</a></div>'));
+                    li.all('.chat-userinfo').append(Y.Node.create('<div><a target="_blank" href="' + users[i].url + '">' + users[i].name + '</a></div>'));
                     var talk = Y.Node.create('<a href="###">' + M.util.get_string('talk', 'chat') + '</a>');
                     talk.on('click', this.talkto, this, users[i].name);
                     var beep = Y.Node.create('<a href="###">' + M.util.get_string('beep', 'chat') + '</a>');
                     beep.on('click', this.send, this, users[i].id);
-                    li.all('td').item(1).append(Y.Node.create('<div></div>').append(talk).append('&nbsp;').append(beep));
+                    li.all('.chat-userinfo').append(Y.Node.create('<div></div>').append(talk).append('&nbsp;').append(beep));
                 }
                 list.append(li);
             }
