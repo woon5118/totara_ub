@@ -683,13 +683,15 @@ class rb_source_dp_course extends rb_base_source {
     }
 
     public function post_config(reportbuilder $report) {
-        $reportfor = $report->reportfor; // ID of the user the report is for.
-        $fieldalias = 'course';
-        $fieldbaseid = $report->get_field('base', 'courseid', 'base.courseid');
-        $fieldvisible = $report->get_field('course', 'coursevisible', 'course.visible');
-        $fieldaudvis = $report->get_field('course', 'courseaudiencevisible', 'course.audiencevisible');
-        $report->set_post_config_restrictions(totara_visibility_where($reportfor,
-            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached()));
+        // Visibility checks are only applied if viewing a single user's records.
+        if ($report->get_param_value('userid')) {
+            $fieldalias = 'course';
+            $fieldbaseid = $report->get_field('course', 'id', 'base.courseid');
+            $fieldvisible = $report->get_field('course', 'visible', 'course.visible');
+            $fieldaudvis = $report->get_field('course', 'audiencevisible', 'course.audiencevisible');
+            $report->set_post_config_restrictions(totara_visibility_where($report->get_param_value('userid'),
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'course', $report->is_cached(), true));
+        }
     }
 
     function rb_display_course_completion_progress($status, $row, $isexport) {

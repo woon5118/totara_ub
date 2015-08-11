@@ -75,64 +75,58 @@ function prog_can_view_users_required_learning($learnerid) {
  * @global object $DB
  * @param int $userid
  * @param string $sort The order in which to sort the programs
- * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
- * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+ * @param mixed $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+ * @param mixed $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
- * @param bool $showhidden Whether to include hidden programs in records returned
+ * @param bool $showhidden Whether to include hidden programs in records returned when using normal visibility
  * @param bool $onlyprograms Only return programs (excludes certifications)
  * @return array|int
  */
-function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum = '', $returncount = false, $showhidden = false,
-        $onlyprograms = false) {
+function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum = '', $returncount = false,
+                               $showhidden = false, $onlyprograms = false) {
     global $DB;
 
     // Construct sql query.
+    $count = 'SELECT COUNT(*) ';
+    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
     list($insql, $params) = $DB->get_in_or_equal(array(PROGRAM_EXCEPTION_RAISED, PROGRAM_EXCEPTION_DISMISSED),
             SQL_PARAMS_NAMED, 'param', false);
-    $count = 'SELECT p.id ';
-
-    $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, pc.status AS status ';
-
     $from = "FROM {prog} p
+       INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = :contextlevel)
        INNER JOIN {prog_completion} pc
                ON p.id = pc.programid AND pc.coursesetid = 0 ";
 
-    $where = "WHERE pc.userid = :uid
-              AND pc.status <> :status
+    $where = "WHERE pc.userid = :userid
+              AND pc.status <> :statuscomplete
               AND EXISTS(SELECT id
                            FROM {prog_user_assignment} pua
                           WHERE pua.exceptionstatus {$insql}
                             AND pc.programid = pua.programid
                             AND pc.userid = pua.userid
                         ) ";
-
     if ($onlyprograms) {
         $where .= " AND p.certifid IS NULL";
     }
 
-    $params['uid'] = $userid;
-    $params['status'] = STATUS_PROGRAM_COMPLETE;
+    $params['contextlevel'] = CONTEXT_PROGRAM;
+    $params['userid'] = $userid;
+    $params['statuscomplete'] = STATUS_PROGRAM_COMPLETE;
+
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
+                                                                      'p.id',
+                                                                      'p.visible',
+                                                                      'p.audiencevisible',
+                                                                      'p',
+                                                                      'certification',
+                                                                      false,
+                                                                      $showhidden);
+    $params = array_merge($params, $visibilityparams);
+    $where .= " AND {$visibilitysql} ";
 
     if ($returncount) {
-        $programs = $DB->get_records_sql($count.$from.$where, $params);
+        return $DB->count_records_sql($count.$from.$where, $params);
     } else {
-        $programs = $DB->get_records_sql($select.$from.$where.$sort, $params, $limitfrom, $limitnum);
-    }
-
-    if (!$showhidden) {
-        $user = $DB->get_record('user', array('id' => $userid));
-        foreach ($programs as $key => $progrecord) {
-            $program = new program($progrecord->id);
-            if (!$program->is_viewable($user)) {
-                unset($programs[$key]);
-            }
-        }
-    }
-
-    if ($returncount) {
-        return count($programs);
-    } else {
-        return $programs;
+        return $DB->get_records_sql($select.$from.$where.$sort, $params, $limitfrom, $limitnum);
     }
 }
 
@@ -142,16 +136,17 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
  * @global object $DB
  * @param int $userid
  * @param string $sort The order in which to sort the programs
- * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
- * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+ * @param mixed $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+ * @param mixed $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
- * @param bool $showhidden Whether to include hidden programs in records returned
+ * @param bool $showhidden Whether to include hidden programs in records returned when using normal visibility
  * @param bool $onlyprograms Only return programs (excludes certifications)
  * @return array|int
  */
 function prog_get_required_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false, $showhidden=false,
                                     $onlyprograms=true) {
-    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden, $onlyprograms);
+    return prog_get_all_programs($userid, $sort, $limitfrom, $limitnum, $returncount, $showhidden,
+                                 $onlyprograms);
 }
 
 /**
@@ -160,15 +155,15 @@ function prog_get_required_programs($userid, $sort='', $limitfrom='', $limitnum=
  * @global object $DB
  * @param int $userid
  * @param string $sort SQL fragment to order the programs
- * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
- * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+ * @param mixed $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+ * @param mixed $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
- * @param bool $showhidden Whether to include hidden programs in records returned
+ * @param bool $showhidden Whether to include hidden programs in records returned when using normal visibility
  * @param bool $activeonly Whether to restrict to only active programs (programs where "Progress" is not "Complete")
  * @return array|int
  */
-function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false, $showhidden=false,
-        $activeonly=false) {
+function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limitnum='', $returncount=false,
+                                         $showhidden=false, $activeonly=false) {
     global $DB;
 
     $params = array();
@@ -184,7 +179,7 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
     $count = 'SELECT COUNT(*) ';
     $select = 'SELECT p.*, p.fullname AS progname, pc.timedue AS duedate, cfc.certifpath, cfc.status, cfc.timeexpires ';
     $from = "FROM {prog} p
-            INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel =:contextlevel)
+            INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = :contextlevel)
             INNER JOIN {prog_completion} pc ON p.id = pc.programid
                     AND pc.coursesetid = 0
                     AND pc.userid = :userid
@@ -192,9 +187,8 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
             INNER JOIN {certif_completion} cfc ON cfc.certifid = cf.id
                     AND cfc.userid = pc.userid ";
 
-    $where = 'WHERE 1=1 ';
     // Is the user assigned? Exists is more efficient than using distinct.
-    $where .= "AND EXISTS (SELECT userid
+    $where = "WHERE EXISTS (SELECT userid
                             FROM {prog_user_assignment} pua
                             WHERE pua.programid = pc.programid
                             AND pua.userid = pc.userid
@@ -205,16 +199,11 @@ function prog_get_certification_programs($userid, $sort='', $limitfrom='', $limi
                                                                       'p.visible',
                                                                       'p.audiencevisible',
                                                                       'p',
-                                                                      'certification');
-
+                                                                      'certification',
+                                                                      false,
+                                                                      $showhidden);
     $params = array_merge($params, $visibilityparams);
-
     $where .= " AND {$visibilitysql} ";
-
-    if (!$showhidden) {
-        $where .= "AND p.visible = :visible ";
-        $params['visible'] = 1;
-    }
 
     if ($activeonly) {
         // This should only show non complete certifications and due/expired recertifications.
@@ -1289,7 +1278,7 @@ function prog_update_completion($userid, program $program = null) {
     global $DB;
 
     if (!$program) {
-        $proglist = prog_get_all_programs($userid);
+        $proglist = prog_get_all_programs($userid, '', '', '', false, true);
         $programs = array();
         foreach ($proglist as $progrow) {
             $programs[] = new program($progrow->id);

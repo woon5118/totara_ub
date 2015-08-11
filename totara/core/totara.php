@@ -32,6 +32,41 @@ define('TOTARA_SHOWFEATURE', 1);
 define('TOTARA_HIDEFEATURE', 2);
 define('TOTARA_DISABLEFEATURE', 3);
 
+define('COHORT_ALERT_NONE', 0);
+define('COHORT_ALERT_AFFECTED', 1);
+define('COHORT_ALERT_ALL', 2);
+
+define('COHORT_COL_STATUS_ACTIVE', 0);
+define('COHORT_COL_STATUS_DRAFT_UNCHANGED', 10);
+define('COHORT_COL_STATUS_DRAFT_CHANGED', 20);
+define('COHORT_COL_STATUS_OBSOLETE', 30);
+
+define('COHORT_BROKEN_RULE_NONE', 0);
+define('COHORT_BROKEN_RULE_NOT_NOTIFIED', 1);
+define('COHORT_BROKEN_RULE_NOTIFIED', 2);
+
+define('COHORT_MEMBER_SELECTOR_MAX_ROWS', 1000);
+
+define('COHORT_OPERATOR_TYPE_COHORT', 25);
+define('COHORT_OPERATOR_TYPE_RULESET', 50);
+
+define('COHORT_ASSN_ITEMTYPE_CATEGORY', 40);
+define('COHORT_ASSN_ITEMTYPE_COURSE', 50);
+define('COHORT_ASSN_ITEMTYPE_PROGRAM', 45);
+define('COHORT_ASSN_ITEMTYPE_CERTIF', 55);
+define('COHORT_ASSN_ITEMTYPE_MENU', 65);
+
+// This should be extended when adding other tabs.
+define ('COHORT_ASSN_VALUE_VISIBLE', 10);
+define ('COHORT_ASSN_VALUE_ENROLLED', 30);
+define ('COHORT_ASSN_VALUE_PERMITTED', 50);
+
+// Visibility constants.
+define('COHORT_VISIBLE_ENROLLED', 0);
+define('COHORT_VISIBLE_AUDIENCE', 1);
+define('COHORT_VISIBLE_ALL', 2);
+define('COHORT_VISIBLE_NOUSERS', 3);
+
 /**
  * This function loads the program settings that are available for the user
  *

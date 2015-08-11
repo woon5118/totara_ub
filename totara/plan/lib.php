@@ -513,24 +513,8 @@ function dp_get_rol_tabs_visible($userid) {
         $visible[] = 'objectives';
     }
 
-    $params = array('contextlevel' => CONTEXT_PROGRAM, 'uid' => $userid, 'eid' => PROGRAM_EXCEPTION_RAISED);
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
-                                                                      'p.id',
-                                                                      'p.visible',
-                                                                      'p.audiencevisible',
-                                                                      'p',
-                                                                      'program');
-    $params = array_merge($params, $visibilityparams);
-    $sql = "SELECT COUNT(pua.programid)
-            FROM {prog_user_assignment} pua
-            INNER JOIN {prog} p ON p.id = pua.programid
-            INNER JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel =:contextlevel)
-            WHERE pua.userid = :uid
-              AND pua.exceptionstatus != :eid
-              AND p.certifid IS NULL
-              AND {$visibilitysql}";
-    $assigned_progs = $DB->count_records_sql($sql, $params);
-    if (($assigned_progs > 0 || $show_program_tab) && totara_feature_visible('programs')) {
+    $programscount = prog_get_all_programs($userid, '', '', '', true, true, true);
+    if (($programscount > 0 || $show_program_tab) && totara_feature_visible('programs')) {
         $visible[] = 'programs';
     }
 

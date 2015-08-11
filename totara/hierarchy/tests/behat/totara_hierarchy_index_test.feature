@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @ndl
+@totara @totara_hierarchy
 Feature: Hierarchy index page sql splitter and joiner
   The index page needs to work with more than 60 custom fields defined.
 

@@ -30,37 +30,12 @@ require_once($CFG->dirroot . '/totara/message/messagelib.php');
 require_once($CFG->dirroot . '/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
 
-define('COHORT_ALERT_NONE', 0);
-define('COHORT_ALERT_AFFECTED', 1);
-define('COHORT_ALERT_ALL', 2);
-
-define('COHORT_COL_STATUS_ACTIVE', 0);
-define('COHORT_COL_STATUS_DRAFT_UNCHANGED', 10);
-define('COHORT_COL_STATUS_DRAFT_CHANGED', 20);
-define('COHORT_COL_STATUS_OBSOLETE', 30);
-
-define('COHORT_BROKEN_RULE_NONE', 0);
-define('COHORT_BROKEN_RULE_NOT_NOTIFIED', 1);
-define('COHORT_BROKEN_RULE_NOTIFIED', 2);
-
-define('COHORT_MEMBER_SELECTOR_MAX_ROWS', 1000);
-
-define('COHORT_OPERATOR_TYPE_COHORT', 25);
-define('COHORT_OPERATOR_TYPE_RULESET', 50);
-
-
 global $COHORT_ALERT;
 $COHORT_ALERT = array(
     COHORT_ALERT_NONE => get_string('alertmembersnone', 'totara_cohort'),
     COHORT_ALERT_AFFECTED => get_string('alertmembersaffected', 'totara_cohort'),
     COHORT_ALERT_ALL => get_string('alertmembersall', 'totara_cohort'),
 );
-
-define('COHORT_ASSN_ITEMTYPE_CATEGORY', 40);
-define('COHORT_ASSN_ITEMTYPE_COURSE', 50);
-define('COHORT_ASSN_ITEMTYPE_PROGRAM', 45);
-define('COHORT_ASSN_ITEMTYPE_CERTIF', 55);
-define('COHORT_ASSN_ITEMTYPE_MENU', 65);
 
 global $COHORT_ASSN_ITEMTYPES;
 $COHORT_ASSN_ITEMTYPES = array(
@@ -71,22 +46,12 @@ $COHORT_ASSN_ITEMTYPES = array(
     COHORT_ASSN_ITEMTYPE_MENU => 'menu',
 );
 
-// This should be extended when adding other tabs.
-define ('COHORT_ASSN_VALUE_VISIBLE', 10);
-define ('COHORT_ASSN_VALUE_ENROLLED', 30);
-define ('COHORT_ASSN_VALUE_PERMITTED', 50);
 global $COHORT_ASSN_VALUES;
 $COHORT_ASSN_VALUES = array(
     COHORT_ASSN_VALUE_VISIBLE => 'visible',
     COHORT_ASSN_VALUE_ENROLLED => 'enrolled',
     COHORT_ASSN_VALUE_PERMITTED => 'permitted'
 );
-
-// Visibility constants.
-define('COHORT_VISIBLE_ENROLLED', 0);
-define('COHORT_VISIBLE_AUDIENCE', 1);
-define('COHORT_VISIBLE_ALL', 2);
-define('COHORT_VISIBLE_NOUSERS', 3);
 
 global $COHORT_VISIBILITY;
 $COHORT_VISIBILITY = array(

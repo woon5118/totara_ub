@@ -21,6 +21,9 @@
  * @subpackage totara_coursecatalog
  */
 
+// Require MOODLE_INTERNAL.
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Get the number of visible items in or below the selected categories
  *
@@ -243,6 +246,16 @@ function totara_get_style_visibility($component, $oldvisfield = 'visible', $audv
  * Get the where clause sql fragment and parameters needed to restrict an sql query to only those courses or
  * programs available to a user.
  *
+ * sqlparams in return are SQL_PARAMS_NAMED, so queries built using this function must also use named params.
+ *
+ * !!! Your query must join to the context table, with alias "ctx" !!!
+ *
+ * Note that currently, if using normal visibility, hidden items will not show in the RoL for a learner, but
+ * it will show in their Required Learning, is accessible, and they are processed for completion. All other
+ * places which display learning items are limited to those that are not hidden. We may want to change this.
+ * For example, f2f calendar items, appraisal questions, recent learning, user course completion report,
+ * enrol_get_my_courses, ... Basically we should check every call to this function.
+ *
  * @param int $userid The user that the results should be restricted for. Defaults to current user.
  * @param string $fieldbaseid The field in the base sql query which this query can link to.
  * @param string $fieldvisible The field in the base sql query which contains the visible property.
@@ -250,12 +263,13 @@ function totara_get_style_visibility($component, $oldvisfield = 'visible', $audv
  * @param string $fieldalias The field in the base sql query (This is used mainly for programs and cert which has available field)
  * @param string $type course, program or certification.
  * @param bool $iscached True if the fields passed comes from a report which data has been cached.
+ * @param bool $showhidden If using normal visibility, show items even if they are hidden.
  * @return array(sqlstring, array(sqlparams))
  */
 function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fieldvisible = 'course.visible',
-             $fieldaudvis = 'course.audiencevisible', $fieldalias = 'course', $type = 'course', $iscached = false) {
+             $fieldaudvis = 'course.audiencevisible', $fieldalias = 'course', $type = 'course', $iscached = false,
+             $showhidden = false) {
     global $CFG, $USER;
-    require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
     if (!$userid) {
         $userid = $USER->id;
@@ -290,7 +304,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         return array('1=1', array());
 
     } else if (empty($CFG->audiencevisibility)) {
-        if (has_capability($capability, $systemcontext, $userid)) {
+        if ($showhidden || has_capability($capability, $systemcontext, $userid)) {
             return array($availabilitysql, $availabilityparams);
         } else {
             // Normal visibility unless they have the capability to see hidden learning components.

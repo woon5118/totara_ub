@@ -547,13 +547,15 @@ class rb_source_dp_program extends rb_base_source {
     }
 
     public function post_config(reportbuilder $report) {
-        $reportfor = $report->reportfor; // ID of the user the report is for.
-        $fieldalias = 'base';
-        $fieldbaseid = $report->get_field('base', 'id', 'base.id');
-        $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
-        $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
-        $report->set_post_config_restrictions(totara_visibility_where($reportfor,
-            $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'program', $report->is_cached()));
+        // Visibility checks are only applied if viewing a single user's records.
+        if ($report->get_param_value('userid')) {
+            $fieldalias = 'base';
+            $fieldbaseid = $report->get_field('base', 'id', 'base.id');
+            $fieldvisible = $report->get_field('base', 'visible', 'base.visible');
+            $fieldaudvis = $report->get_field('base', 'audiencevisible', 'base.audiencevisible');
+            $report->set_post_config_restrictions(totara_visibility_where($report->get_param_value('userid'),
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'program', $report->is_cached(), true));
+        }
     }
 
     /**

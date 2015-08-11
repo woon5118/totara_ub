@@ -96,6 +96,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
                 'completion_organisation.id = base.organisationid',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
         );
+        $this->add_context_table_to_joinlist($joinlist, 'base', 'programid', CONTEXT_PROGRAM, 'INNER');
         $this->add_user_table_to_joinlist($joinlist, 'base', 'userid');
         $this->add_position_tables_to_joinlist($joinlist, 'base', 'userid');
         $this->add_manager_tables_to_joinlist($joinlist, 'position_assignment', 'reportstoid');
@@ -378,7 +379,68 @@ class rb_source_dp_program_recurring extends rb_base_source {
 
     protected function define_requiredcolumns() {
         $requiredcolumns = array();
+
+        $requiredcolumns[] = new rb_column(
+            'ctx',
+            'id',
+            '',
+            "ctx.id",
+            array('joins' => 'ctx')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'prog',
+            'visible',
+            '',
+            "prog.visible",
+            array('joins' => 'prog')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'prog',
+            'audiencevisible',
+            '',
+            "prog.audiencevisible",
+            array('joins' => 'prog')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'prog',
+            'available',
+            '',
+            "prog.available",
+            array('joins' => 'prog')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'prog',
+            'availablefrom',
+            '',
+            "prog.availablefrom",
+            array('joins' => 'prog')
+        );
+
+        $requiredcolumns[] = new rb_column(
+            'prog',
+            'availableuntil',
+            '',
+            "prog.availableuntil",
+            array('joins' => 'prog')
+        );
+
         return $requiredcolumns;
+    }
+
+    public function post_config(reportbuilder $report) {
+        // Visibility checks are only applied if viewing a single user's records.
+        if ($report->get_param_value('userid')) {
+            $fieldalias = 'prog';
+            $fieldbaseid = $report->get_field('prog', 'id', 'base.id');
+            $fieldvisible = $report->get_field('prog', 'visible', 'prog.visible');
+            $fieldaudvis = $report->get_field('prog', 'audiencevisible', 'prog.audiencevisible');
+            $report->set_post_config_restrictions(totara_visibility_where($report->get_param_value('userid'),
+                $fieldbaseid, $fieldvisible, $fieldaudvis, $fieldalias, 'program', $report->is_cached(), true));
+        }
     }
 
     /**
