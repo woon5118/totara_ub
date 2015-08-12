@@ -63,10 +63,9 @@ if ($userid != $USER->id) {
 
 if ($programid) {
     $program = new program($programid);
-    if (!prog_required_for_user($programid, $userid)) {
-        print_error('error:notrequiredlearning', 'totara_program');
-    }
+}
 
+if (isset($program) && prog_required_for_user($programid, $userid)) {
     if (prog_is_accessible($program)) {
 
         //Javascript include

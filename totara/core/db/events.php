@@ -90,5 +90,9 @@ $observers = array (
         'eventname' => '\totara_reportbuilder\event\report_updated',
         'callback'  => 'totara_core_observer::reset_totara_menu',
     ),
+    array(
+        'eventname' => '\totara_program\event\program_completed',
+        'callback'  => 'totara_core_observer::reset_totara_menu',
+    ),
 
 );
