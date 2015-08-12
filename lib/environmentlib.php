@@ -640,29 +640,38 @@ function environment_check_php_settings($version, $env_select) {
             $setting_value = $setting['@']['value'];
             $result->setInfo($setting_name);
 
-            if ($setting_name == 'memory_limit') {
-                $current = ini_get('memory_limit');
-                if ($current == -1) {
-                    $result->setStatus(true);
-                } else {
-                    $current  = get_real_size($current);
-                    $minlimit = get_real_size($setting_value);
-                    if ($current < $minlimit) {
-                        @ini_set('memory_limit', $setting_value);
-                        $current = ini_get('memory_limit');
+            switch ($setting_name) {
+                case 'memory_limit':
+                    $current = ini_get('memory_limit');
+                    if ($current == -1) {
+                        $result->setStatus(true);
+                    } else {
                         $current = get_real_size($current);
+                        $minlimit = get_real_size($setting_value);
+                        if ($current < $minlimit) {
+                            @ini_set('memory_limit', $setting_value);
+                            $current = ini_get('memory_limit');
+                            $current = get_real_size($current);
+                        }
+                        $result->setStatus($current >= $minlimit);
                     }
-                    $result->setStatus($current >= $minlimit);
-                }
-
-            } else {
-                $current = ini_get_bool($setting_name);
-            /// The name exists. Just check if it's an installed extension
-                if ($current == $setting_value) {
-                    $result->setStatus(true);
-                } else {
-                    $result->setStatus(false);
-                }
+                    break;
+                case 'max_input_vars':
+                    $current = ini_get('max_input_vars');
+                    if ($current < $setting_value) {
+                        $result->setStatus(false);
+                    } else {
+                        $result->setStatus(true);
+                    }
+                    break;
+                default:
+                    $current = ini_get_bool($setting_name);
+                    /// The name exists. Just check if it's an installed extension
+                    if ($current == $setting_value) {
+                        $result->setStatus(true);
+                    } else {
+                        $result->setStatus(false);
+                    }
             }
         }
 

@@ -690,6 +690,7 @@ from a STABLE branch of the Totara code. See Totara Docs for more details.';
 $string['maxbytes'] = 'Maximum uploaded file size';
 $string['maxconsecutiveidentchars'] = 'Consecutive identical characters';
 $string['maxeditingtime'] = 'Maximum time to edit posts';
+$string['maxinputvars'] = 'We recommend setting max_input_vars to a minimum of 2000 to ensure proper functionality of the site.';
 $string['maxusersperpage'] = ' Maximum users per page';
 $string['configmaxusersperpage'] = 'Maximum number of users displayed within user selector in course, group, audience, webservice etc.';
 $string['mbstringrecommended'] = 'Installing the optional MBSTRING library is highly recommended in order to improve site performance, particularly if your site is supporting non-Latin languages.';
