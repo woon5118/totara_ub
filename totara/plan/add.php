@@ -29,7 +29,6 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/plan/edit_form.php');
-require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
@@ -133,16 +132,11 @@ $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$headi
 dp_get_plan_base_navlinks($userid);
 $PAGE->navbar->add($heading);
 
-$jsmodule = array(
-    'name' => 'totara_plan_template',
-    'fullpath' => '/totara/plan/templates.js',
-    'requires' => array('json'));
-
 $templates = dp_get_templates();
 $json_templates = json_encode($templates);
 $args = array('args' => '{"templates":' . $json_templates . '}');
 
-$PAGE->requires->js_init_call('M.totara_plan_template.init', $args, false, $jsmodule);
+$PAGE->requires->js_call_amd('totara_plan/templates', 'init', $args);
 
 // Plan menu
 dp_display_plans_menu($userid);
