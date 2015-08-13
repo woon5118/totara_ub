@@ -271,8 +271,8 @@ M.totara_reportbuilder_filterdialogs = M.totara_reportbuilder_filterdialogs || {
                 totaraMultiSelectDialogRbFilter(
                     id,
                     M.util.get_string('choosecohorts', 'totara_cohort'),
-                    url + 'find_cohort.php',
-                    url + 'save_cohort.php?filtername=' + id + '&ids='
+                    url + 'find_cohort.php?sesskey=' + M.cfg.sesskey,
+                    url + 'save_cohort.php?sesskey=' + M.cfg.sesskey + '&filtername=' + id + '&ids='
                 );
             })();
         });

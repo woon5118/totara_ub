@@ -31,6 +31,7 @@ $ids = explode(',', $ids);
 $filtername = required_param('filtername', PARAM_ALPHANUMEXT);
 
 require_login();
+require_sesskey();
 
 $PAGE->set_context(context_system::instance());
 
