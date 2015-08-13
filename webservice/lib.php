@@ -331,7 +331,7 @@ class webservice {
                 if (!in_array($serviceid, $tokenizedservice)) {
                     // create the token for this service
                     $newtoken = new stdClass();
-                    $newtoken->token = md5(uniqid(rand(),1));
+                    $newtoken->token = totara_core_generate_unique_db_value('external_tokens', 'token');
                     // check that the user has capability on this service
                     $newtoken->tokentype = EXTERNAL_TOKEN_PERMANENT;
                     $newtoken->userid = $userid;

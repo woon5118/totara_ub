@@ -2425,3 +2425,25 @@ function totara_get_all_user_name_fields_join($tableprefix = null, $prefix = nul
     }
     return $fields;
 }
+
+/**
+ * Creates a unique value within given table column
+ *
+ * @param string $table The database table.
+ * @param string $column The database column to search within for uniqueness.
+ * @param string $prefix A prefix to the name.
+ * @return string a unique sha1
+ */
+function totara_core_generate_unique_db_value($table, $column, $prefix = null) {
+    global $DB;
+    $exists = true;
+    $name = null;
+    while ($exists) {
+        $name = sha1(uniqid(rand(), true));
+        if ($prefix) {
+            $name = $prefix . '_' . $name;
+        }
+        $exists = $DB->record_exists($table, array($column => $name));
+    }
+    return $name;
+}

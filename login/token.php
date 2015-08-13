@@ -164,7 +164,7 @@ if (!empty($user)) {
 
             // Create a new token.
             $token = new stdClass;
-            $token->token = md5(uniqid(rand(), 1));
+            $token->token = totara_core_generate_unique_db_value('external_tokens', 'token');
             $token->userid = $user->id;
             $token->tokentype = EXTERNAL_TOKEN_PERMANENT;
             $token->contextid = context_system::instance()->id;

@@ -585,7 +585,7 @@ class grading_manager {
         global $DB;
 
         // generate some unique random name for the new area
-        $name = $method . '_' . sha1(rand().uniqid($method, true));
+        $name = totara_core_generate_unique_db_value('grading_areas', 'areaname', $method);
         // create new area record
         $area = array(
             'contextid'     => context_system::instance()->id,
