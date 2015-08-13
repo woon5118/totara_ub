@@ -763,6 +763,9 @@ class totara_sync_element_user extends totara_sync_element {
         // Get empty usernames.
         $badids = $this->check_empty_values($synctable, 'username', 'emptyvalueusernamex');
         $invalidids = array_merge($invalidids, $badids);
+        // Check that usernames are valid.
+        $badids = $this->check_username_validity($synctable);
+        $invalidids = array_merge($invalidids, $badids);
         // Check usernames against the DB to avoid saving repeated values.
         $badids = $this->check_values_in_db($synctable, 'username', 'duplicateusernamexdb');
         $invalidids = array_merge($invalidids, $badids);
@@ -1142,6 +1145,31 @@ class totara_sync_element_user extends totara_sync_element {
             $invalidids[] = $r->id;
         }
         $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Check the validity of username fields.
+     *
+     * Mimics the checks from user/lib.php user_update_user()
+     * Note: the strtolower check isn't needed for sync since we cast to lower.
+     *
+     * @param string $synctable sync table name
+     *
+     * @return array with invalid ids from synctable for usernames that fail the PARAM_USERNAME checks.
+     */
+    function check_username_validity($synctable) {
+        global $DB;
+
+        $invalidids = array();
+        $usernames = $DB->get_recordset($synctable, null, '', 'id, idnumber, username');
+        foreach ($usernames as $user) {
+            if ($user->username !== clean_param($user->username, PARAM_USERNAME)) {
+                $this->addlog(get_string('invalidusernameforuserx', 'tool_totara_sync', $user->idnumber), 'error', 'checksanity');
+                $invalidids[] = $user->id;
+            }
+        }
 
         return $invalidids;
     }
