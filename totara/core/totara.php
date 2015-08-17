@@ -1747,7 +1747,13 @@ function totara_build_menu() {
     if (!empty($CFG->menulifetime) and !empty($SESSION->mymenu['lang'])) {
         if ($SESSION->mymenu['id'] == $USER->id and $SESSION->mymenu['lang'] === $lang) {
             if ($SESSION->mymenu['c'] + $CFG->menulifetime > time()) {
-                return $SESSION->mymenu['tree'];
+                $tree = $SESSION->mymenu['tree'];
+                foreach ($tree as $k => $node) {
+                    $node = clone($node);
+                    $node->url = \totara_core\totara\menu\menu::replace_url_parameter_placeholders($node->url);
+                    $tree[$k] = $node;
+                }
+                return $tree;
             }
         }
     }
@@ -1816,7 +1822,7 @@ function totara_build_menu() {
             'name'     => $node->get_name(),
             'linktext' => $node->get_title(),
             'parent'   => $node->get_parent(),
-            'url'      => $node->get_url(),
+            'url'      => $node->get_url(false),
             'target'   => $node->get_targetattr()
         );
     }
@@ -1828,6 +1834,12 @@ function totara_build_menu() {
             'c' => time(),
             'tree' => $tree,
         );
+    }
+
+    foreach ($tree as $k => $node) {
+        $node = clone($node);
+        $node->url = \totara_core\totara\menu\menu::replace_url_parameter_placeholders($node->url);
+        $tree[$k] = $node;
     }
 
     return $tree;
