@@ -341,14 +341,6 @@ class dp_competency_component extends dp_base_component {
 
             $component_name = required_param('c', PARAM_ALPHA);
             $paginated = optional_param('page', 0, PARAM_INT);
-            $sesskey = sesskey();
-
-            // Get course picker
-            $jsmodule = array(
-                'name' => 'totara_plan_component',
-                'fullpath' => '/totara/plan/component.js',
-                'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_component.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'", "sesskey":"'.$sesskey.'"}'), false, $jsmodule);
 
             $PAGE->requires->string_for_js('save', 'totara_core');
             $PAGE->requires->string_for_js('cancel', 'moodle');
@@ -359,7 +351,7 @@ class dp_competency_component extends dp_base_component {
                 'name' => 'totara_plan_competency_find',
                 'fullpath' => '/totara/plan/components/competency/find.js',
                 'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_competency_find.init', array('args' => '{"plan_id":'.$this->plan->id.'}'), false, $jsmodule);
+            $PAGE->requires->js_init_call('M.totara_plan_competency_find.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'"}'), false, $jsmodule);
         }
     }
 

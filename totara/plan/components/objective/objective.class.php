@@ -245,13 +245,8 @@ class dp_objective_component extends dp_base_component {
             ));
             $component_name = required_param('c', PARAM_ALPHA);
             $paginated = optional_param('page', 0, PARAM_INT);
-            $sesskey = sesskey();
 
-            $jsmodule = array(
-                            'name' => 'totara_plan_component',
-                            'fullpath' => '/totara/plan/component.js',
-                            'requires' => array('json'));
-            $PAGE->requires->js_init_call('M.totara_plan_component.init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'", "sesskey":"'.$sesskey.'"}'), false, $jsmodule);
+            $PAGE->requires->js_call_amd('totara_plan/component', 'init', array('args' => '{"plan_id":'.$this->plan->id.', "page":"'.$paginated.'", "component_name":"'.$component_name.'"}'));
 
         }
     }

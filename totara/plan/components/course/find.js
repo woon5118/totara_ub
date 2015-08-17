@@ -55,21 +55,25 @@ M.totara_plan_course_find = M.totara_plan_course_find || {
         var url = M.cfg.wwwroot + '/totara/plan/components/course/';
         var saveurl = url + 'update.php?id='+this.config.plan_id+'&update=';
 
-        var handler = new M.totara_plan_component.totaraDialog_handler_preRequisite();
-        handler.baseurl = url;
-        var buttonsObj = {};
-        buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
-        buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
+        require(['totara_plan/component'], function (component) {
+            component.init(M.totara_plan_course_find.config);
 
-        totaraDialogs['evidence'] = new totaraDialog(
-            'assigncourses',
-            'show-course-dialog',
-            {
-                buttons: buttonsObj,
-                title: '<h2>' + M.util.get_string('addcourses', 'totara_plan') + '</h2>'
-            },
-            url+'find.php?id='+this.config.plan_id,
-            handler
-        );
+            var handler = new component.totaraDialog_handler_preRequisite();
+            handler.baseurl = url;
+            var buttonsObj = {};
+            buttonsObj[M.util.get_string('save','totara_core')] = function() { handler._save(saveurl) }
+            buttonsObj[M.util.get_string('cancel','moodle')] = function() { handler._cancel() }
+
+            totaraDialogs['evidence'] = new totaraDialog(
+                'assigncourses',
+                'show-course-dialog',
+                {
+                    buttons: buttonsObj,
+                    title: '<h2>' + M.util.get_string('addcourses', 'totara_plan') + '</h2>'
+                },
+                url + 'find.php?id=' + M.totara_plan_course_find.config.plan_id,
+                handler
+            );
+        });
     }
 };
