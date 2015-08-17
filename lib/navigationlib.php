@@ -1083,6 +1083,8 @@ class global_navigation extends navigation_node {
      */
     public function initialise() {
         global $CFG, $SITE, $USER;
+        require_once($CFG->dirroot.'/totara/dashboard/lib.php');
+
         // Check if it has already been initialised
         if ($this->initialised || during_initial_install()) {
             return true;
@@ -1112,11 +1114,12 @@ class global_navigation extends navigation_node {
                 $this->rootnodes['home']->action->param('redirect', '0');
             }
         }
+
         if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             // Add access to my home as well.
             $this->rootnodes['myhome'] = $this->add(get_string('myhome'), new moodle_url('/my/'), self::TYPE_SETTING, null,
                     'myhome');
-        } else if (totara_feature_visible('totaradashboard')) {
+        } else if (totara_feature_visible('totaradashboard') && (count(totara_dashboard::get_user_dashboards($USER->id)))) {
             // Dashboards not in the root, so add here.
             $this->rootnodes['dashboard'] = $this->add(get_string('dashboard'), new moodle_url('/totara/dashboard/index.php'),
                     self::TYPE_ROOTNODE, null, 'dashboard');
