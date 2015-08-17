@@ -121,7 +121,7 @@ Feature: User recertification and expiry of certification
     And I run the "\totara_certification\task\update_certification_task" task
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
     And I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
-    Then I should see "Assigned"
+    Then I should see "Not certified"
     And I should see "Renewal expired"
 
     When I click on "Required Learning" in the totara menu
