@@ -20,10 +20,10 @@ Feature: An admin can import users through HR import
       | Source | CSV |
     And I press "Save changes"
     And I navigate to "CSV" node in "Site administration > HR Import > Sources > User"
+    And I should see "\"firstname\""
+    And I should see "\"lastname\""
+    And I should see "\"email\""
     And I set the following fields to these values:
-      | First name | 1 |
-      | Last name | 1 |
-      | Email | 1 |
       | City | 1 |
       | Country | 1 |
     And I press "Save changes"
