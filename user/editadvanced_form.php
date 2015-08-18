@@ -209,6 +209,14 @@ class user_editadvanced_form extends moodleform {
 
         // Next the customisable profile fields.
         profile_definition_after_data($mform, $userid);
+
+        // Totara: let auth plugin decide what can and cannot be changed!
+        if ($user) {
+            $auth = get_auth_plugin($user->auth);
+            if (method_exists($auth, 'editadvanced_form_after_data')) {
+                $auth->editadvanced_form_after_data($this, $user);
+            }
+        }
     }
 
     /**

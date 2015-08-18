@@ -925,6 +925,7 @@ class reportbuilder {
         if (!is_array($sourcepaths)) {
             $sourcepaths = array();
             $locations = array(
+                'auth',
                 'mod',
                 'block',
                 'tool',

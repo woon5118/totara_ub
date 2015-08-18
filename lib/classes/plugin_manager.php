@@ -964,7 +964,7 @@ class core_plugin_manager {
                 'nntp', 'nologin', 'none', 'pam', 'pop3', 'radius',
                 'shibboleth', 'webservice'
                 // Totara
-                , 'gauth'
+                , 'gauth', 'connect',
             ),
 
             'availability' => array(

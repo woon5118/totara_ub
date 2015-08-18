@@ -228,6 +228,7 @@ class phpunit_util extends testing_util {
         if (class_exists('totara_core\jsend', false)) {
             \totara_core\jsend::set_phpunit_testdata(null);
         }
+        session_id(''); // Totara Connect fakes the sid in tests.
 
         //TODO MDL-25290: add more resets here and probably refactor them to new core function
 
