@@ -561,6 +561,11 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
     protected $repository_opensesame_bps_data = array('id' => 1, 'bundleid' => 1, 'packageid' => 1);
 
+    protected $totara_connect_clients_data = array('id' => 1, 'status' => 1, 'clientidnumber' => 'xxx', 'clientsecret' => 'yyyy',
+        'clientname' => 'some client', 'clienturl' => 'http://example.com/totara', 'clienttype' => 'totaralms', 'clientcomment' => '',
+        'cohortid' => null, 'serversecret' => 'zzzz', 'addnewcohorts' => 0, 'addnewcourses' => 0, 'apiversion' => 1,
+        'timecreated' => 1416859984, 'timemodified' => 1416859985);
+
 
     protected function setUp() {
         global $DB;
@@ -676,6 +681,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'repository_opensesame_bdls' => array($this->repository_opensesame_bdls_data),
             'repository_opensesame_pkgs' => array($this->repository_opensesame_pkgs_data),
             'repository_opensesame_bps' => array($this->repository_opensesame_bps_data),
+            'totara_connect_clients' => array($this->totara_connect_clients_data),
         )));
     }
 

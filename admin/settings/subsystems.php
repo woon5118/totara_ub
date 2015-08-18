@@ -88,6 +88,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     // Audience visibility.
     $optionalsubsystems->add(new admin_setting_configcheckbox('audiencevisibility', new lang_string('enableaudiencevisibility', 'totara_cohort'), new lang_string('configenableaudiencevisibility', 'totara_cohort'), 0));
 
+    $optionalsubsystems->add(new admin_setting_configcheckbox('enableconnectserver',
+        new lang_string('enableconnectserver', 'totara_connect'),
+        new lang_string('enableconnectserver_desc', 'totara_connect'),
+        0));
+
     // Enchanced catalog.
     // Was upgrade - old catalog by default, otherwise - new catalog.
     $defaultenhanced = (isset($CFG->upgradetofaceted) && $CFG->upgradetofaceted == 1) ? 0 : 1;

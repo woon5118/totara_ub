@@ -15,6 +15,10 @@ if (empty($CFG->authloginviaemail)) {
 } else {
     $strusername = get_string('usernameemail');
 }
+
+// Totara Connect SSO extras.
+$totaraconnectinfo = \totara_connect\util::login_page_info();
+
 ?>
 <div class="loginbox clearfix <?php echo $columns ?>">
   <div class="loginpanel">
@@ -119,4 +123,5 @@ if (empty($CFG->authloginviaemail)) {
         </div>
     </div>
 <?php } ?>
+<?php if (!empty($totaraconnectinfo)) { echo $totaraconnectinfo; } ?>
 </div>

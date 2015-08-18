@@ -471,6 +471,28 @@ switch ($searchtype) {
         $search_info->params = $params;
         break;
 
+    /*
+     * Course search.
+     */
+    case 'course':
+        $formdata['hidden']['instanceid'] = $this->customdata['instanceid'];
+
+        // Generate search SQL.
+        $keywords = totara_search_parse_keywords($query);
+        $fields = array('fullname', 'shortname', 'idnumber');
+        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+
+        $search_info->fullname = 'c.fullname';
+        $search_info->sql = "
+            FROM
+                {course} c
+            WHERE c.category > 0 AND
+                {$searchsql}
+        ";
+        $search_info->order = ' ORDER BY c.fullname ASC';
+        $search_info->params = $params;
+        break;
+
     case 'this':
         $keywords = totara_search_parse_keywords($query);
         $this->put_search_info($search_info, $formdata, $keywords);

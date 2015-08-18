@@ -224,6 +224,11 @@ class phpunit_util extends testing_util {
         // Reset internal users.
         core_user::reset_internal_users();
 
+        // Totara specific resets.
+        if (class_exists('totara_core\jsend', false)) {
+            \totara_core\jsend::set_phpunit_testdata(null);
+        }
+
         //TODO MDL-25290: add more resets here and probably refactor them to new core function
 
         // Reset course and module caches.
