@@ -59,12 +59,7 @@ $PAGE->set_heading(format_string($cohort->name));
 
 echo $OUTPUT->header();
 
-local_js();
-$jsmodule = array(
-    'name' => 'totara_cohort_assignroles',
-    'fullpath' => '/totara/cohort/assignroles.js',
-    'requires' => array('json', 'totara_core'));
-$PAGE->requires->js_init_call('M.totara_cohort_assignroles.init', null, false, $jsmodule);
+$PAGE->requires->js_call_amd('totara_cohort/assignroles', 'init');
 
 echo cohort_print_tabs('roles', $cohort->id, $cohort->cohorttype, $cohort);
 
