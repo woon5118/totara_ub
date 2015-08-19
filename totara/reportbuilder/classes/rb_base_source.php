@@ -3821,7 +3821,7 @@ abstract class rb_base_source {
                     break;
 
                 case 'menu':
-                    $filtertype = 'select';
+                    $filtertype = 'menuofchoices';
                     $filter_options['selectchoices'] = $this->list_to_array($record->param1,"\n");
                     $filter_options['simplemode'] = true;
                     $column_options['dbdatatype'] = 'text';
