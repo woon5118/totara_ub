@@ -164,9 +164,16 @@ class tool_uploadcourse_processor {
             $this->shortnametemplate = $options['shortnametemplate'];
         }
 
+        // TOTARA OVERRIDE - we need completion settings in here.
+        $courseconfig = (array) get_config('moodlecourse');
+        foreach ($defaults as $name => $value) {
+            // Override the course defaults with the upload defaults.
+            $courseconfig[$name] = $value;
+        }
+
         $this->cir = $cir;
         $this->columns = $cir->get_columns();
-        $this->defaults = $defaults;
+        $this->defaults = $courseconfig;
         $this->validate();
         $this->reset();
     }
