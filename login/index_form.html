@@ -52,7 +52,7 @@ $totaraconnectinfo = \totara_connect\util::login_page_info();
             <div class="clearer"><!-- --></div>
               <?php if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) { ?>
               <div class="rememberpass">
-                  <input type="checkbox" name="rememberusername" id="rememberusername" value="1" <?php if ($frm->username) {echo 'checked="checked"';} ?> />
+                  <input type="checkbox" name="rememberusername" id="rememberusername" value="1" <?php if (!empty($frm->rememberusername)) {echo 'checked="checked"';} ?> />
                   <label for="rememberusername"><?php print_string('rememberusername', 'admin') ?></label>
               </div>
               <?php } ?>

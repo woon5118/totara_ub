@@ -118,6 +118,17 @@ if ($user !== false or $frm !== false or $errormsg !== '') {
 
 } else {
     $frm = data_submitted();
+    // TOTARA: keeping form state on incorrect submission (TL-7236)
+    if (isset($frm->username)) {
+        $SESSION->login_username = $frm->username;
+        $SESSION->login_remember = !empty($frm->rememberusername);
+        if (!$SESSION->login_remember && ((int)$CFG->rememberusername !== 1)) {
+            set_moodle_cookie('');
+        }
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        unset($SESSION->login_username);
+        unset($SESSION->login_remember);
+    }
 }
 
 /// Check if the user has actually submitted login data to us
@@ -204,6 +215,9 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
         } else {
             set_moodle_cookie($USER->username);
         }
+
+        unset($SESSION->login_username);
+        unset($SESSION->login_remember);
 
         $urltogo = core_login_get_return_url();
 
@@ -300,17 +314,30 @@ if (!empty($CFG->alternateloginurl)) {
 $PAGE->verify_https_required();
 
 /// Generate the login page with forms
-
 if (!isset($frm) or !is_object($frm)) {
     $frm = new stdClass();
 }
 
 if (empty($frm->username) && $authsequence[0] != 'shibboleth') {  // See bug 5184
-    if (!empty($_GET["username"])) {
+
+    // TOTARA: keeping form state on incorrect submission (TL-7236)
+    if (isset($SESSION->login_remember)){
+        $frm->rememberusername = $SESSION->login_remember;
+    }
+
+    if (isset($SESSION->login_username)){
+        $frm->username = $SESSION->login_username;
+    } elseif (!empty($_GET["username"])) {
         $frm->username = clean_param($_GET["username"], PARAM_RAW); // we do not want data from _POST here
     } else {
+        // returning a username in the line below has always meant remember username checkbox should be checked.
         $frm->username = get_moodle_cookie();
+        if (!empty($frm->username)){
+            $frm->rememberusername = '1';
+        }
     }
+    unset($SESSION->login_remember);
+    unset($SESSION->login_username);
 
     $frm->password = "";
 }
@@ -352,6 +379,9 @@ if (!empty($SESSION->loginerrormsg)) {
 
 $PAGE->set_title("$site->fullname: $loginsite");
 $PAGE->set_heading("$site->fullname");
+
+unset($SESSION->login_username);
+unset($SESSION->login_remember);
 
 echo $OUTPUT->header();
 
