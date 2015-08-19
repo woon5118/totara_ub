@@ -66,8 +66,8 @@ if ($format != '') {
 }
 
 if (isset($filterstatus)) {
-    $SESSION->reportbuilder[$report->_id]['userappraisal-status']['operator'] = 1;
-    $SESSION->reportbuilder[$report->_id]['userappraisal-status']['value'] = $filterstatus;
+    $SESSION->reportbuilder[$report->get_uniqueid()]['userappraisal-status']['operator'] = 1;
+    $SESSION->reportbuilder[$report->get_uniqueid()]['userappraisal-status']['value'] = $filterstatus;
 }
 
 $PAGE->set_button($report->edit_button());

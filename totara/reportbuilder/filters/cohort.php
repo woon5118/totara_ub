@@ -60,8 +60,8 @@ class rb_filter_cohort extends rb_filter_type {
         $mform->setType($this->name, PARAM_SEQUENCE);
 
         // set default values
-        if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
-            $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
+            $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
         }
         if (isset($defaults['value'])) {
             $mform->setDefault($this->name, $defaults['value']);

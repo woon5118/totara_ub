@@ -373,7 +373,7 @@ class rb_filter_type {
     function set_data($data) {
         global $SESSION;
         $fieldname = $this->name;
-        $SESSION->reportbuilder[$this->report->_id][$fieldname] = $data;
+        $SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname] = $data;
     }
 
     /**
@@ -384,7 +384,7 @@ class rb_filter_type {
     public function has_data() {
         global $SESSION;
         $fieldname = $this->name;
-        return isset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+        return isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname]);
     }
 
     /**
@@ -397,7 +397,7 @@ class rb_filter_type {
         global $SESSION;
 
         $fieldname = $this->name;
-        unset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+        unset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname]);
 
         // Unset the main parameter.
         unset($_POST[$fieldname]);

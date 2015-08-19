@@ -617,7 +617,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // the correct SESSION var should now be set
         // the SESSION var should be set to the value specified by the saved search
         $this->assertEquals(array('user-fullname' => array(0 => array('operator' => 0, 'value' => 'a'))),
-                $SESSION->reportbuilder[1]);
+                $SESSION->reportbuilder[$rb->get_uniqueid()]);
 
         $this->resetAfterTest(true);
     }
@@ -959,7 +959,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         global $CFG,$SESSION;
         $rb = $this->rb;
         // set a filter session var
-        $SESSION->reportbuilder[1] = array('user-fullname' => 'unused', 'user-positionid' => 'unused');
+        $SESSION->reportbuilder[$rb->get_uniqueid()] = array('user-fullname' => 'unused', 'user-positionid' => 'unused');
         $columns = $rb->get_filter_joins();
         // should return an array
         $this->assertTrue((bool)is_array($columns));
@@ -976,7 +976,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         );
         // the strings should have the correct format
         $this->assertEquals($userjoin, current($columns));
-        unset($SESSION->reportbuilder[1]);
+        unset($SESSION->reportbuilder[$rb->get_uniqueid()]);
 
         $this->resetAfterTest(true);
     }
@@ -1069,12 +1069,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     function test_reportbuilder_check_sort_keys() {
         global $SESSION;
         // set a bad sortorder key
-        $SESSION->flextable['test_report']->sortby['bad_key'] = 4;
-        $before = count($SESSION->flextable['test_report']->sortby);
+        $SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby['bad_key'] = 4;
+        $before = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby);
         $rb = $this->rb;
         // run the function
         $rb->check_sort_keys();
-        $after = count($SESSION->flextable['test_report']->sortby);
+        $after = count($SESSION->flextable[$this->rb->get_uniqueid('rb')]->sortby);
         // the bad sort key should have been deleted
         $this->assertEquals(1, $before - $after);
 

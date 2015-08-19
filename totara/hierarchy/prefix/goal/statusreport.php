@@ -55,8 +55,8 @@ if ($format != '') {
 }
 
 if (isset($filtergoalid)) {
-    $SESSION->reportbuilder[$report->_id]['goal-goalid']['operator'] = 1;
-    $SESSION->reportbuilder[$report->_id]['goal-goalid']['value'] = $filtergoalid;
+    $SESSION->reportbuilder[$report->get_uniqueid()]['goal-goalid']['operator'] = 1;
+    $SESSION->reportbuilder[$report->get_uniqueid()]['goal-goalid']['value'] = $filtergoalid;
 }
 
 $PAGE->set_button($report->edit_button());

@@ -64,7 +64,8 @@ if ($fromform = $mform->get_data()) {
         print_error('error:unknownbuttonclicked', 'totara_reportbuilder', $returnurl);
     }
 
-    $searchsettings = (isset($SESSION->reportbuilder[$id])) ? serialize($SESSION->reportbuilder[$id]) : null;
+    $searchsettings = (isset($SESSION->reportbuilder[$report->get_uniqueid()])) ?
+            serialize($SESSION->reportbuilder[$report->get_uniqueid()]) : null;
 
     // handle form submission
     $todb = new stdClass();

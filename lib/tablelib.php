@@ -126,7 +126,7 @@ class flexible_table {
 
     /**
      * Constructor
-     * @param int $uniqueid all tables have to have a unique id, this is used
+     * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
      */
     function __construct($uniqueid) {
@@ -1212,7 +1212,7 @@ class flexible_table {
 
             $primarysortcolumn = '';
             $primarysortorder  = '';
-            if (reset($this->prefs['sortby'])) {
+            if (isset($this->prefs['sortby']) && reset($this->prefs['sortby'])) {
                 $primarysortcolumn = key($this->prefs['sortby']);
                 $primarysortorder  = current($this->prefs['sortby']);
             }

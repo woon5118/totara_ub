@@ -683,7 +683,8 @@ class totara_reportbuilder_renderer extends plugin_renderer_base {
         global $SESSION;
 
         $buttonsarray = optional_param_array('submitgroup', null, PARAM_TEXT);
-        $search = (isset($SESSION->reportbuilder[$report->_id]) && !empty($SESSION->reportbuilder[$report->_id])) ? true : false;
+        $search = (isset($SESSION->reportbuilder[$report->get_uniqueid()]) &&
+                !empty($SESSION->reportbuilder[$report->get_uniqueid()])) ? true : false;
         // If a report has required url params then scheduled reports require a saved search.
         // This is because the user needs to be able to save the search with no filters defined.
         $hasrequiredurlparams = isset($report->src->redirecturl);

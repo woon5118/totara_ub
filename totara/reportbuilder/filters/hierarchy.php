@@ -109,8 +109,8 @@ class rb_filter_hierarchy extends rb_filter_type {
         $mform->setType($this->name, PARAM_TEXT);
 
         // set default values
-        if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
-            $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
+            $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
         }
         if (isset($defaults['operator'])) {
             $mform->setDefault($this->name . '_op', $defaults['operator']);

@@ -128,6 +128,13 @@ class reportbuilder {
     /** Use site-wide global restrictions in report */
     const GLOBAL_REPORT_RESTRICTIONS_ENABLED = 1;
 
+    /**
+     * Custom uniqueid setting to apply during reportbuiler instantiation
+     * It should be set by @see reportbuilder::overrideuniqueid() before every new reportbuilder call with custom uniqueid
+     * @var string
+     */
+    private static $overrideuniquid = null;
+
     /** @var rb_base_source */
     public $src;
 
@@ -141,6 +148,7 @@ class reportbuilder {
     public $_filtering, $contentoptions, $contentmode, $embeddedurl, $description;
     public $_id, $recordsperpage, $defaultsortcolumn, $defaultsortorder;
     private $_joinlist, $_base, $_params, $_sid;
+    protected $uniqueid;
 
     private $_paramoptions, $_embeddedparams, $_fullcount, $_filteredcount, $_isinitiallyhidden;
     public $grouped, $reportfor, $embedded, $toolbarsearch;
@@ -162,6 +170,12 @@ class reportbuilder {
     private $filterurlparams = array();
 
     /**
+     * Base url of report instance (report page url).
+     * @var moodle_url
+     */
+    protected $baseurl = null;
+
+    /**
      * @var bool $cache Cache state for current report
      */
     public $cache;
@@ -171,6 +185,17 @@ class reportbuilder {
      * @var bool $cacheignore If true cache will be ignored during report preparation
      */
     public $cacheignore = false;
+
+    /**
+     * @var bool Should current instance ignore params or not (null - default behaviour
+     */
+    protected $ignoreparams = null;
+
+    /**
+     *
+     * @var bool Set for next created instance ignore params overriding default/page settings
+     */
+    protected static $overrideignoreparams = null;
 
     /**
      * @var stdClass $cacheschedule Record of cache scheduling and readyness
@@ -290,6 +315,22 @@ class reportbuilder {
         $this->defaultsortcolumn = $report->defaultsortcolumn;
         $this->defaultsortorder = $report->defaultsortorder;
         $this->_sid = $sid;
+
+        // Assign a unique identifier for this report.
+        $this->uniqueid = $report->id;
+
+        // If uniqueid was overridden, apply it here and reset.
+        if (isset(self::$overrideuniquid)) {
+            $this->uniqueid = self::$overrideuniquid;
+            self::$overrideuniquid = null;
+        }
+
+        // If ignoreparams was overridden, apply it here and reset.
+        if (isset(self::$overrideignoreparams)) {
+            $this->ignoreparams = self::$overrideignoreparams;
+            self::$overrideignoreparams = null;
+        }
+
         // Assume no grouping initially.
         $this->grouped = false;
 
@@ -514,6 +555,40 @@ class reportbuilder {
         return false;
     }
 
+    /**
+     * Custom uniqueid setting to apply during reportbuiler instantiation.
+     *
+     * Call this method right before every reportbuilder instantiation that requires custom uniqueid.
+     *
+     * @param string $uniqueid
+     */
+    public static function overrideuniqueid($uniqueid) {
+        self::$overrideuniquid = $uniqueid;
+    }
+
+    /**
+     * Custom setting of reportbuilder params ignore for next created instance.
+     *
+     * Call this method right before every reportbuilder instantiation that requires custom ignore param setting.
+     *
+     * @param bool $overrideignoreparams
+     */
+    public static function overrideignoreparams($overrideignoreparams) {
+        self::$overrideignoreparams = $overrideignoreparams;
+    }
+
+    /**
+     * Get instance uniqueid.
+     *
+     * @param string $prefix optional prefix to make namespaces for uniqueid with other components (e.g. flexible_table).
+     * @return string
+     */
+    public function get_uniqueid($prefix = '') {
+        if ($prefix) {
+            $prefix .= '_';
+        }
+        return $prefix . $this->uniqueid;
+    }
     /**
      * Static cache of source objects to speed up pages loading multiple report sources,
      * primarily used by get_source_object().
@@ -969,7 +1044,7 @@ class reportbuilder {
         if ($saved = $DB->get_record('report_builder_saved', array('id' => $this->_sid))) {
 
             if ($saved->ispublic != 0 || $saved->userid == $this->reportfor) {
-                $SESSION->reportbuilder[$this->_id] = unserialize($saved->search);
+                $SESSION->reportbuilder[$this->get_uniqueid()] = unserialize($saved->search);
             } else {
                 if (defined('FULLME') and FULLME === 'cron') {
                     mtrace('Saved search not found or search is not public');
@@ -1070,8 +1145,8 @@ class reportbuilder {
             $where_sqls[] = $extrasql;
         }
 
-        if (!empty($SESSION->reportbuilder[$this->_id])) {
-            foreach ($SESSION->reportbuilder[$this->_id] as $fname => $data) {
+        if (!empty($SESSION->reportbuilder[$this->get_uniqueid()])) {
+            foreach ($SESSION->reportbuilder[$this->get_uniqueid()] as $fname => $data) {
                 if ($fname == 'toolbarsearchtext') {
                     if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
                         list($where_sqls[], $params) = $this->get_toolbar_sql_filter($data);
@@ -1109,8 +1184,8 @@ class reportbuilder {
     function fetch_text_filters() {
         global $SESSION;
         $out = array();
-        if (!empty($SESSION->reportbuilder[$this->_id])) {
-            foreach ($SESSION->reportbuilder[$this->_id] as $fname => $data) {
+        if (!empty($SESSION->reportbuilder[$this->get_uniqueid()])) {
+            foreach ($SESSION->reportbuilder[$this->get_uniqueid()] as $fname => $data) {
                 if ($fname == 'toolbarsearchtext') {
                     if ($this->toolbarsearch && $this->has_toolbar_filter() && $data) {
                         $out[] = $this->get_toolbar_text_filter($data);
@@ -1246,16 +1321,16 @@ class reportbuilder {
         if ($adddatatoolbar || $clearfilters) {
             if (isset($adddatatoolbar->cleartoolbarsearchtext) || $clearfilters) {
                 // Clear out any existing data.
-                unset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']);
+                unset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext']);
                 unset($_POST['toolbarsearchtext']);
             } else {
                 $data = $adddatatoolbar->toolbarsearchtext;
                 if (empty($data)) {
                     // Unset existing result if field has been set back to "not set" position.
-                    unset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']);
+                    unset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext']);
                     unset($_POST['toolbarsearchtext']);
                 } else {
-                    $SESSION->reportbuilder[$this->_id]['toolbarsearchtext'] = $data;
+                    $SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext'] = $data;
                 }
             }
         }
@@ -1548,22 +1623,35 @@ class reportbuilder {
     }
 
     /**
+     * Set base url for report instance
+     * @param moodle_url $baseurl
+     */
+    public function set_baseurl(moodle_url $baseurl) {
+        $this->baseurl = $baseurl;
+    }
+
+    /**
      * Get the current page url maintaining report specific parameters, minus any pagination or sort order elements
      * Good for submitting forms
      *
      * @return string Current URL, minus any spage and ssort parameters
      */
     function get_current_url() {
-        // Array of parameters to remove from query string.
-        $strip_params = array('spage', 'ssort', 'sid', 'clearfilters');
+        if (!isset($this->baseurl)) {
+            // Array of parameters to remove from query string.
+            $strip_params = array('spage', 'ssort', 'sid', 'clearfilters');
 
-        $url = new moodle_url(qualified_me());
-        foreach ($url->params() as $name =>$value) {
-            if (in_array($name, $strip_params)) {
-                $url->remove_params($name);
+            // Note: this should use $PAGE directly and skip all the stripping, qualified_me() is long dead.
+            $autourl = new moodle_url(qualified_me());
+            foreach ($autourl->params() as $name => $value) {
+                if (in_array($name, $strip_params)) {
+                    $autourl->remove_params($name);
+                }
             }
+            $this->baseurl = $autourl;
         }
         // Reapply filter url params.
+        $url = clone($this->baseurl);
         foreach ($this->get_current_url_params() as $filtername => $filtervalue) {
             if (is_null($url->param($filtername))) {
                 $url->param($filtername, $filtervalue);
@@ -1592,6 +1680,11 @@ class reportbuilder {
         $ignorepageparams = false;
         if (defined('REPORT_BUILDER_IGNORE_PAGE_PARAMETERS')) {
             $ignorepageparams = REPORT_BUILDER_IGNORE_PAGE_PARAMETERS;
+        }
+
+        // Check if ignore params is set for current instance.
+        if (isset($this->ignoreparams)) {
+            $ignorepageparams = $this->ignoreparams;
         }
 
         $out = array();
@@ -2555,9 +2648,9 @@ class reportbuilder {
         $filterjoins = array();
         // Check session variable for any active filters.
         // If they exist we need to make sure we have included joins for them too.
-        if (isset($SESSION->reportbuilder[$this->_id]) &&
-            is_array($SESSION->reportbuilder[$this->_id])) {
-            foreach ($SESSION->reportbuilder[$this->_id] as $fname => $unused) {
+        if (isset($SESSION->reportbuilder[$this->get_uniqueid()]) &&
+            is_array($SESSION->reportbuilder[$this->get_uniqueid()])) {
+            foreach ($SESSION->reportbuilder[$this->get_uniqueid()] as $fname => $unused) {
                 if (!array_key_exists($fname, $this->filters)) {
                     continue; // filter not used in this report
                 }
@@ -2569,8 +2662,8 @@ class reportbuilder {
         }
         // Check session variable for toolbar search text.
         // If it exists we need to make sure we have included joins for it too.
-        if (isset($SESSION->reportbuilder[$this->_id]) &&
-            isset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext'])) {
+        if (isset($SESSION->reportbuilder[$this->get_uniqueid()]) &&
+            isset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext'])) {
             foreach ($this->searchcolumns as $searchcolumn) {
                 $columnoption = $this->get_single_item($this->columnoptions, $searchcolumn->type, $searchcolumn->value);
                 $filterjoins = array_merge($filterjoins,
@@ -2908,8 +3001,7 @@ class reportbuilder {
         // unless the table object is provided we need to call get_sql_sort() statically
         // and pass in the report's unique id (shortname)
         if (!isset($table)) {
-            $shortname = $this->shortname;
-            $sort = trim(flexible_table::get_sort_for_table($shortname));
+            $sort = trim(flexible_table::get_sort_for_table($this->get_uniqueid('rb')));
         } else {
             $sort = trim($table->get_sql_sort());
         }
@@ -3531,8 +3623,12 @@ class reportbuilder {
 
         $initiallyhidden = $this->is_initially_hidden();
 
-        define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
-        define('SHOW_ALL_PAGE_SIZE', 9999);
+        if (!defined('DEFAULT_PAGE_SIZE')) {
+            define('DEFAULT_PAGE_SIZE', $this->recordsperpage);
+        }
+        if (!defined('SHOW_ALL_PAGE_SIZE')) {
+            define('SHOW_ALL_PAGE_SIZE', 9999);
+        }
         $perpage   = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT);
 
         $columns = $this->columns;
@@ -3584,10 +3680,11 @@ class reportbuilder {
         }
 
         // Start the table.
-        $table = new totara_table($shortname);
+        $table = new totara_table($this->get_uniqueid('rb'));
+
         if ($this->toolbarsearch && $this->has_toolbar_filter()) {
-            $toolbarsearchtext = isset($SESSION->reportbuilder[$this->_id]['toolbarsearchtext']) ?
-                    $SESSION->reportbuilder[$this->_id]['toolbarsearchtext'] : '';
+            $toolbarsearchtext = isset($SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext']) ?
+                    $SESSION->reportbuilder[$this->get_uniqueid()]['toolbarsearchtext'] : '';
             $mform = new report_builder_toolbar_search_form($this->report_url(),
                     array('toolbarsearchtext' => $toolbarsearchtext), 'post', '', null, true, 'toolbarsearch');
             $table->add_toolbar_content($mform->render());
@@ -3800,11 +3897,11 @@ class reportbuilder {
 
         $shortname = $this->shortname;
         // javascript to hide columns based on session variable
-        if (isset($SESSION->rb_showhide_columns[$shortname])) {
+        if (isset($SESSION->rb_showhide_columns[$this->get_uniqueid('rb')])) {
             foreach ($this->columns as $column) {
                 $ident = "{$column->type}_{$column->value}";
-                if (isset($SESSION->rb_showhide_columns[$shortname][$ident])) {
-                    if ($SESSION->rb_showhide_columns[$shortname][$ident] == 0) {
+                if (isset($SESSION->rb_showhide_columns[$this->get_uniqueid('rb')][$ident])) {
+                    if ($SESSION->rb_showhide_columns[$this->get_uniqueid('rb')][$ident] == 0) {
                         $cols[] = "#{$shortname} .{$ident}";
                     }
                 }
@@ -3823,8 +3920,8 @@ class reportbuilder {
      */
     function check_sort_keys() {
         global $SESSION;
-        $shortname = $this->shortname;
-        $sortarray = isset($SESSION->flextable[$shortname]->sortby) ? $SESSION->flextable[$shortname]->sortby : null;
+        $sortarray = isset($SESSION->flextable[$this->get_uniqueid('rb')]->sortby) ?
+                $SESSION->flextable[$this->get_uniqueid('rb')]->sortby : null;
         if (is_array($sortarray)) {
             foreach ($sortarray as $sortelement => $unused) {
                 // see if sort element is in columns array
@@ -3836,7 +3933,7 @@ class reportbuilder {
                 }
                 // if it's not remove it from sort SESSION var
                 if ($set === false) {
-                    unset($SESSION->flextable[$shortname]->sortby[$sortelement]);
+                    unset($SESSION->flextable[$this->get_uniqueid('rb')]->sortby[$sortelement]);
                 }
             }
         }

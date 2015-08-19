@@ -157,8 +157,8 @@ class rb_filter_date extends rb_filter_type {
         }
 
         // set default values
-        if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
-            $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
+            $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
         }
         if (isset($defaults['after']) && $defaults['after'] != 0) {
             $mform->setDefault($this->name.'_sck', 1);

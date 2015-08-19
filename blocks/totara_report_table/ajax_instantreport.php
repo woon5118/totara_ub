@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2015 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +17,60 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @author Petr Skoda <petr.skoda@totaralms.com>
+ * @package block_totara_report_table
  */
 
 /**
- * Page for returning report table for AJAX call
+ * Page for returning report table for AJAX call.
  *
- * NOTE: this is cloned in /blocks/totara_report_table/ajax_instantreport.php
+ * NOTE: this is a clone of /totara/reportbuilder/ajax/instantreport.php
  */
 
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+$blockid = required_param('blockid', PARAM_INT);
+
+$blockcontext = context_block::instance($blockid, MUST_EXIST);
+list($context, $course, $cm) = get_context_info_array($blockcontext->id);
+
+if ($CFG->forcelogin) {
+    require_login($course, false, $cm, false, true);
+} else {
+    require_course_login($course, false, $cm, false, true);
+}
+
+require_capability('moodle/block:view', $blockcontext);
 
 // Send the correct headers.
 send_headers('text/html; charset=utf-8', false);
 
-require_sesskey();
+$block = $DB->get_record('block_instances', array('id' => $blockid, 'blockname' => 'totara_report_table'), '*', MUST_EXIST);
 
-$id = required_param('id', PARAM_INT);
-$debug = optional_param('debug', 0, PARAM_INT);
-$searched = optional_param_array('submitgroup', array(), PARAM_ALPHANUM);
-$sid =  optional_param('sid', 0, PARAM_INT);
+if (empty($block->configdata)) {
+    die;
+}
 
-$PAGE->set_context(context_system::instance());
+$config = unserialize(base64_decode($block->configdata));
+if (empty($config->reportid)) {
+    die;
+}
+$id = $config->reportid;
 
 // Verify global restrictions.
 $reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 // Create the report object. Includes embedded report capability checks.
-$report = new reportbuilder($id, null, false, $sid, null, false, array(), $globalrestrictionset);
+$uniqueid = 'block_totara_report_table_' . $blockid;
+reportbuilder::overrideuniqueid($uniqueid);
+$report = new reportbuilder($id, null, false, null, null, false, array(), $globalrestrictionset);
 
 // Decide if require_login should be executed.
-if ($report->needs_require_login()) {
+if ($report->needs_require_login() and !isloggedin()) {
     require_login();
 }
 
@@ -62,6 +79,7 @@ if (!reportbuilder::is_capable($id)) {
     print_error('nopermission', 'totara_reportbuilder');
 }
 
+$PAGE->set_context($blockcontext);
 if (!empty($report->embeddedurl)) {
     $PAGE->set_url($report->embeddedurl);
 } else {
@@ -72,22 +90,15 @@ $PAGE->set_pagelayout('noblocks');
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 
-$override_initial = isset($searched['addfilter']);
-$hide_initial_display = ($report->initialdisplay == RB_INITIAL_DISPLAY_HIDE && !$override_initial);
 $countfiltered = 0;
 $countall = 0;
-
-if (!$hide_initial_display || $report->is_report_filtered()) {
+if ($report->is_report_filtered()) {
     $countfiltered = $report->get_filtered_count(true);
     $countall = $report->get_full_count();
 }
 
 /** @var totara_reportbuilder_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');
-
-if ($debug) {
-    $report->debug($debug);
-}
 
 // Construct the output which consists of a report, header and (eventually) sidebar filter counts.
 // We put the data in a container so that jquery can search inside it.

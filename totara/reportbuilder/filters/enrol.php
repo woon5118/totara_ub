@@ -65,8 +65,8 @@ class rb_filter_enrol extends rb_filter_type {
         }
 
         // set default values
-        if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
-            $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
+            $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
         }
         if (isset($defaults['value'])) {
             $mform->setDefault($this->name, $defaults['value']);

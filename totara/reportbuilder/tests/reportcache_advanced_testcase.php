@@ -58,7 +58,7 @@ abstract class reportcache_advanced_testcase extends advanced_testcase {
             $report = reportbuilder_get_embedded_report($shortname, $data, false, 0);
         }
         if ($form) {
-            $SESSION->reportbuilder[$report->_id] = $form;
+            $SESSION->reportbuilder[$report->get_uniqueid()] = $form;
         }
         list($sql, $params, $cache) = $report->build_query(false, true);
         if ($ensurecache) {

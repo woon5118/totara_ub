@@ -128,8 +128,8 @@ class rb_filter_multicheck extends rb_filter_type {
         }
 
         // set default values
-        if (isset($SESSION->reportbuilder[$this->report->_id][$this->name])) {
-            $defaults = $SESSION->reportbuilder[$this->report->_id][$this->name];
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {
+            $defaults = $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name];
         }
         if (isset($defaults['operator'])) {
             $mform->setDefault($this->name . '_op', $defaults['operator']);
@@ -171,8 +171,8 @@ class rb_filter_multicheck extends rb_filter_type {
     private function is_option_set($option) {
         global $SESSION;
 
-        return isset($SESSION->reportbuilder[$this->report->_id][$this->name]) &&
-               $SESSION->reportbuilder[$this->report->_id][$this->name]['value'][$option];
+        return isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name]) &&
+               $SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name]['value'][$option];
     }
 
     /**
@@ -273,12 +273,12 @@ class rb_filter_multicheck extends rb_filter_type {
         global $SESSION;
 
         $fieldname = $this->name;
-        if (!isset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'])) {
-            $SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'] =
-                    isset($SESSION->reportbuilder[$this->report->_id][$fieldname]) ?
-                    $SESSION->reportbuilder[$this->report->_id][$fieldname] : false;
+        if (!isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was'])) {
+            $SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was'] =
+                    isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname]) ?
+                    $SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname] : false;
         }
-        unset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+        unset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname]);
     }
 
     /**
@@ -288,14 +288,14 @@ class rb_filter_multicheck extends rb_filter_type {
         global $SESSION;
 
         $fieldname = $this->name;
-        if (isset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'])) {
-            if ($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'] === false) {
-                unset($SESSION->reportbuilder[$this->report->_id][$fieldname]);
+        if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was'])) {
+            if ($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was'] === false) {
+                unset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname]);
             } else {
-                $SESSION->reportbuilder[$this->report->_id][$fieldname] =
-                        $SESSION->reportbuilder[$this->report->_id][$fieldname . '_was'];
+                $SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname] =
+                        $SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was'];
             }
-            unset($SESSION->reportbuilder[$this->report->_id][$fieldname . '_was']);
+            unset($SESSION->reportbuilder[$this->report->get_uniqueid()][$fieldname . '_was']);
         }
     }
 

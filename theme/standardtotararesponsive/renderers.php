@@ -259,6 +259,7 @@ class theme_standardtotararesponsive_core_renderer extends core_renderer {
 
     /**
      * Renders the paging bar.
+     * NOTE: Reflect any changes here in ajax version below.
      *
      * @param paging_bar $pagingbar
      * @return string
@@ -434,5 +435,48 @@ class theme_standardtotararesponsive_core_course_renderer extends core_course_re
 
         $content .= html_writer::end_tag('div'); // .coursebox
         return $content;
+    }
+}
+
+/**
+ * Overriding core ajax rendering functions for totara.
+ */
+class theme_standardtotararesponsive_core_renderer_ajax extends core_renderer_ajax {
+    /**
+     * Renders the paging bar.
+     *
+     * @param paging_bar $pagingbar
+     * @return string
+     */
+    protected function render_paging_bar(paging_bar $pagingbar) {
+        $output = '';
+        $pagingbar = clone($pagingbar);
+        $pagingbar->prepare($this, $this->page, $this->target);
+
+        if ($pagingbar->totalcount > $pagingbar->perpage) {
+            $output .= get_string('page') . ':';
+
+            if (!empty($pagingbar->previouslink)) {
+                $output .= $pagingbar->previouslink;
+            }
+
+            if (!empty($pagingbar->firstlink)) {
+                $output .= $pagingbar->firstlink . '...';
+            }
+
+            foreach ($pagingbar->pagelinks as $link) {
+                $output .= $link;
+            }
+
+            if (!empty($pagingbar->lastlink)) {
+                $output .= '...' . $pagingbar->lastlink;
+            }
+
+            if (!empty($pagingbar->nextlink)) {
+                $output .= $pagingbar->nextlink;
+            }
+        }
+
+        return html_writer::tag('div', $output, array('class' => 'paging'));
     }
 }
