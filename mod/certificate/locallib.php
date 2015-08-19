@@ -793,7 +793,9 @@ function certificate_retrieve_uploads($imagetype) {
 function certificate_get_mod_grade($course, $moduleid, $userid) {
     global $DB;
 
-    $cm = $DB->get_record('course_modules', array('id' => $moduleid));
+    if (!$cm = $DB->get_record('course_modules', array('id' => $moduleid))) {
+        return false;
+    }
     $module = $DB->get_record('modules', array('id' => $cm->module));
 
     $grade_item = grade_get_grades($course->id, 'mod', $module->name, $cm->instance, $userid);
