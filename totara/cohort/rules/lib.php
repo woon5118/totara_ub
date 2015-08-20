@@ -99,6 +99,13 @@ function cohort_rules_get_menu_options() {
         // Set up the list of rules for use in menus.
         $rulesmenu = array();
         foreach ($rules as $groupname => $group) {
+            // If we're looking at hierarchy positions, then we need to check if they're enabled.
+            // The check is done here because any existing rulesets using positions remain valid,
+            // but the user isn't allowed to add any more.
+            if ($groupname === 'pos' && totara_feature_disabled('positions')) {
+                continue;
+            }
+
             $curlabel = get_string("rulegroup-{$groupname}", 'totara_cohort');
             $rulesmenu[$curlabel] = array();
 

@@ -114,13 +114,24 @@ class totara_program_renderer extends plugin_renderer_base {
         $out .= html_writer::script('currentassignmentcount = '.$data->assignments.';');
         return $out;
     }
+
     /**
-    * Prints out the html for each assignment category class
-    *
-    * @param reference object $assignment_class the category class object which called this function
-    * @return string html fragment
-    */
-    public function assignment_category_display($assignment_class, $headers, $buttonname, $data) {
+     * Generates the HTML for each assignment category class.
+     *
+     * @param reference object $assignment_class The category class object which called this function.
+     * @param array $headers A list of headers to be processed.
+     * @param string $buttonname The name of the button that adds data to the group.
+     * @param array $data Current data for the group.
+     * @param boolean $canadd If adding date to the group is allowed.
+     * @return string HTML fragment.
+     */
+    public function assignment_category_display($assignment_class, $headers, $buttonname, $data, $canadd) {
+        // If we've got no data to display and the data can't
+        // be added to, then don't display the fieldset.
+        if (!$canadd && !$data) {
+            return '';
+        }
+
         $categoryclassstr = strtolower(str_replace(' ', '', $assignment_class->name));
         $html = html_writer::start_tag('fieldset', array('class' => 'surround assignment_category '.$categoryclassstr,
             'id' => 'category-'. $assignment_class->id));
@@ -154,9 +165,11 @@ class totara_program_renderer extends plugin_renderer_base {
             }
         }
         $html .= html_writer::table($table);
-        // Add a button for adding new items to the category
-        $html .= html_writer::start_tag('button', array('id' => 'add-assignment-' . $assignment_class->id));
-        $html .= $buttonname . html_writer::end_tag('button');
+        // Add a button for adding new items to the category if we have a name.
+        if ($canadd) {
+            $html .= html_writer::start_tag('button', array('id' => 'add-assignment-' . $assignment_class->id));
+            $html .= $buttonname . html_writer::end_tag('button');
+        }
         $html .= html_writer::start_tag('div', array('class' => 'total_user_count')) . get_string('total', 'totara_program') . ': ';
         $html .= html_writer::tag('span', '0', array('class' => 'user_count')) . html_writer::end_tag('div');
         $html .= html_writer::end_tag('fieldset');
@@ -191,11 +204,17 @@ class totara_program_renderer extends plugin_renderer_base {
         // Display the categories!
         $js = '';
         foreach ($categories as $category) {
+            if (get_class($category) === 'positions_category' && totara_feature_disabled('positions')) {
+                $canadd = false;
+            } else {
+                $canadd = true;
+            }
+
             $category->build_table($id);
-            if (!$category->has_items()) {
+            if (!$category->has_items() && $canadd) {
                 $dropdown_options[$category->id] = $category->name;
             } else {
-                $out .= $category->display();
+                $out .= $category->display($canadd);
                 $js .= $category->get_js($id);
             }
         }

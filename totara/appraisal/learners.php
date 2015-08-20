@@ -128,6 +128,11 @@ if ($canassign) {
     } else if (empty($CFG->dynamicappraisals) && $appraisal->status == appraisal::STATUS_ACTIVE) {
         echo get_string('appraisalactivenochangesallowed', 'totara_appraisal');
     } else {
+        // If the hierarchy positions feature is disabled then remove it from the Assign User Group menu.
+        if (totara_feature_disabled('positions') && array_key_exists('pos', $grouptypes)) {
+            unset($grouptypes['pos']);
+        }
+
         $options = array_merge(array("" => get_string('assigngroup', 'totara_core')),
                 $grouptypes);
         echo html_writer::select($options, 'groupselector', null, null,

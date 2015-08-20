@@ -37,6 +37,9 @@ $shortprefix = hierarchy::get_short_prefix($prefix);
 $frameworkid = required_param('frameworkid', PARAM_INT);
 $page       = optional_param('page', 0, PARAM_INT);
 
+// Check hierarchy item is enabled.
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // Make this page appear under the manage competencies admin item

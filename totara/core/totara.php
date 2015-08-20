@@ -2280,6 +2280,7 @@ function totara_advanced_features_list() {
         'reportgraphs',
         'myteam',
         'recordoflearning',
+        'positions',
     );
 }
 

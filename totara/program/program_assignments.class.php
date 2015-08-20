@@ -350,13 +350,13 @@ abstract class prog_assignment_category {
      * Prints out the actual html for the category, by looking at the headers
      * and data which should have been set by sub class
      *
-     * @param bool $return
+     * @param boolean $canadd If the group can have data added to it or not.
      * @return string html
      */
-    function display() {
+    function display($canadd = true) {
         global $PAGE;
         $renderer = $PAGE->get_renderer('totara_program');
-        return $renderer->assignment_category_display($this, $this->headers, $this->buttonname, $this->data);
+        return $renderer->assignment_category_display($this, $this->headers, $this->buttonname, $this->data, $canadd);
     }
 
     /**

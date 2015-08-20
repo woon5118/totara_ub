@@ -45,6 +45,11 @@ if (!$customfieldtype) {
    print_error('nocustomfielddefinedfortheprefix');
 }
 
+// Check if the feature is disabled before managing custom fields in that area.
+if ($customfieldtype->is_feature_type_disabled()) {
+    print_error('nocustomfieldfordisabledfeature');
+}
+
 /** @var totara_customfield_renderer $renderer*/
 $renderer = $PAGE->get_renderer('totara_customfield');
 

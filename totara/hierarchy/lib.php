@@ -166,7 +166,7 @@ function totara_hierarchy_myprofile_navigation(\core_user\output\myprofile\tree 
     $tree->add_category($category);
 
     // Position.
-    if (isset($record->pos)) {
+    if (isset($record->pos) && !totara_feature_disabled('positions')) {
         $title = get_string('position', 'totara_hierarchy');
         $node = new core_user\output\myprofile\node('position', 'pos', $title, null, null, $record->pos);
         $tree->add_node($node);

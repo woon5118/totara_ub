@@ -25,7 +25,9 @@
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
+position::check_feature_enabled();
 
 ///
 /// Setup / loading data

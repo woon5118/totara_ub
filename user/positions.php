@@ -20,6 +20,10 @@ if (!$positionsenabled = get_config('totara_hierarchy', 'positionsenabled')) {
 // Create array of enabled positions
 $enabled_positions = explode(',', $positionsenabled);
 
+if ($POSITION_CODES[$type] == POSITION_TYPE_ASPIRATIONAL && totara_feature_disabled('positions')) {
+    print_error('error:positionsdisabled', 'totara_hierarchy');
+}
+
 if (empty($POSITION_CODES[$type])) {
     // Set default enabled position type
     foreach ($POSITION_CODES as $ptype => $poscode) {

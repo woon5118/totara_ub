@@ -216,6 +216,11 @@ function totara_sync_get_elements($onlyenabled=false) {
     $elements = array();
     foreach ($efiles as $filepath) {
         $element = basename($filepath, '.php');
+
+        if ($element == 'pos' && totara_feature_disabled('positions')) {
+            continue;
+        }
+
         if ($onlyenabled) {
             if (!get_config('totara_sync', 'element_'.$element.'_enabled')) {
                 continue;

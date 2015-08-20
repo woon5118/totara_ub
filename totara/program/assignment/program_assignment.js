@@ -684,12 +684,10 @@ function category(id, name, find_url, title) {
 
     this.check_table_hidden_status = function() {
         if (this.items.length === 0) {
-            $('th',this.table).hide();
+            this.table.hide();
+        } else {
+            this.table.show();
         }
-        else {
-            $('th',this.table).show();
-        }
-
 
         this.update_user_count();
     };

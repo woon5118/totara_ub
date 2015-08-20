@@ -492,6 +492,16 @@ class position extends hierarchy {
         }
         return $label;
     }
+
+    /**
+     * Check if the position feature is enabled, if not Display an error.
+     */
+    public static function check_feature_enabled() {
+        if (totara_feature_disabled('positions')) {
+            print_error('error:positionsdisabled', 'totara_hierarchy');
+        }
+    }
+
 }  // class
 
 
@@ -717,6 +727,12 @@ function pos_add_node_positions_links($course, $user, $tree) {
         $url = new moodle_url('/user/positions.php', array_merge($posbaseargs, array('type' => $dtype)));
 
         foreach ($POSITION_TYPES as $pcode => $ptype) {
+            // Don't display a link to the aspirational position if hierarchy positions
+            // are disabled as it only allows you to select a position.
+            if ($pcode == POSITION_TYPE_ASPIRATIONAL && totara_feature_disabled('positions')) {
+                continue;
+            }
+
             if (in_array($pcode, $enabled_positions)) {
                 $url = new moodle_url('/user/positions.php', array_merge($posbaseargs, array('type' => $ptype)));
                 $title = get_string('type' . $ptype, 'totara_hierarchy');

@@ -72,16 +72,17 @@ abstract class totara_sync_source_user extends totara_sync_source {
             'phone2',
             'address',
             'orgidnumber',
-            'postitle',
-            'posidnumber',
-            'posstartdate',
-            'posenddate',
             'manageridnumber',
             'appraiseridnumber',
             'auth',
             'password',
             'suspended',
         );
+
+        // We need to be able to disable the position fields if required so keep a copy of them separate.
+        $this->positionfields = array ('postitle', 'posidnumber', 'posstartdate', 'posenddate');
+
+        $this->fields = array_merge($this->fields, $this->positionfields);
 
         // Custom fields
         $this->customfields = array();
@@ -134,6 +135,13 @@ abstract class totara_sync_source_user extends totara_sync_source {
             } else if ($f == 'deleted') {
                 $mform->addElement('hidden', $name, $this->config->$name);
                 $mform->setType($name, PARAM_INT);
+            } else if (in_array($f, $this->positionfields)) {
+                if (totara_feature_disabled('positions')) {
+                    $mform->addElement('hidden', $name, '1');
+                    $mform->setType($name, PARAM_INT);
+                } else {
+                    $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
+                }
             } else {
                 $mform->addElement('checkbox', $name, get_string($f, 'tool_totara_sync'));
                 if (in_array($f, array('country'))) {
@@ -150,8 +158,15 @@ abstract class totara_sync_source_user extends totara_sync_source {
         $mform->setExpanded('mappingshdr');
 
         foreach ($this->fields as $f) {
-            $mform->addElement('text', 'fieldmapping_'.$f, $f);
-            $mform->setType('fieldmapping_'.$f, PARAM_TEXT);
+            $name = 'fieldmapping_' . $f;
+
+            if (in_array($f, $this->positionfields) && totara_feature_disabled('positions')) {
+                $mform->addElement('hidden', $name, '1');
+                $mform->setType($name, PARAM_INT);
+            } else {
+                $mform->addElement('text', $name, $f);
+                $mform->setType($name, PARAM_TEXT);
+            }
         }
 
         foreach ($this->customfields as $key => $f) {

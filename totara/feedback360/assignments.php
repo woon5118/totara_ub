@@ -64,7 +64,13 @@ echo $output->heading(get_string('assigncurrentgroups', 'totara_feedback360'));
 
 if ($canassign) {
     if ($feedback360->status == feedback360::STATUS_DRAFT) {
-        $options = array_merge(array("" => get_string('assigngroup', 'totara_core')), $assign->get_assignable_grouptype_names());
+        $groups = $assign->get_assignable_grouptype_names();
+        // If hierarchy positions are disabled then don't included them in the options.
+        if (totara_feature_disabled('positions')) {
+            unset($groups['pos']);
+        }
+
+        $options = array_merge(array("" => get_string('assigngroup', 'totara_core')), $groups);
         echo html_writer::select($options, 'groupselector', null, null, array('class' => 'group_selector', 'itemid' => $itemid));
     } else if ($feedback360->status == feedback360::STATUS_CLOSED) {
         echo get_string('feedback360closednochangesallowed', 'totara_feedback360');

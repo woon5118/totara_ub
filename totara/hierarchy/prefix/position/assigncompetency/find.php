@@ -30,6 +30,8 @@ require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
+position::check_feature_enabled();
+
 // Page title
 $pagetitle = 'assigncompetencies';
 

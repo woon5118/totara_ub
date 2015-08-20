@@ -46,6 +46,9 @@ $confirmdelete = optional_param('confirmdelete', 0, PARAM_INT);
 $confirmmove = optional_param('confirmmove', 0, PARAM_INT);
 $newparent   = optional_param('newparent', false, PARAM_INT);
 
+// Check hierarchy item is enabled.
+hierarchy::check_enable_hierarchy($prefix);
+
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 define('HIERARCHY_BULK_SELECTED_PER_PAGE', 1000);

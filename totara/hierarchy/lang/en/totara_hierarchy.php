@@ -422,6 +422,11 @@ $string['editscalevalue'] = 'Edit scale value';
 $string['edittype'] = 'Edit type';
 $string['edittypelevel'] = 'Edit type';
 $string['enablegoals'] = 'Enable Goals';
+$string['enablepositions'] = 'Enable Positions';
+$string['enablepositions_desc'] = 'This option will let you: enable (show) or disable Positions features on this site.
+
+* If Show is selected, all features related to positions will be visible and accessible.
+* If Disable is selected, no position features will be visible or accessible.';
 $string['enternamesoneperline'] = 'Enter {$a} names (one per line)';
 $string['entervaliddate'] = 'Enter a valid date';
 $string['error:addcompetency'] = 'There was a problem adding the competency "{$a}"';
@@ -483,6 +488,7 @@ $string['error:noreorderscaleinuse'] = 'You cannot reorder a scale that is in us
 $string['error:norestorefiles'] = 'No files found to restore from. {$a}';
 $string['error:onescalevaluemustbeproficient'] = 'At least one scale value must be marked as proficient at all times. Set another scale value to proficent before unchecking this value.';
 $string['error:positionnotset'] = 'A position has not been set for this user';
+$string['error:positionsdisabled'] = 'Hierarchy Positions are disabled on this site';
 $string['error:postypenotenabled'] = 'Position type not enabled';
 $string['error:restoreerror'] = 'An error occurred during the restore process: {$a}';
 $string['error:scaledetails'] = 'Error getting scale details.';

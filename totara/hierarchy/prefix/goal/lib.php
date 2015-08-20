@@ -183,6 +183,10 @@ class goal extends hierarchy {
             'pos' => get_string('addpositions', 'totara_hierarchy'),
             'cohort' => get_string('addcohorts', 'totara_hierarchy'),
         );
+        // Only allow hierarchy positions to be added if it's enabled.
+        if (totara_feature_disabled('positions')) {
+            unset($options['pos']);
+        }
 
         // Get all assignments for $item.
         $assignments = $assignclass->get_current_assigned_groups();

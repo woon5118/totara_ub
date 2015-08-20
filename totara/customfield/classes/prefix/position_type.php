@@ -26,6 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 class position_type extends hierarchy_type {
 
+    public function is_feature_type_disabled() {
+        return totara_feature_disabled('positions');
+    }
+
+    public function is_feature_type_enabled() {
+        return totara_feature_enabled('positions');
+    }
+
     public function get_capability_movefield() {
         return 'totara/hierarchy:updatepositioncustomfield';
     }

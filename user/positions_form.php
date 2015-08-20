@@ -159,18 +159,20 @@ class user_position_assignment_form extends moodleform {
             $mform->addHelpButton('description_editor', 'pos_description', 'totara_core');
         }
 
-        $pos_class = strlen($position_title) ? 'nonempty' : '';
-        $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),
-            html_writer::tag('span', format_string($position_title), array('class' => $pos_class, 'id' => 'positiontitle')).
+        if (!totara_feature_disabled('positions')) {
+            $pos_class = strlen($position_title) ? 'nonempty' : '';
+            $mform->addElement('static', 'positionselector', get_string('position', 'totara_hierarchy'),
+                html_writer::tag('span', format_string($position_title), array('class' => $pos_class, 'id' => 'positiontitle')).
                 ($can_edit ? html_writer::empty_tag('input', array('type' => 'button', 'value' => get_string('chooseposition', 'totara_hierarchy'), 'id' => 'show-position-dialog')) : '')
-        );
-        $mform->addElement('hidden', 'positionid');
-        $mform->setType('positionid', PARAM_INT);
-        $mform->setDefault('positionid', 0);
-        if (!$aspirational) {
-            $mform->addHelpButton('positionselector', 'chooseposition', 'totara_hierarchy');
-        } else {
-            $mform->addHelpButton('positionselector', 'useraspirationalposition', 'totara_hierarchy');
+            );
+            $mform->addElement('hidden', 'positionid');
+            $mform->setType('positionid', PARAM_INT);
+            $mform->setDefault('positionid', 0);
+            if (!$aspirational) {
+                $mform->addHelpButton('positionselector', 'chooseposition', 'totara_hierarchy');
+            } else {
+                $mform->addHelpButton('positionselector', 'useraspirationalposition', 'totara_hierarchy');
+            }
         }
 
         if (!$aspirational) {

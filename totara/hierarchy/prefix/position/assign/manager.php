@@ -24,6 +24,7 @@
 
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content_hierarchy.class.php');
+require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 
 $userid = required_param('userid', PARAM_INT);
 
@@ -32,6 +33,8 @@ $PAGE->set_context(context_system::instance());
 if (!(get_config('totara_hierarchy', 'allowsignupmanager') && $userid == 0)) {
     require_login();
 }
+
+position::check_feature_enabled();
 
 ///
 /// Setup / loading data
