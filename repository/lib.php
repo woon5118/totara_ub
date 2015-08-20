@@ -293,6 +293,7 @@ class repository_type implements cacheable_object {
             // update repository instance name if this plugin type doesn't have muliti instances
             $params = array();
             $params['type'] = $this->_typename;
+            $params['onlyvisible'] = false;
             $instances = repository::get_instances($params);
             $instance = array_pop($instances);
             if ($instance) {

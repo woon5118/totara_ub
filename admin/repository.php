@@ -82,6 +82,7 @@ if (($action == 'edit') || ($action == 'new')) {
         if (empty($instanceoptions)) {
             $params = array();
             $params['type'] = $plugin;
+            $params['onlyvisible'] = false;
             $instances = repository::get_instances($params);
             if ($instance = array_pop($instances)) {
                 // use the one form db record
