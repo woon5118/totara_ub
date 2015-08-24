@@ -57,6 +57,8 @@ if ($currenttab == 'reports' && !empty($reportlist) && count($reportlist) > 1) {
                                 get_string('pluginname', 'scormreport_'.$rep));
     }
     $tabs[] = $row2;
+    $activated[] = 'reports';
+    $currenttab = 'scorm_' . $mode;
 }
 
 print_tabs($tabs, $currenttab, $inactive, $activated);
