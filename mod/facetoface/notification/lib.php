@@ -290,6 +290,9 @@ class facetoface_notification extends data_object {
         $where = 'f.id = ? ';
         $params = array($this->facetofaceid);
 
+        $statussql = '';
+        $statusparams = array();
+
         if ($status) {
             list($statussql, $statusparams) = $DB->get_in_or_equal($status);
             $where .= ' AND sis.statuscode ' . $statussql;
@@ -310,6 +313,43 @@ class facetoface_notification extends data_object {
              AND ns.notificationid = ?
             ) ';
         $params[] = $this->id;
+
+        if (($this->type == MDL_F2F_NOTIFICATION_SCHEDULED) && ($this->conditiontype == MDL_F2F_CONDITION_BEFORE_SESSION) && isset($this->scheduletime)) {
+            if ($status) {
+                // For each signupid, we get the status code of the signup_status that was the last one before the scheduled time for sending the notification.
+                // Then we check that this is in $statusparams.
+
+                // We need the scheduled time that the notifications were supposed to go out at
+                $scheduledtimesql = '((SELECT MIN(fsd.timestart)
+                                       FROM   {facetoface_sessions_dates} fsd
+                                       WHERE  fsd.sessionid = s.id) - ?)';
+
+                // We find the latest timecreated that was less than the scheduled time
+                $timecreatedsql = '(SELECT MAX(fss1.timecreated)
+                                    FROM   {facetoface_signups_status} fss1
+                                    WHERE  fss1.signupid = si.id
+                                    AND    fss1.timecreated < '.$scheduledtimesql.')';
+
+                // We get the status code that's in the same record as the above timestamp.
+                $statuscodesql = '(SELECT fss2.statuscode
+                                   FROM   {facetoface_signups_status} fss2
+                                   WHERE  fss2.signupid = si.id
+                                   AND    fss2.timecreated = '.$timecreatedsql.')';
+
+                // We check that the status code is a status that this notification should be sent out for.
+                $where .= ' AND '.$statuscodesql.' '.$statussql;
+
+                $params[] = $this->scheduletime;
+                $params = array_merge($params, $statusparams);
+            } else {
+                // If statuses aren't specified. just check if the earliest status was before the scheduled time for sending the notification.
+                $where .= ' AND sis.timecreated <
+                                ((SELECT MIN(fsd.timestart)
+                                  FROM   {facetoface_sessions_dates} fsd
+                                  WHERE  fsd.sessionid = s.id) - ?) ';
+                $params[] = $this->scheduletime;
+            }
+        }
 
         // Generate SQL
         $sql = '
@@ -353,7 +393,9 @@ class facetoface_notification extends data_object {
             return false;
         }
 
-        echo "Checking for sessions to send notification to\n";
+        if (!PHPUNIT_TEST) {
+            mtrace("Checking for sessions to send notification to\n");
+        }
 
         // Find due scheduled notifications
         $sql = '
@@ -380,7 +422,9 @@ class facetoface_notification extends data_object {
 
         $recordset = $DB->get_recordset_sql($sql, array($this->facetofaceid));
         if (!$recordset) {
-            echo "No sessions found for scheduled notification\n";
+            if (!PHPUNIT_TEST) {
+                mtrace("No sessions found for scheduled notification\n");
+            }
             return false;
         }
 
@@ -421,9 +465,11 @@ class facetoface_notification extends data_object {
             foreach ($sessions as $sessionid => $session) {
                 $this->send_to_users($sessionid);
             }
-            echo "Sent scheduled notifications for {$sent} session(s)\n";
-        } else {
-            echo "No scheduled notifications need to be sent at this time\n";
+            if (!PHPUNIT_TEST) {
+                mtrace("Sent scheduled notifications for {$sent} session(s)\n");
+            }
+        } else if (!PHPUNIT_TEST) {
+            mtrace("No scheduled notifications need to be sent at this time\n");
         }
 
         $recordset->close();

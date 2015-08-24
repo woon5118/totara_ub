@@ -2493,4 +2493,235 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         }
         $sink->clear();
     }
+
+    public function test_send_scheduled(){
+        global $DB;
+
+        $this->resetAfterTest();
+
+        // We need to explicitly declare users' firstnames as these need to be unique - generator may sometimes produce duplicates.
+        $user1 = $this->getDataGenerator()->create_user(array('firstname' => 'user1'));
+        $user2 = $this->getDataGenerator()->create_user(array('firstname' => 'user2'));
+        $user3 = $this->getDataGenerator()->create_user(array('firstname' => 'user3'));
+        $user4 = $this->getDataGenerator()->create_user(array('firstname' => 'user4'));
+        $user5 = $this->getDataGenerator()->create_user(array('firstname' => 'user5'));
+        $user6 = $this->getDataGenerator()->create_user(array('firstname' => 'user6'));
+        $user7 = $this->getDataGenerator()->create_user(array('firstname' => 'user7'));
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+        $facetoface = $facetofacegenerator->create_instance(array('course' => $course1->id, 'multiplesessions' => 1));
+
+        $sessiondate1 = new stdClass();
+        $sessiondate1->timestart = time() + (HOURSECS * 1);
+        $sessiondate1->timefinish = time() + (HOURSECS * 2);
+        $sessiondate1->sessiontimezone = 'Australia/Sydney';
+
+        $sessiondata1 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate1),
+            'datetimeknown' => '1',
+        );
+        $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
+        $session1 = facetoface_get_session($sessionid1);
+
+        $sessiondate2 = new stdClass();
+        $sessiondate2->timestart = time() + (HOURSECS * 3);
+        $sessiondate2->timefinish = time() + (HOURSECS * 4);
+        $sessiondate2->sessiontimezone = 'Australia/Sydney';
+
+        $sessiondata2 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate2),
+            'datetimeknown' => '1',
+        );
+        $sessionid2 = $facetofacegenerator->add_session($sessiondata2);
+        $session2 = facetoface_get_session($sessionid2);
+
+        $sessiondate3 = new stdClass();
+        $sessiondate3->timestart = time() + (HOURSECS * 1);
+        $sessiondate3->timefinish = time() + (HOURSECS * 2);
+        $sessiondate3->sessiontimezone = 'Australia/Sydney';
+
+        $sessiondata3 = array(
+            'facetoface' => $facetoface->id,
+            'capacity' => 10,
+            'sessiondates' => array($sessiondate3),
+            'datetimeknown' => '1',
+        );
+        $sessionid3 = $facetofacegenerator->add_session($sessiondata3);
+        $session3 = facetoface_get_session($sessionid3);
+
+        // Notification 1 goes to booked and waitlisted users 2 hours before start of session.
+        $notification1 = new facetoface_notification();
+        $notification1->courseid = $course1->id;
+        $notification1->facetofaceid = $facetoface->id;
+        $notification1->ccmanager = 0;
+        $notification1->status = 1;
+        $notification1->title = '2 hours before';
+        $notification1->body = get_string('placeholder:firstname', 'facetoface').' 2 hours before';
+        $notification1->managerprefix = '';
+        $notification1->type = MDL_F2F_NOTIFICATION_SCHEDULED;
+        $notification1->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
+        $notification1->scheduleunit = MDL_F2F_SCHEDULE_UNIT_HOUR;
+        $notification1->scheduleamount = 2;
+        $notification1->booked = 1;
+        $notification1->waitlisted = 1;
+        $notification1->save();
+
+        // Notification 2 goes to booked users 4 hours before start of session.
+        $notification2 = new facetoface_notification();
+        $notification2->courseid = $course1->id;
+        $notification2->facetofaceid = $facetoface->id;
+        $notification2->ccmanager = 0;
+        $notification2->status = 1;
+        $notification2->title = '4 hours before';
+        $notification2->body = get_string('placeholder:firstname', 'facetoface').' 4 hours before';
+        $notification2->managerprefix = '';
+        $notification2->type = MDL_F2F_NOTIFICATION_SCHEDULED;
+        $notification2->conditiontype = MDL_F2F_CONDITION_BEFORE_SESSION;
+        $notification2->scheduleunit = MDL_F2F_SCHEDULE_UNIT_HOUR;
+        $notification2->scheduleamount = 4;
+        $notification2->booked = 1;
+        $notification2->save();
+
+        // Notification 3 goes to booked users 1 hour after end of session.
+        $notification3 = new facetoface_notification();
+        $notification3->courseid = $course1->id;
+        $notification3->facetofaceid = $facetoface->id;
+        $notification3->ccmanager = 0;
+        $notification3->status = 1;
+        $notification3->title = '1 hour after';
+        $notification3->body = get_string('placeholder:firstname', 'facetoface').' 1 hour after';
+        $notification3->managerprefix = '';
+        $notification3->type = MDL_F2F_NOTIFICATION_SCHEDULED;
+        $notification3->conditiontype = MDL_F2F_CONDITION_AFTER_SESSION;
+        $notification3->scheduleunit = MDL_F2F_SCHEDULE_UNIT_HOUR;
+        $notification3->scheduleamount = 1;
+        $notification3->booked = 1;
+        $notification3->save();
+
+        // Grab any messages that get sent.
+        $sink = $this->redirectMessages();
+
+        // Note that signup times in the database are being edited below. This is necessary to test scheduled notifications.
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user1->id, true);
+        $user1signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user1->id));
+        $user1status = $DB->get_record('facetoface_signups_status', array('signupid' => $user1signupid, 'superceded' => 0));
+        $user1status->timecreated = time() - HOURSECS * 6;
+        $DB->update_record('facetoface_signups_status', $user1status);
+
+        facetoface_user_signup($session2, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user2->id, true);
+        $user2signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session2->id, 'userid' => $user2->id));
+        $user2status = $DB->get_record('facetoface_signups_status', array('signupid' => $user2signupid, 'superceded' => 0));
+        $user2status->timecreated = time() - HOURSECS * 6;
+        $DB->update_record('facetoface_signups_status', $user2status);
+
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user3->id, true);
+        $user3signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user3->id));
+        $user3status = $DB->get_record('facetoface_signups_status', array('signupid' => $user3signupid, 'superceded' => 0));
+        $user3status->timecreated = time() - HOURSECS * 2;
+        $DB->update_record('facetoface_signups_status', $user3status);
+
+        facetoface_user_signup($session3, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user4->id, true);
+        $session3date = $DB->get_record('facetoface_sessions_dates', array('sessionid' => $session3->id));
+        $session3date->timestart -= HOURSECS * 4;
+        $session3date->timefinish -= HOURSECS * 4;
+        $DB->update_record('facetoface_sessions_dates', $session3date);
+        $user4signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session3->id, 'userid' => $user4->id));
+        $user4status = $DB->get_record('facetoface_signups_status', array('signupid' => $user4signupid, 'superceded' => 0));
+        $user4status->timecreated = time() - HOURSECS * 4;
+        $DB->update_record('facetoface_signups_status', $user4status);
+
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_WAITLISTED, $user5->id, true);
+        $user5signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user5->id));
+        $user5status = $DB->get_record('facetoface_signups_status', array('signupid' => $user5signupid, 'superceded' => 0));
+        $user5status->timecreated = time() - HOURSECS * 6;
+        $DB->update_record('facetoface_signups_status', $user5status);
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user5->id, true);
+        $user5signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user5->id));
+        $user5status = $DB->get_record('facetoface_signups_status', array('signupid' => $user5signupid, 'superceded' => 0));
+        $user5status->timecreated = time() - MINSECS * 30;
+        $DB->update_record('facetoface_signups_status', $user5status);
+
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user6->id, true);
+        $user6signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user6->id));
+        $user6status = $DB->get_record('facetoface_signups_status', array('signupid' => $user6signupid, 'superceded' => 0));
+        $user6status->timecreated = time() - HOURSECS * 6;
+        $DB->update_record('facetoface_signups_status', $user6status);
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_USER_CANCELLED, $user6->id, true);
+
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user7->id, true);
+        $user7signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user7->id));
+        $user7status = $DB->get_record('facetoface_signups_status', array('signupid' => $user7signupid, 'superceded' => 0));
+        $user7status->timecreated = time() - HOURSECS * 6;
+        $DB->update_record('facetoface_signups_status', $user7status);
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_USER_CANCELLED, $user7->id, true);
+        $user7signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user7->id));
+        $user7status = $DB->get_record('facetoface_signups_status', array('signupid' => $user7signupid, 'superceded' => 0));
+        $user7status->timecreated = time() - HOURSECS * 2;
+        $DB->update_record('facetoface_signups_status', $user7status);
+        facetoface_user_signup($session1, $facetoface, $course1, NULL, MDL_F2F_INVITE, MDL_F2F_STATUS_BOOKED, $user7->id, true);
+        $user7signupid = $DB->get_field('facetoface_signups', 'id', array('sessionid' => $session1->id, 'userid' => $user7->id));
+        $user7status = $DB->get_record('facetoface_signups_status', array('signupid' => $user7signupid, 'superceded' => 0));
+        $user7status->timecreated = time() - MINSECS * 30;
+        $DB->update_record('facetoface_signups_status', $user7status);
+
+        $notification1->send_scheduled();
+        $notification2->send_scheduled();
+        $notification3->send_scheduled();
+
+        // Grab the messages that got sent.
+        $messages = $sink->get_messages();
+
+        // Put the actual message content into their own array to test against
+        $fullmessages = array();
+        foreach($messages as $message){
+            $fullmessages[] = $message->fullmessage;
+        }
+
+        // 6 hours ago, user1 signed up to session that starts 1 hour from now.
+        $this->assertContains($user1->firstname.' 2 hours before', $fullmessages);
+        $this->assertContains($user1->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user1->firstname.' 1 hour after', $fullmessages);
+
+        // 6 hours ago, user2 signed up to session that starts 3 hours from now.
+        $this->assertNotContains($user2->firstname.' 2 hours before', $fullmessages);
+        $this->assertContains($user2->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user2->firstname.' 1 hour after', $fullmessages);
+
+        // 2 hours ago, user3 signed up to session that starts 1 hour from now.
+        $this->assertContains($user3->firstname.' 2 hours before', $fullmessages);
+        $this->assertNotContains($user3->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user3->firstname.' 1 hour after', $fullmessages);
+
+        // user4 has signed up a session an hour before it started. That session finished 2 hours ago.
+        $this->assertNotContains($user4->firstname.' 2 hours before', $fullmessages);
+        $this->assertNotContains($user4->firstname.' 4 hours before', $fullmessages);
+        $this->assertContains($user4->firstname.' 1 hour after', $fullmessages);
+
+        // 6 hours ago, user5 was waitlisted for a session and then became booked half an hour ago. The session starts in one hour.
+        $this->assertContains($user5->firstname.' 2 hours before', $fullmessages);
+        $this->assertNotContains($user5->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user5->firstname.' 1 hour after', $fullmessages);
+
+        // 6 hours ago, user6 signed up to a session that starts 1 hour from now. But has cancelled just before notifications were sent.
+        $this->assertNotContains($user6->firstname.' 2 hours before', $fullmessages);
+        $this->assertNotContains($user6->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user6->firstname.' 1 hour after', $fullmessages);
+
+        // 6 hours ago, user7 booked for a session that starts 1 hour from now. Then cancelled 2 hours ago. And then was rebooked
+        // 30 minutes ago.  So user7's status was cancelled at the time the '2 hours before' notification was scheduled to go out.
+        $this->assertNotContains($user7->firstname.' 2 hours before', $fullmessages);
+        $this->assertContains($user7->firstname.' 4 hours before', $fullmessages);
+        $this->assertNotContains($user7->firstname.' 1 hour after', $fullmessages);
+
+        // Check that notifications are not sent again.
+        $newsink = $this->redirectMessages();
+        $notification1->send_scheduled();
+        $newmessages = $newsink->get_messages();
+        $this->assertCount(0, $newmessages);
+    }
 }
