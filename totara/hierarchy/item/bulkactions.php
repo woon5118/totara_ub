@@ -26,6 +26,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/item/bulkactions_form.php');
 require_once($CFG->dirroot.'/totara/hierarchy/lib.php');
+require_once($CFG->dirroot.'/totara/core/searchlib.php');
 require_once($CFG->dirroot.'/totara/core/utils.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
 
@@ -92,7 +93,7 @@ foreach ($paths as $path) {
 if (count($paths)) {
     $all_disabled_item_ids = $DB->get_fieldset_select($shortprefix, 'id', implode(' OR ', $where), $whereparams);
 } else {
-$all_disabled_item_ids = array();
+    $all_disabled_item_ids = array();
 }
 
 $count_selected_items = count($all_selected_item_ids);
@@ -104,8 +105,10 @@ $searchterm = isset($SESSION->hierarchy_bulk_search[$action][$prefix][$framework
 $searchquery = '';
 $searchqueryparams = array();
 if ($searchterm) {
-    $searchquery = ' AND ' . $DB->sql_like('fullname', '?');
-    $searchqueryparams = array('%' . $DB->sql_like_escape($searchterm) . '%');
+    $keywords = totara_search_parse_keywords($searchterm);
+    list($searchquery, $searchqueryparams) =
+        totara_search_get_keyword_where_clause($keywords, array('fullname'), SQL_PARAMS_QM, 'search');
+    $searchquery = ' AND '.$searchquery;
 }
 
 $count_available_items = $DB->count_records_select($shortprefix, 'frameworkid = ?' . $searchquery, array_merge(array($frameworkid), $searchqueryparams));
