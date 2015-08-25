@@ -71,7 +71,11 @@ input[type="reset"][disabled] {
     background-image:linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
     background-image:-moz-linear-gradient(top, [[setting:buttoncolor-light-perc]], [[setting:buttoncolor-lighter-perc]]);
 }
-#page-footer, .block, .navbar-inner, .block > .header {
+#page-footer,
+.block,
+.navbar-inner,
+.block > .header,
+#dockeditempanel .dockeditempanel_hd {
     background-color: [[setting:headerbgc]];
 }
 .ie8 .navbar-inner,
