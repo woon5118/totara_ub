@@ -3858,7 +3858,11 @@ EOD;
      * @return string HTML.
      */
     public function page_heading($tag = 'h1') {
-        return html_writer::tag($tag, $this->page->heading);
+        $attrs = array();
+        if ($this->page->context->contextlevel == CONTEXT_USER) {
+            $attrs['class'] = 'display';
+        }
+        return html_writer::tag($tag, $this->page->heading, $attrs);
     }
 
     /**
@@ -4096,7 +4100,6 @@ EOD;
      */
     public function full_header() {
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'clearfix'));
-        $html .= $this->context_header();
         $html .= html_writer::start_div('clearfix', array('id' => 'page-navbar'));
         $html .= html_writer::tag('nav', $this->navbar(), array('class' => 'breadcrumb-nav'));
         $html .= html_writer::div($this->page_heading_button(), 'breadcrumb-button');
