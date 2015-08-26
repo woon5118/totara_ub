@@ -33,6 +33,10 @@ require_once($CFG->dirroot . '/totara/program/lib.php');
 
 require_login();
 
+if (totara_feature_disabled('recordoflearning')) {
+    print_error('error:recordoflearningdisabled', 'totara_plan');
+}
+
 // Check if certifications are enabled.
 check_certification_enabled();
 

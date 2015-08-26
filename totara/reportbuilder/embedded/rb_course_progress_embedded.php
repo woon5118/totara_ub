@@ -88,4 +88,13 @@ class rb_course_progress_embedded extends rb_base_embedded {
         // Capability checks are not required as users can only view their own active courses.
         return true;
     }
+
+    /**
+     * Check if the report is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('recordoflearning');
+    }
 }

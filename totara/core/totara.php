@@ -2279,6 +2279,7 @@ function totara_advanced_features_list() {
         'totaradashboard',
         'reportgraphs',
         'myteam',
+        'recordoflearning',
     );
 }
 

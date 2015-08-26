@@ -456,4 +456,13 @@ class rb_source_dp_certification_history extends rb_base_source {
     function rb_display_link_program_icon($certificationname, $row) {
         return prog_display_link_icon($row->programid, $row->userid);
     }
+
+    /**
+     * Check if the report source is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('recordoflearning');
+    }
 }

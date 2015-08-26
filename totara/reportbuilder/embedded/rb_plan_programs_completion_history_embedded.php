@@ -126,4 +126,13 @@ class rb_plan_programs_completion_history_embedded extends rb_base_embedded {
                 has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor) ||
                 has_capability('totara/core:viewrecordoflearning', context_user::instance($subjectid), $reportfor));
     }
+
+    /**
+     * Check if the report is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('recordoflearning');
+    }
 }

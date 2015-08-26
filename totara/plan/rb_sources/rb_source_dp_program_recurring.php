@@ -383,20 +383,12 @@ class rb_source_dp_program_recurring extends rb_base_source {
         return $requiredcolumns;
     }
 
-
-    //
-    //
-    // Source specific column display methods
-    //
-    //
-
-
-    //
-    //
-    // Source specific filter display methods
-    //
-    //
-
-
-
+    /**
+     * Check if the report source is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('recordoflearning');
+    }
 } // end of rb_source_dp_program_recurring class

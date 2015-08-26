@@ -33,6 +33,10 @@ require_once($CFG->dirroot.'/totara/plan/lib.php');
 
 require_login();
 
+if (totara_feature_disabled('recordoflearning')) {
+    print_error('error:recordoflearningdisabled', 'totara_plan');
+}
+
 global $USER;
 
 $userid     = optional_param('userid', null, PARAM_INT); // Which user to show.

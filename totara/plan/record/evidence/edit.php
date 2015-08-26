@@ -35,6 +35,10 @@ require_once('lib.php');
 
 require_login();
 
+if (totara_feature_disabled('recordoflearning')) {
+    print_error('error:recordoflearningdisabled', 'totara_plan');
+}
+
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $evidenceid = optional_param('id', 0, PARAM_INT);
 $deleteflag = optional_param('d', false, PARAM_BOOL);

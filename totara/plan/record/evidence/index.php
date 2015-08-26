@@ -29,6 +29,10 @@ require_once($CFG->dirroot.'/totara/plan/lib.php'); // Is this needed?
 
 require_login();
 
+if (totara_feature_disabled('recordoflearning')) {
+    print_error('error:recordoflearningdisabled', 'totara_plan');
+}
+
 $userid = optional_param('userid', $USER->id, PARAM_INT); // Which user to show, default to current user.
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // Export format.

@@ -21,7 +21,7 @@
  * @subpackage reportbuilder
  */
 
-$string['sourcetitle'] = 'Evidence';
+$string['sourcetitle'] = 'Record of Learning: Evidence';
 $string['name'] = 'Name';
 $string['namelink'] = 'Name (link)';
 $string['attachment'] = 'Attachments';

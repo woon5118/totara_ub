@@ -33,6 +33,10 @@ require_once('lib.php');
 
 require_login();
 
+if (totara_feature_disabled('recordoflearning')) {
+    print_error('error:recordoflearningdisabled', 'totara_plan');
+}
+
 $evidenceid = required_param('id', PARAM_INT); // evidence assignment id
 $rolstatus = optional_param('status', 'all', PARAM_ALPHA);
 if (!in_array($rolstatus, array('active','completed','all'))) {

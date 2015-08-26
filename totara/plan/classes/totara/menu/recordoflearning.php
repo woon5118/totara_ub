@@ -42,8 +42,24 @@ class recordoflearning extends \totara_core\totara\menu\item {
         return 23000;
     }
 
+    protected function check_visibility() {
+        if (!totara_feature_visible('recordoflearning')) {
+            return menu::HIDE_ALWAYS;
+        }
+        return menu::SHOW_ALWAYS;
+    }
+
     public function get_default_visibility() {
         return menu::SHOW_WHEN_REQUIRED;
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('recordoflearning');
     }
 
     protected function get_default_parent() {

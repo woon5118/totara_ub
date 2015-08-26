@@ -423,6 +423,11 @@ $string['editobjectivevalue'] = 'Edit objective value';
 $string['editpriority'] = 'Edit priority {$a}';
 $string['editpriorityvalue'] = 'Edit priority value';
 $string['enablelearningplans'] = 'Enable Learning Plans';
+$string['enablerecordoflearning'] = 'Enable Record of Learning';
+$string['enablerecordoflearninginfo'] = 'This option will let you: enable (show) or disable Record of Learning features on this site.
+
+* If Show is selected, all features related to Record of Learning will be visible and accessible.
+* If Disable is selected, no Record of Learning features will be visible or accessible.';
 $string['enddate'] = 'End date';
 $string['error:cannotaddscalevalue'] = 'You cannot add a scale value to a scale that is in use';
 $string['error:cannotupdatecompetencies'] = 'Cannot update competencies';
@@ -498,6 +503,7 @@ $string['error:priorityscalevalueidincorrect'] = 'Priority Scale value ID was in
 $string['error:problemapproving'] = 'There was a problem approving those items';
 $string['error:propertymustbeset'] = 'Property \'{$a->property}\' must be set in class {$a->class}';
 $string['error:reactivatedatebeforenow'] = 'Error, the new end date specified is before now.';
+$string['error:recordoflearningdisabled'] = 'Record of Learning is not enabled on this site.';
 $string['error:settingdoesnotexist'] = 'Setting {$a->action} does not exist in the component {$a->component}';
 $string['error:templateid'] = 'Invalid plan template ID';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked.';

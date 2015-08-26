@@ -39,4 +39,13 @@ class rb_source_dp_course_completion_history extends rb_source_course_completion
     protected function define_sourcetitle() {
         return get_string('sourcetitle', 'rb_source_dp_course_completion_history');
     }
+
+    /**
+     * Check if the report source is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('recordoflearning');
+    }
 }
