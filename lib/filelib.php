@@ -2107,7 +2107,6 @@ function send_file($path, $filename, $lifetime = null , $filter=0, $pathisstring
 
     if ($forcedownload) {
         header('Content-Disposition: attachment; filename="'.$filename.'"');
-        header('X-Content-Type-Options: nosniff');
     } else if ($mimetype !== 'application/x-shockwave-flash') {
         // If this is an swf don't pass content-disposition with filename as this makes the flash player treat the file
         // as an upload and enforces security that may prevent the file from being loaded.
@@ -2289,7 +2288,6 @@ function send_stored_file($stored_file, $lifetime=null, $filter=0, $forcedownloa
 
     if ($forcedownload) {
         header('Content-Disposition: attachment; filename="'.$filename.'"');
-        header('X-Content-Type-Options: nosniff');
     } else if ($mimetype !== 'application/x-shockwave-flash') {
         // If this is an swf don't pass content-disposition with filename as this makes the flash player treat the file
         // as an upload and enforces security that may prevent the file from being loaded.
