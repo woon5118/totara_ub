@@ -102,7 +102,8 @@ Feature: tool_monitor_subscriptions
     Given I log in as "admin"
     And I follow "Preferences" in the user menu
     And I follow "Messaging"
-    And I click on "input[name^=tool_monitor_notification_loggedin]" "css_element"
+    # Totara has extra processors, we need to pick the popup specifically
+    And I click on "//input[@id='tool_monitor_notification_loggedin[popup]']" "xpath_element"
     And I press "Save changes"
     And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
@@ -121,7 +122,8 @@ Feature: tool_monitor_subscriptions
     Given I log in as "teacher1"
     And I follow "Preferences" in the user menu
     And I follow "Messaging"
-    And I click on "input[name^=tool_monitor_notification_loggedin]" "css_element"
+    # Totara has extra processors, we need to pick the popup specifically
+    And I click on "//input[@id='tool_monitor_notification_loggedin[popup]']" "xpath_element"
     And I press "Save changes"
     And I follow "Preferences" in the user menu
     And I follow "Event monitoring"
