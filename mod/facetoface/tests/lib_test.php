@@ -39,44 +39,24 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     // Test database data.
     protected $facetoface_data = array(
         array('id',                     'course',           'name',                     'thirdparty',
-            'thirdpartywaitlist',       'display',          'confirmationsubject',      'confirmationinstrmngr',
-            'confirmationmessage',      'waitlistedsubject','waitlistedmessage',        'cancellationsubject',
-            'cancellationinstrmngr',    'cancellationmessage','remindersubject',        'reminderinstrmngr',
-            'remindermessage',          'reminderperiod',   'requestsubject',           'requestinstrmngr',
-            'requestmessage',           'timecreated',      'timemodified',             'shortname',
-            'description',              'showoncalendar',   'approvalreqd'
+              'thirdpartywaitlist',     'display',          'timecreated',              'timemodified',
+              'shortname',              'description',      'showoncalendar',           'approvalreqd'
             ),
         array(1,                        1,                  'name1',                    'thirdparty1',
-            0,                          0,                  'consub1',                  'coninst1',
-            'conmsg1',                  'waitsub1',         'waitmsg1',                 'cansub1',
-            'caninst1',                 'canmsg1',          'remsub1',                  'reminst1',
-            'remmsg1',                  0,                  'reqsub1',                  'reqinst1',
-            'reqmsg1',                  0,                  0,                          'short1',
-            'desc1',                    1,                  0
+              0,                        0,                  0,                          0,
+              'short1',                 'desc1',            1,                          0
             ),
         array(2,                        2,                  'name2',                    'thirdparty2',
-            0,                          0,                  'consub2',                  'coninst2',
-            'conmsg2',                  'waitsub2',         'waitmsg2',                 'cansub2',
-            'caninst2',                 'canmsg2',          'remsub2',                  'reminst2',
-            'remmsg2',                 0,                  'reqsub2',                  'reqinst2',
-            'reqmsg2',                  0,                  0,                          'short2',
-            'desc2',                    1,                  0
+              0,                        0,                  0,                          0,
+              'short2',                 'desc2',            1,                          0
             ),
         array(3,                        3,                  'name3',                    'thirdparty3',
-            0,                          0,                  'consub3',                  'coninst3',
-            'conmsg3',                  'waitsub3',         'waitmsg3',                 'cansub3',
-            'caninst3',                 'canmsg3',          'remsub3',                  'reminst3',
-            'remmsg3',                  0,                  'reqsub3',                  'reqinst3',
-            'reqmsg3',                  0,                  0,                          'short3',
-            'desc3',                    1,                  0
+              0,                        0,                  0,                          0,
+              'short3',                 'desc3',            1,                          0
             ),
         array(4,                        4,                  'name4',                    'thirdparty4',
-            0,                          0,                  'consub4',                  'coninst4',
-            'conmsg4',                  'waitsub4',         'waitmsg4',                 'cansub4',
-            'caninst4',                 'canmsg4',          'remsub4',                  'reminst4',
-            'remmsg4',                  0,                  'reqsub4',                  'reqinst4',
-            'reqmsg4',                  0,                  0,                          'short4',
-            'desc4',                    1,                  0
+              0,                        0,                  0,                          0,
+              'short4',                 'desc4',            1,                          0
             ),
     );
 
