@@ -228,6 +228,11 @@ $string['embeddedreports'] = 'Embedded Reports';
 $string['enablereportcaching'] = 'Enable report caching';
 $string['enableglobalrestrictions'] = 'Enable report restrictions';
 $string['enableglobalrestrictions_desc'] = 'Global user report restrictions are designed to restrict the content visible in report builder reports. Turning this feature on allows for fine grained control over what records are visible to users viewing a report builder report but can have a significant impact on performance.';
+$string['enablereportgraphs'] = 'Enable report builder graphs';
+$string['enablereportgraphsinfo'] = 'This option will let you: enable (show) or disable report builder graphs on this site.
+
+* If Show is selected, all features related to report builder graphs will be visible and accessible.
+* If Disable is selected, no report builder graphs features will be visible or accessible.';
 $string['enrol'] = 'Enrol';
 $string['enrolledcoursecohortids'] = 'Enrolled course audience IDs';
 $string['enrolledprogramcohortids'] = 'Enrolled program audience IDs';
@@ -290,6 +295,7 @@ $string['error:problemobtainingreportdata'] = 'There was a problem obtaining the
 $string['error:processfile'] = 'Unable to create process file. Please, try later.';
 $string['error:propertyxmustbesetiny'] = 'Property "{$a->property}" must be set in class "{$a->class}"';
 $string['error:reportcacheinitialize'] = 'Cache is disabled for this report';
+$string['error:reportgraphsdisabled'] = 'Report Builder graphs are not enabled on this site.';
 $string['error:reporturlnotset'] = 'The url property for report {$a} is missing, please ask your developers to check your code';
 $string['error:savedsearchnotdeleted'] = 'Saved search could not be deleted';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';

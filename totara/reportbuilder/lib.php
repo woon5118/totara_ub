@@ -3528,7 +3528,7 @@ class reportbuilder {
         }
 
         $graphrecord = $DB->get_record('report_builder_graph', array('reportid' => $this->_id));
-        if (!empty($graphrecord->type)) {
+        if (!empty($graphrecord->type) && !totara_feature_disabled('reportgraphs')) {
             $graph = new \totara_reportbuilder\local\graph($graphrecord, $this, false);
         } else {
             $graph = null;

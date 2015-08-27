@@ -76,6 +76,10 @@ class block_totara_report_graph extends block_base {
     public function get_content() {
         global $USER, $CFG, $SESSION;
 
+        if (totara_feature_disabled('reportgraphs')) {
+            return '';
+        }
+
         if ($this->content !== null) {
             // We have already been here.
             return $this->content;

@@ -2275,7 +2275,8 @@ function totara_advanced_features_list() {
         'learningplans',
         'programs',
         'certifications',
-        'totaradashboard'
+        'totaradashboard',
+        'reportgraphs'
     );
 }
 

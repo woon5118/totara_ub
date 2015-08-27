@@ -44,7 +44,11 @@ $inactive = array();
 
 $row[] = new tabobject('general', $CFG->wwwroot . '/totara/reportbuilder/general.php?id=' . $id, get_string('general'));
 $row[] = new tabobject('columns', $CFG->wwwroot . '/totara/reportbuilder/columns.php?id=' . $id, get_string('columns', 'totara_reportbuilder'));
-$row[] = new tabobject('graph', $CFG->wwwroot . '/totara/reportbuilder/graph.php?reportid=' . $id, get_string('graph', 'totara_reportbuilder'));
+
+if (!totara_feature_disabled('reportgraphs')) {
+    $row[] = new tabobject('graph', $CFG->wwwroot . '/totara/reportbuilder/graph.php?reportid=' . $id, get_string('graph', 'totara_reportbuilder'));
+}
+
 $row[] = new tabobject('filters', $CFG->wwwroot . '/totara/reportbuilder/filters.php?id=' . $id, get_string('filters', 'totara_reportbuilder'));
 $row[] = new tabobject('content', $CFG->wwwroot . '/totara/reportbuilder/content.php?id=' . $id, get_string('content', 'totara_reportbuilder'));
 // hide access tab for embedded reports

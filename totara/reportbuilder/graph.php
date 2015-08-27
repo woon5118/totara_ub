@@ -30,6 +30,10 @@ require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/report_forms.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+if (totara_feature_disabled('reportgraphs')) {
+    print_error('error:reportgraphsdisabled', 'totara_reportbuilder');
+}
+
 // jQuery is loaded on each page since 8.0.
 $PAGE->requires->yui_module('moodle-totara_reportbuilder-graphicalreporting', 'M.reportbuilder.graphicalreport.init');
 

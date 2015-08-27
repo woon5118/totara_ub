@@ -112,6 +112,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
     );
 
+    $featureoptionssimple = array(
+        TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
+        TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
+    );
+
     // If adding or removing the settings below, be sure to update the array in
     // totara_advanced_features_list() in totara/core/totara.php.
 
@@ -149,4 +154,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enabletotaradashboard', 'totara_dashboard'),
         new lang_string('configenabletotaradashboard', 'totara_dashboard'),
         TOTARA_SHOWFEATURE, $featureoptions));
+
+    $optionalsubsystems->add(new admin_setting_configselect('enablereportgraphs',
+        new lang_string('enablereportgraphs', 'totara_reportbuilder'),
+        new lang_string('enablereportgraphsinfo', 'totara_reportbuilder'),
+        TOTARA_SHOWFEATURE, $featureoptionssimple));
+
 }
