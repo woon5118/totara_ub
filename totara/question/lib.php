@@ -890,6 +890,7 @@ abstract class question_storage {
     private $param3 = null;
     private $param4 = null;
     private $param5 = null;
+    private $param6 = null;
 
     /**
      * Answer field name.
@@ -932,7 +933,8 @@ abstract class question_storage {
      * List of fields that must be stored/loaded
      * @var array
      */
-    public static $storagefields = array('id', 'param1', 'param2', 'param3', 'param4', 'param5', 'datatype', 'name', 'defaultdata');
+    public static $storagefields = array('id', 'param1', 'param2', 'param3', 'param4', 'param5',
+        'param6', 'datatype', 'name', 'defaultdata');
 
     public function get() {
         $obj = new \stdClass();
@@ -944,6 +946,7 @@ abstract class question_storage {
         $obj->param3 = $this->param3;
         $obj->param4 = $this->param4;
         $obj->param5 = $this->param5;
+        $obj->param6 = $this->param6;
         $obj->defaultdata = $this->defaultdata;
 
         return $obj;
@@ -976,7 +979,7 @@ abstract class question_storage {
      * @return mixed
      */
     public function __get($name) {
-        if (in_array($name, array('param1', 'param2', 'param3', 'param4', 'param5'))) {
+        if (in_array($name, array('param1', 'param2', 'param3', 'param4', 'param5', 'param6'))) {
             if (isset($this->$name)) {
                 return json_decode($this->$name, true);
             }
@@ -1007,7 +1010,7 @@ abstract class question_storage {
      * @param mixed $value
      */
     public function __set($name, $value) {
-        if (in_array($name, array('param1', 'param2', 'param3', 'param4', 'param5'))) {
+        if (in_array($name, array('param1', 'param2', 'param3', 'param4', 'param5', 'param6'))) {
             $this->$name = json_encode($value);
             return;
         }

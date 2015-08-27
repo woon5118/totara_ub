@@ -34,6 +34,7 @@ abstract class reviewrating extends review {
      */
     protected function add_field_specific_settings_elements(MoodleQuickForm $form, $readonly, $moduleinfo) {
         $form->addElement('advcheckbox', 'includerating', get_string('reviewincluderating', 'totara_question'));
+        $form->addElement('advcheckbox', 'includepersonal', get_string('reviewincludepersonal', 'totara_question'));
         parent::add_field_specific_settings_elements($form, $readonly, $moduleinfo);
     }
 
@@ -48,6 +49,7 @@ abstract class reviewrating extends review {
         parent::define_get($toform);
 
         $toform->includerating = $this->param4;
+        $toform->includepersonal = $this->param6;
 
         return $toform;
     }
@@ -63,6 +65,7 @@ abstract class reviewrating extends review {
         $fromform = parent::define_set($fromform);
 
         $this->param4 = $fromform->includerating;
+        $this->param6 = $fromform->includepersonal;
 
         return $fromform;
     }
@@ -70,6 +73,15 @@ abstract class reviewrating extends review {
 
     public function include_rating() {
         return $this->param4;
+    }
+
+    /**
+     * Whether the personal goal custom fields should be added to the appraisal goal.@deprecated
+     *
+     * @return boolean If the fields should be included.
+     */
+    public function include_personal_info_fields() {
+        return $this->param6;
     }
 
 
@@ -84,6 +96,10 @@ abstract class reviewrating extends review {
         if ($this->include_rating()) {
             $this->add_rating_selector($form, $item);
         }
+        if ($this->include_personal_info_fields()) {
+            $this->add_personal_info_fields($form, $item);
+        }
+
         parent::add_item_specific_edit_elements($form, $item);
     }
 

@@ -135,6 +135,53 @@ if ($action == 'pages') {
                 $formiscancelled = $form->is_cancelled();
                 $answers = $form->get_submitted_data(); // Get the data, even if invalid.
 
+                // Save custom field data field by field because customfield_save_data can not handle multiple goals.
+                foreach ($answers as $name => $data) {
+                    // Check if this field matches the custom field name pattern.
+                    preg_match('/^customfield_.*?_(\d+)_?(.*)/', $name, $customfield);
+
+                    if ($customfield) {
+                        // Build an object to hold the form field data to write to the database.
+                        $item = new stdClass();
+                        $item->id = $customfield[1];
+                        $typeid = $DB->get_record('goal_personal', array('id' => $item->id), 'typeid');
+                        $item->typeid = $typeid->typeid;
+                        $item->$name = $data;
+
+                        // Get the read name of the field - remove suffixes for text editor or file upload fields.
+                        $realname = str_replace('_'. $customfield[2], '', $name);
+
+                        // If the field is using a text editor process the data before writing to the database.
+                        if ($customfield[2] == 'editor') {
+                            $options = array(
+                                'subdirs' => 0,
+                                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                                'maxbytes' => get_max_upload_file_size(),
+                                'trusttext' => false,
+                                'context' => $systemcontext,
+                                'collapsed' => true
+                            );
+                            $newanswers = file_postupdate_standard_editor($answers, $realname, $options, $systemcontext,
+                                'totara_hierarchy', 'goal', $item->id);
+                            $item->$name = $newanswers->$name;
+
+                        // If the field is using a filemanager process the file before writing any data.
+                        } else if ($customfield[2] == 'filemanager') {
+                            $options = array(
+                                'maxbytes' => get_max_upload_file_size(),
+                                'maxfiles' => '1',
+                                'subdirs' => 0,
+                                'context' => $systemcontext
+                            );
+                            $newanswers = file_postupdate_standard_filemanager($answers, $realname, $options, $systemcontext,
+                                'totara_hierarchy', 'goal', $item->id);
+                            $item->$name = $newanswers->$name;
+                        }
+
+                        customfield_save_data($item, 'goal_user', 'goal_user');
+                    }
+                }
+
                 // Only save the data if it is valid or if it is the active page and the user has clicked "Save progress".
                 if (($answers->submitaction == 'saveprogress') && ($roleassignment->activepageid == $pageid)) {
                     /* User clicked "Save progress" on the active page, so save data (without completing stage, even if valid),

@@ -32,13 +32,14 @@ $prefix         = required_param('prefix', PARAM_ALPHA);        // hierarchy nam
 $typeid         = optional_param('typeid', '0', PARAM_INT);    // typeid if hierarchy
 $action         = optional_param('action', 'showlist', PARAM_ALPHA);    // param for some action
 $id             = optional_param('id', 0, PARAM_INT); // id of a custom field
+$class          = optional_param('class', '', PARAM_ALPHA);
 
 require_login();
 $sitecontext = context_system::instance();
 $PAGE->set_context($sitecontext);
 
 // Add params to extrainfo in case the customfield need them.
-$extrainfo = array('id' => $id, 'action' => $action, 'typeid' => $typeid);
+$extrainfo = array('id' => $id, 'action' => $action, 'typeid' => $typeid, 'class' => $class);
 $customfieldtype = get_customfield_type_instace($prefix, $sitecontext, $extrainfo);
 
 if (!$customfieldtype) {
@@ -54,12 +55,18 @@ if ($customfieldtype->is_feature_type_disabled()) {
 $renderer = $PAGE->get_renderer('totara_customfield');
 
 // Set redirect.
-$redirectoptions = $renderer->get_redirect_options($prefix, $id, $typeid);
+$redirectoptions = $renderer->get_redirect_options($prefix, $id, $typeid, $class);
 $redirectpage = '/totara/customfield/index.php';
 $redirect = new moodle_url('/totara/customfield/index.php', $redirectoptions);
 
 $PAGE->set_url($redirect);
-$adminpagename = $renderer->get_admin_page($prefix);
+
+if ($class) {
+    $adminpagename = $class . $renderer->get_admin_page($prefix);
+} else {
+    $adminpagename = $renderer->get_admin_page($prefix);
+}
+
 admin_externalpage_setup($adminpagename);
 
 // Check if any actions need to be performed.
@@ -101,7 +108,8 @@ switch ($action) {
 
         // Ask for confirmation.
         $datacount = $DB->count_records($customfieldtype->get_table_prefix().'_info_data', array('fieldid' => $id));
-        $optionsyes = array ('prefix' => $prefix, 'id' => $id, 'confirm' => 1, 'action' => 'deletefield', 'sesskey' => sesskey(), 'typeid' => $typeid);
+        $optionsyes = array ('prefix' => $prefix, 'id' => $id, 'confirm' => 1,
+            'action' => 'deletefield', 'sesskey' => sesskey(), 'typeid' => $typeid, 'class' => $class);
         echo $renderer->totara_customfield_delete_confirmation($datacount, $redirectpage, $optionsyes, $redirectoptions);
         break;
     case 'editfield':
@@ -121,7 +129,7 @@ switch ($action) {
         require_capability($capability, $sitecontext);
 
         $field = customfield_get_record_by_id($tableprefix, $id, $datatype);
-        $renderer->customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs);
+        $renderer->customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs, array(), $class);
         break;
     default:
         echo $OUTPUT->header();

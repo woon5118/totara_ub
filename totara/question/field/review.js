@@ -151,7 +151,7 @@ M.totara_review = M.totara_review || {
         if(typeof longid !== "undefined") {
             var thirdunderline = longid.indexOf('_', longid.indexOf('_', longid.indexOf('_') + 1) + 1);
             var shortid = longid.substr(0, thirdunderline);
-            $('#id_' + shortid + '_choosereviewitem').closest('fieldset').after(responseobj.find('fieldset'));
+            $('#id_' + shortid + '_choosereviewitem').closest('fieldset').after(responseobj.find('fieldset.collapsible'));
         }
 
         M.totara_review.addActions(longid);

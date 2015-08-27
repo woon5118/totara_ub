@@ -357,7 +357,10 @@ class totara_dialog_content_goals extends totara_dialog_content {
             return '';
         }
         $select_options = $this->get_frameworks();
-        return display_dialog_selector($select_options, goal::SCOPE_COMPANY, 'simpleframeworkpicker');
+        return display_dialog_selector($select_options, goal::SCOPE_COMPANY, 'simpleframeworkpicker', array(
+            'name' => 'goaltypeselector',
+            'label' => get_string('goaltypes', 'totara_hierarchy'),
+        ));
     }
 
 

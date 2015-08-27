@@ -34,7 +34,9 @@ class type_edit_form extends moodleform {
 
         $strgeneral  = get_string('general');
         $prefix   = $this->_customdata['prefix'];
+        $class = $this->_customdata['class'];
         $page  = $this->_customdata['page'];
+        $id = $this->_customdata['id'];
 
         /// Add some extra hidden fields
         $mform->addElement('hidden', 'id');
@@ -45,6 +47,8 @@ class type_edit_form extends moodleform {
         $mform->setType('frameworkid', PARAM_INT);
         $mform->addElement('hidden', 'page', $page);
         $mform->setType('page', PARAM_INT);
+        $mform->addElement('hidden', 'class', $class);
+        $mform->setType('class', PARAM_ALPHA);
 
         /// Print the required moodle fields first
         $mform->addElement('header', 'moodle', $strgeneral);
@@ -65,6 +69,29 @@ class type_edit_form extends moodleform {
         $mform->addElement('editor', 'description_editor', get_string($prefix. 'typedescription', 'totara_hierarchy'), null, $TEXTAREA_OPTIONS);
         $mform->addHelpButton('description_editor', $prefix. 'typedescription', 'totara_hierarchy');
         $mform->setType('description_editor', PARAM_CLEANHTML);
+
+        if ($class == 'personal') {
+            $selectoptions = array(
+                0 => get_string('goalpersonalavailableall', 'totara_hierarchy'),
+                1 => get_string('goalpersonalavailableaudience', 'totara_hierarchy')
+            );
+            $mform->addElement('select', 'audience', get_string('goaltypeavailability', 'totara_hierarchy'), $selectoptions);
+
+            if (empty($id)) {
+                $cohorts = '';
+            } else {
+                $cohorts = totara_cohort_get_goal_type_cohorts($id, 'c.id');
+                $cohorts = !empty($cohorts) ? implode(',', array_keys($cohorts)) : '';
+            }
+
+            $mform->addElement('hidden', 'cohortsenrolled', $cohorts);
+            $mform->setType('cohortsenrolled', PARAM_SEQUENCE);
+            $cohortsclass = new totara_cohort_goal_cohorts(COHORT_ASSN_VALUE_ENROLLED);
+            $cohortsclass->build_table(!empty($id) ? $id : 0);
+            $mform->addElement('html', $cohortsclass->display(true));
+
+            $mform->addElement('button', 'cohortsaddenrolled', get_string('addcohorts', 'totara_hierarchy'));
+        }
 
         $this->add_action_buttons();
     }

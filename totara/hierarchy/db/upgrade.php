@@ -1229,5 +1229,144 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015061800, 'totara', 'hierarchy');
     }
 
+    if ($oldversion < 2015092100) {
+        // Define table goal_user_info_data to be created.
+        $table = new xmldb_table('goal_user_info_data');
+
+        // Adding fields to table goal_user_info_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('data', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('goal_userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table goal_user_info_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('fieldid', XMLDB_KEY_FOREIGN, array('fieldid'), 'goal_user_info_field', array('id'));
+        $table->add_key('goaluserinfodata_goa_fk', XMLDB_KEY_FOREIGN, array('goal_userid'), 'goal', array('id'));
+
+        // Conditionally launch create table for goal_user_info_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table goal_user_info_data_param to be created.
+        $table = new xmldb_table('goal_user_info_data_param');
+
+        // Adding fields to table goal_user_info_data_param.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table goal_user_info_data_param.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('goaluserinfodatapara_dat_fk', XMLDB_KEY_FOREIGN, array('dataid'), 'goal_user_info_data', array('id'));
+
+        // Adding indexes to table goal_user_info_data_param.
+        $table->add_index('goaluserinfodatapara_val_ix', XMLDB_INDEX_NOTUNIQUE, array('value'));
+
+        // Conditionally launch create table for goal_user_info_data_param.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table goal_user_info_field to be created.
+        $table = new xmldb_table('goal_user_info_field');
+
+        // Adding fields to table goal_user_info_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('datatype', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hidden', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('locked', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('required', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('forceunique', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('defaultdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param1', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param2', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param3', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param4', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('param5', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+
+        // Adding keys to table goal_user_info_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('goalusertypeinfofield_typ_fk', XMLDB_KEY_FOREIGN, array('typeid'), 'goal_user_type', array('id'));
+
+        // Conditionally launch create table for goal_user_info_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table goal_user_type_cohort to be created.
+        $table = new xmldb_table('goal_user_type_cohort');
+
+        // Adding fields to table goal_user_type_cohort.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('cohortid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('goalid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table goal_user_type_cohort.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('cohortid', XMLDB_KEY_FOREIGN, array('cohortid'), 'cohort', array('id'));
+        $table->add_key('goalid', XMLDB_KEY_FOREIGN, array('goalid'), 'goal', array('id'));
+
+        // Conditionally launch create table for goal_user_type_cohort.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('goal_user_type');
+
+        // Adding fields to table goal_user_type.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fullname', XMLDB_TYPE_CHAR, '1024', null, null, null, null);
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('audience', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table goal_user_type.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for goal_user_type.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define field typeid to be added to goal_personal.
+        $table = new xmldb_table('goal_personal');
+        $field = new xmldb_field('typeid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'deleted');
+
+        // Conditionally launch add field typeid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            // We do this inside here to make this block of code safe to execute multiple times.
+            // Define key goalpersonal_type_fk (foreign) to be added to goal_personal.
+            $key = new xmldb_key('goalpersonal_type_fk', XMLDB_KEY_FOREIGN, array('typeid'), 'goal_user_type', array('id'));
+            // Launch add key goalpersonal_type_fk.
+            $dbman->add_key($table, $key);
+        }
+
+        // Define field visible to be added to goal_personal.
+        $table = new xmldb_table('goal_personal');
+        $field = new xmldb_field('visible', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'typeid');
+
+        // Conditionally launch add field visible.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hierarchy savepoint reached.
+        upgrade_plugin_savepoint(true, 2015092100, 'totara', 'hierarchy');
+    }
+
     return true;
 }

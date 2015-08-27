@@ -33,10 +33,11 @@ require_once($CFG->dirroot.'/totara/hierarchy/type/changelib.php');
 ///
 
 // Get params
-$prefix        = required_param('prefix', PARAM_SAFEDIR);
+$prefix     = required_param('prefix', PARAM_SAFEDIR);
 $typeid     = required_param('typeid', PARAM_INT);
-$itemid      = optional_param('itemid', null, PARAM_INT);
-$page        = optional_param('page', 0, PARAM_INT);
+$itemid     = optional_param('itemid', null, PARAM_INT);
+$page       = optional_param('page', 0, PARAM_INT);
+$class      = optional_param('class', '', PARAM_ALPHA);
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
 hierarchy::check_enable_hierarchy($prefix);
@@ -59,9 +60,9 @@ if ($itemid) {
     $item_sql = '';
     $item_param = array();
     $returnurl = $CFG->wwwroot . '/totara/hierarchy/type/index.php?prefix=' . $prefix . '&amp;page=' . $page;
-    $returnparams = array('prefix' => $prefix, 'page' => $page);
+    $returnparams = array('prefix' => $prefix, 'page' => $page, 'class' => $class);
     $optype = 'bulk';
-    $adminpage = $prefix . 'typemanage';
+    $adminpage = $class . $prefix . 'typemanage';
 }
 
 // Setup page and check permissions
@@ -173,7 +174,7 @@ foreach ($types as $type) {
     $row = array();
 
     // button to pick this type
-    $row[] = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/type/changeconfirm.php', array('prefix' => $prefix, 'typeid' => $typeid, 'newtypeid' => $type->id, 'itemid' => $itemid, 'page' => $page)), get_string('choose'), 'get');
+    $row[] = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/type/changeconfirm.php', array('prefix' => $prefix, 'typeid' => $typeid, 'newtypeid' => $type->id, 'itemid' => $itemid, 'page' => $page, 'class' => $class)), get_string('choose'), 'get');
 
     // type name
     $row[] = format_string($type->fullname);
@@ -190,7 +191,7 @@ foreach ($types as $type) {
 // add 'unclassified' as an option (unless that's the old type)
 if ($typeid != 0) {
     $row = array();
-    $row[] = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/type/changeconfirm.php', array('prefix' => $prefix, 'typeid' => $typeid, 'newtypeid' => 0, 'itemid' => $itemid)), get_string('choose'), 'get');
+    $row[] = $OUTPUT->single_button(new moodle_url('/totara/hierarchy/type/changeconfirm.php', array('prefix' => $prefix, 'typeid' => $typeid, 'newtypeid' => 0, 'itemid' => $itemid, 'class' => $class)), get_string('choose'), 'get');
     $row[] = get_string('unclassified', 'totara_hierarchy');
     $row[] = get_string('nocustomfields', 'totara_hierarchy');
     $table->data[] = $row;

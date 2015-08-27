@@ -37,6 +37,7 @@ $typeid     = required_param('typeid', PARAM_INT);
 $newtypeid  = required_param('newtypeid', PARAM_INT);
 $itemid      = optional_param('itemid', 0, PARAM_INT);
 $page        = optional_param('page', 0, PARAM_INT);
+$class      = optional_param('class', '', PARAM_ALPHA);
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
 hierarchy::check_enable_hierarchy($prefix);
@@ -56,13 +57,13 @@ if ($itemid) {
     $item_param = array($itemid);
     $returnurl = new moodle_url("/totara/hierarchy/item/edit.php", array('prefix' => $prefix, 'id' => $itemid, 'page' => $page));
     $optype = 'item'; // used for switching lang strings
-    $adminpage = $prefix . 'manage';
+    $adminpage = $class . $prefix . 'manage';
 } else {
     $affected_item_sql = $cf_data_sql = $item_sql = '';
     $affected_item_param = $cf_data_param = $item_param = array();
-    $returnurl = new moodle_url("/totara/hierarchy/type/index.php", array('prefix' => $prefix, 'page' => $page));
+    $returnurl = new moodle_url("/totara/hierarchy/type/index.php", array('prefix' => $prefix, 'page' => $page, 'class' => $class));
     $optype = 'bulk';
-    $adminpage = $prefix . 'typemanage';
+    $adminpage = $class . $prefix . 'typemanage';
     $cf_data_params = array();
 }
 
@@ -102,7 +103,7 @@ $current_type_cfs = $DB->get_records($shortprefix . '_type_info_field', array('t
 $new_type_cfs = $DB->get_records($shortprefix . '_type_info_field', array('typeid' => $newtypeid), 'typeid');
 
 // Moodle form.
-$changeform = new type_change_form(null, compact('prefix', 'typeid', 'newtypeid', 'itemid', 'current_type_cfs', 'new_type_cfs', 'affected_data_count', 'page'), 'post', '', array('class' => 'hierarchy-bulk-type-form'));
+$changeform = new type_change_form(null, compact('prefix', 'typeid', 'newtypeid', 'itemid', 'current_type_cfs', 'new_type_cfs', 'affected_data_count', 'page', 'class'), 'post', '', array('class' => 'hierarchy-bulk-type-form'));
 
 // Process the form submission/cancellation.
 if ($changeform->is_cancelled()) {

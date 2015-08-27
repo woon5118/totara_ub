@@ -157,3 +157,21 @@ Feature: Behat generators for hierarchies work
     Then I should see "Position Two" in the "#region-main" "css_element"
     And I should see "Organisation Two" in the "#region-main" "css_element"
     And I should see "fn_001 ln_001" in the "#region-main" "css_element"
+
+  @javascript
+  Scenario: Verify the goal generators work
+    Given the following "goal frameworks" exist in "totara_hierarchy" plugin:
+      | fullname       | idnumber |
+      | Goal Framework | gframe   |
+    And the following "goals" exist in "totara_hierarchy" plugin:
+      | fullname | idnumber | goal_framework |
+      | Goal One | goal1    | gframe         |
+      | Goal Two | goal2    | gframe         |
+
+    When I log in as "admin"
+    And I navigate to "Manage goals" node in "Site administration > Hierarchies > Goals"
+    Then I should see "Goal Framework"
+
+    When I click on "Goal Framework" "link" in the "#frameworkstable" "css_element"
+    Then I should see "Goal One"
+    And I should see "Goal Two"

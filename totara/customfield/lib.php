@@ -98,7 +98,12 @@ function customfield_get_record_by_id($tableprefix, $id, $datatype) {
  * @return a custom field instance based on the information provided
  */
 function get_customfield_type_instace($prefix, $sitecontext, $extrainfo) {
-    $classname = 'totara_customfield\\prefix\\'. $prefix . '_type';
+    if (isset($extrainfo["class"]) && $extrainfo["class"] == 'personal') {
+        $classname = 'totara_customfield\\prefix\\'. $prefix . '_user';
+    } else {
+        $classname = 'totara_customfield\\prefix\\'. $prefix . '_type';
+    }
+
     if (!class_exists($classname)) {
         print_error('prefixtypeclassnotfound', 'totara_customfield');
     }

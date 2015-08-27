@@ -133,6 +133,9 @@ abstract class rb_base_source {
                 case '{goal}':
                     $joindata['add_custom_goal_fields'] = 'goal';
                     break;
+                case '{goal_personal}':
+                    $joindata['add_custom_personal_goal_fields'] = 'goal_personal';
+                    break;
             }
         }
         //now ensure customfields fields are added if there are no joins but the base table is customfield-related
@@ -157,6 +160,9 @@ abstract class rb_base_source {
                 break;
             case '{goal}':
                 $joindata['add_custom_goal_fields'] = 'base';
+                break;
+            case '{goal_personal}':
+                $joindata['add_custom_personal_goal_fields'] = 'base';
         }
         //and then use the flags to call the appropriate add functions
         foreach ($joindata as $joinfunction => $jointable) {
@@ -3999,6 +4005,24 @@ abstract class rb_base_source {
         return $this->add_custom_fields_for('goal_type',
                                             'goal',
                                             'goalid',
+                                            $joinlist,
+                                            $columnoptions,
+                                            $filteroptions);
+    }
+
+    /**
+     * Adds custom personal goal fields to the report
+     *
+     * @param array $joinlist
+     * @param array $columnoptions
+     * @param array $filteroptions
+     * @return boolean
+     */
+    protected function add_custom_personal_goal_fields(array &$joinlist, array &$columnoptions,
+        array &$filteroptions) {
+        return $this->add_custom_fields_for('goal_user',
+                                            'goal_personal',
+                                            'goal_userid',
                                             $joinlist,
                                             $columnoptions,
                                             $filteroptions);

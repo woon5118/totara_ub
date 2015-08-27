@@ -1360,4 +1360,201 @@ class goal extends hierarchy {
             print_error('goalsdisabled', 'totara_hierarchy');
         }
     }
+
+    /**
+     * Get types for a hierarchy.
+     *
+     * @@param array $extra_data Provide extra data to be fetched and returned
+     * @return object The found types.
+     */
+    public function get_types($extra_data=array()) {
+        global $DB;
+
+        if (!count($extra_data)) {
+            return $DB->get_records($this->shortprefix.'_type', array(), 'fullname');
+        }
+
+        $sql = "SELECT c.* ";
+
+        if (isset($extra_data['personal'])) {
+            if (isset($extra_data['custom_field_count'])) {
+                $sql .= ", (SELECT COUNT(*) FROM {goal_user_info_field} cif
+                    WHERE cif.typeid = c.id) AS custom_field_count ";
+            }
+            if (isset($extra_data['item_count'])) {
+                $sql .= ", (SELECT COUNT(*) FROM {goal_personal} ic
+                     WHERE ic.typeid = c.id) AS item_count";
+            }
+
+            $sql .= " FROM {goal_user_type} c
+                ORDER BY c.fullname";
+        } else {
+
+            if (isset($extra_data['custom_field_count'])) {
+                $sql .= ", (SELECT COUNT(*) FROM {{$this->shortprefix}_type_info_field} cif
+                    WHERE cif.typeid = c.id) AS custom_field_count ";
+            }
+            if (isset($extra_data['item_count'])) {
+                $sql .= ", (SELECT COUNT(*) FROM {{$this->shortprefix}} ic
+                     WHERE ic.typeid = c.id) AS item_count";
+            }
+            $sql .= " FROM {{$this->shortprefix}_type} c
+                  ORDER BY c.fullname";
+
+        }
+
+        return $DB->get_records_sql($sql);
+    }
+
+    /**
+     * Returns the html to print a row of the hierarchy index table
+     *
+     * @param object $record A hierarchy item record
+     * @param boolean $include_custom_fields Whether to display custom field info too (optional)
+     * @param boolean $indicate_depth Whether to indent to show the hierarchy or not (optional)
+     * @param array $cfields Array of custom fields associated with this hierarchy (optional)
+     * @param array $types Array of type information (optional)
+     * @return string HTML to display the item as a row in the hierarchy index table
+     */
+    public function display_hierarchy_item($record, $include_custom_fields=false, $indicate_depth=true, $cfields=array(), $types=array()) {
+        global $OUTPUT, $CFG;
+
+        // Never indent more than 10 levels as we only have 10 levels of CSS styles.
+        // The table format would break anyway if indented too much.
+        $itemdepth = ($indicate_depth) ? 'depth' . min(10, $record->depthlevel) : 'depth1';
+        // @todo Get based on item type or better still, don't use inline styles :-(.
+        $itemicon = $OUTPUT->pix_url('/i/item');
+        $cssclass = !$record->visible ? 'dimmed' : '';
+        $out = html_writer::start_tag('div', array('class' => 'hierarchyitem ' . $itemdepth));
+
+        if (isset($record->name)) {
+            $out .= $OUTPUT->action_link(new moodle_url('/totara/hierarchy/prefix/goal/item/view.php',
+                array('id' => $record->id)), $record->name, null, array('class' => $cssclass));
+        } else {
+            $out .= $OUTPUT->action_link(new moodle_url('/totara/hierarchy/item/view.php',
+                array('prefix' => $this->prefix, 'id' => $record->id)), format_string($record->fullname),
+                null, array('class' => $cssclass));
+        }
+
+        if ($include_custom_fields) {
+            $out .= html_writer::empty_tag('br');
+            // Print description if available.
+            if ($record->description) {
+                $record->description = file_rewrite_pluginfile_urls($record->description, 'pluginfile.php',
+                    context_system::instance()->id, 'totara_hierarchy', $this->shortprefix, $record->id);
+                $safetext = format_text($record->description, FORMAT_HTML);
+                $out .= html_writer::tag('div', html_writer::tag('strong', get_string('description') . ': ') .
+                    $safetext, array('class' => 'itemdescription ' . $cssclass));
+            }
+
+            // Display any fields unique to this type of hierarchy.
+            $out .= $this->display_additional_item_form_fields($record, $cssclass);
+
+            // Print type, unless unclassified.
+            if ($record->typeid !=0 && is_array($types) && array_key_exists($record->typeid, $types)) {
+                $out .= html_writer::tag('div', html_writer::tag('strong', get_string('type', 'totara_hierarchy') . ': ') .
+                    format_string($types[$record->typeid]->fullname), array('class' => 'itemtype' . $cssclass));
+                if (!empty($CFG->showhierarchyshortnames)) {
+                    $out .= html_writer::tag('div', html_writer::tag('strong', get_string('shortnametype', 'totara_hierarchy') . ': ') .
+                        format_string($types[$record->typeid]->shortname), array('class' => 'itemtype' . $cssclass));
+                }
+            }
+
+            $out .= $this->display_hierarchy_item_custom_field_data($record, $cfields);
+        }
+        $out .= html_writer::end_tag('div');
+        return $out;
+    }
+
+    /**
+     * Display add type button.
+     *
+     * @param int $page page number
+     * @param string $class to specify which table to delete from. PARAM_ALPHA.
+     */
+    public function display_add_type_button($page=0, $class='') {
+        global $OUTPUT;
+        $type = '';
+        $options = array('prefix' => $this->prefix, 'frameworkid' => $this->frameworkid, 'page' => $page);
+        if ($class) {
+            $type = $class . 'goal';
+            $options['class'] = $class;
+        }
+        $url = new moodle_url('/totara/hierarchy/type/edit.php?', $options);
+        echo $OUTPUT->single_button($url, get_string('add' . $type . 'type', 'totara_hierarchy'), 'get');
+    }
+
+    /**
+     * Returns all the personal goal types.
+     *
+     * @return array Personal goal types.
+     */
+    public static function get_goal_user_types() {
+        global $DB;
+        return $DB->get_records('goal_user_type');
+    }
+
+    /**
+     * Returns all the custom fields for a personal goal type.
+     *
+     * @param int $personalgoaltype Id of type to get fields for.
+     * @return array Custom fields.
+     */
+    public static function get_personal_custom_fields($personalgoaltype) {
+        global $DB;
+        return $DB->get_records('goal_user_info_field', array('typeid' => $personalgoaltype->id));
+    }
+
+    /**
+     * Gets the custom field data for each custom field.
+     *
+     * @param array $personalcustomfields all custom fields for a goal type
+     * @param object $assignment holds all custom field values
+     * @return array personal goal types
+     */
+    public static function get_custom_field_data($personalcustomfields, &$assignment) {
+        global $DB;
+
+        // Display custom field fieldname and data.
+        foreach ($personalcustomfields as $personalcustomfield) {
+            $cfitemid = 'cf_' . $personalcustomfield->id . '_itemid';
+            $cf = 'cf_' . $personalcustomfield->id;
+            $assignment->$cfitemid = 0;
+            $assignment->$cf = '';
+            if ($personalcustomfielddata = $DB->get_record('goal_user_info_data',
+                array('goal_userid' => $assignment->id, 'fieldid' => $personalcustomfield->id))) {
+
+                $assignment->$cfitemid = $personalcustomfielddata->id;
+                $assignment->$cf = $personalcustomfielddata->data;
+            }
+        }
+    }
+
+    /**
+     * Gets the values available on a scale.
+     *
+     * @param object $assignment holds all custom field values.
+     * @return array scale values.
+     */
+    public static function get_personal_scale_value(&$assignment) {
+        global $DB;
+        $options = array();
+        $values = $DB->get_records('goal_scale_values', array('scaleid' => $assignment->scaleid));
+
+        foreach ($values as $value) {
+            $options[$value->id] = format_string($value->name);
+        }
+        return $options;
+    }
+
+    /**
+     * Gets a specific scale value.
+     *
+     * @param int $scalevalueid id of value.
+     * @return array scale record.
+     */
+    public static function get_scale_value($scalevalueid) {
+        global $DB;
+        return $DB->get_field('goal_scale_values', 'name', array('id' => $scalevalueid));
+    }
 }

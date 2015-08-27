@@ -59,6 +59,8 @@ class customfield_datetime extends customfield_base {
      * Display the data for this field
      */
     static function display_item_data($data, $extradata=array()) {
+        $data = intval($data);
+
         // Check if time was specifieid with a sneaky sneaky little hack :)
         if (date('G', $data) != 0) { // 12:00 am - assume no time was saved
             $format = get_string('strftimedaydatetime', 'langconfig');

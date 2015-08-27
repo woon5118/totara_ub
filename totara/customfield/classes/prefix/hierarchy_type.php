@@ -38,7 +38,11 @@ abstract class hierarchy_type extends type_base {
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
 
         $shortprefix = \hierarchy::get_short_prefix($prefix);
-        $tableprefix = $shortprefix.'_type';
+        if ($extrainfo["class"] == 'personal') {
+            $tableprefix = $shortprefix.'_user';
+        } else {
+            $tableprefix = $shortprefix.'_type';
+        }
         parent::__construct($prefix, $tableprefix, $shortprefix, $context, $extrainfo);
     }
 

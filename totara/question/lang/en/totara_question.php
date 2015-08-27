@@ -182,6 +182,7 @@ $string['reviewobjfromplanassignmissing'] = 'This objective has been removed fro
 $string['reviewprogfromplanassignmissing'] = 'This program has been removed from the learning plan';
 $string['reviewrequiredlearningassignmissing'] = 'This program has been removed from required learning';
 $string['reviewincluderating'] = 'Include rating';
+$string['reviewincludepersonal'] = 'Include personal goal custom fields';
 $string['reviewnamewithplan'] = '{$a->fullname} ({$a->planname})';
 $string['required'] = 'User must provide answer to this question';
 $string['savechoicesas'] = 'Save these options for other questions as ';

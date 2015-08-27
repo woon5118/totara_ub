@@ -36,6 +36,7 @@ class field_form extends moodleform {
         $datasent = $this->_customdata;
 
         $prefix      = $datasent['prefix'];
+        $class       = $datasent['class'];
         $typeid      = $datasent['typeid'];
         $tableprefix = $datasent['tableprefix'];
         require_once($CFG->dirroot.'/totara/customfield/field/'.$datasent['datatype'].'/define.class.php');
@@ -53,6 +54,8 @@ class field_form extends moodleform {
         $mform->setType('datatype', PARAM_TEXT);
         $mform->addElement('hidden', 'prefix', $datasent['prefix']);
         $mform->setType('prefix', PARAM_TEXT);
+        $mform->addElement('hidden', 'class', $datasent['class']);
+        $mform->setType('class', PARAM_ALPHA);
         $mform->addElement('hidden', 'typeid', $datasent['typeid']);
         $mform->setType('typeid', PARAM_INT);
         $mform->addElement('hidden', 'tableprefix', $datasent['tableprefix']);

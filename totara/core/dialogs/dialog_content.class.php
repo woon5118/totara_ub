@@ -471,26 +471,33 @@ class totara_dialog_content {
 /**
  * Return markup for a simple picker in a dialog
  *
- * @param   $options    array   options/values
- * @param   $selected   mixed   $options key for currently selected element
- * @param   $class      string  select element's class
+ * @param   array  $options  options/values
+ * @param   mixed  $selected $options key for currently selected element
+ * @param   string $class    CSS class of element
+ * @param   array  $attrs    attributes to add into html ($class has precedence in case of conflict)
  * @return  $html
  */
-function display_dialog_selector($options, $selected, $class) {
-
-    $html = '<select class="'.$class.'">';
-
-    foreach ($options as $key => $value) {
-        $html .= '<option value="'.$key.'"';
-
-        if ($key == $selected) {
-            $html .= ' selected="selected"';
-        }
-
-        $html .= '>'.format_string($value).'</option>';
+function display_dialog_selector($options, $selected, $class, $attrs = array()) {
+    $attrs['class'] = $class;
+    $name = '';
+    if (isset($attrs['name'])) {
+        $name = $attrs['name'];
+        unset($attrs['name']);
     }
 
-    $html .= '</select>';
+    // Prepare id as it is done in html_writer::select.
+    if (!isset($attrs['id']) && $name != '') {
+            $id = 'menu' . $name;
+            $id = str_replace('[', '', $id);
+            $id = str_replace(']', '', $id);
+            $attrs['id'] = $id;
+    }
 
-    return $html;
+    $label = '';
+    if (isset($attrs['label']) && isset($attrs['id'])) {
+        $label .= html_writer::label($attrs['label'], $attrs['id'], false, array('class' => 'accesshide'));
+        unset($attrs['label']);
+    }
+
+    return  $label . html_writer::select($options, $name, $selected, array('' => 'choosedots'), $attrs);
 }

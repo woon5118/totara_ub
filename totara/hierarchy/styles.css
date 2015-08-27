@@ -168,6 +168,10 @@ div.companygoals.detailswrapper {
     display:inline;
 }
 
+div.personalgoals.detailswrapper {
+    display:inline;
+}
+
 .dir-rtl #hierarchy-bulk-actions-form > div {
     float: right;
 }

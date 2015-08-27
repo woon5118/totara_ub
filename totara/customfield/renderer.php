@@ -268,9 +268,10 @@ class totara_customfield_renderer extends plugin_renderer_base {
      * @param string $prefix
      * @param int $id
      * @param int $typeid
+     * @param string $class
      * @return array
      */
-    public function get_redirect_options($prefix, $id, $typeid) {
+    public function get_redirect_options($prefix, $id, $typeid, $class) {
         $redirectoptions = array('prefix' => $prefix);
 
         if ($typeid) {
@@ -279,6 +280,10 @@ class totara_customfield_renderer extends plugin_renderer_base {
 
         if ($id) {
             $redirectoptions['id'] = $id;
+        }
+
+        if ($class) {
+            $redirectoptions['class'] = $class;
         }
 
         return $redirectoptions;
@@ -353,8 +358,11 @@ class totara_customfield_renderer extends plugin_renderer_base {
      * @param string $heading Heading to be displayed.
      * @param $tabs (optional) Tabs to be displayed.
      * @param array $elements (optional) Aditional form fields for the customfield.
+     * @param string $class
      */
-    public function customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs, $elements = array()) {
+    public function customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field,
+        $redirect, $heading, $tabs, $elements = array(), $class = '') {
+
         global $CFG, $TEXTAREA_OPTIONS;
         require_once($CFG->dirroot . '/totara/customfield/index_field_form.php');
 
@@ -368,7 +376,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
         }
 
         $datatosend = array('datatype' => $datatype,
-            'prefix' => $prefix, 'typeid' => $typeid, 'tableprefix' => $tableprefix, 'additionalelements' => $elements);
+            'prefix' => $prefix, 'typeid' => $typeid, 'tableprefix' => $tableprefix, 'additionalelements' => $elements, 'class' => $class);
         $fieldform = new \field_form(null, $datatosend);
         $fieldform->set_data($field);
 

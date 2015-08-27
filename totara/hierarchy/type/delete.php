@@ -39,19 +39,29 @@ $id     = required_param('id', PARAM_INT);
 $prefix = required_param('prefix', PARAM_ALPHA);
 // Delete confirmation hash
 $delete = optional_param('delete', '', PARAM_ALPHANUM);
+$class  = optional_param('class', '', PARAM_ALPHA);
 
 hierarchy::check_enable_hierarchy($prefix);
 
 $hierarchy = hierarchy::load_hierarchy($prefix);
 
 // Setup page and check permissions
-admin_externalpage_setup($prefix.'typemanage');
+if ($prefix == "goal") {
+    admin_externalpage_setup($class . $prefix.'typemanage');
+} else {
+    admin_externalpage_setup($prefix.'typemanage');
+}
 
 require_capability('totara/hierarchy:delete'.$prefix.'type', $sitecontext);
 
-$type = $hierarchy->get_type_by_id($id);
+$typetable = false;
+if ($class == 'personal') {
+    $typetable = true;
+}
 
-$back_url = "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=$prefix";
+$type = $hierarchy->get_type_by_id($id, $typetable);
+
+$back_url = "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=$prefix&class=$class";
 
 ///
 /// Display page
@@ -68,7 +78,9 @@ if (!$delete) {
     } else {
         $strdelete = get_string('deletechecktype', 'totara_hierarchy');
     }
-    echo $OUTPUT->confirm($strdelete . html_writer::empty_tag('br') . html_writer::empty_tag('br'), "{$CFG->wwwroot}/totara/hierarchy/type/delete.php?prefix=$prefix&amp;id={$type->id}&amp;delete=".md5($type->timemodified)."&amp;sesskey={$USER->sesskey}", $back_url);
+    echo $OUTPUT->confirm($strdelete . html_writer::empty_tag('br') . html_writer::empty_tag('br'),
+        "{$CFG->wwwroot}/totara/hierarchy/type/delete.php?prefix={$prefix}&amp;id={$type->id}&amp;delete=".
+        md5($type->timemodified)."&amp;sesskey={$USER->sesskey}&amp;class={$class}", $back_url);
 
     echo $OUTPUT->footer();
     exit;
@@ -87,13 +99,15 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-$deleteresult = $hierarchy->delete_type($type->id);
+$deleteresult = $hierarchy->delete_type($type->id, $class);
 
 if ($deleteresult === true) {
     $eventclass = "\\hierarchy_{$prefix}\\event\\type_deleted";
     $eventclass::create_from_instance($type)->trigger();
 
-    totara_set_notification(get_string($prefix.'deletedtype', 'totara_hierarchy', $type->fullname), "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=$prefix", array('class' => 'notifysuccess'));
+    totara_set_notification(get_string($prefix.'deletedtype', 'totara_hierarchy', $type->fullname),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix={$prefix}&class={$class}", array('class' => 'notifysuccess'));
 } else {
-    totara_set_notification(get_string($prefix.'error:deletedtype', 'totara_hierarchy', $type->fullname), "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=$prefix");
+    totara_set_notification(get_string($prefix.'error:deletedtype', 'totara_hierarchy', $type->fullname),
+        "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix={$prefix}&class={$class}");
 }

@@ -690,9 +690,11 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      *
      * @param int $user         The id of the user whos page we are viewing
      * @param bool $can_edit    Whether or not the person viewing the page can edit it
+     * @param bool $display     Whether or not the personal goals will show additional details
      */
-    public function mygoals_personal_table($userid, $can_edit) {
-        global $DB, $CFG;
+    public function mygoals_personal_table($userid, $can_edit, $display = false) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
         $out = '';
 
@@ -701,7 +703,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         $bgdarker = 'mygoals_darker';
 
         // Set up the personal goal data.
-        $goalpersonals = goal::get_goal_items(array('userid' => $userid), goal::SCOPE_PERSONAL);
+        $assignments = goal::get_goal_items(array('userid' => $userid), goal::SCOPE_PERSONAL);
         $personal_table = new html_table();
         $personal_table->head = array(
             get_string('goaltable:name', 'totara_hierarchy'),
@@ -711,17 +713,31 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
             get_string('edit')
         );
 
-        // Add any personal goals the user has assigned to the table.
-        foreach ($goalpersonals as $goalpersonal) {
+        $personalgoaltypes = goal::get_goal_user_types();
 
-            if ($can_edit[$goalpersonal->assigntype]) {
+        // Add any personal goals the user has assigned to the table.
+        foreach ($assignments as $goalid => $assignment) {
+            $assignment->fullname = $assignment->name;
+            $assignment->altprefix = 'goal_user';
+            $personalgoaltype = null;
+            if ($assignment->typeid) {
+                $personalgoaltype = $personalgoaltypes[$assignment->typeid];
+            }
+
+            $personalcustomfields = array();
+            if ($personalgoaltype) {
+                $personalcustomfields = goal::get_personal_custom_fields($personalgoaltype);
+                goal::get_custom_field_data($personalcustomfields, $assignment);
+            }
+
+            if ($can_edit) {
                 // Set up the edit and delete icons.
                 $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php',
-                        array('userid' => $goalpersonal->userid, 'goalpersonalid' => $goalpersonal->id));
+                        array('userid' => $userid, 'id' => $goalid));
                 $edit_str = get_string('edit');
                 $edit_button = $this->output->action_icon($edit_url, new pix_icon('t/edit', $edit_str));
                 $delete_url = new moodle_url('/totara/hierarchy/prefix/goal/item/delete.php',
-                        array('goalpersonalid' => $goalpersonal->id, 'userid' => $goalpersonal->userid));
+                        array('goalpersonalid' => $goalid, 'userid' => $userid));
                 $delete_str = get_string('delete');
                 $delete_button = $this->output->action_icon($delete_url, new pix_icon('t/delete', $delete_str));
             } else {
@@ -732,29 +748,29 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                         get_string('error:deletegoalassignment', 'totara_hierarchy'), 'moodle', array('class' => 'iconsmall action-icon'));
             }
 
-            $duedate = !empty($goalpersonal->targetdate) ? userdate($goalpersonal->targetdate,
-                    get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false) : '';
-            $assign = goal::get_assignment_string(goal::SCOPE_PERSONAL, $goalpersonal);
-            $nameurl = new moodle_url('/totara/hierarchy/prefix/goal/item/view.php', array('goalpersonalid' => $goalpersonal->id));
-            $namelink = html_writer::link($nameurl, format_string($goalpersonal->name));
+            $duedate = '';
+            if (!empty($assignment->targetdate)) {
+                $duedate = userdate($assignment->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'),
+                    $CFG->timezone, false);
+            }
+
+            $assign = goal::get_assignment_string(goal::SCOPE_PERSONAL, $assignment);
+            $nameurl = new moodle_url('/totara/hierarchy/prefix/goal/item/view.php', array('id' => $goalid));
+            $namelink = html_writer::link($nameurl, format_string($assignment->name));
 
             // Set up the scale value selector.
-            if (!empty($goalpersonal->scaleid)) {
-                if ($can_edit[$goalpersonal->assigntype]) {
-                    $values = $DB->get_records('goal_scale_values', array('scaleid' => $goalpersonal->scaleid));
-                    $options = array();
-                    foreach ($values as $value) {
-                        $options[$value->id] = format_string($value->name);
-                    }
+            if (!empty($assignment->scaleid)) {
+                if ($can_edit[$assignment->assigntype]) {
+                    $options =  goal::get_personal_scale_value($assignment);
 
                     $attributes = array(
                         'class' => 'personal_scalevalue_selector',
-                        'itemid' => $goalpersonal->id,
+                        'itemid' => $goalid,
                         'onChange' => "\$.get(".
                             "'{$CFG->wwwroot}/totara/hierarchy/prefix/goal/update-scalevalue.php" .
                             "?scope=" . goal::SCOPE_PERSONAL .
                             "&sesskey=" . sesskey() .
-                            "&goalitemid={$goalpersonal->id}" .
+                            "&goalitemid={$assignment->id}" .
                             "&userid={$userid}" .
                             "&scalevalueid=' + $(this).val()" .
                             ");"
@@ -772,24 +788,32 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     $scalevalue .= html_writer::empty_tag('input',
                             array('type' => 'hidden', 'name' => "userid", 'value' => $userid));
                     $scalevalue .= html_writer::empty_tag('input',
-                            array('type' => 'hidden', 'name' => "goalitemid", 'value' => $goalpersonal->id));
+                            array('type' => 'hidden', 'name' => "goalitemid", 'value' => $assignment->id));
                     $scalevalue .= html_writer::empty_tag('input',
                             array('type' => 'hidden', 'name' => "sesskey", 'value' => sesskey()));
                     $scalevalue .= html_writer::select($options, 'scalevalueid',
-                            $goalpersonal->scalevalueid, false, $attributes);
+                            $assignment->scalevalueid, false, $attributes);
                     $scalevalue .= html_writer::start_tag('noscript');
                     $scalevalue .= html_writer::empty_tag('input',
-                            array('type' => 'submit', 'id' => "update-{$goalpersonal->id}", 'value' => $update_text));
+                            array('type' => 'submit', 'id' => "update-{$assignment->id}", 'value' => $update_text));
                     $scalevalue .= html_writer::end_tag('noscript');
                     $scalevalue .= html_writer::end_tag('form');
                 } else {
-                    $scalevalue = $DB->get_field('goal_scale_values', 'name', array('id' => $goalpersonal->scalevalueid));
+                    $scalevalue = goal::get_scale_value($assignment->scalevalueid);
                 }
             } else {
                 $scalevalue = '';
             }
 
             $cells = array();
+
+            if ($display) {
+                $assignment->description = '';
+                $assignment->targetdate = '';
+                $hierarchy = hierarchy::load_hierarchy('goal');
+                $namelink = $hierarchy->display_hierarchy_item($assignment, true, false, $personalcustomfields, $personalgoaltypes);
+            }
+
             $cells['name'] = new html_table_cell($namelink);
             $cells['due'] = new html_table_cell($duedate);
             $cells['status'] = new html_table_cell($scalevalue);

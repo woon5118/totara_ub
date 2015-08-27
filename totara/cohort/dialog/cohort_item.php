@@ -57,7 +57,7 @@ if ((!has_capability('moodle/cohort:view', $context)) && (!has_capability('moodl
 $PAGE->set_context($context);
 $PAGE->set_url('/totara/cohort/dialog/cohort_item.php');
 
-$ccohort = new totara_cohort_course_cohorts();
+$ccohort = new totara_cohort_goal_cohorts();
 
 $items = array();
 $rows = array();

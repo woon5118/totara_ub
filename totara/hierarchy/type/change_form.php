@@ -41,6 +41,7 @@ class type_change_form extends moodleform {
         $new_type_cfs   = $this->_customdata['new_type_cfs'];
         $affected_data_count = $this->_customdata['affected_data_count'];
         $page  = $this->_customdata['page'];
+        $class = $this->_customdata['class'];
 
         /// Add some extra hidden fields
         $mform->addElement('hidden', 'typeid', $typeid);
@@ -53,6 +54,8 @@ class type_change_form extends moodleform {
         $mform->setType('prefix', PARAM_ALPHA);
         $mform->addElement('hidden', 'page', $page);
         $mform->setType('page', PARAM_INT);
+        $mform->addElement('hidden', 'class', $class);
+        $mform->setType('class', PARAM_ALPHA);
 
         if (!$current_type_cfs || $affected_data_count == false) {
             // old type has no custom fields

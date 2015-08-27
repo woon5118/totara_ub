@@ -103,6 +103,9 @@ class customfield_file extends customfield_base {
         if (!isset($extradata['prefix']) || empty($extradata['prefix'])) {
             return $data;
         }
+        if (isset($extradata['altprefix']) && $extradata['altprefix']) {
+            $extradata['prefix'] = $extradata['altprefix'];
+        }
         if (!isset($extradata['isexport'])) {
             $extradata['isexport'] = false;
         }

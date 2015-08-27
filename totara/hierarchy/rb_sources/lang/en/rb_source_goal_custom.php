@@ -17,14 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Ryan Lafferty <ryanl@learningpool.com>
  * @package totara
- * @subpackage totara_appraisal
+ * @subpackage totara_hierarchy
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2015092100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051205;       // Requires this Moodle version.
-$plugin->component = 'totara_appraisal';   // To check on upgrade, that module sits in correct place.
+$string['allcompanygoalcustomfields'] = 'All company goal custom fields';
+$string['allpersonalgoalcustomfields'] = 'All personal goal custom fields';
+$string['company'] = 'Company';
+$string['goalname'] = 'Goal Name';
+$string['no'] = 'No';
+$string['notype'] = 'No Type';
+$string['personal'] = 'Personal';
+$string['personalcompany'] = 'Personal or Company';
+$string['sourcetitle'] = 'Goal Custom Fields';
+$string['type_goal'] = 'Goals';
+$string['type_goal_type'] = 'Company Goal Type';
+$string['type_goal_user'] = 'Personal Goal Type';
+$string['typename'] = 'Goal Type';
+$string['yes'] = 'Yes';

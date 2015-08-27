@@ -118,6 +118,25 @@ class behat_totara_data_generators extends behat_base {
                     'manager' => 'managerid',
                 ),
             ),
+            'goals' => array(
+                'datagenerator' => 'goal',
+                'required' => array('fullname', 'idnumber', 'goal_framework'),
+                'switchids' => array(
+                    'goal_framework' => 'frameworkid',
+                ),
+            ),
+            'goal frameworks' => array(
+                'datagenerator' => 'goal_frame',
+                'required' => array('idnumber'),
+            ),
+            'goal assignments' => array(
+                'datagenerator' => 'goal_assign',
+                'required' => array('user', 'goal'),
+                'switchids' => array(
+                    'user' => 'userid',
+                    'goal' => 'goalid',
+                ),
+            ),
         ),
         'totara_plan' => array (
             'plans' => array(
@@ -280,5 +299,15 @@ class behat_totara_data_generators extends behat_base {
     public function get_position_id($idnumber) {
         global $DB;
         return $DB->get_field('pos', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_goal_framework_id($idnumber) {
+        global $DB;
+        return $DB->get_field('goal_framework', 'id', array('idnumber' => $idnumber));
+    }
+
+    public function get_goal_id($idnumber) {
+        global $DB;
+        return $DB->get_field('goal', 'id', array('idnumber' => $idnumber));
     }
 }

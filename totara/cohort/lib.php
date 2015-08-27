@@ -1425,6 +1425,25 @@ function totara_cohort_get_course_cohorts($courseid, $type=null, $fields='c.*') 
 }
 
 /**
+ * Get cohorts associated with a certain personal goal type
+ *
+ * @param int $goaltypeid goal type id
+ * @param string $fields fields to return
+ * @return object cohort database table records
+ */
+function totara_cohort_get_goal_type_cohorts($goaltypeid, $fields = 'c.*') {
+    global $DB;
+
+    $sql = "SELECT {$fields}
+        FROM {goal_user_type_cohort} g
+        JOIN {cohort} c ON g.cohortid = c.id
+        WHERE g.goalid = ?";
+    $sqlparams = array($goaltypeid);
+
+    return $DB->get_records_sql($sql, $sqlparams);
+}
+
+/**
  * Get course/programs associated with a certain cohort's visibility settings.
  *
  * @param int $instanceid Course or Program id
@@ -2010,6 +2029,159 @@ class totara_cohort_course_cohorts
         $table = new html_table();
         $table->attributes = array('class' => 'generaltable');
         $table->id = 'course-cohorts-table-' . $type;
+        $table->head = $this->headers;
+
+        if (!empty($this->data)) {
+            $table->data = $this->data;
+        }
+
+        $html .= html_writer::table($table);
+        $html .= '</fieldset></div></div>';
+
+        if ($return) {
+            return $html;
+        }
+        echo $html;
+    }
+}
+
+/**
+ * Class totara_cohort_goal_cohorts
+ */
+class totara_cohort_goal_cohorts {
+
+    /**
+     * @var array
+     */
+    public $headers = array();
+
+    /**
+     * @var array
+     */
+    public $data = array();
+
+    /**
+     * Creates the table to display assigned audiences.
+     *
+     * @param int $goaltypeid id of goaltype
+     */
+    public function build_table($goaltypeid) {
+        $this->headers = array(
+            get_string('cohortname', 'totara_cohort'),
+            get_string('type', 'totara_cohort'),
+            get_string('numlearners', 'totara_cohort')
+        );
+
+        // Gets the assignments.
+        $items = totara_cohort_get_goal_type_cohorts($goaltypeid, 'c.id, c.name AS fullname, c.cohorttype');
+
+        // Convert these into html.
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $this->data[] = $this->build_row($item);
+            }
+        }
+    }
+
+    /**
+     * Creates each row for the table.
+     *
+     * @param obj $item the personal goal type object
+     * @param bool $readonly enables deleting rows
+     * @return string html
+     */
+    public function build_row($item, $readonly = false) {
+        global $OUTPUT;
+
+        // If its not an object it must be an id. Treat it as such.
+        if (!is_object($item)) {
+            $item = $this->get_item((int)$item);
+        }
+
+        $cohorttypes = cohort::getCohortTypes();
+        $cohortstring = $cohorttypes[$item->cohorttype];
+
+        $row = array();
+        $delete = '';
+        if (!$readonly) {
+            $delete = '&nbsp;' . html_writer::link('#', $OUTPUT->pix_icon('t/delete', get_string('delete')),
+                      array('title' => get_string('delete'), 'class'=>'goalcohortdeletelink'));
+        }
+        $row[] = html_writer::start_tag('div', array('id' => 'cohort-item-'.$item->id, 'class' => 'item')) .
+                 format_string($item->fullname) . $delete . html_writer::end_tag('div');
+
+        $row[] = $cohortstring;
+        $row[] = $this->user_affected_count($item);
+
+        return $row;
+    }
+
+    /**
+     * Gets goal type from id
+     *
+     * @param int $itemid goal type id
+     * @return stdClass Goal type from the database.
+     */
+    public function get_item($itemid) {
+        global $DB;
+        return $DB->get_record('cohort', array('id' => $itemid), 'id, name as fullname, cohorttype', '*', MUST_EXIST);
+    }
+
+    /**
+     * Gets count of users
+     *
+     * @param stdClass $item goal type
+     * @return int count
+     */
+    public function user_affected_count($item) {
+        return $this->get_affected_users($item, 0, true);
+    }
+
+    /**
+     * Gets count of users
+     *
+     * @param obj $item goal type
+     * @param int $userid user id
+     * @param bool $count return count or rows
+     * @return mixed count (integer) or rows (object)
+     */
+    public function get_affected_users($item, $userid = 0, $count = false) {
+        global $DB;
+        $select = $count ? 'COUNT(u.id)' : 'u.id';
+        $params = array();
+        $sql = "SELECT $select
+                FROM {cohort_members} cm
+                INNER JOIN {user} u ON cm.userid=u.id
+                WHERE cm.cohortid = ?
+                AND u.deleted=0";
+        $params[] = $item->id;
+        if ($userid) {
+            $sql .= " AND u.id = ?";
+            $params[] = $userid;
+        }
+
+        if ($count) {
+            return (int)$DB->count_records_sql($sql, $params);
+        } else {
+            return $DB->get_records_sql($sql);
+        }
+    }
+
+    /**
+     * Display the table
+     *
+     * @param bool $return If true, return the html rather than display it.
+     * @param string $type Type of the table
+     * @return string html
+     */
+    public function display($return = false, $type = 'enrolled') {
+        $html = '<div id="goal-cohort-assignments">
+            <div id="assignment_categories">
+            <fieldset class="cohorts">';
+
+        $table = new html_table();
+        $table->attributes = array('class' => 'generaltable');
+        $table->id = 'goal-cohorts-table-' . $type;
         $table->head = $this->headers;
 
         if (!empty($this->data)) {

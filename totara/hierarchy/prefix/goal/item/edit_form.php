@@ -59,7 +59,7 @@ class goal_edit_personal_form extends moodleform {
 
     // Define the form.
     public function definition() {
-        global $DB, $TEXTAREA_OPTIONS;
+        global $DB, $TEXTAREA_OPTIONS, $USER;
 
         // Javascript include.
         local_js(array(
@@ -67,14 +67,17 @@ class goal_edit_personal_form extends moodleform {
             TOTARA_JS_UI,
             TOTARA_JS_ICON_PREVIEW
         ));
-
         $mform =& $this->_form;
+        $userid = $this->_customdata['userid'];
+        $id = $this->_customdata['id'];
 
         // Add some extra hidden fields.
-        $mform->addElement('hidden', 'goalpersonalid');
-        $mform->setType('goalpersonalid', PARAM_INT);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'userid');
         $mform->setType('userid', PARAM_INT);
+        $mform->setDefault('userid', $userid);
+        $mform->setDefault('id', $id);
 
         // Name.
         $mform->addElement('text', 'name', get_string('name'), 'maxlength="1024" size="50"');
@@ -86,6 +89,57 @@ class goal_edit_personal_form extends moodleform {
                 null, $TEXTAREA_OPTIONS);
         $mform->addHelpButton('description_editor', 'goaldescription', 'totara_hierarchy');
         $mform->setType('description_editor', PARAM_CLEANHTML);
+
+        // Get the list of goal types.
+        $goals = $DB->get_records('goal_user_type');
+
+        // If goal types available display the dropdown list.
+        $prefix = 'goal';
+        $item = $this->_customdata['item'];
+
+        hierarchy::check_enable_hierarchy($prefix);
+        $hierarchy  = hierarchy::load_hierarchy($prefix);
+        $typetable  = 'goal_user_type';
+        $types      = $hierarchy->get_types(array('personal' => 1));
+        $type       = $hierarchy->get_type_by_id($item->typeid, $typetable);
+
+        $typename   = ($type) ? $type->fullname : get_string('unclassified', 'totara_hierarchy');
+
+        if ($item->id) {
+            // Display current type (static).
+            $mform->addElement('static', 'type', get_string('type', 'totara_hierarchy'));
+            $mform->setDefault('type', $typename);
+            $mform->addHelpButton('type', $prefix.'type', 'totara_hierarchy');
+
+            // Store the actual type ID.
+            $mform->addElement('hidden', 'typeid', $item->typeid);
+            $mform->setType('typeid', PARAM_INT);
+        } else {
+            if ($types) {
+                // Show type picker if there are choices.
+                $select = array('0' => get_string('unclassified', 'totara_hierarchy'));
+                $usercohorts = $DB->get_fieldset_select('cohort_members', 'cohortid', 'userid = ?', array($userid));
+                foreach ($types as $type) {
+                    if ($type->audience == 0) {
+                        $select[$type->id] = $type->fullname;
+                    } else {
+                        $typecohorts = $DB->get_fieldset_select('goal_user_type_cohort',
+                            'cohortid', 'goalid = ?', array($type->id));
+                        if (count(array_intersect($typecohorts, $usercohorts)) > 0) {
+                            $select[$type->id] = $type->fullname;
+                        }
+                    }
+                }
+                $mform->addElement('select', 'typeid', get_string('type', 'totara_hierarchy'),
+                    $select, totara_select_width_limiter());
+                $mform->addHelpButton('typeid', $prefix.'type', 'totara_hierarchy');
+            } else {
+                // No types exist.
+                // Default to 'unclassified'.
+                $mform->addElement('hidden', 'typeid', '0');
+                $mform->setType('typeid', PARAM_INT);
+            }
+        }
 
         // Scale.
         $scales = $DB->get_records('goal_scale', array());
@@ -100,6 +154,11 @@ class goal_edit_personal_form extends moodleform {
         $mform->addElement('date_selector', 'targetdate', get_string('goaltargetdate', 'totara_hierarchy'), array('optional' => true));
         $mform->addHelpButton('targetdate', 'goaltargetdate', 'totara_hierarchy');
         $mform->setType('targetdate', PARAM_INT);
+
+        // Add the custom fields.
+        if ($item->id) {
+            customfield_definition($mform, $item, 'goal_user', $item->typeid, 'goal_user');
+        }
 
         $this->add_action_buttons();
     }
@@ -120,6 +179,21 @@ class goal_edit_personal_form extends moodleform {
         parent::set_data($data);
     }
 
+    /**
+     * Add the any custom fields to the form.
+     */
+    public function definition_after_data() {
+        global $DB;
+
+        $mform =& $this->_form;
+        $itemid = $mform->getElementValue('id');
+        $prefix = 'goal_user';
+
+        if ($item = $DB->get_record('goal_personal', array('id' => $itemid))) {
+            customfield_definition_after_data($mform, $item, $prefix, $item->typeid, $prefix);
+        }
+    }
+
     public function validation($fromform, $files) {
         global $DB;
         $errors = array();
@@ -138,6 +212,11 @@ class goal_edit_personal_form extends moodleform {
         // Check target date is in the future.
         if (!empty($fromform->targetdate) && $fromform->targetdate < time()) {
             $errors['targetdate'] = get_string('error:invaliddatepast', 'totara_hierarchy');
+        }
+
+        if ($fromform->id) {
+            // Check custom fields.
+            $errors = array_merge($errors, customfield_validation($fromform, 'goal_user', 'goal_user'));
         }
 
         return $errors;

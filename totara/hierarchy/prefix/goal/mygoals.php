@@ -25,13 +25,25 @@
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 require_once($CFG->dirroot.'/totara/core/js/lib/setup.php');
+require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 
 // Check if Goals are enabled.
 goal::check_feature_enabled();
 
-$userid     = optional_param('userid', $USER->id, PARAM_INT);  // Show goals of this user.
-$edit       = optional_param('edit', -1, PARAM_BOOL);    // Turn editing on and off.
-$display    = optional_param('display', false, PARAM_BOOL); // Determines whether or not to show the goal details in the table.
+$userid             = optional_param('userid', $USER->id, PARAM_INT);  // Show goals of this user.
+$edit               = optional_param('edit', -1, PARAM_BOOL);    // Turn editing on and off.
+$display            = optional_param('display', false, PARAM_BOOL); // Determines whether or not to show the goal details in the table.
+$personaldisplay    = optional_param('personaldisplay', false, PARAM_BOOL);
+$format             = optional_param('format', '', PARAM_TEXT); // Export format.
+$sid                = optional_param('sid', '0', PARAM_INT);
+
+$pageparams = array(
+    'userid' => $userid
+);
+
+$data = array(
+    'userid' => $userid,
+);
 
 require_login();
 
@@ -49,6 +61,22 @@ extract($permissions);
 $PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
+
+/* Define the "Custom Goals" embedded report */
+$shortname = 'goal_custom_fields';
+if (!$report = reportbuilder_get_embedded_report($shortname, $data, false, $sid)) {
+    print_error('error:couldnotgenerateembeddedreport', 'totara_reportbuilder');
+}
+
+if ($format != '') {
+    $report->export_data($format);
+    die;
+}
+
+\totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
+
+$report->include_js();
+/* End of defining the report */
 
 if (totara_is_manager($userid)) {
     $username = fullname($DB->get_record('user', array('id' => $userid)));
@@ -68,7 +96,6 @@ $PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
 
-
 if (!($can_view_company || $can_view_personal)) {
     // If you can't see any goals you shouldn't be on this page.
     print_error('error:viewusergoals', 'totara_hierarchy');
@@ -83,6 +110,7 @@ local_js(array(
 $showhide_params = array('userid' => $userid, 'display' => !$display);
 $showhide_url = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php', $showhide_params);
 $showhide_text = $display ? get_string('hidedetails', 'totara_hierarchy') : get_string('showdetails', 'totara_hierarchy');
+$personalshowhide_text = $personaldisplay ? get_string('hidedetails', 'totara_hierarchy') : get_string('showdetails', 'totara_hierarchy');
 
 $args = array('args'=>'{"id":"'.$userid.'",
                         "showhide_url":"'.$showhide_url->out().'",
@@ -155,9 +183,11 @@ if ($can_view_company) {
         $company_edit .= html_writer::empty_tag('input',
                 array('type' => 'submit', 'id' => "showhide-goal-details", 'value' => $showhide_text));
         $company_edit .= html_writer::empty_tag('input',
-                array('type' => 'hidden', 'name' => "id", 'value' => $userid));
+                array('type' => 'hidden', 'name' => "userid", 'value' => $userid));
         $company_edit .= html_writer::empty_tag('input',
                 array('type' => 'hidden', 'name' => "display", 'value' => !$display));
+        $company_edit .= html_writer::empty_tag('input',
+                array('type' => 'hidden', 'name' => "personaldisplay", 'value' => $personaldisplay));
         $company_edit .= html_writer::end_tag('div');
         $company_edit .= html_writer::end_tag('form');
         $company_edit .= html_writer::end_tag('div');
@@ -193,6 +223,30 @@ if ($can_view_personal) {
         // Set up the personal goal data.
         $personal_edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', array('userid' => $userid));
         $personal_edit = $OUTPUT->single_button($personal_edit_url, get_string('addgoalpersonal', 'totara_hierarchy'), 'get');
+
+        $personal_edit .= html_writer::start_tag('div', array('class' => 'personalgoals detailswrapper'));
+        if ($DB->record_exists('goal_personal', array('userid' => $userid))) {
+            // Show details button.
+
+            $personal_edit .= html_writer::start_tag('div',
+                    array('class' => 'singlebutton'));
+            $personal_edit .= html_writer::start_tag('form',
+                    array('action' => $showhide_url, 'method' => 'get'));
+            $personal_edit .= html_writer::start_tag('div');
+            $personal_edit .= html_writer::empty_tag('input',
+                    array('type' => 'submit', 'id' => "showhide-personalgoal-details", 'value' => $personalshowhide_text));
+            $personal_edit .= html_writer::empty_tag('input',
+                    array('type' => 'hidden', 'name' => "userid", 'value' => $userid));
+            $personal_edit .= html_writer::empty_tag('input',
+                    array('type' => 'hidden', 'name' => "display", 'value' => $display));
+            $personal_edit .= html_writer::empty_tag('input',
+                    array('type' => 'hidden', 'name' => "personaldisplay", 'value' => !$personaldisplay));
+            $personal_edit .= html_writer::end_tag('div');
+            $personal_edit .= html_writer::end_tag('form');
+            $personal_edit .= html_writer::end_tag('div');
+        }
+         $personal_edit .= html_writer::end_tag('div');
+
     } else {
         $personal_edit = '';
     }
@@ -200,14 +254,16 @@ if ($can_view_personal) {
     // Set up title and add goals button.
     $personal .= html_writer::start_tag('div', array('id' => 'personalgoals'));
     $personal .= $OUTPUT->heading(get_string('personalgoals', 'totara_hierarchy'), 3);
-    $personal .= html_writer::start_tag('div', array('id' => 'singlebutton'));
+    $personal .= html_writer::start_tag('div', array('class' => 'buttons'));
     $personal .= $personal_edit;
     $personal .= html_writer::end_tag('div');
 
     // Set up table.
-    $personal .= $renderer->mygoals_personal_table($userid, $can_edit);
+    $personal .= $renderer->mygoals_personal_table($userid, $can_edit, $personaldisplay);
     $personal .= html_writer::end_tag('div');
 }
+
+$reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
 
 // Output everything.
 echo $OUTPUT->header();
@@ -215,4 +271,5 @@ echo $header;
 echo $company;
 echo $spacing;
 echo $personal;
+$reportrenderer->export_select($report, $sid);
 echo $OUTPUT->footer();

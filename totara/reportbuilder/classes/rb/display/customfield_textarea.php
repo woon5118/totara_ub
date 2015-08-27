@@ -43,7 +43,7 @@ class customfield_textarea extends base {
 
         // Hierarchy custom fields are stored in the FileAPI fileareas using the longform of the prefix
         // extract prefix from field name.
-        $pattern = '/(?P<prefix>(.*?))_custom_field_(\d+)$/';
+        $pattern = '/(?P<prefix>(.*?))(_all)?_custom_field_(\d+)$/';
         $matches = array();
         preg_match($pattern, $field, $matches);
         if (!empty($matches)) {
@@ -60,6 +60,9 @@ class customfield_textarea extends base {
                     break;
                 case 'goal_type':
                     $prefix = 'goal';
+                    break;
+                case 'goal_user':
+                    $prefix = 'goal_user';
                     break;
                 case 'course':
                     $prefix = 'course';

@@ -497,4 +497,31 @@ class question_goals extends reviewrating {
         }
     }
 
+    /**
+     * Add the custom fields to the personal goal and load the dara.abstract
+     *
+     * @param MoodleQuickForm $form The form to add the fields and data to.
+     * @param object $item The goal item to add the fields to.
+     */
+    protected function add_personal_info_fields(MoodleQuickForm $form, $item) {
+        global $DB;
+
+        if ($item->scope == 1) {
+            $disableheader = true;
+            $prefix = 'goal';
+            $fields = 'typeid';
+
+            $goalitem = goal::get_goal_item(array('id' => $item->itemid), $item->scope);
+
+            customfield_definition($form, $goalitem, 'goal_user', $goalitem->typeid, 'goal_user', $disableheader);
+
+            customfield_load_data($goalitem, 'goal_user', 'goal_user');
+
+            foreach ($goalitem as $name => $value) {
+                if (substr_count($name, 'customfield_') > 0) {
+                    $form->setDefault($name, $value);
+                }
+            }
+        }
+    }
 }

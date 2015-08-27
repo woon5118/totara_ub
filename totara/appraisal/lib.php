@@ -5170,7 +5170,7 @@ function totara_appraisal_install_example_appraisal() {
                 $quest->sortorder = $sort;
                 $quest->datatype = $questinfo[$stagenum][$pagenum][$questnum]['datatype'];
                 $quest->defaultdata = '';
-                foreach (range(1, 5) as $paramnum) {
+                foreach (range(1, 6) as $paramnum) {
                     $paramname = "param{$paramnum}";
                     if (isset($questinfo[$stagenum][$pagenum][$questnum][$paramname])) {
                         $quest->$paramname = $questinfo[$stagenum][$pagenum][$questnum][$paramname];

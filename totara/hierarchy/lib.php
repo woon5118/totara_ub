@@ -298,11 +298,17 @@ class hierarchy {
 
     /**
      * Get type by id
-     * @return object|array
+     * @param int $id type's id
+     * @param boolean $usertype optional - specifying if table to be used is for users
+     * @return stdClass
      */
-    function get_type_by_id($id) {
+    public function get_type_by_id($id, $usertype = false) {
         global $DB;
-        return $DB->get_record($this->shortprefix.'_type', array('id' => $id));
+        if ($usertype) {
+            return $DB->get_record($this->shortprefix.'_user_type', array('id' => $id));
+        } else {
+            return $DB->get_record($this->shortprefix.'_type', array('id' => $id));
+        }
     }
 
     /**
@@ -852,15 +858,17 @@ class hierarchy {
 
     /**
      * Display add type button
+     *
+     * @param int $page page number
+     * @param string $class to specify which table to delete from. PARAM_ALPHA.
      * @return boolean success
      */
-    function display_add_type_button($page=0) {
+    public function display_add_type_button($page=0, $class='') {
         global $OUTPUT;
         $options = array('prefix' => $this->prefix, 'frameworkid' => $this->frameworkid, 'page' => $page);
         $url = new moodle_url('/totara/hierarchy/type/edit.php', $options);
         echo $OUTPUT->single_button($url, get_string('addtype', 'totara_hierarchy'), 'get');
     }
-
 
     /**
      * Swap the order of two items
@@ -1133,25 +1141,32 @@ class hierarchy {
      * Delete a type.
      *
      * @param int $id id of type to delete
+     * @param string $class to specify which table to delete from
      * @return mixed Boolean true if successful, false otherwise
      */
-    function delete_type($id) {
+    public function delete_type($id, $class = '') {
         global $DB;
+        $type = '';
+        $tablepostfix = '';
+        if ($class == 'personal') {
+            $tablepostfix = '_personal';
+            $type = '_user';
+        }
 
         $transaction = $DB->start_delegated_transaction();
 
         // remove any custom fields data
-        if (!$this->delete_type_metadata($id)) {
+        if (!$this->delete_type_metadata($id, $class)) {
             return false;
         }
         // unassign this type from all items (set to unclassified)
-        $sql = "UPDATE {{$this->shortprefix}}
+        $sql = "UPDATE {{$this->shortprefix}}{$tablepostfix}
         SET typeid = 0
             WHERE typeid = ?";
         $DB->execute($sql, array($id));
 
         // finally delete the type itself
-        $DB->delete_records("{$this->shortprefix}_type", array('id' => $id));
+        $DB->delete_records("{$this->shortprefix}{$type}_type", array('id' => $id));
 
         $transaction->allow_commit();
         return true;
@@ -1163,23 +1178,28 @@ class hierarchy {
      * separate function so that it can be called when all types are deleted
      *
      * @param int $id id of type with metadata to delete
+     * @param string $class to specify which table to delete from
      * @return void
      */
-    function delete_type_metadata($id) {
+    public function delete_type_metadata($id, $class = '') {
         global $DB;
+        $type = 'type';
+        if ($class == 'personal') {
+            $type = 'user';
+        }
         $result = true;
         // delete all custom field data using fields in this type
-        if ($fields = $DB->get_records($this->shortprefix.'_type_info_field', array('typeid' => $id))) {
+        if ($fields = $DB->get_records($this->shortprefix.'_' . $type . '_info_field', array('typeid' => $id))) {
             $fields = array_keys($fields);
             list($in_sql, $in_params) = $DB->get_in_or_equal($fields);
-            $result = $result && $DB->delete_records_select($this->shortprefix.'_type_info_data', "fieldid $in_sql", $in_params);
+            $result = $result && $DB->delete_records_select($this->shortprefix.'_' . $type . '_info_data',
+                "fieldid $in_sql", $in_params);
         }
         // Delete all info fields in a type
-        $result = $result && $DB->delete_records($this->shortprefix.'_type_info_field', array('typeid' => $id));
+        $result = $result && $DB->delete_records($this->shortprefix.'_' . $type . '_info_field', array('typeid' => $id));
 
         return $result;
     }
-
 
     /**
      * Run any code before printing admin page header
@@ -1453,6 +1473,8 @@ class hierarchy {
             return false;
         }
 
+        $altprefix = isset($record->altprefix) ? $record->altprefix : false;
+
         foreach ($cfields as $cf) {
             $cf_type = "customfield_{$cf->datatype}";
             require_once($CFG->dirroot.'/totara/customfield/field/'.$cf->datatype.'/field.class.php');
@@ -1466,13 +1488,12 @@ class hierarchy {
             }
             $data = "cf_{$cf->id}";
             $itemid = "cf_{$cf->id}_itemid";
-            // only show if there's data
-            if ($record->$data) {
-                $safetext = format_text($record->$data, FORMAT_HTML);
-                $item_data = call_user_func(array($cf_type, 'display_item_data'), $safetext, array('prefix' => $this->prefix, 'itemid' => $record->$itemid));
-                $item_name = html_writer::tag('strong', format_string($cf->fullname) . ': ');
-                $out .= $OUTPUT->container($item_name . $item_data, 'customfield ' . $cssclass);
-            }
+
+            $safetext = format_text($record->$data, FORMAT_HTML);
+            $item_data = call_user_func(array($cf_type, 'display_item_data'), $safetext,
+                array('prefix' => $this->prefix, 'itemid' => $record->$itemid, 'altprefix' => $altprefix));
+            $item_name = html_writer::tag('strong', format_string($cf->fullname) . ': ');
+            $out .= $OUTPUT->container($item_name . $item_data, 'customfield ' . $cssclass);
         }
 
         return $out;
@@ -3068,4 +3089,37 @@ class hierarchy {
         return $items_to_add;
     }
 
+}
+
+/**
+ * Save the cohort / audience data against the hierarchy type.
+ *
+ * @param string $shortprefix The prefix required for the database table name.
+ * @param string $idfield The field name of the type tables primary key.
+ * @param object $typeobject The goal type object.
+ */
+function totara_hierarchy_save_cohorts_for_type($shortprefix, $idfield, stdClass $typeobject) {
+    global $DB, $USER;
+
+    if (!isset($typeobject->cohortsenrolled)) {
+        return;
+    }
+
+    $cohortstosave = $typeobject->cohortsenrolled ? explode(",", $typeobject->cohortsenrolled) : array();
+    $cohorts = $DB->get_fieldset_select($shortprefix . '_type_cohort', 'cohortid', $idfield . ' = ?', array($typeobject->id));
+    $transaction = $DB->start_delegated_transaction();
+    // Save the cohorts that have been added.
+    foreach (array_diff($cohortstosave, $cohorts) as $cohort) {
+        $cohortobject = new stdClass();
+        $cohortobject->cohortid = $cohort;
+        $cohortobject->$idfield = $typeobject->id;
+        $cohortobject->timemodified = time();
+        $cohortobject->usermodified = $USER->id;
+        $DB->insert_record($shortprefix . '_type_cohort', $cohortobject);
+    }
+    // Delete the cohorts that have been removed.
+    foreach (array_diff($cohorts, $cohortstosave) as $cohort) {
+        $DB->delete_records($shortprefix . '_type_cohort', array($idfield => $typeobject->id, 'cohortid' => $cohort));
+    }
+    $transaction->allow_commit();
 }

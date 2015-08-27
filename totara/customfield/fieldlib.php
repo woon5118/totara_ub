@@ -302,10 +302,12 @@ class customfield_base {
             $this->inputname = '';
         } else {
             $this->field = $field;
-            $this->inputname = 'customfield_'.$field->shortname;
+            $this->inputname = 'customfield_'. $field->shortname . '_' . $itemid->id;
         }
         if (!empty($this->field)) {
-            if ($datarecord = $DB->get_record($tableprefix.'_info_data', array($prefix.'id' => $this->itemid, 'fieldid' => $this->fieldid), 'id, data')) {
+            $table = $tableprefix.'_info_data';
+            $params = array($prefix.'id' => $this->itemid, 'fieldid' => $this->fieldid);
+            if ($datarecord = $DB->get_record($table, $params, 'id, data')) {
                 $this->data = $datarecord->data;
                 $this->dataid = $datarecord->id;
             } else {
@@ -405,12 +407,12 @@ function customfield_load_data(&$item, $prefix, $tableprefix) {
  * Print out the customisable fields
  * @param  object  instance of the moodleform class
  */
-function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix) {
+function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix, $disableheader = false) {
     global $DB, $CFG;
 
     $typestr = '';
     $params = array();
-    if ($typeid != 0) {
+    if (isset($item->typeid)) {
         $typestr = 'typeid = ?';
         $params[] = $typeid;
     }
@@ -427,7 +429,10 @@ function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix
 
     // display the header and the fields
     if ($display) {
-        $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
+        if (!$disableheader) {
+            $mform->addElement('header', 'customfields', get_string('customfields', 'totara_customfield'));
+        }
+
         foreach ($fields as $field) {
             require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
             $newfield = 'customfield_'.$field->datatype;

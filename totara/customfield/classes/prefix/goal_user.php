@@ -17,14 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
+ * @author Ryan Lafferty <ryanl@learningpool.com>
  * @package totara
- * @subpackage totara_appraisal
+ * @subpackage customfields
  */
 
+namespace totara_customfield\prefix;
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015092100;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051205;       // Requires this Moodle version.
-$plugin->component = 'totara_appraisal';   // To check on upgrade, that module sits in correct place.
+class goal_user extends hierarchy_type {
+
+    public function is_feature_type_disabled() {
+        return totara_feature_disabled('goals');
+    }
+
+    public function is_feature_type_enabled() {
+        return totara_feature_enabled('goals');
+    }
+
+    public function get_capability_managefield() {
+        return 'totara/hierarchy:goalmanagecustomfield';
+    }
+}

@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 // Check if Goals are enabled.
 goal::check_feature_enabled();
 
-$goalpersonalid = required_param('goalpersonalid', PARAM_INT);
+$goalpersonalid = required_param('id', PARAM_INT);
 
 require_login();
 
@@ -49,7 +49,7 @@ if (!$permissions = $goal->get_permissions(null, $userid)) {
 
 extract($permissions);
 
-$edit_params = array('goalpersonalid' => $goalpersonalid, 'userid' => $userid);
+$edit_params = array('id' => $goalpersonalid, 'userid' => $userid);
 $edit_url = new moodle_url('/totara/hierarchy/prefix/goal/item/edit_personal.php', $edit_params);
 
 $name = format_string($goalpersonal->name);
@@ -88,7 +88,7 @@ if (!empty($goalpersonal->scaleid)) {
 // Set up the page.
 $PAGE->navbar->add($strmygoals, $mygoalsurl);
 $PAGE->navbar->add($name);
-$PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/item/view.php'), array('goalpersonalid' => $goalpersonalid));
+$PAGE->set_url(new moodle_url('/totara/hierarchy/prefix/goal/item/view.php'), array('id' => $goalpersonalid));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_totara_menu_selected('mygoals');
@@ -126,37 +126,43 @@ if ($can_edit[$goalpersonal->assigntype]) {
 
 // Set up the heading.
 echo $OUTPUT->heading(get_string("personalgoal", 'totara_hierarchy') . $edit_button);
-echo html_writer::empty_tag('br');
+
+$tabledata = array ();
 
 // Name.
-$namestr =  html_writer::tag('strong', get_string('goaltable:name', 'totara_hierarchy')) . ': ' . format_string($name);
-echo html_writer::tag('p', $namestr);
+$title = get_string('goaltable:name', 'totara_hierarchy');
+$tabledata[$title] = format_string($name);
 
-// Scale.
-$scalename = !empty($scale) ? format_string($scale->name) : '';
-$scalestr = html_writer::tag('strong', get_string('goaltable:scale', 'totara_hierarchy')) . ': ' . $scalename;
-echo html_writer::tag('p', $scalestr);
+// Scale name.
+$title = get_string('goaltable:scale', 'totara_hierarchy');
+$scalename = !empty($scale) ? $scale->name : '';
+$tabledata[$title] = format_string($scalename);
 
-$scalevaluestr = html_writer::tag('strong', get_string('goaltable:scalevalue', 'totara_hierarchy')) . ': ' . $scalevalue;
-echo html_writer::tag('p', $scalevaluestr);
+// Scale value.
+$title = get_string('goaltable:scalevalue', 'totara_hierarchy');
+$tabledata[$title] = $scalevalue;
 
-// Target Date.
-$targetdate = '';
+// Target.
+$title = get_string('goaltargetdate', 'totara_hierarchy');
 if (!empty($goalpersonal->targetdate)) {
     $targetdate = userdate($goalpersonal->targetdate, get_string('datepickerlongyearphpuserdate', 'totara_core'), 99, false);
+} else {
+    $targetdate = '';
 }
-$targetstr = html_writer::tag('strong', get_string('goaltargetdate', 'totara_hierarchy')) . ': ' . $targetdate;
-echo html_writer::tag('p', $targetstr);
+$tabledata[$title] = format_string($targetdate);
 
 // Description.
-$goalpersonal->descriptionformat = FORMAT_HTML;
-$goalpersonal->description = file_rewrite_pluginfile_urls($goalpersonal->description, 'pluginfile.php', $context->id,
-        'totara_hierarchy', 'goal', $goalpersonalid);
+$title = get_string('description', 'totara_hierarchy');
+$tabledata[$title] = format_text($goalpersonal->description, FORMAT_HTML, $TEXTAREA_OPTIONS);
 
-echo html_writer::tag('p', html_writer::tag('strong', get_string('description', 'totara_hierarchy')) . ': ');
-echo $OUTPUT->box_start('generalbox description');
-echo format_text($goalpersonal->description, FORMAT_HTML, $TEXTAREA_OPTIONS);
-echo $OUTPUT->box_end();
+echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));
+
+foreach ($tabledata as $title => $data) {
+    echo html_writer::tag('dt', format_string($title));
+    echo html_writer::tag('dd', $data);
+}
+
+echo html_writer::end_tag('dl');
 
 // End of goal.
 echo html_writer::end_tag('div');

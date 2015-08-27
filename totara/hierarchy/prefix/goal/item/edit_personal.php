@@ -18,11 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralms.com>
+ * @author James Robinson <jamesr@learningpool.com>
+ * @author Ryan Lafferty <ryanl@learningpool.com>
  * @package totara
  * @subpackage totara_hierarchy
  */
 
 require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/config.php');
+require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/item/edit_form.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
@@ -30,7 +33,7 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 goal::check_feature_enabled();
 
 $userid = optional_param('userid', $USER->id, PARAM_INT);
-$goalpersonalid = optional_param('goalpersonalid', 0, PARAM_INT);
+$id = optional_param('id', 0, PARAM_INT);
 
 require_login();
 
@@ -49,9 +52,9 @@ if (!$permissions = $goal->get_permissions(null, $userid)) {
 
 extract($permissions);
 
-if (!empty($goalpersonalid)) {
-    $goalpersonal = goal::get_goal_item(array('id' => $goalpersonalid), goal::SCOPE_PERSONAL);
-    $goalpersonal->goalpersonalid = $goalpersonal->id;
+if (!empty($id)) {
+    $goalpersonal = goal::get_goal_item(array('id' => $id), goal::SCOPE_PERSONAL);
+    $goalpersonal->id = $goalpersonal->id;
     $goalname = format_string($goalpersonal->name);
 
     // Check the specific permissions for this goal.
@@ -78,7 +81,40 @@ $PAGE->set_totara_menu_selected('mygoals');
 $PAGE->set_title($strmygoals);
 $PAGE->set_heading($strmygoals);
 
-$mform = new goal_edit_personal_form();
+$prefix = 'goal_user';
+$context = context_system::instance();
+
+if ($id === 0) {
+    $item = new stdClass();
+    $item->id = 0;
+    $item->description = $DB->get_field('goal_personal', 'description', array('id' => $id));
+    $item->visible = 1;
+    $item->typeid = $DB->get_field('goal_personal', 'typeid', array('id' => $id));
+
+} else {
+    $item = $DB->get_record('goal_personal', array('id' => $id), '*', MUST_EXIST);
+
+    // Load custom fields data - customfield values need to be available in $item before the call to set_data.
+    if ($id !== 0) {
+        customfield_load_data($item, $prefix, 'goal_user');
+    }
+}
+
+// Display page.
+// Create form.
+$item->descriptionformat = FORMAT_HTML;
+$options = array(
+    'subdirs' => 0,
+    'maxfiles' => EDITOR_UNLIMITED_FILES,
+    'maxbytes' => get_max_upload_file_size(),
+    'trusttext' => false,
+    'context' => $context,
+    'collapsed' => true
+);
+$item = file_prepare_standard_editor($item, 'description', $options, $context, 'totara_hierarchy', $item->id);
+$datatosend = array('item' => $item, 'id' => $id, 'userid' => $userid);
+$mform = new goal_edit_personal_form(null, $datatosend);
+$mform->set_data($item);
 
 // Handle the form.
 if ($mform->is_cancelled()) {
@@ -89,6 +125,7 @@ if ($mform->is_cancelled()) {
     $todb = new stdClass();
     $todb->userid = $fromform->userid;
     $todb->scaleid = $fromform->scaleid;
+    $todb->typeid = $fromform->typeid;
     $todb->name = $fromform->name;
     $todb->usermodified = $USER->id;
     $todb->timemodified = time();
@@ -101,15 +138,15 @@ if ($mform->is_cancelled()) {
     }
 
     $existingrecord = null;
-    if (!empty($fromform->goalpersonalid)) {
-        $existingrecord = goal::get_goal_item(array('id' => $fromform->goalpersonalid), goal::SCOPE_PERSONAL);
+    if ($fromform->id !== 0) {
+        $existingrecord = goal::get_goal_item(array('id' => $fromform->id), goal::SCOPE_PERSONAL);
     }
 
     if (isset($existingrecord)) {
         // Handle updates.
 
         // Set the existing goal id.
-        $todb->id = $fromform->goalpersonalid;
+        $todb->id = $fromform->id;
 
         // If the scale changes then set the current scale value to default.
         if ($todb->scaleid != $existingrecord->scaleid) {
@@ -117,8 +154,10 @@ if ($mform->is_cancelled()) {
         }
 
         $fromform = file_postupdate_standard_editor($fromform, 'description', $TEXTAREA_OPTIONS, $context,
-            'totara_hierarchy', 'goal', $fromform->goalpersonalid);
+            'totara_hierarchy', 'goal', $fromform->id);
         $todb->description = $fromform->description;
+
+        customfield_save_data($fromform, $prefix, 'goal_user');
 
         // Update the record.
         goal::update_goal_item($todb, goal::SCOPE_PERSONAL);
@@ -149,6 +188,9 @@ if ($mform->is_cancelled()) {
         // Set the current scale value to default.
         $todb->scalevalueid = $DB->get_field('goal_scale', 'defaultid', array('id' => $todb->scaleid));
 
+        // Set the goal type id.
+        $todb->typeid = $fromform->typeid;
+
         // Insert the record.
         $todb->id = goal::insert_goal_item($todb, goal::SCOPE_PERSONAL);
 
@@ -167,7 +209,12 @@ if ($mform->is_cancelled()) {
 // Display the page and form.
 echo $OUTPUT->header();
 
-$mform->set_data($goalpersonal);
+if ($id) {
+    echo $OUTPUT->heading(get_string("editpersonalgoal", 'totara_hierarchy') . $item->name);
+} else {
+    echo $OUTPUT->heading(get_string("newpersonalgoal", 'totara_hierarchy'));
+}
+
 $mform->display();
 
 echo $OUTPUT->footer();

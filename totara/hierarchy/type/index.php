@@ -33,6 +33,7 @@ $sitecontext = context_system::instance();
 
 // Get params.
 $prefix        = required_param('prefix', PARAM_ALPHA);
+$class        = optional_param('class', '', PARAM_ALPHA);
 $edit        = optional_param('edit', -1, PARAM_BOOL);
 $shortprefix = hierarchy::get_short_prefix($prefix);
 
@@ -48,12 +49,21 @@ $can_delete = has_capability('totara/hierarchy:delete'.$prefix.'type', $sitecont
 $can_edit_custom_fields = has_capability('totara/hierarchy:'.$prefix.'managecustomfield', $sitecontext);
 
 // Setup page and check permissions.
-admin_externalpage_setup($prefix.'typemanage', null, array('prefix' => $prefix));
+if ($prefix == 'goal' && $class) {
+    admin_externalpage_setup($class . $prefix . 'typemanage', null, array('prefix' => $prefix));
+} else {
+    admin_externalpage_setup($prefix.'typemanage', null, array('prefix' => $prefix));
+}
 
 // Load data for type details.
 
 // Get types for this page.
-$types = $hierarchy->get_types(array('custom_field_count' => 1, 'item_count' => 1));
+if ($class == 'personal') {
+    $types = $hierarchy->get_types(array('custom_field_count' => 1, 'item_count' => 1, 'personal' => 1));
+} else {
+    $types = $hierarchy->get_types(array('custom_field_count' => 1, 'item_count' => 1));
+}
+
 
 // Get count of unclassified items.
 $unclassified = $hierarchy->get_unclassified_items(true);
@@ -85,7 +95,8 @@ if ($types) {
         $cssclass = '';
 
         if ($can_edit_custom_fields) {
-            $row[] = $OUTPUT->action_link(new moodle_url('/totara/customfield/index.php', array('prefix' => $prefix, 'typeid' => $type->id)), format_string($type->fullname));
+            $row[] = $OUTPUT->action_link(new moodle_url('/totara/customfield/index.php',
+                array('prefix' => $prefix, 'typeid' => $type->id, 'class' => $class)), format_string($type->fullname));
         } else {
             $row[] = format_string($type->fullname);
         }
@@ -96,7 +107,7 @@ if ($types) {
         $buttons = array();
         if ($can_edit) {
             $buttons[] = $OUTPUT->action_icon(
-                new moodle_url('/totara/hierarchy/type/edit.php', array('prefix' => $prefix, 'id' => $type->id)),
+                new moodle_url('/totara/hierarchy/type/edit.php', array('prefix' => $prefix, 'id' => $type->id, 'class' => $class)),
                 new pix_icon('t/edit', $str_edit, null, array('class' => 'iconsmall')),
                 null,
                 array('title' => $str_edit)
@@ -104,10 +115,13 @@ if ($types) {
         }
         if ($can_delete) {
             $buttons[] = $OUTPUT->action_icon(
-                new moodle_url('/totara/hierarchy/type/delete.php', array('prefix' => $prefix, 'id' => $type->id)),
-                new pix_icon('t/delete', $str_delete, null),
-                null,
-                array('title' => $str_delete));
+                new moodle_url('/totara/hierarchy/type/delete.php', array('prefix' => $prefix,
+                    'id' => $type->id, 'class' => $class)),
+                    new pix_icon('t/delete', $str_delete, null),
+                    null,
+                    array('title' => $str_delete
+                )
+            );
         }
         if ($buttons) {
             $row[] = implode($buttons, '');
@@ -132,12 +146,19 @@ if ($types) {
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading(get_string('types', 'totara_hierarchy') . ' ' . $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false));
+
+if ($prefix == 'goal') {
+    echo $OUTPUT->heading(get_string('manage' . $class . 'goaltypes', 'totara_hierarchy') . ' ' .
+        $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false));
+} else {
+    echo $OUTPUT->heading(get_string('types', 'totara_hierarchy') . ' ' .
+        $OUTPUT->help_icon($prefix.'type', 'totara_hierarchy', false));
+}
 
 // Add type button.
 if ($can_add) {
     // Print button for creating new type.
-    echo html_writer::tag('div', $hierarchy->display_add_type_button(), array('class' => 'add-type-button'));
+    echo html_writer::tag('div', $hierarchy->display_add_type_button(0, $class), array('class' => 'add-type-button'));
 }
 
 $options = array();
@@ -163,14 +184,15 @@ if ($unclassified) {
     $options[0] = get_string('unclassified', 'totara_hierarchy');
 }
 
-if ($showbulkform) {
+if ($showbulkform && $class == 'company') {
     echo html_writer::empty_tag('br');
     echo html_writer::tag('a', '', array('name' => 'bulkreclassify'));
     echo $OUTPUT->heading(get_string('bulktypechanges', 'totara_hierarchy'));
 
     echo $OUTPUT->container(get_string('bulktypechangesdesc', 'totara_hierarchy'));
 
-    echo $OUTPUT->single_select(new moodle_url("change.php", array('prefix' => $prefix)), 'typeid', $options, 'changetype');
+    echo $OUTPUT->single_select(new moodle_url("change.php", array('prefix' => $prefix, 'class' => $class)),
+        'typeid', $options, 'changetype');
 }
 
 \totara_hierarchy\event\type_viewed::create_from_prefix($prefix)->trigger();

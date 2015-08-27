@@ -90,8 +90,13 @@
                   'totara/hierarchy:creategoalscale', 'totara/hierarchy:updategoalscale', 'totara/hierarchy:deletegoalscale'),
             totara_feature_disabled('goals')));
 
-    $ADMIN->add('goals', new admin_externalpage('goaltypemanage', get_string('managegoaltypes', 'totara_hierarchy'),
-            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal",
+    $ADMIN->add('goals', new admin_externalpage('companygoaltypemanage', get_string('managecompanygoaltypes', 'totara_hierarchy'),
+            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=company",
+            array('totara/hierarchy:creategoaltype', 'totara/hierarchy:updategoaltype', 'totara/hierarchy:deletegoaltype'),
+            totara_feature_disabled('goals')));
+
+    $ADMIN->add('goals', new admin_externalpage('personalgoaltypemanage', get_string('managepersonalgoaltypes', 'totara_hierarchy'),
+            "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=goal&class=personal",
             array('totara/hierarchy:creategoaltype', 'totara/hierarchy:updategoaltype', 'totara/hierarchy:deletegoaltype'),
             totara_feature_disabled('goals')));
 
