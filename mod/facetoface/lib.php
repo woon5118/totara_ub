@@ -2427,7 +2427,6 @@ function facetoface_approve_requests($data) {
         if (!$DB->record_exists('facetoface_signups_status', $params)) {
             continue;
         }
-
         // Update status
         switch ($value) {
 
@@ -2452,9 +2451,14 @@ function facetoface_approve_requests($data) {
                 if (facetoface_session_has_capacity($session, $context)) {
                     $facetoface_allowwaitlisteveryone = get_config(null, 'facetoface_allowwaitlisteveryone');
                     if (!empty($facetoface_allowwaitlisteveryone) && $session->waitlisteveryone) {
+                        // If waitlist everyone is set then send all users to waitlist.
                         $status = MDL_F2F_STATUS_WAITLISTED;
-                    } else {
+                    } else if ($session->datetimeknown) {
+                        // If there is a session date/time set then user is booked.
                         $status = MDL_F2F_STATUS_BOOKED;
+                    } else {
+                        // If not then they are waitlisted.
+                        $status = MDL_F2F_STATUS_WAITLISTED;
                     }
                 } else {
                     if ($session->allowoverbook) {

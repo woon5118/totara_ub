@@ -58,6 +58,14 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
               0,                        0,                  0,                          0,
               'short4',                 'desc4',            1,                          0
             ),
+        array(5,                        4,                  'name5',                    'thirdparty5',
+              0,                        0,                  0,                          0,
+             'short5',                  'desc5',            1,                          1
+            ),
+        array(6,                        4,                  'name6',                    'thirdparty6',
+              0,                        0,                  0,                          0,
+             'short6',                  'desc6',            1,                          1
+            ),
     );
 
     protected $facetoface_sessions_data = array(
@@ -67,6 +75,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(2,    2,    50,    0,  'dtl2',     0,     3600,    '$90',     '$0',     1400,   1500, 2),
         array(3,    3,    10,    1,  'dtl3',     1,     25200,    '$100',    '$80',     1500,   1500, 2),
         array(4,    4,    1,     0,  'dtl4',     0,     25200,    '$10',     '$8',      500,   1900, 2),
+        array(5,    5,    10,    0,  'dtl5',     0,     25200,    '$10',     '$8',      500,   1900, 2),
+        array(6,    6,    10,    0,  'dtl6',     1,     25200,    '$10',     '$8',      500,   1900, 2),
         );
 
     protected $session_info_field = array(
@@ -92,6 +102,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(2,        2,              1900,           2100),
         array(3,        3,               900,           1100),
         array(4,        3,              1200,           1400),
+        array(5,        6,              1200,           1400),
     );
 
     protected $facetoface_signups_data = array(
@@ -100,6 +111,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         array(2,    2,  2,  0,  NULL,       6),
         array(3,    2,  3,  0,  NULL,       5),
         array(4,    2,  4,  0,  'disc4',   11),
+        array(5,    5,  1,  0,  'disc5',   11),
+        array(6,    6,  1,  0,  'disc6',   11),
     );
 
     protected $facetoface_signups_status_data = array(
@@ -113,6 +126,10 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             'note3',    'advice3',      '3',       700),
         array(4,        4,              70,             0,              12.5,
             'note4',    'advice4',      '4',      1100),
+        array(5,        5,              40,             0,              11,
+            'note5',    'advice5',      '1',      1200),
+        array(6,        6,              40,             0,              11,
+            'note6',    'advice6',      '1',      1200)
     );
 
     protected $course_data = array(
@@ -243,33 +260,47 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
             4, 4, 1),
     );
 
+
+    // The module is always 8 as this is the f2f module. They are inserted
+    // into the mdl_modules table by the unit tests in alphabetical order and
+    // f2f is the eighth module (for now).
     protected $course_modules_data = array(
         array('id', 'course', 'module', 'instance', 'section', 'idnumber',
             'added', 'score', 'indent', 'visible', 'visibleold', 'groupmode',
             'groupingid', 'groupmembersonly', 'completion', 'completiongradeitemnumber',
             'completionview', 'completionview', 'completionexpected', 'availablefrom',
             'availableuntil', 'showavailability'),
-        array(1, 2, 3, 4, 5, '1001',
+        array(1, 2, 8, 4, 5, '1001',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
             14, 1),
-        array(2, 2, 3, 4, 5, '1002',
+        array(2, 2, 8, 4, 5, '1002',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
             14, 1),
-        array(3, 2, 3, 4, 5, '1003',
+        array(3, 2, 8, 4, 5, '1003',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
             14, 1),
-        array(4, 2, 3, 4, 5, '1004',
+        array(4, 2, 8, 4, 5, '1004',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
             14, 1),
         array(5, 1, 8, 1, 5, '1005',
+            6, 1, 7, 1, 1, 0,
+            8, 0, 0, 10,
+            0, 11, 12, 13,
+            14, 1),
+        array(6, 4, 8, 5, 5, '1006',
+            6, 1, 7, 1, 1, 0,
+            8, 0, 0, 10,
+            0, 11, 12, 13,
+            14, 1),
+        array(7, 4, 8, 6, 5, '1006',
             6, 1, 7, 1, 1, 0,
             8, 0, 0, 10,
             0, 11, 12, 13,
@@ -815,7 +846,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $facetoface1 = $this->facetoface['f2f0'];
         $f2f = $this->array_to_object($facetoface1);
 
-        $this->assertEquals(facetoface_add_instance($f2f), 5);
+        $this->assertEquals(facetoface_add_instance($f2f), 7);
 
         $this->resetAfterTest(true);
     }
@@ -1443,7 +1474,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         $signup = $DB->get_record('facetoface_signups', $params);
         // Test for valid case.
         $sink = $this->redirectMessages();
-        $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id, 'testnote'), 6);
+        $this->assertEquals(facetoface_update_signup_status($signup->id, $statuscode1, $teacher1->id, 'testnote'), 8);
         $sink->close();
 
         // Test for invalid case.
@@ -1909,6 +1940,8 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
     }
 
     function test_facetoface_approve_requests() {
+        global $DB;
+
         // Test variables.
         $data1 = new stdClass();
         $data1->s = 1;
@@ -1921,6 +1954,38 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
 
         // TODO test for invalid case
         $this->resetAfterTest(true);
+
+        $data2 = new stdClass();
+        $data2->s = 5; // Seesion ID.
+        $data2->submissionid = 5;
+        // Array of approvals,
+        // Key = userid, value = approval where 1 is decline and 2 is approve.
+        $data2->requests = array(1 => 2);
+
+        // Check success.
+        $this->assertTrue((bool)facetoface_approve_requests($data2), $this->msgtrue);
+
+        // The session has no date/time so user should be waitlisted.
+        $sql = "SELECT * FROM {facetoface_signups} s JOIN {facetoface_signups_status} ss ON s.id = ss.signupid WHERE s.sessionid = :sessionid AND s.userid = :userid AND ss.superceded = :superceded";
+        $signupstatus = $DB->get_records_sql($sql, array('sessionid' => 5, 'userid' => 1, 'superceded' => 0));
+        $record = array_shift($signupstatus);
+
+        // The user should be waitlisted.
+        $this->assertEquals(MDL_F2F_STATUS_WAITLISTED, $record->statuscode);
+
+        $data3 = new stdClass();
+        $data3->s = 6;
+        $data3->submissionid = 6;
+        $data3->requests = array(1 => 2);
+
+        $this->assertTrue((bool)facetoface_approve_requests($data3), $this->msgtrue);
+
+        $sql = "SELECT * FROM {facetoface_signups} s JOIN {facetoface_signups_status} ss ON s.id = ss.signupid WHERE s.sessionid = :sessionid AND s.userid = :userid AND ss.superceded = :superceded";
+        $signupstatus = $DB->get_records_sql($sql, array('sessionid' => 6, 'userid' => 1, 'superceded' => 0));
+        $record = array_shift($signupstatus);
+
+        // The date/time is known so user should be booked.
+        $this->assertEquals(MDL_F2F_STATUS_BOOKED, $record->statuscode);
     }
 
     function test_facetoface_ical_generate_timestamp() {
