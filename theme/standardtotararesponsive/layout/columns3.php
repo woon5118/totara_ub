@@ -142,7 +142,7 @@ echo $OUTPUT->doctype() ?>
         if (!empty($PAGE->theme->settings->footnote)) {
             echo '<div class="footnote text-center">'.format_text($PAGE->theme->settings->footnote).'</div>';
         } ?>
-        <div class="footer-powered">Powered by <a href="http://www.totaralms.com/" target="_blank">TotaraLMS</a></div>
+        <div class="footer-powered"><?php echo $OUTPUT->powered_by_totara(); ?></div>
         <?php echo $OUTPUT->standard_footer_html(); ?>
     </div>
 </footer>

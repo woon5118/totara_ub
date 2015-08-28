@@ -687,6 +687,22 @@ class core_renderer extends renderer_base {
     }
 
     /**
+     * Get the standard Powered by Totara LMS phrase.
+     *
+     * @param bool $withlink include link to Totara main site
+     * @return string HTML fragment.
+     */
+    public function powered_by_totara($withlink = true) {
+        $poweredby = get_string('poweredby', 'totara_core');
+        if (!$withlink) {
+            return $poweredby;
+        }
+        // NOTE: 'Totara LMS' should not be translated in lang packs!
+
+        return str_replace('Totara LMS', '<a href="http://www.totaralms.com/" target="_blank">Totara LMS</a>', $poweredby);
+    }
+
+    /**
      * Return the standard string that says whether you are logged in (and switched
      * roles/logged in as another user).
      * @param bool $withlinks if false, then don't include any links in the HTML produced.
