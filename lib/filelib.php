@@ -1414,6 +1414,44 @@ function get_mimetype_for_sending($filename = '') {
 }
 
 /**
+ * Make sure file serving of untrusted files is
+ * as secure as possible.
+ *
+ * @param string $mimetype
+ * @param bool $forcedownload
+ * @return string mimetype
+ */
+function totara_tweak_file_sending($mimetype, $forcedownload) {
+    if (!$forcedownload) {
+        return $mimetype;
+    }
+
+    // No mime guessing in IE and Chrome!
+    header('X-Content-Type-Options: nosniff');
+    // Do not allow any kind of embedding in frames,
+    // we do not want anybody to display these files in frames,
+    // even from this site.
+    header('X-Frame-Options: deny');
+    // Just in case something disabled default stuff.
+    header('X-XSS-Protection: 1; mode=block');
+
+    // Intentionally break mime for dangerous stuff,
+    // we do not want anything that is executed via browser plugins.
+    $dangerous = array(
+        'application/x-shockwave-flash',
+        'application/x-director',
+        'application/java-archive',
+        'application/x-java-jnlp-file',
+        'application/x-javascript',
+    );
+    if (in_array($mimetype, $dangerous)) {
+        $mimetype = 'application/x-forcedownload';
+    }
+
+    return $mimetype;
+}
+
+/**
  * Obtains information about a filetype based on its extension. Will
  * use a default if no information is present about that particular
  * extension.
@@ -2105,6 +2143,9 @@ function send_file($path, $filename, $lifetime = null , $filter=0, $pathisstring
         $filename = rawurlencode($filename);
     }
 
+    // Totara: improve file serving security if possible.
+    $mimetype = totara_tweak_file_sending($mimetype, $forcedownload);
+
     if ($forcedownload) {
         header('Content-Disposition: attachment; filename="'.$filename.'"');
     } else if ($mimetype !== 'application/x-shockwave-flash') {
@@ -2285,6 +2326,9 @@ function send_stored_file($stored_file, $lifetime=null, $filter=0, $forcedownloa
     if (core_useragent::is_ie()) {
         $filename = rawurlencode($filename);
     }
+
+    // Totara: improve file serving security if possible.
+    $mimetype = totara_tweak_file_sending($mimetype, $forcedownload);
 
     if ($forcedownload) {
         header('Content-Disposition: attachment; filename="'.$filename.'"');
