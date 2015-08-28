@@ -144,6 +144,18 @@ class mod_facetoface_session_form extends moodleform {
         if ($displaytimezones) {
             $repeatoptions['sessiontimezone']['disabledif'] = array('datetimeknown', 'eq', 0);
             $repeatoptions['sessiontimezone']['default'] = $this->_customdata['defaulttimezone'];
+            $repeatoptions['timestart']['helpbutton'] = array(
+                'sessionstarttime',
+                'facetoface'
+            );
+            $repeatoptions['timefinish']['helpbutton'] = array(
+                'sessionfinishtime',
+                'facetoface'
+            );
+            $repeatoptions['sessiontimezone']['helpbutton'] = array(
+                'sessiontimezone',
+                'facetoface'
+            );
         }
         $mform->setType('sessiontimezone', PARAM_TIMEZONE);
         $mform->setType('sessiondateid', PARAM_INT);
