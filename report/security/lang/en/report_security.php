@@ -66,6 +66,10 @@ $string['check_google_error'] = 'Search engine access is allowed but guest acces
 $string['check_google_info'] = 'Search engines may enter as guests.';
 $string['check_google_name'] = 'Open to Google';
 $string['check_google_ok'] = 'Search engine access is not enabled.';
+$string['check_guest_details'] = '<p>It is recommended to prevent log in without user account. Please consider disabling the "Guest login button" setting.</p>';
+$string['check_guest_name'] = 'Guest access';
+$string['check_guest_ok'] = 'Users must log in with their account.';
+$string['check_guest_warning'] = 'Users may access this server as guests without password.';
 $string['check_guestrole_details'] = '<p>The guest role is used for guests, not logged in users and temporary guest course access. Please make sure no risky capabilities are allowed in this role.</p>
 <p>The only supported legacy type for guest role is <em>Guest</em>.</p>';
 $string['check_guestrole_error'] = 'The guest role "{$a}" is incorrectly defined!';

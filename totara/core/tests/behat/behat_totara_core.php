@@ -63,6 +63,7 @@ class behat_totara_core extends behat_base {
         // Set Totara defaults. This is to undo the work done in /lib/behat/classes/util.php around line 90
         set_config('enablecompletion', 1);
         set_config('forcelogin', 1);
+        set_config('guestloginbutton', 0);
         set_config('enablecompletion', 1, 'moodlecourse');
         set_config('completionstartonenrol', 1, 'moodlecourse');
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort,totara_program');

@@ -59,6 +59,7 @@ function report_security_get_issue_list() {
         'report_security_check_guestrole',
         'report_security_check_frontpagerole',
         'report_security_check_webcron',
+        'report_security_check_guest',
         'report_security_check_repositoryurl',
     );
 }
@@ -929,6 +930,36 @@ function report_security_check_https($detailed = false) {
 
     if ($detailed) {
         $result->details = get_string('check_https_details', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Verifies if real login required.
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_guest($detailed = false) {
+    global $CFG;
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_guest';
+    $result->name    = get_string('check_guest_name', 'report_security');
+    $result->details = null;
+    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/settings.php?section=manageauths\">".get_string('authsettings', 'core_admin').'</a>';
+
+    if (!empty($CFG->guestloginbutton)) {
+        $result->status = REPORT_SECURITY_SERIOUS;
+        $result->info   = get_string('check_guest_warning', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info   = get_string('check_guest_ok', 'report_security');
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_guest_details', 'report_security');
     }
 
     return $result;
