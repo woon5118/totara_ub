@@ -200,6 +200,9 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
         }
 
+        $encoding = $this->get_config('csvuserencoding');
+        $storefilepath = totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $this->get_element_name());
+
         // Open file from store for processing
         if (!$file = fopen($storefilepath, 'r')) {
             throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotopenx', $storefilepath);
@@ -207,11 +210,6 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
-        $encoding = core_text::strtoupper($this->get_config('csvuserencoding'));
-        if (!empty($fields) && substr($encoding, 0, 3) === 'UTF') {
-            // The file may begin with a UTF BOM (byte order mark), which needs to be stripped off.
-            $fields[0] = core_text::trim_utf8_bom($fields[0]);
-        }
         $fieldmappings = array();
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f})) {
@@ -313,7 +311,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
             $csvrow = array_combine($fields, $csvrow);  // nice associative array ;)
 
             // Encode and clean the data.
-            $csvrow = totara_sync_clean_fields($csvrow, $encoding);
+            $csvrow = totara_sync_clean_fields($csvrow);
 
             // Set up a db row
             $dbrow = array();

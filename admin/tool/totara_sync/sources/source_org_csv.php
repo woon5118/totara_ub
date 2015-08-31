@@ -184,6 +184,9 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
 
         }
 
+        $encoding = $this->get_config('csvorgencoding');
+        $storefilepath = totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $this->get_element_name());
+
         // Open file from store for processing
         if (!$file = fopen($storefilepath, 'r')) {
             throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'cannotopenx', $storefilepath);
@@ -191,11 +194,6 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
 
         // Map CSV fields.
         $fields = fgetcsv($file, 0, $this->config->delimiter);
-        $encoding = core_text::strtoupper($this->get_config('csvorgencoding'));
-        if (!empty($fields) && substr($encoding, 0, 3) === 'UTF') {
-            // The file may begin with a UTF BOM (byte order mark), which needs to be stripped off.
-            $fields[0] = core_text::trim_utf8_bom($fields[0]);
-        }
         $fieldmappings = array();
         foreach ($this->fields as $f) {
             if (empty($this->config->{'import_'.$f})) {
@@ -304,7 +302,7 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
             $row = array_combine($fields, $row);  // nice associative array
 
             // Encode and clean the data.
-            $row = totara_sync_clean_fields($row, $encoding);
+            $row = totara_sync_clean_fields($row);
 
             $row['parentidnumber'] = !empty($row['parentidnumber']) ? $row['parentidnumber'] : '';
             $row['parentidnumber'] = $row['parentidnumber'] == $row['idnumber'] ? '' : $row['parentidnumber'];

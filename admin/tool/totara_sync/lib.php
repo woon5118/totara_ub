@@ -279,10 +279,10 @@ function totara_sync_make_dirs($dirpath) {
  * Cleans the values and returns as an array
  *
  * @param array $fields
- * @param string $encoding the encoding type that string is being converted from to utf-8
+ * @param string $encoding the encoding type that string is being converted from to utf-8 (deprecated, use totara_sync_clean_csvfile)
  * @return array $fields
  */
-function totara_sync_clean_fields($fields, $encoding) {
+function totara_sync_clean_fields($fields, $encoding = 'UTF-8') {
     foreach ($fields as $key => $value) {
         $format = ($key == 'password') ? PARAM_RAW : PARAM_TEXT;
         if ($encoding !== 'UTF-8') {
@@ -291,6 +291,53 @@ function totara_sync_clean_fields($fields, $encoding) {
         $fields[$key] = clean_param(trim($value), $format);
     }
     return $fields;
+}
+
+/**
+ * Convert and cleans content
+ *
+ * @param string $storefilepath original file to clean up
+ * @param string $encoding content encoding
+ * @param integer $fileaccess is FILE_ACCESS_DIRECTORY or FILE_ACCESS_UPLOAD
+ * @param string $elementname the name of the element this source applies to
+ *
+ * @return string temporary file with clean content
+ */
+function totara_sync_clean_csvfile($storefilepath, $encoding, $fileaccess, $elementname) {
+
+    if (!is_readable($storefilepath)) {
+        throw new totara_sync_exception($elementname, 'populatesynctablecsv', 'storedfilecannotread', $storefilepath);
+    }
+
+    $content = file_get_contents($storefilepath);
+
+    if (strtoupper($encoding) === 'UTF-8') {
+        // Remove Unicode BOM from first line.
+        $content = core_text::trim_utf8_bom($content);
+    }
+    $content = core_text::convert($content, $encoding, 'utf-8');
+
+    // Create a temporary file and store the csv file there and delete original filename or
+    // overwrite original filename.
+    if ($fileaccess == FILE_ACCESS_UPLOAD) {
+        unlink($storefilepath);
+        $file = tempnam(make_temp_directory('/csvimport'), 'tmp');
+    } else {
+        @unlink($storefilepath);
+        $file = $storefilepath;
+    }
+
+    $result = file_put_contents($file, $content);
+    if ($result === false) {
+        if ($fileaccess == FILE_ACCESS_UPLOAD) {
+            @unlink($file);
+        }
+        throw new totara_sync_exception($elementname, 'populatesynctablecsv', 'cannotsavedata', $file);
+    }
+
+    // Use permissions form parent dir.
+    @chmod($file, (fileperms(dirname($file)) & 0666));
+    return $file;
 }
 
 /**
