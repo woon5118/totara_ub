@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript @wip
+@mod @mod_facetoface @totara @javascript
 Feature: Confirm end date is adjusted when start date is altered
   In order to test that when the end date and time is adjusted when the start time changes
   As a site manager

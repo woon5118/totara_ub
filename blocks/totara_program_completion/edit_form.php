@@ -44,17 +44,9 @@ class block_totara_program_completion_edit_form extends block_edit_form {
 
         $programids = isset($this->block->config->programids) ? $this->block->config->programids : '';
         $PAGE->requires->strings_for_js(array('addprograms'), 'block_totara_program_completion');
-        $jsmodule = array(
-            'name' => 'block_totara_program_completion',
-            'fullpath' => '/blocks/totara_program_completion/edit.js',
-            'requires' => array('json'));
-        $args = json_encode(array(
-               'blockid' => $this->block->instance->id,
-               'programsselected' => $programids
-           )
-        );
 
-        $PAGE->requires->js_init_call('M.block_totara_program_completion_edit.init', array('args' => $args), false, $jsmodule);
+        $PAGE->requires->js_call_amd('block_totara_program_completion/edit', 'init',
+            array('blockid' => $this->block->instance->id, 'programsselected' => $programids));
 
         $mform->addElement('text', 'config_title', get_string('title', 'block_totara_program_completion'),
                 array('size' => '25'));
