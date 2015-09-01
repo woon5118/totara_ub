@@ -1368,7 +1368,7 @@ abstract class rb_base_source {
     // convert an integer number of minutes into a
     // formatted duration (e.g. 90 mins => 1h 30m)
     function rb_display_hours_minutes($mins, $row) {
-        if ($item === null or $item === '') {
+        if ($mins === null or $mins === '') {
             return '';
         } else {
             $minutes = abs((int) $mins);
