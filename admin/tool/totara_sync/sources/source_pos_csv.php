@@ -306,7 +306,12 @@ class totara_sync_source_pos_csv extends totara_sync_source_pos {
 
             $row['parentidnumber'] = !empty($row['parentidnumber']) ? $row['parentidnumber'] : '';
             $row['parentidnumber'] = $row['parentidnumber'] == $row['idnumber'] ? '' : $row['parentidnumber'];
-            $row['typeidnumber'] = !empty($row['typeidnumber']) ? $row['typeidnumber'] : '';
+
+            if ($this->config->{'import_typeidnumber'} == '0') {
+                unset($row['typeidnumber']);
+            } else {
+                $row['typeidnumber'] = !empty($row['typeidnumber']) ? $row['typeidnumber'] : '';
+            }
 
             if (empty($row['timemodified'])) {
                 $row['timemodified'] = $now;

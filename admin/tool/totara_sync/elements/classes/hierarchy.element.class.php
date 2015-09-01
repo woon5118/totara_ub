@@ -98,12 +98,7 @@ abstract class totara_sync_hierarchy extends totara_sync_element {
 
         $rs = $DB->get_recordset_sql($sql);
 
-        $source = $this->get_sources();
-        $source = $source['csv'];
         foreach ($rs as $item) {
-            if ($source->get_config('import_typeidnumber') == '0') {
-                unset($item->typeidnumber);
-            }
             $this->sync_item($item, $synctable);
         }
         $rs->close();

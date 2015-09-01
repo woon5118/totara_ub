@@ -220,8 +220,15 @@ class totara_sync_source_pos_database extends totara_sync_source_pos {
                 }
             }
 
-            $dbrow['parentidnumber'] = !empty($extdbrow['parentidnumber']) ? $extdbrow['parentidnumber'] : 0;
-            $dbrow['typeidnumber'] = !empty($extdbrow['typeidnumber']) ? $extdbrow['typeidnumber'] : 0;
+            $dbrow['parentidnumber'] = !empty($dbrow['parentidnumber']) ? $dbrow['parentidnumber'] : '0';
+            $dbrow['parentidnumber'] = $dbrow['parentidnumber'] == $dbrow['idnumber'] ? '0' : $dbrow['parentidnumber'];
+
+            if ($this->config->{'import_typeidnumber'} == '0') {
+                unset($dbrow['typeidnumber']);
+            } else {
+                $dbrow['typeidnumber'] = !empty($dbrow['typeidnumber']) ? $dbrow['typeidnumber'] : '0';
+            }
+
             if (empty($extdbrow['timemodified'])) {
                 $dbrow['timemodified'] = $now;
             } else {
