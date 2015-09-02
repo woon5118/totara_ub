@@ -87,13 +87,14 @@ function sql_sequence($field, $items, $type=SQL_PARAMS_QM, $negate = false) {
     }
 
     $not = $negate ? 'NOT' : '';
-    if ($DB->get_dbfamily() != 'oracle' || $count($items) <= 1000) {
+    if ($DB->get_dbfamily() != 'oracle' || count($items) <= 1000) {
         list($sql, $params) = $DB->get_in_or_equal($items, $type, 'param', !$negate);
 
         return array(" $field " . $sql, $params);
     }
 
     $out = array();
+    $outparams = array();
     while ($some_items = totara_pop_n($items, 1000)) {
         list($sql, $params) = $DB->get_in_or_equal($items, $type, 'param', !$negate);
         $out[] =" $field " . $sql;
