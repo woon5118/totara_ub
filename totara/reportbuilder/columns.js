@@ -500,15 +500,23 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
-            colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            if (colrow.find('select.column_selector').val() !== '') {
+                colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+            }
+            if (colrow.find('select.advanced_selector').val() !== '') {
+                colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            }
 
             var lowersibling = colrow.next('tr');
 
             var lowersiblingclone = lowersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            lowersiblingclone.find('select.column_selector option[value='+lowersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
-            lowersiblingclone.find('select.advanced_selector option[value='+lowersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            if (lowersibling.find('select.column_selector').val() !== '') {
+                lowersiblingclone.find('select.column_selector option[value='+lowersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+            }
+            if (lowersibling.find('select.advanced_selector').val() !== '') {
+                lowersiblingclone.find('select.advanced_selector option[value='+lowersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            }
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
@@ -566,15 +574,23 @@ M.totara_reportbuildercolumns = M.totara_reportbuildercolumns || {
 
             var colrowclone = colrow.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
-            colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            if (colrow.find('select.column_selector').val() !== '') {
+                colrowclone.find('select.column_selector option[value='+colrow.find('select.column_selector').val()+']').attr('selected', 'selected');
+            }
+            if (colrow.find('select.advanced_selector').val() !== '') {
+                colrowclone.find('select.advanced_selector option[value='+colrow.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            }
 
             var uppersibling = colrow.prev('tr');
 
             var uppersiblingclone = uppersibling.clone();
             // Set the selected option, cause for some reason this don't clone so well...
-            uppersiblingclone.find('select.column_selector option[value='+uppersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
-            uppersiblingclone.find('select.advanced_selector option[value='+uppersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            if (uppersibling.find('select.column_selector').val() !== '') {
+                uppersiblingclone.find('select.column_selector option[value='+uppersibling.find('select.column_selector').val()+']').attr('selected', 'selected');
+            }
+            if (uppersibling.find('select.advanced_selector').val() !== '') {
+                uppersiblingclone.find('select.advanced_selector option[value='+uppersibling.find('select.advanced_selector').val()+']').attr('selected', 'selected');
+            }
 
             $.ajax({
                 url: M.cfg.wwwroot + '/totara/reportbuilder/ajax/column.php',
