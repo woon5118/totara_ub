@@ -32,7 +32,11 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/assign/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/goal/lib.php');
 
-$module = required_param('module', PARAM_ALPHAEXT);
+$module = required_param('module', PARAM_COMPONENT);
+if ($module === '') {
+    throw new invalid_parameter_exception("Invalid module name");
+}
+
 $grouptype = required_param('grouptype', PARAM_ALPHA);
 $itemid = required_param('itemid', PARAM_INT);
 $add = optional_param('add', false, PARAM_BOOL);

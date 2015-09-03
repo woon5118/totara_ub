@@ -37,7 +37,11 @@ require_login();
 require_sesskey();
 require_capability('totara/appraisal:viewassignedusers', context_system::instance());
 
-$module = required_param('module', PARAM_TEXT);
+$module = required_param('module', PARAM_COMPONENT);
+if ($module === '') {
+    throw new invalid_parameter_exception("Invalid module name");
+}
+
 $itemid = required_param('itemid', PARAM_INT);
 
 // Pagination variables.

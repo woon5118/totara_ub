@@ -35,7 +35,11 @@ require_login();
 require_sesskey();
 require_capability('totara/feedback360:assignfeedback360togroup', context_system::instance());
 
-$module = required_param('module', PARAM_ALPHANUMEXT);
+$module = required_param('module', PARAM_COMPONENT);
+if ($module === '') {
+    throw new invalid_parameter_exception("Invalid module name");
+}
+
 $grouptype = required_param('grouptype', PARAM_ALPHA);
 $itemid = required_param('itemid', PARAM_INT);
 $add = optional_param('add', false, PARAM_BOOL);
