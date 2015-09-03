@@ -2558,11 +2558,11 @@ abstract class rb_base_source {
             'course',
             'name_and_summary',
             get_string('coursenameandsummary', 'totara_reportbuilder'),
-            // case used to merge even if one value is null
-            "CASE WHEN $join.fullname IS NULL THEN " . $DB->sql_compare_text("$join.summary", 1024) . "
+            // Case used to merge even if one value is null.
+            "CASE WHEN $join.fullname IS NULL THEN $join.summary
                 WHEN $join.summary IS NULL THEN $join.fullname
                 ELSE " . $DB->sql_concat("$join.fullname", "'" . html_writer::empty_tag('br') . "'",
-                    $DB->sql_compare_text("$join.summary", 1024)) . ' END',
+                    "$join.summary") . ' END',
             array(
                 'joins' => $join,
                 'displayfunc' => 'tinymce_textarea',
@@ -2578,7 +2578,7 @@ abstract class rb_base_source {
             'course',
             'summary',
             get_string('coursesummary', 'totara_reportbuilder'),
-            $DB->sql_compare_text("$join.summary", 1024),
+            "$join.summary",
             array(
                 'joins' => $join,
                 'displayfunc' => 'tinymce_textarea',
@@ -3701,7 +3701,7 @@ abstract class rb_base_source {
             $filtertype = 'text'; // default filter type
             $filter_options = array();
 
-            $columnsql = $DB->sql_compare_text("{$joinname}.data", 1024);
+            $columnsql = "{$joinname}.data";
 
             if ($record->datatype == 'multiselect') {
                 $filtertype = 'multicheck';
