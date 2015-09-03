@@ -1839,7 +1839,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         // sessiondate2 is the earliest of the three session dates.
         $firstsessiondate = ltrim(strftime("%e %B %Y", $sessiondate2->timestart));
         if (strftime("%e %B %Y", $sessiondate2->timestart) !== strftime("%e %B %Y", $sessiondate2->timefinish)){
-            $firstsessiondate .= ' - '.ltrim(strftime("%e %B %Y", $sessiondate2->timestart));
+            $firstsessiondate .= ' - '.ltrim(strftime("%e %B %Y", $sessiondate2->timefinish));
         }
         $this->assertContains('sessiondate '.$firstsessiondate, $fullmessage);
         $this->assertContains('sessiondate '.$firstsessiondate, $fullmessagehtml);
