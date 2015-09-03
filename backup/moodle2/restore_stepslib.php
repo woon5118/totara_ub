@@ -1794,12 +1794,18 @@ class restore_course_structure_step extends restore_structure_step {
     }
 
     public function process_visibleaudience($data){
-        global $CFG;
+        global $CFG, $DB;
+
         $data = (object)$data;
         // Only restore if audience visibility is enabled and there is real data.
         if ($CFG->audiencevisibility && !empty($data->cohortid)) {
             $courseid = $this->get_courseid();
-            totara_cohort_add_association($data->cohortid, $courseid, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
+
+            if ($DB->record_exists('cohort', array('id' => $data->cohortid))) {
+                totara_cohort_add_association($data->cohortid, $courseid, COHORT_ASSN_ITEMTYPE_COURSE, COHORT_ASSN_VALUE_VISIBLE);
+            } else {
+                $this->log("Audience({$data->cohortid}) does not exists. Cannot give visibility.", backup::LOG_WARNING);
+            }
         }
     }
 
