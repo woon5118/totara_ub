@@ -42,6 +42,7 @@ $PAGE->set_url('/totara/reportbuilder/report.php', array('id' => $id));
 $PAGE->set_totara_menu_selected('myreports');
 $PAGE->set_pagelayout('noblocks');
 
+// We can rely on the report builder record existing here as there is no way to get directly to report.php.
 $reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
 
 // Embedded reports can only be viewed through their embedded url.

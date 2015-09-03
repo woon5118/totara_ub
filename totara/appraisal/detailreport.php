@@ -40,7 +40,7 @@ admin_externalpage_setup('reportappraisals', '', null, $url);
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 // Verify global restrictions.
-$reportrecord = $DB->get_record('report_builder', array('shortname' => 'appraisal_detail'), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('shortname' => 'appraisal_detail'));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 if (!$report = reportbuilder_get_embedded_report('appraisal_detail', null, false, $sid, $globalrestrictionset)) {

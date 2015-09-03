@@ -77,7 +77,7 @@ if ($showall) {
 
 // Verify global restrictions.
 $shortname = 'cohort_admin';
-$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 $report = reportbuilder_get_embedded_report($shortname, $data, false, $sid, $globalrestrictionset);

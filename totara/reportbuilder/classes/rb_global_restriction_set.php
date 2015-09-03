@@ -67,11 +67,18 @@ class rb_global_restriction_set implements Iterator {
      * This method updates $SESSION->rb_global_restriction
      * and processes 'globalrestrictionids' page parameter.
      *
-     * @param stdClass $reportrecord
+     * @param stdClass|false $reportrecord
      * @return rb_global_restriction_set or null if not active
      */
     public static function create_from_page_parameters($reportrecord) {
         global $CFG, $USER, $SESSION;
+
+        if (empty($reportrecord)) {
+            // Not a valid report record, its very likely this has occurred on an uninitialised embedded report.
+            // This situation is acceptable, global restrictions cannot be applied here at this point but the code
+            // will initialise the report shortly and they will work on the next request.
+            return null;
+        }
 
         if (empty($CFG->enableglobalrestrictions) or $reportrecord->globalrestriction == reportbuilder::GLOBAL_REPORT_RESTRICTIONS_DISABLED) {
             // Restrictions are disabled.

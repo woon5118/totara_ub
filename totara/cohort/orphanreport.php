@@ -39,7 +39,7 @@ $PAGE->set_context($context);
 
 // Verify global restrictions.
 $shortname = 'cohort_orphaned_users';
-$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 $report = reportbuilder_get_embedded_report($shortname, null, false, $sid, $globalrestrictionset);

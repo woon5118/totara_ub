@@ -51,7 +51,7 @@ $strheading = get_string('teammembers', 'totara_core');
 $shortname = 'team_members';
 
 // Verify global restrictions.
-$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('shortname' => $shortname));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 if (!$report = reportbuilder_get_embedded_report($shortname, null, false, $sid, $globalrestrictionset)) {

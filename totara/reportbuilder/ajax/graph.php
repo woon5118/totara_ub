@@ -36,7 +36,7 @@ $sid = optional_param('sid', '0', PARAM_INT);
 require_login();
 $context = context_system::instance();
 
-$reportrecord = $DB->get_record('report_builder', array('id' => $id), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('id' => $id));
 
 // Verify global restrictions.
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);

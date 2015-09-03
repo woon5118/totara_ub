@@ -40,7 +40,7 @@ $url = new moodle_url('/totara/appraisal/statusreport.php', array('format' => $f
 admin_externalpage_setup('reportappraisals', '', null, $url);
 
 // Verify global restrictions.
-$reportrecord = $DB->get_record('report_builder', array('shortname' => 'appraisal_status'), '*', MUST_EXIST);
+$reportrecord = $DB->get_record('report_builder', array('shortname' => 'appraisal_status'));
 $globalrestrictionset = rb_global_restriction_set::create_from_page_parameters($reportrecord);
 
 if (!$report = reportbuilder_get_embedded_report('appraisal_status', null, false, $sid, $globalrestrictionset)) {
