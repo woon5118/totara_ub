@@ -152,7 +152,7 @@ $mform = new plan_evidence_edit_form(
 $mform->set_data($item);
 
 if ($data = $mform->get_data()) {
-    if (!empty($data->evidencelink) && substr($data->evidencelink, 0, 7) != 'http://') {
+    if (!empty($data->evidencelink) && substr($data->evidencelink, 0, 7) != 'http://' && substr($data->evidencelink, 0, 8) != 'https://') {
         $data->evidencelink = 'http://' . $data->evidencelink;
     }
     $data->timemodified = time();
