@@ -40,6 +40,11 @@ if (!$resp_assignment = $DB->get_record('feedback360_resp_assignment', array('id
 
 $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $resp_assignment->feedback360userassignmentid));
 
+$feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id), '*', MUST_EXIST);
+if ($feedback360->anonymous) {
+    print_error('error:deletefromanon', 'totara_feedback360');
+}
+
 $email_assignment = null;
 if (!empty($resp_assignment->feedback360emailassignmentid)) {
     $email_assignment = $DB->get_record('feedback360_email_assignment', array('id' => $resp_assignment->feedback360emailassignmentid));

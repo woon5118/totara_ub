@@ -104,7 +104,7 @@ if ($viewrequestee) {
     }
 
     // Join the user assignment to the feedback360 so we have the name later.
-    $sql = "SELECT ua.*, fb.name, fb.status
+    $sql = "SELECT ua.*, fb.name, fb.anonymous, fb.status
             FROM {feedback360_user_assignment} ua
             JOIN {feedback360} fb
             ON ua.feedback360id = fb.id

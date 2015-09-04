@@ -82,6 +82,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $tableheader = array(get_string('name', 'totara_feedback360'),
                              get_string('assignments', 'totara_feedback360'),
+                             get_string('anonymous', 'totara_feedback360'),
                              get_string('status', 'totara_feedback360'),
                              get_string('options', 'totara_feedback360'));
 
@@ -126,6 +127,11 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $row[] = get_string('assignedtoxdraftusers', 'totara_feedback360', $countassignments);
             } else {
                 $row[] = get_string('assignedtoxusers', 'totara_feedback360', $countassignments);
+            }
+            if (!empty($feedback360->anonymous)) {
+                $row[] = get_string('yes');
+            } else {
+                $row[] = '<span class="accesshide">'.get_string('no').'</span>';
             }
             $row[] = feedback360::display_status($feedback360->status);
             $options = '';
@@ -252,9 +258,11 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      *
      * @param feedback360_responder $resp
      * @param user_record $subjectuser      The subject of the feedback.
+     * @param int $anonymous 1 if the feedback is being submitted anonymously, otherwise 0.
+     * @param int $numresponders Total number of users who have been asked to respond to this feedback.
      * @return string HTML
      */
-    public function display_feedback_header(feedback360_responder $resp, $subjectuser) {
+    public function display_feedback_header(feedback360_responder $resp, $subjectuser, $anonymous, $numresponders) {
         global $CFG, $USER;
 
         // The heading.
@@ -264,23 +272,35 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $a->site = $CFG->wwwroot;
         $a->profileurl = "{$CFG->wwwroot}/user/profile.php?id={$subjectuser->id}";
 
+        $anonmessage = false;
         if ($resp->is_email()) {
             if (!$resp->tokenaccess and $subjectuser->id == $USER->id) {
                 $titlestr = 'userownheaderfeedback';
             } else {
                 $a->responder = $resp->get_email();
                 $titlestr = 'userheaderfeedbackbyemail';
+                $anonmessage = true;
             }
         } else {
             if ($subjectuser->id == $USER->id) {
                 $titlestr = 'userownheaderfeedback';
             } else {
                 $titlestr = 'userheaderfeedback';
+                $anonmessage = true;
             }
         }
 
-        $r = new html_table_row(array($this->output->user_picture($subjectuser, array('link' => false)),
-            get_string($titlestr, 'totara_feedback360', $a)));
+        $message = html_writer::tag('p', get_string($titlestr, 'totara_feedback360', $a));
+        if ($anonmessage) {
+            if ($anonymous) {
+                $anonmessage = get_string('feedbackanonymous', 'totara_feedback360', $numresponders);
+            } else {
+                $anonmessage = get_string('feedbacknotanonymous', 'totara_feedback360');
+            }
+            $message .= html_writer::tag('p', $anonmessage);
+        }
+
+        $r = new html_table_row(array($this->output->user_picture($subjectuser, array('link' => false)), $message));
 
         $t = new html_table();
         $t->attributes['class'] = 'invisiblepadded viewing-xs-feedback360';
@@ -590,11 +610,17 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $user_table->head = array(
             get_string('name', 'totara_feedback360'),
             get_string('responses', 'totara_feedback360'),
-            get_string('duedate', 'totara_feedback360')
+            get_string('duedate', 'totara_feedback360'),
+            get_string('anonymous', 'totara_feedback360')
         );
         if ($canmanage) {
             $user_table->head[] = get_string('options', 'totara_feedback360');
         }
+
+        $stryes = new lang_string('yes');
+        $strno = new lang_string('no');
+        $stranoncancel = new lang_string('anoncancel', 'totara_feedback360');
+        $strstop = new lang_string('stop', 'totara_feedback360');
 
         $nodata = true;
         foreach ($user_assignments as $user_assignment) {
@@ -625,6 +651,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $nameurl = new moodle_url('/totara/feedback360/request/view.php',
                         array('userassignment' => $user_assignment->id));
                 $namelink = html_writer::link($nameurl, format_string($user_assignment->name));
+                $anonymous = !empty($user_assignment->anonymous) ? $stryes : $strno;
 
                 // The contents of the options column.
                 if ($canmanage) {
@@ -636,10 +663,14 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                     $remindurl = new moodle_url('/totara/feedback360/request/remind.php', $remindparams);
                     $remindstr = get_string('remind', 'totara_feedback360');
                     $remind = $this->output->action_icon($remindurl, new pix_icon('/t/email', $remindstr, 'moodle'));
-                    $cancelparams = array('userformid' => $user_assignment->id);
-                    $cancelurl = new moodle_url('/totara/feedback360/request/stop.php', $cancelparams);
-                    $cancelstr = get_string('stop', 'totara_feedback360');
-                    $cancel = $this->output->action_icon($cancelurl, new pix_icon('/t/stop', $cancelstr, 'moodle'));
+
+                    if (!empty($user_assignment->anonymous)) {
+                        $cancel = $this->output->pix_icon('/t/stop_gray', $stranoncancel, 'moodle', array('class' => 'iconsmall'));
+                    } else {
+                        $cancelparams = array('userformid' => $user_assignment->id);
+                        $cancelurl = new moodle_url('/totara/feedback360/request/stop.php', $cancelparams);
+                        $cancel = $this->output->action_icon($cancelurl, new pix_icon('/t/stop', $strstop, 'moodle'));
+                    }
 
                     if ($user_assignment->status == feedback360::STATUS_ACTIVE) {
                         if ($res->total == $res->responded) {
@@ -662,6 +693,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $cells['name'] = new html_table_cell($namelink);
                 $cells['responses'] = new html_table_cell($respond);
                 $cells['duedate'] = new html_table_cell($duedate);
+                $cells['anonymous'] = new html_table_cell($anonymous);
                 if ($canmanage) {
                     $cells['options'] = new html_table_cell($options);
                 }
@@ -767,8 +799,10 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      *
      * @param object $user_assignment   a user_assignment record
      * @param array  $resp_assignments  an array of resp_assignment records related to user_assignment
+     * @param int $anonymous If 1 feedback is anonymous, if 0 it is not.
+     * @return string HTML for the table.
      */
-    public function view_request_infotable($user_assignment, $resp_assignments) {
+    public function view_request_infotable($user_assignment, $resp_assignments, $anonymous) {
         $out = '';
         $request_infotable = new html_table();
         $request_infotable->head = array(
@@ -795,7 +829,9 @@ class totara_feedback360_renderer extends plugin_renderer_base {
                 $responselink = '';
             }
 
-            if (empty($resp_assignment->feedback360emailassignmentid)) {
+            if ($anonymous) {
+                $name_str = html_writer::tag('em', get_string('anonymoususer', 'totara_feedback360'));
+            } else if (empty($resp_assignment->feedback360emailassignmentid)) {
                 $name_str = fullname($resp_assignment);
             } else {
                 if (empty($resp_assignment->email)) {
@@ -824,8 +860,9 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      * @param object $userid    A user record
      * @param int $userform     The id of the feedback user assignment
      * @param object $resp      The associated resp_assignment for the timecompleted field
+     * @param boolean $anonymous Whether the form should enforce anonymity
      */
-    public function system_user_record($user, $userform, $resp) {
+    public function system_user_record($user, $userform, $resp, $anonymous) {
         $out = '';
 
         $username = fullname($user);
@@ -834,11 +871,13 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', array('id' => "system_user_{$user->id}", 'class' => 'user_record'));
         $out .= $username;
-        if (!empty($resp->timecompleted)) {
-            $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
-        } else {
-            $out .= $this->output->action_icon('', new pix_icon('/t/delete', $removestr), null,
-                array('class' => 'system_record_del', 'id' => $user->id));
+        if (!$anonymous || empty($resp)) {
+            if (!empty($resp->timecompleted)) {
+                $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
+            } else {
+                $out .= $this->output->action_icon('', new pix_icon('/t/delete', $removestr), null,
+                    array('class' => 'system_record_del', 'id' => $user->id));
+            }
         }
         $out .= html_writer::end_tag('div');
 
@@ -852,7 +891,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      * @param int $userform             The id of the user_assignment record.
      * @param object $resp              The associated resp_assignment, for the timecompleted field.
      */
-    public function external_user_record($email, $userform, $resp) {
+    public function external_user_record($email, $userform, $resp, $anonymous) {
         global $CFG;
 
         $out = '';
@@ -864,11 +903,13 @@ class totara_feedback360_renderer extends plugin_renderer_base {
 
         $out .= html_writer::start_tag('div', array('id' => "external_user_{$email}", 'class' => 'external_record'));
         $out .= $email;
-        if (!empty($resp->timecompleted)) {
-            $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
-        } else {
-            $out .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $removestr), null,
-                    array('class' => 'external_record_del', 'id' => $email));
+        if (!$anonymous) {
+            if (!empty($resp->timecompleted)) {
+                $out .= $this->output->pix_icon('/t/delete_gray', $completestr);
+            } else {
+                $out .= $this->output->action_icon($deleteurl, new pix_icon('/t/delete', $removestr), null,
+                        array('class' => 'external_record_del', 'id' => $email));
+            }
         }
         $out .= html_writer::end_tag('div');
 
@@ -885,7 +926,7 @@ class totara_feedback360_renderer extends plugin_renderer_base {
      * @param object $add_user_selector     User selector object with users to add
      * @param object $remove_user_selector  User selector object with users to remove
      */
-    public function nojs_feedback_request_users($selected, $returnurl, $add_user_selector, $remove_user_selector) {
+    public function nojs_feedback_request_users($selected, $returnurl, $add_user_selector, $remove_user_selector, $anonymous = false) {
         $out = '';
 
         $out .= html_writer::start_tag('form', array('action' => $returnurl, 'method' => 'post', 'id' => 'assignform'));
@@ -903,13 +944,28 @@ class totara_feedback360_renderer extends plugin_renderer_base {
         $existing_cell->id = 'existingcell';
         $row[] = $existing_cell;
 
-        $buttons_cell = new html_table_cell(
-                $this->output->container(html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'add',
-                    'value' => $this->output->larrow() . get_string('add'),
-                    'title' => get_string('add'))), null, 'addcontrols') .
-                $this->output->container(html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'remove',
+        $addbutton = $this->output->container(
+            html_writer::empty_tag('input', array(
+                'type' => 'submit',
+                'name' => 'add',
+                'value' => $this->output->larrow() . get_string('add'),
+                'title' => get_string('add')
+            )), null, 'addcontrols');
+
+        // Anonymous feedback can't have requests removed.
+        if ($anonymous) {
+            $delbutton = '';
+        } else {
+            $delbutton = $this->output->container(
+                html_writer::empty_tag('input', array(
+                    'type' => 'submit',
+                    'name' => 'remove',
                     'value' => $this->output->rarrow(). get_string('remove'),
-                    'title' => get_string('remove'))), null, 'removecontrols'));
+                    'title' => get_string('remove')
+                )), null, 'removecontrols');
+        }
+
+        $buttons_cell = new html_table_cell($addbutton . $delbutton);
         $buttons_cell->id = 'buttonscell';
         $row[] = $buttons_cell;
 

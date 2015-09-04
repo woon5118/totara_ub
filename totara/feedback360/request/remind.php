@@ -184,11 +184,14 @@ echo $renderer->display_userview_header($owner);
 $spacer = html_writer::empty_tag('br');
 $system = '';
 $external = '';
+$count = 0;
 foreach ($resp_assignments as $resp_assignment) {
     if (!empty($resp_assignment->timecompleted)) {
         // Skip anyone who has replied, we don't need to remind them.
         continue;
     }
+
+    $count++;
 
     if (!empty($resp_assignment->feedback360emailassignmentid)) {
         $external .= format_string($DB->get_field('feedback360_email_assignment', 'email',
@@ -198,7 +201,11 @@ foreach ($resp_assignments as $resp_assignment) {
         $system .= fullname($DB->get_record('user', array('id' => $resp_assignment->userid))) . $spacer;
     }
 }
-$strremind = get_string('reminderconfirm', 'totara_feedback360') . $spacer . $system . $spacer . $external;
+if (!empty($feedback->anonymous)) {
+    $strremind = get_string('reminderconfirmanonymous', 'totara_feedback360', $count);
+} else {
+    $strremind = get_string('reminderconfirm', 'totara_feedback360') . $spacer . $system . $spacer . $external;
+}
 $confirm = sha1($userform->feedback360id . ':' . $userform->userid . ':' . $userform->timedue);
 $rem_params = array('userformid' => $userformid, 'confirm' => $confirm);
 $rem_url = new moodle_url('/totara/feedback360/request/remind.php', $rem_params);

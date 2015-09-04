@@ -161,7 +161,8 @@ if ($isexternaluser) {
     $PAGE->navbar->add(get_string('feedback360', 'totara_feedback360'), new moodle_url('/totara/feedback360/index.php'));
     $PAGE->navbar->add(get_string('givefeedback', 'totara_feedback360'));
 } else {
-    $owner = $DB->get_record('user', array('id' => $respassignment->userid));
+    $ownerid = $DB->get_field('feedback360_user_assignment', 'userid', array('id' => $respassignment->feedback360userassignmentid));
+    $owner = $DB->get_record('user', array('id' => $ownerid));
     $userxfeedback = get_string('userxfeedback360', 'totara_feedback360', fullname($owner));
 
     $PAGE->set_title($userxfeedback);
@@ -226,12 +227,14 @@ $renderer = $PAGE->get_renderer('totara_feedback360');
 
 echo $renderer->header();
 
+$numresponders = $DB->get_field('feedback360_resp_assignment', 'COUNT(id)',
+    array('feedback360userassignmentid' => $respassignment->feedback360userassignmentid));
 if ($preview) {
     $feedbackname = $DB->get_field_select('feedback360', 'name', 'id = :fbid', array('fbid' => $respassignment->feedback360id));
     echo $renderer->display_preview_feedback_header($respassignment, $feedbackname);
 } else {
     $subjectuser = $DB->get_record('user', array('id' => $respassignment->subjectid));
-    echo $renderer->display_feedback_header($respassignment, $subjectuser);
+    echo $renderer->display_feedback_header($respassignment, $subjectuser, $feedback360->anonymous, $numresponders);
 }
 $form->display();
 

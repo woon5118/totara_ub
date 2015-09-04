@@ -92,16 +92,23 @@ if ($USER->id == $userid) {
 
 $PAGE->navbar->add($strviewrequest);
 
+if ($feedback->anonymous) {
+    $orderfields = "ra.timecompleted DESC, ra.id";
+} else {
+    $orderfields = "u.firstname, u.lastname";
+}
+
 // Get all the associated resp_assignments to go through and form the table.
 $usernamefields = get_all_user_name_fields(true, 'u');
 $resp_sql = "SELECT ra.*, ea.email, {$usernamefields}
-             FROM {feedback360_resp_assignment} ra
-             LEFT JOIN {feedback360_email_assignment} ea
-             ON ra.feedback360emailassignmentid = ea.id
-             JOIN {user} u
-             ON ra.userid = u.id
-             WHERE ra.feedback360userassignmentid = :uaid
-             AND u.deleted = 0";
+               FROM {feedback360_resp_assignment} ra
+          LEFT JOIN {feedback360_email_assignment} ea
+                 ON ra.feedback360emailassignmentid = ea.id
+               JOIN {user} u
+                 ON ra.userid = u.id
+              WHERE ra.feedback360userassignmentid = :uaid
+                AND u.deleted = 0
+           ORDER BY {$orderfields}";
 $resp_params = array('uaid' => $user_assignment->id);
 $resp_assignments = $DB->get_records_sql($resp_sql, $resp_params);
 
@@ -117,7 +124,7 @@ echo html_writer::start_tag('div', array('class' => 'requestdates'));
 echo $requested . ' ' . $timedue;
 echo html_writer::end_tag('div');
 
-echo $renderer->view_request_infotable($user_assignment, $resp_assignments);
+echo $renderer->view_request_infotable($user_assignment, $resp_assignments, $feedback->anonymous);
 
 $backurl = new moodle_url('/totara/feedback360/index.php',
         array('userid' => $userid));

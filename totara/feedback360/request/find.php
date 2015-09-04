@@ -125,13 +125,21 @@ if (!$nojs) {
     $PAGE->set_url(new moodle_url('/totara/feedback360/request/find.php',
             array('userid' => $userid, 'selected' => $selected, 'nojs' => 1)));
 
-    $completedusers = $DB->get_records_sql("SELECT ra.userid
-                                            FROM {feedback360_resp_assignment} ra
-                                            JOIN {feedback360_user_assignment} ua
-                                            ON ra.feedback360userassignmentid = ua.id
-                                            WHERE ra.timecompleted > 0 AND ua.userid = ?",
-                                            array($userid));
-    $completedusers = array_keys($completedusers);
+    $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $formid));
+    $feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id));
+
+    $completedusers = array();
+    if (!$feedback360->anonymous) {
+        $completedusers = $DB->get_records_sql("SELECT ra.userid
+                                                FROM {feedback360_resp_assignment} ra
+                                                JOIN {feedback360_user_assignment} ua
+                                                ON ra.feedback360userassignmentid = ua.id
+                                                WHERE ra.timecompleted > 0 AND ua.userid = :uid
+                                                AND ra.feedback360emailassignmentid IS NULL
+                                                AND ua.id = :aid",
+                                                array('uid' => $userid, 'aid' => $formid));
+        $completedusers = array_keys($completedusers);
+    }
 
     $options = array('guestid' => $guest->id, 'userid' => $userid, 'currentusers' => $selectedids, 'completedusers' => $completedusers);
 
@@ -191,7 +199,7 @@ if (!$nojs) {
     $renderer = $PAGE->get_renderer('totara_feedback360');
 
     // Print the form.
-    echo $renderer->nojs_feedback_request_users($selected, $returnurl, $add_user_selector, $remove_user_selector);
+    echo $renderer->nojs_feedback_request_users($selected, $returnurl, $add_user_selector, $remove_user_selector, $feedback360->anonymous);
 
     echo $OUTPUT->footer();
 }

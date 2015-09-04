@@ -85,6 +85,12 @@ class feedback360 {
     public $recipients = 0;
 
     /**
+     * Whether the feedback is anonymous or not
+     * @var int
+     */
+    public $anonymous = 0;
+
+    /**
      * Create instance of an
      */
     public function __construct($id = 0) {
@@ -129,6 +135,9 @@ class feedback360 {
         if (isset($todb->userid)) {
             $this->userid = $todb->userid;
         }
+        if (isset($todb->anonymous)) {
+            $this->anonymous = $todb->anonymous;
+        }
         return $this;
     }
 
@@ -145,6 +154,7 @@ class feedback360 {
         $obj->status = $this->status;
         $obj->id = $this->id;
         $obj->recipients = $this->recipients;
+        $obj->anonymous = $this->anonymous;
 
         return $obj;
     }
@@ -403,11 +413,13 @@ class feedback360 {
         global $DB;
 
         // Remove all unanswered feedback requests.
+        $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $userassignmentid), '*', MUST_EXIST);
+        $feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id));
         $resp_assignments = $DB->get_records('feedback360_resp_assignment',
                 array('feedback360userassignmentid' => $userassignmentid));
         $delete_user_assignment = true;
         foreach ($resp_assignments as $resp_assignment) {
-            if (empty($resp_assignment->timecompleted)) {
+            if (empty($feedback360->anonymous) && empty($resp_assignment->timecompleted)) {
                 self::cancel_resp_assignment($resp_assignment, $asmanager);
             } else {
                 $delete_user_assignment = false;
@@ -1371,9 +1383,57 @@ class feedback360_responder {
     }
 
     /**
+     * Create the records for feedback360_resp_assignment for system users and sends notifications.
+     *
+     * @param stdClass $data Data about assignments.
+     * @param bool $asmanager Whether we are sending as the user or as their manager defaults to sending as the user.
+     * @param stdClass $userfrom User object for sender.
+     * @param stdClass $strvars Variables to be substituted into strings.
+     */
+    public static function update_and_notify_system($data, $asmanager, $userfrom, $strvars) {
+        global $DB;
+
+        // Create new resp_assignments for all users selected in the system.
+        $systemnew = !empty($data->systemnew) ? explode(',', $data->systemnew) : array();
+        $systemkeep = !empty($data->systemkeep) ? explode(',', $data->systemkeep) : array();
+        $systemcancel = !empty($data->systemcancel) ? explode(',', $data->systemcancel) : array();
+
+        self::update_system_assignments($systemnew, $systemcancel, $data->formid, $data->duedate, $asmanager);
+
+        if ($data->duenotifications && !empty($systemkeep)) {
+
+            // Prepare strings.
+            $strmanagerupdatesubject = new lang_string('managerupdatesubject', 'totara_feedback360', $strvars);
+            $strmanagerupdatealert = new lang_string('managerupdatealert', 'totara_feedback360', $strvars);
+            $strupdatesubject = new lang_string('updatesubject', 'totara_feedback360', $strvars);
+            $strupdatealert = new lang_string('updatealert', 'totara_feedback360', $strvars);
+
+            // Send an alert with an updated duedate to everyone in systemkeep.
+            $event = new stdClass();
+            $event->userfrom = $userfrom;
+            $event->icon = 'feedback360-update';
+
+            foreach ($systemkeep as $uid) {
+                $userto = $DB->get_record('user', array('id' => $uid));
+
+                $event->userto = $userto;
+                if ($asmanager) {
+                    $event->subject = $strmanagerupdatesubject->out($userto->lang);
+                    $event->fullmessage = $strmanagerupdatealert->out($userto->lang);
+                } else {
+                    $event->subject = $strupdatesubject->out($userto->lang);
+                    $event->fullmessage = $strupdatealert->out($userto->lang);
+                }
+                tm_alert_send($event);
+            }
+        }
+
+    }
+
+    /**
      * Create the records for feedback360_resp_assignment.
      *
-     * @param array $new                An array of userids to create assignments for
+     * @param array $new                An array of userids to create assignments for.
      * @param array $cancel             An array of existing userids that need to be cancelled
      * @param int $userformid           The id of the linked feedback360_user_assignment
      * @param int $duedate              The date they should submit feedback by, for the notification
@@ -1388,6 +1448,7 @@ class feedback360_responder {
         $stringmanager = get_string_manager();
 
         $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $userformid));
+        $feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id), '*', MUST_EXIST);
         $userfrom = $DB->get_record('user', array('id' => $user_assignment->userid));
 
         // Create all the resp_assignments.
@@ -1409,6 +1470,10 @@ class feedback360_responder {
             $dueupdate->timedue = $duedate;
             $DB->update_record('feedback360_user_assignment', $dueupdate);
         }
+
+        // Randomise order users are added to ensure ids can't be used to identify users.
+        // This will lead to keys being lost - NEVER rely on them after this!
+        shuffle($new);
 
         // Loop through the users to add and assign them where appropriate.
         foreach ($new as $userid) {
@@ -1444,10 +1509,55 @@ class feedback360_responder {
         }
 
         // Loop through everything in the cancel array and remove their resp_assignment.
-        foreach ($cancel as $userid) {
-            $resp_params = array('userid' => $userid, 'feedback360userassignmentid' => $userformid);
-            $resp_assignment = $DB->get_record('feedback360_resp_assignment', $resp_params);
-            feedback360::cancel_resp_assignment($resp_assignment, $asmanager);
+        if (empty($feedback360->anonymous)) {
+            // Only allow cancellations when a feedback isn't anonymous.
+            foreach ($cancel as $userid) {
+                $resp_params = array('userid' => $userid, 'feedback360userassignmentid' => $userformid);
+                $resp_assignment = $DB->get_record('feedback360_resp_assignment', $resp_params);
+
+                if (!empty($resp_assignment->timecompleted)) {
+                    // We can't cancel completed responses.
+                    continue;
+                }
+
+                feedback360::cancel_resp_assignment($resp_assignment, $asmanager);
+            }
+        }
+    }
+
+    /**
+     * Create the records for feedback360_resp_assignment for external users and sends notifications.
+     *
+     * @param stdClass $data Data about assignments.
+     * @param bool $asmanager Whether we are sending as the user or as their manager defaults to sending as the user.
+     * @param stdClass $userfrom User object for sender.
+     * @param stdClass $strvars Variables to be substituted into strings.
+     */
+    public static function update_and_notify_email($data, $asmanager, $userfrom, $strvars) {
+        global $USER;
+        // Create new email and resp assignments for emails given.
+        $emailnew = !empty($data->emailnew) ? explode(',', $data->emailnew) : array();
+        $emailkeep = !empty($data->emailkeep) ? explode(',', $data->emailkeep) : array();
+        $emailcancel = !empty($data->emailcancel) ? explode(',', $data->emailcancel) : array();
+        self::update_external_assignments($emailnew, $emailcancel, $data->formid, $data->duedate, $asmanager);
+
+        if ($data->duenotifications && !empty($emailkeep)) {
+            // Send an email with an updated duedate to everyone in emailkeep.
+            // No need to translate these messages as they are going to external users.
+            if ($asmanager) {
+                $emailsubject = get_string('managerupdatesubject', 'totara_feedback360', $strvars);
+                $email_str = get_string('managerupdateemail', 'totara_feedback360', $strvars);
+                $sendas = $USER;
+            } else {
+                $emailsubject = get_string('updatesubject', 'totara_feedback360', $strvars);
+                $email_str = get_string('updateemail', 'totara_feedback360', $strvars);
+                $sendas = $userfrom;
+            }
+
+            foreach ($emailkeep as $email) {
+                $userto = \totara_core\totara_user::get_external_user($email);
+                email_to_user($userto, $sendas, $emailsubject, $email_str, $email_str);
+            }
         }
     }
 
@@ -1465,6 +1575,7 @@ class feedback360_responder {
         global $DB, $CFG, $USER;
 
         $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $userformid));
+        $feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id), '*', MUST_EXIST);
         $userfrom = $DB->get_record('user', array('id' => $user_assignment->userid));
 
         // Create and link the email and resp assignments.
@@ -1487,6 +1598,11 @@ class feedback360_responder {
         $resp_assignment = new stdClass();
         $resp_assignment->feedback360userassignmentid = $userformid;
         $resp_assignment->timeassigned = time();
+
+        // Randomise order users are added to ensure ids can't be used to identify users.
+        // This loses the keys, DO NOT rely on them after this.
+        shuffle($newassignments);
+
         foreach ($newassignments as $email) {
             // Create the feedback360_email_assignment.
             $email_assignment = new stdClass();
@@ -1535,17 +1651,25 @@ class feedback360_responder {
             \totara_feedback360\event\request_created::create_from_instance($resp_assignment, $user_assignment->userid, $email)->trigger();
         }
 
-        foreach ($cancellations as $email) {
-            $sql = "SELECT ra.*, ea.email
-                    FROM {feedback360_resp_assignment} ra
-                    JOIN {feedback360_email_assignment} ea
-                    on ra.feedback360emailassignmentid = ea.id
-                    WHERE ra.feedback360userassignmentid = ?
-                    and ea.email = ?";
-            $params = array($userformid, $email);
-            $resp_assign = $DB->get_record_sql($sql, $params);
+        if (empty($feedback360->anonymous)) {
+            // Only allow cancellations when a feedback isn't anonymous.
+            foreach ($cancellations as $email) {
+                $sql = "SELECT ra.*, ea.email
+                        FROM {feedback360_resp_assignment} ra
+                        JOIN {feedback360_email_assignment} ea
+                        on ra.feedback360emailassignmentid = ea.id
+                        WHERE ra.feedback360userassignmentid = ?
+                        and ea.email = ?";
+                $params = array($userformid, $email);
+                $resp_assign = $DB->get_record_sql($sql, $params);
 
-            feedback360::cancel_resp_assignment($resp_assign, $asmanager);
+                if (!empty($resp_assignment->timecompleted)) {
+                    // We can't cancel completed responses.
+                    continue;
+                }
+
+                feedback360::cancel_resp_assignment($resp_assign, $asmanager);
+            }
         }
     }
 

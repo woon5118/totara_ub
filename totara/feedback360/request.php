@@ -122,6 +122,7 @@ if ($action == 'form') {
     $data['systemexisting'] = array();
     $data['feedbackid'] = $feedback360->id;
     $data['feedbackname'] = format_string($feedback360->name);
+    $data['anonymous'] = $feedback360->anonymous;
     $data['duedate'] = $userassignment->timedue;
     $data['update'] = $update;
 
@@ -286,7 +287,6 @@ if ($mform->is_cancelled()) {
 
         if ($data->duenotifications) {
             // Set up some variables for use lower down in the send update notification loops.
-            $stringmanager = get_string_manager();
             $userfrom = $DB->get_record('user', array('id' => $USER->id));
             $user_assignment = $DB->get_record('feedback360_user_assignment', array('id' => $data->formid));
             $feedback360 = $DB->get_record('feedback360', array('id' => $user_assignment->feedback360id));
@@ -300,65 +300,20 @@ if ($mform->is_cancelled()) {
                 $staffmember = $DB->get_record('user', array('id' => $data->userid));
                 $strvars->staffname = fullname($staffmember);
             }
+        } else {
+            $strvars = $userfrom = null;
         }
 
-        // Create new resp_assignments for all users selected in the system.
-        $systemnew = !empty($data->systemnew) ? explode(',', $data->systemnew) : array();
-        $systemkeep = !empty($data->systemkeep) ? explode(',', $data->systemkeep) : array();
-        $systemcancel = !empty($data->systemcancel) ? explode(',', $data->systemcancel) : array();
-        feedback360_responder::update_system_assignments($systemnew, $systemcancel, $data->formid, $data->duedate, $asmanager);
-
-        if ($data->duenotifications && !empty($systemkeep)) {
-            // Send an alert with an updated duedate to everyone in systemkeep.
-            $event = new stdClass();
-            $event->userfrom = $userfrom;
-            $event->icon = 'feedback360-update';
-
-            foreach ($systemkeep as $uid) {
-                $userto = $DB->get_record('user', array('id' => $uid));
-
-                $event->userto = $userto;
-                if ($asmanager) {
-                    $event->subject = $stringmanager->get_string('managerupdatesubject', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                    $event->fullmessage = $stringmanager->get_string('managerupdatealert', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                    $event->fullmessagehtml = $stringmanager->get_string('managerupdatealert', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                } else {
-                    $event->subject = $stringmanager->get_string('updatesubject', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                    $event->fullmessage = $stringmanager->get_string('updatealert', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                    $event->fullmessagehtml = $stringmanager->get_string('updatealert', 'totara_feedback360',
-                            $strvars, $userto->lang);
-                }
-                tm_alert_send($event);
-            }
-        }
-
-        // Create new email and resp assignments for emails given.
-        $emailnew = !empty($data->emailnew) ? explode(',', $data->emailnew) : array();
-        $emailkeep = !empty($data->emailkeep) ? explode(',', $data->emailkeep) : array();
-        $emailcancel = !empty($data->emailcancel) ? explode(',', $data->emailcancel) : array();
-        feedback360_responder::update_external_assignments($emailnew, $emailcancel, $data->formid, $data->duedate, $asmanager);
-
-        if ($data->duenotifications && !empty($emailkeep)) {
-            // Send an email with an updated duedate to everyone in emailkeep.
-            if ($asmanager) {
-                $emailsubject = get_string('managerupdatesubject', 'totara_feedback360', $strvars);
-                $email_str = get_string('managerupdateemail', 'totara_feedback360', $strvars);
-                $sendas = $USER;
-            } else {
-                $emailsubject = get_string('updatesubject', 'totara_feedback360', $strvars);
-                $email_str = get_string('updateemail', 'totara_feedback360', $strvars);
-                $sendas = $userfrom;
-            }
-
-            foreach ($emailkeep as $email) {
-                $userto = \totara_core\totara_user::get_external_user($email);
-                email_to_user($userto, $sendas, $emailsubject, $email_str, $email_str);
-            }
+        // Randomly select whether to handle system or email responses first.
+        // This is necessary to ensure response ids can't be used to identify
+        // anonymous users in the situation where there are multiple responders
+        // but only one system or email user.
+        if (mt_rand(0, 1) == 1) {
+            feedback360_responder::update_and_notify_system($data, $asmanager, $userfrom, $strvars);
+            feedback360_responder::update_and_notify_email($data, $asmanager, $userfrom, $strvars);
+        } else {
+            feedback360_responder::update_and_notify_email($data, $asmanager, $userfrom, $strvars);
+            feedback360_responder::update_and_notify_system($data, $asmanager, $userfrom, $strvars);
         }
 
         // Redirect to the myfeedback360 page with a success notification.

@@ -69,7 +69,7 @@ M.totara_requestfeedback = M.totara_requestfeedback || {
             feedback360Dialog(
                 'systemrequest',
                 M.util.get_string('addsystemusers', 'totara_feedback360'),
-                findurl + '?userid=' + uid,
+                findurl + '?userid=' + uid + '&formid=' + fid,
                 saveurl + '?userform=' + fid
             );
         })();

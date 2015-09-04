@@ -28,13 +28,15 @@ abstract class feedback360_testcase extends advanced_testcase {
      * Creates new feedback and assign one user on it.
      * @param array|int $users
      * @param int $quest Create question
+     * @param bool $anonyous The value of the anonymous
      *
      * @return array(feedback360 $feedback360, array $users)
      */
-    protected function prepare_feedback_with_users($users = array(), $quest = 1) {
+    protected function prepare_feedback_with_users($users = array(), $quest = 1, $anonymous = false) {
         $feedback360 = new feedback360();
         $feedback360->name = 'Feedback';
         $feedback360->description = 'Description';
+        $feedback360->anonymous = $anonymous;
         $feedback360->save();
 
         // Add question.

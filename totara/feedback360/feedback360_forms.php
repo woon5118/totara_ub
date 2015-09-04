@@ -47,6 +47,9 @@ class feedback360_edit_form extends moodleform {
         if ($readonly) {
             $mform->addElement('static', 'name', get_string('name', 'totara_feedback360'));
             $mform->addElement('static', 'description_ro', get_string('description'), $feedback360->description_editor['text']);
+
+            $mform->addElement('static', 'anonymous_ro', get_string('anonymousfeedback', 'totara_feedback360'),
+                $feedback360->anonymous ? get_string('yes') : get_string('no'));
         } else {
             $mform->addElement('text', 'name', get_string('name', 'totara_feedback360'), 'maxlength="255" size="50"');
             $mform->addRule('name', null, 'required');
@@ -55,6 +58,9 @@ class feedback360_edit_form extends moodleform {
             $mform->addElement('editor', 'description_editor', get_string('description'), null, $TEXTAREA_OPTIONS);
             $mform->addHelpButton('description_editor', 'description', 'totara_feedback360');
             $mform->setType('description_editor', PARAM_CLEANHTML);
+
+            $mform->addElement('advcheckbox', 'anonymous', get_string('anonymousfeedback', 'totara_feedback360'));
+            $mform->addHelpButton('anonymous', 'anonymousfeedback', 'totara_feedback360');
 
             $submittitle = get_string('createfeedback360', 'totara_feedback360');
             if ($feedback360->id > 0) {
@@ -420,6 +426,12 @@ class request_select_users extends moodleform {
         $mform->addElement('hidden', 'popupurl', $popupurl);
         $mform->setType('popupurl', PARAM_TEXT);
 
+        $mform->addElement('hidden', 'anonymous');
+        $mform->setType('anonymous', PARAM_INT);
+
+        // Create a holder for any notices at the top.
+        $mform->addElement('static', 'formnotices', '', '');
+
         $systemuserstr = html_writer::tag('strong', get_string('requestuserssystem', 'totara_feedback360'));
         $mform->addElement('static', 'requestuserssystem', $systemuserstr);
 
@@ -462,6 +474,13 @@ class request_select_users extends moodleform {
             print_error('error:noformselected', 'totara_feedback360');
         }
 
+        if ($data['anonymous']) {
+            $notice = html_writer::start_tag('div', array('class' => 'notifynotice'));
+            $notice .= get_string('anonrequestform', 'totara_feedback360');
+            $notice .= html_writer::end_tag('div');
+            $mform->getElement('formnotices')->setValue($notice);
+        }
+
         if (!empty($data['feedbackid']) && !empty($data['feedbackname'])) {
             $title = get_string('manageuserrequests', 'totara_feedback360');
             $name = $data['feedbackname'];
@@ -482,7 +501,7 @@ class request_select_users extends moodleform {
                 $resp_params = array('userid' => $user->id, 'feedback360userassignmentid' => $userform);
                 $resp = $DB->get_record('feedback360_resp_assignment', $resp_params);
 
-                $existing[] = $renderer->system_user_record($user, $userform, $resp);
+                $existing[] = $renderer->system_user_record($user, $userform, $resp, $data['anonymous']);
                 $existingids[] = $user->id;
             }
 
@@ -526,7 +545,7 @@ class request_select_users extends moodleform {
                         AND ea.email = ?";
                 $resp = $DB->get_record_sql($sql, array($userform, $email));
 
-                $existing[] = $renderer->external_user_record($email, $userform, $resp);
+                $existing[] = $renderer->external_user_record($email, $userform, $resp, $data['anonymous']);
             }
 
             $mform->getElement('emailold')->setValue(implode($data['emailexisting'], ','));

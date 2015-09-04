@@ -21,7 +21,11 @@
  * @package totara
  * @subpackage totara_feedback360
  */
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->dirroot . '/totara/feedback360/lib.php');
+
+ajax_require_login();
 
 $users = required_param('users', PARAM_SEQUENCE);
 $userformid = required_param('userform', PARAM_INT);
@@ -33,12 +37,15 @@ $out = '';
 
 $out .= html_writer::start_tag('div', array('id' => 'system_assignments', 'class' => 'replacement_box'));
 
+$userform = $DB->get_record('feedback360_user_assignment', array('id' => $userformid), '*', MUST_EXIST);
+$feedback360 = $DB->get_record('feedback360', array('id' => $userform->feedback360id), '*', MUST_EXIST);
+
 foreach (explode(',', trim($users, ',')) as $userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     $resp_params = array('userid' => $userid, 'feedback360userassignmentid' => $userformid);
     $resp = $DB->get_record('feedback360_resp_assignment', $resp_params);
 
-    $out .= $renderer->system_user_record($user, $userformid, $resp);
+    $out .= $renderer->system_user_record($user, $userformid, $resp, $feedback360->anonymous);
 }
 
 $out .= html_writer::end_tag('div');

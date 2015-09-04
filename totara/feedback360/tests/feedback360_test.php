@@ -255,6 +255,37 @@ class feedback360_test extends feedback360_testcase {
         $this->assertEmpty($respass2);
     }
 
+    public function test_anon_cancel_user_assignment() {
+        global $DB;
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        list($fdbck, $users) = $this->prepare_feedback_with_users(2, 1, true);
+        $fdbck->activate();
+        $user1 = current($users);
+        $user2 = next($users);
+        $user1ass = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id, 'userid' => $user1->id));
+        $user2ass = $DB->get_record('feedback360_user_assignment', array('feedback360id' => $fdbck->id, 'userid' => $user2->id));
+        $respuser = $this->getDataGenerator()->create_user();
+        feedback360_responder::update_system_assignments(array($respuser->id), array(),
+                $user1ass->id, time());
+        // Check that there two user assignments and one resp assignment.
+        $respass = $DB->get_records('feedback360_resp_assignment', array('feedback360userassignmentid' => $user1ass->id));
+        $userass = $DB->get_records('feedback360_user_assignment', array('feedback360id' => $fdbck->id));
+
+        $this->assertCount(2, $userass);
+        $this->assertCount(1, $respass);
+
+        feedback360::cancel_user_assignment($user1ass->id);
+
+        // Check that there one user assignments and no resp assignments.
+        $respass2 = $DB->get_records('feedback360_resp_assignment', array('feedback360userassignmentid' => $user1ass->id));
+        $userass2 = $DB->get_records('feedback360_user_assignment', array('feedback360id' => $fdbck->id));
+
+        // Function cancel_user_assignments removes only all response assignments of this user.
+        $this->assertCount(2, $userass2);
+        $this->assertCount(1, $respass2);
+    }
+
     public function test_duplicate() {
         $this->resetAfterTest();
         $this->setAdminUser();
