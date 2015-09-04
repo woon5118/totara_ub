@@ -270,7 +270,7 @@ class rb_global_restriction_set implements Iterator {
     }
 
     /**
-     * Return list of restrictions ids available to user.
+     * Return list of restrictions available to user.
      *
      * If user does'nt have restrictions (if user is not in any "Restricted users" list) then empty array will be returned
      *
@@ -346,6 +346,23 @@ class rb_global_restriction_set implements Iterator {
 
         $cache[$userid] = $result;
         return $result;
+    }
+
+    /**
+     * Return list of restrictions ids available to user.
+     *
+     * If user does'nt have restrictions (if user is not in any "Restricted users" list) then empty array will be returned
+     *
+     * @param int $userid user to restrict id, 0 means not logged in, null means use $USER->id
+     * @param bool $nocache Do not use cache (cache is static variable)
+     * @return stdClass[]|null  List of available restrictions ids as (id, id, id) or null if user has no restrictions.
+     */
+    public static function get_user_all_restrictions_ids($userid, $nocache = false) {
+        $restrs = self::get_user_all_restrictions($userid, $nocache);
+        if (empty($restrs)) {
+            return null;
+        }
+        return array_keys($restrs);
     }
 
     /**

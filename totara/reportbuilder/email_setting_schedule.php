@@ -116,7 +116,7 @@ class email_setting_schedule {
     protected function get_emails_audiences() {
         global $DB;
 
-        $sql = "SELECT u.*
+        $sql = "SELECT DISTINCT u.*
               FROM {report_builder_schedule_email_audience} sea
         INNER JOIN {cohort_members} cm
                 ON sea.cohortid = cm.cohortid

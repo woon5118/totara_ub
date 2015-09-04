@@ -5323,7 +5323,7 @@ function reportbuilder_send_scheduled_report($sched) {
  * @return string Filename of the created attachment
  */
 function reportbuilder_create_attachment(stdClass $sched) {
-    global $USER;
+    global $USER, $DB;
 
     $reportid = $sched->reportid;
     $format = $sched->format;
@@ -5344,7 +5344,11 @@ function reportbuilder_create_attachment(stdClass $sched) {
     }
     $writerclass = $formats[$format];
 
-    $report = new reportbuilder($reportid, null, false, $sid, $userid, false, array('userid' => $userid));
+    $allrestr = rb_global_restriction_set::create_from_ids(
+        $DB->get_record('report_builder', array('id' => $reportid)),
+        rb_global_restriction_set::get_user_all_restrictions_ids($userid, true)
+    );
+    $report = new reportbuilder($reportid, null, false, $sid, $userid, false, array('userid' => $userid), $allrestr);
 
     $source = new \totara_reportbuilder\tabexport_source($report);
 
