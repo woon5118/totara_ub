@@ -47,8 +47,6 @@ Feature: Add - Remove Face to face attendees
     And I wait "1" seconds
     And I press "Save"
     Then I wait until "Sam1 Student1" "text" exists
-    And I wait until the page is ready
-    And I log out
 
   @javascript
   Scenario: Add and remove users to a face to face session without dates (waitlist)
@@ -73,5 +71,3 @@ Feature: Add - Remove Face to face attendees
     And I wait "1" seconds
     And I press "Save"
     Then I wait until "Sam1 Student1" "text" exists
-    And I wait until the page is ready
-    And I log out
