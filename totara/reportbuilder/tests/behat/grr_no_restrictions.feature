@@ -60,7 +60,8 @@ Feature: Create global report no restrictions
     And I click on "My Reports" in the totara menu
     And I follow "User report"
     Then I should see "There are no records in this report"
-    And I should see "No global data restriction available to view records." in the ".globalrestrictionscontainer" "css_element"
+    # Do not tell users what is going on, this is a required feature.
+    Then ".globalrestrictionscontainer" "css_element" should not exist
 
   Scenario: See no entries when logged in as a user who has access to no global report restrictions
     Given I set the following administration settings values:

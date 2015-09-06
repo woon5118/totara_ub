@@ -52,8 +52,8 @@ Feature: Create global report view restrictions
     And I press "Make this restriction available to all users"
     When I click on "My Reports" in the totara menu
     And I follow "User report"
-    Then I should not see "change" in the ".globalrestrictionscontainer" "css_element"
-    And I should see "Viewing records restricted by: test restriction." in the ".globalrestrictionscontainer" "css_element"
+    # Do not tell users what is going on, this is a required feature.
+    Then ".globalrestrictionscontainer" "css_element" should not exist
     And I should see "User One" in the ".reportbuilder-table" "css_element"
     And I should see "User Two" in the ".reportbuilder-table" "css_element"
     And I should see "User Three" in the ".reportbuilder-table" "css_element"
@@ -86,8 +86,8 @@ Feature: Create global report view restrictions
     And I press "Make this restriction available to all users"
     When I click on "My Reports" in the totara menu
     And I follow "User report"
-    Then I should not see "change" in the ".globalrestrictionscontainer" "css_element"
-    And I should see "Viewing records restricted by: test restriction." in the ".globalrestrictionscontainer" "css_element"
+    # Do not tell users what is going on, this is a required feature.
+    Then ".globalrestrictionscontainer" "css_element" should not exist
     And I should see "User One" in the ".reportbuilder-table" "css_element"
     And I should see "User Two" in the ".reportbuilder-table" "css_element"
     And I should see "User Three" in the ".reportbuilder-table" "css_element"
@@ -126,8 +126,8 @@ Feature: Create global report view restrictions
     And I press "Make this restriction available to all users"
     When I click on "My Reports" in the totara menu
     And I follow "User report"
-    Then I should not see "change" in the ".globalrestrictionscontainer" "css_element"
-    And I should see "Viewing records restricted by: test restriction." in the ".globalrestrictionscontainer" "css_element"
+    # Do not tell users what is going on, this is a required feature.
+    Then ".globalrestrictionscontainer" "css_element" should not exist
     And I should not see "User One" in the ".reportbuilder-table" "css_element"
     And I should not see "User Two" in the ".reportbuilder-table" "css_element"
     And I should not see "User Three" in the ".reportbuilder-table" "css_element"
@@ -165,8 +165,8 @@ Feature: Create global report view restrictions
     And I press "Make this restriction available to all users"
     When I click on "My Reports" in the totara menu
     And I follow "User report"
-    Then I should not see "change" in the ".globalrestrictionscontainer" "css_element"
-    And I should see "Viewing records restricted by: test restriction." in the ".globalrestrictionscontainer" "css_element"
+    # Do not tell users what is going on, this is a required feature.
+    Then ".globalrestrictionscontainer" "css_element" should not exist
     And I should see "User One" in the ".reportbuilder-table" "css_element"
     And I should see "User Two" in the ".reportbuilder-table" "css_element"
     And I should see "User Three" in the ".reportbuilder-table" "css_element"

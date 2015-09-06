@@ -1682,10 +1682,8 @@ class reportbuilder {
             // No restrictions available - we cannot ask them to select anything.
             if ($this->globalrestrictionset) {
                 if (!$this->globalrestrictionset->get_current_restriction_ids()) {
-                    // Nothing will be displayed, we need to explain this.
-                    $messagehtml = html_writer::div(get_string('selectedglobalrestrictionsnone', 'totara_reportbuilder'),
-                        'notifynotice globalrestrictionsnotice');
-                    echo html_writer::div($messagehtml, 'globalrestrictionscontainer');
+                    // Do not tell users what is going on, this is a required feature.
+                    // Users will not see any records.
                     return;
                 } else {
                     // This should not happen, it might be a very weird race condition when deleting stuff.
@@ -1747,22 +1745,22 @@ class reportbuilder {
             return;
         }
 
+        if (count($allrestrictions) === 1) {
+            // Do not tell users what is going on, this is a required feature.
+            // Users can see records from the current restriction only.
+            return;
+        }
+
         $chooselink = html_writer::link('#', get_string('changeglobalrestriction', 'totara_reportbuilder'), array(
             'id' => 'show-chooserestriction-dialog',
             'class' => 'restrictions_dialog',
             'data-selected' => implode(',', $appliedids)));
 
-        $message = new stdClass();
-        $message->appliednamesstr = implode(', ', $appliednames);
-        $message->chooselink = $chooselink;
-
-        if (count($allrestrictions) === 1) {
-            $messagehtml = html_writer::div(get_string('selectedglobalrestrictionsone', 'totara_reportbuilder', $message),
-                'notifynotice globalrestrictionsnotice');
-        } else {
-            $messagehtml = html_writer::div(get_string('selectedglobalrestrictionsmany', 'totara_reportbuilder', $message),
-                'notifynotice globalrestrictionsnotice');
-        }
+        $a = new stdClass();
+        $a->appliednamesstr = implode(', ', $appliednames);
+        $a->chooselink = $chooselink;
+        $messagehtml = html_writer::div(get_string('selectedglobalrestrictionsmany', 'totara_reportbuilder', $a),
+            'notifynotice globalrestrictionsnotice');
         echo html_writer::div($messagehtml, 'globalrestrictionscontainer');
     }
 
