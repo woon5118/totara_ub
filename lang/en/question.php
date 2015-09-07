@@ -446,3 +446,7 @@ $string['yougotnright'] = 'You have correctly selected {$a->num}.';
 // Deprecated since Moodle 2.8.
 
 $string['hidden'] = 'Hidden';
+
+// Totara tweaks
+$string['parentcategorymissing'] = 'Cannot update categories - a parent category is missing';
+$string['parentloopdetected'] = 'Cannot update categories - loop of category parents detected';

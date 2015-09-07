@@ -82,4 +82,75 @@ class question_category_edit_form extends moodleform {
         }
         parent::set_data($current);
     }
+
+    /**
+     * Totara - Validation to pick up parent/child category conflicts (TL-7317).
+     *
+     * @param array $data to be validated
+     * @param array $files to be validated (required by parent but not currently validated in this function)
+     *
+     * @return array containing error messages (empty array if there were no errors)
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (!empty($data['parent'])) {
+            list($parentid) = explode(',', $data['parent']);
+            $parentsarray = array();
+            if ($parenterror = $this->check_for_invalid_question_category_parents($data['name'], $data['id'], $parentid, $parentsarray)) {
+                $errors['parent'] = $parenterror;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Totara - Function for validation to pick up parent/child category conflicts (TL-7317).
+     *
+     * Recursively checks that a proposed new parent is not already a child of the record within
+     * question_categories table.
+     * Will return error string if a conflict is found between child and proposed parent, so that
+     * an exception or similar can be thrown.
+     * Will also return error string if somewhere in the chain of parents being checked,
+     * a parent field is null or refers to non-existent record.
+     *
+     * @param string $name - name of the category being updated, for adding to error message
+     * @param int $childid - id of the record to have its parent updated
+     * @param int $parentid - id of the proposed parent
+     * @param array &$parentsarray - reference of array showing parent records we've already cycled through
+     *
+     * @return mixed bool false if no invalid parents found, or error message string if there are
+     */
+    protected function check_for_invalid_question_category_parents($name, $childid, $parentid, &$parentsarray) {
+        global $DB;
+
+        if ($parentid == 0) {
+            // The top-level parent is 0, so there was no loop.
+            return false;
+        }
+
+        if ($childid == $parentid) {
+            // Simple instance of a loop.
+            return get_string('movecategoryparentconflict', 'error', $name);
+        }
+
+        if (!$record = $DB->get_record('question_categories', array('id' => $parentid), 'id, parent')) {
+            // A parent field refers to a record that does not exist.
+            return get_string('parentcategorymissing', 'question');
+        }
+
+        $parentsarray[$parentid] = $parentid;
+
+        if (!isset($record->parent)) {
+            // This shouldn't happen as parent field in db should have a "not null" restriction.
+            return get_string('parentcategorymissing', 'question');
+        } else if (isset($parentsarray[$record->parent])) {
+            // We've already encountered this parent, there is a pre-existing loop.
+            return get_string('parentloopdetected', 'question');
+        }
+
+        // if we've got this far, carry on to the parent of this parent until we get a true or false
+        return $this->check_for_invalid_question_category_parents($name, $childid, $record->parent, $parentsarray);
+    }
 }
