@@ -33,6 +33,8 @@ $userid = optional_param('userid', $USER->id, PARAM_INT); // show required learn
 $programid = optional_param('id', 0, PARAM_INT);
 $filter = optional_param('filter', 'all', PARAM_TEXT);
 
+$courseid = optional_param('cid', 0, PARAM_INT); // Used to apply enrolments before redirecting.
+
 $PAGE->set_context(context_system::instance());
 // Check if programs or certifications are enabled.
 if ($filter == 'program') {
@@ -67,6 +69,90 @@ if ($programid) {
 
 if (isset($program) && prog_required_for_user($programid, $userid)) {
     if (prog_is_accessible($program)) {
+
+        // Apply course enrolments before redirecting here.
+        if (!empty($courseid)) {
+            $url = new moodle_url('/course/view.php', array('id' => $courseid));
+            // Check sesskey.
+            if (!confirm_sesskey()) {
+                print_error('confirmsesskeybad', 'error');
+            }
+
+            // Check $user == $USER, don't let managers trigger users enrolments.
+            if ($userid != $USER->id) {
+                // It's not the learner so lets just redirect to the course.
+                redirect($url);
+            }
+
+            // Check for existing enrolment, no point trying to enrol someone who is already enrolled.
+            $sql = "SELECT ue.id
+                      FROM {user_enrolments} ue
+                      JOIN {enrol} e
+                        ON ue.enrolid = e.id
+                     WHERE ue.userid = :uid
+                       AND e.courseid = :cid";
+            $params = array('uid' => $userid, 'cid' => $courseid);
+            if ($DB->record_exists_sql($sql, $params)) {
+                redirect($url);
+            }
+
+            // Check the course is actually a (currently accessible) part of the program.
+            $courseavailable = false;
+            $certifpath = empty($program->certifid) ? CERTIFPATH_STD : $DB->get_field('certif_completion', 'certifpath', array('userid' => $userid, 'certifid' => $program->certifid));
+            $courseset_groups = $program->content->get_courseset_groups($certifpath);
+            foreach ($courseset_groups as $cs_group) {
+                $available = false;
+
+                foreach ($cs_group as $courseset) {
+                    $courses = $courseset->courses;
+                    foreach ($courses as $course) {
+                        if ($course->id == $courseid) {
+                            // Found it, try and enrol the user.
+                            $courseavailable = true;
+                            break(2);
+                        }
+                    }
+
+                    if ($courseset->is_courseset_complete($userid)) {
+                        $available = true;
+                    }
+                }
+
+                if (!$available) {
+                    // Don't check courses in locked coursesets.
+                    break;
+                }
+            }
+
+            if (!$courseavailable) {
+                // Looks like we didn't find the course, redirect before attempting to enrol.
+                redirect($url);
+            }
+
+            // Run the enrolments, note: taken from require_login().
+            $params = array('courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED);
+            $instances = $DB->get_records('enrol', $params, 'sortorder, id ASC');
+            $enrols = enrol_get_plugins(true);
+            // First ask all enabled enrol instances in course if they want to auto enrol user.
+            foreach ($instances as $instance) {
+                if (!isset($enrols[$instance->enrol])) {
+                    continue;
+                }
+                // Get a duration for the enrolment, a timestamp in the future, 0 (always) or false.
+                $until = $enrols[$instance->enrol]->try_autoenrol($instance);
+                if ($until !== false) {
+                    if ($until == 0) {
+                        $until = ENROL_MAX_TIMESTAMP;
+                    }
+                    $USER->enrol['enrolled'][$courseid] = $until;
+                    $access = true;
+                    break;
+                }
+            }
+
+            // Finally redirect to the course view page.
+            redirect($url);
+        }
 
         //Javascript include
         local_js(array(

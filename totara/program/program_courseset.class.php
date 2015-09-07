@@ -839,7 +839,7 @@ class multi_course_set extends course_set {
 
 
     public function display($userid=null, $previous_sets=array(), $next_sets=array(), $accessible=true, $viewinganothersprogram=false) {
-        global $USER, $OUTPUT, $DB;
+        global $USER, $OUTPUT, $DB, $CFG;
 
         if ($userid) {
             $usercontext = context_user::instance($userid);
@@ -951,6 +951,16 @@ class multi_course_set extends course_set {
                         $coursedetails .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)), $coursename);
                         $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                          get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
+                    } else if ($accessible && !empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
+                        // If the program has been assigned but the user is not yet enrolled in the course,
+                        // a course with audience visibility set to "Enrolled users" would not allow the user to become enrolled.
+                        // Instead, when "Launch" is clicked, we redirect to the program requirements page, which will then directly enrol them into the course.
+                        // This isn't needed for normal visibility because if the course is hidden then it will be inaccessible anyway.
+                        $coursedetails .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)), $coursename);
+                        $params = array('id' => $this->programid, 'cid' => $course->id, 'userid' => $userid, 'sesskey' => $USER->sesskey);
+                        $requrl = new moodle_url('/totara/program/required.php', $params);
+                        $button = $OUTPUT->single_button($requrl, get_string('launchcourse', 'totara_program'), null);
+                        $launch = html_writer::tag('div', $button, array('class' => 'prog-course-launch'));
                     } else {
                         $coursedetails .= $coursename;
                         $launch = html_writer::tag('div', $OUTPUT->single_button(null, get_string('notavailable', 'totara_program'), null,
@@ -1694,7 +1704,7 @@ class competency_course_set extends course_set {
     }
 
     public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $CFG, $USER;
 
         $out = '';
         $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
@@ -1740,6 +1750,15 @@ class competency_course_set extends course_set {
                 if ($accessible && totara_course_is_viewable($course->id, $userid)) {
                     $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                      get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
+                } else if ($accessible && !empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
+                    // If the program has been assigned but the user is not yet enrolled in the course,
+                    // a course with audience visibility set to "Enrolled users" would not allow the user to become enrolled.
+                    // Instead, when "Launch" is clicked, we redirect to the program requirements page, which will then directly enrol them into the course.
+                    // This isn't needed for normal visibility because if the course is hidden then it will be inaccessible anyway.
+                    $params = array('id' => $this->programid, 'cid' => $course->id, 'userid' => $userid, 'sesskey' => $USER->sesskey);
+                    $requrl = new moodle_url('/totara/program/required.php', $params);
+                    $button = $OUTPUT->single_button($requrl, get_string('launchcourse', 'totara_program'), null);
+                    $launch = html_writer::tag('div', $button, array('class' => 'prog-course-launch'));
                 } else {
                     $launch = html_writer::tag('div', $OUTPUT->single_button(null, get_string('notavailable', 'totara_program'), null,
                                      array('tooltip' => null, 'disabled' => true)), array('class' => 'prog-course-launch'));
@@ -2240,7 +2259,7 @@ class recurring_course_set extends course_set {
     }
 
     public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $USER;
 
         $out = '';
         $out .= html_writer::start_tag('div', array('class' => 'surround display-program'));
@@ -2275,6 +2294,11 @@ class recurring_course_set extends course_set {
             if ($accessible && totara_course_is_viewable($course->id, $userid)) {
                 $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                  get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
+            } else if ($accessible && !empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
+                $params = array('id' => $this->programid, 'cid' => $course->id, 'userid' => $userid, 'sesskey' => $USER->sesskey);
+                $requrl = new moodle_url('/totara/program/required.php', $params);
+                $button = $OUTPUT->single_button($requrl, get_string('launchcourse', 'totara_program'), null);
+                $launch = html_writer::tag('div', $button, array('class' => 'prog-course-launch'));
             } else {
                 $launch = html_writer::tag('div', $OUTPUT->single_button(null, get_string('notavailable', 'totara_program'), null,
                                  array('tooltip' => null, 'disabled' => true)), array('class' => 'prog-course-launch'));
