@@ -295,6 +295,14 @@ class page_requirements_manager {
         // Totara needs jQuery - load it on each page.
         $this->jquery();
 
+        // Load Ajax handler.
+        // This is so that when an ajax request fails according to a moodle error it is displayed nicely.
+        // The strings are required so that moodle strings doesn't make an AJAX call.
+        $this->strings_for_js(array('accessdenied', 'resourcenotfound'), 'admin');
+        $this->strings_for_js(array('unknownerror'), 'core');
+        $this->yui_module('moodle-core-jqueryajaxhandler', 'M.core.jqueryajaxhandler.init');
+
+        // Load behat ajax handler.
         if (defined('BEHAT_RUNNING') && BEHAT_RUNNING) {
             $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
         }

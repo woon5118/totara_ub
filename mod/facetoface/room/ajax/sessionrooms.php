@@ -23,6 +23,7 @@
  * @subpackage facetoface
  */
 
+define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content.class.php');

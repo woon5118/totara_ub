@@ -920,6 +920,7 @@ $string['requiredentrieschanged'] = '<strong>IMPORTANT - PLEASE READ<br/>(This w
 $string['requiremodintro'] = 'Require activity description';
 $string['requiremodintro_desc'] = 'If enabled, users will be forced to enter a description for each activity.';
 $string['requires'] = 'Requires';
+$string['resourcenotfound'] = 'Resource not found';
 $string['purgecaches']= 'Purge all caches';
 $string['purgecachesconfirm']= 'Totara can cache themes, javascript, language strings, filtered text, rss feeds and many other pieces of calculated data.  Purging these caches will delete that data from the server and force browsers to refetch data, so that you can be sure you are seeing the most up-to-date values produced by the current code.  There is no danger in purging caches, but your site may appear slower for a while until the server and clients calculate new information and cache it.';
 $string['purgecachesfinished']= 'All caches were purged.';
