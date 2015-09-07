@@ -3051,7 +3051,8 @@ class curl {
 
         // Bypass proxy if required.
         if ($this->proxy === null) {
-            if (!empty($this->options['CURLOPT_URL']) and is_proxybypass($this->options['CURLOPT_URL'])) {
+            $info = curl_getinfo($curl);
+            if (!empty($info['url']) and is_proxybypass($info['url'])) {
                 $proxy = false;
             } else {
                 $proxy = true;
@@ -3133,6 +3134,10 @@ class curl {
                 curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 0);
                 continue;
             }
+            if ($name === 'CURLOPT_URL') {
+                debugging('CURLOPT_URL cannot be specified in curl options, use $url in curl_init() instead', DEBUG_DEVELOPER);
+                continue;
+            }
             $name = constant($name);
             curl_setopt($curl, $name, $val);
         }
@@ -3198,6 +3203,13 @@ class curl {
         $results = array();
         $main    = curl_multi_init();
         for ($i = 0; $i < $count; $i++) {
+            // Make sure the URLs are actually valid.
+            $url = clean_param($requests[$i]['url'], PARAM_URL);
+            if (!$url) {
+                $results[$i] = false;
+                continue;
+            }
+            $results[$i] = null;
             if (!empty($requests[$i]['filepath']) and empty($requests[$i]['file'])) {
                 // open file
                 $requests[$i]['file'] = fopen($requests[$i]['filepath'], 'w');
@@ -3206,25 +3218,29 @@ class curl {
             foreach($requests[$i] as $n=>$v) {
                 $options[$n] = $v;
             }
-            $handles[$i] = curl_init($requests[$i]['url']);
+            $handles[$i] = curl_init($url);
             $this->apply_opt($handles[$i], $options);
             curl_multi_add_handle($main, $handles[$i]);
+        }
+        if (!$handles) {
+            curl_multi_close($main);
+            return $results;
         }
         $running = 0;
         do {
             curl_multi_exec($main, $running);
         } while($running > 0);
-        for ($i = 0; $i < $count; $i++) {
+        foreach ($handles as $i => $handle) {
             if (!empty($options['CURLOPT_RETURNTRANSFER'])) {
-                $results[] = true;
+                $results[$i] = true;
             } else {
-                $results[] = curl_multi_getcontent($handles[$i]);
+                $results[$i] = curl_multi_getcontent($handles[$i]);
             }
             curl_multi_remove_handle($main, $handles[$i]);
         }
         curl_multi_close($main);
 
-        for ($i = 0; $i < $count; $i++) {
+        foreach ($handles as $i => $handle) {
             if (!empty($requests[$i]['filepath']) and !empty($requests[$i]['auto-handle'])) {
                 // close file handler if file is opened in this function
                 fclose($requests[$i]['file']);
@@ -3238,14 +3254,17 @@ class curl {
      *
      * @param string $url The URL to request
      * @param array $options
-     * @return bool
+     * @return bool|string true on success, error string on failure
      */
     protected function request($url, $options = array()) {
-        // Set the URL as a curl option.
-        $this->setopt(array('CURLOPT_URL' => $url));
+        // Make sure the URL is valid, guessing is bad for security.
+        $url = clean_param($url, PARAM_URL);
+        if (!$url) {
+            return 'Invalid URL specified';
+        }
 
         // Create curl instance.
-        $curl = curl_init();
+        $curl = curl_init($url);
 
         // Reset here so that the data is valid when result returned from cache.
         $this->info             = array();
@@ -3327,6 +3346,12 @@ class curl {
                             $redirecturl = dirname($current).'/'.$redirecturl;
                         }
                     }
+                }
+
+                $redirecturl = clean_param($redirecturl, PARAM_URL);
+                if (!$redirecturl) {
+                    // Redirect not safe.
+                    break;
                 }
 
                 curl_setopt($curl, CURLOPT_URL, $redirecturl);

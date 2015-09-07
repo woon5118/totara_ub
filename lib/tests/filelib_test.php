@@ -508,37 +508,46 @@ class core_filelib_testcase extends advanced_testcase {
 
         // HTTP and HTTPS requests were verified in previous requests. Now check
         // that we can selectively disable some protocols.
-        $curl = new curl();
 
         // Other protocols than HTTP(S) are disabled by default.
-        $testurl = 'file:///';
-        $curl->get($testurl);
+        $curl = new curl();
+        $testurl = 'file:///example/file.txt';
+        $error = $curl->get($testurl);
+        $this->assertSame('Invalid URL specified', $error);
+        $this->assertNull($curl->error); // This does not get through PARAM_URL.
+
+        $curl = new curl();
+        $testurl = 'ftp://example.com/file.txt';
+        $error = $curl->get($testurl);
+        $this->assertContains('ftp', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
-        $testurl = 'ftp://nowhere';
-        $curl->get($testurl);
-        $this->assertNotEmpty($curl->error);
-        $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
-
-        $testurl = 'telnet://somewhere';
-        $curl->get($testurl);
-        $this->assertNotEmpty($curl->error);
-        $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
+        $curl = new curl();
+        $testurl = 'mailto:test@example.com';
+        $error = $curl->get($testurl);
+        $this->assertSame('Invalid URL specified', $error);
+        $this->assertNull($curl->error);
 
         // Protocols are also disabled during redirections.
+        $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
-        $curl->get($testurl, array('proto' => 'file'));
+        $error = $curl->get($testurl, array('proto' => 'file'));
+        $this->assertContains('file', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
+        $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
-        $curl->get($testurl, array('proto' => 'ftp'));
+        $error = $curl->get($testurl, array('proto' => 'ftp'));
+        $this->assertContains('ftp', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
+        $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
-        $curl->get($testurl, array('proto' => 'telnet'));
+        $error = $curl->get($testurl, array('proto' => 'telnet'));
+        $this->assertContains('telnet', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
     }
