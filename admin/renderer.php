@@ -312,6 +312,7 @@ class core_admin_renderer extends plugin_renderer_base {
             $buggyiconvnomb, $registered, array $cachewarnings = array(), $latesterror, $activeusers, $totara_release) {
         global $CFG, $PAGE;
         $output = '';
+        /** @var totara_core_renderer $totara_renderer */
         $totara_renderer = $PAGE->get_renderer('totara_core');
 
         $output .= $this->header();
@@ -335,7 +336,8 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $totara_renderer->totara_print_copyright($totara_release);
 
         // skodak: Martin likes to threaten people, so just style his copyright notice the standard way.
-        $output .= $this->output->box_start('generalbox adminwarning moodle-copyright');
+        $output .= $this->output->box_start('generalbox adminwarning copyright-acknowledgements');
+        $output .= get_string('totaracopyrightacknowledge', 'totara_core');
 
         //////////////////////////////////////////////////////////////////////////////////////////////////
         ////  IT IS ILLEGAL AND A VIOLATION OF THE GPL TO HIDE, REMOVE OR MODIFY THIS COPYRIGHT NOTICE ///

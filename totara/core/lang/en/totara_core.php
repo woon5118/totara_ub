@@ -548,7 +548,10 @@ $string['toggletotarasyncerror'] = 'Could not enable/disable the HR Import field
 $string['toggletotarasyncerror:noidnumber'] = 'The ID Number field is empty and so HR Import cannot be enabled for these users: {$a}';
 $string['tooltotarasynctask'] = 'Import HR elements from external sources';
 $string['totarabuild'] = 'Totara build number';
-$string['totaracopyright'] = '<p class="totara-copyright"><a href="http://www.totaralms.com">Totara LMS</a> is a distribution of Moodle. A "distro" or distribution is a ready-made extended version of the standard product with its own particular focus and vision. Totara is specifically designed for the requirements of corporate, industry and vocational training in contrast to standard Moodle\'s traditional educational setting.</p><p class="totara-copyright"><a href="http://www.totaralms.com">Totara LMS</a> extensions are Copyright &copy; 2010 onwards, Totara Learning Solutions Limited.</p>';
+$string['totaracopyright'] = '<p>Copyright &copy; 2010 onwards, Totara Learning Solutions Limited.</p>
+<p><a href="http://www.totaralms.com">Totara LMS</a> is a fully supported Open Source learning platform specifically designed for the requirements of corporate, industry and vocational training.</p>
+<p><a href="http://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License</a></p>';
+$string['totaracopyrightacknowledge'] = '<p>Totara LMS utilises the following copyrighted material:</p>';
 $string['totaracore'] = 'Totara core';
 $string['totarafeatures'] = 'Totara features';
 $string['totaralogo'] = 'Totara Logo';
