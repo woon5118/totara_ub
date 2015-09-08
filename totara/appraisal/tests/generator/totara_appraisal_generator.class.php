@@ -109,11 +109,15 @@ class totara_appraisal_generator extends component_generator_base {
         // Increment the count of stages.
         $i = ++$this->stagecount;
 
+        // Build due date.
+        $now = time();
+        $timedue = $now + ($i * (2 * WEEKSECS));
+
         // Create some default values for the stage.
         $defaults = array ('appraisalid' => $appraisalid,
             'name' => self::DEFAULT_NAME_STAGE . ' ' . $i,
             'description' => '<p>' . self::DEFAULT_NAME_STAGE . ' ' . $i . ' description</p>',
-            'timedue' => time()
+            'timedue' => $timedue
         );
 
         // Merge the defaults and the given data and cast into an object.
@@ -162,7 +166,8 @@ class totara_appraisal_generator extends component_generator_base {
         $i = ++$this->pagecount;
 
         // Create some default values for the page.
-        $defaults = array ('appraisalstageid' => $stageid,
+        $defaults = array (
+            'appraisalstageid' => $stageid,
             'name' => self::DEFAULT_NAME_PAGE . ' ' . $i
         );
 
@@ -223,8 +228,8 @@ class totara_appraisal_generator extends component_generator_base {
         $defaults = array (
             'appraisalstagepageid' => $pageid,
             'name' => self::DEFAULT_NAME_QUESTION . ' ' . $i,
-            'roles' => array(appraisal::ROLE_LEARNER => appraisal::ACCESS_MUSTANSWER),
-            'datatype' => 'text'
+            'roles' => array(appraisal::ROLE_LEARNER => appraisal::ACCESS_CANANSWER),
+            'datatype' => 'text',
         );
 
         // Merge the defaults and the given data and cast into an object.
@@ -233,6 +238,43 @@ class totara_appraisal_generator extends component_generator_base {
         // Create a new page.
         $question = new appraisal_question();
         $question->attach_element($data->datatype); // I don't understand why datatype is set here and not in the set method.
+        $question->set($data);
+        $question->save();
+
+        return $question;
+    }
+
+    /**
+     * Create a complex appraisal question with multiple roles.
+     *
+     * @param  integer  $pageid  Record id of the page to add the question to.
+     * @param  array    $data Optional data.
+     * @return stdClass Created instance.
+     */
+    public function create_complex_question($pageid, $data = array()) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+
+        $i = ++$this->questioncount;
+
+        // Default roles are Learner, Manager, Appraiser.
+        $defaults = array(
+            'appraisalstagepageid' => $pageid,
+            'name' => self::DEFAULT_NAME_QUESTION . ' ' . $i,
+            'roles' => array(appraisal::ROLE_LEARNER => appraisal::ACCESS_CANANSWER,
+                             appraisal::ROLE_MANAGER => 3,
+                             appraisal::ROLE_APPRAISER => 3
+                         ),
+        );
+
+        // Set datatype which determines the type of question.
+        $defaults['datatype'] = 'longtext';
+
+        // Merge the defaults and the given data and cast into an object.
+        $data = (object) array_merge($defaults, (array) $data);
+
+        $question = new appraisal_question();
+        $question->attach_element($data->datatype);
         $question->set($data);
         $question->save();
 

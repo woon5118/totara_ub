@@ -102,7 +102,7 @@ if ($action == 'snapshot') {
 
     $file = make_request_directory() . '/appraisal_'.$appraisal->id.'_'.date("Y-m-d_His").'_'.$roles[$role].'.pdf';
 
-    core_php_time_limit::raise('300');
+    core_php_time_limit::raise(0);
     \core\session\manager::write_close();
 
     if (!empty($CFG->pathtowkhtmltopdf) and file_exists($CFG->pathtowkhtmltopdf) and is_executable($CFG->pathtowkhtmltopdf)) {

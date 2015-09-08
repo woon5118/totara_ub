@@ -174,6 +174,7 @@ class behat_totara_hierarchy extends behat_base {
         $optional = array(
             'type',
             'manager', // Username.
+            'appraiser', // Username.
             'organisation', // ID number.
             'position', // ID number.
         );
@@ -208,6 +209,7 @@ class behat_totara_hierarchy extends behat_base {
             $record['userid'] = $userid;
             unset($record['user']);
 
+            // Map Manager to a user.
             if (!empty($record['manager'])) {
                 if (!$managerid = $DB->get_field('user', 'id', array('username' => $record['manager']))) {
                     throw new Exception('Unknown manager '.$record['manager'].' in position assignment definition');
@@ -216,6 +218,16 @@ class behat_totara_hierarchy extends behat_base {
             }
             unset($record['manager']);
 
+            // Map Appraiser to a user.
+            if (!empty($record['appraiser'])) {
+                if (!$appraiserid = $DB->get_field('user', 'id', array('username' => $record['appraiser']))) {
+                    throw new Exception('Unknown appraiser '.$record['appraiser'].' in position assignment definition');
+                }
+                $record['appraiserid'] = $appraiserid;
+            }
+            unset($record['appraiser']);
+
+            // Map Organisation ID Number to an organisation.
             if (!empty($record['organisation'])) {
                 if (!$organisationid = $DB->get_field('org', 'id', array('idnumber' => $record['organisation']))) {
                     throw new Exception('Unknown organisation '.$record['organisation'].' in position assignment definition');
@@ -224,6 +236,7 @@ class behat_totara_hierarchy extends behat_base {
             }
             unset($record['organisation']);
 
+            // Map Position ID Number to a position.
             if (!empty($record['position'])) {
                 if (!$positionid = $DB->get_field('pos', 'id', array('idnumber' => $record['position']))) {
                     throw new Exception('Unknown position '.$record['position'].' in position assignment definition');
@@ -232,6 +245,7 @@ class behat_totara_hierarchy extends behat_base {
             }
             unset($record['position']);
 
+            // Make sure we have a valid position type.
             if (!empty($record['type'])) {
                 if (!isset($POSITION_CODES[$record['type']])) {
                     throw new Exception('Unknown position type '.$record['type']);

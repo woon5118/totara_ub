@@ -498,6 +498,7 @@ class totara_hierarchy_generator extends component_generator_base {
         $data->managerid = (isset($record['managerid'])) ? $record['managerid'] : $managerid; // Assign manager to user position.
         $data->organisationid = (isset($record['organisationid'])) ? $record['organisationid'] : $organisationid; // Assign org.
         $data->positionid = (isset($record['positionid'])) ? $record['positionid'] : $positionid; // Assign pos.
+        $data->appraiserid = (isset($record['appraiserid'])) ? $record['appraiserid'] : null; // Assign appraiser to user position.
 
         // Other fields.
         if (isset($record['timevalidfrom'])) {

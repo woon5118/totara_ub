@@ -230,4 +230,40 @@ class totara_appraisal_generator_testcase extends advanced_testcase {
         // Check the appraisal is active.
         $this->assertEquals(appraisal::STATUS_ACTIVE, $DB->get_field('appraisal', 'status', array('id' => $appraisalid)));
     }
+
+    public function test_create_large_appraisal() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $cohortgenerator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
+
+        $appraisalid = $this->appraisal->id;
+
+        $stage = $this->appraisalgenerator->create_stage($appraisalid);
+        $page = $this->appraisalgenerator->create_page($stage->id);
+
+        for ($i = 1; $i <= 200; $i++) {
+            $question = $this->appraisalgenerator->create_question($page->id);
+        }
+
+        $questions = $DB->get_records('appraisal_quest_field', array('appraisalstagepageid' => $page->id));
+        $this->assertEquals(200, count($questions));
+
+        // Create cohort and assign a user to it.
+        $learner = $this->getDataGenerator()->create_user(array('username' => 'user1'));
+        $cohort = $cohortgenerator->create_cohort(array('name' => 'cohort1'));
+        $cohortgenerator->cohort_assign_users($cohort->id, array($learner->id));
+
+        // Assign cohort to the appraisal.
+        $this->appraisalgenerator->create_group_assignment($this->appraisal, 'cohort', $cohort->id);
+
+        // Check the appraisal is not active at this point.
+        $this->assertEquals(appraisal::STATUS_DRAFT, $DB->get_field('appraisal', 'status', array('id' => $appraisalid)));
+
+        // Activate appraisal.
+        $this->appraisalgenerator->activate($appraisalid);
+
+        // Check the appraisal is active.
+        $this->assertEquals(appraisal::STATUS_ACTIVE, $DB->get_field('appraisal', 'status', array('id' => $appraisalid)));
+    }
 }

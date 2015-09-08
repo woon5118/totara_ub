@@ -105,7 +105,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
         $appraisalstable->summary = '';
         $appraisalstable->head = $tableheader;
         $appraisalstable->data = array();
-        $appraisalstable->attributes = array('class' => 'generaltable fullwidth');
+        $appraisalstable->attributes = array('class' => 'generaltable fullwidth appraisallist');
 
         $stractivate = get_string('activate', 'totara_appraisal');
         $strclose = get_string('close', 'totara_appraisal');

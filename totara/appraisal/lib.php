@@ -242,6 +242,9 @@ class appraisal {
     public function activate($time = 0) {
         global $DB;
 
+        // Big appraisals with lots of questions can take a long time to activate.
+        set_time_limit(0);
+
         if (!self::is_draft($this->id)) {
             throw new appraisal_exception('Cannot make changes to active appraisal');
         }
