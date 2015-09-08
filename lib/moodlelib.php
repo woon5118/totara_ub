@@ -5566,6 +5566,30 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         return false;
     }
 
+    // Totara: make sure developers included all necessary fields in $user object.
+    if ($user->id > 0) {
+        if (!isset($user->deleted) or !isset($user->suspended) or !isset($user->auth) or !isset($user->mailformat)) {
+            global $DB;
+            $u = $DB->get_record('user', array('id' => $user->id), 'id, deleted, suspended, auth, mailformat', IGNORE_MISSING);
+            if ($u) {
+                // Note: it is ok to add missing fields to user object, because they may be getting more emails,
+                //       ideally there should be a debugging message in the future.
+                if (!isset($user->deleted)) {
+                    $user->deleted = $u->deleted;
+                }
+                if (!isset($user->suspended)) {
+                    $user->suspended = $u->suspended;
+                }
+                if (!isset($user->auth)) {
+                    $user->auth = $u->auth;
+                }
+                if (!isset($user->mailformat)) {
+                    $user->mailformat = $u->mailformat;
+                }
+            }
+        }
+    }
+
     if (!empty($user->deleted)) {
         debugging('Can not send email to deleted user: '.$user->id, DEBUG_DEVELOPER);
         return false;
@@ -5590,6 +5614,7 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
 
     // Skip mail to suspended users.
     if ((isset($user->auth) && $user->auth=='nologin') or (isset($user->suspended) && $user->suspended)) {
+        // Totara: this does not work properly without the hack above because devs keep forgetting to add these fields.
         return true;
     }
 

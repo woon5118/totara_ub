@@ -63,4 +63,78 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertSame($user2->username, $deluser->username);
         $this->assertSame($user2->email, $deluser->email);
     }
+
+    /**
+     * Totara specific tests for sending of emails.
+     */
+    public function test_email_to_user() {
+        global $DB, $CFG;
+        $this->resetAfterTest();
+        $sink = $this->redirectEmails();
+        $CFG->noemailever = 0;
+
+        $admin = get_admin();
+        $user = $this->getDataGenerator()->create_user();
+
+        // Everything fine.
+
+        $result = email_to_user($user, $admin, 'subject', 'message');
+        $this->assertTrue($result);
+        $this->assertCount(1, $sink->get_messages());
+        $sink->clear();
+
+        // Missing stuff.
+
+        $u = new stdClass();
+        $u->id = $user->id;
+        $u->email = $user->email;
+
+        $result = email_to_user($u, $admin, 'subject', 'message');
+        $this->assertTrue($result);
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertSame($user->id, $u->id);
+        $this->assertSame($user->deleted, $u->deleted);
+        $this->assertSame($user->suspended, $u->suspended);
+        $this->assertSame($user->auth, $u->auth);
+        $this->assertSame($user->mailformat, $u->mailformat);
+        $sink->clear();
+
+        // Suspended user with all details.
+
+        $DB->set_field('user', 'suspended', '1', array('id' => $user->id));
+        $user = $DB->get_record('user', array('id' => $user->id));
+
+        $result = email_to_user($user, $admin, 'subject', 'message');
+        $this->assertTrue($result);
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        // Suspended user with missing info.
+
+        $u = new stdClass();
+        $u->id = $user->id;
+        $u->email = $user->email;
+        $user = $DB->get_record('user', array('id' => $user->id));
+
+        $result = email_to_user($u, $admin, 'subject', 'message');
+        $this->assertTrue($result);
+        $this->assertCount(0, $sink->get_messages());
+        $this->assertSame($user->id, $u->id);
+        $this->assertSame($user->deleted, $u->deleted);
+        $this->assertSame($user->suspended, $u->suspended);
+        $this->assertSame($user->auth, $u->auth);
+        $this->assertSame($user->mailformat, $u->mailformat);
+        $sink->clear();
+
+        // No messing with external Totara users.
+
+        $u = \totara_core\totara_user::get_external_user('ext@example.com');
+        $prevu = clone($u);
+
+        $result = email_to_user($u, $admin, 'subject', 'message');
+        $this->assertTrue($result);
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertEquals($prevu, $u);
+        $sink->clear();
+    }
 }
