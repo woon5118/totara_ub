@@ -447,6 +447,14 @@ class totara_sync_element_user extends totara_sync_element {
                     unset($userauth);
                 }
 
+                // Using auth plugin that does not allow password changes, lets clear auth_forcepasswordchange setting.
+                $userauth = get_auth_plugin(strtolower($user->auth));
+                if (!$userauth->can_change_password()) {
+                    set_user_preference('auth_forcepasswordchange', 0, $user->id);
+                    set_user_preference('create_password', 0, $user->id);
+                }
+                unset($userauth);
+
                 // Store user data for assignment sync later.
                 $assign_sync_users[] = $suser;
                 // Update custom field data.
