@@ -496,7 +496,19 @@ class report_builder_edit_columns_form extends moodleform {
         $mform->addHelpButton('reportcolumns', 'reportbuildercolumns', 'totara_reportbuilder');
 
         if (isset($report->columnoptions) && is_array($report->columnoptions) && count($report->columnoptions) > 0) {
-
+            $rawcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC');
+            if ($report->grouped) {
+                $aggregatedpreset = false;
+                foreach ($rawcolumns as $rawcolumn) {
+                    if ($rawcolumn->aggregate) {
+                        $aggregatedpreset = true;
+                        break;
+                    }
+                }
+                if ($aggregatedpreset) {
+                    $mform->addElement('html', $OUTPUT->notification(get_string('warngroupaggregation', 'totara_reportbuilder'), 'notifymessage'));
+                }
+            }
 
             $mform->addElement('html', $OUTPUT->container(get_string('help:columnsdesc', 'totara_reportbuilder')) .
                 html_writer::empty_tag('br'));
@@ -512,7 +524,6 @@ class report_builder_edit_columns_form extends moodleform {
             $columnoptions = array();
             $defaultoptions = array('' => get_string('noneselected', 'totara_reportbuilder'));
 
-            $rawcolumns = $DB->get_records('report_builder_columns', array('reportid' => $id), 'sortorder ASC, id ASC');
             $badcolumns = array();
             $goodcolumns = array();
             foreach ($rawcolumns as $rawcolumn) {

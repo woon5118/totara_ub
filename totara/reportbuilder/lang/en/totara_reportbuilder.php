@@ -1027,6 +1027,7 @@ $string['usertimemodified'] = 'User Last Modified';
 $string['value'] = 'Value';
 $string['viewreport'] = 'View This Report';
 $string['viewsavedsearch'] = 'View a saved search...';
+$string['warngroupaggregation'] = 'This report is using data aggregation internally, custom aggregation of columns may produce unexpected results.';
 $string['weekly'] = 'Weekly';
 $string['withcontentrestrictionall'] = 'Show records matching <strong>all</strong> of the checked criteria below';
 $string['withcontentrestrictionany'] = 'Show records matching <strong>any</strong> of the checked criteria below';
