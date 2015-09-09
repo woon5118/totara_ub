@@ -431,7 +431,7 @@ function totara_resize_images_filearea($contextid, $component, $filearea, $itemi
  * Create recursively totara menu table
  *
  * @param html_table $table to add data to.
- * @param totara_core_menu $item to render
+ * @param \totara_core\totara\menu\menu $item to render
  * @param int $depth of the category.
  * @param bool $up true if this category can be moved up.
  * @param bool $down true if this category can be moved down.
@@ -456,6 +456,10 @@ function totara_menu_table_load(html_table &$table, \totara_core\totara\menu\men
         $node = \totara_core\totara\menu\menu::node_instance($item->get_property());
         if ($node === false) {
             // Bad node, don't display.
+            return;
+        }
+        if ($node->is_disabled()) {
+            // Feature is disabled, do not show this in admin UI.
             return;
         }
         $dimmed = ($item->visibility && $node->get_visibility() ? '' : ' dimmed');

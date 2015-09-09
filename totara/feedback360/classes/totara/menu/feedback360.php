@@ -48,14 +48,19 @@ class feedback360 extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         global $CFG, $USER;
-
         static $cache = null;
+
+        if (!totara_feature_visible('feedback360')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
 
         require_once($CFG->dirroot . '/totara/feedback360/lib.php');
-        if (totara_feature_visible('feedback360') && \feedback360::can_view_feedback360s($USER->id)) {
+        if (\feedback360::can_view_feedback360s($USER->id)) {
             $cache = menu::SHOW_ALWAYS;
         } else {
             $cache = menu::HIDE_ALWAYS;
@@ -63,11 +68,16 @@ class feedback360 extends \totara_core\totara\menu\item {
         return $cache;
     }
 
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('feedback360');
+    }
+
     protected function get_default_parent() {
-        if (totara_feature_visible('appraisals')) {
-            return '\totara_appraisal\totara\menu\appraisal';
-        } else {
-            return 'root';
-        }
+        return '\totara_appraisal\totara\menu\appraisal';
     }
 }

@@ -196,7 +196,7 @@ class behat_totara_core extends behat_base {
      */
     public function i_edit_totara_menu_item($text) {
         $text = $this->getSession()->getSelectorsHandler()->xpathLiteral($text);
-        $xpath = "//table[@id='totaramenu']//td[contains(concat(' ', normalize-space(@class), ' '), ' name ')]/*[contains(text(),{$text})]//ancestor::tr//a[@title='Edit']";
+        $xpath = "//table[@id='totaramenutable']//td[contains(concat(' ', normalize-space(@class), ' '), ' name ')]/*[contains(text(),{$text})]//ancestor::tr//a[@title='Edit']";
         $node = $this->find(
             'xpath',
             $xpath,

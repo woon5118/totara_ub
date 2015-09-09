@@ -48,16 +48,18 @@ class latestappraisal extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         global $CFG, $USER;
-
         static $cache = null;
+
+        if (!totara_feature_visible('appraisals')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
 
         require_once($CFG->dirroot . '/totara/appraisal/lib.php');
-        if (!totara_feature_visible('appraisals')) {
-            return menu::HIDE_ALWAYS;
-        }
         if (\appraisal::can_view_own_appraisals($USER->id)) {
             $cache = menu::SHOW_ALWAYS;
         } else {
@@ -67,10 +69,15 @@ class latestappraisal extends \totara_core\totara\menu\item {
     }
 
     protected function get_default_parent() {
-        if (totara_feature_visible('appraisals')) {
-            return '\totara_appraisal\totara\menu\appraisal';
-        } else {
-            return 'root';
-        }
+        return '\totara_appraisal\totara\menu\appraisal';
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('appraisals');
     }
 }

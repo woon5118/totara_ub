@@ -92,7 +92,7 @@ echo $OUTPUT->single_button($editurl, get_string('menuitem:addnew', 'totara_core
 
 // Print table header.
 $table = new html_table;
-$table->id = 'totaramenu';
+$table->id = 'totaramenutable'; // Must not be same as the id of real totara menu!
 $table->attributes['class'] = 'admintable generaltable editcourse';
 
 $table->head = array(

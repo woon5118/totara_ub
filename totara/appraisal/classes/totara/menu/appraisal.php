@@ -76,28 +76,45 @@ class appraisal extends \totara_core\totara\menu\item {
             return $cache;
         }
 
-        require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+        if (totara_feature_visible('goals')) {
+            // Start checking from least consuming requests.
+            $goalmenu = new \totara_hierarchy\totara\menu\mygoals(array());
+            $show = $goalmenu->get_visibility();
+            if ($show != menu::HIDE_ALWAYS) {
+                $cache = menu::SHOW_ALWAYS;
+                return $cache;
+            }
+        }
 
-        // Start checking from least consuming requests.
-        $goalmenu = new \totara_hierarchy\totara\menu\mygoals(array());
-        $show = $goalmenu->get_visibility();
-
-        if (!$show) {
+        if (totara_feature_visible('feedback360')) {
             $feedbackmenu = new \totara_feedback360\totara\menu\feedback360(array());
             $show = $feedbackmenu->get_visibility();
+            if ($show != menu::HIDE_ALWAYS) {
+                $cache = menu::SHOW_ALWAYS;
+                return $cache;
+            }
         }
 
-        if (!$show) {
-            $isappraisalenabled = totara_feature_visible('appraisals');
-            $show = $isappraisalenabled &&
-                (\appraisal::can_view_own_appraisals($USER->id) || \appraisal::can_view_staff_appraisals($USER->id));
+        if (totara_feature_visible('appraisals')) {
+            require_once($CFG->dirroot . '/totara/appraisal/lib.php');
+            $show = (\appraisal::can_view_own_appraisals($USER->id) || \appraisal::can_view_staff_appraisals($USER->id));
+            if ($show) {
+                $cache = menu::SHOW_ALWAYS;
+                return $cache;
+            }
         }
 
-        if ($show) {
-            $cache = menu::SHOW_ALWAYS;
-        } else {
-            $cache = menu::HIDE_ALWAYS;
-        }
+        // Nothing to display here.
+        $cache = menu::HIDE_ALWAYS;
         return $cache;
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return (totara_feature_disabled('appraisals') && totara_feature_disabled('goals') && totara_feature_disabled('feedback360'));
     }
 }

@@ -63,4 +63,13 @@ class certifications extends \totara_core\totara\menu\item {
     protected function get_default_parent() {
         return '\totara_coursecatalog\totara\menu\findlearning';
     }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('certifications');
+    }
 }

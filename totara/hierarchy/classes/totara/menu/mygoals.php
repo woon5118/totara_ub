@@ -48,14 +48,19 @@ class mygoals extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         global $CFG, $USER;
-
         static $cache = null;
+
+        if (!totara_feature_visible('goals')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
 
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
-        if (totara_feature_visible('goals') && \goal::can_view_goals($USER->id)) {
+        if (\goal::can_view_goals($USER->id)) {
             $cache = menu::SHOW_ALWAYS;
         } else {
             $cache = menu::HIDE_ALWAYS;
@@ -63,11 +68,16 @@ class mygoals extends \totara_core\totara\menu\item {
         return $cache;
     }
 
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('goals');
+    }
+
     protected function get_default_parent() {
-        if (totara_feature_visible('appraisals')) {
-            return '\totara_appraisal\totara\menu\appraisal';
-        } else {
-            return 'root';
-        }
+        return '\totara_appraisal\totara\menu\appraisal';
     }
 }

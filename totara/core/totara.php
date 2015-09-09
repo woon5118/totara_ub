@@ -1846,6 +1846,7 @@ function totara_build_menu() {
 }
 
 function totara_upgrade_menu() {
+    totara_menu_reset_cache();
     $TOTARAMENU = new \totara_core\totara\menu\build();
     $plugintypes = core_component::get_plugin_types();
     foreach ($plugintypes as $plugin => $path) {

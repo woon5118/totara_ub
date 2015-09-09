@@ -48,17 +48,19 @@ class allappraisals extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         global $CFG, $USER;
-
         static $cache = null;
+
+        if (!totara_feature_visible('appraisals')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
 
         require_once($CFG->dirroot . '/totara/appraisal/lib.php');
-
-        $isappraisalenabled = totara_feature_visible('appraisals');
-        $viewappraisals = $isappraisalenabled &&
-                (\appraisal::can_view_own_appraisals($USER->id) || \appraisal::can_view_staff_appraisals($USER->id));
+        $viewappraisals = (\appraisal::can_view_own_appraisals($USER->id) || \appraisal::can_view_staff_appraisals($USER->id));
 
         if ($viewappraisals) {
             $cache = menu::SHOW_ALWAYS;
@@ -66,6 +68,15 @@ class allappraisals extends \totara_core\totara\menu\item {
             $cache = menu::HIDE_ALWAYS;
         }
         return $cache;
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('appraisals');
     }
 
     protected function get_default_parent() {

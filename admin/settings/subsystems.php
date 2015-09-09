@@ -91,9 +91,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     // Enchanced catalog.
     // Was upgrade - old catalog by default, otherwise - new catalog.
     $defaultenhanced = (isset($CFG->upgradetofaceted) && $CFG->upgradetofaceted == 1) ? 0 : 1;
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enhancedcatalog',
+    $setting = new admin_setting_configcheckbox('enhancedcatalog',
             new lang_string('enhancedcatalog', 'totara_core'),
-            new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced));
+            new lang_string('configenhancedcatalog', 'totara_core'), $defaultenhanced);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
     // Dynamic Appraisals.
     $optionalsubsystems->add(new admin_setting_configcheckbox('dynamicappraisals',
@@ -120,40 +122,54 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     // If adding or removing the settings below, be sure to update the array in
     // totara_advanced_features_list() in totara/core/totara.php.
 
-    $optionalsubsystems->add(new admin_setting_configselect('enablegoals',
+    $setting = new admin_setting_configselect('enablegoals',
         new lang_string('enablegoals', 'totara_hierarchy'),
         new lang_string('configenablegoals', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enableappraisals',
+    $setting = new admin_setting_configselect('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
         new lang_string('configenableappraisals', 'totara_appraisal'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enablefeedback360',
+    $setting = new admin_setting_configselect('enablefeedback360',
         new lang_string('enablefeedback360', 'totara_feedback360'),
         new lang_string('configenablefeedback360', 'totara_feedback360'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enablelearningplans',
+    $setting = new admin_setting_configselect('enablelearningplans',
         new lang_string('enablelearningplans', 'totara_plan'),
         new lang_string('configenablelearningplans', 'totara_plan'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enableprograms',
+    $setting = new admin_setting_configselect('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enablecertifications',
+    $setting = new admin_setting_configselect('enablecertifications',
         new lang_string('enablecertifications', 'totara_program'),
         new lang_string('configenablecertifications', 'totara_program'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
-    $optionalsubsystems->add(new admin_setting_configselect('enabletotaradashboard',
+    $setting = new admin_setting_configselect('enabletotaradashboard',
         new lang_string('enabletotaradashboard', 'totara_dashboard'),
         new lang_string('configenabletotaradashboard', 'totara_dashboard'),
-        TOTARA_SHOWFEATURE, $featureoptions));
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 
     $optionalsubsystems->add(new admin_setting_configselect('enablereportgraphs',
         new lang_string('enablereportgraphs', 'totara_reportbuilder'),

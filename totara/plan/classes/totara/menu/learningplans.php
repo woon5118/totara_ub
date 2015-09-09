@@ -48,20 +48,33 @@ class learningplans extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         global $CFG, $USER;
-
         static $cache = null;
+
+        if (!totara_feature_visible('learningplans')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
 
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-        $canviewlearningplans = totara_feature_visible('learningplans') && dp_can_view_users_plans($USER->id);
-        if ($canviewlearningplans) {
+        if (dp_can_view_users_plans($USER->id)) {
             $cache = menu::SHOW_ALWAYS;
         } else {
             $cache = menu::HIDE_ALWAYS;
         }
         return $cache;
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('learningplans');
     }
 
     protected function get_default_parent() {

@@ -81,7 +81,7 @@ class menu implements \renderable, \IteratorAggregate {
     const TARGET_ATTR_BLANK = '_blank';
 
     /**
-    * @var totara_core_menu stores pseudo category with id=0.
+    * @var \totara_core\totara\menu\menu stores pseudo category with id=0.
     * Use totara_core_menu::get(0) to retrieve.
     */
     protected static $menucat0;
@@ -189,7 +189,7 @@ class menu implements \renderable, \IteratorAggregate {
      * Create an iterator because magic vars can't be seen by 'foreach'.
      * Implementing method from interface IteratorAggregate.
      *
-     * @return ArrayIterator
+     * @return \ArrayIterator
      */
     public function getiterator() {
         $ret = array();
@@ -209,7 +209,7 @@ class menu implements \renderable, \IteratorAggregate {
      * Constructor.
      * Constructor is protected, use totara_core_menu::get($id) to retrieve category.
      *
-     * @param stdClass $record from DB (may not contain all fields)
+     * @param \stdClass $record from DB (may not contain all fields)
      */
     protected function __construct(\stdClass $record) {
         foreach ($record as $key => $val) {
@@ -226,7 +226,7 @@ class menu implements \renderable, \IteratorAggregate {
      *
      * @param int $id category id
      * @return null|menu
-     * @throws moodle_exception
+     * @throws \moodle_exception
      */
     public static function get($id = 0) {
         if (!$id) {
@@ -264,7 +264,7 @@ class menu implements \renderable, \IteratorAggregate {
      *
      * Data sample
      * @global \moodle_database $DB
-     * @param array|stdClass $data
+     * @param array|\stdClass $data
      * $data->title = 'New parent|child node title';
      * $data->url = '/totara/core/tm_sync4.php';
      * $data->parentid = 0|19;
@@ -318,9 +318,9 @@ class menu implements \renderable, \IteratorAggregate {
      * Creates a new category either from form data or from raw data
      *
      * @global \moodle_database $DB
-     * @param array|stdClass $data
+     * @param array|\stdClass $data
      * @return true
-     * @throws moodle_exception
+     * @throws \moodle_exception
      */
     public function create($data) {
         global $DB;
@@ -355,9 +355,9 @@ class menu implements \renderable, \IteratorAggregate {
      * Updates the record with either form data or raw data
      *
      * @global \moodle_database $DB
-     * @param array|stdClass $data
+     * @param array|\stdClass $data
      * @return true
-     * @throws moodle_exception
+     * @throws \moodle_exception
      */
     public function update($data) {
         global $DB;
@@ -522,7 +522,7 @@ class menu implements \renderable, \IteratorAggregate {
      * Returns array of children categories
      *
      * @global \moodle_database $DB
-     * @return totara_core_menu[] Array of totara_core_menu objects indexed by category id
+     * @return \totara_core\totara\menu\menu[] Array of totara_core_menu objects indexed by category id
      */
     public function get_children() {
         // We need to retrieve all children by sort.
@@ -540,8 +540,6 @@ class menu implements \renderable, \IteratorAggregate {
     /**
      * Deletes a category and all children
      *
-     * @global \moodle_database $DB
-     * @param int $id
      * @return boolean
      */
     public function delete() {
@@ -648,7 +646,7 @@ class menu implements \renderable, \IteratorAggregate {
      * Changes the sort order of this categories parent shifting this category up or down one.
      *
      * @global \moodle_database $DB
-     * @param int category id
+     * @param int $id category
      * @param bool $up If set to true the category is shifted up one spot, else its moved down.
      * @return bool true on success, false otherwise.
      */
@@ -737,7 +735,7 @@ class menu implements \renderable, \IteratorAggregate {
      * Returns false if the classname provided is not found.
      *
      * @param object item
-     * @return object|false - new instance or false if not found.
+     * @return \totara_core\totara\menu\item|bool - new instance or false if not found.
      */
     public static function node_instance($item) {
         if (is_array($item)) {
@@ -759,8 +757,9 @@ class menu implements \renderable, \IteratorAggregate {
      * calculate the best real sortorder for that item. We need to
      * check to see which values have already been used to identify this.
      *
-     * @param int|null Preferred sort order for this item (or null).
-     * @param int ID of parent node. Used to calculate position if no default sort given.
+     * @param int|null $defaultsort Preferred sort order for this item (or null).
+     * @param int $parentid ID of parent node. Used to calculate position if no default sort given.
+     * @return int
      */
     private static function calculate_item_sortorder($defaultsort, $parentid = 0) {
         global $DB;
@@ -825,7 +824,6 @@ class menu implements \renderable, \IteratorAggregate {
     /**
      * Method for obtaining a item setting.
      *
-     * @param integer $itemid ID for the item to obtain a setting for.
      * @param string $type Identifies the class using the setting.
      * @param string $name Identifies the particular setting.
      * @return mixed The value of the setting $name or null if it doesn't exist.

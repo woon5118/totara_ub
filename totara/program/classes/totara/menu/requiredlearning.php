@@ -87,6 +87,15 @@ class requiredlearning extends \totara_core\totara\menu\item {
         }
     }
 
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return (totara_feature_disabled('programs') && totara_feature_disabled('certifications'));
+    }
+
     protected function get_default_parent() {
         return '\totara_core\totara\menu\mylearning';
     }

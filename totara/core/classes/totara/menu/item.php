@@ -88,7 +88,7 @@ class item {
     /**
      * Check if get_default_title() method exists, if not throw exception.
      *
-     * @throws \coding_exception
+     * @return string
      */
     protected function get_default_title() {
         throw new \coding_exception('Menu item get_default_title() method is missing', get_called_class());
@@ -115,7 +115,7 @@ class item {
     /**
      * Check if get_default_url() method exists, if not throw exception.
      *
-     * @throws \coding_exception
+     * @return string
      */
     protected function get_default_url() {
         throw new \coding_exception('Menu item get_default_url() method is missing', get_called_class());
@@ -143,6 +143,10 @@ class item {
      * @return int One of menu::SHOW_WHEN_REQUIRED, menu::SHOW_ALWAYS or menu::HIDE_ALWAYS
      */
     public function get_visibility($calculated = true) {
+        if ($this->is_disabled()) {
+            // Disabled features are always hidden!
+            return menu::HIDE_ALWAYS;
+        }
         if (!isset($this->visibility)) {
             $this->visibility = $this->get_default_visibility();
         }
@@ -168,10 +172,21 @@ class item {
     /**
      * Check if get_default_visibility() method exists, if not throw exception.
      *
-     * @throws \coding_exception
+     * @return bool
      */
     public function get_default_visibility() {
         throw new \coding_exception('Menu item get_default_visibility() method is missing', get_called_class());
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     * If yes it will not be visible in admin UI and also for end users.
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        // Note: override with true if feature disable.
+        return false;
     }
 
     /**
@@ -281,6 +296,7 @@ class item {
         $visibility = true; // Default to being visible.
         $activerules = array();
         $ruleaggregations = array();
+        $context = null;
         foreach ($ruleset as $rule) {
             if ($rule->name === 'enable' && $rule->value === '1') {
                 $activerules[] = $rule->type;
@@ -328,6 +344,8 @@ class item {
             return in_array(true, $result); // Any true result.
         } else if ($visibility == menu::AGGREGATION_ALL) {
             return !in_array(false, $result); // None false results.
+        } else {
+            return false;
         }
     }
 
@@ -406,6 +424,8 @@ class item {
             return in_array(true, $result); // Any true result.
         } else if ($visibility == menu::AGGREGATION_ALL) {
             return !in_array(false, $result); // None false results.
+        } else {
+            return false;
         }
     }
 
@@ -418,6 +438,7 @@ class item {
      * @return bool True if the current user can see that type of menu item.
      */
     private function check_menu_item_visibility($menuclass) {
+        /** @var \totara_core\totara\menu\item $menuinstance */
         $menuinstance = new $menuclass(array());
         $visibility = $menuinstance->get_visibility();
         return (bool) $visibility == menu::SHOW_ALWAYS;
@@ -485,6 +506,8 @@ class item {
             return (count(array_intersect($allowedroles, $userroles)) != 0);
         } else if ($aggregation == menu::AGGREGATION_ALL) {
             return (count(array_intersect($allowedroles, $userroles)) == count($allowedroles));
+        } else {
+            return false;
         }
     }
 
@@ -513,6 +536,8 @@ class item {
             return (count(array_intersect($allowedaudiences, $useraudiences)) != 0);
         } else if ($visibility == menu::AGGREGATION_ALL) {
             return (count(array_intersect($allowedaudiences, $useraudiences)) == count($allowedaudiences));
+        } else {
+            return false;
         }
     }
 }
