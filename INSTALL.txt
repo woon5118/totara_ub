@@ -14,7 +14,7 @@ Before installing Totara you should have a server with:
   * If your database is PostgreSQL you must set standard_conforming_strings to off and escape_string_warning to off in your postgresql.conf file
   * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER).
 * A domain name that resolves to your server
-* Recommended minimum browser: Recent Google Chrome, Recent Firefox, Safari 6, Internet Explorer 9 (IE 10 required for drag and drop of files from outside the browser into Totara)
+* Recommended minimum browser: Recent Google Chrome, Recent Firefox, Safari 6, Internet Explorer 8 (IE 10 required for drag and drop of files from outside the browser into Totara)
 
 1. If you are planning to use Totara in multiple user languages, you should ensure that the server is properly configured with the correct locales.
    This is important to ensure that date, number and currency data is displayed correctly for each language.
