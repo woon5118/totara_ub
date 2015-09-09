@@ -79,8 +79,13 @@ if ($USER->id != $userid) {
     $a->username = fullname($user, true);
     $a->progname = format_string($program->fullname);
     $strheading = get_string('recurringprogramhistoryfor', 'totara_program', $a);
-    $menuitem = 'myteam';
-    $url = new moodle_url('/my/teammembers.php');
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $url = null;
+    }
 } else {
     $strheading = get_string('recurringprogramhistory', 'totara_program', format_string($program->fullname));
     $menuitem = 'mylearning';
@@ -109,7 +114,9 @@ $report->include_js();
 ///
 /// Display the page
 ///
-$PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+if ($url) {
+    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+}
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);

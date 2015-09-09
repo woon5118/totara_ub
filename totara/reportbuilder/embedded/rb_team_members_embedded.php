@@ -101,6 +101,14 @@ class rb_team_members_embedded extends rb_base_embedded {
     }
 
     /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('myteam');
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting params
      * some other way so that the embedded report will be compatible with the scheduler (in the future).

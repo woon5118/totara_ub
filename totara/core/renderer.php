@@ -132,6 +132,10 @@ class totara_core_renderer extends plugin_renderer_base {
             return '';
         }
 
+        if (!totara_feature_visible('myteam')) {
+            return '';
+        }
+
         $text = get_string('viewmyteam','totara_core');
         $icon = new pix_icon('teammembers', $text, 'totara_core');
         $url = new moodle_url('/my/teammembers.php');

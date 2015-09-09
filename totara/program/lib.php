@@ -450,7 +450,9 @@ function prog_add_required_learning_base_navlinks($userid) {
     // the user is viewing someone else's learning
     $user = $DB->get_record('user', array('id' => $userid));
     if ($user) {
-        $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+        if (totara_feature_visible('myteam')) {
+            $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+        }
         $PAGE->navbar->add(get_string('xsrequiredlearning', 'totara_program', fullname($user)), new moodle_url('/totara/program/required.php', array('userid' => $userid)));
     } else {
         $PAGE->navbar->add(get_string('unknownusersrequiredlearning', 'totara_program'), new moodle_url('/totara/program/required.php', array('userid' => $userid)));

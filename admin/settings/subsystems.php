@@ -176,4 +176,10 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enablereportgraphsinfo', 'totara_reportbuilder'),
         TOTARA_SHOWFEATURE, $featureoptionssimple));
 
+    $setting = new admin_setting_configselect('enablemyteam',
+        new lang_string('enablemyteam', 'totara_core'),
+        new lang_string('enablemyteam_desc', 'totara_core'),
+        TOTARA_SHOWFEATURE, $featureoptions);
+    $setting->set_updatedcallback('totara_menu_reset_cache');
+    $optionalsubsystems->add($setting);
 }

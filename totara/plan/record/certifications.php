@@ -73,8 +73,13 @@ $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
     $strheading = get_string('recordoflearningfor', 'totara_core') . fullname($user, true);
-    $menuitem = 'myteam';
-    $url = new moodle_url('/my/teammembers.php');
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $url = null;
+    }
 } else {
     $strheading = get_string('recordoflearning', 'totara_core');
     $menuitem = 'mylearning';
@@ -114,7 +119,9 @@ if ($format != '') {
 $report->include_js();
 
 // Display the page.
-$PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+if ($url) {
+    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+}
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);

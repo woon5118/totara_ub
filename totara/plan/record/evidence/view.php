@@ -67,13 +67,20 @@ if ($USER->id != $userid) {
 
 // Get subheading name for display.
 if ($usertype == 'manager') {
-    $menuitem = 'myteam';
-    $url = new moodle_url('/my/teammembers.php');
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $url = null;
+    }
 } else {
     $menuitem = 'mylearning';
     $url = new moodle_url('/my/');
 }
-$PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+if ($url) {
+    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+}
 $indexurl = new moodle_url('/totara/plan/record/evidence/index.php', array('userid' => $userid));
 $PAGE->navbar->add($strheading, $indexurl);
 $PAGE->navbar->add(get_string('allevidence', 'totara_plan'));

@@ -883,9 +883,11 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
     $out = $OUTPUT->container_start(null, 'dp-plans-menu');
     $class = $userid == 0 ? 'dp-menu-selected' : '';
     if ($role == 'manager') {
-        // Print out the All team members link
-        $out .= $OUTPUT->heading(get_string('teammembers', 'totara_plan'), 3, 'main');
-        $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/my/teammembers.php'), get_string('allteammembers', 'totara_plan'))), array('class' => $class));
+        if (totara_feature_visible('myteam')) {
+            // Print out the All team members link
+            $out .= $OUTPUT->heading(get_string('teammembers', 'totara_plan'), 3, 'main');
+            $out .= html_writer::alist(array($OUTPUT->action_link(new moodle_url('/my/teammembers.php'), get_string('allteammembers', 'totara_plan'))), array('class' => $class));
+        }
         if ($userid) {
             if ($enableplans && !totara_feature_disabled('learningplans')) {
                 // TODO: make this more efficient
@@ -1230,7 +1232,9 @@ function dp_get_plan_base_navlinks($userid) {
     // the user is viewing someone else's plan
     $user = $DB->get_record('user', array('id' => $userid));
     if ($user) {
-        $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+        if (totara_feature_visible('myteam')) {
+            $PAGE->navbar->add(get_string('myteam', 'totara_core'), new moodle_url('/my/teammembers.php'));
+        }
         $PAGE->navbar->add(get_string('xslearningplans', 'totara_plan', fullname($user)), new moodle_url('/totara/plan/index.php', array('userid' => $userid)));
     } else {
         $PAGE->navbar->add(get_string('unknownuserslearningplans', 'totara_plan'), new moodle_url('/totara/plan/index.php', array('userid' => $userid)));

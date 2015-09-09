@@ -52,8 +52,13 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
     $strheading = get_string('pastbookingsfor', 'totara_core').fullname($user, true);
-    $menuitem = 'myteam';
-    $url = new moodle_url('/my/teammembers.php');
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $url = null;
+    }
 } else {
     $strheading = get_string('mypastbookings', 'totara_core');
     $menuitem = 'mylearning';
@@ -88,7 +93,9 @@ $pagetitle = format_string(get_string('report', 'totara_core').': '.$fullname);
 
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading(format_string($SITE->fullname));
-$PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+if ($url) {
+    $PAGE->navbar->add(get_string($menuitem, 'totara_core'), $url);
+}
 $PAGE->navbar->add($strheading);
 
 if (!isset($USER->editing)) {

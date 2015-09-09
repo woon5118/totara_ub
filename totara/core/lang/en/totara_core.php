@@ -178,6 +178,12 @@ $string['elearning'] = 'E-learning';
 $string['elementlibrary'] = 'Element Library';
 $string['emptyassignments'] = 'No assignments';
 $string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
+$string['enablemyteam'] = 'Enable My Team';
+$string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Hide/Disable My Team feature from users on this site.
+
+* If Show is chosen, all links, menus, tabs and option related to My Team will be accessible.
+* If Hide is chosen, all links and tabs related to My Team will be hidden.
+* If Disable is chosen, My Team will disappear from any menu on the site and will not be accessible.';
 $string['enabletempmanagers'] = 'Enable temporary managers';
 $string['enabletempmanagersdesc'] = 'Enable functionality that allows for assigning a temporary manager to a user. Disabling this will cause all current temporary managers to be unassigned on next cron run.';
 $string['enhancedcatalog'] = 'Enhanced catalog';

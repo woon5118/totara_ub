@@ -47,6 +47,12 @@ class myteam extends \totara_core\totara\menu\item {
 
     protected function check_visibility() {
         static $cache = null;
+
+        if (!totara_feature_visible('myteam')) {
+            $cache = null;
+            return menu::HIDE_ALWAYS;
+        }
+
         if (isset($cache)) {
             return $cache;
         }
@@ -57,5 +63,14 @@ class myteam extends \totara_core\totara\menu\item {
             $cache = menu::HIDE_ALWAYS;
         }
         return $cache;
+    }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('myteam');
     }
 }

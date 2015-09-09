@@ -53,9 +53,11 @@ $PAGE->set_pagelayout('standard');
 if (totara_is_manager($userid)) {
     $username = fullname($DB->get_record('user', array('id' => $userid)));
     $strmygoals = get_string('mygoalsteam', 'totara_hierarchy', $username);
-    $myteamurl = new moodle_url('/my/teammembers.php', array());
-    $PAGE->set_totara_menu_selected('myteam');
-    $PAGE->navbar->add(get_string('myteam', 'totara_core'), $myteamurl);
+    if (totara_feature_visible('myteam')) {
+        $myteamurl = new moodle_url('/my/teammembers.php', array());
+        $PAGE->set_totara_menu_selected('myteam');
+        $PAGE->navbar->add(get_string('myteam', 'totara_core'), $myteamurl);
+    }
 } else {
     $strmygoals = get_string('mygoals', 'totara_hierarchy');
     $PAGE->set_totara_menu_selected('mygoals');

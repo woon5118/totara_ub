@@ -2277,7 +2277,8 @@ function totara_advanced_features_list() {
         'programs',
         'certifications',
         'totaradashboard',
-        'reportgraphs'
+        'reportgraphs',
+        'myteam',
     );
 }
 

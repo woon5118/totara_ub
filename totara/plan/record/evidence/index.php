@@ -57,9 +57,15 @@ if ($USER->id == $userid) {
 } else {
     $strheading = get_string('recordoflearningfor', 'totara_core') . fullname($user, true);
     $usertype = 'manager';
-    $menuitem = 'myteam';
-    $menunavitem = 'myteam';
-    $url = new moodle_url('/my/teammembers.php');
+    if (totara_feature_visible('myteam')) {
+        $menuitem = 'myteam';
+        $menunavitem = 'myteam';
+        $url = new moodle_url('/my/teammembers.php');
+    } else {
+        $menuitem = null;
+        $menunavitem = '';
+        $url = null;
+    }
 }
 
 $reportfilters = array('userid' => $userid);
@@ -84,7 +90,9 @@ $report->include_js();
 
 // Display the page.
 $strsubheading = get_string('allevidence', 'totara_plan');
-$PAGE->navbar->add(get_string($menunavitem, 'totara_core'), $url);
+if ($url) {
+    $PAGE->navbar->add(get_string($menunavitem, 'totara_core'), $url);
+}
 $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', array('userid' => $userid)));
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);

@@ -38,7 +38,9 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('my-teammembers');
 $PAGE->set_url(new moodle_url('/my/teammembers.php'));
 
-global $USER;
+if (totara_feature_disabled('myteam')) {
+    redirect(new moodle_url('/'));
+}
 
 $edit = optional_param('edit', -1, PARAM_BOOL);
 $sid = optional_param('sid', '0', PARAM_INT);
