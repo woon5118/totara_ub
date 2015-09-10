@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simonc@catalyst.net.nz>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  *
  * Unit tests to check source column definitions
  *
@@ -566,6 +565,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'cohortid' => null, 'serversecret' => 'zzzz', 'addnewcohorts' => 0, 'addnewcourses' => 0, 'apiversion' => 1,
         'timecreated' => 1416859984, 'timemodified' => 1416859985);
 
+    protected $tool_customlang_data = array('id' => 1, 'lang' => 'en', 'componentid' => 1, 'stringid' => 'totara', 'original' => 'totara',
+        'master' => 'totara', 'local' => 'Totara', 'timecustomized' => 1416859984, 'timemodified' => 1416859984);
+
+    protected $tool_customlang_components_data = array('id' => 1, 'name' => 'totara', 'version' => '1985031400');
 
     protected function setUp() {
         global $DB;
@@ -682,6 +685,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'repository_opensesame_pkgs' => array($this->repository_opensesame_pkgs_data),
             'repository_opensesame_bps' => array($this->repository_opensesame_bps_data),
             'totara_connect_clients' => array($this->totara_connect_clients_data),
+            'tool_customlang' => array($this->tool_customlang_data),
+            'tool_customlang_components' => array($this->tool_customlang_components_data),
         )));
     }
 
