@@ -359,7 +359,9 @@ class appraisal_stage_page_edit_form extends moodleform {
         if ($page->id > 0) {
             $submittitle = get_string('savechanges', 'moodle');
         }
-        $this->add_action_buttons(true, $submittitle);
+        if (!is_ajax_request($_SERVER)) {
+            $this->add_action_buttons(true, $submittitle);
+        }
         $this->set_data($page);
     }
 

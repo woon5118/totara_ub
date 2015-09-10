@@ -128,10 +128,6 @@ switch($action) {
             if (!confirm_sesskey()) {
                 print_error('confirmsesskeybad', 'error');
             }
-            if (empty($fromform->submitbutton)) {
-                totara_set_notification(get_string('error:unknownbuttonclicked', 'totara_appraisal'), $returnurl);
-            }
-
             $page->set($fromform)->save();
 
             totara_set_notification(get_string('pageupdated', 'totara_appraisal'), $returnurl,
