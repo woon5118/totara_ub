@@ -2264,9 +2264,11 @@ function validate_' . $this->_formName . '_' . $escapedElementName . '(element, 
   ret = validate_' . $this->_formName . '_' . $escapedElementName.'(frm.elements[\''.$elementName.'\'], \''.$escapedElementName.'\') && ret;
   if (!ret && !first_focus) {
     first_focus = true;
-    Y.Global.fire(M.core.globalEvents.FORM_ERROR, {formid: \''. $this->_attributes['id'] .'\',
-                                                   elementid: \'id_error_'.$escapedElementName.'\'});
-    document.getElementById(\'id_error_'.$escapedElementName.'\').focus();
+    Y.use(\'moodle-core-event\', function() {
+        Y.Global.fire(M.core.globalEvents.FORM_ERROR, {formid: \'' . $this->_attributes['id'] . '\',
+                                                       elementid: \'id_error_' . $escapedElementName . '\'});
+        document.getElementById(\'id_error_' . $escapedElementName . '\').focus();
+    });
   }
 ';
 
@@ -2696,9 +2698,6 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
                 $this->_collapseButtons = str_replace('{strexpandall}', get_string('expandall'), $this->_collapseButtons);
                 $PAGE->requires->strings_for_js(array('collapseall', 'expandall'), 'moodle');
             }
-            $PAGE->requires->yui_module('moodle-form-shortforms', 'M.form.shortforms', array(array('formid' => $formid)));
-        } else {
-            // Totara: hack alert - shortforms contains form error event which is necessary for client error validation.
             $PAGE->requires->yui_module('moodle-form-shortforms', 'M.form.shortforms', array(array('formid' => $formid)));
         }
         if (!empty($this->_advancedElements)){

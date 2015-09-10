@@ -24,6 +24,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @deprecated since Totara 2.9.0
+ * @param int $length
+ * @return string
+ */
+function totara_random_bytes($length) {
+    debugging('totara_random_bytes() is deprecated, use totara_random_bytes() instead', DEBUG_DEVELOPER);
+    return random_bytes_emulate($length);
+}
+
 function totara_generate_email_user($email) {
     debugging('totara_generate_email_user($email) is deprecated, use \totara_core\totara_user::get_external_user($email) instead', DEBUG_DEVELOPER);
     return \totara_core\totara_user::get_external_user($email);

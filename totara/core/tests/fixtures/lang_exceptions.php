@@ -32,7 +32,7 @@ $exceptions = array(
     ),
     'core_cohort' => array('visible_help'), // Caps.
     'core_completion' => array('err_noroles', 'manualcompletionbynote', 'err_noroles'), // Caps.
-    'core_error' => array('mimetexisnotexist', 'pluginrequirementsnotmet'),
+    'core_error' => array('mimetexisnotexist', 'mssqlrcsmodemissing', 'pluginrequirementsnotmet'),
     'core_hub' => true,
     'core_install' => array('welcomep40'), // Placeholders.
     'core_moodle' => array('backupnonisowarning', 'gpl', 'gpl3', 'moodleversion', 'moodlerelease', 'registrationinfo', 'registrationsend'),

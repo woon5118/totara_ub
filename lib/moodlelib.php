@@ -7578,7 +7578,7 @@ function count_letters($string) {
  * @return string
  */
 function random_string($length=15) {
-    $randombytes = totara_random_bytes($length);
+    $randombytes = random_bytes_emulate($length);
     $pool  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $pool .= 'abcdefghijklmnopqrstuvwxyz';
     $pool .= '0123456789';
@@ -7607,7 +7607,7 @@ function complex_random_string($length=null) {
     if ($length===null) {
         $length = floor(rand(24, 32));
     }
-    $randombytes = totara_random_bytes($length);
+    $randombytes = random_bytes_emulate($length);
     $string = '';
     for ($i = 0; $i < $length; $i++) {
         $rand = ord($randombytes[$i]);
@@ -7619,10 +7619,15 @@ function complex_random_string($length=null) {
 /**
  * Try to generates cryptographically secure pseudo-random bytes.
  *
- * @param int $length
+ * Note this is achieved by fallbacking between:
+ *  - PHP 7 random_bytes().
+ *  - OpenSSL openssl_random_pseudo_bytes().
+ *  - In house random generator getting its entropy from various, hard to guess, pseudo-random sources.
+ *
+ * @param int $length requested length in bytes
  * @return string binary data
  */
-function totara_random_bytes($length) {
+function random_bytes_emulate($length) {
     global $CFG;
     if ($length <= 0) {
         debugging('Invalid random bytes length', DEBUG_DEVELOPER);
@@ -7630,13 +7635,13 @@ function totara_random_bytes($length) {
     }
     if (function_exists('random_bytes')) {
         // Use PHP 7 goodness.
-        $hash = random_bytes($length);
+        $hash = @random_bytes($length);
         if ($hash !== false) {
             return $hash;
         }
     }
     if (function_exists('openssl_random_pseudo_bytes')) {
-        // For PHP 5.3 with openssl extension.
+        // For PHP 5.3 and later with openssl extension.
         $hash = openssl_random_pseudo_bytes($length);
         if ($hash !== false) {
             return $hash;
@@ -7649,7 +7654,7 @@ function totara_random_bytes($length) {
     if ($length <= 20) {
         return substr($hash, 0, $length);
     }
-    return $hash . totara_random_bytes($length - 20);
+    return $hash . random_bytes_emulate($length - 20);
 }
 
 /**

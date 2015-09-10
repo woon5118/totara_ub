@@ -207,7 +207,7 @@ foreach ($members as $gpgid=>$groupdata) {
         $description = file_rewrite_pluginfile_urls($groupings[$gpgid]->description, 'pluginfile.php', $context->id, 'grouping', 'description', $gpgid);
         if ($description) {
             $options = new stdClass;
-            $options->noclean = true;
+            $options->noclean = false;
             $options->overflowdiv = true;
             echo $OUTPUT->box(format_text($description, $groupings[$gpgid]->descriptionformat, $options), 'generalbox boxwidthnarrow boxaligncenter');
         }
