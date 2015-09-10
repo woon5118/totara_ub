@@ -33,12 +33,28 @@ define('MAX_WAITLISTED_SESSIONS', 7);
 
 $timenow    = optional_param('time', time(), PARAM_INT);
 $currenttab = optional_param('tab', 'm', PARAM_ALPHA);
-$day        = optional_param('cal_d', strftime('%d', $timenow), PARAM_INT);
-$month      = optional_param('cal_m', strftime('%m', $timenow), PARAM_INT);
-$year       = optional_param('cal_y', strftime('%Y', $timenow), PARAM_INT);
+$day        = optional_param('cal_d', null, PARAM_INT);
+$month      = optional_param('cal_m', null, PARAM_INT);
+$year       = optional_param('cal_y', null, PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
 require_login();
+
+// We need to get the date as it applies to the user to ensure that we don't end up with a partially working mix of
+// server and user timezones happening.
+/** @var \calendartype_gregorian\structure $calendartype */
+$calendartype = \core_calendar\type_factory::get_calendar_instance();
+if (!is_null($day) && !is_null($month) && !is_null($year)) {
+    // If this has been set then we are going to assume it is gregorian, it has to be sorry.
+    // Good luck with other calendar types.
+    $date = $calendartype->convert_from_gregorian($year, $month, $day);
+} else {
+    // Easy! grab a date object from the timestamp.
+    $date = $calendartype->timestamp_to_date_array($timenow);
+}
+$day = $date['mday'];
+$month = $date['mon'];
+$year = $date['year'];
 
 $baseparams = array('cal_d' => $day, 'cal_m' => $month, 'cal_y' => $year);
 
@@ -265,7 +281,7 @@ function get_display_info($d, $m, $y) {
 
 
 function get_sessions($display, $groups, $users, $courses, $activefilters, &$events, &$sessionids) {
-    global $cfgcalendarfilters;
+    global $USER, $cfgcalendarfilters;
 
     // Get events from database.
     $events = calendar_get_events($display->tstart, $display->tend, $users, $groups, $courses);
@@ -329,7 +345,8 @@ function get_sessions($display, $groups, $users, $courses, $activefilters, &$eve
 
             // Group checks.
             $cm = get_coursemodule_from_instance($event->modulename, $event->instance);
-            if (!groups_course_module_visible($cm)) {
+            $cm = cm_info::create($cm, $USER->id);
+            if (!$cm->uservisible) {
                 unset($events[$eventid]);
             }
         }
@@ -434,7 +451,6 @@ function matches_defaultfield_filters($sessiondata, $event) {
  */
 function show_month_detailed($baseparams, $display, $m, $y, $courses, $groups, $users, $courseid, $activefilters, $waitlistedsessions, $events) {
     global $USER, $SESSION, $OUTPUT, $CFG;
-    global $timenow;
 
     $calendardays = calendar_get_days();
 
@@ -526,7 +542,7 @@ function show_month_detailed($baseparams, $display, $m, $y, $courses, $groups, $
         }
 
         // Special visual fx for today
-        $today = strftime('%d', $timenow);
+        $today = strftime('%d', time());
         if ($display->thismonth && $day == $today) {
             $class .= ' today';
         } else {
