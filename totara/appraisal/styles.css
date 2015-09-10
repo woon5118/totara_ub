@@ -40,6 +40,10 @@ div.appraisal-content .fitem.fitem_fgroup {
   padding: 0;
 }
 
+#fgroup_id_addquestgroup:after {
+    clear: none;
+}
+
 ul.appraisal-page-list,
 ul.appraisal-quest-list {
     list-style-type:none;
