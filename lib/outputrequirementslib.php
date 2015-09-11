@@ -294,6 +294,10 @@ class page_requirements_manager {
 
         // Totara needs jQuery - load it on each page.
         $this->jquery();
+
+        if (defined('BEHAT_RUNNING') && BEHAT_RUNNING) {
+            $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
+        }
     }
 
     /**
