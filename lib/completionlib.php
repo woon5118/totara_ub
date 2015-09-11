@@ -682,7 +682,7 @@ class completion_info {
         }
 
         // Notify course completion.
-        if (in_array($newstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
+        if (in_array($newstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
             $userid = $userid ? $userid : $USER->id;
             $event = \totara_core\event\module_completion::create(
                 array(

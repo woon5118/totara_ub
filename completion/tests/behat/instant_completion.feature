@@ -9,6 +9,7 @@ Feature: Instant completion
       | fullname | shortname | category | enablecompletion | completionstartonenrol |
       | Course 1 | C1        | 0        | 1                | 1                      |
       | Course 2 | C2        | 0        | 1                | 1                      |
+      | Course 3 | C3        | 0        | 1                | 1                      |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | Frist | teacher1@example.com |
@@ -17,8 +18,10 @@ Feature: Instant completion
       | user | course | role           |
       | teacher1 | C1 | editingteacher |
       | teacher1 | C2 | editingteacher |
+      | teacher1 | C3 | editingteacher |
       | student1 | C1 | student        |
       | student1 | C2 | student        |
+      | student1 | C3 | student        |
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable completion tracking | 1 |
@@ -73,6 +76,23 @@ Feature: Instant completion
       | Quiz - Test quiz name2   | 1 |
       | id_criteria_course_value | Miscellaneous / Course 1 |
     And I press "Save changes"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Course 3" "link"
+    And completion tracking is "Enabled" in current course
+    And I add a "Assignment" to section "1" and I fill the form with:
+      | Assignment name                     | Test assignment name                              |
+      | Description                         | Submit your online text                           |
+      | Use marking workflow                | Yes                                               |
+      | assignsubmission_onlinetext_enabled | 1                                                 |
+      | assignsubmission_file_enabled       | 0                                                 |
+      | Completion tracking                 | Show activity as complete when conditions are met |
+      | completionusegrade                  | 1                                                 |
+      | Grade to pass                       | 50                                                |
+    And I follow "Course completion"
+    And I set the field "id_overall_aggregation" to "2"
+    And I click on "Condition: Activity completion" "link"
+    And I set the field "Assignment - Test assignment name" to "1"
+    And I press "Save changes"
     And I log out
 
   @javascript
@@ -94,6 +114,7 @@ Feature: Instant completion
     And I click on "Miscellaneous" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 1" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Course 2" "link" in the "addmulticourse" "totaradialogue"
+    And I click on "Course 3" "link" in the "addmulticourse" "totaradialogue"
     And I click on "Ok" "button" in the "addmulticourse" "totaradialogue"
     And I wait "1" seconds
     And I click on "Save changes" "button"
@@ -122,9 +143,34 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
+    When I click on "Required Learning" in the totara menu
+    And I click on "Course 3" "link"
+    And I follow "Test assignment name"
+    And I press "Add submission"
+    And I set the following fields to these values:
+      | Online text | This is my submission |
+    And I press "Save changes"
+    And I log out
+    And I log in as "teacher1"
+    And I am on homepage
+    And I follow "Course 3"
+    And I follow "Test assignment name"
+    And I follow "View/grade all submissions"
+    And I should see "Not marked" in the "Student First" "table_row"
+    And I click on "Grade Student First" "link" in the "Student First" "table_row"
+    And I set the field "Grade out of 100" to "30"
+    And I set the field "Feedback comments" to "Great job! Lol, not really."
+    And I set the field "Marking workflow state" to "Released"
+    And I press "Save changes"
+    And I press "Continue"
+    Then I should see "Released" in the "Student First" "table_row"
+
+    When I log out
+    When I log in as "student1"
     And I click on "Record of Learning" in the totara menu
     Then I should see "Complete" in the "Course 1" "table_row"
     And  I should see "Complete" in the "Course 2" "table_row"
+    And  I should see "Complete" in the "Course 3" "table_row"
 #    And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
 #    And I click on "Program1" "link"
 #    Then I should see "100%" program progress

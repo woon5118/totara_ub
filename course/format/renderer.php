@@ -389,7 +389,9 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
                     $total++;
                     $completiondata = $completioninfo->get_data($thismod, true);
                     if ($completiondata->completionstate == COMPLETION_COMPLETE ||
-                            $completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                        $completiondata->completionstate == COMPLETION_COMPLETE_PASS ||
+                        $completiondata->completionstate == COMPLETION_COMPLETE_FAIL
+                    ) {
                         $complete++;
                     }
                 }

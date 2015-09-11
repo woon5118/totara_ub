@@ -172,7 +172,7 @@ class completion_criteria_activity extends completion_criteria {
         $data = $info->get_data($cm, false, $completion->userid);
 
         // If the activity is complete
-        if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS))) {
+        if (in_array($data->completionstate, array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS, COMPLETION_COMPLETE_FAIL))) {
             if ($mark) {
                 if (isset($data->timecompleted)) {
                     // If course module indicated it's completion time, this time will be used.

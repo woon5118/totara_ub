@@ -183,7 +183,11 @@ class award_criteria_activity extends award_criteria {
      * @return bool Whether criteria is complete
      */
     public function review($userid, $filtered = false) {
-        $completionstates = array(COMPLETION_COMPLETE, COMPLETION_COMPLETE_PASS);
+        $completionstates = array(
+            COMPLETION_COMPLETE,
+            COMPLETION_COMPLETE_PASS,
+            COMPLETION_COMPLETE_FAIL
+        );
 
         if ($this->course->startdate > time()) {
             return false;
@@ -231,37 +235,65 @@ class award_criteria_activity extends award_criteria {
      * @return array list($join, $where, $params)
      */
     public function get_completed_criteria_sql() {
+        global $DB;
         $join = '';
         $where = '';
         $params = array();
 
         if ($this->method == BADGE_CRITERIA_AGGREGATION_ANY) {
             foreach ($this->params as $param) {
-                $moduledata[] = " cmc.coursemoduleid = :completedmodule{$param['module']} ";
-                $params["completedmodule{$param['module']}"] = $param['module'];
+                // Generate a unique param.
+                $parammodule = $DB->get_unique_param('completedmodule');
+                // Generate the SQL.
+                $moduledata[] = " cmc.coursemoduleid = :{$parammodule} ";
+                // Add the param.
+                $params[$parammodule] = $param['module'];
             }
             if (!empty($moduledata)) {
+                // Generate unique params.
+                $paramcomplete = $DB->get_unique_param('completioncomplete');
+                $parampass = $DB->get_unique_param('completionpass');
+                $paramfail = $DB->get_unique_param('completionfail');
+
+                // Generate the SQL.
                 $extraon = implode(' OR ', $moduledata);
-                $join = " JOIN {course_modules_completion} cmc ON cmc.userid = u.id AND
-                          ( cmc.completionstate = :completionpass OR cmc.completionstate = :completioncomplete ) AND ({$extraon})";
-                $params["completionpass"] = COMPLETION_COMPLETE_PASS;
-                $params["completioncomplete"] = COMPLETION_COMPLETE;
+                $join = " JOIN {course_modules_completion} cmc ON cmc.userid = u.id AND (
+                                cmc.completionstate = :{$paramcomplete} OR
+                                cmc.completionstate = :{$parampass} OR
+                                cmc.completionstate = :{$paramfail}
+                         ) AND ({$extraon})";
+
+                // Add the params.
+                $params[$paramcomplete] = COMPLETION_COMPLETE;
+                $params[$parampass] = COMPLETION_COMPLETE_PASS;
+                $params[$paramfail] = COMPLETION_COMPLETE_FAIL;
             }
-            return array($join, $where, $params);
         } else {
             foreach ($this->params as $param) {
-                $join .= " LEFT JOIN {course_modules_completion} cmc{$param['module']} ON
-                          cmc{$param['module']}.userid = u.id AND
-                          cmc{$param['module']}.coursemoduleid = :completedmodule{$param['module']} AND
-                          ( cmc{$param['module']}.completionstate = :completionpass{$param['module']} OR
-                            cmc{$param['module']}.completionstate = :completioncomplete{$param['module']} )";
-                $where .= " AND cmc{$param['module']}.coursemoduleid IS NOT NULL ";
-                $params["completedmodule{$param['module']}"] = $param['module'];
-                $params["completionpass{$param['module']}"] = COMPLETION_COMPLETE_PASS;
-                $params["completioncomplete{$param['module']}"] = COMPLETION_COMPLETE;
+                // Generate unique params.
+                $prefix = 'cmc'.$param['module'];
+                $parammodule = $DB->get_unique_param('completedmodule');
+                $paramcomplete = $DB->get_unique_param('completionpass');
+                $parampass = $DB->get_unique_param('completionfail');
+                $paramfail = $DB->get_unique_param('completioncomplete');
+
+                // Generate the SQL.
+                $join .= " LEFT JOIN {course_modules_completion} {$prefix} ON
+                                     {$prefix}.userid = u.id AND
+                                     {$prefix}.coursemoduleid = :{$parammodule} AND (
+                                        {$prefix}.completionstate = :{$paramcomplete} OR
+                                        {$prefix}.completionstate = :{$parampass} OR
+                                        {$prefix}.completionstate = :{$paramfail} )";
+                $where .= " AND {$prefix}.coursemoduleid IS NOT NULL ";
+
+                // Add the params.
+                $params[$parammodule] = $param['module'];
+                $params[$paramcomplete] = COMPLETION_COMPLETE;
+                $params[$parampass] = COMPLETION_COMPLETE_PASS;
+                $params[$paramfail] = COMPLETION_COMPLETE_FAIL;
             }
-            return array($join, $where, $params);
         }
+        return array($join, $where, $params);
     }
 
     /**

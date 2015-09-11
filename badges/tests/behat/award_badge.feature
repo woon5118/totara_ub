@@ -167,6 +167,87 @@ Feature: Award badges
     And I follow "Course 1"
     Then I should see "Course Badge"
 
+  # We need to check that a badge set to be awarded upon completing an activity is awarded
+  # when the learner completes the activity regardless of them achieving a pass grade or not.
+  @javascript
+  Scenario: Award badge on activity completion without passing grade
+    Given the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1 | 0 |
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | teacher1 | Teacher | Frist | teacher1@example.com |
+      | student1 | Student | First | student1@example.com |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+    And the following config values are set as admin:
+      | enablecompletion | 1 |
+    And I log in as "teacher1"
+    And I follow "Course 1"
+    And I follow "Edit settings"
+    And I set the following fields to these values:
+      | Enable completion tracking | Yes |
+    And I press "Save and display"
+    And I turn editing mode on
+    And I add a "Assignment" to section "1" and I fill the form with:
+      | Assignment name                     | Test assignment name                              |
+      | Description                         | Submit your online text                           |
+      | Use marking workflow                | Yes                                               |
+      | assignsubmission_onlinetext_enabled | 1                                                 |
+      | assignsubmission_file_enabled       | 0                                                 |
+      | Completion tracking                 | Show activity as complete when conditions are met |
+      | completionusegrade                  | 1                                                 |
+      | Grade to pass                       | 50                                                |
+    And I follow "Course 1"
+    And I navigate to "Add a new badge" node in "Course administration > Badges"
+    And I follow "Add a new badge"
+    And I set the following fields to these values:
+      | Name | Course Badge |
+      | Description | Course badge description |
+      | issuername | Tester of course badge |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    And I set the field "type" to "Activity completion"
+    And I set the field "Test assignment name" to "1"
+    And I press "Save"
+    And I press "Enable access"
+    When I press "Continue"
+    And I log out
+    And I log in as "student1"
+    And I follow "Course 1"
+    And I follow "Test assignment name"
+    And I press "Add submission"
+    And I set the following fields to these values:
+      | Online text | This is my submission |
+    And I press "Save changes"
+    And I follow "Profile" in the user menu
+    And I follow "Course 1"
+    Then I should not see "badges"
+    # Grade the assignment as the teacher.
+    When I log out
+    And I log in as "teacher1"
+    And I am on homepage
+    And I follow "Course 1"
+    And I follow "Test assignment name"
+    And I follow "View/grade all submissions"
+    And I should see "Not marked" in the "Student First" "table_row"
+    And I click on "Grade Student First" "link" in the "Student First" "table_row"
+    And I set the field "Grade out of 100" to "30"
+    And I set the field "Feedback comments" to "Great job! Lol, not really."
+    And I set the field "Marking workflow state" to "Released"
+    And I press "Save changes"
+    And I press "Continue"
+    Then I should see "Released" in the "Student First" "table_row"
+    # Check the user can see the badge.
+    When I log out
+    And I trigger cron
+    And I log in as "student1"
+    And I follow "Profile" in the user menu
+    And I follow "Course 1"
+    Then I should see "Course Badge"
+
   @javascript
   Scenario: Award badge on course completion
     Given the following "courses" exist:
