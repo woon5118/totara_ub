@@ -221,6 +221,16 @@ class rb_source_course_completion_by_org extends rb_base_source {
             ),
             new rb_column_option(
                 'course_completion',
+                'perccompletedrpl',
+                get_string('percentagecompletedviarpl', 'rb_source_course_completion_by_org'),
+                'CASE WHEN base.timecompleted > 0 AND ' .
+                '(base.rpl IS NOT NULL AND ' .
+                $DB->sql_isnotempty('base', 'rpl', false, false) .
+                ') THEN 1 ELSE 0 END',
+                array('grouping' => 'percent')
+            ),
+            new rb_column_option(
+                'course_completion',
                 'inprogress',
                 get_string('numinprogress', 'rb_source_course_completion_by_org'),
                 'CASE WHEN base.timestarted > 0 AND ' .
