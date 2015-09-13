@@ -71,7 +71,7 @@ class rb_global_restriction_set implements Iterator {
      * @return rb_global_restriction_set or null if not active
      */
     public static function create_from_page_parameters($reportrecord) {
-        global $CFG, $USER, $SESSION;
+        global $CFG, $USER, $SESSION, $PAGE;
 
         if (empty($reportrecord)) {
             // Not a valid report record, its very likely this has occurred on an uninitialised embedded report.
@@ -97,6 +97,7 @@ class rb_global_restriction_set implements Iterator {
             }
         }
 
+        $forceredirect = false;
         $selectedids = null;
         $globalrestrictionids = optional_param('globalrestrictionids', null, PARAM_SEQUENCE);
         if ($globalrestrictionids === null) {
@@ -105,6 +106,7 @@ class rb_global_restriction_set implements Iterator {
             }
         } else {
             require_sesskey();
+            $forceredirect = true;
             $selectedids = ($globalrestrictionids === '' ? array() : explode(',', $globalrestrictionids));
         }
 
@@ -126,6 +128,12 @@ class rb_global_restriction_set implements Iterator {
 
         // Remember selection, the UI needs this.
         $SESSION->rb_global_restriction = array_keys($filtered);
+
+        // Make sure we redirect after user action,
+        // unless we are running PHPUnit tests.
+        if (!PHPUNIT_TEST and $forceredirect) {
+            redirect($PAGE->url);
+        }
 
         foreach ($filtered as $restriction) {
             if ($restriction->allrecords) {
