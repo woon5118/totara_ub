@@ -220,7 +220,7 @@ class core_course_management_renderer extends plugin_renderer_base {
 
         $viewcaturl = new moodle_url('/course/management.php', array('categoryid' => $category->id));
         if ($isexpanded) {
-            $icon = $this->output->pix_icon('t/switch_minus', get_string('collapse'), 'moodle', array('class' => 'tree-icon', 'title' => ''));
+            $icon = $this->output->pix_icon('t/expanded', get_string('collapse'), 'moodle', array('class' => 'tree-icon', 'title' => ''));
             $icon = html_writer::link(
                 $viewcaturl,
                 $icon,
@@ -232,7 +232,11 @@ class core_course_management_renderer extends plugin_renderer_base {
                 )
             );
         } else if ($isexpandable) {
-            $icon = $this->output->pix_icon('t/switch_plus', get_string('expand'), 'moodle', array('class' => 'tree-icon', 'title' => ''));
+            if (right_to_left()) {
+                $icon = $this->output->pix_icon('t/collapsed_rtl', get_string('expand'), 'moodle', array('class' => 'tree-icon', 'title' => ''));
+            } else {
+                $icon = $this->output->pix_icon('t/collapsed', get_string('expand'), 'moodle', array('class' => 'tree-icon', 'title' => ''));
+            }
             $icon = html_writer::link(
                 $viewcaturl,
                 $icon,

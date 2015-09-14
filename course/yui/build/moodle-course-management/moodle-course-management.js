@@ -1316,7 +1316,7 @@ Category.prototype = {
         action.setAttribute('data-action', 'collapse').setAttrs({
             title : M.util.get_string('collapsecategory', 'moodle', this.getName())
         }).one('img').setAttrs({
-            src : M.util.image_url('t/switch_minus', 'moodle'),
+            src : M.util.image_url('t/expanded', 'moodle'),
             alt : M.util.get_string('collapse', 'moodle')
         });
         if (ul) {
@@ -1337,9 +1337,14 @@ Category.prototype = {
         action.setAttribute('data-action', 'expand').setAttrs({
             title : M.util.get_string('expandcategory', 'moodle', this.getName())
         }).one('img').setAttrs({
-            src : M.util.image_url('t/switch_plus', 'moodle'),
+            src : M.util.image_url('t/collapsed', 'moodle'),
             alt : M.util.get_string('expand', 'moodle')
         });
+        if (window.right_to_left()) {
+            action.one('img').setAttrs({
+                src : M.util.image_url('t/collapsed_rtl', 'moodle'),
+            });
+        }
         if (ul) {
             ul.setAttribute('aria-hidden', 'true');
         }
