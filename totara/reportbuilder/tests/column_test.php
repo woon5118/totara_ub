@@ -706,7 +706,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         foreach ($sourcelist as $sourcename => $title) {
             $sourcecheck = in_array($sourcename, array('dp_certification_history', 'user'));
             // echo '<h3>Title : [' . $title . '] Sourcename : [' . $sourcename . ']</h3>' . "\n";
-            $src = reportbuilder::get_source_object($sourcename);
+            $src = reportbuilder::get_source_object($sourcename, true); // Caching here is completely fine.
             $sortorder = 1;
             foreach ($src->columnoptions as $column) {
                 // Create a report.

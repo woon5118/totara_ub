@@ -225,6 +225,12 @@ class phpunit_util extends testing_util {
         }
         session_id(''); // Totara Connect fakes the sid in tests.
 
+        // Check if report builder has been loaded and if so reset the source object cache.
+        // Don't autoload here - it won't work.
+        if (class_exists('reportbuilder', false)) {
+            reportbuilder::reset_source_object_cache();
+        }
+
         //TODO MDL-25290: add more resets here and probably refactor them to new core function
 
         // Reset course and module caches.

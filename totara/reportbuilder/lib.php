@@ -301,13 +301,15 @@ class reportbuilder {
         if (!empty($CFG->enableglobalrestrictions) and $globalrestrictionset !== null && $embedgrrsupport) {
             $this->globalrestrictionset = $globalrestrictionset;
             $nocache = true; // Caching cannot work together with restrictions, sorry.
+            $usesourcecache = false; // Cannot use the source cache if we have a restrictionset.
         } else {
             $this->globalrestrictionset = null;
+            $usesourcecache = true; // There is no restrictionset so we can use the sourcecache.
         }
 
         $this->_id = $report->id;
         $this->source = $report->source;
-        $this->src = self::get_source_object($this->source, false, true, $this->globalrestrictionset);
+        $this->src = self::get_source_object($this->source, $usesourcecache, true, $this->globalrestrictionset);
         $this->shortname = $report->shortname;
         $this->fullname = $report->fullname;
         $this->hidden = $report->hidden;
@@ -606,6 +608,13 @@ class reportbuilder {
      * primarily used by get_source_object().
      */
     protected static $sourceobjects = array();
+
+    /**
+     * Useful during testing as it allows us to reset the source object cache.
+     */
+    public static function reset_source_object_cache() {
+        self::$sourceobjects = array();
+    }
 
     /**
      * Searches for and returns an instance of the specified source class

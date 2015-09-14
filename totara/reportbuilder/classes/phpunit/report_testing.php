@@ -90,6 +90,7 @@ trait report_testing {
         global $DB;
 
         $column = $report->src->new_column_from_option($type, $value, $transform, $aggregate, $heading, !empty($heading), $hidden);
+        \reportbuilder::reset_source_object_cache();
 
         $sortorder = $DB->get_field('report_builder_columns', 'MAX(sortorder) + 1', array('reportid' => $report->_id));
         if (!$sortorder) {
