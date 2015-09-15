@@ -1564,6 +1564,10 @@ function install_core($version, $verbose) {
         set_config('totara_build', $TOTARA->build);
         set_config('totara_version', $TOTARA->version);
 
+        // If there is any forced flavour activate it and tell it that it was just activated,
+        // flavours might want to hack some settings or do other weird magic.
+        \totara_flavour\helper::execute_post_install_steps();
+
         print_upgrade_part_end(null, true, $verbose);
 
         // Purge all caches. They're disabled but this ensures that we don't have any persistent data just in case something
@@ -1688,6 +1692,9 @@ function upgrade_noncore($verbose) {
         cache_helper::update_definitions();
         // Mark the site as upgraded.
         set_config('allversionshash', core_component::get_all_versions_hash());
+
+        // Allow the Totara Flavour to act upon the upgrade if need be.
+        \totara_flavour\helper::execute_post_upgrade_steps();
 
         // Purge caches again, just to be sure we arn't holding onto old stuff now.
         cache_helper::purge_all(true);

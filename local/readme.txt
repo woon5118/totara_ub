@@ -244,14 +244,15 @@ for installation and upgrade.
 
 Sample /local/defaults.php file content:
 <?php
-$defaults['moodle']['forcelogin'] = 1;  // new default for $CFG->forcelogin
+$defaults['']['forcelogin'] = 1;  // new default for $CFG->forcelogin
 $defaults['scorm']['maxgrade'] = 20;    // default for get_config('scorm', 'maxgrade')
 $defaults['moodlecourse']['numsections'] = 11;
-$defaults['moodle']['hiddenuserfields'] = array('city', 'country');
+$defaults['']['hiddenuserfields'] = array('city', 'country');
 
 First bracket contains string from column plugin of config_plugins table.
 Second bracket is the name of setting. In the admin settings UI the plugin and
-name of setting is separated by "|".
+name of setting is separated by "|". Empty string '' (or the word 'moodle')
+in the first bracket means main config table setting.
 
 The values usually correspond to the raw string in config table, with the exception
 of comma separated lists that are usually entered as real arrays.

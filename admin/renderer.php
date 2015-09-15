@@ -91,6 +91,7 @@ class core_admin_renderer extends plugin_renderer_base {
         $output .= $this->header();
         $output .= $this->maturity_warning($maturity);
         $output .= $this->heading("Totara {$TOTARA->release}");
+        $output .= $this->active_flavour_notice(); // Totara flavours info.
         $output .= $this->release_notes_link();
 
         $output .= $this->environment_check_table($envstatus, $environment_results);
@@ -166,6 +167,7 @@ class core_admin_renderer extends plugin_renderer_base {
 
         $output .= $this->header();
         $output .= $this->heading("Totara {$TOTARA->release}");
+        $output .= $this->active_flavour_notice(); // Totara flavours info.
         $output .= $this->release_notes_link();
         $output .= $this->environment_check_table($envstatus, $environment_results);
 
@@ -1407,6 +1409,20 @@ class core_admin_renderer extends plugin_renderer_base {
         $box .= $this->output->box_end();
 
         return $box;
+    }
+
+    /**
+     * Render active flavour notice.
+     *
+     * @return string html fragment, null if none
+     */
+    public function active_flavour_notice() {
+        $flavournotice = \totara_flavour\helper::get_active_flavour_notice($this);
+        if (!$flavournotice) {
+            return null;
+        }
+
+        return $this->box($flavournotice, 'flavournotice');
     }
 
     /**

@@ -82,6 +82,16 @@ class totara_core_renderer extends plugin_renderer_base {
         $url = new moodle_url('http://www.totaralms.com');
         $attributes = array('href' => $url, 'target' => '_blank');
         $output .= html_writer::tag('a', $text, $attributes);
+
+        // Inform the admin of the flavour they are using. If one has been set.
+        $flavour = \totara_flavour\helper::get_active_flavour_definition();
+        if ($flavour) {
+            $output .= html_writer::empty_tag('br');
+            $output .= html_writer::empty_tag('br');
+            $text = markdown_to_html(get_string('description', 'totara_flavour', $flavour->get_name()));
+            $output .= html_writer::tag('span', $text);
+        }
+
         $output .= html_writer::empty_tag('br');
         $output .= html_writer::empty_tag('br');
         $output .= get_string('totaracopyright', 'totara_core');

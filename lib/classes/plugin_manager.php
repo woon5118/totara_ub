@@ -1038,6 +1038,11 @@ class core_plugin_manager {
                 'urltolink', 'data', 'glossary'
             ),
 
+            // Totara: flavours allow enforcing of settings and changing of setting defaults.
+            'flavour' => array(
+                'enterprise', 'professional',
+            ),
+
             'format' => array(
                 'singleactivity', 'social', 'topics', 'weeks'
                 // Totara
@@ -1183,7 +1188,7 @@ class core_plugin_manager {
 
             // Totara:
             'totara' => array(
-                'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360',
+                'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect',
             ),

@@ -1147,14 +1147,43 @@ class admin_root extends admin_category {
 
         $this->category_cache = array();
 
-        // load custom defaults if found
-        $this->custom_defaults = null;
+        // Totara: Default settings may be overridden from the config.php OR admin settings UI.
+        $this->custom_defaults = array();
+
+        // Totara: Load flavour defaults as the base.
+        $flavourdefaults = \totara_flavour\helper::get_defaults_setting();
+        foreach ($flavourdefaults as $plugin => $settings) {
+            foreach ($settings as $setting => $value) {
+                $this->custom_defaults[$plugin][$setting] = $value;
+            }
+        }
+
+        // Totara: Local server defaults may override any flavour recommended defaults.
         $defaultsfile = "$CFG->dirroot/local/defaults.php";
         if (is_readable($defaultsfile)) {
             $defaults = array();
             include($defaultsfile);
-            if (is_array($defaults) and count($defaults)) {
-                $this->custom_defaults = $defaults;
+            if (is_array($defaults)) {
+                foreach ($defaults as $plugin => $settings) {
+                    if (is_array($settings)) {
+                        if ($plugin === '') {
+                            // Support both '' and 'moodle' as the fake main CFG plugin name.
+                            $plugin = 'moodle';
+                        }
+                        foreach ($settings as $setting => $value) {
+                            $this->custom_defaults[$plugin][$setting] = $value;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Totara: Finally override with the enforced flavour setting values,
+        // enforced settings cannot be changed via admin UI.
+        $enforedsettings = \totara_flavour\helper::get_enforced_settings();
+        foreach ($enforedsettings as $plugin => $settings) {
+            foreach ($settings as $setting => $value) {
+                $this->custom_defaults[$plugin][$setting] = $value;
             }
         }
     }
@@ -7000,8 +7029,16 @@ function admin_write_settings($formdata) {
     $adminroot = admin_get_root();
     $settings = admin_find_write_settings($adminroot, $data);
 
+    // Totara: Enforce any of these values, no manual admin changes are allowed.
+    $enforcedsettings = \totara_flavour\helper::get_enforced_settings();
+
     $count = 0;
     foreach ($settings as $fullname=>$setting) {
+        $plugin = is_null($setting->plugin) ? 'moodle' : $setting->plugin;
+        if (isset($enforcedsettings[$plugin][$setting->name])) {
+            // This setting is enforced by the active flavour, no cheating here by hacking the submitted form.
+            $data[$fullname] = $enforcedsettings[$plugin][$setting->name];
+        }
         /** @var $setting admin_setting */
         $original = $setting->get_setting();
         $error = $setting->write_setting($data[$fullname]);
@@ -7249,6 +7286,21 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
         $error = '<div><span class="error">' . $adminroot->errors[$fullname]->error . '</span></div>';
     }
 
+    // Totara: check if the setting is enforced via flavour and prevent any changes if yes.
+    $enforcedsetting = '';
+    if (empty($override)) {
+        $enforcedsettings = \totara_flavour\helper::get_enforced_settings();
+        $plugin = is_null($setting->plugin) ? 'moodle' : $setting->plugin;
+        if (isset($enforcedsettings[$plugin][$setting->name])) {
+            // Add a description about this setting being locked because it is prohibited.
+            $enforcedsetting = '<div class="form-overridden flavourlock">'.get_string('settinglocked', \totara_flavour\helper::get_active_flavour_component()).'</div>';
+            // Add a notice to the title so that it can't be missed.
+            $override .= '<div class="form-overridden flavourlock">'.get_string('settinglocked', 'totara_flavour').'</div>';
+            // Add a mask to the form to block users from changing the setting an then being confused about why it doesn't save.
+            $form = '<div class="flavourlock-mask"><div class="mask"></div>'.$form.'</div>';
+        }
+    }
+
     $str = '
 <div class="form-item clearfix" id="admin-'.$setting->name.'">
   <div class="form-label">';
@@ -7261,7 +7313,7 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     $str .='    <span class="form-shortname">'.highlightfast($query, $name).'</span>
   </div>
   <div class="form-setting">'.$error.$form.$defaultinfo.'</div>
-  <div class="form-description">'.highlight($query, markdown_to_html($description)).'</div>
+  <div class="form-description">'.$enforcedsetting. highlight($query, markdown_to_html($description)).'</div>
 </div>';
 
     return $str;

@@ -616,6 +616,28 @@ $CFG->admin = 'admin';
 //   $CFG->forced_plugin_settings = array('pluginname'  => array('settingname' => 'value', 'settingname_locked' => true, 'settingname_adv' => true));
 //
 //=========================================================================
+// 8b. Totara flavours
+//=========================================================================
+// Totara flavours implement feature restrictions and optimised setting defaults.
+// A flavour can be forced by settings the following setting:
+//
+// Example:
+//   $CFG->forceflavour = 'professional';
+//
+// Where the value is one of the directory names in /totara/flavour/flavours/.
+// The forced flavour is activated during install or upgrade.
+// Set to '' if you want to completely disable flavours.
+// Any change of $CFG->forceflavour is activated during installation, any
+// upgrade or when admin confirms the triggers update in /totara/flavour/view.php
+//
+// To show only some flavours use the following setting. By default only the
+// 'enterprise' flavour is visible. The value is a comma separated list.
+// Empty list means hide the flavours UI, enforced flavours are not affected.
+//
+// Example:
+//   $CFG->showflavours = 'professional,enterprise';
+//
+//=========================================================================
 // 9. PHPUNIT SUPPORT
 //=========================================================================
 // $CFG->phpunit_prefix = 'phpu_';

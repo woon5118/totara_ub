@@ -10,6 +10,10 @@ $hassiteconfig = has_capability('moodle/site:config', $systemcontext);
 
 $ADMIN->add('root', new admin_externalpage('adminnotifications', new lang_string('notifications'), "$CFG->wwwroot/$CFG->admin/index.php"));
 
+// Totara flavour overview.
+$hidden = (isset($CFG->showflavours) and empty($CFG->showflavours));
+$ADMIN->add('root', new admin_externalpage('flavouroverview', new lang_string('flavouroverview', 'totara_flavour'), "$CFG->wwwroot/totara/flavour/view.php", 'moodle/site:config', $hidden));
+
 $ADMIN->add('root', new admin_externalpage('totararegistration', new lang_string('totararegistration', 'totara_core'),
         "$CFG->wwwroot/$CFG->admin/register.php", 'moodle/site:config', true));
 
