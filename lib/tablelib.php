@@ -1174,8 +1174,9 @@ class flexible_table {
             $linkattributes = array('title' => get_string('show') . ' ' . strip_tags($this->headers[$index]),
                                     'aria-expanded' => 'false',
                                     'aria-controls' => $ariacontrols);
+            $iconurl = right_to_left() ? $OUTPUT->pix_url('t/switch_plus_rtl') : $OUTPUT->pix_url('t/switch_plus');
             return html_writer::link($this->baseurl->out(false, array($this->request[TABLE_VAR_SHOW] => $column)),
-                    html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/switch_plus'), 'alt' => get_string('show'))),
+                    html_writer::empty_tag('img', array('src' => $iconurl, 'alt' => get_string('show'))),
                     $linkattributes);
 
         } else if ($this->headers[$index] !== NULL) {

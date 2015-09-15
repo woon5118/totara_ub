@@ -1539,7 +1539,11 @@ class grade_report_grader extends grade_report {
 
             if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
                 $url->param('action', 'switch_plus');
-                $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus), null, null);
+                if (right_to_left()) {
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus_rtl', $strswitchplus), null, null);
+                } else {
+                    $icon = $OUTPUT->action_icon($url, new pix_icon('t/switch_plus', $strswitchplus), null, null);
+                }
                 $showing = get_string('showingaggregatesonly', 'grades');
             } else if (in_array($element['object']->id, $this->collapsed['gradesonly'])) {
                 $url->param('action', 'switch_whole');

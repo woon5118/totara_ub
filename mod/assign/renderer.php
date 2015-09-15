@@ -941,7 +941,11 @@ class mod_assign_renderer extends plugin_renderer_base {
 
                 $expandstr = get_string('viewfull', 'assign');
                 $options = array('class'=>'expandsummaryicon expand_' . $classsuffix);
-                $o .= $this->output->pix_icon('t/switch_plus', $expandstr, null, $options);
+                if (right_to_left()) {
+                    $o .= $this->output->pix_icon('t/switch_plus_rtl', $expandstr, null, $options);
+                } else {
+                    $o .= $this->output->pix_icon('t/switch_plus', $expandstr, null, $options);
+                }
 
                 $jsparams = array($submissionplugin->plugin->get_subtype(),
                                   $submissionplugin->plugin->get_type(),
@@ -1045,7 +1049,11 @@ class mod_assign_renderer extends plugin_renderer_base {
 
                 $expandstr = get_string('viewfull', 'assign');
                 $options = array('class'=>'expandsummaryicon expand_' . $classsuffix);
-                $o .= $this->output->pix_icon('t/switch_plus', $expandstr, null, $options);
+                if (right_to_left()) {
+                    $o .= $this->output->pix_icon('t/switch_plus_rtl', $expandstr, null, $options);
+                } else {
+                    $o .= $this->output->pix_icon('t/switch_plus', $expandstr, null, $options);
+                }
 
                 $jsparams = array($feedbackplugin->plugin->get_subtype(),
                                   $feedbackplugin->plugin->get_type(),
