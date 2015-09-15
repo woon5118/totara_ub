@@ -42,7 +42,7 @@ $string['assignnumusers'] = 'Assigned Users';
 $string['assignsourcename'] = 'Assigned Group';
 $string['backtofeedback360'] = 'Back to feedback';
 $string['backtofeedbackrequest'] = 'Back to feedback request';
-$string['byduedate'] = 'by {$a}';
+$string['byduedate'] = ' by {$a}';
 $string['cleanuptask'] = 'Cleanup Feedback360';
 $string['cancellationalert'] = '{$a->userfrom} has cancelled their feedback request "{$a->feedbackname}", you no longer need to respond.';
 $string['cancellationemail'] = '{$a->userfrom} has cancelled their feedback request "{$a->feedbackname}", you no longer need to respond.';
@@ -169,11 +169,13 @@ $string['manageremailrequeststr'] = '{$a->fullname} has requested you fill in th
 
 {$a->url}';
 $string['manageremailrequestsubject'] = '{$a->fullname} requests Feedback about their staff member {$a->staffname}';
-$string['managerreminderemailbody'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form before {$a->timedue}, go to {$a->url} to get started.
+$string['managerreminderemailbody'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form{$a->timedue}, visit the URL below to get started.
+{$a->url}
 
 Thank you,
 {$a->userfrom}';
-$string['managerreminderemailbodyhtml'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form before {$a->timedue}, click {$a->link} to get started.
+$string['managerreminderemailbodyhtml'] = 'I wanted to remind you to fill in the feedback request about my staff member {$a->staffname}. Can you please fill in the form{$a->timedue}, visit the URL below to get started.
+{$a->link}
 
 Thank you,
 {$a->userfrom}';
@@ -220,8 +222,8 @@ $string['reminderconfirm'] = 'This will send a reminder message to everyone you 
 $string['reminderssent'] = 'Reminders sent for {$a}';
 $string['remindresponders'] = 'Send Feedback Reminders';
 $string['reminderemailsubject'] = 'Reminder: {$a->requestername}\'s feedback request';
-$string['reminderemailbody'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please go to {$a->url} and complete the form.';
-$string['reminderemailbodyhtml'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them {$a->timedue}, please click {$a->link} and complete the form.';
+$string['reminderemailbody'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them{$a->timedue}, please visit the URL below and complete the form. {$a->url}';
+$string['reminderemailbodyhtml'] = 'This is to remind you that {$a->requestername} asked you to complete a feedback form about them{$a->timedue}, please visit the URL below and complete the form. {$a->link}';
 $string['removerequest'] = 'Delete Feedback Request';
 $string['removerequestconfirm'] = 'Are you sure you want to remove the feedback request to {$a}?';
 $string['responsecount'] = '{$a->responded} Responses (out of {$a->total})';

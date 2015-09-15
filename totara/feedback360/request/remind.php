@@ -111,9 +111,9 @@ if (!empty($confirmation)) {
                         array('id' => $resp_assignment->feedback360emailassignmentid));
 
                 // Set up some variables for the email.
-                $params = array('email' => $email_assignment->email, 'token' => $email_assignment->token);
+                $params = array('token' => $email_assignment->token);
                 $url = new moodle_url('/totara/feedback360/feedback.php', $params);
-                $remvars->link = html_writer::link($url, get_string('urlrequesturlmask', 'totara_feedback360'));
+                $remvars->link = html_writer::link($url, $url->out());
                 $remvars->url = $url->out();
 
                 if ($asmanager) {
