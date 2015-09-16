@@ -402,6 +402,7 @@ $string['instructions:programdetails'] = 'Define the program name, availability 
 $string['instructions:programexceptions'] = 'Quickly resolve assignment issues by selecting \'type\' and applying an \'action\'';
 $string['instructions:programmessages'] = 'Define program messages and reminders as required';
 $string['invalidtype'] = 'Invalid type param';
+$string['itemdeleted'] = 'Item Deleted';
 $string['label:competencyname'] = 'Competency name';
 $string['label:coursecreation'] = 'When to create new course';
 $string['label:coursescorefield'] = 'Course score field';

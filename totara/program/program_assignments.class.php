@@ -1468,33 +1468,49 @@ class prog_assigment_completion_position_assigned_date extends prog_assignment_c
             });
         ";
     }
-    private function load_data() {
-        global $DB;
-        $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
-        $sql = "SELECT " . $DB->sql_concat('ppa.userid', "'-'", "ppa.positionid") . " AS hash, ppa.timeassigned
-                  FROM {prog_pos_assignment} ppa
-                  JOIN {pos_assignment} pa ON ppa.userid = pa.userid AND ppa.positionid = pa.positionid
-                 WHERE ppa.type = ? AND pa.type = ? AND ppa.positionid IS NOT NULL";
-        $this->timestamps = $DB->get_records_sql($sql, array(POSITION_TYPE_PRIMARY, POSITION_TYPE_PRIMARY));
-    }
     public function get_item_name($instanceid) {
-        // Lazy load data when required.
+        global $DB;
+
+        // Lazy load names when required.
         if (!isset($this->names)) {
-            $this->load_data();
+            $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
         }
-        return $this->names[$instanceid]->fullname;
+
+        if (isset($this->names[$instanceid]->fullname)) {
+            return $this->names[$instanceid]->fullname;
+        } else {
+            return get_string('itemdeleted', 'totara_program');
+        }
     }
     public function get_completion_string() {
         return get_string('assigntoposition', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
-        // Lazy load data when required.
+        global $DB;
+
+        // First time calling this function.
         if (!isset($this->timestamps)) {
-            $this->load_data();
+            $this->timestamps = array();
         }
-        if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
-            return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timeassigned;
+
+        // First time calling this function for this positionid.
+        $positionid = $assignobject->completioninstance;
+        if (!isset($this->timestamps[$positionid])) {
+            $sql = "SELECT ppa.userid, ppa.timeassigned
+                      FROM {prog_pos_assignment} ppa
+                      JOIN {pos_assignment} pa
+                        ON ppa.userid = pa.userid AND ppa.positionid = pa.positionid
+                     WHERE ppa.type = :postypeprimary1 AND pa.type = :postypeprimary2
+                       AND ppa.positionid = :positionid";
+            $params = array('postypeprimary1' => POSITION_TYPE_PRIMARY, 'postypeprimary2' => POSITION_TYPE_PRIMARY,
+                            'positionid' => $positionid);
+            $this->timestamps[$positionid] = $DB->get_records_sql($sql, $params);
         }
+
+        if (isset($this->timestamps[$positionid][$userid])) {
+            return $this->timestamps[$positionid][$userid]->timeassigned;
+        }
+
         return false;
     }
 }
@@ -1520,32 +1536,45 @@ class prog_assigment_completion_position_start_date extends prog_assignment_comp
             });
         ";
     }
-    private function load_data() {
-        global $DB;
-        $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
-        $sql = "SELECT " . $DB->sql_concat('pa.userid', "'-'", "pa.positionid") . " AS hash, pa.timevalidfrom
-                  FROM {pos_assignment} pa
-                 WHERE pa.type = ? AND pa.positionid IS NOT NULL";
-        $this->timestamps = $DB->get_records_sql($sql, array(POSITION_TYPE_PRIMARY));
-    }
     public function get_item_name($instanceid) {
-        // Lazy load data when required.
+        global $DB;
+
+        // Lazy load names when required.
         if (!isset($this->names)) {
-            $this->load_data();
+            $this->names = $DB->get_records_select('pos', '', null, '', 'id, fullname');
         }
-        return $this->names[$instanceid]->fullname;
+
+        if (isset($this->names[$instanceid]->fullname)) {
+            return $this->names[$instanceid]->fullname;
+        } else {
+            return get_string('itemdeleted', 'totara_program');
+        }
     }
     public function get_completion_string() {
         return get_string('startinposition', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
-        // Lazy load data when required.
+        global $DB;
+
+        // First time calling this function.
         if (!isset($this->timestamps)) {
-            $this->load_data();
+            $this->timestamps = array();
         }
-        if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
-            return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timevalidfrom;
+
+        // First time calling this function for this positionid.
+        $positionid = $assignobject->completioninstance;
+        if (!isset($this->timestamps[$positionid])) {
+            $sql = "SELECT pa.userid, pa.timevalidfrom
+                      FROM {pos_assignment} pa
+                     WHERE pa.type = :postypeprimary AND pa.positionid = :positionid";
+            $params = array('postypeprimary' => POSITION_TYPE_PRIMARY, 'positionid' => $positionid);
+            $this->timestamps[$positionid] = $DB->get_records_sql($sql, $params);
         }
+
+        if (isset($this->timestamps[$positionid][$userid])) {
+            return $this->timestamps[$positionid][$userid]->timevalidfrom;
+        }
+
         return false;
     }
 }
@@ -1573,31 +1602,42 @@ class prog_assigment_completion_program_completion extends prog_assignment_compl
             $('.folder').removeClass('clickable').addClass('unclickable');
         ";
     }
-    private function load_data() {
-        global $DB;
-        $this->names = $DB->get_records_select('prog', '', null, '', 'id, fullname');
-        // Prog_completion records where coursesetid = 0 are the master record for the program as a whole.
-        $this->timestamps = $DB->get_records_select('prog_completion', 'coursesetid = 0', null, '',
-            $DB->sql_concat('userid', "'-'", 'programid') . ' as hash, timecompleted');
-    }
     public function get_item_name($instanceid) {
-        // Lazy load data when required.
+        global $DB;
+
+        // Lazy load names when required.
         if (!isset($this->names)) {
-            $this->load_data();
+            $this->names = $DB->get_records_select('prog', '', null, '', 'id, fullname');
         }
-        return $this->names[$instanceid]->fullname;
+
+        if (isset($this->names[$instanceid]->fullname)) {
+            return $this->names[$instanceid]->fullname;
+        } else {
+            return get_string('itemdeleted', 'totara_program');
+        }
     }
     public function get_completion_string() {
         return get_string('completionofprogram', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
-        // Lazy load data when required.
+        global $DB;
+
+        // First time calling this function.
         if (!isset($this->timestamps)) {
-            $this->load_data();
+            $this->timestamps = array();
         }
-        if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
-            return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timecompleted;
+
+        // First time calling this function for this programid.
+        $programid = $assignobject->completioninstance;
+        if (!isset($this->timestamps[$programid])) {
+            $params = array('coursesetid' => 0, 'programid' => $programid);
+            $this->timestamps[$programid] = $DB->get_records('prog_completion', $params, '', 'userid, timecompleted');
         }
+
+        if (isset($this->timestamps[$programid][$userid])) {
+            return $this->timestamps[$programid][$userid]->timecompleted;
+        }
+
         return false;
     }
 }
@@ -1625,30 +1665,42 @@ class prog_assigment_completion_course_completion extends prog_assignment_comple
             $('.folder').removeClass('clickable').addClass('unclickable');
         ";
     }
-    private function load_data() {
-        global $DB;
-        $this->names = $DB->get_records_select('course', '', null, '', 'id, fullname');
-        $this->timestamps = $DB->get_records_select('course_completions', '', null, '',
-            $DB->sql_concat('userid', "'-'", 'course') . ' as hash, timecompleted');
-    }
     public function get_item_name($instanceid) {
-        // Lazy load data when required.
+        global $DB;
+
+        // Lazy load names when required.
         if (!isset($this->names)) {
-            $this->load_data();
+            $this->names = $DB->get_records_select('course', '', null, '', 'id, fullname');
         }
-        return $this->names[$instanceid]->fullname;
+
+        if (isset($this->names[$instanceid]->fullname)) {
+            return $this->names[$instanceid]->fullname;
+        } else {
+            return get_string('itemdeleted', 'totara_program');
+        }
     }
     public function get_completion_string() {
         return get_string('completionofcourse', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
-        // Lazy load data when required.
+        global $DB;
+
+        // First time calling this function.
         if (!isset($this->timestamps)) {
-            $this->load_data();
+            $this->timestamps = array();
         }
-        if (isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
-            return $this->timestamps[$userid . '-' . $assignobject->completioninstance]->timecompleted;
+
+        // First time calling this function for this courseid.
+        $courseid = $assignobject->completioninstance;
+        if (!isset($this->timestamps[$courseid])) {
+            $params = array('course' => $courseid);
+            $this->timestamps[$courseid] = $DB->get_records('course_completions', $params, '', 'userid, timecompleted');
         }
+
+        if (isset($this->timestamps[$courseid][$userid])) {
+            return $this->timestamps[$courseid][$userid]->timecompleted;
+        }
+
         return false;
     }
 }
@@ -1674,32 +1726,45 @@ class prog_assigment_completion_profile_field_date extends prog_assignment_compl
             });
         ";
     }
-    private function load_data() {
-        global $DB;
-        $this->names = $DB->get_records_select('user_info_field', '', null, '', 'id, name');
-        $this->timestamps = $DB->get_records_select('user_info_data', '', null, '',
-            $DB->sql_concat('userid', "'-'", 'fieldid') . ' as hash, data');
-    }
     public function get_item_name($instanceid) {
-        // Lazy load data when required.
+        global $DB;
+
+        // Lazy load names when required.
         if (!isset($this->names)) {
-            $this->load_data();
+            $this->names = $DB->get_records_select('user_info_field', '', null, '', 'id, name');
         }
-        return $this->names[$instanceid]->name;
+
+        if (isset($this->names[$instanceid]->name)) {
+            return $this->names[$instanceid]->name;
+        } else {
+            return get_string('itemdeleted', 'totara_program');
+        }
     }
     public function get_completion_string() {
         return get_string('dateinprofilefield', 'totara_program');
     }
     public function get_timestamp($userid, $assignobject) {
-        // Lazy load data when required.
+        global $DB;
+
+        // First time calling this function.
         if (!isset($this->timestamps)) {
-            $this->load_data();
+            $this->timestamps = array();
         }
-        if (!isset($this->timestamps[$userid . '-' . $assignobject->completioninstance])) {
+
+        // First time calling this function for this fieldid. We can't narrow this down to only the users in this assignment
+        // because it's possible that those records haven't yet been created. But doing it this way means that we can reuse
+        // the same custom field if it is used in more than one assignment.
+        $fieldid = $assignobject->completioninstance;
+        if (!isset($this->timestamps[$fieldid])) {
+            $params = array('fieldid' => $fieldid);
+            $this->timestamps[$fieldid] = $DB->get_records('user_info_data', $params, '', 'userid, data');
+        }
+
+        if (!isset($this->timestamps[$fieldid][$userid])) {
             return false;
         }
 
-        $date = $this->timestamps[$userid . '-' . $assignobject->completioninstance]->data;
+        $date = $this->timestamps[$fieldid][$userid]->data;
         $date = trim($date);
 
         if (empty($date)) {
@@ -1732,6 +1797,7 @@ class prog_assigment_completion_profile_field_date extends prog_assignment_compl
 }
 
 class prog_assigment_completion_enrollment_date extends prog_assignment_completion_type {
+    private $timestamps;
 
     public function get_id() {
         return COMPLETION_EVENT_ENROLLMENT_DATE;
@@ -1753,12 +1819,25 @@ class prog_assigment_completion_enrollment_date extends prog_assignment_completi
     public function get_timestamp($userid, $assignobject) {
         global $DB;
 
-        $date = time();
-        $params = array('userid' => $userid, 'assignmentid' => $assignobject->id);
-        if ($user = $DB->get_record('prog_user_assignment', $params, 'id, timeassigned')) {
-            $date = $user->timeassigned;
+        // First time calling this function.
+        if (!isset($this->timestamps)) {
+            $this->timestamps = array();
         }
 
-        return $date;
+        // First time calling this function for this assignmentid.
+        $assignmentid = $assignobject->id;
+        if (!isset($this->timestamps[$assignmentid])) {
+            $params = array('assignmentid' => $assignmentid);
+            $this->timestamps[$assignmentid] = $DB->get_records('prog_user_assignment', $params, '', 'userid, timeassigned');
+        }
+
+        // Get the specific user assignment record.
+        if (isset($this->timestamps[$assignmentid][$userid])) {
+            return $this->timestamps[$assignmentid][$userid]->timeassigned;
+        }
+
+        // The only reason we would be trying to get this timestamp and it doesn't exist is if the record
+        // is just about to be created, so just return the current time.
+        return time();
     }
 }
