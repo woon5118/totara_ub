@@ -74,9 +74,11 @@ M.totara_visiblecohort = M.totara_visiblecohort || {
             }
         }
 
+        this.checkcohortaddvisibility();
+        $('select[name="audiencevisible"]').change(M.totara_visiblecohort.checkcohortaddvisibility);
+
         this.init_dialogs();
     },
-
 
     init_dialogs: function() {
         var url = M.cfg.wwwroot + '/totara/cohort/dialog/';
@@ -101,9 +103,17 @@ M.totara_visiblecohort = M.totara_visiblecohort || {
                     + '&sesskey=' + this.config.sesskey,
             ehandler
         );
+    },
+
+    checkcohortaddvisibility: function() {
+        var option = $('select[name="audiencevisible"] option:selected');
+        if (option.val() != M.totara_visiblecohort.config.cohortvisibleaudience) {
+            $('#id_cohortsaddvisible').attr("disabled", true);
+        } else {
+            $('#id_cohortsaddvisible').attr("disabled", false);
+        }
     }
 }
-
 
 // Create handler for the dialog.
 totaraDialog_handler_visiblecohorts = function() {
