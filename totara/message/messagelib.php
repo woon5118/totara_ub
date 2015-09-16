@@ -340,8 +340,11 @@ function tm_alert_send($eventdata) {
             $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . $string_manager->get_string('viewdetailshere', 'totara_message', $eventdata->contexturl, $eventdata->userto->lang);
         }
 
-        // Add footer to email
-        $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . $string_manager->get_string('alertfooter2', 'totara_message', $CFG->wwwroot."/message/edit.php", $eventdata->userto->lang);
+        // Add footer to email in the recipient language explaining how to change email preferences. However, this is only for system users.
+        if (core_user::is_real_user($eventdata->userto->id)) {
+            $footer = $string_manager->get_string('alertfooter2', 'totara_message', $CFG->wwwroot."/message/edit.php", $eventdata->userto->lang);
+            $eventdata->fullmessagehtml .= html_writer::empty_tag('br') . html_writer::empty_tag('br') . $footer;
+        }
 
         // Setup some more variables
         $fromaddress = !empty($eventdata->fromaddress) ? $eventdata->fromaddress : '';

@@ -69,8 +69,12 @@ class message_output_email extends message_output {
         }
         // append a footer to the emails in the recipient language explaining how to change email preferences
         $strmgr = get_string_manager();
-        $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
-        $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+        $footerplain = "";
+        $footerhtml = "";
+        if (core_user::is_real_user($eventdata->userto->id)) {
+            $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+            $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+        }
 
         // Check if we have attachments to send.
         $attachment = '';
