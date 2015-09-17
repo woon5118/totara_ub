@@ -199,7 +199,7 @@ Feature: Verify capability manageanyplan.
     And I should see "Website 2"
 
     # Remove an evidence.
-    When I click on "input" "css_element" in the "#dp-component-evidence-container" "css_element"
+    When I click on "input" "css_element" in the "#linkedevidencelist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this course"
 
@@ -259,7 +259,7 @@ Feature: Verify capability manageanyplan.
     And I should see "Course 2"
 
     # Delete the second course.
-    When I click on "input" "css_element" in the ".dp-plan-component-items" "css_element"
+    When I click on "input" "css_element" in the "#linkedcourselist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-update" "css_element"
     Then I should see "The selected linked courses have been removed from this competency"
 
@@ -272,7 +272,7 @@ Feature: Verify capability manageanyplan.
     And I should see "Website 2"
 
     # Remove an evidence.
-    When I click on "input" "css_element" in the "#dp-component-evidence-container" "css_element"
+    When I click on "input" "css_element" in the "#linkedevidencelist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this competency"
 
@@ -327,7 +327,7 @@ Feature: Verify capability manageanyplan.
     And I should see "Course 2"
 
     # Delete the second course.
-    When I click on "input" "css_element" in the "#dp-component-update" "css_element"
+    When I click on "input" "css_element" in the "#linkedcourselist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-update" "css_element"
     Then I should see "The selected linked courses have been removed from this objective"
 
@@ -340,7 +340,7 @@ Feature: Verify capability manageanyplan.
     And I should see "Website 2"
 
     # Remove an evidence.
-    When I click on "input" "css_element" in the "#dp-component-evidence-container" "css_element"
+    When I click on "input" "css_element" in the "#linkedevidencelist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this objective"
 
@@ -386,6 +386,6 @@ Feature: Verify capability manageanyplan.
     And I should see "Website 2"
 
     # Remove an evidence.
-    When I click on "input" "css_element" in the "#dp-component-evidence-container" "css_element"
+    When I click on "input" "css_element" in the "#linkedevidencelist_r0" "css_element"
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this program"

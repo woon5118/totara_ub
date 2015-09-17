@@ -105,10 +105,13 @@ if (!dp_can_manage_users_plans($plan->userid)) {
 ///
 if (!empty($approve)) {
     if (in_array($plan->get_setting('approve'), array(DP_PERMISSION_ALLOW, DP_PERMISSION_APPROVE))) {
-       $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, $reasonfordecision);
-       \totara_plan\event\approval_approved::create_from_plan($plan)->trigger();
-       $plan->send_approved_alert($reasonfordecision);
-       totara_set_notification(get_string('planapproved', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+        $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_MANUAL_APPROVE, $reasonfordecision);
+        \totara_plan\event\approval_approved::create_from_plan($plan)->trigger();
+        $plan->send_approved_alert($reasonfordecision);
+        $a = new stdClass;
+        $a->name = $plan->name;
+        $a->user = fullname($USER);
+        totara_set_notification(get_string('planapproved', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
     } else {
         if (empty($ajax)) {
             totara_set_notification(get_string('nopermission', 'totara_plan'), $referer, array('class' => 'notifysuccess'));
