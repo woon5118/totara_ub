@@ -3858,11 +3858,7 @@ EOD;
      * @return string HTML.
      */
     public function page_heading($tag = 'h1') {
-        $attrs = array();
-        if ($this->page->context->contextlevel == CONTEXT_USER) {
-            $attrs['class'] = 'display';
-        }
-        return html_writer::tag($tag, $this->page->heading, $attrs);
+        return html_writer::tag($tag, $this->page->heading);
     }
 
     /**
