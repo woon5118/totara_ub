@@ -26,7 +26,7 @@ Feature: Test that report builder reports can be scheduled
     And the "schedulegroup[minutely]" "select" should be disabled
     And I set the field "schedulegroup[daily]" to "03:00"
     When I press "Save changes"
-    Then I should see "Daily at 03:00 AM"
+    Then I should see "Daily at 03:00"
 
   @javascript
   Scenario: Report builder reports can be scheduled weekly
