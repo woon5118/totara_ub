@@ -35,7 +35,7 @@ function xmldb_totara_dashboard_upgrade($oldversion) {
     if ($oldversion < 2015030201) {
         $table = new xmldb_table('totara_dashboard_user');
         $key = new xmldb_key('dashuser_das_fk', XMLDB_KEY_FOREIGN, array('dashboardid'), 'totara_dashboard', array('id'));
-        $field = new xmldb_field('dashboardid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0','userid');
+        $field = new xmldb_field('dashboardid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null,'userid');
 
         // This should never happen but just in case, delete any invalid data.
         $dashes = $DB->get_recordset('totara_dashboard_user');
