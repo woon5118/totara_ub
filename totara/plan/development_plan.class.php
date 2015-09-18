@@ -1605,7 +1605,7 @@ class development_plan {
         $a = new stdClass();
         $a->name = $this->name;
         $a->user = fullname($USER); // User that approved the plan request.
-        $event->subject = $stringmanager->get_string('planapproved', 'totara_plan', $a, $userto->lang);
+        $event->subject = $stringmanager->get_string('planapprovedby', 'totara_plan', $a, $userto->lang);
         $event->fullmessage = $stringmanager->get_string('approvedplanrequest', 'totara_plan', $this->name, $userto->lang);
 
         if (!empty($reasonfordecision)) {
@@ -1641,7 +1641,7 @@ class development_plan {
         $a = new stdClass();
         $a->name = $this->name;
         $a->user = fullname($USER); // User that declined the plan request.
-        $event->subject = format_string($stringmanager->get_string('plandeclined', 'totara_plan', $a, $userto->lang));
+        $event->subject = format_string($stringmanager->get_string('plandeclinedby', 'totara_plan', $a, $userto->lang));
         $event->fullmessage = $event->subject;
         $event->fullmessage = $stringmanager->get_string('declinedplanrequest', 'totara_plan', $this->name, $userto->lang);
 
@@ -1693,6 +1693,7 @@ class development_plan {
         require_once($CFG->dirroot.'/totara/message/messagelib.php');
 
         $learner = $DB->get_record('user', array('id' => $this->userid));
+        $fromuser = ($USER->id == $learner->id) ? $learner : core_user::get_support_user();
 
         // Send alert to manager
         // But don't send it if they just manually performed
@@ -1703,7 +1704,7 @@ class development_plan {
             $event = new stdClass();
             $event->userto = $manager;
             //ensure the message is actually coming from $learner, default to support
-            $event->userfrom = ($USER->id == $learner->id) ? $learner : core_user::get_support_user();
+            $event->userfrom = totara_get_user_from($fromuser);
             $event->icon = 'learningplan-complete';
             $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
             $a = new stdClass();
@@ -1717,6 +1718,8 @@ class development_plan {
         // Send alert to user
         $event = new stdClass();
         $event->userto = $learner;
+        //ensure the message is actually coming from $learner, default to support
+        $event->userfrom = totara_get_user_from($fromuser);
         $event->icon = 'learningplan-complete';
         $event->contexturl = $CFG->wwwroot.'/totara/plan/view.php?id='.$this->id;
         $msg = $stringmanager->get_string('plancompletesuccess', 'totara_plan', $this->name, $learner->lang);

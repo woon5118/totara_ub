@@ -111,7 +111,7 @@ if (!empty($approve)) {
         $a = new stdClass;
         $a->name = $plan->name;
         $a->user = fullname($USER);
-        totara_set_notification(get_string('planapproved', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
+        totara_set_notification(get_string('planapprovedby', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
     } else {
         if (empty($ajax)) {
             totara_set_notification(get_string('nopermission', 'totara_plan'), $referer, array('class' => 'notifysuccess'));
@@ -128,8 +128,10 @@ if (!empty($decline)) {
         $plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_MANUAL_DECLINE, $reasonfordecision);
         \totara_plan\event\approval_declined::create_from_plan($plan)->trigger();
         $plan->send_declined_alert($reasonfordecision);
-
-        totara_set_notification(get_string('plandeclined', 'totara_plan', $plan->name), $referer, array('class' => 'notifysuccess'));
+        $a = new stdClass;
+        $a->name = $plan->name;
+        $a->user = fullname($USER);
+        totara_set_notification(get_string('plandeclinedby', 'totara_plan', $a), $referer, array('class' => 'notifysuccess'));
     } else {
         if (empty($ajax)) {
             totara_set_notification(get_string('nopermission', 'totara_plan'), $referer);

@@ -25,18 +25,12 @@ Feature: Verify competency course count within learning plan
     # Login as admin, create a competency and assign courses to it
     Given I log in as "admin"
     And I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
-    And I focus on "Competency Framework 1" "link"
     And I follow "Competency Framework 1"
-    And I focus on "Competency 1" "link"
     And I follow "Competency 1"
     And I click on "Assign course completions" "button"
-    And I focus on "Miscellaneous" "link"
     And I follow "Miscellaneous"
-    And I focus on "Course 1" "link"
     And I follow "Course 1"
-    And I focus on "Course 2" "link"
     And I follow "Course 2"
-    And I focus on "Course 3" "link"
     And I follow "Course 3"
     And I click on "Save" "button" in the "Assign course completions" "totaradialogue"
     And I wait "1" seconds
@@ -47,8 +41,7 @@ Feature: Verify competency course count within learning plan
 
    # Learner adding plan
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "Create new learning plan" "button"
     And I click on "Create plan" "button"
     And I follow "Competencies"
@@ -68,23 +61,22 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should see "Course 2"
     Then I should see "Course 3"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     Then I should see "Courses (3)"
     Then I log out
 
     # admin hiding a course
     Then I log in as "admin"
+    And I follow "Find Learning"
     And I follow "Course 2"
     And I follow "Edit settings"
     And I set the field "visible" to "Hide"
-    And I click on "Save changes" "button"
+    And I click on "Save and display" "button"
     Then I log out
 
     # leaner check plan does not display the hidden course
     Given I log in as "learner1"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     Then I should see "Courses (2)"
     And I follow "Courses (2)"
     Then I should see "Course 1"
@@ -93,8 +85,7 @@ Feature: Verify competency course count within learning plan
     And I should see "2" in the "//table/tbody/tr/td[3]" "xpath_element"
 
     # leaner add a new plan and check hidden courses are not available
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     And I click on "Create new learning plan" "button"
     And I click on "Create plan" "button"
     And I set the field "name" to "Learning Plan 2"
@@ -115,7 +106,6 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should not see "Course 2"
     Then I should see "Course 3"
-    And I focus on "My Learning" "link"
-    And I follow "Learning Plans"
+    And I click on "Learning Plans" in the totara menu
     Then I should see "Courses (2)"
     Then I log out
