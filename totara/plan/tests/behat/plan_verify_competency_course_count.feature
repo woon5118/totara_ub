@@ -67,7 +67,7 @@ Feature: Verify competency course count within learning plan
 
     # admin hiding a course
     Then I log in as "admin"
-    And I follow "Find Learning"
+    And I click on "Find Learning" in the totara menu
     And I follow "Course 2"
     And I follow "Edit settings"
     And I set the field "visible" to "Hide"
@@ -87,8 +87,8 @@ Feature: Verify competency course count within learning plan
     # leaner add a new plan and check hidden courses are not available
     And I click on "Learning Plans" in the totara menu
     And I click on "Create new learning plan" "button"
-    And I click on "Create plan" "button"
     And I set the field "name" to "Learning Plan 2"
+    And I click on "Create plan" "button"
     And I follow "Competencies"
     And I click on "Add competencies" "button"
     And I follow "Competency 1"

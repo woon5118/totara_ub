@@ -271,6 +271,19 @@ class behat_deprecated extends behat_base {
         $this->deprecated_message($alternative, true);
     }
 
+    /**
+     * Generic focus action.
+     *
+     * @When /^I focus on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     */
+    public function i_focus_on($element, $selectortype) {
+        $node = $this->get_selected_node($selectortype, $element);
+        $node->focus();
+        $this->deprecated_message('Use "I click on "<item>" in the totara menu" instead');
+    }
+
 
     /**
      * Throws an exception if $CFG->behat_usedeprecated is not allowed.
