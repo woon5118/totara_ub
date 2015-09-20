@@ -49,6 +49,7 @@ Feature: Assign visible learning to cohort
     And I click on "Find Learning" in the totara menu
     And I follow "Course 1"
     And I follow "Edit settings"
+    And I set the field "Visibility" to "Enrolled users and members of the selected audiences"
     And I click on "Add visible audiences" "button"
     And I follow "Cohort 1"
     And I click on "OK" "link_or_button" in the "div[aria-describedby='course-cohorts-visible-dialog']" "css_element"
