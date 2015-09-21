@@ -37,6 +37,7 @@ $string['clienturl_help'] = 'URL of the Totara Connect Client system.';
 $string['cohorts'] = 'Synchronised audiences';
 $string['cohortsadd'] = 'Add audience';
 $string['comment'] = 'Comment';
+$string['connect:manage'] = 'Manage the Totara Connect server and connecting clients';
 $string['courses'] = 'Synchronised courses';
 $string['coursesadd'] = 'Add course';
 $string['enableconnectserver'] = 'Enable Totara Connect server';
