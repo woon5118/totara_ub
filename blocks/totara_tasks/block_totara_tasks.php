@@ -152,16 +152,8 @@ class block_totara_tasks extends block_base {
                 $output .= html_writer::end_tag('li');
             }
             $output .= html_writer::end_tag('ul');
-        } else {
-            if (!empty($CFG->block_totara_tasks_showempty)) {
-                if (!empty($this->config->showempty)) {
-                    $this->content->text .= html_writer::tag('p', get_string('notasks', 'block_totara_tasks'));
-                } else {
-                    return '';
-                }
-            } else {
-                return '';
-            }
+        } elseif (!empty($CFG->block_totara_tasks_showempty)) {
+            $output = html_writer::tag('p', get_string('notasks', 'block_totara_tasks'));
         }
 
         $this->content->text = $output;
