@@ -513,7 +513,7 @@ function dp_get_rol_tabs_visible($userid) {
         $visible[] = 'objectives';
     }
 
-    $programscount = prog_get_all_programs($userid, '', '', '', true, true, true);
+    $programscount = prog_get_all_programs($userid, '', '', '', true, true, true, false);
     if (($programscount > 0 || $show_program_tab) && totara_feature_visible('programs')) {
         $visible[] = 'programs';
     }

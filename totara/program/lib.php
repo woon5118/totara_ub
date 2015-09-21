@@ -80,10 +80,11 @@ function prog_can_view_users_required_learning($learnerid) {
  * @param bool $returncount Whether to return a count of the number of records found or the records themselves
  * @param bool $showhidden Whether to include hidden programs in records returned when using normal visibility
  * @param bool $onlyprograms Only return programs (excludes certifications)
+ * @param bool $onlyactive Only return active programs.
  * @return array|int
  */
 function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum = '', $returncount = false,
-                               $showhidden = false, $onlyprograms = false) {
+                               $showhidden = false, $onlyprograms = false, $onlyactive = true) {
     global $DB;
 
     // Construct sql query.
@@ -97,20 +98,22 @@ function prog_get_all_programs($userid, $sort = '', $limitfrom = '', $limitnum =
                ON p.id = pc.programid AND pc.coursesetid = 0 ";
 
     $where = "WHERE pc.userid = :userid
-              AND pc.status <> :statuscomplete
               AND EXISTS(SELECT id
                            FROM {prog_user_assignment} pua
                           WHERE pua.exceptionstatus {$insql}
                             AND pc.programid = pua.programid
                             AND pc.userid = pua.userid
                         ) ";
+    if ($onlyactive) {
+        $where .= " AND pc.status <> :statuscomplete";
+        $params['statuscomplete'] = STATUS_PROGRAM_COMPLETE;
+    }
     if ($onlyprograms) {
         $where .= " AND p.certifid IS NULL";
     }
 
     $params['contextlevel'] = CONTEXT_PROGRAM;
     $params['userid'] = $userid;
-    $params['statuscomplete'] = STATUS_PROGRAM_COMPLETE;
 
     list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
                                                                       'p.id',
