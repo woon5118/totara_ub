@@ -462,7 +462,7 @@ class rb_source_completionimport_course extends rb_base_source {
     }
 
 
-    public function rb_display_importerrormsg($importerrormsg, $row) {
+    public function rb_display_importerrormsg($importerrormsg, $row, $isexport) {
         $errors = array();
         $errorcodes = explode(';', $importerrormsg);
         foreach ($errorcodes as $errorcode) {
@@ -471,7 +471,11 @@ class rb_source_completionimport_course extends rb_base_source {
             }
         }
 
-        return html_writer::alist($errors);
+        if ($isexport) {
+            return implode("\n", $errors);
+        } else {
+            return html_writer::alist($errors);
+        }
     }
 
     public function rb_filter_timecreated() {
