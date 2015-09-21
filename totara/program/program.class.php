@@ -1720,26 +1720,45 @@ class program {
             $user = $USER;
         }
 
-        $instancetype =  'program';
-        if (!empty($this->certifid)) {
+        if (empty($this->certifid)) {
+            $isprogram = true;
+            $instancetype = 'program';
+        } else {
+            $isprogram = false;
             $instancetype = 'certification';
         }
 
-        $params = array('itemcontext' => CONTEXT_PROGRAM, 'instanceid' => $this->id);
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($user->id,
-                                                                            'p.id',
-                                                                            'p.visible',
-                                                                            'p.audiencevisible',
-                                                                            'p',
-                                                                            $instancetype);
-        $params = array_merge($params, $visibilityparams);
-        $sql = "SELECT p.id
-                FROM {prog} p
-                LEFT JOIN {context} ctx ON p.id = ctx.instanceid AND contextlevel = :itemcontext
-                WHERE p.id = :instanceid
-                  AND {$visibilitysql}";
+        list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($user->id, $instancetype, 'p');
+        $params = array_merge(array('itemcontext' => CONTEXT_PROGRAM, 'instanceid' => $this->id), $visibilityjoinparams);
 
-        return $DB->record_exists_sql($sql, $params);
+        // Get context data for preload.
+        $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
+        $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = p.id AND ctx.contextlevel = :itemcontext)";
+
+        $sql = "SELECT p.id, {$ctxfields}, visibilityjoin.isvisibletouser
+                  FROM {prog} p
+                       {$visibilityjoinsql}
+                       {$ctxjoin}
+                 WHERE p.id = :instanceid";
+
+        $programs = $DB->get_records_sql($sql, $params);
+
+        // Look for a program that is visible (should be checking either 0 or 1 records).
+        foreach ($programs as $id => $program) {
+            if ($program->isvisibletouser) {
+                return true;
+            } else {
+                context_helper::preload_from_record($program);
+                $context = context_program::instance($id);
+                if ($isprogram && has_capability('totara/program:viewhiddenprograms', $context) ||
+                    !$isprogram && has_capability('totara/certification:viewhiddencertifications', $context) ||
+                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

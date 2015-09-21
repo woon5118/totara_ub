@@ -62,27 +62,18 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
             $itemtable = "{course}";
             $itemcontext = CONTEXT_COURSE;
             $itemalias = 'c';
-            $fieldbaseid  = 'c.id';
-            $fieldvisible = 'c.visible';
-            $fieldaudvis  = 'c.audiencevisible';
             $extrawhere = '';
             break;
         case 'program':
             $itemtable = "{prog}";
             $itemcontext = CONTEXT_PROGRAM;
             $itemalias = 'p';
-            $fieldbaseid  = 'p.id';
-            $fieldvisible = 'p.visible';
-            $fieldaudvis  = 'p.audiencevisible';
             $extrawhere = " AND certifid IS NULL";
             break;
         case 'certification':
             $itemtable = "{prog}";
             $itemcontext = CONTEXT_PROGRAM;
             $itemalias = 'p';
-            $fieldbaseid  = 'p.id';
-            $fieldvisible = 'p.visible';
-            $fieldaudvis  = 'p.audiencevisible';
             $extrawhere = " AND certifid IS NOT NULL";
             break;
         default:
@@ -110,25 +101,53 @@ function totara_get_category_item_count($categoryids, $viewtype = 'course') {
         $contextparams[$paramalias] = $path . '/%';
     }
 
-    // Add audience visibility setting.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($USER->id,
-                                                                        $fieldbaseid,
-                                                                        $fieldvisible,
-                                                                        $fieldaudvis,
-                                                                        $itemalias,
-                                                                        $viewtype);
+    // Add visibility.
+    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($USER->id, $viewtype, $itemalias);
 
-    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path
+    // Get context data for preload.
+    $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
+
+    $sql = "SELECT {$itemalias}.id as itemid, {$itemalias}.visible, {$itemalias}.audiencevisible, ctx.path,
+                   {$ctxfields}, visibilityjoin.isvisibletouser
               FROM {context} ctx
               JOIN {$itemtable} {$itemalias}
                 ON {$itemalias}.id = ctx.instanceid AND contextlevel = :itemcontext
-             WHERE (" . implode(' OR ', $contextwhere) . " AND {$visibilitysql})" . $extrawhere;
-    $params = array('itemcontext' => $itemcontext);
-    $params = array_merge($params, $contextparams);
-    $params = array_merge($params, $visibilityparams);
+                   {$visibilityjoinsql}
+             WHERE (" . implode(' OR ', $contextwhere) . ")" . $extrawhere;
+    $params = array_merge(array('itemcontext' => $itemcontext), $contextparams, $visibilityjoinparams);
 
     // Get all items inside all the categories.
-    if (!$items = $DB->get_records_sql($sql, $params)) {
+    $items = $DB->get_records_sql($sql, $params);
+
+    // Remove items that aren't visible.
+    foreach ($items as $id => $item) {
+        if ($item->isvisibletouser) {
+            unset($item->isvisibletouser); // Visible.
+        } else {
+            context_helper::preload_from_record($item);
+            if ($viewtype == 'course') {
+                $context = context_course::instance($id);
+                if (has_capability('moodle/course:viewhiddencourses', $context) ||
+                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+                    unset($item->isvisibletouser); // Visible.
+                } else {
+                    unset($items[$id]); // Not visible.
+                }
+            } else {
+                $context = context_program::instance($id);
+                if (($viewtype == 'program') && has_capability('totara/program:viewhiddenprograms', $context) ||
+                    ($viewtype == 'certification') && has_capability('totara/certification:viewhiddencertifications', $context) ||
+                    !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+                    unset($item->isvisibletouser); // Visible.
+                } else {
+                    unset($items[$id]); // Not visible.
+                }
+            }
+
+        }
+    }
+
+    if (!$items) {
         // Sub-categories are all empty.
         if (is_array($categoryids)) {
             return array();
@@ -179,36 +198,6 @@ function totara_course_cmp_by_count($a, $b) {
     } else {
         return 0;
     }
-}
-
-/**
- * Returns true or false depending on whether or not this course is visible to a user.
- *
- * @param int $courseid
- * @param int $userid
- * @return bool
- */
-function totara_course_is_viewable($courseid, $userid = null) {
-    global $USER, $CFG, $DB;
-    require_once($CFG->dirroot . '/totara/cohort/lib.php');
-
-    if ($userid == null) {
-        $userid = $USER->id;
-    }
-
-    $coursecontext = context_course::instance($courseid);
-
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    if (empty($CFG->audiencevisibility)) {
-        // This check is moved from require_login().
-        if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {
-            return false;
-        }
-    } else {
-        return check_access_audience_visibility('course', $course, $userid);
-    }
-
-    return true;
 }
 
 /**
@@ -271,7 +260,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
              $showhidden = false) {
     global $CFG, $USER;
 
-    if (!$userid) {
+    if ($userid === null) {
         $userid = $USER->id;
     }
 
@@ -304,7 +293,9 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         return array('1=1', array());
 
     } else if (empty($CFG->audiencevisibility)) {
-        if ($showhidden || has_capability($capability, $systemcontext, $userid)) {
+        if (has_capability($capability, $systemcontext, $userid)) {
+            return array('1=1', array());
+        } else if ($showhidden) {
             return array($availabilitysql, $availabilityparams);
         } else {
             // Normal visibility unless they have the capability to see hidden learning components.
@@ -341,7 +332,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         // Audience visibility No users. Check for capabilities.
         $canmanagevisibility = has_capability('totara/coursecatalog:manageaudiencevisibility', $systemcontext, $userid);
         if ($canmanagevisibility || has_capability($capability, $systemcontext, $userid)) {
-            return array($availabilitysql, $availabilityparams);
+            return array('1=1', array());
         }
 
         $sqlnousers = "{$fieldaudvis} != :tcvwaudvisnousers";
@@ -404,4 +395,67 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
         return array("{$sqlnousers} AND ({$sqlall} OR {$sqlselected} OR {$sqlenrolled})",
                 array_merge($paramsnousers, $paramsall, $paramsselected, $paramsenrolled));
     }
+}
+
+/**
+ * Get the join clause sql fragment and parameters needed to get the isvisibletouser column only for those courses or
+ * programs available to a user.
+ *
+ * Use in the following form:
+ *
+ * list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($userid, 'program', 'p');
+ *
+ * $sql = "SELECT p.*, visibilityjoin.isvisible
+ *           FROM {prog} p
+ *                {$visibilityjoinsql}
+ *          WHERE p.certifid IS NULL";
+ *
+ * @param mixed $userid The user that the results should be restricted for. Defaults to current user.
+ * @param string $type course, program or certification.
+ * @param string $mainalias Alias of the table that contains the data you are working with.
+ * @param string $joinalias Alias to give the joined table, which will contain the isvisible field.
+ * @param string $jointype 'LEFT JOIN' will not restrict the rows returned from you main table,
+ *                         'JOIN' will remove rows from you main table (like using totara_visibility_where).
+ * @return list(string $joinsql, string $joinparams)
+ */
+function totara_visibility_join($userid = null, $type = 'course', $mainalias = 'course', $joinalias = 'visibilityjoin',
+                                $jointype = 'LEFT JOIN') {
+    global $USER;
+
+    // Default user.
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    // Figure out what type of data we're dealing with.
+    if ($type === 'course') {
+        $basetable = 'course';
+        $restrictions = '';
+        $contextlevel = CONTEXT_COURSE;
+    } else {
+        $basetable = 'prog';
+        if ($type === 'program') {
+            $restrictions = ' AND tvjoinsub.certifid IS NULL';
+        } else {
+            $restrictions = ' AND tvjoinsub.certifid IS NOT NULL';
+        }
+        $contextlevel = CONTEXT_PROGRAM;
+    }
+
+    // Get the totara_visibility_where sql, which the join will be based on.
+    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'tvjoinsub.id', 'tvjoinsub.visible',
+        'tvjoinsub.audiencevisible', 'tvjoinsub', $type);
+
+    // Construct the result.
+    $sql = "{$jointype} (SELECT tvjoinsub.id, 1 AS isvisibletouser
+                           FROM {{$basetable}} tvjoinsub
+                           JOIN {context} ctx
+                             ON tvjoinsub.id = ctx.instanceid AND ctx.contextlevel = :tvjcontextlevel
+                          WHERE {$visibilitysql} {$restrictions}
+                         ) {$joinalias}
+                ON {$mainalias}.id = {$joinalias}.id";
+
+    $visibilityparams['tvjcontextlevel'] = $contextlevel;
+
+    return array($sql, $visibilityparams);
 }

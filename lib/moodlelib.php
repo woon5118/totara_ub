@@ -2707,7 +2707,6 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
             // When switching roles ignore the hidden flag - user had to be in course to do the switch.
         } else {
 
-            require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
             // Check audience visibility setting and user permissions.
             if (!totara_course_is_viewable($course->id)) {
                 // originally there was also test of parent category visibility,

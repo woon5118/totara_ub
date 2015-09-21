@@ -873,8 +873,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return array array of stdClass objects
      */
     public static function get_course_records($whereclause, $params, $options, $checkvisibility = false) {
-        global $DB, $CFG, $USER;
-        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+        global $DB;
         $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
         $fields = array('c.id', 'c.category', 'c.sortorder',
                         'c.shortname', 'c.fullname', 'c.idnumber',
@@ -885,28 +884,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         } else {
             $fields[] = $DB->sql_substr('c.summary', 1, 1). ' as hassummary';
         }
-
-        // Add audience visibility setting.
-        $userid = !empty($params['userid']) ? $params['userid'] : $USER->id;
-        list($visibilitysql, $visibilityparams) = totara_visibility_where($userid, 'c.id', 'c.visible', 'c.audiencevisible');
-        $visibilitysql = "AND {$visibilitysql}";
-        $params = array_merge($params, $visibilityparams);
-
         $sql = "SELECT ". join(',', $fields). ", $ctxselect
                 FROM {course} c
                 JOIN {context} ctx ON c.id = ctx.instanceid AND ctx.contextlevel = :contextcourse
-                WHERE {$whereclause} {$visibilitysql} ORDER BY c.sortorder";
+                WHERE ". $whereclause." ORDER BY c.sortorder";
         $list = $DB->get_records_sql($sql,
                 array('contextcourse' => CONTEXT_COURSE) + $params);
-
-        // If audience visibility is enabled, we just need to return records from DB query.
-        if (!empty($CFG->audiencevisibility)) {
-            // Preload course contacts if necessary.
-            if (!empty($options['coursecontacts'])) {
-                self::preload_course_contacts($list);
-            }
-            return $list;
-        }
 
         if ($checkvisibility) {
             // Loop through all records and make sure we only return the courses accessible by user.
@@ -914,12 +897,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 if (isset($list[$course->id]->hassummary)) {
                     $list[$course->id]->hassummary = strlen($list[$course->id]->hassummary) > 0;
                 }
-                if (empty($course->visible)) {
-                    // Load context only if we need to check capability.
-                    context_helper::preload_from_record($course);
-                    if (!has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
-                        unset($list[$course->id]);
-                    }
+                if (!totara_course_is_viewable($course->id)) {
+                    unset($list[$course->id]);
                 }
             }
         }

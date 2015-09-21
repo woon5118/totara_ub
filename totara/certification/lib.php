@@ -1161,9 +1161,8 @@ function certif_print_certification($certification, $highlightterms = '') {
  * Returns list of certifications, for whole site, or category
  * (This is the counterpart to get_courses in /lib/datalib.php)
  */
-function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", $fields="cf.*, p.available, p.availablefrom, p.availableuntil") {
-
-    global $DB;
+function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", $fields="cf.*") {
+    global $CFG, $DB;
 
     $params = array('contextlevel' => CONTEXT_PROGRAM);
     if ($categoryid != "all" && is_numeric($categoryid)) {
@@ -1180,22 +1179,41 @@ function certif_get_certifications($categoryid="all", $sort="cf.sortorder ASC", 
     }
 
     // Add audience visibility setting.
-    list($visibilitysql, $visibilityparams) = totara_visibility_where(null, 'p.id', 'p.visible',
-        'p.audiencevisible', 'p', 'certification');
-    $params = array_merge($params, $visibilityparams);
+    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join(null, 'certification', 'p');
+    $params = array_merge($params, $visibilityjoinparams);
+
+    // Get context data for preload.
+    $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
+    $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = p.id AND ctx.contextlevel = :contextlevel)";
+    $params['contextlevel'] = CONTEXT_PROGRAM;
 
     // Pull out all certifications matching the category
     // the program join effectively removes programs which
     // are not certification-programs.
-    $certifications = $DB->get_records_sql("SELECT $fields,
-                        ctx.id AS ctxid, ctx.path AS ctxpath,
-                        ctx.depth AS ctxdepth, ctx.contextlevel AS ctxlevel
+    $certifications = $DB->get_records_sql("SELECT {$fields}, {$ctxfields}, visibilityjoin.isvisibletouser
                         FROM {certif} cf
                         JOIN {prog} p ON (p.certifid = cf.id)
-                        JOIN {context} ctx ON (p.id = ctx.instanceid AND ctx.contextlevel = :contextlevel)
-                        {$categoryselect} AND {$visibilitysql}
+                             {$visibilityjoinsql}
+                             {$ctxjoin}
+                        {$categoryselect}
                         {$sortstatement}", $params
                     );
+
+    // Remove certifications that aren't visible.
+    foreach ($certifications as $id => $cert) {
+        if ($cert->isvisibletouser) {
+            unset($cert->isvisibletouser);
+        } else {
+            context_helper::preload_from_record($cert);
+            $context = context_program::instance($id);
+            if (has_capability('totara/certification:viewhiddencertifications', $context) ||
+                !empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+                unset($cert->isvisibletouser);
+            } else {
+                unset($certifications[$id]);
+            }
+        }
+    }
 
     return $certifications;
 }

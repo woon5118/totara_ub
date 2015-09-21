@@ -1868,7 +1868,7 @@ function check_access_audience_visibility($type, $instance, $userid = null) {
         return true;
     }
 
-    if (empty($userid)) {
+    if ($userid === null) {
         $userid = $USER->id;
     }
 
@@ -1876,16 +1876,10 @@ function check_access_audience_visibility($type, $instance, $userid = null) {
     if ($type === 'course') {
         $table = 'course';
         $alias = 'c';
-        $fieldid = 'c.id';
-        $fieldvis = 'c.visible';
-        $fieldaudvis = 'c.audiencevisible';
         $itemcontext = CONTEXT_COURSE;
     } else {
         $table = 'prog';
         $alias = 'p';
-        $fieldid = 'p.id';
-        $fieldvis = 'p.visible';
-        $fieldaudvis = 'p.audiencevisible';
         $itemcontext = CONTEXT_PROGRAM;
     }
 
@@ -1898,24 +1892,40 @@ function check_access_audience_visibility($type, $instance, $userid = null) {
         return false;
     }
 
-    $params = array('itemcontext' => $itemcontext, 'instanceid' => $object->id);
-    list($visibilitysql, $visibilityparams) = totara_visibility_where($userid,
-                                                                      $fieldid,
-                                                                      $fieldvis,
-                                                                      $fieldaudvis,
-                                                                      $alias,
-                                                                      $type);
-    $params = array_merge($params, $visibilityparams);
+    // Add audience visibility setting.
+    list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($userid, $type, $alias);
+    $params = array_merge(array('itemcontext' => $itemcontext, 'instanceid' => $object->id), $visibilityjoinparams);
 
-    $sql = "SELECT {$alias}.id
+    // Get context data for preload.
+    $ctxfields = context_helper::get_preload_record_columns_sql('ctx');
+    $ctxjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = {$alias}.id AND ctx.contextlevel = :itemcontext)";
+
+    $sql = "SELECT {$alias}.id, {$ctxfields}, visibilityjoin.isvisibletouser
             FROM {{$table}} {$alias}
-            LEFT JOIN {context} ctx
-              ON {$alias}.id = ctx.instanceid AND contextlevel = :itemcontext
-            WHERE {$alias}.id = :instanceid
-              AND {$visibilitysql}";
+                 {$visibilityjoinsql}
+                 {$ctxjoin}
+            WHERE {$alias}.id = :instanceid";
+    $record = $DB->get_record_sql($sql, $params);
 
-    return $DB->record_exists_sql($sql, $params);
+    if (!empty($record->isvisibletouser)) {
+        return true;
+    }
 
+    context_helper::preload_from_record($record);
+    if ($itemcontext == CONTEXT_COURSE) {
+        $context = context_course::instance($object->id);
+        if (has_capability('moodle/course:viewhiddencourses', $context)) {
+            return true;
+        }
+    } else {
+        $context = context_program::instance($object->id);
+        if (empty($object->certifid) && has_capability('totara/program:viewhiddenprograms', $context) ||
+            !empty($object->certifid) && has_capability('totara/certification:viewhiddencertifications', $context)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 class totara_cohort_visible_learning_cohorts extends totara_cohort_course_cohorts {

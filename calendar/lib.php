@@ -781,9 +781,7 @@ function calendar_get_events($tstart, $tend, $users, $groups, $courses, $withdur
  * @param array $events     An array of DB records from the table 'events'
  */
 function calendar_events_check_visibility($events) {
-    global $DB, $CFG;
-
-    require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+    global $DB;
 
     foreach ($events as $key => $event) {
         // Checking the module this way in case we need to add more later.

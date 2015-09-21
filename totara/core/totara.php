@@ -68,6 +68,36 @@ define('COHORT_VISIBLE_ALL', 2);
 define('COHORT_VISIBLE_NOUSERS', 3);
 
 /**
+ * Returns true or false depending on whether or not this course is visible to a user.
+ *
+ * @param int $courseid
+ * @param int $userid
+ * @return bool
+ */
+function totara_course_is_viewable($courseid, $userid = null) {
+    global $USER, $CFG, $DB;
+
+    if ($userid === null) {
+        $userid = $USER->id;
+    }
+
+    $coursecontext = context_course::instance($courseid);
+
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    if (empty($CFG->audiencevisibility)) {
+        // This check is moved from require_login().
+        if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $coursecontext, $userid)) {
+            return false;
+        }
+    } else {
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+        return check_access_audience_visibility('course', $course, $userid);
+    }
+
+    return true;
+}
+
+/**
  * This function loads the program settings that are available for the user
  *
  * @param object $navinode The navigation_node to add the settings to

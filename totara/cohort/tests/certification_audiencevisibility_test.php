@@ -186,56 +186,147 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
     /**
      * Data provider for the enhancedcatalog_audiencevisibility function.
      *
+     * Ideally, both the old and enhanced catalog would contain exactly the same data. But because
+     * the enhanced catalog is using report builder, it can't do check capabilities properly. In
+     * this test, it's not a problem because the capabilities are only applied at the system context,
+     * but if they were in a different context then we would need different data sets for enhanced
+     * catalog vs old catalog.
+     *
      * @return array $data Array of data to be used by test_audiencevisibility.
      */
     public function users_audience_visibility() {
         $data = array(
-            array('user' => 'user1', array('certif1', 'certif2', 'certif9'), array('certif3', 'certif4', 'certif7', 'certif8'), 1),
-            array('user' => 'user2', array('certif1', 'certif2', 'certif3', 'certif9'), array('certif4', 'certif7', 'certif8'), 1),
-            array('user' => 'user3', array('certif1', 'certif9'), array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'), 1),
-            array('user' => 'user4', array('certif1', 'certif9'), array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'), 1),
-            array('user' => 'user5', array('certif1', 'certif3', 'certif9'), array('certif2', 'certif4', 'certif7', 'certif8'),  1),
-            array('user' => 'user6', array('certif1', 'certif3', 'certif9'), array('certif2', 'certif4', 'certif7', 'certif8'), 1),
-            array('user' => 'user7', array('certif1', 'certif9'), array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'),  1),
-            array('user' => 'user8', array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'), array('certif7', 'certif8'), 1),
-            array('user' => 'user9', array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'), array('certif7', 'certif8'), 1),
-            array('user' => 'user10', array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
-                                        array(), 1),
-            array('user' => 'user1', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user2', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user3', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user5', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user7', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user8', array('certif2', 'certif4', 'certif5', 'certif9'),
-                                        array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'), 0),
-            array('user' => 'user9', array('certif2', 'certif4', 'certif5', 'certif1', 'certif3', 'certif6', 'certif9'),
-                                        array('certif7', 'certif8'), 0),
-            array('user' => 'user10', array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif7', 'certif8',
-                                            'certif9'), array(), 0),
+            array('user' => 'user1',
+                array('certif1', 'certif2', 'certif9'),
+                array('certif3', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user2',
+                array('certif1', 'certif2', 'certif3', 'certif9'),
+                array('certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user3',
+                array('certif1', 'certif9'),
+                array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user4',
+                array('certif1', 'certif9'),
+                array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user5',
+                array('certif1', 'certif3', 'certif9'),
+                array('certif2', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user6',
+                array('certif1', 'certif3', 'certif9'),
+                array('certif2', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user7',
+                array('certif1', 'certif9'),
+                array('certif2', 'certif3', 'certif4', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif9'),
+                array('certif7', 'certif8'),
+                1),
+            array('user' => 'user8',
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                1),
+            array('user' => 'user9',
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                1),
+            array('user' => 'user10',
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif7', 'certif8', 'certif9'),
+                array(),
+                1),
+            array('user' => 'user1',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user2',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user3',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user5',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user7',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user8',
+                array('certif2', 'certif4', 'certif5', 'certif9'),
+                array('certif1', 'certif3', 'certif6', 'certif7', 'certif8'),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif9'),
+                array('certif7', 'certif8'),
+                0),
+            array('user' => 'user9',
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif7', 'certif8', 'certif9'),
+                array(),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif7', 'certif8', 'certif9'),
+                array(),
+                0),
+            array('user' => 'user10',
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif7', 'certif8', 'certif9'),
+                array(),
+                array('certif1', 'certif2', 'certif3', 'certif4', 'certif5', 'certif6', 'certif7', 'certif8', 'certif9'),
+                array(),
+                0),
         );
+
         return $data;
     }
 
     /**
      * Test Audicence visibility
      * @param string $user User that will login to see the programs.
-     * @param array $certificationsvisible Array of programs visible to the user
-     * @param array $certificationsnotvisible Array of programs not visible to the user
+     * @param array $certsvisible Array of programs visible to the user
+     * @param array $certsnotvisible Array of programs not visible to the user
+     * @param array $certsaccessible Array of programs accessible to the user
+     * @param array $certsnotaccessible Array of programs not accessible to the user
      * @param int $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
      * @dataProvider users_audience_visibility
      */
-    public function test_audiencevisibility($user, $certificationsvisible, $certificationsnotvisible, $audvisibilityon) {
+    public function test_audiencevisibility($user, $certsvisible, $certsnotvisible,
+                                            $certsaccessible, $certsnotaccessible, $audvisibilityon) {
         global $PAGE, $CFG;
         $this->resetAfterTest(true);
 
         // Turns ON the audiencevisibility setting.
         set_config('audiencevisibility', $audvisibilityon);
-        $this->assertEquals($CFG->audiencevisibility, $audvisibilityon);
+        $this->assertEquals($audvisibilityon, $CFG->audiencevisibility);
 
         $this->create_certifications_with_availability();
         if (!$audvisibilityon) {
@@ -243,12 +334,11 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
             $this->create_certifications_old_visibility();
         }
 
-        // Make the test toogling the new catalog.
-        for ($i = 1; $i <= 2; $i++) {
-            // Toogle enhanced catalog.
-            $newvalue = ($CFG->enhancedcatalog == 1) ? 0 : 1;
-            set_config('enhancedcatalog', $newvalue);
-            $this->assertEquals($CFG->enhancedcatalog, $newvalue);
+        // Make the test toggling the new catalog.
+        for ($i = 0; $i < 2; $i++) {
+            // Toggle enhanced catalog.
+            set_config('enhancedcatalog', $i);
+            $this->assertEquals($i, $CFG->enhancedcatalog);
 
             // Test #1: Login as $user and see what certifications he can see.
             self::setUser($this->{$user});
@@ -260,19 +350,22 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
             }
 
             // Check how many certifications the user can see.
-            $countprogramsvisbile = count($certificationsvisible);
-            $this->assertEquals(totara_get_category_item_count($this->category->id, 'certification'), $countprogramsvisbile);
-            $this->assertEquals(prog_get_programs_count($this->category, 'certification'), $countprogramsvisbile);
+            $countprogramsvisbile = count($certsvisible);
+            $this->assertEquals($countprogramsvisbile, totara_get_category_item_count($this->category->id, 'certification'));
+            $this->assertEquals($countprogramsvisbile, prog_get_programs_count($this->category, 'certification'));
 
             // Check certifications loaded in dialogs are the same as the visible ones.
-            $this->assertEmpty($this->get_diff_programs_in_dialog($certificationsvisible, $this->category->id));
+            $this->assertEmpty($this->get_diff_programs_in_dialog($certsvisible, $this->category->id));
 
             // Certifications visible to the user.
-            foreach ($certificationsvisible as $certification) {
-                list($visible, $access, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$certification});
+            foreach ($certsvisible as $certification) {
+                list($visible, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$certification});
                 $this->assertTrue($visible);
-                // Test #2: Try to access them.
-                $this->assertTrue($access);
+
+                $program = new program($this->{$certification}->id);
+                $isviewable = $program->is_viewable($this->{$user});
+                $this->assertTrue($isviewable);
+
                 // Test #3: Try to do a search for certifications.
                 if ($CFG->enhancedcatalog) {
                     $this->assertCount(1, $search);
@@ -284,17 +377,32 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
             }
 
             // Certifications not visible to the user.
-            foreach ($certificationsnotvisible as $certification) {
-                list($visible, $access, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$certification});
+            foreach ($certsnotvisible as $certification) {
+                list($visible, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$certification});
                 $this->assertFalse($visible);
-                // Test #2: Try to access them.
-                $this->assertFalse($access);
+
+                $program = new program($this->{$certification}->id);
+                $isviewable = $program->is_viewable($this->{$user});
+                $this->assertFalse($isviewable);
+
                 // Test #3: Try to do a search for certifications.
                 if ($CFG->enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
                     $this->assertInternalType('int', strpos($search, 'No programs were found'));
                 }
+            }
+
+            // Certifications accessible to the user.
+            foreach ($certsaccessible as $certification) {
+                $isaccessible = prog_is_accessible($this->{$certification}, $this->{$user});
+                $this->assertTrue($isaccessible);
+            }
+
+            // Certifications not accessible to the user.
+            foreach ($certsnotaccessible as $certification) {
+                $isaccessible = prog_is_accessible($this->{$certification}, $this->{$user});
+                $this->assertFalse($isaccessible);
             }
         }
     }
@@ -310,9 +418,6 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
         global $PAGE, $CFG;
         $visible = false;
 
-        $program = new program($certification->id);
-        $access = $program->is_viewable($user) && prog_is_accessible($certification, $user);
-
         if ($CFG->enhancedcatalog) { // New catalog.
             $search = array();
             if (is_array($content)) {
@@ -326,7 +431,7 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
             $search = $programrenderer->search_programs(array('search' => $certification->fullname), 'certification');
         }
 
-        return array($visible, $access, $search);
+        return array($visible, $search);
     }
 
     /**
@@ -348,10 +453,10 @@ class totara_cohort_certification_audiencevisibility_testcase extends reportcach
         $this->getDataGenerator()->assign_program($this->certif5->id, array($this->user1->id));
         $this->getDataGenerator()->assign_program($this->certif6->id, array($this->user1->id, $this->user2->id));
 
-        // Assig audience1 and audience2 to certif6 and certif5 respectively.
-        totara_cohort_add_association($this->audience2->id, $this->certif6->id, COHORT_ASSN_ITEMTYPE_CERTIF,
-                                        COHORT_ASSN_VALUE_VISIBLE);
+        // Assig audience1 and audience2 to certif5 and certif6 respectively.
         totara_cohort_add_association($this->audience1->id, $this->certif5->id, COHORT_ASSN_ITEMTYPE_CERTIF,
+                                        COHORT_ASSN_VALUE_VISIBLE);
+        totara_cohort_add_association($this->audience2->id, $this->certif6->id, COHORT_ASSN_ITEMTYPE_CERTIF,
                                         COHORT_ASSN_VALUE_VISIBLE);
     }
 

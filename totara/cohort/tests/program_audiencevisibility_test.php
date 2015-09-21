@@ -175,46 +175,122 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
     /**
      * Data provider for the enhancedcatalog_audiencevisibility function.
      *
+     * Ideally, both the old and enhanced catalog would contain exactly the same data. But because
+     * the enhanced catalog is using report builder, and because report builder doesn't handle
+     * capabilities correctly, it's going to be missing some records.
+     *
      * @return array $data Data to be used by test_audiencevisibility
      */
     public function users_audience_visibility() {
         $data = array(
-            array('user' => 'user1', array('program1', 'program2', 'program9'),
-                                        array('program3', 'program4', 'program7', 'program8'), 1),
-            array('user' => 'user2', array('program1', 'program2', 'program3', 'program9'),
-                                        array('program4', 'program7', 'program8'), 1),
-            array('user' => 'user3', array('program1', 'program9'),
-                                        array('program2', 'program3', 'program4', 'program7', 'program8'), 1),
-            array('user' => 'user4', array('program1', 'program9'),
-                                        array('program2', 'program3', 'program4', 'program7', 'program8'), 1),
-            array('user' => 'user5', array('program1', 'program3', 'program9'),
-                                        array('program2', 'program4', 'program7'),  1),
-            array('user' => 'user6', array('program1', 'program3', 'program9'),
-                                        array('program2', 'program4', 'program7'), 1),
-            array('user' => 'user7', array('program1', 'program9'),
-                                        array('program2', 'program3', 'program4', 'program7'),  1),
-            array('user' => 'user8', array('program1', 'program2', 'program3', 'program4', 'program9'),
-                                        array('program7', 'program8'), 1),
-            array('user' => 'user9', array('program1', 'program2', 'program3', 'program4', 'program9'),
-                                        array('program7', 'program8'), 1),
-            array('user' => 'user10', array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
-                                        array(), 1),
-            array('user' => 'user1', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user2', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user3', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user5', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user7', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user8', array('program2', 'program4', 'program5', 'program9'),
-                                        array('program1', 'program3', 'program6', 'program7', 'program8'), 0),
-            array('user' => 'user9', array('program2', 'program4', 'program5', 'program1', 'program3', 'program6', 'program9'),
-                                        array('program7', 'program8'), 0),
-            array('user' => 'user10', array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program7',
-                                            'program8', 'program9'), array(), 0),
+            array('user' => 'user1',
+                array('program1', 'program2', 'program9'),
+                array('program3', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user2',
+                array('program1', 'program2', 'program3', 'program9'),
+                array('program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user3',
+                array('program1', 'program9'),
+                array('program2', 'program3', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user4',
+                array('program1', 'program9'),
+                array('program2', 'program3', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user5',
+                array('program1', 'program3', 'program9'),
+                array('program2', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user6',
+                array('program1', 'program3', 'program9'),
+                array('program2', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user7',
+                array('program1', 'program9'),
+                array('program2', 'program3', 'program4', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program9'),
+                array('program7', 'program8'),
+                1),
+            array('user' => 'user8',
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                1),
+            array('user' => 'user9',
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                1),
+            array('user' => 'user10',
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                array('program1', 'program2', 'program3', 'program4', 'program7', 'program8', 'program9'),
+                array(),
+                1),
+            array('user' => 'user1',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user2',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user3',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user5',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user7',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user8',
+                array('program2', 'program4', 'program5', 'program9'),
+                array('program1', 'program3', 'program6', 'program7', 'program8'),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program9'),
+                array('program7', 'program8'),
+                0),
+            array('user' => 'user9',
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program7', 'program8', 'program9'),
+                array(),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program7', 'program8', 'program9'),
+                array(),
+                0),
+            array('user' => 'user10',
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program7', 'program8', 'program9'),
+                array(),
+                array('program1', 'program2', 'program3', 'program4', 'program5', 'program6', 'program7', 'program8', 'program9'),
+                array(),
+                0),
         );
         return $data;
     }
@@ -222,18 +298,21 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
     /**
      * Test Audicence visibility.
      * @param string $user User that will login to see the programs
-     * @param array $programsvisible Array of programs visible to the user
-     * @param array $programsnotvisible Array of programs not visible to the user
+     * @param array $progsvisible Array of programs visible to the user
+     * @param array $progsnotvisible Array of programs not visible to the user
+     * @param array $progsaccessible Array of programs accessible to the user
+     * @param array $progsnotaccessible Array of programs not accessible to the user
      * @param int $audvisibilityon Setting for audience visibility (1 => ON, 0 => OFF)
      * @dataProvider users_audience_visibility
      */
-    public function test_audiencevisibility($user, $programsvisible, $programsnotvisible, $audvisibilityon) {
+    public function test_audiencevisibility($user, $progsvisible, $progsnotvisible,
+                                            $progsaccessible, $progsnotaccessible, $audvisibilityon) {
         global $PAGE, $CFG;
         $this->resetAfterTest(true);
 
         // Turns ON the audiencevisibility setting.
         set_config('audiencevisibility', $audvisibilityon);
-        $this->assertEquals($CFG->audiencevisibility, $audvisibilityon);
+        $this->assertEquals($audvisibilityon, $CFG->audiencevisibility);
 
         $this->create_programs_with_availability();
         if (!$audvisibilityon) {
@@ -241,12 +320,11 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
             $this->create_programs_old_visibility();
         }
 
-        // Make the test toogling the new catalog.
-        for ($i = 1; $i <= 2; $i++) {
-            // Toogle enhanced catalog.
-            $newvalue = ($CFG->enhancedcatalog == 1) ? 0 : 1;
-            set_config('enhancedcatalog', $newvalue);
-            $this->assertEquals($CFG->enhancedcatalog, $newvalue);
+        // Make the test toggling the new catalog.
+        for ($i = 0; $i < 2; $i++) {
+            // Toggle enhanced catalog.
+            set_config('enhancedcatalog', $i);
+            $this->assertEquals($i, $CFG->enhancedcatalog);
 
             // Test #1: Login as $user and see what programs he can see.
             self::setUser($this->{$user});
@@ -258,19 +336,22 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
             }
 
             // Check how many programs the user can see.
-            $countprogramsvisbile = count($programsvisible);
-            $this->assertEquals(totara_get_category_item_count($this->category->id, 'program'), $countprogramsvisbile);
-            $this->assertEquals(prog_get_programs_count($this->category, 'program'), $countprogramsvisbile);
+            $countprogramsvisbile = count($progsvisible);
+            $this->assertEquals($countprogramsvisbile, totara_get_category_item_count($this->category->id, 'program'));
+            $this->assertEquals($countprogramsvisbile, prog_get_programs_count($this->category, 'program'));
 
             // Check programs loaded in dialogs are the same as the visible ones.
-            $this->assertEmpty($this->get_diff_programs_in_dialog($programsvisible, $this->category->id));
+            $this->assertEmpty($this->get_diff_programs_in_dialog($progsvisible, $this->category->id));
 
             // Programs visible to the user.
-            foreach ($programsvisible as $program) {
-                list($visible, $access, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$program});
+            foreach ($progsvisible as $program) {
+                list($visible, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$program});
                 $this->assertTrue($visible);
-                // Test #2: Try to access them.
-                $this->assertTrue($access);
+
+                $prog = new program($this->{$program}->id);
+                $isviewable = $prog->is_viewable($this->{$user});
+                $this->assertTrue($isviewable);
+
                 // Test #3: Try to do a search for programs.
                 if ($CFG->enhancedcatalog) {
                     $this->assertCount(1, $search);
@@ -282,17 +363,32 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
             }
 
             // Programs not visible to the user.
-            foreach ($programsnotvisible as $program) {
-                list($visible, $access, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$program});
+            foreach ($progsnotvisible as $program) {
+                list($visible, $search) = $this->get_visible_info($this->{$user}, $content, $this->{$program});
                 $this->assertFalse($visible);
-                // Test #2: Try to access them.
-                $this->assertFalse($access);
+
+                $prog = new program($this->{$program}->id);
+                $isviewable = $prog->is_viewable($this->{$user});
+                $this->assertFalse($isviewable);
+
                 // Test #3: Try to do a search for programs.
                 if ($CFG->enhancedcatalog) {
                     $this->assertCount(0, $search);
                 } else {
                     $this->assertInternalType('int', strpos($search, 'No programs were found'));
                 }
+            }
+
+            // Programs accessible to the user.
+            foreach ($progsaccessible as $program) {
+                $isaccessible = prog_is_accessible($this->{$program}, $this->{$user});
+                $this->assertTrue($isaccessible);
+            }
+
+            // Programs not accessible to the user.
+            foreach ($progsnotaccessible as $program) {
+                $isaccessible = prog_is_accessible($this->{$program}, $this->{$user});
+                $this->assertFalse($isaccessible);
             }
         }
     }
@@ -323,7 +419,7 @@ class totara_cohort_program_audiencevisibility_testcase extends reportcache_adva
             $search = $programrenderer->search_programs(array('search' => $program->fullname), 'program');
         }
 
-        return array($visible, $access, $search);
+        return array($visible, $search);
     }
 
     /**
