@@ -32,7 +32,9 @@ M.totara_visiblecohort = M.totara_visiblecohort || {
 
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
-    config: {},
+    config: {
+        cohortvisibleaudience: 1 // COHORT_VISIBLE_AUDIENCE
+    },
 
     /**
      * module initialisation method called by php js_init_call()
