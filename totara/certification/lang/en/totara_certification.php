@@ -83,8 +83,8 @@ $string['editdetailsactive_help'] = 'The period the certification is active for,
 $string['editdetailsactivep'] = 'Active Period';
 $string['editdetailsdesc'] = 'Define the recertification details rules for all learners assigned to the certification';
 $string['editdetailshdr'] = 'Recertification Details';
-$string['editdetailsminimumactive'] = 'Minumum active period';
-$string['editdetailsminimumactive_help'] = 'When "Use fixed expiry date" is set, this option allows you to specify the minumum length of time that the certification will be guaranteed to be active. If a user completes their certification and there is less than this amount of time until it would be due to expire, the expiry date is pushed forward by another whole "active period".
+$string['editdetailsminimumactive'] = 'Minimum active period';
+$string['editdetailsminimumactive_help'] = 'When "Use fixed expiry date" is set, this option allows you to specify the minimum length of time that the certification will be guaranteed to be active. If a user completes their certification and there is less than this amount of time until it would be due to expire, the expiry date is pushed forward by another whole "active period".
 
 For example:
 
