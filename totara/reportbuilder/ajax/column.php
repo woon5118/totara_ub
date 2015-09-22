@@ -210,6 +210,11 @@ switch ($action) {
         break;
 }
 
+// Update current session.
+if (!isset($result->error) && isset($SESSION->rb_showhide_columns[$rawreport->shortname])) {
+    unset($SESSION->rb_showhide_columns[$rawreport->shortname]);
+}
+
 echo $OUTPUT->header();
 echo json_encode($result);
 die;

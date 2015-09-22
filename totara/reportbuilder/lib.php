@@ -3695,6 +3695,10 @@ class reportbuilder {
             }
         }
 
+        $showhidecolumn = array();
+        if (isset($SESSION->rb_showhide_columns[$shortname])) {
+            $showhidecolumn = $SESSION->rb_showhide_columns[$shortname];
+        }
         $table->define_columns($tablecolumns);
         $table->define_headers($tableheaders);
         $table->define_baseurl($this->get_current_url());
@@ -3716,9 +3720,16 @@ class reportbuilder {
                         $table->column_style($ident, $property, $value);
                     }
                 }
-                // Hide any columns where hidden flag is set.
-                if ($column->hidden != 0) {
-                    $table->column_style($ident, 'display', 'none');
+                if (isset($showhidecolumn[$ident])) {
+                    // Session show/hide is set, so use it, and ignore column default.
+                    if ((int)$showhidecolumn[$ident] == 0) {
+                        $table->column_style($ident, 'display', 'none');
+                    }
+                } else {
+                    // No session set, so use default show/hide value.
+                    if ($column->hidden != 0) {
+                        $table->column_style($ident, 'display', 'none');
+                    }
                 }
 
                 // Disable sorting on column where indicated.
