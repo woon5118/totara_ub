@@ -30,14 +30,15 @@ require_once($CFG->dirroot . '/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/goal/lib.php');
 
+require_login();
+
 // Check if Goals are enabled.
 goal::check_feature_enabled();
 
 $id = required_param('id', PARAM_INT);
-
 $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
-
 $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+$PAGE->set_context($context);
 
 require_capability('moodle/cohort:view', $context);
 $can_edit = has_capability('totara/hierarchy:managegoalassignments', $context)
@@ -49,17 +50,21 @@ raise_memory_limit(MEMORY_HUGE);
 
 define('COHORT_HISTORY_PER_PAGE', 50);
 
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $category = $DB->get_record('course_categories', array('id' => $context->instanceid), '*', MUST_EXIST);
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid' => $cohort->contextid)));
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
+
 if ($context->contextlevel == CONTEXT_SYSTEM) {
     admin_externalpage_setup('cohorts');
 } else {
-    $PAGE->set_context($context);
     $PAGE->set_url('/totara/cohort/goals.php', array('id' => $id));
     $PAGE->set_heading($COURSE->fullname);
     $PAGE->set_title($cohort->name . ' : ' . get_string('goals', 'totara_hierarchy'));
+    $PAGE->set_pagelayout('report');
 }
-
-$PAGE->set_context($context);
-$PAGE->set_url('/totara/cohort/learningplan.php', array('id' => $id));
 
 // Javascript include.
 local_js(

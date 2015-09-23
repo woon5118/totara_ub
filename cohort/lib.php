@@ -677,12 +677,12 @@ function cohort_print_tabs($currenttab, $cohortid, $cohorttype, $cohort) {
             get_string('editmembers','totara_cohort'));
     }
 
-    if ($canview && $canmanage) {
+    if ($canview) {
         $toprow[] = new tabobject('enrolledlearning', new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $cohortid)),
             get_string('enrolledlearning', 'totara_cohort'));
     }
 
-    if (!empty($CFG->audiencevisibility) && $canmanagevisibility) {
+    if (!empty($CFG->audiencevisibility) && $canview) {
         $toprow[] = new tabobject('visiblelearning', new moodle_url('/totara/cohort/visiblelearning.php', array('id' => $cohortid)),
             get_string('visiblelearning', 'totara_cohort'));
     }

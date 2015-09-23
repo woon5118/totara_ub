@@ -30,16 +30,37 @@ require_once($CFG->dirroot . '/cohort/lib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
-$context = context_system::instance();
-$canedit = has_capability('moodle/cohort:manage', $context);
+require_login();
 
 $sid    = optional_param('sid', '0', PARAM_INT);
-$id     = optional_param('id', false, PARAM_INT);
+$id     = required_param('id', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT);
 $debug  = optional_param('debug', false, PARAM_BOOL);
 
+$cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
+$context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+$PAGE->set_context($context);
+
+require_capability('moodle/cohort:view', $context);
+$canedit = has_all_capabilities(array('moodle/cohort:manage', 'totara/coursecatalog:manageaudiencevisibility'), $context);
+
 $url = new moodle_url('/totara/cohort/visiblelearning.php', array('id' => $id, 'format' => $format));
-admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout' => 'report'));
+
+if ($context->contextlevel == CONTEXT_COURSECAT) {
+    $category = $DB->get_record('course_categories', array('id' => $context->instanceid), '*', MUST_EXIST);
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array('contextid' => $cohort->contextid)));
+} else {
+    navigation_node::override_active_url(new moodle_url('/cohort/index.php', array()));
+}
+
+if ($context->contextlevel == CONTEXT_SYSTEM) {
+    admin_externalpage_setup('cohorts', '', null, $url, array('pagelayout'=>'report'));
+} else {
+    $PAGE->set_title($SITE->shortname . " : " . get_string('visiblelearning', 'totara_cohort'));
+    $PAGE->set_heading($SITE->fullname);
+    $PAGE->set_pagelayout('report');
+    $PAGE->set_url($url);
+}
 
 if (empty($CFG->audiencevisibility)) {
     echo $OUTPUT->header();

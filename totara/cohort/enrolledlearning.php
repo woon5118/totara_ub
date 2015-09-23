@@ -32,6 +32,8 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
 
+require_login();
+
 $id     = optional_param('id', false, PARAM_INT);
 $sid = optional_param('sid', '0', PARAM_INT);
 $format = optional_param('format', '', PARAM_TEXT); // Export format.
@@ -54,6 +56,12 @@ $cohort = $DB->get_record('cohort', array('id' => $id), '*', MUST_EXIST);
 $context = context::instance_by_id($cohort->contextid);
 $PAGE->set_context($context);
 
+require_capability('moodle/cohort:view', $context);
+// TODO: TL-7240 - allow moodle/cohort:manage to also work at category context, relies on dialogs being fixed.
+// at this stage cohort:manage is only checked in system context - this can be changed once dialogs
+// allow all necessary permissions checks at category level
+$canedit = has_capability('moodle/cohort:manage', context_system::instance());
+
 $report = reportbuilder_get_embedded_report('cohort_associations_enrolled', array('cohortid' => $id), false, $sid);
 
 $url = new moodle_url('/totara/cohort/enrolledlearning.php', array('id' => $id));
@@ -63,6 +71,7 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     $PAGE->set_url($url);
     $PAGE->set_heading($COURSE->fullname);
     $PAGE->set_title($cohort->name . ' : ' . get_string('enrolledlearning', 'totara_cohort'));
+    $PAGE->set_pagelayout('report');
 }
 
 // Handle a request for export
@@ -139,7 +148,7 @@ echo cohort_print_tabs('enrolledlearning', $cohort->id, $cohort->cohorttype, $co
 echo html_writer::start_tag('div', array('class' => 'buttons'));
 
 // Add courses.
-if (has_capability('moodle/course:update', $context)) {
+if ($canedit && has_capability('moodle/course:update', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-course-learningitem-dialog',
         'value' => get_string('addcourses', 'totara_cohort')));
@@ -147,13 +156,13 @@ if (has_capability('moodle/course:update', $context)) {
 }
 
 // Add programs and certifications.
-if (totara_feature_visible('programs') && has_capability('totara/program:configureassignments', $context)) {
+if ($canedit && totara_feature_visible('programs') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-program-learningitem-dialog',
         'value' => get_string('addprograms', 'totara_cohort')));
     echo html_writer::end_tag('div');
 }
-if (totara_feature_visible('certifications') && has_capability('totara/program:configureassignments', $context)) {
+if ($canedit && totara_feature_visible('certifications') && has_capability('totara/program:configureassignments', $context)) {
     echo html_writer::start_tag('div', array('class' => 'singlebutton'));
     echo html_writer::empty_tag('input', array('type' => 'submit', 'id' => 'add-certification-learningitem-dialog',
         'value' => get_string('addcertifications', 'totara_cohort')));

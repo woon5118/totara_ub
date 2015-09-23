@@ -101,7 +101,6 @@ class rb_cohort_associations_enrolled_embedded extends rb_base_embedded {
             $context = context_system::instance();
         }
 
-        return has_capability('moodle/cohort:view', $context, $reportfor) &&
-               has_capability('moodle/cohort:manage', $context, $reportfor);
+        return has_capability('moodle/cohort:view', $context, $reportfor);
     }
 }

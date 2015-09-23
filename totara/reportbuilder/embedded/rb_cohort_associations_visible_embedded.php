@@ -90,7 +90,15 @@ class rb_cohort_associations_visible_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report) {
-        $context = context_system::instance();
+        global $DB;
+
+        if (isset($this->embeddedparams['cohortid'])) {
+            $cohort = $DB->get_record('cohort', array('id' => $this->embeddedparams['cohortid']));
+            $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
+        } else {
+            $context = context_system::instance();
+        }
+
         return has_capability('moodle/cohort:view', $context, $reportfor);
     }
 }
