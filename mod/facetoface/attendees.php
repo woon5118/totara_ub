@@ -937,7 +937,7 @@ if ($action == 'approvalrequired') {
     $headings = array();
     $headings[] = get_string('name');
     $headings[] = get_string('timerequested', 'facetoface');
-    if ($includeattendeesnote) {
+    if ($session->availablesignupnote && $includeattendeesnote) {
         // The user has to hold specific permissions to view this.
         $headings[] = get_string('attendeenote', 'facetoface');
     }
@@ -977,8 +977,6 @@ if ($action == 'approvalrequired') {
                 $note = html_writer::span($datanote, 'note' . $attendee->id, array('id' => 'usernote' . $attendee->id));
                 $data[] = $icon . $note;
             }
-        } else {
-            $data[] = "";
         }
         $data[] = html_writer::empty_tag('input', array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '0', 'checked' => 'checked')));
         $data[] = html_writer::empty_tag('input',array_merge($approvaldisabled, array('type' => 'radio', 'name' => 'requests['.$attendee->id.']', 'value' => '1')));
