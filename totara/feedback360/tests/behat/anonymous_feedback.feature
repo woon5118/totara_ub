@@ -59,6 +59,7 @@ Feature: anonymous feedback
     And I click on "User Five" "link" in the "Add user(s)" "totaradialogue"
     And I click on "User Six" "link" in the "Add user(s)" "totaradialogue"
     And I click on "Save" "button" in the "Add user(s)" "totaradialogue"
+    And I wait "1" seconds
     When I press "Request"
     Then I should see "User Two"
     And I should see "User Three"
