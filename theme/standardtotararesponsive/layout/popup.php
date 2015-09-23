@@ -101,7 +101,9 @@ if ($devicetype !== 'mobile' and $devicetype !== 'tablet') {
                 <?php
                 if (!empty($PAGE->theme->settings->footnote)) {
                     echo '<div class="footnote text-center">'.format_text($PAGE->theme->settings->footnote).'</div>';
-                } ?>
+                }
+                echo $OUTPUT->login_info();
+                ?>
                 <div class="footer-powered"><?php echo $OUTPUT->powered_by_totara(); ?></div>
                 <?php echo $OUTPUT->standard_footer_html(); ?>
             </div>

@@ -24,6 +24,10 @@
 #totaramenu .usermenu .menu {
     top: 63px;
 }
+.notloggedin #totaramenu .usermenu {
+    padding: 0 10px;
+}
+
 #totaramenu .usermenu .menu li {
     clear: both;
     display: block;
@@ -33,6 +37,9 @@
 }
 #totaramenu .usermenu a {
     padding: 0 10px;
+}
+.notloggedin #totaramenu .usermenu a {
+    padding: 0;
 }
 #totaramenu .usermenu .menu li:last-child a {
     border-bottom-left-radius: 5px;

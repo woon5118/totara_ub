@@ -125,6 +125,7 @@ echo $OUTPUT->doctype() ?>
         </div>
       </div>
       <?php
+      echo $OUTPUT->login_info();
       echo $OUTPUT->standard_footer_html();
       ?>
     </div>

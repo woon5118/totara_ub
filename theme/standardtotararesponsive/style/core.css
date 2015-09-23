@@ -1490,3 +1490,10 @@ div.criteria-description {
     margin: 5px 0 15px;
     color: #444444;
 }
+
+#page-footer .logininfo {
+    padding-bottom: 3px;
+}
+#page-footer .logininfo .link-as-button {
+    vertical-align: baseline;
+}

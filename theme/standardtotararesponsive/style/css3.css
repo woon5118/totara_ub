@@ -50,6 +50,7 @@ input[type="reset"],
 input[type="button"],
 #id_buttonfield,
 a.link-as-button,
+.usermenu a.link-as-button,
 input#id_submitbutton,
 .path-admin .buttons input[type="submit"] {
     color:#333;
