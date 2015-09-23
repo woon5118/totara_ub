@@ -1262,7 +1262,7 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
             $starttime = userdate($date->timestart, $strftimetime, $date->sessiontimezone);
             $finishtime = userdate($date->timefinish, $strftimetime, $date->sessiontimezone);
             $timestr = $starttime . ' - ' . $finishtime . ' ';
-            $timestr .= $displaytimezones ? $date->sessiontimezone : '';
+            $timestr .= $displaytimezones ? core_date::get_user_timezone($date->sessiontimezone) : '';
             $alldates .= $timestr;
         }
 
