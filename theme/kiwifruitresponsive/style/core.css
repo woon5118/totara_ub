@@ -1942,3 +1942,6 @@ div.totara-dialog td.select #search-tab #fgroup_id_searchgroup {
 .totara-dialog h3 {
     color: #ffffff;
 }
+.page-context-header h2 {
+    margin-left: 110px;
+}
