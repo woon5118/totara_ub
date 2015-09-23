@@ -183,27 +183,26 @@ function facetoface_get_completion_state($course, $cm, $userid, $type) {
     if ($facetoface->completionstatusrequired) {
         $completionstatusrequired = json_decode($facetoface->completionstatusrequired, true);
         if (!empty($completionstatusrequired)) {
+            list($insql, $inparams) = $DB->get_in_or_equal(array_keys($completionstatusrequired));
             // Get user's latest face to face status.
-            $sql = "SELECT f2fss.id AS signupstatusid, f2fss.statuscode, f2fsd.timefinish
+            $sql = "SELECT f2fss.id AS signupstatusid, f2fss.statuscode, f2fsd.timefinish, f2fs.archived
                 FROM {facetoface_sessions} f2fses
-                LEFT JOIN {facetoface_signups} f2fs ON (f2fs.sessionid = f2fses.id) AND (f2fs.archived != 1)
-                LEFT JOIN {facetoface_signups_status} f2fss ON (f2fss.signupid = f2fs.id)
+                LEFT JOIN {facetoface_signups} f2fs ON (f2fs.sessionid = f2fses.id)
+                LEFT JOIN (SELECT ss.signupid, MAX(ss.id) AS id
+                             FROM {facetoface_signups_status} ss
+                            GROUP BY ss.signupid) ssmax ON (ssmax.signupid = f2fs.id)
+                     JOIN {facetoface_signups_status} f2fss ON (f2fss.id = ssmax.id)
                 LEFT JOIN {facetoface_sessions_dates} f2fsd ON (f2fsd.sessionid = f2fses.id)
                 WHERE f2fses.facetoface = ? AND f2fs.userid = ?
-                ORDER BY f2fss.id DESC, f2fsd.timefinish DESC";
-            $params = array($facetoface->id, $userid);
+                  AND f2fss.statuscode $insql
+                ORDER BY f2fsd.timefinish DESC";
+            $params = array_merge(array($facetoface->id, $userid), $inparams);
             $status = $DB->get_record_sql($sql, $params, IGNORE_MULTIPLE);
             $newstate = false;
-            if ($status) {
-                foreach ($completionstatusrequired as $statusrequired => $i) {
-                    if ((int)$statusrequired == (int)$status->statuscode) {
-                        $newstate = true;
-                    }
-                }
-                if ($newstate) {
-                    // Tell completion_criteria_activity::review exact time of completion, otherwise it will use time of review run.
-                    $cm->timecompleted = $status->timefinish;
-                }
+            if ($status && !$status->archived) {
+                $newstate = true;
+                // Tell completion_criteria_activity::review exact time of completion, otherwise it will use time of review run.
+                $cm->timecompleted = $status->timefinish;
             }
             $result = completion_info::aggregate_completion_states($type, $result, $newstate);
         }
