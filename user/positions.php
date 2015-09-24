@@ -239,6 +239,7 @@ else {
         // Setup data
         position_assignment::set_properties($position_assignment, $data);
         assign_user_position($position_assignment);
+        $data->id = $position_assignment->id;
 
         // Description editor post-update
         if ($can_edit && $data->type != POSITION_TYPE_ASPIRATIONAL) {
