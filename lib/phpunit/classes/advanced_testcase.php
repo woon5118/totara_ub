@@ -531,7 +531,7 @@ abstract class advanced_testcase extends PHPUnit_Framework_TestCase {
      *  - TEST_EXTERNAL_FILES_HTTPS_URL
      *
      * They should point to standard external test files repository,
-     * it defaults to 'http://download.moodle.org/unittest'.
+     * it defaults to 'http://test.totaralms.com/exttests'.
      *
      * False value means skip tests that require external files.
      *
@@ -551,7 +551,7 @@ abstract class advanced_testcase extends PHPUnit_Framework_TestCase {
                 }
                 return TEST_EXTERNAL_FILES_HTTPS_URL.$path;
             }
-            return 'https://download.moodle.org/unittest'.$path;
+            return 'https://test.totaralms.com/exttests'.$path;
         }
 
         if (defined('TEST_EXTERNAL_FILES_HTTP_URL')) {
@@ -560,7 +560,7 @@ abstract class advanced_testcase extends PHPUnit_Framework_TestCase {
             }
             return TEST_EXTERNAL_FILES_HTTP_URL.$path;
         }
-        return 'http://download.moodle.org/unittest'.$path;
+        return 'http://test.totaralms.com/exttests'.$path;
     }
 
     /**
