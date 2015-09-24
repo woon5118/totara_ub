@@ -303,7 +303,7 @@ class page_requirements_manager {
         $this->yui_module('moodle-core-jqueryajaxhandler', 'M.core.jqueryajaxhandler.init');
 
         // Load behat ajax handler.
-        if (defined('BEHAT_RUNNING') && BEHAT_RUNNING) {
+        if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
             $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
         }
     }
