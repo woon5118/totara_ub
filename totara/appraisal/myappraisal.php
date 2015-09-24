@@ -199,15 +199,11 @@ if ($action == 'pages') {
 // Setup custom javascript.
 local_js(array(
     TOTARA_JS_DIALOG));
-$jsmodule = array(
-    'name' => 'totara_appraisal_myappraisal',
-    'fullpath' => '/totara/appraisal/js/myappraisal.js',
-    'requires' => array('json'));
 $PAGE->requires->strings_for_js(array('printnow', 'printyourappraisal', 'snapshotgeneration', 'downloadnow',
     'snapshotdialogtitle'), 'totara_appraisal');
 $PAGE->requires->js_call_amd('totara_appraisal/myappraisal', 'init', array('args' => json_encode(array(
     'appraisalid' => $appraisal->id, 'role' => $role, 'subjectid' => $subjectid,
-    'keepalivetime' => ($CFG->sessiontimeout / 2)))), false, $jsmodule);
+    'keepalivetime' => ($CFG->sessiontimeout / 2)))));
 
 // Start page output.
 $urlparams = array('role' => $role, 'subjectid' => $subjectid, 'appraisalid' => $appraisalid, 'action' => 'stages');
