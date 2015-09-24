@@ -320,12 +320,12 @@ foreach($activities as $activity) {
     }
 
     // Some names (labels) come URL-encoded and can be very long, so shorten them
-    $activity->name = !$csv ? shorten_text($activity->name) : $activity->name;
+    $activityname = !$csv ? shorten_text($activity->name) : $activity->name;
 
     if ($csv) {
-        print $sep.csv_quote(strip_tags($activity->name)).$sep.csv_quote($datetext);
+        print $sep.csv_quote(strip_tags($activityname)).$sep.csv_quote($datetext);
     } else {
-        $formattedactivityname = format_string($activity->name, true, array('context' => $context));
+        $formattedactivityname = format_string($activityname, true, array('context' => $context));
         print '<th scope="col" class="ie-vertical '.$datepassedclass.'">'.
             '<div class="ie-vertical"><a href="'.$CFG->wwwroot.'/mod/'.$activity->modname.
             '/view.php?id='.$activity->id.'" title="' . $formattedactivityname . '">'.
