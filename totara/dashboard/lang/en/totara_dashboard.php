@@ -25,10 +25,9 @@
 
 $string['assigncohorts'] = 'Assign new audiences';
 $string['assignedcohorts'] = 'Assigned audiences';
-$string['configenabletotaradashboard'] = 'This option will let you: Enable(show)/Hide/Disable Totara Dashboard feature on this site.
+$string['configenabletotaradashboard'] = 'This option will let you: Enable(show)/Disable Totara Dashboard feature on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to Totara Dashboard will be accessible.
-* If Hide is chosen, all links and tabs related to Totara Dashboard will be hidden.
 * If Disable is chosen, Totara Dashboard will disappear from any menu on the site and will not be accessible.
 ';
 $string['createdashboard'] = 'Create dashboard';

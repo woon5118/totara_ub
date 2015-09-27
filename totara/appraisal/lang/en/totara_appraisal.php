@@ -118,10 +118,9 @@ $string['completebystage_help'] = 'Leave the dates empty if you don\'t know them
 $string['completed'] = 'Completed';
 $string['completedon'] = 'This appraisal was completed on {$a}';
 $string['completestage'] = 'Complete Stage';
-$string['configenableappraisals'] = 'This option will let you: Enable(show)/Hide/Disable Appraisal features from users on this site.
+$string['configenableappraisals'] = 'This option will let you: Enable(show)/Disable Appraisal features from users on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to appraisals will be accessible.
-* If Hide is chosen, all links and tabs related to appraisals will be hidden.
 * If Disable is chosen, appraisals will disappear from any menu on the site and will not be accessible.
 ';
 $string['confirmactivateappraisal'] = 'Do you really want to activate this appraisal?';

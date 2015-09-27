@@ -61,10 +61,9 @@ $string['cancelusersemail'] = 'Cancel existing requests to these external users:
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
 $string['closenow'] = '(Close Now)';
-$string['configenablefeedback360'] = 'This option will let you: Enable(show)/Hide/Disable 360 Feedback features from users on this site.
+$string['configenablefeedback360'] = 'This option will let you: Enable(show)/Disable 360 Feedback features from users on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to 360 feedbacks will be accessible.
-* If Hide is chosen, all links and tabs related to 360 feedbacks will be hidden.
 * If Disable is chosen, 360 feedbacks will disappear from any menu on the site and will not be accessible.';
 $string['confirmactivatefeedback360'] = 'Are you sure you want to activate Feedback - {$a}?';
 $string['confirmclosefeedback360'] = 'Are you sure you want to close Feedback - {$a}?';

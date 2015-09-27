@@ -312,10 +312,9 @@ $string['componentupdatelongmanager'] = '{$a->component} in learning plan "{$a->
 $string['componentupdatelongmanagerhtml'] = '{$a->component} in learning plan "{$a->planhtml}" updated:<br /> {$a->updateshtml}';
 $string['componentupdateshortlearner'] = '{$a} updated';
 $string['componentupdateshortmanager'] = '{$a->user} updated {$a->component}';
-$string['configenablelearningplans'] = 'This option will let you: Enable(show)/Hide/Disable Learning Plan features from users on this site.
+$string['configenablelearningplans'] = 'This option will let you: Enable(show)/Disable Learning Plan features from users on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to learning plans will be accessible.
-* If Hide is chosen, all links and tabs related to learning plans will be hidden.
 * If Disable is chosen, learning plans will disappear from any menu on the site and will not be accessible.
 ';
 $string['confirm'] = 'Confirm';

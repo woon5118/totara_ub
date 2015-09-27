@@ -177,10 +177,9 @@ $string['elementlibrary'] = 'Element Library';
 $string['emptyassignments'] = 'No assignments';
 $string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
 $string['enablemyteam'] = 'Enable My Team';
-$string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Hide/Disable My Team feature from users on this site.
+$string['enablemyteam_desc'] = 'This option will let you: Enable(show)/Disable My Team feature from users on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to My Team will be accessible.
-* If Hide is chosen, all links and tabs related to My Team will be hidden.
 * If Disable is chosen, My Team will disappear from any menu on the site and will not be accessible.';
 $string['enableprogramextensionrequests'] = 'Enable program extension requests';
 $string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';

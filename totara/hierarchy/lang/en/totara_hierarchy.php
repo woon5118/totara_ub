@@ -364,10 +364,9 @@ $string['competencyupdatedframework'] = 'The competency framework "{$a}" has bee
 $string['competencyupdatetype'] = 'The competency type "{$a}" has been updated';
 $string['competent'] = 'Competent';
 $string['competentwithsupervision'] = 'Competent with supervision';
-$string['configenablegoals'] = 'This option will let you: Enable(show)/Hide/Disable Goal features from users on this site.
+$string['configenablegoals'] = 'This option will let you: Enable(show)/Disable Goal features from users on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to goals will be accessible.
-* If Hide is chosen, all links and tabs related to goals will be hidden.
 * If Disable is chosen, goals will disappear from any menu on the site and will not be accessible.
 ';
 $string['configshowhierarchyshortnames'] = 'Toggles the use of shortnames in addition to fullnames in hierarchy forms. When enabled, hierarchies will include a shortname field in the framework, item and type forms';
@@ -440,10 +439,9 @@ $string['editscalevalue'] = 'Edit scale value';
 $string['edittype'] = 'Edit type';
 $string['edittypelevel'] = 'Edit type';
 $string['enablecompetencies'] = 'Enable Competencies';
-$string['enablecompetencies_desc'] = 'This option will let you: Enable(show)/Hide/Disable Competency feature on this site.
+$string['enablecompetencies_desc'] = 'This option will let you: Enable(show)/Disable Competency feature on this site.
 
 * If Show is chosen, all links, menus, tabs and option related to competencies will be accessible.
-* If Hide is chosen, all links and tabs related to competencies will be hidden.
 * If Disable is chosen, competencies will disappear from any menu on the site and will not be accessible.
 ';
 $string['enablegoals'] = 'Enable Goals';

@@ -117,98 +117,66 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enableprogramextensionrequests', 'totara_core'),
         new lang_string('enableprogramextensionrequests_help', 'totara_core'), 1));
 
-    // Totara Settings.
-    $featureoptions = array(
-        TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
-        TOTARA_HIDEFEATURE => new lang_string('hidefeature', 'totara_core'),
-        TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
-    );
-
-    $featureoptionssimple = array(
-        TOTARA_SHOWFEATURE => new lang_string('showfeature', 'totara_core'),
-        TOTARA_DISABLEFEATURE => new lang_string('disablefeature', 'totara_core')
-    );
-
     // If adding or removing the settings below, be sure to update the array in
     // totara_advanced_features_list() in totara/core/totara.php.
 
-    $setting = new admin_setting_configselect('enablegoals',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablegoals',
         new lang_string('enablegoals', 'totara_hierarchy'),
         new lang_string('configenablegoals', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablecompetencies',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetencies',
         new lang_string('enablecompetencies', 'totara_hierarchy'),
         new lang_string('enablecompetencies_desc', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enableappraisals',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
         new lang_string('configenableappraisals', 'totara_appraisal'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablefeedback360',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablefeedback360',
         new lang_string('enablefeedback360', 'totara_feedback360'),
         new lang_string('configenablefeedback360', 'totara_feedback360'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablelearningplans',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablelearningplans',
         new lang_string('enablelearningplans', 'totara_plan'),
         new lang_string('configenablelearningplans', 'totara_plan'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enableprograms',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablecertifications',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecertifications',
         new lang_string('enablecertifications', 'totara_program'),
         new lang_string('configenablecertifications', 'totara_program'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enabletotaradashboard',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enabletotaradashboard',
         new lang_string('enabletotaradashboard', 'totara_dashboard'),
         new lang_string('configenabletotaradashboard', 'totara_dashboard'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $optionalsubsystems->add(new admin_setting_configselect('enablereportgraphs',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablereportgraphs',
         new lang_string('enablereportgraphs', 'totara_reportbuilder'),
         new lang_string('enablereportgraphsinfo', 'totara_reportbuilder'),
-        TOTARA_SHOWFEATURE, $featureoptionssimple));
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablerecordoflearning',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablerecordoflearning',
         new lang_string('enablerecordoflearning', 'totara_plan'),
         new lang_string('enablerecordoflearninginfo', 'totara_plan'),
-        TOTARA_SHOWFEATURE, $featureoptionssimple);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablepositions',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablepositions',
         new lang_string('enablepositions', 'totara_hierarchy'),
         new lang_string('enablepositions_desc', 'totara_hierarchy'),
-        TOTARA_SHOWFEATURE, $featureoptionssimple);
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 
-    $setting = new admin_setting_configselect('enablemyteam',
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enablemyteam',
         new lang_string('enablemyteam', 'totara_core'),
         new lang_string('enablemyteam_desc', 'totara_core'),
-        TOTARA_SHOWFEATURE, $featureoptions);
-    $setting->set_updatedcallback('totara_menu_reset_cache');
-    $optionalsubsystems->add($setting);
+        TOTARA_SHOWFEATURE));
 }
