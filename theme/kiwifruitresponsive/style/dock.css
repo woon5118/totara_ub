@@ -8,6 +8,13 @@ body.has_dock {
 body.has_dock #page-content-wrapper {
     padding:0 0 0 0;
 }
+
+.has_dock header {
+    padding-left: 0;
+}
+.dir-rtl.has_dock header {
+    padding-right: 0;
+}
 .dir-ltr body.has_dock #page-content-wrapper {
     border-left:30px solid #FFFFFF
 }
@@ -24,7 +31,7 @@ body.has_dock #page-footer {
     z-index:100;
     background:#FFFFFF;
     border:none;
-    top:87px;
+    top:60px;
     bottom: 0;
 }
 #dock.dock-fixed {
