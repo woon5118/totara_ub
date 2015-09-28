@@ -62,8 +62,8 @@ class availability_checks_task extends \core\task\scheduled_task {
                 mtrace("Checking if Program-{$program->id} is still unavailable...");
             }
 
-            if ((!empty($program->availablefrom) && $program->availablefrom <= $now) &&
-                (!empty($program->availableuntil) && $program->availableuntil >= $now)) {
+            if ((empty($program->availablefrom) || $program->availablefrom < $now) &&
+                (empty($program->availableuntil) || $program->availableuntil > $now)) {
 
                 if (CLI_SCRIPT && $debugging) {
                     mtrace("Marking Program-{$program->id} as available.");
