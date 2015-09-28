@@ -53,13 +53,14 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 
 // Permissions.
 $usercontext = context_user::instance($userid);
-if ((!totara_is_manager($userid)
-    || !has_capability('totara/program:markstaffcoursecomplete', $usercontext)) && !is_siteadmin()) {
+$coursecontext = context_course::instance($course->id);
+$markstaff = (totara_is_manager($userid) && has_capability('totara/program:markstaffcoursecomplete', $usercontext));
+$markuser = has_capability('totara/core:markusercoursecomplete', $usercontext);
+$markcourse = has_capability('moodle/course:markcomplete', $coursecontext);
+if (!($markstaff || $markuser || $markcourse)) {
     // If this doesn't then we have show a permissions error.
     print_error('error:notmanagerornopermissions', 'totara_program');
 }
-
-$coursecontext = context_course::instance($course->id);
 
 $params = array();
 $params['userid'] = $userid;

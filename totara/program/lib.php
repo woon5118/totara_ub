@@ -66,6 +66,11 @@ function prog_can_view_users_required_learning($learnerid) {
         return true;
     }
 
+    $usercontext = context_user::instance($learnerid);
+    if (has_capability('totara/core:markusercoursecomplete', $usercontext)) {
+        return true;
+    }
+
     return false;
 }
 

@@ -983,9 +983,10 @@ class multi_course_set extends course_set {
                         $status = COMPLETION_STATUS_NOTYETSTARTED;
                     }
                     $cells[] = new html_table_cell(totara_display_course_progress_icon($userid, $course->id, $status));
-
-                    if ($showcourseset && totara_is_manager($userid) &&
-                            has_capability('totara/program:markstaffcoursecomplete', $usercontext)) {
+                    $markstaff = (totara_is_manager($userid) && has_capability('totara/program:markstaffcoursecomplete', $usercontext));
+                    $markuser = has_capability('totara/core:markusercoursecomplete', $usercontext);
+                    $markcourse = has_capability('moodle/course:markcomplete', $coursecontext);
+                    if ($showcourseset && ($markstaff || $markuser || $markcourse)) {
                         $completion = new completion_info($course);
                         $indicator = ($completion->is_course_complete($userid) ? 'y' : 'n');
                         $url = new moodle_url('/totara/program/content/completecourse.php',

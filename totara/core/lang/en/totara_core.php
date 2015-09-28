@@ -85,6 +85,7 @@ $string['core:delegateusersmanager'] = 'Assign a temporary manager to other user
 $string['core:editmainmenu'] = 'Edit the main menu';
 $string['core:langconfig'] = 'Edit language settings';
 $string['core:manageprofilefields'] = 'Manage profile fields';
+$string['core:markusercoursecomplete'] = 'Mark another user\'s courses as complete';
 $string['core:modconfig'] = 'Configure activity modules';
 $string['core:programmanagecustomfield'] = 'Manage a program custom field';
 $string['core:seedeletedusers'] = 'See deleted users';

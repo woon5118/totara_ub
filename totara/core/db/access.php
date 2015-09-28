@@ -179,4 +179,13 @@ $capabilities = array(
         'archetypes'    => array(
         ),
     ),
+
+    // Allows for the user to mark another user's courses as complete
+    'totara/core:markusercoursecomplete' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_USER,
+        'archetypes'    => array(
+        ),
+    ),
 );
