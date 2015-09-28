@@ -53,7 +53,7 @@ Scenario: Test the learner can add and remove objectives from their learning pla
   # As the manager, access the learners plans.
   When I log in as "manager2"
   And I click on "My Team" in the totara menu
-  And I click on "Plans" "link" in the "#team_members_r0" "css_element"
+  And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
 
   # Access the learners plans and verify it hasn't been approved.
   When I click on "learner1 Learning Plan" "link"
