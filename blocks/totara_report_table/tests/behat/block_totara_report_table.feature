@@ -82,6 +82,9 @@ Feature: Report builder table block
     And I set the following fields to these values:
       | Block title | Report sid |
       | Report | User report |
+    And I press "Save changes"
+    And I configure the "Report sid" block
+    And I set the following fields to these values:
       | Saved search | LearnerSearch |
     And I press "Save changes"
     And I press "Stop customising this page"
