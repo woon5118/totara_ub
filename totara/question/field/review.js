@@ -163,46 +163,18 @@ M.totara_review = M.totara_review || {
      * @param {Object} el optional The DOM element being deleted, for fancy removal from the display.
      */
     modalDelete: function(url, id, el) {
-      this.Y.use('panel', function(Y) {
-        var panel = new Y.Panel({
-          bodyContent: M.util.get_string('removeconfirm', 'totara_question'),
-          width        : 300,
-          zIndex       : 5,
-          centered     : true,
-          modal        : true,
-          render       : true,
-          buttons: [
-            {
-              name: "confirm",
-              value  : 'Yes',
-              section: Y.WidgetStdMod.FOOTER,
-              action : function (e) {
-                e.preventDefault();
-                $.get(url).done(function(data) {
-                  if (data == 'success') {
-                    el.slideUp(250, function(){
-                      el.remove();
-                    });
-                  }
-                  panel.destroy(true);
+      M.util.show_confirm_dialog( el,
+        {
+          message: M.util.get_string('removeconfirm', 'totara_question'),
+          callback: function () {
+            $.get(url).done(function(data) {
+              if (data == 'success') {
+                el.slideUp(250, function(){
+                  el.remove();
                 });
               }
-            },
-            {
-              name: "deny",
-              value  : 'No',
-              section: Y.WidgetStdMod.FOOTER,
-              action : function (e) {
-                e.preventDefault();
-                panel.destroy(true);
-              }
-            }
-          ]
-        });
-        panel.getButton("confirm").removeClass("yui3-button");
-        panel.getButton("deny").removeClass("yui3-button");
-        panel.show();
-
+            });
+        }
       });
     },
 
