@@ -393,7 +393,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
 
             $statusreporturl->remove_params('filterstatus');
-            $row[] = html_writer::link($statusreporturl, get_string('statusreport', 'totara_appraisal')) . '&nbsp' .
+            $row[] = html_writer::link($statusreporturl, get_string('statusreport', 'totara_appraisal')) . ' ' .
                      html_writer::link($detailreporturl, get_string('detailreport', 'totara_appraisal'));
 
             $data[] = $row;
@@ -460,7 +460,7 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             }
 
             $statusreporturl->remove_params('filterstatus');
-            $row[] = html_writer::link($statusreporturl, get_string('statusreport', 'totara_appraisal')) . '&nbsp' .
+            $row[] = html_writer::link($statusreporturl, get_string('statusreport', 'totara_appraisal')) . ' ' .
                      html_writer::link($detailreporturl, get_string('detailreport', 'totara_appraisal'));
 
             $data[] = $row;
