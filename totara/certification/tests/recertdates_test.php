@@ -63,8 +63,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('3-May-2014 08:14'), $newtimeexpires); // One year after previous expiry date.
-        $this->assertEquals(strtotime('3-Apr-2014 08:14'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('3-May-2014 08:14')), userdate($newtimeexpires)); // One year after previous expiry date.
+        $this->assertEquals(userdate(strtotime('3-Apr-2014 08:14')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $curtimeexpires, $timecompleted);
 
@@ -80,8 +80,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('3-May-2013 08:14'), $newtimeexpires); // Equal to current expiry date!
-        $this->assertEquals(strtotime('3-Apr-2013 08:14'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('3-May-2013 08:14')), userdate($newtimeexpires)); // Equal to current expiry date!
+        $this->assertEquals(userdate(strtotime('3-Apr-2013 08:14')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $curtimeexpires, $timecompleted);
 
@@ -97,8 +97,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('3-May-2014 08:14'), $newtimeexpires);// One year after assignment due date.
-        $this->assertEquals(strtotime('3-Apr-2014 08:14'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('3-May-2014 08:14')), userdate($newtimeexpires));// One year after assignment due date.
+        $this->assertEquals(userdate(strtotime('3-Apr-2014 08:14')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $timedue, $timecompleted);
 
@@ -113,8 +113,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('15-April-2014 12:01'), $newtimeexpires); // One year after date completed.
-        $this->assertEquals(strtotime('15-March-2014 12:01'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('15-April-2014 12:01')), userdate($newtimeexpires)); // One year after date completed.
+        $this->assertEquals(userdate(strtotime('15-March-2014 12:01')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $timecompleted);
 
@@ -129,8 +129,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('15-April-2014 12:01'), $newtimeexpires); // One year after the completion date.
-        $this->assertEquals(strtotime('15-March-2014 12:01'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('15-April-2014 12:01')), userdate($newtimeexpires)); // One year after the completion date.
+        $this->assertEquals(userdate(strtotime('15-March-2014 12:01')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $timecompleted);
 
@@ -145,8 +145,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('15-April-2014 12:01'), $newtimeexpires); // One year after the completion date.
-        $this->assertEquals(strtotime('15-March-2014 12:01'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('15-April-2014 12:01')), userdate($newtimeexpires)); // One year after the completion date.
+        $this->assertEquals(userdate(strtotime('15-March-2014 12:01')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $timecompleted);
 
@@ -161,8 +161,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('15-April-2014 12:01'), $newtimeexpires); // One year after the completion date.
-        $this->assertEquals(strtotime('15-March-2014 12:01'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('15-April-2014 12:01')), userdate($newtimeexpires)); // One year after the completion date.
+        $this->assertEquals(userdate(strtotime('15-March-2014 12:01')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $timecompleted);
 
@@ -178,8 +178,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals(strtotime('15-April-2014 12:01'), $newtimeexpires); // One year after the completion date.
-        $this->assertEquals(strtotime('25-March-2014 12:01'), $timewindowopens);
+        $this->assertEquals(userdate(strtotime('15-April-2014 12:01')), userdate($newtimeexpires)); // One year after the completion date.
+        $this->assertEquals(userdate(strtotime('25-March-2014 12:01')), userdate($timewindowopens));
 
         unset($activeperiod, $windowperiod, $curtimeexpires, $timecompleted);
 
@@ -202,8 +202,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
         $expectedtimeexpired = strtotime('1 year', $curtimeexpires); // One year after the current expiry date.
-        $this->assertEquals($expectedtimeexpired, $newtimeexpires);
-        $this->assertEquals(strtotime('-1 month', $expectedtimeexpired), $timewindowopens);
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $curtimeexpires, $expectedtimeexpired);
 
@@ -225,8 +225,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $this->assertEquals($timedue, $newtimeexpires); // Should just be the assignment due date.
-        $this->assertEquals(strtotime('-1 month', $timedue), $timewindowopens);
+        $this->assertEquals(userdate($timedue), userdate($newtimeexpires)); // Should just be the assignment due date.
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $timedue)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue);
 
@@ -248,9 +248,9 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $expectedtimeexpired = strtotime('1 year', $timedue); // 1 year after the assignment due date.
-        $this->assertEquals($expectedtimeexpired, $newtimeexpires);
-        $this->assertEquals(strtotime('-1 month', $expectedtimeexpired), $timewindowopens);
+        $expectedtimeexpired = strtotime($activeperiod, $timedue); // 1 year after the assignment due date.
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timedue, $timecompleted, $expectedtimeexpired);
 
@@ -269,9 +269,9 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $newtimeexpires = get_timeexpires($base, $activeperiod);
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
-        $expectedtimeexpired = strtotime('1 year', $timecompleted); // 1 year after the date completed.
-        $this->assertEquals($expectedtimeexpired, $newtimeexpires);
-        $this->assertEquals(strtotime('-1 month', $expectedtimeexpired), $timewindowopens);
+        $expectedtimeexpired = strtotime($activeperiod, $timecompleted); // 1 year after the date completed.
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $expectedtimeexpired);
 
@@ -295,8 +295,8 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
 
         $expectedtimeexpired = strtotime('-10 year', $timedue); // 10 years (active periods) before the assignment due date.
-        $this->assertEquals($expectedtimeexpired, $newtimeexpires);
-        $this->assertEquals(strtotime('-1 month', $expectedtimeexpired), $timewindowopens);
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue, $expectedtimeexpired);
 
@@ -321,8 +321,68 @@ class totara_certification_recertdates_testcase extends advanced_testcase {
         // The "recurring" date is in one month's time. This is within the minimum active period, so the
         // expiry date should be period after that, so eleven years after the assignment due date.
         $expectedtimeexpired = strtotime('11 year', $timedue);
-        $this->assertEquals($expectedtimeexpired, $newtimeexpires);
-        $this->assertEquals(strtotime('-1 month', $expectedtimeexpired), $timewindowopens);
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
+
+        unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue, $expectedtimeexpired);
+
+        // Certification is using CERTIFRECERT_FIXED to calculate the next expiry date.
+        // Upload of completion record in the past, before minimum active period (e.g. new assignment).
+        $activeperiod = '1 year';
+        $minimumactiveperiod = '6 month';
+        $windowperiod = '2 month';
+        $timecompleted = mktime(8, 14, 0, 1, 4, 2012); // April 1 2012 at 8:14am.
+        $timedue = mktime(0, 0, 0, 12, 31, 2012); // Due 31 December 2012.
+
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
+        $newtimeexpires = get_timeexpires($base, $activeperiod);
+        $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
+
+        // Time completed was less than minimum from time due, so new expiry is the same as time due.
+        $expectedtimeexpired = $timedue;
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
+
+        unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue, $expectedtimeexpired);
+
+        // Certification is using CERTIFRECERT_FIXED to calculate the next expiry date.
+        // Upload of completion record in the past, within window.
+        $activeperiod = '1 year';
+        $minimumactiveperiod = '6 month';
+        $windowperiod = '2 month';
+        $timecompleted = mktime(8, 14, 0, 11, 5, 2012); // November 5 2012 at 8:14am.
+        $timedue = mktime(0, 0, 0, 12, 31, 2012); // December 31 2012.
+
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, $timedue, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
+        $newtimeexpires = get_timeexpires($base, $activeperiod);
+        $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
+
+        // Time completed is less than minimum active period from time due, so time expires must be one active period further.
+        $expectedtimeexpired = strtotime($activeperiod, $timedue);
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
+
+        unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue, $expectedtimeexpired);
+
+        // Certification is using CERTIFRECERT_FIXED to calculate the next expiry date.
+        // Upload of completion record in the past, expired.
+        $activeperiod = '1 year';
+        $minimumactiveperiod = '6 month';
+        $windowperiod = '2 month';
+        $timecompleted = mktime(8, 14, 0, 2, 4, 2013); // February 4 2013 at 8:14am.
+        $timedue = mktime(0, 0, 0, 12, 31, 2012); // Due December 31 2012.
+
+        $base = get_certiftimebase(CERTIFRECERT_FIXED, null, $timecompleted, $timedue,
+            $activeperiod, $minimumactiveperiod, $unusedperiod);
+        $newtimeexpires = get_timeexpires($base, $activeperiod);
+        $timewindowopens = get_timewindowopens($newtimeexpires, $windowperiod);
+
+        // Expired and more than minimum active period from next expiry date.
+        $expectedtimeexpired = strtotime($activeperiod, $timedue);
+        $this->assertEquals(userdate($expectedtimeexpired), userdate($newtimeexpires));
+        $this->assertEquals(userdate(strtotime('-' . $windowperiod, $expectedtimeexpired)), userdate($timewindowopens));
 
         unset($activeperiod, $minimumactiveperiod, $windowperiod, $timecompleted, $timedue, $expectedtimeexpired);
 

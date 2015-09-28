@@ -294,6 +294,7 @@ class totara_reportbuilder_cache_generator extends testing_data_generator {
             'learningcomptype' => CERTIFTYPE_PROGRAM,
             'activeperiod' => '1 year',
             'windowperiod' => '1 month',
+            'minimumactiveperiod' => '3 month',
             'recertifydatetype' => CERTIFRECERT_COMPLETION,
             'timemodified' => time(),
         );

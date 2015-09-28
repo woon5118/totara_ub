@@ -1407,13 +1407,12 @@ function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted, $t
             // Invalid active period. Stop now, because the following code would cause an infinite loop.
             print_error('error:nullactiveperiod', 'totara_certification');
         }
-        $now = time();
-        // First, if the base is currently too far in the future, move it back (only usually occurs with primary certification).
-        while (strtotime('-' . $minimumactiveperiod, $base) > $now) {
+        // First, if the base is too far in the future, move it back (only usually occurs with primary certification).
+        while (strtotime('-' . $minimumactiveperiod, $base) > $timecompleted) {
             $base = strtotime('-' . $activeperiod, $base);
         }
         // Then, if the base is too far in the past, move it forward (can occur with near primary certification or very overdue).
-        while (strtotime($activeperiod, $base) < strtotime($minimumactiveperiod, $now)) {
+        while (strtotime($activeperiod, $base) < strtotime($minimumactiveperiod, $timecompleted)) {
             $base = strtotime($activeperiod, $base);
         }
         return $base;
