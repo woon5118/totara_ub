@@ -1042,7 +1042,7 @@ class mssql_native_moodle_database extends moodle_database {
             }
         }
 
-        $sql = "INSERT INTO {$this->prefix}$table $fieldssql VALUES $valuessql";
+        $sql = "INSERT INTO {{$table}} $fieldssql VALUES $valuessql";
 
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
         $rawsql = $this->emulate_bound_params($sql, $params);

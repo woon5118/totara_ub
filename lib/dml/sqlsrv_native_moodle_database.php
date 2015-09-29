@@ -1123,7 +1123,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
             }
         }
 
-        $sql = "INSERT INTO {$this->prefix}$table $fieldssql VALUES $valuessql";
+        $sql = "INSERT INTO {{$table}} $fieldssql VALUES $valuessql";
         $this->do_query($sql, $params, SQL_QUERY_INSERT);
     }
 
