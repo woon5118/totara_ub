@@ -245,6 +245,7 @@ $string['cannotcreateuserx'] = 'cannot create user {$a}';
 $string['invalidauthforuserx'] = 'invalid authentication plugin {$a}';
 $string['orgxnotexist'] = 'Organisation {$a->orgidnumber} does not exist. Skipped user {$a->idnumber}';
 $string['posxnotexist'] = 'Position {$a->posidnumber} does not exist. Skipped user {$a->idnumber}';
+$string['posstartdateafterenddate'] = 'Position start date must not be later than end date for user {$a->idnumber}';
 $string['managerxnotexist'] = 'Manager {$a->manageridnumber} does not exist. Skipped user {$a->idnumber}';
 $string['appraiserxnotexist'] = 'Appraiser {$a->appraiseridnumber} does not exist. Skipped user {$a->idnumber}';
 $string['selfassignedmanagerx'] = 'User {$a->idnumber} cannot be their own manager. Skipped user {$a->idnumber}';

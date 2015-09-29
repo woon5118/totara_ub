@@ -779,6 +779,12 @@ class totara_sync_element_user extends totara_sync_element {
             $invalidids = array_merge($invalidids, $badids);
         }
 
+        // Check position start date is not larger than position end date.
+        if (isset($syncfields->posstartdate) && isset($syncfields->posenddate)) {
+            $badids = $this->get_invalid_start_end_dates($synctable, 'posstartdate', 'posenddate', 'posstartdateafterenddate');
+            $invalidids = array_merge($invalidids, $badids);
+        }
+
         if (empty($this->config->allow_create)) {
             $badids = $this->check_users_unable_to_revive($synctable);
             $invalidids = array_merge($invalidids, $badids);
@@ -925,6 +931,36 @@ class totara_sync_element_user extends totara_sync_element {
             $params[0] = 0;
         }
         $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $r) {
+            $this->addlog(get_string($identifier, 'tool_totara_sync', $r), 'error', 'checksanity');
+            $invalidids[] = $r->id;
+        }
+        $rs->close();
+
+        return $invalidids;
+    }
+
+    /**
+     * Get invalid ids from synctable where start date is greater than the end date
+     *
+     * @param string $synctable sync table name
+     * @param string $datefield1 column name for start date
+     * @param string $datefield2 column name for end date
+     * @param string $identifier for logging messages
+     *
+     * @return array with invalid ids from synctable where start date is greater than the end date
+     */
+    function get_invalid_start_end_dates($synctable, $datefield1, $datefield2, $identifier) {
+        global $DB;
+
+        $invalidids = array();
+        $sql = "SELECT s.id, s.idnumber
+                  FROM {{$synctable}} s
+                 WHERE s.$datefield1 > s.$datefield2 ";
+        if (empty($this->config->sourceallrecords)) {
+            $sql .= ' AND s.deleted = 0'; // Avoid users that will be deleted.
+        }
+        $rs = $DB->get_recordset_sql($sql);
         foreach ($rs as $r) {
             $this->addlog(get_string($identifier, 'tool_totara_sync', $r), 'error', 'checksanity');
             $invalidids[] = $r->id;
