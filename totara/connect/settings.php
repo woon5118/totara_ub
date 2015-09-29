@@ -32,7 +32,7 @@ $settingspage = new admin_settingpage('totaraconnectsettings',
     'moodle/site:config',
     $hidden);
 
-$settingspage->add(new admin_setting_configcheckbox('totaraconnect_connect/syncpasswords',
+$settingspage->add(new admin_setting_configcheckbox('totara_connect/syncpasswords',
     new lang_string('syncpasswords', 'totara_connect'),  new lang_string('syncpasswords_desc', 'totara_connect'),
     0));
 

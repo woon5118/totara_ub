@@ -21,8 +21,29 @@
  * @package totara_connect
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2015100201;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2015051102;       // Requires this Moodle version.
-$plugin->component = 'totara_connect';  // To check on upgrade, that module sits in correct place
+/**
+ * Totara Connect server plugin upgrade.
+ *
+ * @param int $oldversion the version we are upgrading from
+ * @return bool always true
+ */
+function xmldb_totara_connect_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2015100201) {
+        // Fix incorrect password sync setting.
+        $sync = get_config('totaraconnect_connect', 'syncpasswords');
+        if ($sync !== false) {
+            unset_config('syncpasswords', 'totaraconnect_connect');
+            set_config('syncpasswords', $sync, 'totara_connect');
+        }
+
+        upgrade_plugin_savepoint(true, 2015100201, 'connect', 'totara');
+    }
+
+    return true;
+}
