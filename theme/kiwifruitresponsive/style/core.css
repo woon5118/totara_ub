@@ -1002,9 +1002,6 @@ fieldset {
 .dir-rtl .mform fieldset legend {
     margin-right:0;
 }
-.mform fieldset div {
-    margin:5px 0;
-}
 .mform .required,
 .mform .fdescription.required {
     color:#6b6b6b;
