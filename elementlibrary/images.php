@@ -77,7 +77,7 @@ echo html_writer::tag('p', 'If you want a spacer (for when an icon is not being 
 
 echo $OUTPUT->pix_icon('t/removeright', '>') . $OUTPUT->spacer(array('width' => 11, 'height' => 11)) . $OUTPUT->pix_icon('t/moveleft', '<');
 
-echo html_writer::tag('p', 'There is a special class for rendering emoticons. All it does dfiferently is set "emoticon" as the default class.');
+echo html_writer::tag('p', 'There is a special class for rendering emoticons. All it does differently is set "emoticon" as the default class.');
 
 $emoticon = new pix_emoticon('s/smiley', 'This is a smiley', 'core');
 echo $OUTPUT->render($emoticon);
