@@ -36,10 +36,10 @@ if (!is_siteadmin()) {
 }
 
 $admisselector = new core_role_admins_existing_selector();
-$admisselector->set_extra_fields(array('username', 'email'));
+$admisselector->set_extra_fields(array('username'));
 
 $potentialadmisselector = new core_role_admins_potential_selector();
-$potentialadmisselector->set_extra_fields(array('username', 'email'));
+$potentialadmisselector->set_extra_fields(array('username'));
 
 if (optional_param('add', false, PARAM_BOOL) and confirm_sesskey()) {
     if ($userstoadd = $potentialadmisselector->get_selected_users()) {

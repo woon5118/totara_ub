@@ -85,7 +85,9 @@ switch ($action) {
             $user->fullname = fullname($user);
             $fieldvalues = array();
             foreach ($extrafields as $field) {
-                $fieldvalues[] = s($user->{$field});
+                if (!empty($user->{$field})) {
+                    $fieldvalues[] = s($user->{$field});
+                }
                 unset($user->{$field});
             }
             $user->extrafields = implode(', ', $fieldvalues);

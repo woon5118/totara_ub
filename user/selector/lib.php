@@ -321,7 +321,7 @@ abstract class user_selector_base {
      * @param array $fields a list of field names that exist in the user table.
      */
     public function set_extra_fields($fields) {
-        $this->extrafields = $fields;
+        $this->extrafields = empty($this->extrafields) ? $fields : array_merge($fields, $this->extrafields);
     }
 
     /**
@@ -575,7 +575,9 @@ abstract class user_selector_base {
         if ($this->extrafields) {
             $displayfields = array();
             foreach ($this->extrafields as $field) {
-                $displayfields[] = $user->{$field};
+                if (!empty($user->{$field})) {
+                    $displayfields[] = $user->{$field};
+                }
             }
             $out .= ' (' . implode(', ', $displayfields) . ')';
         }
