@@ -405,9 +405,7 @@ class totara_sync_source_user_csv extends totara_sync_source_user {
                         unset($dbrow[$cf]);
                     }
                 }
-                if (!empty($cfield_data)) {
-                    $dbrow['customfields'] = json_encode($cfield_data);
-                }
+                $dbrow['customfields'] = json_encode($cfield_data);
                 unset($cfield_data);
             }
 
