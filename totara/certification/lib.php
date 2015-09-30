@@ -1408,7 +1408,7 @@ function get_certiftimebase($recertifydatetype, $timeexpires, $timecompleted, $t
             print_error('error:nullactiveperiod', 'totara_certification');
         }
         // First, if the base is too far in the future, move it back (only usually occurs with primary certification).
-        while (strtotime('-' . $minimumactiveperiod, $base) > $timecompleted) {
+        while (strtotime('-' . $minimumactiveperiod, $base) >= $timecompleted) {
             $base = strtotime('-' . $activeperiod, $base);
         }
         // Then, if the base is too far in the past, move it forward (can occur with near primary certification or very overdue).
