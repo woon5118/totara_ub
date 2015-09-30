@@ -70,6 +70,7 @@ class behat_totara_core extends behat_base {
         set_config('enhancedcatalog', 1);
         set_config('preventexecpath', 1);
         set_config('debugallowscheduledtaskoverride', 1); // Include dev interface for resetting scheduled task "Next run".
+        set_config('defaulthomepage', HOMEPAGE_SITE);
         $DB->set_field('role', 'name', 'Site Manager', array('shortname' => 'manager'));
         $DB->set_field('role', 'name', 'Editing Trainer', array('shortname' => 'editingteacher'));
         $DB->set_field('role', 'name', 'Trainer',array('shortname' => 'teacher'));

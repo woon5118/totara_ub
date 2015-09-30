@@ -458,6 +458,7 @@ class phpunit_util extends testing_util {
         set_config('enablecompletion', 0);
         set_config('forcelogin', 0);
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort');
+        set_config('defaulthomepage', HOMEPAGE_MY);
 
         // We need to keep the installed dataroot filedir files.
         // So each time we reset the dataroot before running a test, the default files are still installed.

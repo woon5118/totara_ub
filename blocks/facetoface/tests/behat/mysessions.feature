@@ -94,9 +94,7 @@ Feature: Confirm Sessions show up in my face to face sessions
       | Capacity                | 30                  |
       | Details                 | 2 some more details |
     And I click on "Save changes" "button"
-    And I click on "My Learning" in the totara menu
     And I add the "Face-to-face" block
-    And I click on "Stop customising this page" "button"
 
   Scenario: Test filters
     Given I follow "Upcoming sessions"

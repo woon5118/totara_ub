@@ -94,6 +94,7 @@ class behat_util extends testing_util {
         set_config('enrol_plugins_enabled', 'manual,guest,self,cohort');
         set_config('enhancedcatalog', 0);
         set_config('preventexecpath', 0);
+        set_config('defaulthomepage', HOMEPAGE_MY);
         $DB->set_field('role', 'name', 'Manager', array('shortname' => 'manager'));
         $DB->set_field('role', 'name', 'Teacher', array('shortname' => 'editingteacher'));
         $DB->set_field('role', 'name', 'Non-editing teacher',array('shortname' => 'teacher'));

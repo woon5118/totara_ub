@@ -20,9 +20,9 @@ Feature: Users completion of courses
       | user001 | C2     | student |
       | user002 | C1     | student |
     And I log in as "admin"
-    And I click on "Customise this page" "button"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "link"
+    And I click on "Turn editing on" "button"
     And I add a "Choice" to section "1" and I fill the form with:
       | Choice name          | Activity One                                      |
       | Description          | The first activity                                |
