@@ -42,15 +42,12 @@ class mod_facetoface_room_form extends moodleform {
 
         $mform->addElement('text', 'name', get_string('roomname', 'facetoface'), array('size' => '45'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('text', 'building', get_string('building', 'facetoface'), array('size' => '45'));
         $mform->setType('building', PARAM_TEXT);
-        $mform->addRule('building', null, 'required', null, 'client');
 
         $mform->addElement('text', 'address', get_string('address', 'facetoface'), array('size' => '45'));
         $mform->setType('address', PARAM_TEXT);
-        $mform->addRule('address', null, 'required', null, 'client');
 
         $mform->addElement('text', 'capacity', get_string('capacity', 'facetoface'));
         $mform->setType('capacity', PARAM_INT);

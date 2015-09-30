@@ -172,7 +172,7 @@ class mod_facetoface_session_form extends moodleform {
                 WHERE s.id = ? AND r.custom = 0";
             $params = array($this->_customdata['s']);
             if ($room = $DB->get_record_sql($sql, $params)) {
-                $pdroom = $room->name.', '.$room->building.', '.$room->address.', '.$room->description." (".get_string('capacity', 'facetoface').": ".$room->capacity.")";
+                $pdroom = get_string('predefinedroom', 'facetoface', $room);
                 $pdroom = format_string($pdroom);
                 if ($room->type == 'external') {
                     $roomnote = '<br><em>'.get_string('roommustbebookedtoexternalcalendar', 'facetoface').'</em>';
