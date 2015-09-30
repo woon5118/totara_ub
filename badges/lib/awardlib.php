@@ -148,12 +148,20 @@ class badge_potential_users_selector extends badge_award_selector_base {
         $countfields = 'SELECT COUNT(u.id)';
 
         $params['badgeid'] = $this->badgeid;
+        $params['badgeid2'] = $this->badgeid;
         $params['issuerrole'] = $this->issuerrole;
+        $params['dateexpire'] = time();
 
         $sql = " FROM {user} u JOIN ($esql) je ON je.id = u.id
                  LEFT JOIN {badge_manual_award} bm
                      ON (bm.recipientid = u.id AND bm.badgeid = :badgeid AND bm.issuerrole = :issuerrole)
-                 $wherecondition AND bm.id IS NULL";
+                 LEFT JOIN {badge_issued} bi
+                 ON bi.userid = u.id
+                 AND bi.badgeid = :badgeid2
+                 AND (bi.dateexpire IS NULL OR bi.dateexpire > :dateexpire)
+                 $wherecondition
+                 AND bm.id IS NULL
+                 AND bi.id IS NULL";
 
         list($sort, $sortparams) = users_order_by_sql('u', $search, $this->accesscontext);
         $order = ' ORDER BY ' . $sort;
