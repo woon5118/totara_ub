@@ -130,7 +130,7 @@ if ($cfdata) {
     }
 }
 
-$table = new html_table();
+echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));
 
 foreach ($data as $ditem) {
 
@@ -139,14 +139,11 @@ foreach ($data as $ditem) {
         continue;
     }
 
-    $header = new html_table_cell(format_string($ditem['title']));
-    $header->header = true;
-    $cell = new html_table_cell(format_string($ditem['value']));
-    $row = new html_table_row(array($header, $cell));
-    $table->data[] = $row;
+    echo html_writer::tag('dt', format_string($ditem['title']));
+    echo html_writer::tag('dd', format_string($ditem['value']));
 }
 
-echo html_writer::table($table);
+echo html_writer::end_tag('dl');
 
 // Print extra info.
 $hierarchy->display_extra_view_info($item, $frameworkid);

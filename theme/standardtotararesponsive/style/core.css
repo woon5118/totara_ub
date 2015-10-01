@@ -1503,3 +1503,10 @@ div.criteria-description {
 #page-footer .logininfo .link-as-button {
     vertical-align: baseline;
 }
+.dl-horizontal dt {
+    white-space: normal
+}
+.dl-horizontal dt,
+.dl-horizontal dd {
+    margin-bottom: 5px;
+}
