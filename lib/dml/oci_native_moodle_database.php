@@ -190,7 +190,9 @@ class oci_native_moodle_database extends moodle_database {
         }
 
         // Make sure moodle package is installed - now required.
-        if (!$this->oci_package_installed()) {
+        if ($this->external) {
+            // Totara: do not pollute external databases with moodle stuff, we use this driver in HR sync only.
+        } else if (!$this->oci_package_installed()) {
             try {
                 $this->attempt_oci_package_install();
             } catch (Exception $e) {

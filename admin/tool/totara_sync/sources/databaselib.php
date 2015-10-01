@@ -34,8 +34,6 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.ph
 function setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array $dboptions = array()) {
     global $CFG;
 
-    $prefix = ' ';
-
     if (!isset($dbuser)) {
         $dbuser = '';
     }
@@ -70,12 +68,14 @@ function setup_sync_DB($dbtype, $dbhost, $dbname, $dbuser, $dbpass, array $dbopt
         }
     }
 
-    if (!$sync_db = moodle_database::get_driver_instance($dbtype, $dblibrary)) {
+    // Note: this is likely not a Totara database, use the $external parameter,
+    //       external databases do not need prefix and do not use some other nasty hacks.
+    if (!$sync_db = moodle_database::get_driver_instance($dbtype, $dblibrary, true)) {
         throw new dml_exception('dbdriverproblem', "Unknown driver $dblibrary/$dbtype");
     }
 
     try {
-        $sync_db->connect($dbhost, $dbuser, $dbpass, $dbname, $prefix, $dboptions);
+        $sync_db->connect($dbhost, $dbuser, $dbpass, $dbname, '', $dboptions);
     } catch (moodle_exception $e) {
         if (empty($CFG->noemailever) and !empty($CFG->emailconnectionerrorsto)) {
             if (file_exists($CFG->dataroot.'/emailcount')){

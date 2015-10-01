@@ -37,7 +37,7 @@ require_sesskey();
 
 $dbtype = required_param('dbtype', PARAM_ALPHANUMEXT);
 $dbhost = optional_param('dbhost', '', PARAM_HOST);
-$dbname = required_param('dbname', PARAM_ALPHANUMEXT);
+$dbname = required_param('dbname', PARAM_RAW); // There is no safe cleaning of connection strings.
 $dbuser = required_param('dbuser', PARAM_ALPHANUMEXT);
 $dbport = optional_param('dbport', '', PARAM_INT);
 // Passwords contain strange characters we dont clean it
@@ -54,7 +54,7 @@ try {
 }
 
 //Check that we can query the db
-if ($connection->get_records_sql('SELECT 1')) {
+if ($connection->get_records_sql('SELECT 1 ' . $connection->sql_null_from_clause())) {
     echo json_encode(array('success' => true));
 } else {
     echo json_encode(array('success' => false));
