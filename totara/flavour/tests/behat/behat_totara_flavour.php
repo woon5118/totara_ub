@@ -56,7 +56,7 @@ class behat_totara_flavour extends behat_base {
      * @param string $flavour
      */
     public function flavour_is_active($flavour) {
-        \totara_flavour\helper::set_active_flavour($flavour);
+        \totara_flavour\helper::set_active_flavour('flavour_' . $flavour);
     }
 
     /**
