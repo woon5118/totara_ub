@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015052900;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051208;       // Requires this Moodle version.
+$plugin->version  = 2015100200;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2015051102;       // Requires this Moodle version.
 $plugin->component = 'tabexport_ods';   // To check on upgrade, that module sits in correct place

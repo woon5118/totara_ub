@@ -22,7 +22,7 @@
  * @subpackage totara_sync
  */
 
-$plugin->version  = 2015080500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2014051205;       // Requires this Moodle version.
+$plugin->version  = 2015100200;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2015051102;       // Requires this Moodle version.
 $plugin->component = 'tool_totara_sync'; // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;
