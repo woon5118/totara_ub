@@ -25,7 +25,6 @@ Feature: Users completion of programs and coursesets
       | comptest | user002 |
       | comptest | user003 |
     And I log in as "admin"
-    And I click on "Customise this page" "button"
     And I set the following administration settings values:
       | menulifetime | 0 |
     And I set self completion for "Course 1" in the "Miscellaneous" category

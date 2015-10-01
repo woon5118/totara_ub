@@ -221,10 +221,12 @@ class behat_totara_core extends behat_base {
         $steps[] = new Given('I click on "' . $course .'" "link" in the ".course-listing" "css_element"');
         $steps[] = new Given('I click on "View" "link" in the ".course-detail-listing-actions" "css_element"');
         $steps[] = new Given('I click on "Course completion" "link"');
-        $steps[] = new Given('I click on "Condition: Manual self completion" "link"');
+        $steps[] = new Given('I expand all fieldsets');
         $steps[] = new Given('I click on "criteria_self_value" "checkbox"');
         $steps[] = new Given('I press "Save changes"');
+        $steps[] = new Given('I press "Turn editing on"');
         $steps[] = new Given('I add the "Self completion" block');
+        $steps[] = new Given('I press "Turn editing off"');
 
         return $steps;
     }
