@@ -55,6 +55,15 @@ class rb_source_badge_issued extends rb_base_source {
     }
 
     /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        global $CFG;
+        return empty($CFG->enablebadges);
+    }
+
+    /**
      * Global report restrictions are implemented in this source.
      * @return boolean
      */

@@ -68,6 +68,14 @@ class rb_source_goal_status_history extends rb_base_source {
     }
 
     /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('goals');
+    }
+
+    /**
      * Global report restrictions are implemented in this source.
      * @return boolean
      */

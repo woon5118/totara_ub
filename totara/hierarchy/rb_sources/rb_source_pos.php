@@ -46,6 +46,15 @@ class rb_source_pos extends rb_base_source {
     }
 
     /**
+     * Check if the report source is disabled and should be ignored.
+     *
+     * @return boolean If the report should be ignored of not.
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('positions');
+    }
+
+    /**
      * Global report restrictions are implemented in this source.
      * @return boolean
      */

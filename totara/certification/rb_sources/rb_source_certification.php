@@ -41,6 +41,14 @@ class rb_source_certification extends rb_source_program {
     }
 
     /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('certifications');
+    }
+
+    /**
      * Global report restrictions are implemented in this source.
      * @return boolean
      */

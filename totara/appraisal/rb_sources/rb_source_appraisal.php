@@ -55,6 +55,14 @@ class rb_source_appraisal extends rb_base_source {
     }
 
     /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('appraisals');
+    }
+
+    /**
      * Global report restrictions are implemented in this source.
      * @return boolean
      */

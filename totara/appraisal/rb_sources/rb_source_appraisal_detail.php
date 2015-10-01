@@ -49,6 +49,14 @@ class rb_source_appraisal_detail extends rb_source_appraisal {
         $this->cacheable = false;
     }
 
+    /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public function is_ignored() {
+        return !totara_feature_visible('appraisals');
+    }
+
     protected function define_columnoptions() {
         $extendedcolumnoptions = array(
             new rb_column_option(

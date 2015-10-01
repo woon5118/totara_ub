@@ -145,6 +145,11 @@ preferences,moodle|/user/preferences.php|preferences',
         HOMEPAGE_USER => new lang_string('userpreference', 'admin'),
         HOMEPAGE_TOTARA_DASHBOARD => new lang_string('totaradashboard', 'admin')
     );
+    if (totara_feature_disabled('totaradashboard')) {
+        if (!isset($CFG->defaulthomepage) or $CFG->defaulthomepage != HOMEPAGE_TOTARA_DASHBOARD) {
+            unset($choices[HOMEPAGE_TOTARA_DASHBOARD]);
+        }
+    }
     $temp->add(new admin_setting_configselect('defaulthomepage', new lang_string('defaulthomepage', 'admin'),
             new lang_string('configdefaulthomepage', 'admin'), HOMEPAGE_SITE, $choices));
     $temp->add(new admin_setting_configcheckbox('allowguestmymoodle', new lang_string('allowguestmymoodle', 'admin'), new lang_string('configallowguestmymoodle', 'admin'), 1));

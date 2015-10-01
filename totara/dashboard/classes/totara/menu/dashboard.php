@@ -66,4 +66,13 @@ class dashboard extends \totara_core\totara\menu\item {
         }
         return $cache;
     }
+
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
+    public function is_disabled() {
+        return totara_feature_disabled('totaradashboard');
+    }
 }
