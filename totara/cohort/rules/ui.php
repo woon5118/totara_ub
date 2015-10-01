@@ -1782,7 +1782,7 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
         // Set selected items
         $alreadyselected = array();
         if ($ruleinstanceid) {
-            $sql = "SELECT u.id, " . $DB->sql_fullname('u.firstname', 'u.lastname') . " AS fullname
+            $sql = "SELECT u.id, " . get_all_user_name_fields(true, 'u') . "
                 FROM {user} u
                 INNER JOIN {cohort_rule_params} crp
                     ON u.id = " . $DB->sql_cast_char2int('crp.value') . "
@@ -1790,6 +1790,9 @@ class cohort_rule_ui_reportsto extends cohort_rule_ui {
                 ORDER BY u.firstname, u.lastname
                 ";
             $alreadyselected = $DB->get_records_sql($sql, array($ruleinstanceid));
+            foreach ($alreadyselected as $k => $v) {
+                $alreadyselected[$k]->fullname = fullname($v);
+            }
         }
         $dialog->selected_items = $alreadyselected;
         $dialog->isdirectreport = isset($this->isdirectreport) ? $this->isdirectreport : '';
