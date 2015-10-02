@@ -120,6 +120,18 @@ class totara_appraisal_generator extends component_generator_base {
             'timedue' => $timedue
         );
 
+        // Convert a string based timedue to a timestamp.
+        if (isset($data['timedue']) && !is_numeric($data['timedue'])) {
+            $timestamp = strtotime($data['timedue']);
+
+            // Update timedue if the date is valid.
+            if ($timestamp) {
+                $data['timedue'] = $timestamp;
+            } else {
+                unset($data['timedue']);
+            }
+        }
+
         // Merge the defaults and the given data and cast into an object.
         $data = (object) array_merge($defaults, (array) $data);
 
