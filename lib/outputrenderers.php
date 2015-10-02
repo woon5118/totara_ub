@@ -475,6 +475,21 @@ class core_renderer extends renderer_base {
 
         $output = '';
         $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
+
+        // Totara: remove script names and url parameters from referrers when linking external content to increase security.
+        if (!empty($CFG->securereferrers)) {
+            // Some browsers such as Safari 9 or MS Edge support referrer meta tag,
+            // but do not support all content values. Fortunately, they provide fallback
+            // to no referrer when they do not understand the value.
+            $referrer = 'origin'; // Local referrers are lost, this may affect functionality of Totara.
+            if (core_useragent::check_firefox_version(37)) {
+                $referrer = 'origin-when-crossorigin';
+            } else if (core_useragent::check_chrome_version(41)) {
+                $referrer = 'origin-when-crossorigin';
+            }
+            $output .= '<meta name="referrer" content="' . $referrer . '">' . "\n";
+        }
+
         $output .= '<meta name="keywords" content="Totara, ' . $this->page->title . '" />' . "\n";
         // This is only set by the {@link redirect()} method
         $output .= $this->metarefreshtag;
