@@ -32,6 +32,7 @@ require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
 define('COMPLETIONTYPE_ALL', 1);
 define('COMPLETIONTYPE_ANY', 2);
 define('COMPLETIONTYPE_SOME', 3);
+define('COMPLETIONTYPE_OPTIONAL', 4);
 
 define('NEXTSETOPERATOR_THEN', 1);
 define('NEXTSETOPERATOR_OR', 2);
@@ -106,6 +107,7 @@ abstract class course_set {
         switch ($this->completiontype) {
         case COMPLETIONTYPE_ANY:
         case COMPLETIONTYPE_SOME:
+        case COMPLETIONTYPE_OPTIONAL:
             $completiontypestr = get_string('or', 'totara_program');
             break;
         case COMPLETIONTYPE_ALL:
@@ -752,6 +754,15 @@ class multi_course_set extends course_set {
         $courses = $this->courses;
         $completiontype = $this->completiontype;
 
+        // Check if this is an 'optional' course set where the user doesn't have to complete any courses.
+        if ($completiontype == COMPLETIONTYPE_OPTIONAL) {
+            $completionsettings = array(
+                'status'        => STATUS_COURSESET_COMPLETE,
+                'timecompleted' => time()
+            );
+            return $this->update_courseset_complete($userid, $completionsettings);
+        }
+
         // Check that the course set contains at least one course.
         if (!count($courses)) {
             return false;
@@ -891,6 +902,9 @@ class multi_course_set extends course_set {
                     $out .= html_writer::tag('p', html_writer::tag('strong', $criteriacompletionset));
                 }
 
+                break;
+            case COMPLETIONTYPE_OPTIONAL:
+                $out .= html_writer::tag('p', html_writer::tag('strong', get_string('completeoptionalcourses', 'totara_program')));
                 break;
         }
 
@@ -1290,6 +1304,7 @@ class multi_course_set extends course_set {
                 COMPLETIONTYPE_ANY => get_string('onecourse', 'totara_program'),
                 COMPLETIONTYPE_ALL => get_string('allcourses', 'totara_program'),
                 COMPLETIONTYPE_SOME => get_string('somecourses', 'totara_program'),
+                COMPLETIONTYPE_OPTIONAL => get_string('completionoptional', 'totara_program'),
             );
             $onchange = 'return M.totara_programcontent.changeCompletionTypeString(this, '.$prefix.');';
             $mform->addElement('select', $prefix.'completiontype', get_string('label:learnermustcomplete', 'totara_program'),
@@ -1554,6 +1569,9 @@ class multi_course_set extends course_set {
         }
         else if ($courseset->completiontype == COMPLETIONTYPE_SOME) {
             return get_string('somecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
+        }
+        else if ($courseset->completiontype == COMPLETIONTYPE_OPTIONAL) {
+            return get_string('nocoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';
         }
         else {
             return get_string('onecoursesfrom', 'totara_program') . ' "' . format_string($courseset->label) . '"';

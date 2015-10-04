@@ -582,7 +582,7 @@ M.totara_programcontent = M.totara_programcontent || {
      * to match the selection
      */
     changeCompletionTypeString: function(el, prefix){
-        if (el.value == this.config.COMPLETIONTYPE_ANY || el.value == this.config.COMPLETIONTYPE_SOME) {
+        if (el.value == this.config.COMPLETIONTYPE_ANY || el.value == this.config.COMPLETIONTYPE_SOME || el.value == this.config.COMPLETIONTYPE_OPTIONAL) {
             var completiontypestr = M.util.get_string('or', 'totara_program');
         } else {
             var completiontypestr = M.util.get_string('and', 'totara_program');
