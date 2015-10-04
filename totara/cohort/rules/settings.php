@@ -234,6 +234,12 @@ function cohort_rules_list($reset = false){
                     );
                     $sqlhandler = new cohort_rule_sqlhandler_in_usercustomfield($id, $field->datatype);
                     break;
+                case 'date':
+                    $dialogs[] = new cohort_rule_ui_date_no_timezone(
+                        get_string('usersx', 'totara_cohort', format_string($field->name))
+                    );
+                    $sqlhandler = new cohort_rule_sqlhandler_date_usercustomfield_no_timezone($id);
+                    break;
                 default:
                     // Skip fields that we haven't defined a rule type for
                     unset($dialogs);

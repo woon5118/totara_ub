@@ -130,6 +130,88 @@ class cohort_rule_sqlhandler_date_usercustomfield extends cohort_rule_sqlhandler
 }
 
 /**
+ * Variation of cohort_rule_sqlhandler_date - ensuring that before and after use the correct operators '<' and '>'
+ * Handles rules that are comparing a DB column versus a specific date timestamp
+ */
+abstract class cohort_rule_sqlhandler_date_no_timezone extends cohort_rule_sqlhandler {
+    public $params = array(
+        'operator' => 0,
+        'date' => 0,
+    );
+
+    /**
+     * The database field we're comparing against. May be a column name or a custom field id
+     * @var mixed
+     */
+    public $field;
+
+    public function __construct($field) {
+        $this->field = $field;
+    }
+
+    /**
+     * Returns sql and params to be added to query to retrieve users who meet requirements of an audience rule.
+     *
+     * @param int $now To allow changing of now, particularly during testing. If not set, will be set to time().
+     * @return object containing sql snippet and params.
+     */
+    public function get_sql_snippet($now = null) {
+
+        if (!isset($now)) {
+            $now = time();
+        }
+
+        switch ($this->operator) {
+            case COHORT_RULE_DATE_OP_BEFORE_FIXED_DATE:
+                $comparison = "< {$this->date}";
+                break;
+            case COHORT_RULE_DATE_OP_AFTER_FIXED_DATE:
+                $comparison = "> {$this->date}";
+                break;
+            case COHORT_RULE_DATE_OP_BEFORE_PAST_DURATION:
+                $comparison = '< ' . ($now - ($this->date * 24 * 60 * 60));
+                break;
+            case COHORT_RULE_DATE_OP_WITHIN_PAST_DURATION:
+                $comparison = 'BETWEEN ' . ($now - ($this->date * 24 * 60 * 60)) . ' AND ' . $now;
+                break;
+            case COHORT_RULE_DATE_OP_WITHIN_FUTURE_DURATION:
+                $comparison = 'BETWEEN ' . $now . ' AND ' . ($now + ($this->date * 24 * 60 * 60));
+                break;
+            case COHORT_RULE_DATE_OP_AFTER_FUTURE_DURATION:
+                $comparison = '> ' . ($now + ($this->date * 24 * 60 * 60));
+                break;
+        }
+        return $this->construct_sql_snippet($this->field, $comparison);
+    }
+
+    /**
+     * Concatenates together the actual string bits to return the SQL snippet
+     * @param $field str
+     * @param $comparison str
+     */
+    abstract protected function construct_sql_snippet($field, $comparison);
+}
+
+/**
+ * SQL snippet for a user custom field holding a timestamp
+ * This covers the user customer profile date (without timezone) field.
+ */
+class cohort_rule_sqlhandler_date_usercustomfield_no_timezone extends cohort_rule_sqlhandler_date_no_timezone {
+    protected function construct_sql_snippet($field, $comparison) {
+        global $DB;
+        $sqlhandler = new stdClass();
+        $sqlhandler->sql = "EXISTS("
+            . "SELECT 1 from {user_info_data} usinda "
+            . "WHERE usinda.userid=u.id "
+            . "AND usinda.fieldid=:ducf{$this->ruleid} "
+            . "AND " . $DB->sql_cast_char2int('usinda.data', true) . " {$comparison}"
+            .")";
+        $sqlhandler->params = array("ducf{$this->ruleid}" => $field);
+        return $sqlhandler;
+    }
+}
+
+/**
  * SQL snippet for finding out when a user was assigned their primary position.
  */
 class cohort_rule_sqlhandler_date_posstarted extends cohort_rule_sqlhandler_date {
