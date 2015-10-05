@@ -144,6 +144,8 @@ Any certifications that do not exist in the current system will be created as ev
 The csv file should contain the following columns in the first line of the file
 
 {$a}
+
+Note: The duedate field should indicate what the due date was at the time of completion, not when the completion is due to expire. The column must be provided in the csv file, but can be left empty. When recertification is set to "Use certification expiry date" or "Use fixed expiry date", then the expiry date will be calculated using the uploaded duedate field. If it is empty or if the recertification is set to "Use certification completion date", then only the completion date will be used to calculate the expiry date
 ';
 $string['uploadcourse'] = 'Upload course csv';
 $string['uploadcourseintro'] = 'This will import historical completion records from a csv file and enrol users onto the specified courses.
@@ -151,7 +153,8 @@ Any courses that do not exist in the current system will be created as evidence 
 
 The csv file should contain the following columns in the first line of the file
 
-{$a}';
+{$a}
+';
 $string['uploadfilerequired'] = 'Please select a file to upload';
 $string['uploadsuccess'] = 'Uploaded files successfully';
 $string['uploadvia_directory'] = 'Alternatively upload csv files via a directory on the server';
