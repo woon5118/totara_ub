@@ -238,10 +238,25 @@ class enrol_totara_facetoface_plugin extends enrol_plugin {
         $settingautosignup = self::SETTING_AUTOSIGNUP;
         $autosignup = $instance->$settingautosignup;
 
+        $signupfields = $DB->get_records('facetoface_signup_info_field');
+
+        $signupfielddata = array();
+
+        foreach ($signupfields as $signupfield) {
+            if ($signupfield->shortname == 'signupnote') {
+                $signupfieldname = $signupfield->shortname;
+                $fieldname = $signupfield->shortname . $sid;
+                $signupfieldvalue = empty($fromform->$fieldname) ? '' : $fromform->$fieldname;
+
+                $signupfielddata['signupnote'] = $signupfieldvalue;
+            }
+        }
+
         $signupparams = array();
         $signupparams['discountcode']     = $discountcode;
         $signupparams['notificationtype'] = $notificationtype;
         $signupparams['autoenrol'] = false;
+        $signupparams['extrasignupfields'] = $signupfielddata; // This adds the signupnote field.
 
         $timestart = time();
         if ($instance->enrolperiod) {

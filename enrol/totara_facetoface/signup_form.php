@@ -178,6 +178,8 @@ class enrol_totara_facetoface_signup_form extends moodleform {
      * @param array $facetofaces
      */
     private function enrol_totara_facetoface_addsessrows($mform, $sessions, $facetoface) {
+        global $DB;
+
         $mform->addElement('html', html_writer::start_tag('table'));
         $mform->addElement('html', html_writer::start_tag('thead'));
         $mform->addElement('html', html_writer::start_tag('tr'));
@@ -194,7 +196,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
 
             $mform->addElement('html', html_writer::start_tag('tr'));
 
-            $mform->addElement('html', html_writer::start_tag('td'));
+            $mform->addElement('html', html_writer::start_tag('td', array('class' => 'session-select')));
             $mform->addElement('radio', 'sid', '', '', $sid);
             $mform->addElement('html', html_writer::end_tag('td'));
 
@@ -219,7 +221,7 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             } else {
                 $allsessiondates = get_string('wait-listed', 'facetoface');
             }
-            $mform->addElement('html', html_writer::tag('td', $allsessiondates));
+            $mform->addElement('html', html_writer::tag('td', $allsessiondates, array('class' => 'session-dates')));
 
             // Room.
             if (isset($session->room)) {
@@ -227,11 +229,10 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             } else {
                 $roomhtml = '';
             }
-
-            $mform->addElement('html', html_writer::tag('td', $roomhtml));
+            $mform->addElement('html', html_writer::tag('td', $roomhtml, array('class' => 'session-room')));
 
             // Signup information.
-            $mform->addElement('html', html_writer::start_tag('td'));
+            $mform->addElement('html', html_writer::start_tag('td', array('class' => 'session-signupinfo')));
 
             $elementid = 'discountcode' . $session->id;
             if ($session->discountcost > 0) {
@@ -242,6 +243,23 @@ class enrol_totara_facetoface_signup_form extends moodleform {
             }
             $mform->setType($elementid, PARAM_TEXT);
 
+            // Signup note.
+            if ($session->availablesignupnote == 1) {
+                // Get list of signup customfields.
+                $signupfields = $DB->get_records('facetoface_signup_info_field');
+
+                foreach ($signupfields as $signupfield) {
+                    // Currently we only support signup note.
+                    if ($signupfield->shortname == 'signupnote') {
+                        $elementid = $signupfield->shortname . $session->id;
+
+                        $mform->addElement('text', $elementid, $signupfield->fullname);
+                        $mform->setType($elementid, PARAM_TEXT);
+                    }
+                }
+            }
+
+            // Display T&Cs for self approval.
             if (facetoface_session_has_selfapproval($facetoface, $session)) {
                 $elementname = 'selfapprovaltandc_' . $facetoface->id;
                 $selfapprovaljsparams[$elementname] = $facetoface->selfapprovaltandc;

@@ -26,10 +26,14 @@
     width: 100%;
 }
 
-#f2fdirect-list table td:first-child {
-    width: 15%;
+#f2fdirect-list table td.session-select {
+    width: 10%;
     min-width: 100px;
 }
-#f2fdirect-list table td:nth-child(2) {
-    width: 60%;
+#f2fdirect-list table td.session-dates {
+    width: 50%;
+}
+
+.room {
+    display: block;
 }
