@@ -972,7 +972,8 @@ abstract class moodle_database {
             $limitnum = 0;
         }
 
-        if ($CFG->debugdeveloper) {
+        // Totara: this may be used from shutdown handler after $CFG is released, we need to prevent notices here!
+        if (!empty($CFG->debugdeveloper)) {
             if (!is_numeric($limitfrom)) {
                 $strvalue = var_export($limitfrom, true);
                 debugging("Non-numeric limitfrom parameter detected: $strvalue, did you pass the correct arguments?",

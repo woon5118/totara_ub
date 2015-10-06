@@ -111,15 +111,17 @@ class lock {
      * Print debugging if this lock falls out of scope before being released.
      */
     public function __destruct() {
-        if (!$this->released && defined('PHPUNIT_TEST')) {
-            $key = $this->key;
+        // Totara: throwing exceptions here makes no sense at all and using defined('PHPUNIT_TEST') is silly.
+        // The only safe place to send info is error log, other things do not work in shutdown handlers!
+        if (!$this->released) {
             $this->release();
-            throw new \coding_exception("A lock was created but not released at:\n" .
-                                        $this->caller . "\n\n" .
-                                        " Code should look like:\n\n" .
-                                        " \$factory = \core\lock\lock_config::get_lock_factory('type');\n" .
-                                        " \$lock = \$factory->get_lock($key);\n" .
-                                        " \$lock->release();  // Locks must ALWAYS be released like this.\n\n");
+            if (!PHPUNIT_TEST) {
+                $key = $this->key;
+                error_log("A lock was created but not released at: " . $this->caller . " Code should look like:\n" .
+                    " \$factory = \\core\\lock\\lock_config::get_lock_factory('type');\n" .
+                    " \$lock = \$factory->get_lock($key);\n" .
+                    " \$lock->release();  // Locks must ALWAYS be released like this.");
+            }
         }
     }
 

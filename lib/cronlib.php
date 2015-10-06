@@ -99,6 +99,13 @@ function cron_run() {
                 mtrace("Backtrace:");
                 mtrace(format_backtrace($e->getTrace(), true));
             }
+
+            // Totara: we do need to know what went wrong and where!!!
+            $info = get_exception_info($e);
+            $logerrmsg = "Scheduled task exception: " . $task->get_name() . " - " . $info->message . ' Debug: ' . $info->debuginfo .
+                "\n" . format_backtrace($info->backtrace, true);
+            error_log($logerrmsg);
+
             \core\task\manager::scheduled_task_failed($task);
         }
         get_mailer('close');
