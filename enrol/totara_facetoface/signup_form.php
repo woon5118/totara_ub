@@ -132,11 +132,9 @@ class enrol_totara_facetoface_signup_form extends moodleform {
                 $mform->addElement('html', html_writer::end_div());
             }
             $mform->addElement('html', html_writer::end_div());
-
-            if ($sessionsavailable) {
-                $mform->addRule('sid', null, 'required', null, 'client');
-            }
         }
+
+        $mform->addElement('static', 'sessionrequired', '');
 
         if ($sessionsavailable) {
             $notificationdisabled = get_config(null, 'facetoface_notificationdisable');
@@ -284,6 +282,11 @@ class enrol_totara_facetoface_signup_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $mform = $this->_form;
+
+        // Fail validation if a session is not selected.
+        if (!isset($data['sid'])) {
+            $errors['sessionrequired'] = get_string('mustselectsession', 'enrol_totara_facetoface');
+        }
 
         if (!empty($data['sid'])) {
             $elementid = 'selfapprovaltc' . $data['sid'];
