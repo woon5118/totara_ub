@@ -427,7 +427,7 @@ class rb_source_user extends rb_base_source {
      *                        'email' => $base . '.email'),
      *                  $allnamefields)
      *
-     * @param string $user Unused
+     * @param string $user Users name
      * @param object $row All the data required to display a user's name, icon and link
      * @param boolean $isexport If the report is being exported or viewed
      * @return string
@@ -454,7 +454,7 @@ class rb_source_user extends rb_base_source {
         $userid = $row->id;
 
         if ($isexport) {
-            return $userid;
+            return $this->rb_display_user($user, $row, true);
         }
 
         $user_pic = $OUTPUT->user_picture($row, array('courseid' => 1));
