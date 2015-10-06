@@ -78,9 +78,7 @@ $THEME->layouts = array(
     ),
 );
 
-if (!(core_useragent::is_ie() && !core_useragent::check_ie_version('10.0'))) {
-    $THEME->enable_dock = true;
-}
+$THEME->enable_dock = true;
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->javascripts_footer = array(
     'core'
