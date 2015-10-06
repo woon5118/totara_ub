@@ -1365,6 +1365,9 @@ div.totara-dialog td.select #search-tab,
 div.totara-dialog td.select #browse-tab {
     padding: 0;
 }
+.ui-dialog .message {
+    clear: both;
+}
 /*Icon picker for programs and courses*/
 #icon-selectable {
     list-style-type: none;
