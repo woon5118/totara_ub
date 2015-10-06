@@ -126,9 +126,6 @@ body.dir-rtl .totaratable .toolbar-right-table {
 .totara-dialog .selected {
     border-left: 1px solid #cccccc;
 }
-.totara-dialog .selected div {
-    padding-left: 3px;
-}
 .totara-dialog .treeview .unclickable,
 .totara-dialog .treeview .unclickable a {
     color: #777777;

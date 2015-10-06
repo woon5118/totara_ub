@@ -125,12 +125,39 @@ div.totara-dialog .selected div.treeview-selected-item {
     clear: left;
 }
 
+.dir-rtl .totara-dialog .select {
+    float: right;
+}
+.dir-rtl .totara-dialog .selected {
+    float: right;
+    margin-left: 0;
+    border-left: none;
+    margin-right: 2.12766%;
+    border-right: 1px solid #cccccc;
+}
+.totara-dialog .selected div {
+    clear: both;
+    padding: 0 3px;
+}
+
+.dir-rtl .totara-dialog .selected .addbutton,
+.dir-rtl .totara-dialog .selected .deletebutton {
+    float: left;
+}
+
 .totara-dialog #fitem_id_query .fitemtitle {
     padding-top: 5px;
 }
 
 .totara-dialog #id_dialogsearchsubmitbutton {
     margin: 0;
+}
+
+.dir-rtl .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+    float: left;
+}
+.dir-rtl .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset button {
+    float: right;
 }
 
 #dialog-tabs{
