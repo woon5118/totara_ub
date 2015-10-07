@@ -255,6 +255,8 @@ class tool_installaddon_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function index_page_repository() {
+        // Totara: no repository yet.
+        return null;
 
         $url = $this->installer->get_addons_repository_url();
 
