@@ -106,7 +106,9 @@ class totara_reportbuilder_rb_global_restriction_testcase extends advanced_testc
         $this->setCurrentTimeStart();
         $restriction->update($data);
         $record = $DB->get_record('report_builder_global_restriction', array('id' => $restriction->id), '*', MUST_EXIST);
-        $this->assertEquals($record, $restriction->get_record_data());
+        $newrecord = $restriction->get_record_data();
+        $newrecord->timemodified = $record->timemodified; // This might have changed by one second.
+        $this->assertEquals($record, $newrecord);
 
         $this->assertSame($data->name, $restriction->name);
         $this->assertSame($data->description, $restriction->description);
