@@ -27,7 +27,7 @@ define(['jquery'], function ($) {
     var templatecontrol = {
         // Optional php params and defaults defined here, args passed to init method
         // below will override these values.
-        config: {},
+        templates: {},
         // Public handler reference for the dialog.
         totaraDialog_handler_preRequisite: null,
 
@@ -39,11 +39,8 @@ define(['jquery'], function ($) {
         init: function(args) {
             // If defined, parse args into this module's config object.
             if (args) {
-                var jargs = $.parseJSON(args);
-                this.config = jargs;
+                this.templates = args;
             }
-
-            var templates = templatecontrol.config.templates;
 
             // Attach event to drop down.
             $('select#id_templateid').change(function() {
@@ -53,13 +50,13 @@ define(['jquery'], function ($) {
                 var current = select.val();
 
                 // Overwrite form data.
-                $('input#id_name').val(templates[current].fullname);
+                $('input#id_name').val(templatecontrol.templates[current].fullname);
 
-                var date = new Date(templates[current].enddate * 1000);
+                var enddate = templatecontrol.templates[current].enddate;
 
-                $('#id_enddate_day').val(date.getDate());
-                $('#id_enddate_month').val(date.getMonth() + 1);
-                $('#id_enddate_year').val(date.getFullYear());
+                $('#id_enddate_day').val(enddate.mday);
+                $('#id_enddate_month').val(enddate.mon);
+                $('#id_enddate_year').val(enddate.year);
             });
 
         }

@@ -50,7 +50,6 @@ class dp_template_general_settings_form extends moodleform {
         $mform->addRule('templatename', null, 'required');
 
         $mform->addElement('date_selector', 'enddate', get_string('enddate', 'totara_plan'));
-        $mform->setType('enddate', PARAM_TEXT);
         $mform->setDefault('enddate', $template->enddate);
         $mform->addRule('enddate', null, 'required');
         $mform->addHelpButton('enddate', 'templateenddate', 'totara_plan', '', true);
@@ -71,7 +70,6 @@ class dp_template_new_form extends moodleform {
         $mform->addRule('templatename', null, 'required');
 
         $mform->addElement('date_selector', 'enddate', get_string('enddate', 'totara_plan'));
-        $mform->setType('enddate', PARAM_TEXT);
         $mform->addRule('enddate', null, 'required');
         $mform->setDefault('enddate', 0);
         $mform->addHelpButton('enddate', 'templateenddate', 'totara_plan', '', true);

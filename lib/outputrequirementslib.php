@@ -1016,12 +1016,16 @@ class page_requirements_manager {
             $jsonparams[] = json_encode($param);
         }
         $strparams = implode(', ', $jsonparams);
+
+        /* TL-7589
+        // This check should not be necessary as most (decent) browsers allow large amounts of JSON.
+        // I've dealt with megabytes before.
         if ($CFG->debugdeveloper) {
             $toomanyparamslimit = 1024;
             if (strlen($strparams) > $toomanyparamslimit) {
                 debugging('Too many params passed to js_call_amd("' . $fullmodule . '", "' . $func . '")', DEBUG_DEVELOPER);
             }
-        }
+        }*/
 
         $js = 'require(["' . $component . '/' . $module . '"], function(amd) { amd.' . $func . '(' . $strparams . '); });';
 

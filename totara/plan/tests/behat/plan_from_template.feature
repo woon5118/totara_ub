@@ -9,10 +9,10 @@ Feature: Create plan from template.
     And I log in as "admin"
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I set the following fields to these values:
-      | Name             | test template |
-      | id_enddate_day   | 31            |
-      | id_enddate_month | December      |
-      | id_enddate_year  | 2020          |
+      | Name              | test template |
+      | id_enddate_day    | 31            |
+      | id_enddate_month  | December      |
+      | id_enddate_year   | 2020          |
     And I press "Save changes"
 
   Scenario: Create plan from template
@@ -20,7 +20,7 @@ Feature: Create plan from template.
     And I press "Create new learning plan"
     When I set the field "Plan template" to "test template"
     Then the following fields match these values:
-      | Plan name        | test template |
-      | id_enddate_day   | 31            |
-      | id_enddate_month | December      |
-      | id_enddate_year  | 2020          |
+      | Plan name         | test template |
+      | id_enddate_day    | 31            |
+      | id_enddate_month  | December      |
+      | id_enddate_year   | 2020          |

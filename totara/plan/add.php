@@ -133,8 +133,10 @@ dp_get_plan_base_navlinks($userid);
 $PAGE->navbar->add($heading);
 
 $templates = dp_get_templates();
-$json_templates = json_encode($templates);
-$args = array('args' => '{"templates":' . $json_templates . '}');
+foreach ($templates as $template) {
+    $template->enddate = usergetdate($template->enddate);
+}
+$args = array('args' => $templates);
 
 $PAGE->requires->js_call_amd('totara_plan/templates', 'init', $args);
 

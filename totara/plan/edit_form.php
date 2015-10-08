@@ -139,14 +139,12 @@ class plan_edit_form extends moodleform {
         }
 
         $mform->addElement('date_selector', 'startdate', get_string('datestarted', 'totara_plan'));
-        $mform->setType('startdate', PARAM_TEXT);
         $mform->addRule('startdate', get_string('err_required', 'form'), 'required', '', 'client', false, false);
         if ($action == 'add') {
             $mform->setDefault('startdate', 0);
         }
 
         $mform->addElement('date_selector', 'enddate', get_string('completiondate', 'totara_plan'));
-        $mform->setType('enddate', PARAM_TEXT);
         $mform->addRule('enddate', get_string('err_required', 'form'), 'required', '', 'client', false, false);
         if ($action == 'add' && isset($template->enddate)) {
             $mform->setDefault('enddate', $template->enddate);
