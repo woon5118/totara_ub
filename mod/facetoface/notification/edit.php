@@ -148,12 +148,14 @@ if ($form->is_cancelled()) {
 
     facetoface_notification::set_from_form($notification, $data);
 
-    if (!empty($data->booked)) {
-        // If one of the booked radio boxes are selected then the value
-        // will be taken from booked_type instead of booked (checkbox).
-        $notification->booked = $data->booked_type;
-    } else {
-        $notification->booked = 0;
+    if ($notification->type != MDL_F2F_NOTIFICATION_AUTO) {
+        if (!empty($data->booked)) {
+            // If one of the booked radio boxes are selected then the value
+            // will be taken from booked_type instead of booked (checkbox).
+            $notification->booked = $data->booked_type;
+        } else {
+            $notification->booked = 0;
+        }
     }
 
     $notification->courseid = $course->id;

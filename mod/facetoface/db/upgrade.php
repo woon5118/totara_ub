@@ -3169,5 +3169,46 @@ function xmldb_facetoface_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2015091000, 'facetoface');
     }
 
+    if ($oldversion < 2015100201) {
+        // Update reminder auto notifications with default value if they were updated.
+        $params = array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_BEFORE_SESSION);
+        $sql = "UPDATE {facetoface_notification}
+                SET booked = ?
+                WHERE type = ? AND conditiontype = ?";
+        $DB->execute($sql, $params);
+
+        // Update session_change auto notifications with default values if they were updated.
+        $params = array(1, 1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_SESSION_DATETIME_CHANGE);
+        $sql = "UPDATE {facetoface_notification}
+                SET booked = ?, waitlisted = ?
+                WHERE type = ?
+                AND conditiontype = ?";
+        $DB->execute($sql, $params);
+
+        // Update cancellation auto notifications with default value if they were updated.
+        $params = array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_CANCELLATION_CONFIRMATION);
+        $sql = "UPDATE {facetoface_notification}
+                SET cancelled = ?
+                WHERE type = ? AND conditiontype = ?";
+        $DB->execute($sql, $params);
+
+        // Update defaultcancelreservationsubjectdefault auto notifications with default value if they were updated.
+        $params = array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_RESERVATION_CANCELLED);
+        $sql = "UPDATE {facetoface_notification}
+                SET cancelled = ?
+                WHERE type = ? AND conditiontype = ?";
+        $DB->execute($sql, $params);
+
+        // Update defaultcancelallreservationssubjectdefault auto notifications with default value if they were updated.
+        $params = array(1, MDL_F2F_NOTIFICATION_AUTO, MDL_F2F_CONDITION_RESERVATION_ALL_CANCELLED);
+        $sql = "UPDATE {facetoface_notification}
+                SET cancelled = ?
+                WHERE type = ? AND conditiontype = ?";
+        $DB->execute($sql, $params);
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2015100201, 'facetoface');
+    }
+
     return $result;
 }
