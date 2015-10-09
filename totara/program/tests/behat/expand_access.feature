@@ -29,6 +29,8 @@ Feature: Users can expand the program info
   @javascript
   Scenario: Allow guest account to expand program when forcelogin enabled
     Given I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I click on "Programs" in the totara menu
@@ -38,6 +40,8 @@ Feature: Users can expand the program info
   @javascript
   Scenario: Allow user to expand program when forcelogin enabled
     Given I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
     And I log out
     And I click on "#guestlogin input[type=submit]" "css_element"
     And I log in as "student1"

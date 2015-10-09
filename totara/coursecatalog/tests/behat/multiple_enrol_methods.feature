@@ -27,7 +27,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I click on "Enable" "link" in the "Face-to-face direct enrolment" "table_row"
     And I set the following administration settings values:
       | Enhanced catalog | 1 |
-    And I press "Save changes"
+      | Guest login button | Show |
     And I log out
 
     Given I log in as "teacher1"

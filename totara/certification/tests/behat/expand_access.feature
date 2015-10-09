@@ -18,7 +18,7 @@ Feature: Users can expand the certification info
     And I press "Save changes"
     And I set the following administration settings values:
       | Enhanced catalog | 1 |
-    And I press "Save changes"
+      | Guest login button | Show |
     And I log out
 
   @javascript

@@ -8,6 +8,8 @@ Feature: Test visibility control of menu items
   Scenario: access controls cant be set on always shown menu items
     Given I am on a totara site
     And I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
     And I navigate to "Main menu" node in "Site administration > Appearance"
     And I press "Add new menu item"
     And I set the following fields to these values:
@@ -80,6 +82,8 @@ Feature: Test visibility control of menu items
       | user2 | C1 | editingteacher |
       | user3 | C1 | manager |
     When I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
     And I create the following totara menu items:
       | Menu title          | Visibility              | Menu default url address | Restrict access by role | Context                            | Learner | Editing Trainer | Site Manager | Guest |
       | Students only       | Use custom access rules | http://totaralms.com     | 1                       | Users may have role in any context | 1       |                 |              |       |

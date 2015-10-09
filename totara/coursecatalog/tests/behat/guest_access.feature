@@ -9,7 +9,7 @@ Feature: Guest users can auto-enrol themself via course catalog in courses where
     And I log in as "admin"
     And I set the following administration settings values:
       | Enhanced catalog | 1 |
-    And I press "Save changes"
+      | Guest login button | Show |
     And I log out
     Given the following "users" exist:
       | username | firstname | lastname | email |

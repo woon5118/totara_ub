@@ -12,6 +12,10 @@ Feature: Users can expand the course info in course catalog
     And the following "courses" exist:
       | fullname | shortname | format |
       | Course 1 | C1 | topics |
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | Guest login button | Show |
+    And I log out
 
   @javascript
   Scenario: Allow not logged in users to expand catalog when forcelogin disabled
