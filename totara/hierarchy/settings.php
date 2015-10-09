@@ -31,7 +31,8 @@
         $ADMIN->add('positions', new admin_externalpage('positionmanage', get_string('positionmanage', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=position",
             array('totara/hierarchy:createpositionframeworks', 'totara/hierarchy:updatepositionframeworks', 'totara/hierarchy:deletepositionframeworks',
-                'totara/hierarchy:createposition', 'totara/hierarchy:updateposition', 'totara/hierarchy:deleteposition')));
+                'totara/hierarchy:createposition', 'totara/hierarchy:updateposition', 'totara/hierarchy:deleteposition',
+                'totara/hierarchy:viewpositionframeworks')));
 
         $ADMIN->add('positions', new admin_externalpage('positiontypemanage', get_string('managepositiontypes', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=position",
@@ -48,7 +49,8 @@
     $ADMIN->add('organisations', new admin_externalpage('organisationmanage', get_string('organisationmanage', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=organisation",
             array('totara/hierarchy:createorganisationframeworks', 'totara/hierarchy:updateorganisationframeworks', 'totara/hierarchy:deleteorganisationframeworks',
-                  'totara/hierarchy:createorganisation', 'totara/hierarchy:updateorganisation', 'totara/hierarchy:deleteorganisation')));
+                  'totara/hierarchy:createorganisation', 'totara/hierarchy:updateorganisation', 'totara/hierarchy:deleteorganisation',
+                  'totara/hierarchy:vieworganisationframeworks')));
 
     $ADMIN->add('organisations', new admin_externalpage('organisationtypemanage', get_string('manageorganisationtypes', 'totara_hierarchy'),
             "{$CFG->wwwroot}/totara/hierarchy/type/index.php?prefix=organisation",
