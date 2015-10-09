@@ -178,7 +178,7 @@ if ($action == 'pages') {
                             $item->$name = $newanswers->$name;
                         }
 
-                        customfield_save_data($item, 'goal_user', 'goal_user');
+                        customfield_save_data($item, 'goal_user', 'goal_user', false, true);
                     }
                 }
 

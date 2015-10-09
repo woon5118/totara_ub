@@ -513,9 +513,9 @@ class question_goals extends reviewrating {
 
             $goalitem = goal::get_goal_item(array('id' => $item->itemid), $item->scope);
 
-            customfield_definition($form, $goalitem, 'goal_user', $goalitem->typeid, 'goal_user', $disableheader);
+            customfield_definition($form, $goalitem, 'goal_user', $goalitem->typeid, 'goal_user', $disableheader, true);
 
-            customfield_load_data($goalitem, 'goal_user', 'goal_user');
+            customfield_load_data($goalitem, 'goal_user', 'goal_user', true);
 
             foreach ($goalitem as $name => $value) {
                 if (substr_count($name, 'customfield_') > 0) {

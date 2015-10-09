@@ -41,15 +41,20 @@ class customfield_base {
     var $inputname;
     var $data;
     var $context;
+    var $addsuffix; // If the custom field requires an item id suffix to make it unique.
 
     /**
      * Constructor method.
-     * @param   integer   field id from the _info_field table
-     * @param   integer   id using the data
+     * @param integer $fieldid If from the _info_field table.
+     * @param object &item The item using the using the custom data.
+     * @param string $prefix The field name prefix.
+     * @param string $tableprefix The database table name prefix.
+     * @param boolean $addsuffix If the custom field should have a suffix added.
      */
-    function customfield_base($fieldid=0, &$item, $prefix, $tableprefix) {
+    function customfield_base($fieldid=0, &$item, $prefix, $tableprefix, $addsuffix = false) {
         $this->set_fieldid($fieldid);
         $this->set_itemid($item->id);
+        $this->set_addsuffix($addsuffix);
         $this->load_data($item, $prefix, $tableprefix);
         $this->prefix = $prefix;
     }
@@ -290,8 +295,20 @@ class customfield_base {
     }
 
     /**
+     * Accessor method: set the addsuffix for this instance
+     * @param   boolean If an itemid suffix should be added to a fieldname
+     */
+    private function set_addsuffix($addsuffix) {
+        $this->addsuffix = $addsuffix;
+    }
+
+    /**
      * Accessor method: Load the field record and prefix data and tableprefix associated with the prefix
      * object's fieldid and itemid
+     *
+     * @param integer $itemid The id of the item to add the custom fields to.
+     * @param string $prefix The database field name prefix.
+     * @param string $tableprefix The database tabel name prefix.
      */
     function load_data($itemid, $prefix, $tableprefix) {
         global $DB;
@@ -302,7 +319,7 @@ class customfield_base {
             $this->inputname = '';
         } else {
             $this->field = $field;
-            $this->inputname = 'customfield_'. $field->shortname . '_' . $itemid->id;
+            $this->inputname = 'customfield_'. $field->shortname . ($this->addsuffix ? '_' . $itemid->id : '');
         }
         if (!empty($this->field)) {
             $table = $tableprefix.'_info_data';
@@ -367,7 +384,16 @@ class customfield_base {
 
 /***** General purpose functions for custom fields *****/
 
-function customfield_load_data(&$item, $prefix, $tableprefix) {
+/**
+ * Load the data into the custom fields.
+ *
+ * @param object $item The item to add the custom fields to.
+ * @param string $prefix The database field name prefix.
+ * @param string $tableprefix The database table name prefix.
+ * @param boolean|false $addsuffix If an item id suffix should be added to the custom field.
+ * @throws coding_exception
+ */
+function customfield_load_data(&$item, $prefix, $tableprefix, $addsuffix = false) {
     global $CFG, $DB, $TEXTAREA_OPTIONS;
 
     $typestr = '';
@@ -382,7 +408,7 @@ function customfield_load_data(&$item, $prefix, $tableprefix) {
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
         $newfield = 'customfield_'.$field->datatype;
-        $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
+        $formfield = new $newfield($field->id, $item, $prefix, $tableprefix, $addsuffix);
         //edit_load_item_data adds the field and data to the $item object
         $formfield->edit_load_item_data($item);
         //if an unlocked textfield we also need to prepare the editor fields
@@ -403,11 +429,20 @@ function customfield_load_data(&$item, $prefix, $tableprefix) {
     }
 }
 
+
 /**
- * Print out the customisable fields
- * @param  object  instance of the moodleform class
+ * Print out the customisable fields.
+ *
+ * @param object &$mform Instance of the moodleform class
+ * @param object $item The item to add the custom fields to.
+ * @param string $prefix The database field name prefix.
+ * @param integer $typeid The item id.
+ * @param string $tableprefix The database table name prefix.
+ * @param boolean|false $disableheader If a header for the custom fields should be displayed.
+ * @param boolean|false $addsuffix If an item id suffix should be added to the custom field.
+ * @throws coding_exception
  */
-function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix, $disableheader = false) {
+function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix, $disableheader = false, $addsuffix = false) {
     global $DB, $CFG;
 
     $typestr = '';
@@ -436,7 +471,7 @@ function customfield_definition(&$mform, $item, $prefix, $typeid=0, $tableprefix
         foreach ($fields as $field) {
             require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
             $newfield = 'customfield_'.$field->datatype;
-            $formfield = new $newfield($field->id, $item, $prefix, $tableprefix);
+            $formfield = new $newfield($field->id, $item, $prefix, $tableprefix, $addsuffix);
             $formfield->edit_field($mform);
         }
     }
@@ -493,8 +528,9 @@ function customfield_validation($itemnew, $prefix, $tableprefix) {
  * @param string  $prefix       The custom field prefix (organisation, position, etc)
  * @param string  $tableprefix  The table prefix (org_type, pos_type, etc)
  * @param boolean $sync         Whether this is being called from sync and needs pre-preprocessing.
+ * @param boolean $addsuffix    Whether the custom fix has an item id suffix added to it.
  */
-function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false) {
+function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false, $addsuffix = false) {
     global $CFG, $DB;
 
     $typestr = '';
@@ -509,7 +545,7 @@ function customfield_save_data($itemnew, $prefix, $tableprefix, $sync = false) {
     foreach ($fields as $field) {
         require_once($CFG->dirroot.'/totara/customfield/field/'.$field->datatype.'/field.class.php');
         $newfield = 'customfield_'.$field->datatype;
-        $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix);
+        $formfield = new $newfield($field->id, $itemnew, $prefix, $tableprefix, $addsuffix);
         if ($sync) {
             $itemnew = $formfield->sync_data_preprocess($itemnew);
         }
