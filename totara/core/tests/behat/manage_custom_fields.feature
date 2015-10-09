@@ -144,8 +144,8 @@ Feature: Test new custom field capabilities
       And I set the following fields to these values:
         | Type full name | Competency Test Type |
       And I press "Save changes"
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
-      And I press "Add a new type"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
+      And I press "Add a new company goal type"
       And I set the following fields to these values:
         | Type full name | Goal Test Type |
       And I press "Save changes"
@@ -180,7 +180,7 @@ Feature: Test new custom field capabilities
       And I follow "Competency Test Type"
       And I should see "Create a new custom field"
       # Goals: allowed
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type" in the "td a" "css_element"
       And I follow "Goal Test Type"
       And I should see "Create a new custom field"
@@ -209,7 +209,7 @@ Feature: Test new custom field capabilities
       And I should see "Competency Test Type"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
@@ -239,7 +239,7 @@ Feature: Test new custom field capabilities
       And I should see "Competency Test Type"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
@@ -269,7 +269,7 @@ Feature: Test new custom field capabilities
       And I should see "Competency Test Type"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
@@ -297,7 +297,7 @@ Feature: Test new custom field capabilities
       And I follow "Competency Test Type"
       And I should see "Create a new custom field"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
@@ -323,7 +323,7 @@ Feature: Test new custom field capabilities
       And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: allowed
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type" in the "td a" "css_element"
       And I follow "Goal Test Type"
       And I should see "Create a new custom field"
@@ -350,7 +350,7 @@ Feature: Test new custom field capabilities
       And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: allowed
@@ -377,7 +377,7 @@ Feature: Test new custom field capabilities
       And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
@@ -402,7 +402,7 @@ Feature: Test new custom field capabilities
       And I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
       And I should not see "Competency Test Type" in the "td a" "css_element"
       # Goals: prevented
-      And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+      And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
       And I should see "Goal Test Type"
       And I should not see "Goal Test Type" in the "td a" "css_element"
       # Organisation: prevented
