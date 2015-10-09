@@ -46,26 +46,7 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
                 component.config = args;
             }
 
-            // Add hooks to learning plan component form elements.
-            // Update when form elements change.
-            $(document).on('change', 'table.dp-plan-component-items input, table.dp-plan-component-items select', function() {
-                var data = {
-                    submitbutton: "1",
-                    ajax: "1",
-                    sesskey: mdlconfig.sesskey,
-                    page: component.config.page
-                };
-
-                // Get current value.
-                data[$(this).attr('name')] = $(this).val();
-
-                $.post(
-                    mdlconfig.wwwroot + '/totara/plan/component.php?id=' + component.config.plan_id +
-                        '&c=' + component.config.component_name + '&page=' + component.config.page,
-                    data,
-                    component.totara_totara_plan_update
-                );
-            });
+            component.add_handlers();
 
             // Create the dialog.
             component.totaraDialog_handler_preRequisite = function() {
@@ -88,6 +69,32 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
                 // Update table
                 component.totara_totara_plan_update(response);
             };
+        },
+
+        /**
+         * Add change event handlers to input and select elements.
+         */
+        add_handlers : function() {
+            // Add hooks to learning plan component form elements.
+            // Update when form elements change.
+            jQuery('table.dp-plan-component-items input, table.dp-plan-component-items select').change(function() {
+                var data = {
+                    submitbutton: "1",
+                    ajax: "1",
+                    sesskey: mdlconfig.sesskey,
+                    page: component.config.page
+                };
+
+                // Get current value.
+                data[$(this).attr('name')] = $(this).val();
+
+                $.post(
+                    mdlconfig.wwwroot + '/totara/plan/component.php?id=' + component.config.plan_id +
+                        '&c=' + component.config.component_name + '&page=' + component.config.page,
+                    data,
+                    component.totara_totara_plan_update
+                );
+            });
         },
 
         /**
@@ -136,6 +143,9 @@ define(['jquery', 'core/config'], function($, mdlconfig) {
             // Replace plan message box.
             $('div.plan_box').replaceWith(new_planbox);
             $('.paging').replaceWith(new_paging);
+
+            // Reinit handlers.
+            component.add_handlers();
 
             // Add duedate datepicker.
             require(['core/str'], function (mdlstr) {
