@@ -420,6 +420,7 @@ function totaraDialog(title, buttonid, config, default_url, handler) {
             url: url,
             type: type,
             data: query_data,
+            dataType: 'html',
 
             success: function(o) {
 
