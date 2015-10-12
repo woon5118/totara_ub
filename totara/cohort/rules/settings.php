@@ -537,36 +537,38 @@ function cohort_rules_list($reset = false){
             ),
             new cohort_rule_sqlhandler_completion_duration_course()
         );
-        // Completion of all/any/not-all/none of programs in a list
-        $rules[] = new cohort_rule_option(
-            'learning',
-            'programcompletionlist',
-            new cohort_rule_ui_picker_program_allanynotallnone(
-                get_string('ruledesc-learning-programcompletionlist', 'totara_cohort'),
-                COHORT_PICKER_PROGRAM_COMPLETION
-            ),
-            new cohort_rule_sqlhandler_completion_list_program()
-        );
-        // Completion of all programs in list before/after a fixed date
-        $rules[] = new cohort_rule_option(
-            'learning',
-            'programcompletiondate',
-            new cohort_rule_ui_picker_course_program_date(
-                get_string('ruledesc-learning-programcompletiondate', 'totara_cohort'),
-                COHORT_PICKER_PROGRAM_COMPLETION
-            ),
-            new cohort_rule_sqlhandler_completion_date_program()
-        );
-        // Completion of all programs in a list within a given duration
-        $rules[] = new cohort_rule_option(
-            'learning',
-            'programcompletionduration',
-            new cohort_rule_ui_picker_program_duration(
-                get_string('ruledesc-learning-programcompletionduration', 'totara_cohort'),
-                COHORT_PICKER_PROGRAM_COMPLETION
-            ),
-            new cohort_rule_sqlhandler_completion_duration_program()
-        );
+        if (totara_feature_visible('programs')) {
+            // Completion of all/any/not-all/none of programs in a list
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'programcompletionlist',
+                new cohort_rule_ui_picker_program_allanynotallnone(
+                    get_string('ruledesc-learning-programcompletionlist', 'totara_cohort'),
+                    COHORT_PICKER_PROGRAM_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_completion_list_program()
+            );
+            // Completion of all programs in list before/after a fixed date
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'programcompletiondate',
+                new cohort_rule_ui_picker_course_program_date(
+                    get_string('ruledesc-learning-programcompletiondate', 'totara_cohort'),
+                    COHORT_PICKER_PROGRAM_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_completion_date_program()
+            );
+            // Completion of all programs in a list within a given duration
+            $rules[] = new cohort_rule_option(
+                'learning',
+                'programcompletionduration',
+                new cohort_rule_ui_picker_program_duration(
+                    get_string('ruledesc-learning-programcompletionduration', 'totara_cohort'),
+                    COHORT_PICKER_PROGRAM_COMPLETION
+                ),
+                new cohort_rule_sqlhandler_completion_duration_program()
+            );
+        }
 
         // Cohort member
         $rules[] = new cohort_rule_option(

@@ -374,10 +374,12 @@ class rb_source_user extends rb_base_source {
         $disp = html_writer::start_tag('span', array('style' => 'white-space:nowrap;'));
 
         // Learning Records icon
-        $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/record/index.php?userid='.$itemid));
-        $disp .= html_writer::empty_tag('img',
-            array('src' => $OUTPUT->pix_url('record', 'totara_core'), 'title' => get_string('learningrecords', 'totara_core')));
-        $disp .= html_writer::end_tag('a');
+        if (totara_feature_visible('recordoflearning')) {
+            $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/record/index.php?userid='.$itemid));
+            $disp .= html_writer::empty_tag('img',
+                array('src' => $OUTPUT->pix_url('record', 'totara_core'), 'title' => get_string('learningrecords', 'totara_core')));
+            $disp .= html_writer::end_tag('a');
+        }
 
         // Face To Face Bookings icon
         if ($this->staff_f2f) {
@@ -388,11 +390,13 @@ class rb_source_user extends rb_base_source {
         }
 
         // Individual Development Plans icon
-        if (has_capability('totara/plan:accessplan', $systemcontext)) {
-            $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/index.php?userid='.$itemid));
-            $disp .= html_writer::empty_tag('img',
-                array('src' => $OUTPUT->pix_url('plan', 'totara_core'), 'title' => get_string('learningplans', 'totara_plan')));
-            $disp .= html_writer::end_tag('a');
+        if (totara_feature_visible('learningplans')) {
+            if (has_capability('totara/plan:accessplan', $systemcontext)) {
+                $disp .= html_writer::start_tag('a', array('href' => $CFG->wwwroot . '/totara/plan/index.php?userid=' . $itemid));
+                $disp .= html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->pix_url('plan', 'totara_core'), 'title' => get_string('learningplans', 'totara_plan')));
+                $disp .= html_writer::end_tag('a');
+            }
         }
 
         $disp .= html_writer::end_tag('span');

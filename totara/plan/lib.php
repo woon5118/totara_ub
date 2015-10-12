@@ -1768,13 +1768,15 @@ function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree
     $tree->add_category($category);
 
     // Record of learning.
-    if ($currentuser || totara_is_manager($user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
-        $title = get_string('recordoflearning', 'totara_core');
-        $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
-        $content =  html_writer::link($url, $title);
+    if (totara_feature_visible('recordoflearning')) {
+        if ($currentuser || totara_is_manager($user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
+            $title = get_string('recordoflearning', 'totara_core');
+            $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
+            $content =  html_writer::link($url, $title);
 
-        $localnode = new core_user\output\myprofile\node('mylearning', 'recordoflearning', $title, null, $url);
-        $tree->add_node($localnode);
+            $localnode = new core_user\output\myprofile\node('mylearning', 'recordoflearning', $title, null, $url);
+            $tree->add_node($localnode);
+        }
     }
 
     // Learning plans.
