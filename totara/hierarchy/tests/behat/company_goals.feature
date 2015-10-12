@@ -147,14 +147,15 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
   And I upload "/totara/hierarchy/tests/behat/fixtures/logo.png" file to "File 1" filemanager
   And I press "Save changes"
   # Check that all the data has been added to the company goal.
-  Then I should see "Company Goal Type 1" in the ".generaltable" "css_element"
-  And I should see "Yes" in the ".generaltable" "css_element"
-  And I should see "31 December 2035" in the ".generaltable" "css_element"
-  And I should see "logo.png" in the ".generaltable" "css_element"
-  And I should see "Choice 1" in the ".generaltable" "css_element"
-  And I should see "Select 1 Select 2 Select 3" in the ".generaltable" "css_element"
-  And I should see "Text area 1" in the ".generaltable" "css_element"
-  And I should see "Text input 1" in the ".generaltable" "css_element"
+  And pause
+  Then I should see "Company Goal Type 1" in the ".dl-horizontal" "css_element"
+  And I should see "Yes" in the ".dl-horizontal" "css_element"
+  And I should see "31 December 2035" in the ".dl-horizontal" "css_element"
+  And I should see "logo.png" in the ".dl-horizontal" "css_element"
+  And I should see "Choice 1" in the ".dl-horizontal" "css_element"
+  And I should see "Select 1 Select 2 Select 3" in the ".dl-horizontal" "css_element"
+  And I should see "Text area 1" in the ".dl-horizontal" "css_element"
+  And I should see "Text input 1" in the ".dl-horizontal" "css_element"
 
   # Login as a learner and create a company goal with the custom fields.
   When I log out
@@ -170,12 +171,12 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
 
   # Check the correct data is visible on the goal.
   When I follow "Company Goal 1"
-  Then I should see "Company Goal Type 1" in the ".generaltable" "css_element"
-  And I should see "Yes" in the ".generaltable" "css_element"
-  And I should see "31 December 2035" in the ".generaltable" "css_element"
-  And I should see "logo.png" in the ".generaltable" "css_element"
-  And I should see "Choice 1" in the ".generaltable" "css_element"
-  And I should see "Select 1 Select 2 Select 3" in the ".generaltable" "css_element"
-  And I should see "Text area 1" in the ".generaltable" "css_element"
-  And I should see "Text input 1" in the ".generaltable" "css_element"
+  Then I should see "Company Goal Type 1" in the ".dl-horizontal" "css_element"
+  And I should see "Yes" in the ".dl-horizontal" "css_element"
+  And I should see "31 December 2035" in the ".dl-horizontal" "css_element"
+  And I should see "logo.png" in the ".dl-horizontal" "css_element"
+  And I should see "Choice 1" in the ".dl-horizontal" "css_element"
+  And I should see "Select 1 Select 2 Select 3" in the ".dl-horizontal" "css_element"
+  And I should see "Text area 1" in the ".dl-horizontal" "css_element"
+  And I should see "Text input 1" in the ".dl-horizontal" "css_element"
 
