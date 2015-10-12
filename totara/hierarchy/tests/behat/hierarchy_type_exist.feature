@@ -95,7 +95,7 @@ Feature: Test hierarchy generator.
       | fullname    | idnumber    |
       | Goal type 1 | GOALTYPE001 |
     Given I log in as "admin"
-    And I navigate to "Manage types" node in "Site administration > Hierarchies > Goals"
+    And I navigate to "Manage company goal types" node in "Site administration > Hierarchies > Goals"
     And I should see "Goal type 1"
     # Test goal hierarchy type is added to goal hierarchy.
     And the following "textinput field for hierarchy type" exist in "totara_hierarchy" plugin:

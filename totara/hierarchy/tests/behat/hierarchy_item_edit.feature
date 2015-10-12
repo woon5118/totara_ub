@@ -21,6 +21,6 @@ Feature: The generators create the expected position framework
       | Position ID number | POS002                    |
       | Description        | This is a second position |
     And I click on "Save changes" "button"
-    And I should see "This is a second position" in the "Description" "table_row"
+    And I should see "This is a second position" in the ".dl-horizontal" "css_element"
 
 
