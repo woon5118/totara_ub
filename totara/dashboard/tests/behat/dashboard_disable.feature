@@ -80,22 +80,6 @@
       And I click on "Site home" "link"
       And I should see "I'm a label on the frontpage"
 
-    Scenario: Hide Totara dashboard feature
-      Given I set the following administration settings values:
-        | enabletotaradashboard | Hide |
-      # As admin I shouldn't see any links with reference to Totara dashboard but the one in the left menu.
-      And I click on "Home" in the totara menu
-      And I should not see "Dashboard" in the "Navigation" "block"
-      When I navigate to "Dashboards" node in "Site administration > Appearance"
-      Then I should see "Manage dashboards"
-      And I log out
-      # As a student I shouldn't see any references to Totara dashboard.
-      When I log in as "student1"
-      Then I should not see "My first dashboard" in the "#page-header" "css_element"
-      And I should not see "My second dashboard" in the "#page-header" "css_element"
-      And I click on "Site home" "link"
-      And I should see "I'm a label on the frontpage"
-
     Scenario: Disable Totara dashboard feature
       Given I set the following administration settings values:
         | enabletotaradashboard | Disable |
@@ -124,16 +108,6 @@
 
       When I log in as "student1"
       Then I should see "Dashboard" in the totara menu
-      And I log out
-
-      # Dasboard does not show in the Totara menu
-      And I log in as "admin"
-      And I set the following administration settings values:
-        | enabletotaradashboard | Hide |
-      And I log out
-
-      When I log in as "student1"
-      Then I should not see "Dashboard" in the totara menu
       And I log out
 
       # Dasboard does not show in the Totara menu

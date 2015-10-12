@@ -23,32 +23,8 @@ Feature: Test Required Learning menu item
     And I should not see "Required Learning" in the totara menu
 
     When I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Programs" to "Hide"
-    And I set the field "Enable Certifications" to "Disable"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should see "Required Learning" in the "#totaramenutable" "css_element"
-    And I should not see "Required Learning" in the totara menu
-
-    When I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Programs" to "Disable"
-    And I set the field "Enable Certifications" to "Hide"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should see "Required Learning" in the "#totaramenutable" "css_element"
-    And I should not see "Required Learning" in the totara menu
-
-    When I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Programs" to "Show"
     And I set the field "Enable Certifications" to "Disable"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should see "Required Learning" in the "#totaramenutable" "css_element"
-    And I should not see "Required Learning" in the totara menu
-
-    When I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Programs" to "Show"
-    And I set the field "Enable Certifications" to "Hide"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Appearance"
     Then I should see "Required Learning" in the "#totaramenutable" "css_element"

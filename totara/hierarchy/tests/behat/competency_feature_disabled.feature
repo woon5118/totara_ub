@@ -76,37 +76,6 @@ Feature: The competencies can be disabled
     And the "contenttype_ce" select box should contain "Competency"
 
   @javascript
-  Scenario: Hide competency feature. All links and options related to the feature should be in hidden but could be access if the url is known.
-    Given I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Competencies" to "Hide"
-    And I press "Save changes"
-
-    # Check competency component is not displayed in learning plans.
-    And I click on "Learning Plans" in the totara menu
-    Then I should not see "Competencies"
-    And I click on "Learning Plan 1" "link"
-    Then I should not see "Competencies"
-
-    # Check competencies are not displayed when going to a course in the learning plan.
-    When I click on "Courses" "link" in the "#dp-plan-content" "css_element"
-    And I click on "Course 1" "link"
-    Then I should not see "Linked Competencies"
-    And I should not see "Competency 1"
-
-    # Check competencies menu is visible. It should be visible if not disabled.
-    When I navigate to "Manage competencies" node in "Site administration > Hierarchies > Competencies"
-    Then I should see "Competency frameworks"
-    When I navigate to "Manage types" node in "Site administration > Hierarchies > Competencies"
-    Then I should see "Types"
-
-    # Check competencies are not an option to be added in the program's content.
-    When I click on "Programs" in the totara menu
-    And I click on "Program 1" "link"
-    And I click on "Edit program details" "button"
-    And I click on "Content" "link"
-    And the "contenttype_ce" select box should not contain "Competency"
-
-  @javascript
   Scenario: Disable competency feature. All links and options related to the feature should not be in available anywhere.
     Given I navigate to "Advanced features" node in "Site administration"
     And I set the field "Enable Competencies" to "Disable"

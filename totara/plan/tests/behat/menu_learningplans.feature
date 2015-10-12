@@ -20,13 +20,3 @@ Feature: Test Learning Plans menu item
     And I navigate to "Main menu" node in "Site administration > Appearance"
     Then I should not see "Learning Plans" in the "#totaramenutable" "css_element"
     And I should not see "Learning Plans" in the totara menu
-
-  Scenario: Make sure Learning Plans is hidden in totara menu if feature hidden
-    Given I am on a totara site
-    And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Learning Plans" to "Hide"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should see "Learning Plans" in the "#totaramenutable" "css_element"
-    And I should not see "Learning Plans" in the totara menu

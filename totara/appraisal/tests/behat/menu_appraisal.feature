@@ -23,16 +23,3 @@ Feature: Test Appraisals menu item
     And I navigate to "Main menu" node in "Site administration > Appearance"
     Then I should not see "Appraisal" in the "#totaramenutable" "css_element"
     And I should not see "Appraisal" in the totara menu
-
-  Scenario: Make sure Appraisals is hidden in totara menu if all features hidden
-    Given I am on a totara site
-    And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration"
-    When I navigate to "Advanced features" node in "Site administration"
-    And I set the field "Enable Appraisals" to "Hide"
-    And I set the field "Enable 360 Feedbacks" to "Hide"
-    And I set the field "Enable Goals" to "Disable"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Appearance"
-    Then I should see "Appraisal" in the "#totaramenutable" "css_element"
-    And I should not see "Appraisal" in the totara menu
