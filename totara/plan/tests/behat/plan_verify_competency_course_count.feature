@@ -107,5 +107,4 @@ Feature: Verify competency course count within learning plan
     Then I should not see "Course 2"
     Then I should see "Course 3"
     And I click on "Learning Plans" in the totara menu
-    Then I should see "Courses (2)"
-    Then I log out
+    Then I should see "Courses (2)" in the "Learning Plan 2" "table_row"
