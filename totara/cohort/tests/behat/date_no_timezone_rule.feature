@@ -50,6 +50,9 @@ Feature: Apply audience membership rules using custom date field
       | beforeaftermenu  | before     |
       | beforeafterdate  | 22/07/2015 |
     And I press "Save"
+    # Sometimes the Calendar will cover the Approve changes button causing a failure in chrome
+    # The small pause confirms that the button is no longer covered
+    And I wait "1" seconds
     And I press "Approve changes"
     And I follow "Members"
     Then I should see "user1"
