@@ -908,7 +908,10 @@ class totara_appraisal_renderer extends plugin_renderer_base {
             $strview = get_string('view');
             $last = end($quests);
             $first = reset($quests);
-            $questtypes = question_manager::get_registered_elements();
+            // Get the list of question types that are supported. We'll ignore if
+            // they're disabled in case the feature was enabled when it was added.
+            $questtypes = question_manager::get_registered_elements(false);
+            
             foreach ($quests as $quest) {
                 $question = new appraisal_question($quest->id);
                 $posuplink = $posdownlink = '';
