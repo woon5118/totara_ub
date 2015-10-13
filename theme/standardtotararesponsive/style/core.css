@@ -248,18 +248,22 @@ table.generalbox :last-child .last td:last-child {
 .dir-rtl table.generalbox :first-child tr:first-child th:first-child,
 .dir-rtl table.generalbox :first-child tr:first-child td:first-child {
     border-top-right-radius: 4px;
+    border-top-left-radius: 0;
 }
 .dir-rtl table.generalbox :first-child tr:first-child th:last-child,
 .dir-rtl table.generalbox :first-child tr:first-child td:last-child {
     border-top-left-radius: 4px;
+    border-top-right-radius: 0;
 }
 .dir-rtl table.generalbox :last-child .last th:first-child,
 .dir-rtl table.generalbox :last-child .last td:first-child {
     border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 0;
 }
 .dir-rtl table.generalbox :last-child .last th:last-child,
 .dir-rtl table.generalbox :last-child .last td:last-child {
     border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0;
 }
 
 .paging a,
