@@ -96,7 +96,7 @@ class question_manager {
      *
      * @return array
      */
-    public static function get_registered_elements() {
+    public static function get_registered_elements($checkEnabledStatus = true) {
         $dir = dirname(__FILE__).'/field';
         $elemfiles = glob($dir.'/*.class.php');
         $info = array();
@@ -107,7 +107,7 @@ class question_manager {
                 throw new exception('Custom field element file cannot have two dots \'..\' sequentially');
             }
             require_once($file);
-            if (class_exists($classname) && $classname::check_enabled()) {
+            if (class_exists($classname) && (($checkEnabledStatus && $classname::check_enabled()) || !$checkEnabledStatus)) {
                 $info[$element] = $classname::get_info();
                 $info[$element]['classname'] = $classname;
             }

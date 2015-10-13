@@ -524,4 +524,14 @@ class question_goals extends reviewrating {
             }
         }
     }
+
+    /**
+     * Check if goals is enabled.
+     *
+     * @return boolean If goals is enabled or not.
+     */
+    public static function check_enabled() {
+        return !totara_feature_disabled('goals');
+    }
+
 }
