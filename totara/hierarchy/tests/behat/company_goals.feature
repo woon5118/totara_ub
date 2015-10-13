@@ -147,7 +147,6 @@ Scenario: Verify custom fields can be successfully added to a company goal type 
   And I upload "/totara/hierarchy/tests/behat/fixtures/logo.png" file to "File 1" filemanager
   And I press "Save changes"
   # Check that all the data has been added to the company goal.
-  And pause
   Then I should see "Company Goal Type 1" in the ".dl-horizontal" "css_element"
   And I should see "Yes" in the ".dl-horizontal" "css_element"
   And I should see "31 December 2035" in the ".dl-horizontal" "css_element"
