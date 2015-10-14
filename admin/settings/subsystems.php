@@ -148,7 +148,8 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableprograms',
         new lang_string('enableprograms', 'totara_program'),
         new lang_string('configenableprograms', 'totara_program'),
-        TOTARA_SHOWFEATURE));
+        TOTARA_SHOWFEATURE,
+        array('totara_menu_reset_cache', array('enrol_totara_program_util', 'feature_setting_updated_callback'))));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecertifications',
         new lang_string('enablecertifications', 'totara_program'),

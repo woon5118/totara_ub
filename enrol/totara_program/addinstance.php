@@ -38,6 +38,10 @@ require_login($course);
 require_capability('moodle/course:enrolconfig', $context);
 require_sesskey();
 
+if (!totara_feature_visible('programs')) {
+    redirect(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
+}
+
 $enrol = enrol_get_plugin('totara_program');
 
 if ($enrol->get_newinstance_link($course->id)) {

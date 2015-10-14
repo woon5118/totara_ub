@@ -34,6 +34,10 @@ class enrol_totara_program_plugin extends enrol_plugin {
     public function get_newinstance_link($courseid) {
         global $DB;
 
+        if (!totara_feature_visible('programs')) {
+            return null;
+        }
+
         $context = context_course::instance($courseid);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/guest:config', $context)) {
@@ -48,11 +52,32 @@ class enrol_totara_program_plugin extends enrol_plugin {
     }
 
     /**
+     * Is it possible to delete enrol instance via standard UI?
+     *
+     * @param stdClass  $instance
+     * @return bool
+     */
+    public function can_delete_instance($instance) {
+        if (!totara_feature_visible('programs')) {
+            // Allow deleting only when programs disabled so that they can get rid of preexisting
+            // ebrolemnts before the programs were disabled.
+            $context = context_course::instance($instance->courseid);
+            return has_capability('enrol/totara_program:unenrol', $context);
+        }
+
+        return false;
+    }
+
+    /**
      * Add new instance of enrol plugin with default settings.
      * @param object $course
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
+        if (!totara_feature_visible('programs')) {
+            return null;
+        }
+
         $fields = array('enrolperiod' => $this->get_config('enrolperiod', 0), 'roleid' => $this->get_config('roleid', 0));
         return $this->add_instance($course, $fields);
     }
@@ -159,6 +184,10 @@ class enrol_totara_program_plugin extends enrol_plugin {
      */
     public function try_autoenrol(stdClass $instance) {
         global $CFG, $USER, $DB;
+
+        if (!totara_feature_visible('programs')) {
+            return false;
+        }
 
         if ($course = $DB->get_record('course', array('id' => $instance->courseid))) {
             //because of use of constants and program class functions, best to leave the prog_can_enter_course function where it is

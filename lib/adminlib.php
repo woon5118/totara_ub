@@ -1890,8 +1890,9 @@ abstract class admin_setting {
         }
 
         $callbackfunction = $this->updatedcallback;
-        if (!empty($callbackfunction) and function_exists($callbackfunction)) {
-            $callbackfunction($this->get_full_name());
+        // Totara: support general callbacks, not just functions.
+        if (!empty($callbackfunction) and is_callable($callbackfunction)) {
+            call_user_func($callbackfunction, $this->get_full_name());
         }
         return true;
     }
@@ -8910,8 +8911,9 @@ class admin_setting_configstoredfile extends admin_setting {
         $this->oldhashes = null;
 
         $callbackfunction = $this->updatedcallback;
-        if (!empty($callbackfunction) and function_exists($callbackfunction)) {
-            $callbackfunction($this->get_full_name());
+        // Totara: support general callbacks, not just functions.
+        if (!empty($callbackfunction) and is_callable($callbackfunction)) {
+            call_user_func($callbackfunction, $this->get_full_name());
         }
         return true;
     }
