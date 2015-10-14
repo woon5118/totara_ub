@@ -39,7 +39,6 @@
         <FIELD NAME="param3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="param4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="param5" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="param6" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

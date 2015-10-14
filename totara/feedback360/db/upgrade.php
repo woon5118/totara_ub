@@ -48,20 +48,5 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015090400, 'totara_feedback360');
     }
 
-    if ($oldversion < 2015092100) {
-
-        // Define field param6 to be added to feedback360_quest_field.
-        $table = new xmldb_table('feedback360_quest_field');
-        $field = new xmldb_field('param6', XMLDB_TYPE_TEXT, null, null, null, null, null, 'param5');
-
-        // Conditionally launch add field param6.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Appraisal savepoint reached.
-        upgrade_plugin_savepoint(true, 2015092100, 'totara', 'feedback360');
-    }
-
     return true;
 }

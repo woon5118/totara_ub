@@ -295,21 +295,6 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015030201, 'totara', 'appraisal');
     }
 
-    if ($oldversion < 2015092100) {
-
-        // Define field param6 to be added to appraisal_quest_field.
-        $table = new xmldb_table('appraisal_quest_field');
-        $field = new xmldb_field('param6', XMLDB_TYPE_TEXT, null, null, null, null, null, 'param5');
-
-        // Conditionally launch add field param6.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Appraisal savepoint reached.
-        upgrade_plugin_savepoint(true, 2015092100, 'totara', 'appraisal');
-    }
-
     // TL-7650 Increase size of sortorder fields so that they can handle more than 100 records.
     if ($oldversion <= 2015100201) {
         // Questions table.
