@@ -43,6 +43,8 @@ require_once($CFG->libdir.'/adminlib.php');
  * @author    Petr Skoda <petr.skoda@totaralms.com>
  */
 class totara_core_admin_setting_feature extends admin_setting_configselect {
+    /** @var  array list of udpate callbacks */
+    protected $updatecallbacks;
     /**
      * Constructor.
      *
@@ -50,12 +52,17 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
      * @param string $visiblename localised
      * @param string $description long localised info
      * @param int $defaultsetting
+     * @param array $updatecallbacks list of update callbacks, null defaults to array('totara_menu_reset_cache')
      */
-    public function __construct($name, $visiblename, $description, $defaultsetting) {
+    public function __construct($name, $visiblename, $description, $defaultsetting, array $updatecallbacks = null) {
         parent::__construct($name, $visiblename, $description, $defaultsetting, null);
-        // In majority of cases the Totara menu needs to be reset,
-        // so do it automatically here after any feature change - this is cheap.
-        $this->set_updatedcallback('totara_menu_reset_cache');
+        if ($updatecallbacks === null) {
+            // In majority of cases the Totara menu needs to be reset.
+            $updatecallbacks = array('totara_menu_reset_cache');
+        }
+        $this->updatecallbacks = $updatecallbacks;
+
+        $this->set_updatedcallback(array($this, 'execute_update_callbacks'));
 
         if (debugging('', DEBUG_DEVELOPER)) {
             // Make sure developers did not forget to modify the list of core features.
@@ -66,6 +73,18 @@ class totara_core_admin_setting_feature extends admin_setting_configselect {
                 if (!in_array($shortname, totara_advanced_features_list())) {
                     debugging('Feature setting name must be included in totara_advanced_features_list()', DEBUG_DEVELOPER);
                 }
+            }
+        }
+    }
+
+    /**
+     * Called when this setting changes.
+     * @param string $fullname
+     */
+    public function execute_update_callbacks($fullname) {
+        foreach ($this->updatecallbacks as $callback) {
+            if (is_callable($callback)) {
+                call_user_func($callback);
             }
         }
     }

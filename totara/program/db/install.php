@@ -55,12 +55,6 @@ function xmldb_totara_program_install() {
         $DB->update_record('course_categories', $cat, true);
     }
 
-    //enable program enrolment plugin
-    $enabledplugins = explode(',', $CFG->enrol_plugins_enabled);
-    $enabledplugins[] = 'totara_program';
-    $enabledplugins = array_unique($enabledplugins);
-    set_config('enrol_plugins_enabled', implode(',', $enabledplugins));
-
     prog_setup_initial_plan_settings();
 }
 

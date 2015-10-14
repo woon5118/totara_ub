@@ -48,20 +48,28 @@ class clean_enrolment_plugins_task extends \core\task\scheduled_task {
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
-        // Don't run programs cron if programs and certifications are disabled.
-        if (totara_feature_disabled('programs') &&
-            totara_feature_disabled('certifications')) {
+        // Don't run programs cron if programs are disabled, certifications are irrelevant here.
+        if (totara_feature_disabled('programs')) {
+            // Note that managers may deleted the program enrol instances manually if necessary.
             return false;
         }
 
         // Get program enrolment plugin.
+        /** @var \enrol_totara_program_plugin $program_plugin */
         $program_plugin = enrol_get_plugin('totara_program');
 
         // Fix courses that are in a courseset but do not have the enrolment plugin.
         // Or where enrolments are incorrectly suspended.
         $program_courses = prog_get_courses_associated_with_programs();
         foreach ($program_courses as $course) {
-            $program_plugin->add_instance($course);
+            $instance = $program_plugin->get_instance_for_course($course->id);
+            if (!$instance) {
+                $program_plugin->add_instance($course);
+                $instance = $program_plugin->get_instance_for_course($course->id);
+                if (!$instance) {
+                    continue;
+                }
+            }
             // Check for suspended program enrolments that should be active on this course.
             $sql = "SELECT DISTINCT ue.userid from {user_enrolments} ue
                           LEFT JOIN {enrol} e ON ue.enrolid=e.id AND e.enrol = ?
@@ -73,7 +81,6 @@ class clean_enrolment_plugins_task extends \core\task\scheduled_task {
             $params = array('totara_program', $course->id, ENROL_USER_SUSPENDED, $course->id);
             $records = $DB->get_recordset_sql($sql, $params);
             if ($records) {
-                $instance = $program_plugin->get_instance_for_course($course->id);
                 foreach ($records as $record) {
                     $program_plugin->update_user_enrol($instance, $record->userid, ENROL_USER_ACTIVE);
                 }

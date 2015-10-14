@@ -27,6 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_enrol_totara_program_install() {
     global $CFG, $DB;
 
+    if (!totara_feature_visible('programs')) {
+        return;
+    }
+
     //enable program enrolment plugin
     $enabledplugins = explode(',', $CFG->enrol_plugins_enabled);
     $enabledplugins[] = 'totara_program';
