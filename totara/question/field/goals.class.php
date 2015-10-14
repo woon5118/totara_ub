@@ -32,6 +32,7 @@ class question_goals extends reviewrating {
     const SELECT_COMPANY_USERCANCHOOSE = 2;
     const SELECT_PERSONAL_ADDALL = 4;
     const SELECT_PERSONAL_USERCANCHOOSE = 8;
+    const INCLUDE_PERSONAL_CUSTOM_FIELDS = 16;
 
     public static function get_info() {
         return array('group' => question_manager::GROUP_REVIEW,
@@ -78,6 +79,8 @@ class question_goals extends reviewrating {
                 array('<br/>'), true);
         $form->addRule('selection', null, 'required');
 
+        $form->addElement('advcheckbox', 'includepersonal', get_string('reviewincludepersonal', 'totara_question'));
+
         parent::add_field_specific_settings_elements($form, $readonly, $moduleinfo);
     }
 
@@ -99,6 +102,8 @@ class question_goals extends reviewrating {
         $toform->selection['selectpersonal'] =
                 $this->param5 & (self::SELECT_PERSONAL_USERCANCHOOSE | self::SELECT_PERSONAL_ADDALL);
 
+        $toform->includepersonal = $this->param5 & self::INCLUDE_PERSONAL_CUSTOM_FIELDS ? 1 : 0;
+
         return $toform;
     }
 
@@ -114,7 +119,25 @@ class question_goals extends reviewrating {
         $this->param5 = (int)$fromform->selection['selectcompany'] |
                         (int)$fromform->selection['selectpersonal'];
 
+        if ($fromform->includepersonal) {
+            $this->param5 |= self::INCLUDE_PERSONAL_CUSTOM_FIELDS;
+        }
+
         return $fromform;
+    }
+
+    /**
+     * Add any form elements which are specific to the field, for each review item.
+     *
+     * @param MoodleQuickForm $form
+     * @param object $item
+     */
+    public function add_item_specific_edit_elements(MoodleQuickForm $form, $item) {
+        if ($this->param5 & self::INCLUDE_PERSONAL_CUSTOM_FIELDS) {
+            $this->add_personal_info_fields($form, $item);
+        }
+
+        parent::add_item_specific_edit_elements($form, $item);
     }
 
     /**
