@@ -310,5 +310,33 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015092100, 'totara', 'appraisal');
     }
 
+    // TL-7650 Increase size of sortorder fields so that they can handle more than 100 records.
+    if ($oldversion <= 2015100201) {
+        // Questions table.
+        $table = new xmldb_table('appraisal_quest_field');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, null, 'descriptionformat');
+        $dbman->change_field_precision($table, $field);
+
+        // Pages table.
+        $table = new xmldb_table('appraisal_stage_page');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, null, 'name');
+        $dbman->change_field_precision($table, $field);
+
+        // Scales table - we need to remove the index first, modify the table, then re-add the index.
+        $table = new xmldb_table('appraisal_scale');
+        $index = new xmldb_index('apprscal_scatyp_ix', XMLDB_INDEX_NOTUNIQUE, array('scaletype'));
+        $field = new xmldb_field('scaletype', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, null, 'userid');
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        $dbman->change_field_precision($table, $field);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Appraisal savepoint reached.
+        upgrade_plugin_savepoint(true, 2015100201, 'totara', 'appraisal');
+    }
+
     return true;
 }
