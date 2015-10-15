@@ -35,7 +35,7 @@ $timeslots = required_param('timeslots', PARAM_RAW);
 $timeslotsarray = json_decode($timeslots);
 // Cleanup the json encoded data.
 foreach ($timeslotsarray as $k => $v) {
-    $timeslotsarray[$k] = array(clean_param($v[0], PARAM_INT), clean_param($v[1], PARAM_INT));
+    $timeslotsarray[$k] = array(strtotime($v->start), strtotime($v->finish));
 }
 
 if (!$facetoface = $DB->get_record('facetoface',array('id' => $facetofaceid))) {
