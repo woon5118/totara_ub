@@ -82,16 +82,6 @@ M.totara_f2f_room = M.totara_f2f_room || {
             }
         });
 
-        // Clear pre-defined room selection if session start/finish datetimes change
-        $('select[name^="timestart["]').change(function() {
-            clean_pdroom_data();
-            $('input[name="duration[number]"]').val('');
-        });
-        $('select[name^="timefinish["]').change(function() {
-            clean_pdroom_data();
-            $('input[name="duration[number]"]').val('');
-        });
-
         // Clear pre-defined room selection and set room capacity if custom room is selected
         $('input[name="customroom"]').click(function() {
             if ($(this).is(':checked')) {

@@ -166,11 +166,123 @@ Feature: Manage pre-defined rooms
       | timefinish[0][year]   | 2020 |
       | timefinish[0][hour]   | 12   |
       | timefinish[0][minute] | 00   |
-      | capacity              | 7    |
+    When I press "Choose a pre-defined room"
+    And I wait "1" seconds
+    Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I set the following fields to these values:
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 14   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 15   |
+      | timefinish[0][minute] | 00   |
+    When I press "Choose a pre-defined room"
+    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I set the following fields to these values:
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 11   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 12   |
+      | timefinish[0][minute] | 00   |
+    And I press "Save changes"
+    And I should see "There is a room conflict - another session is using the room at the same time"
+
+  Scenario: Clash a room with different timezones
+    Given I click on "Find Learning" in the totara menu
+    And I follow "Course 1"
+    And I turn editing mode on
+    And I add a "Face-to-face" to section "1" and I fill the form with:
+      | Name        | Test facetoface name        |
+      | Description | Test facetoface description |
+    And I follow "View all sessions"
+    And I follow "Add a new session"
+    And I set the following fields to these values:
+      | datetimeknown           | Yes              |
+      | timestart[0][day]       | 1                |
+      | timestart[0][month]     | 1                |
+      | timestart[0][year]      | 2020             |
+      | timestart[0][hour]      | 19               |
+      | timestart[0][minute]    | 00               |
+      | timestart[0][timezone]  | Pacific/Auckland |
+      | timefinish[0][day]      | 1                |
+      | timefinish[0][month]    | 1                |
+      | timefinish[0][year]     | 2020             |
+      | timefinish[0][hour]     | 20               |
+      | timefinish[0][minute]   | 00               |
+      | timefinish[0][timezone] | Pacific/Auckland |
+      | capacity                | 7                |
     When I press "Choose a pre-defined room"
     And I wait "1" seconds
     And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
     And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save changes"
+
+    And I follow "Add a new session"
+    And I set the following fields to these values:
+      | datetimeknown           | Yes           |
+      | timestart[0][day]       | 1             |
+      | timestart[0][month]     | 1             |
+      | timestart[0][year]      | 2020          |
+      | timestart[0][hour]      | 6             |
+      | timestart[0][minute]    | 00            |
+      | timestart[0][timezone]  | Europe/London |
+      | timefinish[0][day]      | 1             |
+      | timefinish[0][month]    | 1             |
+      | timefinish[0][year]     | 2020          |
+      | timefinish[0][hour]     | 7             |
+      | timefinish[0][minute]   | 00            |
+      | timefinish[0][timezone] | Europe/London |
+      | capacity                | 7             |
+    When I press "Choose a pre-defined room"
+    And I wait "1" seconds
+    Then I should see "(room unavailable on selected dates)" in the "Choose a room" "totaradialogue"
+    And I click on "Cancel" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I set the following fields to these values:
+      | timestart[0][day]     | 1    |
+      | timestart[0][month]   | 1    |
+      | timestart[0][year]    | 2020 |
+      | timestart[0][hour]    | 14   |
+      | timestart[0][minute]  | 00   |
+      | timefinish[0][day]    | 1    |
+      | timefinish[0][month]  | 1    |
+      | timefinish[0][year]   | 2020 |
+      | timefinish[0][hour]   | 15   |
+      | timefinish[0][minute] | 00   |
+      | capacity              | 7    |
+    When I press "Choose a pre-defined room"
+    And I click on "Room 1, That house, 123 here street,  (Capacity: 5)" "text" in the "Choose a room" "totaradialogue"
+    And I click on "OK" "button" in the "Choose a room" "totaradialogue"
+    And I wait "1" seconds
+    And I set the following fields to these values:
+      | timestart[0][day]       | 1             |
+      | timestart[0][month]     | 1             |
+      | timestart[0][year]      | 2020          |
+      | timestart[0][hour]      | 6             |
+      | timestart[0][minute]    | 00            |
+      | timestart[0][timezone]  | Europe/London |
+      | timefinish[0][day]      | 1             |
+      | timefinish[0][month]    | 1             |
+      | timefinish[0][year]     | 2020          |
+      | timefinish[0][hour]     | 7             |
+      | timefinish[0][minute]   | 00            |
+      | timefinish[0][timezone] | Europe/London |
+      | capacity                | 7             |
+    And I press "Save changes"
     And I wait "1" seconds
     And I press "Save changes"
     And I should see "There is a room conflict - another session is using the room at the same time"

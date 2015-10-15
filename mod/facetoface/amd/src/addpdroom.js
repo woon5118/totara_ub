@@ -59,21 +59,32 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, cfg) {
         var timeslots = [];
         $('input[name^="datedelete["]').each(function() {
             if (!$(this).is(':checked')) {
-                var timestart = new Date(
-                    $('.fdate_time_selector select[name="timestart['+datecount+'][year]"]').val(),
-                    $('.fdate_time_selector select[name="timestart['+datecount+'][month]"]').val()-1,
-                    $('.fdate_time_selector select[name="timestart['+datecount+'][day]"]').val(),
-                    $('.fdate_time_selector select[name="timestart['+datecount+'][hour]"]').val(),
-                    $('.fdate_time_selector select[name="timestart['+datecount+'][minute]"]').val()
-                    ).getTime() / 1000;
-                var timefinish = new Date(
-                    $('.fdate_time_selector select[name="timefinish['+datecount+'][year]"]').val(),
-                    $('.fdate_time_selector select[name="timefinish['+datecount+'][month]"]').val()-1,
-                    $('.fdate_time_selector select[name="timefinish['+datecount+'][day]"]').val(),
-                    $('.fdate_time_selector select[name="timefinish['+datecount+'][hour]"]').val(),
-                    $('.fdate_time_selector select[name="timefinish['+datecount+'][minute]"]').val()
-                    ).getTime() / 1000;
-                timeslots.push([timestart, timefinish]);
+                var timeslot = {};
+                var minute = $('.fdate_time_selector select[name="timestart['+datecount+'][minute]"]').val();
+                if (minute == undefined) {
+                    minute = "00";
+                }
+                timeslot.start =
+                    $('.fdate_time_selector select[name="timestart['+datecount+'][year]"]').val() + '-' +
+                    $('.fdate_time_selector select[name="timestart['+datecount+'][month]"]').val() + '-' +
+                    $('.fdate_time_selector select[name="timestart['+datecount+'][day]"]').val() + ' ' +
+                    $('.fdate_time_selector select[name="timestart['+datecount+'][hour]"]').val() + ':' +
+                    minute + ' ' +
+                    $('.fdate_time_selector select[name="timestart['+datecount+'][timezone]"]').val();
+
+                minute = $('.fdate_time_selector select[name="timefinish['+datecount+'][minute]"]').val();
+                if (minute == undefined) {
+                    minute = "00";
+                }
+                timeslot.finish =
+                    $('.fdate_time_selector select[name="timefinish['+datecount+'][year]"]').val() + '-' +
+                    $('.fdate_time_selector select[name="timefinish['+datecount+'][month]"]').val() + '-' +
+                    $('.fdate_time_selector select[name="timefinish['+datecount+'][day]"]').val() + ' ' +
+                    $('.fdate_time_selector select[name="timefinish['+datecount+'][hour]"]').val() + ':' +
+                    minute + ' ' +
+                    $('.fdate_time_selector select[name="timefinish['+datecount+'][timezone]"]').val();
+
+                timeslots.push(timeslot);
             }
             datecount += 1;
         });
@@ -81,7 +92,7 @@ define(['jquery', 'core/str', 'core/config'], function($, mdlstrings, cfg) {
         timeslots = JSON.stringify(timeslots);
         this._dialog.default_url = cfg.wwwroot+'/mod/facetoface/room/ajax/sessionrooms.php'+
             '?sessionid='+M.totara_f2f_room.config.sessionid+
-            '&datetimeknown='+M.totara_f2f_room.config.datetimeknown+
+            '&datetimeknown='+$('#id_datetimeknown').val()+
             '&timeslots='+timeslots+
             '&facetofaceid='+M.totara_f2f_room.config.facetofaceid;
     };
