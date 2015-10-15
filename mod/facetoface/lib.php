@@ -2377,6 +2377,9 @@ function facetoface_take_attendance($data) {
  *
  * @param array $data array containing the sessionid under the 's' key
  *                    and an array of request approval/denies
+ * @return bool|string[] returns false if there are issues loading the
+ *                  data needed to process requests or an array of errors if there
+ *                  are issues with the attendee or the request doesn't exist.
  */
 function facetoface_approve_requests($data) {
     global $USER, $DB;
@@ -2416,6 +2419,7 @@ function facetoface_approve_requests($data) {
     $context = context_module::instance($cm->id);
     $approved = array();
     $rejected = array();
+    $errors = array();
 
     // Loop through requests
     foreach ($data->requests as $key => $value) {
@@ -2428,6 +2432,7 @@ function facetoface_approve_requests($data) {
         // Load user submission
         if (!$attendee = facetoface_get_attendee($sessionid, $key)) {
             error_log('F2F: User '.$key.' not an attendee of this session');
+            $errors[$attendee->id] = 'notattendingsession';
             continue;
         }
 
@@ -2437,6 +2442,7 @@ function facetoface_approve_requests($data) {
             'statuscode' => MDL_F2F_STATUS_REQUESTED,
             'superceded' => 0);
         if (!$DB->record_exists('facetoface_signups_status', $params)) {
+            $errors[$attendee->id] = 'norequest';
             continue;
         }
         // Update status
@@ -2523,6 +2529,10 @@ function facetoface_approve_requests($data) {
     if (!empty($rejected)) {
         $data = array('sessionid' => $session->id, 'userids' => implode(', ', $rejected));
         \mod_facetoface\event\booking_requests_rejected::create_from_data($data, $context)->trigger();
+    }
+
+    if (!empty($errors)) {
+        return $errors;
     }
 
     return true;
