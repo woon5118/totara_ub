@@ -34,6 +34,10 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
     public function get_newinstance_link($courseid) {
         global $DB;
 
+        if (!totara_feature_visible('learningplans')) {
+            return null;
+        }
+
         $context = context_course::instance($courseid);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/guest:config', $context)) {
@@ -48,11 +52,32 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
     }
 
     /**
+     * Is it possible to delete enrol instance via standard UI?
+     *
+     * @param stdClass  $instance
+     * @return bool
+     */
+    public function can_delete_instance($instance) {
+        if (!totara_feature_visible('learningplans')) {
+            // Allow deleting only when learning plans disabled so that they can get rid of preexisting
+            // enrolments before the learning plans were disabled.
+            $context = context_course::instance($instance->courseid);
+            return has_capability('enrol/totara_learningplan:unenrol', $context);
+        }
+
+        return false;
+    }
+
+    /**
      * Add new instance of enrol plugin with default settings.
      * @param object $course
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
+        if (!totara_feature_visible('learningplans')) {
+            return null;
+        }
+
         $fields = array('roleid' => $this->get_config('roleid', 0));
         return $this->add_instance($course, $fields);
     }
@@ -110,6 +135,10 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
      */
     public function try_autoenrol(stdClass $instance) {
         global $USER, $DB;
+
+        if (!totara_feature_visible('learningplans')) {
+            return false;
+        }
 
         $course = $DB->get_record('course', array('id' => $instance->courseid));
         if ($this->is_user_approved($instance->courseid)) {
@@ -191,5 +220,16 @@ class enrol_totara_learningplan_plugin extends enrol_plugin {
             $actions[] = new user_enrolment_action(new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url, array('class'=>'unenrollink', 'rel'=>$ue->id));
         }
         return $actions;
+    }
+
+    /**
+     * Can current user disable learning plan enrolments in a course?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        $context = context_course::instance($instance->courseid);
+        return has_capability('moodle/course:enrolconfig', $context);
     }
 }
