@@ -2979,7 +2979,8 @@ class restore_course_completion_structure_step extends restore_structure_step {
                 'timeenrolled' => $this->apply_date_offset($data->timeenrolled),
                 'timestarted' => $this->apply_date_offset($data->timestarted),
                 'timecompleted' => $this->apply_date_offset($data->timecompleted),
-                'reaggregate' => $data->reaggregate
+                'reaggregate' => $data->reaggregate,
+                'status' => $data->status
             );
 
             $existing = $DB->get_record('course_completions', array(

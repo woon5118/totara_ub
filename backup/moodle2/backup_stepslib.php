@@ -2537,7 +2537,7 @@ class backup_course_completion_structure_step extends backup_structure_step {
         ));
 
         $coursecompletions = new backup_nested_element('course_completions', array('id'), array(
-            'userid', 'course', 'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate'
+            'userid', 'course', 'timeenrolled', 'timestarted', 'timecompleted', 'reaggregate', 'status'
         ));
 
         $aggregatemethod = new backup_nested_element('course_completion_aggr_methd', array('id'), array(
