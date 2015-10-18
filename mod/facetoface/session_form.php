@@ -162,6 +162,25 @@ class mod_facetoface_session_form extends moodleform {
         $this->repeat_elements($repeatarray, $repeatcount, $repeatoptions, 'date_repeats', 'date_add_fields',
                                1, get_string('dateadd', 'facetoface'), true);
 
+        // Really nasty default timezone hackery.
+        if ($displaytimezones) {
+            for ($i = 0; $i < $repeatcount + 1; $i++) {
+                $timezonefield = "sessiontimezone[$i]";
+                if (isset($sessiondata->$timezonefield)) {
+                    $tz = $sessiondata->$timezonefield;
+                } else {
+                    $tz = $this->_customdata['defaulttimezone'];
+                }
+                if (!$mform->elementExists("timestart[$i]")) {
+                    continue;
+                }
+                $el = $mform->getElement("timestart[$i]");
+                $el->set_option('timezone', $tz);
+                $el = $mform->getElement("timefinish[$i]");
+                $el->set_option('timezone', $tz);
+            }
+        }
+
         // Rooms form
         $pdroom = '';
         $roomnote = '';

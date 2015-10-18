@@ -131,9 +131,6 @@ $canconfigurecancellation = has_capability('mod/facetoface:configurecancellation
 
 $defaulttimezone = '99';
 if (!isset($session)) {
-    if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
-        $defaulttimezone = core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
-    }
     $sessiondata = new stdClass();
     $sessiondata->id = 0;
     $sessiondata->allowcancellations = $facetoface->allowcancellationsdefault;
@@ -141,6 +138,9 @@ if (!isset($session)) {
     $nbdays = 1;
 
 } else {
+    if (!empty($session->sessiondates[0]->sessiontimezone) and $session->sessiondates[0]->sessiontimezone != '99') {
+        $defaulttimezone = core_date::normalise_timezone($session->sessiondates[0]->sessiontimezone);
+    }
     // Load custom fields data for the session.
     customfield_load_data($session, 'facetofacesession', 'facetoface_session');
 

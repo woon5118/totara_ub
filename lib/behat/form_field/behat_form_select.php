@@ -291,6 +291,13 @@ class behat_form_select extends behat_form_field {
         // Selenium getValue() implementation breaks - separates - values having
         // commas within them, so we'll be looking for options with the 'selected' attribute instead.
         if ($this->running_javascript()) {
+            // Totara: try to make this faster by looking at the initially selected option first.
+            if (!$multiple) {
+                $initialselected = $this->field->find('xpath', '//option[@selected=\'selected\']');
+                if ($initialselected and $initialselected->hasAttribute('selected')) {
+                    return trim($initialselected->{$method}());
+                }
+            }
             // Get all the options in the select and extract their value/text pairs.
             $alloptions = $this->field->findAll('xpath', '//option');
             foreach ($alloptions as $option) {
@@ -301,6 +308,8 @@ class behat_form_select extends behat_form_field {
                         $selectedoptions[] = trim(str_replace(',', '\,', $option->{$method}()));
                     } else {
                         $selectedoptions[] = trim($option->{$method}());
+                        // Totara: single selects may have only one value, there is no point in continuing looking for more selected options.
+                        break;
                     }
                 }
             }
@@ -326,6 +335,8 @@ class behat_form_select extends behat_form_field {
                         $selectedoptions[] = trim(str_replace(',', '\,', $option->{$method}()));
                     } else {
                         $selectedoptions[] = trim($option->{$method}());
+                        // Totara: single selects may have only one value, there is no point in continuing looking for more selected options.
+                        break;
                     }
                 }
             }
