@@ -242,8 +242,10 @@ class totara_appraisal_generator_testcase extends advanced_testcase {
         $stage = $this->appraisalgenerator->create_stage($appraisalid);
         $page = $this->appraisalgenerator->create_page($stage->id);
 
+        // NOTE: MySQL has relatively low limits on number of varchar table columns, we cannot use 'text' here.
+        $data = array('datatype' => 'datepicker', 'startyear' => 1975, 'stopyear' => 2020, 'withtime' => 0);
         for ($i = 1; $i <= 200; $i++) {
-            $question = $this->appraisalgenerator->create_question($page->id);
+            $question = $this->appraisalgenerator->create_question($page->id, $data);
         }
 
         $questions = $DB->get_records('appraisal_quest_field', array('appraisalstagepageid' => $page->id));

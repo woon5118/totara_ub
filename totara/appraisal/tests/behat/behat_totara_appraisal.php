@@ -25,31 +25,28 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
-use Behat\Behat\Exception\PendingException as PendingException;
-
 class behat_totara_appraisal extends behat_base {
 
     /**
-     * Creates the specified element. More info about available elements in http://docs.moodle.org/dev/Acceptance_testing#Fixtures.
+     * Creates number of questions on an appraisal page.
      *
      * @Given /^I create "([0-9]*)" appraisal questions on the page "([^"]*)"$/
      *
-     * @throws Exception
-     * @throws PendingException
-     * @param string    $elementname The name of the entity to add
-     * @param string    $component The Frankenstyle name of the plugin
-     * @param TableNode $data
+     * @param string    $numberofquestions number of questions
+     * @param string    $page page number
      */
     public function create_appraisal_questions_on_page($numberofquestions, $page) {
         global $DB;
 
+        /** @var totara_appraisal_generator $datagenerator */
         $datagenerator = testing_util::get_data_generator()->get_plugin_generator('totara_appraisal');
 
         $page = $DB->get_record('appraisal_stage_page', array('name' => $page));
 
+        // NOTE: MySQL has relatively low limits on number of varchar table columns, we cannot use 'text' here.
+        $data = array('datatype' => 'datepicker', 'startyear' => 1975, 'stopyear' => 2020, 'withtime' => 0);
         for ($i = 1; $i <= $numberofquestions; $i++) {
-            $datagenerator->create_complex_question($page->id);
+            $datagenerator->create_complex_question($page->id, $data);
         }
     }
 
