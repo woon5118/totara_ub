@@ -80,7 +80,6 @@ $string['maxenrolled'] = 'Max enrolled users';
 $string['maxenrolled_help'] = 'Specifies the maximum number of users that can use face-to-face enrolment. 0 means no limit.';
 $string['maxenrolledreached'] = 'Maximum number of users allowed to use face-to-face enrolment was already reached.';
 $string['messageprovider:expiry_notification'] = 'Face-to-Face Direct enrolment expiry notifications';
-$string['mustselectsession'] = 'You must select a session';
 $string['newenrols'] = 'Allow new enrolments';
 $string['newenrols_desc'] = 'Allow users to use face-to-face enrolment on new courses by default.';
 $string['newenrols_help'] = 'This setting determines whether a user can enrol into this course.';
