@@ -137,4 +137,75 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
         $this->assertEquals($prevu, $u);
         $sink->clear();
     }
+
+    /**
+     * Test all strftime() parameters.
+     */
+    public function test_date_format_string() {
+        // Note: by default phpunit is using AU locale and Perth timezone.
+        $time = make_timestamp(1975, 4, 6, 3, 5, 6);
+        $this->assertsame(165956706, $time);
+        $this->assertSame('Australia/Perth', date_default_timezone_get());
+
+        $this->assertSame('Sun', date_format_string($time, '%a'));
+        $this->assertSame('Sunday', date_format_string($time, '%A'));
+        $this->assertSame('06', date_format_string($time, '%d'));
+        $this->assertSame(' 6', date_format_string($time, '%e'));
+        $this->assertSame('096', date_format_string($time, '%j'));
+        $this->assertSame('7', date_format_string($time, '%u'));
+        $this->assertSame('14', date_format_string($time, '%U'));
+        $this->assertSame('14', date_format_string($time, '%V'));
+        $this->assertSame('13', date_format_string($time, '%W'));
+        $this->assertSame('Apr', date_format_string($time, '%b'));
+        $this->assertSame('April', date_format_string($time, '%B'));
+        $this->assertSame('Apr', date_format_string($time, '%h'));
+        $this->assertSame('04', date_format_string($time, '%m'));
+        $this->assertSame('19', date_format_string($time, '%C'));
+        $this->assertSame('75', date_format_string($time, '%g'));
+        $this->assertSame('1975', date_format_string($time, '%G'));
+        $this->assertSame('75', date_format_string($time, '%y'));
+        $this->assertSame('1975', date_format_string($time, '%Y'));
+        $this->assertSame('03', date_format_string($time, '%H'));
+        $this->assertSame(' 3', date_format_string($time, '%k'));
+        $this->assertSame('03', date_format_string($time, '%I'));
+        $this->assertSame(' 3', date_format_string($time, '%l'));
+        $this->assertSame('05', date_format_string($time, '%M'));
+        $this->assertSame('AM', date_format_string($time, '%p'));
+        $this->assertSame('am', date_format_string($time, '%P'));
+        $this->assertSame('03:05:06 AM', date_format_string($time, '%r'));
+        $this->assertSame('03:05', date_format_string($time, '%R'));
+        $this->assertSame('06', date_format_string($time, '%S'));
+        $this->assertSame('03:05:06', date_format_string($time, '%T'));
+        $this->assertSame('04/06/75', date_format_string($time, '%D'));
+        $this->assertSame('1975-04-06', date_format_string($time, '%F'));
+        $this->assertSame("$time", date_format_string($time, '%s')); // Real Unix timestamp in UTC timezone, strftime returns weird stuff.
+        $this->assertSame("\n", date_format_string($time, '%n'));
+        $this->assertSame("\t", date_format_string($time, '%t'));
+        $this->assertSame('%', date_format_string($time, '%%'));
+        $this->assertSame('+0800', date_format_string($time, '%z'));
+        $this->assertSame('+0000', date_format_string($time, '%z', 'UTC'));
+        $this->assertSame('-0400', date_format_string($time, '%z', 'America/New_York'));
+        $this->assertSame('AWST', date_format_string($time, '%Z'));
+
+        // These have variable result - depend on OS and locale.
+        $this->assertNotEmpty(date_format_string($time, '%c')); // Something like 'Sun  6 Apr 03:05:06 1975'.
+        $this->assertNotEmpty(date_format_string($time, '%x')); // Something like '06/04/1975'.
+        $this->assertNotEmpty(date_format_string($time, '%X')); // Something like '03:05:06'.
+
+        // Some extra tests for the magic replacement regex.
+        $this->assertSame('%AM %p', date_format_string($time, '%%%p %%p'));
+        $this->assertSame('% 6 %e', date_format_string($time, '%%%e %%e'));
+
+        // Now the weird ISO leap weeks stuff - see https://en.wikipedia.org/wiki/ISO_week_date
+        $time = make_timestamp(2005, 1, 2, 3, 4, 5);
+        $this->assertSame('53', date_format_string($time, '%V'));
+        $this->assertSame('04', date_format_string($time, '%g'));
+        $this->assertSame('2004', date_format_string($time, '%G'));
+        $this->assertSame('7', date_format_string($time, '%u'));
+        $time = make_timestamp(2008, 12, 30, 3, 4, 5);
+        $this->assertSame('01', date_format_string($time, '%V'));
+        $this->assertSame('09', date_format_string($time, '%g'));
+        $this->assertSame('2009', date_format_string($time, '%G'));
+        $this->assertSame('2', date_format_string($time, '%u'));
+    }
 }

@@ -2192,7 +2192,12 @@ function userdate($date, $format = '', $timezone = 99, $fixday = true, $fixhour 
  * If we are running under Windows convert to Windows encoding and then back to UTF-8
  * (because it's impossible to specify UTF-8 to fetch locale info in Win32).
  *
- * @param int $date the timestamp - since Moodle 2.9 this is a real UTC timestamp
+ * NOTES:
+ * - %c, %x and %X may return inconsistent results on different OS
+ * - %p and %P may return incorrect letter-case for non-English locales
+ * - %s is using real UTC timestamp, the strftime() uses some weird timezone magic
+ *
+ * @param int $date the timestamp - since Moodle 2.9 and Totara 2.7 this is a real UTC timestamp
  * @param string $format strftime format.
  * @param int|float|string $tz the user timezone
  * @return string the formatted date/time.
@@ -2200,26 +2205,139 @@ function userdate($date, $format = '', $timezone = 99, $fixday = true, $fixhour 
  */
 function date_format_string($date, $format, $tz = 99) {
     global $CFG;
+    date_default_timezone_set(core_date::get_user_timezone($tz));
 
     $localewincharset = null;
-    // Get the calendar type user is using.
-    if ($CFG->ostype == 'WINDOWS') {
-        $calendartype = \core_calendar\type_factory::get_calendar_instance();
-        $localewincharset = $calendartype->locale_win_charset();
+
+    // Totara: fix all broken % format strings first, we need to work with ascii chars only here.
+    if (strpos($format, '%s') !== false) {
+        // This gives weird results in linux and osx, the Windows does not have it at all.
+        $format = preg_replace('#(?<!%)((?:%%)*)%s#', '${1}' . $date, $format);
+    }
+    if (stristr(PHP_OS, 'darwin')) {
+        if (strpos($format, '%r') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%r#', '${1}%I:%M:%S %p', $format);
+        }
+        if (strpos($format, '%p') !== false) {
+            // %p is incorrectly lower-cased in OSX.
+            $p = strftime('%p', $date);
+            // The AM/PM fix is necessary for behat and phpunit tests, this is just a cosmetic issue for other languages,
+            // feel free to add more here if it makes sense.
+            $replace = array('am' => 'AM', 'pm' => 'PM');
+            if (isset($replace[$p])) {
+                $format = preg_replace('#(?<!%)((?:%%)*)%p#', '${1}' . $replace[$p], $format);
+            }
+        }
+        if (strpos($format, '%P') !== false) {
+            // %P is not implemented in OSX at all, but we can use the %p which does the right thing. Weird, right?
+            if (@strftime('%P', $date) === 'P') {
+                $format = preg_replace('#(?<!%)((?:%%)*)%P#', '${1}%p', $format);
+            }
+        }
+        if (strpos($format, '%z') !== false) {
+            // %z seems to return bogus offset in OSX.
+            $format = preg_replace('#(?<!%)((?:%%)*)%z#', '${1}' . date('O', $date), $format);
+        }
+
+    } else if ($CFG->ostype === 'WINDOWS') {
+        if (strpos($format, '%r') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%r#', '${1}%I:%M:%S %p', $format);
+        }
+        if (strpos($format, '%h') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%h#', '${1}%b', $format);
+        }
+        if (strpos($format, '%R') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%R#', '${1}%H:%M', $format);
+        }
+        if (strpos($format, '%T') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%T#', '${1}%H:%M:%S', $format);
+        }
+        if (strpos($format, '%D') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%D#', '${1}%m/%d/%y', $format);
+        }
+        if (strpos($format, '%F') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%F#', '${1}%Y-%m-%d', $format);
+        }
+        if (strpos($format, '%u') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%u#', '${1}' . date('N', $date), $format);
+        }
+        if (strpos($format, '%V') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%V#', '${1}' . date('W', $date), $format);
+        }
+        if (strpos($format, '%g') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%g#', '${1}' . str_pad(date('o', $date) % 100, 2, '0', STR_PAD_LEFT), $format);
+        }
+        if (strpos($format, '%G') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%G#', '${1}' . date('o', $date), $format);
+        }
+        if (strpos($format, '%C') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%C#', '${1}' . (int)(strftime('%Y', $date)/100), $format);
+        }
+        if (strpos($format, '%P') !== false) {
+            // %P is not implemented in Win at all.
+            if (@strftime('%P', $date) === false) {
+                // The AM/PM fix is necessary for behat and phpunit tests, this is just a cosmetic issue for other languages,
+                // feel free to add more here if it makes sense.
+                $p = strftime('%p', $date);
+                $replace = array('AM' => 'am', 'PM' => 'pm');
+                if (isset($replace[$p])) {
+                    $format = preg_replace('#(?<!%)((?:%%)*)%P#', '${1}' . $replace[$p], $format);
+                }
+            }
+            // Fallback to at least something.
+            $format = preg_replace('#(?<!%)((?:%%)*)%P#', '${1}%p', $format);
+        }
+        if (strpos($format, '%l') !== false) {
+            $i = strftime('%I', $date);
+            if (strpos($i, '0') === 0 and strlen($i) === 2) {
+                $i = ' ' . substr($i, 1);
+            }
+            $format = preg_replace('#(?<!%)((?:%%)*)%l#', '${1}' . $i, $format);
+        }
+        if (strpos($format, '%k') !== false) {
+            $i = strftime('%H', $date);
+            if (strpos($i, '0') === 0 and strlen($i) === 2) {
+                $i = ' ' . substr($i, 1);
+            }
+            $format = preg_replace('#(?<!%)((?:%%)*)%k#', '${1}' . $i, $format);
+        }
+        if (strpos($format, '%e') !== false) {
+            $d = strftime('%d', $date);
+            if (strpos($d, '0') === 0 and strlen($d) === 2) {
+                $d = ' ' . substr($d, 1);
+            }
+            $format = preg_replace('#(?<!%)((?:%%)*)%e#', '${1}' . $d, $format);
+        }
+        if (strpos($format, '%z') !== false) {
+            // %z returns full name instead of hour offset in Windows.
+            $format = preg_replace('#(?<!%)((?:%%)*)%z#', '${1}' . date('O', $date), $format);
+        }
+        if (strpos($format, '%Z') !== false) {
+            // %z returns full name instead of abbreviation.
+            $format = preg_replace('#(?<!%)((?:%%)*)%Z#', '${1}' . date('T', $date), $format);
+        }
+        if (strpos($format, '%n') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%n#', '${1}' . "\n", $format);
+        }
+        if (strpos($format, '%t') !== false) {
+            $format = preg_replace('#(?<!%)((?:%%)*)%t#', '${1}' . "\t", $format);
+        }
+
+        // Totara: calendars have absolutely nothing to do with current Windows encoding!!!
+        $localewincharset = get_string('localewincharset', 'langconfig');
     }
 
     if ($localewincharset) {
         $format = core_text::convert($format, 'utf-8', $localewincharset);
     }
 
-    date_default_timezone_set(core_date::get_user_timezone($tz));
     $datestring = strftime($format, $date);
-    core_date::set_default_server_timezone();
 
     if ($localewincharset) {
         $datestring = core_text::convert($datestring, $localewincharset, 'utf-8');
     }
 
+    core_date::set_default_server_timezone();
     return $datestring;
 }
 
