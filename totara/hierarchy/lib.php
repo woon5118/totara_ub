@@ -843,7 +843,11 @@ class hierarchy {
             $options['/totara/hierarchy/item/bulkactions.php?action=move&prefix='.$this->prefix.'&frameworkid='.$this->frameworkid] = get_string('move');
         }
         if ($can_manage_type) {
-            $options['/totara/hierarchy/type/index.php?prefix='.$this->prefix.'#bulkreclassify'] = get_string('reclassifyitems' ,'totara_hierarchy');
+            $class = '';
+            if ($this->prefix == 'goal') {
+                $class = '&class=company';
+            }
+            $options['/totara/hierarchy/type/index.php?prefix='.$this->prefix.$class.'#bulkreclassify'] = get_string('reclassifyitems', 'totara_hierarchy');
         }
 
         if (count($options) > 0) {

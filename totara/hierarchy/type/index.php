@@ -184,7 +184,7 @@ if ($unclassified) {
     $options[0] = get_string('unclassified', 'totara_hierarchy');
 }
 
-if ($showbulkform && $class == 'company') {
+if ($showbulkform && $class != 'personal') {
     echo html_writer::empty_tag('br');
     echo html_writer::tag('a', '', array('name' => 'bulkreclassify'));
     echo $OUTPUT->heading(get_string('bulktypechanges', 'totara_hierarchy'));
