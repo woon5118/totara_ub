@@ -82,7 +82,7 @@ class controller {
                     $a->url  = $this->installer->lang_pack_url($langcode);
                     $a->dest = $CFG->dataroot.'/lang';
                     $this->errors[] = get_string('remotedownloaderror', 'error', $a);
-                    throw new \moodle_exception('remotedownloaderror', 'error', $a);
+                    throw new \moodle_exception('remotedownloaderror', 'error', '', $a);
                     break;
                 case \lang_installer::RESULT_INSTALLED:
                     $updatedpacks++;

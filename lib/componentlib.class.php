@@ -785,7 +785,7 @@ class lang_installer {
     protected function install_language_pack($langcode) {
         global $OUTPUT;
         // initialise new component installer to process this language
-        $installer = new component_installer(DOWNLOAD_BASE, '/' . $this->version,
+        $installer = new component_installer(DOWNLOAD_BASE, $this->version,
             $langcode . '.zip', 'languages.md5', 'lang');
 
         if (!$installer->requisitesok) {
