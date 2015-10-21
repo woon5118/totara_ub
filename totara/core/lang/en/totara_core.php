@@ -51,6 +51,7 @@ $string['authdeleteusers'] = 'User deletion';
 $string['authdeleteusers_desc'] = 'Select what happens when user account is deleted. During full delete username, email and ID number are discarded - this means that accounts cannot be undeleted later. Please note that any user delete operation discards settings and user information.';
 $string['authdeleteusersfull'] = 'Full';
 $string['authdeleteuserspartial'] = 'Keep username, email and ID number';
+$string['autofillprevention'] = 'This field is to prevent browsers automatically filling in username and password fields. It will be ignored by the server';
 $string['blended'] = 'Blended';
 $string['bookings'] = 'Bookings';
 $string['bookingsfor'] = 'Bookings for ';

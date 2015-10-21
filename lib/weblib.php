@@ -3606,5 +3606,5 @@ function get_formatted_help_string($identifier, $component, $ajax = false, $a = 
  */
 function prevent_form_autofill_password() {
     // Totara: inline style is much safer here than general class.
-    return '<div style="display: none;"><input type="password" /></div>';
+    return '<div style="display: none;"><label for="autofill-prevention">' . get_string('autofillprevention', 'totara_core') . '</label><input id="autofill-prevention" type="password" /></div>';
 }
