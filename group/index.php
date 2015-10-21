@@ -227,8 +227,7 @@ echo '<p><label for="members"><span id="memberslabel">'.
     ' </span><span id="thegroup">'.$selectedname.'</span></label></p>'."\n";
 //NOTE: the SELECT was, multiple="multiple" name="user[]" - not used and breaks onclick.
 echo '<div class="userselector" id="addselect_wrapper">';
-echo '<select name="user" id="members" size="15"'."\n";
-echo ' onclick="window.status=this.options[this.selectedIndex].title;" onmouseout="window.status=\'\';">'."\n";
+echo '<select name="user" id="members" size="15">'."\n";
 
 $member_names = array();
 
