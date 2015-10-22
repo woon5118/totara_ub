@@ -608,7 +608,7 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
         echo '<div class="topfields clearfix">';
         $this->print_field('shortname', get_string('roleshortname', 'core_role').'&nbsp;'.$OUTPUT->help_icon('roleshortname', 'core_role'), $this->get_shortname_field('shortname'));
         $this->print_field('name', get_string('customrolename', 'core_role').'&nbsp;'.$OUTPUT->help_icon('customrolename', 'core_role'), $this->get_name_field('name'));
-        $this->print_field('edit-description', get_string('customroledescription', 'core_role').'&nbsp;'.$OUTPUT->help_icon('customroledescription', 'core_role'),
+        $this->print_field('description', get_string('customroledescription', 'core_role').'&nbsp;'.$OUTPUT->help_icon('customroledescription', 'core_role'),
             $this->get_description_field('description'));
         $this->print_field('menuarchetype', get_string('archetype', 'core_role').'&nbsp;'.$OUTPUT->help_icon('archetype', 'core_role'), $this->get_archetype_field('archetype'));
         $this->print_field('', get_string('maybeassignedin', 'core_role'), $this->get_assignable_levels_control());
