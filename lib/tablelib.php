@@ -1023,7 +1023,7 @@ class flexible_table {
                     get_string('download').'"/>';
             $html = '<form action="'. $this->baseurl .'" method="post">';
             $html .= '<div class="mdl-align">';
-            $html .= html_writer::tag('label', get_string('downloadas', 'table', $downloadelements));
+            $html .= html_writer::tag('label', get_string('downloadas', 'table', $downloadelements), array('for' => 'menudownload'));
             $html .= '</div></form>';
 
             return $html;
