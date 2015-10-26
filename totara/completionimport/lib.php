@@ -1402,6 +1402,8 @@ function get_config_data($filesource, $importname) {
     $data->csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
     $overridesetting = 'overrideactive' . $importname;
     $data->$overridesetting = get_default_config($pluginname, 'overrideactive' . $importname, 0);
+    $forcecaseinsensitive = 'forcecaseinsensitive' . $importname;
+    $data->$forcecaseinsensitive = get_default_config($pluginname, 'forcecaseinsensitive' . $importname, 0);
     return $data;
 }
 
