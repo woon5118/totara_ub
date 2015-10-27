@@ -111,19 +111,18 @@ $position_assignment = new position_assignment(
     )
 );
 
-$strparticipants    = get_string('participants');
-$positions          = get_string('positions', 'totara_hierarchy');
 $positiontype       = get_string('type'.$type, 'totara_hierarchy');
 $fullname           = fullname($user, true);
 
 if ($course->id != SITEID && has_capability('moodle/course:viewparticipants', $coursecontext)) {
-    $PAGE->navbar->add($strparticipants, "{$CFG->wwwroot}/user/index.php?id={$course->id}");
+    $PAGE->navbar->add(get_string('participants'), "{$CFG->wwwroot}/user/index.php?id={$course->id}");
     $PAGE->navbar->add($fullname, "{$CFG->wwwroot}/user/view.php?id={$user->id}&amp;course={$course->id}");
     $PAGE->navbar->add($positiontype, null);
 } else {
-    $PAGE->navigation->extend_for_user($user);
+    $PAGE->navbar->add(get_string('users'), "{$CFG->wwwroot}/admin/user.php");
+    $PAGE->navbar->add($fullname, "{$CFG->wwwroot}/user/view.php?id={$user->id}&amp;course={$course->id}");
+    $PAGE->navbar->add($positiontype, null);
 }
-
 
 // Setup custom javascript
 local_js(array(
