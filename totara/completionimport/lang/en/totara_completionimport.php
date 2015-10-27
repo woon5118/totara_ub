@@ -32,21 +32,22 @@ $string['cannotdeletefile'] = 'Cannot delete file {$a}';
 $string['cannotmovefiles'] = 'Cannot move file from {$a->fromfile} to {$a->tofile}';
 $string['cannotsaveupload'] = 'Cannot save file to {$a}';
 $string['caseinsensitivecourse'] = 'Case insensitive shortnames';
-$string['caseinsensitivecertification'] = 'Case insensitive shortnames';
 $string['caseinsensitivecourse_help'] = 'When enabled, course short names will be matched case insensitively.
 
-* If an uploaded course shortname matches an existing course shortname except for case then the name of the existing course will be used.
+* If there are 2 or more courses with shortnames that use different case but have matching idnumbers then the name of the existing course will be matched.
 
-* If two uploaded course shortnames match except for case then name from the first record will be used for both.
+* If the inital match fails, the shortname for the duplicate records with matching idnumbers will be used.
 
-This is an advanced setting. We strongly advise any case issues be corrected in the uploaded file.';
+This is an advanced setting and will cause performance issues during uploads. We strongly advise any case issues be corrected in the uploaded file.';
+
+$string['caseinsensitivecertification'] = 'Case insensitive shortnames';
 $string['caseinsensitivecertification_help'] = 'When enabled, certification short names will be matched case insensitively.
 
-* If an uploaded certification shortname matches an existing certification shortname except for case then the name of the existing certification will be used.
+* If there are 2 or more certifications with shortnames that use different case but have matching idnumbers then the name of the existing certification will be matched.
 
-* If two uploaded certification shortnames match except for case then name from the first record will be used for both.
+* If the inital match fails, the shortname for the duplicate records with matching idnumbers will be used.
 
-This is an advanced setting. We strongly advise any case issues be corrected in the uploaded file.';
+This is an advanced setting and will cause performance issues during uploads. We strongly advise any case issues be corrected in the uploaded file.';
 $string['certification_results'] = 'Certification results';
 $string['certificationblankrefs'] = 'Blank certification shortname and certification ID number';
 $string['certificationexpired'] = 'Import certification expired, skipping importing';
