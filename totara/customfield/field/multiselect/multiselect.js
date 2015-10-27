@@ -119,10 +119,10 @@ M.totara_customfield_multiselect = M.totara_customfield_multiselect || {
                 return false;
             });
 
-            $this.find('fieldset').append($makeDefault);
-            $this.find('fieldset').append($unselectLink);
-            $this.find('fieldset').append('&nbsp;&nbsp;&nbsp;');
-            $this.find('fieldset').append($delete);
+            $this.find('fieldset div').append($makeDefault);
+            $this.find('fieldset div').append($unselectLink);
+            $this.find('fieldset div').append('&nbsp;&nbsp;&nbsp;');
+            $this.find('fieldset div').append($delete);
 
             if ($this.find('input.makedefault').prop('checked')) {
               $makeDefaultLink.click();
