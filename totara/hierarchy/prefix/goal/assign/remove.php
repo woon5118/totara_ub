@@ -116,13 +116,16 @@ if ($delete) {
         $delete_params['id'] = $goalid;
     }
 
-    $snapshot = $DB->get_record($type->table, $delete_params);
     if ($assigntype == GOAL_ASSIGNMENT_INDIVIDUAL) {
+        $delete_params['assigntype'] = GOAL_ASSIGNMENT_INDIVIDUAL;
+        $delete_params['assignmentid'] = 0;
+        $snapshot = $DB->get_record($type->table, $delete_params);
         goal::delete_user_assignments($delete_params);
         $eventclass = "\\hierarchy_goal\\event\\assignment_user_deleted";
     } else {
         // If it's not an individual assignment delete/transfer user assignments.
         $assignmentid = $DB->get_field($type->table, 'id', $delete_params);
+        $snapshot = $DB->get_record($type->table, $delete_params);
         goal::delete_group_assignment($assigntype, $assignmentid, $type, $delete_params);
         $eventclass = "\\hierarchy_goal\\event\\assignment_{$type->fullname}_deleted";
     }
