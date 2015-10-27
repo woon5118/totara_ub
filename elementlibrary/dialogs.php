@@ -89,10 +89,10 @@ if (!$item) {
     $PAGE->requires->strings_for_js(array('assignrelatedcompetencies',
         'assignnewevidenceitem','assigncoursecompletions'), 'totara_hierarchy');
     $jsmodule = array(
-        'name' => 'totara_competencyitem',
-        'fullpath' => '/totara/core/js/competency.item.js',
+        'name' => 'totara_elementlibmultiselect',
+        'fullpath' => '/elementlibrary/js/competency.item.js',
         'requires' => array('json'));
-    $PAGE->requires->js_init_call('M.totara_competencyitem.init',
+    $PAGE->requires->js_init_call('M.totara_elementlibmultiselect.init',
         array('args'=>$jargs), false, $jsmodule);
 
     $out = html_writer::start_tag('div', array('class' => 'buttons'));
