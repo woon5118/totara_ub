@@ -1907,31 +1907,13 @@ div.totara-dialog td.select #search-tab #fgroup_id_searchgroup {
  * Comments
  */
 .comment-area .fd {text-align:right;}
-.comment-userpicture {float:left !important;padding:0 !important;}
 .comment-content {margin-left:22px;margin-right:0;}
 .comment-content p {margin:0 18px 0 0;}
-.comment-delete {float:right;text-align:right;}
 .comment-container {float:left;}
 .dir-rtl .comment-area .fd {text-align:left;}
-.dir-rtl .comment-userpicture {position:static !important;padding:0 !important;}
 .dir-rtl .comment-content {margin-right: 22px;margin-left:0;}
 .dir-rtl .comment-content p {margin:0 0 0 18px;}
-.dir-rtl .comment-delete {float:left;text-align:left;right:auto !important;left:4px !important;}
 .dir-rtl .comment-container {float:right;}
-.dir-rtl ul.comment-list li.comment-own-post .comment-userpicture {
-    background: url([[pix:totara_core|comment-point-blue-rtl]]) no-repeat scroll left center transparent;
-    float: right !important;
-    left: auto;
-    right: 0;
-    text-align: right;
-}
-.dir-rtl ul.comment-list li.comment-others-post .comment-userpicture {
-    background: url([[pix:totara_core|comment-point-grey-rtl]]) no-repeat scroll right center transparent;
-    float: left !important;
-    left: 0;
-    right: auto;
-    text-align: left;
-}
 .ui-dialog-content dl {
     color: #eeeeee;
 }
