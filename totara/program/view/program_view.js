@@ -106,15 +106,15 @@ M.totara_programview = M.totara_programview || {
                     userid: module.config.userid,
                     extrequest: "1",
                     extdate: extensiontime,
-                    extreason: extensionreason
+                    extreason: extensionreason,
+                    sesskey: M.cfg.sesskey
                 };
 
                 $.ajax({
                     type: 'POST',
                     url: M.cfg.wwwroot + '/totara/program/extension.php',
                     data: data,
-                    success: module.totara_program_extension_update,
-                    error: module.totara_program_extension_error
+                    success: module.totara_program_extension_result
                 });
                 this._dialog.hide();
             }
@@ -166,33 +166,23 @@ M.totara_programview = M.totara_programview || {
     },
 
     /**
-     * Update extension text and notify user of success
+     * Update extension text and notify user of success or failure depending on result.
      */
-    totara_program_extension_update: function(response) {
-        // Get existing text
-        var extensiontext = $('a#extrequestlink');
+    totara_program_extension_result: function(data) {
+        if (data.success) {
+            // Get existing text.
+            var extensiontext = $('a#extrequestlink');
 
-        if (response) {
-            var new_text = response;
+            var new_text = data.message;
 
             if (extensiontext.size()) {
-                //If text found replace
+                // If text found replace.
                 extensiontext.replaceWith(new_text);
             }
 
             $('div#totara-header-notifications').html(M.totara_programview.config.notify_html);
         } else {
-            $('div#totara-header-notifications').html(M.totara_programview.config.notify_html_fail);
-        }
-    },
-
-    /**
-     * If validation error has occured then an error is returned print a
-     * notification with the error message
-     */
-    totara_program_extension_error: function(response) {
-        if (response) {
-            var notify_text = response.responseText;
+            var notify_text = data.message;
 
             var notify_html = '<div class="notifyproblem" style="text-align:center">' + notify_text + '</div>';
 
@@ -200,4 +190,3 @@ M.totara_programview = M.totara_programview || {
         }
     }
 };
-

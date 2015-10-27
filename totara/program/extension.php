@@ -22,10 +22,15 @@
  * @subpackage program
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 require_login();
+require_sesskey();
+
+$OUTPUT->header();
 
 $programid = required_param('id', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
@@ -35,24 +40,29 @@ $extensionreason = optional_param('extreason', '', PARAM_TEXT);
 
 $PAGE->set_context(context_program::instance($programid));
 
+$result = array();
+
 if ($USER->id != $userid) {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('error:cannotrequestextnotuser', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('error:cannotrequestextnotuser', 'totara_program');
+    echo json_encode($result);
+    return;
 }
 
 $program = new program($programid);
 
 if (!$extensionrequest || !$extensiondate || !$extensionreason) {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('error:processingextrequest', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('error:processingextrequest', 'totara_program');
+    echo json_encode($result);
+    return;
 }
 
 if (!$manager = totara_get_manager($userid)) {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('extensionrequestfailed:nomanager', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('extensionrequestfailed:nomanager', 'totara_program');
+    echo json_encode($result);
+    return;
 }
 
 $timearray = explode('/', $extensiondate);
@@ -83,21 +93,24 @@ if ($prog_completion = $DB->get_record('prog_completion', array('programid' => $
     $duedate = empty($prog_completion->timedue) ? 0 : $prog_completion->timedue;
 
     if ($extensiondate_timestamp < $duedate) {
-        @header('HTTP/1.0 404 Not Found');
-        echo get_string('extensionearlierthanduedate', 'totara_program');
-        return false;
+        $result['success'] = false;
+        $result['message'] = get_string('extensionearlierthanduedate', 'totara_program');
+        echo json_encode($result);
+        return;
     }
 } else {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('error:noprogramcompletionfound', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('error:noprogramcompletionfound', 'totara_program');
+    echo json_encode($result);
+    return;
 }
 
 $now = time();
 if ($extensiondate_timestamp < $now) {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('extensionbeforenow', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('extensionbeforenow', 'totara_program');
+    echo json_encode($result);
+    return;
 }
 
 $extension->extensionreason = $extensionreason;
@@ -129,16 +142,20 @@ if ($extensionid = $DB->insert_record('prog_extension', $extension)) {
     $managermessagedata->rejecttext = $strmgr->get_string('extensionrejecttext', 'totara_program', null, $manager->lang);
 
     if ($extension_message->send_message($manager, $user)) {
-        // Calcuate the new time and print pending extension text
-        echo get_string('pendingextension', 'totara_program');
+        $result['success'] = true;
+        $result['message'] = get_string('pendingextension', 'totara_program');
+        echo json_encode($result);
+        return;
     } else {
-        @header('HTTP/1.0 404 Not Found');
-        echo get_string('extensionrequestnotsent', 'totara_program');
-        return false;
+        $result['success'] = false;
+        $result['message'] = get_string('extensionrequestnotsent', 'totara_program');
+        echo json_encode($result);
+        return;
     }
 
 } else {
-    @header('HTTP/1.0 404 Not Found');
-    echo get_string('extensionrequestfailed', 'totara_program');
-    return false;
+    $result['success'] = false;
+    $result['message'] = get_string('extensionrequestfailed', 'totara_program');
+    echo json_encode($result);
+    return;
 }
