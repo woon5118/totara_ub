@@ -1265,7 +1265,7 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
     unset($memberlist);
 
     //$fields = "u.id, u.username, u.firstname, u.lastname, u.maildisplay, u.mailformat, u.maildigest, u.emailstop, u.imagealt, u.email, u.city, u.country, u.lastaccess, u.lastlogin, u.picture, u.timezone, u.theme, u.lang, u.trackforums, u.mnethostid";
-    $fields  = "id, username, maildisplay, mailformat, maildigest, emailstop, imagealt, email, city, country, lastaccess, lastlogin, picture, timezone, theme, lang, trackforums, mnethostid, ";
+    $fields  = "id, username, maildisplay, mailformat, maildigest, emailstop, imagealt, email, city, country, lastaccess, lastlogin, picture, timezone, theme, lang, trackforums, mnethostid, auth, suspended, deleted, ";
     $fields .= $usernamefields;
     switch ($cohort->alertmembers) {
         case COHORT_ALERT_AFFECTED:
