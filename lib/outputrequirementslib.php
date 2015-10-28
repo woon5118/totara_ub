@@ -304,7 +304,10 @@ class page_requirements_manager {
 
         // Load behat ajax handler.
         if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
-            $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
+            if (!is_ajax_request($_SERVER)) {
+                // Totara: sometimes Totara loads forms via ajax, we do not need second init there when the html is injected into dialog.
+                $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
+            }
         }
     }
 
@@ -1555,9 +1558,10 @@ class page_requirements_manager {
      * Normally, this method is called automatically by the code that prints the
      * page footer. You should not normally need to call it in your own code.
      *
+     * @param bool $initialiseamd initialise AMD. This is probably useful only in Totara forms ajax where we don't want it.
      * @return string the HTML code to to at the end of the page.
      */
-    public function get_end_code() {
+    public function get_end_code($initialiseamd = true) {
         global $CFG;
         $output = '';
 
@@ -1567,10 +1571,13 @@ class page_requirements_manager {
         if ($CFG->debugdeveloper) {
             $logconfig->level = 'trace';
         }
-        $this->js_call_amd('core/log', 'setConfig', array($logconfig));
 
         // Call amd init functions.
-        $output .= $this->get_amd_footercode();
+        if ($initialiseamd) {
+            // Totara: ajaxy form fetching does not like AMD.
+            $this->js_call_amd('core/log', 'setConfig', array($logconfig));
+            $output .= $this->get_amd_footercode();
+        }
 
         // Add other requested modules.
         $output .= $this->get_extra_modules_code();

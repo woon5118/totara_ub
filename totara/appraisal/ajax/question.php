@@ -33,6 +33,7 @@ ajax_require_login();
 $sytemcontext = context_system::instance();
 require_capability('totara/appraisal:managepageelements', $sytemcontext);
 $PAGE->set_context($sytemcontext);
+$PAGE->set_url('/totara/appraisal/ajax/question.php');
 
 $action = optional_param('action', '', PARAM_ACTION);
 $pageid = optional_param('appraisalstagepageid', 0, PARAM_INT);
@@ -257,4 +258,8 @@ switch($action) {
 
 if (!is_ajax_request($_SERVER)) {
     echo $output->footer();
+} else {
+    // Get the end code, but do not initialise AMD.
+    // We need the form JS, but not the AMD config and init.
+    echo $PAGE->requires->get_end_code(false);
 }
