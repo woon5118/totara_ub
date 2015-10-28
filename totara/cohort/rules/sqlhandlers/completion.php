@@ -50,8 +50,8 @@ $COHORT_RULE_COMPLETION_OP = array(
     COHORT_RULE_COMPLETION_OP_DATE_GREATERTHAN => 'after',
     COHORT_RULE_COMPLETION_OP_BEFORE_PAST_DURATION => 'beforepastduration',
     COHORT_RULE_COMPLETION_OP_WITHIN_PAST_DURATION => 'inpastduration',
-    COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION => 'inpastduration',
-    COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION => 'beforepastduration',
+    COHORT_RULE_COMPLETION_OP_WITHIN_FUTURE_DURATION => 'infutureduration',
+    COHORT_RULE_COMPLETION_OP_AFTER_FUTURE_DURATION => 'afterfutureduration',
 );
 
 require_once($CFG->dirroot . '/totara/program/program.class.php');
