@@ -73,7 +73,7 @@ body.path-admin-totara-reportbuilder-restrictions .header.c3.lastcol {
 #my-teammembers-content .rb-display-table-container {
     clear: both;
 }
-#team_members .user_namewithlinks a {
+.reportbuilder-table .user_namewithlinks a {
     padding-left: 5px;
     float: left;
 }
@@ -82,43 +82,43 @@ body.path-admin-totara-reportbuilder-restrictions .header.c3.lastcol {
     font-weight: bold;
     padding-top: 8px;
 }
-.dir-rtl #team_members .user_namewithlinks .name {
+.dir-rtl .reportbuilder-table .user_namewithlinks .name {
     float: right;
 }
 
-#team_members .user_namewithlinks ul {
+.reportbuilder-table .user_namewithlinks ul {
     clear: both;
     margin: 0;
     padding-top: 2px;
 }
 
-#team_members .user_namewithlinks ul li {
+.reportbuilder-table .user_namewithlinks ul li {
     float:left;
     list-style-type: none;
 }
-.dir-rtl #team_members .user_namewithlinks ul li {
+.dir-rtl .reportbuilder-table .user_namewithlinks ul li {
     float: right;
 }
 
-#team_members .user_namewithlinks li a {
+.reportbuilder-table .user_namewithlinks li a {
     border-left: 1px solid #bbbbbb;
     font-size: 10px;
     line-height: 10px;
     margin: 2px;
 }
-.dir-rtl #team_members .user_namewithlinks a {
+.dir-rtl .reportbuilder-table .user_namewithlinks a {
     float: right;
 }
 
-#team_members .user_namewithlinks li:first-child a {
+.reportbuilder-table .user_namewithlinks li:first-child a {
     border-left: none;
     margin-left: 0;
 }
-.dir-rtl #team_members .user_namewithlinks li:first-child a {
+.dir-rtl .reportbuilder-table .user_namewithlinks li:first-child a {
     border-left: 1px solid #bbb;
 }
 
-.dir-rtl #team_members .user_namewithlinks li:last-child a {
+.dir-rtl .reportbuilder-table .user_namewithlinks li:last-child a {
     border-left: none;
 }
 
