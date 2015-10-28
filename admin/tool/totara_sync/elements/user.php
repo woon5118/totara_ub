@@ -963,8 +963,9 @@ class totara_sync_element_user extends totara_sync_element {
 
         $invalidids = array();
         $sql = "SELECT s.id, s.idnumber
-                  FROM {{$synctable}} s
-                 WHERE s.$datefield1 > s.$datefield2 ";
+                FROM {{$synctable}} s
+                WHERE s.$datefield1 > s.$datefield2
+                AND s.$datefield2 != 0";
         if (empty($this->config->sourceallrecords)) {
             $sql .= ' AND s.deleted = 0'; // Avoid users that will be deleted.
         }
