@@ -405,7 +405,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
  *
  * list($visibilityjoinsql, $visibilityjoinparams) = totara_visibility_join($userid, 'program', 'p');
  *
- * $sql = "SELECT p.*, visibilityjoin.isvisible
+ * $sql = "SELECT p.*, visibilityjoin.isvisibletouser
  *           FROM {prog} p
  *                {$visibilityjoinsql}
  *          WHERE p.certifid IS NULL";
@@ -416,11 +416,11 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
  * @param string $joinalias Alias to give the joined table, which will contain the isvisible field.
  * @param string $jointype 'LEFT JOIN' will not restrict the rows returned from you main table,
  *                         'JOIN' will remove rows from you main table (like using totara_visibility_where).
- * @return list(string $joinsql, string $joinparams)
+ * @return array list(string $joinsql, array $joinparams)
  */
 function totara_visibility_join($userid = null, $type = 'course', $mainalias = 'course', $joinalias = 'visibilityjoin',
                                 $jointype = 'LEFT JOIN') {
-    global $USER;
+    global $USER, $DB;
 
     // Default user.
     if ($userid === null) {
@@ -447,7 +447,12 @@ function totara_visibility_join($userid = null, $type = 'course', $mainalias = '
         'tvjoinsub.audiencevisible', 'tvjoinsub', $type);
 
     // Construct the result.
-    $sql = "{$jointype} (SELECT tvjoinsub.id, 1 AS isvisibletouser
+    $one = '1';
+    if ($DB->get_dbfamily() === 'mysql') {
+        // Workaround for broken MariaDB - see TL-7785.
+        $one = '(CASE WHEN tvjoinsub.id > 0 THEN 1 ELSE 0 END)';
+    }
+    $sql = "{$jointype} (SELECT tvjoinsub.id, $one AS isvisibletouser
                            FROM {{$basetable}} tvjoinsub
                            JOIN {context} ctx
                              ON tvjoinsub.id = ctx.instanceid AND ctx.contextlevel = :tvjcontextlevel
