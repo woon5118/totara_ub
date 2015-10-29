@@ -101,11 +101,8 @@ if (empty($cm->visible) and !has_capability('mod/facetoface:viewemptyactivities'
 echo $OUTPUT->box_start();
 echo $OUTPUT->heading(get_string('allsessionsin', 'facetoface', $facetoface->name), 2);
 
-if ($facetoface->intro) {
-    echo $OUTPUT->box_start('generalbox','description');
-    $facetoface->intro = file_rewrite_pluginfile_urls($facetoface->intro, 'pluginfile.php', $context->id, 'mod_facetoface', 'intro', null);
-    echo format_text($facetoface->intro, $facetoface->introformat);
-    echo $OUTPUT->box_end();
+if (!empty($facetoface->intro)) {
+    echo $OUTPUT->box(format_module_intro('facetoface', $facetoface, $cm->id), 'generalbox', 'intro');
 }
 
 $locations = get_locations($facetoface->id);
