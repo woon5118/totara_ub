@@ -343,11 +343,11 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         $this->assertEquals(0, $DB->count_records('course_completions', array('course' => $this->course1->id)));
     }
 
-    /** This function will test the delete_course_completion_data_user function should behave as follow:
+    /** This function will test the delete_course_completion_data function with a userid should behave as follow:
      *  All course completion records (including those marked via RPL) for the user given should be deleted
      *  when this function is called
      */
-    public function test_delete_course_completion_data_user() {
+    public function test_delete_course_completion_data_with_userid() {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -386,9 +386,9 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Check records in course_completion_crit_compl.
         $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
 
-        // Call delete_course_completion_data_user with user1 id.
+        // Call delete_course_completion_data with user1 id.
         $completion = new completion_info($course);
-        $completion->delete_course_completion_data_user($this->user1->id);
+        $completion->delete_course_completion_data($this->user1->id);
 
         $this->assertEquals(4, $DB->count_records('course_completions'));
         // Now should be two records in completions. One for user2 and other for user3 in course1.
@@ -422,7 +422,7 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
 
         // Delete completion records for course3-user1.
         // Changes should be reflected in course_completions table.
-        $completion->delete_course_completion_data_user($this->user1->id);
+        $completion->delete_course_completion_data($this->user1->id);
         $this->assertEquals(3, $DB->count_records('course_completions'));
         $this->assertEquals(0, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
 
@@ -444,7 +444,7 @@ class core_completion_course_completion_testcase extends reportcache_advanced_te
         // Delete completion for user1-course3.
         // Note that it doesn't matter that the user completed the activity via RPl, the activity completion is deleted.
         $completion = new completion_info($this->course3);
-        $completion->delete_course_completion_data_user($this->user1->id);
+        $completion->delete_course_completion_data($this->user1->id);
         $this->assertEquals(1, $DB->count_records('course_completion_crit_compl', array('course' => $this->course3->id)));
         $this->assertEquals(3, $DB->count_records('course_completions'));
         $conditions = array('userid' => $this->user1->id, 'course' => $this->course3->id);

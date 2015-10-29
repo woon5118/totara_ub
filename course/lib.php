@@ -3872,7 +3872,7 @@ function archive_course_completion($userid, $courseid) {
     // Reset course completion.
     $course = $DB->get_record('course', array('id' => $courseid));
     $completion = new completion_info($course);
-    $completion->delete_course_completion_data_user($userid);
+    $completion->delete_course_completion_data($userid);
     $completion->invalidatecache($courseid, $userid, true);
     return true;
 }
