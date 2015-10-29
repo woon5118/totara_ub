@@ -1491,5 +1491,26 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_upgrade_mod_savepoint(true, 2015043001, 'totara_core');
     }
 
+    // TL-7529 Delete completion records for deleted courses.
+    if ($oldversion < 2015103000) {
+        $transaction = $DB->start_delegated_transaction();
+
+        $sql = "DELETE FROM {course_completions}
+            WHERE course NOT IN (SELECT id FROM {course})";
+        $DB->execute($sql);
+
+        $sql = "DELETE FROM {block_totara_stats}
+            WHERE eventtype IN (:eventstarted, :eventcomplete) AND data2 NOT IN (SELECT id FROM {course})";
+        $DB->execute($sql, array('eventstarted' => STATS_EVENT_COURSE_STARTED, 'eventcomplete' => STATS_EVENT_COURSE_COMPLETE));
+
+        $sql = "DELETE FROM {course_completion_crit_compl}
+            WHERE course NOT IN (SELECT id FROM {course})";
+        $DB->execute($sql);
+
+        $transaction->allow_commit();
+
+        totara_upgrade_mod_savepoint(true, 2015103000, 'totara_core');
+    }
+
     return true;
 }
