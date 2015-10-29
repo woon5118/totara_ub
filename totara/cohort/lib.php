@@ -1295,6 +1295,25 @@ function totara_cohort_notify_users($cohortid, $userids, $action, $delaymessages
         tm_alert_send($eventdata);
     }
 
+    // If alertmessage is set to "alerts to all members" AND action is 'membersremoved' then
+    // send 'Audience membership revoked' alert emails to deleted users too.
+    if ($cohort->alertmembers == COHORT_ALERT_ALL && $action == 'membersremoved') {
+        $towho = 'toaffected';
+        $tousers = $DB->get_records_select('user', 'id IN ('.implode(',', $userids).')', null, 'id', $fields);
+        $eventdata = new stdClass();
+        foreach ($tousers as $touser) {
+            // Send emails in user lang.
+            $emailsubject = $strmgr->get_string("msg:{$action}_{$towho}_emailsubject", 'totara_cohort', $a, $touser->lang);
+            $notice = $strmgr->get_string("msg:{$action}_{$towho}_notice", 'totara_cohort', $a, $touser->lang);
+            $eventdata->subject = $emailsubject;
+            $eventdata->fullmessage = $notice;
+
+            $eventdata->userto = $touser;
+            $eventdata->userfrom = $touser;
+            tm_alert_send($eventdata);
+        }
+    }
+
     return true;
 }
 
