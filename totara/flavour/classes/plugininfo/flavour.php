@@ -38,7 +38,7 @@ class flavour extends base {
 
     /**
      * No uninstalling of flavours presently sorry.
-     * We'd need to work out how to prevent admins from trying to uninstall the professional edition and unlock settings.
+     * We'd need to work out how to prevent admins from trying to uninstall the a limiting flavour and unlock settings.
      * @return bool
      */
     public function is_uninstall_allowed() {

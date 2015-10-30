@@ -103,7 +103,7 @@ abstract class definition {
     }
 
     /**
-     * Returns the flavour component. e.g. flavour_enterprise, flavour_professional.
+     * Returns the flavour component. e.g. flavour_enterprise.
      *
      * @return string
      */

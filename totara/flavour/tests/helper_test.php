@@ -29,11 +29,21 @@ defined('MOODLE_INTERNAL') || die();
  * Tests flavour helper class
  */
 class totara_flavour_helper_testcase extends advanced_testcase {
+
+    /**
+     * True if the test flavour has been installed and is available
+     * @var bool
+     */
+    protected $testflavouravailable = false;
+
     protected function setUp() {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         parent::setUp();
         $this->resetAfterTest();
+        // When/if we have a second core flavour we should convert our tests to use that instead of the test flavour.
+        // The test flavour is available at TL-7812
+        $this->testflavouravailable = file_exists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
     }
 
     protected function tearDown() {
@@ -57,32 +67,42 @@ class totara_flavour_helper_testcase extends advanced_testcase {
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/professional/classes/definition.php");
+
+        if ($this->testflavouravailable) {
+            // We can only test this if the test flavour is installed.
+            $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
+        }
     }
 
     public function test_get_active_flavour_definition_forced() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test forced definitions you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Forced flavour settings can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
 
         // Nothing active.
         $result = helper::get_active_flavour_definition();
         $this->assertNull($result);
 
         // Forced flavour.
-        set_config('currentflavour', 'flavour_professional', 'totara_flavour');
+        set_config('currentflavour', 'flavour_test', 'totara_flavour');
         $CFG->forceflavour = '';
         $result = helper::get_active_flavour_definition();
         $this->assertNull($result);
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         $result = helper::get_active_flavour_definition();
-        $this->assertInstanceOf('flavour_professional\\definition', $result);
+        $this->assertInstanceOf('flavour_test\\definition', $result);
 
         $CFG->forceflavour = 'enterprise';
         $result = helper::get_active_flavour_definition();
         $this->assertInstanceOf('flavour_enterprise\\definition', $result);
 
         // Nothing during initial install unless forced.
-        set_config('currentflavour', 'flavour_professional', 'totara_flavour');
+        set_config('currentflavour', 'flavour_test', 'totara_flavour');
 
         $this->assertFalse(during_initial_install());
         unset($CFG->rolesactive);
@@ -109,9 +129,11 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertNull($result);
 
         // Manually activated flavour.
-        set_config('currentflavour', 'flavour_professional', 'totara_flavour');
-        $result = helper::get_active_flavour_definition();
-        $this->assertInstanceOf('flavour_professional\\definition', $result);
+        if ($this->testflavouravailable) {
+            set_config('currentflavour', 'flavour_test', 'totara_flavour');
+            $result = helper::get_active_flavour_definition();
+            $this->assertInstanceOf('flavour_test\\definition', $result);
+        }
 
         set_config('currentflavour', 'flavour_enterprise', 'totara_flavour');
         $result = helper::get_active_flavour_definition();
@@ -130,7 +152,9 @@ class totara_flavour_helper_testcase extends advanced_testcase {
     public function test_get_available_flavour_definitions() {
         $result = helper::get_available_flavour_definitions();
         $this->assertInternalType('array', $result);
-        $this->assertArrayHasKey('flavour_professional', $result);
+        if ($this->testflavouravailable) {
+            $this->assertArrayHasKey('flavour_test', $result);
+        }
         $this->assertArrayHasKey('flavour_enterprise', $result);
         foreach ($result as $component => $flavour) {
             $this->assertStringStartsWith('flavour_', $component);
@@ -153,10 +177,12 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_active_flavour_notice($output);
         $this->assertNull($result);
 
-        // Upgrade notice to full.
-        $CFG->forceflavour = 'professional';
-        $result = helper::get_active_flavour_notice($output);
-        $this->assertNotNull($result);
+        if ($this->testflavouravailable) {
+            // Upgrade notice to full.
+            $CFG->forceflavour = 'test';
+            $result = helper::get_active_flavour_notice($output);
+            $this->assertNotNull($result);
+        }
     }
 
     public function test_get_active_flavour_component() {
@@ -182,13 +208,21 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_defaults_setting();
         $this->assertSame(array(), $result);
 
-        $CFG->forceflavour = 'professional';
-        $result = helper::get_defaults_setting();
-        $this->assertSame(array(), $result);
+        if ($this->testflavouravailable) {
+            $CFG->forceflavour = 'test';
+            $result = helper::get_defaults_setting();
+            $this->assertSame(array(), $result);
+        }
     }
 
     public function test_get_enforced_settings() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test forced settings you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Forced flavour settings can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
 
         // No flavour.
         $result = helper::get_enforced_settings();
@@ -198,7 +232,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_enforced_settings();
         $this->assertSame(array(), $result);
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         $result = helper::get_enforced_settings();
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('moodle', $result);
@@ -211,6 +245,12 @@ class totara_flavour_helper_testcase extends advanced_testcase {
     public function test_get_prohibited_settings() {
         global $CFG;
 
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test prohibited settings you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Prohibited flavour settings can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
+
         // No flavour.
         $result = helper::get_prohibited_settings();
         $this->assertSame(array(), $result);
@@ -219,7 +259,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_prohibited_settings();
         $this->assertSame(array(), $result);
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         $result = helper::get_prohibited_settings();
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('moodle', $result);
@@ -231,44 +271,72 @@ class totara_flavour_helper_testcase extends advanced_testcase {
 
     public function test_execute_post_install_steps() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test post install steps you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Flavour post install steps can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         helper::execute_post_install_steps();
 
-        $this->assertSame('flavour_professional', get_config('totara_flavour', 'currentflavour'));
+        $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_execute_post_upgrade_steps() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test post upgrade steps you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Flavour post upgrade steps can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         helper::execute_post_upgrade_steps();
 
-        $this->assertSame('flavour_professional', get_config('totara_flavour', 'currentflavour'));
+        $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_execute_post_upgradesettings_steps() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test post upgrade settings steps you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Flavour post upgrade settings steps can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         helper::execute_post_upgradesettings_steps();
 
-        $this->assertSame('flavour_professional', get_config('totara_flavour', 'currentflavour'));
+        $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
     }
 
     public function test_set_active_flavour() {
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test setting the active flavour you must install the test plugin at TL-7812.
+            $this->markTestSkipped('Flavour set active can only be tested if the test definition has been installed.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
 
-        $this->assertSame('flavour_professional', get_config('totara_flavour', 'currentflavour'));
+        $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(TOTARA_DISABLEFEATURE, get_config('moodle', 'enableappraisals'));
 
         helper::set_active_flavour('flavour_enterprise');
@@ -278,7 +346,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
 
         // Invalid value.
         try {
-            helper::set_active_flavour('professional');
+            helper::set_active_flavour('test');
             $this->fail('coding_exception expected for invalid flavour name');
         } catch (moodle_exception $ex) {
             $this->assertInstanceOf('coding_exception', $ex);

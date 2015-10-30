@@ -30,11 +30,21 @@ defined('MOODLE_INTERNAL') || die();
  * Tests flavour overview class
  */
 class totara_flavour_overview_testcase extends advanced_testcase {
+
+    /**
+     * True if the test flavour has been installed and is available
+     * @var bool
+     */
+    protected $testflavouravailable = false;
+
     protected function setUp() {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         parent::setUp();
         $this->resetAfterTest();
+        // When/if we have a second core flavour we should convert our tests to use that instead of the test flavour.
+        // The test flavour is available at TL-7812
+        $this->testflavouravailable = file_exists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
     }
 
     protected function tearDown() {
@@ -58,7 +68,9 @@ class totara_flavour_overview_testcase extends advanced_testcase {
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/professional/classes/definition.php");
+        if ($this->testflavouravailable) {
+            $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
+        }
     }
 
     public function test_current_flavour() {
@@ -68,10 +80,12 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $overview = new overview();
         $this->assertNull(null, $overview->currentflavour);
 
-        $CFG->forceflavour = 'professional';
-        helper::set_active_flavour('flavour_professional');
-        $overview = new overview();
-        $this->assertSame('flavour_professional', $overview->currentflavour);
+        if ($this->testflavouravailable) {
+            $CFG->forceflavour = 'test';
+            helper::set_active_flavour('flavour_test');
+            $overview = new overview();
+            $this->assertSame('flavour_test', $overview->currentflavour);
+        }
 
         unset($CFG->forceflavour);
         helper::set_active_flavour('flavour_enterprise');
@@ -81,6 +95,13 @@ class totara_flavour_overview_testcase extends advanced_testcase {
 
     public function test_flavours() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test the overview of flavours you must install the test plugin at TL-7812.
+            $this->markTestSkipped('You must install the test flavour in order to test the overview functionality.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
         // Show enterprise if nothing configured.
@@ -89,11 +110,11 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
 
         // Show configured in specified order.
-        $CFG->showflavours = 'professional,enterprise';
+        $CFG->showflavours = 'test,enterprise';
         $overview = new overview();
-        $this->assertSame(array('flavour_professional', 'flavour_enterprise'), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_test', 'flavour_enterprise'), array_keys($overview->flavours));
         $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
-        $this->assertInstanceOf('flavour_professional\\definition', $overview->flavours['flavour_professional']);
+        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
         // Hide all flavours.
         $CFG->showflavours = '';
@@ -101,57 +122,64 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->assertSame(array(), array_keys($overview->flavours));
 
         // Make sure active is included, as last if not in the list.
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
         unset($CFG->showflavours);
         $overview = new overview();
-        $this->assertSame(array('flavour_enterprise', 'flavour_professional'), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_enterprise', 'flavour_test'), array_keys($overview->flavours));
         $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
-        $this->assertInstanceOf('flavour_professional\\definition', $overview->flavours['flavour_professional']);
+        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
-        $CFG->showflavours = 'professional,enterprise';
+        $CFG->showflavours = 'test,enterprise';
         $overview = new overview();
-        $this->assertSame(array('flavour_professional', 'flavour_enterprise'), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_test', 'flavour_enterprise'), array_keys($overview->flavours));
         $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
-        $this->assertInstanceOf('flavour_professional\\definition', $overview->flavours['flavour_professional']);
+        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
         $CFG->showflavours = '';
         $overview = new overview();
-        $this->assertSame(array('flavour_professional'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_professional\\definition', $overview->flavours['flavour_professional']);
+        $this->assertSame(array('flavour_test'), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
     }
 
     public function test_get_flavour_to_enforce() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test the overview of flavours you must install the test plugin at TL-7812.
+            $this->markTestSkipped('You must install the test flavour in order to test the overview functionality.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
         $this->assertNull($result);
 
-        $CFG->forceflavour = 'professional';
+        $CFG->forceflavour = 'test';
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertSame('flavour_professional', $result);
+        $this->assertSame('flavour_test', $result);
 
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertSame('flavour_professional', $result);
+        $this->assertSame('flavour_test', $result);
 
         set_config('enablegoals', TOTARA_SHOWFEATURE);
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertSame('flavour_professional', $result);
+        $this->assertSame('flavour_test', $result);
 
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertSame('flavour_professional', $result);
+        $this->assertSame('flavour_test', $result);
 
         $CFG->enablegoals = 1;
         $CFG->config_php_settings['enablegoals'] = 1;
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertSame('flavour_professional', $result);
+        $this->assertSame('flavour_test', $result);
     }
 }

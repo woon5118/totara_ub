@@ -30,11 +30,21 @@ defined('MOODLE_INTERNAL') || die();
  * Tests flavour overview setting class
  */
 class totara_flavour_overview_setting_testcase extends advanced_testcase {
+
+    /**
+     * True if the test flavour has been installed and is available
+     * @var bool
+     */
+    protected $testflavouravailable = false;
+
     protected function setUp() {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         parent::setUp();
         $this->resetAfterTest();
+        // When/if we have a second core flavour we should convert our tests to use that instead of the test flavour.
+        // The test flavour is available at TL-7812
+        $this->testflavouravailable = file_exists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
     }
 
     protected function tearDown() {
@@ -58,13 +68,22 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/professional/classes/definition.php");
+        if ($this->testflavouravailable) {
+            $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
+        }
     }
 
     public function test_strings() {
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test the overview strings for flavours you must install the test plugin at TL-7812.
+            $this->markTestSkipped('You must install the test flavour in order to test the overview strings functionality.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
         $overview = new overview();
         $this->assertCount(19, $overview->settings);
 
@@ -81,9 +100,16 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
 
     public function test_current_flavour() {
         global $CFG;
+
+        if (!$this->testflavouravailable) {
+            // If you get this and want to test the current flavour overview you must install the test plugin at TL-7812.
+            $this->markTestSkipped('You must install the test flavour in order to test the overview current flavour functionality.');
+            return true; // Not needed but keeps it clear.
+        }
+
         $this->setAdminUser();
 
-        helper::set_active_flavour('flavour_professional');
+        helper::set_active_flavour('flavour_test');
 
         $overview = new overview();
         $setting = $overview->settings['moodle|enablegoals'];
@@ -91,7 +117,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(TOTARA_DISABLEFEATURE, $setting->currentvalue);
-        $this->assertTrue($setting->is_prohibited('flavour_professional'));
+        $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertFalse($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
@@ -103,7 +129,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(TOTARA_SHOWFEATURE, $setting->currentvalue);
-        $this->assertTrue($setting->is_prohibited('flavour_professional'));
+        $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
@@ -115,7 +141,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(TOTARA_HIDEFEATURE, $setting->currentvalue);
-        $this->assertTrue($setting->is_prohibited('flavour_professional'));
+        $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
@@ -129,7 +155,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('enablegoals', $setting->name);
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(TOTARA_SHOWFEATURE, $setting->currentvalue);
-        $this->assertTrue($setting->is_prohibited('flavour_professional'));
+        $this->assertTrue($setting->is_prohibited('flavour_test'));
         $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertTrue($setting->is_set_in_configphp());
