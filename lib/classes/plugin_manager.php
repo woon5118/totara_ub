@@ -1040,7 +1040,7 @@ class core_plugin_manager {
 
             // Totara: flavours allow enforcing of settings and changing of setting defaults.
             'flavour' => array(
-                'enterprise', 'professional',
+                'enterprise',
             ),
 
             'format' => array(

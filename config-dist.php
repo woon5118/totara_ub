@@ -622,7 +622,7 @@ $CFG->admin = 'admin';
 // A flavour can be forced by settings the following setting:
 //
 // Example:
-//   $CFG->forceflavour = 'professional';
+//   $CFG->forceflavour = 'flavourname';
 //
 // Where the value is one of the directory names in /totara/flavour/flavours/.
 // The forced flavour is activated during install or upgrade.
@@ -635,7 +635,7 @@ $CFG->admin = 'admin';
 // Empty list means hide the flavours UI, enforced flavours are not affected.
 //
 // Example:
-//   $CFG->showflavours = 'professional,enterprise';
+//   $CFG->showflavours = 'flavourname,enterprise';
 //
 //=========================================================================
 // 9. PHPUNIT SUPPORT
