@@ -183,11 +183,17 @@ function totara_cohort_add_association($cohortid, $instanceid, $instancetype, $v
                 $todb->assignmenttype = ASSIGNTYPE_COHORT;
                 $todb->assignmenttypeid = $cohortid;
                 $assid = $DB->insert_record('prog_assignment', $todb);
+
                 // Trigger event.
                 $log[] = "itemid={$instanceid};associationid={$assid}";
                 $event = \totara_cohort\event\enrolled_program_item_added::create_from_data($assid, $cohort);
                 $event->set_legacy_logdata($log);
                 $event->trigger();
+
+                // Update the program - will mark it as deferred if there are too many to process immediately.
+                $prog = new program($instanceid);
+                $prog->update_learner_assignments();
+
                 return $assid;
                 break;
             default:
@@ -270,12 +276,12 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
             break;
         case COHORT_ASSN_ITEMTYPE_PROGRAM:
         case COHORT_ASSN_ITEMTYPE_CERTIF:
-            if ($progassid = $DB->get_field('prog_assignment', 'id', array('id' => $assid))) {
-                $record = $DB->get_record('prog_assignment', array('id' => $assid));
+            $record = $DB->get_record('prog_assignment', array('id' => $assid));
+            if (!empty($record)) {
                 $transaction = $DB->start_delegated_transaction();
 
-                prog_exceptions_manager::delete_exceptions_by_assignment($progassid);
-                $DB->delete_records('prog_assignment', array('id' => $progassid));
+                prog_exceptions_manager::delete_exceptions_by_assignment($assid);
+                $DB->delete_records('prog_assignment', array('id' => $assid));
 
                 $transaction->allow_commit();
 
@@ -285,6 +291,10 @@ function totara_cohort_delete_association($cohortid, $assid, $instancetype, $val
                 $event->set_legacy_logdata($log);
                 $event->add_record_snapshot('prog_assignment', $record);
                 $event->trigger();
+
+                // Update the program - will mark it as deferred if there are too many to process immediately.
+                $prog = new program($record->programid);
+                $prog->update_learner_assignments();
             }
             break;
         default:
