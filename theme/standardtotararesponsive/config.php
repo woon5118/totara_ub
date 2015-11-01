@@ -76,6 +76,12 @@ $THEME->layouts = array(
         'defaultregion' => 'side-pre',
         'options' => array('langmenu' => true),
     ),
+    // Should display the content and basic headers only.
+    'print' => array(
+        'file' => 'columns1.php',
+        'regions' => array(),
+        'options' => array('nofooter' => true, 'nonavbar' => false, 'nocustommenu' => true),
+    ),
 );
 
 $THEME->enable_dock = true;
