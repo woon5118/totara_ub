@@ -42,7 +42,13 @@ function xmldb_totara_connect_upgrade($oldversion) {
             set_config('syncpasswords', $sync, 'totara_connect');
         }
 
-        upgrade_plugin_savepoint(true, 2015100201, 'connect', 'totara');
+        upgrade_plugin_savepoint(true, 2015100201, 'totara', 'connect');
+    }
+
+    if ($oldversion < 2015100202) {
+        // Cleanup after wrong upgrade step.
+        unset_config('version', 'connect_totara');
+        upgrade_plugin_savepoint(true, 2015100202, 'totara', 'connect');
     }
 
     return true;

@@ -920,6 +920,8 @@ class core_plugin_manager {
                 // Totara uninstalled themes.
                 , 'canvas', 'clean', 'more', 'customtotara', 'kiwifruit', 'standardtotara',
             ),
+            // Other Totara leftovers and mistakes.
+            'connect' => array('totara'),
         );
 
         if (!isset($plugins[$type])) {
