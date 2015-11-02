@@ -253,6 +253,21 @@
 .admin_colourpicker .colourdialogue {float:left;border:1px solid #000;}
 .admin_colourpicker .previewcolour {border:1px solid #000;margin-left:301px;}
 .admin_colourpicker .currentcolour {border:1px solid #000;margin-left:301px;border-top-width:0;}
+/* TL-7741 */
+.admin_calendarweekend {
+    list-style: none;
+    margin: 0;
+}
+.admin_calendarweekend li {
+    display: inline-block;
+}
+.admin_calendarweekend li input {
+    vertical-align: bottom;
+    margin-right: 0.2em;
+}
+.admin_calendarweekend li label {
+    padding-right: 7px;
+}
 
 /* Styles for flags on admin settings */
 .adminsettingsflags { float: right; }
