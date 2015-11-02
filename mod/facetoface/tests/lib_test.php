@@ -1852,7 +1852,7 @@ class mod_facetoface_lib_testcase extends advanced_testcase {
         foreach($session->sessiondates as $sessiondate) {
             $alldates_segment = ltrim(date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland'));
             if (date_format_string($sessiondate->timestart, "%e %B %Y", 'Pacific/Auckland') !== date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland')){
-                $alldates_segment .= ' - '.ltrim(date_format_string($sessiondate->timefinish, "%e %B %Y"));
+                $alldates_segment .= ' - '.ltrim(date_format_string($sessiondate->timefinish, "%e %B %Y", 'Pacific/Auckland'));
             }
             $alldates_segment .= ', '.ltrim(date_format_string($sessiondate->timestart, "%l:%M %p", 'Pacific/Auckland')).' - ';
             $alldates_segment .= ltrim(date_format_string($sessiondate->timefinish, "%l:%M %p", 'Pacific/Auckland')).' Pacific/Auckland';
