@@ -170,7 +170,8 @@ class mod_quiz_admin_review_setting extends admin_setting {
         }
         $return .= "</div>\n";
 
+        // TL-7748: replaced label
         return format_admin_setting($this, $this->visiblename, $return,
-                $this->description, true, '', get_string('everythingon', 'quiz'), $query);
+                $this->description, false, '', get_string('everythingon', 'quiz'), $query);
     }
 }
