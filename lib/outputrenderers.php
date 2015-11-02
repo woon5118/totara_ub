@@ -3237,19 +3237,19 @@ EOD;
      * Theme developers: DO NOT OVERRIDE! Please override function
      * {@link core_renderer::render_custom_menu()} instead.
      *
+     * This has been deprecated - please use the totara menu instead
+     *
+     * @deprecated since Totara 9.0
      * @param string $custommenuitems - custom menuitems set by theme instead of global theme settings
      * @return string
      */
     public function custom_menu($custommenuitems = '') {
-        global $CFG;
-        if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
-            $custommenuitems = $CFG->custommenuitems;
-        }
-        if (empty($custommenuitems)) {
-            return '';
-        }
-        $custommenu = new custom_menu($custommenuitems, current_language());
-        return $this->render($custommenu);
+        debugging('This functionality has been deprecated - Please use the totara menu functionality instead', DEBUG_DEVELOPER);
+        $menudata = totara_build_menu();
+        $totara_core_renderer = $PAGE->get_renderer('totara_core');
+        $totaramenu = $totara_core_renderer->totara_menu($menudata);
+
+        return $totaramenu;
     }
 
     /**
@@ -3258,37 +3258,20 @@ EOD;
      * The custom menu this method produces makes use of the YUI3 menunav widget
      * and requires very specific html elements and classes.
      *
+     * This has been deprecated - please use the totara menu instead
+     *
+     * @deprecated since Totara 9.0
      * @staticvar int $menucount
      * @param custom_menu $menu
      * @return string
      */
     protected function render_custom_menu(custom_menu $menu) {
-        static $menucount = 0;
-        // If the menu has no children return an empty string
-        if (!$menu->has_children()) {
-            return '';
-        }
-        // Increment the menu count. This is used for ID's that get worked with
-        // in JavaScript as is essential
-        $menucount++;
-        // Initialise this custom menu (the custom menu object is contained in javascript-static
-        $jscode = js_writer::function_call_with_Y('M.core_custom_menu.init', array('custom_menu_'.$menucount));
-        $jscode = "(function(){{$jscode}})";
-        $this->page->requires->yui_module('node-menunav', $jscode);
-        // Build the root nodes as required by YUI
-        $content = html_writer::start_tag('div', array('id'=>'custom_menu_'.$menucount, 'class'=>'yui3-menu yui3-menu-horizontal javascript-disabled custom-menu'));
-        $content .= html_writer::start_tag('div', array('class'=>'yui3-menu-content'));
-        $content .= html_writer::start_tag('ul');
-        // Render each child
-        foreach ($menu->get_children() as $item) {
-            $content .= $this->render_custom_menu_item($item);
-        }
-        // Close the open tags
-        $content .= html_writer::end_tag('ul');
-        $content .= html_writer::end_tag('div');
-        $content .= html_writer::end_tag('div');
-        // Return the custom menu
-        return $content;
+        debugging('This functionality has been deprecated - Please use the totara menu functionality instead', DEBUG_DEVELOPER);
+        $menudata = totara_build_menu();
+        $totara_core_renderer = $PAGE->get_renderer('totara_core');
+        $totaramenu = $totara_core_renderer->totara_menu($menudata);
+
+        return $totaramenu;
     }
 
     /**
@@ -3299,12 +3282,16 @@ EOD;
      *
      * @see core:renderer::render_custom_menu()
      *
+     * This has been deprecated - please use the totara menu instead
+     *
+     * @deprecated since Totara 9.0
      * @staticvar int $submenucount
      * @param custom_menu_item $menunode
      * @return string
      */
     protected function render_custom_menu_item(custom_menu_item $menunode) {
         // Required to ensure we get unique trackable id's
+        debugging('This functionality has been deprecated - Please use the totara menu functionality instead', DEBUG_DEVELOPER);
         static $submenucount = 0;
         if ($menunode->has_children()) {
             // If the child has menus render it as a sub menu

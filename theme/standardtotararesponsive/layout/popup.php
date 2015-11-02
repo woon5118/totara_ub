@@ -71,7 +71,6 @@ if ($devicetype !== 'mobile' and $devicetype !== 'tablet') {
                 <span class="accesshide"><?php echo get_string('expand'); ?></span>
             </a>
             <div class="nav-collapse collapse">
-                <?php echo $OUTPUT->custom_menu(); ?>
                 <ul class="nav <?php echo $left ? "pull-right" : "pull-left" ?>">
                     <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
                     <li class="navbar-text"><?php echo $OUTPUT->login_info() ?></li>

@@ -22,6 +22,18 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$showmenu = empty($PAGE->layout_options['nocustommenu']);
+
+$hastotaramenu = false;
+$totaramenu = '';
+if (empty($PAGE->layout_options['nocustommenu'])) {
+    // load totara menu
+    $menudata = totara_build_menu();
+    $totara_core_renderer = $PAGE->get_renderer('totara_core');
+    $totaramenu = $totara_core_renderer->totara_menu($menudata);
+    $hastotaramenu = !empty($totaramenu);
+}
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -53,7 +65,7 @@ echo $OUTPUT->doctype() ?>
                 ?></a>
             <?php echo $OUTPUT->navbar_button(); ?>
             <div class="nav-collapse collapse">
-                <?php echo $OUTPUT->custom_menu(); ?>
+                <?php echo $totaramenu; ?>
                 <ul class="nav pull-right">
                     <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
                     <li class="navbar-text"><?php echo $OUTPUT->user_menu(); ?></li>

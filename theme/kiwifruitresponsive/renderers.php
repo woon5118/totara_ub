@@ -59,15 +59,10 @@ class theme_kiwifruitresponsive_core_renderer extends theme_standardtotararespon
         // The menu.
         $output .= html_writer::start_tag('div', array('id' => 'totaramenu', 'class' => 'nav-collapse'));
         if (empty($PAGE->layout_options['nocustommenu'])) {
-            $custommenu = $OUTPUT->custom_menu();
-            if ($custommenu) {
-                $output .= $custommenu;
-            } else {
-                $menudata = totara_build_menu();
-                $totara_core_renderer = $PAGE->get_renderer('totara_core');
-                $totaramenu = $totara_core_renderer->print_totara_menu($menudata);
-                $output .= $totaramenu;
-            }
+            $menudata = totara_build_menu();
+            $totara_core_renderer = $PAGE->get_renderer('totara_core');
+            $totaramenu = $totara_core_renderer->totara_menu($menudata);
+            $output .= $totaramenu;
         }
 
         // Profile Menu.

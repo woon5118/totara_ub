@@ -3014,9 +3014,12 @@ class block_move_target {
  * This class is used to represent one item within a custom menu that may or may
  * not have children.
  *
+ * This functionality has been deprecated - please use the totara menu functionality instead
+ *
  * @copyright 2010 Sam Hemelryk
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since Moodle 2.0
+ * @deprecated since Totara 9.0
  * @package core
  * @category output
  */
@@ -3219,9 +3222,12 @@ class custom_menu_item implements renderable {
  * To configure the custom menu:
  *     Settings: Administration > Appearance > Themes > Theme settings
  *
+ * This functionality has been deprecated - please use the totara menu functionality instead
+ *
  * @copyright 2010 Sam Hemelryk
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since Moodle 2.0
+ * @deprecated since Totara 9.0
  * @package core
  * @category output
  */

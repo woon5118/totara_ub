@@ -28,8 +28,6 @@ if (!empty($PAGE->theme->settings->favicon)) {
     $faviconurl = $OUTPUT->favicon();
 }
 
-$custommenu = $OUTPUT->custom_menu();
-$hascustommenu = !empty($custommenu);
 $hassidepre = $PAGE->blocks->region_has_content('side-pre', $OUTPUT);
 $hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
 $hasnavbar = (empty($PAGE->layout_options['nonavbar']) && $PAGE->has_navbar());
@@ -41,7 +39,7 @@ $showmenu = empty($PAGE->layout_options['nocustommenu']);
 $sitesummary = isset($SITE->summary) ? $SITE->summary : '';
 $left = (!right_to_left());
 
-if ($showmenu && !$hascustommenu) {
+if ($showmenu) {
     // load totara menu
     $menudata = totara_build_menu();
     $totara_core_renderer = $PAGE->get_renderer('totara_core');
@@ -111,18 +109,13 @@ echo $OUTPUT->doctype() ?>
 <?php if ($hasfooter) { ?>
   <div id="page-footer">
     <div class="footer-content">
-      <?php if ($hascustommenu) { ?>
-      <div id="custommenu"><?php echo $custommenu; ?></div>
-      <?php } else { ?>
       <div id="totaramenu"><?php echo $totaramenu; ?>
-  <div class="clear"></div>
-  </div>
-      <?php } ?>
+        <div class="clear"></div>
+      </div>
       <div class="footer-powered"><a href="http://www.totaralms.com/" target="_blank"><img class="logo" src="<?php echo $OUTPUT->pix_url('logo-ftr', 'theme_kiwifruitresponsive'); ?>" alt="Logo" /></a></div>
-    <div class="footer-backtotop"><a href="#">Back to top</a></div>
+      <div class="footer-backtotop"><a href="#">Back to top</a></div>
       <div class="footnote">
-        <div class="footer-links">
-        </div>
+        <div class="footer-links"></div>
       </div>
       <?php
       echo $OUTPUT->login_info();

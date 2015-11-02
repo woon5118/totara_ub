@@ -41,18 +41,17 @@ if (!empty($PAGE->theme->settings->favicon)) {
     $faviconurl = $OUTPUT->favicon();
 }
 
-$custommenu = $OUTPUT->custom_menu();
-$hascustommenu = !empty($custommenu);
-
 $haslogininfo = empty($PAGE->layout_options['nologininfo']);
-$showmenu = empty($PAGE->layout_options['nocustommenu']);
 $haslangmenu = (!isset($PAGE->layout_options['langmenu']) || $PAGE->layout_options['langmenu'] );
 
-if ($showmenu && !$hascustommenu) {
+$hastotaramenu = false;
+$totaramenu = '';
+if (empty($PAGE->layout_options['nocustommenu'])) {
     // load totara menu
     $menudata = totara_build_menu();
     $totara_core_renderer = $PAGE->get_renderer('totara_core');
     $totaramenu = $totara_core_renderer->totara_menu($menudata);
+    $hastotaramenu = !empty($totaramenu);
 }
 
 $regionmain = 'span9 pull-right';
@@ -98,12 +97,8 @@ echo $OUTPUT->doctype() ?>
             </a>
             <?php echo $OUTPUT->user_menu(); ?>
             <?php echo $OUTPUT->page_heading(); ?>
-            <?php if ($showmenu) { ?>
-                <?php if ($hascustommenu) { ?>
-                <div id="custommenu" class="nav-collapse collapse"><?php echo $custommenu; ?></div>
-                <?php } else { ?>
+            <?php if ($hastotaramenu) { ?>
                 <div id="totaramenu" class="nav-collapse collapse"><?php echo $totaramenu; ?></div>
-                <?php } ?>
             <?php } ?>
         </div>
     </nav>

@@ -24,9 +24,6 @@
 
 class theme_bootstrapbase_core_renderer extends core_renderer {
 
-    /** @var custom_menu_item language The language menu if created */
-    protected $language = null;
-
     /**
      * The standard tags that should be included in the <head> tag
      * including a meta description for the front page
@@ -66,116 +63,6 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
         $list_items = '<li>'.join(" $divider</li><li>", $breadcrumbs).'</li>';
         $title = '<span class="accesshide">'.get_string('pagepath').'</span>';
         return $title . "<ul class=\"breadcrumb\">$list_items</ul>";
-    }
-
-    /*
-     * Overriding the custom_menu function ensures the custom menu is
-     * always shown, even if no menu items are configured in the global
-     * theme settings page.
-     */
-    public function custom_menu($custommenuitems = '') {
-        global $CFG;
-
-        if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
-            $custommenuitems = $CFG->custommenuitems;
-        }
-        $custommenu = new custom_menu($custommenuitems, current_language());
-        return $this->render_custom_menu($custommenu);
-    }
-
-    /*
-     * This renders the bootstrap top menu.
-     *
-     * This renderer is needed to enable the Bootstrap style navigation.
-     */
-    protected function render_custom_menu(custom_menu $menu) {
-        global $CFG;
-
-        $langs = get_string_manager()->get_list_of_translations();
-        $haslangmenu = $this->lang_menu() != '';
-
-        if (!$menu->has_children() && !$haslangmenu) {
-            return '';
-        }
-
-        if ($haslangmenu) {
-            $strlang =  get_string('language');
-            $currentlang = current_language();
-            if (isset($langs[$currentlang])) {
-                $currentlang = $langs[$currentlang];
-            } else {
-                $currentlang = $strlang;
-            }
-            $this->language = $menu->add($currentlang, new moodle_url('#'), $strlang, 10000);
-            foreach ($langs as $langtype => $langname) {
-                $this->language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
-            }
-        }
-
-        $content = '<ul class="nav">';
-        foreach ($menu->get_children() as $item) {
-            $content .= $this->render_custom_menu_item($item, 1);
-        }
-
-        return $content.'</ul>';
-    }
-
-    /*
-     * This code renders the custom menu items for the
-     * bootstrap dropdown menu.
-     */
-    protected function render_custom_menu_item(custom_menu_item $menunode, $level = 0 ) {
-        static $submenucount = 0;
-
-        $content = '';
-        if ($menunode->has_children()) {
-
-            if ($level == 1) {
-                $class = 'dropdown';
-            } else {
-                $class = 'dropdown-submenu';
-            }
-
-            if ($menunode === $this->language) {
-                $class .= ' langmenu';
-            }
-            $content = html_writer::start_tag('li', array('class' => $class));
-            // If the child has menus render it as a sub menu.
-            $submenucount++;
-            if ($menunode->get_url() !== null) {
-                $url = $menunode->get_url();
-            } else {
-                $url = '#cm_submenu_'.$submenucount;
-            }
-            $content .= html_writer::start_tag('a', array('href'=>$url, 'class'=>'dropdown-toggle', 'data-toggle'=>'dropdown', 'title'=>$menunode->get_title()));
-            $content .= $menunode->get_text();
-            if ($level == 1) {
-                $content .= '<b class="caret"></b>';
-            }
-            $content .= '</a>';
-            $content .= '<ul class="dropdown-menu">';
-            foreach ($menunode->get_children() as $menunode) {
-                $content .= $this->render_custom_menu_item($menunode, 0);
-            }
-            $content .= '</ul>';
-        } else {
-            // The node doesn't have children so produce a final menuitem.
-            // Also, if the node's text matches '####', add a class so we can treat it as a divider.
-            if (preg_match("/^#+$/", $menunode->get_text())) {
-                // This is a divider.
-                $content = '<li class="divider">&nbsp;</li>';
-            } else {
-                $content = '<li>';
-                if ($menunode->get_url() !== null) {
-                    $url = $menunode->get_url();
-                } else {
-                    $url = '#';
-                }
-                $content .= html_writer::link($url, $menunode->get_text(), array('title' => $menunode->get_title()));
-                $content .= '</li>';
-            }
-        }
-        return $content;
     }
 
     /**

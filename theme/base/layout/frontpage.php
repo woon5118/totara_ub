@@ -27,8 +27,15 @@ $hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
 $showsidepre = $hassidepre && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT);
 $showsidepost = $hassidepost && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT);
 
-$custommenu = $OUTPUT->custom_menu();
-$hascustommenu = (empty($PAGE->layout_options['nocustommenu']) && !empty($custommenu));
+$hastotaramenu = false;
+$totaramenu = '';
+if (empty($PAGE->layout_options['nocustommenu'])) {
+    // load totara menu
+    $menudata = totara_build_menu();
+    $totara_core_renderer = $PAGE->get_renderer('totara_core');
+    $totaramenu = $totara_core_renderer->totara_menu($menudata);
+    $hastotaramenu = !empty($totaramenu);
+}
 
 $bodyclasses = array();
 if ($showsidepre && !$showsidepost) {
@@ -46,8 +53,8 @@ if ($showsidepre && !$showsidepost) {
 } else if (!$showsidepost && !$showsidepre) {
     $bodyclasses[] = 'content-only';
 }
-if ($hascustommenu) {
-    $bodyclasses[] = 'has-custom-menu';
+if ($hastotaramenu) {
+    $bodyclasses[] = 'has-totara-menu';
 }
 
 echo $OUTPUT->doctype() ?>
@@ -70,8 +77,8 @@ echo $OUTPUT->doctype() ?>
             echo $OUTPUT->lang_menu();
             echo $PAGE->headingmenu;
         ?></div>
-        <?php if ($hascustommenu) { ?>
-        <div id="custommenu"><?php echo $custommenu; ?></div>
+        <?php if ($hastotaramenu) { ?>
+        <div id="custommenu"><?php echo $totaramenu; ?></div>
          <?php } ?>
     </div>
 <!-- END OF HEADER -->

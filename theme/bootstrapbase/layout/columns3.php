@@ -27,6 +27,7 @@ $regionmainbox = 'span9';
 $regionmain = 'span8 pull-right';
 $sidepre = 'span4 desktop-first-column';
 $sidepost = 'span3 pull-right';
+
 // Reset layout mark-up for RTL languages.
 if (right_to_left()) {
     $regionmainbox = 'span9 pull-right';
@@ -35,6 +36,15 @@ if (right_to_left()) {
     $sidepost = 'span3 desktop-first-column';
 }
 
+$hastotaramenu = false;
+$totaramenu = '';
+if (empty($PAGE->layout_options['nocustommenu'])) {
+    // load totara menu
+    $menudata = totara_build_menu();
+    $totara_core_renderer = $PAGE->get_renderer('totara_core');
+    $totaramenu = $totara_core_renderer->totara_menu($menudata);
+    $hastotaramenu = !empty($totaramenu);
+}
 
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
@@ -58,7 +68,7 @@ echo $OUTPUT->doctype() ?>
             <?php echo $OUTPUT->navbar_button(); ?>
             <?php echo $OUTPUT->user_menu(); ?>
             <div class="nav-collapse collapse">
-                <?php echo $OUTPUT->custom_menu(); ?>
+                <?php echo $totaramenu ?>
                 <ul class="nav pull-right">
                     <li><?php echo $OUTPUT->page_heading_menu(); ?></li>
                 </ul>
