@@ -4697,16 +4697,16 @@ class admin_setting_special_calendar_weekend extends admin_setting {
     public function output_html($data, $query='') {
     // The order matters very much because of the implied numeric keys
         $days = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
-        $return = '<table><thead><tr>';
-        $return .= '<input type="hidden" name="'.$this->get_full_name().'[xxxxx]" value="1" />'; // something must be submitted even if nothing selected
+        // TL-7741 removed table
+        $return = '<input type="hidden" name="'.$this->get_full_name().'[xxxxx]" value="1" />'; // something must be submitted even if nothing selected
+        $return .= html_writer::start_tag('ul', array('class' => 'admin_calendarweekend'));
         foreach($days as $index => $day) {
-            $return .= '<td><label for="'.$this->get_id().$index.'">'.get_string($day, 'calendar').'</label></td>';
+            $return .= html_writer::start_tag('li');
+            $return .= '<input type="checkbox" class="form-checkbox" id="'.$this->get_id().$index.'" name="'.$this->get_full_name().'[]" value="'.$index.'" '.(in_array("$index", $data) ? 'checked="checked"' : '').' />';
+            $return .= '<label for="'.$this->get_id().$index.'">'.get_string($day, 'calendar').'</label>';
+            $return .= html_writer::end_tag('li');
         }
-        $return .= '</tr></thead><tbody><tr>';
-        foreach($days as $index => $day) {
-            $return .= '<td><input type="checkbox" class="form-checkbox" id="'.$this->get_id().$index.'" name="'.$this->get_full_name().'[]" value="'.$index.'" '.(in_array("$index", $data) ? 'checked="checked"' : '').' /></td>';
-        }
-        $return .= '</tr></tbody></table>';
+        $return .= html_writer::end_tag('ul');
 
         return format_admin_setting($this, $this->visiblename, $return, $this->description, false, '', NULL, $query);
 
