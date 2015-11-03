@@ -454,6 +454,7 @@ $string['pluginnamewithkey'] = 'Self enrolment with key';
 $string['pos_description'] = 'Description';
 $string['pos_description_help'] = 'Description of the position';
 $string['position_typeicon'] = 'Position type icon';
+$string['positiona'] = 'Position {$a}';
 $string['positionatcompletion'] = 'Position at completion';
 $string['positionsarrow'] = 'Positions > ';
 $string['poweredby'] = 'Powered by Totara LMS';
