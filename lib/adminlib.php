@@ -4000,6 +4000,8 @@ class admin_setting_courselist_frontpage extends admin_setting {
             if (!array_key_exists($i, $currentsetting)) {
                 $currentsetting[$i] = 'none'; //none
             }
+            // TL-7745: added label
+            $return .= html_writer::tag('label', get_string('positiona', 'totara_core', $i+1), array('for' => $this->get_id().$i, 'class' => 'accesshide'));
             $return .='<select class="form-select" id="'.$this->get_id().$i.'" name="'.$this->get_full_name().'[]">';
             foreach ($this->choices as $key => $value) {
                 $return .= '<option value="'.$key.'"'.("$key" == $currentsetting[$i] ? ' selected="selected"' : '').'>'.$value.'</option>';
