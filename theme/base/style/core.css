@@ -2349,3 +2349,19 @@ body.lockscroll {
     font-size: 123.1%;
     font-weight: bold;
 }
+
+.user-multiselect > div {
+    display: inline-block;
+    width: 39%;
+    vertical-align: top;
+}
+
+.user-multiselect > .controls {
+    width: 20%;
+    margin-top: 120px;
+}
+.user-multiselect > .controls input {
+    display: block;
+    margin: 10px auto;
+    white-space: normal;
+}

@@ -710,3 +710,34 @@ input[size] {
     text-align: left;
     width: 145px;
 }
+
+.user-multiselect select {
+    width: 100%;
+}
+.user-multiselect .controls {
+    margin-top: 130px;
+
+    input {
+        white-space: normal;
+        display: block;
+        margin: 10px auto;
+    }
+}
+@media screen and (max-width: 767px) {
+    .user-multiselect .controls {
+        margin-top: 0;
+
+        input {
+            display: inline-block;
+        }
+    }
+}
+.dir-rtl .user-multiselect > div {
+    float: right;
+    margin-left: 0;
+    margin-right: 2.5641%;
+
+    &:first-child {
+        margin-right: 0;
+    }
+}
