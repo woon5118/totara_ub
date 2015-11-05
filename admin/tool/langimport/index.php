@@ -149,21 +149,17 @@ if ($missingparents) {
     }
 }
 
-echo $OUTPUT->box_start();
-
-echo html_writer::start_tag('table');
-echo html_writer::start_tag('tr');
+// TL-7742 removed table
+echo $OUTPUT->box_start('admin_lang_available');
 
 // list of installed languages
 $url = new moodle_url('/admin/tool/langimport/index.php', array('mode' => DELETION_OF_SELECTED_LANG));
-echo html_writer::start_tag('td', array('valign' => 'top'));
+echo html_writer::start_tag('div', array('class' => 'currentlangs'));
 echo html_writer::start_tag('form', array('id' => 'uninstallform', 'action' => $url->out(), 'method' => 'post'));
 echo html_writer::start_tag('fieldset');
 echo html_writer::label(get_string('installedlangs', 'tool_langimport'), 'menuuninstalllang');
-echo html_writer::empty_tag('br');
 echo html_writer::select($installedlangs, 'uninstalllang', '', false, array('size' => 15));
 echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-echo html_writer::empty_tag('br');
 echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('uninstall', 'tool_langimport')));
 echo html_writer::end_tag('fieldset');
 echo html_writer::end_tag('form');
@@ -173,7 +169,7 @@ if ($remote) {
     echo html_writer::tag('fieldset', html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('updatelangs','tool_langimport'))));
     echo html_writer::end_tag('form');
 }
-echo html_writer::end_tag('td');
+echo html_writer::end_tag('div');
 
 // list of available languages
 $options = array();
@@ -183,23 +179,19 @@ foreach ($availablelangs as $alang) {
     }
 }
 if (!empty($options)) {
-    echo html_writer::start_tag('td', array('valign' => 'top'));
+    echo html_writer::start_tag('div', array('class' => 'availablelangs'));
     $url = new moodle_url('/admin/tool/langimport/index.php', array('mode' => INSTALLATION_OF_SELECTED_LANG));
     echo html_writer::start_tag('form', array('id' => 'installform', 'action' => $url->out(), 'method' => 'post'));
     echo html_writer::start_tag('fieldset');
     echo html_writer::label(get_string('availablelangs','install'), 'menupack');
-    echo html_writer::empty_tag('br');
     echo html_writer::select($options, 'pack[]', '', false, array('size' => 15, 'multiple' => 'multiple'));
     echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-    echo html_writer::empty_tag('br');
     echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('install','tool_langimport')));
     echo html_writer::end_tag('fieldset');
     echo html_writer::end_tag('form');
-    echo html_writer::end_tag('td');
+    echo html_writer::end_tag('div');
 }
 
-echo html_writer::end_tag('tr');
-echo html_writer::end_tag('table');
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
 die();

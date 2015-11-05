@@ -135,7 +135,6 @@ img.iconsmall {
     font-size: @fontSizeMini;
 }
 
-#page-admin-lang .generalbox,
 #page-admin-course-index .singlebutton,
 #page-admin-course-index .addcategory,
 #page-course-index .buttons,
@@ -814,5 +813,22 @@ img.iconsmall {
             background-color: rgba(238,238,238,0.5);
             z-index:987654321
         }
+    }
+}
+
+/* TL-7742 replaced table */
+#page-admin-tool-langimport-index .admin_lang_available > div {
+    width: 49%;
+    display: inline-block;
+    vertical-align: top;
+
+    input[type="submit"] {
+        display: block;
+        margin: 10px 0 0;
+    }
+}
+@media screen and (max-width: 767px) {
+    #page-admin-tool-langimport-index .admin_lang_available > div {
+        width: 100%;
     }
 }

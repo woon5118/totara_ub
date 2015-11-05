@@ -351,3 +351,17 @@
 .maintenancewarning {padding:3px 1em;text-align:center;position:fixed;bottom:0;right:0;overflow:hidden;z-index:1;}
 .maintenancewarning.error {background-color:#F2DEDE;border:2px solid #EED3D7;font-weight:bold;}
 .maintenancewarning.warning {background-color:#ffd3d9;border:2px solid #EED3D7;}
+
+/* TL-7742 replaced table */
+#page-admin-tool-langimport-index .admin_lang_available > div {
+    width: 49%;
+    display: inline-block;
+    vertical-align: top;
+}
+#page-admin-tool-langimport-index .admin_lang_available > div input[type="submit"] {
+    display: block;
+    margin: 10px 0 0;
+}
+#page-admin-tool-langimport-index .admin_lang_available > div select {
+    display: block;
+}
